@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {media, QueryKeys} from '../../utils';
 import {filterTextProps, TextProps, textStyle} from '../Text';
 

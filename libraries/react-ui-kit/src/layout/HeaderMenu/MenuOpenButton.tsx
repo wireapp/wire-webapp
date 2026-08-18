@@ -22,7 +22,7 @@ import * as React from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {Theme} from '../../identity';
-import {COLOR_V2} from '../../identity/colors-v2/colors-v2';
+import {COLOR_V2} from '../../identity/colorsV2/colorsV2';
 import {filterProps, media, QueryKeys} from '../../utils';
 
 export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps<T> {

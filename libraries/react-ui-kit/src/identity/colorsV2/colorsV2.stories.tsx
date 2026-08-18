@@ -19,7 +19,7 @@
 
 import {Meta} from '@storybook/react';
 
-import {COLOR_V2} from './colors-v2';
+import {COLOR_V2} from './colorsV2';
 
 const meta: Meta = {
   title: 'identity/Colors/V2',

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './colors-v2';
+export * from './animation';

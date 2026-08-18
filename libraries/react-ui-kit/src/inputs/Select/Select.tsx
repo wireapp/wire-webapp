@@ -33,7 +33,7 @@ import {SelectMenuList} from './SelectMenuList/SelectMenuList';
 import {isGroup, SelectOption} from './SelectOption/SelectOption';
 import {SelectValueContainer} from './SelectValueContainer/SelectValueContainer';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {TabIndex} from '../../utils/enums';
 import {InputLabel} from '../InputLabel';
 

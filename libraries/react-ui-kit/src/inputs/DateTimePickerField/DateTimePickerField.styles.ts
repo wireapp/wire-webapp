@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 
 export const dateTimePickerContentStyles: CSSObject = {
   display: 'flex',

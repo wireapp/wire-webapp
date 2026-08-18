@@ -22,7 +22,7 @@ import {StylesConfig} from 'react-select';
 
 import type {ComboboxSelectOption} from './ComboboxSelect';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {visuallyHidden} from '../../utils';
 import {
   baseContainerStyles,

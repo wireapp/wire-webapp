@@ -22,7 +22,7 @@ import {forwardRef} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {defaultTransition} from '../../identity/motions/motions';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {TextProps, filterTextProps} from '../../typography';
 import {filterProps} from '../../utils/util';
 

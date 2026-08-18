@@ -23,7 +23,7 @@ import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, OptionProps, OptionsOrGroups} from 'react-select';
 
 import {CheckIcon} from '../../../dataDisplay/icon';
-import {Theme} from '../../../identity/Theme';
+import {Theme} from '../../../identity/theme';
 import {Option} from '../Select';
 
 export const SelectOption = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(

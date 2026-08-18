@@ -24,7 +24,7 @@ import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
 import {containerStyles, dataListOption, headingStyle, rangeStyles} from './IndicatorRangeInput.styles';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {InputLabel} from '../InputLabel';
 
 type DataListOptions = {

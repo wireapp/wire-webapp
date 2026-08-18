@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 
 import {SVGIconProps} from '../../dataDisplay/icon/svgIcon';
 import {COLOR} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {childrenWithDefaultProps} from '../../utils';
 import {ButtonProps, filterButtonProps} from '../Button';
 import {buttonStyle} from '../Button/Button.styles';

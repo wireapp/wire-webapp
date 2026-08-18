@@ -28,7 +28,7 @@ import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyle} from './
 import {CloseIcon} from '../../dataDisplay/icon';
 import {SVGIconProps} from '../../dataDisplay/icon/svgIcon';
 import {COLOR} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {QueryKeys, media} from '../../utils';
 import {filterProps, noop} from '../../utils/util';
 

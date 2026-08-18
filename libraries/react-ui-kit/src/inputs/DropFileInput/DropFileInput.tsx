@@ -25,7 +25,7 @@ import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhu
 
 import {UploadIcon} from '../../dataDisplay/icon';
 import {COLOR} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {FlexBox} from '../../layout';
 import {TextProps} from '../../typography';
 

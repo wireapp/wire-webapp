@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 import {Loading} from '../../dataDisplay';
 import {COLOR} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {filterTextProps} from '../../typography';
 import {filterProps} from '../../utils/util';
 import {ButtonProps} from '../Button';

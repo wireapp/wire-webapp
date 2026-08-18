@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Theme';
+export * from './logo';

@@ -19,7 +19,7 @@
 
 import {CSSObject, keyframes} from '@emotion/react';
 
-import {COLOR_V2} from '../../../identity/colors-v2/colors-v2';
+import {COLOR_V2} from '../../../identity/colorsV2/colorsV2';
 import {ellipsis} from '../../../utils/util';
 
 const ANIMATION_TIMING = '300ms';

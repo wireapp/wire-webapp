@@ -29,7 +29,7 @@ import {
   ValueLabelPosition,
 } from './RangeInput.styles';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {TextProps} from '../../typography';
 import {InputLabel} from '../InputLabel';
 

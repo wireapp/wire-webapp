@@ -22,7 +22,7 @@ import {CSSObject} from '@emotion/react';
 import {SVGIcon, SVGIconProps} from '../../dataDisplay/icon/svgIcon';
 import {COLOR} from '../colors';
 import {defaultTransition} from '../motions/motions';
-import {Theme} from '../Theme';
+import {Theme} from '../theme';
 
 export interface LogoProps<T = SVGSVGElement> extends SVGIconProps<T> {
   hover?: boolean;

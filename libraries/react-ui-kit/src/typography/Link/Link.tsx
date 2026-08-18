@@ -22,7 +22,7 @@ import {ReactNode} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {defaultTransition} from '../../identity/motions';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {filterProps} from '../../utils';
 import {TextProps, filterTextProps, textStyle} from '../Text';
 

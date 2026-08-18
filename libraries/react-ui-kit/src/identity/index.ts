@@ -17,12 +17,12 @@
  *
  */
 
-export * from './Animation';
+export * from './animation';
 export * from './colors';
-export * from './colors-v2';
-export * from './GlobalCssVariables';
-export * from './GlobalStyle';
-export * from './Logo';
+export * from './colorsV2';
+export * from './globalCssVariables';
+export * from './globalStyle';
+export * from './logo';
 export * from './motions';
-export * from './Sizes';
-export * from './Theme';
+export * from './sizes';
+export * from './theme';

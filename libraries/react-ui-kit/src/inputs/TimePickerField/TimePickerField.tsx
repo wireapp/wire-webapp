@@ -32,7 +32,7 @@ import {
 } from './TimePickerField.styles';
 import {buildTimeOptions, filterTimeOptionsAfter} from './timePickerUtils';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {InputLabel} from '../InputLabel';
 import {Option, Select} from '../Select';
 

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Sizes';
+export * from './globalStyle';

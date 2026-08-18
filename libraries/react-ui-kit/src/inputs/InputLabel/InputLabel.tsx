@@ -22,7 +22,7 @@ import {FC, ReactNode} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {COLOR_V2} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 
 export interface InputLabelProps {
   children: ReactNode | string;

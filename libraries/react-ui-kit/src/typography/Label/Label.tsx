@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 
 import {COLOR} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {LinkProps, linkStyle} from '../Link';
 import {TextProps, filterTextProps, textStyle} from '../Text';
 

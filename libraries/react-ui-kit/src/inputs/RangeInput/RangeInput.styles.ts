@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 
 import {COLOR_V2} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {manySelectors} from '../../utils/util';
 
 export const rangeInputWrapperStyles: CSSObject = {

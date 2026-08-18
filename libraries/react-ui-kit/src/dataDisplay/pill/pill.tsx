@@ -24,7 +24,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {COLOR} from '../../identity';
 import {DURATION, EASE} from '../../identity/motions/motions';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {filterProps} from '../../utils/util';
 
 export interface PillProps<T = HTMLSpanElement> extends React.HTMLProps<T> {

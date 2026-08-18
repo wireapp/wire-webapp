@@ -19,8 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '../../identity/colors-v2/colors-v2';
-import {Theme} from '../../identity/Theme';
+import {COLOR_V2} from '../../identity/colorsV2/colorsV2';
+import {Theme} from '../../identity/theme';
 import {LinkProps, filterLinkProps, linkStyle} from '../Link';
 
 export type TextLinkProps<T = HTMLAnchorElement> = LinkProps<T>;

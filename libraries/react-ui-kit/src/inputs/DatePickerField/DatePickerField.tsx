@@ -62,7 +62,7 @@ import {
 } from './DatePickerField.styles';
 
 import {CalendarIcon} from '../../dataDisplay/icon';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {getOverlayPortalContainer} from '../../utils/overlayPortal';
 import {InputLabel} from '../InputLabel';
 

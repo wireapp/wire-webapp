@@ -29,12 +29,12 @@ import {
   TopDownMovement,
   XAxisMovement,
   YAxisMovement,
-} from './Animation';
+} from './animation';
 
 import {COLOR} from '../colors/colors';
 
 const meta: Meta = {
-  title: 'identity/Animation',
+  title: 'identity/animation',
   decorators: [
     Story => (
       <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>

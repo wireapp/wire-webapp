@@ -25,8 +25,8 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {styles as actionLinkButtonStyles} from './ActionLinkButton.style';
 
-import {COLOR_V2} from '../../identity/colors-v2/colors-v2';
-import {Theme} from '../../identity/Theme';
+import {COLOR_V2} from '../../identity/colorsV2/colorsV2';
+import {Theme} from '../../identity/theme';
 import {LinkProps, linkStyle, filterLinkProps} from '../Link';
 
 type VisualProps = Pick<LinkProps, 'bold' | 'color' | 'fontSize' | 'textTransform'> & {

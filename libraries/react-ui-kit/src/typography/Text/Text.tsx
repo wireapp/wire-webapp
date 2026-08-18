@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 import type {Property} from 'csstype';
 
 import {COLOR} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {filterProps} from '../../utils/util';
 
 export interface TextProps<T = HTMLSpanElement> extends React.PropsWithRef<React.HTMLProps<T>> {

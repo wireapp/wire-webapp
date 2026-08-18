@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 import type {Property} from 'csstype';
 
 import {COLOR} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {TextProps} from '../../typography';
 import {filterProps} from '../../utils/util';
 

@@ -22,7 +22,7 @@ import * as React from 'react';
 import {CSSObject} from '@emotion/react';
 import {isUndefined} from '@sindresorhus/is';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 
 export interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
   realHeight: number;

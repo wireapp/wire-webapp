@@ -21,7 +21,7 @@ import {Meta, StoryObj} from '@storybook/react';
 
 import {Accordion} from './Accordion';
 
-import {COLOR_V2} from '../../identity/colors-v2/colors-v2';
+import {COLOR_V2} from '../../identity/colorsV2/colorsV2';
 import {Text} from '../../typography';
 
 const meta: Meta<typeof Accordion> = {

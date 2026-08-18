@@ -20,7 +20,7 @@
 import {useId} from 'react';
 import * as React from 'react';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {Text, TextProps, textStyle} from '../../typography';
 import {INPUT_CLASSNAME, InputProps} from '../Input';
 

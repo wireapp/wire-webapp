@@ -23,7 +23,7 @@ import {components, GroupBase, MenuListProps} from 'react-select';
 import {closeButtonStyles, headingContainerStyles} from './SelectMenuList.styles';
 
 import {CloseIcon} from '../../../dataDisplay/icon';
-import {Theme} from '../../../identity/Theme';
+import {Theme} from '../../../identity/theme';
 import {Option} from '../Select';
 
 export const SelectMenuList = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(

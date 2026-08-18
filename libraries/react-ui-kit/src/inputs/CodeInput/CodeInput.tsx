@@ -24,7 +24,7 @@ import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {COLOR_V2} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {noop} from '../../utils/util';
 import {InputProps, inputStyle} from '../Input';
 

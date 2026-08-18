@@ -25,7 +25,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import type {Property} from 'csstype';
 
 import {ErrorIcon, HideIcon, ShowIcon} from '../../dataDisplay/icon';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {TextProps} from '../../typography';
 import {filterProps} from '../../utils/util';
 import {InputLabel} from '../InputLabel';

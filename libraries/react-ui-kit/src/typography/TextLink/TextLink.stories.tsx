@@ -21,7 +21,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {TextLink} from './TextLink';
 
-import {COLOR_V2} from '../../identity/colors-v2/colors-v2';
+import {COLOR_V2} from '../../identity/colorsV2/colorsV2';
 import {Text} from '../Text';
 
 const meta = {

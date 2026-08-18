@@ -20,11 +20,11 @@
 import {Meta, StoryObj} from '@storybook/react';
 
 import {COLOR} from '../colors';
-import {Logo} from '../Logo';
+import {Logo} from '../logo';
 
 const meta: Meta<typeof Logo> = {
   component: Logo,
-  title: 'identity/Logo',
+  title: 'identity/logo',
   argTypes: {
     height: {control: {type: 'number', min: 12, max: 96, step: 4}},
     color: {control: 'color'},

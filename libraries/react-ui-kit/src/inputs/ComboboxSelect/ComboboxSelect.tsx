@@ -33,7 +33,7 @@ import {
 } from './ComboboxSelect.styles';
 
 import {CloseIcon} from '../../dataDisplay/icon';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {InputLabel} from '../InputLabel';
 import {BaseSelectDropdownIndicator} from '../Select/BaseSelect/BaseSelectDropdownIndicator';
 

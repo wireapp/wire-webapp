@@ -31,7 +31,7 @@ import {
 } from './DateTimePickerField.styles';
 import {combineDateAndTime, dateValueFromDate, isSameLocalCalendarDay} from './dateTimeUtils';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {DatePickerField, DatePickerFieldLabels} from '../DatePickerField';
 import {InputLabel} from '../InputLabel';
 import {Option} from '../Select';

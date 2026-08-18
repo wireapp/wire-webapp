@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react/dist/emotion-react.cjs';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {manySelectors} from '../../utils/util';
 
 const thumbSelectors = ['&::-webkit-slider-thumb', '&::-moz-range-thumb', '&::-ms-thumb'];

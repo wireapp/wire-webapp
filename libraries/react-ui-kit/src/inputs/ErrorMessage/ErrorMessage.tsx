@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 
 import {COLOR_V2} from '../../identity';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {FlexBox, FlexBoxProps, flexBoxStyle, filterFlexBoxProps} from '../../layout';
 import {Text, linkStyle} from '../../typography';
 import {filterProps} from '../../utils/util';

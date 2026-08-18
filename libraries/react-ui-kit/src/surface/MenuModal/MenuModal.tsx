@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 
 import {COLOR} from '../../identity';
 import {ANIMATION, DURATION, EASE} from '../../identity/motions/motions';
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {QueryKeys, media} from '../../utils';
 import {noop} from '../../utils/util';
 import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyle} from '../Modal/Overlay';

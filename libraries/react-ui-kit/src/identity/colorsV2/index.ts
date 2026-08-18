@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Logo';
+export * from './colorsV2';

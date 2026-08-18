@@ -600,3 +600,9 @@ ls:
     .styles.ts: camelCase
     .stories.tsx: camelCase
     .test.tsx: camelCase
+  libraries/react-ui-kit/src/identity:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+    .stories.tsx: camelCase
+    .test.tsx: camelCase

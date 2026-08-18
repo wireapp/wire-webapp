@@ -33,7 +33,7 @@ import {
 import {Option} from './Select';
 import {isGroup} from './SelectOption/SelectOption';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 
 interface CustomStylesParams {
   theme: Theme;

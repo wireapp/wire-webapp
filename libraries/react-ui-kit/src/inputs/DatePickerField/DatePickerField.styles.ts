@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {Theme} from '../../identity/Theme';
+import {Theme} from '../../identity/theme';
 import {overlayPortalZIndex} from '../../utils/overlayPortal';
 
 /** Must exceed react-aria's inline overlay z-index (100000). Applied via `style` on Popover. */
