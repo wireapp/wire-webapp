@@ -121,7 +121,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/checksums@npm:^3.1000.27":
+"@aws-sdk/checksums@npm:^3.1000.28":
   version: 3.1000.28
   resolution: "@aws-sdk/checksums@npm:3.1000.28"
   dependencies:
@@ -134,26 +134,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:3.1110.0":
-  version: 3.1110.0
-  resolution: "@aws-sdk/client-s3@npm:3.1110.0"
+"@aws-sdk/client-s3@npm:3.1111.0":
+  version: 3.1111.0
+  resolution: "@aws-sdk/client-s3@npm:3.1111.0"
   dependencies:
-    "@aws-sdk/checksums": "npm:^3.1000.27"
-    "@aws-sdk/core": "npm:^3.977.7"
-    "@aws-sdk/credential-provider-node": "npm:^3.972.79"
-    "@aws-sdk/middleware-sdk-s3": "npm:^3.972.73"
-    "@aws-sdk/signature-v4-multi-region": "npm:^3.996.44"
-    "@aws-sdk/types": "npm:^3.974.3"
+    "@aws-sdk/checksums": "npm:^3.1000.28"
+    "@aws-sdk/core": "npm:^3.977.8"
+    "@aws-sdk/credential-provider-node": "npm:^3.972.80"
+    "@aws-sdk/middleware-sdk-s3": "npm:^3.972.74"
+    "@aws-sdk/signature-v4-multi-region": "npm:^3.996.45"
+    "@aws-sdk/types": "npm:^3.974.4"
     "@smithy/core": "npm:^3.31.1"
     "@smithy/fetch-http-handler": "npm:^5.6.13"
     "@smithy/node-http-handler": "npm:^4.9.13"
     "@smithy/types": "npm:^4.16.1"
     tslib: "npm:^2.6.2"
-  checksum: 10/d05f802e7b8d21fa5bc304845fec0e139cb1ec74b673fa1fa8fd0633bb891182cc287d15d7640c76d4e13610217a41f3e278342fce2dab315c9d9a5e4e5c54b9
+  checksum: 10/bd4edc2deae625705d54a4003b0c24d5fe57370cb7115d8ac578a71d45a93022a101590686d298758329dab9e63ef311e8137bc2dd2d1ec09863e49d36087470
   languageName: node
   linkType: hard
 
-"@aws-sdk/core@npm:^3.977.7, @aws-sdk/core@npm:^3.977.8":
+"@aws-sdk/core@npm:^3.977.8":
   version: 3.977.8
   resolution: "@aws-sdk/core@npm:3.977.8"
   dependencies:
@@ -232,7 +232,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/credential-provider-node@npm:^3.972.79":
+"@aws-sdk/credential-provider-node@npm:^3.972.80":
   version: 3.972.80
   resolution: "@aws-sdk/credential-provider-node@npm:3.972.80"
   dependencies:
@@ -293,9 +293,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.1110.0":
-  version: 3.1110.0
-  resolution: "@aws-sdk/lib-storage@npm:3.1110.0"
+"@aws-sdk/lib-storage@npm:3.1111.0":
+  version: 3.1111.0
+  resolution: "@aws-sdk/lib-storage@npm:3.1111.0"
   dependencies:
     "@smithy/core": "npm:^3.31.1"
     "@smithy/types": "npm:^4.16.1"
@@ -304,12 +304,12 @@ __metadata:
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.1110.0
-  checksum: 10/bcfd21a4cf170bc5ec29789b8c1e646bc9edae8f4025c9a6bb76c9232dc302ea9a156f1575491bc13e6fe6dc5d583d2aac5f50ef9d70f9454295ec55d7b9e6ca
+    "@aws-sdk/client-s3": ^3.1111.0
+  checksum: 10/4c3a240dce37b453d63c3dccbebf9753096ad449054479de79945f2cf2d6e8083df59fa7590899d2da9d3453c842671ebde847a7d9b077393414f637f47b5c43
   languageName: node
   linkType: hard
 
-"@aws-sdk/middleware-sdk-s3@npm:^3.972.73":
+"@aws-sdk/middleware-sdk-s3@npm:^3.972.74":
   version: 3.972.74
   resolution: "@aws-sdk/middleware-sdk-s3@npm:3.972.74"
   dependencies:
@@ -339,7 +339,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/signature-v4-multi-region@npm:^3.996.44, @aws-sdk/signature-v4-multi-region@npm:^3.996.45":
+"@aws-sdk/signature-v4-multi-region@npm:^3.996.45":
   version: 3.996.45
   resolution: "@aws-sdk/signature-v4-multi-region@npm:3.996.45"
   dependencies:
@@ -365,7 +365,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/types@npm:^3.974.3, @aws-sdk/types@npm:^3.974.4":
+"@aws-sdk/types@npm:^3.974.4":
   version: 3.974.4
   resolution: "@aws-sdk/types@npm:3.974.4"
   dependencies:
@@ -11241,8 +11241,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
-    "@aws-sdk/client-s3": "npm:3.1110.0"
-    "@aws-sdk/lib-storage": "npm:3.1110.0"
+    "@aws-sdk/client-s3": "npm:3.1111.0"
+    "@aws-sdk/lib-storage": "npm:3.1111.0"
     "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:1.16.0"
     "@swc/jest": "npm:0.2.39"
