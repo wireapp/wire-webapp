@@ -17,63 +17,49 @@
  *
  */
 
-import {useState} from 'react';
-
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {Switch} from './Switch';
+import {TextArea} from './textArea';
 
-interface SwitchStoryProps {
-  checked: boolean;
-  disabled?: boolean;
-}
-
-const DefaultStory = ({checked, disabled}: SwitchStoryProps) => {
-  const [isChecked, setIsChecked] = useState(checked);
-  return <Switch checked={isChecked} disabled={disabled} onToggle={() => setIsChecked(!isChecked)} />;
-};
+import {InputLabel} from '../inputLabel';
 
 const meta = {
-  title: 'inputs/Switch',
-  component: Switch,
+  title: 'inputs/TextArea',
+  component: TextArea,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  render: ({checked, disabled, ...args}) => <DefaultStory {...args} checked={checked} disabled={disabled} />,
-} satisfies Meta<typeof Switch>;
+} satisfies Meta<typeof TextArea>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    checked: false,
-    disabled: false,
-    onToggle: () => {},
+    placeholder: 'Enter your message...',
   },
 };
 
-export const Checked: Story = {
+export const WithLabel: Story = {
+  render: () => (
+    <div>
+      <InputLabel htmlFor="textarea-example">Message</InputLabel>
+      <TextArea id="textarea-example" placeholder="Type your message here..." />
+    </div>
+  ),
+};
+
+export const Invalid: Story = {
   args: {
-    checked: true,
-    disabled: false,
-    onToggle: () => {},
+    placeholder: 'Invalid input...',
+    markInvalid: true,
   },
 };
 
 export const Disabled: Story = {
   args: {
-    checked: false,
+    placeholder: 'Disabled textarea...',
     disabled: true,
-    onToggle: () => {},
-  },
-};
-
-export const DisabledChecked: Story = {
-  args: {
-    checked: true,
-    disabled: true,
-    onToggle: () => {},
   },
 };

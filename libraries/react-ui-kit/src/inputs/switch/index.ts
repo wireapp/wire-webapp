@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,4 @@
  *
  */
 
-import {TextArea} from './TextArea';
-
-import {matchComponent} from '../../utils/testUtil';
-
-describe('"TextArea"', () => {
-  it('renders', () => matchComponent(<TextArea>TextArea</TextArea>));
-  it('renders as invalid', () => matchComponent(<TextArea markInvalid>TextArea</TextArea>));
-  it('renders as disabled', () => matchComponent(<TextArea disabled>TextArea</TextArea>));
-  it('renders with placeholderTextTransform', () =>
-    matchComponent(
-      <TextArea placeholderTextTransform="uppercase" placeholder="TextArea">
-        TextArea
-      </TextArea>,
-    ));
-});
+export * from './switch';

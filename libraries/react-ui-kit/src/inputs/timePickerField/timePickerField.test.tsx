@@ -17,7 +17,7 @@
  *
  */
 
-import {TimePickerField} from './TimePickerField';
+import {TimePickerField} from './timePickerField';
 import {buildTimeOptions} from './timePickerUtils';
 
 import {matchComponent} from '../../utils/testUtil';

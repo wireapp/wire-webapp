@@ -35,8 +35,8 @@ import {Theme} from '../../identity/theme';
 import {DatePickerField, DatePickerFieldLabels} from '../datePickerField';
 import {InputLabel} from '../inputLabel';
 import {Option} from '../select';
-import {TimePickerField} from '../TimePickerField';
-import {nearestTimeOptionFromDate} from '../TimePickerField/timePickerUtils';
+import {TimePickerField} from '../timePickerField';
+import {nearestTimeOptionFromDate} from '../timePickerField/timePickerUtils';
 
 export interface DateTimePickerFieldLabels extends DatePickerFieldLabels {
   dateAriaLabel: string;

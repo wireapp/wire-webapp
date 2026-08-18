@@ -20,7 +20,7 @@
 import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
 
 import {Option} from '../select';
-import {nearestTimeOptionFromDate, parseTimeLabel, timeOptionFromDate} from '../TimePickerField/timePickerUtils';
+import {nearestTimeOptionFromDate, parseTimeLabel, timeOptionFromDate} from '../timePickerField/timePickerUtils';
 
 export const dateValueFromDate = (date: Date): DateValue => {
   const tz = getLocalTimeZone();

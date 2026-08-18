@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2026 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,18 @@
  *
  */
 
-export * from './TimePickerField';
-export {
-  buildTimeOptions,
-  filterTimeOptionsAfter,
-  formatTimeLabel,
-  getTimeOptionTotalMinutes,
-  nearestTimeOptionFromDate,
-  parseTimeLabel,
-  timeOptionFromDate,
-  TIME_INTERVAL_MINUTES,
-  TIME_OPTIONS_COUNT,
-} from './timePickerUtils';
+import {TextArea} from './textArea';
+
+import {matchComponent} from '../../utils/testUtil';
+
+describe('"TextArea"', () => {
+  it('renders', () => matchComponent(<TextArea>TextArea</TextArea>));
+  it('renders as invalid', () => matchComponent(<TextArea markInvalid>TextArea</TextArea>));
+  it('renders as disabled', () => matchComponent(<TextArea disabled>TextArea</TextArea>));
+  it('renders with placeholderTextTransform', () =>
+    matchComponent(
+      <TextArea placeholderTextTransform="uppercase" placeholder="TextArea">
+        TextArea
+      </TextArea>,
+    ));
+});

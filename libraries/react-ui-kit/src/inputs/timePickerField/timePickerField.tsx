@@ -29,7 +29,7 @@ import {
   timeSelectMenuPortalStyles,
   timeSelectMenuStyles,
   timeSelectStyles,
-} from './TimePickerField.styles';
+} from './timePickerField.styles';
 import {buildTimeOptions, filterTimeOptionsAfter} from './timePickerUtils';
 
 import {Theme} from '../../identity/theme';

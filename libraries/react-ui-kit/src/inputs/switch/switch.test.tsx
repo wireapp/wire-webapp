@@ -22,7 +22,7 @@ import type {ComponentProps} from 'react';
 import {matchers} from '@emotion/jest';
 import {render} from '@testing-library/react';
 
-import {Switch} from './Switch';
+import {Switch} from './switch';
 
 import {THEME_ID, Theme, themes} from '../../identity';
 import {StyledApp} from '../../layout';

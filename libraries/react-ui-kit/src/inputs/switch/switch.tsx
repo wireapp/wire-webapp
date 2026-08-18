@@ -21,7 +21,7 @@ import {forwardRef} from 'react';
 
 import {useTheme} from '@emotion/react';
 
-import {inputStyles, labelStyles, loadingStyles, switchDotStyles, switchStyles, wrapperStyles} from './Switch.styles';
+import {inputStyles, labelStyles, loadingStyles, switchDotStyles, switchStyles, wrapperStyles} from './switch.styles';
 
 import {Loading} from '../../dataDisplay';
 import {COLOR, Theme, THEME_ID} from '../../identity';

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,15 @@
  *
  */
 
-export * from './ShakeBox';
+export * from './timePickerField';
+export {
+  buildTimeOptions,
+  filterTimeOptionsAfter,
+  formatTimeLabel,
+  getTimeOptionTotalMinutes,
+  nearestTimeOptionFromDate,
+  parseTimeLabel,
+  timeOptionFromDate,
+  TIME_INTERVAL_MINUTES,
+  TIME_OPTIONS_COUNT,
+} from './timePickerUtils';
