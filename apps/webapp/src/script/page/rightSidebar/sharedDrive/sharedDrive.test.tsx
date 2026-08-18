@@ -68,6 +68,20 @@ describe('SharedDrive', () => {
     expect(getByText('Viewer user')).toBeInTheDocument();
   });
 
+  it('exposes the full participant handle when it is truncated', () => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const participant = createUser({id: 'participant', name: 'Participant', teamId: 'conversation-team'});
+    participant.username('long-participant-handle');
+    conversation.participating_user_ets([participant]);
+
+    const {getByText} = render(
+      <SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />,
+      {wrapper: rootProviderWrapper},
+    );
+
+    expect(getByText('@long-participant-handle')).toHaveAttribute('title', '@long-participant-handle');
+  });
+
   it('does not show access roles for apps and services', () => {
     const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.teamId = 'conversation-team';
