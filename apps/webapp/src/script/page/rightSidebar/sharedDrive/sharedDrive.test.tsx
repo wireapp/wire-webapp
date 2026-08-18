@@ -52,7 +52,7 @@ describe('SharedDrive', () => {
     conversation.selfUser(selfUser);
     conversation.participating_user_ets([editor, viewer]);
 
-    const {getAllByText, getByText} = render(
+    const {getAllByText, getByTestId, getByText} = render(
       <SharedDrive activeConversation={conversation} onBack={jest.fn()} onClose={jest.fn()} />,
       {wrapper: rootProviderWrapper},
     );
@@ -62,6 +62,7 @@ describe('SharedDrive', () => {
     expect(getByText('cells.sharedDriveAccess.externalDescription')).toBeInTheDocument();
     expect(getAllByText('cells.sharedDriveAccess.role.editor')).toHaveLength(2);
     expect(getAllByText('cells.sharedDriveAccess.role.viewer')).toHaveLength(1);
+    expect(getByTestId('shared-drive-viewer-icon')).toBeInTheDocument();
     expect(getByText('Editor user')).toBeInTheDocument();
     expect(getByText('Viewer user')).toBeInTheDocument();
   });

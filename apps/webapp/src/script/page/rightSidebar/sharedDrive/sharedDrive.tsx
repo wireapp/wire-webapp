@@ -27,6 +27,7 @@ import {
   getSelfUserDriveRole,
 } from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
 import {ParticipantItemContent} from 'Components/participantItemContent';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -43,6 +44,14 @@ interface SharedDriveProps {
   onBack: () => void;
   onClose: () => void;
 }
+
+const viewerRoleCss = {
+  '& > span': {marginLeft: 0},
+  alignItems: 'center',
+  display: 'flex',
+  gap: 8,
+  paddingLeft: 8,
+};
 
 const roleLabelCss = {
   border: '1px solid var(--gray-40)',
@@ -145,6 +154,14 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
               ? `(${capitalizeFirstChar(translate('conversationYouNominative'))})`
               : '';
 
+            const roleLabel = <span css={roleLabelCss}>{translate(roleTranslationKey)}</span>;
+            const roleWithViewerIcon = (
+              <div css={viewerRoleCss}>
+                <Icon.GuestIcon data-uie-name="shared-drive-viewer-icon" />
+                {roleLabel}
+              </div>
+            );
+
             return (
               <li
                 key={participant.id}
@@ -178,7 +195,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
                   selfString={selfString}
                   hasUsernameInfo
                 />
-                <span css={roleLabelCss}>{translate(roleTranslationKey)}</span>
+                {role === CELLS_SELF_USER_DRIVE_ROLE.VIEWER ? roleWithViewerIcon : roleLabel}
               </li>
             );
           })}
