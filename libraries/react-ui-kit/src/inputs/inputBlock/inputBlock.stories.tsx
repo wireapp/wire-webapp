@@ -19,15 +19,15 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {InputBlock} from './InputBlock';
+import {InputBlock} from './inputBlock';
 
 import {ArrowIcon} from '../../dataDisplay/icon';
-import {Input} from '../Input';
+import {Input} from '../input';
 import {InputSubmitCombo} from '../InputSubmitCombo';
 import {RoundIconButton} from '../RoundIconButton';
 
 const meta = {
-  title: 'inputs/InputBlock',
+  title: 'inputs/inputBlock',
   component: InputBlock,
   parameters: {
     layout: 'centered',

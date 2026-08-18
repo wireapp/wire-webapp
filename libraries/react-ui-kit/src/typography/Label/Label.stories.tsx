@@ -21,7 +21,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {Label, LabelLink} from './Label';
 
-import {Input} from '../../inputs/Input';
+import {Input} from '../../inputs/input';
 import {Text} from '../Text';
 
 const meta = {

@@ -19,7 +19,7 @@
 
 import {COLOR_V2} from '../../identity';
 import {Theme} from '../../identity/theme';
-import {INPUT_CLASSNAME, INPUT_GROUP, InputProps, inputStyle} from '../Input';
+import {INPUT_CLASSNAME, INPUT_GROUP, InputProps, inputStyle} from '../input';
 
 export type InputSubmitComboProps<T = HTMLDivElement> = InputProps<T>;
 

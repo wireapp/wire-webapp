@@ -19,7 +19,7 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {IndicatorRangeInput} from './IndicatorRangeInput';
+import {IndicatorRangeInput} from './indicatorRangeInput';
 
 const dataListOptions = [
   {value: 10, label: '10px', heading: 'Small'},
@@ -32,7 +32,7 @@ const dataListOptions = [
 ];
 
 const meta = {
-  title: 'inputs/IndicatorRangeInput',
+  title: 'inputs/indicatorRangeInput',
   component: IndicatorRangeInput,
   parameters: {
     layout: 'centered',

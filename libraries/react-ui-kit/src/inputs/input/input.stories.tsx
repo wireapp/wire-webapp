@@ -19,12 +19,12 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {Input} from './Input';
+import {Input} from './input';
 
 import {ErrorMessage} from '../errorMessage';
 
 const meta = {
-  title: 'inputs/Input',
+  title: 'inputs/input',
   component: Input,
   parameters: {
     layout: 'centered',

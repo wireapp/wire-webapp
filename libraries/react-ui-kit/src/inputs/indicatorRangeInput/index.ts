@@ -17,4 +17,4 @@
  *
  */
 
-export * from './IndicatorRangeInput';
+export * from './indicatorRangeInput';

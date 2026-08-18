@@ -22,7 +22,7 @@ import {HTMLProps, PropsWithRef, forwardRef, useMemo} from 'react';
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
-import {containerStyles, dataListOption, headingStyle, rangeStyles} from './IndicatorRangeInput.styles';
+import {containerStyles, dataListOption, headingStyle, rangeStyles} from './indicatorRangeInput.styles';
 
 import {Theme} from '../../identity/theme';
 import {InputLabel} from '../InputLabel';

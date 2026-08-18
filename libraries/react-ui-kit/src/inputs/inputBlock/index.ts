@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Input';
+export * from './inputBlock';

@@ -21,7 +21,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {InputLabel} from './InputLabel';
 
-import {Input} from '../Input';
+import {Input} from '../input';
 
 const meta = {
   title: 'inputs/InputLabel',

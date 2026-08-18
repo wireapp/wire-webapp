@@ -22,7 +22,7 @@ import * as React from 'react';
 
 import {Theme} from '../../identity/theme';
 import {Text, TextProps, textStyle} from '../../typography';
-import {INPUT_CLASSNAME, InputProps} from '../Input';
+import {INPUT_CLASSNAME, InputProps} from '../input';
 
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
   disabled?: boolean;

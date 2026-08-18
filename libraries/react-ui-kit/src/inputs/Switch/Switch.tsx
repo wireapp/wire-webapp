@@ -25,7 +25,7 @@ import {inputStyles, labelStyles, loadingStyles, switchDotStyles, switchStyles, 
 
 import {Loading} from '../../dataDisplay';
 import {COLOR, Theme, THEME_ID} from '../../identity';
-import {InputProps} from '../Input';
+import {InputProps} from '../input';
 
 export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
   activatedColor?: string;

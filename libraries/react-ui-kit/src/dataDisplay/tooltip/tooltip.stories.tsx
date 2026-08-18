@@ -22,7 +22,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 import {Tooltip} from './tooltip';
 
 import {Button} from '../../inputs/button/button';
-import {Input} from '../../inputs/Input/Input';
+import {Input} from '../../inputs/input/input';
 
 const meta = {
   title: 'dataDisplay/tooltip',

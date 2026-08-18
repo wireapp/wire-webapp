@@ -18,7 +18,7 @@
  */
 
 import {matchComponent} from '../../utils/testUtil';
-import {Input} from '../Input';
+import {Input} from '../input';
 
 describe('"Input"', () => {
   it('renders', () => matchComponent(<Input />));

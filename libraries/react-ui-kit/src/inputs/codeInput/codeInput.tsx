@@ -26,7 +26,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {COLOR_V2} from '../../identity';
 import {Theme} from '../../identity/theme';
 import {noop} from '../../utils/util';
-import {InputProps, inputStyle} from '../Input';
+import {InputProps, inputStyle} from '../input';
 
 const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
   <div

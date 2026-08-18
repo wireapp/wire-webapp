@@ -22,7 +22,7 @@ import {useRef} from 'react';
 import type {Meta, StoryObj} from '@storybook/react';
 
 import {Button} from '../button';
-import {Input} from '../Input';
+import {Input} from '../input';
 import {ShakeBox, ShakeBoxRef} from '../ShakeBox';
 
 const meta = {
