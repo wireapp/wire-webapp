@@ -19,10 +19,10 @@
 
 import {ReactNode} from 'react';
 
-import {BreadcrumbItem} from './BreadcrumbItem/BreadcrumbItem';
-import {BreadcrumbLeaf} from './BreadcrumbLeaf/BreadcrumbLeaf';
-import {listStyles} from './Breadcrumbs.styles';
-import {CombainedBreadcrumbs} from './CombainedBreadcrumbs/CombainedBreadcrumbs';
+import {BreadcrumbItem} from './breadcrumbItem/breadcrumbItem';
+import {BreadcrumbLeaf} from './breadcrumbLeaf/breadcrumbLeaf';
+import {listStyles} from './breadcrumbs.styles';
+import {CombainedBreadcrumbs} from './combainedBreadcrumbs/combainedBreadcrumbs';
 
 const DEFAULT_MAX_VISIBLE_BREADCRUMBS = 4;
 

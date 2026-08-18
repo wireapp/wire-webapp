@@ -19,7 +19,7 @@
 
 import {MouseEvent as ReactMouseEvent, ReactNode} from 'react';
 
-import {activeItemStyles, buttonStyles, listItemStyles} from './BreadcrumbItem.styles';
+import {activeItemStyles, buttonStyles, listItemStyles} from './breadcrumbItem.styles';
 
 interface BreadcrumbItemProps {
   name: string;

@@ -19,13 +19,13 @@
 
 import {Meta, StoryObj} from '@storybook/react/*';
 
-import {Breadcrumbs} from './Breadcrumbs';
+import {Breadcrumbs} from './breadcrumbs';
 
 import {TrashIcon} from '../../dataDisplay/icon';
 
 const meta: Meta<typeof Breadcrumbs> = {
   component: Breadcrumbs,
-  title: 'navigation/Breadcrumbs',
+  title: 'navigation/breadcrumbs',
   parameters: {
     layout: 'centered',
   },

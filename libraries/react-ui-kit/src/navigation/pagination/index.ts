@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Breadcrumbs';
+export * from './pagination';

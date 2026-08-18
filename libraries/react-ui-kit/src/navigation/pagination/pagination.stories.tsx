@@ -21,14 +21,14 @@ import {useState} from 'react';
 
 import {Meta, StoryObj} from '@storybook/react';
 
-import {Pagination} from './Pagination';
+import {Pagination} from './pagination';
 
 import {COLOR} from '../../identity/colors';
 import {Small} from '../../typography';
 
 const meta: Meta<typeof Pagination> = {
   component: Pagination,
-  title: 'navigation/Pagination',
+  title: 'navigation/pagination',
   decorators: [
     Story => (
       <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>

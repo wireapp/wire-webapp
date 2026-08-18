@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {buttonStyles, itemStyles} from './CombainedBreadcrumbs.styles';
+import {buttonStyles, itemStyles} from './combainedBreadcrumbs.styles';
 
 import {DropdownMenu} from '../../../surface/DropdownMenu';
 

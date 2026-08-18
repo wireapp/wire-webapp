@@ -17,5 +17,5 @@
  *
  */
 
-export * from './Breadcrumbs';
-export * from './Pagination';
+export * from './breadcrumbs';
+export * from './pagination';

@@ -17,7 +17,7 @@
  *
  */
 
-import {iconStyles} from './BreadcrumbLeaf.styles';
+import {iconStyles} from './breadcrumbLeaf.styles';
 
 import {ChevronUpIcon} from '../../../dataDisplay/icon';
 
