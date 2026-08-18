@@ -17,7 +17,7 @@
  *
  */
 
-import {DateTimePickerField} from './DateTimePickerField';
+import {DateTimePickerField} from './dateTimePickerField';
 
 const fixedDateTime = new Date(2026, 5, 15, 15, 0, 0, 0);
 

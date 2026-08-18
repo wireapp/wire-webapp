@@ -19,10 +19,10 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {DropFileInput} from './DropFileInput';
+import {DropFileInput} from './dropFileInput';
 
 const meta = {
-  title: 'inputs/DropFileInput',
+  title: 'inputs/dropFileInput',
   component: DropFileInput,
   parameters: {
     layout: 'centered',

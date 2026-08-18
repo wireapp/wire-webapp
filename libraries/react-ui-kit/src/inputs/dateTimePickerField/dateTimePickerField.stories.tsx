@@ -18,88 +18,86 @@
  */
 
 import type {Meta, StoryObj} from '@storybook/react';
-import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
 import {useState} from 'react';
 
-import {DatePickerField} from './DatePickerField';
+import {DateTimePickerField} from './dateTimePickerField';
+import {getNextHourDateTime} from './dateTimeUtils';
 
 const defaultLabels = {
+  dateAriaLabel: 'Select date',
+  timeAriaLabel: 'Select time',
   openCalendarLabel: 'Open calendar',
   previousMonthLabel: 'Previous month',
   nextMonthLabel: 'Next month',
 };
 
 const meta = {
-  title: 'inputs/DatePickerField',
-  component: DatePickerField,
+  title: 'inputs/dateTimePickerField',
+  component: DateTimePickerField,
   parameters: {
     layout: 'centered',
   },
   decorators: [
     Story => (
-      <div style={{width: '350px'}}>
+      <div style={{width: '420px'}}>
         <Story />
       </div>
     ),
   ],
   tags: ['autodocs'],
-} satisfies Meta<typeof DatePickerField>;
+} satisfies Meta<typeof DateTimePickerField>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const ControlledDatePicker = (args: React.ComponentProps<typeof DatePickerField>) => {
-  const [value, setValue] = useState<DateValue | null>(args.value ?? today(getLocalTimeZone()));
+const ControlledDateTimePicker = (args: React.ComponentProps<typeof DateTimePickerField>) => {
+  const [value, setValue] = useState<Date | null>(args.value ?? getNextHourDateTime());
 
-  return <DatePickerField {...args} value={value} onChange={setValue} />;
+  return <DateTimePickerField {...args} value={value} onChange={setValue} />;
 };
 
 export const Default: Story = {
-  render: args => <ControlledDatePicker {...args} />,
+  render: args => <ControlledDateTimePicker {...args} />,
   args: {
-    dataUieName: 'date-picker-default',
-    id: 'date-picker-default',
+    dataUieName: 'datetime-picker-default',
     labels: defaultLabels,
-    ariaLabel: 'Select date',
-    value: today(getLocalTimeZone()),
+    value: getNextHourDateTime(),
     onChange: () => undefined,
   },
 };
 
 export const WithLabel: Story = {
-  render: args => <ControlledDatePicker {...args} />,
+  render: args => <ControlledDateTimePicker {...args} />,
   args: {
-    dataUieName: 'date-picker-with-label',
-    id: 'date-picker-with-label',
-    label: 'Date',
+    dataUieName: 'datetime-picker-with-label',
+    label: 'Starts at',
     labels: defaultLabels,
-    value: today(getLocalTimeZone()),
+    value: getNextHourDateTime(),
     onChange: () => undefined,
   },
 };
 
 export const Invalid: Story = {
-  render: args => <ControlledDatePicker {...args} />,
+  render: args => <ControlledDateTimePicker {...args} />,
   args: {
-    dataUieName: 'date-picker-invalid',
-    id: 'date-picker-invalid',
-    label: 'Date',
+    dataUieName: 'datetime-picker-invalid',
+    label: 'Starts at',
     labels: defaultLabels,
     markInvalid: true,
-    value: today(getLocalTimeZone()),
+    errorText: 'Please select a future date and time.',
+    value: getNextHourDateTime(),
     onChange: () => undefined,
   },
 };
 
 export const Disabled: Story = {
-  render: args => <ControlledDatePicker {...args} />,
+  render: args => <ControlledDateTimePicker {...args} />,
   args: {
-    dataUieName: 'date-picker-disabled',
-    id: 'date-picker-disabled',
-    label: 'Date',
+    dataUieName: 'datetime-picker-disabled',
+    label: 'Starts at',
     labels: defaultLabels,
     disabled: true,
-    value: today(getLocalTimeZone()),
+    value: getNextHourDateTime(),
     onChange: () => undefined,
   },
 };

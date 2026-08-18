@@ -17,4 +17,11 @@
  *
  */
 
-export * from './DatePickerField';
+export * from './dateTimePickerField';
+export {
+  combineDateAndTime,
+  dateValueFromDate,
+  getDefaultDateTimeSelection,
+  getNextHourDateTime,
+  splitDateTime,
+} from './dateTimeUtils';

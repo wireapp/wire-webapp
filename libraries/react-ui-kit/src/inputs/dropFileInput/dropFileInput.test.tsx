@@ -19,7 +19,7 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {DropFileInput, DropFileInputProps} from './DropFileInput';
+import {DropFileInput, DropFileInputProps} from './dropFileInput';
 
 import {THEME_ID} from '../../identity';
 import {StyledApp} from '../../layout';

@@ -19,7 +19,7 @@
 
 import {parseDate} from '@internationalized/date';
 
-import {DatePickerField} from './DatePickerField';
+import {DatePickerField} from './datePickerField';
 
 import {matchComponent} from '../../utils/testUtil';
 import React from 'react';

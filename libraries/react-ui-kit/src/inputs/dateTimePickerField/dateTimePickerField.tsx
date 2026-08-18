@@ -28,11 +28,11 @@ import {
   dateTimePickerErrorTextStyles,
   dateTimePickerFieldsRowStyles,
   dateTimePickerTimeFieldWrapperStyles,
-} from './DateTimePickerField.styles';
+} from './dateTimePickerField.styles';
 import {combineDateAndTime, dateValueFromDate, isSameLocalCalendarDay} from './dateTimeUtils';
 
 import {Theme} from '../../identity/theme';
-import {DatePickerField, DatePickerFieldLabels} from '../DatePickerField';
+import {DatePickerField, DatePickerFieldLabels} from '../datePickerField';
 import {InputLabel} from '../InputLabel';
 import {Option} from '../Select';
 import {TimePickerField} from '../TimePickerField';

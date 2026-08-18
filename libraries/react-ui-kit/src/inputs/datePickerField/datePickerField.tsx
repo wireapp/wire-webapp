@@ -59,7 +59,7 @@ import {
   datePickerGroupStyles,
   datePickerWrapperStyles,
   dateSegmentStyles,
-} from './DatePickerField.styles';
+} from './datePickerField.styles';
 
 import {CalendarIcon} from '../../dataDisplay/icon';
 import {Theme} from '../../identity/theme';
