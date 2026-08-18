@@ -46,7 +46,7 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Config} from '../Config';
 import {
-  isConversationListTab,
+  getConversationListTab,
   SidebarTabs,
   useSidebarStore,
 } from '../page/leftSidebar/panels/conversations/useSidebarStore';
@@ -328,7 +328,7 @@ export class ListViewModel {
     if (archive) {
       setCurrentTab(SidebarTabs.ARCHIVES);
     } else {
-      setCurrentTab(isConversationListTab(currentTab) ? currentTab : SidebarTabs.RECENT);
+      setCurrentTab(getConversationListTab(currentTab));
     }
   };
 

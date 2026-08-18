@@ -20,6 +20,7 @@ import {render} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Call} from 'Repositories/calling/Call';
@@ -38,7 +39,7 @@ import {createUuid} from 'Util/uuid';
 
 import {MeetingCallingView} from './meetingCallingView';
 
-const createCall = (): Call => {
+const createCall = (type: CONVERSATION_TYPE, groupConversationType?: GROUP_CONVERSATION_TYPE): Call => {
   const id = createUuid();
   const selfUser = new User(createUuid(), '', translateForTest);
   const conversation = new Conversation(id, 'example.com', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
@@ -50,6 +51,10 @@ const createCall = (): Call => {
     CALL_TYPE.NORMAL,
     buildMediaDevicesHandler(),
   );
+  conversation.type(type);
+  if (groupConversationType) {
+    conversation.groupConversationType(groupConversationType);
+  }
   call.state(CALL_STATE.INCOMING);
   return call;
 };
@@ -78,7 +83,11 @@ describe('MeetingCallingView', () => {
   );
 
   it('renders incoming 1:1, group, and meeting calls', () => {
-    const calls = [createCall(), createCall(), createCall()];
+    const calls = [
+      createCall(CONVERSATION_TYPE.ONE_TO_ONE),
+      createCall(CONVERSATION_TYPE.REGULAR, GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION),
+      createCall(CONVERSATION_TYPE.REGULAR, GROUP_CONVERSATION_TYPE.MEETING),
+    ];
     callState.calls(calls);
 
     const {container: renderedContainer} = render(<MeetingCallingView />, {wrapper: rootProviderWrapper});

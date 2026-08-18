@@ -56,12 +56,24 @@ describe('ListViewModel', () => {
     'returns to the conversation list when opening a conversation from tab %s',
     currentTab => {
       useSidebarStore.setState({currentTab});
-      useAppState.setState({listState: ListState.MEETINGS});
+      useAppState.setState({listState: currentTab === SidebarTabs.CELLS ? ListState.CELLS : ListState.MEETINGS});
 
       createListViewModel().openConversations();
 
       expect(useAppState.getState().listState).toBe(ListState.CONVERSATIONS);
       expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.RECENT);
+    },
+  );
+
+  it.each([SidebarTabs.FAVORITES, SidebarTabs.GROUPS])(
+    'keeps conversation list tab %s when opening a conversation',
+    currentTab => {
+      useSidebarStore.setState({currentTab});
+
+      createListViewModel().openConversations();
+
+      expect(useAppState.getState().listState).toBe(ListState.CONVERSATIONS);
+      expect(useSidebarStore.getState().currentTab).toBe(currentTab);
     },
   );
 
