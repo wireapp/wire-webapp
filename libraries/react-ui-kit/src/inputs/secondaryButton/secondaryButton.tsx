@@ -17,4 +17,28 @@
  *
  */
 
-export * from './SecondaryButton';
+import type {ReactNode, MouseEvent} from 'react';
+
+import {styles} from './secondaryButton.style';
+
+interface SecondaryButtonProps {
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  disabled?: boolean;
+  children: ReactNode;
+  fullWidth: boolean;
+  uieName?: string;
+}
+
+export const SecondaryButton = ({onClick, disabled = false, fullWidth, uieName, children}: SecondaryButtonProps) => {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      data-uie-name={uieName}
+      css={[styles.button, fullWidth && styles.fullWidth]}
+      disabled={disabled}
+    >
+      {children}
+    </button>
+  );
+};

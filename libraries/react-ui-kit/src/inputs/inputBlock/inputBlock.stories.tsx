@@ -24,7 +24,7 @@ import {InputBlock} from './inputBlock';
 import {ArrowIcon} from '../../dataDisplay/icon';
 import {Input} from '../input';
 import {InputSubmitCombo} from '../inputSubmitCombo';
-import {RoundIconButton} from '../RoundIconButton';
+import {RoundIconButton} from '../roundIconButton';
 
 const meta = {
   title: 'inputs/inputBlock',

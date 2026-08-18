@@ -19,7 +19,7 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {SecondaryButton} from './SecondaryButton';
+import {SecondaryButton} from './secondaryButton';
 
 describe('"SecondaryButton"', () => {
   it('fires onClick when clicked', () => {

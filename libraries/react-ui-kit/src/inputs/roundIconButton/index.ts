@@ -17,4 +17,4 @@
  *
  */
 
-export * from './RoundIconButton';
+export * from './roundIconButton';

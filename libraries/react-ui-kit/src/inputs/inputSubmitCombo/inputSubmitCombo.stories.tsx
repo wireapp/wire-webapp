@@ -23,7 +23,7 @@ import {InputSubmitCombo} from './inputSubmitCombo';
 
 import {ArrowIcon, AttachmentIcon} from '../../dataDisplay/icon';
 import {Input} from '../input';
-import {RoundIconButton} from '../RoundIconButton';
+import {RoundIconButton} from '../roundIconButton';
 
 const meta = {
   title: 'inputs/inputSubmitCombo',

@@ -19,7 +19,7 @@
 
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {RoundIconButton} from './RoundIconButton';
+import {RoundIconButton} from './roundIconButton';
 
 import {
   ArrowIcon,
@@ -38,7 +38,7 @@ import {
 import {COLOR} from '../../identity';
 
 const meta = {
-  title: 'inputs/RoundIconButton',
+  title: 'inputs/roundIconButton',
   component: RoundIconButton,
   parameters: {
     layout: 'centered',
