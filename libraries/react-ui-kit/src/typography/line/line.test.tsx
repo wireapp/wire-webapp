@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,13 @@
  *
  */
 
-export * from './box';
-export * from './column';
-export * from './container';
-export * from './content';
-export * from './flexBox';
-export * from './footer';
-export * from './header';
-export * from './headerMenu';
-export * from './matchMedia';
-export * from './spacer';
-export * from './styledApp';
-export * from './sizes';
+import {Line} from './line';
+
+import {COLOR, THEME_ID} from '../../identity';
+import {matchComponent} from '../../utils/testUtil';
+
+describe('"Line"', () => {
+  it('renders', () => matchComponent(<Line>Line</Line>));
+  it('renders (dark theme)', () => matchComponent(<Line>Line</Line>, THEME_ID.DARK));
+  it('renders with color', () => matchComponent(<Line color={COLOR.RED}>Line</Line>));
+});

@@ -17,15 +17,22 @@
  *
  */
 
-export * from './box';
-export * from './column';
-export * from './container';
-export * from './content';
-export * from './flexBox';
-export * from './footer';
-export * from './header';
-export * from './headerMenu';
-export * from './matchMedia';
-export * from './spacer';
-export * from './styledApp';
-export * from './sizes';
+import {CSSObject} from '@emotion/react';
+
+import {COLOR} from '../../identity';
+import {Theme} from '../../identity/theme';
+import {TextProps, filterTextProps, textStyle} from '../text';
+
+export type TitleProps<T = HTMLDivElement> = TextProps<T>;
+
+const titleStyle: <T>(theme: Theme, props: TitleProps<T>) => CSSObject = (
+  theme,
+  {block = true, center = true, fontSize = ' 2rem', color = COLOR.GRAY, bold = true, ...props},
+) => ({
+  ...textStyle(theme, {block, bold, center, color, fontSize, ...props}),
+  marginBottom: '8px',
+});
+
+export const Title = (props: TitleProps) => (
+  <div css={(theme: Theme) => titleStyle(theme, props)} {...filterTextProps(props)} />
+);

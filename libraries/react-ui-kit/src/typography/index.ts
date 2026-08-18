@@ -17,12 +17,12 @@
  *
  */
 
-export * from './Heading';
-export * from './Label';
-export * from './Line';
-export * from './Link';
-export * from './Paragraph';
-export * from './Text';
-export * from './TextLink';
-export * from './ActionLink';
-export * from './Title';
+export * from './heading';
+export * from './label';
+export * from './line';
+export * from './link';
+export * from './paragraph';
+export * from './text';
+export * from './textLink';
+export * from './actionLink';
+export * from './title';
