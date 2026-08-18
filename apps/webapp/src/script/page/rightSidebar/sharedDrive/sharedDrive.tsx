@@ -169,15 +169,6 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
               <li
                 key={participant.id}
                 css={{
-                  '&::after': {
-                    backgroundColor: '#DCE0E3',
-                    bottom: 0,
-                    content: '""',
-                    height: 1,
-                    left: 64,
-                    position: 'absolute',
-                    right: 0,
-                  },
                   alignItems: 'center',
                   display: 'flex',
                   minHeight: 56,
