@@ -19,12 +19,12 @@
 import {createWireLexicalEditorTestHarness} from '../testSupport/createWireLexicalEditorTestHarness';
 import {getRawMessageText, transformMessage} from './transformMessage';
 
-interface MessageTransformationTestCase {
+type MessageTransformationTestCase = {
   readonly description: string;
   readonly replaceEmojis: boolean;
   readonly inputMarkdown: string;
   readonly expectedMessage: string;
-}
+};
 
 const messageTransformationTestCases: readonly MessageTransformationTestCase[] = [
   {
@@ -59,11 +59,11 @@ const messageTransformationTestCases: readonly MessageTransformationTestCase[] =
   },
 ];
 
-interface RawMessageTextTestCase {
+type RawMessageTextTestCase = {
   readonly description: string;
   readonly inputMarkdown: string;
   readonly expectedText: string;
-}
+};
 
 const rawMessageTextTestCases: readonly RawMessageTextTestCase[] = [
   {

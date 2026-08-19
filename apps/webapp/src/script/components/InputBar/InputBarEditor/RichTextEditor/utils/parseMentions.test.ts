@@ -29,24 +29,24 @@ import {$createMentionNode} from '../nodes/MentionNode';
 
 import {parseMentions} from './parseMentions';
 
-interface CreateTestUserOptions {
+type CreateTestUserOptions = {
   readonly userId: string;
   readonly userName: string;
   readonly userDomain?: string;
-}
+};
 
-interface MentionEditorContentOptions {
+type MentionEditorContentOptions = {
   readonly harness: WireLexicalEditorTestHarness;
   readonly text: string;
   readonly mentionValues: string[];
-}
+};
 
-interface ParsedMentionValue {
+type ParsedMentionValue = {
   readonly startIndex: number;
   readonly length: number;
   readonly userId: string;
   readonly domain: string | undefined;
-}
+};
 
 function createTestUser({userId, userName, userDomain}: CreateTestUserOptions): User {
   const user = new User(userId, userDomain ?? '', translateForTest);

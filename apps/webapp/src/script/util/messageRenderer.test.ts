@@ -23,11 +23,11 @@ import {MentionEntity} from '../message/mentionEntity';
 
 const escapeLink = (link: string) => link.replace(/&/g, '&amp;');
 
-interface MarkdownStructureCharacterizationTestCase {
+type MarkdownStructureCharacterizationTestCase = {
   readonly description: string;
   readonly inputMarkdown: string;
   readonly expectedHtml: string;
-}
+};
 
 const markdownStructureCharacterizationTestCases: readonly MarkdownStructureCharacterizationTestCase[] = [
   {

@@ -20,12 +20,12 @@ import {MentionEntity} from '../../../../../message/mentionEntity';
 
 import {createNodes} from './generateNodes';
 
-interface GenerateNodesTestCase {
+type GenerateNodesTestCase = {
   readonly description: string;
   readonly messageText: string;
   readonly mentions: MentionEntity[];
   readonly expectedNodes: readonly {readonly data: string; readonly type: string}[];
-}
+};
 
 const generateNodesTestCases: readonly GenerateNodesTestCase[] = [
   {

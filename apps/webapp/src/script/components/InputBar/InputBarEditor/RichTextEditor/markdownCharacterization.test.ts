@@ -21,12 +21,12 @@ import {
   WireLexicalEditorTestHarness,
 } from './testSupport/createWireLexicalEditorTestHarness';
 
-interface MarkdownCharacterizationTestCase {
+type MarkdownCharacterizationTestCase = {
   readonly description: string;
   readonly inputMarkdown: string;
   readonly expectedMarkdown: string;
   readonly expectedTextContent: string;
-}
+};
 
 const markdownCharacterizationTestCases: MarkdownCharacterizationTestCase[] = [
   {description: 'an empty message', inputMarkdown: '', expectedMarkdown: '', expectedTextContent: ''},
@@ -212,12 +212,12 @@ const markdownCharacterizationTestCases: MarkdownCharacterizationTestCase[] = [
   },
 ];
 
-interface MarkdownRoundTripCharacterizationTestCase {
+type MarkdownRoundTripCharacterizationTestCase = {
   readonly description: string;
   readonly inputMarkdown: string;
   readonly expectedCanonicalMarkdown: string;
   readonly expectedTextContent: string;
-}
+};
 
 const markdownRoundTripCharacterizationTestCases: readonly MarkdownRoundTripCharacterizationTestCase[] = [
   {

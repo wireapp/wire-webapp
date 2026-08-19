@@ -23,12 +23,12 @@ import {createEditor, $getRoot, LexicalEditor} from 'lexical';
 import {editorConfig} from '../editorConfig';
 import {markdownTransformers} from '../utils/markdownTransformers';
 
-export interface WireLexicalEditorTestHarness {
+export type WireLexicalEditorTestHarness = {
   readonly editor: LexicalEditor;
   readonly importMarkdown: (markdown: string) => void;
   readonly exportMarkdown: () => string;
   readonly getTextContent: () => string;
-}
+};
 
 function throwEditorError(error: unknown): never {
   throw error;

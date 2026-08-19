@@ -18,12 +18,12 @@
 
 import {wrapMentionsWithTags} from './wrapMentionsWithTags';
 
-interface MentionTagCharacterizationTestCase {
+type MentionTagCharacterizationTestCase = {
   readonly description: string;
   readonly inputText: string;
   readonly allowedMentions: string[];
   readonly expectedText: string;
-}
+};
 
 const mentionTagCharacterizationTestCases: readonly MentionTagCharacterizationTestCase[] = [
   {

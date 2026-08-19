@@ -18,11 +18,11 @@
 
 import {findAndTransformEmoji} from './InlineEmojiReplacementPlugin';
 
-interface EmojiReplacementCharacterizationTestCase {
+type EmojiReplacementCharacterizationTestCase = {
   readonly description: string;
   readonly inputText: string;
   readonly expectedText: string;
-}
+};
 
 const emojiReplacementCharacterizationTestCases: readonly EmojiReplacementCharacterizationTestCase[] = [
   {

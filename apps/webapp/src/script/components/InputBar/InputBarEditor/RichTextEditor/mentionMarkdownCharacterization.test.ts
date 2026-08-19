@@ -27,14 +27,14 @@ import {MentionNode} from './nodes/MentionNode';
 import {getMentionMarkdownTransformer} from './plugins/EditedMessagePlugin/getMentionMarkdownTransformer/getMentionMarkdownTransformer';
 import {markdownTransformers} from './utils/markdownTransformers';
 
-interface MentionMarkdownCharacterizationTestCase {
+type MentionMarkdownCharacterizationTestCase = {
   readonly description: string;
   readonly inputMarkdown: string;
   readonly allowedMentions: string[];
   readonly expectedMarkdown: string;
   readonly expectedTextContent: string;
   readonly expectedMentionValues: string[];
-}
+};
 
 const mentionMarkdownCharacterizationTestCases: readonly MentionMarkdownCharacterizationTestCase[] = [
   {
@@ -87,11 +87,11 @@ const mentionMarkdownCharacterizationTestCases: readonly MentionMarkdownCharacte
   },
 ];
 
-interface ImportMentionMarkdownOptions {
+type ImportMentionMarkdownOptions = {
   readonly harness: WireLexicalEditorTestHarness;
   readonly inputMarkdown: string;
   readonly allowedMentions: string[];
-}
+};
 
 function createMentionTransformers(allowedMentions: string[]): Transformer[] {
   const mentionMarkdownTransformer = getMentionMarkdownTransformer(allowedMentions);
