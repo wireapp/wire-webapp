@@ -24,6 +24,10 @@ import {amplify} from 'amplify';
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  getSelfUserDriveRole,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import * as Icon from 'Components/icon';
 import {PanelActions} from 'Components/panel/panelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
@@ -33,6 +37,7 @@ import {isGroupMLSConversation} from 'Repositories/conversation/ConversationSele
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -76,7 +81,7 @@ const ConversationDetailsOptions = ({
   updateConversationReceiptMode,
   isChannelPublic,
 }: ConversationDetailsOptionsProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const {
     isMutable,
     receiptMode,
@@ -125,6 +130,8 @@ const ConversationDetailsOptions = ({
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = !!teamId;
   const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
+  const selfUserDriveRole = getSelfUserDriveRole({conversationTeamId: teamId, selfUserTeamId: selfUser.teamId});
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
@@ -143,6 +150,8 @@ const ConversationDetailsOptions = ({
 
   const openTimedMessagePanel = () => togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
 
+  const openSharedDrivePanel = () => togglePanel(PanelState.SHARED_DRIVE, activeConversation);
+
   const openGuestPanel = () => togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
 
   const openServicePanel = () => togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
@@ -154,6 +163,16 @@ const ConversationDetailsOptions = ({
   const openConversationHistoryPanel = () => togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
 
   const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant!, false, 'left');
+
+  const getSharedDriveStatusTranslationKey = () => {
+    if (!isViewerPermissionFeatureEnabled) {
+      return 'conversationDetailsActionCellsOption';
+    }
+
+    return selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
+      ? 'cells.sharedDriveAccess.editorAccess'
+      : 'cells.sharedDriveAccess.viewerAccess';
+  };
 
   return (
     <div className="conversation-details__options">
@@ -207,12 +226,13 @@ const ConversationDetailsOptions = ({
         {isCellsConversation && (
           <ConversationDetailsOption
             className="conversation-details__cells-info"
-            dataUieName="cells-info"
+            dataUieName={isViewerPermissionFeatureEnabled ? 'go-shared-drive' : 'cells-info'}
             icon={<CollectionIcon />}
+            onClick={isViewerPermissionFeatureEnabled ? openSharedDrivePanel : undefined}
             title={translate('conversationDetailsActionCellsTitle')}
             statusUieName="status-cells-info"
-            statusText={translate('conversationDetailsActionCellsOption')}
-            disabled
+            statusText={translate(getSharedDriveStatusTranslationKey())}
+            disabled={!isViewerPermissionFeatureEnabled}
           />
         )}
 

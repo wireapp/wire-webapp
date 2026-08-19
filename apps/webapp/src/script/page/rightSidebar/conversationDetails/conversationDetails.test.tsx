@@ -17,8 +17,8 @@
  *
  */
 
-import {act, render} from '@testing-library/react';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {act, fireEvent, render} from '@testing-library/react';
+import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 
@@ -52,6 +52,8 @@ import {ConversationDetails} from './conversationDetails';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
+import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {PanelState} from '../rightSidebar';
 
 jest.mock('Components/panel/enrichedFields', () => ({
   useEnrichedFields: (): never[] => [],
@@ -68,6 +70,12 @@ let conversationRepository: ConversationRepository;
 let searchRepository: SearchRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+const viewerPermissionRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    isFeatureToggleEnabled: () => true,
+    translate: translateForTest,
+  }),
+);
 
 beforeAll(async () => {
   conversationRepository = await testFactory.exposeConversationActors();
@@ -123,6 +131,48 @@ const getDefaultParams = () => {
 };
 
 describe('ConversationDetails', () => {
+  it.each([
+    {selfUserTeamId: 'conversation-team', expectedStatus: 'cells.sharedDriveAccess.editorAccess'},
+    {selfUserTeamId: 'other-team', expectedStatus: 'cells.sharedDriveAccess.viewerAccess'},
+  ])('opens Shared Drive settings with $expectedStatus', ({selfUserTeamId, expectedStatus}) => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    conversation.teamId = 'conversation-team';
+
+    const defaultProps = getDefaultParams();
+    defaultProps.selfUser.teamId = selfUserTeamId;
+    const togglePanel = jest.fn();
+    const {getByTestId} = render(
+      withThemeAndRootContext(
+        <ConversationDetails
+          {...defaultProps}
+          activeConversation={conversation}
+          selfUser={defaultProps.selfUser}
+          togglePanel={togglePanel}
+        />,
+        viewerPermissionRootProviderWrapper,
+      ),
+    );
+
+    expect(getByTestId('status-cells-info')).toHaveTextContent(expectedStatus);
+    fireEvent.click(getByTestId('go-shared-drive'));
+
+    expect(togglePanel).toHaveBeenCalledWith(PanelState.SHARED_DRIVE, conversation);
+  });
+
+  it('keeps Shared Drive settings disabled when viewer permissions are disabled', () => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+
+    const defaultProps = getDefaultParams();
+    const {getByTestId, getByText} = render(
+      withTheme(<ConversationDetails {...defaultProps} activeConversation={conversation} />),
+    );
+
+    expect(getByText('conversationDetailsActionCellsOption')).toBeInTheDocument();
+    expect(getByTestId('cells-info')).toBeDisabled();
+  });
+
   it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
     'shows legacy bots and apps in %s groups',
     protocol => {

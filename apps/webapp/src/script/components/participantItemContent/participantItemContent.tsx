@@ -99,6 +99,7 @@ export const ParticipantItemContent = ({
               css={[contentInfoText(hasUsernameInfo), ellipsis]}
               className="subline"
               data-uie-name="status-username"
+              title={shortDescription}
             >
               {shortDescription}
             </span>
