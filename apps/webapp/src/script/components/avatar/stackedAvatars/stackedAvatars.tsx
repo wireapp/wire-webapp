@@ -17,9 +17,9 @@
  *
  */
 
-import {getStackedAvatarDisplay} from 'Components/avatar';
 import type {User} from 'Repositories/entity/User';
 
+import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
 import {overflowCountStyles, wrapperStyles} from './stackedAvatars.styles';
 
