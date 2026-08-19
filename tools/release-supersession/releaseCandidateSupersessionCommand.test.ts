@@ -48,8 +48,6 @@ function createProductionJob(jobOptions: Partial<ReleaseWorkflowJob> = {}): Rele
 function createActionsClient(
   workflowRuns: readonly ReleaseWorkflowRun[],
   workflowJobsByRunId: Readonly<Record<number, readonly ReleaseWorkflowJob[]>>,
-  cancelledRunIds: number[],
-  cancellationResult: 'accepted' | 'conflict' = 'accepted',
 ): GitHubActionsClient {
   return {
     async listReleaseWorkflowRuns(): Promise<Result<readonly ReleaseWorkflowRun[], Error>> {
@@ -58,16 +56,11 @@ function createActionsClient(
     async listReleaseWorkflowJobs(options): Promise<Result<readonly ReleaseWorkflowJob[], Error>> {
       return Result.ok(workflowJobsByRunId[options.runId] ?? []);
     },
-    async cancelWorkflowRun(runId): Promise<Result<'accepted' | 'conflict', Error>> {
-      cancelledRunIds.push(runId);
-      return Result.ok(cancellationResult);
-    },
   };
 }
 
 describe('release candidate supersession orchestration', () => {
-  it('cancels only older runs that have not started Production', async () => {
-    const cancelledRunIds: number[] = [];
+  it('identifies only older runs that have not started Production', async () => {
     const githubActionsClient = createActionsClient(
       [
         createRun({id: 10}),
@@ -80,7 +73,6 @@ describe('release candidate supersession orchestration', () => {
         20: [createProductionJob({status: 'in_progress'})],
         30: [],
       },
-      cancelledRunIds,
     );
 
     const actualResult = await supersedePreviousReleaseCandidates({
@@ -91,7 +83,6 @@ describe('release candidate supersession orchestration', () => {
 
     assert(actualResult.isOk);
     expect(actualResult.value.supersededRunIds).toEqual([10]);
-    expect(cancelledRunIds).toEqual([10]);
   });
 
   it('fails closed when workflow state cannot be inspected', async () => {
@@ -101,9 +92,6 @@ describe('release candidate supersession orchestration', () => {
       },
       async listReleaseWorkflowJobs(): Promise<Result<readonly ReleaseWorkflowJob[], Error>> {
         return Result.err(new Error('GitHub API unavailable'));
-      },
-      async cancelWorkflowRun(): Promise<Result<'accepted', Error>> {
-        return Result.ok('accepted');
       },
     };
 
@@ -115,19 +103,5 @@ describe('release candidate supersession orchestration', () => {
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).toContain('GitHub API unavailable');
-  });
-
-  it('treats a cancellation conflict as a safe Production-boundary race', async () => {
-    const githubActionsClient = createActionsClient([createRun({id: 10})], {10: []}, [], 'conflict');
-
-    const actualResult = await supersedePreviousReleaseCandidates({
-      currentRunId: 30,
-      workflowFileName: 'release-webapp.yml',
-      githubActionsClient,
-    });
-
-    assert(actualResult.isOk);
-    expect(actualResult.value.supersededRunIds).toEqual([]);
-    expect(actualResult.value.cancellationConflictRunIds).toEqual([10]);
   });
 });

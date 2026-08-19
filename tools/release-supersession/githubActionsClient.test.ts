@@ -287,21 +287,4 @@ describe('GitHub Actions supersession client', () => {
     assert(actualResult.isErr);
     expect(actualResult.error.message).toContain('Malformed GitHub workflow-runs response');
   });
-
-  it('accepts normal cancellation and treats a conflict as non-cancellation', async () => {
-    const acceptedClient = createClient(async (): Promise<Response> => {
-      return new Response(null, {status: 202});
-    });
-    const conflictClient = createClient(async (): Promise<Response> => {
-      return createJsonResponse({message: 'workflow already crossed the cancellation boundary'}, 409);
-    });
-
-    const actualAcceptedResult = await acceptedClient.cancelWorkflowRun(123);
-    const actualConflictResult = await conflictClient.cancelWorkflowRun(123);
-
-    assert(actualAcceptedResult.isOk);
-    assert(actualConflictResult.isOk);
-    expect(actualAcceptedResult.value).toBe('accepted');
-    expect(actualConflictResult.value).toBe('conflict');
-  });
 });

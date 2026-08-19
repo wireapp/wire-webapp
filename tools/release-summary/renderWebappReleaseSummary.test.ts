@@ -44,7 +44,6 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     webappUrl: Maybe.just('https://beta.example.com'),
   },
   supersession: {
-    cancellationConflictRunIds: Maybe.just(''),
     jobResult: Maybe.just('success'),
     supersededRunIds: Maybe.just(''),
   },
@@ -990,21 +989,18 @@ describe('WebApp release summary renderer', () => {
 
   it('reads Beta candidate supersession evidence from the workflow environment', () => {
     const input = readWebappReleaseSummaryInput({
-      CANCELLATION_CONFLICT_RUN_IDS: '41',
       SUPERSESSION_JOB_RESULT: 'success',
       SUPERSEDED_RUN_IDS: '17,23',
     });
 
     expect(input.supersession.jobResult.unwrapOr('failure')).toBe('success');
     expect(input.supersession.supersededRunIds.unwrapOr('not available')).toBe('17,23');
-    expect(input.supersession.cancellationConflictRunIds.unwrapOr('not available')).toBe('41');
   });
 
   it('reports that a verified Beta candidate superseded older release runs', () => {
     const input: WebappReleaseSummaryInput = {
       ...baselineWebappReleaseSummaryInput,
       supersession: {
-        cancellationConflictRunIds: Maybe.just('41'),
         jobResult: Maybe.just('success'),
         supersededRunIds: Maybe.just('17,23'),
       },
@@ -1014,19 +1010,20 @@ describe('WebApp release summary renderer', () => {
     const detailsContent = technicalEvidence(summary);
 
     expect(visibleContent).toContain(
-      '- Beta candidate supersession: completed successfully; current Beta candidate: established; older runs superseded: 17,23; cancellation conflicts: 41',
+      '- Beta candidate supersession: completed successfully; current Beta candidate: established; older runs superseded: 17,23; older workflows remain visible; stale Production promotion is blocked by the live-Beta guard',
     );
     expect(detailsContent).toContain('### Beta candidate supersession');
     expect(detailsContent).toContain('- Superseded older run IDs: 17,23');
-    expect(detailsContent).toContain('- Cancellation conflict run IDs: 41');
-    expect(detailsContent).toContain('- Production operations: never force-cancelled');
+    expect(detailsContent).toContain(
+      '- Older workflows remain visible; stale Production promotion is blocked by the live-Beta guard',
+    );
+    expect(detailsContent).toContain('- Production operations: never automatically cancelled');
   });
 
   it('blocks Production promotion when candidate supersession fails without calling it a validation failure', () => {
     const input: WebappReleaseSummaryInput = {
       ...baselineWebappReleaseSummaryInput,
       supersession: {
-        cancellationConflictRunIds: Maybe.nothing<string>(),
         jobResult: Maybe.just('failure'),
         supersededRunIds: Maybe.nothing<string>(),
       },

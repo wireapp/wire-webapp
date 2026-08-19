@@ -48,7 +48,6 @@ export type BetaSummaryInput = {
 };
 
 export type SupersessionSummaryInput = {
-  readonly cancellationConflictRunIds: Maybe<string>;
   readonly jobResult: Maybe<WorkflowJobResult>;
   readonly supersededRunIds: Maybe<string>;
 };
@@ -308,7 +307,6 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       manualReason: readOptionalEnvironmentValue(environment, 'RELEASE_REASON'),
     },
     supersession: {
-      cancellationConflictRunIds: readOptionalEnvironmentValue(environment, 'CANCELLATION_CONFLICT_RUN_IDS'),
       jobResult: readWorkflowJobResult(environment, 'SUPERSESSION_JOB_RESULT'),
       supersededRunIds: readOptionalEnvironmentValue(environment, 'SUPERSEDED_RUN_IDS'),
     },
@@ -1000,7 +998,7 @@ function formatSupersessionStageOverview(input: WebappReleaseSummaryInput): stri
     supersessionResult,
     `current Beta candidate: ${currentBetaCandidate}`,
     `older runs superseded: ${formatSupersessionRunIds(input.supersession.supersededRunIds)}`,
-    `cancellation conflicts: ${formatSupersessionRunIds(input.supersession.cancellationConflictRunIds)}`,
+    'older workflows remain visible; stale Production promotion is blocked by the live-Beta guard',
   ].join('; ');
 }
 
@@ -1394,8 +1392,8 @@ function renderSupersessionSection(input: WebappReleaseSummaryInput): string {
     `- Result: ${formatSupersessionJobResult(input.supersession.jobResult)}`,
     `- Current Beta candidate: ${currentBetaCandidate}`,
     `- Superseded older run IDs: ${formatSupersessionRunIds(input.supersession.supersededRunIds)}`,
-    `- Cancellation conflict run IDs: ${formatSupersessionRunIds(input.supersession.cancellationConflictRunIds)}`,
-    '- Production operations: never force-cancelled',
+    '- Older workflows remain visible; stale Production promotion is blocked by the live-Beta guard',
+    '- Production operations: never automatically cancelled',
   ].join('\n');
 }
 

@@ -137,13 +137,10 @@ function redactSecret(message: string, secret: string): string {
 async function writeSupersessionOutputs(
   environment: RuntimeCommandEnvironment,
   supersededRunIds: readonly number[],
-  cancellationConflictRunIds: readonly number[],
 ): Promise<void> {
   const outputLines = [
     `superseded_run_count=${supersededRunIds.length}`,
     `superseded_run_ids=${supersededRunIds.join(',')}`,
-    `cancellation_conflict_run_count=${cancellationConflictRunIds.length}`,
-    `cancellation_conflict_run_ids=${cancellationConflictRunIds.join(',')}`,
   ];
 
   await appendFile(environment.githubOutputPath, `${outputLines.join('\n')}\n`, 'utf8');
@@ -165,11 +162,7 @@ async function executeRuntimeCommand(environment: RuntimeCommandEnvironment): Pr
     throw supersessionResult.error;
   }
 
-  await writeSupersessionOutputs(
-    environment,
-    supersessionResult.value.supersededRunIds,
-    supersessionResult.value.cancellationConflictRunIds,
-  );
+  await writeSupersessionOutputs(environment, supersessionResult.value.supersededRunIds);
   await appendFile(
     environment.githubStepSummaryPath,
     `${renderSupersessionSummary(environment.currentRunId, supersessionResult.value)}\n`,

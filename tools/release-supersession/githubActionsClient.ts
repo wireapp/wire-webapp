@@ -33,8 +33,6 @@ export type ListReleaseWorkflowJobsOptions = {
   readonly runId: number;
 };
 
-export type WorkflowRunCancellationResult = 'accepted' | 'conflict';
-
 export type GitHubActionsClient = {
   readonly listReleaseWorkflowRuns: (
     options: ListReleaseWorkflowRunsOptions,
@@ -42,7 +40,6 @@ export type GitHubActionsClient = {
   readonly listReleaseWorkflowJobs: (
     options: ListReleaseWorkflowJobsOptions,
   ) => Promise<Result<readonly ReleaseWorkflowJob[], Error>>;
-  readonly cancelWorkflowRun: (runId: number) => Promise<Result<WorkflowRunCancellationResult, Error>>;
 };
 
 export type CreateGitHubActionsClientOptions = {
@@ -266,29 +263,6 @@ export function createGitHubActionsClient(options: CreateGitHubActionsClientOpti
       }
 
       return createSuccess(workflowJobs);
-    },
-
-    async cancelWorkflowRun(runId: number): Promise<Result<WorkflowRunCancellationResult, Error>> {
-      const requestUrl = new URL(`repos/${encodedRepositoryName}/actions/runs/${runId}/cancel`, apiRoot);
-
-      try {
-        const response = await options.kyInstance(requestUrl, {headers: requestHeaders, method: 'post'});
-
-        if (response.status !== 202) {
-          return createFailure(`Unexpected GitHub cancellation response status: ${response.status}`);
-        }
-
-        return createSuccess('accepted');
-      } catch (error: unknown) {
-        if (isHTTPError(error) && error.response.status === 409) {
-          return createSuccess('conflict');
-        }
-
-        return createFailure(
-          `GitHub workflow cancellation failed: ${formatApiFailure(error, requestUrl, options.githubToken)}`,
-          error,
-        );
-      }
     },
   };
 }

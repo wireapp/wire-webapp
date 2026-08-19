@@ -524,7 +524,7 @@ jobs:
             Beta tag creation result: ${{ needs.create_beta_tag.result }}
             Beta candidate supersession result: ${{ needs.supersede_previous_candidates.result }}
             Superseded older Release WebApp run IDs: ${{ needs.supersede_previous_candidates.outputs.superseded_run_ids || 'none' }}
-            Production-boundary cancellation conflicts: ${{ needs.supersede_previous_candidates.outputs.cancellation_conflict_run_ids || 'none' }}
+            Older workflows remain visible; the final live-Beta guard blocks stale Production promotion.
             Triggering actor: ${{ github.actor }}
             Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
@@ -623,7 +623,6 @@ jobs:
           BETA_TAG_CREATION_RESULT: ${{ needs.create_beta_tag.result }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
-          CANCELLATION_CONFLICT_RUN_IDS: ${{ needs.supersede_previous_candidates.outputs.cancellation_conflict_run_ids }}
           SUPERSESSION_JOB_RESULT: ${{ needs.supersede_previous_candidates.result }}
           SUPERSEDED_RUN_IDS: ${{ needs.supersede_previous_candidates.outputs.superseded_run_ids }}
           RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
@@ -640,22 +639,11 @@ jobs:
     name: Supersede previous Beta candidates
     runs-on: ubuntu-24.04
     needs: [build_artifact, deploy_to_beta, create_beta_tag]
-    # Serialize supersession with the actual Production operation. This makes
-    # the state inspection and cancellation decision safe around approval:
-    # either this job owns the boundary before cancelling an older run, or the
-    # older Production operation owns it and is allowed to finish.
-    concurrency:
-      group: deploy-webapp-production
-      cancel-in-progress: false
-      queue: max
     permissions:
-      actions: write
       contents: read
     outputs:
       superseded_run_count: ${{ steps.supersede_candidates.outputs.superseded_run_count }}
       superseded_run_ids: ${{ steps.supersede_candidates.outputs.superseded_run_ids }}
-      cancellation_conflict_run_count: ${{ steps.supersede_candidates.outputs.cancellation_conflict_run_count }}
-      cancellation_conflict_run_ids: ${{ steps.supersede_candidates.outputs.cancellation_conflict_run_ids }}
 
     steps:
       - name: Checkout release tooling
@@ -1310,7 +1298,6 @@ jobs:
           BETA_TAG_CREATION_RESULT: ${{ needs.create_beta_tag.result }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
-          CANCELLATION_CONFLICT_RUN_IDS: ${{ needs.supersede_previous_candidates.outputs.cancellation_conflict_run_ids }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
           DOCKER_REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
           E2E_RUNTIME_BACKEND_REST: ${{ env.E2E_RUNTIME_BACKEND_REST }}
@@ -1403,7 +1390,7 @@ jobs:
             Beta tag: ${{ needs.create_beta_tag.result }}
             Beta candidate supersession: ${{ needs.supersede_previous_candidates.result }}
             Superseded older Release WebApp run IDs: ${{ needs.supersede_previous_candidates.outputs.superseded_run_ids || 'none' }}
-            Production-boundary cancellation conflicts: ${{ needs.supersede_previous_candidates.outputs.cancellation_conflict_run_ids || 'none' }}
+            Older workflows remain visible; the final live-Beta guard blocks stale Production promotion.
             E2E system gate: ${{ needs.run_e2e.result }}
             Production preflight: ${{ needs.production_preflight.result }}
             Production deployment: ${{ needs.deploy_to_production.result }}

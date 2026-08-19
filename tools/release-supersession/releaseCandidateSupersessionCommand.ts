@@ -21,11 +21,7 @@ import {Result} from 'true-myth';
 
 import type {GitHubActionsClient} from './githubActionsClient.ts';
 import {selectSupersedableReleaseCandidates} from './releaseCandidateSupersession.ts';
-import type {
-  ReleaseCandidateObservation,
-  ReleaseWorkflowRun,
-  SupersedableReleaseCandidate,
-} from './releaseCandidateSupersession.ts';
+import type {ReleaseCandidateObservation, ReleaseWorkflowRun} from './releaseCandidateSupersession.ts';
 
 export type SupersedePreviousReleaseCandidatesOptions = {
   readonly currentRunId: number;
@@ -35,7 +31,6 @@ export type SupersedePreviousReleaseCandidatesOptions = {
 
 export type SupersessionResult = {
   readonly supersededRunIds: readonly number[];
-  readonly cancellationConflictRunIds: readonly number[];
 };
 
 function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
@@ -69,29 +64,6 @@ async function createObservationsForRuns(
   return createSuccess(observations);
 }
 
-async function cancelSupersedableCandidates(
-  candidates: readonly SupersedableReleaseCandidate[],
-  githubActionsClient: GitHubActionsClient,
-): Promise<Result<SupersessionResult, Error>> {
-  const supersededRunIds: number[] = [];
-  const cancellationConflictRunIds: number[] = [];
-
-  for (const candidate of candidates) {
-    const cancellationResult = await githubActionsClient.cancelWorkflowRun(candidate.run.id);
-    if (cancellationResult.isErr) {
-      return createFailure(`Unable to supersede workflow run ${candidate.run.id}: ${cancellationResult.error.message}`);
-    }
-
-    if (cancellationResult.value === 'accepted') {
-      supersededRunIds.push(candidate.run.id);
-    } else {
-      cancellationConflictRunIds.push(candidate.run.id);
-    }
-  }
-
-  return createSuccess({supersededRunIds, cancellationConflictRunIds});
-}
-
 export async function supersedePreviousReleaseCandidates(
   options: SupersedePreviousReleaseCandidatesOptions,
 ): Promise<Result<SupersessionResult, Error>> {
@@ -115,23 +87,23 @@ export async function supersedePreviousReleaseCandidates(
     return createFailure(`Unable to determine supersedable release runs: ${candidatesResult.error.message}`);
   }
 
-  return cancelSupersedableCandidates(candidatesResult.value, options.githubActionsClient);
+  return createSuccess({
+    supersededRunIds: candidatesResult.value.map(candidate => {
+      return candidate.run.id;
+    }),
+  });
 }
 
 export function renderSupersessionSummary(currentRunId: number, supersessionResult: SupersessionResult): string {
   const supersededRunIds =
     supersessionResult.supersededRunIds.length > 0 ? supersessionResult.supersededRunIds.join(', ') : 'none';
-  const conflictRunIds =
-    supersessionResult.cancellationConflictRunIds.length > 0
-      ? supersessionResult.cancellationConflictRunIds.join(', ')
-      : 'none';
 
   return [
     '## Beta candidate supersession',
     '',
     `- Current Release WebApp run: ${currentRunId}`,
     `- Superseded older runs: ${supersededRunIds}`,
-    `- Cancellation conflicts (Production boundary race): ${conflictRunIds}`,
-    '- Production operations are never force-cancelled.',
+    '- Older workflows remain visible; the final live-Beta guard blocks stale Production promotion.',
+    '- Production operations are never automatically cancelled.',
   ].join('\n');
 }
