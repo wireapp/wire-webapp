@@ -11785,7 +11785,7 @@ __metadata:
     emoji-picker-react: "npm:4.16.1"
     html-webpack-plugin: "npm:5.6.8"
     i18next-scanner: "npm:4.6.0"
-    immer: "npm:11.1.16"
+    immer: "npm:11.1.17"
     jest-canvas-mock: "npm:2.5.8"
     jest-jasmine2: "npm:30.4.2"
     jest-transform-stub: "npm:2.0.0"
@@ -19221,10 +19221,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immer@npm:11.1.16":
-  version: 11.1.16
-  resolution: "immer@npm:11.1.16"
-  checksum: 10/ae33169318d1a78099dadc747105709506886387b72bf3468dd81c5c854140719d633da94bbefe4f8167311ad685ea0d069e0dfff5804fe9801777131f515f9a
+"immer@npm:11.1.17":
+  version: 11.1.17
+  resolution: "immer@npm:11.1.17"
+  checksum: 10/67d8f84278596f2a8e0fe3af90560bc9f780f078f67b0e46e23e38cb137d5d644004f767e82c2f9d41768a57e61fe27c7d3a3f9dd06b7e4ac854d11bd24f150d
   languageName: node
   linkType: hard
 
