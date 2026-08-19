@@ -212,6 +212,88 @@ const markdownCharacterizationTestCases: MarkdownCharacterizationTestCase[] = [
   },
 ];
 
+interface MarkdownRoundTripCharacterizationTestCase {
+  readonly description: string;
+  readonly inputMarkdown: string;
+  readonly expectedCanonicalMarkdown: string;
+  readonly expectedTextContent: string;
+}
+
+const markdownRoundTripCharacterizationTestCases: readonly MarkdownRoundTripCharacterizationTestCase[] = [
+  {
+    description: 'a plain paragraph',
+    inputMarkdown: 'plain paragraph',
+    expectedCanonicalMarkdown: 'plain paragraph',
+    expectedTextContent: 'plain paragraph',
+  },
+  {
+    description: 'a multiline paragraph',
+    inputMarkdown: 'first line\nsecond line',
+    expectedCanonicalMarkdown: 'first line\nsecond line',
+    expectedTextContent: 'first line\nsecond line',
+  },
+  {
+    description: 'combined inline formatting',
+    inputMarkdown: '**bold** *italic* ***both*** ~~strike~~ `code`',
+    expectedCanonicalMarkdown: '**bold** *italic* ***both*** ~~strike~~ `code`',
+    expectedTextContent: 'bold italic both strike code',
+  },
+  {
+    description: 'a fenced code block',
+    inputMarkdown: '```\n**not bold** https://example.com\n```',
+    expectedCanonicalMarkdown: '```\n**not bold** https://example.com\n```',
+    expectedTextContent: '**not bold** https://example.com',
+  },
+  {
+    description: 'a heading',
+    inputMarkdown: '### heading',
+    expectedCanonicalMarkdown: '### heading',
+    expectedTextContent: 'heading',
+  },
+  {
+    description: 'a multiline blockquote',
+    inputMarkdown: '> first\n> second',
+    expectedCanonicalMarkdown: '> first\n> second',
+    expectedTextContent: 'first\nsecond',
+  },
+  {
+    description: 'an ordered list with a non-one starting number',
+    inputMarkdown: '14. first\n15. second',
+    expectedCanonicalMarkdown: '14. first\n15. second',
+    expectedTextContent: 'first\n\nsecond',
+  },
+  {
+    description: 'an unordered list with a non-canonical marker',
+    inputMarkdown: '* first\n* second',
+    expectedCanonicalMarkdown: '- first\n- second',
+    expectedTextContent: 'first\n\nsecond',
+  },
+  {
+    description: 'an ordered list with zero-padded item numbers',
+    inputMarkdown: '01. first\n02. second',
+    expectedCanonicalMarkdown: '1. first\n2. second',
+    expectedTextContent: 'first\n\nsecond',
+  },
+  {
+    description: 'a mixed nested list',
+    inputMarkdown: '1. one\n   - nested',
+    expectedCanonicalMarkdown: '1. one\n- nested',
+    expectedTextContent: 'one\n\nnested',
+  },
+  {
+    description: 'a Markdown link',
+    inputMarkdown: '[Wire](https://wire.com)',
+    expectedCanonicalMarkdown: '[Wire](https://wire.com)',
+    expectedTextContent: 'Wire',
+  },
+  {
+    description: 'the ambiguous date-like list input',
+    inputMarkdown: '14. - 25. september',
+    expectedCanonicalMarkdown: '14. - 25. september',
+    expectedTextContent: '- 25. september',
+  },
+];
+
 describe('Wire Lexical Markdown characterization', () => {
   it.each(markdownCharacterizationTestCases)(
     'preserves the current behavior for $description',
@@ -225,6 +307,30 @@ describe('Wire Lexical Markdown characterization', () => {
 
       expect(actualMarkdown).toBe(characterizationTestCase.expectedMarkdown);
       expect(actualTextContent).toBe(characterizationTestCase.expectedTextContent);
+    },
+  );
+});
+
+describe('Wire Lexical Markdown round trips', () => {
+  it.each(markdownRoundTripCharacterizationTestCases)(
+    'keeps the canonical representation stable for $description',
+    characterizationTestCase => {
+      const harness: WireLexicalEditorTestHarness = createWireLexicalEditorTestHarness();
+
+      harness.importMarkdown(characterizationTestCase.inputMarkdown);
+
+      const actualFirstExport = harness.exportMarkdown();
+
+      harness.importMarkdown(actualFirstExport);
+
+      const actualSecondExport = harness.exportMarkdown();
+      const actualTextContent = harness.getTextContent();
+      const expectedCanonicalMarkdown = characterizationTestCase.expectedCanonicalMarkdown;
+      const expectedTextContent = characterizationTestCase.expectedTextContent;
+
+      expect(actualFirstExport).toBe(expectedCanonicalMarkdown);
+      expect(actualSecondExport).toBe(expectedCanonicalMarkdown);
+      expect(actualTextContent).toBe(expectedTextContent);
     },
   );
 });
