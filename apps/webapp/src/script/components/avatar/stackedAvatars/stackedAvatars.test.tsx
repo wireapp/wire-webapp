@@ -39,9 +39,17 @@ const renderStackedAvatars = (participants: User[], organizer?: User) => {
     createRootContextValueForTest({translate: translateForTest}),
   );
 
-  return render(<StackedAvatars participants={participants} organizer={organizer?.qualifiedId} />, {
-    wrapper: rootProviderWrapper,
-  });
+  return render(
+    <StackedAvatars
+      participants={participants}
+      getParticipantLabel={(participant, name) =>
+        participant === organizer ? `${name} (${translateForTest('meetings.participant.organizer')})` : name
+      }
+    />,
+    {
+      wrapper: rootProviderWrapper,
+    },
+  );
 };
 
 describe('StackedAvatars', () => {

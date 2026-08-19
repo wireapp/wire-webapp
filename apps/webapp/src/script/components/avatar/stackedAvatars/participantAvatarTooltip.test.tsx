@@ -53,7 +53,7 @@ const renderParticipantAvatarTooltip = (participant: User, organizer?: User, ind
     <ThemeProvider>
       <ParticipantAvatarTooltip
         participant={participant}
-        organizer={organizer?.qualifiedId}
+        getLabel={name => (participant === organizer ? `${name} (${translateForTest('meetings.participant.organizer')})` : name)}
         index={index}
         avatarSize={AVATAR_SIZE.X_SMALL}
         avatarRingColor="black"

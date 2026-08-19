@@ -17,9 +17,7 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {getStackedAvatarDisplay} from 'Components/avatar';
+import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
 import type {User} from 'Repositories/entity/User';
 
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
@@ -29,7 +27,7 @@ import {AVATAR_SIZE} from '../avatar';
 
 interface StackedAvatarsProps {
   participants: User[];
-  organizer?: QualifiedId;
+  getParticipantLabel?: (participant: User, name: string) => string;
   avatarSize?: AVATAR_SIZE;
   avatarRingColor?: string;
   className?: string;
@@ -38,7 +36,7 @@ interface StackedAvatarsProps {
 
 export const StackedAvatars = ({
   participants,
-  organizer,
+  getParticipantLabel,
   avatarSize = AVATAR_SIZE.X_SMALL,
   avatarRingColor = 'var(--text-input-background)',
   className,
@@ -57,7 +55,7 @@ export const StackedAvatars = ({
         <ParticipantAvatarTooltip
           key={`${participant.id}-${participant.domain}`}
           participant={participant}
-          organizer={organizer}
+          getLabel={name => getParticipantLabel?.(participant, name) ?? name}
           index={index}
           avatarSize={avatarSize}
           avatarRingColor={avatarRingColor}

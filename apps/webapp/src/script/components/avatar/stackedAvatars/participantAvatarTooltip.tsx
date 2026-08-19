@@ -17,22 +17,17 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {useUserName} from 'Components/UserName';
 import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {avatarItemStyles} from './stackedAvatars.styles';
 
 interface ParticipantAvatarTooltipProps {
   participant: User;
-  organizer?: QualifiedId;
+  getLabel?: (name: string) => string;
   index?: number;
   avatarSize: AVATAR_SIZE;
   avatarRingColor?: string;
@@ -40,20 +35,13 @@ interface ParticipantAvatarTooltipProps {
 
 export const ParticipantAvatarTooltip = ({
   participant,
-  organizer,
+  getLabel,
   index = 0,
   avatarSize,
   avatarRingColor,
 }: ParticipantAvatarTooltipProps) => {
-  const {translate} = useApplicationContext();
-  const isOrganizer = !isUndefined(organizer) && matchQualifiedIds(participant.qualifiedId, organizer);
   const name = useUserName(participant);
-  const label = isOrganizer
-    ? translate('meetings.participant.nameWithOrganizer', {
-        name,
-        organizer: translate('meetings.participant.organizer'),
-      })
-    : name;
+  const label = getLabel ? getLabel(name) : name;
 
   return (
     <Tooltip body={label} css={avatarRingColor ? avatarItemStyles(index, avatarRingColor) : undefined}>
