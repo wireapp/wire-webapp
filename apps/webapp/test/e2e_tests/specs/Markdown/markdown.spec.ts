@@ -36,8 +36,8 @@ test.describe('Markdown', () => {
   test(
     'normalizes CRLF in plain text pasted into the editor',
     {tag: ['@rich-text-characterization', '@regression']},
-    async testContext => {
-      const userAPage = await testContext.createPage(withLogin(userA));
+    async ({createPage}) => {
+      const userAPage = await createPage(withLogin(userA));
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -63,8 +63,8 @@ test.describe('Markdown', () => {
   test(
     'preserves rich HTML formatting, links, and lists when pasted into the editor',
     {tag: ['@rich-text-characterization', '@regression']},
-    async testContext => {
-      const userAPage = await testContext.createPage(withLogin(userA));
+    async ({createPage}) => {
+      const userAPage = await createPage(withLogin(userA));
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
