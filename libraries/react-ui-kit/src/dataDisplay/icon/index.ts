@@ -104,6 +104,7 @@ export * from './trashCrossIcon';
 export * from './triangleIcon';
 export * from './uploadIcon';
 export * from './verificationShieldIcon';
+export * from './viewerAccessIcon';
 export * from './wireIcon';
 export * from './shieldIcon';
 export * from './lockClosedIcon';

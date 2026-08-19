@@ -37,6 +37,7 @@ const translate = (key: string) =>
   ({
     'cells.imageFullScreenModal.closeButton': 'Close',
     'cells.imageFullScreenModal.downloadButton': 'Download',
+    'cells.imageFullScreenModal.viewerAccessLabel': 'Viewer access',
     'cells.options.label': 'More options',
     'cells.options.versionHistory': 'Version History',
   })[key] ?? key;
@@ -108,5 +109,22 @@ describe('FileHeader', () => {
     renderHeader({isViewerPermissionFeatureEnabled: false});
 
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
+  });
+
+  it('shows viewer access state and removes other action buttons', () => {
+    const {container: renderContainer} = renderHeader({
+      isViewerPermissionFeatureEnabled: true,
+      props: {isEditable: true, showViewOnlyLabel: true},
+    });
+
+    expect(screen.getByText('Viewer access')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Viewing'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Editing'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'More options'})).not.toBeInTheDocument();
+    expect(renderContainer.querySelector('[data-uie-name="file-header-view-only-icon"]')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
   });
 });

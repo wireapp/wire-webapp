@@ -30,6 +30,7 @@ import {
   DropdownMenu,
   MoreIcon,
   ShowIcon,
+  ViewerAccessIcon,
 } from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
@@ -57,6 +58,7 @@ import {
   downloadButtonStyles,
   actionButtonsStyles,
   editModeButtonStyles,
+  viewOnlyLabelStyles,
 } from './FileHeader.styles';
 
 interface FileHeaderProps {
@@ -70,6 +72,7 @@ interface FileHeaderProps {
   fileUrl?: string;
   isEditable?: boolean;
   isInEditMode?: boolean;
+  showViewOnlyLabel?: boolean;
   onEditModeChange: (isEditable: boolean) => void;
   onFileContentRefresh: () => void;
 }
@@ -85,6 +88,7 @@ export const FileHeader = ({
   badges,
   isEditable,
   isInEditMode,
+  showViewOnlyLabel = false,
   onEditModeChange,
   onFileContentRefresh,
 }: FileHeaderProps) => {
@@ -102,6 +106,8 @@ export const FileHeader = ({
   const isRecycleBin = isInRecycleBin();
   const cellsRepository = container.resolve(CellsRepository);
   const {showModal} = useFileHistoryModal();
+  const canEdit = canPerformCellsAction(CELLS_ACTION.EDIT);
+  const canDownload = canPerformCellsAction(CELLS_ACTION.DOWNLOAD);
   const canViewVersionHistory = canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY);
 
   const handleFileDownload = async () => {
@@ -133,7 +139,7 @@ export const FileHeader = ({
           {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
-      {isEditable === true && (
+      {isEditable === true && !showViewOnlyLabel && (
         <div css={editModeButtonStyles}>
           <button
             title="Viewing"
@@ -144,7 +150,7 @@ export const FileHeader = ({
             <ShowIcon width={16} height={16} />
             Viewing
           </button>
-          {!isRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT) && (
+          {!isRecycleBin && canEdit && (
             <button
               title="Editing"
               aria-label="Editing"
@@ -158,7 +164,15 @@ export const FileHeader = ({
         </div>
       )}
       <div css={actionButtonsStyles}>
-        {!isRecycleBin && canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && (
+        {showViewOnlyLabel && (
+          <div css={viewOnlyLabelStyles}>
+            <span data-uie-name="file-header-view-only-icon" aria-hidden="true">
+              <ViewerAccessIcon />
+            </span>
+            {translate('cells.imageFullScreenModal.viewerAccessLabel')}
+          </div>
+        )}
+        {!showViewOnlyLabel && !isRecycleBin && canDownload && (
           <Button
             variant={ButtonVariant.TERTIARY}
             css={downloadButtonStyles}
@@ -169,7 +183,7 @@ export const FileHeader = ({
             <DownloadIcon />
           </Button>
         )}
-        {!isRecycleBin && isEditable === true && canViewVersionHistory && (
+        {!showViewOnlyLabel && !isRecycleBin && isEditable === true && canViewVersionHistory && (
           <DropdownMenu>
             <DropdownMenu.Trigger asChild>
               <Button
@@ -181,7 +195,7 @@ export const FileHeader = ({
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
+              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh(), canDownload)}>
                 {translate('cells.options.versionHistory')}
               </DropdownMenu.Item>
             </DropdownMenu.Content>

@@ -132,3 +132,31 @@ export const editModeButtonStyles: CSSObject = {
     },
   },
 };
+
+export const viewOnlyLabelStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+  padding: '4px',
+  width: '159px',
+  height: '32px',
+  minHeight: '32px',
+  borderRadius: '12px',
+  backgroundColor: 'var(--Backgrounds-Background, #EDEFF0)',
+  color: 'var(--gray-100, #17181A)',
+  fontSize: 'var(--font-size-small)',
+  lineHeight: 'var(--line-height-sm)',
+  whiteSpace: 'nowrap',
+
+  'body.theme-dark &': {
+    backgroundColor: 'var(--gray-100, #17181A)',
+    color: 'var(--white, #FFFFFF)',
+  },
+
+  svg: {
+    color: 'currentColor',
+    fill: 'currentColor',
+    flexShrink: 0,
+  },
+};
