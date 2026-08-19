@@ -39,7 +39,13 @@ const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
 const translateForNotificationTest: Translate = (key, substitutions) =>
-  key === 'meetings.notifications.title' ? `${substitutions?.label} ${substitutions?.meetingTitle}` : key;
+  key === 'meetings.notifications.title'
+    ? `${substitutions?.label} ${substitutions?.meetingTitle}`
+    : key === 'meetings.notifications.by'
+      ? `By ${substitutions?.organizer}`
+      : key === 'meetings.meetingStatus.startedAt'
+        ? `Started at ${substitutions?.time}`
+        : key;
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForNotificationTest}),
 );
@@ -66,6 +72,7 @@ describe('MeetingNotificationCard', () => {
       kind: MeetingNotificationKind.UPDATE,
       meetingTitle: 'meeting Title',
       qualifiedId,
+      qualifiedCreator,
       meetingStartTime,
     },
     {
@@ -105,20 +112,24 @@ describe('MeetingNotificationCard', () => {
       notification.kind === MeetingNotificationKind.INVITE ||
       notification.kind === MeetingNotificationKind.CANCELLED
     ) {
-      expect(card).toHaveTextContent(`creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
+      expect(card).toHaveTextContent(`By creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
     }
 
     if (notification.kind === MeetingNotificationKind.UPDATE) {
-      expect(card).toHaveTextContent('meetings.notifications.newTime');
+      expect(card).toHaveTextContent(`By creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
+      expect(card).not.toHaveTextContent('meetings.notifications.newTime');
     }
 
     if (notification.kind === MeetingNotificationKind.ONGOING) {
-      expect(card).toHaveTextContent('creator-id');
-      expect(card).toHaveTextContent('meetings.meetingStatus.startedAt');
-      expect(screen.getByText('meetings.meetingStatus.startedAt')).toHaveStyle({color: 'var(--accent-color)'});
+      expect(card).toHaveTextContent('By creator-id');
+      expect(card).toHaveTextContent(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`);
+      expect(screen.getByText(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`)).toHaveStyle({
+        color: 'var(--accent-color)',
+      });
     }
 
     if (notification.kind === MeetingNotificationKind.CANCELLED) {
+      expect(card).toHaveTextContent('By creator-id');
       expect(screen.queryByRole('button', {name: 'meetings.notifications.view'})).not.toBeInTheDocument();
     } else {
       expect(screen.getByRole('button', {name: 'meetings.notifications.view'})).toBeInTheDocument();
@@ -137,7 +148,9 @@ describe('MeetingNotificationCard', () => {
         onDismiss={jest.fn()}
       />,
     );
-    expect(screen.getByText('meetings.meetingStatus.startedAt')).toHaveStyle({color: 'var(--accent-color)'});
+    expect(screen.getByText(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`)).toHaveStyle({
+      color: 'var(--accent-color)',
+    });
   });
 
   it('omits View for canceled cards and dismisses every variant', () => {
@@ -189,7 +202,9 @@ describe('MeetingNotificationCard', () => {
       />,
     );
 
-    expect(screen.getByRole('listitem')).toHaveTextContent(`creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
+    expect(screen.getByRole('listitem')).toHaveTextContent(
+      `By creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`,
+    );
   });
 
   it('renders an apostrophe in the meeting title instead of an HTML entity', () => {

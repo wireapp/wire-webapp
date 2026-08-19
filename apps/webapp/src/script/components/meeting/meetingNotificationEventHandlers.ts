@@ -17,13 +17,14 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {match} from 'ts-pattern';
 
 import {
   type AddNotificationInput,
   MeetingNotificationKind,
 } from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
+import {getMeetingInstanceAt} from 'Components/meeting/selectors/getMeetingInstancesInRange';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
@@ -41,6 +42,7 @@ export const staleMeetingNotificationKinds = [
 
 export type MeetingNotificationEventHandlersDependencies = {
   getMeetingSeries: () => readonly MeetingSeries[];
+  wallClock: WallClock;
   addNotification: (input: AddNotificationInput) => void;
   dismissNotificationsForMeeting: (meetingId: QualifiedId, kinds?: readonly MeetingNotificationKind[]) => void;
   logger: MeetingNotificationLogger;
@@ -56,6 +58,7 @@ export type MeetingNotificationEventHandlers = {
 
 export const createMeetingNotificationEventHandlers = ({
   getMeetingSeries,
+  wallClock,
   addNotification,
   dismissNotificationsForMeeting,
   logger,
@@ -75,23 +78,7 @@ export const createMeetingNotificationEventHandlers = ({
       qualifiedId: meeting.qualified_id,
     };
 
-    match(kind)
-      .with(MeetingNotificationKind.UPDATE, kind => {
-        addNotification({...notificationBase, kind});
-      })
-      .with(
-        MeetingNotificationKind.INVITE,
-        MeetingNotificationKind.CANCELLED,
-        MeetingNotificationKind.ONGOING,
-        kind => {
-          addNotification({
-            ...notificationBase,
-            kind,
-            qualifiedCreator: meeting.qualified_creator,
-          });
-        },
-      )
-      .exhaustive();
+    addNotification({...notificationBase, kind, qualifiedCreator: meeting.qualified_creator});
   };
 
   const dismissStaleNotificationsForMeeting = (meetingId: QualifiedId): void => {
@@ -145,7 +132,25 @@ export const createMeetingNotificationEventHandlers = ({
   return {
     notifyMeetingChange: meeting => {
       const meetingKey = toMeetingIdKey(meeting.qualified_id);
-      const kind = notifiedMeetings.has(meetingKey) ? MeetingNotificationKind.UPDATE : MeetingNotificationKind.INVITE;
+      const now = wallClock.currentTimestampInMilliseconds;
+      const hasInvalidDates =
+        Number.isNaN(Date.parse(meeting.series_start_date)) || Number.isNaN(Date.parse(meeting.series_end_date));
+
+      if (hasInvalidDates) {
+        logger.warn('meeting notification received with invalid meeting dates', {
+          meetingId: meeting.qualified_id,
+          meetingStartTime: meeting.series_start_date,
+          meetingEndTime: meeting.series_end_date,
+        });
+        return;
+      }
+
+      let kind = MeetingNotificationKind.INVITE;
+      if (getMeetingInstanceAt(meeting, new Date(now))) {
+        kind = MeetingNotificationKind.ONGOING;
+      } else if (notifiedMeetings.has(meetingKey)) {
+        kind = MeetingNotificationKind.UPDATE;
+      }
       notifiedMeetings.add(meetingKey);
       notifyForMeeting(kind, meeting);
     },

@@ -44,6 +44,7 @@ export type AddNotificationInput = MeetingNotificationBase &
       }
     | {
         kind: MeetingNotificationKind.UPDATE;
+        qualifiedCreator: QualifiedId;
       }
     | {
         kind: MeetingNotificationKind.CANCELLED;
@@ -87,13 +88,17 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
               meetingStartTime,
             }),
           )
-          .with({kind: MeetingNotificationKind.UPDATE}, ({kind, qualifiedId, meetingTitle, meetingStartTime}) => ({
-            kind,
-            qualifiedId,
-            meetingTitle,
-            id: `meeting-notification-${nextNotificationId++}`,
-            meetingStartTime,
-          }))
+          .with(
+            {kind: MeetingNotificationKind.UPDATE},
+            ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
+              kind,
+              qualifiedId,
+              meetingTitle,
+              id: `meeting-notification-${nextNotificationId++}`,
+              qualifiedCreator,
+              meetingStartTime,
+            }),
+          )
           .with(
             {kind: MeetingNotificationKind.CANCELLED},
             ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({

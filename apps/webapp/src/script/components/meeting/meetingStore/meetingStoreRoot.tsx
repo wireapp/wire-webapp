@@ -90,6 +90,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const notificationStore = useMeetingNotificationStore.getState();
     const notificationHandlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => store.getState().meetingSeries,
+      wallClock,
       addNotification: notificationStore.addNotification,
       dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
       logger,

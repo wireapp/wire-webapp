@@ -1332,6 +1332,7 @@
   "meetings.noMeetingsText": "No meetings yet.",
   "meetings.noScheduledMeetings": "No meetings scheduled.",
   "meetings.noUpcomingMeetingsText": "No upcoming meetings yet.",
+  "meetings.notifications.by": "By {organizer}",
   "meetings.notifications.canceled": "Canceled",
   "meetings.notifications.dismiss": "Dismiss",
   "meetings.notifications.dismissAll": "Dismiss all",
