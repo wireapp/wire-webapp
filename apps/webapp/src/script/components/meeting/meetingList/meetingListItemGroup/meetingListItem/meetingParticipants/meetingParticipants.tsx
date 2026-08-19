@@ -19,9 +19,13 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Avatar, AVATAR_SIZE, StackedAvatars} from 'Components/avatar';
+import {AVATAR_SIZE, StackedAvatars} from 'Components/avatar';
+import {ParticipantAvatarTooltip} from 'Components/avatar/stackedAvatars/participantAvatarTooltip';
 import {UserName} from 'Components/UserName';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {participantNameStyles, singleParticipantStyles, wrapperStyles} from './meetingParticipants.styles';
 import {useMeetingConversation} from './useMeetingConversation';
@@ -29,17 +33,27 @@ import {useMeetingParticipants} from './useMeetingParticipants';
 
 interface MeetingParticipantsProps {
   qualifiedConversation: QualifiedId;
+  qualifiedCreator: QualifiedId;
   isOngoing?: boolean;
 }
 
 interface MeetingParticipantsContentProps {
   conversation: Conversation;
+  qualifiedCreator: QualifiedId;
   isOngoing: boolean;
 }
 
-const MeetingParticipantsContent = ({conversation, isOngoing}: MeetingParticipantsContentProps) => {
-  const participants = useMeetingParticipants(conversation);
+const MeetingParticipantsContent = ({conversation, qualifiedCreator, isOngoing}: MeetingParticipantsContentProps) => {
+  const {translate} = useApplicationContext();
+  const participants = useMeetingParticipants(conversation, qualifiedCreator);
   const avatarRingColor = isOngoing ? 'var(--accent-color-highlight)' : 'var(--text-input-background)';
+  const getParticipantLabel = (participant: User, name: string) =>
+    matchQualifiedIds(participant.qualifiedId, qualifiedCreator)
+      ? translate('meetings.participant.nameWithOrganizer', {
+          name,
+          organizer: translate('meetings.participant.organizer'),
+        })
+      : name;
 
   if (participants.length === 0) {
     return null;
@@ -51,12 +65,10 @@ const MeetingParticipantsContent = ({conversation, isOngoing}: MeetingParticipan
     return (
       <div css={wrapperStyles} data-uie-name="meeting-participants">
         <div css={singleParticipantStyles}>
-          <Avatar
+          <ParticipantAvatarTooltip
             participant={participant}
+            getLabel={name => getParticipantLabel(participant, name)}
             avatarSize={AVATAR_SIZE.X_SMALL}
-            hideAvailabilityStatus
-            noBadge
-            className="cursor-default"
           />
           <span css={participantNameStyles}>
             <UserName user={participant} />
@@ -70,6 +82,7 @@ const MeetingParticipantsContent = ({conversation, isOngoing}: MeetingParticipan
     <div css={wrapperStyles} data-uie-name="meeting-participants">
       <StackedAvatars
         participants={participants}
+        getParticipantLabel={getParticipantLabel}
         avatarRingColor={avatarRingColor}
         dataUieName="meeting-participants-avatars"
       />
@@ -77,12 +90,18 @@ const MeetingParticipantsContent = ({conversation, isOngoing}: MeetingParticipan
   );
 };
 
-export const MeetingParticipants = ({qualifiedConversation, isOngoing = false}: MeetingParticipantsProps) => {
+export const MeetingParticipants = ({
+  qualifiedConversation,
+  qualifiedCreator,
+  isOngoing = false,
+}: MeetingParticipantsProps) => {
   const conversation = useMeetingConversation(qualifiedConversation);
 
   if (!conversation) {
     return null;
   }
 
-  return <MeetingParticipantsContent conversation={conversation} isOngoing={isOngoing} />;
+  return (
+    <MeetingParticipantsContent conversation={conversation} qualifiedCreator={qualifiedCreator} isOngoing={isOngoing} />
+  );
 };

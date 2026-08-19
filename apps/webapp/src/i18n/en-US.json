@@ -1346,6 +1346,8 @@
   "meetings.notifications.total": "Meetings notifications ({count})",
   "meetings.notifications.update": "Update",
   "meetings.notifications.view": "View",
+  "meetings.participant.nameWithOrganizer": "{name} ({organizer})",
+  "meetings.participant.organizer": "Organizer",
   "meetings.schedule.errors.endInPast": "End time must be in the future",
   "meetings.schedule.errors.startInPast": "Start time must be in the future",
   "meetings.scheduleModal.closeAriaLabel": "Close",

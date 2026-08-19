@@ -20,12 +20,14 @@
 import type {User} from 'Repositories/entity/User';
 
 import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
-import {avatarItemStyles, overflowCountStyles, wrapperStyles} from './stackedAvatars.styles';
+import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
+import {overflowCountStyles, wrapperStyles} from './stackedAvatars.styles';
 
-import {Avatar, AVATAR_SIZE} from '../avatar';
+import {AVATAR_SIZE} from '../avatar';
 
 interface StackedAvatarsProps {
   participants: User[];
+  getParticipantLabel?: (participant: User, name: string) => string;
   avatarSize?: AVATAR_SIZE;
   avatarRingColor?: string;
   className?: string;
@@ -34,6 +36,7 @@ interface StackedAvatarsProps {
 
 export const StackedAvatars = ({
   participants,
+  getParticipantLabel,
   avatarSize = AVATAR_SIZE.X_SMALL,
   avatarRingColor = 'var(--text-input-background)',
   className,
@@ -49,15 +52,14 @@ export const StackedAvatars = ({
   return (
     <div css={wrapperStyles} className={className} data-uie-name={dataUieName}>
       {visibleParticipants.map((participant, index) => (
-        <div key={`${participant.id}-${participant.domain}`} css={avatarItemStyles(index, avatarRingColor)}>
-          <Avatar
-            participant={participant}
-            avatarSize={avatarSize}
-            hideAvailabilityStatus
-            noBadge
-            className="cursor-default"
-          />
-        </div>
+        <ParticipantAvatarTooltip
+          key={`${participant.id}-${participant.domain}`}
+          participant={participant}
+          getLabel={name => getParticipantLabel?.(participant, name) ?? name}
+          index={index}
+          avatarSize={avatarSize}
+          avatarRingColor={avatarRingColor}
+        />
       ))}
       {overflowCount > 0 && <span css={overflowCountStyles}>+{overflowCount}</span>}
     </div>
