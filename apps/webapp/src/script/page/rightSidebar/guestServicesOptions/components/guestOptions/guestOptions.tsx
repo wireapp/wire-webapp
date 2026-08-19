@@ -19,6 +19,7 @@
 
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -79,10 +80,11 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   const [optionPasswordSecured, setOptionPasswordSecured] = useState<PasswordPreference>(
     PasswordPreference.PASSWORD_SECURED,
   );
-  const {accessCode, accessCodeHasPassword, hasGuest, isGuestAndServicesRoom, isGuestRoom, isServicesRoom} =
+  const {accessCode, accessCodeHasPassword, cellsState, hasGuest, isGuestAndServicesRoom, isGuestRoom, isServicesRoom} =
     useKoSubscribableChildren(activeConversation, [
       'accessCode',
       'accessCodeHasPassword',
+      'cellsState',
       'hasGuest',
       'isGuestAndServicesRoom',
       'isGuestRoom',
@@ -92,6 +94,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   const inTeam = teamState.isInTeam(activeConversation);
 
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
+  const isCellsConversationEnabled = cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
   const isGuestLinkEnabled = inTeam
     ? isTeamStateGuestLinkEnabled
     : isTeamStateGuestLinkEnabled && conversationHasGuestLinkEnabled;
@@ -291,6 +294,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           isChecked={isGuestEnabled}
           setIsChecked={toggleGuestAccess}
           isDisabled={isToggleDisabled}
+          infoText={isCellsConversationEnabled ? translate('guestRoomToggleCellsInfo') : ''}
           toggleName={translate('guestRoomToggleName')}
           toggleId="guests"
         />
