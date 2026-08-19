@@ -22,6 +22,7 @@ import {addDays} from 'date-fns';
 import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
 
 const daysPerWeek = 7;
 const daysPerBiweeklyPeriod = 14;
@@ -162,4 +163,21 @@ export const getMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: D
   }
 
   return getRecurringMeetingInstancesInRange(meetingSeries, from, to);
+};
+
+/**
+ * Finds the concrete instance that is ongoing at `now`, if any.
+ *
+ * The search starts one meeting duration before `now`, because an ongoing
+ * instance may have started before the current time. The upper bound is just
+ * after `now` so an instance starting exactly at `now` is included.
+ */
+export const getMeetingInstanceAt = (meetingSeries: MeetingSeries, now: Date): MeetingInstance | undefined => {
+  const from = new Date(now.getTime() - meetingSeries.duration_ms);
+  const to = new Date(now.getTime() + 1);
+
+  return getMeetingInstancesInRange(meetingSeries, from, to).find(
+    meetingInstance =>
+      getMeetingTemporalStatusAt(now, meetingInstance.start, meetingInstance.end) === MeetingTemporalStatuses.ON_GOING,
+  );
 };

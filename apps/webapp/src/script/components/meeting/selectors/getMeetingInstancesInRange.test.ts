@@ -19,7 +19,11 @@
 
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 
-import {getMeetingInstancesInRange, getUpcomingMeetingInstanceStart} from './getMeetingInstancesInRange';
+import {
+  getMeetingInstanceAt,
+  getMeetingInstancesInRange,
+  getUpcomingMeetingInstanceStart,
+} from './getMeetingInstancesInRange';
 
 const createMeetingSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSeries, 'recurrence'>): MeetingSeries => ({
   series_start_date: '2026-06-01T10:00:00.000Z',
@@ -240,5 +244,30 @@ describe('getUpcomingMeetingInstanceStart', () => {
     expect(getUpcomingMeetingInstanceStart(meetingSeries, new Date('2026-06-10T12:00:00.000Z')).toISOString()).toBe(
       '2026-06-15T10:00:00.000Z',
     );
+  });
+});
+
+describe('getMeetingInstanceAt', () => {
+  it('returns a one-shot meeting while it is ongoing, including at its end time', () => {
+    const meetingSeries = createMeetingSeries({recurrence: 'doesNotRepeat'});
+    const meetingInstance = getMeetingInstanceAt(meetingSeries, new Date('2026-06-01T11:00:00.000Z'));
+
+    expect(meetingInstance?.start.toISOString()).toBe('2026-06-01T10:00:00.000Z');
+    expect(meetingInstance?.end.toISOString()).toBe('2026-06-01T11:00:00.000Z');
+  });
+
+  it('returns the current occurrence for a recurring meeting', () => {
+    const meetingSeries = createMeetingSeries({recurrence: 'weekly'});
+    const meetingInstance = getMeetingInstanceAt(meetingSeries, new Date('2026-06-08T10:30:00.000Z'));
+
+    expect(meetingInstance?.start.toISOString()).toBe('2026-06-08T10:00:00.000Z');
+    expect(meetingInstance?.end.toISOString()).toBe('2026-06-08T11:00:00.000Z');
+  });
+
+  it('returns undefined when there is no ongoing instance', () => {
+    const meetingSeries = createMeetingSeries({recurrence: 'doesNotRepeat'});
+
+    expect(getMeetingInstanceAt(meetingSeries, new Date('2026-06-01T09:59:59.999Z'))).toBeUndefined();
+    expect(getMeetingInstanceAt(meetingSeries, new Date('2026-06-01T11:00:00.001Z'))).toBeUndefined();
   });
 });

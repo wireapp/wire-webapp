@@ -24,6 +24,7 @@ import {
   type AddNotificationInput,
   MeetingNotificationKind,
 } from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
+import {getMeetingInstanceAt} from 'Components/meeting/selectors/getMeetingInstancesInRange';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
@@ -132,9 +133,8 @@ export const createMeetingNotificationEventHandlers = ({
     notifyMeetingChange: meeting => {
       const meetingKey = toMeetingIdKey(meeting.qualified_id);
       const now = wallClock.currentTimestampInMilliseconds;
-      const startTimestamp = Date.parse(meeting.series_start_date);
-      const endTimestamp = Date.parse(meeting.series_end_date);
-      const hasInvalidDates = Number.isNaN(startTimestamp) || Number.isNaN(endTimestamp);
+      const hasInvalidDates =
+        Number.isNaN(Date.parse(meeting.series_start_date)) || Number.isNaN(Date.parse(meeting.series_end_date));
 
       if (hasInvalidDates) {
         logger.warn('meeting notification received with invalid meeting dates', {
@@ -142,10 +142,11 @@ export const createMeetingNotificationEventHandlers = ({
           meetingStartTime: meeting.series_start_date,
           meetingEndTime: meeting.series_end_date,
         });
+        return;
       }
 
       let kind = MeetingNotificationKind.INVITE;
-      if (startTimestamp <= now && endTimestamp > now) {
+      if (getMeetingInstanceAt(meeting, new Date(now))) {
         kind = MeetingNotificationKind.ONGOING;
       } else if (notifiedMeetings.has(meetingKey)) {
         kind = MeetingNotificationKind.UPDATE;

@@ -41,7 +41,7 @@ export const MeetingCallingView = () => {
   }
 
   return (
-    <div css={meetingCallingViewStyles} data-uie-name="meeting-calling-views">
+    <div css={meetingCallingViewStyles} data-uie-name="meeting-calling-view">
       {activeCalls.map(call => (
         <CallingCell
           key={`${call.conversation.qualifiedId.id}-${call.conversation.qualifiedId.domain}`}

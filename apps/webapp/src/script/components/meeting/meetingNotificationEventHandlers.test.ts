@@ -38,13 +38,13 @@ const wallClock = createDeterministicWallClock({
 
 const meetingSeries: MeetingSeries = {
   conversation_id: '',
-  recurrence: 'weekly',
+  recurrence: 'doesNotRepeat',
   duration_ms: 60 * 60 * 1000,
   qualified_conversation: conversationId,
   qualified_creator: creatorId,
   qualified_id: meetingId,
-  series_end_date: '2026-06-01T11:00:00.000Z',
-  series_start_date: '2026-06-01T10:00:00.000Z',
+  series_end_date: '2026-06-01T14:00:00.000Z',
+  series_start_date: '2026-06-01T13:00:00.000Z',
   title: 'Weekly sync',
 };
 
@@ -182,7 +182,7 @@ describe('createMeetingNotificationEventHandlers', () => {
   it('notifies with ONGOING when the first notification arrives during the meeting', () => {
     const notifications: AddNotificationInput[] = [];
     const activeMeetingWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T10:30:00.000Z'),
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T13:30:00.000Z'),
     });
 
     const {notifyMeetingChange} = createHandlers({notifications, activeWallClock: activeMeetingWallClock});
@@ -203,7 +203,7 @@ describe('createMeetingNotificationEventHandlers', () => {
   it('keeps an active meeting ongoing on subsequent notifications', () => {
     const notifications: AddNotificationInput[] = [];
     const activeMeetingWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T10:30:00.000Z'),
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T13:30:00.000Z'),
     });
 
     const {notifyMeetingChange} = createHandlers({notifications, activeWallClock: activeMeetingWallClock});
@@ -217,7 +217,61 @@ describe('createMeetingNotificationEventHandlers', () => {
     ]);
   });
 
-  it('logs invalid meeting dates and falls back to an invitation', () => {
+  it('notifies with ONGOING for the current instance of a recurring meeting', () => {
+    const notifications: AddNotificationInput[] = [];
+    const activeMeetingWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-08T10:30:00.000Z'),
+    });
+    const recurringMeeting = {
+      ...meetingSeries,
+      recurrence: 'weekly' as const,
+      series_start_date: '2026-06-01T10:00:00.000Z',
+      series_end_date: '2026-06-01T11:00:00.000Z',
+    };
+
+    const {notifyMeetingChange} = createHandlers({
+      notifications,
+      activeWallClock: activeMeetingWallClock,
+    });
+
+    notifyMeetingChange(recurringMeeting);
+
+    expect(notifications[0]?.kind).toBe(MeetingNotificationKind.ONGOING);
+  });
+
+  it('keeps a one-shot meeting ongoing at its exact end time', () => {
+    const notifications: AddNotificationInput[] = [];
+    const activeMeetingWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T14:00:00.000Z'),
+    });
+
+    const {notifyMeetingChange} = createHandlers({
+      notifications,
+      activeWallClock: activeMeetingWallClock,
+    });
+
+    notifyMeetingChange(meetingSeries);
+
+    expect(notifications[0]?.kind).toBe(MeetingNotificationKind.ONGOING);
+  });
+
+  it('notifies with INVITE when the first notification arrives after the meeting ends', () => {
+    const notifications: AddNotificationInput[] = [];
+    const activeMeetingWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T14:00:00.001Z'),
+    });
+
+    const {notifyMeetingChange} = createHandlers({
+      notifications,
+      activeWallClock: activeMeetingWallClock,
+    });
+
+    notifyMeetingChange(meetingSeries);
+
+    expect(notifications[0]?.kind).toBe(MeetingNotificationKind.INVITE);
+  });
+
+  it('logs invalid meeting dates and does not create a notification', () => {
     const notifications: AddNotificationInput[] = [];
     const warnings: Array<{message: string; context?: unknown}> = [];
     const invalidMeeting = {...meetingSeries, series_start_date: 'invalid-start'};
@@ -225,7 +279,7 @@ describe('createMeetingNotificationEventHandlers', () => {
 
     notifyMeetingChange(invalidMeeting);
 
-    expect(notifications[0]?.kind).toBe(MeetingNotificationKind.INVITE);
+    expect(notifications).toEqual([]);
     expect(warnings).toEqual([
       {
         message: 'meeting notification received with invalid meeting dates',
