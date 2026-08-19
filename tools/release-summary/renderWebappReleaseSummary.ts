@@ -47,11 +47,6 @@ export type BetaSummaryInput = {
   readonly webappUrl: Maybe<string>;
 };
 
-export type SupersessionSummaryInput = {
-  readonly jobResult: Maybe<WorkflowJobResult>;
-  readonly supersededRunIds: Maybe<string>;
-};
-
 export type E2ESummaryInput = {
   readonly environmentName: Maybe<string>;
   readonly reportUrl: Maybe<string>;
@@ -66,6 +61,7 @@ export type ProductionPreflightResult = 'already_tagged' | 'failure' | 'ready' |
 
 export type ProductionSummaryInput = {
   readonly approvalResult: Maybe<WorkflowJobResult>;
+  readonly currentBetaVerificationResult: Maybe<WorkflowJobResult>;
   readonly deploymentResult: Maybe<WorkflowJobResult>;
   readonly deploymentRequired: Maybe<boolean>;
   readonly environmentName: Maybe<string>;
@@ -126,7 +122,6 @@ export type WebappReleaseSummaryInput = {
   readonly preparation: ReleasePreparationSummaryInput;
   readonly production: ProductionSummaryInput;
   readonly release: ReleaseMetadata;
-  readonly supersession: SupersessionSummaryInput;
 };
 
 type RenderReleaseIdentityParameters = {
@@ -278,6 +273,7 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
     },
     production: {
       approvalResult: readWorkflowJobResult(environment, 'PRODUCTION_APPROVAL_RESULT'),
+      currentBetaVerificationResult: readWorkflowJobResult(environment, 'PRODUCTION_CURRENT_BETA_VERIFICATION_RESULT'),
       createdTagName: readOptionalEnvironmentValue(environment, 'CREATED_PRODUCTION_TAG_NAME'),
       deploymentResult: readWorkflowJobResult(environment, 'PRODUCTION_DEPLOYMENT_RESULT'),
       deploymentRequired: readOptionalBoolean(environment, 'PRODUCTION_DEPLOYMENT_REQUIRED'),
@@ -307,10 +303,6 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       commitSha: readOptionalEnvironmentValue(environment, 'RELEASE_COMMIT_SHA'),
       identifier: readOptionalEnvironmentValue(environment, 'RELEASE_IDENTIFIER'),
       manualReason: readOptionalEnvironmentValue(environment, 'RELEASE_REASON'),
-    },
-    supersession: {
-      jobResult: readWorkflowJobResult(environment, 'SUPERSESSION_JOB_RESULT'),
-      supersededRunIds: readOptionalEnvironmentValue(environment, 'SUPERSEDED_RUN_IDS'),
     },
   };
 }
@@ -709,7 +701,7 @@ function formatProductionApprovalResult(result: Maybe<WorkflowJobResult>): strin
   });
 }
 
-function formatProductionDeploymentResult(result: Maybe<WorkflowJobResult>): string {
+function formatWorkflowJobResult(result: Maybe<WorkflowJobResult>): string {
   return result.mapOr('unknown result', actualResult => {
     return match(actualResult)
       .with('success', () => {
@@ -726,6 +718,22 @@ function formatProductionDeploymentResult(result: Maybe<WorkflowJobResult>): str
       })
       .exhaustive();
   });
+}
+
+function formatProductionDeploymentResult(input: ProductionSummaryInput): string {
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'failure')) {
+    return 'not run because current Beta verification failed';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'cancelled')) {
+    return 'not run because current Beta verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'skipped')) {
+    return 'not run because current Beta verification did not run';
+  }
+
+  return formatWorkflowJobResult(input.deploymentResult);
 }
 
 function formatProductionResult(input: ProductionSummaryInput): string {
@@ -767,6 +775,18 @@ function formatProductionResult(input: ProductionSummaryInput): string {
 
   if (!hasWorkflowJobResult(input.approvalResult, 'success')) {
     return 'approval result unavailable; deployment status unavailable';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'failure')) {
+    return 'current Beta verification failed; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'cancelled')) {
+    return 'current Beta verification was cancelled; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'skipped')) {
+    return 'current Beta verification did not run; deployment not started';
   }
 
   if (hasWorkflowJobResult(input.deploymentResult, 'failure')) {
@@ -854,6 +874,18 @@ function formatProductionSkipReason(input: ProductionSummaryInput): Maybe<string
     hasWorkflowJobResult(input.approvalResult, 'success') === false
   ) {
     return Maybe.just('Production approval result was unavailable');
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'failure')) {
+    return Maybe.just('Current Beta verification failed; Production deployment did not run');
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'cancelled')) {
+    return Maybe.just('Current Beta verification was cancelled; Production deployment did not run');
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'skipped')) {
+    return Maybe.just('Current Beta verification did not run; Production deployment did not run');
   }
 
   if (hasWorkflowJobResult(input.deploymentResult, 'skipped')) {
@@ -1038,45 +1070,6 @@ function formatBetaStageOverview(input: WebappReleaseSummaryInput): string {
   });
 }
 
-function formatSupersessionJobResult(result: Maybe<WorkflowJobResult>): string {
-  return result.mapOr('unknown result', actualResult => {
-    return match(actualResult)
-      .with('success', () => {
-        return 'completed successfully';
-      })
-      .with('failure', () => {
-        return 'failed; Production promotion was blocked';
-      })
-      .with('skipped', () => {
-        return 'did not run; Production promotion was blocked';
-      })
-      .with('cancelled', () => {
-        return 'did not complete; Production promotion was blocked';
-      })
-      .exhaustive();
-  });
-}
-
-function formatSupersessionRunIds(runIds: Maybe<string>): string {
-  return runIds.mapOr('not available', value => {
-    return value.length > 0 ? value : 'none';
-  });
-}
-
-function formatSupersessionStageOverview(input: WebappReleaseSummaryInput): string {
-  const supersessionResult = formatSupersessionJobResult(input.supersession.jobResult);
-  const currentBetaCandidate = input.supersession.jobResult.mapOr('not established', actualResult => {
-    return actualResult === 'success' ? 'established' : 'not established';
-  });
-
-  return [
-    supersessionResult,
-    `current Beta candidate: ${currentBetaCandidate}`,
-    `older runs superseded: ${formatSupersessionRunIds(input.supersession.supersededRunIds)}`,
-    'older workflows remain visible; stale Production promotion is blocked by the live-Beta guard',
-  ].join('; ');
-}
-
 function formatE2EStageOverview(input: WebappReleaseSummaryInput): string {
   const reportLink = formatOptionalExternalLink('Playwright report', input.e2e.reportUrl);
   const e2EResult = formatE2EResult(input.e2e.result);
@@ -1170,17 +1163,6 @@ function formatBetaReleaseOutcome(input: WebappReleaseSummaryInput): string {
     return 'Beta release incomplete because Beta tag creation did not run';
   }
 
-  if (hasWorkflowJobResult(input.supersession.jobResult, 'failure')) {
-    return 'Beta release stopped because the candidate supersession safety check failed';
-  }
-
-  if (
-    hasWorkflowJobResult(input.supersession.jobResult, 'cancelled') ||
-    hasWorkflowJobResult(input.supersession.jobResult, 'skipped')
-  ) {
-    return 'Beta release incomplete because candidate supersession did not complete';
-  }
-
   if (
     hasWorkflowJobResult(input.beta.deploymentResult, 'success') &&
     hasWorkflowJobResult(input.beta.tagCreationResult, 'success')
@@ -1214,17 +1196,6 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
 
   if (hasWorkflowJobResult(input.beta.tagCreationResult, 'skipped')) {
     return 'Release incomplete because Beta tag creation did not run';
-  }
-
-  if (hasWorkflowJobResult(input.supersession.jobResult, 'failure')) {
-    return 'Release stopped because the candidate supersession safety check failed';
-  }
-
-  if (
-    hasWorkflowJobResult(input.supersession.jobResult, 'cancelled') ||
-    hasWorkflowJobResult(input.supersession.jobResult, 'skipped')
-  ) {
-    return 'Release incomplete because candidate supersession did not complete';
   }
 
   if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
@@ -1275,6 +1246,18 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
     hasWorkflowJobResult(input.production.approvalResult, 'success') === false
   ) {
     return 'Release status is unavailable because Production approval result is missing';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'failure')) {
+    return 'Release stopped because current Beta verification failed before Production deployment';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'cancelled')) {
+    return 'Release stopped because current Beta verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'skipped')) {
+    return 'Release incomplete because current Beta verification did not run';
   }
 
   if (hasWorkflowJobResult(input.production.deploymentResult, 'failure')) {
@@ -1394,17 +1377,6 @@ function formatFinalProductionOverview(input: WebappReleaseSummaryInput): string
     return 'unavailable because Beta tag creation did not run';
   }
 
-  if (hasWorkflowJobResult(input.supersession.jobResult, 'failure')) {
-    return 'blocked because the candidate supersession safety check failed';
-  }
-
-  if (
-    hasWorkflowJobResult(input.supersession.jobResult, 'cancelled') ||
-    hasWorkflowJobResult(input.supersession.jobResult, 'skipped')
-  ) {
-    return 'unavailable because candidate supersession did not complete';
-  }
-
   if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
     return 'blocked because the E2E system gate failed';
   }
@@ -1434,6 +1406,18 @@ function formatFinalProductionOverview(input: WebappReleaseSummaryInput): string
     hasWorkflowJobResult(input.production.approvalResult, 'success') === false
   ) {
     return 'unavailable because Production approval result is missing';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'failure')) {
+    return 'blocked because current Beta verification failed before Production deployment';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'cancelled')) {
+    return 'unavailable because current Beta verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'skipped')) {
+    return 'unavailable because current Beta verification did not run';
   }
 
   return formatProductionResult(input.production);
@@ -1506,22 +1490,6 @@ function renderBetaSection(input: WebappReleaseSummaryInput): string {
   ].join('\n');
 }
 
-function renderSupersessionSection(input: WebappReleaseSummaryInput): string {
-  const currentBetaCandidate = input.supersession.jobResult.mapOr('not established', actualResult => {
-    return actualResult === 'success' ? 'established' : 'not established';
-  });
-
-  return [
-    '### Beta candidate supersession',
-    '',
-    `- Result: ${formatSupersessionJobResult(input.supersession.jobResult)}`,
-    `- Current Beta candidate: ${currentBetaCandidate}`,
-    `- Superseded older run IDs: ${formatSupersessionRunIds(input.supersession.supersededRunIds)}`,
-    '- Older workflows remain visible; stale Production promotion is blocked by the live-Beta guard',
-    '- Production operations: never automatically cancelled',
-  ].join('\n');
-}
-
 function renderE2ESection(input: WebappReleaseSummaryInput): string {
   const testinyRunName =
     input.release.identifier.isJust && input.beta.tagName.isJust
@@ -1556,7 +1524,8 @@ function renderProductionSection(input: WebappReleaseSummaryInput): string {
     `- Result: ${formatProductionResult(input.production)}`,
     `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
     `- Production approval result: ${formatProductionApprovalResult(input.production.approvalResult)}`,
-    `- Production deployment result: ${formatProductionDeploymentResult(input.production.deploymentResult)}`,
+    `- Current Beta verification result: ${formatWorkflowJobResult(input.production.currentBetaVerificationResult)}`,
+    `- Production deployment result: ${formatProductionDeploymentResult(input.production)}`,
     ...productionSkipReasonLines,
     `- Target environment: ${formatValueOrFallback(input.production.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.production.webappUrl)}`,
@@ -1630,11 +1599,7 @@ function renderReleasePreparationSection(input: WebappReleaseSummaryInput): stri
 type WebappReleaseSummaryPhase = 'beta' | 'final';
 
 function renderTechnicalReleaseEvidence(input: WebappReleaseSummaryInput, phase: WebappReleaseSummaryPhase): string {
-  const technicalSections = [
-    renderReleasePreparationSection(input),
-    renderBetaSection(input),
-    renderSupersessionSection(input),
-  ];
+  const technicalSections = [renderReleasePreparationSection(input), renderBetaSection(input)];
 
   if (phase === 'final') {
     technicalSections.push(renderE2ESection(input), renderProductionSection(input));
@@ -1658,12 +1623,7 @@ export function renderWebappBetaReleaseSummary(input: WebappReleaseSummaryInput)
       outcome: formatBetaReleaseOutcome(input),
       input,
     }),
-    [
-      '### Release stages',
-      '',
-      `- Hosted Beta: ${formatBetaStageOverview(input)}`,
-      `- Beta candidate supersession: ${formatSupersessionStageOverview(input)}`,
-    ].join('\n'),
+    ['### Release stages', '', `- Hosted Beta: ${formatBetaStageOverview(input)}`].join('\n'),
   ].join('\n\n');
 
   return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, 'beta')}\n`;
@@ -1692,7 +1652,6 @@ export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): st
       '### Release stages',
       '',
       `- Hosted Beta: ${formatBetaStageOverview(input)}`,
-      `- Beta candidate supersession: ${formatSupersessionStageOverview(input)}`,
       `- E2E system gate: ${formatE2EStageOverview(input)}`,
       `- Hosted Production: ${productionOverview}`,
       `- Release distribution: ${distributionOverview}`,

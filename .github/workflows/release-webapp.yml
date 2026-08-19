@@ -809,6 +809,8 @@ jobs:
       }}
     permissions:
       contents: read
+    outputs:
+      current_beta_verification_result: ${{ steps.verify_current_beta.outcome }}
     concurrency:
       group: deploy-webapp-production
       cancel-in-progress: false
@@ -827,6 +829,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Verify current Beta runtime
+        id: verify_current_beta
         uses: ./.github/actions/verify-webapp-runtime
         with:
           environment-label: Current Beta before Production promotion
@@ -1264,6 +1267,7 @@ jobs:
           E2E_RESULT: ${{ needs.run_e2e.result }}
           E2E_WEBAPP_URL: ${{ env.E2E_WEBAPP_URL }}
           PRODUCTION_APPROVAL_RESULT: ${{ needs.production_approval.result }}
+          PRODUCTION_CURRENT_BETA_VERIFICATION_RESULT: ${{ needs.deploy_to_production.outputs.current_beta_verification_result }}
           PRODUCTION_DEPLOYMENT_RESULT: ${{ needs.deploy_to_production.result }}
           PRODUCTION_DISTRIBUTION_JOB_RESULT: ${{ needs.publish_production_distribution.result }}
           PRODUCTION_DISTRIBUTION_RESULT: ${{ needs.publish_production_distribution.outputs.distribution_result }}
@@ -1347,6 +1351,7 @@ jobs:
             E2E system gate: ${{ needs.run_e2e.result }}
             Production preflight: ${{ needs.production_preflight.result }}
             Production approval: ${{ needs.production_approval.result }}
+            Current Beta verification: ${{ needs.deploy_to_production.outputs.current_beta_verification_result || 'not run' }}
             Production deployment: ${{ needs.deploy_to_production.result }}
             Production runtime verification: ${{ needs.verify_production_runtime.result }}
             Production tag: ${{ needs.create_production_tag.result }}

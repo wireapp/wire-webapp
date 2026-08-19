@@ -43,10 +43,6 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     tagName: Maybe.just(betaTagName),
     webappUrl: Maybe.just('https://beta.example.com'),
   },
-  supersession: {
-    jobResult: Maybe.just('success'),
-    supersededRunIds: Maybe.just(''),
-  },
   distribution: {
     chartRepositoryUrl: Maybe.just('https://charts.example.com/webapp'),
     dockerImageTag: Maybe.nothing<string>(),
@@ -86,6 +82,7 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
   },
   production: {
     approvalResult: Maybe.just('success'),
+    currentBetaVerificationResult: Maybe.just('success'),
     createdTagName: Maybe.nothing<string>(),
     deploymentResult: Maybe.just('skipped'),
     deploymentRequired: Maybe.just(false),
@@ -838,6 +835,37 @@ describe('WebApp release summary renderer', () => {
     expect(technicalEvidence(summary)).toContain('- Skip reason: Production approval was rejected or failed');
   });
 
+  it('blocks Production when the live Beta verification fails before deployment', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        currentBetaVerificationResult: Maybe.just('failure'),
+        deploymentRequired: Maybe.just(true),
+        deploymentResult: Maybe.just('failure'),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('ready'),
+        runtimeVerificationResult: Maybe.just('skipped'),
+        tagCreationResult: Maybe.just('skipped'),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+
+    expect(visibleSummary(summary)).toContain(
+      'Release stopped because current Beta verification failed before Production deployment',
+    );
+    expect(visibleSummary(summary)).toContain(
+      '- Hosted Production: blocked because current Beta verification failed before Production deployment',
+    );
+    expect(technicalEvidence(summary)).toContain('- Current Beta verification result: failed');
+    expect(technicalEvidence(summary)).toContain(
+      '- Production deployment result: not run because current Beta verification failed',
+    );
+    expect(technicalEvidence(summary)).toContain(
+      '- Skip reason: Current Beta verification failed; Production deployment did not run',
+    );
+  });
+
   it('stops a release when Hosted Production deployment fails', () => {
     const input: WebappReleaseSummaryInput = {
       ...baselineWebappReleaseSummaryInput,
@@ -992,6 +1020,7 @@ describe('WebApp release summary renderer', () => {
       GITHUB_RELEASE_URL: githubReleaseUrl,
       PRODUCTION_DEPLOYMENT_REQUIRED: 'true',
       PRODUCTION_APPROVAL_RESULT: 'success',
+      PRODUCTION_CURRENT_BETA_VERIFICATION_RESULT: 'success',
       RELEASE_ACTOR: 'release-captain',
       RELEASE_BRANCH_ACTION: 'created',
       SOURCE_COMMIT_SHA: sourceCommitSha,
@@ -1006,67 +1035,12 @@ describe('WebApp release summary renderer', () => {
     expect(input.preparation.sourceRef.unwrapOr('not available')).toBe('main');
     expect(input.production.deploymentRequired.unwrapOr(false)).toBe(true);
     expect(input.production.approvalResult.unwrapOr('failure')).toBe('success');
+    expect(input.production.currentBetaVerificationResult.unwrapOr('failure')).toBe('success');
     expect(input.githubRelease.action.unwrapOr('already_published')).toBe('created');
     expect(input.githubRelease.jobResult.unwrapOr('failure')).toBe('success');
     expect(input.githubRelease.state.unwrapOr('published')).toBe('draft');
     expect(input.githubRelease.tagName.unwrapOr('not available')).toBe(productionTagName);
     expect(input.githubRelease.url.unwrapOr('not available')).toBe(githubReleaseUrl);
-  });
-
-  it('reads Beta candidate supersession evidence from the workflow environment', () => {
-    const input = readWebappReleaseSummaryInput({
-      SUPERSESSION_JOB_RESULT: 'success',
-      SUPERSEDED_RUN_IDS: '17,23',
-    });
-
-    expect(input.supersession.jobResult.unwrapOr('failure')).toBe('success');
-    expect(input.supersession.supersededRunIds.unwrapOr('not available')).toBe('17,23');
-  });
-
-  it('reports that a verified Beta candidate superseded older release runs', () => {
-    const input: WebappReleaseSummaryInput = {
-      ...baselineWebappReleaseSummaryInput,
-      supersession: {
-        jobResult: Maybe.just('success'),
-        supersededRunIds: Maybe.just('17,23'),
-      },
-    };
-    const summary = renderWebappReleaseSummary(input);
-    const visibleContent = visibleSummary(summary);
-    const detailsContent = technicalEvidence(summary);
-
-    expect(visibleContent).toContain(
-      '- Beta candidate supersession: completed successfully; current Beta candidate: established; older runs superseded: 17,23; older workflows remain visible; stale Production promotion is blocked by the live-Beta guard',
-    );
-    expect(detailsContent).toContain('### Beta candidate supersession');
-    expect(detailsContent).toContain('- Superseded older run IDs: 17,23');
-    expect(detailsContent).toContain(
-      '- Older workflows remain visible; stale Production promotion is blocked by the live-Beta guard',
-    );
-    expect(detailsContent).toContain('- Production operations: never automatically cancelled');
-  });
-
-  it('blocks Production promotion when candidate supersession fails without calling it a validation failure', () => {
-    const input: WebappReleaseSummaryInput = {
-      ...baselineWebappReleaseSummaryInput,
-      supersession: {
-        jobResult: Maybe.just('failure'),
-        supersededRunIds: Maybe.nothing<string>(),
-      },
-    };
-    const summary = renderWebappReleaseSummary(input);
-    const betaSummary = renderWebappBetaReleaseSummary(input);
-    const visibleContent = visibleSummary(summary);
-
-    expect(visibleContent).toContain('Release stopped because the candidate supersession safety check failed');
-    expect(visibleContent).toContain(
-      '- Hosted Production: blocked because the candidate supersession safety check failed',
-    );
-    expect(visibleContent).not.toContain('E2E system gate failed');
-    expect(visibleSummary(betaSummary)).toContain(
-      'Beta release stopped because the candidate supersession safety check failed',
-    );
-    expect(visibleSummary(betaSummary)).not.toContain('Beta release failed');
   });
 
   it('does not create a link for an invalid E2E report URL', () => {
