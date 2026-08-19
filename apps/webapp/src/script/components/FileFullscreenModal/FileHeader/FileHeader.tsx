@@ -106,7 +106,6 @@ export const FileHeader = ({
   const isRecycleBin = isInRecycleBin();
   const cellsRepository = container.resolve(CellsRepository);
   const {showModal} = useFileHistoryModal();
-  const canViewVersionHistory = canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY);
 
   const handleFileDownload = async () => {
     if (fileUrl !== undefined && fileUrl.length > 0) {
@@ -181,24 +180,27 @@ export const FileHeader = ({
             <DownloadIcon />
           </Button>
         )}
-        {!showViewOnlyLabel && !isRecycleBin && isEditable === true && canViewVersionHistory && (
-          <DropdownMenu>
-            <DropdownMenu.Trigger asChild>
-              <Button
-                variant={ButtonVariant.TERTIARY}
-                css={downloadButtonStyles}
-                aria-label={translate('cells.options.label')}
-              >
-                <MoreIcon css={iconStyles} />
-              </Button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content>
-              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
-                {translate('cells.options.versionHistory')}
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu>
-        )}
+        {!showViewOnlyLabel &&
+          !isRecycleBin &&
+          isEditable === true &&
+          canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY) && (
+            <DropdownMenu>
+              <DropdownMenu.Trigger asChild>
+                <Button
+                  variant={ButtonVariant.TERTIARY}
+                  css={downloadButtonStyles}
+                  aria-label={translate('cells.options.label')}
+                >
+                  <MoreIcon css={iconStyles} />
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content>
+                <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
+                  {translate('cells.options.versionHistory')}
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu>
+          )}
       </div>
     </header>
   );
