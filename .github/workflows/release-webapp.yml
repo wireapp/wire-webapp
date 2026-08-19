@@ -487,13 +487,12 @@ jobs:
   notify_beta_release_success:
     name: Notify successful Beta release
     runs-on: ubuntu-24.04
-    needs: [build_artifact, deploy_to_beta, create_beta_tag, supersede_previous_candidates]
+    needs: [build_artifact, deploy_to_beta, create_beta_tag]
     if: >-
       ${{
         always() &&
         needs.deploy_to_beta.result == 'success' &&
-        needs.create_beta_tag.result == 'success' &&
-        needs.supersede_previous_candidates.result == 'success'
+        needs.create_beta_tag.result == 'success'
       }}
     continue-on-error: true
     permissions:
@@ -522,9 +521,6 @@ jobs:
             Beta deployment result: ${{ needs.deploy_to_beta.result }}
             Beta runtime-verification result: ${{ needs.deploy_to_beta.outputs.runtime_verification_result }}
             Beta tag creation result: ${{ needs.create_beta_tag.result }}
-            Beta candidate supersession result: ${{ needs.supersede_previous_candidates.result }}
-            Superseded older Release WebApp run IDs: ${{ needs.supersede_previous_candidates.outputs.superseded_run_ids || 'none' }}
-            Older workflows remain visible; the final live-Beta guard blocks stale Production promotion.
             Triggering actor: ${{ github.actor }}
             Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
@@ -581,7 +577,6 @@ jobs:
       - build_artifact
       - deploy_to_beta
       - create_beta_tag
-      - supersede_previous_candidates
     if: ${{ always() }}
     permissions:
       contents: read
@@ -623,8 +618,6 @@ jobs:
           BETA_TAG_CREATION_RESULT: ${{ needs.create_beta_tag.result }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
-          SUPERSESSION_JOB_RESULT: ${{ needs.supersede_previous_candidates.result }}
-          SUPERSEDED_RUN_IDS: ${{ needs.supersede_previous_candidates.outputs.superseded_run_ids }}
           RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
           RELEASE_ACTOR: ${{ github.actor }}
           RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
@@ -635,50 +628,12 @@ jobs:
           SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
         run: node tools/release-summary/renderWebappReleaseSummary.ts --beta-release >> "$GITHUB_STEP_SUMMARY"
 
-  supersede_previous_candidates:
-    name: Supersede previous Beta candidates
-    runs-on: ubuntu-24.04
-    needs: [build_artifact, deploy_to_beta, create_beta_tag]
-    permissions:
-      contents: read
-    outputs:
-      superseded_run_count: ${{ steps.supersede_candidates.outputs.superseded_run_count }}
-      superseded_run_ids: ${{ steps.supersede_candidates.outputs.superseded_run_ids }}
-
-    steps:
-      - name: Checkout release tooling
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-          ref: ${{ github.sha }}
-
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
-
-      - name: Install release tooling dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
-
-      - name: Supersede previous Beta candidates
-        id: supersede_candidates
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: node tools/release-cli/releaseCandidateSupersessionCommand.mts
-
   # WebApp release owns release-specific success and failure notifications.
   # The reusable workflow's optional failure-only notification is intentionally
   # not enabled here to prevent duplicate failure messages.
   run_e2e:
     name: Deploy to precommit and run E2E
-    needs: [build_artifact, create_beta_tag, supersede_previous_candidates]
+    needs: [build_artifact, create_beta_tag]
     permissions:
       contents: read
     uses: ./.github/workflows/precommit-slot-run.yml
@@ -1250,7 +1205,6 @@ jobs:
         build_artifact,
         deploy_to_beta,
         create_beta_tag,
-        supersede_previous_candidates,
         run_e2e,
         production_preflight,
         production_approval,
@@ -1341,8 +1295,6 @@ jobs:
           RELEASE_REASON: ${{ inputs.reason }}
           SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
           SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
-          SUPERSESSION_JOB_RESULT: ${{ needs.supersede_previous_candidates.result }}
-          SUPERSEDED_RUN_IDS: ${{ needs.supersede_previous_candidates.outputs.superseded_run_ids }}
           TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
         run: node tools/release-summary/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
 
@@ -1356,7 +1308,6 @@ jobs:
         build_artifact,
         deploy_to_beta,
         create_beta_tag,
-        supersede_previous_candidates,
         run_e2e,
         production_preflight,
         production_approval,
@@ -1393,9 +1344,6 @@ jobs:
             Build: ${{ needs.build_artifact.result }}
             Beta deployment: ${{ needs.deploy_to_beta.result }}
             Beta tag: ${{ needs.create_beta_tag.result }}
-            Beta candidate supersession: ${{ needs.supersede_previous_candidates.result }}
-            Superseded older Release WebApp run IDs: ${{ needs.supersede_previous_candidates.outputs.superseded_run_ids || 'none' }}
-            Older workflows remain visible; the final live-Beta guard blocks stale Production promotion.
             E2E system gate: ${{ needs.run_e2e.result }}
             Production preflight: ${{ needs.production_preflight.result }}
             Production approval: ${{ needs.production_approval.result }}

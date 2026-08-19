@@ -39,10 +39,6 @@ const releaseMetadataEntrypointPath = join(process.cwd(), 'tools/release-cli/rel
 const productionDistributionEntrypointPath = join(process.cwd(), 'tools/release-cli/productionDistributionCli.mts');
 const releaseAppearanceEntrypointPath = join(process.cwd(), 'tools/release-cli/releaseAppearanceCommand.mts');
 const previewNextBetaEntrypointPath = join(process.cwd(), 'tools/release-cli/previewNextBetaCommand.mts');
-const releaseCandidateSupersessionEntrypointPath = join(
-  process.cwd(),
-  'tools/release-cli/releaseCandidateSupersessionCommand.mts',
-);
 
 function runNativeCommand(entrypointPath: string, commandLineArguments: readonly string[]): NativeCommandResult {
   const childProcessResult = spawnSync(process.execPath, [entrypointPath, ...commandLineArguments], {
@@ -311,14 +307,5 @@ describe('preview next Beta CLI entrypoint', () => {
     expect(unknownOptionResult.standardError).toContain("error: unknown option '--unknown-option'");
     expect(missingArgumentResult.exitCode).toBe(1);
     expect(missingArgumentResult.standardError).toContain("error: missing required argument 'target-main-commit-sha'");
-  });
-});
-
-describe('release candidate supersession CLI entrypoint', () => {
-  it('rejects missing GitHub Actions environment values', () => {
-    const actualResult = runNativeCommand(releaseCandidateSupersessionEntrypointPath, []);
-
-    expect(actualResult.exitCode).toBe(1);
-    expect(actualResult.standardError).toContain('GITHUB_API_URL must be set');
   });
 });
