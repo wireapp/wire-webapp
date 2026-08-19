@@ -199,6 +199,18 @@ const markdownCharacterizationTestCases: MarkdownCharacterizationTestCase[] = [
     expectedTextContent: '**not bold** https://example.com @name 😀',
   },
   {
+    description: 'an empty fenced code block',
+    inputMarkdown: '```\n```',
+    expectedMarkdown: '```\n```',
+    expectedTextContent: '',
+  },
+  {
+    description: 'a fenced code block with a language suffix',
+    inputMarkdown: '```typescript\nconst value = 1;\n```',
+    expectedMarkdown: '```typescript\nconst value = 1;\n```',
+    expectedTextContent: 'const value = 1;',
+  },
+  {
     description: 'inline formatting and inline code',
     inputMarkdown: '**bold** *italic* ***both*** ~~strike~~ `code`',
     expectedMarkdown: '**bold** *italic* ***both*** ~~strike~~ `code`',
@@ -243,6 +255,18 @@ const markdownRoundTripCharacterizationTestCases: readonly MarkdownRoundTripChar
     inputMarkdown: '```\n**not bold** https://example.com\n```',
     expectedCanonicalMarkdown: '```\n**not bold** https://example.com\n```',
     expectedTextContent: '**not bold** https://example.com',
+  },
+  {
+    description: 'an empty fenced code block',
+    inputMarkdown: '```\n```',
+    expectedCanonicalMarkdown: '```\n```',
+    expectedTextContent: '',
+  },
+  {
+    description: 'a fenced code block with a language suffix',
+    inputMarkdown: '```typescript\nconst value = 1;\n```',
+    expectedCanonicalMarkdown: '```typescript\nconst value = 1;\n```',
+    expectedTextContent: 'const value = 1;',
   },
   {
     description: 'a heading',
