@@ -24,6 +24,7 @@ import {render, screen} from '@testing-library/react';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
+  type CellsSelfUserDriveRole,
 } from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {
   createRootContextValueForTest,
@@ -37,7 +38,11 @@ jest.mock('Components/fullscreenModal/fullscreenModal', () => ({
 }));
 
 jest.mock('./FileHeader/FileHeader', () => ({
-  FileHeader: () => <div data-uie-name="file-header">Header</div>,
+  FileHeader: ({showViewOnlyLabel}: {showViewOnlyLabel?: boolean}) => (
+    <div data-uie-name="file-header" data-show-view-only-label={String(showViewOnlyLabel === true)}>
+      Header
+    </div>
+  ),
 }));
 
 jest.mock('./FileEditor/FileEditor', () => {
@@ -74,20 +79,32 @@ jest.mock('./PdfViewer/PdfViewer', () => ({
   PDFViewer: () => <div data-uie-name="pdf-viewer">PDF Viewer</div>,
 }));
 
+interface CreateWrapperOptions {
+  isViewerPermissionFeatureEnabled?: boolean;
+  selfUserDriveRole?: CellsSelfUserDriveRole;
+}
+
 describe('FileFullscreenModal - File Version Restore', () => {
-  const RootProviderWrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({
-      isFeatureToggleEnabled: () => false,
-      translate: key => key,
-    }),
-  );
-  const wrapper = ({children}: {children: ReactNode}) => (
-    <RootProviderWrapper>
-      <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.EDITOR}>
-        {children}
-      </CellsSelfUserDriveRoleProvider>
-    </RootProviderWrapper>
-  );
+  const createWrapper = ({
+    isViewerPermissionFeatureEnabled = false,
+    selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+  }: CreateWrapperOptions = {}) => {
+    const RootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+        translate: key => key,
+      }),
+    );
+
+    return ({children}: {children: ReactNode}) => (
+      <RootProviderWrapper>
+        <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+          {children}
+        </CellsSelfUserDriveRoleProvider>
+      </RootProviderWrapper>
+    );
+  };
+  const wrapper = createWrapper();
 
   const defaultProps = {
     id: 'test-file-id',
@@ -192,6 +209,49 @@ describe('FileFullscreenModal - File Version Restore', () => {
       render(<FileFullscreenModal {...defaultProps} filePreviewUrl={undefined} status="success" />, {wrapper});
 
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    });
+
+    it('should pass viewer access state to header for restricted viewers when preview url is available', () => {
+      render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.xlsx" fileExtension="xlsx" />, {
+        wrapper: createWrapper({
+          isViewerPermissionFeatureEnabled: true,
+          selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+        }),
+      });
+
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-show-view-only-label', 'true');
+    });
+
+    it('should pass viewer access state to header for restricted viewers when preview is unavailable', () => {
+      render(<FileFullscreenModal {...defaultProps} status="unavailable" />, {
+        wrapper: createWrapper({
+          isViewerPermissionFeatureEnabled: true,
+          selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+        }),
+      });
+
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-show-view-only-label', 'true');
+    });
+
+    it('should pass viewer access state to header for restricted viewers on editable files without preview', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          fileExtension="docx"
+          filePreviewUrl={undefined}
+          status="unavailable"
+          isEditMode
+        />,
+        {
+          wrapper: createWrapper({
+            isViewerPermissionFeatureEnabled: true,
+            selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+          }),
+        },
+      );
+
+      expect(screen.getByTestId('file-header')).toHaveAttribute('data-show-view-only-label', 'true');
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
     });
   });
 

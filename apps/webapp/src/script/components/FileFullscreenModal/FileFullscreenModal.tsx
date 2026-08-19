@@ -74,9 +74,8 @@ export const FileFullscreenModal = ({
 }: FileFullscreenModalProps) => {
   const notInRecycleBin = !checkIsInRecycleBin();
   const canPerformCellsAction = useCellsActionPermissions();
-  const [isInEditMode, setIsInEditMode] = useState(
-    isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT),
-  );
+  const canEdit = canPerformCellsAction(CELLS_ACTION.EDIT);
+  const [isInEditMode, setIsInEditMode] = useState(isEditMode && notInRecycleBin && canEdit);
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
 
@@ -90,8 +89,8 @@ export const FileFullscreenModal = ({
   };
 
   useEffect(() => {
-    setIsInEditMode(isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT));
-  }, [canPerformCellsAction, isEditMode, notInRecycleBin]);
+    setIsInEditMode(isEditMode && notInRecycleBin && canEdit);
+  }, [canEdit, isEditMode, notInRecycleBin]);
 
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
@@ -108,6 +107,7 @@ export const FileFullscreenModal = ({
         isEditable={isEditable}
         id={id}
         onFileContentRefresh={refreshModalContent}
+        showViewOnlyLabel={!canEdit}
       />
       {isInEditMode && isEditable ? (
         <FileEditor key={refreshKey} id={id} />

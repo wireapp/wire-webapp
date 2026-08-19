@@ -431,6 +431,7 @@
   "cells.heading": "Files",
   "cells.imageFullScreenModal.closeButton": "Close",
   "cells.imageFullScreenModal.downloadButton": "Download",
+  "cells.imageFullScreenModal.viewerAccessLabel": "Viewer access",
   "cells.modal.closeButton": "Close",
   "cells.moveNodeModal.cancelButton": "Cancel",
   "cells.moveNodeModal.createFolder.hintButton": "Create a new folder",
