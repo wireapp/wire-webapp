@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {AVATAR_SIZE} from 'Components/avatar';
@@ -27,6 +27,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from 'Util/localizerUtil';
 
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
 
@@ -36,16 +37,24 @@ const createUser = (id: string, name: string) => {
   return user;
 };
 
-const renderParticipantAvatarTooltip = (participant: User, organizer?: User) => {
+const translateForTooltip: Translate = (key, substitutions) => {
+  if (key === 'meetings.participant.nameWithOrganizer' && substitutions) {
+    return `${substitutions.name} (${substitutions.organizer})`;
+  }
+
+  return translateForTest(key);
+};
+
+const renderParticipantAvatarTooltip = (participant: User, organizer?: User, index = 0) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({translate: translateForTest}),
+    createRootContextValueForTest({translate: translateForTooltip}),
   );
   const result = render(
     <ThemeProvider>
       <ParticipantAvatarTooltip
         participant={participant}
         organizer={organizer?.qualifiedId}
-        index={0}
+        index={index}
         avatarSize={AVATAR_SIZE.X_SMALL}
         avatarRingColor="black"
       />
@@ -81,5 +90,50 @@ describe('ParticipantAvatarTooltip', () => {
     renderParticipantAvatarTooltip(organizer, organizer);
 
     expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Kim Organizer (meetings.participant.organizer)');
+  });
+
+  it('updates the tooltip and aria-label when the participant name changes', async () => {
+    const participant = createUser('participant', 'Alice Anderson');
+
+    renderParticipantAvatarTooltip(participant);
+    act(() => participant.name('Alex Anderson'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Alex Anderson');
+    });
+  });
+
+  it('uses the unavailable-user label when the participant is unavailable', () => {
+    const participant = createUser('', '');
+
+    renderParticipantAvatarTooltip(participant);
+
+    expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'unavailableUser');
+  });
+
+  it('shows the name belonging to the hovered stacked avatar', () => {
+    const firstParticipant = createUser('first', 'First Participant');
+    const secondParticipant = createUser('second', 'Second Participant');
+    const thirdParticipant = createUser('third', 'Third Participant');
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({translate: translateForTooltip}),
+    );
+
+    const result = render(
+      <ThemeProvider>
+        <>
+          <ParticipantAvatarTooltip participant={firstParticipant} avatarSize={AVATAR_SIZE.X_SMALL} />
+          <ParticipantAvatarTooltip participant={secondParticipant} index={1} avatarSize={AVATAR_SIZE.X_SMALL} />
+          <ParticipantAvatarTooltip participant={thirdParticipant} index={2} avatarSize={AVATAR_SIZE.X_SMALL} />
+        </>
+      </ThemeProvider>,
+      {wrapper: rootProviderWrapper},
+    );
+    result.container.id = 'wire-app';
+
+    const tooltipWrappers = screen.getAllByRole('presentation');
+    fireEvent.mouseEnter(tooltipWrappers[1]);
+
+    expect(screen.getByText('Second Participant')).toBeInTheDocument();
   });
 });

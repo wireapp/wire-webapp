@@ -23,6 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {useUserName} from 'Components/UserName';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -46,22 +47,25 @@ export const ParticipantAvatarTooltip = ({
 }: ParticipantAvatarTooltipProps) => {
   const {translate} = useApplicationContext();
   const isOrganizer = !isUndefined(organizer) && matchQualifiedIds(participant.qualifiedId, organizer);
-  const organizerLabel = translate('meetings.participant.organizer');
-  const label = `${participant.name()}${isOrganizer ? ` (${organizerLabel})` : ''}`;
+  const name = useUserName(participant);
+  const label = isOrganizer
+    ? translate('meetings.participant.nameWithOrganizer', {
+        name,
+        organizer: translate('meetings.participant.organizer'),
+      })
+    : name;
 
   return (
-    <Tooltip body={label}>
-      <div css={avatarRingColor ? avatarItemStyles(index, avatarRingColor) : undefined}>
-        <Avatar
-          participant={participant}
-          aria-label={label}
-          title={undefined}
-          avatarSize={avatarSize}
-          hideAvailabilityStatus
-          noBadge
-          className="cursor-default"
-        />
-      </div>
+    <Tooltip body={label} css={avatarRingColor ? avatarItemStyles(index, avatarRingColor) : undefined}>
+      <Avatar
+        participant={participant}
+        aria-label={label}
+        title={undefined}
+        avatarSize={avatarSize}
+        hideAvailabilityStatus
+        noBadge
+        className="cursor-default"
+      />
     </Tooltip>
   );
 };
