@@ -128,7 +128,6 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
             setIsRequestOngoing={setIsRequestOngoing}
             isToggleDisabled={isToggleDisabled}
             isPasswordSupported={isPasswordSupported}
-            teamState={teamState}
           />
         ) : (
           <ServicesOptions

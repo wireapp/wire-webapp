@@ -94,7 +94,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   const inTeam = teamState.isInTeam(activeConversation);
 
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
-  const isCellsConversation = cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isCellsConversationEnabled = cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
   const isGuestLinkEnabled = inTeam
     ? isTeamStateGuestLinkEnabled
     : isTeamStateGuestLinkEnabled && conversationHasGuestLinkEnabled;
@@ -294,7 +294,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           isChecked={isGuestEnabled}
           setIsChecked={toggleGuestAccess}
           isDisabled={isToggleDisabled}
-          infoText={isCellsConversation ? translate('guestRoomToggleCellsInfo') : ''}
+          infoText={isCellsConversationEnabled ? translate('guestRoomToggleCellsInfo') : ''}
           toggleName={translate('guestRoomToggleName')}
           toggleId="guests"
         />
