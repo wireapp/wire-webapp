@@ -1186,6 +1186,7 @@ jobs:
       [
         build_artifact,
         create_beta_tag,
+        production_approval,
         deploy_to_production,
         verify_production_runtime,
         create_production_tag,
@@ -1226,6 +1227,7 @@ jobs:
             Promoted Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
             Production tag: ${{ needs.create_production_tag.outputs.production_tag_name }}
             Production URL: ${{ env.PRODUCTION_WEBAPP_URL }}
+            Production approval result: ${{ needs.production_approval.result }}
             Production deployment result: ${{ needs.deploy_to_production.result }}
             Production runtime-verification result: ${{ needs.verify_production_runtime.result }}
             Production distribution result: ${{ needs.publish_production_distribution.result }}
@@ -1251,6 +1253,7 @@ jobs:
         supersede_previous_candidates,
         run_e2e,
         production_preflight,
+        production_approval,
         deploy_to_production,
         verify_production_runtime,
         create_production_tag,
@@ -1306,6 +1309,7 @@ jobs:
           E2E_REPORT_URL: ${{ needs.run_e2e.outputs.reportUrl }}
           E2E_RESULT: ${{ needs.run_e2e.result }}
           E2E_WEBAPP_URL: ${{ env.E2E_WEBAPP_URL }}
+          PRODUCTION_APPROVAL_RESULT: ${{ needs.production_approval.result }}
           PRODUCTION_DEPLOYMENT_RESULT: ${{ needs.deploy_to_production.result }}
           PRODUCTION_DISTRIBUTION_JOB_RESULT: ${{ needs.publish_production_distribution.result }}
           PRODUCTION_DISTRIBUTION_RESULT: ${{ needs.publish_production_distribution.outputs.distribution_result }}
@@ -1355,6 +1359,7 @@ jobs:
         supersede_previous_candidates,
         run_e2e,
         production_preflight,
+        production_approval,
         deploy_to_production,
         verify_production_runtime,
         create_production_tag,
@@ -1393,6 +1398,7 @@ jobs:
             Older workflows remain visible; the final live-Beta guard blocks stale Production promotion.
             E2E system gate: ${{ needs.run_e2e.result }}
             Production preflight: ${{ needs.production_preflight.result }}
+            Production approval: ${{ needs.production_approval.result }}
             Production deployment: ${{ needs.deploy_to_production.result }}
             Production runtime verification: ${{ needs.verify_production_runtime.result }}
             Production tag: ${{ needs.create_production_tag.result }}

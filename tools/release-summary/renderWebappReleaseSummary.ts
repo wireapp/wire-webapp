@@ -65,6 +65,7 @@ export type E2ESummaryInput = {
 export type ProductionPreflightResult = 'already_tagged' | 'failure' | 'ready' | 'skipped';
 
 export type ProductionSummaryInput = {
+  readonly approvalResult: Maybe<WorkflowJobResult>;
   readonly deploymentResult: Maybe<WorkflowJobResult>;
   readonly deploymentRequired: Maybe<boolean>;
   readonly environmentName: Maybe<string>;
@@ -276,6 +277,7 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       url: readOptionalEnvironmentValue(environment, 'GITHUB_RELEASE_URL'),
     },
     production: {
+      approvalResult: readWorkflowJobResult(environment, 'PRODUCTION_APPROVAL_RESULT'),
       createdTagName: readOptionalEnvironmentValue(environment, 'CREATED_PRODUCTION_TAG_NAME'),
       deploymentResult: readWorkflowJobResult(environment, 'PRODUCTION_DEPLOYMENT_RESULT'),
       deploymentRequired: readOptionalBoolean(environment, 'PRODUCTION_DEPLOYMENT_REQUIRED'),
@@ -688,6 +690,44 @@ function formatProductionPreflightResult(input: ProductionSummaryInput): string 
   );
 }
 
+function formatProductionApprovalResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOr('approval result unavailable', actualResult => {
+    return match(actualResult)
+      .with('success', () => {
+        return 'approved';
+      })
+      .with('failure', () => {
+        return 'rejected or failed';
+      })
+      .with('cancelled', () => {
+        return 'cancelled';
+      })
+      .with('skipped', () => {
+        return 'not run';
+      })
+      .exhaustive();
+  });
+}
+
+function formatProductionDeploymentResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOr('unknown result', actualResult => {
+    return match(actualResult)
+      .with('success', () => {
+        return 'completed successfully';
+      })
+      .with('failure', () => {
+        return 'failed';
+      })
+      .with('cancelled', () => {
+        return 'cancelled';
+      })
+      .with('skipped', () => {
+        return 'not run';
+      })
+      .exhaustive();
+  });
+}
+
 function formatProductionResult(input: ProductionSummaryInput): string {
   if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
     return 'already tagged; deployment not required';
@@ -711,6 +751,22 @@ function formatProductionResult(input: ProductionSummaryInput): string {
 
   if (!hasProductionPreflightResult(input.preflightResult, 'ready')) {
     return 'unknown result';
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'failure')) {
+    return 'approval rejected or failed; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'cancelled')) {
+    return 'approval was cancelled; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'skipped')) {
+    return 'approval did not run; deployment not started';
+  }
+
+  if (!hasWorkflowJobResult(input.approvalResult, 'success')) {
+    return 'approval result unavailable; deployment status unavailable';
   }
 
   if (hasWorkflowJobResult(input.deploymentResult, 'failure')) {
@@ -781,6 +837,25 @@ function formatProductionSkipReason(input: ProductionSummaryInput): Maybe<string
     return Maybe.just('Production preflight failed');
   }
 
+  if (hasWorkflowJobResult(input.approvalResult, 'failure')) {
+    return Maybe.just('Production approval was rejected or failed');
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'cancelled')) {
+    return Maybe.just('Production approval was cancelled');
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'skipped')) {
+    return Maybe.just('Production approval did not run');
+  }
+
+  if (
+    hasProductionPreflightResult(input.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.approvalResult, 'success') === false
+  ) {
+    return Maybe.just('Production approval result was unavailable');
+  }
+
   if (hasWorkflowJobResult(input.deploymentResult, 'skipped')) {
     return Maybe.just('Production deployment did not run');
   }
@@ -794,7 +869,7 @@ function formatApprovalGate(input: ProductionSummaryInput): string {
   }
 
   if (hasProductionPreflightResult(input.preflightResult, 'ready')) {
-    return `${formatValueOrFallback(input.environmentName)} GitHub Environment settings`;
+    return `${formatValueOrFallback(input.environmentName)} GitHub Environment ${formatProductionApprovalResult(input.approvalResult)}`;
   }
 
   return 'not reached';
@@ -1022,6 +1097,18 @@ function hasProductionPreflightCancellation(input: ProductionSummaryInput): bool
   return hasWorkflowJobResult(input.preflightJobResult, 'cancelled');
 }
 
+function hasProductionApprovalFailure(input: ProductionSummaryInput): boolean {
+  return hasWorkflowJobResult(input.approvalResult, 'failure');
+}
+
+function hasProductionApprovalCancellation(input: ProductionSummaryInput): boolean {
+  return hasWorkflowJobResult(input.approvalResult, 'cancelled');
+}
+
+function hasProductionApprovalSkipped(input: ProductionSummaryInput): boolean {
+  return hasWorkflowJobResult(input.approvalResult, 'skipped');
+}
+
 function hasHostedProductionCompleted(input: ProductionSummaryInput): boolean {
   return (
     hasProductionPreflightResult(input.preflightResult, 'ready') &&
@@ -1171,6 +1258,25 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
     return 'Release incomplete because Production preflight did not run';
   }
 
+  if (hasProductionApprovalFailure(input.production)) {
+    return 'Release stopped because Production approval was rejected or failed';
+  }
+
+  if (hasProductionApprovalCancellation(input.production)) {
+    return 'Release stopped because Production approval was cancelled';
+  }
+
+  if (hasProductionApprovalSkipped(input.production)) {
+    return 'Release incomplete because Production approval did not run';
+  }
+
+  if (
+    hasProductionPreflightResult(input.production.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.production.approvalResult, 'success') === false
+  ) {
+    return 'Release status is unavailable because Production approval result is missing';
+  }
+
   if (hasWorkflowJobResult(input.production.deploymentResult, 'failure')) {
     return 'Release stopped because Hosted Production deployment failed';
   }
@@ -1311,6 +1417,25 @@ function formatFinalProductionOverview(input: WebappReleaseSummaryInput): string
     return 'unavailable because the E2E system gate did not run';
   }
 
+  if (hasProductionApprovalFailure(input.production)) {
+    return 'blocked because Production approval was rejected or failed';
+  }
+
+  if (hasProductionApprovalCancellation(input.production)) {
+    return 'unavailable because Production approval was cancelled';
+  }
+
+  if (hasProductionApprovalSkipped(input.production)) {
+    return 'unavailable because Production approval did not run';
+  }
+
+  if (
+    hasProductionPreflightResult(input.production.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.production.approvalResult, 'success') === false
+  ) {
+    return 'unavailable because Production approval result is missing';
+  }
+
   return formatProductionResult(input.production);
 }
 
@@ -1430,6 +1555,8 @@ function renderProductionSection(input: WebappReleaseSummaryInput): string {
     '',
     `- Result: ${formatProductionResult(input.production)}`,
     `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
+    `- Production approval result: ${formatProductionApprovalResult(input.production.approvalResult)}`,
+    `- Production deployment result: ${formatProductionDeploymentResult(input.production.deploymentResult)}`,
     ...productionSkipReasonLines,
     `- Target environment: ${formatValueOrFallback(input.production.environmentName)}`,
     `- Frontend URL: ${formatOptionalFrontendUrl(input.production.webappUrl)}`,
