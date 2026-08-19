@@ -487,12 +487,13 @@ jobs:
   notify_beta_release_success:
     name: Notify successful Beta release
     runs-on: ubuntu-24.04
-    needs: [build_artifact, deploy_to_beta, create_beta_tag]
+    needs: [build_artifact, deploy_to_beta, create_beta_tag, supersede_previous_candidates]
     if: >-
       ${{
         always() &&
         needs.deploy_to_beta.result == 'success' &&
-        needs.create_beta_tag.result == 'success'
+        needs.create_beta_tag.result == 'success' &&
+        needs.supersede_previous_candidates.result == 'success'
       }}
     continue-on-error: true
     permissions:
@@ -577,6 +578,7 @@ jobs:
       - build_artifact
       - deploy_to_beta
       - create_beta_tag
+      - supersede_previous_candidates
     if: ${{ always() }}
     permissions:
       contents: read
@@ -628,12 +630,53 @@ jobs:
           SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
         run: node tools/release-summary/renderWebappReleaseSummary.ts --beta-release >> "$GITHUB_STEP_SUMMARY"
 
+  supersede_previous_candidates:
+    name: Supersede previous Beta candidates
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, deploy_to_beta, create_beta_tag]
+    permissions:
+      actions: write
+      contents: read
+    outputs:
+      superseded_run_count: ${{ steps.supersede_candidates.outputs.superseded_run_count }}
+      superseded_run_ids: ${{ steps.supersede_candidates.outputs.superseded_run_ids }}
+      cancellation_conflict_run_count: ${{ steps.supersede_candidates.outputs.cancellation_conflict_run_count }}
+      cancellation_conflict_run_ids: ${{ steps.supersede_candidates.outputs.cancellation_conflict_run_ids }}
+
+    steps:
+      - name: Checkout release tooling
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install release tooling dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Supersede previous Beta candidates
+        id: supersede_candidates
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/release-cli/releaseCandidateSupersessionCommand.mts
+
   # WebApp release owns release-specific success and failure notifications.
   # The reusable workflow's optional failure-only notification is intentionally
   # not enabled here to prevent duplicate failure messages.
   run_e2e:
     name: Deploy to precommit and run E2E
-    needs: [build_artifact, create_beta_tag]
+    needs: [build_artifact, create_beta_tag, supersede_previous_candidates]
     permissions:
       contents: read
     uses: ./.github/workflows/precommit-slot-run.yml
@@ -785,19 +828,59 @@ jobs:
             echo "production_tag_name=${production_tag_name}"
           } >> "$GITHUB_OUTPUT"
 
+  production_approval:
+    name: Approve Production deployment
+    runs-on: ubuntu-24.04
+    needs: production_preflight
+    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' }}
+    permissions: {}
+    # This job is the approval gate only. The Deploy to Production job below
+    # is the non-cancellable Production operation boundary.
+    environment: wire-webapp-prod
+    steps:
+      - name: Record Production approval
+        run: echo 'Production approval granted; the non-cancellable deployment job may start.'
+
   deploy_to_production:
     name: Deploy to Production
     runs-on: ubuntu-24.04
-    needs: [build_artifact, production_preflight]
-    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' }}
-    permissions: {}
-    # Production approval is enforced by the wire-webapp-prod GitHub Environment settings.
-    environment: wire-webapp-prod
+    needs: [build_artifact, production_preflight, production_approval]
+    if: >-
+      ${{
+        needs.production_preflight.outputs.should_deploy == 'true' &&
+        needs.production_approval.result == 'success'
+      }}
+    permissions:
+      contents: read
     concurrency:
       group: deploy-webapp-production
       cancel-in-progress: false
       queue: max
     steps:
+      - name: Checkout runtime verification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+
+      - name: Setup Node.js for runtime verification
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Verify current Beta runtime
+        uses: ./.github/actions/verify-webapp-runtime
+        with:
+          environment-label: Current Beta before Production promotion
+          webapp-url: ${{ env.BETA_WEBAPP_URL }}
+          expected-version: ${{ needs.build_artifact.outputs.artifact_version }}
+          expected-asset-version: ${{ needs.build_artifact.outputs.artifact_asset_version }}
+          expected-commit: ${{ needs.build_artifact.outputs.artifact_commit }}
+          expected-built-at: ${{ needs.build_artifact.outputs.artifact_built_at }}
+          expected-backend-rest: ${{ env.BETA_RUNTIME_BACKEND_REST }}
+          expected-backend-ws: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+
       - name: Download build artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
@@ -1163,6 +1246,7 @@ jobs:
         build_artifact,
         deploy_to_beta,
         create_beta_tag,
+        supersede_previous_candidates,
         run_e2e,
         production_preflight,
         deploy_to_production,
@@ -1264,6 +1348,7 @@ jobs:
         build_artifact,
         deploy_to_beta,
         create_beta_tag,
+        supersede_previous_candidates,
         run_e2e,
         production_preflight,
         deploy_to_production,
@@ -1299,6 +1384,7 @@ jobs:
             Build: ${{ needs.build_artifact.result }}
             Beta deployment: ${{ needs.deploy_to_beta.result }}
             Beta tag: ${{ needs.create_beta_tag.result }}
+            Beta candidate supersession: ${{ needs.supersede_previous_candidates.result }}
             E2E system gate: ${{ needs.run_e2e.result }}
             Production preflight: ${{ needs.production_preflight.result }}
             Production deployment: ${{ needs.deploy_to_production.result }}
