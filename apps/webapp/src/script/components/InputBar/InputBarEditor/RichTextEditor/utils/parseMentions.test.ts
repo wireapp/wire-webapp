@@ -48,14 +48,16 @@ type ParsedMentionValue = {
   readonly domain: string | undefined;
 };
 
-function createTestUser({userId, userName, userDomain}: CreateTestUserOptions): User {
+function createTestUser(testUserOptions: CreateTestUserOptions): User {
+  const {userId, userName, userDomain} = testUserOptions;
   const user = new User(userId, userDomain ?? '', translateForTest);
   user.name(userName);
 
   return user;
 }
 
-function setMentionEditorContent({harness, text, mentionValues}: MentionEditorContentOptions): void {
+function setMentionEditorContent(mentionEditorContentOptions: MentionEditorContentOptions): void {
+  const {harness, text, mentionValues} = mentionEditorContentOptions;
   harness.editor.update(
     () => {
       const paragraph = $createParagraphNode();

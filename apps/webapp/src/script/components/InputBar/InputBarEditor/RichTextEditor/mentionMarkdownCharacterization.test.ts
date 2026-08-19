@@ -98,7 +98,8 @@ function createMentionTransformers(allowedMentions: string[]): Transformer[] {
   return [mentionMarkdownTransformer, ...markdownTransformers];
 }
 
-function importMentionMarkdown({harness, inputMarkdown, allowedMentions}: ImportMentionMarkdownOptions): void {
+function importMentionMarkdown(importMentionMarkdownOptions: ImportMentionMarkdownOptions): void {
+  const {harness, inputMarkdown, allowedMentions} = importMentionMarkdownOptions;
   const transformers = createMentionTransformers(allowedMentions);
 
   harness.editor.update(

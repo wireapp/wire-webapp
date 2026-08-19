@@ -36,8 +36,8 @@ test.describe('Markdown', () => {
   test(
     'normalizes CRLF in plain text pasted into the editor',
     {tag: ['@rich-text-characterization', '@regression']},
-    async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+    async testContext => {
+      const userAPage = await testContext.createPage(withLogin(userA));
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -63,8 +63,8 @@ test.describe('Markdown', () => {
   test(
     'preserves rich HTML formatting, links, and lists when pasted into the editor',
     {tag: ['@rich-text-characterization', '@regression']},
-    async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA));
+    async testContext => {
+      const userAPage = await testContext.createPage(withLogin(userA));
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
@@ -72,17 +72,20 @@ test.describe('Markdown', () => {
 
       const messageInput = userAPages.conversation().messageInput;
       await messageInput.click();
-      await userAPage.evaluate(async clipboardContents => {
-        const clipboardItem = new ClipboardItem({
-          'text/html': new Blob([clipboardContents.html], {type: 'text/html'}),
-          'text/plain': new Blob([clipboardContents.plainText], {type: 'text/plain'}),
-        });
+      await userAPage.evaluate(
+        async clipboardContents => {
+          const clipboardItem = new ClipboardItem({
+            'text/html': new Blob([clipboardContents.html], {type: 'text/html'}),
+            'text/plain': new Blob([clipboardContents.plainText], {type: 'text/plain'}),
+          });
 
-        await navigator.clipboard.write([clipboardItem]);
-      }, {
-        html: '<p><strong>Pasted bold</strong> <a href="https://wire.com">Wire</a></p><ul><li>first</li><li>second</li></ul>',
-        plainText: 'Pasted bold Wire\nfirst\nsecond',
-      });
+          await navigator.clipboard.write([clipboardItem]);
+        },
+        {
+          html: '<p><strong>Pasted bold</strong> <a href="https://wire.com">Wire</a></p><ul><li>first</li><li>second</li></ul>',
+          plainText: 'Pasted bold Wire\nfirst\nsecond',
+        },
+      );
       await messageInput.press('ControlOrMeta+v');
 
       await expect(messageInput.locator('strong')).toHaveText('Pasted bold');
