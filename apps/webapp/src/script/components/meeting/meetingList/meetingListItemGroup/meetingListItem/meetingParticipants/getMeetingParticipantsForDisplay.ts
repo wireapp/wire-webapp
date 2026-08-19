@@ -26,8 +26,10 @@ export const getMeetingParticipantsForDisplay = (
   participants: User[],
   selfUser: User,
   qualifiedCreator: QualifiedId,
+  organizerUser?: User,
 ): User[] => {
-  const organizer = participants.find(participant => matchQualifiedIds(participant.qualifiedId, qualifiedCreator));
+  const organizer =
+    participants.find(participant => matchQualifiedIds(participant.qualifiedId, qualifiedCreator)) ?? organizerUser;
   const otherParticipants = participants.filter(
     participant =>
       !matchQualifiedIds(participant.qualifiedId, selfUser.qualifiedId) &&

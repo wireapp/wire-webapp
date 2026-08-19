@@ -39,6 +39,18 @@ describe('getMeetingParticipantsForDisplay', () => {
     );
   });
 
+  it('handles the production participant list where self is absent', () => {
+    const selfUser = createUser('self', 'Kim Self');
+    const otherUser = createUser('other', 'Jaqueline Olaho');
+    const organizer = createUser('organizer', 'Organizer');
+
+    expect(getMeetingParticipantsForDisplay([otherUser, organizer], selfUser, organizer.qualifiedId)).toEqual([
+      organizer,
+      selfUser,
+      otherUser,
+    ]);
+  });
+
   it('places the self user first when they are the organizer', () => {
     const selfUser = createUser('self', 'Kim Organizer');
     const otherUser = createUser('other', 'Jaqueline Olaho');
@@ -61,5 +73,17 @@ describe('getMeetingParticipantsForDisplay', () => {
     const selfUser = createUser('self', 'Kim Organizer');
 
     expect(getMeetingParticipantsForDisplay([], selfUser, selfUser.qualifiedId)).toEqual([selfUser]);
+  });
+
+  it('places a known organizer first when they are absent from the participant list', () => {
+    const selfUser = createUser('self', 'Kim Self');
+    const organizer = createUser('organizer', 'Organizer');
+    const otherUser = createUser('other', 'Jaqueline Olaho');
+
+    expect(getMeetingParticipantsForDisplay([otherUser], selfUser, organizer.qualifiedId, organizer)).toEqual([
+      organizer,
+      selfUser,
+      otherUser,
+    ]);
   });
 });
