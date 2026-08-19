@@ -71,6 +71,32 @@ describe('release candidate supersession decisions', () => {
     expect(actualResult.value.every(candidate => candidate.state === 'superseded')).toBe(true);
   });
 
+  it('selects only runs older than the current run', () => {
+    const observations = [
+      createObservation({id: 10, createdAt: '2026-08-19T10:10:00Z'}),
+      createObservation({id: 20, createdAt: '2026-08-19T10:20:00Z'}),
+      createObservation({id: 30, createdAt: '2026-08-19T10:30:00Z'}),
+    ];
+
+    const actualResult = selectSupersedableReleaseCandidates({currentRunId: 20, observations});
+
+    assert(actualResult.isOk);
+    expect(actualResult.value.map(candidate => candidate.run.id)).toEqual([10]);
+  });
+
+  it('uses the run ID as a deterministic tie-breaker for equal creation timestamps', () => {
+    const observations = [
+      createObservation({id: 30, createdAt: '2026-08-19T10:00:00Z'}),
+      createObservation({id: 20, createdAt: '2026-08-19T10:00:00Z'}),
+      createObservation({id: 10, createdAt: '2026-08-19T10:00:00Z'}),
+    ];
+
+    const actualResult = selectSupersedableReleaseCandidates({currentRunId: 20, observations});
+
+    assert(actualResult.isOk);
+    expect(actualResult.value.map(candidate => candidate.run.id)).toEqual([10]);
+  });
+
   it('does not select the current run even when it is still in progress', () => {
     const observations = [createObservation({id: 30})];
 
@@ -85,7 +111,10 @@ describe('release candidate supersession decisions', () => {
       createProductionJob({status: 'completed', conclusion: 'success'}),
     ]);
 
-    const actualResult = selectSupersedableReleaseCandidates({currentRunId: 30, observations: [completedObservation]});
+    const actualResult = selectSupersedableReleaseCandidates({
+      currentRunId: 30,
+      observations: [completedObservation, createObservation({id: 30})],
+    });
 
     assert(actualResult.isOk);
     expect(actualResult.value).toEqual([]);
@@ -94,7 +123,10 @@ describe('release candidate supersession decisions', () => {
   it('does not supersede a release whose Production operation is in progress', () => {
     const observation = createObservation({id: 10}, [createProductionJob({status: 'in_progress'})]);
 
-    const actualResult = selectSupersedableReleaseCandidates({currentRunId: 30, observations: [observation]});
+    const actualResult = selectSupersedableReleaseCandidates({
+      currentRunId: 30,
+      observations: [observation, createObservation({id: 30})],
+    });
 
     assert(actualResult.isOk);
     expect(actualResult.value).toEqual([]);
@@ -109,7 +141,10 @@ describe('release candidate supersession decisions', () => {
       createProductionJob({status: 'completed', conclusion: 'failure'}),
     ]);
 
-    const actualResult = selectSupersedableReleaseCandidates({currentRunId: 30, observations: [observation]});
+    const actualResult = selectSupersedableReleaseCandidates({
+      currentRunId: 30,
+      observations: [observation, createObservation({id: 30})],
+    });
 
     assert(actualResult.isOk);
     expect(actualResult.value).toEqual([]);
@@ -118,7 +153,10 @@ describe('release candidate supersession decisions', () => {
   it('keeps a release promotable while its Production job is only queued', () => {
     const observation = createObservation({id: 10}, [createProductionJob({status: 'queued'})]);
 
-    const actualResult = selectSupersedableReleaseCandidates({currentRunId: 30, observations: [observation]});
+    const actualResult = selectSupersedableReleaseCandidates({
+      currentRunId: 30,
+      observations: [observation, createObservation({id: 30})],
+    });
 
     assert(actualResult.isOk);
     expect(actualResult.value.map(candidate => candidate.run.id)).toEqual([10]);
@@ -144,6 +182,16 @@ describe('release candidate supersession decisions', () => {
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).toContain('has a conclusion');
+  });
+
+  it('fails closed when the current workflow run is missing from GitHub state', () => {
+    const actualResult = selectSupersedableReleaseCandidates({
+      currentRunId: 30,
+      observations: [createObservation({id: 10})],
+    });
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('is missing from GitHub Actions state');
   });
 
   it('fails closed when a Production job has no conclusion after completion', () => {

@@ -18,7 +18,7 @@
  */
 
 import {isInteger} from '@sindresorhus/is';
-import {Result} from 'true-myth';
+import {maybe, Result} from 'true-myth';
 
 export type WorkflowRunStatus = 'completed' | 'in_progress' | 'pending' | 'queued' | 'requested' | 'waiting';
 
@@ -65,6 +65,11 @@ export type SupersedableReleaseCandidate = {
 export type SelectSupersedableReleaseCandidatesOptions = {
   readonly currentRunId: number;
   readonly observations: readonly ReleaseCandidateObservation[];
+};
+
+type ValidatedReleaseCandidateObservation = {
+  readonly observation: ReleaseCandidateObservation;
+  readonly state: ReleaseCandidateState;
 };
 
 export const productionOperationJobName = 'Deploy to Production';
@@ -174,22 +179,48 @@ export function selectSupersedableReleaseCandidates(
     return createFailure(`Current workflow run has an invalid id: ${options.currentRunId}`);
   }
 
-  const sortedObservations = options.observations.toSorted((leftObservation, rightObservation) => {
-    return compareReleaseWorkflowRuns(leftObservation.run, rightObservation.run);
-  });
-  const supersedableCandidates: SupersedableReleaseCandidate[] = [];
+  const currentObservation = maybe.find(observation => {
+    return observation.run.id === options.currentRunId;
+  }, options.observations);
 
-  for (const observation of sortedObservations) {
-    if (observation.run.id === options.currentRunId) {
-      continue;
+  if (currentObservation.isNothing) {
+    return createFailure(`Current workflow run ${options.currentRunId} is missing from GitHub Actions state`);
+  }
+
+  const observedRunIds = new Set<number>();
+  const validatedObservations: ValidatedReleaseCandidateObservation[] = [];
+
+  for (const observation of options.observations) {
+    if (observedRunIds.has(observation.run.id)) {
+      return createFailure(`GitHub Actions state contains duplicate workflow run ${observation.run.id}`);
     }
+
+    observedRunIds.add(observation.run.id);
 
     const candidateStateResult = determineReleaseCandidateState(observation);
     if (candidateStateResult.isErr) {
       return createFailure(candidateStateResult.error.message);
     }
 
-    if (candidateStateResult.value === 'promotable') {
+    validatedObservations.push({observation, state: candidateStateResult.value});
+  }
+
+  const sortedObservations = validatedObservations.toSorted((leftObservation, rightObservation) => {
+    return compareReleaseWorkflowRuns(leftObservation.observation.run, rightObservation.observation.run);
+  });
+  const supersedableCandidates: SupersedableReleaseCandidate[] = [];
+
+  for (const validatedObservation of sortedObservations) {
+    const {observation, state} = validatedObservation;
+
+    if (
+      observation.run.id === options.currentRunId ||
+      compareReleaseWorkflowRuns(observation.run, currentObservation.value.run) >= 0
+    ) {
+      continue;
+    }
+
+    if (state === 'promotable') {
       supersedableCandidates.push({run: observation.run, state: 'superseded'});
     }
   }
