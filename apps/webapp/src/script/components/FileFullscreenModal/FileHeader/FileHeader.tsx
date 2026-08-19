@@ -106,8 +106,6 @@ export const FileHeader = ({
   const isRecycleBin = isInRecycleBin();
   const cellsRepository = container.resolve(CellsRepository);
   const {showModal} = useFileHistoryModal();
-  const canEdit = canPerformCellsAction(CELLS_ACTION.EDIT);
-  const canDownload = canPerformCellsAction(CELLS_ACTION.DOWNLOAD);
   const canViewVersionHistory = canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY);
 
   const handleFileDownload = async () => {
@@ -150,7 +148,7 @@ export const FileHeader = ({
             <ShowIcon width={16} height={16} />
             Viewing
           </button>
-          {!isRecycleBin && canEdit && (
+          {!isRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT) && (
             <button
               title="Editing"
               aria-label="Editing"
@@ -172,7 +170,7 @@ export const FileHeader = ({
             {translate('cells.imageFullScreenModal.viewerAccessLabel')}
           </div>
         )}
-        {!showViewOnlyLabel && !isRecycleBin && canDownload && (
+        {!showViewOnlyLabel && !isRecycleBin && canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && (
           <Button
             variant={ButtonVariant.TERTIARY}
             css={downloadButtonStyles}
@@ -195,7 +193,7 @@ export const FileHeader = ({
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh(), canDownload)}>
+              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
                 {translate('cells.options.versionHistory')}
               </DropdownMenu.Item>
             </DropdownMenu.Content>
