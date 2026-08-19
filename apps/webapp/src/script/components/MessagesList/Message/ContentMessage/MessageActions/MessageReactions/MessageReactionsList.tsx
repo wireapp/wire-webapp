@@ -57,6 +57,7 @@ const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) 
         return (
           <EmojiPill
             reactingUsers={reactingUsers}
+            emojiCount={users.length}
             hasUserReacted={hasUserReacted}
             emojiUnicode={emojiUnicode}
             emoji={emoji}

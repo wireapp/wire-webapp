@@ -49,6 +49,7 @@ interface EmojiPillProps {
   isRemovedFromConversation: boolean;
   index: number;
   emojiListCount: number;
+  emojiCount: number;
   hasUserReacted: boolean;
   reactingUsers: User[];
 }
@@ -66,14 +67,13 @@ export const EmojiPill = ({
   isRemovedFromConversation,
   index,
   emojiListCount,
+  emojiCount,
   hasUserReacted,
   reactingUsers,
 }: EmojiPillProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;
-
-  const emojiCount = reactingUsers.length;
 
   const reactingUserNames = reactingUsers.slice(0, MAX_USER_NAMES_TO_SHOW).map(user => user.name());
 
