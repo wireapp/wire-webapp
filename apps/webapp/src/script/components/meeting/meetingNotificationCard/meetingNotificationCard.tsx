@@ -77,7 +77,7 @@ const MeetingNotificationOrganizerAndTimeMetadata = ({
 
   return (
     <>
-      {translate('meetings.notifications.by', {organizer})}
+      {translate('meetings.notifications.by', {organizer}, undefined, true)}
       {organizer && meetingTime && <span aria-hidden="true"> • </span>}
       {meetingTime}
     </>
@@ -114,7 +114,7 @@ const MeetingNotificationMetadata = ({
 
       return (
         <>
-          {translate('meetings.notifications.by', {organizer})}
+          {translate('meetings.notifications.by', {organizer}, undefined, true)}
           {organizer && <span aria-hidden="true"> • </span>}
           <span css={meetingNotificationCardOngoingTimeStyles}>
             {translate('meetings.meetingStatus.startedAt', {time: meetingTime})}
