@@ -785,19 +785,62 @@ jobs:
             echo "production_tag_name=${production_tag_name}"
           } >> "$GITHUB_OUTPUT"
 
+  production_approval:
+    name: Approve Production deployment
+    runs-on: ubuntu-24.04
+    needs: production_preflight
+    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' }}
+    permissions: {}
+    # This job is the approval gate only. The Deploy to Production job below
+    # is the non-cancellable Production operation boundary.
+    environment: wire-webapp-prod
+    steps:
+      - name: Record Production approval
+        run: echo 'Production approval granted; the non-cancellable deployment job may start.'
+
   deploy_to_production:
     name: Deploy to Production
     runs-on: ubuntu-24.04
-    needs: [build_artifact, production_preflight]
-    if: ${{ needs.production_preflight.outputs.should_deploy == 'true' }}
-    permissions: {}
-    # Production approval is enforced by the wire-webapp-prod GitHub Environment settings.
-    environment: wire-webapp-prod
+    needs: [build_artifact, production_preflight, production_approval]
+    if: >-
+      ${{
+        needs.production_preflight.outputs.should_deploy == 'true' &&
+        needs.production_approval.result == 'success'
+      }}
+    permissions:
+      contents: read
+    outputs:
+      current_beta_verification_result: ${{ steps.verify_current_beta.outcome }}
     concurrency:
       group: deploy-webapp-production
       cancel-in-progress: false
       queue: max
     steps:
+      - name: Checkout runtime verification action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+
+      - name: Setup Node.js for runtime verification
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Verify current Beta runtime
+        id: verify_current_beta
+        uses: ./.github/actions/verify-webapp-runtime
+        with:
+          environment-label: Current Beta before Production promotion
+          webapp-url: ${{ env.BETA_WEBAPP_URL }}
+          expected-version: ${{ needs.build_artifact.outputs.artifact_version }}
+          expected-asset-version: ${{ needs.build_artifact.outputs.artifact_asset_version }}
+          expected-commit: ${{ needs.build_artifact.outputs.artifact_commit }}
+          expected-built-at: ${{ needs.build_artifact.outputs.artifact_built_at }}
+          expected-backend-rest: ${{ env.BETA_RUNTIME_BACKEND_REST }}
+          expected-backend-ws: ${{ env.BETA_RUNTIME_BACKEND_WS }}
+
       - name: Download build artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
@@ -1101,6 +1144,7 @@ jobs:
       [
         build_artifact,
         create_beta_tag,
+        production_approval,
         deploy_to_production,
         verify_production_runtime,
         create_production_tag,
@@ -1141,6 +1185,7 @@ jobs:
             Promoted Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
             Production tag: ${{ needs.create_production_tag.outputs.production_tag_name }}
             Production URL: ${{ env.PRODUCTION_WEBAPP_URL }}
+            Production approval result: ${{ needs.production_approval.result }}
             Production deployment result: ${{ needs.deploy_to_production.result }}
             Production runtime-verification result: ${{ needs.verify_production_runtime.result }}
             Production distribution result: ${{ needs.publish_production_distribution.result }}
@@ -1165,6 +1210,7 @@ jobs:
         create_beta_tag,
         run_e2e,
         production_preflight,
+        production_approval,
         deploy_to_production,
         verify_production_runtime,
         create_production_tag,
@@ -1220,6 +1266,8 @@ jobs:
           E2E_REPORT_URL: ${{ needs.run_e2e.outputs.reportUrl }}
           E2E_RESULT: ${{ needs.run_e2e.result }}
           E2E_WEBAPP_URL: ${{ env.E2E_WEBAPP_URL }}
+          PRODUCTION_APPROVAL_RESULT: ${{ needs.production_approval.result }}
+          PRODUCTION_CURRENT_BETA_VERIFICATION_RESULT: ${{ needs.deploy_to_production.outputs.current_beta_verification_result }}
           PRODUCTION_DEPLOYMENT_RESULT: ${{ needs.deploy_to_production.result }}
           PRODUCTION_DISTRIBUTION_JOB_RESULT: ${{ needs.publish_production_distribution.result }}
           PRODUCTION_DISTRIBUTION_RESULT: ${{ needs.publish_production_distribution.outputs.distribution_result }}
@@ -1266,6 +1314,7 @@ jobs:
         create_beta_tag,
         run_e2e,
         production_preflight,
+        production_approval,
         deploy_to_production,
         verify_production_runtime,
         create_production_tag,
@@ -1301,6 +1350,8 @@ jobs:
             Beta tag: ${{ needs.create_beta_tag.result }}
             E2E system gate: ${{ needs.run_e2e.result }}
             Production preflight: ${{ needs.production_preflight.result }}
+            Production approval: ${{ needs.production_approval.result }}
+            Current Beta verification: ${{ needs.deploy_to_production.outputs.current_beta_verification_result || 'not run' }}
             Production deployment: ${{ needs.deploy_to_production.result }}
             Production runtime verification: ${{ needs.verify_production_runtime.result }}
             Production tag: ${{ needs.create_production_tag.result }}

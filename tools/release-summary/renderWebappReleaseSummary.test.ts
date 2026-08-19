@@ -81,6 +81,8 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     sourceRef: Maybe.just('main'),
   },
   production: {
+    approvalResult: Maybe.just('success'),
+    currentBetaVerificationResult: Maybe.just('success'),
     createdTagName: Maybe.nothing<string>(),
     deploymentResult: Maybe.just('skipped'),
     deploymentRequired: Maybe.just(false),
@@ -326,6 +328,7 @@ describe('WebApp release summary renderer', () => {
       `Release distribution: published successfully - Docker \`quay.io/wire/webapp:${productionTagName}-v0.34.9-0-1234567\`, Helm \`0.8.0-pre.3175\`, wire-builds [${wireBuildsCommitSha}](https://github.com/wireapp/wire-builds/commit/${wireBuildsCommitSha})`,
     );
     expect(detailsContent).toContain('- Runtime verification result: verified successfully');
+    expect(detailsContent).toContain('- Production approval result: approved');
     expect(detailsContent).toContain('- Production tag creation result: created successfully');
     expect(detailsContent).toContain('- Docker image: quay.io/wire/webapp:2026-07-17.1-production-v0.34.9-0-1234567');
     expect(detailsContent).toContain('- Helm chart repository: https://charts.example.com/webapp');
@@ -810,6 +813,59 @@ describe('WebApp release summary renderer', () => {
     expect(technicalEvidence(summary)).toContain('- Production preflight result: failed');
   });
 
+  it('reports rejected Production approval without presenting deployment as a failure', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        approvalResult: Maybe.just('failure'),
+        deploymentRequired: Maybe.just(true),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('ready'),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+
+    expect(visibleSummary(summary)).toContain('Release stopped because Production approval was rejected or failed');
+    expect(visibleSummary(summary)).toContain(
+      '- Hosted Production: blocked because Production approval was rejected or failed',
+    );
+    expect(technicalEvidence(summary)).toContain('- Production approval result: rejected or failed');
+    expect(technicalEvidence(summary)).toContain('- Production deployment result: not run');
+    expect(technicalEvidence(summary)).toContain('- Skip reason: Production approval was rejected or failed');
+  });
+
+  it('blocks Production when the live Beta verification fails before deployment', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        currentBetaVerificationResult: Maybe.just('failure'),
+        deploymentRequired: Maybe.just(true),
+        deploymentResult: Maybe.just('failure'),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('ready'),
+        runtimeVerificationResult: Maybe.just('skipped'),
+        tagCreationResult: Maybe.just('skipped'),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+
+    expect(visibleSummary(summary)).toContain(
+      'Release stopped because current Beta verification failed before Production deployment',
+    );
+    expect(visibleSummary(summary)).toContain(
+      '- Hosted Production: blocked because current Beta verification failed before Production deployment',
+    );
+    expect(technicalEvidence(summary)).toContain('- Current Beta verification result: failed');
+    expect(technicalEvidence(summary)).toContain(
+      '- Production deployment result: not run because current Beta verification failed',
+    );
+    expect(technicalEvidence(summary)).toContain(
+      '- Skip reason: Current Beta verification failed; Production deployment did not run',
+    );
+  });
+
   it('stops a release when Hosted Production deployment fails', () => {
     const input: WebappReleaseSummaryInput = {
       ...baselineWebappReleaseSummaryInput,
@@ -963,6 +1019,8 @@ describe('WebApp release summary renderer', () => {
       GITHUB_RELEASE_TAG_NAME: productionTagName,
       GITHUB_RELEASE_URL: githubReleaseUrl,
       PRODUCTION_DEPLOYMENT_REQUIRED: 'true',
+      PRODUCTION_APPROVAL_RESULT: 'success',
+      PRODUCTION_CURRENT_BETA_VERIFICATION_RESULT: 'success',
       RELEASE_ACTOR: 'release-captain',
       RELEASE_BRANCH_ACTION: 'created',
       SOURCE_COMMIT_SHA: sourceCommitSha,
@@ -976,6 +1034,8 @@ describe('WebApp release summary renderer', () => {
     expect(input.preparation.sourceCommitSha.unwrapOr('not available')).toBe(sourceCommitSha);
     expect(input.preparation.sourceRef.unwrapOr('not available')).toBe('main');
     expect(input.production.deploymentRequired.unwrapOr(false)).toBe(true);
+    expect(input.production.approvalResult.unwrapOr('failure')).toBe('success');
+    expect(input.production.currentBetaVerificationResult.unwrapOr('failure')).toBe('success');
     expect(input.githubRelease.action.unwrapOr('already_published')).toBe('created');
     expect(input.githubRelease.jobResult.unwrapOr('failure')).toBe('success');
     expect(input.githubRelease.state.unwrapOr('published')).toBe('draft');
