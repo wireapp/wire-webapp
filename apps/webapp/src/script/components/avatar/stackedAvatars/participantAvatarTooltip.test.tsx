@@ -53,7 +53,9 @@ const renderParticipantAvatarTooltip = (participant: User, organizer?: User, ind
     <ThemeProvider>
       <ParticipantAvatarTooltip
         participant={participant}
-        getLabel={name => (participant === organizer ? `${name} (${translateForTest('meetings.participant.organizer')})` : name)}
+        getLabel={name =>
+          participant === organizer ? `${name} (${translateForTest('meetings.participant.organizer')})` : name
+        }
         index={index}
         avatarSize={AVATAR_SIZE.X_SMALL}
         avatarRingColor="black"
@@ -87,9 +89,12 @@ describe('ParticipantAvatarTooltip', () => {
   it('adds the localized organizer label', () => {
     const organizer = createUser('organizer', 'Kim Organizer');
 
-    renderParticipantAvatarTooltip(organizer, organizer);
+    const {container} = renderParticipantAvatarTooltip(organizer, organizer);
 
     expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Kim Organizer (meetings.participant.organizer)');
+    fireEvent.mouseEnter(screen.getByRole('presentation'));
+    expect(screen.getByText('Kim Organizer (meetings.participant.organizer)')).toBeInTheDocument();
+    container.removeAttribute('id');
   });
 
   it('updates the tooltip and aria-label when the participant name changes', async () => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
+import {getStackedAvatarDisplay} from 'Components/avatar';
 import type {User} from 'Repositories/entity/User';
 
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';

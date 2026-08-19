@@ -45,7 +45,10 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
-import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {
+  disableMessagePreprocessingFeatureToggleName,
+  viewerPermissionFeatureToggleName,
+} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -66,7 +69,6 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {viewerPermissionFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../page/rootProvider';
 
 const CONFIG = {

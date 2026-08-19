@@ -48,6 +48,7 @@ export const ParticipantAvatarTooltip = ({
       <Avatar
         participant={participant}
         aria-label={label}
+        // Prevent the avatar's native tooltip from duplicating the custom tooltip above.
         title={undefined}
         avatarSize={avatarSize}
         hideAvailabilityStatus
