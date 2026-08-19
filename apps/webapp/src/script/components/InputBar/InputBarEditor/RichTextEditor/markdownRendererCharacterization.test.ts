@@ -43,6 +43,11 @@ const markdownRendererCharacterizationTestCases: readonly MarkdownRendererCharac
     expectedHtml: '<strong>bold</strong> <em>italic</em> <s>strike</s> <code>code</code>',
   },
   {
+    description: 'an empty fenced code block',
+    inputMarkdown: '```\n```',
+    expectedHtml: '<pre><code></code></pre>',
+  },
+  {
     description: 'a heading',
     inputMarkdown: '### heading',
     expectedHtml: '<div class="md-heading md-heading--3">heading</div>',
