@@ -47,6 +47,12 @@ export type BetaSummaryInput = {
   readonly webappUrl: Maybe<string>;
 };
 
+export type SupersessionSummaryInput = {
+  readonly cancellationConflictRunIds: Maybe<string>;
+  readonly jobResult: Maybe<WorkflowJobResult>;
+  readonly supersededRunIds: Maybe<string>;
+};
+
 export type E2ESummaryInput = {
   readonly environmentName: Maybe<string>;
   readonly reportUrl: Maybe<string>;
@@ -120,6 +126,7 @@ export type WebappReleaseSummaryInput = {
   readonly preparation: ReleasePreparationSummaryInput;
   readonly production: ProductionSummaryInput;
   readonly release: ReleaseMetadata;
+  readonly supersession: SupersessionSummaryInput;
 };
 
 type RenderReleaseIdentityParameters = {
@@ -299,6 +306,11 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       commitSha: readOptionalEnvironmentValue(environment, 'RELEASE_COMMIT_SHA'),
       identifier: readOptionalEnvironmentValue(environment, 'RELEASE_IDENTIFIER'),
       manualReason: readOptionalEnvironmentValue(environment, 'RELEASE_REASON'),
+    },
+    supersession: {
+      cancellationConflictRunIds: readOptionalEnvironmentValue(environment, 'CANCELLATION_CONFLICT_RUN_IDS'),
+      jobResult: readWorkflowJobResult(environment, 'SUPERSESSION_JOB_RESULT'),
+      supersededRunIds: readOptionalEnvironmentValue(environment, 'SUPERSEDED_RUN_IDS'),
     },
   };
 }
@@ -953,6 +965,45 @@ function formatBetaStageOverview(input: WebappReleaseSummaryInput): string {
   });
 }
 
+function formatSupersessionJobResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOr('unknown result', actualResult => {
+    return match(actualResult)
+      .with('success', () => {
+        return 'completed successfully';
+      })
+      .with('failure', () => {
+        return 'failed; Production promotion was blocked';
+      })
+      .with('skipped', () => {
+        return 'did not run; Production promotion was blocked';
+      })
+      .with('cancelled', () => {
+        return 'did not complete; Production promotion was blocked';
+      })
+      .exhaustive();
+  });
+}
+
+function formatSupersessionRunIds(runIds: Maybe<string>): string {
+  return runIds.mapOr('not available', value => {
+    return value.length > 0 ? value : 'none';
+  });
+}
+
+function formatSupersessionStageOverview(input: WebappReleaseSummaryInput): string {
+  const supersessionResult = formatSupersessionJobResult(input.supersession.jobResult);
+  const currentBetaCandidate = input.supersession.jobResult.mapOr('not established', actualResult => {
+    return actualResult === 'success' ? 'established' : 'not established';
+  });
+
+  return [
+    supersessionResult,
+    `current Beta candidate: ${currentBetaCandidate}`,
+    `older runs superseded: ${formatSupersessionRunIds(input.supersession.supersededRunIds)}`,
+    `cancellation conflicts: ${formatSupersessionRunIds(input.supersession.cancellationConflictRunIds)}`,
+  ].join('; ');
+}
+
 function formatE2EStageOverview(input: WebappReleaseSummaryInput): string {
   const reportLink = formatOptionalExternalLink('Playwright report', input.e2e.reportUrl);
   const e2EResult = formatE2EResult(input.e2e.result);
@@ -1034,6 +1085,17 @@ function formatBetaReleaseOutcome(input: WebappReleaseSummaryInput): string {
     return 'Beta release incomplete because Beta tag creation did not run';
   }
 
+  if (hasWorkflowJobResult(input.supersession.jobResult, 'failure')) {
+    return 'Beta release stopped because the candidate supersession safety check failed';
+  }
+
+  if (
+    hasWorkflowJobResult(input.supersession.jobResult, 'cancelled') ||
+    hasWorkflowJobResult(input.supersession.jobResult, 'skipped')
+  ) {
+    return 'Beta release incomplete because candidate supersession did not complete';
+  }
+
   if (
     hasWorkflowJobResult(input.beta.deploymentResult, 'success') &&
     hasWorkflowJobResult(input.beta.tagCreationResult, 'success')
@@ -1067,6 +1129,17 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
 
   if (hasWorkflowJobResult(input.beta.tagCreationResult, 'skipped')) {
     return 'Release incomplete because Beta tag creation did not run';
+  }
+
+  if (hasWorkflowJobResult(input.supersession.jobResult, 'failure')) {
+    return 'Release stopped because the candidate supersession safety check failed';
+  }
+
+  if (
+    hasWorkflowJobResult(input.supersession.jobResult, 'cancelled') ||
+    hasWorkflowJobResult(input.supersession.jobResult, 'skipped')
+  ) {
+    return 'Release incomplete because candidate supersession did not complete';
   }
 
   if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
@@ -1217,6 +1290,17 @@ function formatFinalProductionOverview(input: WebappReleaseSummaryInput): string
     return 'unavailable because Beta tag creation did not run';
   }
 
+  if (hasWorkflowJobResult(input.supersession.jobResult, 'failure')) {
+    return 'blocked because the candidate supersession safety check failed';
+  }
+
+  if (
+    hasWorkflowJobResult(input.supersession.jobResult, 'cancelled') ||
+    hasWorkflowJobResult(input.supersession.jobResult, 'skipped')
+  ) {
+    return 'unavailable because candidate supersession did not complete';
+  }
+
   if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
     return 'blocked because the E2E system gate failed';
   }
@@ -1296,6 +1380,22 @@ function renderBetaSection(input: WebappReleaseSummaryInput): string {
       ? ['- Runtime verification: /version and /config.js']
       : []),
     `- Beta tag: ${formatBetaTag(input.beta, input.github)}`,
+  ].join('\n');
+}
+
+function renderSupersessionSection(input: WebappReleaseSummaryInput): string {
+  const currentBetaCandidate = input.supersession.jobResult.mapOr('not established', actualResult => {
+    return actualResult === 'success' ? 'established' : 'not established';
+  });
+
+  return [
+    '### Beta candidate supersession',
+    '',
+    `- Result: ${formatSupersessionJobResult(input.supersession.jobResult)}`,
+    `- Current Beta candidate: ${currentBetaCandidate}`,
+    `- Superseded older run IDs: ${formatSupersessionRunIds(input.supersession.supersededRunIds)}`,
+    `- Cancellation conflict run IDs: ${formatSupersessionRunIds(input.supersession.cancellationConflictRunIds)}`,
+    '- Production operations: never force-cancelled',
   ].join('\n');
 }
 
@@ -1405,7 +1505,11 @@ function renderReleasePreparationSection(input: WebappReleaseSummaryInput): stri
 type WebappReleaseSummaryPhase = 'beta' | 'final';
 
 function renderTechnicalReleaseEvidence(input: WebappReleaseSummaryInput, phase: WebappReleaseSummaryPhase): string {
-  const technicalSections = [renderReleasePreparationSection(input), renderBetaSection(input)];
+  const technicalSections = [
+    renderReleasePreparationSection(input),
+    renderBetaSection(input),
+    renderSupersessionSection(input),
+  ];
 
   if (phase === 'final') {
     technicalSections.push(renderE2ESection(input), renderProductionSection(input));
@@ -1429,7 +1533,12 @@ export function renderWebappBetaReleaseSummary(input: WebappReleaseSummaryInput)
       outcome: formatBetaReleaseOutcome(input),
       input,
     }),
-    ['### Release stages', '', `- Hosted Beta: ${formatBetaStageOverview(input)}`].join('\n'),
+    [
+      '### Release stages',
+      '',
+      `- Hosted Beta: ${formatBetaStageOverview(input)}`,
+      `- Beta candidate supersession: ${formatSupersessionStageOverview(input)}`,
+    ].join('\n'),
   ].join('\n\n');
 
   return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, 'beta')}\n`;
@@ -1458,6 +1567,7 @@ export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): st
       '### Release stages',
       '',
       `- Hosted Beta: ${formatBetaStageOverview(input)}`,
+      `- Beta candidate supersession: ${formatSupersessionStageOverview(input)}`,
       `- E2E system gate: ${formatE2EStageOverview(input)}`,
       `- Hosted Production: ${productionOverview}`,
       `- Release distribution: ${distributionOverview}`,

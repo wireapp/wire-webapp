@@ -43,6 +43,11 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     tagName: Maybe.just(betaTagName),
     webappUrl: Maybe.just('https://beta.example.com'),
   },
+  supersession: {
+    cancellationConflictRunIds: Maybe.just(''),
+    jobResult: Maybe.just('success'),
+    supersededRunIds: Maybe.just(''),
+  },
   distribution: {
     chartRepositoryUrl: Maybe.just('https://charts.example.com/webapp'),
     dockerImageTag: Maybe.nothing<string>(),
@@ -981,6 +986,64 @@ describe('WebApp release summary renderer', () => {
     expect(input.githubRelease.state.unwrapOr('published')).toBe('draft');
     expect(input.githubRelease.tagName.unwrapOr('not available')).toBe(productionTagName);
     expect(input.githubRelease.url.unwrapOr('not available')).toBe(githubReleaseUrl);
+  });
+
+  it('reads Beta candidate supersession evidence from the workflow environment', () => {
+    const input = readWebappReleaseSummaryInput({
+      CANCELLATION_CONFLICT_RUN_IDS: '41',
+      SUPERSESSION_JOB_RESULT: 'success',
+      SUPERSEDED_RUN_IDS: '17,23',
+    });
+
+    expect(input.supersession.jobResult.unwrapOr('failure')).toBe('success');
+    expect(input.supersession.supersededRunIds.unwrapOr('not available')).toBe('17,23');
+    expect(input.supersession.cancellationConflictRunIds.unwrapOr('not available')).toBe('41');
+  });
+
+  it('reports that a verified Beta candidate superseded older release runs', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      supersession: {
+        cancellationConflictRunIds: Maybe.just('41'),
+        jobResult: Maybe.just('success'),
+        supersededRunIds: Maybe.just('17,23'),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+    const detailsContent = technicalEvidence(summary);
+
+    expect(visibleContent).toContain(
+      '- Beta candidate supersession: completed successfully; current Beta candidate: established; older runs superseded: 17,23; cancellation conflicts: 41',
+    );
+    expect(detailsContent).toContain('### Beta candidate supersession');
+    expect(detailsContent).toContain('- Superseded older run IDs: 17,23');
+    expect(detailsContent).toContain('- Cancellation conflict run IDs: 41');
+    expect(detailsContent).toContain('- Production operations: never force-cancelled');
+  });
+
+  it('blocks Production promotion when candidate supersession fails without calling it a validation failure', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      supersession: {
+        cancellationConflictRunIds: Maybe.nothing<string>(),
+        jobResult: Maybe.just('failure'),
+        supersededRunIds: Maybe.nothing<string>(),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const betaSummary = renderWebappBetaReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+
+    expect(visibleContent).toContain('Release stopped because the candidate supersession safety check failed');
+    expect(visibleContent).toContain(
+      '- Hosted Production: blocked because the candidate supersession safety check failed',
+    );
+    expect(visibleContent).not.toContain('E2E system gate failed');
+    expect(visibleSummary(betaSummary)).toContain(
+      'Beta release stopped because the candidate supersession safety check failed',
+    );
+    expect(visibleSummary(betaSummary)).not.toContain('Beta release failed');
   });
 
   it('does not create a link for an invalid E2E report URL', () => {
