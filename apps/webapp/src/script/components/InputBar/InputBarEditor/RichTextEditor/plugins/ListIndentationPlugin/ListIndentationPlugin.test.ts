@@ -18,6 +18,8 @@
 
 import {$getRoot, KEY_TAB_COMMAND} from 'lexical';
 import {registerList} from '@lexical/list';
+import {registerRichText} from '@lexical/rich-text';
+import {$isElementNode, $isTextNode, type LexicalEditor} from 'lexical';
 
 import {createWireLexicalEditorTestHarness} from '../../testSupport/createWireLexicalEditorTestHarness';
 
@@ -53,6 +55,23 @@ const listIndentationCharacterizationTestCases: readonly ListIndentationCharacte
 
 function createTabEvent(isShiftPressed: boolean): KeyboardEvent {
   return new KeyboardEvent('keydown', {cancelable: true, shiftKey: isShiftPressed});
+}
+
+function selectEndOfLastListItem(editor: LexicalEditor): void {
+  editor.update(
+    () => {
+      const firstDocumentElement = $getRoot().getFirstChild();
+      if (firstDocumentElement === null || !$isElementNode(firstDocumentElement)) {
+        throw new Error('The list indentation characterization requires a document element');
+      }
+      const lastTextNode = firstDocumentElement.getLastDescendant();
+      if (lastTextNode === null || !$isTextNode(lastTextNode)) {
+        throw new Error('The list indentation characterization requires a text node');
+      }
+      lastTextNode.selectEnd();
+    },
+    {discrete: true},
+  );
 }
 
 describe('ListIndentationPlugin', () => {
@@ -109,5 +128,26 @@ describe('ListIndentationPlugin', () => {
     expect(actualWasHandled).toBe(expectedWasHandled);
     expect(tabEvent.defaultPrevented).toBe(false);
     expect(harness.exportMarkdown()).toBe('ordinary text');
+  });
+
+  it('handles Tab for the selected last list item without changing Markdown', () => {
+    const harness = createWireLexicalEditorTestHarness();
+    harness.importMarkdown('- first\n- second');
+    selectEndOfLastListItem(harness.editor);
+
+    const unregisterList = registerList(harness.editor);
+    const unregisterRichText = registerRichText(harness.editor);
+    const unregisterListItemTabIndentation = registerListItemTabIndentation(harness.editor);
+    const tabEvent = createTabEvent(false);
+    const actualWasHandled = harness.editor.dispatchCommand(KEY_TAB_COMMAND, tabEvent);
+    const actualMarkdown = harness.exportMarkdown();
+
+    unregisterList();
+    unregisterRichText();
+    unregisterListItemTabIndentation();
+
+    expect(actualWasHandled).toBe(true);
+    expect(tabEvent.defaultPrevented).toBe(true);
+    expect(actualMarkdown).toBe('- first\n- second');
   });
 });
