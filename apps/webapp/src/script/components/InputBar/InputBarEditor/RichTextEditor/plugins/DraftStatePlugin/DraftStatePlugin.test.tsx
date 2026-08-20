@@ -19,7 +19,7 @@
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getRoot, LexicalEditor} from 'lexical';
+import {$createParagraphNode, $getRoot, $nodesOfType, LexicalEditor} from 'lexical';
 import {Maybe, toolbelt, type Result} from 'true-myth';
 import {useEffect, type FunctionComponent} from 'react';
 
@@ -28,7 +28,9 @@ import {render, waitFor} from '@testing-library/react';
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 import {unwrap} from 'Util/test/resultTestSupport';
 
+import {EmojiNode} from '../../nodes/EmojiNode';
 import {editorConfig} from '../../editorConfig';
+import {$createMentionNode, MentionNode} from '../../nodes/MentionNode';
 import {markdownTransformers} from '../../utils/markdownTransformers';
 import {createWireLexicalEditorTestHarness} from '../../testSupport/createWireLexicalEditorTestHarness';
 import {DraftStatePlugin} from './DraftStatePlugin';
@@ -92,6 +94,36 @@ function createSerializedEditorState(inputMarkdown: string): string {
   return JSON.stringify(sourceHarness.editor.getEditorState().toJSON());
 }
 
+function createSerializedMentionEditorState(): string {
+  const sourceHarness = createWireLexicalEditorTestHarness();
+
+  sourceHarness.editor.update(
+    () => {
+      const paragraphNode = $createParagraphNode();
+      paragraphNode.append($createMentionNode('@', 'Alice'));
+      $getRoot().clear().append(paragraphNode);
+    },
+    {discrete: true},
+  );
+
+  return JSON.stringify(sourceHarness.editor.getEditorState().toJSON());
+}
+
+function createSerializedEmojiEditorState(): string {
+  const sourceHarness = createWireLexicalEditorTestHarness();
+
+  sourceHarness.editor.update(
+    () => {
+      const paragraphNode = $createParagraphNode();
+      paragraphNode.append(new EmojiNode('🧪'));
+      $getRoot().clear().append(paragraphNode);
+    },
+    {discrete: true},
+  );
+
+  return JSON.stringify(sourceHarness.editor.getEditorState().toJSON());
+}
+
 function renderDraftStatePlugin(draftState: DraftState): Result<DraftStatePluginTestFixture, Error> {
   const loadDraftState = jest.fn<Promise<DraftState>, []>().mockResolvedValue(draftState);
   let capturedEditor: Maybe<LexicalEditor> = Maybe.nothing();
@@ -126,6 +158,18 @@ function getTextContent(editor: LexicalEditor): string {
   });
 }
 
+function getMentionNodeCount(editor: LexicalEditor): number {
+  return editor.getEditorState().read(() => {
+    return $nodesOfType(MentionNode).length;
+  });
+}
+
+function getEmojiNodeCount(editor: LexicalEditor): number {
+  return editor.getEditorState().read(() => {
+    return $nodesOfType(EmojiNode).length;
+  });
+}
+
 describe('DraftStatePlugin', () => {
   it.each(draftStateCharacterizationTestCases)('restores $description from serialized editor state', async testCase => {
     const serializedEditorState = createSerializedEditorState(testCase.inputMarkdown);
@@ -137,6 +181,30 @@ describe('DraftStatePlugin', () => {
     });
 
     expect(getTextContent(fixture.editor)).toBe(testCase.expectedTextContent);
+  });
+
+  it('restores a serialized custom mention node from a draft', async () => {
+    const fixture = unwrap(renderDraftStatePlugin({editorState: createSerializedMentionEditorState()}));
+
+    await waitFor(() => {
+      expect(fixture.loadDraftState).toHaveBeenCalledTimes(1);
+      expect(getMarkdown(fixture.editor)).toBe('@Alice');
+    });
+
+    expect(getTextContent(fixture.editor)).toBe('@Alice');
+    expect(getMentionNodeCount(fixture.editor)).toBe(1);
+  });
+
+  it('restores a serialized custom emoji node from a draft', async () => {
+    const fixture = unwrap(renderDraftStatePlugin({editorState: createSerializedEmojiEditorState()}));
+
+    await waitFor(() => {
+      expect(fixture.loadDraftState).toHaveBeenCalledTimes(1);
+      expect(getMarkdown(fixture.editor)).toBe('🧪');
+    });
+
+    expect(getTextContent(fixture.editor)).toBe('🧪');
+    expect(getEmojiNodeCount(fixture.editor)).toBe(1);
   });
 
   it.each([
