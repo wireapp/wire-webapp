@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
@@ -39,7 +40,7 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
 
   useEffect(() => {
     if (!message) {
-      return () => {};
+      return noop;
     }
     const progressSubscribable = assetRepository.getUploadProgress(message?.id);
     setUploadProgress(progressSubscribable());

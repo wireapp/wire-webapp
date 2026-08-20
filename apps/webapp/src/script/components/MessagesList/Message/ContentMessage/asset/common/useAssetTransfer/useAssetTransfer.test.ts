@@ -19,6 +19,7 @@
 
 import {act, renderHook, waitFor} from '@testing-library/react';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -56,7 +57,7 @@ describe('useAssetTransfer', () => {
   describe('getAssetUrl', () => {
     beforeAll(() => {
       jest.spyOn(window.URL, 'createObjectURL').mockReturnValue('assetUrl');
-      jest.spyOn(window.URL, 'revokeObjectURL').mockImplementation(() => {});
+      jest.spyOn(window.URL, 'revokeObjectURL').mockReturnValue(undefined);
     });
 
     it('should return the asset url', async () => {

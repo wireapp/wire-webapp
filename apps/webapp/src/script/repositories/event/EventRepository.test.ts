@@ -130,7 +130,7 @@ describe('EventRepository', () => {
       const fakeProp: any = undefined;
       const eventRepo = new EventRepository({} as any, fakeProp, fakeProp, fakeProp);
       eventRepo.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      jest.spyOn<any, any>(eventRepo, 'distributeEvent').mockImplementation(() => {});
+      jest.spyOn<any, any>(eventRepo, 'distributeEvent').mockReturnValue(undefined);
 
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -181,8 +181,8 @@ describe('EventRepository', () => {
       );
 
       // Spy on Warnings methods
-      jest.spyOn(Warnings, 'showWarning').mockImplementation(() => {});
-      jest.spyOn(Warnings, 'hideWarning').mockImplementation(() => {});
+      jest.spyOn(Warnings, 'showWarning').mockReturnValue(undefined);
+      jest.spyOn(Warnings, 'hideWarning').mockReturnValue(undefined);
 
       // Spy on amplify publish
       jest.spyOn(amplify, 'publish').mockReturnValue(true);
@@ -227,7 +227,7 @@ describe('EventRepository', () => {
     });
 
     it('should log the connection state change', () => {
-      const logSpy = jest.spyOn(eventRepository.logger, 'log').mockImplementation(() => {});
+      const logSpy = jest.spyOn(eventRepository.logger, 'log').mockReturnValue(undefined);
 
       eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
 
@@ -317,7 +317,7 @@ describe('EventRepository', () => {
     )(
       'does not publish normalized event when $eventType has $description',
       async ({eventType, webAppEvent, eventOverrides}) => {
-        const warnSpy = jest.spyOn(eventRepository.logger, 'warn').mockImplementation(() => {});
+        const warnSpy = jest.spyOn(eventRepository.logger, 'warn').mockReturnValue(undefined);
         const event = {
           ...meetingLifecycleEventBase,
           ...eventOverrides,
@@ -387,8 +387,8 @@ describe('EventRepository', () => {
       jest.spyOn(document, 'removeEventListener');
 
       // Mock Warnings
-      jest.spyOn(Warnings, 'showWarning').mockImplementation(() => {});
-      jest.spyOn(Warnings, 'hideWarning').mockImplementation(() => {});
+      jest.spyOn(Warnings, 'showWarning').mockReturnValue(undefined);
+      jest.spyOn(Warnings, 'hideWarning').mockReturnValue(undefined);
     });
 
     afterEach(() => {

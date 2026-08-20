@@ -65,10 +65,10 @@ const invalidTokenHttpClient: any = {
 
 const fakeSocket = {
   close: jest.fn(),
-  onclose: () => {},
-  onerror: (error: Error) => {},
-  onmessage: ({}) => {},
-  onopen: () => {},
+  onclose: noop,
+  onerror: noop,
+  onmessage: noop,
+  onopen: noop,
 };
 
 let currentTimestampInMilliseconds = 1_000_000;

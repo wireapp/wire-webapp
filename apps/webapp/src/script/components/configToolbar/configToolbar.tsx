@@ -20,6 +20,7 @@
 import {useEffect, useRef, useState} from 'react';
 
 import keyboardjs from 'keyboardjs';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
@@ -107,7 +108,7 @@ export function ConfigToolbar() {
 
   useEffect(() => {
     if (!isMessageSendingActive) {
-      return () => {};
+      return noop;
     }
 
     let timeoutId: number | null = null;

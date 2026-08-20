@@ -19,6 +19,7 @@
 
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -126,7 +127,7 @@ describe('VideoAsset', () => {
       return videoElement;
     });
 
-    jest.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    jest.spyOn(URL, 'revokeObjectURL').mockReturnValue(undefined);
   });
 
   beforeEach(() => {
@@ -223,7 +224,7 @@ describe('VideoAsset', () => {
   });
 
   it('revokes the object URL when unmounted before play finishes loading', async () => {
-    let resolveLoad: (blob: Blob) => void = () => {};
+    let resolveLoad: (blob: Blob) => void = noop;
     const deferredLoad = new Promise<Blob>(resolve => {
       resolveLoad = resolve;
     });

@@ -17,6 +17,7 @@
  *
  */
 
+import {asyncNoop} from 'noop-esm';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from '../../test.fixtures';
 
@@ -68,9 +69,8 @@ test(
       await expect(pages.calling().callCell).toBeVisible();
     });
 
-    await test.step('Owner switches audio on and sends audio', async () => {
-      // Presumed automatic from device, skip if not applicable
-    });
+    // Presumed automatic from device, skip if not applicable
+    await test.step('Owner switches audio on and sends audio', asyncNoop);
 
     await test.step("Member is able to hear Owner's audio", async () => {
       await api.callingService.verifyAudioIsBeingReceived(callingServiceInstanceId);

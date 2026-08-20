@@ -31,6 +31,7 @@ import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQuali
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
@@ -158,7 +159,7 @@ type SubconversationData = {
 
 export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window) => {
   if (!Runtime.isDesktopApp()) {
-    return () => {};
+    return noop;
   }
 
   const handleClick = (event: MouseEvent) => {
@@ -223,7 +224,7 @@ export class CallingRepository {
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('CallingRepository');
-    this.incomingCallCallback = () => {};
+    this.incomingCallCallback = noop;
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -296,7 +297,7 @@ export class CallingRepository {
 
     this.subscribeToEvents();
 
-    this.onChooseScreen = (deviceId: string) => {};
+    this.onChooseScreen = noop;
 
     // Request the video streams whenever the mode changes to active speaker
     ko.computed(() => {
@@ -603,8 +604,8 @@ export class CallingRepository {
       this.sendSFTRequest, // `sfth`
       this.incomingCall, // `incomingh`,
       this.handleMissedCall, // `missedh`,
-      () => {}, // `answer
-      () => {}, // `estabh`,
+      noop, // `answer
+      noop, // `estabh`,
       this.callClosed, // `closeh`,
       this.metricsReceived, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,

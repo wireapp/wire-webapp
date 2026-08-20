@@ -18,5 +18,5 @@
  */
 
 module.exports = {
-  useAutoAnimate: () => [null, () => {}],
+  useAutoAnimate: () => [null, jest.fn()],
 };

@@ -21,6 +21,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../e2eIdentity';
@@ -52,7 +53,7 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
 
   useEffect(() => {
     if (!updateAfterEnrollment) {
-      return () => {};
+      return noop;
     }
     E2EIHandler.getInstance().on('deviceStatusUpdated', refreshDeviceIdentities);
     return () => {

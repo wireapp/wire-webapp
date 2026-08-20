@@ -20,6 +20,7 @@
 
 import {cosmiconfig} from 'cosmiconfig';
 import logdown from 'logdown';
+import {noop} from 'noop-esm';
 
 import {CopyConfig, CopyConfigOptions} from './';
 
@@ -37,7 +38,7 @@ import {CopyConfig, CopyConfigOptions} from './';
     }
     if (logLevel !== 'verbose') {
       // Disable debug logging when not in verbose mode
-      logger.debug = () => {};
+      logger.debug = noop;
     }
   }
 

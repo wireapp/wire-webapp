@@ -362,7 +362,7 @@ describe('Account', () => {
         return new Promise<void>(async resolve => {
           const nbNotifications = 10;
           const onNotificationStreamProgress = jest.fn();
-          const onEvent = jest.fn().mockImplementation(() => {});
+          const onEvent = jest.fn();
           mockNotifications(nbNotifications);
           await dependencies.account.listen({
             useLegacy: false,
@@ -495,7 +495,7 @@ describe('Account', () => {
 
         const onEvent = jest
           .fn()
-          .mockImplementationOnce(() => {})
+          .mockReturnValueOnce(undefined)
           .mockImplementationOnce(() => {
             // abort websocket connection after the second notification is processeed
             server.close({reason: 'Aborted by test', code: 2000, wasClean: true});

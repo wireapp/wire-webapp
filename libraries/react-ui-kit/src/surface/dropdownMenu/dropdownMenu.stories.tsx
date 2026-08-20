@@ -18,6 +18,7 @@
  */
 
 import {Meta, StoryObj} from '@storybook/react/*';
+import {noop} from 'noop-esm';
 
 import {DropdownMenu} from './dropdownMenu';
 
@@ -44,9 +45,9 @@ export const Default: Story = {
         <PlusIcon />
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => {}}>Copy</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => {}}>Details</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => {}}>Delete for me</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu>
   ),
@@ -59,9 +60,9 @@ export const WithLongItems: Story = {
         <PlusIcon />
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => {}}>Copy the detail of this message</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => {}}>Contact the sender</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => {}}>Delete this message (works only if you are the owner)</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Copy the detail of this message</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Contact the sender</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Delete this message (works only if you are the owner)</DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu>
   ),
@@ -74,9 +75,9 @@ export const WithCustomButton: Story = {
         <Button variant={ButtonVariant.PRIMARY}>Open menu</Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => {}}>Copy</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => {}}>Details</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => {}}>Delete for me</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu>
   ),
@@ -91,9 +92,9 @@ export const WithCustomIconButton: Story = {
         </IconButton>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => {}}>Copy</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => {}}>Details</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => {}}>Delete for me</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu>
   ),

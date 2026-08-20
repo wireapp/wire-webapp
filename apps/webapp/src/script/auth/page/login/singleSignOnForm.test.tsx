@@ -20,6 +20,7 @@
 import {fireEvent, waitFor} from '@testing-library/react';
 
 import {TypeUtil} from '@wireapp/commons';
+import {noop} from 'noop-esm';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
@@ -178,7 +179,7 @@ describe('SingleSignOnForm', () => {
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
     );
-    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
+    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(noop);
 
     const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
@@ -217,7 +218,7 @@ describe('SingleSignOnForm', () => {
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
     );
-    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
+    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(noop);
 
     const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,

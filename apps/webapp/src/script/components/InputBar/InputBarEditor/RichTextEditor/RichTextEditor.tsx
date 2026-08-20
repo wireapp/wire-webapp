@@ -30,6 +30,7 @@ import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlug
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {LexicalEditor, EditorState} from 'lexical';
+import {noop} from 'noop-esm';
 
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
@@ -101,7 +102,7 @@ export const RichTextEditor = ({
   onShiftTab,
   onBlur,
   onSend,
-  onSetup = () => {},
+  onSetup = noop,
 }: RichTextEditorProps) => {
   const editorRef = useRef<LexicalEditor | null>(null);
   const emojiPickerOpen = useRef<boolean>(true);

@@ -22,6 +22,7 @@ import {forwardRef, useEffect, useMemo, useState} from 'react';
 import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {UserType} from '@wireapp/api-client/lib/user';
+import {noop} from 'noop-esm';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -77,8 +78,8 @@ interface ConversationDetailsProps {
 const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>(
   (
     {
-      onClose = () => {},
-      togglePanel = () => {},
+      onClose = noop,
+      togglePanel = noop,
       actionsViewModel,
       activeConversation,
       conversationRepository,

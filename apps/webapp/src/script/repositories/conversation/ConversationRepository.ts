@@ -59,6 +59,7 @@ import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {asyncNoop, noop} from 'noop-esm';
 import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
@@ -370,8 +371,8 @@ export class ConversationRepository {
 
   public registerMLSConversationVerificationStateHandler = (
     domain: string,
-    onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
-    onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
+    onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = noop,
+    onSelfClientCertificateRevoked: () => Promise<void> = asyncNoop,
   ): void => {
     this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
       domain,

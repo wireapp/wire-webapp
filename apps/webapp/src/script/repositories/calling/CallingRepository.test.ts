@@ -26,6 +26,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {
@@ -1102,7 +1103,7 @@ describe('CallingRepository ISO', () => {
 
 describe.skip('E2E audio call', () => {
   const {repository: client} = createCallingRepositoryForTest({
-    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+    eventRepository: {injectEvent: noop} as unknown as EventRepository,
   });
   type E2ECallingRepositorySpies = {
     checkConcurrentJoinedCall: () => Promise<boolean>;
@@ -1160,8 +1161,8 @@ describe.skip('E2E audio call', () => {
 
   let joinedCallSub: Subscription;
   let activeCallsSub: Subscription;
-  let onCallClosed = () => {};
-  let onCallConnected = () => {};
+  let onCallClosed: () => void = noop;
+  let onCallConnected: () => void = noop;
   beforeEach(() => {
     joinedCallSub = client['callState'].joinedCall.subscribe(call => {
       if (call) {
@@ -1242,9 +1243,9 @@ describe.skip('E2E audio call', () => {
 
 describe('NotificationHandlingState', () => {
   const {repository: client} = createCallingRepositoryForTest({
-    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+    eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
-      setOnMediaDevicesRefreshHandler: () => {},
+      setOnMediaDevicesRefreshHandler: noop,
     } as unknown as MediaDevicesHandler,
   });
   const user = new User('user-1', '', translateForTest);
@@ -1289,9 +1290,9 @@ describe('NotificationHandlingState', () => {
 
 describe('init AVS state', () => {
   const {repository: client} = createCallingRepositoryForTest({
-    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+    eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
-      setOnMediaDevicesRefreshHandler: () => {},
+      setOnMediaDevicesRefreshHandler: noop,
     } as unknown as MediaDevicesHandler,
   });
   const user = new User('user-1', '', translateForTest);
@@ -2053,18 +2054,18 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
   const wUser = wCall.create(
     selfUserId,
     selfClientId,
-    () => {}, // `readyh`,
+    noop, // `readyh`,
     sendMsg, // `sendh`,
     () => 0, // `sfth`
     incoming, // `incomingh`,
-    () => {}, // `missedh`,
-    () => {}, // `answerh`,
-    () => {}, // `estabh`,
-    () => {}, // `closeh`,
-    () => {}, // `metricsh`,
+    noop, // `missedh`,
+    noop, // `answerh`,
+    noop, // `estabh`,
+    noop, // `closeh`,
+    noop, // `metricsh`,
     requestConfig, // `cfg_reqh`,
-    (() => {}) as WcallAudioCbrChangeHandler, // `acbrh`,
-    () => {}, // `vstateh`,
+    noop as WcallAudioCbrChangeHandler, // `acbrh`,
+    noop, // `vstateh`,
     0,
   );
   return wUser;

@@ -17,17 +17,19 @@
  *
  */
 
+import {noop} from 'noop-esm';
+
 import {Priority} from './Priority';
 
 export class Item {
   /** original business logic */
-  fn: Function = () => {};
+  fn: Function = noop;
   label: string | undefined;
   priority: number = Priority.MEDIUM;
   /** wrapped `reject` of `fn` */
-  reject: Function = () => {};
+  reject: Function = noop;
   /** wrapped `resolve` of `fn` */
-  resolve: Function = () => {};
+  resolve: Function = noop;
   /** number of remaining retries for rejecting Promises */
   retry: number = Infinity;
   /** time when the item has been added to the queue */

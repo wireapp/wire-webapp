@@ -124,7 +124,7 @@ describe('Login util', () => {
       const navigate = jest.fn();
       const resetAuthError = jest.fn();
       const setSsoError = jest.fn();
-      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      jest.spyOn(console, 'warn').mockReturnValue(undefined);
 
       const error = new BackendError('Unknown backend issue', BackendErrorLabel.SSO_FORBIDDEN, StatusCodes.FORBIDDEN);
 

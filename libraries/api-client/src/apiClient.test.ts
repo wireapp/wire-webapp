@@ -342,7 +342,7 @@ describe('APIClient', () => {
       jest.spyOn(client.api.auth, 'postLogout').mockReturnValue(Promise.reject(testError));
       const disconnectSpy = jest.spyOn(client, 'disconnect').mockReturnValue();
       jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
-      jest.spyOn(client['logger'], 'warn').mockImplementation(() => {});
+      jest.spyOn(client['logger'], 'warn').mockReturnValue(undefined);
 
       await client.logout();
       expect(client['logger'].warn).toHaveBeenCalledWith(testError);
@@ -358,7 +358,7 @@ describe('APIClient', () => {
       jest.spyOn(client.api.auth, 'postLogout');
       const disconnectSpy = jest.spyOn(client, 'disconnect').mockReturnValue();
       jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
-      jest.spyOn(client['logger'], 'warn').mockImplementation(() => {});
+      jest.spyOn(client['logger'], 'warn').mockReturnValue(undefined);
 
       await client.logout({skipLogoutRequest: true});
       expect(client['logger'].warn).not.toHaveBeenCalled();

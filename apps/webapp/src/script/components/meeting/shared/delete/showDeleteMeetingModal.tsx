@@ -17,6 +17,8 @@
  *
  */
 
+import {noop} from 'noop-esm';
+
 import {TrashIcon} from '@wireapp/react-ui-kit';
 
 import {
@@ -76,7 +78,7 @@ export const showDeleteMeetingModal = ({
         ),
       },
       secondaryAction: {
-        action: () => {},
+        action: noop,
         text: translate('meetings.deleteModal.cancel'),
       },
       text: {

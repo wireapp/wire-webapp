@@ -43,7 +43,7 @@ function createAbortableWaitDependenciesForTest(
         return 123 as ReturnType<typeof globalThis.setTimeout>;
       }),
   );
-  const clearTimeout = jest.fn(overrides.clearTimeout ?? (() => {}));
+  const clearTimeout = jest.fn(overrides.clearTimeout);
 
   return {
     abortableWaitDependencies: {

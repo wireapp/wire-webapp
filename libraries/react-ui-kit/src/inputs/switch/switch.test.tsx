@@ -21,6 +21,7 @@ import type {ComponentProps} from 'react';
 
 import {matchers} from '@emotion/jest';
 import {render} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {Switch} from './switch';
 
@@ -59,7 +60,7 @@ describe('"Switch"', () => {
       {
         id: '1',
         checked: true,
-        onToggle: () => {},
+        onToggle: noop,
         activatedColor: '#0a5fb3',
         deactivatedColor: '#c2c2c2',
       },
@@ -75,7 +76,7 @@ describe('"Switch"', () => {
       {
         id: '2',
         checked: false,
-        onToggle: () => {},
+        onToggle: noop,
         deactivatedColorDark: '#111111',
       },
       THEME_ID.DARK,
@@ -90,7 +91,7 @@ describe('"Switch"', () => {
       {
         id: '3',
         checked: false,
-        onToggle: () => {},
+        onToggle: noop,
         disabled: true,
         disabledColorDark: '#222222',
       },
@@ -106,7 +107,7 @@ describe('"Switch"', () => {
       {
         id: '4',
         checked: true,
-        onToggle: () => {},
+        onToggle: noop,
         activatedColor: '#123456',
       },
       THEME_ID.DARK,
@@ -130,7 +131,7 @@ describe('"Switch"', () => {
       {
         id: '5',
         checked: false,
-        onToggle: () => {},
+        onToggle: noop,
         disabled: true,
       },
       theme,
@@ -145,7 +146,7 @@ describe('"Switch"', () => {
       {
         id: '6',
         checked: true,
-        onToggle: () => {},
+        onToggle: noop,
       },
       THEME_ID.LIGHT,
     );

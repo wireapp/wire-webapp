@@ -20,6 +20,7 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {noop} from 'noop-esm';
 
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -85,7 +86,7 @@ export const useCertificateStatus = (
       };
     }
 
-    return () => {};
+    return noop;
   }, [refreshCertificateStatus, isCurrentDevice]);
 
   return certificateStatus;

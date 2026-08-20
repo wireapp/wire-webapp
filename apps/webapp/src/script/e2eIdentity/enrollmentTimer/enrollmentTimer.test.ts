@@ -20,6 +20,7 @@
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {noop} from 'noop-esm';
 
 import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './enrollmentTimer';
 
@@ -38,7 +39,7 @@ const generateWireIdentity = (
     notAfter: BigInt(0),
     notBefore: BigInt(0),
     serialNumber: '',
-    [Symbol.dispose]: () => {},
+    [Symbol.dispose]: noop,
   },
   thumbprint: '',
   credentialType,

@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {asyncNoop} from 'noop-esm';
 import {ConversationLabelRepository, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
@@ -48,9 +49,7 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
       putPropertiesByKey: jest.fn(async <T extends Record<string, any>>(key: string, value: T): Promise<void> => {
         localStorage.setItem(`test_${key}`, JSON.stringify(value));
       }),
-      deleteProperties: jest.fn(async (): Promise<void> => {
-        // Not used in these tests
-      }),
+      deleteProperties: jest.fn(asyncNoop),
       deletePropertiesByKey: jest.fn(async (key: string): Promise<void> => {
         localStorage.removeItem(`test_${key}`);
       }),
