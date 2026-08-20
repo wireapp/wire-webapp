@@ -19,10 +19,11 @@
 import {ListViewModel} from './ListViewModel';
 
 import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
-import {ListState, useAppState} from '../page/useAppState';
+import {ContentState, ListState, useAppState} from '../page/useAppState';
+import * as Router from '../router/Router';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const createListViewModel = (): ListViewModel => {
+const createListViewModel = () => {
   const mainViewModel = {
     actions: {},
     calling: {},
@@ -33,21 +34,23 @@ const createListViewModel = (): ListViewModel => {
     isFederated: false,
   } as unknown as ConstructorParameters<typeof ListViewModel>[0];
 
+  const teamRepository = {getTeam: jest.fn().mockResolvedValue(undefined)};
   const repositories = {
     calling: {},
     conversation: {},
     properties: {},
     search: {},
-    team: {},
+    team: teamRepository,
   } as unknown as ConstructorParameters<typeof ListViewModel>[1];
 
   const listViewModel = new ListViewModel(mainViewModel, repositories, translateForTest);
   (listViewModel as unknown as {isActivatedAccount: () => boolean}).isActivatedAccount = () => true;
-  return listViewModel;
+  return {listViewModel, teamRepository};
 };
 
 describe('ListViewModel', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
     useAppState.setState({listState: ListState.CONVERSATIONS});
   });
@@ -58,7 +61,7 @@ describe('ListViewModel', () => {
       useSidebarStore.setState({currentTab});
       useAppState.setState({listState: currentTab === SidebarTabs.CELLS ? ListState.CELLS : ListState.MEETINGS});
 
-      createListViewModel().openConversations();
+      createListViewModel().listViewModel.openConversations();
 
       expect(useAppState.getState().listState).toBe(ListState.CONVERSATIONS);
       expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.RECENT);
@@ -70,7 +73,7 @@ describe('ListViewModel', () => {
     currentTab => {
       useSidebarStore.setState({currentTab});
 
-      createListViewModel().openConversations();
+      createListViewModel().listViewModel.openConversations();
 
       expect(useAppState.getState().listState).toBe(ListState.CONVERSATIONS);
       expect(useSidebarStore.getState().currentTab).toBe(currentTab);
@@ -80,9 +83,86 @@ describe('ListViewModel', () => {
   it('keeps the archive list when opening an archived conversation', () => {
     useSidebarStore.setState({currentTab: SidebarTabs.MEETINGS});
 
-    createListViewModel().openConversations(true);
+    createListViewModel().listViewModel.openConversations(true);
 
     expect(useAppState.getState().listState).toBe(ListState.ARCHIVE);
     expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.ARCHIVES);
+  });
+
+  it('does not repeat navigation when opening the active preference', () => {
+    const {listViewModel} = createListViewModel();
+    const setHistoryParam = jest.spyOn(Router, 'setHistoryParam');
+    const switchContent = jest.spyOn(listViewModel.contentViewModel, 'switchContent');
+
+    useAppState.setState({listState: ListState.PREFERENCES, contentState: ContentState.PREFERENCES_ACCOUNT});
+
+    listViewModel.openPreferences(ContentState.PREFERENCES_ACCOUNT);
+
+    expect(setHistoryParam).not.toHaveBeenCalled();
+    expect(switchContent).not.toHaveBeenCalled();
+  });
+
+  it('navigates when opening a different preference', () => {
+    const {listViewModel} = createListViewModel();
+    const setHistoryParam = jest.spyOn(Router, 'setHistoryParam');
+    const switchContent = jest.spyOn(listViewModel.contentViewModel, 'switchContent');
+
+    useAppState.setState({listState: ListState.PREFERENCES, contentState: ContentState.PREFERENCES_ACCOUNT});
+
+    listViewModel.openPreferences(ContentState.PREFERENCES_DEVICES);
+
+    expect(setHistoryParam).toHaveBeenCalledWith('/preferences/devices');
+    expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.PREFERENCES);
+    expect(switchContent).toHaveBeenCalledWith(ContentState.PREFERENCES_DEVICES);
+  });
+
+  it.each([
+    [ContentState.PREFERENCES_ABOUT, '/preferences/about'],
+    [ContentState.PREFERENCES_ACCOUNT, '/preferences/account'],
+    [ContentState.PREFERENCES_AV, '/preferences/av'],
+    [ContentState.PREFERENCES_DEVICES, '/preferences/devices'],
+    [ContentState.PREFERENCES_OPTIONS, '/preferences/options'],
+  ])('maps preference %s to its deep link', (contentState, path) => {
+    const {listViewModel} = createListViewModel();
+    const setHistoryParam = jest.spyOn(Router, 'setHistoryParam');
+
+    listViewModel.openPreferences(contentState);
+
+    expect(setHistoryParam).toHaveBeenCalledWith(path);
+  });
+
+  it('navigates to the meetings deep link when opening meetings', () => {
+    const {listViewModel} = createListViewModel();
+    const setHistoryParam = jest.spyOn(Router, 'setHistoryParam');
+
+    listViewModel.openMeetingsList();
+
+    expect(setHistoryParam).toHaveBeenCalledWith('/meetings');
+    expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.MEETINGS);
+  });
+
+  it('does not repeat navigation when opening the active meetings list', () => {
+    const {listViewModel} = createListViewModel();
+    const setHistoryParam = jest.spyOn(Router, 'setHistoryParam');
+
+    useAppState.setState({listState: ListState.MEETINGS, contentState: ContentState.MEETINGS});
+
+    listViewModel.openMeetingsList();
+
+    expect(setHistoryParam).not.toHaveBeenCalled();
+  });
+
+  it('refreshes the team before reopening the active account preference', async () => {
+    const {listViewModel, teamRepository} = createListViewModel();
+    const setHistoryParam = jest.spyOn(Router, 'setHistoryParam');
+    const switchContent = jest.spyOn(listViewModel.contentViewModel, 'switchContent');
+
+    useAppState.setState({listState: ListState.PREFERENCES, contentState: ContentState.PREFERENCES_ACCOUNT});
+
+    await listViewModel.openPreferencesAccount();
+
+    expect(teamRepository.getTeam).toHaveBeenCalledTimes(1);
+    expect(setHistoryParam).not.toHaveBeenCalled();
+    expect(switchContent).not.toHaveBeenCalled();
   });
 });

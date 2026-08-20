@@ -76,10 +76,14 @@ import {
 
 import {Config} from '../../../../Config';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../listWrapper';
 import {StartUI} from '../startUi';
+
+export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean =>
+  ![SidebarTabs.PREFERENCES, SidebarTabs.MEETINGS].includes(tab);
 
 type ConversationsProps = {
   callState?: CallState;
@@ -352,7 +356,8 @@ export const Conversations = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(nextTab)) {
+      if (shouldClearDeepLinkForTab(nextTab)) {
+        setHistoryParam('/');
         onExitPreferences();
       }
 
@@ -365,8 +370,7 @@ export const Conversations = ({
         if (!isMeetingsEnabled) {
           return;
         }
-        switchList(ListState.MEETINGS);
-        switchContent(ContentState.MEETINGS);
+        listViewModel.openMeetingsList();
       }
 
       clearConversationFilter();
@@ -381,6 +385,7 @@ export const Conversations = ({
       isMeetingsEnabled,
       clearConversationFilter,
       setCurrentTab,
+      listViewModel,
     ],
   );
 
@@ -410,9 +415,8 @@ export const Conversations = ({
 
   const onClickPreferences = useCallback(
     (itemId: ContentState) => {
-      switchList(ListState.PREFERENCES);
+      listViewModel.openPreferences(itemId);
       setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
-      switchContent(itemId);
 
       setTimeout(() => {
         const centerColumn = document.getElementById('center-column');
@@ -420,7 +424,7 @@ export const Conversations = ({
         nextElementToFocus?.focus();
       }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
     },
-    [switchList, setCurrentView, switchContent],
+    [listViewModel, setCurrentView],
   );
 
   const handleEnterSearchClick = useCallback(
