@@ -51,6 +51,7 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
@@ -122,27 +123,27 @@ function buildConversationRepository(translate: Translate) {
   const conversationState = new ConversationState();
   // @ts-ignore
   const conversationService = {
-    deleteConversation: () => {},
-    deleteConversationFromDb: () => {},
-    wipeMLSCapableConversation: () => {},
-    postBots: () => {},
-    saveConversationStateInDb: () => {},
-    wipeMLSConversation: () => {},
+    deleteConversation: noop,
+    deleteConversationFromDb: noop,
+    wipeMLSCapableConversation: noop,
+    postBots: noop,
+    saveConversationStateInDb: noop,
+    wipeMLSConversation: noop,
   } as ConversationService;
-  const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
+  const messageRepository = {setClientMismatchHandler: noop} as unknown as MessageRepository;
   // @ts-ignore
   const callingRepository = new CallingRepository();
   const connectionRepository = {
-    setDeleteConnectionRequestConversationHandler: () => {},
+    setDeleteConnectionRequestConversationHandler: noop,
   } as unknown as ConnectionRepository;
   const eventRepository = {
     eventService: new EventService(),
-    injectEvent: () => {},
-    injectEvents: () => {},
+    injectEvent: noop,
+    injectEvents: noop,
   } as unknown as EventRepository;
-  const selfRepository = {on: () => {}} as unknown as SelfRepository;
+  const selfRepository = {on: noop} as unknown as SelfRepository;
   const teamRepository = {} as TeamRepository;
-  const userRepository = {on: () => {}} as unknown as UserRepository;
+  const userRepository = {on: noop} as unknown as UserRepository;
   const userState = new UserState();
   const core = new Core();
 
@@ -3906,7 +3907,7 @@ describe('ConversationRepository', () => {
 
       jest.spyOn(conversationRepository['conversationService'], 'getConversationById').mockRejectedValueOnce(error);
 
-      const loggerSpy = jest.spyOn(conversationRepository['logger'], 'error').mockImplementation(() => {});
+      const loggerSpy = jest.spyOn(conversationRepository['logger'], 'error').mockReturnValue(undefined);
 
       await expect(conversationRepository.fetchBackendConversationEntityById(qualifiedId)).rejects.toThrow(error);
       expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to get conversation from backend'));

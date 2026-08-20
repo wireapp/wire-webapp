@@ -40,7 +40,7 @@ describe('HistoryExport', () => {
   });
 
   it('uses a stable modal id so rerenders do not queue duplicate password modals', async () => {
-    const showSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {});
+    const showSpy = jest.spyOn(PrimaryModal, 'show').mockReturnValue(undefined);
     const user = new User('', '', translateForTest);
     const switchContent = jest.fn();
     const clientState = new ClientState();

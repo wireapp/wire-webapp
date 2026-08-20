@@ -20,6 +20,7 @@
 import {useState} from 'react';
 
 import {Meta, StoryObj} from '@storybook/react';
+import {noop} from 'noop-esm';
 
 import {Pagination} from './pagination';
 
@@ -45,7 +46,7 @@ export const Default: Story = {
   args: {
     currentPage: 0,
     numberOfPages: 5,
-    goPage: () => {},
+    goPage: noop,
   },
 };
 
@@ -53,7 +54,7 @@ export const CustomNavigation: Story = {
   args: {
     currentPage: 0,
     numberOfPages: 5,
-    goPage: () => {},
+    goPage: noop,
     previousPageComponent: () => 'Previous',
     nextPageComponent: () => 'Next',
   },
@@ -63,7 +64,7 @@ export const WithManyPages: Story = {
   args: {
     currentPage: 4,
     numberOfPages: 20,
-    goPage: () => {},
+    goPage: noop,
   },
 };
 

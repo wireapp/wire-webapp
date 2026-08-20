@@ -17,6 +17,7 @@
  *
  */
 
+import {noop} from 'noop-esm';
 import type {Task} from 'true-myth';
 
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
@@ -51,7 +52,7 @@ export const showMeetingConversationRenameFailedModal = ({
         text: translate('meetings.scheduleModal.error.conversationRenameFailedRetry'),
       },
       secondaryAction: {
-        action: () => {},
+        action: noop,
         text: translate('meetings.deleteModal.cancel'),
       },
       text: {

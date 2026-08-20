@@ -63,7 +63,7 @@ describe('PropertiesRepository', () => {
 
       propertiesRepository = new PropertiesRepository(propertiesService, selfService, translate);
 
-      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {});
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockReturnValue(undefined);
 
       propertiesRepository.checkTelemetrySharingPermission();
 

@@ -21,6 +21,7 @@ import {waitFor} from '@testing-library/react';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
+import {noop} from 'noop-esm';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
@@ -75,7 +76,7 @@ const generateWireIdentity = (
     notAfter: BigInt(0),
     notBefore: BigInt(0),
     serialNumber: '',
-    [Symbol.dispose]: () => {},
+    [Symbol.dispose]: noop,
   },
   thumbprint: '',
   credentialType,

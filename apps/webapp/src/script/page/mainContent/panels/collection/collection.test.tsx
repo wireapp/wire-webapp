@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -292,8 +293,8 @@ describe('FullSearch', () => {
 
   it('ignores slow stale search results so the latest query wins', async () => {
     jest.useFakeTimers();
-    let resolveFirstSearch: (value: {messageEntities: ContentMessage[]; query: string}) => void = () => {};
-    let resolveSecondSearch: (value: {messageEntities: ContentMessage[]; query: string}) => void = () => {};
+    let resolveFirstSearch: (value: {messageEntities: ContentMessage[]; query: string}) => void = noop;
+    let resolveSecondSearch: (value: {messageEntities: ContentMessage[]; query: string}) => void = noop;
     const searchProvider = jest.fn((query: string) => {
       if (query === 'term') {
         return new Promise<{messageEntities: ContentMessage[]; query: string}>(resolve => {

@@ -258,6 +258,17 @@ const strictBooleanExpressionsRule = [
   },
 ];
 
+const emptyArrowFunctionRestrictions = [
+  {
+    selector: "ArrowFunctionExpression[async=false][body.type='BlockStatement'][body.body.length=0]",
+    message: 'Use noop from noop-esm instead of an empty arrow function.',
+  },
+  {
+    selector: "ArrowFunctionExpression[async=true][body.type='BlockStatement'][body.body.length=0]",
+    message: 'Use asyncNoop from noop-esm instead of an empty async arrow function.',
+  },
+];
+
 const restrictedSyntaxRule = [
   'error',
   {
@@ -273,7 +284,10 @@ const restrictedSyntaxRule = [
     selector: "ImportDeclaration[source.value='@sindresorhus/is'] > ImportNamespaceSpecifier",
     message: 'Use named imports from @sindresorhus/is instead of a namespace import.',
   },
+  ...emptyArrowFunctionRestrictions,
 ];
+
+const emptyArrowFunctionRule = ['error', ...emptyArrowFunctionRestrictions];
 
 const jestMockRestrictionRule = [
   'warn',
@@ -730,6 +744,17 @@ const config = [
           jsx: true,
         },
       },
+    },
+  },
+  {
+    files: [
+      ...testTypeScriptFilePatterns,
+      ...testTsxFilePatterns,
+      ...testJavaScriptFilePatterns,
+      ...testJsxFilePatterns,
+    ],
+    rules: {
+      'no-restricted-syntax': emptyArrowFunctionRule,
     },
   },
   {

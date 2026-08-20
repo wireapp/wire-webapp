@@ -20,6 +20,7 @@
 import {useState} from 'react';
 
 import type {Meta, StoryObj} from '@storybook/react';
+import {noop} from 'noop-esm';
 
 import {Switch} from './switch';
 
@@ -50,7 +51,7 @@ export const Default: Story = {
   args: {
     checked: false,
     disabled: false,
-    onToggle: () => {},
+    onToggle: noop,
   },
 };
 
@@ -58,7 +59,7 @@ export const Checked: Story = {
   args: {
     checked: true,
     disabled: false,
-    onToggle: () => {},
+    onToggle: noop,
   },
 };
 
@@ -66,7 +67,7 @@ export const Disabled: Story = {
   args: {
     checked: false,
     disabled: true,
-    onToggle: () => {},
+    onToggle: noop,
   },
 };
 
@@ -74,6 +75,6 @@ export const DisabledChecked: Story = {
   args: {
     checked: true,
     disabled: true,
-    onToggle: () => {},
+    onToggle: noop,
   },
 };

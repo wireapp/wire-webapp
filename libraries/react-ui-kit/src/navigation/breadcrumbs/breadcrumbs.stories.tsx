@@ -18,6 +18,7 @@
  */
 
 import {Meta, StoryObj} from '@storybook/react/*';
+import {noop} from 'noop-esm';
 
 import {Breadcrumbs} from './breadcrumbs';
 
@@ -36,14 +37,14 @@ export default meta;
 type Story = StoryObj<typeof Breadcrumbs>;
 
 export const Default: Story = {
-  render: () => <Breadcrumbs items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder'}]} onItemClick={() => {}} />,
+  render: () => <Breadcrumbs items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder'}]} onItemClick={noop} />,
 };
 
 export const WithCombinedItems: Story = {
   render: () => (
     <Breadcrumbs
       items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder 1'}, {name: 'Subfolder 2'}, {name: 'Subfolder 3'}]}
-      onItemClick={() => {}}
+      onItemClick={noop}
     />
   ),
 };
@@ -52,7 +53,7 @@ export const WithIcons: Story = {
   render: () => (
     <Breadcrumbs
       items={[{name: 'Home'}, {name: 'Folder', icon: <TrashIcon />}, {name: 'Subfolder'}]}
-      onItemClick={() => {}}
+      onItemClick={noop}
     />
   ),
 };
@@ -67,11 +68,11 @@ export const WithIconsAndCombinedItems: Story = {
         {name: 'Subfolder 2'},
         {name: 'Subfolder 3'},
       ]}
-      onItemClick={() => {}}
+      onItemClick={noop}
     />
   ),
 };
 
 export const OneItem: Story = {
-  render: () => <Breadcrumbs items={[{name: 'Home'}]} onItemClick={() => {}} />,
+  render: () => <Breadcrumbs items={[{name: 'Home'}]} onItemClick={noop} />,
 };

@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, render, screen} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {SecondaryButton} from './secondaryButton';
 
@@ -54,7 +55,7 @@ describe('"SecondaryButton"', () => {
 
   it('sets data-uie-name when provided', () => {
     render(
-      <SecondaryButton onClick={() => {}} fullWidth={false} uieName="secondary">
+      <SecondaryButton onClick={noop} fullWidth={false} uieName="secondary">
         Label
       </SecondaryButton>,
     );

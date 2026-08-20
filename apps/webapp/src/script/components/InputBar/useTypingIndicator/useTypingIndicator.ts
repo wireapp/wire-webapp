@@ -19,6 +19,8 @@
 
 import {useCallback, useEffect, useRef} from 'react';
 
+import {noop} from 'noop-esm';
+
 import {TYPING_TIMEOUT} from '../TypingIndicator';
 
 type TypingIndicatorProps = {
@@ -51,13 +53,13 @@ export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndi
       return () => document.removeEventListener('keydown', setHasHitKeyboard);
     }
 
-    return () => {};
+    return noop;
   }, [onTypingChange, isEnabled]);
 
   useEffect(() => {
     let timerId: number;
     if (!hasHitKeyboard.current) {
-      return () => {};
+      return noop;
     }
 
     if (text.length > 0) {

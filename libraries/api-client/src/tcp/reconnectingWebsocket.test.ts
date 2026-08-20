@@ -21,6 +21,7 @@ import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 import {once} from 'events';
 import type {CloseEvent, ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
+import {noop} from 'noop-esm';
 import {Server as WebSocketServer} from 'ws';
 
 import {AddressInfo} from 'net';
@@ -401,7 +402,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      let resolveReconnectUrl: (websocketUrl: string) => void = () => {};
+      let resolveReconnectUrl: (websocketUrl: string) => void = noop;
       const reconnectUrlPromise = new Promise<string>(resolve => {
         resolveReconnectUrl = resolve;
       });
@@ -443,7 +444,7 @@ describe('ReconnectingWebsocket', () => {
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const thirdSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket, thirdSocket);
-      let resolveReconnectUrl: (websocketUrl: string) => void = () => {};
+      let resolveReconnectUrl: (websocketUrl: string) => void = noop;
       const reconnectUrlPromise = new Promise<string>(resolve => {
         resolveReconnectUrl = resolve;
       });

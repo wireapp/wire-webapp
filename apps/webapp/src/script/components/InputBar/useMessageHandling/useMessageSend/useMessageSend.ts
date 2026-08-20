@@ -20,6 +20,7 @@
 import {useCallback, useMemo} from 'react';
 
 import {LexicalEditor} from 'lexical';
+import {noop} from 'noop-esm';
 
 import {IAttachment} from '@wireapp/protocol-messaging';
 
@@ -272,7 +273,7 @@ export const useMessageSend = ({
             text: translate('conversation.E2EISendAnyway'),
           },
           primaryAction: {
-            action: () => {},
+            action: noop,
             text: translate('conversation.E2EICancel'),
           },
           text: {

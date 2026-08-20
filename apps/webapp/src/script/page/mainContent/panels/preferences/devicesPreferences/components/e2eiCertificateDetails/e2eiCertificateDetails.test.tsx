@@ -20,6 +20,7 @@
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {User} from 'Repositories/entity/User';
@@ -47,7 +48,7 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
     notAfter: BigInt(0),
     notBefore: BigInt(0),
     serialNumber: '',
-    [Symbol.dispose]: () => {},
+    [Symbol.dispose]: noop,
   },
   credentialType,
   deviceId: '',

@@ -20,6 +20,7 @@
 import {forwardRef} from 'react';
 
 import {useTheme} from '@emotion/react';
+import {noop} from 'noop-esm';
 
 import {inputStyles, labelStyles, loadingStyles, switchDotStyles, switchStyles, wrapperStyles} from './switch.styles';
 
@@ -49,7 +50,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
     {
       id = Math.random().toString(),
       checked,
-      onToggle = () => {},
+      onToggle = noop,
       showLoading,
       disabled,
       loadingColor = COLOR.BLUE,

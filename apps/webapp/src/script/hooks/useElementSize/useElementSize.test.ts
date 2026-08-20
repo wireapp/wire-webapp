@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {act, renderHook} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {useElementSize} from './useElementSize';
 
@@ -33,7 +34,7 @@ describe('useElementSize', () => {
   beforeEach(() => {
     mockObserve = jest.fn();
     mockDisconnect = jest.fn();
-    observerCallback = () => {};
+    observerCallback = noop;
     mockRef = {current: null};
 
     window.ResizeObserver = class MockResizeObserver implements ResizeObserver {

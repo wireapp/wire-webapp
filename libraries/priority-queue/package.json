@@ -13,7 +13,8 @@
   "main": "lib/index",
   "types": "lib/index.d.ts",
   "dependencies": {
-    "@sindresorhus/is": "8.1.0"
+    "@sindresorhus/is": "8.1.0",
+    "noop-esm": "1.1.0"
   },
   "devDependencies": {
     "@swc/core": "^1.3.10",

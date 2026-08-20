@@ -19,6 +19,7 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {CredentialType, E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
+import {asyncNoop, noop} from 'noop-esm';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as e2eIdentity from 'src/script/e2eIdentity';
@@ -61,7 +62,7 @@ describe('MLSConversationVerificationStateHandler', () => {
       notAfter: BigInt(0),
       notBefore: BigInt(0),
       serialNumber: '',
-      [Symbol.dispose]: () => {},
+      [Symbol.dispose]: noop,
     },
     thumbprint: '',
     credentialType: CredentialType.X509,
@@ -89,13 +90,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if MLS feature is not active', () => {
     core.isMLSActiveForClient = jest.fn().mockReturnValue(false);
 
-    new MLSConversationVerificationStateHandler(
-      'domain',
-      () => {},
-      async () => {},
-      conversationState,
-      core,
-    );
+    new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
     expect(core.service?.mls?.conversationExists).not.toHaveBeenCalled();
   });
@@ -103,13 +98,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if E2EI feature is not active', () => {
     e2eiHandler.isE2EIEnabled = jest.fn().mockReturnValue(false);
 
-    new MLSConversationVerificationStateHandler(
-      'domain',
-      () => {},
-      async () => {},
-      conversationState,
-      core,
-    );
+    new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
     expect(core.service?.mls?.conversationExists).not.toHaveBeenCalled();
   });
@@ -117,14 +106,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if MLS service is not available', () => {
     core.service!.mls = undefined;
 
-    const t = () =>
-      new MLSConversationVerificationStateHandler(
-        'domain',
-        () => {},
-        async () => {},
-        conversationState,
-        core,
-      );
+    const t = () => new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
     expect(t).not.toThrow();
   });
@@ -132,13 +114,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if e2eIdentity service is not available', () => {
     core.service!.e2eIdentity = undefined;
 
-    new MLSConversationVerificationStateHandler(
-      'domain',
-      () => {},
-      async () => {},
-      conversationState,
-      core,
-    );
+    new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
     expect(core.service?.mls?.on).not.toHaveBeenCalled();
   });
@@ -146,13 +122,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if the user does not have an mls device', () => {
     jest.spyOn(core, 'hasMLSDevice', 'get').mockReturnValue(false);
 
-    new MLSConversationVerificationStateHandler(
-      'domain',
-      () => {},
-      async () => {},
-      conversationState,
-      core,
-    );
+    new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
     expect(core.service?.mls?.on).not.toHaveBeenCalled();
   });
@@ -160,7 +130,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   describe('handleNewRevocationList', () => {
     it('should check for self certificate revocation for tenant-prefixed CRL hosts', async () => {
       const localConversationState = new ConversationState();
-      let triggerCrlChanged: (...args: {domain: string}[]) => void = () => {};
+      let triggerCrlChanged: (...args: {domain: string}[]) => void = noop;
       const onSelfClientCertificateRevoked = jest.fn().mockResolvedValue(undefined);
 
       getActiveWireIdentityMock.mockResolvedValue(createRevokedWireIdentity());
@@ -173,7 +143,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
       new MLSConversationVerificationStateHandler(
         'wire.com',
-        () => {},
+        noop,
         onSelfClientCertificateRevoked,
         localConversationState,
         core,
@@ -187,7 +157,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
     it('should not check for self certificate revocation for non-matching CRL hosts', async () => {
       const localConversationState = new ConversationState();
-      let triggerCrlChanged: (...args: {domain: string}[]) => void = () => {};
+      let triggerCrlChanged: (...args: {domain: string}[]) => void = noop;
       const onSelfClientCertificateRevoked = jest.fn().mockResolvedValue(undefined);
 
       getActiveWireIdentityMock.mockResolvedValue(createRevokedWireIdentity());
@@ -200,7 +170,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
       new MLSConversationVerificationStateHandler(
         'wire.com',
-        () => {},
+        noop,
         onSelfClientCertificateRevoked,
         localConversationState,
         core,
@@ -215,7 +185,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
   describe('checkConversationVerificationState', () => {
     it('should reset to unverified if mls group does not exist anymore', async () => {
-      let triggerEpochChange: Function = () => {};
+      let triggerEpochChange: Function = noop;
       conversation.mlsVerificationState(ConversationVerificationState.VERIFIED);
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(false);
 
@@ -223,13 +193,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      new MLSConversationVerificationStateHandler(
-        'domain',
-        () => {},
-        async () => {},
-        conversationState,
-        core,
-      );
+      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -237,7 +201,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     });
 
     it('should degrade conversation', async () => {
-      let triggerEpochChange: Function = () => {};
+      let triggerEpochChange: Function = noop;
       conversation.mlsVerificationState(ConversationVerificationState.VERIFIED);
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
@@ -246,13 +210,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      new MLSConversationVerificationStateHandler(
-        'domain',
-        () => {},
-        async () => {},
-        conversationState,
-        core,
-      );
+      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -260,7 +218,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     });
 
     it('should not degrade conversation if it is not verified', async () => {
-      let triggerEpochChange: Function = () => {};
+      let triggerEpochChange: Function = noop;
       conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
 
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
@@ -270,13 +228,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      new MLSConversationVerificationStateHandler(
-        'domain',
-        () => {},
-        async () => {},
-        conversationState,
-        core,
-      );
+      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -284,7 +236,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     });
 
     it('should verify conversation', async () => {
-      let triggerEpochChange: Function = () => {};
+      let triggerEpochChange: Function = noop;
       conversation.mlsVerificationState(ConversationVerificationState.DEGRADED);
 
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
@@ -294,13 +246,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      new MLSConversationVerificationStateHandler(
-        'domain',
-        () => {},
-        async () => {},
-        conversationState,
-        core,
-      );
+      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -308,7 +254,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     });
 
     it('should wait for conversation to be known', async () => {
-      let triggerEpochChange: Function = () => {};
+      let triggerEpochChange: Function = noop;
 
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
@@ -320,13 +266,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      new MLSConversationVerificationStateHandler(
-        'domain',
-        () => {},
-        async () => {},
-        conversationState,
-        core,
-      );
+      new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId: newConversation.groupId});
       setTimeout(() => {

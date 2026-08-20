@@ -17,6 +17,8 @@
  *
  */
 
+import {noop} from 'noop-esm';
+
 import {overlayedObserver} from './overlayedObserver';
 
 describe('overlayedObserver', () => {
@@ -31,7 +33,7 @@ describe('overlayedObserver', () => {
   describe('addElement', () => {
     it('calls the callback right away if the element is not overlayed', () => {
       const callbackSpy = {
-        onVisible: () => {},
+        onVisible: noop,
       };
       spyOn(callbackSpy, 'onVisible');
 
@@ -47,7 +49,7 @@ describe('overlayedObserver', () => {
 
     it('does not call the callback if the element is overlayed', () => {
       const callbackSpy = {
-        onVisible: () => {},
+        onVisible: noop,
       };
       spyOn(callbackSpy, 'onVisible');
 
@@ -75,7 +77,7 @@ describe('overlayedObserver', () => {
 
     it('calls the callback when an overlayed element becomes visible', () => {
       const callbackSpy = {
-        onVisible: () => {},
+        onVisible: noop,
       };
       spyOn(callbackSpy, 'onVisible');
 

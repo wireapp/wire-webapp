@@ -46,6 +46,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {once} from 'lodash';
 import logdown from 'logdown';
+import {asyncNoop, noop} from 'noop-esm';
 import {TimeoutError} from 'p-queue';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
@@ -685,10 +686,10 @@ export class Account extends TypedEventEmitter<Events> {
    */
   public listen = async ({
     useLegacy,
-    onEvent = async () => {},
-    onConnectionStateChanged: onConnectionStateChangedCallBack = () => {},
-    onNotificationStreamProgress = () => {},
-    onMissedNotifications = () => {},
+    onEvent = asyncNoop,
+    onConnectionStateChanged: onConnectionStateChangedCallBack = noop,
+    onNotificationStreamProgress = noop,
+    onMissedNotifications = noop,
   }: {
     /**
      * Called when a new event arrives from backend

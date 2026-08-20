@@ -19,6 +19,7 @@
 
 import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
+import {noop} from 'noop-esm';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -109,7 +110,6 @@ export class AudioRepository {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference);
 
     if ('mediaSession' in navigator) {
-      const noop = () => {};
       navigator.mediaSession.setActionHandler('play', noop);
       navigator.mediaSession.setActionHandler('pause', noop);
     }

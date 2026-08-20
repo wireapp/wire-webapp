@@ -19,6 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 
 import {AccentColor} from '@wireapp/commons';
 
@@ -38,7 +39,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 describe('AccentColorPicker', () => {
   it('shows expected accent colors', async () => {
     const props: AccentColorPickerProps = {
-      doSetAccentColor: () => {},
+      doSetAccentColor: noop,
       user: {
         accent_id: ko.observable(AccentColor.BRIGHT_ORANGE.id),
       } as User,
@@ -53,7 +54,7 @@ describe('AccentColorPicker', () => {
   it('selects users current accent color', async () => {
     const selectedAccentColorId = AccentColor.BRIGHT_ORANGE.id;
     const props = {
-      doSetAccentColor: () => {},
+      doSetAccentColor: noop,
       user: {
         accent_id: ko.observable(selectedAccentColorId),
       } as User,

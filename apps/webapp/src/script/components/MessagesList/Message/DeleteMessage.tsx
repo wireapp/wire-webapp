@@ -17,6 +17,8 @@
  *
  */
 
+import {noop} from 'noop-esm';
+
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
@@ -31,7 +33,7 @@ interface DeleteMessageProps {
   onClickAvatar?: (user: User | ServiceEntity) => void;
 }
 
-const DeleteMessage = ({message, onClickAvatar = () => {}}: DeleteMessageProps) => {
+const DeleteMessage = ({message, onClickAvatar = noop}: DeleteMessageProps) => {
   const {translate} = useApplicationContext();
   const deletedTimeStamp = message.deleted_timestamp ?? 0;
 

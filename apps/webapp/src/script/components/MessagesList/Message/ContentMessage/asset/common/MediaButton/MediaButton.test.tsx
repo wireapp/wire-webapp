@@ -19,6 +19,7 @@
 
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {FileAsset} from 'Repositories/entity/message/fileAsset';
@@ -40,7 +41,7 @@ describe('MediaButton', () => {
 
     return {
       asset: {downloadProgress: ko.pureComputed(() => 0)} as FileAsset,
-      cancel: () => {},
+      cancel: noop,
       large: false,
       mediaElement: videoElement,
       pause: () => {

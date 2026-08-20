@@ -20,6 +20,7 @@
 import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -319,7 +320,7 @@ export const Conversations = ({
 
   useEffect(() => {
     if (!activeConversation) {
-      return () => {};
+      return noop;
     }
 
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);

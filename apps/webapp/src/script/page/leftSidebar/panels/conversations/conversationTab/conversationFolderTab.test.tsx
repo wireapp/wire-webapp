@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import * as Icon from 'Components/icon';
 import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
@@ -46,7 +47,7 @@ const getProps = async (conversations: Conversation[] = []) => {
       label: 'label',
       type: SidebarTabs.FOLDER,
       conversationTabIndex: 0,
-      onChangeTab: () => {},
+      onChangeTab: noop,
       Icon: <Icon.FoldersOutline />,
       conversationRepository,
       unreadConversations: [] as Conversation[],

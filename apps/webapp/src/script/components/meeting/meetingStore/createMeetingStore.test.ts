@@ -24,6 +24,7 @@ import {MEETING_EVENT} from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {noop} from 'noop-esm';
 import {maybe, task} from 'true-myth';
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -125,7 +126,7 @@ describe('createMeetingStore', () => {
   });
 
   it('keeps the list visible while reloading meetings that are already shown', async () => {
-    let finishFetch: () => void = () => {};
+    let finishFetch: () => void = noop;
     const fetchGate = new Promise<void>(resolve => {
       finishFetch = resolve;
     });
@@ -172,7 +173,7 @@ describe('createMeetingStore', () => {
   });
 
   it('does not restore a removed meeting when an older list reload finishes', async () => {
-    let finishFetch: () => void = () => {};
+    let finishFetch: () => void = noop;
     const fetchGate = new Promise<void>(resolve => {
       finishFetch = resolve;
     });
@@ -197,7 +198,7 @@ describe('createMeetingStore', () => {
   });
 
   it('does not remove a newly synchronized meeting when an older list reload finishes', async () => {
-    let finishFetch: () => void = () => {};
+    let finishFetch: () => void = noop;
     const fetchGate = new Promise<void>(resolve => {
       finishFetch = resolve;
     });
@@ -429,7 +430,7 @@ describe('createMeetingStore', () => {
     });
 
     it('does not restore a locally removed meeting when an older sync finishes', async () => {
-      let finishFetch: () => void = () => {};
+      let finishFetch: () => void = noop;
       const fetchGate = new Promise<void>(resolve => {
         finishFetch = resolve;
       });

@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {noop} from 'noop-esm';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -64,9 +65,7 @@ describe('ReadOnlyConversationMessage', () => {
       false,
     );
 
-    const {getByText} = render(
-      withTheme(<ReadOnlyConversationMessage conversation={conversation} reloadApp={() => {}} />),
-    );
+    const {getByText} = render(withTheme(<ReadOnlyConversationMessage conversation={conversation} reloadApp={noop} />));
 
     expect(getByText('otherUserNotSupportMLSMsg')).toBeDefined();
   });
@@ -97,9 +96,7 @@ describe('ReadOnlyConversationMessage', () => {
   it('renders a conversation with a blocked user', () => {
     const conversation = generateConversation(null, true);
 
-    const {getByText} = render(
-      withTheme(<ReadOnlyConversationMessage reloadApp={() => {}} conversation={conversation} />),
-    );
+    const {getByText} = render(withTheme(<ReadOnlyConversationMessage reloadApp={noop} conversation={conversation} />));
 
     expect(getByText('conversationWithBlockedUser')).toBeDefined();
   });
@@ -107,9 +104,7 @@ describe('ReadOnlyConversationMessage', () => {
   it("renders a conversation with a user that don't have any key pakages available", () => {
     const conversation = generateConversation(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_NO_KEY_PACKAGES, false);
 
-    const {getByText} = render(
-      withTheme(<ReadOnlyConversationMessage reloadApp={() => {}} conversation={conversation} />),
-    );
+    const {getByText} = render(withTheme(<ReadOnlyConversationMessage reloadApp={noop} conversation={conversation} />));
 
     expect(getByText('otherUserNoAvailableKeyPackages')).toBeDefined();
   });

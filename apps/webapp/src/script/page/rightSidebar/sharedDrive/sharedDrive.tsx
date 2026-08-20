@@ -20,6 +20,7 @@
 import {useMemo} from 'react';
 
 import {UserType} from '@wireapp/api-client/lib/user';
+import {noop} from 'noop-esm';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -124,7 +125,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
           <BaseToggle
             isChecked
             isDisabled
-            setIsChecked={() => {}}
+            setIsChecked={noop}
             toggleName={translate('conversationCellsConversationEnabled')}
             infoText={translate('conversationDetailsActionCellsOption')}
             toggleId="shared-drive"

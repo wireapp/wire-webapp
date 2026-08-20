@@ -37,6 +37,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {noop} from 'noop-esm';
 import {Result, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
@@ -142,7 +143,7 @@ describe('ConversationService', () => {
 
     const mockedMLSService = {
       on: jest.fn(),
-      encryptMessage: () => {},
+      encryptMessage: noop,
       commitPendingProposals: () => Promise.resolve(),
       getEpoch: () => Promise.resolve(),
       getSafeEpoch: jest.fn(),

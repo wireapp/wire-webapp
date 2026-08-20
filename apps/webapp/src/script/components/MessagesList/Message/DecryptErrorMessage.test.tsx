@@ -71,7 +71,7 @@ describe('DecryptErrorMessage', () => {
     jest.useFakeTimers();
     const props = {
       message: createError(200),
-      onClickResetSession: jest.fn(() => {}),
+      onClickResetSession: jest.fn(),
     };
 
     const {getByTestId, queryByTestId} = render(<DecryptErrorMessage {...props} />, {wrapper: rootProviderWrapper});

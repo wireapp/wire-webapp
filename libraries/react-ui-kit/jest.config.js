@@ -51,6 +51,6 @@ module.exports = {
       },
     ],
   },
-  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is|noop-esm)/)'],
   snapshotSerializers: ['@emotion/jest/serializer'],
 };

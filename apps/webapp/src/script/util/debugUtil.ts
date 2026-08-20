@@ -35,6 +35,7 @@ import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseR
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
@@ -285,7 +286,7 @@ export class DebugUtil {
     const useAsyncNotificationStream =
       teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
     const useLegacyNotificationStream = !useAsyncNotificationStream;
-    return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
+    return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, noop, dryRun);
   }
 
   async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
