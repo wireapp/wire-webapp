@@ -253,6 +253,19 @@ describe('EditedMessagePlugin', () => {
     },
   );
 
+  it('restores mentions as custom nodes when preview mode is disabled', async () => {
+    const messageText = 'Hello @Alice!';
+    const mention = new MentionEntity(6, 6, '00000000-0000-0000-0000-000000000001');
+    const fixture = unwrap(renderEditedMessagePlugin(createContentMessage(messageText, [mention]), false));
+
+    await waitFor(() => {
+      expect(getMentionTexts(fixture.editor)).toEqual(['@Alice']);
+    });
+
+    expect(getTextContent(fixture.editor)).toBe(messageText);
+    expect(getMentionMarkdown(fixture.editor, ['@Alice'])).toBe('Hello <mention>@Alice</mention>!');
+  });
+
   it('replaces the previous editor contents when the edited message changes', async () => {
     const firstMessage = createContentMessage('first message');
     const secondMessage = createContentMessage('second message');
