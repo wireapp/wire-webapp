@@ -206,6 +206,37 @@ describe('RichTextEditor', () => {
   );
 
   it(
+    'reports and saves emoji replacements when preprocessing and emoji replacement are enabled',
+    withFakeTimers(() => {
+      const fixture = unwrap(
+        renderRichTextEditor({
+          ...defaultRichTextEditorTestOptions,
+          replaceEmojis: true,
+        }),
+      );
+
+      act(() => {
+        setRawParagraphs(fixture.editor, ['hello :)']);
+      });
+
+      expect(fixture.onUpdate).toHaveBeenLastCalledWith({
+        text: 'hello 🙂',
+        mentions: [],
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(800);
+      });
+
+      expect(fixture.saveDraftState).toHaveBeenLastCalledWith(
+        JSON.stringify(fixture.editor.getEditorState().toJSON()),
+        'hello 🙂',
+        undefined,
+      );
+    }),
+  );
+
+  it(
     'reports raw editor text and leaves Markdown-looking text unchanged when preprocessing is disabled',
     withFakeTimers(() => {
       const fixture = unwrap(
