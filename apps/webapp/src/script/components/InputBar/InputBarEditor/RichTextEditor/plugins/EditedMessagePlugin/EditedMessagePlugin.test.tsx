@@ -20,6 +20,7 @@ import {$convertToMarkdownString} from '@lexical/markdown';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot, $nodesOfType, LexicalEditor} from 'lexical';
+import {noop} from 'noop-esm';
 import {Maybe, toolbelt, type Result} from 'true-myth';
 import {useEffect, type FunctionComponent} from 'react';
 
@@ -55,6 +56,12 @@ type MentionCharacterizationTestCase = {
   readonly expectedMentionText: string;
 };
 
+type EditedMessageStructureTestCase = {
+  readonly description: string;
+  readonly messageText: string;
+  readonly expectedTextContent: string;
+};
+
 const mentionCharacterizationTestCases: readonly MentionCharacterizationTestCase[] = [
   {
     description: 'a mention surrounded by ordinary text and punctuation',
@@ -63,6 +70,19 @@ const mentionCharacterizationTestCases: readonly MentionCharacterizationTestCase
     mentionLength: 6,
     expectedTextContent: 'Hello @Alice!',
     expectedMentionText: '@Alice',
+  },
+];
+
+const editedMessageStructureTestCases: readonly EditedMessageStructureTestCase[] = [
+  {
+    description: 'a multiline blockquote',
+    messageText: '> first\n> second',
+    expectedTextContent: 'first\nsecond',
+  },
+  {
+    description: 'a fenced code block with a language suffix',
+    messageText: '```typescript\nconst value = 1;\n```',
+    expectedTextContent: 'const value = 1;',
   },
 ];
 
@@ -164,6 +184,21 @@ describe('EditedMessagePlugin', () => {
     expect(getTextContent(fixture.editor)).toBe('bold\n\n\n\nitem\n\nlink');
   });
 
+  it.each(editedMessageStructureTestCases)(
+    'restores $description and preserves its Markdown representation',
+    async editedMessageStructureTestCase => {
+      const fixture = unwrap(
+        renderEditedMessagePlugin(createContentMessage(editedMessageStructureTestCase.messageText), true),
+      );
+
+      await waitFor(() => {
+        expect(getMarkdown(fixture.editor)).toBe(editedMessageStructureTestCase.messageText);
+      });
+
+      expect(getTextContent(fixture.editor)).toBe(editedMessageStructureTestCase.expectedTextContent);
+    },
+  );
+
   it('keeps Markdown-looking text as text when preview mode is disabled', async () => {
     const messageText = '**bold**';
     const fixture = unwrap(renderEditedMessagePlugin(createContentMessage(messageText), false));
@@ -208,7 +243,7 @@ describe('EditedMessagePlugin', () => {
 
     fixture.rerender(
       <LexicalComposer initialConfig={{...editorConfig, onError: throwEditorError}}>
-        <EditorCapturePlugin onReady={() => {}} />
+        <EditorCapturePlugin onReady={noop} />
         <EditedMessagePlugin message={secondMessage} showMarkdownPreview />
       </LexicalComposer>,
     );
