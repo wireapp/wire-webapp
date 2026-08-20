@@ -1082,6 +1082,7 @@
   "fileFullscreenModal.noPreviewAvailable.callToAction": "Datei herunterladen",
   "fileFullscreenModal.noPreviewAvailable.description": "Für diese Datei ist keine Vorschau verfügbar. Laden Sie stattdessen die Datei herunter.",
   "fileFullscreenModal.noPreviewAvailable.title": "Datei ohne Vorschau",
+  "fileFullscreenModal.noPreviewAvailable.viewerDescription": "Previews aren't available for this file type, and viewers can't download files.",
   "fileHistoryModal.failedToLoadVersions": "Versionen können nicht geladen werden",
   "fileHistoryModal.failedToRestore": "Dateiversion kann nicht wiederhergestellt werden",
   "fileHistoryModal.invalidNodeData": "Ungültige Datei-Daten",
