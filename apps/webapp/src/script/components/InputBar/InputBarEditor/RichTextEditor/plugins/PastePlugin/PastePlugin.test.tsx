@@ -275,6 +275,26 @@ describe('PastePlugin', () => {
     expect(getTextContent(fixture.editor)).toBe('@Alice');
   });
 
+  it('preserves ordinary mention markup as plain text', () => {
+    const fixture = unwrap(
+      renderPastePlugin({
+        isPreviewMode: true,
+        mentionCandidates: [createMentionCandidate('Alice')],
+      }),
+    );
+    const pasteEventFixture = createPasteEvent({
+      htmlContent: '<span data-lexical-mention data-lexical-mention-value="Alice">@Alice</span>',
+      plainText: '@Alice',
+    });
+    selectEndOfEmptyParagraph(fixture.editor);
+
+    const wasHandled = dispatchPaste(fixture.editor, pasteEventFixture.event);
+
+    expect(wasHandled).toBe(true);
+    expect(getMentionTexts(fixture.editor)).toEqual([]);
+    expect(getTextContent(fixture.editor)).toBe('@Alice');
+  });
+
   it('combines the mention trigger with an at-prefixed pasted mention value', () => {
     const fixture = unwrap(
       renderPastePlugin({
