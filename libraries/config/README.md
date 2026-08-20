@@ -66,7 +66,7 @@ Configuration values are resolved from multiple sources. The effective value pri
 3. **`.env.defaults` file**
   - Baseline defaults copied from configuration repositories.
 4. **Code-level fallback in generators** (lowest priority)
-  - Example: `MAX_API_VERSION` fallback to `13`, `PORT` fallback to `21080`.
+  - Example: `MAX_API_VERSION` fallback to `17`, `PORT` fallback to `21080`.
 
 If `FEDERATION` is not set, `APP_BASE`, `BACKEND_REST`, and `BACKEND_WS` must resolve to non-empty values (otherwise config generation throws an error).
 
@@ -93,7 +93,7 @@ If `FEDERATION` is not set, `APP_BASE`, `BACKEND_REST`, and `BACKEND_WS` must re
 - **Primary source:** configuration repositories (pinned in `apps/webapp/app-config/package.json`) provide baseline values via their `.env.defaults`.
 - During `webapp:configure`, the selected config repository is copied and its `.env.defaults` is written to workspace root `.env.defaults`.
 - At runtime/build time, values are loaded with this priority: **process env** > **`.env`** > **`.env.defaults`** > **code fallback**.
-- **Code fallbacks** are defined in config generators for specific variables only (for example `MAX_API_VERSION = 13`, `PORT = 21080`).
+- **Code fallbacks** are defined in config generators for specific variables only (for example `MAX_API_VERSION = 17`, `PORT = 21080`).
 - So, defaults are mostly from config repositories; webapp/server code provides fallback defaults only for a smaller subset.
 
 Notes:
@@ -120,7 +120,7 @@ Notes:
 | `BRAND_NAME` | From `.env.defaults` | Brand name in client config | N/A |
 | `WEBSITE_LABEL` | From `.env.defaults` | Label for website links in client config | N/A |
 | `ENABLE_DEV_BACKEND_API` | `false` | Allow development API usage in client | N/A |
-| `MAX_API_VERSION` | `13` | Max backend API version accepted by client | N/A |
+| `MAX_API_VERSION` | `17` | Max backend API version accepted by client | N/A |
 | `GOOGLE_WEBMASTER_ID` | From `.env.defaults` | Verification id in server-rendered metadata | N/A |
 | `OPEN_GRAPH_DESCRIPTION` | From `.env.defaults` | OpenGraph description meta tag | N/A |
 | `OPEN_GRAPH_IMAGE_URL` | From `.env.defaults` | OpenGraph image URL meta tag | N/A |
