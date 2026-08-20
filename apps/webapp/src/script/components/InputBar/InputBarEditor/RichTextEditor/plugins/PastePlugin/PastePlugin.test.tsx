@@ -234,6 +234,26 @@ describe('PastePlugin', () => {
     expect(getTextContent(fixture.editor)).toBe('[Wire](https://wire.com)');
   });
 
+  it('preserves an HTML link as a link node in preview mode', () => {
+    const fixture = unwrap(
+      renderPastePlugin({
+        isPreviewMode: true,
+        mentionCandidates: [],
+      }),
+    );
+    const pasteEventFixture = createPasteEvent({
+      htmlContent: '<a href="https://wire.com">Wire</a>',
+      plainText: 'Wire',
+    });
+    selectEndOfEmptyParagraph(fixture.editor);
+
+    const wasHandled = dispatchPaste(fixture.editor, pasteEventFixture.event);
+
+    expect(wasHandled).toBe(true);
+    expect(getMarkdown(fixture.editor)).toBe('[Wire](https://wire.com)');
+    expect(getTextContent(fixture.editor)).toBe('Wire');
+  });
+
   it('preserves a valid Lexical mention node from HTML', () => {
     const fixture = unwrap(
       renderPastePlugin({
