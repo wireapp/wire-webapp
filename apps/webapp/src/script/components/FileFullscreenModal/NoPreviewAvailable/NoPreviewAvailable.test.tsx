@@ -35,6 +35,8 @@ const translate = (key: string) =>
   ({
     'fileFullscreenModal.noPreviewAvailable.title': 'No preview available',
     'fileFullscreenModal.noPreviewAvailable.description': 'Download this file to view it.',
+    'fileFullscreenModal.noPreviewAvailable.viewerDescription':
+      "Previews aren't available for this file type, and viewers can't download files.",
     'fileFullscreenModal.noPreviewAvailable.callToAction': 'Download',
   })[key] ?? key;
 
@@ -69,9 +71,18 @@ describe('NoPreviewAvailable', () => {
     expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
   });
 
+  it('shows viewer-specific message when download is restricted', () => {
+    renderPlaceholder(true);
+
+    expect(
+      screen.getByText("Previews aren't available for this file type, and viewers can't download files."),
+    ).toBeInTheDocument();
+  });
+
   it('shows download action when download is allowed', () => {
     renderPlaceholder(false);
 
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
+    expect(screen.getByText('Download this file to view it.')).toBeInTheDocument();
   });
 });

@@ -43,5 +43,8 @@ export const titleStyles: CSSObject = {
 
 export const descriptionStyles: CSSObject = {
   fontSize: 'var(--font-size-base)',
+  lineHeight: 'var(--line-height-md)',
   marginBottom: '16px',
+  maxWidth: '420px',
+  textAlign: 'center',
 };
