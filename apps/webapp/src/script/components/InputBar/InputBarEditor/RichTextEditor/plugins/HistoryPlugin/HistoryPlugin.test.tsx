@@ -35,6 +35,7 @@ import {act, render} from '@testing-library/react';
 import {unwrap} from 'Util/test/resultTestSupport';
 
 import {editorConfig} from '../../editorConfig';
+import {EmojiNode} from '../../nodes/EmojiNode';
 import {$createMentionNode, MentionNode} from '../../nodes/MentionNode';
 import {HistoryPlugin} from './HistoryPlugin';
 
@@ -131,6 +132,23 @@ function getMentionNodeCount(editor: LexicalEditor): number {
   });
 }
 
+function setEditorEmoji(editor: LexicalEditor): void {
+  editor.update(
+    () => {
+      const paragraphNode = $createParagraphNode();
+      paragraphNode.append($createTextNode('hello '), new EmojiNode('🧪'));
+      $getRoot().clear().append(paragraphNode);
+    },
+    {discrete: true},
+  );
+}
+
+function getEmojiNodeCount(editor: LexicalEditor): number {
+  return editor.getEditorState().read(() => {
+    return $nodesOfType(EmojiNode).length;
+  });
+}
+
 function advancePastHistoryMergeWindow(): void {
   act(() => {
     jest.advanceTimersByTime(301);
@@ -213,6 +231,25 @@ describe('HistoryPlugin', () => {
       expect(dispatchHistoryCommand(fixture.editor, REDO_COMMAND)).toBe(true);
       expect(getTextContent(fixture.editor)).toBe('plain text');
       expect(getMentionNodeCount(fixture.editor)).toBe(0);
+    }),
+  );
+
+  it(
+    'restores custom emoji nodes through undo and redo',
+    withFakeTimers(() => {
+      const fixture = unwrap(renderHistoryPlugin());
+      setEditorEmoji(fixture.editor);
+      advancePastHistoryMergeWindow();
+      setEditorText(fixture.editor, 'plain text');
+      advancePastHistoryMergeWindow();
+
+      expect(dispatchHistoryCommand(fixture.editor, UNDO_COMMAND)).toBe(true);
+      expect(getTextContent(fixture.editor)).toBe('hello 🧪');
+      expect(getEmojiNodeCount(fixture.editor)).toBe(1);
+
+      expect(dispatchHistoryCommand(fixture.editor, REDO_COMMAND)).toBe(true);
+      expect(getTextContent(fixture.editor)).toBe('plain text');
+      expect(getEmojiNodeCount(fixture.editor)).toBe(0);
     }),
   );
 });
