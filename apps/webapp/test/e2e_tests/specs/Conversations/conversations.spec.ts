@@ -468,6 +468,23 @@ test.describe('Conversations', () => {
     await expect(userAPages.conversation().getMessage({content: '🙂'})).toBeVisible();
   });
 
+  test('Verify emoji picker selection replaces an emoji alias', {tag: ['@regression']}, async ({createPage}) => {
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    await userAPages.conversationList().getConversation(userB.fullName).open();
+
+    await userAPages.conversation().messageInput.pressSequentially(':smile', {delay: 100});
+
+    const emojiMenu = userAPage.locator('#emoji-typeahead-menu');
+    await expect(emojiMenu).toBeVisible();
+    await emojiMenu.getByRole('button', {name: 'smile', exact: true}).click();
+
+    await expect(userAPages.conversation().messageInput).toContainText('😄');
+    await expect(userAPages.conversation().messageInput).not.toContainText(':smile');
+  });
+
   test(
     'I can see the system message "You renamed the conversation" after renaming conversation',
     {tag: ['@TC-496', '@regression']},

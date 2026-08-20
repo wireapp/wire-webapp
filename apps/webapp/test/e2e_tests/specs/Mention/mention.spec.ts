@@ -478,6 +478,32 @@ test.describe('Mention', () => {
     },
   );
 
+  test('I should navigate mention suggestions with the keyboard', {tag: ['@regression']}, async ({createPage}) => {
+    const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+
+    await createGroup(pages, 'Keyboard Mention Group', [userB, userC]);
+    await pages.conversationList().getConversation('Keyboard Mention Group').open();
+
+    const conversationPage = pages.conversation();
+    const mentionSuggestions = conversationPage.mentionSuggestions;
+
+    await conversationPage.messageInput.pressSequentially('@');
+    await expect(mentionSuggestions).toHaveCount(2);
+    await expect(mentionSuggestions.nth(1)).toHaveAttribute('data-uie-selected', 'true');
+    await expect(mentionSuggestions.nth(0)).toHaveAttribute('data-uie-selected', 'false');
+
+    await conversationPage.messageInput.press('ArrowUp');
+    await expect(mentionSuggestions.nth(0)).toHaveAttribute('data-uie-selected', 'true');
+    await expect(mentionSuggestions.nth(1)).toHaveAttribute('data-uie-selected', 'false');
+
+    await conversationPage.messageInput.press('ArrowDown');
+    await expect(mentionSuggestions.nth(1)).toHaveAttribute('data-uie-selected', 'true');
+
+    await conversationPage.messageInput.press('Escape');
+    await expect(mentionSuggestions).toHaveCount(0);
+    await expect(conversationPage.messageInput).toHaveText('@');
+  });
+
   test(
     'I want to mention a name with or without umlaut gives the same suggestion (query normalization)',
     {tag: ['@TC-3537', '@regression']},
