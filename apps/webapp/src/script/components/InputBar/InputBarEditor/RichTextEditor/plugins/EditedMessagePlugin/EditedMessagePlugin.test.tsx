@@ -19,12 +19,12 @@
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getRoot, $nodesOfType, LexicalEditor} from 'lexical';
+import {$createParagraphNode, $createTextNode, $getRoot, $nodesOfType, LexicalEditor} from 'lexical';
 import {noop} from 'noop-esm';
 import {Maybe, toolbelt, type Result} from 'true-myth';
 import {useEffect, type FunctionComponent} from 'react';
 
-import {render, waitFor, type RenderResult} from '@testing-library/react';
+import {act, render, waitFor, type RenderResult} from '@testing-library/react';
 
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Text} from 'Repositories/entity/message/text';
@@ -182,6 +182,27 @@ describe('EditedMessagePlugin', () => {
     });
 
     expect(getTextContent(fixture.editor)).toBe('bold\n\n\n\nitem\n\nlink');
+  });
+
+  it('serializes content added after restoring an edited message', async () => {
+    const fixture = unwrap(renderEditedMessagePlugin(createContentMessage('**existing**'), true));
+
+    await waitFor(() => {
+      expect(getMarkdown(fixture.editor)).toBe('**existing**');
+    });
+
+    act(() => {
+      fixture.editor.update(
+        () => {
+          const paragraphNode = $createParagraphNode();
+          paragraphNode.append($createTextNode('added'));
+          $getRoot().append(paragraphNode);
+        },
+        {discrete: true},
+      );
+    });
+
+    expect(getMarkdown(fixture.editor)).toBe('**existing**\nadded');
   });
 
   it.each(editedMessageStructureTestCases)(
