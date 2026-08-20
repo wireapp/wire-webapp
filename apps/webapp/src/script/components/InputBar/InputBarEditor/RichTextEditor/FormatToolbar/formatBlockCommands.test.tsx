@@ -20,6 +20,7 @@ import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor} from 'lexical';
+import {noop} from 'noop-esm';
 import {act, renderHook} from '@testing-library/react';
 import {type FunctionComponent, type ReactNode} from 'react';
 
@@ -76,7 +77,7 @@ function getMarkdown(editor: LexicalEditor): string {
 }
 
 function flushEditorUpdate(editor: LexicalEditor): void {
-  editor.update(() => {}, {discrete: true});
+  editor.update(noop, {discrete: true});
 }
 
 describe('FormatToolbar block commands', () => {

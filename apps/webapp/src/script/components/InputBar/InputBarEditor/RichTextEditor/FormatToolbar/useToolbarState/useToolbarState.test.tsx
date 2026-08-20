@@ -32,6 +32,7 @@ import {
   LexicalEditor,
   TextFormatType,
 } from 'lexical';
+import {noop} from 'noop-esm';
 import {match} from 'ts-pattern';
 import {act, renderHook} from '@testing-library/react';
 import {type FunctionComponent, type ReactNode} from 'react';
@@ -176,7 +177,7 @@ function setSelectedBlock(editor: LexicalEditor, format: BlockFormat): void {
 }
 
 function flushEditorUpdate(editor: LexicalEditor): void {
-  editor.update(() => {}, {discrete: true});
+  editor.update(noop, {discrete: true});
 }
 
 describe('useToolbarState', () => {

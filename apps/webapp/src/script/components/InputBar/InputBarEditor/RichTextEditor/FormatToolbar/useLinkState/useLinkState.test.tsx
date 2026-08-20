@@ -21,6 +21,7 @@ import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$createLinkNode} from '@lexical/link';
 import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor} from 'lexical';
+import {noop} from 'noop-esm';
 import {Maybe, toolbelt, type Result} from 'true-myth';
 import {useEffect, type FunctionComponent} from 'react';
 
@@ -139,7 +140,7 @@ function getMarkdown(editor: LexicalEditor): string {
 }
 
 function flushEditorUpdate(editor: LexicalEditor): void {
-  editor.update(() => {}, {discrete: true});
+  editor.update(noop, {discrete: true});
 }
 
 describe('useLinkState', () => {
