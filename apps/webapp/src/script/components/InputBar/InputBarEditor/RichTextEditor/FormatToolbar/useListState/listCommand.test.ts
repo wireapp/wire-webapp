@@ -23,7 +23,7 @@ import {
   registerList,
 } from '@lexical/list';
 import {registerRichText} from '@lexical/rich-text';
-import {$getRoot, $isElementNode, $isTextNode, KEY_ENTER_COMMAND, LexicalEditor} from 'lexical';
+import {$getRoot, $isElementNode, $isTextNode, KEY_BACKSPACE_COMMAND, KEY_ENTER_COMMAND, LexicalEditor} from 'lexical';
 
 import {
   createWireLexicalEditorTestHarness,
@@ -140,6 +140,34 @@ describe('Wire Lexical list commands', () => {
       expect(wasHandled).toBe(true);
       expect(enterEvent.defaultPrevented).toBe(true);
       expect(harness.exportMarkdown()).toBe('- first\n- ');
+    }),
+  );
+
+  it(
+    'removes an empty list item when Backspace follows Enter',
+    withRegisteredList('- first', harness => {
+      registerRichText(harness.editor);
+
+      harness.editor.update(
+        () => {
+          harness.editor.dispatchCommand(KEY_ENTER_COMMAND, new KeyboardEvent('keydown', {cancelable: true}));
+        },
+        {discrete: true},
+      );
+
+      const backspaceEvent = new KeyboardEvent('keydown', {cancelable: true, key: 'Backspace'});
+      let wasHandled = false;
+
+      harness.editor.update(
+        () => {
+          wasHandled = harness.editor.dispatchCommand(KEY_BACKSPACE_COMMAND, backspaceEvent);
+        },
+        {discrete: true},
+      );
+
+      expect(wasHandled).toBe(true);
+      expect(backspaceEvent.defaultPrevented).toBe(true);
+      expect(harness.exportMarkdown()).toBe('- first');
     }),
   );
 });
