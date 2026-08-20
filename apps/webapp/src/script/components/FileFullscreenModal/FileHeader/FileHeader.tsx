@@ -33,6 +33,7 @@ import {
   ViewerAccessIcon,
 } from '@wireapp/react-ui-kit';
 
+import {ChannelAvatar, GroupAvatar} from 'Components/avatar';
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {
   CELLS_ACTION,
@@ -45,7 +46,10 @@ import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {
@@ -53,8 +57,12 @@ import {
   leftColumnStyles,
   closeButtonStyles,
   metadataStyles,
+  metadataTextStyles,
   nameStyles,
+  sourceConversationIconStyles,
+  sourceConversationMetadataStyles,
   textStyles,
+  timeStyles,
   downloadButtonStyles,
   actionButtonsStyles,
   editModeButtonStyles,
@@ -68,6 +76,8 @@ interface FileHeaderProps {
   fileExtension: string;
   senderName: string;
   timestamp: number;
+  fallbackConversationName?: string;
+  sourceConversation?: Conversation;
   badges?: string[];
   fileUrl?: string;
   isEditable?: boolean;
@@ -77,6 +87,16 @@ interface FileHeaderProps {
   onFileContentRefresh: () => void;
 }
 
+type ConversationIconType = 'channel' | 'group';
+
+export const getConversationIconType = ({
+  isChannel,
+  isChannelsEnabled,
+}: {
+  isChannel: boolean;
+  isChannelsEnabled: boolean;
+}): ConversationIconType => (isChannel && isChannelsEnabled ? 'channel' : 'group');
+
 export const FileHeader = ({
   id,
   onClose,
@@ -85,6 +105,8 @@ export const FileHeader = ({
   fileExtension,
   senderName,
   timestamp,
+  fallbackConversationName,
+  sourceConversation,
   badges,
   isEditable,
   isInEditMode,
@@ -128,11 +150,17 @@ export const FileHeader = ({
         </button>
         <div css={metadataStyles}>
           <FileTypeIcon extension={fileExtension} />
-          <h3 css={nameStyles}>{fileName}</h3>
-          <p css={textStyles}>{senderName}</p>
-          <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={textStyles}>
-            {timeAgo}
-          </MessageTime>
+          <div css={metadataTextStyles}>
+            <h3 css={nameStyles}>{fileName}</h3>
+            {(sourceConversation !== undefined ||
+              (fallbackConversationName !== undefined && fallbackConversationName.length > 0)) && (
+              <ConversationLabel conversation={sourceConversation} fallbackName={fallbackConversationName ?? ''} />
+            )}
+            <span css={textStyles}>{senderName}</span>
+            <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={timeStyles}>
+              {timeAgo}
+            </MessageTime>
+          </div>
           {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
@@ -203,5 +231,42 @@ export const FileHeader = ({
           )}
       </div>
     </header>
+  );
+};
+
+const ConversationLabel = ({conversation, fallbackName}: {conversation?: Conversation; fallbackName: string}) => {
+  if (conversation === undefined) {
+    return <FallbackConversationLabel fallbackName={fallbackName} />;
+  }
+
+  return <ConversationEntityLabel conversation={conversation} fallbackName={fallbackName} />;
+};
+
+const FallbackConversationLabel = ({fallbackName}: {fallbackName: string}) => (
+  <span css={sourceConversationMetadataStyles}>
+    <span css={sourceConversationIconStyles} aria-hidden="true">
+      <GroupAvatar size="small" />
+    </span>
+    <span css={textStyles}>{fallbackName}</span>
+  </span>
+);
+
+const ConversationEntityLabel = ({conversation, fallbackName}: {conversation: Conversation; fallbackName: string}) => {
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
+  const {isChannel, display_name: displayName} = useKoSubscribableChildren(conversation, ['isChannel', 'display_name']);
+  const name = displayName || fallbackName;
+  const iconType = getConversationIconType({isChannel, isChannelsEnabled});
+
+  return (
+    <span css={sourceConversationMetadataStyles}>
+      <span css={sourceConversationIconStyles} aria-hidden="true">
+        {iconType === 'channel' ? (
+          <ChannelAvatar conversationID={conversation.id} isLocked={false} size="small" />
+        ) : (
+          <GroupAvatar conversationID={conversation.id} size="small" />
+        )}
+      </span>
+      <span css={textStyles}>{name}</span>
+    </span>
   );
 };

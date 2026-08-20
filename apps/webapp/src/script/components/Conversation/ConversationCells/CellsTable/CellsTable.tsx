@@ -21,6 +21,7 @@ import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
@@ -43,6 +44,7 @@ import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCe
 interface CellsTableProps {
   nodes: Array<CellNode>;
   cellsRepository: CellsRepository;
+  conversation: Conversation;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onRefresh: () => void;
@@ -78,6 +80,7 @@ const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: Cells
 export const CellsTable = ({
   nodes,
   cellsRepository,
+  conversation,
   conversationQualifiedId,
   conversationName,
   onRefresh,
@@ -156,7 +159,7 @@ export const CellsTable = ({
             </tbody>
           )}
         </table>
-        <CellsFilePreviewModal />
+        <CellsFilePreviewModal sourceConversation={conversation} />
       </div>
     </CellsFilePreviewModalProvider>
   );

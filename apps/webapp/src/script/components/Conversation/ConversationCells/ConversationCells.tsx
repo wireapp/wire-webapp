@@ -252,6 +252,7 @@ export const ConversationCells = memo(
             <CellsTable
               nodes={isLoading ? [] : nodes}
               cellsRepository={cellsRepository}
+              conversation={activeConversation}
               conversationQualifiedId={conversationQualifiedId}
               conversationName={name}
               onRefresh={handleRefresh}

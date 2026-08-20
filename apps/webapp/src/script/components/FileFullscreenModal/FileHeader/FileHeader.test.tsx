@@ -31,7 +31,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-import {FileHeader} from './FileHeader';
+import {FileHeader, getConversationIconType} from './FileHeader';
 
 const translate = (key: string) =>
   ({
@@ -110,6 +110,31 @@ describe('FileHeader', () => {
 
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
   });
+
+  it('shows file metadata beside the file name', () => {
+    const {container: renderContainer} = renderHeader({
+      props: {
+        fallbackConversationName: 'Marketing Channel',
+        senderName: 'Kim Dawson',
+      },
+    });
+
+    expect(screen.getByRole('heading', {name: 'document'})).toBeInTheDocument();
+    expect(screen.getByText('Marketing Channel')).toBeInTheDocument();
+    expect(screen.getByText('Kim Dawson')).toBeInTheDocument();
+    expect(renderContainer.querySelector('[data-uie-name="group-avatar-box-wrapper"]')).toBeInTheDocument();
+  });
+
+  it.each([
+    {isChannel: false, isChannelsEnabled: true, expectedIconType: 'group'},
+    {isChannel: true, isChannelsEnabled: false, expectedIconType: 'group'},
+    {isChannel: true, isChannelsEnabled: true, expectedIconType: 'channel'},
+  ])(
+    'returns $expectedIconType icon when isChannel is $isChannel and isChannelsEnabled is $isChannelsEnabled',
+    ({isChannel, isChannelsEnabled, expectedIconType}) => {
+      expect(getConversationIconType({isChannel, isChannelsEnabled})).toBe(expectedIconType);
+    },
+  );
 
   it('shows viewer access state and removes other action buttons', () => {
     const {container: renderContainer} = renderHeader({

@@ -25,6 +25,7 @@ import ko from 'knockout';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
+import {FileFullscreenModalSourceConversationProvider} from 'Components/FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -223,62 +224,64 @@ export const ContentMessageComponent = ({
           </div>
         )}
 
-        <div
-          className={cx('message-body', {
-            'message-asset': isAssetMessage,
-            'message-quoted': !!quote,
-            'ephemeral-asset-expired': isObfuscated && isAssetMessage,
-            'icon-file': isObfuscated && isFileMessage,
-            'icon-movie': isObfuscated && isVideoMessage,
-          })}
-        >
-          {quote && (
-            <Quote
-              conversation={conversation}
-              quote={quote}
-              selfId={selfId}
-              findMessage={findMessage}
-              showDetail={onClickImage}
-              focusMessage={onClickTimestamp}
-              handleClickOnMessage={onClickMessage}
-              showUserDetails={onClickAvatar}
-              isMessageFocused={msgFocusState}
-            />
-          )}
+        <FileFullscreenModalSourceConversationProvider sourceConversation={conversation}>
+          <div
+            className={cx('message-body', {
+              'message-asset': isAssetMessage,
+              'message-quoted': !!quote,
+              'ephemeral-asset-expired': isObfuscated && isAssetMessage,
+              'icon-file': isObfuscated && isFileMessage,
+              'icon-movie': isObfuscated && isVideoMessage,
+            })}
+          >
+            {quote && (
+              <Quote
+                conversation={conversation}
+                quote={quote}
+                selfId={selfId}
+                findMessage={findMessage}
+                showDetail={onClickImage}
+                focusMessage={onClickTimestamp}
+                handleClickOnMessage={onClickMessage}
+                showUserDetails={onClickAvatar}
+                isMessageFocused={msgFocusState}
+              />
+            )}
 
-          {assets.map(asset => (
-            <ContentAsset
-              key={asset.type}
-              asset={asset}
-              message={message}
-              selfId={selfId}
-              onClickButton={onClickButton}
-              onClickImage={onClickImage}
-              onClickMessage={onClickMessage}
-              isMessageFocused={msgFocusState}
-              is1to1Conversation={conversation.is1to1()}
-              isFileShareRestricted={isFileShareRestricted}
-              onClickDetails={() => onClickDetails(message)}
-            />
-          ))}
+            {assets.map(asset => (
+              <ContentAsset
+                key={asset.type}
+                asset={asset}
+                message={message}
+                selfId={selfId}
+                onClickButton={onClickButton}
+                onClickImage={onClickImage}
+                onClickMessage={onClickMessage}
+                isMessageFocused={msgFocusState}
+                is1to1Conversation={conversation.is1to1()}
+                isFileShareRestricted={isFileShareRestricted}
+                onClickDetails={() => onClickDetails(message)}
+              />
+            ))}
 
-          {isAssetMessage && (
-            <ReadIndicator message={message} is1to1Conversation={conversation.is1to1()} onClick={onClickDetails} />
-          )}
+            {isAssetMessage && (
+              <ReadIndicator message={message} is1to1Conversation={conversation.is1to1()} onClick={onClickDetails} />
+            )}
 
-          {!isConversationReadonly && isActionMenuVisible && (
-            <MessageActionsMenu
-              isMsgWithHeader={!hideHeader}
-              message={message}
-              handleActionMenuVisibility={setActionMenuVisibility}
-              contextMenu={contextMenu}
-              isMessageFocused={msgFocusState}
-              handleReactionClick={onClickReaction}
-              reactionsTotalCount={reactions.length}
-              isRemovedFromConversation={conversation.isSelfUserRemoved()}
-            />
-          )}
-        </div>
+            {!isConversationReadonly && isActionMenuVisible && (
+              <MessageActionsMenu
+                isMsgWithHeader={!hideHeader}
+                message={message}
+                handleActionMenuVisibility={setActionMenuVisibility}
+                contextMenu={contextMenu}
+                isMessageFocused={msgFocusState}
+                handleReactionClick={onClickReaction}
+                reactionsTotalCount={reactions.length}
+                isRemovedFromConversation={conversation.isSelfUserRemoved()}
+              />
+            )}
+          </div>
+        </FileFullscreenModalSourceConversationProvider>
 
         {message.expectsReadConfirmation && (
           <div css={deliveredMessageIndicator}>
