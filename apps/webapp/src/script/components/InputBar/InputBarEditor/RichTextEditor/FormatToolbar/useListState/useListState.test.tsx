@@ -20,12 +20,7 @@ import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$convertToMarkdownString} from '@lexical/markdown';
-import {
-  $createParagraphNode,
-  $createTextNode,
-  $getRoot,
-  type LexicalEditor,
-} from 'lexical';
+import {$createParagraphNode, $createTextNode, $getRoot, type LexicalEditor} from 'lexical';
 import {noop} from 'noop-esm';
 import {act, renderHook} from '@testing-library/react';
 import {type FunctionComponent, type ReactNode} from 'react';

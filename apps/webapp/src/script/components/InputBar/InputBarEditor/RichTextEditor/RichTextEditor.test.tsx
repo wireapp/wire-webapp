@@ -18,7 +18,7 @@
 
 import {$convertFromMarkdownString} from '@lexical/markdown';
 import {$createMentionNode} from './nodes/MentionNode';
-import {LexicalEditor, $createParagraphNode, $createTextNode, $getRoot} from 'lexical';
+import {LexicalEditor, $createParagraphNode, $createTextNode, $getRoot, KEY_ENTER_COMMAND} from 'lexical';
 import {noop} from 'noop-esm';
 import {Maybe, toolbelt, type Result} from 'true-myth';
 
@@ -43,6 +43,7 @@ type RichTextEditorTestOptions = {
 type RichTextEditorTestFixture = {
   readonly editor: LexicalEditor;
   readonly onUpdate: jest.Mock<void, [MessageContent]>;
+  readonly onSend: jest.Mock<void, []>;
   readonly saveDraftState: jest.Mock<void, [string, string, string | undefined]>;
 };
 
@@ -97,6 +98,7 @@ function renderRichTextEditor(
   richTextEditorTestOptions: RichTextEditorTestOptions = defaultRichTextEditorTestOptions,
 ): Result<RichTextEditorTestFixture, Error> {
   const onUpdate = jest.fn<void, [MessageContent]>();
+  const onSend = jest.fn<void, []>();
   const saveDraftState = jest.fn<void, [string, string, string | undefined]>();
   let capturedEditor: Maybe<LexicalEditor> = Maybe.nothing();
 
@@ -125,7 +127,7 @@ function renderRichTextEditor(
       onEscape={noop}
       onShiftTab={noop}
       onBlur={noop}
-      onSend={noop}
+      onSend={onSend}
       onSetup={captureEditor}
     >
       {null}
@@ -133,7 +135,7 @@ function renderRichTextEditor(
   );
 
   const fixture = capturedEditor.map(editor => {
-    return {editor, onUpdate, saveDraftState};
+    return {editor, onUpdate, onSend, saveDraftState};
   });
 
   return toolbelt.fromMaybe(new Error('The Lexical editor was not captured'), fixture);
@@ -303,4 +305,18 @@ describe('RichTextEditor', () => {
       });
     }),
   );
+
+  it('sends Enter when the mention and emoji menus are closed', () => {
+    const fixture = unwrap(renderRichTextEditor());
+    const enterEvent = new KeyboardEvent('keydown', {cancelable: true});
+
+    let wasHandled = false;
+    act(() => {
+      wasHandled = fixture.editor.dispatchCommand(KEY_ENTER_COMMAND, enterEvent);
+    });
+
+    expect(wasHandled).toBe(true);
+    expect(enterEvent.defaultPrevented).toBe(true);
+    expect(fixture.onSend).toHaveBeenCalledTimes(1);
+  });
 });
