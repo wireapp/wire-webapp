@@ -89,6 +89,20 @@ describe('MessageReactionsList', () => {
     expect(smileyFace2Count).toBeDefined();
   });
 
+  test('counts reactions from users who are no longer conversation members', () => {
+    const departedUserId = generateQualifiedId();
+    const reactionsWithDepartedUser: ReactionMap = [
+      ['❤️', [user1.qualifiedId, user2.qualifiedId, user3.qualifiedId, departedUserId]],
+    ];
+
+    const {getByTitle} = render(
+      withTheme(<MessageReactionsList {...defaultProps} reactions={reactionsWithDepartedUser} />),
+      {wrapper: rootProviderWrapper},
+    );
+
+    expect(within(getByTitle('heart')).getByText('4')).toBeDefined();
+  });
+
   test('handles click on reaction button', () => {
     const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />), {
       wrapper: rootProviderWrapper,
