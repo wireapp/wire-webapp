@@ -19,8 +19,9 @@
 import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$convertFromMarkdownString} from '@lexical/markdown';
-import {$getRoot, INDENT_CONTENT_COMMAND, LexicalEditor} from 'lexical';
+import {$convertFromMarkdownString, $convertToMarkdownString} from '@lexical/markdown';
+import {registerRichText} from '@lexical/rich-text';
+import {$getRoot, $isElementNode, $isTextNode, INDENT_CONTENT_COMMAND, type LexicalEditor} from 'lexical';
 import {Maybe, toolbelt, type Result} from 'true-myth';
 import {useEffect, type FunctionComponent} from 'react';
 
@@ -43,26 +44,30 @@ type ListMaxIndentLevelCharacterizationTestCase = {
   readonly inputMarkdown: string;
   readonly maxDepth: number;
   readonly expectedWasHandled: boolean;
+  readonly expectedMarkdown: string;
 };
 
 const listMaxIndentLevelCharacterizationTestCases: readonly ListMaxIndentLevelCharacterizationTestCase[] = [
   {
     description: 'a top-level list item below the configured maximum depth',
-    inputMarkdown: '- item',
+    inputMarkdown: '- first\n- second',
     maxDepth: 3,
-    expectedWasHandled: false,
+    expectedWasHandled: true,
+    expectedMarkdown: '- first\n- second',
   },
   {
     description: 'a top-level list item at a maximum depth of one',
-    inputMarkdown: '- item',
+    inputMarkdown: '- first\n- second',
     maxDepth: 1,
     expectedWasHandled: true,
+    expectedMarkdown: '- first\n- second',
   },
   {
     description: 'a nested list item at a maximum depth of two',
     inputMarkdown: '- one\n  - two\n    - three',
     maxDepth: 2,
     expectedWasHandled: true,
+    expectedMarkdown: '- one\n- two\n    - three',
   },
 ];
 
@@ -111,6 +116,33 @@ function importMarkdown(editor: LexicalEditor, markdown: string): void {
   );
 }
 
+function selectEndOfLastListItem(editor: LexicalEditor): void {
+  editor.update(
+    () => {
+      const firstDocumentElement = $getRoot().getFirstChild();
+      if (firstDocumentElement === null || !$isElementNode(firstDocumentElement)) {
+        throw new Error('The list max indentation characterization requires a document element');
+      }
+      const lastTextNode = firstDocumentElement.getLastDescendant();
+      if (lastTextNode === null || !$isTextNode(lastTextNode)) {
+        throw new Error('The list max indentation characterization requires a text node');
+      }
+      lastTextNode.selectEnd();
+    },
+    {discrete: true},
+  );
+}
+
+function exportMarkdown(editor: LexicalEditor): string {
+  let markdown = '';
+
+  editor.getEditorState().read(() => {
+    markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
+  });
+
+  return markdown;
+}
+
 describe('ListMaxIndentLevelPlugin', () => {
   it.each(listMaxIndentLevelCharacterizationTestCases)(
     'preserves the current indent command behavior for $description',
@@ -119,11 +151,16 @@ describe('ListMaxIndentLevelPlugin', () => {
       const editor = unwrap(editorResult);
 
       importMarkdown(editor, characterizationTestCase.inputMarkdown);
+      registerRichText(editor);
+      selectEndOfLastListItem(editor);
 
       const actualWasHandled = editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
+      const actualMarkdown = exportMarkdown(editor);
       const expectedWasHandled = characterizationTestCase.expectedWasHandled;
+      const expectedMarkdown = characterizationTestCase.expectedMarkdown;
 
       expect(actualWasHandled).toBe(expectedWasHandled);
+      expect(actualMarkdown).toBe(expectedMarkdown);
     },
   );
 });
