@@ -18,7 +18,15 @@
 
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor, REDO_COMMAND, UNDO_COMMAND} from 'lexical';
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  $nodesOfType,
+  LexicalEditor,
+  REDO_COMMAND,
+  UNDO_COMMAND,
+} from 'lexical';
 import {Maybe, toolbelt, type Result} from 'true-myth';
 import {useEffect, type FunctionComponent} from 'react';
 
@@ -27,6 +35,7 @@ import {act, render} from '@testing-library/react';
 import {unwrap} from 'Util/test/resultTestSupport';
 
 import {editorConfig} from '../../editorConfig';
+import {$createMentionNode, MentionNode} from '../../nodes/MentionNode';
 import {HistoryPlugin} from './HistoryPlugin';
 
 type EditorCapturePluginProps = {
@@ -105,6 +114,23 @@ function getTextContent(editor: LexicalEditor): string {
   });
 }
 
+function setEditorMention(editor: LexicalEditor): void {
+  editor.update(
+    () => {
+      const paragraphNode = $createParagraphNode();
+      paragraphNode.append($createTextNode('hello '), $createMentionNode('@', 'Alice'));
+      $getRoot().clear().append(paragraphNode);
+    },
+    {discrete: true},
+  );
+}
+
+function getMentionNodeCount(editor: LexicalEditor): number {
+  return editor.getEditorState().read(() => {
+    return $nodesOfType(MentionNode).length;
+  });
+}
+
 function advancePastHistoryMergeWindow(): void {
   act(() => {
     jest.advanceTimersByTime(301);
@@ -168,6 +194,25 @@ describe('HistoryPlugin', () => {
 
       expect(dispatchHistoryCommand(fixture.editor, UNDO_COMMAND)).toBe(true);
       expect(getTextContent(fixture.editor)).toBe('');
+    }),
+  );
+
+  it(
+    'restores custom mention nodes through undo and redo',
+    withFakeTimers(() => {
+      const fixture = unwrap(renderHistoryPlugin());
+      setEditorMention(fixture.editor);
+      advancePastHistoryMergeWindow();
+      setEditorText(fixture.editor, 'plain text');
+      advancePastHistoryMergeWindow();
+
+      expect(dispatchHistoryCommand(fixture.editor, UNDO_COMMAND)).toBe(true);
+      expect(getTextContent(fixture.editor)).toBe('hello @Alice');
+      expect(getMentionNodeCount(fixture.editor)).toBe(1);
+
+      expect(dispatchHistoryCommand(fixture.editor, REDO_COMMAND)).toBe(true);
+      expect(getTextContent(fixture.editor)).toBe('plain text');
+      expect(getMentionNodeCount(fixture.editor)).toBe(0);
     }),
   );
 });
