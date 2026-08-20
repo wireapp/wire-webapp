@@ -146,7 +146,9 @@ function getTextContent(editor: LexicalEditor): string {
 
 function getMentionTexts(editor: LexicalEditor): string[] {
   return editor.getEditorState().read(() => {
-    return $nodesOfType(MentionNode).map(mentionNode => mentionNode.getTextContent());
+    return $nodesOfType(MentionNode).map(mentionNode => {
+      return mentionNode.getTextContent();
+    });
   });
 }
 

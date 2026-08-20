@@ -21,7 +21,9 @@ import {renderMessage, getRenderedTextContent} from './messageRenderer';
 
 import {MentionEntity} from '../message/mentionEntity';
 
-const escapeLink = (link: string) => link.replace(/&/g, '&amp;');
+function escapeLink(link: string): string {
+  return link.replace(/&/g, '&amp;');
+}
 
 type MarkdownStructureCharacterizationTestCase = {
   readonly description: string;

@@ -113,6 +113,8 @@ describe('getSelectedNode', () => {
   });
 
   it.each(crossNodeSelectionCharacterizationTestCases)('$description', selectionTestCase => {
-    expect(() => readSelectedNodeName(selectionTestCase)).toThrow(TypeError);
+    expect(() => {
+      return readSelectedNodeName(selectionTestCase);
+    }).toThrow(TypeError);
   });
 });

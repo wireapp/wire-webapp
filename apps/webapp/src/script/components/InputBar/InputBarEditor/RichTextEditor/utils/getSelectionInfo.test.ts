@@ -19,7 +19,10 @@
 import {assertNotNull} from '@sindresorhus/is';
 import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor} from 'lexical';
 
-import {createWireLexicalEditorTestHarness, WireLexicalEditorTestHarness} from '../testSupport/createWireLexicalEditorTestHarness';
+import {
+  createWireLexicalEditorTestHarness,
+  WireLexicalEditorTestHarness,
+} from '../testSupport/createWireLexicalEditorTestHarness';
 
 import {getSelectionInfo} from './getSelectionInfo';
 
@@ -108,7 +111,9 @@ function setTextSelection(editor: LexicalEditor, textSelectionOptions: TextSelec
 }
 
 function readSelectionInfo(editor: LexicalEditor): ReturnType<typeof getSelectionInfo> {
-  return editor.getEditorState().read(() => getSelectionInfo(['@']));
+  return editor.getEditorState().read(() => {
+    return getSelectionInfo(['@']);
+  });
 }
 
 function readSelectionSiblingTextContents(editor: LexicalEditor): SelectionSiblingTextContents {

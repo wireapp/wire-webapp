@@ -47,7 +47,9 @@ function getEmojiNodeText(editor: LexicalEditor): string {
 }
 
 function getEmojiNodeCount(editor: LexicalEditor): number {
-  return editor.getEditorState().read(() => $nodesOfType(EmojiNode).length);
+  return editor.getEditorState().read(() => {
+    return $nodesOfType(EmojiNode).length;
+  });
 }
 
 describe('EmojiNode', () => {

@@ -174,7 +174,11 @@ describe('Mention', () => {
     });
 
     expect(commandResult).toEqual({wasHandled: true, defaultWasPrevented: true});
-    expect(fixture.editor.getEditorState().read(() => $getRoot().getTextContent())).toBe('before  after');
+    expect(
+      fixture.editor.getEditorState().read(() => {
+        return $getRoot().getTextContent();
+      }),
+    ).toBe('before  after');
     expect(getFocusedMentionElement(fixture.editorElement)).toBeNull();
   });
 
@@ -200,7 +204,11 @@ describe('Mention', () => {
 
     expect(selectionResult).toEqual({wasHandled: true, defaultWasPrevented: true});
     expect(deletionResult).toEqual({wasHandled: true, defaultWasPrevented: true});
-    expect(fixture.editor.getEditorState().read(() => $getRoot().getTextContent())).toBe('before  after');
+    expect(
+      fixture.editor.getEditorState().read(() => {
+        return $getRoot().getTextContent();
+      }),
+    ).toBe('before  after');
     expect(getFocusedMentionElement(fixture.editorElement)).toBeNull();
   });
 
@@ -218,7 +226,9 @@ describe('Mention', () => {
       await Promise.resolve();
     });
 
-    const hasRangeSelection = fixture.editor.getEditorState().read(() => $isRangeSelection($getSelection()));
+    const hasRangeSelection = fixture.editor.getEditorState().read(() => {
+      return $isRangeSelection($getSelection());
+    });
 
     expect(commandResult).toEqual({wasHandled: true, defaultWasPrevented: true});
     expect(hasRangeSelection).toBe(true);

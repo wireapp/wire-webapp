@@ -20,7 +20,10 @@ import {assertNotNull} from '@sindresorhus/is';
 import assert from 'node:assert';
 import {$createParagraphNode, $getRoot, $nodesOfType, LexicalEditor} from 'lexical';
 
-import {createWireLexicalEditorTestHarness, WireLexicalEditorTestHarness} from '../testSupport/createWireLexicalEditorTestHarness';
+import {
+  createWireLexicalEditorTestHarness,
+  WireLexicalEditorTestHarness,
+} from '../testSupport/createWireLexicalEditorTestHarness';
 
 import {$createMentionNode, MentionNode} from './MentionNode';
 
