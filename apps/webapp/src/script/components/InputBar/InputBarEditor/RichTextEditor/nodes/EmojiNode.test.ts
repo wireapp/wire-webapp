@@ -19,7 +19,10 @@
 import {assertNotNull} from '@sindresorhus/is';
 import {$createParagraphNode, $getRoot, $nodesOfType, LexicalEditor} from 'lexical';
 
-import {createWireLexicalEditorTestHarness, WireLexicalEditorTestHarness} from '../testSupport/createWireLexicalEditorTestHarness';
+import {
+  createWireLexicalEditorTestHarness,
+  WireLexicalEditorTestHarness,
+} from '../testSupport/createWireLexicalEditorTestHarness';
 
 import {EmojiNode} from './EmojiNode';
 
@@ -38,6 +41,7 @@ function getEmojiNodeText(editor: LexicalEditor): string {
   return editor.getEditorState().read(() => {
     const [emojiNode] = $nodesOfType(EmojiNode);
     assertNotNull(emojiNode);
+
     return emojiNode.getTextContent();
   });
 }

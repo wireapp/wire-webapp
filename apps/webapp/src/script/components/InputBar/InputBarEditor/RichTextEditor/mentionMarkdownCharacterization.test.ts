@@ -95,6 +95,7 @@ type ImportMentionMarkdownOptions = {
 
 function createMentionTransformers(allowedMentions: string[]): Transformer[] {
   const mentionMarkdownTransformer = getMentionMarkdownTransformer(allowedMentions);
+
   return [mentionMarkdownTransformer, ...markdownTransformers];
 }
 

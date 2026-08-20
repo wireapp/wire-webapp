@@ -480,6 +480,7 @@ describe('renderMessage', () => {
     tests.forEach(({expected, mentions, testCase, text}) => {
       const mentionEntities = mentions.map(mention => {
         const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
+
         return mentionEntity;
       });
 
@@ -496,6 +497,7 @@ describe('renderMessage', () => {
       const mentions = [{length: 5, startIndex: 4, userId: 'pain-id'}];
       const mentionEntities = mentions.map(mention => {
         const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
+
         return mentionEntity;
       });
       const result = renderMessage('hey @user', undefined, mentionEntities);

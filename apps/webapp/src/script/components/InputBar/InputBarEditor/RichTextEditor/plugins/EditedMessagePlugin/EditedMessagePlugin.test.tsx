@@ -86,10 +86,14 @@ function createContentMessage(messageText: string, mentions: readonly MentionEnt
   const textAsset = new Text(undefined, messageText);
   textAsset.mentions(mentions.slice());
   message.addAsset(textAsset);
+
   return message;
 }
 
-function renderEditedMessagePlugin(message: ContentMessage, showMarkdownPreview: boolean): Result<EditedMessagePluginTestFixture, Error> {
+function renderEditedMessagePlugin(
+  message: ContentMessage,
+  showMarkdownPreview: boolean,
+): Result<EditedMessagePluginTestFixture, Error> {
   let capturedEditor: Maybe<LexicalEditor> = Maybe.nothing();
 
   function captureEditor(editor: LexicalEditor): void {

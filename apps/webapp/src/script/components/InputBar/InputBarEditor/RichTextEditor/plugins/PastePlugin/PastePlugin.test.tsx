@@ -153,6 +153,7 @@ function getMentionTexts(editor: LexicalEditor): string[] {
 function createMentionCandidate(name: string): User {
   const user = new User(`${name}-id`, '', translateForTest);
   user.name(name);
+
   return user;
 }
 
