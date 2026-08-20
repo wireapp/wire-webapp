@@ -1082,6 +1082,7 @@
   "fileFullscreenModal.noPreviewAvailable.callToAction": "Скачать файл",
   "fileFullscreenModal.noPreviewAvailable.description": "Для этого файла нет превью. Просто скачайте этот файл.",
   "fileFullscreenModal.noPreviewAvailable.title": "Файл без превью",
+  "fileFullscreenModal.noPreviewAvailable.viewerDescription": "Для этого типа файлов предварительный просмотр недоступен, и пользователи не могут скачивать файлы.",
   "fileHistoryModal.failedToLoadVersions": "Не удалось загрузить версии",
   "fileHistoryModal.failedToRestore": "Не удалось восстановить версию файла",
   "fileHistoryModal.invalidNodeData": "Неверная дата файла",
