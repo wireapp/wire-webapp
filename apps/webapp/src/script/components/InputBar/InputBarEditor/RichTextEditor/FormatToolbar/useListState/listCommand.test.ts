@@ -22,7 +22,8 @@ import {
   REMOVE_LIST_COMMAND,
   registerList,
 } from '@lexical/list';
-import {$getRoot, $isElementNode, $isTextNode, LexicalEditor} from 'lexical';
+import {registerRichText} from '@lexical/rich-text';
+import {$getRoot, $isElementNode, $isTextNode, KEY_ENTER_COMMAND, LexicalEditor} from 'lexical';
 
 import {
   createWireLexicalEditorTestHarness,
@@ -118,6 +119,27 @@ describe('Wire Lexical list commands', () => {
 
       expect(wasHandled).toBe(true);
       expect(harness.exportMarkdown()).toBe('item');
+    }),
+  );
+
+  it(
+    'creates a new list item when Enter is pressed at the end of an item',
+    withRegisteredList('- first', harness => {
+      registerRichText(harness.editor);
+
+      const enterEvent = new KeyboardEvent('keydown', {cancelable: true});
+      let wasHandled = false;
+
+      harness.editor.update(
+        () => {
+          wasHandled = harness.editor.dispatchCommand(KEY_ENTER_COMMAND, enterEvent);
+        },
+        {discrete: true},
+      );
+
+      expect(wasHandled).toBe(true);
+      expect(enterEvent.defaultPrevented).toBe(true);
+      expect(harness.exportMarkdown()).toBe('- first\n- ');
     }),
   );
 });
