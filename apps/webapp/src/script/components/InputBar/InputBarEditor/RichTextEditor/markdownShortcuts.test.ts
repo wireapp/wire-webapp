@@ -44,10 +44,58 @@ const markdownShortcutCharacterizationTestCases: readonly MarkdownShortcutCharac
     expectedTextContent: '- 25. september',
   },
   {
+    description: 'a non-one ordered-list input with a month name',
+    typedText: '14. September',
+    expectedMarkdown: '14. September',
+    expectedTextContent: 'September',
+  },
+  {
+    description: 'a year-like ordered-list input',
+    typedText: '2026. something',
+    expectedMarkdown: '2026. something',
+    expectedTextContent: 'something',
+  },
+  {
+    description: 'a zero-padded ordered-list input',
+    typedText: '01. something',
+    expectedMarkdown: '1. something',
+    expectedTextContent: 'something',
+  },
+  {
+    description: 'a zero ordered-list input',
+    typedText: '0. something',
+    expectedMarkdown: '0. something',
+    expectedTextContent: 'something',
+  },
+  {
+    description: 'a number without a separating space',
+    typedText: '1.something',
+    expectedMarkdown: '1.something',
+    expectedTextContent: '1.something',
+  },
+  {
+    description: 'a number followed by a closing parenthesis',
+    typedText: '1) something',
+    expectedMarkdown: '1) something',
+    expectedTextContent: '1) something',
+  },
+  {
     description: 'a dash unordered-list shortcut',
     typedText: '- item',
     expectedMarkdown: '- item',
     expectedTextContent: 'item',
+  },
+  {
+    description: 'a dash unordered-list input with a following space',
+    typedText: '- something',
+    expectedMarkdown: '- something',
+    expectedTextContent: 'something',
+  },
+  {
+    description: 'a dash without a following space',
+    typedText: '-something',
+    expectedMarkdown: '-something',
+    expectedTextContent: '-something',
   },
   {
     description: 'an asterisk unordered-list shortcut',
@@ -56,10 +104,34 @@ const markdownShortcutCharacterizationTestCases: readonly MarkdownShortcutCharac
     expectedTextContent: 'item',
   },
   {
+    description: 'an asterisk unordered-list input with a following space',
+    typedText: '* something',
+    expectedMarkdown: '- something',
+    expectedTextContent: 'something',
+  },
+  {
+    description: 'an asterisk without a following space',
+    typedText: '*something',
+    expectedMarkdown: '*something',
+    expectedTextContent: '*something',
+  },
+  {
     description: 'a plus unordered-list shortcut',
     typedText: '+ item',
     expectedMarkdown: '- item',
     expectedTextContent: 'item',
+  },
+  {
+    description: 'a plus unordered-list input with a following space',
+    typedText: '+ something',
+    expectedMarkdown: '- something',
+    expectedTextContent: 'something',
+  },
+  {
+    description: 'a plus without a following space',
+    typedText: '+something',
+    expectedMarkdown: '+something',
+    expectedTextContent: '+something',
   },
   {
     description: 'a heading shortcut',
