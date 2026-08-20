@@ -17,6 +17,7 @@
  */
 
 import {$createMentionNode} from '../nodes/MentionNode';
+import {EmojiNode} from '../nodes/EmojiNode';
 import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor} from 'lexical';
 
 import {act, renderHook} from '@testing-library/react';
@@ -131,6 +132,17 @@ function appendMentionContent(editor: LexicalEditor): void {
   );
 }
 
+function appendEmojiContent(editor: LexicalEditor): void {
+  editor.update(
+    () => {
+      const paragraphNode = $createParagraphNode();
+      paragraphNode.append(new EmojiNode('🧪'));
+      $getRoot().clear().append(paragraphNode);
+    },
+    {discrete: true},
+  );
+}
+
 describe('useEditorDraftState', () => {
   it.each(draftStateCharacterizationTestCases)(
     'saves the serialized editor and transformed plain message for $description',
@@ -222,6 +234,30 @@ describe('useEditorDraftState', () => {
         'Hello @Alice!',
         undefined,
       );
+
+      renderedHook.unmount();
+    }),
+  );
+
+  it(
+    'saves the display text and serialized state of a custom emoji node',
+    withFakeTimers(() => {
+      const harness = createWireLexicalEditorTestHarness();
+      appendEmojiContent(harness.editor);
+      const saveDraftState = jest.fn<void, Parameters<SaveDraftState>>();
+      const renderedHook = renderDraftStateHook({
+        editor: harness.editor,
+        replaceEmojis: false,
+        disableMessagePreprocessing: false,
+        saveDraftState,
+      });
+
+      act(() => {
+        renderedHook.result.current.saveDraft();
+        jest.advanceTimersByTime(800);
+      });
+
+      expect(saveDraftState).toHaveBeenCalledWith(expect.stringContaining('"type":"emoji"'), '🧪', undefined);
 
       renderedHook.unmount();
     }),
