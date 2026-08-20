@@ -177,6 +177,24 @@ describe('PastePlugin', () => {
     expect(getTextContent(fixture.editor)).toBe('first line\nsecond line');
   });
 
+  it('preserves date-like list syntax as pasted text', () => {
+    const fixture = unwrap(
+      renderPastePlugin({
+        isPreviewMode: true,
+        mentionCandidates: [],
+      }),
+    );
+    const pasteEventFixture = createPasteEvent({htmlContent: '', plainText: '14. - 25. september'});
+    selectEndOfEmptyParagraph(fixture.editor);
+
+    const wasHandled = dispatchPaste(fixture.editor, pasteEventFixture.event);
+
+    expect(wasHandled).toBe(true);
+    expect(pasteEventFixture.preventDefault).toHaveBeenCalledTimes(1);
+    expect(getTextContent(fixture.editor)).toBe('14. - 25. september');
+    expect(getMarkdown(fixture.editor)).toBe('14. - 25. september');
+  });
+
   it('preserves formatting from HTML in preview mode', () => {
     const fixture = unwrap(
       renderPastePlugin({
