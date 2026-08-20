@@ -826,6 +826,20 @@ export class UserRepository extends TypedEventEmitter<Events> {
     return knownUserEntities.concat(userEntities);
   }
 
+  /**
+   * Get users from the local database without making a backend request.
+   *
+   * This is useful for historical message data, such as reactions from users who are no longer conversation members.
+   */
+  async getUsersByIdFromDb(userIds: QualifiedId[] = []): Promise<User[]> {
+    const localDomain = this.userState.self()?.qualifiedId.domain ?? '';
+    const userRecords = await Promise.all(userIds.map(userId => this.userService.loadUserFromDb(userId)));
+
+    return userRecords
+      .filter((userRecord): userRecord is UserRecord => typeof userRecord !== 'undefined')
+      .map(userRecord => this.userMapper.mapUserFromJson(userRecord, localDomain));
+  }
+
   getUserListFromBackend(userIds: QualifiedId[]) {
     return this.userService.getUsers(userIds);
   }

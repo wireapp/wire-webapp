@@ -17,7 +17,7 @@
  *
  */
 
-import {render, fireEvent, within} from '@testing-library/react';
+import {render, fireEvent, waitFor, within} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {ReactionMap} from 'Repositories/storage';
@@ -45,6 +45,7 @@ const defaultProps: MessageReactionsListProps = {
   translate: translateForTest,
   reactions: reactions,
   handleReactionClick: jest.fn(),
+  loadUsersFromDb: jest.fn().mockResolvedValue([]),
   onTooltipReactionCountClick: jest.fn(),
   isMessageFocused: false,
   onLastReactionKeyEvent: jest.fn(),
@@ -101,6 +102,28 @@ describe('MessageReactionsList', () => {
     );
 
     expect(within(getByTitle('heart')).getByText('4')).toBeDefined();
+  });
+
+  test('loads names for departed users when the reaction tooltip is opened', async () => {
+    const departedUserId = generateQualifiedId();
+    const departedUser = new User(departedUserId.id, departedUserId.domain, translateForTest);
+    departedUser.name('Departed User');
+    const loadUsersFromDb = jest.fn().mockResolvedValue([departedUser]);
+
+    const {getByTitle} = render(
+      withTheme(
+        <MessageReactionsList
+          {...defaultProps}
+          loadUsersFromDb={loadUsersFromDb}
+          reactions={[['❤️', [departedUserId]]]}
+        />,
+      ),
+      {wrapper: rootProviderWrapper},
+    );
+
+    fireEvent.mouseEnter(getByTitle('heart'));
+
+    await waitFor(() => expect(loadUsersFromDb).toHaveBeenCalledWith([departedUserId]));
   });
 
   test('handles click on reaction button', () => {

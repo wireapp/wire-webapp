@@ -97,7 +97,7 @@ export const ContentMessageComponent = ({
   isFileShareRestricted,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
-  const {translate} = useApplicationContext();
+  const {mainViewModel, translate} = useApplicationContext();
 
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => isMsgElementsFocusable && isFocused, [isMsgElementsFocusable, isFocused]);
@@ -315,6 +315,7 @@ export const ContentMessageComponent = ({
         <MessageReactionsList
           translate={translate}
           reactions={reactions}
+          loadUsersFromDb={userIds => mainViewModel.content.userRepository.getUsersByIdFromDb(userIds)}
           selfUserId={selfId}
           handleReactionClick={onClickReaction}
           isMessageFocused={msgFocusState}

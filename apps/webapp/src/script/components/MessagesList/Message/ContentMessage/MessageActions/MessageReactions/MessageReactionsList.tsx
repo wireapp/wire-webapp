@@ -32,6 +32,7 @@ export interface MessageReactionsListProps {
   translate: Translate;
   reactions: ReactionMap;
   handleReactionClick: (emoji: string) => void;
+  loadUsersFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
   selfUserId: QualifiedId;
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
@@ -41,7 +42,7 @@ export interface MessageReactionsListProps {
 }
 
 const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) => {
-  const {selfUserId, users: conversationUsers, ...emojiPillProps} = props;
+  const {selfUserId, users: conversationUsers, loadUsersFromDb, ...emojiPillProps} = props;
 
   return (
     <div css={messageReactionWrapper} data-uie-name="message-reactions">
@@ -50,16 +51,19 @@ const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) 
         const emojiListCount = users.length;
         const hasUserReacted = users.some(user => matchQualifiedIds(selfUserId, user));
 
-        // Departed users still contribute to the reaction count, but their names are omitted from the tooltip
-        // because only current conversation members are available here.
+        // Use current conversation members immediately and resolve missing historical users when the tooltip opens.
         const reactingUsers = users
           .map(qualifiedId => conversationUsers.find(user => matchQualifiedIds(qualifiedId, user.qualifiedId)))
           .filter((user): user is User => typeof user !== 'undefined');
+        const missingUserIds = users.filter(
+          qualifiedId => !reactingUsers.some(user => matchQualifiedIds(qualifiedId, user.qualifiedId)),
+        );
 
         return (
           <EmojiPill
             reactingUsers={reactingUsers}
             emojiCount={users.length}
+            loadAdditionalUsers={missingUserIds.length ? () => loadUsersFromDb(missingUserIds) : undefined}
             hasUserReacted={hasUserReacted}
             emojiUnicode={emojiUnicode}
             emoji={emoji}

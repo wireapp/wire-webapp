@@ -17,6 +17,8 @@
  *
  */
 
+import {useRef, useState} from 'react';
+
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
@@ -25,6 +27,7 @@ import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
 import {isTabKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {EmojiChar} from './EmojiChar';
 import {
@@ -52,6 +55,7 @@ interface EmojiPillProps {
   emojiCount: number;
   hasUserReacted: boolean;
   reactingUsers: User[];
+  loadAdditionalUsers?: () => Promise<User[]>;
 }
 
 const MAX_USER_NAMES_TO_SHOW = 2;
@@ -70,12 +74,36 @@ export const EmojiPill = ({
   emojiCount,
   hasUserReacted,
   reactingUsers,
+  loadAdditionalUsers,
 }: EmojiPillProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;
+  const [additionalReactingUsers, setAdditionalReactingUsers] = useState<User[]>([]);
+  const hasLoadedAdditionalUsers = useRef(false);
 
-  const reactingUserNames = reactingUsers.slice(0, MAX_USER_NAMES_TO_SHOW).map(user => user.name());
+  const tooltipUsers = [...reactingUsers, ...additionalReactingUsers].filter(
+    (user, index, users) =>
+      users.findIndex(otherUser => matchQualifiedIds(user.qualifiedId, otherUser.qualifiedId)) === index,
+  );
+
+  const loadAdditionalUsersForTooltip = () => {
+    if (!loadAdditionalUsers || hasLoadedAdditionalUsers.current) {
+      return;
+    }
+
+    hasLoadedAdditionalUsers.current = true;
+    void loadAdditionalUsers().then(
+      users => setAdditionalReactingUsers(users),
+      () => undefined,
+    );
+  };
+
+  const fallbackUserName = translate('deletedUser');
+  const tooltipUserCount = Math.min(MAX_USER_NAMES_TO_SHOW, emojiCount);
+  const reactingUserNames = Array(tooltipUserCount)
+    .fill(fallbackUserName)
+    .map((fallbackName, index) => tooltipUsers[index]?.name() || fallbackName);
 
   const conversationReactionCaption = () => {
     if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
@@ -162,6 +190,8 @@ export const EmojiPill = ({
           tabIndex={messageFocusedTabIndex}
           className="button-reset-default"
           data-uie-name="emoji-pill"
+          onMouseEnter={loadAdditionalUsersForTooltip}
+          onFocus={loadAdditionalUsersForTooltip}
           onClick={() => {
             handleReactionClick(emoji);
           }}
