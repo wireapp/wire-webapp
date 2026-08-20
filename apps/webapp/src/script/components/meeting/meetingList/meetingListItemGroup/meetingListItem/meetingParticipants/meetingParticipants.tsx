@@ -19,15 +19,13 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {AVATAR_SIZE, StackedAvatars} from 'Components/avatar';
-import {ParticipantAvatarTooltip} from 'Components/avatar/stackedAvatars/participantAvatarTooltip';
-import {UserName} from 'Components/UserName';
+import {StackedAvatars} from 'Components/avatar';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {participantNameStyles, singleParticipantStyles, wrapperStyles} from './meetingParticipants.styles';
+import {wrapperStyles} from './meetingParticipants.styles';
 import {useMeetingConversation} from './useMeetingConversation';
 import {useMeetingParticipants} from './useMeetingParticipants';
 
@@ -49,33 +47,19 @@ const MeetingParticipantsContent = ({conversation, qualifiedCreator, isOngoing}:
   const avatarRingColor = isOngoing ? 'var(--accent-color-highlight)' : 'var(--text-input-background)';
   const getParticipantLabel = (participant: User, name: string) =>
     matchQualifiedIds(participant.qualifiedId, qualifiedCreator)
-      ? translate('meetings.participant.nameWithOrganizer', {
-          name,
-          organizer: translate('meetings.participant.organizer'),
-        })
+      ? translate(
+          'meetings.participant.nameWithOrganizer',
+          {
+            name,
+            organizer: translate('meetings.participant.organizer'),
+          },
+          undefined,
+          true,
+        )
       : name;
 
   if (participants.length === 0) {
     return null;
-  }
-
-  if (participants.length === 1) {
-    const participant = participants[0];
-
-    return (
-      <div css={wrapperStyles} data-uie-name="meeting-participants">
-        <div css={singleParticipantStyles}>
-          <ParticipantAvatarTooltip
-            participant={participant}
-            getLabel={name => getParticipantLabel(participant, name)}
-            avatarSize={AVATAR_SIZE.X_SMALL}
-          />
-          <span css={participantNameStyles}>
-            <UserName user={participant} />
-          </span>
-        </div>
-      </div>
-    );
   }
 
   return (

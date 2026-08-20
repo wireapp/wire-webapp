@@ -19,8 +19,11 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {container} from 'tsyringe';
 
 import en from 'I18n/en-US.json';
+import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/userState';
 import {MeetingNotificationCard} from './meetingNotificationCard';
 import {
   type MeetingNotification,
@@ -38,6 +41,7 @@ const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
+const specialCharacterName = `Eldon Bauch ±§!@#{}[]:"|;'\\<>?,./$%^&*()`;
 const translateForNotificationTest: Translate = (key, substitutions) =>
   key === 'meetings.notifications.title'
     ? `${substitutions?.label} ${substitutions?.meetingTitle}`
@@ -229,5 +233,37 @@ describe('MeetingNotificationCard', () => {
     const card = screen.getByRole('listitem');
     expect(card).toHaveTextContent("Invitation: Cleopatra's meeting");
     expect(card).not.toHaveTextContent('&#x27;');
+  });
+
+  it('renders special characters in the organizer name without encoding them', () => {
+    setStrings({en});
+    const user = new User(qualifiedCreator.id, qualifiedCreator.domain, translate);
+    user.name(specialCharacterName);
+    const userState = container.resolve(UserState);
+    const previousUsers = userState.users();
+    userState.users([user]);
+
+    try {
+      render(
+        <ThemeProvider>
+          <MeetingNotificationCard
+            id="notification-invite"
+            kind={MeetingNotificationKind.INVITE}
+            meetingTitle="Meeting Title"
+            qualifiedId={qualifiedId}
+            qualifiedCreator={qualifiedCreator}
+            meetingStartTime={meetingStartTime}
+            onDismiss={jest.fn()}
+          />
+        </ThemeProvider>,
+        {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
+      );
+
+      const card = screen.getByRole('listitem');
+      expect(card).toHaveTextContent(`By ${specialCharacterName} • ${formatLocale(meetingStartTime, 'PP, p')}`);
+      expect(card).not.toHaveTextContent(/&quot;|&#x27;|&lt;|&gt;|&amp;/);
+    } finally {
+      userState.users(previousUsers);
+    }
   });
 });
