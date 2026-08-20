@@ -249,7 +249,6 @@ export class ContentViewModel {
    *
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
-   * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | QualifiedId | undefined,
@@ -343,6 +342,7 @@ export class ContentViewModel {
         return;
       }
 
+      setHistoryParam('/');
       return this.switchContent(ContentState.WATERMARK);
     }
   };
