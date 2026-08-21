@@ -48,7 +48,7 @@ import {Preferences} from 'src/script/page/leftSidebar/panels/preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/mainContent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {ContentState, ListState} from 'src/script/page/useAppState';
+import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
@@ -65,13 +65,13 @@ import {getTabConversations, scrollToConversation} from './helpers';
 import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {
-  SidebarStatus,
   ConversationListStatus,
-  SidebarTabs,
-  useSidebarStore,
   getCanCollapseConversationList,
   getIsConversationListCollapsed,
   isConversationListTab,
+  SidebarStatus,
+  SidebarTabs,
+  useSidebarStore,
 } from './useSidebarStore';
 
 import {Config} from '../../../../Config';
@@ -302,8 +302,14 @@ export const Conversations = ({
   };
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+    const handleConversationShow = (conversation?: Conversation) => {
       if (!conversation) {
+        return;
+      }
+
+      if (
+        [SidebarTabs.CONNECT, SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(currentTab)
+      ) {
         return;
       }
 
@@ -312,8 +318,11 @@ export const Conversations = ({
       if (!includesConversation) {
         setCurrentTab(SidebarTabs.RECENT);
       }
-    });
-  }, [currentTabConversations, setCurrentTab]);
+    };
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
+    return () => amplify.unsubscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
+  }, [currentTab, currentTabConversations, setCurrentTab]);
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
@@ -339,11 +348,14 @@ export const Conversations = ({
   const switchList = listViewModel.switchList;
   const switchContent = listViewModel.contentViewModel.switchContent;
 
-  const onExitPreferences = useCallback(() => {
-    setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
-    switchList(ListState.CONVERSATIONS);
-    switchContent(ContentState.CONVERSATION);
-  }, [setCurrentView, switchList, switchContent]);
+  const onExitPreferences = useCallback(
+    (loadPreviousContent = true) => {
+      setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+      switchList(ListState.CONVERSATIONS, loadPreviousContent);
+      switchContent(ContentState.CONVERSATION);
+    },
+    [setCurrentView, switchList, switchContent],
+  );
 
   const changeTab = useCallback(
     (nextTab: SidebarTabs, folderId?: string) => {
@@ -356,9 +368,19 @@ export const Conversations = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (shouldClearDeepLinkForTab(nextTab)) {
+      if (nextTab === SidebarTabs.MEETINGS && !isMeetingsEnabled) {
+        return;
+      }
+
+      clearConversationFilter();
+      setCurrentTab(nextTab);
+
+      const {listState} = useAppState.getState();
+      const isSwitchingConversationListTab = listState === ListState.CONVERSATIONS && isConversationListTab(nextTab);
+
+      if (shouldClearDeepLinkForTab(nextTab) && !isSwitchingConversationListTab) {
         setHistoryParam('/');
-        onExitPreferences();
+        onExitPreferences(isConversationListTab(nextTab));
       }
 
       if (nextTab === SidebarTabs.CELLS) {
@@ -367,14 +389,8 @@ export const Conversations = ({
       }
 
       if (nextTab === SidebarTabs.MEETINGS) {
-        if (!isMeetingsEnabled) {
-          return;
-        }
         listViewModel.openMeetingsList();
       }
-
-      clearConversationFilter();
-      setCurrentTab(nextTab);
     },
     [
       conversationRepository,

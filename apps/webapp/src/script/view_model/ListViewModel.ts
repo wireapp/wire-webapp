@@ -346,7 +346,7 @@ export class ListViewModel {
 
     if (archive) {
       setCurrentTab(SidebarTabs.ARCHIVES);
-    } else {
+    } else if (currentTab !== SidebarTabs.CONNECT) {
       setCurrentTab(getConversationListTab(currentTab));
     }
   };

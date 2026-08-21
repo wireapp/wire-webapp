@@ -91,5 +91,38 @@ describe('Router', () => {
       setHistoryParam('/test-path');
       expect(window.location.hash).toBe('#/test-path');
     });
+
+    it('forces route re-evaluation when the hash is already at the target path', () => {
+      jest.useFakeTimers();
+
+      const routes = {'/': jest.fn()};
+      configureRoutes(routes);
+      routes['/'].mockClear();
+
+      // Hash is already '/' (set by configureRoutes' initial parse), so the browser won't fire a
+      // native hashchange event - setHistoryParam must force route re-evaluation itself.
+      setHistoryParam('/');
+      expect(routes['/']).not.toHaveBeenCalled();
+
+      jest.runAllTimers();
+      expect(routes['/']).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it('does not force route re-evaluation when the hash actually changes', () => {
+      jest.useFakeTimers();
+
+      const routes = {'/': jest.fn(), '/other': jest.fn()};
+      configureRoutes(routes);
+      routes['/'].mockClear();
+
+      setHistoryParam('/other');
+
+      jest.runAllTimers();
+      expect(routes['/']).not.toHaveBeenCalled();
+
+      jest.useRealTimers();
+    });
   });
 });

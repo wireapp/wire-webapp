@@ -80,6 +80,15 @@ describe('ListViewModel', () => {
     },
   );
 
+  it('keeps the Connect tab selected when a conversation navigation is triggered underneath it', () => {
+    useSidebarStore.setState({currentTab: SidebarTabs.CONNECT});
+
+    createListViewModel().listViewModel.openConversations();
+
+    expect(useAppState.getState().listState).toBe(ListState.CONVERSATIONS);
+    expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.CONNECT);
+  });
+
   it('keeps the archive list when opening an archived conversation', () => {
     useSidebarStore.setState({currentTab: SidebarTabs.MEETINGS});
 
