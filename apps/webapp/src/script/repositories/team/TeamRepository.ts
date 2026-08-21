@@ -388,6 +388,22 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return IntegrationMapper.mapServicesFromArray(servicesData, domain);
   }
 
+  async getTeamCollaborators(): Promise<User[]> {
+    const teamId = this.teamState.team()?.id;
+    if (!teamId) {
+      return [];
+    }
+
+    const domain = this.teamState.teamDomain();
+    const selfId = this.userState.self().id;
+    const collaborators = await this.teamService.getCollaborators(teamId);
+    const collaboratorIds: QualifiedId[] = collaborators
+      .map(({user}) => ({domain, id: user}))
+      .filter(({id}) => id !== selfId);
+
+    return this.userRepository.getUsersById(collaboratorIds);
+  }
+
   readonly onTeamEvent = async (eventJson: any, source: EventSource): Promise<void> => {
     if (this.teamState.isTeamDeleted()) {
       // We don't want to handle any events after the team has been deleted

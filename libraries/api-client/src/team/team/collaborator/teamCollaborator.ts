@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,13 @@
  *
  */
 
-export * from './collaborator/teamCollaborator';
-export * from './newTeamData';
-export * from './teamApi';
-export * from './teamChunkData';
-export * from './teamData';
-export * from './teamInfo';
-export * from './updateTeamData';
-export * from './teamSizeData';
+export enum CollaboratorPermission {
+  CREATE_TEAM_CONVERSATION = 'create_team_conversation',
+  IMPLICIT_CONNECTION = 'implicit_connection',
+}
+
+export interface TeamCollaborator {
+  permissions: CollaboratorPermission[];
+  team: string;
+  user: string;
+}
