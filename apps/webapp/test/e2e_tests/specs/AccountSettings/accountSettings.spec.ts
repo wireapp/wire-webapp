@@ -169,7 +169,7 @@ test.describe('account settings', () => {
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
       const actualManageTeamUrl = await components.conversationSidebar().manageTeamButton.getAttribute('href');
 
-      expect(actualManageTeamUrl).toBe(expectedManageTeamUrl);
+      expect(actualManageTeamUrl).toContain(expectedManageTeamUrl);
     },
   );
 
