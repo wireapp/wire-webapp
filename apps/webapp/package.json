@@ -35,7 +35,7 @@
     "@mediapipe/tasks-vision": "0.10.35",
     "@sindresorhus/is": "8.1.0",
     "@tanstack/react-table": "8.21.3",
-    "@tanstack/react-virtual": "3.14.9",
+    "@tanstack/react-virtual": "3.14.10",
     "@wireapp/avs": "10.5.11",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "workspace:^",
