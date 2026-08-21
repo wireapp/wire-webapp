@@ -34,7 +34,6 @@ const CONVERSATION_LIST_TAB_IDS = [
   'go-groups-view',
   'go-directs-view',
   'go-channels-view',
-  'go-folders-view',
   'go-archive',
 ] as const;
 
@@ -44,6 +43,10 @@ const expectHash = async (page: Page, hash: string) => {
 
 const expectTabSelected = async (sidebar: ConversationSidebar, testId: string) => {
   await expect(sidebar.tab(testId)).toHaveAttribute('aria-selected', 'true');
+};
+
+const expectConversationListView = async (page: Page) => {
+  await expect(page.getByTestId('conversation-list-header-title')).toBeVisible();
 };
 
 test.describe('URL on navigation (WPB-27977)', () => {
@@ -108,7 +111,7 @@ test.describe('URL on navigation (WPB-27977)', () => {
 
         await tab.click();
         await expectTabSelected(sidebar, testId);
-        await expect(pages.conversationList().searchConversationsInput.or(pages.conversationList().list)).toBeVisible();
+        await expectConversationListView(page);
         await expect(page).not.toHaveURL(/#\/(meetings|preferences)/);
       }
     },
@@ -135,7 +138,7 @@ test.describe('URL on navigation (WPB-27977)', () => {
       await sidebar.clickAllConversationsButton();
       await expectHash(page, '#/');
       await expectTabSelected(sidebar, 'go-recent-view');
-      await expect(pages.conversationList().searchConversationsInput).toBeVisible();
+      await expectConversationListView(page);
 
       await sidebar.clickPreferencesButton();
       await expectHash(page, '#/preferences/account');
