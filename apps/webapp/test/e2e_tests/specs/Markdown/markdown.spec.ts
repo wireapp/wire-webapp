@@ -41,7 +41,7 @@ test.describe('Markdown', () => {
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
-      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName).open();
 
       const messageInput = userAPages.conversation().messageInput;
       await messageInput.click();
@@ -68,7 +68,7 @@ test.describe('Markdown', () => {
       await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
-      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName).open();
 
       const messageInput = userAPages.conversation().messageInput;
       await messageInput.click();
@@ -89,7 +89,7 @@ test.describe('Markdown', () => {
       await messageInput.press('ControlOrMeta+v');
 
       await expect(messageInput.locator('strong')).toHaveText('Pasted bold');
-      await expect(messageInput.locator('a')).toHaveAttribute('href', 'https://wire.com');
+      await expect(messageInput.locator('a')).toHaveAttribute('href', 'https://wire.com/');
       await expect(messageInput.locator('a')).toHaveText('Wire');
       await expect(messageInput.locator('ul')).toHaveCount(1);
       await expect(messageInput.locator('li')).toHaveText(['first', 'second']);
