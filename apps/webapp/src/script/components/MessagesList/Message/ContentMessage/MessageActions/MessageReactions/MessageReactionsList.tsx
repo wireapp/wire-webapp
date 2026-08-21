@@ -38,6 +38,7 @@ export interface MessageReactionsListProps {
   onLastReactionKeyEvent: () => void;
   isRemovedFromConversation: boolean;
   users: User[];
+  loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
 }
 
 const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) => {
@@ -50,8 +51,6 @@ const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) 
         const emojiListCount = users.length;
         const hasUserReacted = users.some(user => matchQualifiedIds(selfUserId, user));
 
-        // Departed users still contribute to the reaction count, but their names are omitted from the tooltip
-        // because only current conversation members are available here.
         const reactingUsers = users
           .map(qualifiedId => conversationUsers.find(user => matchQualifiedIds(qualifiedId, user.qualifiedId)))
           .filter((user): user is User => typeof user !== 'undefined');
@@ -59,6 +58,7 @@ const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) 
         return (
           <EmojiPill
             reactingUsers={reactingUsers}
+            reactorIds={users}
             emojiCount={users.length}
             hasUserReacted={hasUserReacted}
             emojiUnicode={emojiUnicode}
