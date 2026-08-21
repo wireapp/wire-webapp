@@ -90,5 +90,15 @@ export const navigate = (path: string) => {
 };
 
 export const setHistoryParam = (path: string) => {
+  const hashUnchanged = window.location.hash === `#${path}`;
   window.location.hash = path;
+
+  if (hashUnchanged) {
+    // Setting the hash to its current value does not fire a native `hashchange` event, so route
+    // handlers that rely on it (e.g. re-showing the most recent conversation) would otherwise
+    // never run. Force route re-evaluation async, matching the timing of a real hashchange, so
+    // callers that synchronously update content state right after calling this still take effect
+    // first.
+    setTimeout(parseRoute, 0);
+  }
 };

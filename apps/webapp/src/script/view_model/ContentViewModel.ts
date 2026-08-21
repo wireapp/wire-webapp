@@ -43,7 +43,11 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
 import '../page/leftSidebar';
-import {getConversationListTab, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+import {
+  getConversationListTab,
+  isConversationListTab,
+  useSidebarStore,
+} from '../page/leftSidebar/panels/conversations/useSidebarStore';
 import '../page/mainContent';
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
@@ -101,9 +105,11 @@ export class ContentViewModel {
 
     this.userState.connectRequests.subscribe(requests => {
       const {contentState} = useAppState.getState();
+      const {currentTab} = useSidebarStore.getState();
 
       const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
-      if (isStateRequests && !requests.length) {
+      const isOnConversationListTab = isConversationListTab(currentTab);
+      if (isStateRequests && isOnConversationListTab && !requests.length) {
         showMostRecentConversation();
       }
     });
@@ -314,7 +320,10 @@ export class ContentViewModel {
       throw error;
     } finally {
       const {currentTab, setCurrentTab} = useSidebarStore.getState();
-      setCurrentTab(getConversationListTab(currentTab));
+
+      if (isConversationListTab(currentTab)) {
+        setCurrentTab(getConversationListTab(currentTab));
+      }
     }
   };
 
