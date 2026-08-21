@@ -18,14 +18,19 @@
  */
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
 import {sortTagsAlphabetically} from '../../common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
+interface CellsFilePreviewModalProps {
+  sourceConversation?: Conversation;
+}
+
 // This component is duplicated across global view and conversation view
 // TODO: Abstract when it starts to grow / feels right
-export const CellsFilePreviewModal = () => {
+export const CellsFilePreviewModal = ({sourceConversation}: CellsFilePreviewModalProps) => {
   const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
   const isModalOpen = selectedFile !== null;
 
@@ -33,7 +38,8 @@ export const CellsFilePreviewModal = () => {
     return null;
   }
 
-  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags} = selectedFile;
+  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags, conversationName} =
+    selectedFile;
 
   const getFileUrl = () => {
     const type = getFileTypeFromExtension(extension);
@@ -62,6 +68,8 @@ export const CellsFilePreviewModal = () => {
       status={filePreviewUrl === undefined ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
+      fallbackConversationName={conversationName}
+      sourceConversation={selectedFile.conversation ?? sourceConversation}
       badges={sortTagsAlphabetically(tags)}
       isEditMode={isEditMode}
     />

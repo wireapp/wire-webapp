@@ -35,7 +35,8 @@ export const CellsFilePreviewModal = () => {
     return null;
   }
 
-  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags} = selectedFile;
+  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags, conversationName} =
+    selectedFile;
 
   const getFileUrl = () => {
     const type = getFileTypeFromExtension(extension);
@@ -70,6 +71,8 @@ export const CellsFilePreviewModal = () => {
         status={getFileUrl() === undefined ? 'unavailable' : 'success'}
         senderName={owner}
         timestamp={uploadedAtTimestamp}
+        fallbackConversationName={conversationName}
+        sourceConversation={selectedFile.conversation}
         badges={sortTagsAlphabetically(tags)}
         isEditMode={isEditMode}
       />

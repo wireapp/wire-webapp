@@ -86,13 +86,15 @@ const file: CellFile = {
 const FakeFilePreviewProvider = ({
   children,
   selfUserDriveRole,
+  selectedFile = file,
 }: {
   children: ReactNode;
   selfUserDriveRole: CellFile['selfUserDriveRole'];
+  selectedFile?: CellFile;
 }) => {
   const value: CellsFilePreviewModalContextValue = {
     id: 'preview-context-id',
-    selectedFile: {...file, selfUserDriveRole},
+    selectedFile: {...selectedFile, selfUserDriveRole},
     isEditMode: true,
     handleOpenFile: jest.fn(),
     handleCloseFile: jest.fn(),
@@ -123,15 +125,17 @@ describe('CellsFilePreviewModal', () => {
   const renderModal = ({
     isViewerPermissionFeatureEnabled = true,
     selfUserDriveRole,
+    selectedFile,
   }: {
     isViewerPermissionFeatureEnabled?: boolean;
     selfUserDriveRole: CellFile['selfUserDriveRole'];
+    selectedFile?: CellFile;
   }) => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     render(
       withThemeAndRootContext(
-        <FakeFilePreviewProvider selfUserDriveRole={selfUserDriveRole}>
+        <FakeFilePreviewProvider selfUserDriveRole={selfUserDriveRole} selectedFile={selectedFile}>
           <CellsFilePreviewModal />
         </FakeFilePreviewProvider>,
         createRootProviderWrapper({fireAndForgetInvoker, isViewerPermissionFeatureEnabled}),
