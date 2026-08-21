@@ -26,13 +26,13 @@ export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boo
   matchQualifiedIds(meetingSeries.qualified_creator, selfUser.qualifiedId);
 
 /**
- * Edit is allowed per list row: the host may edit an instance until it starts.
+ * Edit is allowed per list row: the host may edit an instance until it ends.
  *
- * The edit form is prefilled from the upcoming instance start/end for recurring series
+ * The edit form is prefilled from the edit anchor instance for recurring series
  * ({@link mapMeetingInstanceToScheduleFormState}); the series `qualified_id` is used for the update.
  */
 export const canEditMeeting = (meetingInstance: MeetingInstance, selfUser: User, nowMilliseconds: number): boolean => {
-  const instanceHasNotStarted = nowMilliseconds < meetingInstance.start.getTime();
+  const instanceHasNotEnded = nowMilliseconds < meetingInstance.end.getTime();
 
-  return isMeetingHost(meetingInstance.meetingSeries, selfUser) && instanceHasNotStarted;
+  return isMeetingHost(meetingInstance.meetingSeries, selfUser) && instanceHasNotEnded;
 };

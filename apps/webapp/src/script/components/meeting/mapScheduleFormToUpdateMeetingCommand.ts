@@ -22,7 +22,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {type Maybe, Result, result} from 'true-myth';
 
 import {ScheduleFormErrors} from 'Components/meeting/scheduleFormErrors';
-import {requireScheduleMeetingTimes} from 'Components/meeting/scheduleMeetingModal/requireScheduleMeetingTimes';
+import {requireScheduleMeetingTimesForUpdate} from 'Components/meeting/scheduleMeetingModal/requireScheduleMeetingTimes';
 import type {
   ScheduleMeetingFormState,
   ScheduleMeetingRecurrenceOption,
@@ -51,9 +51,8 @@ export const mapScheduleFormToUpdateMeetingCommand = ({
   originalEnd,
   originalRecurrence,
   originalSelectedUsers,
-  wallClock,
 }: MapScheduleFormToUpdateMeetingCommandParams): Result<UpdateMeetingCommand, ScheduleFormErrors> => {
-  const timesResult = requireScheduleMeetingTimes(formState, wallClock);
+  const timesResult = requireScheduleMeetingTimesForUpdate(formState);
 
   if (timesResult.isErr) {
     return result.err(timesResult.error);

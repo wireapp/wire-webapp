@@ -20,9 +20,9 @@
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 
 import {
+  getEditAnchorMeetingInstance,
   getMeetingInstanceAt,
   getMeetingInstancesInRange,
-  getUpcomingMeetingInstanceStart,
 } from './getMeetingInstancesInRange';
 
 const createMeetingSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSeries, 'recurrence'>): MeetingSeries => ({
@@ -225,7 +225,7 @@ describe('getMeetingInstancesInRange', () => {
   });
 });
 
-describe('getUpcomingMeetingInstanceStart', () => {
+describe('getEditAnchorMeetingInstance', () => {
   it('returns the series anchor for non-repeating meetings', () => {
     const meetingSeries = createMeetingSeries({
       recurrence: 'doesNotRepeat',
@@ -233,17 +233,34 @@ describe('getUpcomingMeetingInstanceStart', () => {
       series_end_date: '2026-06-16T11:00:00.000Z',
     });
 
-    expect(getUpcomingMeetingInstanceStart(meetingSeries, new Date('2026-06-10T12:00:00.000Z')).toISOString()).toBe(
-      '2026-06-16T10:00:00.000Z',
-    );
+    const anchor = getEditAnchorMeetingInstance(meetingSeries, new Date('2026-06-10T12:00:00.000Z'));
+
+    expect(anchor.start.toISOString()).toBe('2026-06-16T10:00:00.000Z');
+    expect(anchor.end.toISOString()).toBe('2026-06-16T11:00:00.000Z');
   });
 
-  it('returns the first recurring instance on or after now', () => {
+  it('returns today’s not-yet-ended occurrence while that slot is in progress', () => {
     const meetingSeries = createMeetingSeries({recurrence: 'weekly'});
+    const anchor = getEditAnchorMeetingInstance(meetingSeries, new Date('2026-06-15T10:30:00.000Z'));
 
-    expect(getUpcomingMeetingInstanceStart(meetingSeries, new Date('2026-06-10T12:00:00.000Z')).toISOString()).toBe(
-      '2026-06-15T10:00:00.000Z',
-    );
+    expect(anchor.start.toISOString()).toBe('2026-06-15T10:00:00.000Z');
+    expect(anchor.end.toISOString()).toBe('2026-06-15T11:00:00.000Z');
+  });
+
+  it('returns today’s upcoming occurrence before it starts', () => {
+    const meetingSeries = createMeetingSeries({recurrence: 'weekly'});
+    const anchor = getEditAnchorMeetingInstance(meetingSeries, new Date('2026-06-15T09:00:00.000Z'));
+
+    expect(anchor.start.toISOString()).toBe('2026-06-15T10:00:00.000Z');
+    expect(anchor.end.toISOString()).toBe('2026-06-15T11:00:00.000Z');
+  });
+
+  it('falls back to the next instance when today’s occurrence has ended', () => {
+    const meetingSeries = createMeetingSeries({recurrence: 'weekly'});
+    const anchor = getEditAnchorMeetingInstance(meetingSeries, new Date('2026-06-15T13:00:00.000Z'));
+
+    expect(anchor.start.toISOString()).toBe('2026-06-22T10:00:00.000Z');
+    expect(anchor.end.toISOString()).toBe('2026-06-22T11:00:00.000Z');
   });
 });
 

@@ -23,13 +23,14 @@ import {result} from 'true-myth';
 
 import {getMeetingTitleError} from 'Components/meeting/shared/validation/meetingTitleValidation';
 
-import {type ScheduleMeetingFormErrors} from './scheduleMeetingTypes';
+import {type ScheduleMeetingFormErrors, ScheduleMeetingMode} from './scheduleMeetingTypes';
 
 export interface ScheduleMeetingValidationInput {
   title: string;
   start: Maybe<Date>;
   end: Maybe<Date>;
   wallClock: WallClock;
+  mode: ScheduleMeetingMode;
 }
 
 export const getScheduleMeetingFormErrors = ({
@@ -37,11 +38,13 @@ export const getScheduleMeetingFormErrors = ({
   start,
   end,
   wallClock,
+  mode,
 }: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors => {
   const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
   const missingTimes = start.isNothing || end.isNothing ? 'meetings.scheduleModal.error.missingTimes' : undefined;
+  const allowPastTimes = mode === 'edit';
   const endInPast =
-    missingTimes === undefined && end.isJust && end.value.getTime() <= currentTimestampInMilliseconds
+    !allowPastTimes && missingTimes === undefined && end.isJust && end.value.getTime() <= currentTimestampInMilliseconds
       ? 'meetings.schedule.errors.endInPast'
       : undefined;
 
@@ -49,7 +52,10 @@ export const getScheduleMeetingFormErrors = ({
     title: getMeetingTitleError(title),
     missingTimes,
     startInPast:
-      missingTimes === undefined && start.isJust && start.value.getTime() <= currentTimestampInMilliseconds
+      !allowPastTimes &&
+      missingTimes === undefined &&
+      start.isJust &&
+      start.value.getTime() <= currentTimestampInMilliseconds
         ? 'meetings.schedule.errors.startInPast'
         : undefined,
     endInPast,

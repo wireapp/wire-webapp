@@ -36,9 +36,17 @@ describe('scheduleMeetingValidation', () => {
   const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
   const futureStart = maybe.just(futureStartDate);
   const futureEnd = maybe.just(futureEndDate);
+  const createMode = {mode: 'create' as const};
+  const editMode = {mode: 'edit' as const};
 
   it('returns titleRequired when title is empty', () => {
-    const errors = getScheduleMeetingFormErrors({title: '   ', start: futureStart, end: futureEnd, wallClock});
+    const errors = getScheduleMeetingFormErrors({
+      title: '   ',
+      start: futureStart,
+      end: futureEnd,
+      wallClock,
+      ...createMode,
+    });
 
     expect(errors.title).toBe(meetingTitleErrorKeys.required);
     expect(errors.startInPast).toBeUndefined();
@@ -51,6 +59,7 @@ describe('scheduleMeetingValidation', () => {
       start: maybe.just(pastStartDate),
       end: futureEnd,
       wallClock,
+      ...createMode,
     });
 
     expect(errors.startInPast).toBe('meetings.schedule.errors.startInPast');
@@ -62,6 +71,7 @@ describe('scheduleMeetingValidation', () => {
       start: futureStart,
       end: maybe.just(pastStartDate),
       wallClock,
+      ...createMode,
     });
 
     expect(errors.endInPast).toBe('meetings.schedule.errors.endInPast');
@@ -77,6 +87,7 @@ describe('scheduleMeetingValidation', () => {
       start: maybe.just(pastTimeToday),
       end: futureEnd,
       wallClock,
+      ...createMode,
     });
 
     expect(errors.startInPast).toBe('meetings.schedule.errors.startInPast');
@@ -88,6 +99,7 @@ describe('scheduleMeetingValidation', () => {
       start: futureStart,
       end: maybe.just(futureStartDate),
       wallClock,
+      ...createMode,
     });
 
     expect(errors.endBeforeStart).toBe('meetings.scheduleModal.error.endBeforeStart');
@@ -99,6 +111,7 @@ describe('scheduleMeetingValidation', () => {
       start: futureStart,
       end: futureEnd,
       wallClock,
+      ...createMode,
     });
 
     expect(errors.title).toBe(meetingTitleErrorKeys.tooLong);
@@ -106,9 +119,29 @@ describe('scheduleMeetingValidation', () => {
   });
 
   it('returns no errors for valid input', () => {
-    const errors = getScheduleMeetingFormErrors({title: 'Weekly sync', start: futureStart, end: futureEnd, wallClock});
+    const errors = getScheduleMeetingFormErrors({
+      title: 'Weekly sync',
+      start: futureStart,
+      end: futureEnd,
+      wallClock,
+      ...createMode,
+    });
 
     expect(hasScheduleMeetingFormErrors(errors)).toBe(false);
+  });
+
+  it('allows past start and end times in edit mode', () => {
+    const pastEndDate = new Date('2026-06-23T11:00:00.000Z');
+    const errors = getScheduleMeetingFormErrors({
+      title: 'Weekly sync',
+      start: maybe.just(pastStartDate),
+      end: maybe.just(pastEndDate),
+      wallClock,
+      ...editMode,
+    });
+
+    expect(errors.startInPast).toBeUndefined();
+    expect(errors.endInPast).toBeUndefined();
   });
 
   it('returns missingTimes when start or end is missing', () => {
@@ -117,6 +150,7 @@ describe('scheduleMeetingValidation', () => {
       start: maybe.nothing(),
       end: futureEnd,
       wallClock,
+      ...createMode,
     });
 
     expect(errors.missingTimes).toBe('meetings.scheduleModal.error.missingTimes');

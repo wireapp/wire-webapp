@@ -92,4 +92,30 @@ describe('mapScheduleFormToUpdateMeetingCommand', () => {
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe('missingTimes');
   });
+
+  it('maps past start and end times for an ongoing meeting edit', () => {
+    const pastStartDate = new Date('2026-06-23T10:00:00.000Z');
+    const pastEndDate = new Date('2026-06-23T11:00:00.000Z');
+    const result = mapScheduleFormToUpdateMeetingCommand({
+      formState: {
+        ...baseFormState(),
+        start: maybe.just(pastStartDate),
+        end: maybe.just(pastEndDate),
+      },
+      meetingId,
+      qualifiedConversation: maybe.just(qualifiedConversation),
+      originalTitle: 'Weekly sync',
+      originalStart: pastStartDate,
+      originalEnd: pastEndDate,
+      originalRecurrence: 'weekly',
+      originalSelectedUsers: [],
+      wallClock,
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(result.match({Ok: value => value, Err: () => null})).toMatchObject({
+      start: pastStartDate,
+      end: pastEndDate,
+    });
+  });
 });

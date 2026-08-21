@@ -53,12 +53,11 @@ const createMeetingInstance = (
   end: new Date(end),
 });
 
-const wallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
-});
-
 describe('mapMeetingInstanceToScheduleFormState', () => {
-  it('maps the upcoming instance start/end for recurring meetings', () => {
+  it('maps the edit anchor start/end for recurring meetings when today’s slot has ended', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    });
     const selectedUsers = [createUser('1'), createUser('2')];
     const meetingInstance = createMeetingInstance({}, '2026-06-29T10:00:00.000Z', '2026-06-29T11:00:00.000Z');
 
@@ -74,7 +73,22 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
     expect(result.selectedUsers).toBe(selectedUsers);
   });
 
+  it('uses today’s in-progress occurrence when editing a future row (WPB-27894)', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T10:30:00.000Z'),
+    });
+    const meetingInstance = createMeetingInstance({}, '2026-06-22T10:00:00.000Z', '2026-06-22T11:00:00.000Z');
+
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
+
+    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+  });
+
   it('does not use a later selected instance start/end for recurring meetings', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    });
     const meetingInstance = createMeetingInstance(
       {
         series_start_date: '2026-06-01T10:00:00.000Z',
@@ -91,6 +105,9 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
   });
 
   it('uses the series anchor for non-repeating meetings', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    });
     const meetingInstance = createMeetingInstance(
       {
         recurrence: 'doesNotRepeat',
@@ -108,6 +125,9 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
   });
 
   it('uses selectedUsers passed by the caller', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    });
     const alice = createUser('1');
     const bob = createUser('2');
     const selectedUsers = [alice, bob];
