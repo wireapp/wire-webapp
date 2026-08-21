@@ -12,10 +12,6 @@ on:
         options:
           - https://wire-webapp-dev.zinfra.io/
           - https://wire-webapp-qa.zinfra.io/
-      expectedManageTeamUrl:
-        type: string
-        required: true
-        description: Exact manage-team URL expected from the deployed WebApp artifact
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -33,10 +29,10 @@ on:
       webappUrl:
         type: string
         required: true
-      expectedManageTeamUrl:
+      teamManagementUrl:
         type: string
         required: true
-        description: Exact manage-team URL expected from the deployed WebApp artifact
+        description: Exact team management URL expected from the deployed WebApp artifact
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -190,10 +186,20 @@ jobs:
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
-      - name: Run tests
+      - name: Run tests (workflow call)
+        if: ${{ inputs.teamManagementUrl != '' }}
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
-          EXPECTED_MANAGE_TEAM_URL: ${{ inputs.expectedManageTeamUrl }}
+          TEAM_MANAGEMENT_URL: ${{ inputs.teamManagementUrl }}
+          TEST_SERVICE_URL: http://testservice:8080
+          PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
+          GREP: ${{ inputs.grep }}
+        run: ./bin/yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
+
+      - name: Run tests (workflow dispatch)
+        if: ${{ inputs.teamManagementUrl == '' }}
+        env:
+          WEBAPP_URL: ${{ inputs.webappUrl }}
           TEST_SERVICE_URL: http://testservice:8080
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}

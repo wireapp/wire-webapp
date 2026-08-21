@@ -7,7 +7,7 @@ on:
       env_name:
         type: string
         required: true
-      expectedManageTeamUrl:
+      teamManagementUrl:
         type: string
         required: true
       artifact_name:
@@ -189,7 +189,7 @@ jobs:
     uses: ./.github/workflows/e2e-tests.yml
     with:
       webappUrl: ${{ needs.deploy_to_aws.outputs.precommit_url }}
-      expectedManageTeamUrl: ${{ inputs.expectedManageTeamUrl }}
+      teamManagementUrl: ${{ inputs.teamManagementUrl }}
       grep: ${{ inputs.grep }}
       testinyRunName: ${{ inputs.testinyRunName }}
     secrets:
