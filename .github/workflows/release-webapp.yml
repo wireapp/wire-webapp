@@ -639,7 +639,7 @@ jobs:
     uses: ./.github/workflows/precommit-slot-run.yml
     with:
       env_name: wire-webapp-precommit-3
-      expectedManageTeamUrl: https://teams.wire.com/login/
+      teamManagementUrl: https://teams.wire.com/login/
       artifact_name: ${{ needs.build_artifact.outputs.artifact_name }}
       expectedBackendRest: https://staging-nginz-https.zinfra.io/
       expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
