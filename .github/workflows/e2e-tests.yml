@@ -12,6 +12,7 @@ on:
         options:
           - https://wire-webapp-dev.zinfra.io/
           - https://wire-webapp-qa.zinfra.io/
+          - https://webapp.fulu.wire.link/
       expectedManageTeamUrl:
         type: string
         required: true
