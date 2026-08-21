@@ -34,8 +34,8 @@ test.describe('Markdown', () => {
   });
 
   test(
-    'normalizes CRLF in plain text pasted into the editor',
-    {tag: ['@rich-text-characterization', '@regression']},
+    'I want to paste text with CRLF (carriage return/ line feed) characters in the message',
+    {tag: ['@regression', '@TC-11735']},
     async ({createPage}) => {
       const userAPage = await createPage(withLogin(userA));
       await connectWithUser(userAPage, userB);
@@ -61,8 +61,8 @@ test.describe('Markdown', () => {
   );
 
   test(
-    'preserves rich HTML formatting, links, and lists when pasted into the editor',
-    {tag: ['@rich-text-characterization', '@regression']},
+    'I want to paste text with HTML code in the message',
+    {tag: ['@regression', '@TC-11736']},
     async ({createPage}) => {
       const userAPage = await createPage(withLogin(userA));
       await connectWithUser(userAPage, userB);
