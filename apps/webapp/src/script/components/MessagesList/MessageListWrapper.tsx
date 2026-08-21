@@ -30,6 +30,7 @@ export const MessageListWrapper = ({
   selfUser,
   conversationRepository,
   messageRepository,
+  loadUsersByIdsFromDb,
   getVisibleCallback,
   onClickMessage,
   showUserDetails,
@@ -58,6 +59,7 @@ export const MessageListWrapper = ({
         conversationRepository={conversationRepository}
         assetRepository={assetRepository}
         messageRepository={messageRepository}
+        loadUsersByIdsFromDb={loadUsersByIdsFromDb}
         messageActions={messageActions}
         invitePeople={invitePeople}
         cancelConnectionRequest={cancelConnectionRequest}
@@ -86,6 +88,7 @@ export const MessageListWrapper = ({
       conversationRepository={conversationRepository}
       assetRepository={assetRepository}
       messageRepository={messageRepository}
+      loadUsersByIdsFromDb={loadUsersByIdsFromDb}
       messageActions={messageActions}
       invitePeople={invitePeople}
       cancelConnectionRequest={cancelConnectionRequest}

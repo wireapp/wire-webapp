@@ -36,6 +36,7 @@ import {MemberMessage} from 'Repositories/entity/message/memberMessage';
 import {Message as MessageEntity} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import type {UserRepository} from 'Repositories/user/userRepository';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -61,6 +62,7 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
+  loadUsersByIdsFromDb: UserRepository['getUsersByIdsFromDb'];
   onClickMessage: MessageActions['onClickMessage'];
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
@@ -82,6 +84,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   selfUser,
   conversationRepository,
   messageRepository,
+  loadUsersByIdsFromDb,
   getVisibleCallback,
   onClickMessage,
   showUserDetails,
@@ -328,6 +331,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                   scrollTo={scrollToElement}
                   isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                   messageRepository={messageRepository}
+                  loadUsersByIdsFromDb={loadUsersByIdsFromDb}
                   onClickAvatar={showUserDetails}
                   onClickCancelRequest={cancelConnectionRequest}
                   onClickImage={showImageDetails}

@@ -17,16 +17,18 @@
  *
  */
 
-import {render, fireEvent, within} from '@testing-library/react';
+import {act, fireEvent, render, waitFor, within} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {ReactionMap} from 'Repositories/storage';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
+  createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
+import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
@@ -34,6 +36,9 @@ import {MessageReactionsList, MessageReactionsListProps} from './MessageReaction
 const user1 = new User('', '', translateForTest);
 const user2 = new User('', '', translateForTest);
 const user3 = new User('', '', translateForTest);
+user1.name('User One');
+user2.name('User Two');
+user3.name('User Three');
 const reactions: ReactionMap = [
   ['😇', [user1.qualifiedId, user2.qualifiedId, user3.qualifiedId]],
   ['😊', [user1.qualifiedId, user2.qualifiedId]],
@@ -51,9 +56,11 @@ const defaultProps: MessageReactionsListProps = {
   isRemovedFromConversation: false,
   selfUserId: generateQualifiedId(),
   users: [user1, user2, user3],
+  loadUsersByIdsFromDb: jest.fn().mockResolvedValue([]),
 };
+const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
+  createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest}),
 );
 
 describe('MessageReactionsList', () => {
@@ -101,6 +108,42 @@ describe('MessageReactionsList', () => {
     );
 
     expect(within(getByTitle('heart')).getByText('4')).toBeDefined();
+  });
+
+  test('loads missing reactor names from the local database when the tooltip is opened', async () => {
+    const departedUser = new User('departed-user', 'test.wire.link', translateForTest);
+    departedUser.name('Former Member');
+    const loadUsersByIdsFromDb = jest.fn().mockResolvedValue([departedUser]);
+    const translate: Translate = (identifier, substitutions, dangerousSubstitutions, skipEscape) => {
+      if (identifier === 'conversationLikesCaptionPlural') {
+        return `${substitutions?.firstUser}, ${substitutions?.secondUser}`;
+      }
+
+      return translateForTest(identifier, substitutions, dangerousSubstitutions, skipEscape);
+    };
+    const reactionsWithDepartedUser: ReactionMap = [['❤️', [departedUser.qualifiedId, user1.qualifiedId]]];
+
+    const {getByTitle} = render(
+      withThemeAndRootContext(
+        <div id="wire-app">
+          <MessageReactionsList
+            {...defaultProps}
+            translate={translate}
+            reactions={reactionsWithDepartedUser}
+            users={[user1]}
+            loadUsersByIdsFromDb={loadUsersByIdsFromDb}
+          />
+        </div>,
+        rootProviderWrapper,
+      ),
+    );
+
+    expect(loadUsersByIdsFromDb).not.toHaveBeenCalled();
+    fireEvent.focus(getByTitle('heart'));
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([departedUser.qualifiedId]);
+    await waitFor(() => expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member'));
   });
 
   test('handles click on reaction button', () => {
