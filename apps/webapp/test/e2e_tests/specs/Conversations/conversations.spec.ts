@@ -477,9 +477,9 @@ test.describe('Conversations', () => {
 
     await userAPages.conversation().messageInput.pressSequentially(':smile', {delay: 100});
 
-    const emojiMenu = userAPage.locator('#emoji-typeahead-menu');
-    await expect(emojiMenu).toBeVisible();
-    await emojiMenu.getByRole('button', {name: 'smile', exact: true}).click();
+    const smileOption = userAPage.locator('#emoji-typeahead-menu').getByRole('button', {name: 'smile', exact: true});
+    await expect(smileOption).toBeVisible();
+    await smileOption.click();
 
     await expect(userAPages.conversation().messageInput).toContainText('😄');
     await expect(userAPages.conversation().messageInput).not.toContainText(':smile');
