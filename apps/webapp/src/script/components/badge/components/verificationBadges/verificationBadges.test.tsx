@@ -26,7 +26,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-import {VerificationBadges} from './verificationBadges';
+import {VerificationBadges, getUserVerificationBadgeLabel} from './verificationBadges';
 import {translateForTest} from 'Util/test/translateForTest';
 
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
@@ -90,5 +90,71 @@ describe('VerificationBadges', () => {
 
     const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRES_SOON);
+  });
+});
+
+describe('getUserVerificationBadgeLabel', () => {
+  it('returns MLS verified label for VALID status', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: MLSStatuses.VALID,
+      isProteusVerified: false,
+    });
+    expect(label).toBe(translateForTest('E2EI.userDevicesVerified'));
+  });
+
+  it('returns certificate expired label for EXPIRED status', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: MLSStatuses.EXPIRED,
+      isProteusVerified: false,
+    });
+    expect(label).toBe(translateForTest('E2EI.certificateExpired'));
+  });
+
+  it('returns certificate expires soon label for EXPIRES_SOON status', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: MLSStatuses.EXPIRES_SOON,
+      isProteusVerified: false,
+    });
+    expect(label).toBe(translateForTest('E2EI.certificateExpiresSoon'));
+  });
+
+  it('returns certificate revoked label for REVOKED status', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: MLSStatuses.REVOKED,
+      isProteusVerified: false,
+    });
+    expect(label).toBe(translateForTest('E2EI.certificateRevoked'));
+  });
+
+  it('returns Proteus device verified label when isProteusVerified is true', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: undefined,
+      isProteusVerified: true,
+    });
+    expect(label).toBe(translateForTest('proteusDeviceVerified'));
+  });
+
+  it('returns composed labels when both MLS and Proteus are verified', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: MLSStatuses.VALID,
+      isProteusVerified: true,
+    });
+    expect(label).toBe(`${translateForTest('E2EI.userDevicesVerified')}, ${translateForTest('proteusDeviceVerified')}`);
+  });
+
+  it('returns undefined when neither MLS nor Proteus is verified', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: undefined,
+      isProteusVerified: false,
+    });
+    expect(label).toBeUndefined();
+  });
+
+  it('handles not activated status', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: MLSStatuses.NOT_ACTIVATED,
+      isProteusVerified: false,
+    });
+    expect(label).toBe(translateForTest('E2EI.certificateNotActivated'));
   });
 });
