@@ -31,6 +31,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
+import type {User} from 'Repositories/entity/User';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/statusType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -72,6 +73,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   onClickReaction: (emoji: string) => void;
   is1to1?: boolean;
   isFileShareRestricted: boolean;
+  loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
 }
 
 export const ContentMessageComponent = ({
@@ -95,6 +97,7 @@ export const ContentMessageComponent = ({
   onClickDetails,
   is1to1,
   isFileShareRestricted,
+  loadUsersByIdsFromDb,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
   const {translate} = useApplicationContext();
@@ -322,6 +325,7 @@ export const ContentMessageComponent = ({
           onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
           isRemovedFromConversation={conversation.isSelfUserRemoved()}
           users={conversation.allUserEntities()}
+          loadUsersByIdsFromDb={loadUsersByIdsFromDb}
         />
       )}
     </div>

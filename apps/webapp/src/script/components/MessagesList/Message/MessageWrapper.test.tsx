@@ -89,6 +89,7 @@ const createBaseProps = (conversation: Conversation, message: MemberMessageEntit
     retryUploadFile: jest.fn(),
     toggleReaction: jest.fn(),
   } as any,
+  loadUsersByIdsFromDb: jest.fn().mockResolvedValue([]),
   messageActions: {
     deleteMessage: jest.fn(),
     deleteMessageEveryone: jest.fn(),

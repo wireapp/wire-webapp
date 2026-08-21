@@ -715,6 +715,7 @@ export const Conversation = ({
                 conversationRepository={conversationRepository}
                 assetRepository={repositories.asset}
                 messageRepository={repositories.message}
+                loadUsersByIdsFromDb={repositories.user.getUsersByIdsFromDb}
                 messageActions={mainViewModel.actions}
                 invitePeople={clickOnInvitePeople}
                 cancelConnectionRequest={clickOnCancelRequest}

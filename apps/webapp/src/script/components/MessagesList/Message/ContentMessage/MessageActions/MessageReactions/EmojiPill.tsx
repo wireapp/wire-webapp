@@ -17,14 +17,21 @@
  *
  */
 
+import {useRef, useState} from 'react';
+
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {task} from 'true-myth';
+
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
 import {isTabKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {EmojiChar} from './EmojiChar';
 import {
@@ -52,6 +59,8 @@ interface EmojiPillProps {
   emojiCount: number;
   hasUserReacted: boolean;
   reactingUsers: User[];
+  reactorIds: QualifiedId[];
+  loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
 }
 
 const MAX_USER_NAMES_TO_SHOW = 2;
@@ -70,12 +79,53 @@ export const EmojiPill = ({
   emojiCount,
   hasUserReacted,
   reactingUsers,
+  reactorIds,
+  loadUsersByIdsFromDb,
 }: EmojiPillProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
+  const [storedReactingUsers, setStoredReactingUsers] = useState<User[]>([]);
+  const isLoadingStoredUsers = useRef(false);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;
 
-  const reactingUserNames = reactingUsers.slice(0, MAX_USER_NAMES_TO_SHOW).map(user => user.name());
+  // Prefer the already-cached conversation members and resolve departed reactors from IndexedDB only on demand.
+  const resolvedReactingUsers = [...reactingUsers, ...storedReactingUsers];
+  const tooltipReactorIds = reactorIds.slice(0, MAX_USER_NAMES_TO_SHOW);
+  const missingReactorIds = tooltipReactorIds.filter(
+    reactorId => !resolvedReactingUsers.some(user => matchQualifiedIds(reactorId, user.qualifiedId)),
+  );
+
+  const reactingUserNames = tooltipReactorIds.map(reactorId => {
+    const user = resolvedReactingUsers.find(reactingUser => matchQualifiedIds(reactorId, reactingUser.qualifiedId));
+    return user?.name() || translate('deletedUser');
+  });
+
+  const loadMissingReactingUsers = () => {
+    if (missingReactorIds.length === 0 || isLoadingStoredUsers.current) {
+      return;
+    }
+
+    isLoadingStoredUsers.current = true;
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      const loadResult = await task.tryOrElse(
+        () => 'failedToLoadReactionUsers' as const,
+        () => loadUsersByIdsFromDb(missingReactorIds),
+      );
+      isLoadingStoredUsers.current = false;
+
+      if (loadResult.isErr) {
+        return;
+      }
+
+      setStoredReactingUsers(currentUsers => {
+        const newUsers = loadResult.value.filter(
+          loadedUser => !currentUsers.some(user => matchQualifiedIds(loadedUser.qualifiedId, user.qualifiedId)),
+        );
+        return [...currentUsers, ...newUsers];
+      });
+    });
+  };
 
   const conversationReactionCaption = () => {
     if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
@@ -162,6 +212,8 @@ export const EmojiPill = ({
           tabIndex={messageFocusedTabIndex}
           className="button-reset-default"
           data-uie-name="emoji-pill"
+          onMouseEnter={loadMissingReactingUsers}
+          onFocus={loadMissingReactingUsers}
           onClick={() => {
             handleReactionClick(emoji);
           }}

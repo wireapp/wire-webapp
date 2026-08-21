@@ -235,6 +235,24 @@ describe('UserRepository', () => {
       });
     });
 
+    describe('getUsersByIdsFromDb', () => {
+      it('loads cached users without requesting them from the backend', async () => {
+        const [userRepository, {userService, userState}] = await buildUserRepository(translateForTest);
+        const selfUser = new User('self', 'test.wire.link', translateForTest);
+        const departedUser = generateAPIUser(undefined, {name: 'Former Member'});
+        userState.self(selfUser);
+        jest.spyOn(userService, 'loadUserFromDb').mockResolvedValue(departedUser);
+        const backendUsersSpy = jest.spyOn(userService, 'getUsers');
+
+        const users = await userRepository.getUsersByIdsFromDb([departedUser.qualified_id!]);
+
+        expect(users).toHaveLength(1);
+        expect(users[0].name()).toBe('Former Member');
+        expect(userService.loadUserFromDb).toHaveBeenCalledWith(departedUser.qualified_id);
+        expect(backendUsersSpy).not.toHaveBeenCalled();
+      });
+    });
+
     describe('saveUser', () => {
       it('saves a user', async () => {
         const [userRepository, {userState}] = await buildUserRepository(translateForTest);

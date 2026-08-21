@@ -32,6 +32,7 @@ import {Message as BaseMessage} from 'Repositories/entity/message/message';
 import type {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
+import type {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/keyboardUtil';
@@ -67,6 +68,7 @@ export interface MessageParams extends MessageActions {
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
+  loadUsersByIdsFromDb: UserRepository['getUsersByIdsFromDb'];
   onVisible?: () => void;
   onVisibilityLost?: () => void;
   selfId: QualifiedId;

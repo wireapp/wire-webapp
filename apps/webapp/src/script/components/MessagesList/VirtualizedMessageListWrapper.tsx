@@ -34,6 +34,7 @@ export const VirtualizedMessageListWrapper = ({
   selfUser,
   conversationRepository,
   messageRepository,
+  loadUsersByIdsFromDb,
   getVisibleCallback,
   onClickMessage,
   showUserDetails,
@@ -88,6 +89,7 @@ export const VirtualizedMessageListWrapper = ({
           conversationRepository={conversationRepository}
           assetRepository={assetRepository}
           messageRepository={messageRepository}
+          loadUsersByIdsFromDb={loadUsersByIdsFromDb}
           messageActions={messageActions}
           getVisibleCallback={getVisibleCallback}
           isMsgElementsFocusable={isMsgElementsFocusable}

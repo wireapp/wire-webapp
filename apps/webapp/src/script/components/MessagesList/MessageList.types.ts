@@ -30,6 +30,7 @@ import {MemberMessage} from 'Repositories/entity/message/memberMessage';
 import {Message as MessageEntity} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import type {UserRepository} from 'Repositories/user/userRepository';
 
 export interface MessagesListParams {
   assetRepository: AssetRepository;
@@ -43,6 +44,7 @@ export interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
+  loadUsersByIdsFromDb: UserRepository['getUsersByIdsFromDb'];
   onClickMessage: MessageActions['onClickMessage'];
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
