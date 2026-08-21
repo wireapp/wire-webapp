@@ -637,9 +637,16 @@ export class CallingRepository {
 
   private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string) => {
     const callDuration = 0;
+    const parsedConversationId = this.parseQualifiedId(conversationId);
+    // Prefer the original caller captured when the call started ringing
+    // (call.initiator = AVS SETUP sender) over the `missedh` userId, which
+    // is the sender of the missed-trigger message and usually not the
+    // caller. Falls back when no Call exists locally (e.g. the app
+    // cold-launched straight into a missed call).
+    const callerId = this.findCall(parsedConversationId)?.initiator ?? this.parseQualifiedId(userId);
     this.injectDeactivateEvent(
-      this.parseQualifiedId(conversationId),
-      this.parseQualifiedId(userId),
+      parsedConversationId,
+      callerId,
       callDuration,
       REASON.CANCELED,
       new Date(timestamp * 1000).toISOString(),
