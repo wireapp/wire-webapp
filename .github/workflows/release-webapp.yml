@@ -1083,6 +1083,7 @@ jobs:
             github_release_url="$(
               gh release create \
                 "${PRODUCTION_TAG_NAME}" \
+                --repo "${GITHUB_REPOSITORY}" \
                 --verify-tag \
                 --draft \
                 --title "${PRODUCTION_TAG_NAME}" \
