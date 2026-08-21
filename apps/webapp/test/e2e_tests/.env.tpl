@@ -39,14 +39,14 @@ KEYCLOAK_URL=op://Test Automation/KEYCLOAK_QA_AUTOMATION/website
 KEYCLOAK_USERNAME=op://Test Automation/KEYCLOAK_QA_AUTOMATION/username
 KEYCLOAK_PASSWORD=op://Test Automation/KEYCLOAK_QA_AUTOMATION/password
 
-INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
-INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection staging/inbucketPassword }}"
-INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl
-BACKEND_URL=op://Test Automation/BackendConnection staging/backendUrl
-WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
-EXPECTED_MANAGE_TEAM_URL=https://wire-teams-staging.zinfra.io/login/
-DOMAIN=op://Test Automation/BackendConnection staging/domain
-BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth
+INBUCKET_USERNAME=op://Test Automation/BackendConnection fulu/inbucketUsername
+INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection fulu/inbucketPassword }}"
+INBUCKET_URL=op://Test Automation/BackendConnection fulu/inbucketUrl
+BACKEND_URL=op://Test Automation/BackendConnection fulu/backendUrl
+WEBAPP_URL=op://Test Automation/BackendConnection fulu/webappUrl
+EXPECTED_MANAGE_TEAM_URL=https://teams.fulu.wire.link/login/
+DOMAIN=op://Test Automation/BackendConnection fulu/domain
+BASIC_AUTH=op://Test Automation/BackendConnection fulu/basicAuth
 
 FEDERATION_BACKEND_URL=op://Test Automation/BackendConnection qa-federation-a/backendUrl
 FEDERATION_WEBAPP_URL=op://Test Automation/BackendConnection qa-federation-a/webappUrl
