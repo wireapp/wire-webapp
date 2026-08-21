@@ -97,7 +97,7 @@ test.describe('URL on navigation (WPB-27977)', () => {
         features: {meetings: true, mls: true, cells: true, channels: true},
       });
       const page = await createPage(loginWithMeetingsEnabled(owner));
-      const {pages, components} = PageManager.from(page).webapp;
+      const {components} = PageManager.from(page).webapp;
       const sidebar = components.conversationSidebar();
 
       await sidebar.clickAllConversationsButton();

@@ -51,12 +51,20 @@ const defaultParams: Omit<ConversationsProps, 'conversationRepository' | 'search
       switchContent: jest.fn(),
     },
   } as unknown as ConversationsProps['listViewModel'],
-  preferenceNotificationRepository: {notifications: observable([])} as unknown as ConversationsProps['preferenceNotificationRepository'],
-  propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as unknown as ConversationsProps['propertiesRepository'],
+  preferenceNotificationRepository: {
+    notifications: observable([]),
+  } as unknown as ConversationsProps['preferenceNotificationRepository'],
+  propertiesRepository: {
+    getPreference: jest.fn(),
+    savePreference: jest.fn(),
+  } as unknown as ConversationsProps['propertiesRepository'],
   selfUser: new User('', '', translateForTest),
   integrationRepository: {integrations: observable([])} as unknown as ConversationsProps['integrationRepository'],
   teamRepository: {getTeam: jest.fn()} as unknown as ConversationsProps['teamRepository'],
-  userRepository: {users: observable([]), getUsersById: jest.fn().mockResolvedValue([])} as unknown as ConversationsProps['userRepository'],
+  userRepository: {
+    users: observable([]),
+    getUsersById: jest.fn().mockResolvedValue([]),
+  } as unknown as ConversationsProps['userRepository'],
   isConversationListCollapseEnabled: false,
 };
 
