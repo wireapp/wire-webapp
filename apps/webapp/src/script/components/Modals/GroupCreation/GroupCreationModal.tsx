@@ -554,13 +554,14 @@ const GroupCreationModal = ({
                 )}
                 {enableCellsToggle && (
                   <InfoToggle
-                    className="modal-style"
+                    className="modal-style info-toggle--no-separator"
                     dataUieName="cells"
                     isChecked={isCellsOptionEnabled}
                     setIsChecked={setIsCellsOptionEnabled}
                     isDisabled={false}
                     name={translate('modalCreateGroupCellsToggleHeading')}
                     info={translate('modalCreateGroupCellsToggleInfo')}
+                    adminHintForShareDrive={translate('modalCreateConversationAdminHint')}
                   />
                 )}
                 {enableMLSToggle && (

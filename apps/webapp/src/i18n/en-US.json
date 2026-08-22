@@ -1599,6 +1599,7 @@
   "modalCreateFolderPlaceholder": "Folder name",
   "modalCreateGroupCellsToggleHeading": "Shared Drive",
   "modalCreateGroupCellsToggleInfo": "Enable participants to manage their documents and media files in a shared Drive. This can’t be undone.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateGroupProtocolHeading": "Protocol",
   "modalCreateGroupProtocolInfo": "Select MLS to create a group conversation using the Messaging Layer Security protocol.",
   "modalCreateGroupProtocolSelect.default": " (default)",

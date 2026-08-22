@@ -45,4 +45,25 @@ describe('InfoToggle', () => {
 
     expect(isChecked).toBe(true);
   });
+
+  it('renders Shared Drive admin hint only when provided', () => {
+    const props = {
+      dataUieName: 'example',
+      info: 'info',
+      isChecked: false,
+      isDisabled: false,
+      name: 'example',
+      setIsChecked: jest.fn(),
+    };
+
+    const {queryByText, rerender} = render(<InfoToggle {...props} />);
+
+    expect(queryByText('People outside your team can view files, not upload or edit.')).toBeNull();
+
+    rerender(
+      <InfoToggle {...props} adminHintForShareDrive="People outside your team can view files, not upload or edit." />,
+    );
+
+    expect(queryByText('People outside your team can view files, not upload or edit.')).not.toBeNull();
+  });
 });
