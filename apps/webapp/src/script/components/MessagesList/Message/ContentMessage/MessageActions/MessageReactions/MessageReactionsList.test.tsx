@@ -114,12 +114,12 @@ describe('MessageReactionsList', () => {
     const departedUser = new User('departed-user', 'test.wire.link', translateForTest);
     departedUser.name('Former Member');
     const loadUsersByIdsFromDb = jest.fn().mockResolvedValue([departedUser]);
-    const translate: Translate = (identifier, substitutions, dangerousSubstitutions, skipEscape): string => {
+    const translate: Translate = (identifier, substitutions): string => {
       if (identifier === 'conversationLikesCaptionPlural') {
         return `${substitutions?.firstUser}, ${substitutions?.secondUser}`;
       }
 
-      return translateForTest(identifier, substitutions, dangerousSubstitutions, skipEscape);
+      return translateForTest(identifier);
     };
     const reactionsWithDepartedUser: ReactionMap = [['❤️', [departedUser.qualifiedId, user1.qualifiedId]]];
 
@@ -154,17 +154,15 @@ describe('MessageReactionsList', () => {
     secondDepartedUser.name('Second Former Member');
     thirdDepartedUser.name('Third Former Member');
     const loadUsersByIdsFromDb = jest.fn().mockResolvedValue([secondDepartedUser, firstDepartedUser]);
-    const translate: Translate = function translateReactionCaption(
+    const translate: Translate = (
       identifier,
       substitutions,
-      dangerousSubstitutions,
-      skipEscape,
-    ): string {
+    ): string => {
       if (identifier === 'conversationLikesCaptionPluralMoreThan2') {
-        return substitutions?.userNames ?? '';
+        return String(substitutions?.userNames ?? '');
       }
 
-      return translateForTest(identifier, substitutions, dangerousSubstitutions, skipEscape);
+      return translateForTest(identifier);
     };
     const reactionsWithThreeDepartedUsers: ReactionMap = [
       ['❤️', [secondDepartedUser.qualifiedId, firstDepartedUser.qualifiedId, thirdDepartedUser.qualifiedId]],
@@ -228,17 +226,15 @@ describe('MessageReactionsList', () => {
       .fn()
       .mockRejectedValueOnce(new Error('IndexedDB unavailable'))
       .mockResolvedValueOnce([departedUser]);
-    const translate: Translate = function translateReactionCaption(
+    const translate: Translate = (
       identifier,
       substitutions,
-      dangerousSubstitutions,
-      skipEscape,
-    ): string {
+    ): string => {
       if (identifier === 'conversationLikesCaptionSingular') {
-        return substitutions?.userName ?? '';
+        return String(substitutions?.userName ?? '');
       }
 
-      return translateForTest(identifier, substitutions, dangerousSubstitutions, skipEscape);
+      return translateForTest(identifier);
     };
     const reactionsWithDepartedUser: ReactionMap = [['❤️', [departedUser.qualifiedId]]];
     const {getByTitle} = render(
