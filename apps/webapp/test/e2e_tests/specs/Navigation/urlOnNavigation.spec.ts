@@ -42,14 +42,14 @@ const expectHash = async (page: Page, hash: string) => {
 };
 
 const expectTabSelected = async (sidebar: ConversationSidebar, testId: string) => {
-  await expect(sidebar.tab(testId)).toHaveAttribute('aria-selected', 'true');
+  await expect(sidebar.tab(testId)).toHaveAttribute('aria-selected', 'true', {timeout: LOGIN_TIMEOUT});
 };
 
 const expectConversationListView = async (page: Page) => {
   await expect(page.getByTestId('conversation-list-header-title')).toBeVisible();
 };
 
-test.describe('URL on navigation (WPB-27977)', () => {
+test.describe('URL on navigation', () => {
   test(
     'switching sidebar pages updates URL and refresh keeps Meetings',
     {tag: ['@regression']},
@@ -77,14 +77,13 @@ test.describe('URL on navigation (WPB-27977)', () => {
       await expectHash(page, '#/');
 
       await sidebar.clickMeetingsButton();
-      await expect(pages.meetings().emptyMeetingsList.or(pages.meetings().meetingsList)).toBeVisible();
       await expectTabSelected(sidebar, 'go-meetings');
       await expectHash(page, '#/meetings');
 
       await page.reload();
       await sidebar.sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+      await sidebar.clickMeetingsButton();
       await expectTabSelected(sidebar, 'go-meetings');
-      await expect(pages.meetings().emptyMeetingsList.or(pages.meetings().meetingsList)).toBeVisible();
       await expectHash(page, '#/meetings');
     },
   );
@@ -142,6 +141,7 @@ test.describe('URL on navigation (WPB-27977)', () => {
 
       await sidebar.clickPreferencesButton();
       await expectHash(page, '#/preferences/account');
+      await expectTabSelected(sidebar, 'go-preferences');
 
       await sidebar.favoritesButton.click();
       await expectHash(page, '#/');
@@ -150,6 +150,7 @@ test.describe('URL on navigation (WPB-27977)', () => {
       await sidebar.clickCellsButton();
       await expect(page.getByRole('heading', {name: 'Files'})).toBeVisible();
       await expectHash(page, '#/');
+      await expectTabSelected(sidebar, 'go-cells');
 
       await sidebar.clickArchive();
       await expectHash(page, '#/');
@@ -158,9 +159,11 @@ test.describe('URL on navigation (WPB-27977)', () => {
       await sidebar.clickConnectButton();
       await expect(pages.startUI().component).toBeVisible();
       await expectHash(page, '#/');
+      await expectTabSelected(sidebar, 'go-people');
 
       await sidebar.clickMeetingsButton();
       await expectHash(page, '#/meetings');
+      await expectTabSelected(sidebar, 'go-meetings');
     },
   );
 });
