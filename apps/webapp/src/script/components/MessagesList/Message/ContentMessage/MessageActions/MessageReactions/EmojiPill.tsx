@@ -26,7 +26,6 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
 import {isTabKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
@@ -82,7 +81,6 @@ export const EmojiPill = ({
   reactorIds,
   loadUsersByIdsFromDb,
 }: EmojiPillProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
   const [storedReactingUsers, setStoredReactingUsers] = useState<User[]>([]);
   const isLoadingStoredUsers = useRef(false);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -101,18 +99,17 @@ export const EmojiPill = ({
     return user?.name() || translate('deletedUser');
   });
 
-  const loadMissingReactingUsers = () => {
+  async function loadMissingReactingUsers(): Promise<void> {
     if (missingReactorIds.length === 0 || isLoadingStoredUsers.current) {
       return;
     }
 
     isLoadingStoredUsers.current = true;
-    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+    try {
       const loadResult = await task.tryOrElse(
         () => 'failedToLoadReactionUsers' as const,
         () => loadUsersByIdsFromDb(missingReactorIds),
       );
-      isLoadingStoredUsers.current = false;
 
       if (loadResult.isErr) {
         return;
@@ -124,8 +121,10 @@ export const EmojiPill = ({
         );
         return [...currentUsers, ...newUsers];
       });
-    });
-  };
+    } finally {
+      isLoadingStoredUsers.current = false;
+    }
+  }
 
   const conversationReactionCaption = () => {
     if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
@@ -212,8 +211,12 @@ export const EmojiPill = ({
           tabIndex={messageFocusedTabIndex}
           className="button-reset-default"
           data-uie-name="emoji-pill"
-          onMouseEnter={loadMissingReactingUsers}
-          onFocus={loadMissingReactingUsers}
+          onMouseEnter={() => {
+            void loadMissingReactingUsers();
+          }}
+          onFocus={() => {
+            void loadMissingReactingUsers();
+          }}
           onClick={() => {
             handleReactionClick(emoji);
           }}

@@ -21,12 +21,7 @@ import {act, fireEvent, render, waitFor, within} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {ReactionMap} from 'Repositories/storage';
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {
-  createExecutingFireAndForgetInvokerForTest,
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -58,20 +53,14 @@ const defaultProps: MessageReactionsListProps = {
   users: [user1, user2, user3],
   loadUsersByIdsFromDb: jest.fn().mockResolvedValue([]),
 };
-const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest}),
-);
-
 describe('MessageReactionsList', () => {
   afterEach(() => {
+    jest.useRealTimers();
     jest.clearAllMocks();
   });
 
   test('renders a button for each reaction and user count', () => {
-    const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />), {
-      wrapper: rootProviderWrapper,
-    });
+    const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
 
     const winkButton = getAllByTitle('wink');
     const smileyFace1 = getAllByTitle('innocent');
@@ -104,7 +93,6 @@ describe('MessageReactionsList', () => {
 
     const {getByTitle} = render(
       withTheme(<MessageReactionsList {...defaultProps} reactions={reactionsWithDepartedUser} />),
-      {wrapper: rootProviderWrapper},
     );
 
     expect(within(getByTitle('heart')).getByText('4')).toBeDefined();
@@ -124,7 +112,7 @@ describe('MessageReactionsList', () => {
     const reactionsWithDepartedUser: ReactionMap = [['❤️', [departedUser.qualifiedId, user1.qualifiedId]]];
 
     const {getByTitle} = render(
-      withThemeAndRootContext(
+      withTheme(
         <div id="wire-app">
           <MessageReactionsList
             {...defaultProps}
@@ -134,15 +122,13 @@ describe('MessageReactionsList', () => {
             loadUsersByIdsFromDb={loadUsersByIdsFromDb}
           />
         </div>,
-        rootProviderWrapper,
       ),
     );
 
     expect(loadUsersByIdsFromDb).not.toHaveBeenCalled();
     fireEvent.focus(getByTitle('heart'));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([departedUser.qualifiedId]);
+    await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([departedUser.qualifiedId]));
     await waitFor(() => expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member'));
   });
 
@@ -154,10 +140,7 @@ describe('MessageReactionsList', () => {
     secondDepartedUser.name('Second Former Member');
     thirdDepartedUser.name('Third Former Member');
     const loadUsersByIdsFromDb = jest.fn().mockResolvedValue([secondDepartedUser, firstDepartedUser]);
-    const translate: Translate = (
-      identifier,
-      substitutions,
-    ): string => {
+    const translate: Translate = (identifier, substitutions): string => {
       if (identifier === 'conversationLikesCaptionPluralMoreThan2') {
         return String(substitutions?.userNames ?? '');
       }
@@ -169,7 +152,7 @@ describe('MessageReactionsList', () => {
     ];
 
     const {getByTitle} = render(
-      withThemeAndRootContext(
+      withTheme(
         <div id="wire-app">
           <MessageReactionsList
             {...defaultProps}
@@ -179,14 +162,17 @@ describe('MessageReactionsList', () => {
             loadUsersByIdsFromDb={loadUsersByIdsFromDb}
           />
         </div>,
-        rootProviderWrapper,
       ),
     );
 
     fireEvent.mouseEnter(getByTitle('heart'));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([secondDepartedUser.qualifiedId, firstDepartedUser.qualifiedId]);
+    await waitFor(() =>
+      expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([
+        secondDepartedUser.qualifiedId,
+        firstDepartedUser.qualifiedId,
+      ]),
+    );
     await waitFor(() => {
       expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Second Former Member, First Former Member');
     });
@@ -198,7 +184,7 @@ describe('MessageReactionsList', () => {
     const loadUsersByIdsFromDb = jest.fn().mockResolvedValue([departedUser]);
     const reactionsWithDepartedUser: ReactionMap = [['❤️', [departedUser.qualifiedId]]];
     const {getByTitle} = render(
-      withThemeAndRootContext(
+      withTheme(
         <div id="wire-app">
           <MessageReactionsList
             {...defaultProps}
@@ -207,16 +193,13 @@ describe('MessageReactionsList', () => {
             loadUsersByIdsFromDb={loadUsersByIdsFromDb}
           />
         </div>,
-        rootProviderWrapper,
       ),
     );
 
     fireEvent.focus(getByTitle('heart'));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
     fireEvent.mouseEnter(getByTitle('heart'));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(1));
   });
 
   test('allows a later tooltip interaction to retry a failed local lookup', async () => {
@@ -226,10 +209,7 @@ describe('MessageReactionsList', () => {
       .fn()
       .mockRejectedValueOnce(new Error('IndexedDB unavailable'))
       .mockResolvedValueOnce([departedUser]);
-    const translate: Translate = (
-      identifier,
-      substitutions,
-    ): string => {
+    const translate: Translate = (identifier, substitutions): string => {
       if (identifier === 'conversationLikesCaptionSingular') {
         return String(substitutions?.userName ?? '');
       }
@@ -238,7 +218,7 @@ describe('MessageReactionsList', () => {
     };
     const reactionsWithDepartedUser: ReactionMap = [['❤️', [departedUser.qualifiedId]]];
     const {getByTitle} = render(
-      withThemeAndRootContext(
+      withTheme(
         <div id="wire-app">
           <MessageReactionsList
             {...defaultProps}
@@ -248,23 +228,23 @@ describe('MessageReactionsList', () => {
             loadUsersByIdsFromDb={loadUsersByIdsFromDb}
           />
         </div>,
-        rootProviderWrapper,
       ),
     );
 
     fireEvent.focus(getByTitle('heart'));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    jest.useFakeTimers();
+    await act(async () => {
+      await jest.runAllTimersAsync();
+    });
+    jest.useRealTimers();
     fireEvent.mouseEnter(getByTitle('heart'));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member'));
   });
 
   test('handles click on reaction button', () => {
-    const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />), {
-      wrapper: rootProviderWrapper,
-    });
+    const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
 
     fireEvent.click(getByTitle('+1'));
     const {handleReactionClick} = defaultProps;
