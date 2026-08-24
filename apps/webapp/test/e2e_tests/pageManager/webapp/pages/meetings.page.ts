@@ -19,8 +19,17 @@
 import {expect, type Locator, type Page} from '@playwright/test';
 
 import {ConfirmModal} from '../modals/confirm.modal';
+import {
+  createEndedMeetingWindow,
+  createOngoingMeetingWindow,
+  formatMeetingDateIso,
+  formatMeetingTimeLabel,
+} from 'test/e2e_tests/utils/meetingTime.util';
 
 const MEETINGS_LIST_TIMEOUT_MS = 30_000;
+
+type ScheduleMeetingRecurrenceLabel = 'Daily' | 'Never';
+type ScheduleMeetingModalMode = 'create' | 'edit';
 
 export class MeetingsPage {
   private readonly page: Page;
@@ -48,6 +57,10 @@ export class MeetingsPage {
   }
 
   async openMeetingsTab() {
+    if ((await this.meetingsTab.getAttribute('aria-selected')) === 'true') {
+      return;
+    }
+
     await this.meetingsTab.click();
   }
 
@@ -90,7 +103,7 @@ export class MeetingsPage {
   }
 
   meetingListItem(title: string) {
-    return this.meetingsList.filter({hasText: title});
+    return this.meetingsList.locator(`[data-uie-name="item-meeting"][data-uie-value="${title}"]`);
   }
 
   async waitForMeetingInList(title: string) {
@@ -136,6 +149,16 @@ export class MeetingsPage {
     if (await acknowledgeModal.isVisible()) {
       await acknowledgeModal.getByTestId('do-action').click();
       await expect(acknowledgeModal).toBeHidden();
+    }
+
+    if (await this.scheduleMeetingModal.isVisible()) {
+      await this.scheduleMeetingModal.getByRole('button', {name: 'Close'}).click();
+      await expect(this.scheduleMeetingModal).toBeHidden();
+    }
+
+    const openModal = this.page.locator('.modal.show');
+    if (await openModal.isVisible()) {
+      await this.page.keyboard.press('Escape');
     }
   }
 
@@ -198,10 +221,52 @@ export class MeetingsPage {
     return this.scheduleMeetingModal.getByRole('group', {name: 'Starts'}).getByRole('button', {name: 'Open calendar'});
   }
 
+  scheduleMeetingForm() {
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-form');
+  }
+
+  async scheduleMeetingModalMode(): Promise<ScheduleMeetingModalMode> {
+    const mode = await this.scheduleMeetingForm().getAttribute('data-uie-mode');
+    if (mode === 'create' || mode === 'edit') {
+      return mode;
+    }
+
+    throw new Error(`Unexpected schedule meeting modal mode: ${mode ?? 'missing'}`);
+  }
+
+  startDateInput() {
+    return this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-start-date"] input[type="text"]');
+  }
+
+  endDateInput() {
+    return this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-end-date"] input[type="text"]');
+  }
+
+  recurrenceSelect() {
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-recurrence');
+  }
+
+  async selectRecurrence(label: ScheduleMeetingRecurrenceLabel) {
+    const recurrence = this.recurrenceSelect();
+    await recurrence.scrollIntoViewIfNeeded();
+    await recurrence.click();
+    await this.page.getByRole('option', {name: label}).click();
+  }
+
+  private timePicker(groupName: 'Starts' | 'Ends') {
+    const dataUieName = groupName === 'Starts' ? 'schedule-meeting-start-time' : 'schedule-meeting-end-time';
+    return this.scheduleMeetingModal.locator(`[data-uie-name="${dataUieName}"] [data-uie-name="${dataUieName}"]`);
+  }
+
+  async selectTimeForGroup(groupName: 'Starts' | 'Ends', timeLabel: string) {
+    const timePicker = this.timePicker(groupName);
+    await timePicker.scrollIntoViewIfNeeded();
+    await timePicker.click();
+    await this.page.getByRole('option', {name: timeLabel, exact: true}).click();
+  }
+
   async selectLatestAvailableStartTime() {
-    const startTimeCombobox = this.scheduleMeetingModal.locator(
-      '[data-uie-name="schedule-meeting-start-time"] > [data-uie-name="schedule-meeting-start-time"]',
-    );
+    const startTimeCombobox = this.timePicker('Starts');
     await startTimeCombobox.scrollIntoViewIfNeeded();
     await startTimeCombobox.click();
     const startTimeOptions = this.page.getByRole('option');
@@ -209,20 +274,34 @@ export class MeetingsPage {
     await startTimeOptions.nth(Math.min(1, optionCount - 1)).click();
   }
 
-  async setMeetingStartDateToTomorrow() {
+  async setMeetingStartDate(date: Date) {
     await this.startDateOpenCalendarButton().scrollIntoViewIfNeeded();
     await this.startDateOpenCalendarButton().click();
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowLabel = tomorrow.toLocaleDateString('en-US', {
+    const dateLabel = date.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',
       day: 'numeric',
       year: 'numeric',
     });
 
-    await this.page.getByRole('button', {name: tomorrowLabel}).click();
+    await this.page.getByRole('button', {name: dateLabel}).click();
+  }
+
+  async setMeetingStartDateToTomorrow() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    await this.setMeetingStartDate(tomorrow);
+  }
+
+  async setMeetingTimes(start: Date, end: Date) {
+    const mode = await this.scheduleMeetingModalMode();
+    if (mode === 'create') {
+      await this.setMeetingStartDate(start);
+    }
+
+    await this.selectTimeForGroup('Starts', formatMeetingTimeLabel(start));
+    await this.selectTimeForGroup('Ends', formatMeetingTimeLabel(end));
   }
 
   async fixStartTimeInPastValidationError() {
@@ -239,22 +318,41 @@ export class MeetingsPage {
     }
   }
 
-  async submitScheduleMeetingModal() {
+  startInPastError() {
+    return this.scheduleMeetingModal.getByText('Start time must be in the future');
+  }
+
+  async submitScheduleMeetingModal(options: {expectSuccess?: boolean} = {}) {
+    const {expectSuccess = true} = options;
+    const mode = await this.scheduleMeetingModalMode();
+
     await this.scheduleMeetingModal.getByTestId('schedule-meeting-modal-submit').click();
 
-    const startInPastError = this.scheduleMeetingModal.getByText('Start time must be in the future');
-    if (await startInPastError.isVisible()) {
+    const startInPastError = this.startInPastError();
+    if (expectSuccess && mode === 'create' && (await startInPastError.isVisible())) {
       await this.fixStartTimeInPastValidationError();
       await this.scheduleMeetingModal.getByTestId('schedule-meeting-modal-submit').click();
+    }
+
+    if (!expectSuccess) {
+      return;
     }
 
     await expect(this.scheduleMeetingModal).toBeHidden({timeout: MEETINGS_LIST_TIMEOUT_MS});
     await this.dismissBlockingModals();
   }
 
-  async scheduleMeeting(title: string, participantNames: string[]) {
+  async scheduleMeeting(
+    title: string,
+    participantNames: string[],
+    options: {recurrence?: ScheduleMeetingRecurrenceLabel} = {},
+  ) {
     await this.openScheduleMeetingModal();
     await this.fillMeetingTitle(title);
+
+    if (options.recurrence !== undefined) {
+      await this.selectRecurrence(options.recurrence);
+    }
 
     for (const participantName of participantNames) {
       await this.addParticipant(participantName);
@@ -263,34 +361,78 @@ export class MeetingsPage {
     await this.submitScheduleMeetingModal();
   }
 
+  async openEditMeetingModal(title: string) {
+    const menu = await this.openMeetingContextMenu(title);
+    await menu.getByRole('button', {name: 'Edit meeting'}).click();
+    await expect(this.scheduleMeetingModal).toBeVisible();
+    await expect(this.scheduleMeetingForm()).toHaveAttribute('data-uie-mode', 'edit');
+  }
+
+  async expectEditMeetingActionVisible(title: string, visible: boolean) {
+    const menu = await this.openMeetingContextMenu(title);
+    const editAction = menu.getByRole('button', {name: 'Edit meeting'});
+
+    if (visible) {
+      await expect(editAction).toBeVisible();
+    } else {
+      await expect(editAction).toBeHidden();
+    }
+
+    await this.page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+  }
+
+  async expectEditPrefillDateIsToday() {
+    const today = formatMeetingDateIso(new Date());
+    await expect(this.startDateInput()).toHaveValue(today);
+  }
+
+  async configureOngoingMeetingTimes() {
+    const {start, end} = createOngoingMeetingWindow();
+    await this.setMeetingTimes(start, end);
+  }
+
+  async configureEndedMeetingTimes() {
+    const {start, end} = createEndedMeetingWindow();
+    await this.setMeetingTimes(start, end);
+  }
+
   async openMeetingContextMenu(title: string) {
     await this.openMeetingsTab();
     await this.dismissBlockingModals();
-    const meetingItem = this.meetingListItem(title);
+    const meetingItem = this.meetingListItem(title).first();
     await meetingItem.getByRole('button').last().click();
     return this.page.getByRole('menu');
   }
 
   async editMeeting(
     title: string,
-    updates: {newTitle?: string; updateStartTime?: boolean; addParticipants?: string[]; removeParticipants?: string[]},
+    updates: {
+      newTitle?: string;
+      updateStartTime?: boolean;
+      setOngoingTimes?: boolean;
+      setEndedTimes?: boolean;
+      addParticipants?: string[];
+      removeParticipants?: string[];
+    },
   ) {
-    const menu = await this.openMeetingContextMenu(title);
-    await menu.getByRole('button', {name: 'Edit meeting'}).click();
-    await expect(this.scheduleMeetingModal).toBeVisible();
-    await expect(this.scheduleMeetingModal.getByTestId('schedule-meeting-form')).toHaveAttribute(
-      'data-uie-mode',
-      'edit',
-    );
+    await this.openEditMeetingModal(title);
     await expect(this.meetingTitleInput()).toHaveValue(title);
 
     if (updates.newTitle !== undefined) {
       await this.fillMeetingTitle(updates.newTitle);
     }
 
+    if (updates.setOngoingTimes) {
+      await this.configureOngoingMeetingTimes();
+    }
+
+    if (updates.setEndedTimes) {
+      await this.configureEndedMeetingTimes();
+    }
+
     if (updates.updateStartTime) {
       await this.selectLatestAvailableStartTime();
-      await this.fixStartTimeInPastValidationError();
     }
 
     for (const participantName of updates.addParticipants ?? []) {
