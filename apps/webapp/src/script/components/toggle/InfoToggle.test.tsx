@@ -19,6 +19,8 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+
 import {InfoToggle} from './InfoToggle';
 
 describe('InfoToggle', () => {
@@ -56,12 +58,14 @@ describe('InfoToggle', () => {
       setIsChecked: jest.fn(),
     };
 
-    const {queryByText, rerender} = render(<InfoToggle {...props} />);
+    const {queryByText, rerender} = render(withTheme(<InfoToggle {...props} />));
 
     expect(queryByText('People outside your team can view files, not upload or edit.')).toBeNull();
 
     rerender(
-      <InfoToggle {...props} adminHintForShareDrive="People outside your team can view files, not upload or edit." />,
+      withTheme(
+        <InfoToggle {...props} adminHintForShareDrive="People outside your team can view files, not upload or edit." />,
+      ),
     );
 
     expect(queryByText('People outside your team can view files, not upload or edit.')).not.toBeNull();
