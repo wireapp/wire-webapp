@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Nye gæster vil ikke kunne tilslutte med dette link. Aktuelle gæster vil stadig have adgang.",
   "modalConversationTooManyMembersHeadline": "Fuldt hus",
   "modalConversationTooManyMembersMessage": "Op til {number1} personer kan deltage i en samtale. I øjeblikket er der kun plads til {number2} mere.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Create",
   "modalCreateFolderHeadline": "Create new folder",
   "modalCreateFolderMessage": "Move your conversation to a new folder.",

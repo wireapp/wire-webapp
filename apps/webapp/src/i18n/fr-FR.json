@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Les contacts externes ne pourront plus rejoindre la conversation avec ce lien. Les contacts externes ayant déjà rejoint la conversation conserveront leurs accès.",
   "modalConversationTooManyMembersHeadline": "Ce groupe est complet",
   "modalConversationTooManyMembersMessage": "Jusqu’à {number1} contacts peuvent participer à une conversation. Nombre de places disponibles actuellement: {number2}.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Créer",
   "modalCreateFolderHeadline": "Créer un nouveau dossier",
   "modalCreateFolderMessage": "Déplacer la conversation vers un nouveau dossier.",

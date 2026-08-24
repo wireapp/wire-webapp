@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Novi gosti neće imati mogućnost pridruživanja s ovom poveznicom. Trenutačni gosti će još uvijek imati pristup.",
   "modalConversationTooManyMembersHeadline": "Grupa je puna",
   "modalConversationTooManyMembersMessage": "Do {number1} ljudi može se pridružiti razgovoru. Trenutno u sobi ima mjesta za još {number2}.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Create",
   "modalCreateFolderHeadline": "Create new folder",
   "modalCreateFolderMessage": "Move your conversation to a new folder.",

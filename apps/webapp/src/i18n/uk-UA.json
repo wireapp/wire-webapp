@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Нові гості не зможуть приєднатися з цим лінком. Поточні гості все ще матимуть доступ.",
   "modalConversationTooManyMembersHeadline": "Розмова переповнена",
   "modalConversationTooManyMembersMessage": "До розмови може приєднатися до {number1} учаснків. В даний час є місце тільки для {number2} учасників.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Створити",
   "modalCreateFolderHeadline": "Створити нову теку",
   "modalCreateFolderMessage": "Перенести розмову до нової теки.",

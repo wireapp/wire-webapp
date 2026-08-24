@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Нови гости се неће моћи придружити овом линку. Садашњи гости и даље ће имати приступ.",
   "modalConversationTooManyMembersHeadline": "Све попуњено",
   "modalConversationTooManyMembersMessage": "Све до {number1} људи се могу придружити разговору. Тренутно постоји само простор за{number2} више.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Креирај",
   "modalCreateFolderHeadline": "Креирајте нову фасциклу",
   "modalCreateFolderMessage": "Преместите разговор у нову фасциклу.",

@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "නව අමුත්තන්ට මෙම සබැඳිය සමඟ එක්වීමට නොහැකි වනු ඇත. වත්මන් අමුත්තන්ට තවමත් ප්‍රවේශය ඇත.",
   "modalConversationTooManyMembersHeadline": "සමූහය පිරී ඇත",
   "modalConversationTooManyMembersMessage": "{number1} දෙනෙක්ට සංවාදයකට එක් වීමට හැකිය. දැනට ඉඩ තිබෙන්නේ තවත් {number2} දෙනෙකුට පමණි.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "සාදන්න",
   "modalCreateFolderHeadline": "නව බහාලුමක් සාදන්න",
   "modalCreateFolderMessage": "ඔබගේ සංවාදය නව බහාලුමකට ගෙන යන්න.",
