@@ -18,10 +18,7 @@
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {expect, test} from 'test/e2e_tests/test.fixtures';
-import {
-  createOngoingMeetingWindow,
-  meetingWindowWithinPastEditPeriod,
-} from 'test/e2e_tests/utils/meetingTime.util';
+import {createOngoingMeetingWindow, meetingWindowWithinPastEditPeriod} from 'test/e2e_tests/utils/meetingTime.util';
 import {createMeetingsTeam, loginMeetingsUsers} from 'test/e2e_tests/utils/meetings.util';
 
 const MEETING_TITLE = 'Team sync';
