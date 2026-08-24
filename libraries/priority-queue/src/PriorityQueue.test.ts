@@ -17,7 +17,7 @@
  *
  */
 
-import {PriorityQueue} from '@wireapp/priority-queue';
+import {PriorityQueue, Priority} from '@wireapp/priority-queue';
 
 beforeAll(() => {
   jest.useRealTimers();
@@ -98,10 +98,10 @@ describe('PriorityQueue', () => {
 
       queue = new PriorityQueue();
 
-      void queue.add(() => promise, 1, 'get request');
-      void queue.add(() => promise, 1, 'put request');
-      void queue.add(() => promise, 5, 'access token refresh');
-      void queue.add(() => promise, 1, 'another get request');
+      void queue.add(() => promise, Priority.LOW, 'get request');
+      void queue.add(() => promise, Priority.LOW, 'put request');
+      void queue.add(() => promise, Priority.MEDIUM, 'access token refresh');
+      void queue.add(() => promise, Priority.LOW, 'another get request');
 
       const promisesByPriority = queue.all;
       expect(promisesByPriority[0].label).toBe('access token refresh');
@@ -137,10 +137,10 @@ describe('PriorityQueue', () => {
       const promise = new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
 
       queue = new PriorityQueue();
-      void queue.add(() => promise, 1);
-      void queue.add(() => promise, 1);
-      void queue.add(() => promise, 1, 'delete-me');
-      void queue.add(() => promise, 1);
+      void queue.add(() => promise, Priority.LOW);
+      void queue.add(() => promise, Priority.LOW);
+      void queue.add(() => promise, Priority.LOW, 'delete-me');
+      void queue.add(() => promise, Priority.LOW);
 
       // When adding four items, three are in the queue and one is in progress.
       expect(queue.all.length).toBe(3);

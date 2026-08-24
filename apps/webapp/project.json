@@ -116,7 +116,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
       "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.build.json --noEmit"
+        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
       }
     },
     "check-circular": {

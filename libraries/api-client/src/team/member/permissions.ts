@@ -34,7 +34,7 @@ export enum Permissions {
   SET_MEMBER_PERMISSIONS = 1 << 12,
 }
 
-export const hasPermissions = (permissions: Permissions, expectedPermissions: Permissions): boolean => {
+export const hasPermissions = (permissions: number, expectedPermissions: Permissions): boolean => {
   const validPermissions = Number.isSafeInteger(permissions) && permissions > 0;
   return validPermissions && (permissions & expectedPermissions) === expectedPermissions;
 };

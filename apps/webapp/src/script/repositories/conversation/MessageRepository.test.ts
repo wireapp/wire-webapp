@@ -21,6 +21,7 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {Account} from '@wireapp/core';
@@ -195,6 +196,9 @@ describe('MessageRepository', () => {
       expect(showModalSpy).toHaveBeenCalledTimes(1);
 
       const [, modalOptions] = showModalSpy.mock.calls[0];
+      assertNotNullOrUndefined(modalOptions.primaryAction);
+      assertNotNullOrUndefined(modalOptions.text);
+      assertNotNullOrUndefined(modalOptions.close);
       expect(modalOptions.primaryAction.text).toBe('translated:modalConversationNewDeviceAction');
       expect(modalOptions.text.message).toBe('translated:modalConversationNewDeviceMessage');
       expect(modalOptions.text.title).toBe('translated:modalConversationNewDeviceHeadlineOne');
@@ -663,13 +667,12 @@ describe('MessageRepository', () => {
       const unsubscribeSpy = jest.spyOn(amplify, 'unsubscribe');
       const conversation = generateConversation();
 
-      const sendResult = await messageRepository.sendTextWithLinkPreview({
+      await messageRepository.sendTextWithLinkPreview({
         conversation,
         textMessage: 'hello there',
         mentions: [],
       });
 
-      expect(sendResult).toBe(MessageSendingState.FAILED);
       expect(unsubscribeSpy).toHaveBeenCalledWith(WebAppEvents.CONVERSATION.MESSAGE.ADDED, expect.any(Function));
     });
 

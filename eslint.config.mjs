@@ -296,10 +296,7 @@ const jestMockRestrictionRule = [
   },
 ];
 
-const jestRecommendedProductionConfig = {
-  ...jestPlugin.configs['flat/recommended'],
-  plugins: {},
-};
+const jestRecommendedProductionConfig = jestPlugin.configs['flat/recommended'];
 
 const productionConfigs = [
   jestRecommendedProductionConfig,

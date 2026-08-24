@@ -42,7 +42,7 @@ describe('ConversationFilter', () => {
     });
 
     it('does not show call controls for an outgoing connection request', () => {
-      const conversationData: ConversationDatabaseData = {
+      const conversationData = {
         access: undefined,
         accessRoleV2: undefined,
         access_role: undefined,
@@ -77,7 +77,7 @@ describe('ConversationFilter', () => {
         type: 3,
         verification_state: ConversationVerificationState.UNVERIFIED,
         mlsVerificationState: ConversationVerificationState.UNVERIFIED,
-      };
+      } as unknown as ConversationDatabaseData;
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
       expect(conversationEntity.is1to1()).toBeFalsy();
       expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
@@ -93,7 +93,7 @@ describe('ConversationFilter', () => {
     });
 
     it('shows call controls for an accepted connection request', () => {
-      const conversationData: ConversationDatabaseData = {
+      const conversationData = {
         access: [CONVERSATION_ACCESS.PRIVATE],
         accessRoleV2: undefined,
         access_role: CONVERSATION_LEGACY_ACCESS_ROLE.PRIVATE,
@@ -132,7 +132,7 @@ describe('ConversationFilter', () => {
         type: 2,
         verification_state: ConversationVerificationState.UNVERIFIED,
         mlsVerificationState: ConversationVerificationState.UNVERIFIED,
-      };
+      } as unknown as ConversationDatabaseData;
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
       expect(conversationEntity.is1to1()).toBeTruthy();
       expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();

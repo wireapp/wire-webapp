@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {assertNotNull} from '@sindresorhus/is';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor} from 'lexical';
 
 import {
@@ -119,7 +119,7 @@ function readSelectionInfo(editor: LexicalEditor): ReturnType<typeof getSelectio
 function readSelectionSiblingTextContents(editor: LexicalEditor): SelectionSiblingTextContents {
   return editor.getEditorState().read(() => {
     const selectionInfo = getSelectionInfo(['@']);
-    assertNotNull(selectionInfo);
+    assertNotNullOrUndefined(selectionInfo);
 
     return {
       previousText: selectionInfo.prevNode?.getTextContent(),
@@ -155,7 +155,7 @@ describe('getSelectionInfo', () => {
     });
 
     const actualSelectionInfo = readSelectionInfo(harness.editor);
-    assertNotNull(actualSelectionInfo);
+    assertNotNullOrUndefined(actualSelectionInfo);
 
     expect(actualSelectionInfo.textContent).toBe(testCase.text);
     expect(actualSelectionInfo.offset).toBe(testCase.cursorOffset);
@@ -202,7 +202,7 @@ describe('getSelectionInfo', () => {
     );
 
     const actualSelectionInfo = readSelectionInfo(harness.editor);
-    assertNotNull(actualSelectionInfo);
+    assertNotNullOrUndefined(actualSelectionInfo);
 
     expect(actualSelectionInfo.textContent).toBe('Alice');
     expect(actualSelectionInfo.offset).toBe(0);

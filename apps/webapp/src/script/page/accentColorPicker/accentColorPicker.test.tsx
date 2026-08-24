@@ -61,10 +61,13 @@ describe('AccentColorPicker', () => {
     };
     const {container} = render(<AccentColorPicker {...props} />, {wrapper: rootProviderWrapper});
 
-    const input: HTMLInputElement = container.querySelector(
+    const input = container.querySelector<HTMLInputElement>(
       `[data-uie-name="do-set-accent-color"][data-uie-value="${selectedAccentColorId}"]`,
     );
-    expect(input).not.toBe(null);
+    if (input === null) {
+      throw new Error('Expected an accent color input');
+    }
+
     expect(input.checked).toBe(true);
   });
 
@@ -102,10 +105,13 @@ describe('AccentColorPicker', () => {
       act(() => {
         props.user.accent_id(accentColor.id);
       });
-      const input: HTMLInputElement = container.querySelector(
+      const input = container.querySelector<HTMLInputElement>(
         `[data-uie-name="do-set-accent-color"][data-uie-value="${accentColor.id}"]`,
       );
-      expect(input).not.toBe(null);
+      if (input === null) {
+        throw new Error('Expected an accent color input');
+      }
+
       expect(input.checked).toBe(true);
     });
   });

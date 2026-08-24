@@ -24,6 +24,7 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CELLS_SELF_USER_DRIVE_ROLE} from '../common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 
 import {useConversationSearchFiles} from './useConversationSearchFiles';
 
@@ -55,6 +56,7 @@ const staleFolderNode: CellNode = {
   tags: [],
   presignedUrlExpiresAt: null,
   user: null,
+  selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
 };
 
 function createRestNode(name: string, uuid = name): RestNode {

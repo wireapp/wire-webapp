@@ -27,6 +27,7 @@ const createApiMeeting = (
   overrides: {
     start_time?: string;
     end_time?: string;
+    title?: string;
     recurrence?: {frequency: MeetingRecurrenceFrequency; until?: string};
   } = {},
 ) => ({

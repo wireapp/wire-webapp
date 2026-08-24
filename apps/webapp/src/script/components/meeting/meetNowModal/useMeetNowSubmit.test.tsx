@@ -112,6 +112,10 @@ const createMeetingStore = ({
     meetNowMeeting,
     updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+    removeMeetingByQualifiedId: jest.fn(),
+    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
   }));
 
 const createWrapper =

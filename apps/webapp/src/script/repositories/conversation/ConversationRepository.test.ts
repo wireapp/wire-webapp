@@ -19,6 +19,7 @@
 
 import {faker} from '@faker-js/faker';
 import {waitFor} from '@testing-library/react';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
@@ -33,6 +34,7 @@ import {
   GROUP_CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import type {ValidatedMeetingConversation} from '@wireapp/api-client/lib/conversation/conversationSchema';
 import {
   ConversationProtocolUpdateEvent,
   ConversationCreateEvent,
@@ -352,10 +354,13 @@ describe('ConversationRepository', () => {
       const backendConversation = generateAPIConversation({
         id: qualifiedId,
         name: 'Updated meeting title',
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
       });
 
-      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+      const result = await conversationRepository.saveMeetingConversationFromBackend(
+        backendConversation as unknown as ValidatedMeetingConversation,
+      );
 
       expect(result.isOk).toBe(true);
       const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
@@ -379,10 +384,13 @@ describe('ConversationRepository', () => {
       const backendConversation = generateAPIConversation({
         id: qualifiedId,
         name: 'Updated meeting title',
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
       });
 
-      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+      const result = await conversationRepository.saveMeetingConversationFromBackend(
+        backendConversation as unknown as ValidatedMeetingConversation,
+      );
 
       expect(result.isOk).toBe(true);
       const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
@@ -415,10 +423,13 @@ describe('ConversationRepository', () => {
       const backendConversation = generateAPIConversation({
         id: qualifiedId,
         name: 'Updated meeting title',
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
       });
 
-      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+      const result = await conversationRepository.saveMeetingConversationFromBackend(
+        backendConversation as unknown as ValidatedMeetingConversation,
+      );
 
       expect(result.isOk).toBe(true);
       const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
@@ -451,12 +462,15 @@ describe('ConversationRepository', () => {
 
       const backendConversation = generateAPIConversation({
         id: qualifiedId,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
       });
       delete backendConversation.name;
       delete backendConversation.add_permission;
 
-      const result = await conversationRepository.saveMeetingConversationFromBackend(backendConversation);
+      const result = await conversationRepository.saveMeetingConversationFromBackend(
+        backendConversation as unknown as ValidatedMeetingConversation,
+      );
 
       expect(result.isOk).toBe(true);
       const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
@@ -703,12 +717,28 @@ describe('ConversationRepository', () => {
   });
 
   describe('resolve1To1Conversation', () => {
+    let selfSupportedProtocolsSpy: jest.SpyInstance | undefined;
+
     beforeEach(() => {
       testFactory.conversation_repository['conversationState'].conversations([]);
       testFactory.conversation_repository['userState'].users([]);
       testFactory.conversation_repository['initiatingMlsConversationQualifiedIds'] = [];
 
       jest.clearAllMocks();
+
+      const conversationRepository = testFactory.conversation_repository;
+      const selfRepository = testFactory.self_repository;
+      assertNotNullOrUndefined(conversationRepository);
+      assertNotNullOrUndefined(selfRepository);
+
+      selfSupportedProtocolsSpy = jest
+        .spyOn(selfRepository, 'getSelfSupportedProtocols')
+        .mockImplementation(async () => conversationRepository['userState'].self()?.supportedProtocols() ?? []);
+    });
+
+    afterEach(() => {
+      selfSupportedProtocolsSpy?.mockRestore();
+      selfSupportedProtocolsSpy = undefined;
     });
 
     beforeAll(() => {
@@ -759,6 +789,7 @@ describe('ConversationRepository', () => {
 
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members?.others[0].id;
+      assertNotNullOrUndefined(teamMemberId);
       const userEntity = new User(teamMemberId, 'test-domain', translateForTest);
 
       const selfUser = generateUser();
@@ -1551,7 +1582,7 @@ describe('ConversationRepository', () => {
       group_b.name('René, Benny, Gregor, Lipis');
 
       const group_c = _generateConversation();
-      self_user_et = new User('id', null, translateForTest);
+      self_user_et = new User('id', null as unknown as string, translateForTest);
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
@@ -1612,7 +1643,7 @@ describe('ConversationRepository', () => {
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', async () => {
       spyOn(testFactory.user_repository, 'getUserById').and.returnValue(
-        Promise.resolve(new User('id', null, translateForTest)),
+        Promise.resolve(new User('id', null as unknown as string, translateForTest)),
       );
       const selfUser = generateUser();
       spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
@@ -1641,7 +1672,7 @@ describe('ConversationRepository', () => {
        *  - With Dexie 3.x, specifying a key when saving a record with an auto-inc. inbound key just fails silently
        */
       await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, messageWithoutTime);
-      await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, messageWithTime);
+      await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined as unknown as string, messageWithTime);
       const loadedEvents = await testFactory.conversation_repository.getPrecedingMessages(conversation);
 
       expect(loadedEvents.length).toBe(1);
@@ -1693,6 +1724,7 @@ describe('ConversationRepository', () => {
 
   describe('mapConnection', () => {
     let connectionEntity: ConnectionEntity;
+    let conversationService: ConversationService;
 
     beforeEach(() => {
       connectionEntity = new ConnectionEntity();
@@ -1717,14 +1749,13 @@ describe('ConversationRepository', () => {
         },
         name: null,
         type: 2,
-      } as ConversationDatabaseData;
+      } as unknown as ConversationDatabaseData;
 
       spyOn(testFactory.conversation_repository as any, 'fetchConversationById').and.callThrough();
       spyOn(testFactory.user_repository, 'getUserSupportedProtocols').and.returnValue([CONVERSATION_PROTOCOL.PROTEUS]);
       spyOn(testFactory.self_repository, 'getSelfSupportedProtocols').and.returnValue([CONVERSATION_PROTOCOL.PROTEUS]);
-      spyOn(testFactory.conversation_service, 'getConversationById').and.returnValue(
-        Promise.resolve(conversation_payload),
-      );
+      conversationService = testFactory.conversation_repository!['conversationService'];
+      spyOn(conversationService, 'getConversationById').and.returnValue(Promise.resolve(conversation_payload));
       spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
     });
 
@@ -1740,7 +1771,7 @@ describe('ConversationRepository', () => {
       return testFactory.conversation_repository['mapConnection'](connectionEntity).then(
         (_conversation: Conversation) => {
           expect(testFactory.conversation_repository['fetchConversationById']).not.toHaveBeenCalled();
-          expect(testFactory.conversation_service.getConversationById).not.toHaveBeenCalled();
+          expect(conversationService.getConversationById).not.toHaveBeenCalled();
           expect(_conversation.connection()).toBe(connectionEntity);
         },
       );
@@ -1757,8 +1788,9 @@ describe('ConversationRepository', () => {
       conversationRepository['conversationState'].conversations.removeAll();
 
       return conversationRepository['mapConnection'](connectionEntity).then(_conversation => {
+        assertNotNullOrUndefined(_conversation);
         expect(conversationRepository['fetchConversationById']).toHaveBeenCalled();
-        expect(testFactory.conversation_service.getConversationById).toHaveBeenCalled();
+        expect(conversationService.getConversationById).toHaveBeenCalled();
         expect(_conversation.connection()).toBe(connectionEntity);
       });
     });
@@ -1774,6 +1806,7 @@ describe('ConversationRepository', () => {
       connectionEntity.status(ConnectionStatus.CANCELLED);
 
       return conversationRepository['mapConnection'](connectionEntity).then(_conversation => {
+        assertNotNullOrUndefined(_conversation);
         expect(_conversation.connection()).toBe(connectionEntity);
         expect(
           _findConversation(_conversation, conversationRepository['conversationState'].conversations),
@@ -1853,6 +1886,9 @@ describe('ConversationRepository', () => {
         const coreConversationService = container.resolve(Core).service!.conversation!;
 
         jest.spyOn(coreConversationService, 'isMLSGroupEstablishedLocally').mockResolvedValueOnce(false);
+        const selfSupportedProtocolsSpy = jest
+          .spyOn(testFactory.self_repository!, 'getSelfSupportedProtocols')
+          .mockResolvedValue([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
 
         const establishedMls1to1ConversationResponse = generateAPIConversation({
           id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
@@ -1873,9 +1909,13 @@ describe('ConversationRepository', () => {
           .spyOn(coreConversationService, 'establishMLS1to1Conversation')
           .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
 
-        await conversationRepository['handleConversationEvent'](welcomeEvent);
+        try {
+          await conversationRepository['handleConversationEvent'](welcomeEvent);
 
-        expect(coreConversationService.establishMLS1to1Conversation).toHaveBeenCalled();
+          expect(coreConversationService.establishMLS1to1Conversation).toHaveBeenCalled();
+        } finally {
+          selfSupportedProtocolsSpy.mockRestore();
+        }
       });
     });
 
@@ -1956,7 +1996,7 @@ describe('ConversationRepository', () => {
             name: null,
             team: null,
             type: 2,
-          } as ConversationDatabaseData;
+          } as unknown as ConversationDatabaseData;
           xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(conversation));
         });
       });
@@ -2035,17 +2075,17 @@ describe('ConversationRepository', () => {
             return testFactory.conversation_repository['handleConversationEvent'](upload_start as any);
           })
           .then(() => {
-            const number_of_messages = Object.keys(
-              testFactory.conversation_repository['conversationState'].activeConversation().messages(),
-            ).length;
+            const activeConversation = testFactory.conversation_repository['conversationState'].activeConversation();
+            assertNotNullOrUndefined(activeConversation);
+            const number_of_messages = Object.keys(activeConversation.messages()).length;
 
             expect(number_of_messages).toBe(1);
             return testFactory.conversation_repository['handleConversationEvent'](upload_failed as any);
           })
           .then(() => {
-            const number_of_messages = Object.keys(
-              testFactory.conversation_repository['conversationState'].activeConversation().messages(),
-            ).length;
+            const activeConversation = testFactory.conversation_repository['conversationState'].activeConversation();
+            assertNotNullOrUndefined(activeConversation);
+            const number_of_messages = Object.keys(activeConversation.messages()).length;
 
             expect(number_of_messages).toBe(1);
           });
@@ -2115,7 +2155,7 @@ describe('ConversationRepository', () => {
           from: '',
           time: '',
           type: CONVERSATION_EVENT.CREATE,
-        };
+        } as unknown as ConversationCreateEvent;
       });
 
       it('should process create event for a new conversation created locally', () => {
@@ -2154,7 +2194,7 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(testFactory.conversation_repository as any, 'saveConversation').and.returnValue(false);
 
-        const createMeetingEvent: ConversationCreateMeetingEvent = {
+        const createMeetingEvent = {
           conversation: createUuid(),
           data: {
             access: [CONVERSATION_ACCESS.INVITE],
@@ -2195,7 +2235,7 @@ describe('ConversationRepository', () => {
           from: '',
           time: '1970-01-01T00:00:00.001Z',
           type: CONVERSATION_EVENT.CREATE_MEETING,
-        };
+        } as unknown as ConversationCreateMeetingEvent;
 
         jest
           .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
@@ -2217,7 +2257,7 @@ describe('ConversationRepository', () => {
           .mockResolvedValue(undefined);
         const updateParticipatingUserEntitiesSpy = jest
           .spyOn(conversationRepository, 'updateParticipatingUserEntities')
-          .mockResolvedValue(true);
+          .mockResolvedValue(conversation_et);
         const saveConversationSpy = jest
           .spyOn(conversationRepository as any, 'saveConversation')
           .mockResolvedValue(false);
@@ -2264,15 +2304,15 @@ describe('ConversationRepository', () => {
                   status_time: '1970-01-01T00:00:00.000Z',
                 },
               },
-              message_timer: null,
+              message_timer: undefined,
               name: 'Weekly sync',
               protocol: CONVERSATION_PROTOCOL.MLS,
               qualified_id: {
                 domain: 'bella.wire.link',
                 id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
               },
-              receipt_mode: null,
-              team: null,
+              receipt_mode: undefined,
+              team: undefined,
               type: 0,
             },
             from: '',
@@ -2338,7 +2378,7 @@ describe('ConversationRepository', () => {
         const conversationRepository = testFactory.conversation_repository!;
         deleteFromDbSpy = jest
           .spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb')
-          .mockResolvedValue(1);
+          .mockResolvedValue('');
         wipeMeetingConversationSpy = jest
           .spyOn(conversationRepository, 'wipeMLSCapableConversation')
           .mockResolvedValue(undefined);
@@ -2949,16 +2989,16 @@ describe('ConversationRepository', () => {
     let lara: User;
 
     beforeEach(() => {
-      anne = new User('', null, translateForTest);
+      anne = new User('', null as unknown as string, translateForTest);
       anne.name('Anne');
 
-      bob = new User('532af01e-1e24-4366-aacf-33b67d4ee376', null, translateForTest);
+      bob = new User('532af01e-1e24-4366-aacf-33b67d4ee376', null as unknown as string, translateForTest);
       bob.name('Bob');
 
-      jane = new User(entities.user.jane_roe.id, null, translateForTest);
+      jane = new User(entities.user.jane_roe.id, null as unknown as string, translateForTest);
       jane.name('Jane');
 
-      john = new User(entities.user.john_doe.id, null, translateForTest);
+      john = new User(entities.user.john_doe.id, null as unknown as string, translateForTest);
       john.name('John');
 
       const johns_computer = new ClientEntity(false, null);
@@ -2966,7 +3006,7 @@ describe('ConversationRepository', () => {
       johns_computer.class = ClientClassification.TABLET;
       john.devices.push(johns_computer);
 
-      lara = new User('', null, translateForTest);
+      lara = new User('', null as unknown as string, translateForTest);
       lara.name('Lara');
 
       const bobs_computer = new ClientEntity(false, null);
@@ -3158,7 +3198,9 @@ describe('ConversationRepository', () => {
     it('uses the account preference for 1:1 conversations', () => {
       // Set a receipt mode on account-level
       const preferenceMode = RECEIPT_MODE.ON;
-      testFactory.propertyRepository.receiptMode(preferenceMode);
+      const propertyRepository = testFactory.propertyRepository;
+      assertNotNullOrUndefined(propertyRepository);
+      propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
       const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.ONE_TO_ONE});
@@ -3173,7 +3215,9 @@ describe('ConversationRepository', () => {
     it('uses the conversation setting for group conversations', () => {
       // Set a receipt mode on account-level
       const preferenceMode = RECEIPT_MODE.ON;
-      testFactory.propertyRepository.receiptMode(preferenceMode);
+      const propertyRepository = testFactory.propertyRepository;
+      assertNotNullOrUndefined(propertyRepository);
+      propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
       const conversationEntity = _generateConversation();
@@ -4086,6 +4130,8 @@ describe('translation migration', () => {
     expect(showModalSpy).toHaveBeenCalledTimes(1);
 
     const [, modalOptions] = showModalSpy.mock.calls[0];
+    assertNotNullOrUndefined(modalOptions.primaryAction);
+    assertNotNullOrUndefined(modalOptions.text);
     expect(modalOptions.primaryAction.text).toBe('translated:modalCreateFolderAction');
     expect(modalOptions.text.closeBtnLabel).toBe('translated:modalNewFolderCloseBtn');
     expect(modalOptions.text.input).toBe('translated:modalCreateFolderPlaceholder');
@@ -4106,7 +4152,7 @@ describe('translation migration', () => {
     expect(showModalSpy).toHaveBeenCalled();
 
     const matchingCall = showModalSpy.mock.calls.find(([, modalOptions]) => {
-      return modalOptions.text.message === 'translated:modalConversationGuestOptionsGetCodeMessage';
+      return modalOptions.text?.message === 'translated:modalConversationGuestOptionsGetCodeMessage';
     });
 
     expect(matchingCall).toBeDefined();

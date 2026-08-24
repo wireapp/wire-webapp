@@ -18,9 +18,10 @@
  */
 
 import {faker} from '@faker-js/faker';
-import {QualifiedId, UserAssetType} from '@wireapp/api-client/lib/user';
+import {QualifiedId, UserAssetType, UserType} from '@wireapp/api-client/lib/user';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import type {User} from 'Repositories/entity/User';
+import type {UserRecord} from 'Repositories/storage';
 import {UserMapper} from 'Repositories/user/userMapper';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
@@ -58,10 +59,11 @@ export function generateAPIUser(
     name: faker.person.fullName().replace(/[^a-zA-Z ]/g, ''),
     qualified_id: id,
     ...overwites,
+    type: overwites?.type ?? UserType.REGULAR,
   };
 }
 
 export function generateUser(id?: QualifiedId, overwites?: Partial<APIClientUser>): User {
   const apiUser = generateAPIUser(id, overwites);
-  return new UserMapper(serverTimeHandler, translate).mapUserFromJson(apiUser, '');
+  return new UserMapper(serverTimeHandler, translate).mapUserFromJson(apiUser as unknown as UserRecord, '');
 }

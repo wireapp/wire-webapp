@@ -35,7 +35,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 const createDeleteMessage = (sender: User) => {
-  const deleteMessage = new DeleteMessageEntity();
+  const deleteMessage = new DeleteMessageEntity(translateForTest);
   deleteMessage.user(sender);
   return deleteMessage;
 };

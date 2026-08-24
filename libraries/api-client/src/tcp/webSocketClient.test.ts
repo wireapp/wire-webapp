@@ -22,12 +22,13 @@ import {ReconnectingWebsocketWallClock, WebSocketReconnectContext} from './recon
 import {noop} from 'noop-esm';
 
 import {InvalidTokenError} from '../auth/authenticationError';
+import type {AccessTokenData} from '../auth';
 import {MINIMUM_API_VERSION} from '../config';
 import {TEAM_EVENT} from '../event/';
 import {NetworkError} from '../http';
 import {ConsumableEvent, ConsumableNotification} from '../notification/consumableNotification';
 
-const accessTokenPayload = {
+const accessTokenPayload: AccessTokenData = {
   access_token:
     'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
   expires_in: 900,

@@ -22,6 +22,7 @@ import {act, renderHook} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 
 import {useCellsRenameForm} from './useCellsRenameNodeForm';
 
@@ -46,6 +47,7 @@ describe('useCellsRenameForm', () => {
     tags: [],
     presignedUrlExpiresAt: null,
     user: null,
+    selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
     type: CellNodeType.FOLDER,
     ...overrides,
   });

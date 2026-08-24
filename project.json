@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint tools/release-appearance"
+        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/release-appearance 'tools/**/*.test.ts'"
       }
     },
     "e2e": {

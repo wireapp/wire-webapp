@@ -18,6 +18,7 @@
  */
 
 import {User} from 'Repositories/entity/User';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {Declension, translate, getSelfName, getUserName} from 'Util/localizerUtil';
 
 import {escapeRegex, safeWindowOpen} from './sanitizationUtil';
@@ -82,6 +83,7 @@ describe('sanitizationUtil', () => {
       };
       jest.spyOn(window, 'open').mockImplementation(() => mockedWindow as any);
       const newWindow = safeWindowOpen('https://wire.com/');
+      assertNotNullOrUndefined(newWindow);
 
       expect(newWindow.opener).toBeNull();
       expect(newWindow.focus).toHaveBeenCalled();

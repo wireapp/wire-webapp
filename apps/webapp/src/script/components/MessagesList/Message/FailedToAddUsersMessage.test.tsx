@@ -46,7 +46,7 @@ function withTheme(component: React.ReactNode): React.ReactElement {
 const createFailedToAddUsersMessages = (
   failures: AddUsersFailure[] = [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}],
 ) => {
-  return new FailedToAddUsersMessageEntity(failures, Date.now());
+  return new FailedToAddUsersMessageEntity(failures, Date.now(), translateForTest);
 };
 
 function createUser(qualifiedId: QualifiedId, name: string) {

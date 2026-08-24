@@ -25,13 +25,10 @@ import {AuthAPI} from './auth/authApi';
 import {ClientType} from './client';
 import {Config, MINIMUM_API_VERSION} from './config';
 import {BackendErrorLabel, StatusCode} from './http';
-import {cellsConfigMock} from './mocks/cells';
 import {Self, SelfAPI} from './self';
-import {UserAPI} from './user/userApi';
+import {UserAPI, UserType} from './user';
 
-const testConfig = {
-  cells: cellsConfigMock,
-} as Config;
+const testConfig: Config = {urls: APIClient.BACKEND.PRODUCTION};
 
 const apiClients: APIClient[] = [];
 
@@ -65,6 +62,7 @@ describe('APIClient', () => {
     name: 'Example User',
     id: '024174ec-c098-4104-9424-3849804acb78',
     assets: [],
+    type: UserType.REGULAR,
   };
 
   beforeEach(() => {
@@ -80,7 +78,7 @@ describe('APIClient', () => {
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
-      const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION, cells: testConfig.cells});
+      const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
       apiClients.push(client);
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
@@ -113,7 +111,7 @@ describe('APIClient', () => {
       try {
         await client.useVersion(MINIMUM_API_VERSION + 2, MINIMUM_API_VERSION + 3);
       } catch (error: unknown) {
-        errorMessage = error.message;
+        errorMessage = error instanceof Error ? error.message : String(error);
       } finally {
         expect(errorMessage).toContain('No compatible API version in range');
       }
@@ -127,7 +125,7 @@ describe('APIClient', () => {
       try {
         await client.useVersion(0, 3);
       } catch (error: unknown) {
-        errorMessage = error.message;
+        errorMessage = error instanceof Error ? error.message : String(error);
       } finally {
         expect(errorMessage).toContain(`Minimum supported API version is ${MINIMUM_API_VERSION}. Received: 0`);
       }

@@ -17,9 +17,8 @@
  *
  */
 
-import {createRef} from 'react';
+import type {MutableRefObject} from 'react';
 
-import {createFactory} from '@enormora/objectory';
 import {renderHook, act} from '@testing-library/react';
 import {Virtualizer} from '@tanstack/react-virtual';
 
@@ -28,31 +27,20 @@ import {Message} from 'Repositories/entity/message/message';
 import {GroupedMessage, Marker} from './virtualizedMessagesGroup';
 import {getInitialScrollPosition, useScrollToLastUnreadMessage} from './useScrollToLastUnreadMessage';
 
-const messageFactory = createFactory<Message>(() => {
-  return {
-    id: 'message-id',
-  } as Message;
-});
-
-const groupedMessageFactory = createFactory<GroupedMessage>(() => {
-  return {
-    messageType: 'message',
-    message: messageFactory.build(),
-    timestamp: 1,
-    sender: 'sender-id',
-    firstMessageTimestamp: 1,
-    lastMessageTimestamp: 1,
-    shouldGroup: false,
-  };
-});
+function createMessage(messageId: string): Message {
+  return {id: messageId} as unknown as Message;
+}
 
 function createGroupedMessage(messageId: string, timestamp: number): GroupedMessage {
-  return groupedMessageFactory.build({
-    message: messageFactory.build({id: messageId}),
+  return {
+    messageType: 'message',
+    message: createMessage(messageId),
     timestamp,
+    sender: 'sender-id',
     firstMessageTimestamp: timestamp,
     lastMessageTimestamp: timestamp,
-  });
+    shouldGroup: false,
+  };
 }
 
 function createUnreadMarker(timestamp: number): Marker {
@@ -76,6 +64,10 @@ describe('useScrollToLastUnreadMessage', () => {
     const actualScrollPosition = getInitialScrollPosition(groupedMessages, 30);
 
     expect(actualScrollPosition.isJust).toBe(true);
+    if (actualScrollPosition.isNothing) {
+      throw new Error('Expected an initial scroll position');
+    }
+
     expect(actualScrollPosition.value).toEqual({
       scrollAlign: 'end',
       scrollIndex: 2,
@@ -93,6 +85,10 @@ describe('useScrollToLastUnreadMessage', () => {
     const actualScrollPosition = getInitialScrollPosition(groupedMessages, 10);
 
     expect(actualScrollPosition.isJust).toBe(true);
+    if (actualScrollPosition.isNothing) {
+      throw new Error('Expected an initial scroll position');
+    }
+
     expect(actualScrollPosition.value).toEqual({
       scrollAlign: 'start',
       scrollIndex: 1,
@@ -112,16 +108,21 @@ describe('useScrollToLastUnreadMessage', () => {
       measure,
       scrollToIndex,
     } as unknown as Virtualizer<HTMLDivElement, Element>;
-    const conversationLastReadTimestamp = createRef<number>();
-    conversationLastReadTimestamp.current = 30;
+    const conversationLastReadTimestamp: MutableRefObject<number> = {current: 30};
     const groupedMessages = [
       createGroupedMessage('older-message-1', 10),
       createGroupedMessage('older-message-2', 20),
       createGroupedMessage('missed-call-message', 30),
     ];
 
+    type ScrollProperties = {
+      isConversationLoaded: boolean;
+      groupedMessages: (Marker | GroupedMessage)[];
+      conversationLastReadTimestamp: MutableRefObject<number>;
+    };
+
     const renderedHook = renderHook(
-      properties => {
+      (properties: ScrollProperties) => {
         return useScrollToLastUnreadMessage(virtualizer, properties);
       },
       {

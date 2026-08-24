@@ -36,6 +36,10 @@ describe('ConversationRoleRepository', () => {
 
   beforeEach(async () => {
     await testFactory.exposeConversationActors();
+    if (testFactory.conversation_service === undefined) {
+      throw new Error('Expected conversation service');
+    }
+
     roleRepository = new ConversationRoleRepository(
       testFactory.team_repository,
       testFactory.conversation_service,
@@ -76,7 +80,7 @@ describe('ConversationRoleRepository', () => {
   describe('canAddParticipants', () => {
     it('checks if a user can add participants to a group', async () => {
       const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-      const userEntity = new User(createUuid(), null, translateForTest);
+      const userEntity = new User(createUuid(), '', translateForTest);
       conversationEntity.participating_user_ets.push(userEntity);
 
       let canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);

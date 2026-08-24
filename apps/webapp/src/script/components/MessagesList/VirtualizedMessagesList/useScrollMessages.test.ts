@@ -17,7 +17,6 @@
  *
  */
 
-import {createFactory} from '@enormora/objectory';
 import {renderHook, act} from '@testing-library/react';
 import {Virtualizer} from '@tanstack/react-virtual';
 
@@ -27,30 +26,24 @@ import {GroupedMessage} from '../utils/virtualizedMessagesGroup';
 
 import {useScrollMessages} from './useScrollMessages';
 
-const messageFactory = createFactory<Message>(() => {
+function createMessage(messageId: string): Message {
   return {
-    id: 'message-id',
+    id: messageId,
     status: () => StatusType.SENT,
     user: () => ({id: 'sender-id'}),
-  } as Message;
-});
+  } as unknown as Message;
+}
 
-const groupedMessageFactory = createFactory<GroupedMessage>(() => {
+function createGroupedMessage(messageId: string): GroupedMessage {
   return {
     messageType: 'message',
-    message: messageFactory.build(),
+    message: createMessage(messageId),
     timestamp: 1,
     sender: 'sender-id',
     firstMessageTimestamp: 1,
     lastMessageTimestamp: 1,
     shouldGroup: false,
   };
-});
-
-function createGroupedMessage(messageId: string): GroupedMessage {
-  return groupedMessageFactory.build({
-    message: messageFactory.build({id: messageId}),
-  });
 }
 
 describe('useScrollMessages', () => {

@@ -40,7 +40,7 @@ function createHttpClientDependenciesForTest(): HttpClientDependenciesForTest {
     observedDelayInMilliseconds.push(delayInMilliseconds);
     handler();
 
-    return 1 as ReturnType<typeof globalThis.setTimeout>;
+    return 1 as unknown as ReturnType<typeof globalThis.setTimeout>;
   });
   const clearTimeout = jest.fn();
 
@@ -283,7 +283,7 @@ describe('HttpClient', () => {
         assert(resolveWaitWasScheduled !== undefined);
         resolveWaitWasScheduled();
 
-        return 1 as ReturnType<typeof globalThis.setTimeout>;
+        return 1 as unknown as ReturnType<typeof globalThis.setTimeout>;
       });
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
         dependencies: {
@@ -328,7 +328,7 @@ describe('HttpClient', () => {
         assert(resolveWaitWasScheduled !== undefined);
         resolveWaitWasScheduled();
 
-        return 1 as ReturnType<typeof globalThis.setTimeout>;
+        return 1 as unknown as ReturnType<typeof globalThis.setTimeout>;
       });
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
         dependencies: {

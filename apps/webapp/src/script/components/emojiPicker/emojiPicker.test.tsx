@@ -83,7 +83,7 @@ describe('EmojiPicker', () => {
       expect(getByTestId('emoji-picker-dialog')).toBeDefined();
     });
 
-    handleClickOutsideOfInputBar({target: getByTestId('emoji-picker-dialog')} as Event, handleOutsideClick);
+    handleClickOutsideOfInputBar({target: getByTestId('emoji-picker-dialog')} as unknown as Event, handleOutsideClick);
 
     expect(handleOutsideClick).not.toHaveBeenCalled();
   });

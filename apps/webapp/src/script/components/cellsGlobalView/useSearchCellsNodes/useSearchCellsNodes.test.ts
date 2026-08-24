@@ -18,7 +18,7 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
-import {RestNodeCollection} from 'cells-sdk-ts';
+import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -77,15 +77,15 @@ function createControllablePromise<T>() {
   return {promise, resolve, reject};
 }
 
-function buildRestNodeStub(name: string, uuid = name) {
+function buildRestNodeStub(name: string, uuid = name): RestNode {
   return {
     Uuid: uuid,
     Path: `wire-cells-web/${name}`,
     Type: 'LEAF',
-    Modified: 1,
-    Size: 1,
+    Modified: '1',
+    Size: '1',
     UserMetadata: [],
-    ContextWorkspace: {Uuid: 'conversation-id@example.com', Label: 'Conversation'},
+    ContextWorkspace: {Uuid: 'conversation-id@example.com', Label: 'Conversation', Slug: 'conversation'},
   };
 }
 

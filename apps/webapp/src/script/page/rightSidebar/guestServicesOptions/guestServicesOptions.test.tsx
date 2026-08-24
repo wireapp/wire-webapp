@@ -59,7 +59,7 @@ const getDefaultParams = (isGuest: boolean = true) => {
       ...new TeamState(),
       isGuestLinkEnabled: ko.pureComputed(() => true),
       isInTeam: () => true,
-    } as TeamState,
+    } as unknown as TeamState,
   };
 };
 

@@ -97,10 +97,7 @@ function selectEndOfFirstListItem(editor: LexicalEditor): void {
 
 type RegisteredListTestFunction = (harness: WireLexicalEditorTestHarness) => void;
 
-function withRegisteredList(
-  inputMarkdown: string,
-  testFunction: RegisteredListTestFunction,
-): RegisteredListTestFunction {
+function withRegisteredList(inputMarkdown: string, testFunction: RegisteredListTestFunction): () => void {
   return () => {
     const harness = createWireLexicalEditorTestHarness();
     harness.importMarkdown(inputMarkdown);
