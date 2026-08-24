@@ -110,13 +110,14 @@ export const Preference = () => {
 
       {isCellsOptionEnabled && (
         <InfoToggle
-          className="modal-style"
+          className="modal-style info-toggle--no-separator"
           dataUieName="cells"
           isChecked={isCellsEnabled}
           setIsChecked={setIsCellsEnabled}
           isDisabled={false}
           name={translate('modalCreateGroupCellsToggleHeading')}
           info={translate('modalCreateGroupCellsToggleInfo')}
+          adminHintForShareDrive={translate('modalCreateConversationAdminHint')}
         />
       )}
     </>
