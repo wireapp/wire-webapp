@@ -31,7 +31,7 @@ on:
         required: true
       teamManagementUrl:
         type: string
-        required: true
+        required: false
         description: Exact team management URL expected from the deployed WebApp artifact
       grep:
         type: string
@@ -186,7 +186,7 @@ jobs:
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
-      - name: Run tests (workflow call)
+      - name: Run tests (with team management URL override)
         if: ${{ inputs.teamManagementUrl != '' }}
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
@@ -196,7 +196,7 @@ jobs:
           GREP: ${{ inputs.grep }}
         run: ./bin/yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
 
-      - name: Run tests (workflow dispatch)
+      - name: Run tests
         if: ${{ inputs.teamManagementUrl == '' }}
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
