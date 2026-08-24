@@ -29,6 +29,7 @@ import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {UserMapper} from './userMapper';
+import type {UserRecord} from 'Repositories/storage';
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('User Mapper', () => {
@@ -60,7 +61,7 @@ describe('User Mapper', () => {
           locale: '',
           name: 'user',
           qualified_id: {domain: domain, id: 'id'},
-        },
+        } as unknown as UserRecord,
         'local.test',
       );
 
@@ -77,7 +78,7 @@ describe('User Mapper', () => {
           name: 'guest',
           qualified_id: {domain: 'otherdomain.test', id: 'id'},
           team: teamId,
-        },
+        } as unknown as UserRecord,
         'local.domain',
       );
 
@@ -131,7 +132,7 @@ describe('User Mapper', () => {
     });
 
     it('returns an empty array if input was undefined', () => {
-      const user_ets = mapper.mapUsersFromJson(undefined, '');
+      const user_ets = mapper.mapUsersFromJson(undefined as unknown as UserRecord[], '');
 
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);

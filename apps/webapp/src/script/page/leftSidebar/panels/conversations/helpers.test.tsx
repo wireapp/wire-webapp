@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {createFactory} from '@enormora/objectory';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {
@@ -54,7 +53,7 @@ type RecentConversationSearchInputOptions = {
 
 type GetTabConversationsInput = Parameters<typeof getTabConversations>[0];
 
-const recentConversationSearchInputFactory = createFactory<GetTabConversationsInput>(() => {
+function createRecentConversationSearchInputBase(): GetTabConversationsInput {
   return {
     currentTab: SidebarTabs.RECENT,
     conversations: [],
@@ -69,14 +68,15 @@ const recentConversationSearchInputFactory = createFactory<GetTabConversationsIn
     draftConversations: [],
     searchInputPlaceholders,
   };
-});
+}
 
 function createRecentConversationSearchInput(options: RecentConversationSearchInputOptions): GetTabConversationsInput {
   const {conversation, conversationsFilter} = options;
 
-  const recentConversationSearchInput = recentConversationSearchInputFactory.build({
+  const recentConversationSearchInput = {
+    ...createRecentConversationSearchInputBase(),
     conversationsFilter,
-  });
+  };
 
   return {
     ...recentConversationSearchInput,

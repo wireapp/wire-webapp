@@ -4,7 +4,7 @@
     "module": "commonjs",
     "target": "es2024",
     "lib": ["ES2024"],
-    "types": ["node"],
+    "types": ["node", "jest"],
     "rootDir": ".",
     "allowImportingTsExtensions": true
   },
@@ -13,7 +13,6 @@
     "node_modules",
     "dist",
     "tmp",
-    "tools/**/*.test.ts",
     "tools/release-appearance",
     "tools/release-cli"
   ]

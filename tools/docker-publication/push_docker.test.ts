@@ -21,7 +21,6 @@ import assert from 'node:assert';
 import {readFileSync} from 'node:fs';
 import path from 'node:path';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const {
   createUniqueImageTag,
   resolveDockerContextPath,
@@ -29,6 +28,19 @@ const {
   runProcess,
   selectReleaseCommit,
 } = require('./push_docker');
+
+type ProcessEvent =
+  | {
+      kind: 'process';
+      command: string;
+      commandArguments: string[];
+      processOptions: Record<string, unknown>;
+    }
+  | {
+      kind: 'write';
+      filePath: string;
+      fileContents: string;
+    };
 
 describe('push_docker metadata', () => {
   it('prefers the explicit release environment over the caller SHA and argument', () => {
@@ -127,7 +139,7 @@ describe('push_docker metadata', () => {
   });
 
   it('invokes Docker with separate arguments and writes the image tag without a shell', () => {
-    const events: Array<Record<string, unknown>> = [];
+    const events: ProcessEvent[] = [];
     const environment = {
       DOCKER_PASSWORD: 'secret-password',
       DOCKER_USERNAME: 'docker-user',
@@ -143,13 +155,20 @@ describe('push_docker metadata', () => {
       },
     });
 
-    const processEvents = events.filter(event => event.kind === 'process');
+    const processEvents = events.filter(
+      (event): event is Extract<ProcessEvent, {kind: 'process'}> => event.kind === 'process',
+    );
     const loginEvent = processEvents.find(event => event.commandArguments[0] === 'login');
     const buildEvent = processEvents.find(event => event.commandArguments[0] === 'build');
     const runEvent = processEvents.find(event => event.commandArguments[0] === 'run');
     const tagEvents = processEvents.filter(event => event.commandArguments[0] === 'tag');
     const pushEvents = processEvents.filter(event => event.commandArguments[0] === 'push');
     const writeEvent = events.find(event => event.kind === 'write');
+
+    assert.ok(loginEvent);
+    assert.ok(buildEvent);
+    assert.ok(runEvent);
+    assert.ok(writeEvent);
 
     expect(loginEvent.commandArguments).toEqual(['login', '--username', 'docker-user', '--password-stdin', 'quay.io']);
     expect(loginEvent.processOptions.input).toBe('secret-password\n');

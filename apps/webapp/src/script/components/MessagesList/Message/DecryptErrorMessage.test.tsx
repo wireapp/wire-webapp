@@ -36,7 +36,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 function createError(code: number) {
-  const error = new DecryptErrorMessageEntity('client', code);
+  const error = new DecryptErrorMessageEntity('client', code, translateForTest);
   error.user(new User('', '', translateForTest));
   return error;
 }

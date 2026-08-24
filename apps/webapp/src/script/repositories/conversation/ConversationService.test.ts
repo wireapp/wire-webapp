@@ -46,7 +46,7 @@ describe('ConversationService', () => {
         data: {content},
         ephemeral_expires: false,
         ...overrides,
-      };
+      } as unknown as EventRecord;
     }
 
     afterEach(() => {
@@ -89,7 +89,7 @@ describe('ConversationService', () => {
     });
 
     it('matches composite message text items', async () => {
-      const compositeEvent: EventRecord = {
+      const compositeEvent = {
         primary_key: 'primary-key',
         category: MessageCategory.TEXT,
         conversation: 'conversation-id',
@@ -99,7 +99,7 @@ describe('ConversationService', () => {
         type: ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
         data: {items: [{button: {id: '', text: ''}, text: {sender: '', content: 'composite caption'}}]},
         ephemeral_expires: false,
-      };
+      } as unknown as EventRecord;
 
       const loadEventsWithCategory = jest
         .fn<
@@ -120,7 +120,7 @@ describe('ConversationService', () => {
     });
 
     it('reuses the search regex without skipping consecutive matches', async () => {
-      const matchingEvents: EventRecord[] = [
+      const matchingEvents = [
         {
           primary_key: 'primary-key-1',
           category: MessageCategory.TEXT,
@@ -143,7 +143,7 @@ describe('ConversationService', () => {
           data: {content: 'term'},
           ephemeral_expires: false,
         },
-      ];
+      ] as unknown as EventRecord[];
 
       const loadEventsWithCategory = jest
         .fn<

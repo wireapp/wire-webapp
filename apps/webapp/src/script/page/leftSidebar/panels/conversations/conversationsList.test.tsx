@@ -70,7 +70,7 @@ describe('ConversationsList', () => {
   let resetConversationFocus: jest.Mock;
   let handleArrowKeyDown: jest.Mock;
   let clearSearchFilter: jest.Mock;
-  let conversationLabelRepository: ConversationLabelRepository;
+  let conversationLabelRepository: ConversationLabelRepository = {} as ConversationLabelRepository;
 
   beforeEach(async () => {
     listViewModel = {} as ListViewModel;

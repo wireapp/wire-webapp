@@ -32,7 +32,7 @@ import {Notification, PreferenceNotificationRepository} from './PreferenceNotifi
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('PreferenceNotificationRepository', () => {
-  const user = new User(createUuid(), null, translateForTest);
+  const user = new User(createUuid(), '', translateForTest);
   const userObservable = ko.observable(user);
 
   beforeEach(() => {

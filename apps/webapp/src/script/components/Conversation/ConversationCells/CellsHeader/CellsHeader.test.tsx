@@ -37,7 +37,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 
 const filter = {
   type: 'toggle' as const,
-  id: 'hasPublicLink' as const,
+  id: 'sharedViaLink' as const,
   label: 'Public links',
   isActive: false,
   onToggle: jest.fn(),

@@ -33,7 +33,7 @@ function createConversationState() {
   return new ConversationState(new UserState(), new TeamState());
 }
 
-function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATION_TYPE) {
+function createConversation(protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS, type?: CONVERSATION_TYPE) {
   const conversation = new Conversation(randomUUID(), '', protocol, translateForTest);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;

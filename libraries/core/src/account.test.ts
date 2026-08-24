@@ -32,6 +32,7 @@ import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {NotificationAPI} from '@wireapp/api-client/lib/notification';
 import {ConsumableEvent} from '@wireapp/api-client/lib/notification/consumableNotification';
 import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
+import {UserType} from '@wireapp/api-client/lib/user';
 import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
@@ -110,7 +111,7 @@ describe('Account', () => {
   });
 
   // Fix for node 16, crypto.subtle.decrypt has a type problem
-  jest.spyOn(global.crypto.subtle, 'decrypt').mockResolvedValue(new Uint8Array(32));
+  jest.spyOn(global.crypto.subtle, 'decrypt').mockResolvedValue(new Uint8Array(32).buffer);
   const accessTokenData = {
     access_token:
       'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
@@ -212,6 +213,7 @@ describe('Account', () => {
         name: 'Example User',
         id: '024174ec-c098-4104-9424-3849804acb78',
         assets: [],
+        type: UserType.REGULAR,
       } as Self);
   });
 

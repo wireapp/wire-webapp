@@ -18,6 +18,7 @@
  */
 
 import {getLinkPreviewFromString} from '.';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
 describe('linkPreviews', () => {
   const mockOgResult = {
@@ -110,9 +111,10 @@ describe('linkPreviews', () => {
       const url = 'https://twitter.com/jack/status/20';
       const res = await getLinkPreviewFromString(url);
 
-      expect(res?.tweet).toBeDefined();
-      expect(res?.tweet.author).toBe('Jack');
-      expect(res?.tweet.username).toBe('jack');
+      const tweet = res?.tweet;
+      assertNotNullOrUndefined(tweet);
+      expect(tweet.author).toBe('Jack');
+      expect(tweet.username).toBe('jack');
     });
   });
 });

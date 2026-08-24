@@ -120,7 +120,7 @@ describe('videoGridHandler', () => {
 
       const fallbackParticipant = createParticipant('fallback');
 
-      jest.spyOn(call, 'participants').mockReturnValue(undefined);
+      jest.spyOn(call, 'participants').mockReturnValue(undefined as unknown as Participant[]);
       jest.spyOn(call, 'pages').mockReturnValue([[fallbackParticipant]]);
       jest.spyOn(call, 'currentPage').mockReturnValue(0);
 

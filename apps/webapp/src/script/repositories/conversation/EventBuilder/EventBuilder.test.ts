@@ -18,6 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
@@ -35,12 +36,12 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('EventBuilder', () => {
-  let event_mapper: EventMapper = undefined;
-  let conversation_et: Conversation = undefined;
-  let self_user_et: User = undefined;
+  let event_mapper: EventMapper = new EventMapper(undefined, translate);
+  let conversation_et: Conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  let self_user_et: User = new User('', '', translateForTest);
 
   beforeEach(() => {
-    self_user_et = new User(createUuid(), null, translateForTest);
+    self_user_et = new User(createUuid(), '', translateForTest);
     self_user_et.isMe = true;
 
     conversation_et = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
@@ -55,7 +56,9 @@ describe('EventBuilder', () => {
     expect(messageEntity).toBeDefined();
     expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
     expect(messageEntity.VerificationMessageType()).toBe(VerificationMessageType.VERIFIED);
-    expect(messageEntity.from).toBe(conversation_et.selfUser().id);
+    const selfUser = conversation_et.selfUser();
+    assertNotNullOrUndefined(selfUser);
+    expect(messageEntity.from).toBe(selfUser.id);
     expect(messageEntity.conversation_id).toBe(conversation_et.id);
   });
 
@@ -66,7 +69,9 @@ describe('EventBuilder', () => {
     expect(messageEntity).toBeDefined();
     expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
     expect(messageEntity.VerificationMessageType()).toBe(VerificationMessageType.NEW_DEVICE);
-    expect(messageEntity.from).toBe(conversation_et.selfUser().id);
+    const selfUser = conversation_et.selfUser();
+    assertNotNullOrUndefined(selfUser);
+    expect(messageEntity.from).toBe(selfUser.id);
     expect(messageEntity.conversation_id).toBe(conversation_et.id);
     expect(messageEntity.userIds()).toEqual(users);
   });
@@ -74,9 +79,11 @@ describe('EventBuilder', () => {
   it('buildMissed', () => {
     const event = EventBuilder.buildMissed(conversation_et, 0);
     const messageEntity = event_mapper.mapJsonEvent(event, conversation_et);
-    expect(messageEntity).toBeDefined();
+    assertNotNullOrUndefined(messageEntity);
     expect(messageEntity.super_type).toBe(SuperType.MISSED);
-    expect(messageEntity.from).toBe(conversation_et.selfUser().id);
+    const selfUser = conversation_et.selfUser();
+    assertNotNullOrUndefined(selfUser);
+    expect(messageEntity.from).toBe(selfUser.id);
     expect(messageEntity.conversation_id).toBe(conversation_et.id);
   });
 
@@ -92,7 +99,7 @@ describe('EventBuilder', () => {
     conversation_et.creator = 'one';
     const event = EventBuilder.buildGroupCreation(conversation_et, false, 0);
     const messageEntity = event_mapper.mapJsonEvent(event, conversation_et);
-    expect(messageEntity).toBeDefined();
+    assertNotNullOrUndefined(messageEntity);
     expect(messageEntity.type).toBe(ClientEvent.CONVERSATION.GROUP_CREATION);
     expect(messageEntity.conversation_id).toBe(conversation_et.id);
     expect(conversation_et.participating_user_ids().length).toBe(3);

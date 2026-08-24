@@ -41,7 +41,7 @@ function createConfigureIncrementalHttpRetryBackoffResetDependenciesForTest(): C
   const resetIncrementalRetryBackoff = jest.fn();
   const apiClient = {
     resetIncrementalRetryBackoff,
-  } as APIClient;
+  } as unknown as APIClient;
   const subscribeToApplicationSignal = jest.fn((signalName: 'visibilitychange', listener: () => void) => {
     applicationSignalListeners.set(signalName, listener);
   });

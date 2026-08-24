@@ -67,7 +67,7 @@
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
+        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
       }
     },
     "storybook": {

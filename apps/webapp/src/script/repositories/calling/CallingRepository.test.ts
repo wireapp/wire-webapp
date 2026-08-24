@@ -1788,7 +1788,7 @@ describe('set background effect', () => {
 
       jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(originalStream);
-      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(ko.pureComputed<boolean>(() => true));
+      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true);
 
       const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
@@ -1818,7 +1818,7 @@ describe('set background effect', () => {
       const inputStream = createMediaStream('inputStream');
 
       jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
-      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(ko.pureComputed<boolean>(() => true));
+      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true);
 
       const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 

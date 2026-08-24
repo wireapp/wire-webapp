@@ -17,6 +17,8 @@
  *
  */
 
+import type {Account as AccountType} from '../account';
+
 const {ClientType} = require('@wireapp/api-client/lib/client');
 
 const {APIClient} = require('@wireapp/api-client');
@@ -25,7 +27,7 @@ const {Account} = require('@wireapp/core');
 const StoreHelper = require('./storeHelper');
 
 module.exports = {
-  getAccount: async function (email, password) {
+  getAccount: async function (email: string, password: string): Promise<AccountType> {
     const login = {
       clientType: ClientType.TEMPORARY,
       email,

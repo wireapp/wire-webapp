@@ -61,13 +61,13 @@ const createMockPropertiesRepository = (): PropertiesRepository => {
   return {
     receiptMode: ko.observable(0),
     typingIndicatorMode: ko.observable(0),
-  };
+  } as unknown as PropertiesRepository;
 };
 
 const createMockAppLockRepository = (): AppLockRepository => {
   return {
     setEnabled: jest.fn(),
-  };
+  } as unknown as AppLockRepository;
 };
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -83,7 +83,7 @@ describe('PrivacySection', () => {
       FEATURE: {
         ENABLE_MDM_CONFIG: false,
       },
-    });
+    } as unknown as ReturnType<typeof Config.getConfig>);
     desktopConfigSpy = jest.spyOn(Config, 'getDesktopConfig').mockReturnValue(undefined);
   });
 

@@ -20,6 +20,7 @@
 import {waitFor} from '@testing-library/react';
 import {FeatureList} from '@wireapp/api-client/lib/team';
 import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature';
+import {UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from 'Repositories/client';
@@ -71,6 +72,7 @@ describe('SelfRepository', () => {
         qualified_id: {domain: 'test-domain', id: 'test-id'},
         id: 'test-id',
         name: 'test-name',
+        type: UserType.REGULAR,
       });
 
       void selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
@@ -98,6 +100,7 @@ describe('SelfRepository', () => {
         qualified_id: {domain: 'test-domain', id: 'test-id'},
         id: 'test-id',
         name: 'test-name',
+        type: UserType.REGULAR,
       });
 
       await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
@@ -124,6 +127,7 @@ describe('SelfRepository', () => {
         qualified_id: {domain: 'test-domain', id: 'test-id'},
         id: 'test-id',
         name: 'test-name',
+        type: UserType.REGULAR,
       });
 
       await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
@@ -184,6 +188,7 @@ describe('SelfRepository', () => {
         qualified_id: {domain: 'test-domain', id: 'test-id'},
         id: 'test-id',
         name: 'test-name',
+        type: UserType.REGULAR,
       });
 
       await selfRepository.refreshSelfSupportedProtocols();
@@ -209,6 +214,7 @@ describe('SelfRepository', () => {
         qualified_id: {domain: 'test-domain', id: 'test-id'},
         id: 'test-id',
         name: 'test-name',
+        type: UserType.REGULAR,
       });
 
       await selfRepository.refreshSelfSupportedProtocols();

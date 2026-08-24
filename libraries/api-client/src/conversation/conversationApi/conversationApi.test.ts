@@ -29,7 +29,7 @@ import {HttpClient} from '../../http';
 const domain = 'https://test.zinfra.io';
 const testConfig = {urls: {rest: domain, ws: '', name: 'test'}};
 const mockedAccessTokenStore: Partial<AccessTokenStore> = {
-  accessToken: {
+  accessTokenData: {
     access_token: 'test',
     expires_in: 900,
     token_type: 'Bearer',
