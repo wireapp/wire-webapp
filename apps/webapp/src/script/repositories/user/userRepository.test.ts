@@ -278,6 +278,20 @@ describe('UserRepository', () => {
         expect(users.map(user => user.name())).toEqual(['First Former Member', 'Second Former Member']);
         expect(users.every(user => user.isFederated)).toBe(true);
       });
+
+      it('returns a translated deleted user when the cached user is unavailable', async () => {
+        const [userRepository, {userService, userState}] = await buildUserRepository(translateForTest);
+        const selfUser = new User('self', 'local.test', translateForTest);
+        const requestedUserId = {id: 'departed-user', domain: 'remote.test'};
+        userState.self(selfUser);
+        jest.spyOn(userService, 'loadUserFromDb').mockResolvedValue(undefined);
+
+        const [deletedUser] = await userRepository.getUsersByIdsFromDb([requestedUserId]);
+
+        expect(deletedUser.qualifiedId).toEqual(requestedUserId);
+        expect(deletedUser.name()).toBe('nonexistentUser');
+        expect(deletedUser.isDeleted).toBe(true);
+      });
     });
 
     describe('saveUser', () => {
