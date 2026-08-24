@@ -82,9 +82,19 @@ test.describe('URL on navigation', () => {
 
       await page.reload();
       await sidebar.sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-      await sidebar.clickMeetingsButton();
+      const meetingsPage = pages.meetings();
+      await expect(meetingsPage.meetingsList.or(meetingsPage.emptyMeetingsList)).toBeVisible({timeout: LOGIN_TIMEOUT});
       await expectTabSelected(sidebar, 'go-meetings');
       await expectHash(page, '#/meetings');
+
+      await sidebar.clickPreferencesButton();
+      await expect(pages.settings().accountButton).toBeVisible();
+      await expectHash(page, '#/preferences/account');
+
+      await page.reload();
+      await expect(pages.settings().accountButton).toBeVisible({timeout: LOGIN_TIMEOUT});
+      await expectTabSelected(sidebar, 'go-preferences');
+      await expectHash(page, '#/preferences/account');
     },
   );
 
