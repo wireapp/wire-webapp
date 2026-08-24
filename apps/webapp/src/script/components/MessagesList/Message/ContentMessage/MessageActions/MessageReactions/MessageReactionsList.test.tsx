@@ -55,7 +55,6 @@ const defaultProps: MessageReactionsListProps = {
 };
 describe('MessageReactionsList', () => {
   afterEach(() => {
-    jest.useRealTimers();
     jest.clearAllMocks();
   });
 
@@ -205,10 +204,11 @@ describe('MessageReactionsList', () => {
   test('allows a later tooltip interaction to retry a failed local lookup', async () => {
     const departedUser = new User('departed-user', 'test.wire.link', translateForTest);
     departedUser.name('Former Member');
-    const loadUsersByIdsFromDb = jest
-      .fn()
-      .mockRejectedValueOnce(new Error('IndexedDB unavailable'))
-      .mockResolvedValueOnce([departedUser]);
+    let rejectFirstLookup: ((error: Error) => void) | undefined;
+    const firstLookup = new Promise<User[]>((_, reject): void => {
+      rejectFirstLookup = reject;
+    });
+    const loadUsersByIdsFromDb = jest.fn().mockReturnValueOnce(firstLookup).mockResolvedValueOnce([departedUser]);
     const translate: Translate = (identifier, substitutions): string => {
       if (identifier === 'conversationLikesCaptionSingular') {
         return String(substitutions?.userName ?? '');
@@ -232,11 +232,22 @@ describe('MessageReactionsList', () => {
     );
 
     fireEvent.focus(getByTitle('heart'));
-    jest.useFakeTimers();
-    await act(async () => {
-      await jest.runAllTimersAsync();
+    await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(1));
+
+    const rejectLookup = rejectFirstLookup;
+    if (typeof rejectLookup !== 'function') {
+      throw new Error('The first lookup rejector was not initialized');
+    }
+
+    await act(async (): Promise<void> => {
+      rejectLookup(new Error('IndexedDB unavailable'));
+      try {
+        await firstLookup;
+      } catch {
+        // The rejected lookup is expected; the component handles the failure.
+      }
     });
-    jest.useRealTimers();
+
     fireEvent.mouseEnter(getByTitle('heart'));
 
     await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(2));
