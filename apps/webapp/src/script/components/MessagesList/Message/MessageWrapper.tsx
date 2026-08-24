@@ -81,6 +81,7 @@ export const MessageWrapper = ({
   onClickResetSession,
   onClickCancelRequest,
   messageRepository,
+  loadUsersByIdsFromDb,
   messageActions,
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
@@ -224,6 +225,7 @@ export const MessageWrapper = ({
         onClickReaction={handleReactionClick}
         is1to1={conversation.is1to1()}
         isFileShareRestricted={isFileShareRestricted}
+        loadUsersByIdsFromDb={loadUsersByIdsFromDb}
       />
     );
   }

@@ -665,6 +665,29 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   /**
+   * Load users from the local database without making a backend request.
+   * Users that are no longer cached in IndexedDB are represented as deleted users.
+   */
+  readonly getUsersByIdsFromDb = async (userIds: QualifiedId[]): Promise<User[]> => {
+    const storedUsers = await Promise.all(userIds.map(userId => this.userService.loadUserFromDb(userId)));
+    const localDomain = this.userState.self().domain;
+
+    return storedUsers.map((storedUser, index) => {
+      if (!storedUser?.name) {
+        return this.createDeletedUser(userIds[index]);
+      }
+
+      return this.userMapper.mapUserFromJson(
+        {
+          ...storedUser,
+          qualified_id: storedUser.qualified_id ?? userIds[index],
+        },
+        localDomain,
+      );
+    });
+  };
+
+  /**
    * Find a local user.
    */
   findUserById(userId: QualifiedId): User | undefined {

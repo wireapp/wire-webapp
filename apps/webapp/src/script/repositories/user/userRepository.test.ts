@@ -41,6 +41,7 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamState} from 'Repositories/team/TeamState';
+import type {UserRecord} from 'Repositories/storage';
 import type {Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -232,6 +233,64 @@ describe('UserRepository', () => {
 
         expect(deletedUser.name()).toBe('translated:deletedUser');
         expect(translate).toHaveBeenCalledWith('deletedUser');
+      });
+    });
+
+    describe('getUsersByIdsFromDb', () => {
+      it('loads cached users without requesting them from the backend', async () => {
+        const [userRepository, {userService, userState}] = await buildUserRepository(translateForTest);
+        const selfUser = new User('self', 'test.wire.link', translateForTest);
+        const departedUser = generateAPIUser(undefined, {name: 'Former Member'});
+        userState.self(selfUser);
+        jest.spyOn(userService, 'loadUserFromDb').mockResolvedValue(departedUser);
+        const backendUsersSpy = jest.spyOn(userService, 'getUsers');
+
+        const users = await userRepository.getUsersByIdsFromDb([departedUser.qualified_id!]);
+
+        expect(users).toHaveLength(1);
+        expect(users[0].name()).toBe('Former Member');
+        expect(userService.loadUserFromDb).toHaveBeenCalledWith(departedUser.qualified_id);
+        expect(backendUsersSpy).not.toHaveBeenCalled();
+      });
+
+      it('preserves requested federated identities for sparse cached users', async () => {
+        const [userRepository, {userService, userState}] = await buildUserRepository(translateForTest);
+        const selfUser = new User('self', 'local.test', translateForTest);
+        const firstRequestedUserId = {id: 'same-user-id', domain: 'first.remote.test'};
+        const secondRequestedUserId = {id: 'same-user-id', domain: 'second.remote.test'};
+        const firstSparseUserRecord = {
+          id: firstRequestedUserId.id,
+          name: 'First Former Member',
+        } as UserRecord;
+        const secondSparseUserRecord = {
+          id: secondRequestedUserId.id,
+          name: 'Second Former Member',
+        } as UserRecord;
+        userState.self(selfUser);
+        jest
+          .spyOn(userService, 'loadUserFromDb')
+          .mockResolvedValueOnce(firstSparseUserRecord)
+          .mockResolvedValueOnce(secondSparseUserRecord);
+
+        const users = await userRepository.getUsersByIdsFromDb([firstRequestedUserId, secondRequestedUserId]);
+
+        expect(users.map(user => user.qualifiedId)).toEqual([firstRequestedUserId, secondRequestedUserId]);
+        expect(users.map(user => user.name())).toEqual(['First Former Member', 'Second Former Member']);
+        expect(users.every(user => user.isFederated)).toBe(true);
+      });
+
+      it('returns a translated deleted user when the cached user is unavailable', async () => {
+        const [userRepository, {userService, userState}] = await buildUserRepository(translateForTest);
+        const selfUser = new User('self', 'local.test', translateForTest);
+        const requestedUserId = {id: 'departed-user', domain: 'remote.test'};
+        userState.self(selfUser);
+        jest.spyOn(userService, 'loadUserFromDb').mockResolvedValue(undefined);
+
+        const [deletedUser] = await userRepository.getUsersByIdsFromDb([requestedUserId]);
+
+        expect(deletedUser.qualifiedId).toEqual(requestedUserId);
+        expect(deletedUser.name()).toBe('nonexistentUser');
+        expect(deletedUser.isDeleted).toBe(true);
       });
     });
 

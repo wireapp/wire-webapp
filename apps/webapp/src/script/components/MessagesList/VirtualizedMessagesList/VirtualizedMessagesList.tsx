@@ -88,6 +88,7 @@ export const VirtualizedMessagesList = ({
   selfUser,
   conversationRepository,
   messageRepository,
+  loadUsersByIdsFromDb,
   getVisibleCallback,
   invitePeople,
   cancelConnectionRequest,
@@ -367,6 +368,7 @@ export const VirtualizedMessagesList = ({
                   }
                   isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                   messageRepository={messageRepository}
+                  loadUsersByIdsFromDb={loadUsersByIdsFromDb}
                   onClickAvatar={showUserDetails}
                   onClickCancelRequest={cancelConnectionRequest}
                   onClickImage={showImageDetails}
