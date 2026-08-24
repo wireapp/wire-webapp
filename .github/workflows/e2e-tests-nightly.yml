@@ -11,7 +11,7 @@ on:
         required: true
         type: choice
         options:
-          - https://wire-webapp-dev.wire.com/
+          - https://wire-webapp-dev.zinfra.io/
           - https://wire-webapp-qa.zinfra.io/
 
 # Only allow one instance of this workflow to run per branch at a time
