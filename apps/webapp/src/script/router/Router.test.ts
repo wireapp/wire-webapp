@@ -17,9 +17,10 @@
  *
  */
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {waitFor} from '@testing-library/react';
 
-import {configureRoutes, navigate, setHistoryParam} from './Router';
+import {configureRouterWallClock, configureRoutes, navigate, setHistoryParam} from './Router';
 
 describe('Router', () => {
   afterEach(() => {
@@ -93,25 +94,26 @@ describe('Router', () => {
     });
 
     it('forces route re-evaluation when the hash is already at the target path', () => {
-      jest.useFakeTimers();
+      const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+      configureRouterWallClock(deterministicWallClock);
 
       const routes = {'/': jest.fn()};
       configureRoutes(routes);
       routes['/'].mockClear();
+      window.location.hash = '#/';
 
-      // Hash is already '/' (set by configureRoutes' initial parse), so the browser won't fire a
-      // native hashchange event - setHistoryParam must force route re-evaluation itself.
+      // Hash is already '/', so the browser won't fire a native hashchange event -
+      // setHistoryParam must force route re-evaluation itself.
       setHistoryParam('/');
       expect(routes['/']).not.toHaveBeenCalled();
 
-      jest.runAllTimers();
+      deterministicWallClock.advanceByMilliseconds(0);
       expect(routes['/']).toHaveBeenCalledTimes(1);
-
-      jest.useRealTimers();
     });
 
     it('does not force route re-evaluation when the hash actually changes', () => {
-      jest.useFakeTimers();
+      const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+      configureRouterWallClock(deterministicWallClock);
 
       const routes = {'/': jest.fn(), '/other': jest.fn()};
       configureRoutes(routes);
@@ -119,10 +121,8 @@ describe('Router', () => {
 
       setHistoryParam('/other');
 
-      jest.runAllTimers();
+      deterministicWallClock.advanceByMilliseconds(0);
       expect(routes['/']).not.toHaveBeenCalled();
-
-      jest.useRealTimers();
     });
   });
 });

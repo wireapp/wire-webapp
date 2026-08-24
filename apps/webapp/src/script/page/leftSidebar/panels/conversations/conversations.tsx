@@ -380,7 +380,10 @@ export const Conversations = ({
 
       if (shouldClearDeepLinkForTab(nextTab) && !isSwitchingConversationListTab) {
         setHistoryParam('/');
-        onExitPreferences(isConversationListTab(nextTab));
+
+        if (nextTab !== SidebarTabs.CELLS && nextTab !== SidebarTabs.MEETINGS) {
+          onExitPreferences(isConversationListTab(nextTab));
+        }
       }
 
       if (nextTab === SidebarTabs.CELLS) {
@@ -426,6 +429,7 @@ export const Conversations = ({
       setCurrentTab(SidebarTabs.RECENT);
       switchList(ListState.CONVERSATIONS);
       switchContent(ContentState.CONVERSATION);
+      setHistoryParam('/');
     }
   }, [currentTab, isMeetingsEnabled, setCurrentTab, switchContent, switchList]);
 

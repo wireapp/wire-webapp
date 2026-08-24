@@ -17,9 +17,19 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {match} from 'path-to-regexp';
 
+import {isConversationListTab, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+
 type Routes = Record<string, ((...args: any[]) => void | Promise<void>) | null>;
+
+let routerWallClock: WallClock = createWallClock();
+
+export const configureRouterWallClock = (wallClock: WallClock): void => {
+  routerWallClock = wallClock;
+};
 
 const defaultRoute: Routes = {
   // do nothing if url was not matched
@@ -99,6 +109,11 @@ export const setHistoryParam = (path: string) => {
     // never run. Force route re-evaluation async, matching the timing of a real hashchange, so
     // callers that synchronously update content state right after calling this still take effect
     // first.
-    setTimeout(parseRoute, 0);
+    routerWallClock.setTimeout(() => {
+      if (path === '/' && !isConversationListTab(useSidebarStore.getState().currentTab)) {
+        return;
+      }
+      parseRoute();
+    }, 0);
   }
 };

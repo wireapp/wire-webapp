@@ -70,7 +70,7 @@ import {ContentState, useAppState} from './useAppState';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {configureRoutes, navigate} from '../router/Router';
+import {configureRouterWallClock, configureRoutes, navigate} from '../router/Router';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 
@@ -100,6 +100,7 @@ export const AppMain = (properties: AppMainProps) => {
     selfUser,
     conversationState = container.resolve(ConversationState),
     callState = container.resolve(CallState),
+    wallClock,
     locked,
   } = properties;
   const translate = mainView.translate;
@@ -242,6 +243,7 @@ export const AppMain = (properties: AppMainProps) => {
       showUserModal({domain, id: userId}, () => navigate('/'));
     };
 
+    configureRouterWallClock(wallClock);
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId/:domain': showConversationMessages,

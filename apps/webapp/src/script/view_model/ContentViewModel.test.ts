@@ -20,8 +20,11 @@
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {UserState} from 'Repositories/user/userState';
 import type {UserRepository} from 'Repositories/user/userRepository';
 
@@ -31,9 +34,14 @@ import {ContentState, useAppState} from '../page/useAppState';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+const buildConversation = () =>
+  new Conversation('conversation-id', 'example.com', CONVERSATION_PROTOCOL.PROTEUS, (text: string) => text);
+
 const buildContentViewModel = () => {
   const conversationRepository = {
-    getConversationById: jest.fn().mockRejectedValue(new Error('conversation lookup failed')),
+    getConversationById: jest.fn().mockResolvedValue(buildConversation()),
+    init1to1Conversation: jest.fn(),
+    refreshMLSConversationVerificationState: jest.fn().mockResolvedValue(undefined),
   } as unknown as ConversationRepository;
 
   const mainViewModel = {
@@ -51,23 +59,27 @@ const buildContentViewModel = () => {
 
 describe('ContentViewModel', () => {
   it.each([SidebarTabs.CONNECT, SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS])(
-    'keeps the %s tab selected after a conversation navigation is triggered underneath it',
+    'keeps the %s tab selected after a conversation is successfully shown underneath it',
     async tab => {
       const contentViewModel = buildContentViewModel();
       useSidebarStore.getState().setCurrentTab(tab);
+      const conversation = buildConversation();
 
-      await expect(contentViewModel.showConversation({domain: 'example.com', id: 'conversation-id'})).rejects.toThrow();
+      await contentViewModel.showConversation(conversation);
 
+      expect(useAppState.getState().contentState).toBe(ContentState.CONVERSATION);
       expect(useSidebarStore.getState().currentTab).toBe(tab);
     },
   );
 
-  it('keeps a conversation-list tab selected after a conversation navigation is triggered', async () => {
+  it('keeps a conversation-list tab selected after a conversation is successfully shown', async () => {
     const contentViewModel = buildContentViewModel();
     useSidebarStore.getState().setCurrentTab(SidebarTabs.ARCHIVES);
+    const conversation = buildConversation();
 
-    await expect(contentViewModel.showConversation({domain: 'example.com', id: 'conversation-id'})).rejects.toThrow();
+    await contentViewModel.showConversation(conversation);
 
+    expect(useAppState.getState().contentState).toBe(ContentState.CONVERSATION);
     expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.ARCHIVES);
   });
 
