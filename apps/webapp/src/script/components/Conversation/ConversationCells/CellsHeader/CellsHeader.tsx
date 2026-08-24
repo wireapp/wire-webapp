@@ -19,6 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {ViewerAccessIcon} from '@wireapp/react-ui-kit';
+
 import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -35,6 +37,7 @@ import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 import {CellsRootHomeIcon} from './CellsRootHomeIcon';
 
+import {ConversationViewerPermissionBanner} from '../../ConversationViewerPermissionBanner/ConversationViewerPermissionBanner';
 import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {CellsFiltersBar} from '../common/CellsFiltersBar/CellsFiltersBar';
 import type {FilterConfig} from '../common/CellsFiltersBar/filterConfig';
@@ -54,6 +57,7 @@ interface CellsHeaderProps {
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
   filters: FilterConfig[];
+  showViewerPermission: boolean;
 }
 
 export const CellsHeader = ({
@@ -68,6 +72,7 @@ export const CellsHeader = ({
   onSearchChange,
   onSearchClear,
   filters,
+  showViewerPermission,
 }: CellsHeaderProps) => {
   const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
@@ -98,6 +103,12 @@ export const CellsHeader = ({
           <CellsFiltersBar filters={filters} />
         ) : (
           <div css={actionsStyles}>
+            {showViewerPermission && !isInRecycleBin && (
+              <button type="button" className="cells-viewer-access-button">
+                <ViewerAccessIcon />
+                {translate('cells.sharedDriveAccess.viewerAccess')}
+              </button>
+            )}
             {!isInRecycleBin && (
               <CellsNewMenu
                 cellsRepository={cellsRepository}
@@ -128,6 +139,8 @@ export const CellsHeader = ({
           )}
         </div>
       )}
+
+      {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && <ConversationViewerPermissionBanner />}
     </div>
   );
 };

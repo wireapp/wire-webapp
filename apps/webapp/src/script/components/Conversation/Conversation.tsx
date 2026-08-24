@@ -65,6 +65,7 @@ import {
 import {
   CellsSelfUserDriveRoleProvider,
   getSelfUserDriveRole,
+  shouldRestrictCellsViewerActions,
 } from './ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
 import {getCellsFilesPath} from './ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {getCurrentFolderName} from './ConversationCells/common/getCurrentFolderName/getCurrentFolderName';
@@ -74,6 +75,7 @@ import {isConversationFileDropAllowed} from './ConversationFileDropzone/isConver
 import {ConversationMessagesWrapper} from './ConversationMessagesWrapper/ConversationMessagesWrapper';
 import {ConversationTabPanel} from './ConversationTabPanel/ConversationTabPanel';
 import {ConversationTabs} from './ConversationTabs/ConversationTabs';
+import {ConversationViewerPermissionBanner} from './ConversationViewerPermissionBanner/ConversationViewerPermissionBanner';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
@@ -619,6 +621,12 @@ export const Conversation = ({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: selfUser.teamId,
   });
+  const showViewerPermission =
+    isCellsEnabled &&
+    shouldRestrictCellsViewerActions({
+      isViewerPermissionFeatureEnabled,
+      selfUserDriveRole,
+    });
 
   return (
     <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
@@ -681,6 +689,7 @@ export const Conversation = ({
                       isSearchViewOpen={isSharedDriveSearchViewOpen}
                       onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
                       onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
+                      showViewerPermission={showViewerPermission}
                     />
                   )}
                 </ConversationTabPanel>
@@ -734,6 +743,8 @@ export const Conversation = ({
                 isRightSidebarOpen={isRightSidebarOpen}
                 updateConversationLastRead={updateConversationLastRead}
               />
+
+              {showViewerPermission && !isFileTabActive && <ConversationViewerPermissionBanner />}
 
               {isConversationLoaded &&
                 !isSelfUserRemoved &&

@@ -64,6 +64,7 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
+  showViewerPermission: boolean;
 }
 
 export const ConversationCells = memo(
@@ -75,6 +76,7 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
+    showViewerPermission,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
     const {
@@ -247,6 +249,7 @@ export const ConversationCells = memo(
             onSearchChange={handleSearch}
             onSearchClear={handleClearSearch}
             filters={filters}
+            showViewerPermission={showViewerPermission}
           />
           {isTableVisible && (
             <CellsTable

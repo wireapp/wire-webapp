@@ -55,6 +55,7 @@ const defaultProperties = {
   onSearchChange: jest.fn(),
   onSearchClear: jest.fn(),
   filters: [filter],
+  showViewerPermission: false,
 };
 
 const renderCellsHeader = (properties: Partial<typeof defaultProperties> = {}) => {
@@ -79,6 +80,13 @@ describe('CellsHeader', () => {
 
     expect(screen.getByRole('textbox', {name: 'cells.search.placeholder'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Public links'})).toBeInTheDocument();
+  });
+
+  it('renders viewer access in the header when restricted', () => {
+    renderCellsHeader({showViewerPermission: true, isSearchViewOpen: false});
+
+    expect(screen.getByRole('button', {name: /cells.sharedDriveAccess.viewerAccess/})).toBeInTheDocument();
+    expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
   });
 
   it('renders the new-item menu outside the recycle bin', () => {
