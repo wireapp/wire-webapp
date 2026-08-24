@@ -677,7 +677,13 @@ export class UserRepository extends TypedEventEmitter<Events> {
         return this.createDeletedUser(userIds[index]);
       }
 
-      return this.userMapper.mapUserFromJson(storedUser, localDomain);
+      return this.userMapper.mapUserFromJson(
+        {
+          ...storedUser,
+          qualified_id: storedUser.qualified_id ?? userIds[index],
+        },
+        localDomain,
+      );
     });
   };
 
