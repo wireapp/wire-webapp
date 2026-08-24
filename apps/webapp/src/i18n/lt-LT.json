@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Nauji svečiai negalės prisijungti spustelėję nuorodą. Dabartiniai svečiai liks prisijungę.",
   "modalConversationTooManyMembersHeadline": "Balso kanalas perpildytas",
   "modalConversationTooManyMembersMessage": "Prie pokalbio gali prisijungti iki {number1} žmonių. Šiuo metu yra vietos tik dar {number2} žmonėms.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Sukurti",
   "modalCreateFolderHeadline": "Sukurti naują aplanką",
   "modalCreateFolderMessage": "Move your conversation to a new folder.",

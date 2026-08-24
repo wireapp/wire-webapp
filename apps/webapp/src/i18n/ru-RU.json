@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Новые гости не смогут присоединиться по этой ссылке. На доступ текущих гостей это не повлияет.",
   "modalConversationTooManyMembersHeadline": "Эта группа заполнена",
   "modalConversationTooManyMembersMessage": "К беседе может присоединиться до {number1} участников. На текущий момент в комнате есть места еще для {number2} участников.",
+  "modalCreateConversationAdminHint": "Пользователи, не входящие в вашу команду, могут просматривать файлы, но не могут их загружать или редактировать.",
   "modalCreateFolderAction": "Создать",
   "modalCreateFolderHeadline": "Создать новую папку",
   "modalCreateFolderMessage": "Переместить вашу беседу в новую папку.",

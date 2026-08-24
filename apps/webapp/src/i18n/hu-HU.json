@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Új vendégek nem tudnak ezzel a hivatkozással csatlakozni. A már meglévő vendégeknek továbbra is megmarad a hozzáférése.",
   "modalConversationTooManyMembersHeadline": "Telt ház",
   "modalConversationTooManyMembersMessage": "Legfeljebb {number1} partner tud csatlakozni a beszélgetéshez. Még {number2} partner számára van hely.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Létrehozás",
   "modalCreateFolderHeadline": "Új mappa létrehozása",
   "modalCreateFolderMessage": "Helyezd át a beszélgetést egy új mappába.",

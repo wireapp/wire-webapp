@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Uued külalised ei saa selle lingi abil liituda. Praegustel külalistel on jätkuvalt ligipääs.",
   "modalConversationTooManyMembersHeadline": "Grupp on täis",
   "modalConversationTooManyMembersMessage": "Vestlusega saavad liituda kuni {number1} inimest. Hetkel on ruumi veel {number2} inimesele.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Create",
   "modalCreateFolderHeadline": "Create new folder",
   "modalCreateFolderMessage": "Move your conversation to a new folder.",

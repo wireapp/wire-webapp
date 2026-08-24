@@ -1593,6 +1593,7 @@
   "modalConversationRevokeLinkMessage": "Los nuevos invitados no podrán unirse a este enlace. Los invitados actuales seguirán teniendo acceso.",
   "modalConversationTooManyMembersHeadline": "Grupo completo",
   "modalConversationTooManyMembersMessage": "Hasta {number1} personas pueden unirse a una conversación. Actualmente sólo hay espacio para {number2} personas más.",
+  "modalCreateConversationAdminHint": "People outside your team can view files, not upload or edit.",
   "modalCreateFolderAction": "Create",
   "modalCreateFolderHeadline": "Create new folder",
   "modalCreateFolderMessage": "Move your conversation to a new folder.",
