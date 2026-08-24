@@ -87,4 +87,23 @@ describe('mapScheduleFormToMeetingCommand', () => {
       endBeforeStart: undefined,
     });
   });
+
+  it('returns startInPast when creating with a start that is not in the future', () => {
+    const result = mapScheduleFormToMeetingCommand(
+      {
+        ...baseFormState(),
+        start: maybe.just(new Date('2026-06-23T10:00:00.000Z')),
+      },
+      wallClock,
+    );
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toEqual({
+      title: undefined,
+      missingTimes: undefined,
+      startInPast: 'meetings.schedule.errors.startInPast',
+      endInPast: undefined,
+      endBeforeStart: undefined,
+    });
+  });
 });

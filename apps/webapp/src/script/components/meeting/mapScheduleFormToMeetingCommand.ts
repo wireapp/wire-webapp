@@ -50,6 +50,7 @@ export const mapScheduleFormToMeetingCommand = (
     start: formState.start,
     end: formState.end,
     wallClock,
+    mode: 'create',
   });
 
   if (validationResult.isErr) {
