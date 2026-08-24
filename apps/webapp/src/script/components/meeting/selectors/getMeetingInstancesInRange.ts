@@ -76,12 +76,31 @@ const advanceToFirstInstanceOnOrAfter = (
   return current;
 };
 
+const getLastMeetingInstanceAtOrBeforeUntil = (meetingSeries: MeetingSeries): MeetingInstance => {
+  const anchor = new Date(meetingSeries.series_start_date);
+
+  if (meetingSeries.recurrence === 'doesNotRepeat' || meetingSeries.recurrence_until === undefined) {
+    return createMeetingInstance(meetingSeries, anchor);
+  }
+
+  let current = anchor;
+  let lastStart = anchor;
+
+  while (!isAfterRecurrenceUntil(current, meetingSeries.recurrence_until)) {
+    lastStart = current;
+    current = advanceInstanceStart(current, meetingSeries.recurrence);
+  }
+
+  return createMeetingInstance(meetingSeries, lastStart);
+};
+
 /**
  * Instance whose start/end should anchor a recurring edit PUT.
  *
  * When today still has an upcoming or ongoing occurrence, use that slot so
  * editing a future list row does not jump the series start to the next day
- * (WPB-27894). Otherwise fall back to the next instance on or after `now`.
+ * (WPB-27894). Otherwise fall back to the next instance on or after `now`,
+ * or the last occurrence at or before `recurrence_until` when the series has ended.
  */
 export const getEditAnchorMeetingInstance = (meetingSeries: MeetingSeries, now: Date): MeetingInstance => {
   if (meetingSeries.recurrence === 'doesNotRepeat') {
@@ -104,10 +123,7 @@ export const getEditAnchorMeetingInstance = (meetingSeries: MeetingSeries, now: 
     return nextInstance;
   }
 
-  const anchor = new Date(meetingSeries.series_start_date);
-  const start = advanceToFirstInstanceOnOrAfter(anchor, now, meetingSeries.recurrence);
-
-  return createMeetingInstance(meetingSeries, start);
+  return getLastMeetingInstanceAtOrBeforeUntil(meetingSeries);
 };
 
 export const getFirstMeetingInstanceOnOrAfter = (

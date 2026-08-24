@@ -105,7 +105,6 @@ const submitMeeting = ({
     originalEnd: originalEnd.value,
     originalRecurrence,
     originalSelectedUsers,
-    wallClock,
   });
 
   if (commandResult.isErr) {

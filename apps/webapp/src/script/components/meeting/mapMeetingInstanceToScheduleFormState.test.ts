@@ -17,7 +17,10 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {maybe} from 'true-myth';
 
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
@@ -64,10 +67,10 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
     const result = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, wallClock);
 
     expect(result.title).toBe('Weekly sync');
-    expect(result.start.isJust).toBe(true);
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
-    expect(result.end.isJust).toBe(true);
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+    assert(maybe.isJust(result.start));
+    expect(result.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    assert(maybe.isJust(result.end));
+    expect(result.end.value).toEqual(new Date('2026-06-15T11:00:00.000Z'));
     expect(result.recurrence).toBe('weekly');
     expect(result.participantsFilter).toBe('');
     expect(result.selectedUsers).toBe(selectedUsers);
@@ -81,8 +84,10 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
 
     const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
 
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+    assert(maybe.isJust(result.start));
+    expect(result.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    assert(maybe.isJust(result.end));
+    expect(result.end.value).toEqual(new Date('2026-06-15T11:00:00.000Z'));
   });
 
   it('does not use a later selected instance start/end for recurring meetings', () => {
@@ -100,8 +105,10 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
 
     const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
 
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+    assert(maybe.isJust(result.start));
+    expect(result.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    assert(maybe.isJust(result.end));
+    expect(result.end.value).toEqual(new Date('2026-06-15T11:00:00.000Z'));
   });
 
   it('uses the series anchor for non-repeating meetings', () => {
@@ -120,8 +127,10 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
 
     const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
 
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+    assert(maybe.isJust(result.start));
+    expect(result.start.value).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    assert(maybe.isJust(result.end));
+    expect(result.end.value).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
   it('uses selectedUsers passed by the caller', () => {

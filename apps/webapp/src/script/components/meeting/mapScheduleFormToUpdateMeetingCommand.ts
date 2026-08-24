@@ -17,7 +17,6 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {type Maybe, Result, result} from 'true-myth';
 
@@ -39,7 +38,6 @@ export type MapScheduleFormToUpdateMeetingCommandParams = {
   originalEnd: Date;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
-  wallClock: WallClock;
 };
 
 export const mapScheduleFormToUpdateMeetingCommand = ({

@@ -130,7 +130,7 @@ describe('scheduleMeetingValidation', () => {
     expect(hasScheduleMeetingFormErrors(errors)).toBe(false);
   });
 
-  it('allows past start and end times in edit mode', () => {
+  it('allows past start and end times in edit mode when end is after start', () => {
     const pastEndDate = new Date('2026-06-23T11:00:00.000Z');
     const errors = getScheduleMeetingFormErrors({
       title: 'Weekly sync',
@@ -142,6 +142,21 @@ describe('scheduleMeetingValidation', () => {
 
     expect(errors.startInPast).toBeUndefined();
     expect(errors.endInPast).toBeUndefined();
+    expect(errors.endBeforeStart).toBeUndefined();
+    expect(hasScheduleMeetingFormErrors(errors)).toBe(false);
+  });
+
+  it('returns endBeforeStart in edit mode when end is not after start', () => {
+    const errors = getScheduleMeetingFormErrors({
+      title: 'Weekly sync',
+      start: maybe.just(pastStartDate),
+      end: maybe.just(pastStartDate),
+      wallClock,
+      ...editMode,
+    });
+
+    expect(errors.endBeforeStart).toBe('meetings.scheduleModal.error.endBeforeStart');
+    expect(hasScheduleMeetingFormErrors(errors)).toBe(true);
   });
 
   it('returns missingTimes when start or end is missing', () => {
@@ -155,6 +170,19 @@ describe('scheduleMeetingValidation', () => {
 
     expect(errors.missingTimes).toBe('meetings.scheduleModal.error.missingTimes');
     expect(errors.endBeforeStart).toBeUndefined();
+    expect(hasScheduleMeetingFormErrors(errors)).toBe(true);
+  });
+
+  it('returns missingTimes in edit mode when start or end is missing', () => {
+    const errors = getScheduleMeetingFormErrors({
+      title: 'Weekly sync',
+      start: maybe.nothing(),
+      end: futureEnd,
+      wallClock,
+      ...editMode,
+    });
+
+    expect(errors.missingTimes).toBe('meetings.scheduleModal.error.missingTimes');
     expect(hasScheduleMeetingFormErrors(errors)).toBe(true);
   });
 });

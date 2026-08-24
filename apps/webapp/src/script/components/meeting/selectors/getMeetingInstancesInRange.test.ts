@@ -262,6 +262,17 @@ describe('getEditAnchorMeetingInstance', () => {
     expect(anchor.start.toISOString()).toBe('2026-06-22T10:00:00.000Z');
     expect(anchor.end.toISOString()).toBe('2026-06-22T11:00:00.000Z');
   });
+
+  it('does not synthesize an occurrence after recurrence_until', () => {
+    const meetingSeries = createMeetingSeries({
+      recurrence: 'weekly',
+      recurrence_until: '2026-06-08T10:00:00.000Z',
+    });
+    const anchor = getEditAnchorMeetingInstance(meetingSeries, new Date('2026-06-10T12:00:00.000Z'));
+
+    expect(anchor.start.toISOString()).toBe('2026-06-08T10:00:00.000Z');
+    expect(anchor.end.toISOString()).toBe('2026-06-08T11:00:00.000Z');
+  });
 });
 
 describe('getMeetingInstanceAt', () => {

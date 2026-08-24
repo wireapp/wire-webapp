@@ -20,7 +20,6 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {expect, test} from 'test/e2e_tests/test.fixtures';
 import {
   createOngoingMeetingWindow,
-  formatMeetingDateIso,
   meetingWindowWithinPastEditPeriod,
 } from 'test/e2e_tests/utils/meetingTime.util';
 import {createMeetingsTeam, loginMeetingsUsers} from 'test/e2e_tests/utils/meetings.util';
@@ -128,7 +127,7 @@ test.describe('Meetings', () => {
       await expect(memberMeetings.meetingListItem(UPDATED_MEETING_TITLE)).toBeVisible();
     });
 
-    test('host can edit an ongoing recurring meeting without it leaving the list', async ({
+    test('host can edit a future row of an ongoing recurring meeting without dropping today', async ({
       createUser,
       createTeam,
       createPage,
@@ -141,14 +140,21 @@ test.describe('Meetings', () => {
 
       await meetings.openMeetingsTab();
       await meetings.scheduleMeeting(DAILY_ONGOING_TITLE, [member.fullName], {recurrence: 'Daily'});
-      await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE);
+      await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE, 2);
 
       await meetings.editMeeting(DAILY_ONGOING_TITLE, {setOngoingTimes: true});
-      await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE);
+      await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE, 2);
       await meetings.expectEditMeetingActionVisible(DAILY_ONGOING_TITLE, true);
 
-      await meetings.editMeeting(DAILY_ONGOING_TITLE, {newTitle: UPDATED_DAILY_TITLE});
-      await meetings.waitForMeetingInList(UPDATED_DAILY_TITLE);
+      await meetings.openEditMeetingModal(DAILY_ONGOING_TITLE, 1);
+      await meetings.expectEditPrefillDateIsToday();
+      await meetings.fillMeetingTitle(UPDATED_DAILY_TITLE);
+      await meetings.submitScheduleMeetingModal();
+      await meetings.assertNoSubmitErrorVisible();
+      await meetings.waitForMeetingInList(UPDATED_DAILY_TITLE, 2);
+
+      await meetings.openEditMeetingModal(UPDATED_DAILY_TITLE, 0);
+      await meetings.expectEditPrefillDateIsToday();
     });
 
     test('host can edit an ongoing one-off meeting', async ({createUser, createTeam, createPage}) => {
@@ -189,41 +195,6 @@ test.describe('Meetings', () => {
       await expect(meetings.startInPastError()).toBeHidden();
       await meetings.submitScheduleMeetingModal();
       await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE);
-    });
-
-    test("editing an ongoing meeting keeps today's date", async ({createUser, createTeam, createPage}) => {
-      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
-      const member = members[0];
-      const today = formatMeetingDateIso(new Date());
-
-      const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
-      const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
-
-      await meetings.openMeetingsTab();
-      await meetings.scheduleMeeting(DAILY_ONGOING_TITLE, [member.fullName], {recurrence: 'Daily'});
-      await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE);
-
-      await meetings.editMeeting(DAILY_ONGOING_TITLE, {setOngoingTimes: true});
-      await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE);
-
-      await meetings.openEditMeetingModal(DAILY_ONGOING_TITLE);
-      await meetings.expectEditPrefillDateIsToday();
-      await expect(meetings.startDateInput()).toHaveValue(today);
-    });
-
-    test('host can edit a meeting while it is in progress', async ({createUser, createTeam, createPage}) => {
-      const {owner, members} = await createMeetingsTeam(createUser, createTeam, 1);
-      const member = members[0];
-
-      const [ownerPage] = await loginMeetingsUsers(createPage, [owner, member]);
-      const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
-
-      await meetings.openMeetingsTab();
-      await meetings.scheduleMeeting(DAILY_ONGOING_TITLE, [member.fullName], {recurrence: 'Daily'});
-      await meetings.waitForMeetingInList(DAILY_ONGOING_TITLE);
-
-      await meetings.editMeeting(DAILY_ONGOING_TITLE, {setOngoingTimes: true});
-      await meetings.expectEditMeetingActionVisible(DAILY_ONGOING_TITLE, true);
     });
 
     test('host cannot edit a meeting after it has ended', async ({createUser, createTeam, createPage}) => {

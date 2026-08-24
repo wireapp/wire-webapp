@@ -106,11 +106,11 @@ export class MeetingsPage {
     return this.meetingsList.locator(`[data-uie-name="item-meeting"][data-uie-value="${title}"]`);
   }
 
-  async waitForMeetingInList(title: string) {
+  async waitForMeetingInList(title: string, minimumCount = 1) {
     await this.openMeetingsTab();
     await expect
       .poll(() => this.meetingListItem(title).count(), {timeout: MEETINGS_LIST_TIMEOUT_MS})
-      .toBeGreaterThan(0);
+      .toBeGreaterThanOrEqual(minimumCount);
   }
 
   async waitForMeetingAbsentFromList(title: string) {
@@ -361,8 +361,8 @@ export class MeetingsPage {
     await this.submitScheduleMeetingModal();
   }
 
-  async openEditMeetingModal(title: string) {
-    const menu = await this.openMeetingContextMenu(title);
+  async openEditMeetingModal(title: string, occurrenceIndex = 0) {
+    const menu = await this.openMeetingContextMenu(title, occurrenceIndex);
     await menu.getByRole('button', {name: 'Edit meeting'}).click();
     await expect(this.scheduleMeetingModal).toBeVisible();
     await expect(this.scheduleMeetingForm()).toHaveAttribute('data-uie-mode', 'edit');
@@ -397,10 +397,10 @@ export class MeetingsPage {
     await this.setMeetingTimes(start, end);
   }
 
-  async openMeetingContextMenu(title: string) {
+  async openMeetingContextMenu(title: string, occurrenceIndex = 0) {
     await this.openMeetingsTab();
     await this.dismissBlockingModals();
-    const meetingItem = this.meetingListItem(title).first();
+    const meetingItem = this.meetingListItem(title).nth(occurrenceIndex);
     await meetingItem.getByRole('button').last().click();
     return this.page.getByRole('menu');
   }
@@ -414,9 +414,10 @@ export class MeetingsPage {
       setEndedTimes?: boolean;
       addParticipants?: string[];
       removeParticipants?: string[];
+      occurrenceIndex?: number;
     },
   ) {
-    await this.openEditMeetingModal(title);
+    await this.openEditMeetingModal(title, updates.occurrenceIndex ?? 0);
     await expect(this.meetingTitleInput()).toHaveValue(title);
 
     if (updates.newTitle !== undefined) {
