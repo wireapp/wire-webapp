@@ -40,6 +40,7 @@ import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 import {CellsRootHomeIcon} from './CellsRootHomeIcon';
 
+import {ConversationViewerPermissionBanner} from '../../ConversationViewerPermissionBanner/ConversationViewerPermissionBanner';
 import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {CellsFiltersBar} from '../common/CellsFiltersBar/CellsFiltersBar';
 import type {FilterConfig} from '../common/CellsFiltersBar/filterConfig';
@@ -59,6 +60,7 @@ interface CellsHeaderProps {
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
   filters: FilterConfig[];
+  showViewerPermission: boolean;
 }
 
 export const CellsHeader = ({
@@ -73,6 +75,7 @@ export const CellsHeader = ({
   onSearchChange,
   onSearchClear,
   filters,
+  showViewerPermission,
 }: CellsHeaderProps) => {
   const {translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
@@ -138,6 +141,8 @@ export const CellsHeader = ({
           )}
         </div>
       )}
+
+      {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && <ConversationViewerPermissionBanner />}
     </div>
   );
 };

@@ -135,6 +135,59 @@
   }
 }
 
+.conversation-viewer-permission-banner {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 28px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 40px;
+  background: #edeff0;
+  color: var(--foreground);
+  font-size: var(--font-size-small);
+}
+
+.conversation-viewer-permission-banner__content {
+  display: flex;
+  min-height: 24px;
+  align-items: center;
+  gap: 10px;
+}
+
+.conversation-viewer-permission-banner__learn-more {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+}
+
+.conversation-viewer-permission-banner__close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.conversation-viewer-permission-banner__close svg {
+  width: 16px;
+  height: 16px;
+}
+
 .conversation-tabpanel {
   &--messages {
     display: flex;
