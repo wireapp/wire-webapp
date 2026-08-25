@@ -24,9 +24,8 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
-import {shouldRestrictCellsViewerActions} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {useShouldRestrictGlobalDriveNodeActions} from 'Components/cellsGlobalView/common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {forcedDownloadFile} from 'Util/util';
@@ -43,15 +42,12 @@ interface CellsTableRowOptionsProps {
 
 export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): ReactElement => {
   const {node, cellsRepository} = properties;
-  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {handleOpenFile} = useCellsFilePreviewModal();
 
   const url = node.url;
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
-  const shouldDisableRestrictedActions = shouldRestrictCellsViewerActions({
-    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
-    selfUserDriveRole: node.selfUserDriveRole,
-  });
+  const shouldDisableRestrictedActions = useShouldRestrictGlobalDriveNodeActions(node);
   // DropdownMenu.Item disabled state is visual/ARIA only for native onClick handlers.
   // Keep restricted actions without a handler so viewer access cannot activate them.
   const restrictedActionClickHandler = <ClickHandler extends () => void>(clickHandler: ClickHandler) =>

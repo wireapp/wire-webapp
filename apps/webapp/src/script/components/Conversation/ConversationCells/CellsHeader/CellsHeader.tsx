@@ -20,6 +20,11 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CellsViewerAccessLabel} from 'Components/Conversation/ConversationCells/common/CellsViewerAccessLabel';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -70,12 +75,14 @@ export const CellsHeader = ({
   filters,
 }: CellsHeaderProps) => {
   const {translate} = useApplicationContext();
+  const canPerformCellsAction = useCellsActionPermissions();
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
     currentPath: getCellsFilesPath(),
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
   const isRootLevel = breadcrumbs.length === 1;
+  const shouldShowViewerAccessLabel = !isInRecycleBin && !canPerformCellsAction(CELLS_ACTION.CREATE);
 
   return (
     <div css={wrapperStyles}>
@@ -104,6 +111,9 @@ export const CellsHeader = ({
                 conversationQualifiedId={conversationQualifiedId}
                 onRefresh={onRefresh}
               />
+            )}
+            {shouldShowViewerAccessLabel && (
+              <CellsViewerAccessLabel label={translate('cells.sharedDriveAccess.viewerAccess')} />
             )}
             <CellsRefresh onRefresh={onRefresh} />
             <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />

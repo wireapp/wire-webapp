@@ -71,6 +71,23 @@ export const desktopNameStyles: CSSObject = {
   },
 };
 
+export const fileNameWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  minWidth: 0,
+  gap: '8px',
+};
+
+export const viewerAccessIconStyles: CSSObject = {
+  color: 'var(--gray-90, #34373D)',
+  fill: 'currentColor',
+  flexShrink: 0,
+
+  'body.theme-dark &': {
+    color: 'var(--white, #FFFFFF)',
+  },
+};
+
 export const mobileNameStyles: CSSObject = {
   [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'none',

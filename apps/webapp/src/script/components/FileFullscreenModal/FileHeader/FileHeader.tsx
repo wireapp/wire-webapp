@@ -30,7 +30,6 @@ import {
   DropdownMenu,
   MoreIcon,
   ShowIcon,
-  ViewerAccessIcon,
 } from '@wireapp/react-ui-kit';
 
 import {ChannelAvatar, GroupAvatar} from 'Components/avatar';
@@ -39,6 +38,7 @@ import {
   CELLS_ACTION,
   useCellsActionPermissions,
 } from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CellsViewerAccessLabel} from 'Components/Conversation/ConversationCells/common/CellsViewerAccessLabel';
 import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {EditIcon} from 'Components/icon';
 import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
@@ -66,7 +66,6 @@ import {
   downloadButtonStyles,
   actionButtonsStyles,
   editModeButtonStyles,
-  viewOnlyLabelStyles,
 } from './FileHeader.styles';
 
 interface FileHeaderProps {
@@ -190,12 +189,10 @@ export const FileHeader = ({
       )}
       <div css={actionButtonsStyles}>
         {showViewOnlyLabel && (
-          <div css={viewOnlyLabelStyles}>
-            <span data-uie-name="file-header-view-only-icon" aria-hidden="true">
-              <ViewerAccessIcon />
-            </span>
-            {translate('cells.imageFullScreenModal.viewerAccessLabel')}
-          </div>
+          <CellsViewerAccessLabel
+            label={translate('cells.imageFullScreenModal.viewerAccessLabel')}
+            iconUieName="file-header-view-only-icon"
+          />
         )}
         {!showViewOnlyLabel && !isRecycleBin && canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && (
           <Button
