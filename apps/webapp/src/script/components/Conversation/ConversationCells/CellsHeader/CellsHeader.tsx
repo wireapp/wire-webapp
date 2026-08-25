@@ -19,8 +19,6 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {ViewerAccessIcon} from '@wireapp/react-ui-kit';
-
 import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -103,12 +101,6 @@ export const CellsHeader = ({
           <CellsFiltersBar filters={filters} />
         ) : (
           <div css={actionsStyles}>
-            {showViewerPermission && !isInRecycleBin && (
-              <button type="button" className="cells-viewer-access-button">
-                <ViewerAccessIcon />
-                {translate('cells.sharedDriveAccess.viewerAccess')}
-              </button>
-            )}
             {!isInRecycleBin && (
               <CellsNewMenu
                 cellsRepository={cellsRepository}

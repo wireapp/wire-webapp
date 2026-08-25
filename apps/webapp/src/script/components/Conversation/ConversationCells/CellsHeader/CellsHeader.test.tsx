@@ -82,10 +82,10 @@ describe('CellsHeader', () => {
     expect(screen.getByRole('button', {name: 'Public links'})).toBeInTheDocument();
   });
 
-  it('renders viewer access in the header when restricted', () => {
+  it('renders the viewer permission banner when restricted', () => {
     renderCellsHeader({showViewerPermission: true, isSearchViewOpen: false});
 
-    expect(screen.getByRole('button', {name: /cells.sharedDriveAccess.viewerAccess/})).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
   });
 
