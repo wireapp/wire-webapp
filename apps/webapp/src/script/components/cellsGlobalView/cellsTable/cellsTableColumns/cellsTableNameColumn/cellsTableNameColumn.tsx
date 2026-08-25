@@ -19,19 +19,23 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
+import {FolderIcon, PlayIcon, Tooltip, ViewerAccessIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
+import {useShouldRestrictGlobalDriveNodeActions} from 'Components/cellsGlobalView/common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {getFileExtension} from 'Util/util';
 
 import {
   desktopNameStyles,
+  fileNameWrapperStyles,
   imagePreviewStyles,
   imagePreviewWrapperStyles,
   mobileNameStyles,
   playIconStyles,
+  viewerAccessIconStyles,
   wrapperStyles,
 } from './cellsTableNameColumn.styles';
 
@@ -56,12 +60,14 @@ export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
 };
 
 const FileNameColumn = ({file}: {file: CellFile}) => {
+  const {translate} = useApplicationContext();
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
   const isImage = isNonEmptyString(file.mimeType) && file.mimeType.startsWith('image');
   const isVideo = isNonEmptyString(file.mimeType) && file.mimeType.startsWith('video');
 
   const shouldDisplayImagePreview = (isImage || isVideo) && isNonEmptyString(file.previewImageUrl);
+  const shouldShowViewerAccessIcon = useShouldRestrictGlobalDriveNodeActions(file);
 
   const {previewImageUrl, name} = file;
 
@@ -75,16 +81,30 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
       ) : (
         <FileTypeIcon extension={getFileExtension(name)} size={24} />
       )}
-      <button
-        type="button"
-        css={desktopNameStyles}
-        onClick={() => handleOpenFile(file)}
-        aria-controls={id}
-        aria-expanded={selectedFile !== null}
-        aria-haspopup="dialog"
-      >
-        {name}
-      </button>
+      <div css={fileNameWrapperStyles}>
+        <button
+          type="button"
+          css={desktopNameStyles}
+          onClick={() => handleOpenFile(file)}
+          aria-controls={id}
+          aria-expanded={selectedFile !== null}
+          aria-haspopup="dialog"
+        >
+          {name}
+        </button>
+        {shouldShowViewerAccessIcon && (
+          <Tooltip body={translate('cells.sharedDriveAccess.viewerAccess')}>
+            <ViewerAccessIcon
+              width={14}
+              height={14}
+              css={viewerAccessIconStyles}
+              role="img"
+              aria-label={translate('cells.sharedDriveAccess.viewerAccess')}
+              data-uie-name="cells-table-viewer-access-icon"
+            />
+          </Tooltip>
+        )}
+      </div>
     </>
   );
 };
