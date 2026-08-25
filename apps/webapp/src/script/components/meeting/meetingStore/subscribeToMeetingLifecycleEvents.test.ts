@@ -98,7 +98,7 @@ describe('subscribeToMeetingLifecycleEvents', () => {
 
     amplify.publish(WebAppEvents.MEETING.DELETED, meetingId, otherUserId);
 
-    expect(onMeetingCancelled).toHaveBeenCalledWith(meetingId);
+    expect(onMeetingCancelled).toHaveBeenCalledWith(meetingId, {notify: true});
     expect(dispatcher.enqueueMeetingRemoval).toHaveBeenCalledWith(meetingId);
     expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalled();
   });
@@ -109,7 +109,7 @@ describe('subscribeToMeetingLifecycleEvents', () => {
 
     amplify.publish(WebAppEvents.MEETING.DELETED, meetingId, selfUserId);
 
-    expect(onMeetingCancelled).not.toHaveBeenCalled();
+    expect(onMeetingCancelled).toHaveBeenCalledWith(meetingId, {notify: false});
     expect(dispatcher.enqueueMeetingRemoval).toHaveBeenCalledWith(meetingId);
   });
 

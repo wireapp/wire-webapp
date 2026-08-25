@@ -303,6 +303,37 @@ describe('MeetingStoreRoot', () => {
     expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
   });
 
+  it('dismisses leftover meeting cards without a cancellation when the current user deleted the meeting', async () => {
+    renderMeetingStoreRoot();
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.UPDATED, meetingId, otherUserId);
+    });
+
+    await waitFor(() => {
+      expect(useMeetingNotificationStore.getState().notifications).toEqual([
+        expect.objectContaining({
+          kind: MeetingNotificationKind.UPDATE,
+          qualifiedId: meetingId,
+        }),
+      ]);
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId, selfUserId);
+    });
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('');
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
+  });
+
   it('does not add an update notification when a queued sync is followed by deletion', async () => {
     let resolveMeeting: () => void = () => undefined;
     const meetingFetch = new Promise<void>(resolve => {

@@ -334,6 +334,27 @@ describe('createMeetingNotificationEventHandlers', () => {
     ]);
   });
 
+  it('dismisses stale notifications without creating a cancellation when notify is false', () => {
+    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    const notifications: AddNotificationInput[] = [];
+    const {notifyUpdate, onMeetingCancelled} = createHandlers({notifications, dismissedMeetings});
+
+    notifyUpdate(meetingSeries);
+    onMeetingCancelled(meetingId, {notify: false});
+
+    expect(dismissedMeetings).toEqual([
+      {
+        meetingId,
+        kinds: [MeetingNotificationKind.UPDATE, MeetingNotificationKind.INVITE, MeetingNotificationKind.ONGOING],
+      },
+      {
+        meetingId,
+        kinds: [MeetingNotificationKind.CANCELLED],
+      },
+    ]);
+    expect(notifications).toEqual([]);
+  });
+
   it('creates only one cancellation notification when cancelled twice', () => {
     const notifications: AddNotificationInput[] = [];
     const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
