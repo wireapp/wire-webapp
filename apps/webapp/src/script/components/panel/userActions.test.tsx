@@ -446,7 +446,7 @@ describe('UserActions', () => {
     const originalSetCurrentTab = useSidebarStore.getState().setCurrentTab;
     const setCurrentTab = jest.fn();
     useSidebarStore.setState({setCurrentTab});
-    actionsViewModel.sendConnectionRequest = jest.fn().mockResolvedValue({
+    jest.spyOn(actionsViewModel, 'sendConnectionRequest').mockResolvedValue({
       connectionStatus: ConnectionStatus.SENT,
       conversationId: {id: 'conversation-id', domain: ''},
     });
