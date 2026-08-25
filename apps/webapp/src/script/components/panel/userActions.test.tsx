@@ -49,6 +49,8 @@ import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conver
 const actionsViewModel = {
   open1to1Conversation: jest.fn(),
   getOrCreate1to1Conversation: jest.fn(),
+  sendConnectionRequest: jest.fn(),
+  saveConversation: jest.fn(),
 } as unknown as ActionsViewModel;
 
 const getAllActions = (queryFunction: (id: string) => HTMLElement | null) =>
@@ -450,7 +452,7 @@ describe('UserActions', () => {
       connectionStatus: ConnectionStatus.SENT,
       conversationId: {id: 'conversation-id', domain: ''},
     });
-    actionsViewModel.saveConversation = jest.fn().mockResolvedValue(conversation);
+    jest.spyOn(actionsViewModel, 'saveConversation').mockResolvedValue(conversation);
 
     const {getByTestId} = renderWithRootProvider(
       <UserActions
@@ -473,6 +475,8 @@ describe('UserActions', () => {
     await act(async () => {
       useSidebarStore.setState({setCurrentTab: originalSetCurrentTab});
     });
+    jest.mocked(actionsViewModel.sendConnectionRequest).mockReset();
+    jest.mocked(actionsViewModel.saveConversation).mockReset();
   });
 
   it('displays a list when multiple actions are available in user modal', () => {
