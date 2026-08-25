@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {addDays, startOfDay} from 'date-fns';
 
 import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
@@ -113,13 +114,13 @@ export const getEditAnchorMeetingInstance = (meetingSeries: MeetingSeries, now: 
     meetingInstance => meetingInstance.end.getTime() > now.getTime(),
   );
 
-  if (todaysNotYetEnded !== undefined) {
+  if (!isUndefined(todaysNotYetEnded)) {
     return todaysNotYetEnded;
   }
 
   const nextInstance = getFirstMeetingInstanceOnOrAfter(meetingSeries, now);
 
-  if (nextInstance !== undefined) {
+  if (!isUndefined(nextInstance)) {
     return nextInstance;
   }
 
