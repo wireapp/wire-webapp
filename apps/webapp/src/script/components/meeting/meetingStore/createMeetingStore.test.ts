@@ -96,16 +96,18 @@ describe('createMeetingStore', () => {
     getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting)),
     safeGetConversationById = jest.fn(),
     serviceTasks = createServiceTasks(),
+    wallClock: wallClockOverride = wallClock,
   }: {
     getMeetingsList?: jest.Mock;
     getMeeting?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     serviceTasks?: MeetingStoreServiceTasks;
+    wallClock?: typeof wallClock;
   } = {}): MeetingStoreDeps => ({
     meetingsRepository: {getMeetingsList, getMeeting} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
     callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
-    wallClock,
+    wallClock: wallClockOverride,
     serviceTasks,
   });
 
@@ -307,7 +309,7 @@ describe('createMeetingStore', () => {
     expect(result.value.formState.end.value).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
-  it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
+  it('prefills edit form with the edit anchor times for recurring meetings', async () => {
     const conversation = new Conversation(
       'conversation-id',
       'example.com',
@@ -339,6 +341,43 @@ describe('createMeetingStore', () => {
     expect(result.value.formState.start.value).toEqual(new Date('2026-06-22T10:00:00.000Z'));
     assert(maybe.isJust(result.value.formState.end));
     expect(result.value.formState.end.value).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+  });
+
+  it('prefills today’s in-progress occurrence when editing a future row (WPB-27894)', async () => {
+    const conversation = new Conversation(
+      'conversation-id',
+      'example.com',
+      CONVERSATION_PROTOCOL.MLS,
+      translateForTest,
+    );
+    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
+    const ongoingWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T10:30:00.000Z'),
+    });
+    const store = createMeetingStore(createDeps({safeGetConversationById, wallClock: ongoingWallClock}));
+    const recurringMeetingInstance = {
+      meetingSeries: {
+        ...meetingSeriesEntry,
+        series_start_date: '2026-06-01T10:00:00.000Z',
+        series_end_date: '2026-06-01T11:00:00.000Z',
+        recurrence: 'weekly' as const,
+      },
+      start: new Date('2026-06-22T10:00:00.000Z'),
+      end: new Date('2026-06-22T11:00:00.000Z'),
+    };
+
+    const result = await store.getState().loadMeetingForEdit(recurringMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+
+    if (!result.isOk) {
+      throw new Error('Expected loadMeetingForEdit to succeed');
+    }
+
+    assert(maybe.isJust(result.value.formState.start));
+    expect(result.value.formState.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    assert(maybe.isJust(result.value.formState.end));
+    expect(result.value.formState.end.value).toEqual(new Date('2026-06-15T11:00:00.000Z'));
   });
 
   it('maps deleteMeetingForAll to a DeleteMeetingCommand for serviceTasks', async () => {

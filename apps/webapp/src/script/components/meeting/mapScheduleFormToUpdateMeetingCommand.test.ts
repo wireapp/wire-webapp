@@ -17,21 +17,17 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {maybe} from 'true-myth';
 
-import {unwrapErr} from 'Util/test/resultTestSupport';
+import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {mapScheduleFormToUpdateMeetingCommand} from './mapScheduleFormToUpdateMeetingCommand';
 import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 
-const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
-
-const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
 const baseFormState = (): ScheduleMeetingFormState => ({
   title: 'Weekly sync',
@@ -53,11 +49,10 @@ describe('mapScheduleFormToUpdateMeetingCommand', () => {
       originalEnd: futureEndDate,
       originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
-      wallClock,
     });
 
     expect(result.isOk).toBe(true);
-    expect(result.match({Ok: value => value, Err: () => null})).toEqual({
+    expect(unwrap(result)).toEqual({
       meetingId,
       title: 'Weekly sync',
       start: futureStartDate,
@@ -86,10 +81,34 @@ describe('mapScheduleFormToUpdateMeetingCommand', () => {
       originalEnd: futureEndDate,
       originalRecurrence: 'weekly',
       originalSelectedUsers: [],
-      wallClock,
     });
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe('missingTimes');
+  });
+
+  it('maps past start and end times for an ongoing meeting edit', () => {
+    const pastStartDate = new Date('2026-06-23T10:00:00.000Z');
+    const pastEndDate = new Date('2026-06-23T11:00:00.000Z');
+    const result = mapScheduleFormToUpdateMeetingCommand({
+      formState: {
+        ...baseFormState(),
+        start: maybe.just(pastStartDate),
+        end: maybe.just(pastEndDate),
+      },
+      meetingId,
+      qualifiedConversation: maybe.just(qualifiedConversation),
+      originalTitle: 'Weekly sync',
+      originalStart: pastStartDate,
+      originalEnd: pastEndDate,
+      originalRecurrence: 'weekly',
+      originalSelectedUsers: [],
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result)).toMatchObject({
+      start: pastStartDate,
+      end: pastEndDate,
+    });
   });
 });

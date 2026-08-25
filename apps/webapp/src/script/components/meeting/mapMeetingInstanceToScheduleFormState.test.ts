@@ -17,7 +17,10 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {maybe} from 'true-myth';
 
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
@@ -53,28 +56,44 @@ const createMeetingInstance = (
   end: new Date(end),
 });
 
-const wallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
-});
-
 describe('mapMeetingInstanceToScheduleFormState', () => {
-  it('maps the upcoming instance start/end for recurring meetings', () => {
+  it('maps the edit anchor start/end for recurring meetings when today’s slot has ended', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    });
     const selectedUsers = [createUser('1'), createUser('2')];
     const meetingInstance = createMeetingInstance({}, '2026-06-29T10:00:00.000Z', '2026-06-29T11:00:00.000Z');
 
     const result = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, wallClock);
 
     expect(result.title).toBe('Weekly sync');
-    expect(result.start.isJust).toBe(true);
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
-    expect(result.end.isJust).toBe(true);
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+    assert(maybe.isJust(result.start));
+    expect(result.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    assert(maybe.isJust(result.end));
+    expect(result.end.value).toEqual(new Date('2026-06-15T11:00:00.000Z'));
     expect(result.recurrence).toBe('weekly');
     expect(result.participantsFilter).toBe('');
     expect(result.selectedUsers).toBe(selectedUsers);
   });
 
+  it('uses today’s in-progress occurrence when editing a future row (WPB-27894)', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T10:30:00.000Z'),
+    });
+    const meetingInstance = createMeetingInstance({}, '2026-06-22T10:00:00.000Z', '2026-06-22T11:00:00.000Z');
+
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
+
+    assert(maybe.isJust(result.start));
+    expect(result.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    assert(maybe.isJust(result.end));
+    expect(result.end.value).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+  });
+
   it('does not use a later selected instance start/end for recurring meetings', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    });
     const meetingInstance = createMeetingInstance(
       {
         series_start_date: '2026-06-01T10:00:00.000Z',
@@ -86,11 +105,16 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
 
     const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
 
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T10:00:00.000Z'));
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-15T11:00:00.000Z'));
+    assert(maybe.isJust(result.start));
+    expect(result.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    assert(maybe.isJust(result.end));
+    expect(result.end.value).toEqual(new Date('2026-06-15T11:00:00.000Z'));
   });
 
   it('uses the series anchor for non-repeating meetings', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    });
     const meetingInstance = createMeetingInstance(
       {
         recurrence: 'doesNotRepeat',
@@ -103,11 +127,16 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
 
     const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
 
-    expect(result.start.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T10:00:00.000Z'));
-    expect(result.end.unwrapOr(new Date(0))).toEqual(new Date('2026-06-16T11:00:00.000Z'));
+    assert(maybe.isJust(result.start));
+    expect(result.start.value).toEqual(new Date('2026-06-16T10:00:00.000Z'));
+    assert(maybe.isJust(result.end));
+    expect(result.end.value).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
   it('uses selectedUsers passed by the caller', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    });
     const alice = createUser('1');
     const bob = createUser('2');
     const selectedUsers = [alice, bob];

@@ -17,7 +17,8 @@
  *
  */
 
-import {addDays} from 'date-fns';
+import {isUndefined} from '@sindresorhus/is';
+import {addDays, startOfDay} from 'date-fns';
 
 import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
@@ -76,19 +77,54 @@ const advanceToFirstInstanceOnOrAfter = (
   return current;
 };
 
-/**
- * First instance start on or after `now`, walking forward from the series anchor.
- *
- * Used when prefilling the edit form for recurring meetings so updates do not move
- * the series anchor to a later selected occurrence and wipe earlier instances.
- */
-export const getUpcomingMeetingInstanceStart = (meetingSeries: MeetingSeries, now: Date): Date => {
-  if (meetingSeries.recurrence === 'doesNotRepeat') {
-    return new Date(meetingSeries.series_start_date);
+const getLastMeetingInstanceAtOrBeforeUntil = (meetingSeries: MeetingSeries): MeetingInstance => {
+  const anchor = new Date(meetingSeries.series_start_date);
+
+  if (meetingSeries.recurrence === 'doesNotRepeat' || meetingSeries.recurrence_until === undefined) {
+    return createMeetingInstance(meetingSeries, anchor);
   }
 
-  const anchor = new Date(meetingSeries.series_start_date);
-  return advanceToFirstInstanceOnOrAfter(anchor, now, meetingSeries.recurrence);
+  let current = anchor;
+  let lastStart = anchor;
+
+  while (!isAfterRecurrenceUntil(current, meetingSeries.recurrence_until)) {
+    lastStart = current;
+    current = advanceInstanceStart(current, meetingSeries.recurrence);
+  }
+
+  return createMeetingInstance(meetingSeries, lastStart);
+};
+
+/**
+ * Instance whose start/end should anchor a recurring edit PUT.
+ *
+ * When today still has an upcoming or ongoing occurrence, use that slot so
+ * editing a future list row does not jump the series start to the next day
+ * (WPB-27894). Otherwise fall back to the next instance on or after `now`,
+ * or the last occurrence at or before `recurrence_until` when the series has ended.
+ */
+export const getEditAnchorMeetingInstance = (meetingSeries: MeetingSeries, now: Date): MeetingInstance => {
+  if (meetingSeries.recurrence === 'doesNotRepeat') {
+    return createMeetingInstance(meetingSeries, new Date(meetingSeries.series_start_date));
+  }
+
+  const startOfToday = startOfDay(now);
+  const startOfTomorrow = addDays(startOfToday, 1);
+  const todaysNotYetEnded = getMeetingInstancesInRange(meetingSeries, startOfToday, startOfTomorrow).find(
+    meetingInstance => meetingInstance.end.getTime() > now.getTime(),
+  );
+
+  if (!isUndefined(todaysNotYetEnded)) {
+    return todaysNotYetEnded;
+  }
+
+  const nextInstance = getFirstMeetingInstanceOnOrAfter(meetingSeries, now);
+
+  if (!isUndefined(nextInstance)) {
+    return nextInstance;
+  }
+
+  return getLastMeetingInstanceAtOrBeforeUntil(meetingSeries);
 };
 
 export const getFirstMeetingInstanceOnOrAfter = (

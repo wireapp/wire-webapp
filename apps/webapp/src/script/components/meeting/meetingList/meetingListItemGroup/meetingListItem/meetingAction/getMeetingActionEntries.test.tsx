@@ -150,7 +150,7 @@ describe('getMeetingActionEntries', () => {
     expect(getEditEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Edit meeting when the instance has started', () => {
+  it('includes Edit meeting when the instance is ongoing', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -162,7 +162,7 @@ describe('getMeetingActionEntries', () => {
       onDeleteForMe: noop,
     });
 
-    expect(getEditEntryLabel(entries)).toBeUndefined();
+    expect(getEditEntryLabel(entries)).toBeDefined();
   });
 
   it('omits Edit meeting when the instance is in the past', () => {
