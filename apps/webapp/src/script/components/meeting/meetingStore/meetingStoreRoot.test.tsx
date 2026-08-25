@@ -269,7 +269,7 @@ describe('MeetingStoreRoot', () => {
     });
 
     act(() => {
-      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId, otherUserId);
     });
 
     expect(useMeetingNotificationStore.getState().notifications).toEqual([
@@ -283,6 +283,24 @@ describe('MeetingStoreRoot', () => {
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('');
     });
+  });
+
+  it('does not notify the user who deleted the meeting', async () => {
+    renderMeetingStoreRoot();
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('Weekly sync');
+    });
+
+    act(() => {
+      amplify.publish(WebAppEvents.MEETING.DELETED, meetingId, selfUserId);
+    });
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('');
+    });
+
+    expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
   });
 
   it('does not add an update notification when a queued sync is followed by deletion', async () => {

@@ -32,6 +32,7 @@ export type SubscribeToMeetingLifecycleEventsDependencies = {
   getSelfUserQualifiedId: () => QualifiedId;
   notifyMeetingChange: (meeting: MeetingSeries) => void;
   notifyUpdate: (meeting: MeetingSeries) => void;
+  onMeetingCancelled: (meetingId: QualifiedId) => void;
 };
 
 /**
@@ -43,6 +44,7 @@ export const subscribeToMeetingLifecycleEvents = ({
   getSelfUserQualifiedId,
   notifyMeetingChange,
   notifyUpdate,
+  onMeetingCancelled,
 }: SubscribeToMeetingLifecycleEventsDependencies): (() => void) => {
   const onMeetingCreated = (meetingId: QualifiedId) => {
     dispatcher.enqueueMeetingSync(meetingId);
@@ -66,7 +68,11 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingSync(meetingId, notifyMeetingChange);
   };
 
-  const onMeetingDeleted = (meetingId: QualifiedId) => {
+  const onMeetingDeleted = (meetingId: QualifiedId, actorId: QualifiedId) => {
+    if (!matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
+      onMeetingCancelled(meetingId);
+    }
+
     dispatcher.enqueueMeetingRemoval(meetingId);
   };
 
