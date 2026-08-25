@@ -19,10 +19,7 @@
 
 import {type ReactNode, useEffect, useMemo} from 'react';
 
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {createMeetingNotificationEventHandlers} from 'Components/meeting/meetingNotificationEventHandlers';
 import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
@@ -96,8 +93,6 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       logger,
     });
 
-    amplify.subscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingCancelled);
-
     const getSelfUserQualifiedId = () => container.resolve(UserState).self().qualifiedId;
 
     const unsubscribeFromMeetingLifecycleEvents = subscribeToMeetingLifecycleEvents({
@@ -105,6 +100,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       getSelfUserQualifiedId,
       notifyMeetingChange: notificationHandlers.notifyMeetingChange,
       notifyUpdate: notificationHandlers.notifyUpdate,
+      onMeetingCancelled: notificationHandlers.onMeetingCancelled,
     });
     const unsubscribeFromMeetingConversationEvents = subscribeToMeetingConversationEvents({
       dispatcher,
@@ -123,7 +119,6 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       unsubscribeFromMeetingLifecycleEvents();
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
-      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingCancelled);
     };
   }, [isMeetingsEnabled, store]);
 
