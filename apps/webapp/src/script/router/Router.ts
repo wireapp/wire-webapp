@@ -17,9 +17,19 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {match} from 'path-to-regexp';
 
+import {isConversationListTab, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+
 type Routes = Record<string, ((...args: any[]) => void | Promise<void>) | null>;
+
+let routerWallClock: WallClock = createWallClock();
+
+export const configureRouterWallClock = (wallClock: WallClock): void => {
+  routerWallClock = wallClock;
+};
 
 const defaultRoute: Routes = {
   // do nothing if url was not matched
@@ -85,10 +95,31 @@ export const configureRoutes = (routeDefinitions: Routes): void => {
   parseRoute();
 };
 export const navigate = (path: string) => {
-  setHistoryParam(path);
-  parseRoute();
+  const isDeferred = setHistoryParam(path);
+  if (!isDeferred) {
+    parseRoute();
+  }
 };
 
-export const setHistoryParam = (path: string) => {
+export const setHistoryParam = (path: string): boolean => {
+  const hashUnchanged = window.location.hash === `#${path}`;
   window.location.hash = path;
+
+  const shouldDefer = hashUnchanged && path === '/' && isConversationListTab(useSidebarStore.getState().currentTab);
+
+  if (shouldDefer) {
+    // Setting the hash to its current value does not fire a native `hashchange` event, so route
+    // handlers that rely on it (e.g. re-showing the most recent conversation) would otherwise
+    // never run. Force route re-evaluation async, matching the timing of a real hashchange, so
+    // callers that synchronously update content state right after calling this still take effect
+    // first.
+    routerWallClock.setTimeout(() => {
+      if (!isConversationListTab(useSidebarStore.getState().currentTab)) {
+        return;
+      }
+      parseRoute();
+    }, 0);
+  }
+
+  return shouldDefer;
 };

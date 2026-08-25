@@ -17,7 +17,7 @@
  *
  */
 
-import {act, render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -44,10 +44,13 @@ import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 
 import {ActionIdentifier, Actions, UserActions} from './userActions';
+import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
 
 const actionsViewModel = {
   open1to1Conversation: jest.fn(),
   getOrCreate1to1Conversation: jest.fn(),
+  sendConnectionRequest: jest.fn(),
+  saveConversation: jest.fn(),
 } as unknown as ActionsViewModel;
 
 const getAllActions = (queryFunction: (id: string) => HTMLElement | null) =>
@@ -431,6 +434,49 @@ describe('UserActions', () => {
     const identifier = ActionIdentifier[Actions.SEND_REQUEST];
     expect(queryByTestId(identifier)).not.toBeNull();
     expect(queryByTestId('do-close')).toBeNull();
+  });
+
+  it('keeps the current conversation route when sending a connection request from a conversation', async () => {
+    const user = new User('', '', translateForTest);
+    const connection = new ConnectionEntity();
+    user.connection(connection);
+    user.connection()?.status(ConnectionStatus.UNKNOWN);
+    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const selfUser = new User('', '', translateForTest);
+    const originalSetCurrentTab = useSidebarStore.getState().setCurrentTab;
+    const setCurrentTab = jest.fn();
+    useSidebarStore.setState({setCurrentTab});
+    jest.spyOn(actionsViewModel, 'sendConnectionRequest').mockResolvedValue({
+      connectionStatus: ConnectionStatus.SENT,
+      conversationId: {id: 'conversation-id', domain: ''},
+    });
+    jest.spyOn(actionsViewModel, 'saveConversation').mockResolvedValue(conversation);
+
+    const {getByTestId} = renderWithRootProvider(
+      <UserActions
+        actionsViewModel={actionsViewModel}
+        conversation={conversation}
+        conversationRoleRepository={{} as ConversationRoleRepository}
+        isSelfActivated
+        onAction={noop}
+        selfUser={selfUser}
+        user={user}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(getByTestId(ActionIdentifier[Actions.SEND_REQUEST]));
+    });
+
+    expect(actionsViewModel.open1to1Conversation).not.toHaveBeenCalled();
+    expect(setCurrentTab).not.toHaveBeenCalledWith(SidebarTabs.RECENT);
+    await act(async () => {
+      useSidebarStore.setState({setCurrentTab: originalSetCurrentTab});
+    });
+    jest.mocked(actionsViewModel.sendConnectionRequest).mockReset();
+    jest.mocked(actionsViewModel.saveConversation).mockReset();
   });
 
   it('displays a list when multiple actions are available in user modal', () => {

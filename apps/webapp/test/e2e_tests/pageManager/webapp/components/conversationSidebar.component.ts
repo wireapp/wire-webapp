@@ -30,6 +30,8 @@ export class ConversationSidebar {
   readonly preferencesButton: Locator;
   readonly allConversationsButton: Locator;
   readonly connectButton: Locator;
+  readonly cellsButton: Locator;
+  readonly meetingsButton: Locator;
   readonly archiveButton: Locator;
   readonly manageTeamButton: Locator;
   readonly sidebar: Locator;
@@ -50,6 +52,8 @@ export class ConversationSidebar {
     this.preferencesButton = page.getByTestId('go-preferences');
     this.allConversationsButton = page.getByTestId('go-recent-view');
     this.connectButton = page.getByTestId('go-people');
+    this.cellsButton = page.getByTestId('go-cells');
+    this.meetingsButton = page.getByTestId('go-meetings');
     this.archiveButton = page.getByTestId('go-archive');
     this.manageTeamButton = page.getByTestId('go-team-management');
     this.sidebar = page.locator(`.conversations-sidebar-items`);
@@ -71,8 +75,20 @@ export class ConversationSidebar {
     await this.connectButton.click();
   }
 
+  async clickCellsButton() {
+    await this.cellsButton.click();
+  }
+
+  async clickMeetingsButton() {
+    await this.meetingsButton.click();
+  }
+
   async clickArchive() {
     await this.archiveButton.click();
+  }
+
+  tab(testId: string) {
+    return this.page.getByTestId(testId);
   }
 
   async openStatusMenu(userFullName: string) {
