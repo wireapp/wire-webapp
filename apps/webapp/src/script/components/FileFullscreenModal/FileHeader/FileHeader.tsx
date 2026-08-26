@@ -33,13 +33,13 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {ChannelAvatar, GroupAvatar} from 'Components/avatar';
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
-import {CellsViewerAccessLabel} from 'Components/Conversation/ConversationCells/common/CellsViewerAccessLabel';
-import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsViewerAccessLabel} from 'Components/conversation/conversationCells/common/cellsViewerAccessLabel';
+import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
 import {EditIcon} from 'Components/icon';
 import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';

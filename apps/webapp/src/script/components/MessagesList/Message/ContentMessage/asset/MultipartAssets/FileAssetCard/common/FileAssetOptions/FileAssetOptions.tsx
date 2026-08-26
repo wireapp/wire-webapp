@@ -22,7 +22,7 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isFileEditable} from 'Util/fileTypeUtil';

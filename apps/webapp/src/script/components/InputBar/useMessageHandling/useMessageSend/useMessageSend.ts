@@ -24,7 +24,7 @@ import {noop} from 'noop-esm';
 
 import {IAttachment} from '@wireapp/protocol-messaging';
 
-import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
+import {useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';

@@ -22,7 +22,7 @@ import {Button} from '@wireapp/react-ui-kit';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 

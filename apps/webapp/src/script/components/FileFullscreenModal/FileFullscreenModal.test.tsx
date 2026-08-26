@@ -25,7 +25,7 @@ import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
   type CellsSelfUserDriveRole,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

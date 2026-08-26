@@ -22,7 +22,7 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
+import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';

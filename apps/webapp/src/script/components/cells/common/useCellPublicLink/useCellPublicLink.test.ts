@@ -20,7 +20,7 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'src/script/components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CELLS_SELF_USER_DRIVE_ROLE} from 'src/script/components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 

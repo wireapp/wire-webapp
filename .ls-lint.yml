@@ -69,6 +69,438 @@ ls:
     .tsx: camelCase
     .style.ts: camelCase
     .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationFileDropzone:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationMessagesWrapper:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationTabPanel:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationTabs:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationViewerPermissionBanner:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/hooks:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/readOnlyConversationMessage:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/components/conversation/useFilesUploadDropzone:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/useFilesUploadState:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/utils:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/common/fileTypeIcon:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsHeader:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsLoader:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsPagination:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsStateInfo:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/useCellsPagination:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/useConversationSearch:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/useGetAllCellsNodes:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/useOnPresignedUrlExpired:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/useRefreshCellsState:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationFileDropzone/fileDropzone:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationFileDropzone/isConversationFileDropAllowed:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/useFilesUploadDropzone/buildCellFileMetadata:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/useFilesUploadDropzone/createFileDropHandler:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/useFilesUploadDropzone/fileValidation:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/useFilesUploadDropzone/showFileDropzoneErrorModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/useFilesUploadDropzone/transformAcceptedFiles:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsHeader/cellsMoreMenu:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsHeader/cellsNewMenu:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsHeader/cellsRefresh:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsPagination/cellsPageList:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsPagination/cellsPageSizeSelect:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsFilePreviewModal:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellPagination:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsBreadcrumbs:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsFiltersBar:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsNewNodeForm:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsSelfUserDriveRole:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsSortIcon:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsTableLoader:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsTableSortableHeader:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsViewerAccessLabel:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/driveFilters:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/filterPopover:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/getBreadcrumbsFromPath:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/getCellsApiPath:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/getCellsFilesPath:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/getCurrentFolderName:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/loadMorePagination:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/openBreadcrumb:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/openFolder:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/recycleBin:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/sortTagsAlphabetically:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/styleBreakpoint:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useAllCellsTagsStore:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useCellsNewNodeForm:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useCellsSorting:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useCellsStore:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useConversationDriveFilters:
+    .dir: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useDriveEnabledConversationFilterItems:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useDriveEnabledParticipantFilterItems:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useGetAllTags:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/useInputAutoFocus:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationFileDropzone/fileDropzone/fileDropzoneOverlay:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationFileDropzone/fileDropzone/useIsDragging:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsHeader/cellsNewMenu/cellsNewFileModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsHeader/cellsNewMenu/cellsNewFolderModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsNodeShareModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableDateColumn:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableNameColumn:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableOwnerColumn:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableSharedColumn:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTagsColumn:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/common/cellsFilePreviewModalContext:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsModal/cellsModalActions:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsModal/cellsModalContext:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/common/cellsModal/cellsModalHeader:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsRenameNodeModal:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTagsModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/showDeletePermanentlyModal:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/showMoveToRecycleBinModal:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/showRestoreNestedNodeModal:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/showRestoreRootNodeModal:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/useDeleteNode:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/useRestoreNestedNode:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/useRestoreParentNode:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsFoldersListModalContent:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/useGetCellsFolders:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/useMoveCellNode:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsRenameNodeModal/cellsRenameForm:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsRenameNodeModal/useCellsRenameNodeForm:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTagsModal/useTagsManagement:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsFoldersListModalContent/cellsCreateNewFolderHint:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsFoldersListModalContent/cellsFolderList:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsFoldersListModalContent/cellsFolderListEmpty:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsFoldersListModalContent/cellsFolderListLoading:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTagsModal/useTagsManagement/transformTagToSelectOption:
+    .dir: camelCase
+    .ts: camelCase
   apps/webapp/src/script/components/appContainer:
     .dir: camelCase
     .tsx: camelCase

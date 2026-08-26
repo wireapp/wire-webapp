@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {CellsGlobalView} from 'Components/cellsGlobalView/cellsGlobalView';
 import {ConnectRequests} from 'Components/connectRequests/index';
-import {Conversation} from 'Components/Conversation';
+import {Conversation} from 'Components/conversation';
 import {HistoryExport} from 'Components/historyExport';
 import {HistoryImport} from 'Components/historyImport';
 import * as Icon from 'Components/icon';

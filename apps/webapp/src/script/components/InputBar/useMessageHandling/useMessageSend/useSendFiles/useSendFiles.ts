@@ -20,7 +20,7 @@
 import {useCallback, useState} from 'react';
 
 import {useAppNotification} from 'Components/appNotification/index';
-import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
+import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';

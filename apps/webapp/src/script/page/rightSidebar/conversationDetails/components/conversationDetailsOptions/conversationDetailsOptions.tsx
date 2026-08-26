@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   getSelfUserDriveRole,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import * as Icon from 'Components/icon';
 import {PanelActions} from 'Components/panel/panelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';

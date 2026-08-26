@@ -28,8 +28,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import {isConversationFileDropAllowed} from 'Components/Conversation/ConversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
-import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
+import {isConversationFileDropAllowed} from 'Components/conversation/conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
+import {useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';

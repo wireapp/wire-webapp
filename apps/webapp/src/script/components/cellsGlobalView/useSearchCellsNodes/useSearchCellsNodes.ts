@@ -28,9 +28,9 @@ import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/t
 import {
   GlobalDriveFiltersState,
   toGlobalDriveSearchParams,
-} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
-import {CellsSort} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
-import {createRequestVersionGate} from 'Components/Conversation/ConversationCells/useConversationSearch/requestVersionGate';
+} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
+import {CellsSort} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
+import {createRequestVersionGate} from 'Components/conversation/conversationCells/useConversationSearch/requestVersionGate';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';

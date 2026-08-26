@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {isPreviewableImage} from 'Util/imageUtil';

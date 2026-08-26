@@ -24,8 +24,8 @@ import {Maybe} from 'true-myth';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
-import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/fullscreenModal/fullscreenModal';
 import type {Conversation} from 'Repositories/entity/Conversation';

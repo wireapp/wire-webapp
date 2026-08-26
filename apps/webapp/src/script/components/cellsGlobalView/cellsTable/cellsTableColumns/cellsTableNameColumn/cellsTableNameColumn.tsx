@@ -23,7 +23,7 @@ import {FolderIcon, PlayIcon, Tooltip, ViewerAccessIcon} from '@wireapp/react-ui
 
 import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
 import {useShouldRestrictGlobalDriveNodeActions} from 'Components/cellsGlobalView/common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {getFileExtension} from 'Util/util';
