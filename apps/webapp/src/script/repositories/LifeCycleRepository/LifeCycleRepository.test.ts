@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

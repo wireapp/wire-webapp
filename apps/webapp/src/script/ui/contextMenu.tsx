@@ -27,7 +27,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {IgnoreOutsideClickWrapper} from 'Components/inputBar/util/clickHandlers';
 import {useMessageActionsState} from 'Components/messagesList/message/contentMessage/messageActions/messageActions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/keyboardUtil';
 

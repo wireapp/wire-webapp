@@ -1355,3 +1355,356 @@ ls:
   apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/useVideoPlayback/isVideoPlayable:
     .dir: camelCase
     .ts: camelCase
+  apps/webapp/src/script/components/inputBar:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/inputBar/common/draftState:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/common/formatSeparator:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/common/messageContent:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/audioPreviewCard:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/audioPreviewCard/audioEmptySeekBar:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/common/filePreviewDeleteButton:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/common/filePreviewErrorMoreButton:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/common/filePreviewPlayButton:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/common/mediaFilePreviewCard:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/filePreviewCard:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/imagePreviewCard:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/useFilePreview:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/filePreviews/videoPreviewCard:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarContainer:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/assetUploadButton:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/cancelEditButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/cellAssetUploadButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/cellImageUploadButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/emojiButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/formatTextButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/giphyButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/imageUploadButton:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/messageTimerButton:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/pingButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarControls/sendMessageButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor:
+    .dir: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/common/isBlockquoteNode:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/common/isCodeBlockNode:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/common/isHeadingNode:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/common/isListNode:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/formatButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/linkDialog:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useBlockquoteState:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useCodeBlockState:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useHeadingState:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useLinkState:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useLinkState/createNewLink:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useLinkState/getSelectedNode:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useLinkState/useLinkEditing:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useLinkState/useModalState:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useListState:
+    .dir: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/formatToolbar/useToolbarState:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/nodes:
+    .dir: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/placeholder:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins:
+    .dir: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/autoFocusPlugin:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/autoLinkPlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/blockquotePlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/codeHighlightPlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/draftStatePlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/editedMessagePlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/editedMessagePlugin/getMentionMarkdownTransformer:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/editedMessagePlugin/getMentionNodesFromMessage:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/editedMessagePlugin/getRawMarkdownFromMessage:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/editedMessagePlugin/wrapMentionsWithTags:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/emojiPickerPlugin:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/globalEventsPlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/historyPlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/inlineEmojiReplacementPlugin:
+    .dir: camelCase
+    .integration.test.tsx: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/linkPlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/listIndentationPlugin:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/listMaxIndentLevelPlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/mentionsPlugin:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/pastePlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/plainTextPastePlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/replaceCarriageReturnPlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/sendPlugin:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/typeaheadMenuPlugin:
+    .dir: camelCase
+    .test.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/testSupport:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/utils:
+    .dir: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/pastedFileControls:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/replyBar:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/typingIndicator:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/inputBar/typingIndicator/useTypingIndicatorState:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useEmojiPicker:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useFileHandling:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useFileHandling/useFilePaste:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useFormatToolbar:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useGiphy:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useMessageHandling:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useMessageHandling/useDraftState:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useMessageHandling/useMessageEditing:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useMessageHandling/useMessageReply:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useMessageHandling/useMessageSend:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useMessageHandling/useMessageSend/useSendFiles:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useMessageHandling/useOutsideInputClick:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/usePing:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/useTypingIndicator:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/inputBar/util:
+    .dir: camelCase
+    .tsx: camelCase
