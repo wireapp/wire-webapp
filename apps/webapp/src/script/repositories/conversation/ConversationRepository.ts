@@ -3746,6 +3746,18 @@ export class ConversationRepository {
               // we ignore leave/join events that are sent by the user actually leaving or joining
               return conversationEntity;
             }
+            break;
+
+          // member-update events can be sent by the team owner or system
+          // without being part of the conversation. This happens e.g. for the
+          // "adminless group prevention" feature when a user gets
+          // auto-promoted to group admin.
+          case CONVERSATION_EVENT.MEMBER_UPDATE:
+          case CONVERSATION_EVENT.SYSTEM_MEMBER_UPDATE:
+            this.logger.info(
+              `Skipping auto-join for unknown sender '${senderId}' of '${eventJson.type}' event in '${conversationEntity.id}'`,
+            );
+            return conversationEntity;
         }
 
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;

@@ -1822,6 +1822,43 @@ describe('ConversationRepository', () => {
       });
     });
 
+    it.each([
+      {type: CONVERSATION_EVENT.MEMBER_UPDATE, from: messageSenderId},
+      // system-initiated member-updates (e.g. adminless-group autopromotion) carry no `from`
+      {type: CONVERSATION_EVENT.SYSTEM_MEMBER_UPDATE, from: undefined},
+    ])('does not add the sender of a $type event as a participant even when unknown (WPB-28205)', ({type, from}) => {
+      const selfUser = generateUser();
+      const conversationEntity = _generateConversation();
+      const event = {
+        conversation: conversationEntity.id,
+        data: {
+          conversation_role: 'wire_admin',
+          target: selfUser.id,
+          qualified_target: selfUser.qualifiedId,
+        },
+        ...(from && {from}),
+        id: createUuid(),
+        time: '2017-09-06T09:43:36.528Z',
+        type,
+      };
+
+      jest.spyOn(testFactory.user_repository, 'getUserById').mockResolvedValue(new User('', '', translateForTest));
+      spyOn(testFactory.conversation_repository, 'addMissingMember').and.returnValue(
+        Promise.resolve(conversationEntity),
+      );
+      spyOn(testFactory.conversation_repository, 'getConversationById').and.returnValue(
+        Promise.resolve(conversationEntity),
+      );
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+
+      return testFactory.conversation_repository['handleConversationEvent'](event as any).then(() => {
+        expect(testFactory.conversation_repository.addMissingMember).not.toHaveBeenCalled();
+        expect(
+          conversationEntity.participating_user_ids().some(participant => participant.id === messageSenderId),
+        ).toBe(false);
+      });
+    });
+
     describe('conversation.mls-welcome', () => {
       it('should initialise mls 1:1 conversation after receiving a welcome', async () => {
         const conversationRepository = testFactory.conversation_repository!;
