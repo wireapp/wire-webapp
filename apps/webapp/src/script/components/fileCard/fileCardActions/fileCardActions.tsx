@@ -19,16 +19,12 @@
 
 import {ReactNode} from 'react';
 
-import {wrapperStyles} from './FileCardHeader.styles';
+import {wrapperStyles} from './fileCardActions.style';
 
-interface FileCardHeaderProps {
+interface FileCardActionsProps {
   children: ReactNode;
 }
 
-export const FileCardHeader = ({children}: FileCardHeaderProps) => {
-  return (
-    <header css={wrapperStyles} data-file-card="header">
-      {children}
-    </header>
-  );
+export const FileCardActions = ({children}: FileCardActionsProps) => {
+  return <div css={wrapperStyles}>{children}</div>;
 };

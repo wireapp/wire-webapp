@@ -21,7 +21,7 @@ import {ReactNode} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {FileCard} from 'Components/fileCard/fileCard';
 
 import {
   alertIconStyles,

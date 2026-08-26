@@ -19,7 +19,7 @@
 
 import {useState} from 'react';
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {FileCard} from 'Components/fileCard/fileCard';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {hollowWrapperButtonStyles} from '../../MultipartAssets.styles';

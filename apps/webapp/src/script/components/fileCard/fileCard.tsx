@@ -17,16 +17,16 @@
  *
  */
 
-import {FileCardActions} from './FileCardActions/FileCardActions';
-import {FileCardCloseButton} from './FileCardCloseButton/FileCardCloseButton';
-import {FileCardContent} from './FileCardContent/FileCardContent';
-import {FileCardError} from './FileCardError/FileCardError';
-import {FileCardHeader} from './FileCardHeader/FileCardHeader';
-import {FileCardIcon} from './FileCardIcon/FileCardIcon';
-import {FileCardLoading} from './FileCardLoading/FileCardLoading';
-import {FileCardName} from './FileCardName/FileCardName';
-import {FileCardRoot} from './FileCardRoot/FileCardRoot';
-import {FileCardType} from './FileCardType/FileCardType';
+import {FileCardActions} from './fileCardActions/fileCardActions';
+import {FileCardCloseButton} from './fileCardCloseButton/fileCardCloseButton';
+import {FileCardContent} from './fileCardContent/fileCardContent';
+import {FileCardError} from './fileCardError/fileCardError';
+import {FileCardHeader} from './fileCardHeader/fileCardHeader';
+import {FileCardIcon} from './fileCardIcon/fileCardIcon';
+import {FileCardLoading} from './fileCardLoading/fileCardLoading';
+import {FileCardName} from './fileCardName/fileCardName';
+import {FileCardRoot} from './fileCardRoot/fileCardRoot';
+import {FileCardType} from './fileCardType/fileCardType';
 
 /**
  * Compound component that displays file information in a card format.

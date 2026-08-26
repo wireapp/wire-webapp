@@ -19,9 +19,9 @@
 
 import {CSSProperties} from 'react';
 
-import {primaryStyles, secondaryStyles, textStyles} from './FileCardName.styles';
+import {primaryStyles, secondaryStyles, textStyles} from './fileCardName.styles';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {useFileCardContext} from '../common/fileCardContext/fileCardContext';
 
 interface FileCardNameProps {
   /**

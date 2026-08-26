@@ -17,14 +17,24 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {CloseIcon} from '@wireapp/react-ui-kit';
 
-import {wrapperStyles} from './FileCardActions.style';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
-interface FileCardActionsProps {
-  children: ReactNode;
+import {buttonStyles} from './fileCardCloseButton.styles';
+
+interface FileCardCloseButtonProps {
+  label?: string;
+  onClose: () => void;
 }
 
-export const FileCardActions = ({children}: FileCardActionsProps) => {
-  return <div css={wrapperStyles}>{children}</div>;
+export const FileCardCloseButton = ({label, onClose}: FileCardCloseButtonProps) => {
+  const {translate} = useApplicationContext();
+  const closeButtonLabel = label ?? translate('fileCardDefaultCloseButtonLabel');
+
+  return (
+    <button aria-label={closeButtonLabel} type="button" onClick={onClose} css={buttonStyles}>
+      <CloseIcon />
+    </button>
+  );
 };

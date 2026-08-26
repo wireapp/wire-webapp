@@ -17,7 +17,7 @@
  *
  */
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {FileCard} from 'Components/fileCard/fileCard';
 import {
   controlStyles,
   playerWrapperStyles,

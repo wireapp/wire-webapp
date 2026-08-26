@@ -17,16 +17,18 @@
  *
  */
 
-import {categoryStyles, wrapperStyles} from './FileCardType.styles';
+import {ReactNode} from 'react';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {wrapperStyles} from './fileCardHeader.styles';
 
-export const FileCardType = () => {
-  const {extension, size} = useFileCardContext();
+interface FileCardHeaderProps {
+  children: ReactNode;
+}
+
+export const FileCardHeader = ({children}: FileCardHeaderProps) => {
   return (
-    <p css={wrapperStyles}>
-      <span css={categoryStyles}>{extension}</span>
-      {size !== undefined && size.length > 0 ? ` (${size})` : null}
-    </p>
+    <header css={wrapperStyles} data-file-card="header">
+      {children}
+    </header>
   );
 };
