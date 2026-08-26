@@ -29,7 +29,7 @@ import {CallingCell} from 'Components/calling/CallingCell';
 import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
 import {Giphy} from 'Components/giphy';
 import {InputBar} from 'Components/InputBar';
-import {MessageListWrapper} from 'Components/MessagesList/MessageListWrapper';
+import {MessageListWrapper} from 'Components/messagesList/messageListWrapper';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal} from 'Components/Modals/UserModal';
@@ -87,7 +87,7 @@ import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
-import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
+import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 
 interface ConversationProps {
   readonly teamState: TeamState;

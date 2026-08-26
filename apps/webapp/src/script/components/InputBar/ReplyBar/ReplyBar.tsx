@@ -23,7 +23,7 @@ import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/image';
-import {MultipartAssetPreview} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssetPreview';
+import {MultipartAssetPreview} from 'Components/messagesList/message/contentMessage/asset/multipartAssetPreview';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

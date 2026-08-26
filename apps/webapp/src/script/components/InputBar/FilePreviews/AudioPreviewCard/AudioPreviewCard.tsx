@@ -21,7 +21,7 @@ import {FileCard} from 'Components/fileCard/fileCard';
 import {
   controlStyles,
   playerWrapperStyles,
-} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset/AudioAssetV2.styles';
+} from 'Components/messagesList/message/contentMessage/asset/audioAsset/audioAssetV2.styles';
 
 import {AudioEmptySeekBar} from './AudioEmptySeekBar/AudioEmptySeekBar';
 import {wrapperStyles} from './AudioPreviewCard.styles';

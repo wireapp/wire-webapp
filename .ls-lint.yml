@@ -1079,3 +1079,279 @@ ls:
     .styles.ts: camelCase
     .stories.tsx: camelCase
     .test.tsx: camelCase
+
+  apps/webapp/src/script/components/messagesList:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/components/messagesList/message:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/uploadAssets:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/utils:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/messagesList/virtualizedMessagesList:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/adminlessDeleteReminderMessage:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/e2eEncryptionMessage:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/e2eiVerificationMessage:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/marker:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .utils.ts: camelCase
+  apps/webapp/src/script/components/messagesList/message/memberMessage:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/protocolUpdateMessage:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/readIndicator:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/systemMessage:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/util:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/messagesList/uploadAssets/components:
+    .dir: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/messageActions:
+    .dir: camelCase
+    .state.tsx: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/warnings:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/messagesList/uploadAssets/components/uploadAssetItem:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/audioAsset:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/fileAsset:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/imageAsset:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/messageButton:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/textMessageRenderer:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/videoAsset:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/messageActions/messageReactions:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/warnings/completeFailureToSend:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/warnings/partialFailureToSend:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/audioAsset/audioAssetSeekBar:
+    .dir: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/audioAsset/audioSeekBar:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/audioAsset/restrictedAudio:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/assetHeader:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/assetLoader:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/mediaButton:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/seekBar:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useAssetTransfer:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useGetAssetUrl:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/fileAsset/restrictedFile:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/imageAssetCard:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/useGetMultipartAsset:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/audioAsset/audioAssetSeekBar/audioSeekBarV2:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/common/filePreviewPlayButton:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/common/mediaFilePreviewCard:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/fileAssetSmall:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/fileAssetWithPreview:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/imageAssetCard/imageAssetLarge:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/imageAssetCard/imageAssetSmall:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetSmall:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/audioAsset/audioAssetSeekBar/audioSeekBarV2/useAudioSeekBar:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/filePreviewModal:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/common:
+    .dir: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/useVideoPlayback:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/videoAssetCard:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/videoAssetError:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/videoAssetLoading:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/videoControls:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/videoPlayOverlay:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/common/videoAssetPlaceholder:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/common/videoPlayButton:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/videoAssetCard/videoAssetPlayer/useVideoPlayback/isVideoPlayable:
+    .dir: camelCase
+    .ts: camelCase
