@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
+import type {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
@@ -89,6 +90,7 @@ export class ListViewModel {
     mainViewModel: MainViewModel,
     repositories: ViewModelRepositories,
     private readonly translate: Translate,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
   ) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
@@ -265,9 +267,8 @@ export class ListViewModel {
     this.switchList(listState);
   };
 
-  openPreferencesAccount = async (): Promise<void> => {
-    await this.teamRepository.getTeam();
-
+  openPreferencesAccount = (): void => {
+    this.fireAndForgetInvoker.fireAndForget(() => this.teamRepository.getTeam());
     this.openPreferences(ContentState.PREFERENCES_ACCOUNT);
   };
 

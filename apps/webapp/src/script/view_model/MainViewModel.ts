@@ -19,6 +19,8 @@
 
 import {container} from 'tsyringe';
 
+import type {FireAndForgetInvoker} from '@wireapp/core';
+
 import type {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import type {BackupRepository} from 'Repositories/backup/backupRepository';
@@ -106,7 +108,7 @@ export class MainViewModel {
     return this.core.backendFeatures.isFederated;
   }
 
-  constructor(repositories: ViewModelRepositories, translate: Translate) {
+  constructor(repositories: ViewModelRepositories, translate: Translate, fireAndForgetInvoker: FireAndForgetInvoker) {
     this.translate = translate;
     const userState = container.resolve(UserState);
     const teamState = container.resolve(TeamState);
@@ -137,6 +139,6 @@ export class MainViewModel {
       this.translate,
     );
     this.content = new ContentViewModel(this, repositories, this.translate);
-    this.list = new ListViewModel(this, repositories, this.translate);
+    this.list = new ListViewModel(this, repositories, this.translate, fireAndForgetInvoker);
   }
 }

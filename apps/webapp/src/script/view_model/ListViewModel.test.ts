@@ -19,17 +19,22 @@
 import {ListViewModel} from './ListViewModel';
 
 import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+import {createExecutingFireAndForgetInvokerForTest} from '../page/testSupport/rootContextTestSupport';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
 import * as Router from '../router/Router';
 import {translateForTest} from 'Util/test/translateForTest';
 
 const createListViewModel = () => {
+  const switchContent = jest.fn((contentState: ContentState) => {
+    useAppState.setState({contentState});
+  });
+
   const mainViewModel = {
     actions: {},
     calling: {},
     content: {
       loadPreviousContent: jest.fn(),
-      switchContent: jest.fn(),
+      switchContent,
     },
     isFederated: false,
   } as unknown as ConstructorParameters<typeof ListViewModel>[0];
@@ -42,10 +47,11 @@ const createListViewModel = () => {
     search: {},
     team: teamRepository,
   } as unknown as ConstructorParameters<typeof ListViewModel>[1];
+  const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
-  const listViewModel = new ListViewModel(mainViewModel, repositories, translateForTest);
+  const listViewModel = new ListViewModel(mainViewModel, repositories, translateForTest, fireAndForgetInvoker);
   (listViewModel as unknown as {isActivatedAccount: () => boolean}).isActivatedAccount = () => true;
-  return {listViewModel, teamRepository};
+  return {fireAndForgetInvoker, listViewModel, teamRepository};
 };
 
 describe('ListViewModel', () => {
@@ -161,17 +167,36 @@ describe('ListViewModel', () => {
     expect(setHistoryParam).not.toHaveBeenCalled();
   });
 
-  it('refreshes the team before reopening the active account preference', async () => {
-    const {listViewModel, teamRepository} = createListViewModel();
+  it('refreshes the team when opening the account preference', async () => {
+    const {fireAndForgetInvoker, listViewModel, teamRepository} = createListViewModel();
     const setHistoryParam = jest.spyOn(Router, 'setHistoryParam');
     const switchContent = jest.spyOn(listViewModel.contentViewModel, 'switchContent');
 
     useAppState.setState({listState: ListState.PREFERENCES, contentState: ContentState.PREFERENCES_ACCOUNT});
 
-    await listViewModel.openPreferencesAccount();
+    listViewModel.openPreferencesAccount();
+    await fireAndForgetInvoker.waitUntilAllSettled();
 
     expect(teamRepository.getTeam).toHaveBeenCalledTimes(1);
     expect(setHistoryParam).not.toHaveBeenCalled();
     expect(switchContent).not.toHaveBeenCalled();
+  });
+
+  it('does not switch back to Account if another preference is opened while getTeam is in flight', async () => {
+    const {fireAndForgetInvoker, listViewModel, teamRepository} = createListViewModel();
+    let resolveGetTeam: (value?: unknown) => void = () => undefined;
+    const getTeamPromise = new Promise(resolve => {
+      resolveGetTeam = resolve;
+    });
+    teamRepository.getTeam.mockReturnValue(getTeamPromise);
+
+    listViewModel.openPreferencesAccount();
+    listViewModel.openPreferences(ContentState.PREFERENCES_DEVICES);
+
+    resolveGetTeam();
+    await fireAndForgetInvoker.waitUntilAllSettled();
+
+    expect(useAppState.getState().contentState).toBe(ContentState.PREFERENCES_DEVICES);
+    expect(listViewModel.contentViewModel.switchContent).toHaveBeenLastCalledWith(ContentState.PREFERENCES_DEVICES);
   });
 });
