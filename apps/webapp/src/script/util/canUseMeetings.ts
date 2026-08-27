@@ -24,7 +24,6 @@ export const canUseMeetings = (input: {
   readonly apiVersion: number;
 }): boolean => {
   return (
-    input.isTeamMeetingsFeatureEnabled &&
-    input.apiVersion >= Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION
+    input.isTeamMeetingsFeatureEnabled && input.apiVersion >= Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION
   );
 };

@@ -23,6 +23,7 @@ import {TeamState} from 'src/script/repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {canUseMeetings} from './canUseMeetings';
+
 import {Core} from '../service/coreSingleton';
 
 export const useMeetingsFeatureFlag = () => {
