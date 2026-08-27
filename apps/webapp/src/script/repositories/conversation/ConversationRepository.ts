@@ -4442,7 +4442,7 @@ export class ConversationRepository {
       await this.clearConversationContent(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
-    if (isActiveConversation && conversationEntity.is_archived()) {
+    if (isActiveConversation && conversationEntity.is_archived() && nextConversationEntity) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
