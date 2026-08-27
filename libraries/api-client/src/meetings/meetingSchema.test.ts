@@ -223,7 +223,7 @@ describe('meetingSchema', () => {
     expect(meetingSchema.safeParse(meetingWithoutTzid).success).toBe(false);
   });
 
-  it('rejects a V16-shaped list item that has trial but no tzid', () => {
+  it('rejects a list item that has trial but no tzid', () => {
     const {tzid: _tzid, ...meetingWithoutTzid} = validMeeting;
 
     expect(meetingsListResponseSchema.safeParse([{...meetingWithoutTzid, trial: false}]).success).toBe(false);
