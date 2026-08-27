@@ -49,6 +49,7 @@ const series: MeetingSeries = {
   qualified_id: {id: 'meeting-id', domain: 'example.com'},
   qualified_creator: {id: 'host-id', domain: 'example.com'},
   qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
 };
 const meetingInstance: MeetingInstance = {meetingSeries: series, start, end};
 const selfUser = new User('host-id', 'example.com', translateForTest);
@@ -59,6 +60,7 @@ const createMeetingStoreForTest = () =>
     conversationRepository: {} as ConversationRepository,
     callingRepository: {} as CallingRepository,
     wallClock: createDeterministicWallClock(),
+    deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
     serviceTasks: {
       scheduleMeeting: jest.fn(),
       meetNowMeeting: jest.fn(),

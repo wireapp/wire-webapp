@@ -23,6 +23,7 @@
   "dependencies": {
     "@datadog/browser-logs": "7.9.0",
     "@datadog/browser-rum": "7.9.0",
+    "@date-fns/tz": "1.5.0",
     "@emotion/react": "11.14.0",
     "@enormora/wall-clock": "0.0.3",
     "@formkit/auto-animate": "0.10.0",

@@ -35,7 +35,7 @@ describe('MeetingsAPI', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    trial: false,
+    tzid: 'Europe/Berlin',
     recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
   };
 
@@ -135,6 +135,7 @@ describe('MeetingsAPI', () => {
       title: validMeeting.title,
       start_time: validMeeting.start_time,
       end_time: validMeeting.end_time,
+      tzid: validMeeting.tzid,
     });
 
     expect(meeting).toEqual(validMeetingWithConversation);
@@ -193,6 +194,7 @@ describe('MeetingsAPI', () => {
           title: validMeeting.title,
           start_time: validMeeting.start_time,
           end_time: validMeeting.end_time,
+          tzid: validMeeting.tzid,
         }),
       validMeetingWithConversation,
     ],

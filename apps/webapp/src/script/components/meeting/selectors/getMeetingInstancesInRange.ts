@@ -17,6 +17,7 @@
  *
  */
 
+import {TZDate} from '@date-fns/tz';
 import {isUndefined} from '@sindresorhus/is';
 import {addDays, startOfDay} from 'date-fns';
 
@@ -28,12 +29,26 @@ import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from 'Components/me
 const daysPerWeek = 7;
 const daysPerBiweeklyPeriod = 14;
 const daysPerFourWeeksPeriod = 28;
+const fallbackMeetingTimeZoneId = 'Europe/Berlin';
 
-const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): MeetingInstance => ({
-  meetingSeries,
-  start,
-  end: new Date(start.getTime() + meetingSeries.duration_ms),
-});
+const getMeetingSeriesTimeZoneId = (meetingSeries: MeetingSeries): string =>
+  meetingSeries.tzid || fallbackMeetingTimeZoneId;
+
+const inMeetingSeriesTimeZone = (date: Date, meetingSeries: MeetingSeries): TZDate =>
+  new TZDate(date.getTime(), getMeetingSeriesTimeZoneId(meetingSeries));
+
+const getSeriesAnchorInTimeZone = (meetingSeries: MeetingSeries): TZDate =>
+  new TZDate(Date.parse(meetingSeries.series_start_date), getMeetingSeriesTimeZoneId(meetingSeries));
+
+const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): MeetingInstance => {
+  const utcStart = new Date(start.getTime());
+
+  return {
+    meetingSeries,
+    start: utcStart,
+    end: new Date(utcStart.getTime() + meetingSeries.duration_ms),
+  };
+};
 
 const isMeetingInstanceStartInRange = (meetingInstance: MeetingInstance, from: Date, to: Date): boolean =>
   meetingInstance.start.getTime() >= from.getTime() && meetingInstance.start.getTime() < to.getTime();
@@ -78,7 +93,7 @@ const advanceToFirstInstanceOnOrAfter = (
 };
 
 const getLastMeetingInstanceAtOrBeforeUntil = (meetingSeries: MeetingSeries): MeetingInstance => {
-  const anchor = new Date(meetingSeries.series_start_date);
+  const anchor = getSeriesAnchorInTimeZone(meetingSeries);
 
   if (meetingSeries.recurrence === 'doesNotRepeat' || meetingSeries.recurrence_until === undefined) {
     return createMeetingInstance(meetingSeries, anchor);
@@ -105,7 +120,7 @@ const getLastMeetingInstanceAtOrBeforeUntil = (meetingSeries: MeetingSeries): Me
  */
 export const getEditAnchorMeetingInstance = (meetingSeries: MeetingSeries, now: Date): MeetingInstance => {
   if (meetingSeries.recurrence === 'doesNotRepeat') {
-    return createMeetingInstance(meetingSeries, new Date(meetingSeries.series_start_date));
+    return createMeetingInstance(meetingSeries, getSeriesAnchorInTimeZone(meetingSeries));
   }
 
   const startOfToday = startOfDay(now);
@@ -131,7 +146,7 @@ export const getFirstMeetingInstanceOnOrAfter = (
   meetingSeries: MeetingSeries,
   from: Date,
 ): MeetingInstance | undefined => {
-  const anchor = new Date(meetingSeries.series_start_date);
+  const anchor = getSeriesAnchorInTimeZone(meetingSeries);
 
   if (meetingSeries.recurrence === 'doesNotRepeat') {
     return anchor.getTime() >= from.getTime() ? createMeetingInstance(meetingSeries, anchor) : undefined;
@@ -151,7 +166,10 @@ export const getNextMeetingInstance = (meetingInstance: MeetingInstance): Meetin
     return undefined;
   }
 
-  const start = advanceInstanceStart(meetingInstance.start, meetingSeries.recurrence);
+  const start = advanceInstanceStart(
+    inMeetingSeriesTimeZone(meetingInstance.start, meetingSeries),
+    meetingSeries.recurrence,
+  );
 
   return isAfterRecurrenceUntil(start, meetingSeries.recurrence_until)
     ? undefined
@@ -159,7 +177,7 @@ export const getNextMeetingInstance = (meetingInstance: MeetingInstance): Meetin
 };
 
 const getRecurringMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
-  const anchor = new Date(meetingSeries.series_start_date);
+  const anchor = getSeriesAnchorInTimeZone(meetingSeries);
   const meetingInstances: MeetingInstance[] = [];
   let current = advanceToFirstInstanceOnOrAfter(anchor, from, meetingSeries.recurrence);
 
@@ -193,7 +211,7 @@ const getRecurringMeetingInstancesInRange = (meetingSeries: MeetingSeries, from:
  */
 export const getMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
   if (meetingSeries.recurrence === 'doesNotRepeat') {
-    const meetingInstance = createMeetingInstance(meetingSeries, new Date(meetingSeries.series_start_date));
+    const meetingInstance = createMeetingInstance(meetingSeries, getSeriesAnchorInTimeZone(meetingSeries));
 
     return isMeetingInstanceStartInRange(meetingInstance, from, to) ? [meetingInstance] : [];
   }

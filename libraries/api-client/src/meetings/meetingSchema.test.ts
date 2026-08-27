@@ -40,7 +40,7 @@ describe('meetingSchema', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    trial: false,
+    tzid: 'Europe/Berlin',
   };
 
   const validMeetingConversation = {
@@ -215,6 +215,24 @@ describe('meetingSchema', () => {
 
   it('accepts a valid meeting payload', () => {
     expect(meetingSchema.safeParse(validMeeting).success).toBe(true);
+  });
+
+  it('requires tzid on meeting payloads', () => {
+    const {tzid: _tzid, ...meetingWithoutTzid} = validMeeting;
+
+    expect(meetingSchema.safeParse(meetingWithoutTzid).success).toBe(false);
+  });
+
+  it('preserves tzid on a valid meeting payload', () => {
+    const result = meetingSchema.safeParse(validMeeting);
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error('Expected meeting schema parse to succeed');
+    }
+
+    expect(result.data.tzid).toBe('Europe/Berlin');
   });
 
   it('accepts optional recurrence and strips unknown backend fields', () => {

@@ -50,6 +50,7 @@ const createMeetingInstance = (
     title: 'Weekly sync',
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    tzid: 'Europe/Berlin',
     ...seriesOverrides,
   },
   start: new Date(start),

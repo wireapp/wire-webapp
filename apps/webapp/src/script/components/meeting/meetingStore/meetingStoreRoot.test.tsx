@@ -57,7 +57,7 @@ const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId) =
   qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
   qualified_id: qualifiedId,
-  trial: false,
+  tzid: 'Europe/Berlin',
 });
 
 const meetingTitlesTestId = 'meeting-titles';

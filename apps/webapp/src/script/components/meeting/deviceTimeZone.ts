@@ -17,20 +17,12 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-
-export type MeetingSeries = {
-  series_start_date: string;
-  series_end_date: string;
-  duration_ms: number;
-  recurrence: ScheduleMeetingRecurrenceOption;
-  recurrence_until?: string;
-  conversation_id: string;
-  qualified_conversation: QualifiedId;
-  qualified_id: QualifiedId;
-  qualified_creator: QualifiedId;
-  title: string;
-  tzid: string;
+export type DeviceTimeZone = {
+  readonly ianaTimeZoneId: string;
 };
+
+export const createBrowserDeviceTimeZone = (): DeviceTimeZone => ({
+  get ianaTimeZoneId() {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  },
+});

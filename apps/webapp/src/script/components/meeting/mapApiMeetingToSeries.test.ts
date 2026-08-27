@@ -29,6 +29,7 @@ const createApiMeeting = (
     end_time?: string;
     title?: string;
     recurrence?: {frequency: MeetingRecurrenceFrequency; until?: string};
+    tzid?: string;
   } = {},
 ) => ({
   created_at: '2026-06-15T09:00:00.000Z',
@@ -39,7 +40,7 @@ const createApiMeeting = (
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
   qualified_id: {id: 'meeting-id', domain: 'example.com'},
-  trial: false,
+  tzid: 'Europe/Berlin',
   ...overrides,
 });
 
@@ -59,7 +60,15 @@ describe('mapApiMeetingToSeries', () => {
       recurrence: 'weekly',
       qualified_id: {id: 'meeting-id', domain: 'example.com'},
       qualified_creator: {id: 'creator-id', domain: 'example.com'},
+      tzid: 'Europe/Berlin',
     });
+  });
+
+  it('falls back to Europe/Berlin when tzid is missing', () => {
+    const {tzid: _tzid, ...meetingWithoutTzid} = createApiMeeting();
+    const result = mapApiMeetingToSeries(meetingWithoutTzid as ReturnType<typeof createApiMeeting>);
+
+    expect(unwrap(result)).toEqual(expect.objectContaining({tzid: 'Europe/Berlin'}));
   });
 
   it('uses doesNotRepeat when meeting does not repeat', () => {

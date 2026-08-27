@@ -31,7 +31,7 @@ export interface Meeting {
   recurrence?: MeetingRecurrence;
   start_time: string;
   title: string;
-  trial: boolean;
+  tzid: string;
   updated_at: string;
 }
 
