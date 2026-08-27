@@ -1892,6 +1892,34 @@ describe('ConversationRepository', () => {
       });
     });
 
+    it('does not show an undefined conversation when archiving the only active conversation', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const conversation = _generateConversation();
+      const selfUser = generateUser();
+
+      conversationRepository['conversationState'].conversations.removeAll();
+      conversationRepository['conversationState'].conversations.push(conversation);
+      conversationRepository['conversationState'].activeConversation(conversation);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const publishSpy = jest.spyOn(amplify, 'publish');
+
+      try {
+        await conversationRepository['onMemberUpdate'](conversation, {
+          data: {
+            otr_archived: true,
+            otr_archived_ref: '2026-08-27T10:00:00.000Z',
+          },
+          from: selfUser.id,
+        });
+
+        expect(conversation.is_archived()).toBe(true);
+        expect(publishSpy).not.toHaveBeenCalledWith(WebAppEvents.CONVERSATION.SHOW, undefined, {});
+      } finally {
+        publishSpy.mockRestore();
+      }
+    });
+
     describe('conversation.mls-welcome', () => {
       it('should initialise mls 1:1 conversation after receiving a welcome', async () => {
         const conversationRepository = testFactory.conversation_repository!;
