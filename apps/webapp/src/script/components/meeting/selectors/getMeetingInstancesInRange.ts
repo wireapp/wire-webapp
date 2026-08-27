@@ -56,7 +56,7 @@ const isMeetingInstanceStartInRange = (meetingInstance: MeetingInstance, from: D
 const isAfterRecurrenceUntil = (start: Date, recurrenceUntil?: string): boolean =>
   recurrenceUntil !== undefined && start.getTime() > Date.parse(recurrenceUntil);
 
-const advanceInstanceStart = (start: Date, recurrence: ScheduleMeetingRecurrenceOption): Date => {
+const advanceInstanceStart = (start: TZDate, recurrence: ScheduleMeetingRecurrenceOption): TZDate => {
   switch (recurrence) {
     case 'doesNotRepeat':
       return start;
@@ -78,10 +78,10 @@ const advanceInstanceStart = (start: Date, recurrence: ScheduleMeetingRecurrence
  * This advances by whole recurrence steps (one day, week, etc.) until the candidate start is >= `from`.
  */
 const advanceToFirstInstanceOnOrAfter = (
-  anchor: Date,
+  anchor: TZDate,
   from: Date,
   recurrence: ScheduleMeetingRecurrenceOption,
-): Date => {
+): TZDate => {
   let current = anchor;
 
   // Step by whole recurrence periods (day/week/month), not by milliseconds.
