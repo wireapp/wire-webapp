@@ -145,7 +145,9 @@ describe('MeetingsAPI', () => {
 
     await client.useVersion(MINIMUM_API_VERSION, 17);
 
-    jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeetingWithConversation} as never);
+    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({
+      data: validMeetingWithConversation,
+    } as never);
 
     const meeting = await client.api.meetings.createMeeting({
       title: validMeeting.title,
@@ -155,6 +157,18 @@ describe('MeetingsAPI', () => {
     });
 
     expect(meeting).toEqual(validMeetingWithConversation);
+    expect(sendJSONSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {
+          title: validMeeting.title,
+          start_time: validMeeting.start_time,
+          end_time: validMeeting.end_time,
+          tzid: validMeeting.tzid,
+        },
+        method: 'post',
+        url: '/meetings',
+      }),
+    );
   });
 
   it('returns parsed update meeting responses with embedded conversation', async () => {
