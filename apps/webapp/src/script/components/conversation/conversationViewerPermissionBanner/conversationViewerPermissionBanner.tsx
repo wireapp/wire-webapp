@@ -53,7 +53,7 @@ export const ConversationViewerPermissionBanner = () => {
       <button
         type="button"
         className="conversation-viewer-permission-banner__close"
-        aria-label={translate('fullsearchCancelLabel')}
+        aria-label={translate('accessibility.rightPanel.close')}
         onClick={() => setIsVisible(false)}
       >
         <CloseIcon />
