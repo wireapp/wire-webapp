@@ -64,7 +64,11 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
-import {NetworkQualityInfo, NetworkQualityInfoSchema} from 'Repositories/calling/calling.schema';
+import {
+  NetworkQualityInfo,
+  NetworkQualityInfoSchema,
+  UNKNOWN_NETWORK_QUALITY,
+} from 'Repositories/calling/calling.schema';
 import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -711,11 +715,16 @@ export class CallingRepository {
       return;
     }
 
+    const {quality} = qualityInfo;
+    if (quality === UNKNOWN_NETWORK_QUALITY) {
+      return;
+    }
+
     const call = this.findCall(this.parseQualifiedId(conversationId));
     if (!call) {
       return;
     }
-    const {quality} = qualityInfo;
+
     if (quality !== QUALITY.NORMAL) {
       // @note: This should be reverted back once avs is sending correct quality metrics
       // Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
