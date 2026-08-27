@@ -51,7 +51,7 @@ const InfoToggle = ({
   return (
     <div data-uie-name={dataUieName} className={cx('info-toggle', className)}>
       <div className="info-toggle__row">
-        <div>
+        <div className="info-toggle__content">
           <label htmlFor={inputId} className="heading-h3">
             {name}
           </label>
