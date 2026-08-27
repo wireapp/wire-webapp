@@ -223,6 +223,25 @@ describe('meetingSchema', () => {
     expect(meetingSchema.safeParse(meetingWithoutTzid).success).toBe(false);
   });
 
+  it('rejects a V16-shaped list item that has trial but no tzid', () => {
+    const {tzid: _tzid, ...meetingWithoutTzid} = validMeeting;
+
+    expect(meetingsListResponseSchema.safeParse([{...meetingWithoutTzid, trial: false}]).success).toBe(false);
+  });
+
+  it('strips deprecated trial and keeps tzid on a V17 payload', () => {
+    const result = meetingSchema.safeParse({...validMeeting, trial: false});
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error('Expected meeting schema parse to succeed');
+    }
+
+    expect(result.data.tzid).toBe('Europe/Berlin');
+    expect(result.data).not.toHaveProperty('trial');
+  });
+
   it('preserves tzid on a valid meeting payload', () => {
     const result = meetingSchema.safeParse(validMeeting);
 

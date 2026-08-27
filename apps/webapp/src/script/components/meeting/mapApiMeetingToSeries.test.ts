@@ -64,13 +64,6 @@ describe('mapApiMeetingToSeries', () => {
     });
   });
 
-  it('falls back to Europe/Berlin when tzid is missing', () => {
-    const {tzid: _tzid, ...meetingWithoutTzid} = createApiMeeting();
-    const result = mapApiMeetingToSeries(meetingWithoutTzid as ReturnType<typeof createApiMeeting>);
-
-    expect(unwrap(result)).toEqual(expect.objectContaining({tzid: 'Europe/Berlin'}));
-  });
-
   it('uses doesNotRepeat when meeting does not repeat', () => {
     const result = mapApiMeetingToSeries(createApiMeeting({title: 'One-off'}));
 

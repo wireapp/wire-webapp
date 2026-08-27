@@ -21,8 +21,10 @@ import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 
 import {
   getEditAnchorMeetingInstance,
+  getFirstMeetingInstanceOnOrAfter,
   getMeetingInstanceAt,
   getMeetingInstancesInRange,
+  getNextMeetingInstance,
 } from './getMeetingInstancesInRange';
 
 const createMeetingSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSeries, 'recurrence'>): MeetingSeries => ({
@@ -141,6 +143,21 @@ describe('getMeetingInstancesInRange', () => {
       '2026-11-02T10:00:00.000Z',
     ]);
     expect(meetingInstances[1]?.end.toISOString()).toBe('2026-10-26T11:00:00.000Z');
+  });
+
+  it('keeps weekly local wall time across Europe/Berlin DST end when paging instances', () => {
+    const meetingSeries = createMeetingSeries({
+      recurrence: 'weekly',
+      tzid: 'Europe/Berlin',
+      series_start_date: '2026-10-19T09:00:00.000Z',
+      series_end_date: '2026-10-19T10:00:00.000Z',
+    });
+    const first = getFirstMeetingInstanceOnOrAfter(meetingSeries, new Date('2026-10-19T00:00:00.000Z'));
+    const second = first === undefined ? undefined : getNextMeetingInstance(first);
+
+    expect(first?.start.toISOString()).toBe('2026-10-19T09:00:00.000Z');
+    expect(second?.start.toISOString()).toBe('2026-10-26T10:00:00.000Z');
+    expect(second?.end.toISOString()).toBe('2026-10-26T11:00:00.000Z');
   });
 
   it('sets instance end from series duration', () => {
