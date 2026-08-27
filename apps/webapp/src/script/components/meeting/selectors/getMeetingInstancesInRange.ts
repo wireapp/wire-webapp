@@ -29,16 +29,12 @@ import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from 'Components/me
 const daysPerWeek = 7;
 const daysPerBiweeklyPeriod = 14;
 const daysPerFourWeeksPeriod = 28;
-const fallbackMeetingTimeZoneId = 'Europe/Berlin';
-
-const getMeetingSeriesTimeZoneId = (meetingSeries: MeetingSeries): string =>
-  meetingSeries.tzid || fallbackMeetingTimeZoneId;
 
 const inMeetingSeriesTimeZone = (date: Date, meetingSeries: MeetingSeries): TZDate =>
-  new TZDate(date.getTime(), getMeetingSeriesTimeZoneId(meetingSeries));
+  new TZDate(date.getTime(), meetingSeries.tzid);
 
 const getSeriesAnchorInTimeZone = (meetingSeries: MeetingSeries): TZDate =>
-  new TZDate(Date.parse(meetingSeries.series_start_date), getMeetingSeriesTimeZoneId(meetingSeries));
+  new TZDate(Date.parse(meetingSeries.series_start_date), meetingSeries.tzid);
 
 const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): MeetingInstance => {
   const utcStart = new Date(start.getTime());
