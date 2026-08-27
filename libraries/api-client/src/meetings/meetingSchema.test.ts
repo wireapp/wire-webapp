@@ -243,11 +243,7 @@ describe('meetingSchema', () => {
   it('preserves tzid on a valid meeting payload', () => {
     const result = meetingSchema.safeParse(validMeeting);
 
-    expect(result.success).toBe(true);
-
-    if (!result.success) {
-      throw new Error('Expected meeting schema parse to succeed');
-    }
+    assert(result.success);
 
     expect(result.data.tzid).toBe('Europe/Berlin');
   });
