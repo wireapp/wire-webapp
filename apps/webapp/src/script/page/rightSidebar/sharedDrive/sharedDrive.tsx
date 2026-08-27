@@ -93,7 +93,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
       css={{
         '& .button-label': {padding: 0, width: 48},
         '& .panel__content > div:first-child': {
-          height: 90,
+          height: 70,
           padding: 16,
           position: 'relative',
         },
@@ -104,7 +104,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
           left: 16,
           position: 'absolute',
           right: 16,
-          top: 73,
+          top: 70,
         },
         '& .panel__header': {height: 45, minHeight: 45},
         '& .slider': {width: 48},
