@@ -17,6 +17,8 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {
   ADD_PERMISSION,
   CONVERSATION_ACCESS,
@@ -232,11 +234,7 @@ describe('meetingSchema', () => {
   it('strips deprecated trial and keeps tzid on a V17 payload', () => {
     const result = meetingSchema.safeParse({...validMeeting, trial: false});
 
-    expect(result.success).toBe(true);
-
-    if (!result.success) {
-      throw new Error('Expected meeting schema parse to succeed');
-    }
+    assert(result.success);
 
     expect(result.data.tzid).toBe('Europe/Berlin');
     expect(result.data).not.toHaveProperty('trial');
