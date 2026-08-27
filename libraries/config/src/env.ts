@@ -300,6 +300,8 @@ export type Env = {
 
   URL_SUPPORT_FOLDERS: string;
 
+  URL_SUPPORT_SHARED_DRIVE: string;
+
   URL_SUPPORT_BUG_REPORT: string;
 
   URL_SUPPORT_CALLING: string;

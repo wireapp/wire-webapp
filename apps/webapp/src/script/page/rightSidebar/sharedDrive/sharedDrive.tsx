@@ -94,17 +94,17 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
         '& .button-label': {padding: 0, width: 48},
         '& .panel__content > div:first-child': {
           height: 90,
-          padding: '16px 8px',
+          padding: 16,
           position: 'relative',
         },
         '& .panel__content > div:first-child::after': {
           backgroundColor: '#CBCED1',
           content: '""',
           height: 1,
-          left: 10,
+          left: 16,
           position: 'absolute',
+          right: 16,
           top: 73,
-          width: 300,
         },
         '& .panel__header': {height: 45, minHeight: 45},
         '& .slider': {width: 48},
@@ -121,7 +121,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
       />
 
       <FadingScrollbar className="panel__content">
-        <div css={{padding: '16px 8px 8px'}}>
+        <div css={{padding: 16}}>
           <BaseToggle
             isChecked
             isDisabled
@@ -132,7 +132,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
           />
         </div>
 
-        <section css={{padding: 8}} tabIndex={TabIndex.FOCUSABLE}>
+        <section css={{padding: 16}} tabIndex={TabIndex.FOCUSABLE}>
           <h3 className="guest-options__info-head" css={{lineHeight: '20px', margin: 0}}>
             {translate('cells.sharedDriveAccess.title')}
           </h3>
@@ -173,7 +173,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
                   alignItems: 'center',
                   display: 'flex',
                   minHeight: 56,
-                  padding: '8px 8px 8px 0',
+                  padding: '8px 16px 8px 0',
                   position: 'relative',
                 }}
               >

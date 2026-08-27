@@ -21,10 +21,15 @@ import {useState} from 'react';
 
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
+import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+const SHARED_DRIVE_SUPPORT_URL =
+  'https://support.wire.com/hc/en-us/articles/32207745256221-Shared-Drive-in-conversations';
 
 export const ConversationViewerPermissionBanner = () => {
   const {translate} = useApplicationContext();
+  const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE || SHARED_DRIVE_SUPPORT_URL;
   const [isVisible, setIsVisible] = useState(true);
 
   if (!isVisible) {
@@ -35,9 +40,15 @@ export const ConversationViewerPermissionBanner = () => {
     <div className="conversation-viewer-permission-banner" role="status">
       <div className="conversation-viewer-permission-banner__content">
         <span>{translate('conversationFileUploadRestrictedOverlayDescription')}</span>
-        <button type="button" className="conversation-viewer-permission-banner__learn-more">
+        <a
+          className="conversation-viewer-permission-banner__learn-more"
+          href={sharedDriveSupportUrl}
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+          data-uie-name="conversation-viewer-permission-learn-more"
+        >
           {translate('historyInfo.learnMore')}
-        </button>
+        </a>
       </div>
       <button
         type="button"

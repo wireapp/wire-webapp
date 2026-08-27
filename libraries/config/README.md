@@ -241,6 +241,7 @@ Notes:
 | `URL_PATH_PASSWORD_RESET` | From `.env.defaults` | Path segment for password reset | N/A |
 | `URL_SUPPORT_INDEX` | From `.env.defaults` | Support index page URL | N/A |
 | `URL_SUPPORT_FOLDERS` | From `.env.defaults` | Support folders/help URL | N/A |
+| `URL_SUPPORT_SHARED_DRIVE` | From `.env.defaults` | Shared Drive help URL | N/A |
 | `URL_SUPPORT_BUG_REPORT` | From `.env.defaults` | Bug report help URL | N/A |
 | `URL_SUPPORT_CALLING` | From `.env.defaults` | Calling support URL | N/A |
 | `URL_SUPPORT_CAMERA_ACCESS_DENIED` | From `.env.defaults` | Camera permission denied help URL | N/A |
