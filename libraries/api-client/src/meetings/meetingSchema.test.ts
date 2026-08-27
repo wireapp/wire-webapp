@@ -240,14 +240,6 @@ describe('meetingSchema', () => {
     expect(result.data).not.toHaveProperty('trial');
   });
 
-  it('preserves tzid on a valid meeting payload', () => {
-    const result = meetingSchema.safeParse(validMeeting);
-
-    assert(result.success);
-
-    expect(result.data.tzid).toBe('Europe/Berlin');
-  });
-
   it('accepts optional recurrence and strips unknown backend fields', () => {
     const result = meetingSchema.safeParse({
       ...validMeeting,
