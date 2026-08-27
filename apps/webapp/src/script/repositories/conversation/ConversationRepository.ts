@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {
   ADD_PERMISSION,
   Conversation as BackendConversation,
@@ -4442,7 +4442,7 @@ export class ConversationRepository {
       await this.clearConversationContent(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
-    if (isActiveConversation && conversationEntity.is_archived() && nextConversationEntity) {
+    if (isActiveConversation && conversationEntity.is_archived() && !isUndefined(nextConversationEntity)) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
