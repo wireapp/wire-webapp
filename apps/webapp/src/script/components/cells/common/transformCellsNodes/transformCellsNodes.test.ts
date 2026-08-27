@@ -21,6 +21,8 @@ import {RestNode} from 'cells-sdk-ts';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {transformCellsNodes} from './transformCellsNodes';
 
@@ -72,6 +74,22 @@ describe('transformCellsNodes', () => {
     const [node] = transformCellsNodes({nodes: [createStubNode()], users: [], conversations: [conversation]});
 
     expect(node.conversation).toBe(conversation);
+  });
+
+  it('uses the resolved user profile name as owner when the node has owner metadata', () => {
+    const user = new User('owner-id', 'example.com', translateForTest);
+    user.name('Arjita Team web');
+    user.username('arjitateamweb');
+    const nodeWithOwner = createStubNode({
+      UserMetadata: [
+        {Namespace: 'usermeta-owner', JsonValue: JSON.stringify('arjitateamweb')},
+        {Namespace: 'usermeta-owner-uuid', JsonValue: JSON.stringify('owner-id@example.com')},
+      ],
+    });
+
+    const [node] = transformCellsNodes({nodes: [nodeWithOwner], users: [user]});
+
+    expect(node.owner).toBe('Arjita Team web');
   });
 
   it('marks a node as editor when the conversation and self user belong to the same team', () => {

@@ -25,6 +25,7 @@ import {getSelfUserDriveRole} from 'Components/conversation/conversationCells/co
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes, getFileExtension, getName} from 'Util/util';
 
@@ -43,7 +44,6 @@ export const transformCellsNodes = ({
 }): CellNode[] => {
   return nodes.map(node => {
     const id = node.Uuid;
-    const owner = getOwner(node);
     const name = getName(node.Path);
     const sizeMb = getFileSize(node);
     const uploadedAtTimestamp = getUploadedAtTimestamp(node);
@@ -69,7 +69,8 @@ export const transformCellsNodes = ({
     });
 
     const userQualifiedId = getUserQualifiedIdFromNode(node);
-    const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) ?? null;
+    const user = users.find(user => matchQualifiedIds(user.qualifiedId, userQualifiedId ?? undefined)) ?? null;
+    const owner = user?.name() || getOwner(node);
 
     if (node.Type === 'COLLECTION') {
       return {
