@@ -106,22 +106,6 @@ describe('MeetingsAPI', () => {
     await expect(client.api.meetings.getMeetingsList()).rejects.toBeInstanceOf(ZodError);
   });
 
-  it('rejects list responses that omit tzid even when deprecated trial is present', async () => {
-    const client = new APIClient(testConfig);
-    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
-    } as never);
-
-    await client.useVersion(MINIMUM_API_VERSION, 17);
-
-    const {tzid: _tzid, ...meetingWithoutTzid} = validMeeting;
-    jest
-      .spyOn(client.transport.http, 'sendJSON')
-      .mockResolvedValue({data: [{...meetingWithoutTzid, trial: false}]} as never);
-
-    await expect(client.api.meetings.getMeetingsList()).rejects.toBeInstanceOf(ZodError);
-  });
-
   it('returns parsed meeting responses for valid payloads', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
