@@ -41,7 +41,7 @@ jest.mock('Components/cells/shareModal/cellsShareExpirationFields', () => ({
   CellsShareExpirationFields: () => <div data-uie-name="expiration-fields">Expiration Fields Mock</div>,
 }));
 
-jest.mock('Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader', () => ({
+jest.mock('Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader', () => ({
   CellsTableLoader: () => <div data-uie-name="cells-table-loader">Loading...</div>,
 }));
 

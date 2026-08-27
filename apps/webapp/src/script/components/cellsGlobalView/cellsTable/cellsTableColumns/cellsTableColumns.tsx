@@ -19,9 +19,9 @@
 
 import {createColumnHelper} from '@tanstack/react-table';
 
-import {CellsSortDirection} from 'Components/Conversation/ConversationCells/common/CellsSortIcon/CellsSortIcon';
-import {CellsTableSortableHeader} from 'Components/Conversation/ConversationCells/common/CellsTableSortableHeader/CellsTableSortableHeader';
-import {CellsSortField} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
+import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
+import {CellsTableSortableHeader} from 'Components/conversation/conversationCells/common/cellsTableSortableHeader/cellsTableSortableHeader';
+import {CellsSortField} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';

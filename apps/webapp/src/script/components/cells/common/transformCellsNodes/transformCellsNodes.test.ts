@@ -19,7 +19,7 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {Conversation} from 'Repositories/entity/Conversation';
 
 import {transformCellsNodes} from './transformCellsNodes';

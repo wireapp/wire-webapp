@@ -28,7 +28,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   getSelfUserDriveRole,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {ParticipantItemContent} from 'Components/participantItemContent';

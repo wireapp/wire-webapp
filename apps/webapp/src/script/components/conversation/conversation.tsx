@@ -1,0 +1,791 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {UIEvent, useCallback, useEffect, useState} from 'react';
+
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {container} from 'tsyringe';
+
+import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {CallingCell} from 'Components/calling/CallingCell';
+import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
+import {Giphy} from 'Components/giphy';
+import {InputBar} from 'Components/inputBar';
+import {MessageListWrapper} from 'Components/messagesList/messageListWrapper';
+import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {showUserModal} from 'Components/Modals/UserModal';
+import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {TitleBar} from 'Components/titleBar';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {Message} from 'Repositories/entity/message/message';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isLastReceivedMessage} from 'Util/conversationMessages';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
+import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
+import {getLogger} from 'Util/logger';
+import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
+import {formatBytes} from 'Util/util';
+
+import {
+  searchResultsHeadingStyles,
+  searchResultsOverlayStyles,
+  tabsHiddenStyles,
+  tabsWrapperStyles,
+} from './conversation.styles';
+import {
+  CellsSelfUserDriveRoleProvider,
+  getSelfUserDriveRole,
+  shouldRestrictCellsViewerActions,
+} from './conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {getCellsFilesPath} from './conversationCells/common/getCellsFilesPath/getCellsFilesPath';
+import {getCurrentFolderName} from './conversationCells/common/getCurrentFolderName/getCurrentFolderName';
+import {ConversationCells} from './conversationCells/conversationCells';
+import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
+import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
+import {ConversationMessagesWrapper} from './conversationMessagesWrapper/conversationMessagesWrapper';
+import {ConversationTabPanel} from './conversationTabPanel/conversationTabPanel';
+import {ConversationTabs} from './conversationTabs/conversationTabs';
+import {ConversationViewerPermissionBanner} from './conversationViewerPermissionBanner/conversationViewerPermissionBanner';
+import {useReadReceiptSender} from './hooks/useReadReceipt';
+import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
+import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
+import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
+
+import {UserError} from '../../error/userError';
+import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
+import {isServiceEntity} from '../../guards/Service';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {RightSidebarParams} from '../../page/appMain';
+import {PanelState} from '../../page/rightSidebar';
+import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
+
+interface ConversationProps {
+  readonly teamState: TeamState;
+  selfUser: User;
+  openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
+  isRightSidebarOpen?: boolean;
+  reloadApp: () => void;
+}
+
+const CONFIG = Config.getConfig();
+
+export const Conversation = ({
+  teamState,
+  selfUser,
+  openRightSidebar,
+  isRightSidebarOpen = false,
+  reloadApp,
+}: ConversationProps) => {
+  const messageListLogger = getLogger('ConversationList');
+
+  const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
+
+  const mainViewModel = useMainViewModel();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {content: contentViewModel} = mainViewModel;
+  const {conversationRepository, repositories} = contentViewModel;
+  const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
+  const [isSharedDriveSearchViewOpen, setIsSharedDriveSearchViewOpen] = useState<boolean>(false);
+
+  const conversationState = container.resolve(ConversationState);
+  const callState = container.resolve(CallState);
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, [
+    'classifiedDomains',
+    'isFileSharingSendingEnabled',
+  ]);
+
+  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(
+    activeConversation!,
+    [
+      'is1to1',
+      'isRequest',
+      'readOnlyState',
+      'participating_user_ets',
+      'connection',
+      'isReadOnlyConversation',
+      'isSelfUserRemoved',
+      'selfUser',
+    ],
+  );
+
+  const inTeam = teamState.isInTeam(selfUser);
+
+  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+
+  const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
+
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const smBreakpoint = useMatchMedia('max-width: 640px');
+
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+
+  const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+
+  useEffect(() => {
+    if (!isVirtualizedMessagesListEnabled) {
+      // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
+      // not to display the jump to last message button initially
+      activeConversation?.isLastMessageVisible(true);
+    }
+  }, [activeConversation, isVirtualizedMessagesListEnabled]);
+
+  const uploadImages = useCallback(
+    (images: File[]) => {
+      if (!activeConversation || isHittingUploadLimit(images, repositories.asset, translate)) {
+        return;
+      }
+
+      for (const image of Array.from(images)) {
+        const isImageTooLarge = image.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
+
+        if (isImageTooLarge) {
+          const isGif = image.type === 'image/gif';
+          const bytesMultiplier = 1024;
+          const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
+
+          return showWarningModal(
+            translate(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
+            translate(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', {number: maxSize}),
+            translate,
+          );
+        }
+      }
+
+      repositories.message.uploadImages(activeConversation, images);
+    },
+    [activeConversation, repositories.asset, repositories.message, translate],
+  );
+
+  const uploadFiles = useCallback(
+    (files: File[]) => {
+      if (!activeConversation) {
+        return;
+      }
+
+      const fileArray = Array.from(files);
+
+      if (!allowsAllFiles()) {
+        for (const file of fileArray) {
+          if (!hasAllowedExtension(file.name)) {
+            fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+              await conversationRepository.injectFileTypeRestrictedMessage(
+                activeConversation,
+                selfUser,
+                false,
+                getFileExtensionOrName(file.name),
+              );
+            });
+
+            return;
+          }
+        }
+      }
+
+      const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+
+      if (!isHittingUploadLimit(files, repositories.asset, translate)) {
+        for (const file of fileArray) {
+          const isFileTooLarge = file.size > uploadLimit;
+
+          if (isFileTooLarge) {
+            const fileSize = formatBytes(uploadLimit);
+            showWarningModal(
+              translate('modalAssetTooLargeHeadline'),
+              translate('modalAssetTooLargeMessage', {number: fileSize}),
+              translate,
+            );
+
+            return;
+          }
+        }
+
+        repositories.message.uploadFiles(activeConversation, files);
+      }
+    },
+    [
+      activeConversation,
+      conversationRepository,
+      fireAndForgetInvoker,
+      inTeam,
+      repositories.asset,
+      repositories.message,
+      selfUser,
+      translate,
+    ],
+  );
+
+  const uploadDroppedFiles = useCallback(
+    (droppedFiles: File[]) => {
+      const images: File[] = [];
+      const files: File[] = [];
+
+      if (!isHittingUploadLimit(droppedFiles, repositories.asset, translate)) {
+        Array.from(droppedFiles).forEach(file => {
+          const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type);
+
+          if (isSupportedImage) {
+            images.push(file);
+          } else {
+            files.push(file);
+          }
+        });
+
+        uploadImages(images);
+        uploadFiles(files);
+      }
+    },
+    [repositories.asset, translate, uploadFiles, uploadImages],
+  );
+
+  const openGiphy = (text: string) => {
+    setInputValue(text);
+    setIsGiphyModalOpen(true);
+  };
+
+  const closeGiphy = () => setIsGiphyModalOpen(false);
+
+  const clickOnInvitePeople = (conversation: ConversationEntity): void => {
+    openRightSidebar(PanelState.GUEST_OPTIONS, {entity: conversation});
+  };
+
+  const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
+    if (activeConversation) {
+      const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
+      });
+    }
+  };
+
+  const showUserDetails = async (userEntity: User | ServiceEntity) => {
+    const isSingleModeConversation = is1to1 || isRequest;
+
+    const isUserEntity = !isServiceEntity(userEntity);
+
+    if (
+      activeConversation &&
+      isUserEntity &&
+      (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))
+    ) {
+      openRightSidebar(PanelState.CONVERSATION_DETAILS, {entity: activeConversation});
+
+      return;
+    }
+
+    const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
+
+    const serviceEntity = userEntity.isService
+      ? await repositories.integration.getServiceFromUser(userEntity)
+      : undefined;
+
+    openRightSidebar(panelId, {entity: serviceEntity ?? userEntity}, true);
+  };
+
+  const showParticipants = (participants: User[]) => {
+    if (activeConversation) {
+      openRightSidebar(PanelState.CONVERSATION_PARTICIPANTS, {entity: activeConversation, highlighted: participants});
+    }
+  };
+
+  const showMessageDetails = (message: Message, showReactions = false) => {
+    if (!is1to1) {
+      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
+    }
+  };
+
+  const showMessageReactions = (message: Message, showReactions = true) => {
+    openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
+  };
+
+  const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
+    safeMailOpen(messageDetails.href!);
+    event.preventDefault();
+    return false;
+  };
+
+  const openUserProfile = async (id: string, domain?: string) => {
+    if (!teamState.isProfileLinkEnabled()) {
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: translate('profileLinkDisabled'),
+            title: translate('profileLinkDisabledHeadline'),
+          },
+        },
+        undefined,
+        translate,
+      );
+      return;
+    }
+
+    try {
+      const userEntity = await repositories.user.getUserById({
+        id,
+        domain: domain ?? '',
+      });
+
+      showUserModal(userEntity);
+    } catch (error: unknown) {
+      if (error instanceof UserError && error.type === UserError.TYPE.USER_NOT_FOUND) {
+        messageListLogger.warn('Could not resolve user profile deep link', {id, domain});
+        return;
+      }
+      throw error;
+    }
+  };
+
+  const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails) => {
+    const href = messageDetails.href!;
+
+    const parsed = parseAccountDeepLink(href, CONFIG.URL.ACCOUNT_BASE);
+
+    if (parsed?.type === 'user-profile') {
+      event.preventDefault();
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await openUserProfile(parsed.id, parsed.domain);
+      });
+      return false;
+    }
+
+    if (parsed?.type === 'conversation-join') {
+      event.preventDefault();
+
+      window.dispatchEvent(
+        new CustomEvent(WebAppEvents.CONVERSATION.JOIN, {
+          detail: {
+            key: parsed.key,
+            code: parsed.code,
+            domain: parsed.domain,
+          },
+        }),
+      );
+      return false;
+    }
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        primaryAction: {
+          action: () => safeWindowOpen(href),
+          text: translate('modalOpenLinkAction'),
+        },
+        text: {
+          htmlMessage: translate('modalOpenLinkMessage', {link: href}, {}, true),
+          title: translate('modalOpenLinkTitle'),
+        },
+      },
+      undefined,
+      translate,
+    );
+    event.preventDefault();
+    return false;
+  };
+
+  const userMentionClick = (messageDetails: MessageDetails) => {
+    const userId = messageDetails.userId;
+    const domain = messageDetails.userDomain;
+
+    if (userId !== undefined && userId.length > 0) {
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        try {
+          const userEntity = await repositories.user.getUserById({domain: domain ?? '', id: userId});
+          await showUserDetails(userEntity);
+        } catch (error: unknown) {
+          if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
+            throw error;
+          }
+        }
+      });
+    }
+  };
+
+  const handleClickOnMessage = (
+    event: MouseEvent | KeyboardEvent,
+    elementType: ElementType,
+    messageDetails: MessageDetails = {
+      href: '',
+      userId: '',
+      userDomain: '',
+    },
+  ) => {
+    if (isMouseRightClickEvent(event) || isAuxRightClickEvent(event)) {
+      // Default browser behavior on right click
+      return true;
+    }
+
+    switch (elementType) {
+      case 'email':
+        handleEmailClick(event, messageDetails);
+        break;
+      case 'markdownLink':
+        handleMarkdownLinkClick(event, messageDetails);
+        break;
+      case 'mention':
+        userMentionClick(messageDetails);
+        break;
+    }
+
+    // need to return `true` because knockout will prevent default if we return anything else (including undefined)
+    return true;
+  };
+
+  const showDetail = async (messageEntity: ContentMessage, event: UIEvent): Promise<void> => {
+    if (messageEntity.isExpired() || event.currentTarget.classList.contains('image-asset--no-image')) {
+      return;
+    }
+
+    showDetailViewModal({
+      assetRepository: repositories.asset,
+      conversationRepository: repositories.conversation,
+      currentMessageEntity: messageEntity,
+      fireAndForgetInvoker,
+      messageRepository: repositories.message,
+      selfUser,
+      translate,
+    });
+  };
+
+  const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
+    const resetProgress = () => {
+      setTimeout(() => {
+        PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {}, undefined, translate);
+      }, MotionDuration.LONG);
+    };
+
+    try {
+      if (messageEntity.fromDomain !== undefined && messageEntity.fromDomain.length > 0 && activeConversation) {
+        await repositories.message.resetSession(
+          {domain: messageEntity.fromDomain, id: messageEntity.from},
+          messageEntity.clientId,
+          activeConversation,
+        );
+        resetProgress();
+      }
+    } catch (error: unknown) {
+      messageListLogger.warn('Error while trying to reset session', error);
+      resetProgress();
+    }
+  };
+
+  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
+    const conversationLastRead = conversationEntity.last_read_timestamp();
+    const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
+    const needsUpdate = conversationLastRead < lastKnownTimestamp;
+
+    // if no message provided it means we need to jump to the last message
+    if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
+      conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await repositories.message.markAsRead(conversationEntity);
+      });
+    }
+  };
+
+  const getInViewportCallback = useCallback(
+    (conversationEntity: ConversationEntity, messageEntity: Message) => {
+      const messageTimestamp = messageEntity.timestamp();
+
+      const callbacks: Function[] = [];
+
+      if (!messageEntity.isEphemeral()) {
+        const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
+        if (conversationEntity.is1to1() && isCreationMessage) {
+          fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+            await repositories.integration.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
+          });
+        }
+      }
+
+      const updateLastRead = () => {
+        conversationEntity.setTimestamp(messageEntity.timestamp(), ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
+      };
+
+      const startTimer = async () => {
+        if (messageEntity.conversation_id === conversationEntity.id) {
+          repositories.conversation.checkMessageTimer(messageEntity as ContentMessage);
+        }
+      };
+
+      if (messageEntity.isEphemeral()) {
+        callbacks.push(startTimer);
+      }
+
+      const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
+      const isNotOwnMessage = !messageEntity.user().isMe;
+
+      let shouldSendReadReceipt = false;
+
+      if (messageEntity.expectsReadConfirmation) {
+        if (conversationEntity.is1to1()) {
+          shouldSendReadReceipt = repositories.conversation.expectReadReceipt(conversationEntity);
+        } else if (
+          conversationEntity.isGroupOrChannel() &&
+          (conversationEntity.inTeam() ||
+            conversationEntity.isGuestRoom() ||
+            conversationEntity.isGuestAndServicesRoom())
+        ) {
+          shouldSendReadReceipt = true;
+        }
+      }
+
+      if (isLastReceivedMessage(messageEntity, conversationEntity)) {
+        callbacks.push(() => updateConversationLastRead(conversationEntity, messageEntity));
+      }
+
+      if (isUnreadMessage && isNotOwnMessage) {
+        callbacks.push(updateLastRead);
+        if (shouldSendReadReceipt) {
+          callbacks.push(() => addReadReceiptToBatch(conversationEntity, messageEntity));
+        }
+      }
+
+      return () => {
+        const trigger = () => callbacks.forEach(callback => callback());
+
+        return document.hasFocus() ? trigger() : window.addEventListener('focus', () => trigger(), {once: true});
+      };
+    },
+    [
+      addReadReceiptToBatch,
+      fireAndForgetInvoker,
+      repositories.conversation,
+      repositories.integration,
+      updateConversationLastRead,
+    ],
+  );
+
+  const isFileTabActive = activeTabIndex === 1;
+
+  const isCellsEnabled =
+    Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
+  const isFileDropAllowed = isConversationFileDropAllowed({
+    conversationTeamId: activeConversation?.teamId,
+    selfUserTeamId: activeConversation?.selfUser()?.teamId,
+    isCellsEnabled,
+    isViewerPermissionFeatureEnabled,
+  });
+
+  useEffect(() => {
+    if (!isFileTabActive && isSharedDriveSearchViewOpen) {
+      setIsSharedDriveSearchViewOpen(false);
+    }
+  }, [isFileTabActive, isSharedDriveSearchViewOpen]);
+
+  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept} =
+    useFilesUploadDropzone({
+      isTeam: inTeam,
+      cellsRepository: repositories.cells,
+      conversation: activeConversation,
+      isCellsEnabled: isCellsEnabled,
+      isDisabled: isFileTabActive,
+      isFileDropAllowed,
+      translate,
+    });
+
+  const currentFolderName = getCurrentFolderName(getCellsFilesPath());
+  const selfUserDriveRole = getSelfUserDriveRole({
+    conversationTeamId: activeConversation?.teamId,
+    selfUserTeamId: selfUser.teamId,
+  });
+  const showViewerPermission =
+    isCellsEnabled &&
+    shouldRestrictCellsViewerActions({
+      isViewerPermissionFeatureEnabled,
+      selfUserDriveRole,
+    });
+
+  return (
+    <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+      <ConversationFileDropzone
+        isDragAccept={isDragAccept}
+        isFileDropAllowed={isFileDropAllowed}
+        isCellsEnabled={isCellsEnabled}
+        isConversationLoaded={isConversationLoaded}
+        activeConversationId={activeConversation?.id}
+        onFileDropped={checkFileSharingPermission(uploadDroppedFiles, translate)}
+        rootProps={getRootProps()}
+        inputProps={getInputProps()}
+      >
+        {activeConversation && (
+          <>
+            <TitleBar
+              repositories={repositories}
+              conversation={activeConversation}
+              selfUser={selfUser}
+              teamState={teamState}
+              callActions={mainViewModel.calling.callActions}
+              openRightSidebar={openRightSidebar}
+              isRightSidebarOpen={isRightSidebarOpen}
+              isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
+              withBottomDivider={!isCellsEnabled || isSharedDriveSearchViewOpen}
+              isSharedDriveSearchViewOpen={isSharedDriveSearchViewOpen}
+              onCloseSharedDriveSearchView={() => setIsSharedDriveSearchViewOpen(false)}
+            />
+
+            {isCellsEnabled && (
+              <>
+                <div css={tabsWrapperStyles}>
+                  <div
+                    aria-hidden={isSharedDriveSearchViewOpen || undefined}
+                    css={isSharedDriveSearchViewOpen ? tabsHiddenStyles : undefined}
+                  >
+                    <ConversationTabs
+                      activeTabIndex={activeTabIndex}
+                      onIndexChange={setActiveTabIndex}
+                      conversationQualifiedId={activeConversation.qualifiedId}
+                    />
+                  </div>
+                  {isSharedDriveSearchViewOpen && (
+                    <div css={searchResultsOverlayStyles}>
+                      <h3 css={searchResultsHeadingStyles}>
+                        {currentFolderName
+                          ? translate('cells.search.resultsIn', {folderName: currentFolderName})
+                          : translate('cells.search.results')}
+                      </h3>
+                    </div>
+                  )}
+                </div>
+                <ConversationTabPanel id="files" isActive={isFileTabActive}>
+                  {isFileTabActive && (
+                    <ConversationCells
+                      activeConversation={activeConversation}
+                      userRepository={repositories.user}
+                      cellsRepository={repositories.cells}
+                      conversationRepository={conversationRepository}
+                      isSearchViewOpen={isSharedDriveSearchViewOpen}
+                      onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
+                      onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
+                      showViewerPermission={showViewerPermission}
+                    />
+                  )}
+                </ConversationTabPanel>
+              </>
+            )}
+
+            <ConversationMessagesWrapper isCellsEnabled={isCellsEnabled} isPanelHidden={isFileTabActive}>
+              {activeCalls.map(call => {
+                const {conversation} = call;
+                const callingViewModel = mainViewModel.calling;
+                const callingRepository = callingViewModel.callingRepository;
+
+                if (!smBreakpoint) {
+                  return null;
+                }
+
+                return (
+                  <CallingCell
+                    key={conversation.id}
+                    classifiedDomains={classifiedDomains}
+                    call={call}
+                    callActions={callingViewModel.callActions}
+                    callingRepository={callingRepository}
+                    propertiesRepository={repositories.properties}
+                  />
+                );
+              })}
+
+              <MessageListWrapper
+                conversation={activeConversation}
+                selfUser={selfUser}
+                conversationRepository={conversationRepository}
+                assetRepository={repositories.asset}
+                messageRepository={repositories.message}
+                loadUsersByIdsFromDb={repositories.user.getUsersByIdsFromDb}
+                messageActions={mainViewModel.actions}
+                invitePeople={clickOnInvitePeople}
+                cancelConnectionRequest={clickOnCancelRequest}
+                showUserDetails={showUserDetails}
+                showMessageDetails={showMessageDetails}
+                showMessageReactions={showMessageReactions}
+                showParticipants={showParticipants}
+                showImageDetails={showDetail}
+                resetSession={onSessionResetClick}
+                onClickMessage={handleClickOnMessage}
+                isConversationLoaded={isConversationLoaded}
+                onLoading={loading => setIsConversationLoaded(!loading)}
+                getVisibleCallback={getInViewportCallback}
+                isMsgElementsFocusable={isMsgElementsFocusable}
+                setMsgElementsFocusable={setMsgElementsFocusable}
+                isRightSidebarOpen={isRightSidebarOpen}
+                updateConversationLastRead={updateConversationLastRead}
+              />
+
+              {showViewerPermission && !isFileTabActive && <ConversationViewerPermissionBanner />}
+
+              {isConversationLoaded &&
+                !isSelfUserRemoved &&
+                (isReadOnlyConversation ? (
+                  <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
+                ) : (
+                  <InputBar
+                    key={activeConversation?.id}
+                    conversation={activeConversation}
+                    conversationRepository={repositories.conversation}
+                    cellsRepository={repositories.cells}
+                    eventRepository={repositories.event}
+                    messageRepository={repositories.message}
+                    openGiphy={openGiphy}
+                    propertiesRepository={repositories.properties}
+                    searchRepository={repositories.search}
+                    storageRepository={repositories.storage}
+                    teamState={teamState}
+                    selfUser={selfUser}
+                    isCellsEnabled={isCellsEnabled}
+                    onShiftTab={() => setMsgElementsFocusable(false)}
+                    uploadDroppedFiles={uploadDroppedFiles}
+                    uploadImages={uploadImages}
+                    uploadFiles={uploadFiles}
+                    uploadPastedFiles={checkFileSharingPermission(handlePastedFile, translate)}
+                    onCellImageUpload={openImageFilesView}
+                    onCellAssetUpload={openAllFilesView}
+                  />
+                ))}
+
+              <div className="conversation-loading">
+                <div className="icon-spinner spin accent-text"></div>
+              </div>
+            </ConversationMessagesWrapper>
+          </>
+        )}
+
+        {isGiphyModalOpen && inputValue && (
+          <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
+        )}
+      </ConversationFileDropzone>
+    </CellsSelfUserDriveRoleProvider>
+  );
+};

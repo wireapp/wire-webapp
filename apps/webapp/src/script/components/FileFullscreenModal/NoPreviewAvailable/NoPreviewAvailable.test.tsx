@@ -22,7 +22,7 @@ import {render, screen} from '@testing-library/react';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

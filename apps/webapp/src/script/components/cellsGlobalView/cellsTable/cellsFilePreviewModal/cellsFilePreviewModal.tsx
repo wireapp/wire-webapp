@@ -19,11 +19,11 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CellsSelfUserDriveRoleProvider} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CellsSelfUserDriveRoleProvider} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
-import {sortTagsAlphabetically} from '../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
+import {sortTagsAlphabetically} from '../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 // This component is duplicated across global view and conversation view

@@ -36,7 +36,7 @@ import {Config} from '../../Config';
 import {
   AssetUrl,
   useAssetTransfer,
-} from '../MessagesList/Message/ContentMessage/asset/common/useAssetTransfer/useAssetTransfer';
+} from '../messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
 
 interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
   alt?: string;

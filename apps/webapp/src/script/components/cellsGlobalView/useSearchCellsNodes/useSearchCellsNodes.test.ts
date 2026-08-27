@@ -28,8 +28,8 @@ import type {Logger} from 'Util/logger';
 
 import {useSearchCellsNodes} from './useSearchCellsNodes';
 
-import type {GlobalDriveFiltersState} from '../../Conversation/ConversationCells/common/driveFilters/driveFilters';
-import type {CellsSort} from '../../Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
+import type {GlobalDriveFiltersState} from '../../conversation/conversationCells/common/driveFilters/driveFilters';
+import type {CellsSort} from '../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 const emptyFilters: GlobalDriveFiltersState = {

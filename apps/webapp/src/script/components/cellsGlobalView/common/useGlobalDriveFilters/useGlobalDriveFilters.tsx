@@ -22,16 +22,16 @@ import {useCallback, useMemo, useState} from 'react';
 import type {
   FilterConfig,
   FilterItem,
-} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
+} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import {
   type GlobalDriveFiltersState,
   getActiveGlobalDriveFilterType,
   isFilterTypeDisabled,
-} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
-import {FILE_TYPE_CATALOG} from 'Components/Conversation/ConversationCells/common/driveFilters/fileTypeCatalog';
-import {useDriveEnabledConversationFilterItems} from 'Components/Conversation/ConversationCells/common/useDriveEnabledConversationFilterItems/useDriveEnabledConversationFilterItems';
-import {useDriveEnabledParticipantFilterItems} from 'Components/Conversation/ConversationCells/common/useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
-import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
+} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
+import {FILE_TYPE_CATALOG} from 'Components/conversation/conversationCells/common/driveFilters/fileTypeCatalog';
+import {useDriveEnabledConversationFilterItems} from 'Components/conversation/conversationCells/common/useDriveEnabledConversationFilterItems/useDriveEnabledConversationFilterItems';
+import {useDriveEnabledParticipantFilterItems} from 'Components/conversation/conversationCells/common/useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
+import {useGetAllTags} from 'Components/conversation/conversationCells/common/useGetAllTags/useGetAllTags';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';

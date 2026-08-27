@@ -26,7 +26,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {EmojiPicker} from './emojiPicker';
 
-import {handleClickOutsideOfInputBar} from '../InputBar/util/clickHandlers';
+import {handleClickOutsideOfInputBar} from '../inputBar/util/clickHandlers';
 
 describe('EmojiPicker', () => {
   it('marks the dialog as ignored for input bar outside-click handling', async () => {

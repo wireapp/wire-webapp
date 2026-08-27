@@ -22,7 +22,7 @@ import {ReactNode} from 'react';
 import {act, render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
