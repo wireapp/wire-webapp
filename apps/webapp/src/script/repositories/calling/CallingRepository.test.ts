@@ -58,6 +58,7 @@ import {createUuid} from 'Util/uuid';
 import {Call} from './Call';
 import {CallingRepository, setupDetachedWindowExternalLinksClick} from './CallingRepository';
 import {CallingViewMode, CallState, MuteState} from './CallState';
+import {type NetworkQuality, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
@@ -670,7 +671,7 @@ describe('CallingRepository', () => {
     const userId = 'user-id';
     const remoteClientId = 'client-id';
 
-    const qualityInfo = (quality: QUALITY) =>
+    const qualityInfo = (quality: NetworkQuality) =>
       JSON.stringify({
         quality,
         rtt: 80,
@@ -712,6 +713,25 @@ describe('CallingRepository', () => {
 
       jest.spyOn(Warnings, 'showWarning');
       jest.spyOn(Warnings, 'hideWarning');
+    });
+
+    it('keeps unknown network quality as a no-op', () => {
+      jest.spyOn(callingRepository['logger'], 'warn');
+      jest.spyOn(callingRepository, 'findCall');
+
+      expect(() => {
+        callingRepository['updateCallQuality'](
+          conversationId,
+          userId,
+          remoteClientId,
+          qualityInfo(UNKNOWN_NETWORK_QUALITY),
+        );
+      }).not.toThrow();
+
+      expect(callingRepository['logger'].warn).not.toHaveBeenCalled();
+      expect(Warnings.showWarning).not.toHaveBeenCalled();
+      expect(Warnings.hideWarning).not.toHaveBeenCalled();
+      expect(callingRepository.findCall).not.toHaveBeenCalled();
     });
 
     // skipping test for now. Once we have correct stats about network

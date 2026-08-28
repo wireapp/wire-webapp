@@ -21,6 +21,9 @@ import {z} from 'zod';
 
 import {QUALITY} from '@wireapp/avs';
 
+export const UNKNOWN_NETWORK_QUALITY = 0;
+export type NetworkQuality = QUALITY | typeof UNKNOWN_NETWORK_QUALITY;
+
 const stringLiteralUnknown = z.literal('Unknown');
 
 const CandidateSchema = z.union([
@@ -34,6 +37,7 @@ const ProtocolSchema = z.union([z.literal('UDP'), z.literal('TCP'), stringLitera
 const PeerSchema = z.union([z.literal('Server'), z.literal('User'), stringLiteralUnknown]);
 
 const QualitySchema = z.union([
+  z.literal(UNKNOWN_NETWORK_QUALITY),
   z.literal(QUALITY.NORMAL),
   z.literal(QUALITY.MEDIUM),
   z.literal(QUALITY.POOR),
