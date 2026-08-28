@@ -21,6 +21,7 @@ import {type ReactNode, useEffect, useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
+import {createBrowserDeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {createMeetingNotificationEventHandlers} from 'Components/meeting/meetingNotificationEventHandlers';
 import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
@@ -54,9 +55,16 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     conversation: conversationRepository,
     calling: callingRepository,
   } = mainViewModel.content.repositories;
+  const deviceTimeZone = useMemo(() => createBrowserDeviceTimeZone(), []);
 
   const store = useMemo(() => {
-    const meetingServiceDeps = {meetingsRepository, conversationRepository, callingRepository, wallClock};
+    const meetingServiceDeps = {
+      meetingsRepository,
+      conversationRepository,
+      callingRepository,
+      wallClock,
+      deviceTimeZone,
+    };
 
     return createMeetingStore({
       ...meetingServiceDeps,
@@ -68,7 +76,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
         deleteMeetingForAll: command => deleteMeetingForAll(command, meetingServiceDeps),
       },
     });
-  }, [meetingsRepository, conversationRepository, callingRepository, wallClock]);
+  }, [meetingsRepository, conversationRepository, callingRepository, wallClock, deviceTimeZone]);
 
   useEffect(() => {
     if (!isMeetingsEnabled) {

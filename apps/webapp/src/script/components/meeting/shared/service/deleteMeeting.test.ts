@@ -89,7 +89,13 @@ const createDeps = ({
   } as unknown as MeetingsRepository;
 
   return {
-    deps: {conversationRepository, callingRepository, meetingsRepository, wallClock},
+    deps: {
+      conversationRepository,
+      callingRepository,
+      meetingsRepository,
+      wallClock,
+      deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
+    },
     leaveCall,
     leaveConversation,
     deleteConversationLocally,

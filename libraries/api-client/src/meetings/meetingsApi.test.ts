@@ -35,7 +35,7 @@ describe('MeetingsAPI', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    trial: false,
+    tzid: 'Europe/Berlin',
     recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
   };
 
@@ -75,16 +75,16 @@ describe('MeetingsAPI', () => {
   it('sends meeting requests through the versioned HTTP client', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 16);
+    await client.useVersion(MINIMUM_API_VERSION, 17);
 
     const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: []} as never);
 
     await client.api.meetings.getMeetingsList();
 
-    expect(client.transport.http.getBaseUrl()).toBe('https://test.zinfra.io/v16');
+    expect(client.transport.http.getBaseUrl()).toBe('https://test.zinfra.io/v17');
     expect(sendJSONSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         method: 'get',
@@ -96,10 +96,10 @@ describe('MeetingsAPI', () => {
   it('throws when meeting responses fail schema validation', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 16);
+    await client.useVersion(MINIMUM_API_VERSION, 17);
 
     jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: [{title: 'invalid'}]} as never);
 
@@ -109,10 +109,10 @@ describe('MeetingsAPI', () => {
   it('returns parsed meeting responses for valid payloads', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 16);
+    await client.useVersion(MINIMUM_API_VERSION, 17);
 
     jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeeting} as never);
 
@@ -124,29 +124,44 @@ describe('MeetingsAPI', () => {
   it('returns parsed create meeting responses with embedded conversation', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 16);
+    await client.useVersion(MINIMUM_API_VERSION, 17);
 
-    jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeetingWithConversation} as never);
+    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({
+      data: validMeetingWithConversation,
+    } as never);
 
     const meeting = await client.api.meetings.createMeeting({
       title: validMeeting.title,
       start_time: validMeeting.start_time,
       end_time: validMeeting.end_time,
+      tzid: validMeeting.tzid,
     });
 
     expect(meeting).toEqual(validMeetingWithConversation);
+    expect(sendJSONSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {
+          title: validMeeting.title,
+          start_time: validMeeting.start_time,
+          end_time: validMeeting.end_time,
+          tzid: validMeeting.tzid,
+        },
+        method: 'post',
+        url: '/meetings',
+      }),
+    );
   });
 
   it('returns parsed update meeting responses with embedded conversation', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 16);
+    await client.useVersion(MINIMUM_API_VERSION, 17);
 
     jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeetingWithConversation} as never);
 
@@ -168,10 +183,10 @@ describe('MeetingsAPI', () => {
   it('deletes a meeting by qualified id', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 16);
+    await client.useVersion(MINIMUM_API_VERSION, 17);
 
     const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: undefined} as never);
 
@@ -193,6 +208,7 @@ describe('MeetingsAPI', () => {
           title: validMeeting.title,
           start_time: validMeeting.start_time,
           end_time: validMeeting.end_time,
+          tzid: validMeeting.tzid,
         }),
       validMeetingWithConversation,
     ],
@@ -217,10 +233,10 @@ describe('MeetingsAPI', () => {
   ] as const)('disables infinite network retries for %s', async (_name, callMeetingsApi, responseData) => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 16], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 16);
+    await client.useVersion(MINIMUM_API_VERSION, 17);
 
     const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: responseData} as never);
 

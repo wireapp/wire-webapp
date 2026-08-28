@@ -81,6 +81,7 @@ const createMeetingSeries = (start: string, end: string, title: string): Meeting
   qualified_id: {id: `meeting-${title}`, domain: 'example.com'},
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
 });
 
 const createMainViewModelForTest = (): MainViewModel =>

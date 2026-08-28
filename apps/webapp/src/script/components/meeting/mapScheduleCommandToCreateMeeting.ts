@@ -19,16 +19,21 @@
 
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
+import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
 
-export const mapScheduleCommandToCreateMeeting = (command: ScheduleMeetingCommand): CreateMeeting => {
+export const mapScheduleCommandToCreateMeeting = (
+  command: ScheduleMeetingCommand,
+  deviceTimeZone: DeviceTimeZone,
+): CreateMeeting => {
   const recurrence = mapRecurrenceOptionToMeetingRecurrence(command.recurrence);
 
   return {
     title: command.title,
     start_time: command.start.toISOString(),
     end_time: command.end.toISOString(),
+    tzid: deviceTimeZone.ianaTimeZoneId,
     ...(recurrence !== undefined && {recurrence}),
   };
 };

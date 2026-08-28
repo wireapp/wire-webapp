@@ -20,6 +20,7 @@
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Task} from 'true-myth';
 
+import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import type {MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {DeleteMeetingCommand} from 'Components/meeting/shared/service/deleteMeeting';
 import type {
@@ -49,6 +50,7 @@ export type MeetingServiceDeps = {
   conversationRepository: ConversationRepository;
   callingRepository: CallingRepository;
   wallClock: WallClock;
+  deviceTimeZone: DeviceTimeZone;
 };
 
 export type MeetingStoreDeps = MeetingServiceDeps & {

@@ -44,6 +44,7 @@ const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => 
   qualified_id: meetingId,
   qualified_creator: {id: 'host-id', domain: 'example.com'},
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
   ...overrides,
 });
 

@@ -46,6 +46,7 @@ const meetingSeries: MeetingSeries = {
   series_end_date: '2026-06-01T14:00:00.000Z',
   series_start_date: '2026-06-01T13:00:00.000Z',
   title: 'Weekly sync',
+  tzid: 'Europe/Berlin',
 };
 
 describe('createMeetingNotificationEventHandlers', () => {

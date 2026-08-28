@@ -60,5 +60,6 @@ export const mapApiMeetingToSeries = (apiMeeting: ApiMeeting): Result<MeetingSer
     qualified_id: apiMeeting.qualified_id,
     qualified_creator: apiMeeting.qualified_creator,
     title: apiMeeting.title,
+    tzid: apiMeeting.tzid,
   });
 };

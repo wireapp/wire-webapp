@@ -25,19 +25,21 @@ const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
 describe('mapMeetNowCommandToCreateMeeting', () => {
-  it('maps title and immediate start/end times', () => {
+  it('maps title, immediate start/end times, and device tzid', () => {
     const result = mapMeetNowCommandToCreateMeeting(
       {
         title: 'Standup',
         selectedUsers: [],
       },
       wallClock,
+      {ianaTimeZoneId: 'Pacific/Auckland'},
     );
 
     expect(result).toEqual({
       title: 'Standup',
       start_time: fixedNow.toISOString(),
       end_time: new Date(fixedNow.getTime() + 60 * 60 * 1000).toISOString(),
+      tzid: 'Pacific/Auckland',
     });
   });
 });

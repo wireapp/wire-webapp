@@ -17,20 +17,13 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Config} from 'src/script/Config';
 
-import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-
-export type MeetingSeries = {
-  series_start_date: string;
-  series_end_date: string;
-  duration_ms: number;
-  recurrence: ScheduleMeetingRecurrenceOption;
-  recurrence_until?: string;
-  conversation_id: string;
-  qualified_conversation: QualifiedId;
-  qualified_id: QualifiedId;
-  qualified_creator: QualifiedId;
-  title: string;
-  tzid: string;
+export const canUseMeetings = (input: {
+  readonly isTeamMeetingsFeatureEnabled: boolean;
+  readonly apiVersion: number;
+}): boolean => {
+  return (
+    input.isTeamMeetingsFeatureEnabled && input.apiVersion >= Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION
+  );
 };

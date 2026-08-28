@@ -34,10 +34,12 @@ import {
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
+import {Config} from 'src/script/Config';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {Core} from 'src/script/service/coreSingleton';
 import type {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -57,7 +59,7 @@ const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId) =
   qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
   qualified_id: qualifiedId,
-  trial: false,
+  tzid: 'Europe/Berlin',
 });
 
 const meetingTitlesTestId = 'meeting-titles';
@@ -66,6 +68,10 @@ const setMeetingsTeamFeature = (status: FEATURE_STATUS) => {
   act(() => {
     container.resolve(TeamState).teamFeatures({meetings: {status}} as FeatureList);
   });
+};
+
+const setNegotiatedApiVersion = (apiVersion: number) => {
+  container.resolve(Core).backendFeatures.version = apiVersion;
 };
 
 const MeetingTitlesProbe = () => {
@@ -78,14 +84,17 @@ type RenderParameters = {
   readonly getMeetingsList?: jest.Mock;
   readonly getMeeting?: jest.Mock;
   readonly isMeetingsFeatureEnabled?: boolean;
+  readonly apiVersion?: number;
 };
 
 const renderMeetingStoreRoot = ({
   getMeetingsList = jest.fn(() => task.resolve([createApiMeeting('Weekly sync')])),
   getMeeting = jest.fn(() => task.resolve(createApiMeeting('Weekly sync (updated)'))),
   isMeetingsFeatureEnabled = true,
+  apiVersion = Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION,
 }: RenderParameters = {}) => {
   setMeetingsTeamFeature(isMeetingsFeatureEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED);
+  setNegotiatedApiVersion(apiVersion);
   container.resolve(UserState).self(new User(selfUserId.id, selfUserId.domain, translateForTest));
 
   const mainViewModel = {
@@ -124,6 +133,7 @@ describe('MeetingStoreRoot', () => {
     act(() => {
       container.resolve(TeamState).teamFeatures(undefined);
     });
+    setNegotiatedApiVersion(1);
   });
 
   it('loads the meetings list once for the signed-in session', async () => {
@@ -450,6 +460,18 @@ describe('MeetingStoreRoot', () => {
 
   it('does not load meeting data when the meetings feature is disabled', async () => {
     const {getMeetingsList} = renderMeetingStoreRoot({isMeetingsFeatureEnabled: false});
+
+    await waitFor(() => {
+      expect(getRenderedMeetingTitles()).toBe('');
+    });
+
+    expect(getMeetingsList).not.toHaveBeenCalled();
+  });
+
+  it('does not load meeting data when the negotiated API version is below 17', async () => {
+    const {getMeetingsList} = renderMeetingStoreRoot({
+      apiVersion: Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION - 1,
+    });
 
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('');

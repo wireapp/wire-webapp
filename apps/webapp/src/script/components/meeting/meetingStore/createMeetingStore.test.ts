@@ -49,7 +49,7 @@ describe('createMeetingStore', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    trial: false,
+    tzid: 'Europe/Berlin',
   };
 
   const meetingSeriesEntry = {
@@ -62,6 +62,7 @@ describe('createMeetingStore', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     recurrence: 'doesNotRepeat' as const,
+    tzid: 'Europe/Berlin',
   };
 
   const listMeetingInstance = {
@@ -108,6 +109,7 @@ describe('createMeetingStore', () => {
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
     callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
     wallClock: wallClockOverride,
+    deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
     serviceTasks,
   });
 
