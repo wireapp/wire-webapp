@@ -117,4 +117,53 @@ describe('ConversationsList', () => {
 
     await Promise.all(userNames.map(async userName => expect(await findByText(userName)).toBeDefined()));
   });
+
+  it('keeps group participant results inside the conversation results scroll container', async () => {
+    const conversationNameResult = create1to1Conversation('Conversation name match');
+    const participantNameResult = create1to1Conversation('Participant name match');
+
+    const {container, findByText} = render(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[conversationNameResult]}
+        conversationsFilter="a"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={currentFocus}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[participantNameResult]}
+        isGroupParticipantsVisible={true}
+        isEmpty={false}
+        searchInputRef={createRef()}
+      />,
+      {wrapper: rootProviderWrapper},
+    );
+
+    const conversationList = container.querySelector<HTMLUListElement>('[data-uie-name="conversation-view"]');
+    const groupParticipantsList = container.querySelector<HTMLUListElement>(
+      '[data-uie-name="group-participants-conversations-view"]',
+    );
+
+    expect(conversationList).not.toBeNull();
+    expect(groupParticipantsList).not.toBeNull();
+
+    if (!conversationList || !groupParticipantsList) {
+      throw new Error('Expected both conversation result lists to be rendered');
+    }
+
+    const actualGroupParticipantsContainer = groupParticipantsList.parentElement?.parentElement;
+    const expectedGroupParticipantsContainer = conversationList;
+
+    expect(actualGroupParticipantsContainer).toBe(expectedGroupParticipantsContainer);
+    expect(groupParticipantsList.parentElement?.tagName).toBe('LI');
+    await expect(findByText('Conversation name match')).resolves.toBeDefined();
+    await expect(findByText('Participant name match')).resolves.toBeDefined();
+    await expect(findByText('searchConversationNames')).resolves.toBeDefined();
+    await expect(findByText('searchGroupParticipants')).resolves.toBeDefined();
+  });
 });
