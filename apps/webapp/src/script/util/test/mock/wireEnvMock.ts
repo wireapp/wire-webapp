@@ -27,7 +27,12 @@ const wire: WireModule = {
     APP_BASE: 'https://app.wire.com',
     BACKEND_REST: 'https://test.wire.link',
     FEATURE: {},
-    URL: {SUPPORT: {}},
+    URL: {
+      SUPPORT: {
+        SHARED_DRIVE:
+          'https://support.wire.com/auth/v3/signin?brand_id=162184&locale=en-us&return_to=https%3A%2F%2Fsupport.wire.com%2Fhc%2Fen-us%2Farticles%2F36679600377373-File-permissions-in-Shared-Drive&role=end_user',
+      },
+    },
     NEW_PASSWORD_MINIMUM_LENGTH: 8,
     ASSET_VERSION: 'dev-unknown',
     VERSION: '0.0.0-test',
