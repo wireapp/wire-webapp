@@ -1361,7 +1361,7 @@
   "meetings.scheduleModal.error.conversationRenameFailedRetry": "Erneut versuchen",
   "meetings.scheduleModal.error.conversationRenameFailedTitle": "Could not update call name",
   "meetings.scheduleModal.error.createFailed": "Something went wrong while scheduling the meeting. Please try again.",
-  "meetings.scheduleModal.error.createFailedTitle": "Could not schedule meeting",
+  "meetings.scheduleModal.error.createFailedTitle": "Meeting konnte nicht geplant werden",
   "meetings.scheduleModal.error.editMeetingIdMissing": "Something went wrong while updating the meeting. Please close the dialog and try again.",
   "meetings.scheduleModal.error.endBeforeStart": "Ende des Meetings muss nach dem Beginn liegen",
   "meetings.scheduleModal.error.missingTimes": "Beginn und Ende sind erforderlich.",
