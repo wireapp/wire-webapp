@@ -20,7 +20,7 @@
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
-import {Maybe} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {getSelfUserDriveRole} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -71,7 +71,7 @@ export const transformCellsNodes = ({
 
     const userQualifiedId = Maybe.of(getUserQualifiedIdFromNode(node));
     const matchingUser = userQualifiedId.andThen(userQualifiedId =>
-      Maybe.of(users.find(user => matchQualifiedIds(user.qualifiedId, userQualifiedId))),
+      maybe.find(user => matchQualifiedIds(user.qualifiedId, userQualifiedId), users),
     );
     const user = matchingUser.unwrapOr(null);
     const owner = user?.name() || getOwner(node);
