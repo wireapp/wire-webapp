@@ -25,7 +25,7 @@ import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const SHARED_DRIVE_SUPPORT_URL =
-  'https://support.wire.com/hc/en-us/articles/32207745256221-Shared-Drive-in-conversations';
+  'https://support.wire.com/auth/v3/signin?brand_id=162184&locale=en-us&return_to=https%3A%2F%2Fsupport.wire.com%2Fhc%2Fen-us%2Farticles%2F36679600377373-File-permissions-in-Shared-Drive&role=end_user';
 
 export const ConversationViewerPermissionBanner = () => {
   const {translate} = useApplicationContext();
