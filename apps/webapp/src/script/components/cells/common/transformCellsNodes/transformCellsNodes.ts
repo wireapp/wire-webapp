@@ -20,6 +20,7 @@
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
+import {Maybe} from 'true-myth';
 
 import {getSelfUserDriveRole} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -68,8 +69,11 @@ export const transformCellsNodes = ({
       selfUserTeamId,
     });
 
-    const userQualifiedId = getUserQualifiedIdFromNode(node);
-    const user = users.find(user => matchQualifiedIds(user.qualifiedId, userQualifiedId ?? undefined)) ?? null;
+    const userQualifiedId = Maybe.of(getUserQualifiedIdFromNode(node));
+    const matchingUser = userQualifiedId.andThen(userQualifiedId =>
+      Maybe.of(users.find(user => matchQualifiedIds(user.qualifiedId, userQualifiedId))),
+    );
+    const user = matchingUser.unwrapOr(null);
     const owner = user?.name() || getOwner(node);
 
     if (node.Type === 'COLLECTION') {
