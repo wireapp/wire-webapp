@@ -67,18 +67,22 @@ export class CellsRepository {
     uuid,
     file,
     path,
+    versionId = createUuid(),
     progressCallback,
+    abortController,
   }: {
     uuid: string;
     file: File;
     path: string;
+    versionId?: string;
     progressCallback?: (progress: number) => void;
+    abortController?: AbortController;
   }): Promise<{uuid: string; versionId: string}> {
     const filePath = `${path || this.basePath}/${file.name}`;
-    const versionId = createUuid();
-
-    const controller = new AbortController();
-    this.uploadControllers.set(uuid, controller);
+    const controller = abortController ?? new AbortController();
+    if (!abortController) {
+      this.uploadControllers.set(uuid, controller);
+    }
 
     try {
       await this.apiClient.api.cells.uploadNodeDraft({
@@ -90,20 +94,16 @@ export class CellsRepository {
         abortController: controller,
       });
 
-      return {
-        uuid,
-        versionId,
-      };
+      return {uuid, versionId};
     } finally {
-      this.uploadControllers.delete(uuid);
+      if (!abortController && this.uploadControllers.get(uuid) === controller) {
+        this.uploadControllers.delete(uuid);
+      }
     }
   }
 
   cancelUpload(uuid: string): void {
-    const controller = this.uploadControllers.get(uuid);
-    if (controller) {
-      controller.abort();
-    }
+    this.uploadControllers.get(uuid)?.abort();
   }
 
   async deleteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {

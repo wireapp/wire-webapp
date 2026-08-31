@@ -21,7 +21,7 @@ import {Task} from 'true-myth';
 import type {Result} from 'true-myth';
 
 import type {CellsUploadGateway, CellsUploadGatewayError, UploadDraftRequest} from './gateway';
-import type {UploadSource} from './identity';
+import type {DraftIdentity, UploadSource} from './identity';
 import {createCellsUploadProcess, type CellsUploadProcessDependencies} from './process';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'file.txt', contentType: 'text/plain', size: 4};
@@ -37,19 +37,23 @@ const unwrapResult = <T, E>(result: Result<T, E>): T => {
   return result.unwrapOr(undefined as never);
 };
 
-const deferred = <T, E>() => {
-  let resolve!: (value: T) => void;
+const deferred = <T, E>(defaultValue?: T) => {
+  let resolve!: (value?: T) => void;
   let reject!: (error: E) => void;
   const value = new Task<T, E>((resolveTask, rejectTask) => {
-    resolve = resolveTask;
+    resolve = nextValue => resolveTask(nextValue ?? (defaultValue as T));
     reject = rejectTask;
   });
   return {value, resolve, reject};
 };
 
-const setup = (failure?: 'publish' | 'discard' | 'mismatch', duplicateAttemptIds = false) => {
+const setup = (
+  failure?: 'publish' | 'discard' | 'mismatch',
+  duplicateAttemptIds = false,
+  remoteIdentity: DraftIdentity = {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
+) => {
   const uploads: UploadDraftRequest[] = [];
-  const uploadTasks: ReturnType<typeof deferred<void, CellsUploadGatewayError<'upload'>>>[] = [];
+  const uploadTasks: ReturnType<typeof deferred<DraftIdentity, CellsUploadGatewayError<'upload'>>>[] = [];
   const aborts: AbortController[] = [];
   const published = [] as string[];
   const discarded = [] as string[];
@@ -58,13 +62,13 @@ const setup = (failure?: 'publish' | 'discard' | 'mismatch', duplicateAttemptIds
     uploadDraft: request => {
       uploads.push(request);
       if (failureMode === 'mismatch') {
-        return Task.reject<void, CellsUploadGatewayError<'publish'>>({
+        return Task.reject<DraftIdentity, CellsUploadGatewayError<'upload'>>({
           kind: 'gatewayError',
-          operation: 'publish',
+          operation: 'publish' as CellsUploadGatewayError<'upload'>['operation'],
           cause: 'mismatched-operation',
-        }) as unknown as Task<void, CellsUploadGatewayError<'upload'>>;
+        });
       }
-      const task = deferred<void, CellsUploadGatewayError<'upload'>>();
+      const task = deferred<DraftIdentity, CellsUploadGatewayError<'upload'>>(remoteIdentity);
       uploadTasks.push(task);
       return task.value;
     },
@@ -132,6 +136,26 @@ describe('createCellsUploadProcess', () => {
     required(fixture.uploadTasks[0]).resolve(undefined);
     await unwrap(start);
     expect(snapshots).toEqual(['queued', 'uploading', 'uploading', 'draftReady']);
+  });
+
+  it('uses the repository-returned remote identity after upload', async () => {
+    const remoteIdentity: DraftIdentity = {
+      uploadId: 'upload-1',
+      resourceUuid: 'remote-resource',
+      versionId: 'remote-version',
+    };
+    const fixture = setup(undefined, false, remoteIdentity);
+    const start = fixture.process.start();
+    required(fixture.uploadTasks[0]).resolve(undefined);
+    await unwrap(start);
+
+    expect(fixture.process.snapshot().unwrapOr({kind: 'cancelled', identity: {uploadId: 'missing'}, source})).toEqual({
+      kind: 'draftReady',
+      identity: remoteIdentity,
+      source,
+    });
+    await unwrap(fixture.process.publish());
+    expect(fixture.published).toEqual(['remote-version']);
   });
 
   it('reports typed upload failure and aborts only the active attempt', async () => {

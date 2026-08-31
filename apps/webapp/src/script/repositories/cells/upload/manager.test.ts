@@ -22,7 +22,7 @@ import {Task} from 'true-myth';
 
 import type {CellsUploadGateway, CellsUploadGatewayError, UploadDraftRequest} from './gateway';
 import {createCellsUploadManager} from './manager';
-import type {UploadSource} from './identity';
+import type {DraftIdentity, UploadSource} from './identity';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'file.txt', contentType: 'text/plain', size: 4};
 const path = 'wire-cells-web/conversation-1';
@@ -33,10 +33,10 @@ const required = <T>(value: T | undefined): T => {
 };
 
 const deferred = () => {
-  let resolve!: (value: void) => void;
+  let resolve!: (value?: DraftIdentity) => void;
   let reject!: (error: CellsUploadGatewayError<'upload'>) => void;
-  const task = new Task<void, CellsUploadGatewayError<'upload'>>((resolveTask, rejectTask) => {
-    resolve = resolveTask;
+  const task = new Task<DraftIdentity, CellsUploadGatewayError<'upload'>>((resolveTask, rejectTask) => {
+    resolve = value => resolveTask(value ?? {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'});
     reject = rejectTask;
   });
   return {task, resolve, reject};
@@ -71,7 +71,11 @@ describe('createCellsUploadManager', () => {
     const gateway: CellsUploadGateway = {
       uploadDraft: request => {
         requests.push(request);
-        return Task.resolve<void, never>(undefined);
+        return Task.resolve<DraftIdentity, never>({
+          uploadId: request.uploadId,
+          resourceUuid: request.identity.resourceUuid,
+          versionId: request.identity.versionId,
+        });
       },
       publishDraft: () => Task.resolve<void, never>(undefined),
       discardDraft: () => Task.resolve<void, never>(undefined),
