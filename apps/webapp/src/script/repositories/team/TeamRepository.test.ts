@@ -262,7 +262,7 @@ describe('TeamRepository', () => {
       jest.spyOn(teamService, 'getApps').mockResolvedValue(rawAppsFromBackend as any);
       jest.spyOn(teamService, 'getCollaborators').mockResolvedValue(collaboratorsFromBackend);
 
-      userRepository.userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([ownedApp])} as any;
+      (userRepository as any).userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([ownedApp])};
       const getUsersByIdMock = jest
         .fn()
         .mockResolvedValue([duplicateAppCollaborator, newAppCollaborator, humanCollaborator]);
@@ -292,7 +292,7 @@ describe('TeamRepository', () => {
 
       jest.spyOn(teamService, 'getApps').mockResolvedValue([]);
       jest.spyOn(teamService, 'getCollaborators').mockResolvedValue([]);
-      userRepository.userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([])} as any;
+      (userRepository as any).userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([])};
       userRepository.getUsersById = jest.fn().mockResolvedValue([]);
 
       await teamRepo.loadTeamAppsAndCollaborators(teamId);

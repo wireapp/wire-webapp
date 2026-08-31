@@ -50,6 +50,8 @@ export type SearchResultsData = {contacts: User[]; others: User[]};
 const TOP_PEOPLE_LIMIT = 6;
 const SEARCH_DEBOUNCE_MILLISECONDS = 300;
 
+const logger = getLogger('PeopleSearch');
+
 export interface PeopleTabProps {
   canInviteTeamMembers: boolean;
   canSearchUnconnectedUsers: boolean;
@@ -90,7 +92,6 @@ export const PeopleTab = ({
   onSearchResults,
 }: PeopleTabProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
-  const logger = getLogger('PeopleSearch');
   const [topPeople, setTopPeople] = useState<User[]>([]);
   const teamSize = teamState.teamSize();
   const [hasFederationError, setHasFederationError] = useState(false);
@@ -125,7 +126,8 @@ export const PeopleTab = ({
       return teamApps;
     }
     return teamApps.filter(
-      app => app.name().toLowerCase().includes(normalizedQuery) || app.username().toLowerCase().includes(normalizedQuery),
+      app =>
+        app.name().toLowerCase().includes(normalizedQuery) || app.username().toLowerCase().includes(normalizedQuery),
     );
   }, [teamApps, searchQuery]);
 

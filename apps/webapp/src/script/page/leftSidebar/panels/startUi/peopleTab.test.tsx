@@ -206,8 +206,8 @@ describe('PeopleTab', () => {
       normalizeQuery: (query: string) => {
         return {query: query.trim().toLowerCase(), isHandleQuery: false};
       },
-      searchUserInSet: () => {
-        return [];
+      searchUserInSet: (query: string, users: User[]): User[] => {
+        return searchUsersByQuery(query, users);
       },
     } satisfies MinimalSearchRepository;
     const loadTeamAppsAndCollaborators = jest.fn(async () => {
