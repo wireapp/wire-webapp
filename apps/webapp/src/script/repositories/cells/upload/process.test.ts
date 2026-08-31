@@ -187,7 +187,9 @@ describe('createCellsUploadProcess', () => {
     required(fixture.process.subscribe(snapshot => snapshots.push(snapshot.kind)));
     firstRequest.onProgress(0.9);
     firstRequest.onProgress(1);
-    expect(fixture.process.snapshot().unwrapOr({kind: 'cancelled', identity: {uploadId: 'missing'}, source})).toMatchObject({
+    expect(
+      fixture.process.snapshot().unwrapOr({kind: 'cancelled', identity: {uploadId: 'missing'}, source}),
+    ).toMatchObject({
       kind: 'uploading',
       progress: 0,
     });
@@ -207,7 +209,9 @@ describe('createCellsUploadProcess', () => {
     const secondRequest = required(fixture.uploads[1]);
     expect(secondRequest.attemptId).toBe(firstRequest.attemptId);
     firstRequest.onProgress(0.9);
-    expect(fixture.process.snapshot().unwrapOr({kind: 'cancelled', identity: {uploadId: 'missing'}, source})).toMatchObject({
+    expect(
+      fixture.process.snapshot().unwrapOr({kind: 'cancelled', identity: {uploadId: 'missing'}, source}),
+    ).toMatchObject({
       kind: 'uploading',
       progress: 0,
     });
@@ -226,7 +230,9 @@ describe('createCellsUploadProcess', () => {
         cause: {kind: 'gatewayError', operation: 'publish', cause: 'mismatched-operation'},
       },
     });
-    expect(fixture.process.snapshot().unwrapOr({kind: 'cancelled', identity: {uploadId: 'missing'}, source})).toMatchObject({
+    expect(
+      fixture.process.snapshot().unwrapOr({kind: 'cancelled', identity: {uploadId: 'missing'}, source}),
+    ).toMatchObject({
       kind: 'uploadFailed',
       error: {
         kind: 'uploadFailed',
@@ -243,7 +249,9 @@ describe('createCellsUploadProcess', () => {
     request.onProgress(0.9);
     required(fixture.uploadTasks[0]).reject({kind: 'gatewayError', operation: 'upload', cause: 'late'});
     await unwrap(start);
-    expect(fixture.process.snapshot().unwrapOr({kind: 'queued', identity: {uploadId: 'missing'}, source})).toMatchObject({
+    expect(
+      fixture.process.snapshot().unwrapOr({kind: 'queued', identity: {uploadId: 'missing'}, source}),
+    ).toMatchObject({
       kind: 'cancelled',
     });
   });
@@ -284,7 +292,9 @@ describe('createCellsUploadProcess', () => {
     await publishFixture.process.publish();
     publishFixture.setFailure();
     await unwrap(publishFixture.process.retryPublish());
-    expect(publishFixture.process.snapshot().unwrapOr({kind: 'queued', identity: {uploadId: 'missing'}, source})).toEqual({
+    expect(
+      publishFixture.process.snapshot().unwrapOr({kind: 'queued', identity: {uploadId: 'missing'}, source}),
+    ).toEqual({
       kind: 'published',
       identity: {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
       source,
@@ -297,7 +307,9 @@ describe('createCellsUploadProcess', () => {
     await discardFixture.process.discard();
     discardFixture.setFailure();
     await unwrap(discardFixture.process.retryDiscard());
-    expect(discardFixture.process.snapshot().unwrapOr({kind: 'queued', identity: {uploadId: 'missing'}, source})).toEqual({
+    expect(
+      discardFixture.process.snapshot().unwrapOr({kind: 'queued', identity: {uploadId: 'missing'}, source}),
+    ).toEqual({
       kind: 'discarded',
       identity: {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
       source,
