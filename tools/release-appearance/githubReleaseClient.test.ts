@@ -28,11 +28,19 @@ type FakeHttpClientOptions = {
   readonly responseForRequest: (request: HttpRequest) => unknown;
 };
 
+type FakeHttpClient = {
+  readonly requestJson: (request: HttpRequest) => Promise<unknown>;
+};
+
 type FakeHttpClientFixture = {
-  readonly httpClient: {
-    readonly requestJson: (request: HttpRequest) => Promise<unknown>;
-  };
+  readonly httpClient: FakeHttpClient;
   readonly requests: HttpRequest[];
+};
+
+type GitHubReleaseResponse = {
+  readonly tag_name: string;
+  readonly html_url: string;
+  readonly draft: boolean;
 };
 
 function createFakeHttpClient(fakeHttpClientOptions: FakeHttpClientOptions): FakeHttpClientFixture {
@@ -64,6 +72,14 @@ function createHttpResponseFailure(statusCode: number): HttpRequestFailure {
       rateLimitRemaining: Maybe.nothing<string>(),
       rateLimitReset: Maybe.nothing<string>(),
     },
+  };
+}
+
+function createReleaseResponse(tagName: string, isDraft: boolean): GitHubReleaseResponse {
+  return {
+    tag_name: tagName,
+    html_url: `https://github.com/wireapp/wire-webapp/releases/tag/${tagName}`,
+    draft: isDraft,
   };
 }
 
@@ -109,26 +125,17 @@ describe('GitHub Release client', () => {
     ]);
   });
 
-  it('maps an existing GitHub Release and treats a missing release as absent', async () => {
+  it('finds an existing draft GitHub Release in the releases collection', async () => {
     const productionTagName = '2026-08-28.1-production';
-    const existingRelease = {
-      tag_name: productionTagName,
-      html_url: `https://github.com/wireapp/wire-webapp/releases/tag/${productionTagName}`,
-      draft: true,
-    };
+    const existingRelease = createReleaseResponse(productionTagName, true);
     const fakeHttpClient = createFakeHttpClient({
-      responseForRequest(request) {
-        if (request.url.pathname.endsWith('/2026-08-28.1-production')) {
-          return existingRelease;
-        }
-
-        throw createHttpResponseFailure(404);
+      responseForRequest() {
+        return [existingRelease];
       },
     });
     const githubReleaseClient = createClient(fakeHttpClient.httpClient);
 
     const existingReleaseResult = await githubReleaseClient.findReleaseByTag({tagName: productionTagName});
-    const missingReleaseResult = await githubReleaseClient.findReleaseByTag({tagName: '2026-09-01.1-production'});
 
     assert(existingReleaseResult.isOk);
     expect(existingReleaseResult.value).toEqual(
@@ -138,58 +145,138 @@ describe('GitHub Release client', () => {
         isDraft: true,
       }),
     );
-    assert(missingReleaseResult.isOk);
-    expect(missingReleaseResult.value.isNothing).toBe(true);
+    expect(fakeHttpClient.requests[0]?.url.toString()).toBe(
+      'https://api.github.example/repos/wireapp/wire-webapp/releases?per_page=100&page=1',
+    );
   });
 
-  it('requests GitHub-generated notes from the preceding Production tag', async () => {
+  it('finds an existing published GitHub Release in the releases collection', async () => {
+    const productionTagName = '2026-08-28.1-production';
+    const existingRelease = createReleaseResponse(productionTagName, false);
     const fakeHttpClient = createFakeHttpClient({
-      responseForRequest(request) {
-        return {
-          tag_name: '2026-08-28.1-production',
-          html_url: 'https://github.com/wireapp/wire-webapp/releases/tag/2026-08-28.1-production',
-          draft: true,
-        };
+      responseForRequest() {
+        return [existingRelease];
       },
     });
     const githubReleaseClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubReleaseClient.createProductionDraft({
+    const existingReleaseResult = await githubReleaseClient.findReleaseByTag({tagName: productionTagName});
+
+    assert(existingReleaseResult.isOk);
+    expect(existingReleaseResult.value).toEqual(
+      Maybe.just({
+        tagName: productionTagName,
+        htmlUrl: existingRelease.html_url,
+        isDraft: false,
+      }),
+    );
+  });
+
+  it('finds a matching release on a later page and stops fetching after the match', async () => {
+    const productionTagName = '2026-08-28.1-production';
+    const firstPage = Array.from({length: 100}, (_, releaseIndex) => {
+      return createReleaseResponse(`release-${releaseIndex + 1}`, false);
+    });
+    const secondPage = [
+      createReleaseResponse(productionTagName, true),
+      ...Array.from({length: 99}, (_, releaseIndex) => {
+        return createReleaseResponse(`later-release-${releaseIndex + 1}`, false);
+      }),
+    ];
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest(request) {
+        const page = request.url.searchParams.get('page');
+
+        if (page === '1') {
+          return firstPage;
+        }
+
+        if (page === '2') {
+          return secondPage;
+        }
+
+        throw new Error('The releases collection was fetched after the matching release was found.');
+      },
+    });
+    const githubReleaseClient = createClient(fakeHttpClient.httpClient);
+
+    const actualResult = await githubReleaseClient.findReleaseByTag({tagName: productionTagName});
+
+    assert(actualResult.isOk);
+    expect(actualResult.value.isJust).toBe(true);
+    expect(
+      fakeHttpClient.requests.map(request => {
+        return request.url.searchParams.get('page');
+      }),
+    ).toEqual(['1', '2']);
+  });
+
+  it('returns no release after the releases collection is exhausted', async () => {
+    const firstPage = Array.from({length: 100}, (_, releaseIndex) => {
+      return createReleaseResponse(`release-${releaseIndex + 1}`, false);
+    });
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest(request) {
+        return request.url.searchParams.get('page') === '1'
+          ? firstPage
+          : [createReleaseResponse('other-release', false)];
+      },
+    });
+    const githubReleaseClient = createClient(fakeHttpClient.httpClient);
+
+    const actualResult = await githubReleaseClient.findReleaseByTag({tagName: '2026-08-28.1-production'});
+
+    assert(actualResult.isOk);
+    expect(actualResult.value.isNothing).toBe(true);
+    expect(fakeHttpClient.requests).toHaveLength(2);
+  });
+
+  it('requests generated GitHub Release notes with the explicit Production range', async () => {
+    const generatedReleaseNotes = {
+      name: 'Generated Production release',
+      body: '## Changes\n\n- Generated change',
+    };
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest(request) {
+        expect(request.method).toBe('post');
+        expect(request.url.toString()).toBe(
+          'https://api.github.example/repos/wireapp/wire-webapp/releases/generate-notes',
+        );
+        return generatedReleaseNotes;
+      },
+    });
+    const githubReleaseClient = createClient(fakeHttpClient.httpClient);
+
+    const actualResult = await githubReleaseClient.generateReleaseNotes({
       productionTagName: '2026-08-28.1-production',
-      precedingProductionTagName: Maybe.just('2026-08-07.1-production'),
+      precedingProductionTagName: '2026-08-07.1-production',
     });
 
     assert(actualResult.isOk);
+    expect(actualResult.value).toEqual(generatedReleaseNotes);
     const request = Maybe.of(fakeHttpClient.requests[0]);
     assert(request.isJust);
-    expect(request.value.method).toBe('post');
-    expect(request.value.url.toString()).toBe('https://api.github.example/repos/wireapp/wire-webapp/releases');
     expect(request.value.json).toEqual(
       Maybe.just({
         tag_name: '2026-08-28.1-production',
-        name: '2026-08-28.1-production',
-        draft: true,
-        generate_release_notes: true,
         previous_tag_name: '2026-08-07.1-production',
       }),
     );
   });
 
-  it('uses a deterministic manual placeholder when no preceding Production tag exists', async () => {
+  it('passes the supplied generated body to draft release creation', async () => {
+    const productionTagName = '2026-08-28.1-production';
+    const generatedBody = '## Changes\n\n- Generated change';
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
-        return {
-          tag_name: '2026-07-27.1-production',
-          html_url: 'https://github.com/wireapp/wire-webapp/releases/tag/2026-07-27.1-production',
-          draft: true,
-        };
+        return createReleaseResponse(productionTagName, true);
       },
     });
     const githubReleaseClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubReleaseClient.createProductionDraft({
-      productionTagName: '2026-07-27.1-production',
-      precedingProductionTagName: Maybe.nothing(),
+    const actualResult = await githubReleaseClient.createDraftRelease({
+      productionTagName,
+      body: generatedBody,
     });
 
     assert(actualResult.isOk);
@@ -197,18 +284,18 @@ describe('GitHub Release client', () => {
     assert(request.isJust);
     expect(request.value.json).toEqual(
       Maybe.just({
-        tag_name: '2026-07-27.1-production',
-        name: '2026-07-27.1-production',
+        tag_name: productionTagName,
+        name: productionTagName,
         draft: true,
-        body: 'No preceding ADR Production release was found. Add the customer-facing changelog manually before publication.',
+        body: generatedBody,
       }),
     );
   });
 
-  it('rejects malformed GitHub Release responses at the API boundary', async () => {
+  it('rejects malformed GitHub Release collection responses at the API boundary', async () => {
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
-        return {tag_name: '2026-08-28.1-production', draft: true};
+        return [{tag_name: '2026-08-28.1-production', draft: true}];
       },
     });
     const githubReleaseClient = createClient(fakeHttpClient.httpClient);
@@ -216,6 +303,51 @@ describe('GitHub Release client', () => {
     const actualResult = await githubReleaseClient.findReleaseByTag({tagName: '2026-08-28.1-production'});
 
     assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('Malformed GitHub Release response');
+    expect(actualResult.error.message).toBe('Malformed GitHub Release collection response');
+  });
+
+  it('rejects malformed generated GitHub Release notes responses at the API boundary', async () => {
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest() {
+        return {name: 'Generated Production release'};
+      },
+    });
+    const githubReleaseClient = createClient(fakeHttpClient.httpClient);
+
+    const actualResult = await githubReleaseClient.generateReleaseNotes({
+      productionTagName: '2026-08-28.1-production',
+      precedingProductionTagName: '2026-08-07.1-production',
+    });
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toBe('Malformed generated GitHub Release notes response');
+  });
+
+  it('handles GitHub API and transport failures without exposing the token', async () => {
+    const apiFailureClient = createClient(
+      createFakeHttpClient({
+        responseForRequest() {
+          throw createHttpResponseFailure(500);
+        },
+      }).httpClient,
+    );
+    const transportFailureClient = createClient(
+      createFakeHttpClient({
+        responseForRequest() {
+          throw new Error('transport failure for github-token');
+        },
+      }).httpClient,
+    );
+
+    const apiFailureResult = await apiFailureClient.findReleaseByTag({tagName: '2026-08-28.1-production'});
+    const transportFailureResult = await transportFailureClient.findReleaseByTag({
+      tagName: '2026-08-28.1-production',
+    });
+
+    assert(apiFailureResult.isErr);
+    expect(apiFailureResult.error.message).toContain('Unable to find GitHub Release');
+    assert(transportFailureResult.isErr);
+    expect(transportFailureResult.error.message).not.toContain('github-token');
+    expect(transportFailureResult.error.message).toContain('[REDACTED]');
   });
 });

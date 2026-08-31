@@ -17,12 +17,12 @@
  *
  */
 
-import {isError} from '@sindresorhus/is';
-import {Maybe, Result} from 'true-myth';
+import {isError, isUndefined} from '@sindresorhus/is';
+import {Maybe, Result, Task, task} from 'true-myth';
 import {z} from 'zod';
 
 import {formatHttpRequestFailure, isHttpRequestFailure} from './httpClient.ts';
-import type {HttpClient, HttpMethod, HttpRequest, HttpRequestFailure} from './httpClient.ts';
+import type {HttpClient, HttpMethod, HttpRequest} from './httpClient.ts';
 
 export type GitHubReleaseRecord = {
   readonly tagName: string;
@@ -34,17 +34,26 @@ export type FindGitHubReleaseOptions = {
   readonly tagName: string;
 };
 
-export type CreateProductionDraftOptions = {
+export type GenerateReleaseNotesOptions = {
   readonly productionTagName: string;
-  readonly precedingProductionTagName: Maybe<string>;
+  readonly precedingProductionTagName: string;
+};
+
+export type GitHubGeneratedReleaseNotes = {
+  readonly name: string;
+  readonly body: string;
+};
+
+export type CreateDraftReleaseOptions = {
+  readonly productionTagName: string;
+  readonly body: string;
 };
 
 export type GitHubReleaseClient = {
-  readonly listTagNames: () => Promise<Result<readonly string[], Error>>;
-  readonly findReleaseByTag: (options: FindGitHubReleaseOptions) => Promise<Result<Maybe<GitHubReleaseRecord>, Error>>;
-  readonly createProductionDraft: (
-    options: CreateProductionDraftOptions,
-  ) => Promise<Result<GitHubReleaseRecord, Error>>;
+  readonly listTagNames: () => Task<readonly string[], Error>;
+  readonly findReleaseByTag: (options: FindGitHubReleaseOptions) => Task<Maybe<GitHubReleaseRecord>, Error>;
+  readonly generateReleaseNotes: (options: GenerateReleaseNotesOptions) => Task<GitHubGeneratedReleaseNotes, Error>;
+  readonly createDraftRelease: (options: CreateDraftReleaseOptions) => Task<GitHubReleaseRecord, Error>;
 };
 
 export type CreateGitHubReleaseClientOptions = {
@@ -59,20 +68,27 @@ type ParsedGitHubTagPage = {
   readonly tagNames: readonly string[];
 };
 
+type GitHubReleasePage = {
+  readonly rawItemCount: number;
+  readonly releases: readonly GitHubReleaseRecord[];
+};
+
 type GitHubCreateReleaseRequestBody = {
   readonly tag_name: string;
   readonly name: string;
   readonly draft: true;
-  readonly generate_release_notes?: true;
-  readonly previous_tag_name?: string;
-  readonly body?: string;
+  readonly body: string;
+};
+
+type RequestGitHubJsonOptions = {
+  readonly httpClient: HttpClient;
+  readonly request: HttpRequest;
+  readonly failureMessage: string;
+  readonly githubToken: string;
 };
 
 const githubPageSize = 100;
 const githubApiVersion = '2022-11-28';
-const notFoundHttpStatusCode = 404;
-const noPrecedingProductionReleaseNotes =
-  'No preceding ADR Production release was found. Add the customer-facing changelog manually before publication.';
 
 const githubTagResponseSchema = z.object({
   name: z.string().min(1),
@@ -84,6 +100,13 @@ const githubReleaseResponseSchema = z.object({
   tag_name: z.string().min(1),
   html_url: z.string().url(),
   draft: z.boolean(),
+});
+
+const githubReleasePageResponseSchema = z.array(githubReleaseResponseSchema);
+
+const githubGeneratedReleaseNotesResponseSchema = z.object({
+  name: z.string(),
+  body: z.string(),
 });
 
 function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
@@ -112,14 +135,6 @@ function redactSecret(message: string, secret: string): string {
   }
 
   return message.replaceAll(secret, '[REDACTED]');
-}
-
-function isNotFoundHttpRequestFailure(error: unknown): error is HttpRequestFailure {
-  return (
-    isHttpRequestFailure(error) &&
-    error.kind === 'http-response-failure' &&
-    error.response.statusCode === notFoundHttpStatusCode
-  );
 }
 
 function createGitHubApiRoot(githubApiUrl: URL): URL {
@@ -195,23 +210,55 @@ function parseGitHubRelease(githubResponse: unknown): Result<GitHubReleaseRecord
   });
 }
 
-function createProductionDraftRequestBody(options: CreateProductionDraftOptions): GitHubCreateReleaseRequestBody {
-  if (options.precedingProductionTagName.isJust) {
-    return {
-      tag_name: options.productionTagName,
-      name: options.productionTagName,
-      draft: true,
-      generate_release_notes: true,
-      previous_tag_name: options.precedingProductionTagName.value,
-    };
+function parseGitHubReleasePage(githubResponse: unknown): Result<GitHubReleasePage, Error> {
+  const validationResult = githubReleasePageResponseSchema.safeParse(githubResponse);
+
+  if (validationResult.success === false) {
+    return createFailure('Malformed GitHub Release collection response');
   }
 
+  return createSuccess({
+    rawItemCount: validationResult.data.length,
+    releases: validationResult.data.map(release => {
+      return {
+        tagName: release.tag_name,
+        htmlUrl: release.html_url,
+        isDraft: release.draft,
+      };
+    }),
+  });
+}
+
+function parseGitHubGeneratedReleaseNotes(githubResponse: unknown): Result<GitHubGeneratedReleaseNotes, Error> {
+  const validationResult = githubGeneratedReleaseNotesResponseSchema.safeParse(githubResponse);
+
+  if (validationResult.success === false) {
+    return createFailure('Malformed generated GitHub Release notes response');
+  }
+
+  return createSuccess(validationResult.data);
+}
+
+function createDraftReleaseRequestBody(options: CreateDraftReleaseOptions): GitHubCreateReleaseRequestBody {
   return {
     tag_name: options.productionTagName,
     name: options.productionTagName,
     draft: true,
-    body: noPrecedingProductionReleaseNotes,
+    body: options.body,
   };
+}
+
+function requestGitHubJson(options: RequestGitHubJsonOptions): Task<unknown, Error> {
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      return new Error(`${options.failureMessage}: ${redactSecret(errorMessage(error), options.githubToken)}`, {
+        cause: error,
+      });
+    },
+    (): Promise<unknown> => {
+      return options.httpClient.requestJson(options.request);
+    },
+  );
 }
 
 export function createGitHubReleaseClient(
@@ -224,78 +271,119 @@ export function createGitHubReleaseClient(
   const writeHeaders = createGitHubHeaders(githubToken, true);
 
   return {
-    async listTagNames(): Promise<Result<readonly string[], Error>> {
-      const tagNames: string[] = [];
+    listTagNames(): Task<readonly string[], Error> {
       const endpoint = new URL(`repos/${encodedRepositoryName}/tags`, githubApiRoot);
 
-      for (let page = 1; ; page += 1) {
-        let githubResponse: unknown;
+      function listTagNamesPage(page: number, accumulatedTagNames: readonly string[]): Task<readonly string[], Error> {
+        const request = createHttpRequest('get', createPageUrl(endpoint, page), readHeaders, Maybe.nothing());
 
-        try {
-          githubResponse = await httpClient.requestJson(
-            createHttpRequest('get', createPageUrl(endpoint, page), readHeaders, Maybe.nothing()),
-          );
-        } catch (error: unknown) {
-          return createFailure(`Unable to list GitHub tag names: ${redactSecret(errorMessage(error), githubToken)}`);
-        }
+        return requestGitHubJson({
+          httpClient,
+          request,
+          failureMessage: 'Unable to list GitHub tag names',
+          githubToken,
+        }).andThen(githubResponse => {
+          const pageResult = parseGitHubTagPage(githubResponse);
 
-        const pageResult = parseGitHubTagPage(githubResponse);
+          if (pageResult.isErr) {
+            return Result.err<readonly string[], Error>(pageResult.error);
+          }
 
-        if (pageResult.isErr) {
-          return createFailure(pageResult.error.message);
-        }
+          const tagNames = [...accumulatedTagNames, ...pageResult.value.tagNames];
 
-        tagNames.push(...pageResult.value.tagNames);
+          if (pageResult.value.rawItemCount !== githubPageSize) {
+            return Result.ok<readonly string[], Error>(tagNames);
+          }
 
-        if (pageResult.value.rawItemCount !== githubPageSize) {
-          break;
-        }
+          return listTagNamesPage(page + 1, tagNames);
+        });
       }
 
-      return createSuccess(tagNames);
+      return listTagNamesPage(1, []);
     },
 
-    async findReleaseByTag(options: FindGitHubReleaseOptions): Promise<Result<Maybe<GitHubReleaseRecord>, Error>> {
-      const endpoint = new URL(
-        `repos/${encodedRepositoryName}/releases/tags/${encodeURIComponent(options.tagName)}`,
-        githubApiRoot,
-      );
-
-      try {
-        const githubResponse = await httpClient.requestJson(
-          createHttpRequest('get', endpoint, readHeaders, Maybe.nothing()),
-        );
-        const releaseResult = parseGitHubRelease(githubResponse);
-
-        if (releaseResult.isErr) {
-          return createFailure(releaseResult.error.message);
-        }
-
-        return createSuccess(Maybe.just(releaseResult.value));
-      } catch (error: unknown) {
-        if (isNotFoundHttpRequestFailure(error)) {
-          return createSuccess(Maybe.nothing<GitHubReleaseRecord>());
-        }
-
-        return createFailure(
-          `Unable to find GitHub Release for tag ${options.tagName}: ${redactSecret(errorMessage(error), githubToken)}`,
-        );
-      }
-    },
-
-    async createProductionDraft(options: CreateProductionDraftOptions): Promise<Result<GitHubReleaseRecord, Error>> {
+    findReleaseByTag(options: FindGitHubReleaseOptions): Task<Maybe<GitHubReleaseRecord>, Error> {
       const endpoint = new URL(`repos/${encodedRepositoryName}/releases`, githubApiRoot);
 
-      try {
-        const githubResponse = await httpClient.requestJson(
-          createHttpRequest('post', endpoint, writeHeaders, Maybe.just(createProductionDraftRequestBody(options))),
-        );
-        return parseGitHubRelease(githubResponse);
-      } catch (error: unknown) {
-        return createFailure(
-          `Unable to create GitHub Release for tag ${options.productionTagName}: ${redactSecret(errorMessage(error), githubToken)}`,
-        );
+      function findReleasePage(page: number): Task<Maybe<GitHubReleaseRecord>, Error> {
+        const request = createHttpRequest('get', createPageUrl(endpoint, page), readHeaders, Maybe.nothing());
+
+        return requestGitHubJson({
+          httpClient,
+          request,
+          failureMessage: `Unable to find GitHub Release for tag ${options.tagName}`,
+          githubToken,
+        }).andThen(githubResponse => {
+          const pageResult = parseGitHubReleasePage(githubResponse);
+
+          if (pageResult.isErr) {
+            return Result.err<Maybe<GitHubReleaseRecord>, Error>(pageResult.error);
+          }
+
+          const matchingRelease = pageResult.value.releases.find(release => {
+            return release.tagName === options.tagName;
+          });
+
+          if (isUndefined(matchingRelease) === false) {
+            return Result.ok<Maybe<GitHubReleaseRecord>, Error>(Maybe.just(matchingRelease));
+          }
+
+          if (pageResult.value.rawItemCount !== githubPageSize) {
+            return Result.ok<Maybe<GitHubReleaseRecord>, Error>(Maybe.nothing<GitHubReleaseRecord>());
+          }
+
+          return findReleasePage(page + 1);
+        });
       }
+
+      return findReleasePage(1);
+    },
+
+    generateReleaseNotes(options: GenerateReleaseNotesOptions): Task<GitHubGeneratedReleaseNotes, Error> {
+      const endpoint = new URL(`repos/${encodedRepositoryName}/releases/generate-notes`, githubApiRoot);
+      const request = createHttpRequest(
+        'post',
+        endpoint,
+        writeHeaders,
+        Maybe.just({
+          tag_name: options.productionTagName,
+          previous_tag_name: options.precedingProductionTagName,
+        }),
+      );
+
+      return requestGitHubJson({
+        httpClient,
+        request,
+        failureMessage: `Unable to generate GitHub Release notes for tag ${options.productionTagName}`,
+        githubToken,
+      }).andThen(githubResponse => {
+        const generatedReleaseNotesResult = parseGitHubGeneratedReleaseNotes(githubResponse);
+
+        if (generatedReleaseNotesResult.isErr) {
+          return generatedReleaseNotesResult;
+        }
+
+        return generatedReleaseNotesResult;
+      });
+    },
+
+    createDraftRelease(options: CreateDraftReleaseOptions): Task<GitHubReleaseRecord, Error> {
+      const endpoint = new URL(`repos/${encodedRepositoryName}/releases`, githubApiRoot);
+      const request = createHttpRequest(
+        'post',
+        endpoint,
+        writeHeaders,
+        Maybe.just(createDraftReleaseRequestBody(options)),
+      );
+
+      return requestGitHubJson({
+        httpClient,
+        request,
+        failureMessage: `Unable to create GitHub Release for tag ${options.productionTagName}`,
+        githubToken,
+      }).andThen(githubResponse => {
+        return parseGitHubRelease(githubResponse);
+      });
     },
   };
 }

@@ -19,10 +19,10 @@
 
 import assert from 'node:assert';
 
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Task} from 'true-myth';
 
 import {ensureProductionGitHubRelease} from './ensureProductionGitHubRelease.ts';
-import type {GitHubReleaseClient, GitHubReleaseRecord} from './githubReleaseClient.ts';
+import type {GitHubGeneratedReleaseNotes, GitHubReleaseClient, GitHubReleaseRecord} from './githubReleaseClient.ts';
 
 type FakeGitHubReleaseClientOptions = {
   readonly existingRelease: Maybe<GitHubReleaseRecord>;
@@ -33,31 +33,40 @@ type FakeGitHubReleaseClientFixture = {
   readonly githubReleaseClient: GitHubReleaseClient;
   readonly findReleaseTagNames: string[];
   readonly listTagNamesCallCount: number[];
-  readonly createProductionDraftOptions: Parameters<GitHubReleaseClient['createProductionDraft']>[0][];
+  readonly generateReleaseNotesOptions: Parameters<GitHubReleaseClient['generateReleaseNotes']>[0][];
+  readonly createDraftReleaseOptions: Parameters<GitHubReleaseClient['createDraftRelease']>[0][];
 };
+
+const generatedReleaseNotesBody = 'Generated release notes';
 
 function createFakeGitHubReleaseClient(
   fakeGitHubReleaseClientOptions: FakeGitHubReleaseClientOptions,
 ): FakeGitHubReleaseClientFixture {
   const findReleaseTagNames: string[] = [];
   const listTagNamesCallCount: number[] = [];
-  const createProductionDraftOptions: Parameters<GitHubReleaseClient['createProductionDraft']>[0][] = [];
+  const generateReleaseNotesOptions: Parameters<GitHubReleaseClient['generateReleaseNotes']>[0][] = [];
+  const createDraftReleaseOptions: Parameters<GitHubReleaseClient['createDraftRelease']>[0][] = [];
   return {
     findReleaseTagNames,
     listTagNamesCallCount,
-    createProductionDraftOptions,
+    generateReleaseNotesOptions,
+    createDraftReleaseOptions,
     githubReleaseClient: {
-      async listTagNames(): Promise<Result<readonly string[], Error>> {
+      listTagNames(): Task<readonly string[], Error> {
         listTagNamesCallCount.push(1);
-        return Result.ok(fakeGitHubReleaseClientOptions.tagNames);
+        return Task.resolve(fakeGitHubReleaseClientOptions.tagNames);
       },
-      async findReleaseByTag(options): Promise<Result<Maybe<GitHubReleaseRecord>, Error>> {
+      findReleaseByTag(options): Task<Maybe<GitHubReleaseRecord>, Error> {
         findReleaseTagNames.push(options.tagName);
-        return Result.ok(fakeGitHubReleaseClientOptions.existingRelease);
+        return Task.resolve(fakeGitHubReleaseClientOptions.existingRelease);
       },
-      async createProductionDraft(options): Promise<Result<GitHubReleaseRecord, Error>> {
-        createProductionDraftOptions.push(options);
-        return Result.ok({
+      generateReleaseNotes(options): Task<GitHubGeneratedReleaseNotes, Error> {
+        generateReleaseNotesOptions.push(options);
+        return Task.resolve({name: options.productionTagName, body: generatedReleaseNotesBody});
+      },
+      createDraftRelease(options): Task<GitHubReleaseRecord, Error> {
+        createDraftReleaseOptions.push(options);
+        return Task.resolve({
           tagName: options.productionTagName,
           htmlUrl: `https://github.com/wireapp/wire-webapp/releases/tag/${options.productionTagName}`,
           isDraft: true,
@@ -96,10 +105,16 @@ describe('ensureProductionGitHubRelease', () => {
     });
     expect(fakeGitHubReleaseClient.findReleaseTagNames).toEqual(['2026-08-28.1-production']);
     expect(fakeGitHubReleaseClient.listTagNamesCallCount).toHaveLength(1);
-    expect(fakeGitHubReleaseClient.createProductionDraftOptions).toEqual([
+    expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toEqual([
       {
         productionTagName: '2026-08-28.1-production',
-        precedingProductionTagName: Maybe.just('2026-08-07.1-production'),
+        precedingProductionTagName: '2026-08-07.1-production',
+      },
+    ]);
+    expect(fakeGitHubReleaseClient.createDraftReleaseOptions).toEqual([
+      {
+        productionTagName: '2026-08-28.1-production',
+        body: generatedReleaseNotesBody,
       },
     ]);
   });
@@ -124,7 +139,8 @@ describe('ensureProductionGitHubRelease', () => {
       url: existingRelease.htmlUrl,
     });
     expect(fakeGitHubReleaseClient.listTagNamesCallCount).toHaveLength(0);
-    expect(fakeGitHubReleaseClient.createProductionDraftOptions).toHaveLength(0);
+    expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toHaveLength(0);
+    expect(fakeGitHubReleaseClient.createDraftReleaseOptions).toHaveLength(0);
   });
 
   it('preserves an existing published Release without listing tags or creating a Release', async (): Promise<void> => {
@@ -143,7 +159,8 @@ describe('ensureProductionGitHubRelease', () => {
     expect(actualResult.value.action).toBe('already_published');
     expect(actualResult.value.state).toBe('published');
     expect(fakeGitHubReleaseClient.listTagNamesCallCount).toHaveLength(0);
-    expect(fakeGitHubReleaseClient.createProductionDraftOptions).toHaveLength(0);
+    expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toHaveLength(0);
+    expect(fakeGitHubReleaseClient.createDraftReleaseOptions).toHaveLength(0);
   });
 
   it('creates a bootstrap draft without using the entire tag history as release notes', async (): Promise<void> => {
@@ -158,10 +175,11 @@ describe('ensureProductionGitHubRelease', () => {
     });
 
     assert(actualResult.isOk);
-    expect(fakeGitHubReleaseClient.createProductionDraftOptions).toEqual([
+    expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toHaveLength(0);
+    expect(fakeGitHubReleaseClient.createDraftReleaseOptions).toEqual([
       {
         productionTagName: '2026-07-27.1-production',
-        precedingProductionTagName: Maybe.nothing(),
+        body: 'No preceding ADR Production release was found. Add the customer-facing changelog manually before publication.',
       },
     ]);
   });
@@ -181,6 +199,7 @@ describe('ensureProductionGitHubRelease', () => {
     expect(actualResult.error.message).toBe('Invalid production tag name: 2026-08-28.1-beta.1');
     expect(fakeGitHubReleaseClient.findReleaseTagNames).toHaveLength(0);
     expect(fakeGitHubReleaseClient.listTagNamesCallCount).toHaveLength(0);
-    expect(fakeGitHubReleaseClient.createProductionDraftOptions).toHaveLength(0);
+    expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toHaveLength(0);
+    expect(fakeGitHubReleaseClient.createDraftReleaseOptions).toHaveLength(0);
   });
 });
