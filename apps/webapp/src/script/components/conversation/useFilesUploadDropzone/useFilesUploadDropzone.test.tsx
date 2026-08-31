@@ -55,6 +55,9 @@ describe('useFilesUploadDropzone', () => {
     });
     await waitFor(() => expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})).toHaveLength(1));
 
+    expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledWith(
+      expect.objectContaining({uuid: expect.any(String), file, path: 'conversation-id@example.com'}),
+    );
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledTimes(1);
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})[0]).toMatchObject({
       name: 'document.txt',
