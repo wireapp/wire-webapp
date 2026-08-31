@@ -39,6 +39,20 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {capitalizeFirstChar, sortUsersByPriority} from 'Util/stringUtil';
 
+import {
+  sharedDriveAvatarCss,
+  sharedDriveContainerCss,
+  sharedDriveDescriptionCss,
+  sharedDriveExternalDescriptionCss,
+  sharedDriveInfoCss,
+  sharedDriveInfoHeadingCss,
+  sharedDriveParticipantItemCss,
+  sharedDriveParticipantListCss,
+  sharedDriveRoleLabelCss,
+  sharedDriveToggleContainerCss,
+  sharedDriveViewerRoleCss,
+} from './sharedDrive.styles';
+
 import {PanelHeader} from '../panelHeader';
 
 interface SharedDriveProps {
@@ -46,25 +60,6 @@ interface SharedDriveProps {
   onBack: () => void;
   onClose: () => void;
 }
-
-const viewerRoleCss = {
-  '& > span': {marginLeft: 0},
-  alignItems: 'center',
-  display: 'flex',
-  gap: 8,
-  paddingLeft: 8,
-};
-
-const roleLabelCss = {
-  border: '1px solid var(--gray-40)',
-  borderRadius: 8,
-  flexShrink: 0,
-  fontSize: 12,
-  fontWeight: 600,
-  lineHeight: '14px',
-  marginLeft: 8,
-  padding: '4px 8px',
-};
 
 const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) => {
   const {translate} = useApplicationContext();
@@ -87,32 +82,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
   }, [isSelfUserRemoved, participatingUsers, selfUser]);
 
   return (
-    <div
-      id="shared-drive-settings"
-      className="panel__page shared-drive-settings"
-      css={{
-        '& .button-label': {padding: 0, width: 48},
-        '& .panel__content > div:first-child': {
-          height: 70,
-          padding: 16,
-          position: 'relative',
-        },
-        '& .panel__content > div:first-child::after': {
-          backgroundColor: '#CBCED1',
-          content: '""',
-          height: 1,
-          left: 16,
-          position: 'absolute',
-          right: 16,
-          top: 70,
-        },
-        '& .panel__header': {height: 45, minHeight: 45},
-        '& .slider': {width: 48},
-        '& .slider.disabled .button-label__switch': {backgroundColor: '#9FA1A7'},
-        '& .base-toggle': {borderBottom: 0, marginBottom: 0},
-        '& .base-toggle .info-toggle__details': {marginTop: 0, position: 'absolute', top: 36},
-      }}
-    >
+    <div id="shared-drive-settings" className="panel__page shared-drive-settings" css={sharedDriveContainerCss}>
       <PanelHeader
         onGoBack={onBack}
         onClose={onClose}
@@ -121,7 +91,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
       />
 
       <FadingScrollbar className="panel__content">
-        <div css={{padding: 16}}>
+        <div css={sharedDriveToggleContainerCss}>
           <BaseToggle
             isChecked
             isDisabled
@@ -132,19 +102,15 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
           />
         </div>
 
-        <section css={{padding: 16}} tabIndex={TabIndex.FOCUSABLE}>
-          <h3 className="guest-options__info-head" css={{lineHeight: '20px', margin: 0}}>
+        <section css={sharedDriveInfoCss} tabIndex={TabIndex.FOCUSABLE}>
+          <h3 className="guest-options__info-head" css={sharedDriveInfoHeadingCss}>
             {translate('cells.sharedDriveAccess.title')}
           </h3>
-          <p css={{fontSize: 12, lineHeight: '14px', margin: '4px 0 0'}}>
-            {translate('cells.sharedDriveAccess.description')}
-          </p>
-          <p css={{fontSize: 12, lineHeight: '14px', margin: '14px 0 0'}}>
-            {translate('cells.sharedDriveAccess.externalDescription')}
-          </p>
+          <p css={sharedDriveDescriptionCss}>{translate('cells.sharedDriveAccess.description')}</p>
+          <p css={sharedDriveExternalDescriptionCss}>{translate('cells.sharedDriveAccess.externalDescription')}</p>
         </section>
 
-        <ul css={{listStyle: 'none', margin: 0, padding: 0}} data-uie-name="list-shared-drive-participants">
+        <ul css={sharedDriveParticipantListCss} data-uie-name="list-shared-drive-participants">
           {participants.map(participant => {
             const role = getSelfUserDriveRole({
               conversationTeamId: activeConversation.teamId,
@@ -158,30 +124,21 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
               ? `(${capitalizeFirstChar(translate('conversationYouNominative'))})`
               : '';
 
-            const roleLabel = <span css={roleLabelCss}>{translate(roleTranslationKey)}</span>;
+            const roleLabel = <span css={sharedDriveRoleLabelCss}>{translate(roleTranslationKey)}</span>;
             const roleWithViewerIcon = (
-              <div css={viewerRoleCss}>
+              <div css={sharedDriveViewerRoleCss}>
                 <Icon.GuestIcon data-uie-name="shared-drive-viewer-icon" />
                 {roleLabel}
               </div>
             );
 
             return (
-              <li
-                key={participant.id}
-                css={{
-                  alignItems: 'center',
-                  display: 'flex',
-                  minHeight: 56,
-                  padding: '8px 16px 8px 0',
-                  position: 'relative',
-                }}
-              >
+              <li key={participant.id} css={sharedDriveParticipantItemCss}>
                 <Avatar
                   avatarSize={AVATAR_SIZE.SMALL}
                   participant={participant}
                   aria-hidden="true"
-                  css={{margin: '0 20px 0 16px'}}
+                  css={sharedDriveAvatarCss}
                 />
                 <ParticipantItemContent
                   groupId={activeConversation.groupId}
