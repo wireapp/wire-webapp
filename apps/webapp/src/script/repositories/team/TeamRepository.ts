@@ -29,9 +29,10 @@ import {TEAM_EVENT} from '@wireapp/api-client/lib/event/teamEvent';
 import {FEATURE_KEY, FeatureList, CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/permissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/teamData';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+import {partition} from 'underscore';
 
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
@@ -51,6 +52,7 @@ import {Config} from 'src/script/Config';
 import {Environment} from 'Util/environment';
 import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {loadDataUrl} from 'Util/util';
 
@@ -386,6 +388,51 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   async getWhitelistedServices(teamId: string, domain: string): Promise<ServiceEntity[]> {
     const {services: servicesData} = await this.teamService.getWhitelistedServices(teamId);
     return IntegrationMapper.mapServicesFromArray(servicesData, domain);
+  }
+
+  /**
+   * Loads the team's apps and collaborators and stores them on the `TeamState`.
+   *
+   * Combines two backend sources into a single deduped list of apps:
+   * - `GET /teams/:tid/apps`: team-owned apps (full `UserType.APP` members of the team)
+   * - `GET /teams/:tid/collaborators`: collaborators (human or app) that are not full team members.
+   *   The collaborators endpoint has no type discriminator, so the resolved user IDs are fetched as
+   *   full profiles and partitioned by `type` to tell apps and humans apart.
+   *
+   * Writes `teamState.teamApps` (team-owned apps ∪ app-type collaborators, deduped by qualifiedId) and
+   * `teamState.teamCollaborators` (human-only collaborators).
+   */
+  async loadTeamAppsAndCollaborators(teamId: string, abortController?: AbortController): Promise<void> {
+    const domain = this.teamState.teamDomain();
+    const selfId = this.userState.self().id;
+
+    const [appsData, collaborators] = await Promise.all([
+      this.teamService.getApps(teamId, abortController),
+      this.teamService.getCollaborators(teamId, abortController),
+    ]);
+
+    const teamOwnedApps = this.userRepository.userMapper.mapUsersFromJson(appsData, domain);
+
+    const collaboratorIds: QualifiedId[] = collaborators
+      .map(({user}) => ({domain, id: user}))
+      .filter(({id}) => id !== selfId);
+    const resolvedCollaborators = await this.userRepository.getUsersById(collaboratorIds);
+
+    const [appCollaborators, humanCollaborators] = partition(
+      resolvedCollaborators,
+      collaborator => collaborator.type === UserType.APP,
+    );
+
+    const mergedApps = teamOwnedApps.slice();
+    appCollaborators.forEach(appCollaborator => {
+      const isAlreadyKnown = mergedApps.some(app => matchQualifiedIds(app.qualifiedId, appCollaborator.qualifiedId));
+      if (!isAlreadyKnown) {
+        mergedApps.push(appCollaborator);
+      }
+    });
+
+    this.teamState.teamApps(mergedApps);
+    this.teamState.teamCollaborators(humanCollaborators);
   }
 
   readonly onTeamEvent = async (eventJson: any, source: EventSource): Promise<void> => {
