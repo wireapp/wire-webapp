@@ -19,9 +19,9 @@
 
 import {Maybe, Result} from 'true-myth';
 
-import {isString} from '@sindresorhus/is';
 import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
+import {match, P} from 'ts-pattern';
 
 export type BuildArtifactHtmlDocument = {
   readonly archiveFilePath: string;
@@ -40,25 +40,21 @@ const htmlResourceAttributePattern = /\b(?:src|href)\s*=\s*(?:"([^"]*)"|'([^']*)
 
 function readHtmlResourceAttributeValues(htmlContents: string): readonly string[] {
   return [...htmlContents.matchAll(htmlResourceAttributePattern)].flatMap(attributeMatch => {
-    const doubleQuotedAttributeValue = attributeMatch[1];
+    const attributeValueCaptures = attributeMatch.slice(1, 4);
 
-    if (isString(doubleQuotedAttributeValue)) {
-      return [doubleQuotedAttributeValue];
-    }
-
-    const singleQuotedAttributeValue = attributeMatch[2];
-
-    if (isString(singleQuotedAttributeValue)) {
-      return [singleQuotedAttributeValue];
-    }
-
-    const unquotedAttributeValue = attributeMatch[3];
-
-    if (isString(unquotedAttributeValue)) {
-      return [unquotedAttributeValue];
-    }
-
-    return [];
+    return match(attributeValueCaptures)
+      .with([P.string, P._, P._], ([doubleQuotedAttributeValue]) => {
+        return [doubleQuotedAttributeValue];
+      })
+      .with([P._, P.string, P._], ([, singleQuotedAttributeValue]) => {
+        return [singleQuotedAttributeValue];
+      })
+      .with([P._, P._, P.string], ([, , unquotedAttributeValue]) => {
+        return [unquotedAttributeValue];
+      })
+      .otherwise(() => {
+        return [];
+      });
   });
 }
 
