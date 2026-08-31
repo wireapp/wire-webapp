@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen, waitFor} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
@@ -29,6 +29,7 @@ import {
 import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
 import {User} from 'src/script/repositories/entity/User';
 import {SearchRepository} from 'src/script/repositories/search/searchRepository';
+import {TeamEntity} from 'src/script/repositories/team/TeamEntity';
 import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
 import {TeamState} from 'src/script/repositories/team/TeamState';
 import {UserState} from 'src/script/repositories/user/userState';
@@ -42,7 +43,7 @@ type UserDefinition = {
   username: string;
 };
 type MinimalSearchRepository = Pick<SearchRepository, 'normalizeQuery' | 'searchUserInSet'>;
-type MinimalTeamRepository = Pick<TeamRepository, 'isSelfConnectedTo'>;
+type MinimalTeamRepository = Pick<TeamRepository, 'isSelfConnectedTo' | 'loadTeamAppsAndCollaborators'>;
 type MinimalConversationRepository = Pick<PeopleTabProps['conversationRepository'], never>;
 type MinimalUserRepository = Pick<PeopleTabProps['userRepository'], never>;
 
@@ -132,6 +133,9 @@ describe('PeopleTab', () => {
       isSelfConnectedTo: () => {
         return false;
       },
+      loadTeamAppsAndCollaborators: async () => {
+        return undefined;
+      },
     } satisfies MinimalTeamRepository;
     const conversationRepositoryDouble = {} satisfies MinimalConversationRepository;
     const userRepositoryDouble = {} satisfies MinimalUserRepository;
@@ -151,6 +155,7 @@ describe('PeopleTab', () => {
       conversationState,
       isFederated: false,
       isTeam: true,
+      onClickApp: jest.fn(),
       onClickContact: jest.fn(),
       onClickUser: jest.fn(),
       onSearchResults,
@@ -185,5 +190,88 @@ describe('PeopleTab', () => {
     });
 
     expect(screen.getByText('Bob Test')).toBeInTheDocument();
+  });
+
+  it('renders team apps from teamState.teamApps, filters them by the search query, and routes clicks through onClickApp', async () => {
+    const emmaApp = createUser({id: 'emma-app-id', name: 'Emma App', username: 'emmaapp'});
+    const oliviaApp = createUser({id: 'olivia-app-id', name: 'Olivia App', username: 'oliviaapp'});
+    const selfUser = createUser({id: 'self-id', name: 'Self User', username: 'selfuser'});
+
+    const teamState = createTeamState();
+    teamState.team(new TeamEntity('team-id'));
+    teamState.teamApps([emmaApp, oliviaApp]);
+
+    const conversationState = createConversationState([], teamState);
+    const searchRepositoryDouble = {
+      normalizeQuery: (query: string) => {
+        return {query: query.trim().toLowerCase(), isHandleQuery: false};
+      },
+      searchUserInSet: () => {
+        return [];
+      },
+    } satisfies MinimalSearchRepository;
+    const loadTeamAppsAndCollaborators = jest.fn(async () => {
+      return undefined;
+    });
+    const teamRepositoryDouble = {
+      isSelfConnectedTo: () => {
+        return false;
+      },
+      loadTeamAppsAndCollaborators,
+    } satisfies MinimalTeamRepository;
+    const conversationRepositoryDouble = {} satisfies MinimalConversationRepository;
+    const userRepositoryDouble = {} satisfies MinimalUserRepository;
+    const onClickApp = jest.fn();
+    const onSearchResults = jest.fn<void, [SearchResultsData | undefined]>();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        fireAndForgetInvoker,
+        translate: translateForTest,
+      }),
+    );
+
+    const properties: PeopleTabProps = {
+      canInviteTeamMembers: false,
+      canSearchUnconnectedUsers: false,
+      conversationRepository: conversationRepositoryDouble as PeopleTabProps['conversationRepository'],
+      conversationState,
+      isFederated: false,
+      isTeam: true,
+      onClickApp,
+      onClickContact: jest.fn(),
+      onClickUser: jest.fn(),
+      onSearchResults,
+      searchQuery: '',
+      searchRepository: searchRepositoryDouble as PeopleTabProps['searchRepository'],
+      selfUser,
+      teamRepository: teamRepositoryDouble as unknown as PeopleTabProps['teamRepository'],
+      teamState,
+      userRepository: userRepositoryDouble as PeopleTabProps['userRepository'],
+      userState: new UserState(),
+    };
+
+    const {rerender} = render(
+      withThemeAndRootContext(<PeopleTab {...properties} searchQuery="" />, rootProviderWrapper),
+    );
+
+    // TeamRepository.loadTeamAppsAndCollaborators is triggered on mount so TeamState.teamApps gets populated
+    await waitFor(() => {
+      expect(loadTeamAppsAndCollaborators).toHaveBeenCalledWith('team-id', expect.any(AbortController));
+    });
+
+    expect(screen.getByText('Emma App')).toBeInTheDocument();
+    expect(screen.getByText('Olivia App')).toBeInTheDocument();
+
+    // Clicking an app routes through onClickApp (opens the service detail modal), not a 1:1 conversation
+    fireEvent.click(screen.getByText('Emma App'));
+    expect(onClickApp).toHaveBeenCalledWith(emmaApp, expect.anything());
+
+    rerender(withThemeAndRootContext(<PeopleTab {...properties} searchQuery="olivia" />, rootProviderWrapper));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Emma App')).toBeNull();
+      expect(screen.getByText('Olivia App')).toBeInTheDocument();
+    });
   });
 });

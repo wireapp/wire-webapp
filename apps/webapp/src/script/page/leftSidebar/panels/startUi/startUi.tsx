@@ -142,6 +142,10 @@ const StartUI = ({
     });
   };
 
+  // Apps found in the "People" tab (team-owned apps + app-type collaborators) open the same
+  // service detail modal as the legacy "Services" tab, instead of starting a 1:1 conversation.
+  const openAppFromUser = (user: User) => openService(integrationRepository.mapServiceFromUser(user));
+
   const openInviteModal = () => showInviteModal({translate, selfUser});
 
   const before = (
@@ -203,6 +207,7 @@ const StartUI = ({
           conversationRepository={conversationRepository}
           canInviteTeamMembers={canInviteTeamMembers()}
           userRepository={userRepository}
+          onClickApp={openAppFromUser}
           onClickContact={openContact}
           onClickUser={openOther}
           onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}

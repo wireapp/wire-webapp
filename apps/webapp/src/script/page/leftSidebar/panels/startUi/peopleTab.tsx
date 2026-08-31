@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -35,6 +35,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger} from 'Util/logger';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {sortByPriority} from 'Util/stringUtil';
@@ -56,6 +57,7 @@ export interface PeopleTabProps {
   conversationState: ConversationState;
   isFederated: boolean;
   isTeam: boolean;
+  onClickApp: (user: User) => void;
   onClickContact: (user: User) => void;
   onClickUser: (user: User) => void;
   onSearchResults: (results: SearchResultsData | undefined) => void;
@@ -82,6 +84,7 @@ export const PeopleTab = ({
   searchRepository,
   conversationRepository,
   userRepository,
+  onClickApp,
   onClickContact,
   onClickUser,
   onSearchResults,
@@ -94,6 +97,37 @@ export const PeopleTab = ({
   const currentSearchQuery = useRef('');
 
   const inTeam = teamState.isInTeam(selfUser);
+
+  const {teamApps} = useKoSubscribableChildren(teamState, ['teamApps']);
+  const teamId = teamState.team()?.id;
+
+  useEffect(() => {
+    if (!isTeam || !teamId) {
+      return undefined;
+    }
+
+    const abortController = new AbortController();
+
+    void teamRepository.loadTeamAppsAndCollaborators(teamId, abortController).catch((error: unknown) => {
+      if (!abortController.signal.aborted) {
+        logger.error('Failed to load team apps and collaborators', error);
+      }
+    });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [isTeam, teamId, teamRepository]);
+
+  const filteredApps = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return teamApps;
+    }
+    return teamApps.filter(
+      app => app.name().toLowerCase().includes(normalizedQuery) || app.username().toLowerCase().includes(normalizedQuery),
+    );
+  }, [teamApps, searchQuery]);
 
   const getLocalUsers = (unfiltered?: boolean) => {
     const connectedUsers = conversationState.connectedUsers();
@@ -120,7 +154,7 @@ export const PeopleTab = ({
 
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: []});
   const searchOnFederatedDomain = () => '';
-  const hasResults = results.contacts.length + results.others.length > 0;
+  const hasResults = results.contacts.length + results.others.length + filteredApps.length > 0;
 
   const manageTeamUrl = getManageTeamUrl('client_landing');
 
@@ -335,6 +369,21 @@ export const PeopleTab = ({
               <UserList
                 users={results.others}
                 onClick={onClickUser}
+                mode={UserlistMode.OTHERS}
+                conversationRepository={conversationRepository}
+                selfUser={selfUser}
+              />
+            </div>
+          </div>
+        )}
+
+        {filteredApps.length > 0 && (
+          <div className="apps" data-uie-name="status-search-apps">
+            <h3 className="start-ui-list-header start-ui-list-header-apps">{translate('searchApps')}</h3>
+            <div className="search-list-theme-black">
+              <UserList
+                users={filteredApps}
+                onClick={onClickApp}
                 mode={UserlistMode.OTHERS}
                 conversationRepository={conversationRepository}
                 selfUser={selfUser}
