@@ -602,7 +602,7 @@ function formatGitHubReleaseManualHandoff(state: Maybe<GitHubReleaseState>): str
   return state.mapOr('not available', actualState => {
     return match(actualState)
       .with('draft', () => {
-        return 'Customer-facing changelog completion and GitHub Release publication remain manual.';
+        return 'Review or edit the generated customer-facing changelog and publish the GitHub Release manually.';
       })
       .with('published', () => {
         return 'The existing published GitHub Release was preserved; no automated publication was performed.';

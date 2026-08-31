@@ -30,6 +30,7 @@ import {
   productionTagExists,
   productionTagPointsToCommit,
   resolveWebappBuildVersion,
+  selectPrecedingProductionTag,
   validateMaintenanceBranchName,
   validateMaintenanceLineKey,
   validateMaintenanceSource,
@@ -145,6 +146,44 @@ describe('releaseMetadata', () => {
     assert(actualProductionTagName.isOk === true);
 
     expect(actualProductionTagName.value).toBe(productionTagName);
+  });
+
+  it('selectPrecedingProductionTag() selects the latest preceding ADR Production tag numerically', () => {
+    const actualPrecedingProductionTag = selectPrecedingProductionTag('2026-09-10.10-production', [
+      '2026-09-10.9-production',
+      '2026-09-10.10-production',
+      '2026-09-10.11-beta.1',
+      '2026-09-10-staging.1',
+      '2026-09-10-production.9',
+      '2026-09-09.3-production',
+    ]);
+
+    assert(actualPrecedingProductionTag.isOk);
+    assert(actualPrecedingProductionTag.value.isJust);
+    expect(actualPrecedingProductionTag.value.value).toBe('2026-09-10.9-production');
+  });
+
+  it('selectPrecedingProductionTag() returns no tag for the first ADR Production release', () => {
+    const actualPrecedingProductionTag = selectPrecedingProductionTag('2026-07-27.1-production', [
+      '2026-07-27.1-beta.1',
+      '2026-07-27-staging.1',
+      '2026-07-27-production.0',
+    ]);
+
+    assert(actualPrecedingProductionTag.isOk);
+    expect(actualPrecedingProductionTag.value.isNothing).toBe(true);
+  });
+
+  it('selectPrecedingProductionTag() fails closed when a newer ADR Production tag exists', () => {
+    const actualPrecedingProductionTag = selectPrecedingProductionTag('2026-09-10.10-production', [
+      '2026-09-10.9-production',
+      '2026-09-10.11-production',
+    ]);
+
+    assert(actualPrecedingProductionTag.isErr);
+    expect(actualPrecedingProductionTag.error.message).toBe(
+      'Cannot select a preceding Production tag because a newer ADR Production tag exists: 2026-09-10.11-production',
+    );
   });
 
   it.each(['2026-07-27.1-airgap-a', '2026-07-27.1-airgap-hotfix'])(

@@ -903,7 +903,7 @@ describe('executeReleaseAppearanceCommand', () => {
       githubRepository: 'wireapp/wire-webapp',
       githubToken: 'github-token',
       httpClient: {
-        requestJson: async function requestJson(request): Promise<unknown> {
+        async requestJson(request): Promise<unknown> {
           githubRequests.push(request);
           if (request.url.pathname.endsWith('/pulls')) {
             return [

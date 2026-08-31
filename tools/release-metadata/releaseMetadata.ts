@@ -17,7 +17,8 @@
  *
  */
 
-import {maybe, Result} from 'true-myth';
+import {isUndefined} from '@sindresorhus/is';
+import {Maybe, maybe, Result} from 'true-myth';
 import type {NonEmptyString} from 'type-fest';
 
 declare const commitHashBrand: unique symbol;
@@ -47,6 +48,11 @@ export type ProductionTagPointsToCommitParameters = {
   readonly releaseTagMetadata: readonly ReleaseTagMetadata[];
 };
 
+type ParsedProductionTag = {
+  readonly tagName: ProductionTagName;
+  readonly releaseIdentifier: ReleaseIdentifier;
+};
+
 const releaseDatePattern = String.raw`\d{4}-\d{2}-\d{2}`;
 const releaseIdentifierPattern = String.raw`${releaseDatePattern}\.[1-9]\d*`;
 const releaseBranchNamePattern = new RegExp(`^release/(${releaseIdentifierPattern})$`);
@@ -59,6 +65,9 @@ const maintenanceBranchNamePattern = new RegExp(
 const maintenanceTagNamePattern = new RegExp(
   String.raw`^${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*-maintenance\.[1-9]\d*$`,
 );
+const productionTagSuffix = '-production';
+const releaseDateLength = 10;
+const releaseSequenceStartIndex = 11;
 
 function isWebappBuildChannel(value: string): value is WebappBuildChannel {
   return value === 'main' || value === 'development' || value === 'production';
@@ -132,6 +141,99 @@ export function validateProductionTagName(productionTagName: string): Result<Pro
   }
 
   return Result.ok(productionTagName as ProductionTagName);
+}
+
+function parseProductionTag(productionTagName: string): Result<ParsedProductionTag, Error> {
+  const validatedProductionTagNameResult = validateProductionTagName(productionTagName);
+
+  if (validatedProductionTagNameResult.isErr) {
+    return Result.err(validatedProductionTagNameResult.error);
+  }
+
+  const validatedProductionTagName = validatedProductionTagNameResult.value;
+
+  return Result.ok({
+    tagName: validatedProductionTagName,
+    releaseIdentifier: validatedProductionTagName.slice(0, -productionTagSuffix.length) as ReleaseIdentifier,
+  });
+}
+
+function compareReleaseIdentifiers(leftReleaseIdentifier: string, rightReleaseIdentifier: string): number {
+  const leftReleaseDate = leftReleaseIdentifier.slice(0, releaseDateLength);
+  const rightReleaseDate = rightReleaseIdentifier.slice(0, releaseDateLength);
+
+  if (leftReleaseDate < rightReleaseDate) {
+    return -1;
+  }
+
+  if (leftReleaseDate > rightReleaseDate) {
+    return 1;
+  }
+
+  const leftReleaseSequence = BigInt(leftReleaseIdentifier.slice(releaseSequenceStartIndex));
+  const rightReleaseSequence = BigInt(rightReleaseIdentifier.slice(releaseSequenceStartIndex));
+
+  if (leftReleaseSequence < rightReleaseSequence) {
+    return -1;
+  }
+
+  if (leftReleaseSequence > rightReleaseSequence) {
+    return 1;
+  }
+
+  return 0;
+}
+
+export function selectPrecedingProductionTag(
+  currentProductionTagName: string,
+  existingTagNames: readonly string[],
+): Result<Maybe<ProductionTagName>, Error> {
+  const currentProductionTagResult = parseProductionTag(currentProductionTagName);
+
+  if (currentProductionTagResult.isErr) {
+    return Result.err(currentProductionTagResult.error);
+  }
+
+  const currentProductionTag = currentProductionTagResult.value;
+  const validProductionTags = existingTagNames.flatMap(existingTagName => {
+    const parsedProductionTagResult = parseProductionTag(existingTagName);
+
+    if (parsedProductionTagResult.isErr) {
+      return [];
+    }
+
+    return [parsedProductionTagResult.value];
+  });
+  const laterProductionTags = validProductionTags
+    .filter(productionTag => {
+      return compareReleaseIdentifiers(productionTag.releaseIdentifier, currentProductionTag.releaseIdentifier) > 0;
+    })
+    .toSorted((leftProductionTag, rightProductionTag) => {
+      return compareReleaseIdentifiers(leftProductionTag.releaseIdentifier, rightProductionTag.releaseIdentifier);
+    });
+
+  const laterProductionTag = laterProductionTags[0];
+
+  if (isUndefined(laterProductionTag) === false) {
+    return Result.err(
+      new Error(
+        `Cannot select a preceding Production tag because a newer ADR Production tag exists: ${laterProductionTag.tagName}`,
+      ),
+    );
+  }
+
+  const precedingProductionTags = validProductionTags.filter(productionTag => {
+    return compareReleaseIdentifiers(productionTag.releaseIdentifier, currentProductionTag.releaseIdentifier) < 0;
+  });
+  const precedingProductionTag = precedingProductionTags.toSorted((leftProductionTag, rightProductionTag) => {
+    return compareReleaseIdentifiers(leftProductionTag.releaseIdentifier, rightProductionTag.releaseIdentifier);
+  })[precedingProductionTags.length - 1];
+
+  if (isUndefined(precedingProductionTag)) {
+    return Result.ok(Maybe.nothing<ProductionTagName>());
+  }
+
+  return Result.ok(Maybe.just(precedingProductionTag.tagName));
 }
 
 export function validateMaintenanceLineKey(maintenanceLineKey: string): Result<MaintenanceLineKey, Error> {
