@@ -118,7 +118,7 @@
   "accessibility.conversationOptionsMenu": "Unterhaltungsoptionen öffnen",
   "accessibility.conversationOptionsMenuAccessKey": "Verwenden Sie die rechte Pfeiltaste, um das Menü mit den Unterhaltungsoptionen aufzurufen.",
   "accessibility.conversationSelected": "Ausgewählt",
-  "accessibility.conversationStatusGhosted": "Ghost conversation",
+  "accessibility.conversationStatusGroupWithoutAdmin": "Gruppen ohne Admin",
   "accessibility.conversationStatusMuted": "Unterhaltung ist stummgeschaltet",
   "accessibility.conversationStatusPending": "Ausstehende Kontaktanfrage",
   "accessibility.conversationStatusUnread": "Ungelesene Nachricht",

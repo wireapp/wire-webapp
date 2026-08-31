@@ -118,7 +118,7 @@
   "accessibility.conversationOptionsMenu": "සංවාදයේ විකල්ප අරින්න",
   "accessibility.conversationOptionsMenuAccessKey": "සංවාද විකල්ප වට්ටෝරුව වෙත අවධානයට දකුණු ඊතල යතුර යොදා ගන්න",
   "accessibility.conversationSelected": "Selected",
-  "accessibility.conversationStatusGhosted": "Ghost conversation",
+  "accessibility.conversationStatusGroupWithoutAdmin": "Group without any admin",
   "accessibility.conversationStatusMuted": "නිහඬ කළ සංවාදය",
   "accessibility.conversationStatusPending": "පොරොත්තු සම්බන්ධතා ඉල්ලීම",
   "accessibility.conversationStatusUnread": "නොකියවූ පණිවිඩය",

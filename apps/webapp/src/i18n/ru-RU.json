@@ -118,7 +118,7 @@
   "accessibility.conversationOptionsMenu": "Открыть параметры беседы",
   "accessibility.conversationOptionsMenuAccessKey": "Используйте клавишу курсора вправо, чтобы перейти в меню параметров беседы.",
   "accessibility.conversationSelected": "Выбрано",
-  "accessibility.conversationStatusGhosted": "Ghost conversation",
+  "accessibility.conversationStatusGroupWithoutAdmin": "Группа без администраторов",
   "accessibility.conversationStatusMuted": "Беззвучные беседы",
   "accessibility.conversationStatusPending": "Ожидающий запрос",
   "accessibility.conversationStatusUnread": "Непрочитанное сообщение",

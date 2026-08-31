@@ -118,7 +118,7 @@
   "accessibility.conversationOptionsMenu": "Abrir opções da conversa",
   "accessibility.conversationOptionsMenuAccessKey": "Use a tecla seta para a direita para focar no menu de opções de conversa",
   "accessibility.conversationSelected": "Selected",
-  "accessibility.conversationStatusGhosted": "Ghost conversation",
+  "accessibility.conversationStatusGroupWithoutAdmin": "Group without any admin",
   "accessibility.conversationStatusMuted": "Conversa silenciada",
   "accessibility.conversationStatusPending": "Pedido de conexão pendente",
   "accessibility.conversationStatusUnread": "Mensagem não lida",
