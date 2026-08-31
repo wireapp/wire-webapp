@@ -9,7 +9,10 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {useFilesUploadDropzone} from './useFilesUploadDropzone';
 
-const conversation = {id: 'conversation-id', qualifiedId: {id: 'conversation-id', domain: 'example.com'}};
+const conversation = {
+  id: 'local-conversation-id',
+  qualifiedId: {id: 'qualified-conversation-id', domain: 'example.com'},
+};
 const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const createRepository = () => ({
@@ -19,9 +22,15 @@ const createRepository = () => ({
 });
 
 describe('useFilesUploadDropzone', () => {
+  const originalNodeEnvironment = process.env.NODE_ENV;
+
   beforeEach(() => {
     useFileUploadState.getState().clearAll({conversationId: conversation.id});
     URL.createObjectURL = jest.fn(() => 'blob:preview');
+  });
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnvironment;
   });
 
   it('waits for media metadata before starting an upload', async () => {
@@ -103,7 +112,7 @@ describe('useFilesUploadDropzone', () => {
     );
 
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledWith(
-      expect.objectContaining({uuid: expect.any(String), file, path: 'conversation-id@example.com'}),
+      expect.objectContaining({uuid: expect.any(String), file, path: 'qualified-conversation-id@example.com'}),
     );
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledTimes(1);
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})[0]).toMatchObject({
@@ -120,6 +129,31 @@ describe('useFilesUploadDropzone', () => {
       remoteVersionId: 'version-id',
       uploadStatus: 'success',
     });
+  });
+
+  it('uses the local conversation ID for development uploads', async () => {
+    process.env.NODE_ENV = 'development';
+    const cellsRepository = createRepository();
+    cellsRepository.uploadNodeDraft.mockResolvedValue({uuid: 'remote-id', versionId: 'version-id'});
+    const {result} = renderHook(
+      () =>
+        useFilesUploadDropzone({
+          isTeam: false,
+          isCellsEnabled: true,
+          isDisabled: false,
+          isFileDropAllowed: true,
+          cellsRepository: cellsRepository as never,
+          translate: translateForTest,
+          conversation,
+        }),
+      {wrapper},
+    );
+
+    await act(async () => result.current.handlePastedFile(new File(['content'], 'document.txt')));
+
+    expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledWith(
+      expect.objectContaining({path: expect.stringMatching(/^local-conversation-id@/)}),
+    );
   });
 
   it('marks an upload as retryable when the repository rejects', async () => {

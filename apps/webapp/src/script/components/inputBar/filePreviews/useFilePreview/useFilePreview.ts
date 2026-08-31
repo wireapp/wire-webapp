@@ -29,10 +29,11 @@ import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 interface FilePreviewParams {
   file: FileWithPreview;
   cellsRepository: CellsRepository;
+  conversationId: string;
   conversationQualifiedId: QualifiedId;
 }
 
-export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}: FilePreviewParams) => {
+export const useFilePreview = ({file, cellsRepository, conversationId, conversationQualifiedId}: FilePreviewParams) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const {deleteFile, updateFile} = useFileUploadState();
 
@@ -47,7 +48,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
 
   const cancelUpload = () => {
     cellsRepository.cancelUpload(file.id);
-    deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
+    deleteFile({conversationId, fileId: file.id});
   };
 
   const handleDelete = () => {
@@ -60,7 +61,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
       return;
     }
 
-    deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
+    deleteFile({conversationId, fileId: file.id});
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await cellsRepository.deleteNodeDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
     });
@@ -68,9 +69,9 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
 
   const handleRetry = async () => {
     try {
-      updateFile({conversationId: conversationQualifiedId.id, fileId: file.id, data: {uploadStatus: 'uploading'}});
+      updateFile({conversationId, fileId: file.id, data: {uploadStatus: 'uploading'}});
       const path = buildCellsUploadPath({
-        conversationId: conversationQualifiedId.id,
+        conversationId,
         conversationQualifiedId,
         cellsWireDomain: Config.getConfig().CELLS_WIRE_DOMAIN,
         isDevelopment: process.env.NODE_ENV === 'development',
@@ -82,12 +83,12 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
         path,
       });
       updateFile({
-        conversationId: conversationQualifiedId.id,
+        conversationId,
         fileId: file.id,
         data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
       });
     } catch (error: unknown) {
-      updateFile({conversationId: conversationQualifiedId.id, fileId: file.id, data: {uploadStatus: 'error'}});
+      updateFile({conversationId, fileId: file.id, data: {uploadStatus: 'error'}});
     }
   };
 
