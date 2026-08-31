@@ -17,6 +17,9 @@
  *
  */
 
+export * from './gateway';
 export * from './identity';
 export * from './lifecycle';
+export * from './manager';
+export * from './process';
 export * from './transition';
