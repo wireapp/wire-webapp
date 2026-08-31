@@ -27,11 +27,7 @@ const wire: WireModule = {
     APP_BASE: 'https://app.wire.com',
     BACKEND_REST: 'https://test.wire.link',
     FEATURE: {},
-    URL: {
-      SUPPORT: {
-        SHARED_DRIVE: '',
-      },
-    },
+    URL: {SUPPORT: {}},
     NEW_PASSWORD_MINIMUM_LENGTH: 8,
     ASSET_VERSION: 'dev-unknown',
     VERSION: '0.0.0-test',
