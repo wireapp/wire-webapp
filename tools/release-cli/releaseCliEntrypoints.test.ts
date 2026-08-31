@@ -39,6 +39,10 @@ const releaseMetadataEntrypointPath = join(process.cwd(), 'tools/release-cli/rel
 const productionDistributionEntrypointPath = join(process.cwd(), 'tools/release-cli/productionDistributionCli.mts');
 const releaseAppearanceEntrypointPath = join(process.cwd(), 'tools/release-cli/releaseAppearanceCommand.mts');
 const previewNextBetaEntrypointPath = join(process.cwd(), 'tools/release-cli/previewNextBetaCommand.mts');
+const ensureProductionGitHubReleaseEntrypointPath = join(
+  process.cwd(),
+  'tools/release-cli/ensureProductionGitHubRelease.mts',
+);
 
 function runNativeCommand(entrypointPath: string, commandLineArguments: readonly string[]): NativeCommandResult {
   const childProcessResult = spawnSync(process.execPath, [entrypointPath, ...commandLineArguments], {
@@ -106,6 +110,22 @@ describe('release metadata CLI entrypoint', () => {
 
     expect(actualResult.exitCode).toBe(1);
     expect(actualResult.standardError).toContain("error: missing required argument 'release-identifier'");
+  });
+});
+
+describe('ensure Production GitHub Release CLI entrypoint', () => {
+  it('writes help to standard output', () => {
+    const actualResult = runNativeCommand(ensureProductionGitHubReleaseEntrypointPath, ['--help']);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toContain('Usage: ensureProductionGitHubRelease [options] <production-tag>');
+  });
+
+  it('rejects a missing Production tag without contacting GitHub', () => {
+    const actualResult = runNativeCommand(ensureProductionGitHubReleaseEntrypointPath, []);
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.standardError).toContain("error: missing required argument 'production-tag'");
   });
 });
 
