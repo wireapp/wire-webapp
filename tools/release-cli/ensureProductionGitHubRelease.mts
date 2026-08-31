@@ -42,7 +42,10 @@ type RuntimeEnvironment = {
   readonly githubToken: string;
 };
 
-function readRequiredEnvironmentValue(environment: NodeJS.ProcessEnv, environmentVariableName: string): Result<string, Error> {
+function readRequiredEnvironmentValue(
+  environment: NodeJS.ProcessEnv,
+  environmentVariableName: string,
+): Result<string, Error> {
   const environmentValue = environment[environmentVariableName];
 
   if (isNonEmptyStringAndNotWhitespace(environmentValue) === false) {
@@ -95,9 +98,7 @@ function writeProductionReleaseOutputs(
   writeOutput(`github_release_url=${handoff.url}`);
 }
 
-export function createCommand(
-  createCommandOptions: CreateEnsureProductionGitHubReleaseCommandOptions,
-): Command {
+export function createCommand(createCommandOptions: CreateEnsureProductionGitHubReleaseCommandOptions): Command {
   return new Command()
     .name('ensureProductionGitHubRelease')
     .description('Ensure the draft GitHub Release for a verified Production tag.')
@@ -119,7 +120,7 @@ export async function runEnsureProductionGitHubReleaseCommand(
   let executionExitCode = 0;
   const command = createCommand({
     ...createCommandOptions,
-    executeCommand: async function executeCommand(productionTagName: string): Promise<void> {
+    async executeCommand(productionTagName: string): Promise<void> {
       await createCommandOptions.executeCommand(productionTagName);
       executionExitCode = 0;
     },

@@ -67,11 +67,13 @@ function createHttpResponseFailure(statusCode: number): HttpRequestFailure {
   };
 }
 
-function createClient(fakeHttpClient: FakeHttpClientFixture['httpClient'] = createFakeHttpClient({
-  responseForRequest() {
-    return [];
-  },
-}).httpClient): ReturnType<typeof createGitHubReleaseClient> {
+function createClient(
+  fakeHttpClient: FakeHttpClientFixture['httpClient'] = createFakeHttpClient({
+    responseForRequest() {
+      return [];
+    },
+  }).httpClient,
+): ReturnType<typeof createGitHubReleaseClient> {
   return createGitHubReleaseClient({
     httpClient: fakeHttpClient,
     githubApiUrl: new URL('https://api.github.example/'),

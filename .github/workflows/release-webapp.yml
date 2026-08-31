@@ -1044,99 +1044,33 @@ jobs:
       github_release_url: ${{ steps.ensure_github_release.outputs.github_release_url }}
 
     steps:
+      - name: Checkout release tooling
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
       - name: Ensure GitHub Release for immutable Production tag
         id: ensure_github_release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           PRODUCTION_TAG_NAME: ${{ needs.create_production_tag.outputs.production_tag_name || needs.production_preflight.outputs.production_tag_name }}
-        run: |
-          set -euo pipefail
-
-          if [[ -z "${PRODUCTION_TAG_NAME}" ]]; then
-            echo 'The authoritative Production tag name is unavailable.' >&2
-            exit 1
-          fi
-
-          echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "${GITHUB_OUTPUT}"
-
-          release_lookup_response_path="${RUNNER_TEMP}/github-release-lookup-response"
-          release_lookup_error_path="${RUNNER_TEMP}/github-release-lookup-error"
-          release_lookup_exit_code=0
-
-          set +e
-          gh api \
-            --include \
-            --header 'Accept: application/vnd.github+json' \
-            "repos/${GITHUB_REPOSITORY}/releases/tags/${PRODUCTION_TAG_NAME}" \
-            > "${release_lookup_response_path}" \
-            2> "${release_lookup_error_path}"
-          release_lookup_exit_code="$?"
-          set -e
-
-          http_status="$(
-            awk '$1 ~ /^HTTP\/[0-9.]+$/ { status = $2 } END { print status }' \
-              "${release_lookup_response_path}"
-          )"
-
-          if [[ "${http_status}" == '404' ]]; then
-            manual_changelog_placeholder='Customer-facing changelog must be added manually before publication.'
-            github_release_url="$(
-              gh release create \
-                "${PRODUCTION_TAG_NAME}" \
-                --repo "${GITHUB_REPOSITORY}" \
-                --verify-tag \
-                --draft \
-                --title "${PRODUCTION_TAG_NAME}" \
-                --notes "${manual_changelog_placeholder}"
-            )"
-
-            if [[ -z "${github_release_url}" ]]; then
-              echo 'GitHub CLI created the release but returned no release URL.' >&2
-              exit 1
-            fi
-
-            {
-              echo 'github_release_action=created'
-              echo 'github_release_state=draft'
-              echo "github_release_url=${github_release_url}"
-            } >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-
-          if [[ "${release_lookup_exit_code}" -ne 0 || "${http_status}" != '200' ]]; then
-            echo "Unable to look up the GitHub Release for ${PRODUCTION_TAG_NAME}." >&2
-            echo "HTTP status: ${http_status:-unavailable}" >&2
-            cat "${release_lookup_error_path}" >&2
-            cat "${release_lookup_response_path}" >&2
-            exit 1
-          fi
-
-          release_json="$(sed -n '/^{/,$p' "${release_lookup_response_path}")"
-          release_tag_name="$(jq -r '.tag_name // empty' <<< "${release_json}")"
-          github_release_url="$(jq -r '.html_url // empty' <<< "${release_json}")"
-          is_draft="$(jq -r '.draft // empty' <<< "${release_json}")"
-
-          if [[ "${release_tag_name}" != "${PRODUCTION_TAG_NAME}" || -z "${github_release_url}" ]]; then
-            echo "The GitHub Release lookup did not return a valid release for ${PRODUCTION_TAG_NAME}." >&2
-            exit 1
-          fi
-
-          if [[ "${is_draft}" == 'true' ]]; then
-            github_release_action='already_draft'
-            github_release_state='draft'
-          elif [[ "${is_draft}" == 'false' ]]; then
-            github_release_action='already_published'
-            github_release_state='published'
-          else
-            echo "The GitHub Release for ${PRODUCTION_TAG_NAME} has an invalid draft state." >&2
-            exit 1
-          fi
-
-          {
-            echo "github_release_action=${github_release_action}"
-            echo "github_release_state=${github_release_state}"
-            echo "github_release_url=${github_release_url}"
-          } >> "${GITHUB_OUTPUT}"
+        run: node ./tools/release-cli/ensureProductionGitHubRelease.mts "${PRODUCTION_TAG_NAME}" >> "${GITHUB_OUTPUT}"
 
   notify_production_release_success:
     name: Notify successful Production release

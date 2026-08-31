@@ -33,7 +33,7 @@ type FakeGitHubReleaseClientFixture = {
   readonly githubReleaseClient: GitHubReleaseClient;
   readonly findReleaseTagNames: string[];
   readonly listTagNamesCallCount: number[];
-  readonly createProductionDraftOptions: Array<Parameters<GitHubReleaseClient['createProductionDraft']>[0]>;
+  readonly createProductionDraftOptions: Parameters<GitHubReleaseClient['createProductionDraft']>[0][];
 };
 
 function createFakeGitHubReleaseClient(
@@ -41,27 +41,21 @@ function createFakeGitHubReleaseClient(
 ): FakeGitHubReleaseClientFixture {
   const findReleaseTagNames: string[] = [];
   const listTagNamesCallCount: number[] = [];
-  const createProductionDraftOptions: Array<
-    Parameters<GitHubReleaseClient['createProductionDraft']>[0]
-  > = [];
+  const createProductionDraftOptions: Parameters<GitHubReleaseClient['createProductionDraft']>[0][] = [];
   return {
     findReleaseTagNames,
     listTagNamesCallCount,
     createProductionDraftOptions,
     githubReleaseClient: {
-      listTagNames: async function listTagNames(): Promise<Result<readonly string[], Error>> {
+      async listTagNames(): Promise<Result<readonly string[], Error>> {
         listTagNamesCallCount.push(1);
         return Result.ok(fakeGitHubReleaseClientOptions.tagNames);
       },
-      findReleaseByTag: async function findReleaseByTag(
-        options,
-      ): Promise<Result<Maybe<GitHubReleaseRecord>, Error>> {
+      async findReleaseByTag(options): Promise<Result<Maybe<GitHubReleaseRecord>, Error>> {
         findReleaseTagNames.push(options.tagName);
         return Result.ok(fakeGitHubReleaseClientOptions.existingRelease);
       },
-      createProductionDraft: async function createProductionDraft(
-        options,
-      ): Promise<Result<GitHubReleaseRecord, Error>> {
+      async createProductionDraft(options): Promise<Result<GitHubReleaseRecord, Error>> {
         createProductionDraftOptions.push(options);
         return Result.ok({
           tagName: options.productionTagName,
@@ -85,12 +79,7 @@ describe('ensureProductionGitHubRelease', () => {
   it('creates a new draft with the preceding Production tag when no Release exists', async (): Promise<void> => {
     const fakeGitHubReleaseClient = createFakeGitHubReleaseClient({
       existingRelease: Maybe.nothing(),
-      tagNames: [
-        '2026-08-07.1-production',
-        '2026-08-28.1-beta.1',
-        '2026-08-28-staging.0',
-        '2026-08-28-production.0',
-      ],
+      tagNames: ['2026-08-07.1-production', '2026-08-28.1-beta.1', '2026-08-28-staging.0', '2026-08-28-production.0'],
     });
 
     const actualResult = await ensureProductionGitHubRelease({
