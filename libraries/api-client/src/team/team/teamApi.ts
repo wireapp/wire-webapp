@@ -21,19 +21,21 @@ import Axios, {AxiosRequestConfig} from 'axios';
 
 import {NewAppRequest} from './app/newAppRequest';
 import {NewAppResponse} from './app/newAppResponse';
+import {TeamCollaborator} from './collaborator/teamCollaborator';
 import {LeadData} from './leadData';
 import {TeamSizeData} from './teamSizeData';
 import {UpdateTeamData} from './updateTeamData';
 
 import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';
-import {RequestCancellationError} from '../../user';
+import {RequestCancellationError, User} from '../../user';
 
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
     APPS: 'apps',
+    COLLABORATORS: 'collaborators',
     SIZE: 'size',
     TEAMS: '/teams',
     CONSENT: '/consent',
@@ -140,6 +142,35 @@ export class TeamAPI {
     };
 
     const response = await this.client.sendJSON<any>(config);
+    return response.data;
+  }
+
+  /**
+   * Returns the team-owned apps (i.e. apps that are full members of the team, `type: 'app'`).
+   * This does not include apps that are collaborators only - see `getCollaborators`.
+   */
+  public async getApps(teamId: string, abortController?: AbortController): Promise<User[]> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.APPS}`,
+    };
+
+    const response = await this.client.sendJSON<User[]>(config, false, abortController);
+    return response.data;
+  }
+
+  /**
+   * Returns the team's collaborators (human or app) - i.e. users granted specific permissions on the team
+   * without being full team members. The response contains no discriminator for whether a collaborator is
+   * a human or an app; resolve `user` into a full profile to find out via its `type`.
+   */
+  public async getCollaborators(teamId: string, abortController?: AbortController): Promise<TeamCollaborator[]> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.COLLABORATORS}`,
+    };
+
+    const response = await this.client.sendJSON<TeamCollaborator[]>(config, false, abortController);
     return response.data;
   }
 
