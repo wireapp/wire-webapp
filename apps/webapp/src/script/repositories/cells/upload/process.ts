@@ -167,6 +167,7 @@ export const createCellsUploadProcess = (
         source: currentSource.value,
         path,
         signal: attempt.controller.signal,
+        abortController: attempt.controller,
         onProgress: progress => {
           if (isCurrentAttempt(attempt)) {
             apply({type: 'progress', progress});
@@ -183,10 +184,11 @@ export const createCellsUploadProcess = (
       apply({type: 'uploadFailed', error: {kind: 'uploadFailed', cause: gatewayResult.error}});
       return Result.err(gatewayResult.error);
     }
+    resourceUuid = Maybe.just(gatewayResult.value.resourceUuid);
     apply({
       type: 'uploadSucceeded',
-      resourceUuid: attempt.identity.resourceUuid,
-      versionId: attempt.identity.versionId,
+      resourceUuid: gatewayResult.value.resourceUuid,
+      versionId: gatewayResult.value.versionId,
     });
     return Result.ok(undefined);
   };

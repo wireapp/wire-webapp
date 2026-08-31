@@ -35,11 +35,12 @@ export type UploadDraftRequest = {
   readonly source: UploadSource;
   readonly path: string;
   readonly signal: AbortSignal;
+  readonly abortController: AbortController;
   readonly onProgress: (progress: number) => void;
 };
 
 export interface CellsUploadGateway {
-  readonly uploadDraft: (request: UploadDraftRequest) => Task<void, CellsUploadGatewayError<'upload'>>;
+  readonly uploadDraft: (request: UploadDraftRequest) => Task<DraftIdentity, CellsUploadGatewayError<'upload'>>;
   readonly publishDraft: (identity: DraftIdentity) => Task<void, CellsUploadGatewayError<'publish'>>;
   readonly discardDraft: (identity: DraftIdentity) => Task<void, CellsUploadGatewayError<'discard'>>;
 }
