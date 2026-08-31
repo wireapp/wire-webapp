@@ -35,16 +35,22 @@ import {VideoPreviewCard} from './videoPreviewCard/videoPreviewCard';
 
 interface FilePreviewsProps {
   files: FileWithPreview[];
+  conversationId: string;
   conversationQualifiedId: QualifiedId;
 }
 
-export const FilePreviews = ({files, conversationQualifiedId}: FilePreviewsProps) => {
+export const FilePreviews = ({files, conversationId, conversationQualifiedId}: FilePreviewsProps) => {
   const [wrapperRef] = useAutoAnimate();
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       {files.map(file => (
-        <FilePreview key={file.id} file={file} conversationQualifiedId={conversationQualifiedId} />
+        <FilePreview
+          key={file.id}
+          file={file}
+          conversationId={conversationId}
+          conversationQualifiedId={conversationQualifiedId}
+        />
       ))}
     </div>
   );
@@ -53,17 +59,20 @@ export const FilePreviews = ({files, conversationQualifiedId}: FilePreviewsProps
 interface FilePreviewProps {
   file: FileWithPreview;
   cellsRepository?: CellsRepository;
+  conversationId: string;
   conversationQualifiedId: QualifiedId;
 }
 
 const FilePreview = ({
   file,
   cellsRepository = container.resolve(CellsRepository),
+  conversationId,
   conversationQualifiedId,
 }: FilePreviewProps) => {
   const {name, extension, size, isError, handleDelete, handleRetry} = useFilePreview({
     file,
     cellsRepository,
+    conversationId,
     conversationQualifiedId,
   });
 
