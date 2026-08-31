@@ -339,5 +339,11 @@ jobs:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
-          WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
-          ./bin/yarn build:prod:public
+          expected_version="dev-${short_commit_sha}"
+          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
+            ./bin/yarn build:prod:public
+
+          BUILD_ARTIFACT_PATH=apps/server/dist/s3/ebs.zip \
+          EXPECTED_COMMIT="${WIRE_WEBAPP_BUILD_COMMIT}" \
+          EXPECTED_VERSION="${expected_version}" \
+            node ./tools/build-artifact/validateBuildArtifact.mts
