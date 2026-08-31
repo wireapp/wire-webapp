@@ -19,6 +19,7 @@
 
 import {Maybe, Result} from 'true-myth';
 
+import {isString} from '@sindresorhus/is';
 import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
 
@@ -35,12 +36,29 @@ export type BuildArtifactMetadataValidationInput = {
 };
 
 const localStaticAssetDirectoryNames = ['assets', 'audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker'];
+const htmlResourceAttributePattern = /\b(?:src|href)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+))/giu;
 
 function readHtmlResourceAttributeValues(htmlContents: string): readonly string[] {
-  return [...htmlContents.matchAll(/\b(?:src|href)\s*=\s*(["'])(.*?)\1/giu)].flatMap(attributeMatch => {
-    return Maybe.of(attributeMatch[2])
-      .map(attributeValue => [attributeValue])
-      .unwrapOr([]);
+  return [...htmlContents.matchAll(htmlResourceAttributePattern)].flatMap(attributeMatch => {
+    const doubleQuotedAttributeValue = attributeMatch[1];
+
+    if (isString(doubleQuotedAttributeValue)) {
+      return [doubleQuotedAttributeValue];
+    }
+
+    const singleQuotedAttributeValue = attributeMatch[2];
+
+    if (isString(singleQuotedAttributeValue)) {
+      return [singleQuotedAttributeValue];
+    }
+
+    const unquotedAttributeValue = attributeMatch[3];
+
+    if (isString(unquotedAttributeValue)) {
+      return [unquotedAttributeValue];
+    }
+
+    return [];
   });
 }
 
