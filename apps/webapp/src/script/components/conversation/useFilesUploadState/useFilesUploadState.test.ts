@@ -35,6 +35,11 @@ describe('useFileUploadState', () => {
   it('removes only the cancelled or deleted file', () => {
     useFileUploadState.getState().addFiles({conversationId: 'conversation', files: [file('first'), file('second')]});
     useFileUploadState.getState().deleteFile({conversationId: 'conversation', fileId: 'first'});
-    expect(useFileUploadState.getState().getFiles({conversationId: 'conversation'}).map(({id}) => id)).toEqual(['second']);
+    expect(
+      useFileUploadState
+        .getState()
+        .getFiles({conversationId: 'conversation'})
+        .map(({id}) => id),
+    ).toEqual(['second']);
   });
 });

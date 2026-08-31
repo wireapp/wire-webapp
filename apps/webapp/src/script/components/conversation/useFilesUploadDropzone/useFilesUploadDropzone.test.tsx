@@ -24,16 +24,61 @@ describe('useFilesUploadDropzone', () => {
     URL.createObjectURL = jest.fn(() => 'blob:preview');
   });
 
+  it('waits for media metadata before starting an upload', async () => {
+    let resolveMetadata!: (metadata: {image: {width: number; height: number}}) => void;
+    const metadataPromise = new Promise<{image: {width: number; height: number}}>(resolve => {
+      resolveMetadata = resolve;
+    });
+    const cellsRepository = createRepository();
+    cellsRepository.uploadNodeDraft.mockResolvedValue({uuid: 'remote-id', versionId: 'version-id'});
+    const buildFileMetadata = jest.fn(() => metadataPromise);
+    const {result} = renderHook(
+      () =>
+        useFilesUploadDropzone({
+          isTeam: false,
+          isCellsEnabled: true,
+          isDisabled: false,
+          isFileDropAllowed: true,
+          cellsRepository: cellsRepository as never,
+          translate: translateForTest,
+          conversation,
+          buildFileMetadata,
+        }),
+      {wrapper},
+    );
+    const file = new File(['content'], 'image.png', {type: 'image/png'});
+
+    let upload!: Promise<void>;
+    await act(async () => {
+      upload = result.current.handlePastedFile(file);
+      await Promise.resolve();
+    });
+
+    expect(buildFileMetadata).toHaveBeenCalledWith(expect.objectContaining({name: 'image.png'}));
+    expect(cellsRepository.uploadNodeDraft).not.toHaveBeenCalled();
+
+    resolveMetadata({image: {width: 640, height: 480}});
+    await act(async () => await upload);
+
+    expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledTimes(1);
+    expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})[0]).toMatchObject({
+      image: {width: 640, height: 480},
+      uploadStatus: 'success',
+    });
+  });
+
   it('adds a local preview before starting an upload and maps repository progress to percent', async () => {
     let resolveUpload: (result: {uuid: string; versionId: string}) => void = () => undefined;
     const uploadPromise = new Promise<{uuid: string; versionId: string}>(resolve => {
       resolveUpload = resolve;
     });
     const cellsRepository = createRepository();
-    cellsRepository.uploadNodeDraft.mockImplementation(async ({progressCallback}: {progressCallback: (value: number) => void}) => {
-      progressCallback(0.25);
-      return uploadPromise;
-    });
+    cellsRepository.uploadNodeDraft.mockImplementation(
+      async ({progressCallback}: {progressCallback: (value: number) => void}) => {
+        progressCallback(0.25);
+        return uploadPromise;
+      },
+    );
     const {result} = renderHook(
       () =>
         useFilesUploadDropzone({
@@ -53,7 +98,9 @@ describe('useFilesUploadDropzone', () => {
     await act(async () => {
       upload = result.current.handlePastedFile(file);
     });
-    await waitFor(() => expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})).toHaveLength(1));
+    await waitFor(() =>
+      expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})).toHaveLength(1),
+    );
 
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledWith(
       expect.objectContaining({uuid: expect.any(String), file, path: 'conversation-id@example.com'}),
