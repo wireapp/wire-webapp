@@ -38,14 +38,19 @@ describe('useFilePreview', () => {
 
   it('exposes display metadata and marks failed uploads', () => {
     const {result} = renderHook(
-      () => useFilePreview({file: createFile({uploadStatus: 'error'}), cellsRepository: {} as never, conversationQualifiedId: conversation}),
+      () =>
+        useFilePreview({
+          file: createFile({uploadStatus: 'error'}),
+          cellsRepository: {} as never,
+          conversationQualifiedId: conversation,
+        }),
       {wrapper},
     );
 
     expect(result.current).toMatchObject({name: 'Upload failed: document', extension: 'txt', isError: true});
   });
 
-  it('cancels loading uploads and removes the local preview without deleting a draft', () => {
+  it('cancels loading uploads, revokes the preview, and removes the local preview without deleting a draft', () => {
     const cellsRepository = {cancelUpload: jest.fn(), deleteNodeDraft: jest.fn()};
     const file = createFile({uploadStatus: 'uploading'});
     useFileUploadState.getState().addFiles({conversationId: conversation.id, files: [file]});
@@ -57,6 +62,7 @@ describe('useFilePreview', () => {
     act(() => result.current.handleDelete());
 
     expect(cellsRepository.cancelUpload).toHaveBeenCalledWith('local-id');
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:local-id');
     expect(cellsRepository.deleteNodeDraft).not.toHaveBeenCalled();
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})).toEqual([]);
   });
@@ -78,7 +84,7 @@ describe('useFilePreview', () => {
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})).toEqual([]);
   });
 
-  it('retries a failed upload with the same resource and stores its new version', async () => {
+  it('retries a failed upload with its local resource ID and stores its new version', async () => {
     const cellsRepository = {
       uploadNodeDraft: jest.fn().mockResolvedValue({uuid: 'remote-id', versionId: 'new-version-id'}),
     };
