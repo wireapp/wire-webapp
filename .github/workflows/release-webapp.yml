@@ -1131,7 +1131,7 @@ jobs:
             GitHub Release state: ${{ needs.ensure_github_release.outputs.github_release_state }}
             GitHub Release URL: ${{ needs.ensure_github_release.outputs.github_release_url }}
             GitHub Release handoff: ${{ needs.ensure_github_release.outputs.github_release_action }}
-            ${{ needs.ensure_github_release.outputs.github_release_state == 'draft' && 'The GitHub Release is a draft. Add the customer-facing changelog and publish it manually.' || 'The existing published GitHub Release was preserved.' }}
+            ${{ needs.ensure_github_release.outputs.github_release_state == 'draft' && 'The GitHub Release is a draft. Review or edit the generated customer-facing changelog and publish it manually.' || 'The existing published GitHub Release was preserved.' }}
             Triggering actor: ${{ github.actor }}
             Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 

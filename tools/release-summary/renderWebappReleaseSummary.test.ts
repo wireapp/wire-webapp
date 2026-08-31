@@ -338,7 +338,7 @@ describe('WebApp release summary renderer', () => {
     expect(detailsContent).toContain('- Action: new draft created');
     expect(detailsContent).toContain(`- Release URL: [GitHub Release](${githubReleaseUrl})`);
     expect(detailsContent).toContain(
-      '- Manual follow-up: Customer-facing changelog completion and GitHub Release publication remain manual.',
+      '- Manual follow-up: Review or edit the generated customer-facing changelog and publish the GitHub Release manually.',
     );
   });
 
@@ -379,7 +379,7 @@ describe('WebApp release summary renderer', () => {
       `- GitHub Release handoff: completed successfully; action: existing draft verified; state: draft; URL: [GitHub Release](${githubReleaseUrl})`,
     );
     expect(detailsContent).toContain(
-      '- Manual follow-up: Customer-facing changelog completion and GitHub Release publication remain manual.',
+      '- Manual follow-up: Review or edit the generated customer-facing changelog and publish the GitHub Release manually.',
     );
   });
 
