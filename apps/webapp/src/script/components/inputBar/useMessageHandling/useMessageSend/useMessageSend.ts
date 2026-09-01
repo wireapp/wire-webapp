@@ -285,7 +285,8 @@ export const useMessageSend = ({
         translate,
       );
     } else {
-      void sendMessage();
+      // Return the promise so FireAndForgetInvoker can observe publication failures.
+      await sendMessage();
     }
   }, [conversation, conversationRepository, sendMessage, translate]);
 
