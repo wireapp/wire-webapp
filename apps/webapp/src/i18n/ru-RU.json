@@ -448,6 +448,7 @@
   "cells.newItemMenu.folder": "Создать папку",
   "cells.newItemMenu.presentation": "Презентация",
   "cells.newItemMenu.spreadsheet": "Электронная таблица",
+  "cells.newItemMenu.uploadFile": "Загрузить файл",
   "cells.newItemMenuModal.descriptionFile": "Все участники этой беседы могут видеть этот файл и его содержимое.",
   "cells.newItemMenuModal.descriptionFolder": "Все участники этой беседы могут видеть эту папку и ее содержимое.",
   "cells.newItemMenuModal.headlineFile": "Создать файл {fileType}",
