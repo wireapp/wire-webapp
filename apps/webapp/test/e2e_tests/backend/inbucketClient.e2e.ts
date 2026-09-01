@@ -18,6 +18,7 @@
  */
 
 import axios, {AxiosInstance} from 'axios';
+import { User } from '../data/user';
 
 export class InbucketClientE2E {
   private readonly axiosInstance: AxiosInstance;
@@ -82,6 +83,28 @@ export class InbucketClientE2E {
       if (response.status === 200) {
         const message = response.data;
         if (message.body.text.includes(`${inviterEmail} has invited you to join a team on Wire.`)) {
+          return true;
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
+      attempt++;
+    }
+
+    return false;
+  }
+
+  async isPaymentConfirmationEmailReceived(teamOwner: User) {
+    const timeoutLimit = 30000;
+    const delayBetweenAttempts = 500;
+    const maxAttempts = timeoutLimit / delayBetweenAttempts;
+    let attempt = 0;
+    while (attempt < maxAttempts) {
+      const response = await this.getLatestEmail(teamOwner.email);
+      if (response.status === 200) {
+        const message = response.data;
+        const subject = response.data.subject;
+        // const attachment
+        if (message.body.text.includes(`Team ID: ${teamOwner.teamId}`) && subject.includes('Thank you for your order')) {
           return true;
         }
       }

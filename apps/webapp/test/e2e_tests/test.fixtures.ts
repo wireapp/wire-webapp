@@ -234,6 +234,7 @@ export const createTeam = async (
 
   if (options?.features && Object.values(options.features).some(Boolean)) {
     await api.team.upgradeTeam(teamId, owner);
+    await api.inbucket.isPaymentConfirmationEmailReceived(owner);
 
     if (options.features.conferenceCalling) {
       await api.enableConferenceCallingFeature(teamId);
