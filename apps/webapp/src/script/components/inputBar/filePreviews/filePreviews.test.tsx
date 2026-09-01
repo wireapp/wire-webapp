@@ -33,7 +33,8 @@ jest.mock('./filePreviewCard/filePreviewCard', () => ({
 }));
 
 describe('FilePreviews', () => {
-  const conversationQualifiedId = {id: 'conv-id', domain: 'example.com'};
+  const conversationId = 'local-conversation-id';
+  const conversationQualifiedId = {id: 'qualified-conversation-id', domain: 'example.com'};
 
   const createFileWithPreview = (file: File): FileWithPreview =>
     Object.assign(file, {
@@ -48,7 +49,15 @@ describe('FilePreviews', () => {
   it('renders a file preview card for HEIC images', () => {
     const heicFile = createFileWithPreview(new File(['heic'], 'photo.heic', {type: 'image/heic'}));
 
-    render(withTheme(<FilePreviews files={[heicFile]} conversationQualifiedId={conversationQualifiedId} />));
+    render(
+      withTheme(
+        <FilePreviews
+          files={[heicFile]}
+          conversationId={conversationId}
+          conversationQualifiedId={conversationQualifiedId}
+        />,
+      ),
+    );
 
     expect(screen.getByTestId('file-preview-card')).toBeInTheDocument();
     expect(screen.queryByTestId('image-preview-card')).not.toBeInTheDocument();
@@ -57,7 +66,15 @@ describe('FilePreviews', () => {
   it('renders an image preview card for PNG images', () => {
     const pngFile = createFileWithPreview(new File(['png'], 'photo.png', {type: 'image/png'}));
 
-    render(withTheme(<FilePreviews files={[pngFile]} conversationQualifiedId={conversationQualifiedId} />));
+    render(
+      withTheme(
+        <FilePreviews
+          files={[pngFile]}
+          conversationId={conversationId}
+          conversationQualifiedId={conversationQualifiedId}
+        />,
+      ),
+    );
 
     expect(screen.getByTestId('image-preview-card')).toBeInTheDocument();
     expect(screen.queryByTestId('file-preview-card')).not.toBeInTheDocument();

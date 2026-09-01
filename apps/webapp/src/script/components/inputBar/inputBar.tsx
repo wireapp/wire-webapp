@@ -347,7 +347,13 @@ export const InputBar = ({
                   disableMessagePreprocessing={disableMessagePreprocessing}
                   replaceEmojis={shouldReplaceEmoji}
                 >
-                  {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
+                  {!!files.length && (
+                    <FilePreviews
+                      files={files}
+                      conversationId={conversation.id}
+                      conversationQualifiedId={conversation.qualifiedId}
+                    />
+                  )}
                   <InputBarControls
                     conversation={conversation}
                     isCellsFeatureEnabled={isCellsEnabled}

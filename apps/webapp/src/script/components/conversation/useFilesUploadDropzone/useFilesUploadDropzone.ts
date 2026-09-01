@@ -34,6 +34,7 @@ import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileD
 import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
 
 import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
+import {buildCellsUploadPath} from '../utils/buildCellsUploadPath';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
 
 const MAX_FILES = 10;
@@ -51,6 +52,7 @@ interface UseFilesUploadDropzoneParams {
   cellsRepository: CellsRepository;
   translate: RootContextValue['translate'];
   conversation?: Pick<Conversation, 'id' | 'qualifiedId'>;
+  buildFileMetadata?: typeof buildCellFileMetadata;
 }
 
 export const useFilesUploadDropzone = ({
@@ -61,6 +63,7 @@ export const useFilesUploadDropzone = ({
   cellsRepository,
   translate,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
+  buildFileMetadata = buildCellFileMetadata,
 }: UseFilesUploadDropzoneParams) => {
   const {addFiles, getFiles, updateFile} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
@@ -153,10 +156,12 @@ export const useFilesUploadDropzone = ({
   const uploadFile = async (file: FileWithPreview) => {
     // Temporary solution to handle the local development
     // TODO: remove this once we have a proper way to handle the domain per env
-    const path =
-      process.env.NODE_ENV === 'development'
-        ? `${conversation.id}@${CONFIG.CELLS_WIRE_DOMAIN}`
-        : `${conversation.qualifiedId.id}@${conversation.qualifiedId.domain}`;
+    const path = buildCellsUploadPath({
+      conversationId: conversation.id,
+      conversationQualifiedId: conversation.qualifiedId,
+      cellsWireDomain: CONFIG.CELLS_WIRE_DOMAIN,
+      isDevelopment: process.env.NODE_ENV === 'development',
+    });
 
     const decimalMultiplier = 100;
 
@@ -202,7 +207,7 @@ export const useFilesUploadDropzone = ({
     await Promise.all(
       files.map(async file => {
         try {
-          const metadata = await buildCellFileMetadata(file);
+          const metadata = await buildFileMetadata(file);
 
           if (!metadata) {
             return;

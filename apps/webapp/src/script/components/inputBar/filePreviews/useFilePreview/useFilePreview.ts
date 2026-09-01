@@ -20,6 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
+import {buildCellsUploadPath} from 'Components/conversation/utils/buildCellsUploadPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -28,10 +29,11 @@ import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 interface FilePreviewParams {
   file: FileWithPreview;
   cellsRepository: CellsRepository;
+  conversationId: string;
   conversationQualifiedId: QualifiedId;
 }
 
-export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}: FilePreviewParams) => {
+export const useFilePreview = ({file, cellsRepository, conversationId, conversationQualifiedId}: FilePreviewParams) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const {deleteFile, updateFile} = useFileUploadState();
 
@@ -46,7 +48,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
 
   const cancelUpload = () => {
     cellsRepository.cancelUpload(file.id);
-    deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
+    deleteFile({conversationId, fileId: file.id});
   };
 
   const handleDelete = () => {
@@ -59,7 +61,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
       return;
     }
 
-    deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
+    deleteFile({conversationId, fileId: file.id});
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await cellsRepository.deleteNodeDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
     });
@@ -67,13 +69,13 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
 
   const handleRetry = async () => {
     try {
-      updateFile({conversationId: conversationQualifiedId.id, fileId: file.id, data: {uploadStatus: 'uploading'}});
-      // Temporary solution to handle the local development
-      // TODO: remove this once we have a proper way to handle the domain per env
-      const path =
-        process.env.NODE_ENV === 'development'
-          ? `${conversationQualifiedId.id}@${Config.getConfig().CELLS_WIRE_DOMAIN}`
-          : `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+      updateFile({conversationId, fileId: file.id, data: {uploadStatus: 'uploading'}});
+      const path = buildCellsUploadPath({
+        conversationId,
+        conversationQualifiedId,
+        cellsWireDomain: Config.getConfig().CELLS_WIRE_DOMAIN,
+        isDevelopment: process.env.NODE_ENV === 'development',
+      });
 
       const {uuid, versionId} = await cellsRepository.uploadNodeDraft({
         uuid: file.id,
@@ -81,12 +83,12 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
         path,
       });
       updateFile({
-        conversationId: conversationQualifiedId.id,
+        conversationId,
         fileId: file.id,
         data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
       });
     } catch (error: unknown) {
-      updateFile({conversationId: conversationQualifiedId.id, fileId: file.id, data: {uploadStatus: 'error'}});
+      updateFile({conversationId, fileId: file.id, data: {uploadStatus: 'error'}});
     }
   };
 
