@@ -123,7 +123,11 @@ export type PublishFailureError = {readonly kind: 'publishFailed'; readonly caus
 export type DiscardFailureError = {readonly kind: 'discardFailed'; readonly cause: unknown};
 
 export type UploadLifecycleError =
-  | {readonly kind: 'invalidTransition'; readonly from: UploadState['kind']; readonly action: UploadActionType}
+  | {
+      readonly kind: 'invalidTransition';
+      readonly from: UploadState['kind'];
+      readonly action: UploadActionType | 'release';
+    }
   | UploadFailureError
   | PublishFailureError
   | DiscardFailureError;
