@@ -81,6 +81,7 @@ const baseProps = {
   shouldShowInvitePeople: false,
   conversationName: 'group 1',
   isCellsConversation: false,
+  isSelfGuest: false,
 };
 
 describe('MemberMessage', () => {
@@ -146,10 +147,32 @@ describe('MemberMessage', () => {
       isCellsConversation: true,
     };
 
-    const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+    const {container, getByText, getByTitle} = render(withTheme(<MemberMessage {...props} />), {
+      wrapper: rootProviderWrapper,
+    });
     // Both banners should be visible
-    expect(getByText('Shared Drive is on')).toBeInTheDocument();
+    expect(
+      getByTitle('Shared Drive is on. You have editor access. People outside your team only have viewer access.'),
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="label-cells-conversation"] .ellipsis')).not.toBeInTheDocument();
     expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+  });
+
+  it('shows the guest Shared Drive system message for guests', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isCellsConversation: true,
+      isSelfGuest: true,
+    };
+
+    const {container, getByTitle} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+
+    expect(
+      getByTitle('Shared Drive is on. You can view, but you can’t upload, edit, or manage files.'),
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="cells-conversation-learn-more"]')).toBeInTheDocument();
   });
 
   describe('CONVERSATION_CREATE', () => {

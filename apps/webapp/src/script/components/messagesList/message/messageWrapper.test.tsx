@@ -111,9 +111,9 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
+      const {getByTitle} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(getByText('conversationCellsConversationEnabled')).toBeInTheDocument();
+      expect(getByTitle('conversationCellsConversationEnabledEditor')).toBeInTheDocument();
     });
 
     it('computes isCellsConversation as true when cellsState is PENDING', () => {
@@ -128,9 +128,9 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
+      const {getByTitle} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(getByText('conversationCellsConversationEnabled')).toBeInTheDocument();
+      expect(getByTitle('conversationCellsConversationEnabledEditor')).toBeInTheDocument();
     });
 
     it('computes isCellsConversation as false when cellsState is DISABLED', () => {
@@ -147,7 +147,25 @@ describe('MessageWrapper', () => {
 
       const {queryByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(queryByText('conversationCellsConversationEnabled')).not.toBeInTheDocument();
+      expect(queryByText('conversationCellsConversationEnabledEditor')).not.toBeInTheDocument();
+    });
+
+    it('passes the guest Shared Drive system message when self is a conversation guest', () => {
+      const conversation = new Conversation(
+        createUuid(),
+        'test.wire.link',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
+      conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+      conversation.isGuest(true);
+
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
+      const props = createBaseProps(conversation, message);
+
+      const {getByTitle} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
+
+      expect(getByTitle('conversationCellsConversationEnabledViewer')).toBeInTheDocument();
     });
   });
 
@@ -219,9 +237,9 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
+      const {getByText, getByTitle} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(getByText('conversationCellsConversationEnabled')).toBeInTheDocument();
+      expect(getByTitle('conversationCellsConversationEnabledEditor')).toBeInTheDocument();
       expect(getByText('conversationDetailsActionTimedMessagesDisabled')).toBeInTheDocument();
     });
   });

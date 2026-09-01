@@ -17,16 +17,18 @@
  *
  */
 
-import {Button, ButtonVariant, CollectionIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
+import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
+import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
 import {ConnectedMessage} from './memberMessage/connectedMessage';
 import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
@@ -43,6 +45,7 @@ interface MemberMessageProps {
   shouldShowInvitePeople: boolean;
   conversationName: string;
   isCellsConversation: boolean;
+  isSelfGuest: boolean;
 }
 
 export const MemberMessage = ({
@@ -57,6 +60,7 @@ export const MemberMessage = ({
   classifiedDomains,
   conversationName,
   isCellsConversation,
+  isSelfGuest,
 }: MemberMessageProps) => {
   const {translate} = useApplicationContext();
   const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
@@ -70,9 +74,12 @@ export const MemberMessage = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const cellsConversationLabel = translate('conversationCellsConversationEnabled');
+  const cellsConversationLabel = translate(
+    isSelfGuest ? 'conversationCellsConversationEnabledViewer' : 'conversationCellsConversationEnabledEditor',
+  );
   const receiptsEnabledLabel = translate('conversationCreateReceiptsEnabled');
   const timedMessagesDisabledLabel = translate('conversationDetailsActionTimedMessagesDisabled');
+  const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE;
 
   const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
     message.memberMessageType,
@@ -160,8 +167,22 @@ export const MemberMessage = ({
             <CollectionIcon />
           </div>
           <p className="message-header-label">
-            <span className="ellipsis" title={cellsConversationLabel}>
+            <span title={cellsConversationLabel}>
               {cellsConversationLabel}
+              &nbsp;
+              <Link
+                css={{
+                  ...e2eMessageContentLinkCss,
+                  fontWeight: 'var(--font-weight-bold)',
+                  textDecoration: 'underline',
+                }}
+                variant={LinkVariant.PRIMARY}
+                href={sharedDriveSupportUrl}
+                target="_blank"
+                data-uie-name="cells-conversation-learn-more"
+              >
+                {translate('systemMessageLearnMore')}
+              </Link>
             </span>
           </p>
         </div>

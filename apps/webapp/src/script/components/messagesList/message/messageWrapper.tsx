@@ -124,10 +124,11 @@ export const MessageWrapper = ({
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
-  const {display_name: displayName, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
-    'display_name',
-    'hasGlobalMessageTimer',
-  ]);
+  const {
+    display_name: displayName,
+    hasGlobalMessageTimer,
+    isGuest: isSelfGuest,
+  } = useKoSubscribableChildren(conversation, ['display_name', 'hasGlobalMessageTimer', 'isGuest']);
   const isFileShareRestricted = !teamState.isFileSharingReceivingEnabled();
 
   const isCellsConversation =
@@ -273,6 +274,7 @@ export const MessageWrapper = ({
         isSelfTemporaryGuest={isSelfTemporaryGuest}
         classifiedDomains={teamState.classifiedDomains()}
         isCellsConversation={isCellsConversation}
+        isSelfGuest={isSelfGuest}
       />
     );
   }
