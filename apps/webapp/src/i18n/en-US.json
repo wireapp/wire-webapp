@@ -445,6 +445,7 @@
   "cells.newItemMenu.button": "New",
   "cells.newItemMenu.document": "Document",
   "cells.newItemMenu.file": "Create File",
+  "cells.newItemMenu.uploadFile": "Upload file",
   "cells.newItemMenu.folder": "Create Folder",
   "cells.newItemMenu.presentation": "Presentation",
   "cells.newItemMenu.spreadsheet": "Spreadsheet",

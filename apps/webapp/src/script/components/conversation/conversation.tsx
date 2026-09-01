@@ -46,7 +46,10 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {
+  sharedDriveDirectUploadFeatureToggleName,
+  viewerPermissionFeatureToggleName,
+} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -592,6 +595,7 @@ export const Conversation = ({
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
   const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
+  const isSharedDriveDirectUploadFeatureEnabled = isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName);
   const isFileDropAllowed = isConversationFileDropAllowed({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: activeConversation?.selfUser()?.teamId,
@@ -611,7 +615,7 @@ export const Conversation = ({
       cellsRepository: repositories.cells,
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
-      isDisabled: isFileTabActive,
+      isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
       isFileDropAllowed,
       translate,
     });
@@ -689,6 +693,9 @@ export const Conversation = ({
                       isSearchViewOpen={isSharedDriveSearchViewOpen}
                       onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
                       onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
+                      // TODO: Wire Cristian's modular upload-file flow from PR #22326 here.
+                      onUploadFiles={openAllFilesView}
+                      isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
                       showViewerPermission={showViewerPermission}
                     />
                   )}

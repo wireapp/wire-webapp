@@ -40,11 +40,19 @@ interface CellsNewMenuProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onRefresh: () => void;
+  onUploadFiles: () => void;
+  isUploadFilesEnabled: boolean;
 }
 
 export type CellsNewFileType = 'document' | 'spreadsheet' | 'presentation';
 
-export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
+export const CellsNewMenu = ({
+  cellsRepository,
+  conversationQualifiedId,
+  onRefresh,
+  onUploadFiles,
+  isUploadFilesEnabled,
+}: CellsNewMenuProps) => {
   const {translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
@@ -75,6 +83,9 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
             </Button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>
+            {isUploadFilesEnabled && (
+              <DropdownMenu.Item onClick={onUploadFiles}>{translate('cells.newItemMenu.uploadFile')}</DropdownMenu.Item>
+            )}
             <DropdownMenu.Item onClick={openFolderModal}>{translate('cells.newItemMenu.folder')}</DropdownMenu.Item>
             <DropdownMenu.Sub>
               <DropdownMenu.SubTrigger>{translate('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>

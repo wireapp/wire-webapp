@@ -59,6 +59,8 @@ interface CellsHeaderProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
+  onUploadFiles: () => void;
+  isUploadFilesEnabled: boolean;
   filters: FilterConfig[];
   showViewerPermission: boolean;
 }
@@ -74,6 +76,8 @@ export const CellsHeader = ({
   searchValue,
   onSearchChange,
   onSearchClear,
+  onUploadFiles,
+  isUploadFilesEnabled,
   filters,
   showViewerPermission,
 }: CellsHeaderProps) => {
@@ -113,6 +117,8 @@ export const CellsHeader = ({
                 cellsRepository={cellsRepository}
                 conversationQualifiedId={conversationQualifiedId}
                 onRefresh={onRefresh}
+                onUploadFiles={onUploadFiles}
+                isUploadFilesEnabled={isUploadFilesEnabled}
               />
             )}
             {shouldShowViewerAccessLabel && (
