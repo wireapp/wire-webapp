@@ -668,6 +668,8 @@
   "conversationAudioAssetUploading": "Hochladen: {name}",
   "conversationButtonSeparator": "oder",
   "conversationCellsConversationEnabled": "Geteiltes Drive aktiv",
+  "conversationCellsConversationEnabledEditor": "Shared Drive is on. You have editor access. People outside your team only have viewer access.",
+  "conversationCellsConversationEnabledViewer": "Shared Drive is on. You can view, but you can’t upload, edit, or manage files.",
   "conversationClassified": " Sicherheitsniveau: VS-NfD",
   "conversationCommonFeature1": "Bis zu [bold]{capacity}[/bold] Personen",
   "conversationCommonFeature2": "Videokonferenzen",

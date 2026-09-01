@@ -668,6 +668,8 @@
   "conversationAudioAssetUploading": "Выгрузка: {name}",
   "conversationButtonSeparator": "или",
   "conversationCellsConversationEnabled": "Общий диск включен",
+  "conversationCellsConversationEnabledEditor": "Общий диск включен. У вас есть права редактора. У пользователей, не входящих в вашу команду, есть только права просмотра.",
+  "conversationCellsConversationEnabledViewer": "Общий диск включен. Вы можете просматривать файлы, но не можете загружать, редактировать или управлять ими.",
   "conversationClassified": "Уровень безопасности: VS-NfD",
   "conversationCommonFeature1": "До [bold]{capacity}[/bold] пользователей",
   "conversationCommonFeature2": "Видеоконференции",
