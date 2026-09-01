@@ -27,8 +27,8 @@ import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
 import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
+import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
 import {ConnectedMessage} from './memberMessage/connectedMessage';
 import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
@@ -79,6 +79,7 @@ export const MemberMessage = ({
   );
   const receiptsEnabledLabel = translate('conversationCreateReceiptsEnabled');
   const timedMessagesDisabledLabel = translate('conversationDetailsActionTimedMessagesDisabled');
+  const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE;
 
   const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
     message.memberMessageType,
@@ -176,7 +177,7 @@ export const MemberMessage = ({
                   textDecoration: 'underline',
                 }}
                 variant={LinkVariant.PRIMARY}
-                href={Config.getConfig().URL.SUPPORT.E2E_ENCRYPTION}
+                href={sharedDriveSupportUrl}
                 target="_blank"
                 data-uie-name="cells-conversation-learn-more"
               >
