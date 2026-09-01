@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import cs from 'I18n/cs-CZ.json';
 import da from 'I18n/da-DK.json';
 import de from 'I18n/de-DE.json';
@@ -43,7 +45,7 @@ import uk from 'I18n/uk-UA.json';
 import {StorageKey} from 'Repositories/storage/storageKey';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/storageUtil';
-import {setDateLocale, LocaleType} from 'Util/timeUtil';
+import {setDateLocale, setRegionalDateLocale} from 'Util/timeUtil';
 import {getParameter} from 'Util/urlUtil';
 
 import {URLParameter} from '../auth/urlParameter';
@@ -76,18 +78,65 @@ const strings = {
 
 setStrings(strings);
 
-export function setAppLocale() {
-  const queryParam = getParameter(URLParameter.LOCALE);
-  const currentBrowserLocale = navigator.language.slice(0, 2) as LocaleType;
+type ApplicationTranslationLanguage = keyof typeof strings;
 
-  if (queryParam) {
+export type ApplicationLocaleResolutionInput = {
+  queryParameter: unknown;
+  storedLocale: unknown;
+  browserRegionalLocale: string;
+};
+
+export type ApplicationLocaleSettings = {
+  applicationTranslationLanguage: ApplicationTranslationLanguage;
+  regionalDateLocale: string;
+};
+
+function isApplicationTranslationLanguage(value: string): value is ApplicationTranslationLanguage {
+  return Object.hasOwn(strings, value);
+}
+
+export function resolveApplicationLocale(input: ApplicationLocaleResolutionInput): ApplicationLocaleSettings {
+  const browserLanguage = input.browserRegionalLocale.split('-')[0];
+  let selectedLanguage: string = DEFAULT_LOCALE;
+
+  if (isNonEmptyString(input.queryParameter)) {
+    selectedLanguage = input.queryParameter;
+  } else if (isNonEmptyString(input.storedLocale)) {
+    selectedLanguage = input.storedLocale;
+  } else if (isNonEmptyString(browserLanguage)) {
+    selectedLanguage = browserLanguage;
+  }
+
+  let applicationTranslationLanguage: ApplicationTranslationLanguage = DEFAULT_LOCALE;
+  if (isApplicationTranslationLanguage(selectedLanguage)) {
+    applicationTranslationLanguage = selectedLanguage;
+  }
+
+  return {
+    applicationTranslationLanguage,
+    regionalDateLocale: input.browserRegionalLocale,
+  };
+}
+
+export function setAppLocale(): void {
+  const queryParam = getParameter(URLParameter.LOCALE);
+  const currentBrowserRegionalLocale = navigator.language;
+
+  if (isNonEmptyString(queryParam)) {
     storeValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
   }
 
-  const storedLocale = loadValue<LocaleType>(StorageKey.LOCALIZATION.LOCALE);
-  const locale: LocaleType = storedLocale || currentBrowserLocale || (DEFAULT_LOCALE as LocaleType);
-  setLocale(locale);
-  setDateLocale(locale);
+  const storedLocale = loadValue<unknown>(StorageKey.LOCALIZATION.LOCALE);
+  const resolvedLocaleSettings = resolveApplicationLocale({
+    queryParameter: queryParam,
+    storedLocale,
+    browserRegionalLocale: currentBrowserRegionalLocale,
+  });
+  const {applicationTranslationLanguage, regionalDateLocale} = resolvedLocaleSettings;
 
-  document.getElementsByTagName('html')[0].setAttribute('lang', locale);
+  setLocale(applicationTranslationLanguage);
+  setDateLocale(applicationTranslationLanguage);
+  setRegionalDateLocale(regionalDateLocale);
+
+  document.getElementsByTagName('html')[0].setAttribute('lang', applicationTranslationLanguage);
 }
