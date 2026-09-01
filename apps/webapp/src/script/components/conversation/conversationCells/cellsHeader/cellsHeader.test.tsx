@@ -18,6 +18,7 @@
  */
 
 import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -54,6 +55,8 @@ const defaultProperties = {
   searchValue: '',
   onSearchChange: jest.fn(),
   onSearchClear: jest.fn(),
+  onUploadFiles: jest.fn(),
+  isUploadFilesEnabled: false,
   filters: [filter],
   showViewerPermission: false,
 };
@@ -93,6 +96,24 @@ describe('CellsHeader', () => {
     renderCellsHeader({isSearchViewOpen: false});
 
     expect(screen.getByRole('button', {name: cellsNewItemButtonLabel})).toBeInTheDocument();
+  });
+
+  it('opens the file picker from the new-item menu', async () => {
+    const onUploadFiles = jest.fn();
+    renderCellsHeader({isSearchViewOpen: false, onUploadFiles, isUploadFilesEnabled: true});
+
+    await userEvent.click(screen.getByRole('button', {name: cellsNewItemButtonLabel}));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'cells.newItemMenu.uploadFile'}));
+
+    expect(onUploadFiles).toHaveBeenCalledTimes(1);
+  });
+
+  it('hides the file picker menu item when direct upload is disabled', async () => {
+    renderCellsHeader({isSearchViewOpen: false, isUploadFilesEnabled: false});
+
+    await userEvent.click(screen.getByRole('button', {name: cellsNewItemButtonLabel}));
+
+    expect(screen.queryByRole('menuitem', {name: 'cells.newItemMenu.uploadFile'})).not.toBeInTheDocument();
   });
 
   it('does not render the new-item menu in the recycle bin', () => {
