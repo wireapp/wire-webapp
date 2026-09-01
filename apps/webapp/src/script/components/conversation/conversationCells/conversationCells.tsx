@@ -39,6 +39,8 @@ import {
   CellsSelfUserDriveRoleProvider,
   getSelfUserDriveRole,
 } from './common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {getCellsApiPath} from './common/getCellsApiPath/getCellsApiPath';
+import {getCellsFilesPath} from './common/getCellsFilesPath/getCellsFilesPath';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {isInRecycleBin as isCurrentPathInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
@@ -64,7 +66,6 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
-  onUploadFiles: () => void;
   isUploadFilesEnabled: boolean;
   showViewerPermission: boolean;
 }
@@ -78,11 +79,12 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
-    onUploadFiles,
     isUploadFilesEnabled,
     showViewerPermission,
   }: ConversationCellsProps) => {
-    const {fireAndForgetInvoker, translate} = useApplicationContext();
+    const {fireAndForgetInvoker, translate, sharedDriveUploadController} = useApplicationContext();
+    const uploadInput = useRef<HTMLInputElement>(null);
+    const onUploadFiles = () => uploadInput.current?.click();
     const {
       cellsState: initialCellState,
       name,
@@ -241,6 +243,24 @@ export const ConversationCells = memo(
     return (
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <div css={wrapperStyles}>
+          <input
+            ref={uploadInput}
+            type="file"
+            multiple
+            hidden
+            onChange={async event => {
+              const files = Array.from(event.target.files ?? []);
+              event.target.value = '';
+              if (!files.length || !sharedDriveUploadController) {
+                return;
+              }
+              await sharedDriveUploadController.upload(
+                files,
+                getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()}),
+                handleRefresh,
+              );
+            }}
+          />
           <CellsHeader
             onRefresh={handleRefresh}
             conversationName={name}

@@ -33,12 +33,15 @@ import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot
 import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
+import {createCellsRepositoryGateway} from 'Repositories/cells/cellsRepositoryGateway';
+import {createCellsUploadManager} from 'Repositories/cells/upload/manager';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import type {Translate} from 'Util/localizerUtil';
+import {createUuid} from 'Util/uuid';
 
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
@@ -59,6 +62,7 @@ import type {MonotonicClock} from '../../time/monotonicClock';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {AppLoader} from '../appLoader/index';
+import {createSharedDriveUploadController} from '../conversation/conversationCells/sharedDriveUploadController';
 
 type AppProps = {
   readonly config: Configuration;
@@ -95,6 +99,21 @@ export const AppContainer = (properties: AppProps) => {
     return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
   }, [config, translate]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
+  const sharedDriveUploadController = useMemo(() => {
+    const gateway = createCellsRepositoryGateway(app.repository.cells);
+    const manager = createCellsUploadManager({
+      gateway,
+      createResourceUuid: createUuid,
+      createVersionUuid: createUuid,
+      createAttemptId: createUuid,
+      createAbortController: () => new AbortController(),
+    });
+    return createSharedDriveUploadController({
+      manager,
+      createUploadId: createUuid,
+      createSource: file => ({blob: file, name: file.name, contentType: file.type, size: file.size}),
+    });
+  }, [app.repository.cells]);
 
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
@@ -157,6 +176,7 @@ export const AppContainer = (properties: AppProps) => {
       doesApplicationNeedForceReload,
       isFeatureToggleEnabled,
       translate,
+      sharedDriveUploadController,
       applicationNavigation: {
         get currentPathname(): string {
           return window.location.pathname;
@@ -172,7 +192,15 @@ export const AppContainer = (properties: AppProps) => {
         },
       },
     };
-  }, [doesApplicationNeedForceReload, fireAndForgetInvoker, isFeatureToggleEnabled, mainView, translate, wallClock]);
+  }, [
+    doesApplicationNeedForceReload,
+    fireAndForgetInvoker,
+    isFeatureToggleEnabled,
+    mainView,
+    sharedDriveUploadController,
+    translate,
+    wallClock,
+  ]);
 
   if (hasOtherInstance) {
     // Automatically sign out the user if the user has multiple tabs open

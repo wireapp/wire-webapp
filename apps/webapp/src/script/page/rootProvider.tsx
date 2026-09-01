@@ -25,6 +25,7 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {Translate} from 'Util/localizerUtil';
 
+import type {SharedDriveUploadController} from '../components/conversation/conversationCells/sharedDriveUploadController';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../view_model/MainViewModel';
 
@@ -43,6 +44,7 @@ export type RootContextValue = {
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly applicationNavigation: ApplicationNavigation;
   readonly translate: Translate;
+  readonly sharedDriveUploadController?: SharedDriveUploadController;
 };
 
 export const RootContext = createContext<RootContextValue | null>(null);

@@ -693,8 +693,6 @@ export const Conversation = ({
                       isSearchViewOpen={isSharedDriveSearchViewOpen}
                       onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
                       onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
-                      // TODO: Wire Cristian's modular upload-file flow from PR #22326 here.
-                      onUploadFiles={openAllFilesView}
                       isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
                       showViewerPermission={showViewerPermission}
                     />
