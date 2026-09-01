@@ -33,6 +33,7 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import * as Icon from 'Components/icon';
+import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Call} from 'Repositories/calling/Call';
@@ -71,6 +72,7 @@ interface AnsweringControlsProps {
   classifiedDomains?: string[];
   isTemporaryUser?: boolean;
   setMaximizedParticipant?: (participant: Participant | null) => void;
+  isNotificationHostVisible?: boolean;
 }
 
 export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
@@ -88,6 +90,7 @@ export const CallingCell = ({
   callingRepository,
   propertiesRepository,
   setMaximizedParticipant,
+  isNotificationHostVisible = true,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: CallingCellProps) => {
@@ -120,6 +123,7 @@ export const CallingCell = ({
     'display_name',
   ]);
   const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
+  const hasMeetingNotifications = useMeetingNotificationStore(state => state.notifications.length > 0);
 
   const guardCall = useNoInternetCallGuard({
     description: translate('callNotEstablishedDescription'),
@@ -365,7 +369,7 @@ export const CallingCell = ({
   }
 
   return (
-    <div css={callingContainer}>
+    <div css={callingContainer(isNotificationHostVisible && hasMeetingNotifications)}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
           {translate('callConversationAcceptOrDecline', {conversationName: resolvedConversationName})}
