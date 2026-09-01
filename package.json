@@ -63,7 +63,7 @@
     "fake-indexeddb": "6.2.5",
     "globals": "17.11.0",
     "jest": "30.5.0",
-    "jest-environment-jsdom": "30.4.1",
+    "jest-environment-jsdom": "30.5.0",
     "js-yaml": "4.3.2",
     "jsdom": "29.1.1",
     "nock": "14.0.17",
