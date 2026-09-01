@@ -1189,7 +1189,7 @@
   "guestRoomConversationButton": "Personen einladen",
   "guestRoomConversationHead": "Personen außerhalb des Teams können an dieser Unterhaltung teilnehmen.",
   "guestRoomConversationName": "Gästebereich",
-  "guestRoomToggleCellsInfo": "Guests can’t upload, edit, or manage files in Shared Drive.",
+  "guestRoomToggleCellsInfo": "Gäste können in Geteiltes Drive keine Dateien hochladen, bearbeiten oder verwalten.",
   "guestRoomToggleInfo": "Öffnen Sie diese Unterhaltung für Personen außerhalb Ihres Teams.",
   "guestRoomToggleInfoDisabled": "Sie können die Gast-Option in dieser Unterhaltung nicht deaktivieren, da sie von jemandem aus einem anderen Team erstellt wurde.",
   "guestRoomToggleInfoExtended": "Öffnen Sie diese Unterhaltung für Personen außerhalb Ihres Teams. Diese Einstellung kann später jederzeit geändert werden.",
