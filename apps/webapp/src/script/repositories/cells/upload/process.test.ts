@@ -213,6 +213,17 @@ describe('createCellsUploadProcess', () => {
     ).toMatchObject({kind: 'cancelled'});
   });
 
+  it('does not publish a cancelled upload', async () => {
+    const fixture = setup();
+    const start = fixture.process.start();
+    await unwrap(fixture.process.cancel());
+    required(fixture.uploadTasks[0]).resolve(undefined);
+    await unwrap(start);
+
+    expect((await fixture.process.publish()).isErr).toBe(true);
+    expect(fixture.published).toEqual([]);
+  });
+
   it('suppresses stale progress callbacks after a retry starts', async () => {
     const fixture = setup();
     const first = fixture.process.start();

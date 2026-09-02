@@ -17,7 +17,7 @@
  *
  */
 
-import {act, render, screen} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {UploadState} from 'Repositories/cells/upload';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
@@ -52,13 +52,14 @@ const failedState: UploadState = {
 type TestController = SharedDriveUploadController & {
   snapshots: jest.MockedFunction<SharedDriveUploadController['snapshots']>;
   subscribe: jest.MockedFunction<SharedDriveUploadController['subscribe']>;
+  cancel: jest.MockedFunction<SharedDriveUploadController['cancel']>;
 };
 
 const createController = (state: UploadState = uploadState): TestController => ({
   snapshots: jest.fn(scope => (scope === conversationQualifiedId ? [state] : [])),
   subscribe: jest.fn((_listener: () => void) => jest.fn()),
   upload: jest.fn(),
-  cancel: jest.fn(),
+  cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
   retryUpload: jest.fn(),
   retryPublish: jest.fn(),
   discard: jest.fn(),
@@ -140,6 +141,66 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     expect(view.getByRole('status')).toBeInTheDocument();
     expect(controller.snapshots).toHaveBeenCalledWith(conversationQualifiedId);
+  });
+
+  it('cancels the displayed upload and removes its status', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    let state: UploadState = uploadState;
+    let notify: () => void = jest.fn();
+    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? [state] : []));
+    controller.subscribe.mockImplementation(listener => {
+      notify = listener;
+      return jest.fn();
+    });
+    controller.cancel.mockImplementation(async uploadId => {
+      expect(uploadId).toBe('upload-1');
+      state = {...uploadState, kind: 'cancelled'};
+      act(() => notify());
+    });
+
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+    await user.click(view.getByRole('button', {name: 'conversationAssetUploadCancel'}));
+
+    expect(controller.cancel).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(view.queryByRole('status')).not.toBeInTheDocument());
+  });
+
+  it('re-enables cancellation when the command completes without changing the upload state', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+    const cancel = view.getByRole('button', {name: 'conversationAssetUploadCancel'});
+    await user.click(cancel);
+
+    expect(controller.cancel).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(cancel).toBeEnabled());
+    expect(view.getByRole('status')).toBeInTheDocument();
+  });
+
+  it('blocks a second cancellation while the first command is pending', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    let resolveCancellation: () => void = jest.fn();
+    const cancellation = new Promise<void>(resolve => {
+      resolveCancellation = resolve;
+    });
+    controller.cancel.mockReturnValue(cancellation);
+
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+    const cancel = view.getByRole('button', {name: 'conversationAssetUploadCancel'});
+    await user.click(cancel);
+    await user.click(cancel);
+
+    expect(controller.cancel).toHaveBeenCalledTimes(1);
+    expect(cancel).toBeDisabled();
+
+    await act(async () => resolveCancellation());
+    await waitFor(() => expect(cancel).toBeEnabled());
   });
 
   it('formats the source size in the expanded status copy', async () => {

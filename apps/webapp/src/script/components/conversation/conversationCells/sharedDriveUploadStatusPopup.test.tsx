@@ -30,13 +30,14 @@ const upload: SharedDriveUploadStatus = {
   fileName: 'report.pdf',
   fileSize: 4,
   kind: 'uploading',
+  canCancel: true,
 };
 
 const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false) =>
   render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup
-        upload={{...upload, kind}}
+        upload={{...upload, kind, canCancel: kind === 'uploading'}}
         title={`${kind} report.pdf`}
         statusLabel={
           kind === 'failed' ? 'Couldn’t upload file' : `${kind === 'uploading' ? 'Uploading' : 'Uploaded'} 4 KB`
@@ -44,7 +45,10 @@ const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false) 
         destination="to Shared Drive"
         isExpanded={isExpanded}
         toggleLabel={isExpanded ? 'Collapse upload details' : 'Expand upload details'}
+        cancelLabel="Cancel"
+        isCancelling={false}
         onToggle={jest.fn()}
+        onCancel={jest.fn()}
       />
     </ThemeProvider>,
   );
@@ -123,7 +127,10 @@ describe('SharedDriveUploadStatusPopup', () => {
         destination="to Shared Drive"
         isExpanded={false}
         toggleLabel="Expand upload details"
+        cancelLabel="Cancel"
+        isCancelling={false}
         onToggle={onToggle}
+        onCancel={jest.fn()}
       />,
     );
 
@@ -134,10 +141,35 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(onToggle).toHaveBeenCalledTimes(2);
   });
 
-  it('shows failed status without retry, cancel, or open actions', () => {
-    const {getByText, queryByRole} = renderPopup('failed');
+  it('shows a cancel action for an active upload and prevents duplicate interaction while cancelling', async () => {
+    const user = userEvent.setup();
+    const onCancel = jest.fn();
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={upload}
+          title="Uploading report.pdf"
+          statusLabel="Uploading"
+          destination="to Shared Drive"
+          isExpanded
+          toggleLabel="Collapse upload details"
+          cancelLabel="Cancel"
+          isCancelling
+          onToggle={jest.fn()}
+          onCancel={onCancel}
+        />
+      </ThemeProvider>,
+    );
 
-    expect(getByText('failed report.pdf')).toBeInTheDocument();
-    expect(queryByRole('button', {name: /retry|cancel|open/i})).not.toBeInTheDocument();
+    const cancel = screen.getByRole('button', {name: 'Cancel'});
+    expect(cancel).toBeDisabled();
+    await user.click(cancel);
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+
+  it.each(['uploaded', 'failed'] as const)('does not show cancel for %s status', kind => {
+    const {queryByRole} = renderPopup(kind);
+
+    expect(queryByRole('button', {name: 'Cancel'})).not.toBeInTheDocument();
   });
 });

@@ -26,6 +26,7 @@ import {getFileExtension} from 'Util/util';
 
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {
+  sharedDriveUploadStatusPopupCancelStyles,
   sharedDriveUploadStatusPopupContentStyles,
   sharedDriveUploadStatusPopupDestinationStyles,
   sharedDriveUploadStatusPopupProgressStyles,
@@ -48,7 +49,10 @@ interface SharedDriveUploadStatusPopupProps {
   readonly destination: string;
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
+  readonly cancelLabel: string;
+  readonly isCancelling: boolean;
   readonly onToggle: () => void;
+  readonly onCancel: () => void;
 }
 
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
@@ -92,7 +96,10 @@ export const SharedDriveUploadStatusPopup = ({
   destination,
   isExpanded,
   toggleLabel,
+  cancelLabel,
+  isCancelling,
   onToggle,
+  onCancel,
 }: SharedDriveUploadStatusPopupProps) => {
   const statusRowId = `shared-drive-upload-status-${upload.uploadId}`;
 
@@ -143,6 +150,17 @@ export const SharedDriveUploadStatusPopup = ({
             {statusLabel}
           </span>
         </div>
+        {upload.canCancel && (
+          <button
+            type="button"
+            css={sharedDriveUploadStatusPopupCancelStyles}
+            disabled={isCancelling}
+            data-uie-name="shared-drive-upload-cancel"
+            onClick={onCancel}
+          >
+            {cancelLabel}
+          </button>
+        )}
       </div>
       {upload.kind === 'uploading' && (
         <div css={sharedDriveUploadStatusPopupProgressStyles} data-uie-name="shared-drive-upload-progress" />
