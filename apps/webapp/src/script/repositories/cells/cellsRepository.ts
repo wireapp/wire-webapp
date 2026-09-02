@@ -78,7 +78,8 @@ export class CellsRepository {
     progressCallback?: (progress: number) => void;
     abortController?: AbortController;
   }): Promise<{uuid: string; versionId: string}> {
-    const filePath = `${path || this.basePath}/${file.name}`;
+    const uploadFilePath = file.webkitRelativePath || file.name;
+    const filePath = `${path || this.basePath}/${uploadFilePath}`;
     const controller = abortController ?? new AbortController();
     if (!abortController) {
       this.uploadControllers.set(uuid, controller);

@@ -68,6 +68,7 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
+  onUploadFolder: () => void;
   isUploadFilesEnabled: boolean;
   showViewerPermission: boolean;
 }
@@ -81,6 +82,7 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
+    onUploadFolder,
     isUploadFilesEnabled,
     showViewerPermission,
   }: ConversationCellsProps) => {
@@ -271,6 +273,7 @@ export const ConversationCells = memo(
             onSearchChange={handleSearch}
             onSearchClear={handleClearSearch}
             onUploadFiles={onUploadFiles}
+            onUploadFolder={onUploadFolder}
             isUploadFilesEnabled={isUploadFilesEnabled}
             filters={filters}
             showViewerPermission={showViewerPermission}

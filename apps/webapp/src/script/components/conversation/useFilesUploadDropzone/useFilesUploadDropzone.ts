@@ -19,7 +19,7 @@
 
 import {useState} from 'react';
 
-import {Accept, FileRejection, useDropzone} from 'react-dropzone';
+import {Accept, DropzoneInputProps, FileRejection, useDropzone} from 'react-dropzone';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -43,6 +43,11 @@ const IMAGE_FILE_TYPES = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
 const CONFIG = Config.getConfig();
 
 const logger = getLogger('FileDropzone');
+
+type FolderUploadInputProps = DropzoneInputProps & {
+  directory?: string;
+  webkitdirectory?: string;
+};
 
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
@@ -69,12 +74,18 @@ export const useFilesUploadDropzone = ({
   const files = getFiles({conversationId: conversation.id});
 
   const [accept, setAccept] = useState<Accept | undefined>(undefined);
+  const [isFolderUploadMode, setIsFolderUploadMode] = useState(false);
 
   const TEAM_MAX_SIZE = isCellsEnabled ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS : CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM;
 
   const MAX_SIZE = isTeam ? TEAM_MAX_SIZE : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-  const {getRootProps, getInputProps, open, isDragAccept} = useDropzone({
+  const {
+    getRootProps,
+    getInputProps: getDropzoneInputProps,
+    open,
+    isDragAccept,
+  } = useDropzone({
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
@@ -104,8 +115,17 @@ export const useFilesUploadDropzone = ({
       // After it closes/selects files, we want to reset the state immediately.
       // By resetting the state already at this stage, we are assured that the accept state will not be stale.
       setAccept(undefined);
+      setIsFolderUploadMode(false);
     },
   });
+
+  const getInputProps = (props: DropzoneInputProps = {}) => {
+    const inputProps: DropzoneInputProps | FolderUploadInputProps = isFolderUploadMode
+      ? {...props, directory: '', webkitdirectory: ''}
+      : props;
+
+    return getDropzoneInputProps(inputProps);
+  };
 
   const processIncomingFiles = async (
     acceptedFiles: File[],
@@ -233,15 +253,31 @@ export const useFilesUploadDropzone = ({
 
   const openAllFilesView = () => {
     setAccept(undefined);
+    setIsFolderUploadMode(false);
+    delayedOpen();
+  };
+
+  const openFolderView = () => {
+    setAccept(undefined);
+    setIsFolderUploadMode(true);
     delayedOpen();
   };
 
   const openImageFilesView = () => {
+    setIsFolderUploadMode(false);
     setAccept({
       'image/*': IMAGE_FILE_TYPES,
     });
     delayedOpen();
   };
 
-  return {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept};
+  return {
+    getRootProps,
+    getInputProps,
+    openAllFilesView,
+    openFolderView,
+    openImageFilesView,
+    handlePastedFile,
+    isDragAccept,
+  };
 };

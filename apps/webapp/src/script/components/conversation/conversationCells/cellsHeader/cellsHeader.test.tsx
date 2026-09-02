@@ -56,6 +56,7 @@ const defaultProperties = {
   onSearchChange: jest.fn(),
   onSearchClear: jest.fn(),
   onUploadFiles: jest.fn(),
+  onUploadFolder: jest.fn(),
   isUploadFilesEnabled: false,
   filters: [filter],
   showViewerPermission: false,
@@ -108,12 +109,23 @@ describe('CellsHeader', () => {
     expect(onUploadFiles).toHaveBeenCalledTimes(1);
   });
 
+  it('opens the folder picker from the new-item menu', async () => {
+    const onUploadFolder = jest.fn();
+    renderCellsHeader({isSearchViewOpen: false, onUploadFolder, isUploadFilesEnabled: true});
+
+    await userEvent.click(screen.getByRole('button', {name: cellsNewItemButtonLabel}));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'cells.newItemMenu.uploadFolder'}));
+
+    expect(onUploadFolder).toHaveBeenCalledTimes(1);
+  });
+
   it('hides the file picker menu item when direct upload is disabled', async () => {
     renderCellsHeader({isSearchViewOpen: false, isUploadFilesEnabled: false});
 
     await userEvent.click(screen.getByRole('button', {name: cellsNewItemButtonLabel}));
 
     expect(screen.queryByRole('menuitem', {name: 'cells.newItemMenu.uploadFile'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', {name: 'cells.newItemMenu.uploadFolder'})).not.toBeInTheDocument();
   });
 
   it('does not render the new-item menu in the recycle bin', () => {
