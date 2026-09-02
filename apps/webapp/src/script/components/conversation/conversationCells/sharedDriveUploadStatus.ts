@@ -28,27 +28,29 @@ export type SharedDriveUploadStatus = {
   readonly kind: SharedDriveUploadStatusKind;
 };
 
+const getSharedDriveUploadStatusKind = (state: UploadState): SharedDriveUploadStatusKind | null => {
+  switch (state.kind) {
+    case 'published':
+      return 'uploaded';
+    case 'uploadFailed':
+    case 'publishFailed':
+    case 'discardFailed':
+      return 'failed';
+    case 'queued':
+    case 'uploading':
+    case 'draftReady':
+    case 'publishing':
+      return 'uploading';
+    default:
+      return null;
+  }
+};
+
 export const toSharedDriveUploadStatus = (
   state: UploadState,
   conversationQualifiedId: string,
 ): SharedDriveUploadStatus | null => {
-  const kind = (() => {
-    switch (state.kind) {
-      case 'published':
-        return 'uploaded' as const;
-      case 'uploadFailed':
-      case 'publishFailed':
-      case 'discardFailed':
-        return 'failed' as const;
-      case 'queued':
-      case 'uploading':
-      case 'draftReady':
-      case 'publishing':
-        return 'uploading' as const;
-      default:
-        return null;
-    }
-  })();
+  const kind = getSharedDriveUploadStatusKind(state);
 
   if (!kind) {
     return null;
