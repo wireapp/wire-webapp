@@ -37,6 +37,17 @@ const uploadState: UploadState = {
   source: uploadSource,
   progress: 0,
 };
+const uploadedState: UploadState = {
+  kind: 'published',
+  identity: {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
+  source: uploadSource,
+};
+const failedState: UploadState = {
+  kind: 'uploadFailed',
+  identity: {uploadId: 'upload-1'},
+  source: uploadSource,
+  error: {kind: 'uploadFailed', cause: new Error('upload failed')},
+};
 type TestController = SharedDriveUploadController & {
   snapshots: jest.MockedFunction<SharedDriveUploadController['snapshots']>;
   subscribe: jest.MockedFunction<SharedDriveUploadController['subscribe']>;
@@ -53,9 +64,14 @@ const createController = (state: UploadState = uploadState): TestController => (
   retryDiscard: jest.fn(),
 });
 
-const renderHost = (controller: TestController, scope: string, isEnabled = true) =>
+const renderHost = (controller: TestController, scope: string, isEnabled = true, isFileTabActive = true) =>
   render(
-    <SharedDriveUploadStatusPopupHost controller={controller} conversationQualifiedId={scope} isEnabled={isEnabled} />,
+    <SharedDriveUploadStatusPopupHost
+      controller={controller}
+      conversationQualifiedId={scope}
+      isEnabled={isEnabled}
+      isFileTabActive={isFileTabActive}
+    />,
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
   );
 
@@ -85,6 +101,40 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).toBeInTheDocument();
   });
 
+  it.each([
+    ['uploading', uploadState],
+    ['uploaded', uploadedState],
+    ['failed', failedState],
+  ])('hides a %s upload on the Messages tab and shows it again on the Files tab', (_kind, state) => {
+    const controller = createController(state);
+    const view = renderHost(controller, conversationQualifiedId);
+
+    expect(view.getByRole('status')).toBeInTheDocument();
+
+    view.rerender(
+      <SharedDriveUploadStatusPopupHost
+        controller={controller}
+        conversationQualifiedId={conversationQualifiedId}
+        isEnabled
+        isFileTabActive={false}
+      />,
+    );
+
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
+
+    view.rerender(
+      <SharedDriveUploadStatusPopupHost
+        controller={controller}
+        conversationQualifiedId={conversationQualifiedId}
+        isEnabled
+        isFileTabActive
+      />,
+    );
+
+    expect(view.getByRole('status')).toBeInTheDocument();
+    expect(controller.snapshots).toHaveBeenCalledWith(conversationQualifiedId);
+  });
+
   it('does not show an upload from another conversation', () => {
     const controller = createController();
 
@@ -105,6 +155,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
         controller={controller}
         conversationQualifiedId={otherConversationQualifiedId}
         isEnabled
+        isFileTabActive
       />,
     );
 

@@ -29,6 +29,7 @@ interface SharedDriveUploadStatusPopupHostProps {
   readonly controller: SharedDriveUploadController;
   readonly conversationQualifiedId: string;
   readonly isEnabled: boolean;
+  readonly isFileTabActive: boolean;
 }
 
 const getLatestStatus = (
@@ -47,6 +48,7 @@ export const SharedDriveUploadStatusPopupHost = ({
   controller,
   conversationQualifiedId,
   isEnabled,
+  isFileTabActive,
 }: SharedDriveUploadStatusPopupHostProps) => {
   const {translate} = useApplicationContext();
   const readStatus = useCallback(
@@ -65,7 +67,7 @@ export const SharedDriveUploadStatusPopupHost = ({
     return controller.subscribe(updateStatus);
   }, [controller, conversationQualifiedId, readStatus]);
 
-  if (!isEnabled || !upload) {
+  if (!isEnabled || !isFileTabActive || !upload) {
     return null;
   }
 

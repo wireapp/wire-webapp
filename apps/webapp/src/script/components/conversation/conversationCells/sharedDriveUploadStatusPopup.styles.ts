@@ -81,7 +81,7 @@ export const sharedDriveUploadStatusPopupProgressStyles: CSSObject = {
   position: 'absolute',
   bottom: 0,
   left: 3,
-  width: '50%',
+  width: 'min(209px, calc(50% + 3px))',
   height: 3,
   overflow: 'hidden',
   backgroundColor: '#0667c8',

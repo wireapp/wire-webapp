@@ -826,6 +826,7 @@ export const Conversation = ({
             controller={sharedDriveUploadController}
             conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
             isEnabled={isSharedDriveDirectUploadFeatureEnabled}
+            isFileTabActive={isFileTabActive}
           />
         )}
       </ConversationFileDropzone>
