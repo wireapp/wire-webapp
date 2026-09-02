@@ -53,6 +53,7 @@ import {
   wrapperStyles,
 } from './conversationCells.styles';
 import {useSharedDriveUploadController} from './sharedDriveUploadContext';
+import {handleSharedDriveUploadInput} from './sharedDriveUploadInput';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
@@ -193,6 +194,18 @@ export const ConversationCells = memo(
       fireAndForgetInvoker.fireAndForget(refresh);
     }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
 
+    const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
+    const handleUploadFiles = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>): void =>
+        handleSharedDriveUploadInput(event, {
+          fireAndForgetInvoker,
+          onRefresh: handleRefresh,
+          sharedDriveUploadController,
+          uploadPath: sharedDriveUploadPath,
+        }),
+      [fireAndForgetInvoker, handleRefresh, sharedDriveUploadController, sharedDriveUploadPath],
+    );
+
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
     const loadMoreOffset = getLoadMoreOffset(pagination);
@@ -245,24 +258,7 @@ export const ConversationCells = memo(
     return (
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <div css={wrapperStyles}>
-          <input
-            ref={uploadInput}
-            type="file"
-            multiple
-            hidden
-            onChange={async event => {
-              const files = Array.from(event.target.files ?? []);
-              event.target.value = '';
-              if (!files.length) {
-                return;
-              }
-              await sharedDriveUploadController.upload(
-                files,
-                getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()}),
-                handleRefresh,
-              );
-            }}
-          />
+          <input ref={uploadInput} type="file" multiple hidden onChange={handleUploadFiles} />
           <CellsHeader
             onRefresh={handleRefresh}
             conversationName={name}
