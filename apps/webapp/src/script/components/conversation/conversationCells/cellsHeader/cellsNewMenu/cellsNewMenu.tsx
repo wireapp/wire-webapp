@@ -41,6 +41,7 @@ interface CellsNewMenuProps {
   conversationQualifiedId: QualifiedId;
   onRefresh: () => void;
   onUploadFiles: () => void;
+  onUploadFolder: () => void;
   isUploadFilesEnabled: boolean;
 }
 
@@ -51,6 +52,7 @@ export const CellsNewMenu = ({
   conversationQualifiedId,
   onRefresh,
   onUploadFiles,
+  onUploadFolder,
   isUploadFilesEnabled,
 }: CellsNewMenuProps) => {
   const {translate} = useApplicationContext();
@@ -85,6 +87,11 @@ export const CellsNewMenu = ({
           <DropdownMenu.Content>
             {isUploadFilesEnabled && (
               <DropdownMenu.Item onClick={onUploadFiles}>{translate('cells.newItemMenu.uploadFile')}</DropdownMenu.Item>
+            )}
+            {isUploadFilesEnabled && (
+              <DropdownMenu.Item onClick={onUploadFolder}>
+                {translate('cells.newItemMenu.uploadFolder')}
+              </DropdownMenu.Item>
             )}
             <DropdownMenu.Item onClick={openFolderModal}>{translate('cells.newItemMenu.folder')}</DropdownMenu.Item>
             <DropdownMenu.Sub>

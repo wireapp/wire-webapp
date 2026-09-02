@@ -156,6 +156,38 @@ describe('useFilesUploadDropzone', () => {
     );
   });
 
+  it('sets directory picker input attributes for folder uploads', () => {
+    const {result} = renderHook(
+      () =>
+        useFilesUploadDropzone({
+          isTeam: false,
+          isCellsEnabled: true,
+          isDisabled: false,
+          isFileDropAllowed: true,
+          cellsRepository: createRepository() as never,
+          translate: translateForTest,
+          conversation,
+        }),
+      {wrapper},
+    );
+
+    act(() => result.current.openFolderView());
+    expect(result.current.getInputProps()).toEqual(
+      expect.objectContaining({
+        directory: '',
+        webkitdirectory: '',
+      }),
+    );
+
+    act(() => result.current.openAllFilesView());
+    expect(result.current.getInputProps()).toEqual(
+      expect.not.objectContaining({
+        directory: '',
+        webkitdirectory: '',
+      }),
+    );
+  });
+
   it('marks an upload as retryable when the repository rejects', async () => {
     const cellsRepository = createRepository();
     cellsRepository.uploadNodeDraft.mockRejectedValue(new Error('network'));

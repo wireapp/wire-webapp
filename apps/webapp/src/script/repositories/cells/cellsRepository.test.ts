@@ -98,3 +98,42 @@ describe('CellsRepository upload cancellation', () => {
     await secondUpload;
   });
 });
+
+describe('CellsRepository upload paths', () => {
+  const createApiClient = () => ({
+    api: {
+      cells: {
+        uploadNodeDraft: jest.fn().mockResolvedValue(undefined),
+      },
+    },
+  });
+
+  it('uploads file picker files at the selected cells path', async () => {
+    const apiClient = createApiClient();
+    const repository = new CellsRepository(apiClient as never);
+    const file = new File(['content'], 'document.txt');
+
+    await repository.uploadNodeDraft({uuid: 'upload-uuid', file, path: 'shared-drive'});
+
+    expect(apiClient.api.cells.uploadNodeDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: 'shared-drive/document.txt',
+      }),
+    );
+  });
+
+  it('preserves the selected folder structure for folder picker files', async () => {
+    const apiClient = createApiClient();
+    const repository = new CellsRepository(apiClient as never);
+    const file = new File(['content'], 'document.txt');
+    Object.defineProperty(file, 'webkitRelativePath', {value: 'Marketing/Briefs/document.txt'});
+
+    await repository.uploadNodeDraft({uuid: 'upload-uuid', file, path: 'shared-drive'});
+
+    expect(apiClient.api.cells.uploadNodeDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: 'shared-drive/Marketing/Briefs/document.txt',
+      }),
+    );
+  });
+});

@@ -60,6 +60,7 @@ interface CellsHeaderProps {
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
   onUploadFiles: () => void;
+  onUploadFolder: () => void;
   isUploadFilesEnabled: boolean;
   filters: FilterConfig[];
   showViewerPermission: boolean;
@@ -77,6 +78,7 @@ export const CellsHeader = ({
   onSearchChange,
   onSearchClear,
   onUploadFiles,
+  onUploadFolder,
   isUploadFilesEnabled,
   filters,
   showViewerPermission,
@@ -118,6 +120,7 @@ export const CellsHeader = ({
                 conversationQualifiedId={conversationQualifiedId}
                 onRefresh={onRefresh}
                 onUploadFiles={onUploadFiles}
+                onUploadFolder={onUploadFolder}
                 isUploadFilesEnabled={isUploadFilesEnabled}
               />
             )}
