@@ -1006,6 +1006,117 @@ describe('CallingRepository ISO', () => {
       return avsCall && avsCall.destroy(avsUser);
     });
 
+    it('forwards a fresh incoming SETUP request to AVS', async () => {
+      const currentTimestamp = new Date('2026-01-20T20:00:31.000Z').getTime();
+      const freshEventTimestamp = currentTimestamp - 21_000;
+      const selfUser = new User(createUuid(), '', translateForTest);
+      selfUser.isMe = true;
+
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const {repository: callingRepo} = createCallingRepositoryForTest({
+        conversationState: {
+          findConversation: jest.fn().mockImplementation(() => conversation),
+          participating_user_ets: jest.fn(),
+        } as unknown as ConversationState,
+        serverTimeHandler: {
+          toServerTimestamp: jest.fn().mockReturnValue(currentTimestamp),
+        },
+      });
+
+      const avs = await callingRepo.initAvs(selfUser, createUuid());
+      avsUser = avs.wUser;
+      avsCall = avs.wCall;
+      const recvMsgSpy = jest.spyOn(avsCall, 'recvMsg').mockReturnValue(0);
+      recvMsgSpy.mockClear();
+
+      const event = {
+        content: {resp: false, type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
+        conversation: conversation.id,
+        from: createUuid(),
+        sender: createUuid(),
+        time: new Date(freshEventTimestamp).toISOString(),
+        type: CALL.E_CALL,
+      } as CallingEvent;
+
+      await callingRepo.onCallEvent(event, '');
+
+      expect(recvMsgSpy).toHaveBeenCalled();
+    });
+
+    it('ignores an incoming SETUP event that was received hours ago', async () => {
+      const currentTimestamp = new Date('2026-01-20T20:00:31.000Z').getTime();
+      const staleEventTimestamp = currentTimestamp - 31_000;
+      const selfUser = new User(createUuid(), '', translateForTest);
+      selfUser.isMe = true;
+
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const {repository: callingRepo} = createCallingRepositoryForTest({
+        conversationState: {
+          findConversation: jest.fn().mockImplementation(() => conversation),
+          participating_user_ets: jest.fn(),
+        } as unknown as ConversationState,
+        serverTimeHandler: {
+          toServerTimestamp: jest.fn().mockReturnValue(currentTimestamp),
+        },
+      });
+
+      const avs = await callingRepo.initAvs(selfUser, createUuid());
+      avsUser = avs.wUser;
+      avsCall = avs.wCall;
+      const recvMsgSpy = jest.spyOn(avsCall, 'recvMsg').mockReturnValue(0);
+      recvMsgSpy.mockClear();
+
+      const event = {
+        content: {resp: false, type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
+        conversation: conversation.id,
+        from: createUuid(),
+        sender: createUuid(),
+        time: new Date(staleEventTimestamp).toISOString(),
+        type: CALL.E_CALL,
+      } as CallingEvent;
+
+      await callingRepo.onCallEvent(event, '');
+
+      expect(recvMsgSpy).not.toHaveBeenCalled();
+    });
+
+    it('forwards a stale SETUP response to AVS', async () => {
+      const currentTimestamp = new Date('2026-01-20T20:00:31.000Z').getTime();
+      const staleEventTimestamp = currentTimestamp - 31_000;
+      const selfUser = new User(createUuid(), '', translateForTest);
+      selfUser.isMe = true;
+
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const {repository: callingRepo} = createCallingRepositoryForTest({
+        conversationState: {
+          findConversation: jest.fn().mockImplementation(() => conversation),
+          participating_user_ets: jest.fn(),
+        } as unknown as ConversationState,
+        serverTimeHandler: {
+          toServerTimestamp: jest.fn().mockReturnValue(currentTimestamp),
+        },
+      });
+
+      const avs = await callingRepo.initAvs(selfUser, createUuid());
+      avsUser = avs.wUser;
+      avsCall = avs.wCall;
+      const recvMsgSpy = jest.spyOn(avsCall, 'recvMsg').mockReturnValue(0);
+      recvMsgSpy.mockClear();
+
+      const event = {
+        content: {resp: true, type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
+        conversation: conversation.id,
+        from: createUuid(),
+        sender: createUuid(),
+        time: new Date(staleEventTimestamp).toISOString(),
+        type: CALL.E_CALL,
+      } as CallingEvent;
+
+      await callingRepo.onCallEvent(event, '');
+
+      expect(recvMsgSpy).toHaveBeenCalled();
+    });
+
     it('creates and stores a new call when an incoming call arrives', async () => {
       const selfUser = new User(createUuid(), '', translateForTest);
       selfUser.isMe = true;

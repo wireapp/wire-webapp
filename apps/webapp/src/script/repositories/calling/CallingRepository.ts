@@ -84,7 +84,7 @@ import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHand
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
-import {backgroundEffectsStore, BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
+import {BackgroundEffectsQuality, backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
@@ -1149,7 +1149,19 @@ export class CallingRepository {
     } = event;
     const contentStr = JSON.stringify(content);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const eventTimestamp = new Date(time).getTime();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
+
+    if (
+      content.type === CALL_MESSAGE_TYPE.SETUP &&
+      content.resp === false &&
+      currentTimestamp - eventTimestamp > EventRepository.CONFIG.E_CALL_EVENT_LIFETIME
+    ) {
+      this.logger.warn(
+        `Ignoring stale incoming call SETUP: age=${currentTimestamp - eventTimestamp}ms conversation=${conversation.id}`,
+      );
+      return;
+    }
 
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
@@ -1164,7 +1176,7 @@ export class CallingRepository {
       contentStr,
       contentStr.length,
       toSecond(currentTimestamp),
-      toSecond(new Date(time).getTime()),
+      toSecond(eventTimestamp),
       this.serializeQualifiedId(conversation.qualifiedId),
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
