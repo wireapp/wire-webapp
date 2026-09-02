@@ -449,7 +449,7 @@
   "cells.newItemMenu.presentation": "Präsentation",
   "cells.newItemMenu.spreadsheet": "Tabellenkalkulation",
   "cells.newItemMenu.uploadFile": "Datei hochladen",
-  "cells.newItemMenu.uploadFolder": "Upload folder",
+  "cells.newItemMenu.uploadFolder": "Ordner hochladen",
   "cells.newItemMenuModal.descriptionFile": "Alle Teilnehmer dieser Unterhaltung können diese Datei und ihren Inhalt sehen.",
   "cells.newItemMenuModal.descriptionFolder": "Alle Teilnehmer dieser Unterhaltung können diesen Ordner und dessen Inhalt sehen.",
   "cells.newItemMenuModal.headlineFile": "Datei {fileType} erstellen",
