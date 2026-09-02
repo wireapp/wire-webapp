@@ -449,6 +449,7 @@
   "cells.newItemMenu.presentation": "Presentation",
   "cells.newItemMenu.spreadsheet": "Spreadsheet",
   "cells.newItemMenu.uploadFile": "Upload file",
+  "cells.newItemMenu.uploadFolder": "Upload folder",
   "cells.newItemMenuModal.descriptionFile": "All participants in this conversation can see this file and its content.",
   "cells.newItemMenuModal.descriptionFolder": "All participants in this conversation can see this folder and its content.",
   "cells.newItemMenuModal.headlineFile": "Create {fileType} file",
