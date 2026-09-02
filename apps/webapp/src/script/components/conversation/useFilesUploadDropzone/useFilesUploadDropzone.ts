@@ -80,7 +80,12 @@ export const useFilesUploadDropzone = ({
 
   const MAX_SIZE = isTeam ? TEAM_MAX_SIZE : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-  const {getRootProps, getInputProps: getDropzoneInputProps, open, isDragAccept} = useDropzone({
+  const {
+    getRootProps,
+    getInputProps: getDropzoneInputProps,
+    open,
+    isDragAccept,
+  } = useDropzone({
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
