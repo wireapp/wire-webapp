@@ -57,7 +57,7 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
       const isInsideNotificationHost =
         target instanceof Node &&
         (hostRef.current?.contains(target) ||
-          (target instanceof Element && target.closest('[data-uie-name="meeting-notification-host"]') !== null));
+          (target instanceof Element && target.closest('.meeting-notification-host') !== null));
 
       if (!(target instanceof Node) || isInsideNotificationHost) {
         return;
@@ -82,6 +82,7 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
         ...(isStandalone ? meetingNotificationHostFallbackStyles : {}),
       }}
       data-uie-name="meeting-notification-host"
+      className="meeting-notification-host"
     >
       <div css={meetingNotificationHostContainerStyles}>
         <div css={meetingNotificationHostHeaderStyles}>

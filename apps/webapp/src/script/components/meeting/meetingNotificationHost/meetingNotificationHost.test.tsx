@@ -45,7 +45,9 @@ const translateForCountTest: Translate = (_key, substitutions) => {
   return '';
 };
 
-const getHost = () => document.querySelector('[data-uie-name="meeting-notification-host"]');
+const getHost = () => {
+  return document.querySelector('.meeting-notification-host');
+};
 const getList = () => document.getElementById('meeting-notification-list');
 
 const renderHost = (isStandalone = true, translate: Translate = translateForTest) =>
