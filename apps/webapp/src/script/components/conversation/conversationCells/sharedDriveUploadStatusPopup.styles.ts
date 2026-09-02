@@ -109,8 +109,24 @@ export const sharedDriveUploadStatusPopupRowStyles: CSSObject = {
 export const sharedDriveUploadStatusPopupRowTextStyles: CSSObject = {
   display: 'flex',
   minWidth: 0,
+  flex: 1,
   flexDirection: 'column',
   gap: 2,
+};
+
+export const sharedDriveUploadStatusPopupCancelStyles: CSSObject = {
+  flex: '0 0 auto',
+  padding: 0,
+  border: 0,
+  background: 'transparent',
+  color: 'var(--accent-color)',
+  fontSize: 12,
+  lineHeight: '14px',
+  cursor: 'pointer',
+  '&:disabled': {
+    cursor: 'default',
+    opacity: 0.5,
+  },
 };
 
 export const sharedDriveUploadStatusPopupRowFileNameStyles: CSSObject = {

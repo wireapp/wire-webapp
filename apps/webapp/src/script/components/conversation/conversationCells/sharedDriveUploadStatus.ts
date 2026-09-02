@@ -27,6 +27,7 @@ export type SharedDriveUploadStatus = {
   readonly fileName: string;
   readonly fileSize: number;
   readonly kind: SharedDriveUploadStatusKind;
+  readonly canCancel: boolean;
 };
 
 const getSharedDriveUploadStatusKind = (state: UploadState): SharedDriveUploadStatusKind | null => {
@@ -63,5 +64,6 @@ export const toSharedDriveUploadStatus = (
     fileName: state.source.name,
     fileSize: state.source.size,
     kind,
+    canCancel: state.kind === 'queued' || state.kind === 'uploading',
   };
 };

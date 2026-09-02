@@ -19,6 +19,8 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {Maybe, maybe} from 'true-myth';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatBytes} from 'Util/util';
 
@@ -61,7 +63,24 @@ export const SharedDriveUploadStatusPopupHost = ({
     upload: readStatus(),
   }));
   const [isExpanded, setIsExpanded] = useState(false);
+  const [cancellingUploadId, setCancellingUploadId] = useState<Maybe<string>>(Maybe.nothing());
   const upload = status.conversationQualifiedId === conversationQualifiedId ? status.upload : readStatus();
+
+  const cancelUpload = useCallback(
+    (uploadId: string): void => {
+      if (maybe.isJust(cancellingUploadId)) {
+        return;
+      }
+
+      setCancellingUploadId(Maybe.just(uploadId));
+      const finishCancellation = () =>
+        setCancellingUploadId(current =>
+          maybe.isJust(current) && current.value === uploadId ? Maybe.nothing() : current,
+        );
+      void controller.cancel(uploadId).then(finishCancellation, finishCancellation);
+    },
+    [cancellingUploadId, controller],
+  );
 
   useEffect(() => {
     const updateStatus = () => setStatus({conversationQualifiedId, upload: readStatus()});
@@ -97,7 +116,10 @@ export const SharedDriveUploadStatusPopupHost = ({
       destination={translate('cells.uploadStatus.destination', {destination: translate('cells.sharedDrive.title')})}
       isExpanded={isExpanded}
       toggleLabel={translate(isExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
+      cancelLabel={translate('conversationAssetUploadCancel')}
+      isCancelling={maybe.isJust(cancellingUploadId) && cancellingUploadId.value === upload.uploadId}
       onToggle={() => setIsExpanded(expanded => !expanded)}
+      onCancel={() => cancelUpload(upload.uploadId)}
     />
   );
 };
