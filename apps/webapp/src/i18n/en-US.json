@@ -773,6 +773,8 @@
   "conversationFileUploadOverlayTitle": "Upload files",
   "conversationFileUploadRestrictedOverlayDescription": "You have view access for this conversation, but you can’t upload, edit, or manage files",
   "conversationFileUploadRestrictedOverlayTitle": "Files not sharable",
+  "sharedDriveDropRecycleBinMessage": "You can’t upload files to the recycle bin.",
+  "sharedDriveDropUnsupportedFileMessage": "This file type can’t be uploaded to Shared Drive.",
   "conversationFileVideoPreviewLabel": "Video file preview for: {src}",
   "conversationFoldersEmptyText": "Add your conversations to folders to stay organized.",
   "conversationFoldersEmptyTextLearnMore": "Learn more",
