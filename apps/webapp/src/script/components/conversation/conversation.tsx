@@ -17,7 +17,7 @@
  *
  */
 
-import {UIEvent, useCallback, useEffect, useState} from 'react';
+import {UIEvent, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
@@ -36,6 +36,8 @@ import {showUserModal} from 'Components/Modals/UserModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/titleBar';
 import {CallState} from 'Repositories/calling/CallState';
+import {createCellsRepositoryGateway} from 'Repositories/cells/cellsRepositoryGateway';
+import {createCellsUploadManager} from 'Repositories/cells/upload/manager';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
@@ -58,6 +60,7 @@ import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {getLogger} from 'Util/logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
 import {formatBytes} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {
   searchResultsHeadingStyles,
@@ -73,6 +76,8 @@ import {
 import {getCellsFilesPath} from './conversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {getCurrentFolderName} from './conversationCells/common/getCurrentFolderName/getCurrentFolderName';
 import {ConversationCells} from './conversationCells/conversationCells';
+import {SharedDriveUploadProvider} from './conversationCells/sharedDriveUploadContext';
+import {createSharedDriveUploadController} from './conversationCells/sharedDriveUploadController';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
 import {ConversationMessagesWrapper} from './conversationMessagesWrapper/conversationMessagesWrapper';
@@ -117,6 +122,21 @@ export const Conversation = ({
   const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
+  const sharedDriveUploadController = useMemo(() => {
+    const gateway = createCellsRepositoryGateway(repositories.cells);
+    const manager = createCellsUploadManager({
+      gateway,
+      createResourceUuid: createUuid,
+      createVersionUuid: createUuid,
+      createAttemptId: createUuid,
+      createAbortController: () => new AbortController(),
+    });
+    return createSharedDriveUploadController({
+      manager,
+      createUploadId: createUuid,
+      createSource: file => ({blob: file, name: file.name, contentType: file.type, size: file.size}),
+    });
+  }, [repositories.cells]);
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
   const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
@@ -685,19 +705,19 @@ export const Conversation = ({
                 </div>
                 <ConversationTabPanel id="files" isActive={isFileTabActive}>
                   {isFileTabActive && (
-                    <ConversationCells
-                      activeConversation={activeConversation}
-                      userRepository={repositories.user}
-                      cellsRepository={repositories.cells}
-                      conversationRepository={conversationRepository}
-                      isSearchViewOpen={isSharedDriveSearchViewOpen}
-                      onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
-                      onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
-                      // TODO: Wire Cristian's modular upload-file flow from PR #22326 here.
-                      onUploadFiles={openAllFilesView}
-                      isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
-                      showViewerPermission={showViewerPermission}
-                    />
+                    <SharedDriveUploadProvider controller={sharedDriveUploadController}>
+                      <ConversationCells
+                        activeConversation={activeConversation}
+                        userRepository={repositories.user}
+                        cellsRepository={repositories.cells}
+                        conversationRepository={conversationRepository}
+                        isSearchViewOpen={isSharedDriveSearchViewOpen}
+                        onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
+                        onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
+                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
+                        showViewerPermission={showViewerPermission}
+                      />
+                    </SharedDriveUploadProvider>
                   )}
                 </ConversationTabPanel>
               </>

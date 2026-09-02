@@ -39,6 +39,8 @@ import {
   CellsSelfUserDriveRoleProvider,
   getSelfUserDriveRole,
 } from './common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {getCellsApiPath} from './common/getCellsApiPath/getCellsApiPath';
+import {getCellsFilesPath} from './common/getCellsFilesPath/getCellsFilesPath';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {isInRecycleBin as isCurrentPathInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
@@ -50,6 +52,8 @@ import {
   loadMoreWrapperStyles,
   wrapperStyles,
 } from './conversationCells.styles';
+import {useSharedDriveUploadController} from './sharedDriveUploadContext';
+import {handleSharedDriveUploadInput} from './sharedDriveUploadInput';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
@@ -64,7 +68,6 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
-  onUploadFiles: () => void;
   isUploadFilesEnabled: boolean;
   showViewerPermission: boolean;
 }
@@ -78,11 +81,13 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
-    onUploadFiles,
     isUploadFilesEnabled,
     showViewerPermission,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
+    const sharedDriveUploadController = useSharedDriveUploadController();
+    const uploadInput = useRef<HTMLInputElement>(null);
+    const onUploadFiles = () => uploadInput.current?.click();
     const {
       cellsState: initialCellState,
       name,
@@ -189,6 +194,18 @@ export const ConversationCells = memo(
       fireAndForgetInvoker.fireAndForget(refresh);
     }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
 
+    const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
+    const handleUploadFiles = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>): void =>
+        handleSharedDriveUploadInput(event, {
+          fireAndForgetInvoker,
+          onRefresh: handleRefresh,
+          sharedDriveUploadController,
+          uploadPath: sharedDriveUploadPath,
+        }),
+      [fireAndForgetInvoker, handleRefresh, sharedDriveUploadController, sharedDriveUploadPath],
+    );
+
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
     const loadMoreOffset = getLoadMoreOffset(pagination);
@@ -241,6 +258,7 @@ export const ConversationCells = memo(
     return (
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <div css={wrapperStyles}>
+          <input ref={uploadInput} type="file" multiple hidden onChange={handleUploadFiles} />
           <CellsHeader
             onRefresh={handleRefresh}
             conversationName={name}
