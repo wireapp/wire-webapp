@@ -25,7 +25,6 @@ import {Runtime} from '@wireapp/commons';
 
 import type {Conversation} from 'Repositories/entity/Conversation';
 
-import {getFileExtension} from './getFileExtension';
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
@@ -145,7 +144,11 @@ export const loadUrlBlob = (url: string): Promise<Blob> => {
   return loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
-export {getFileExtension};
+export const getFileExtension = (filename: string): string => {
+  const extensionMatch = filename?.match(/\.(tar\.gz|[^.]*)$/i);
+  const foundExtension = extensionMatch?.[1];
+  return foundExtension ?? '';
+};
 
 export const getName = (nodePath: string): string => {
   const parts = nodePath.split('/');

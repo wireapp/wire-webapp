@@ -22,7 +22,7 @@ import type {ReactNode} from 'react';
 import {AlertIcon, ChevronIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {getFileExtension} from 'Util/getFileExtension';
+import {getFileExtension} from 'Util/util';
 
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {
