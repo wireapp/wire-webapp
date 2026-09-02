@@ -17,7 +17,8 @@
  *
  */
 
-import {act, render} from '@testing-library/react';
+import {act, render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import type {UploadState} from 'Repositories/cells/upload';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {SharedDriveUploadStatusPopupHost} from './sharedDriveUploadStatusPopupHost';
@@ -64,7 +65,13 @@ const createController = (state: UploadState = uploadState): TestController => (
   retryDiscard: jest.fn(),
 });
 
-const renderHost = (controller: TestController, scope: string, isEnabled = true, isFileTabActive = true) =>
+const renderHost = (
+  controller: TestController,
+  scope: string,
+  isEnabled = true,
+  isFileTabActive = true,
+  translate = translateForTest,
+) =>
   render(
     <SharedDriveUploadStatusPopupHost
       controller={controller}
@@ -72,7 +79,7 @@ const renderHost = (controller: TestController, scope: string, isEnabled = true,
       isEnabled={isEnabled}
       isFileTabActive={isFileTabActive}
     />,
-    {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
+    {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
   );
 
 describe('SharedDriveUploadStatusPopupHost', () => {
@@ -133,6 +140,70 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     expect(view.getByRole('status')).toBeInTheDocument();
     expect(controller.snapshots).toHaveBeenCalledWith(conversationQualifiedId);
+  });
+
+  it('formats the source size in the expanded status copy', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    const translate = (key: string, substitutions?: Record<string, string | number>) =>
+      substitutions?.size ? `${key} ${substitutions.size}` : key;
+
+    const view = renderHost(controller, conversationQualifiedId, true, true, translate);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    expect(view.getByText('cells.uploadStatus.uploadingSize 4 B')).toBeInTheDocument();
+  });
+
+  it('keeps the collapsed state when the upload lifecycle changes', () => {
+    const controller = createController();
+    let state: UploadState = uploadState;
+    let notify: () => void = jest.fn();
+    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? [state] : []));
+    controller.subscribe.mockImplementation(listener => {
+      notify = listener;
+      return jest.fn();
+    });
+
+    renderHost(controller, conversationQualifiedId);
+    expect(screen.getByRole('button', {name: 'cells.uploadStatus.expand'})).toHaveAttribute('aria-expanded', 'false');
+
+    state = uploadedState;
+    act(() => notify());
+
+    expect(screen.getByText('cells.uploadStatus.uploaded')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'cells.uploadStatus.expand'})).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId('shared-drive-upload-status-row')).not.toBeVisible();
+  });
+
+  it('preserves the expanded state while switching tabs', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    const view = renderHost(controller, conversationQualifiedId);
+
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+    expect(view.getByTestId('shared-drive-upload-status-row')).toBeVisible();
+
+    view.rerender(
+      <SharedDriveUploadStatusPopupHost
+        controller={controller}
+        conversationQualifiedId={conversationQualifiedId}
+        isEnabled
+        isFileTabActive={false}
+      />,
+    );
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
+
+    view.rerender(
+      <SharedDriveUploadStatusPopupHost
+        controller={controller}
+        conversationQualifiedId={conversationQualifiedId}
+        isEnabled
+        isFileTabActive
+      />,
+    );
+
+    expect(view.getByRole('button', {name: 'cells.uploadStatus.collapse'})).toHaveAttribute('aria-expanded', 'true');
+    expect(view.getByTestId('shared-drive-upload-status-row')).toBeVisible();
   });
 
   it('does not show an upload from another conversation', () => {

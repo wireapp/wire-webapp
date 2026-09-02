@@ -17,7 +17,9 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, within} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
@@ -26,16 +28,25 @@ const upload: SharedDriveUploadStatus = {
   uploadId: 'upload-1',
   conversationQualifiedId: 'conversation@example.com',
   fileName: 'report.pdf',
+  fileSize: 4,
   kind: 'uploading',
 };
 
-const renderPopup = (kind: SharedDriveUploadStatus['kind']) =>
+const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false) =>
   render(
-    <SharedDriveUploadStatusPopup
-      upload={{...upload, kind}}
-      title={`${kind} report.pdf`}
-      destination="to Shared Drive"
-    />,
+    <ThemeProvider>
+      <SharedDriveUploadStatusPopup
+        upload={{...upload, kind}}
+        title={`${kind} report.pdf`}
+        statusLabel={
+          kind === 'failed' ? 'Couldn’t upload file' : `${kind === 'uploading' ? 'Uploading' : 'Uploaded'} 4 KB`
+        }
+        destination="to Shared Drive"
+        isExpanded={isExpanded}
+        toggleLabel={isExpanded ? 'Collapse upload details' : 'Expand upload details'}
+        onToggle={jest.fn()}
+      />
+    </ThemeProvider>,
   );
 
 describe('SharedDriveUploadStatusPopup', () => {
@@ -48,25 +59,6 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
   });
 
-  it.each([
-    ['uploaded', 'shared-drive-upload-success'],
-    ['failed', 'shared-drive-upload-failure'],
-  ] as const)('hides the decorative %s icon from assistive technology', (kind, iconName) => {
-    renderPopup(kind);
-
-    expect(screen.getByRole('status').querySelector(`[data-uie-name="${iconName}"]`)).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
-  });
-
-  it('provides full text for truncated status content', () => {
-    renderPopup('uploading');
-
-    expect(screen.getByText('uploading report.pdf')).toHaveAttribute('title', 'uploading report.pdf');
-    expect(screen.getByText('to Shared Drive')).toHaveAttribute('title', 'to Shared Drive');
-  });
-
   it('shows uploaded status without a progress bar', () => {
     const {getByText, queryByTestId} = renderPopup('uploaded');
 
@@ -74,10 +66,64 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
   });
 
-  it('shows failed status without retry or cancel actions', () => {
+  it('starts collapsed and exposes an accessible toggle for the file details', () => {
+    renderPopup('uploading');
+
+    const toggle = screen.getByRole('button', {name: 'Expand upload details'});
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveAttribute('aria-controls', 'shared-drive-upload-status-upload-1');
+    expect(screen.getByRole('status').querySelector('button')).not.toBeInTheDocument();
+    expect(toggle.querySelector('path')).toHaveAttribute('transform', 'rotate(270 3 4)');
+    expect(screen.getByTestId('shared-drive-upload-status-row')).not.toBeVisible();
+  });
+
+  it.each([
+    ['uploading', 'Uploading 4 KB', '#0667c8', 'shared-drive-upload-uploading'],
+    ['uploaded', 'Uploaded 4 KB', '#1d7833', 'shared-drive-upload-uploaded'],
+    ['failed', 'Couldn’t upload file', '#c20013', 'shared-drive-upload-failed'],
+  ] as const)('shows the %s file status row without duplicate header icons', (kind, label, color, iconName) => {
+    renderPopup(kind, true);
+
+    const header = screen.getByTestId('shared-drive-upload-status-header');
+    const row = screen.getByTestId('shared-drive-upload-status-row');
+    expect(screen.getByRole('button', {name: 'Collapse upload details'})).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', {name: 'Collapse upload details'}).querySelector('path')).toHaveAttribute(
+      'transform',
+      'rotate(90 3 4)',
+    );
+    expect(row).toBeVisible();
+    expect(within(row).getByText('report.pdf')).toBeInTheDocument();
+    expect(within(row).getByText(label)).toHaveStyle({color});
+    expect(within(row).getByTestId(iconName)).toBeInTheDocument();
+    expect(header.querySelector(`[data-uie-name="${iconName}"]`)).not.toBeInTheDocument();
+  });
+
+  it('calls the toggle handler when activated by keyboard', async () => {
+    const user = userEvent.setup();
+    const onToggle = jest.fn();
+    render(
+      <SharedDriveUploadStatusPopup
+        upload={upload}
+        title="Uploading report.pdf"
+        statusLabel="Uploading"
+        destination="to Shared Drive"
+        isExpanded={false}
+        toggleLabel="Expand upload details"
+        onToggle={onToggle}
+      />,
+    );
+
+    screen.getByRole('button', {name: 'Expand upload details'}).focus();
+    await user.keyboard('{Enter}');
+    await user.keyboard(' ');
+
+    expect(onToggle).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows failed status without retry, cancel, or open actions', () => {
     const {getByText, queryByRole} = renderPopup('failed');
 
     expect(getByText('failed report.pdf')).toBeInTheDocument();
-    expect(queryByRole('button')).not.toBeInTheDocument();
+    expect(queryByRole('button', {name: /retry|cancel|open/i})).not.toBeInTheDocument();
   });
 });

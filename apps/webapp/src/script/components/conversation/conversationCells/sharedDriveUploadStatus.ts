@@ -25,6 +25,7 @@ export type SharedDriveUploadStatus = {
   readonly uploadId: string;
   readonly conversationQualifiedId: string;
   readonly fileName: string;
+  readonly fileSize: number;
   readonly kind: SharedDriveUploadStatusKind;
 };
 
@@ -60,6 +61,7 @@ export const toSharedDriveUploadStatus = (
     uploadId: state.identity.uploadId,
     conversationQualifiedId,
     fileName: state.source.name,
+    fileSize: state.source.size,
     kind,
   };
 };

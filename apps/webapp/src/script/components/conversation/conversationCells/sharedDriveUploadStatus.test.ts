@@ -35,6 +35,7 @@ describe('toSharedDriveUploadStatus', () => {
       uploadId: 'upload-1',
       conversationQualifiedId,
       fileName: 'report.pdf',
+      fileSize: 4,
       kind: 'uploading',
     });
   });

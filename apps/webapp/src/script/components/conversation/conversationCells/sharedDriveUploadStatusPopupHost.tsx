@@ -20,6 +20,7 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {formatBytes} from 'Util/util';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {toSharedDriveUploadStatus, type SharedDriveUploadStatus} from './sharedDriveUploadStatus';
@@ -59,6 +60,7 @@ export const SharedDriveUploadStatusPopupHost = ({
     conversationQualifiedId,
     upload: readStatus(),
   }));
+  const [isExpanded, setIsExpanded] = useState(false);
   const upload = status.conversationQualifiedId === conversationQualifiedId ? status.upload : readStatus();
 
   useEffect(() => {
@@ -76,12 +78,26 @@ export const SharedDriveUploadStatusPopupHost = ({
     uploaded: 'cells.uploadStatus.uploaded',
     failed: 'cells.uploadStatus.failed',
   } as const;
+  const statusLabelKey = {
+    uploading: 'cells.uploadStatus.uploadingSize',
+    uploaded: 'cells.uploadStatus.uploadedSize',
+    failed: 'cells.uploadStatus.failedLabel',
+  } as const;
+
+  const statusLabel =
+    upload.kind === 'failed'
+      ? translate(statusLabelKey.failed)
+      : translate(statusLabelKey[upload.kind], {size: formatBytes(upload.fileSize)});
 
   return (
     <SharedDriveUploadStatusPopup
       upload={upload}
       title={translate(titleKey[upload.kind], {name: upload.fileName})}
+      statusLabel={statusLabel}
       destination={translate('cells.uploadStatus.destination', {destination: translate('cells.sharedDrive.title')})}
+      isExpanded={isExpanded}
+      toggleLabel={translate(isExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
+      onToggle={() => setIsExpanded(expanded => !expanded)}
     />
   );
 };
