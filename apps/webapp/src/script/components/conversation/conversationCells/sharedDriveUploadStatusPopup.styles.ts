@@ -19,6 +19,8 @@
 
 import type {CSSObject} from '@emotion/react';
 
+import type {SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
+
 export const sharedDriveUploadStatusPopupStyles: CSSObject = {
   position: 'absolute',
   right: 16,
@@ -71,10 +73,72 @@ export const sharedDriveUploadStatusPopupDestinationStyles: CSSObject = {
   whiteSpace: 'nowrap',
 };
 
-export const sharedDriveUploadStatusPopupIconStyles: CSSObject = {
+export const sharedDriveUploadStatusPopupToggleStyles: CSSObject = {
+  display: 'flex',
+  width: 24,
+  height: 32,
   flex: '0 0 auto',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+  border: 0,
+  borderRadius: 12,
+  background: 'transparent',
+  color: 'inherit',
+  cursor: 'pointer',
+};
+
+export const sharedDriveUploadStatusPopupToggleIconStyles: CSSObject = {
   width: 16,
   height: 16,
+};
+
+export const sharedDriveUploadStatusPopupRowStyles: CSSObject = {
+  display: 'flex',
+  minWidth: 0,
+  minHeight: 38,
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  gap: 16,
+  padding: '4px 0',
+  '&[hidden]': {
+    display: 'none',
+  },
+};
+
+export const sharedDriveUploadStatusPopupRowTextStyles: CSSObject = {
+  display: 'flex',
+  minWidth: 0,
+  flexDirection: 'column',
+  gap: 2,
+};
+
+export const sharedDriveUploadStatusPopupRowFileNameStyles: CSSObject = {
+  overflow: 'hidden',
+  fontSize: 12,
+  fontWeight: 600,
+  lineHeight: '14px',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};
+
+export const sharedDriveUploadStatusPopupRowStatusStyles = (kind: SharedDriveUploadStatusKind): CSSObject => ({
+  overflow: 'hidden',
+  color: {
+    uploading: '#0667c8',
+    uploaded: '#1d7833',
+    failed: '#c20013',
+  }[kind],
+  fontSize: 12,
+  lineHeight: '14px',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+});
+
+export const sharedDriveUploadStatusPopupRowIconStyles: CSSObject = {
+  width: 24,
+  height: 24,
+  flex: '0 0 auto',
 };
 
 export const sharedDriveUploadStatusPopupProgressStyles: CSSObject = {
