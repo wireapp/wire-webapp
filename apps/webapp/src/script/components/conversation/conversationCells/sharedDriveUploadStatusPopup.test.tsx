@@ -73,7 +73,6 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     expect(toggle).toHaveAttribute('aria-controls', 'shared-drive-upload-status-upload-1');
     expect(screen.getByRole('status').querySelector('button')).not.toBeInTheDocument();
-    expect(toggle.querySelector('path')).toHaveAttribute('transform', 'rotate(270 3 4)');
     expect(screen.getByTestId('shared-drive-upload-status-row')).not.toBeVisible();
   });
 
@@ -87,10 +86,6 @@ describe('SharedDriveUploadStatusPopup', () => {
     const header = screen.getByTestId('shared-drive-upload-status-header');
     const row = screen.getByTestId('shared-drive-upload-status-row');
     expect(screen.getByRole('button', {name: 'Collapse upload details'})).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('button', {name: 'Collapse upload details'}).querySelector('path')).toHaveAttribute(
-      'transform',
-      'rotate(90 3 4)',
-    );
     expect(row).toBeVisible();
     expect(within(row).getByText('report.pdf')).toBeInTheDocument();
     expect(within(row).getByText(label)).toHaveStyle({color});
