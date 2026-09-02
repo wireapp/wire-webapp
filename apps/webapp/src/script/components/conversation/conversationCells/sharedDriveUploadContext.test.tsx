@@ -27,7 +27,9 @@ const controller = {} as SharedDriveUploadController;
 describe('useSharedDriveUploadController', () => {
   it('returns the controller supplied by the nearest provider', () => {
     const {result} = renderHook(() => useSharedDriveUploadController(), {
-      wrapper: ({children}) => <SharedDriveUploadProvider controller={controller}>{children}</SharedDriveUploadProvider>,
+      wrapper: ({children}) => (
+        <SharedDriveUploadProvider controller={controller}>{children}</SharedDriveUploadProvider>
+      ),
     });
 
     expect(result.current).toBe(controller);
