@@ -204,8 +204,15 @@ export const ConversationCells = memo(
           onRefresh: handleRefresh,
           sharedDriveUploadController,
           uploadPath: sharedDriveUploadPath,
+          conversationQualifiedId: `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`,
         }),
-      [fireAndForgetInvoker, handleRefresh, sharedDriveUploadController, sharedDriveUploadPath],
+      [
+        conversationQualifiedId,
+        fireAndForgetInvoker,
+        handleRefresh,
+        sharedDriveUploadController,
+        sharedDriveUploadPath,
+      ],
     );
 
     const nodes = getNodes({conversationId});
@@ -260,7 +267,7 @@ export const ConversationCells = memo(
     return (
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <div css={wrapperStyles}>
-          <input ref={uploadInput} type="file" multiple hidden onChange={handleUploadFiles} />
+          <input ref={uploadInput} type="file" hidden onChange={handleUploadFiles} />
           <CellsHeader
             onRefresh={handleRefresh}
             conversationName={name}

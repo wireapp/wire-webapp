@@ -25,6 +25,7 @@ import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {handleSharedDriveUploadInput} from './sharedDriveUploadInput';
 
 const uploadPath = 'conversation-id@example.com/files';
+const conversationQualifiedId = 'conversation-id@example.com';
 
 function createEvent(files: readonly File[]): ChangeEvent<HTMLInputElement> {
   return {target: {files, value: 'selected'}} as unknown as ChangeEvent<HTMLInputElement>;
@@ -40,7 +41,7 @@ function createDependencies() {
   } as unknown as SharedDriveUploadController;
   const onRefresh = jest.fn();
 
-  return {fireAndForgetInvoker, sharedDriveUploadController, onRefresh};
+  return {fireAndForgetInvoker, sharedDriveUploadController, onRefresh, conversationQualifiedId};
 }
 
 describe('handleSharedDriveUploadInput', () => {
@@ -59,6 +60,25 @@ describe('handleSharedDriveUploadInput', () => {
       [file],
       uploadPath,
       dependencies.onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it('uploads only the first file when multiple files are supplied', async () => {
+    const firstFile = new File(['first'], 'first.txt');
+    const secondFile = new File(['second'], 'second.txt');
+    const dependencies = createDependencies();
+
+    handleSharedDriveUploadInput(createEvent([firstFile, secondFile]), {...dependencies, uploadPath});
+
+    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    await uploadAction();
+
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [firstFile],
+      uploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
     );
   });
 

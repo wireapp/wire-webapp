@@ -24,8 +24,13 @@ import type {CellsUploadManager} from 'Repositories/cells/upload/manager';
 import type {UploadSnapshotListener} from 'Repositories/cells/upload/process';
 
 export type SharedDriveUploadController = {
-  readonly upload: (files: readonly File[], path: string, onRefresh: () => void) => Promise<void>;
-  readonly snapshots: () => readonly UploadState[];
+  readonly upload: (
+    files: readonly File[],
+    path: string,
+    onRefresh: () => void,
+    conversationQualifiedId: string,
+  ) => Promise<void>;
+  readonly snapshots: (conversationQualifiedId: string) => readonly UploadState[];
   readonly subscribe: (listener: () => void) => () => void;
   readonly cancel: (uploadId: string) => Promise<void>;
   readonly retryUpload: (uploadId: string) => Promise<void>;
@@ -42,6 +47,7 @@ type Dependencies = {
 
 export const createSharedDriveUploadController = ({manager, createUploadId, createSource}: Dependencies) => {
   const ids: string[] = [];
+  const conversationByUploadId = new Map<string, string>();
   const listeners = new Set<() => void>();
   const notify = () => listeners.forEach(listener => listener());
   const subscriptions = new Map<string, () => void>();
@@ -59,13 +65,14 @@ export const createSharedDriveUploadController = ({manager, createUploadId, crea
     notify();
   };
 
-  const registerFile = (file: File, path: string) => {
+  const registerFile = (file: File, path: string, conversationQualifiedId: string) => {
     const uploadId = createUploadId();
-    ids.push(uploadId);
     const registered = manager.register(uploadId, createSource(file), path);
     if (registered.isErr) {
       return Result.err(registered.error);
     }
+    ids.push(uploadId);
+    conversationByUploadId.set(uploadId, conversationQualifiedId);
     attach(uploadId);
     return Result.ok(uploadId);
   };
@@ -78,27 +85,36 @@ export const createSharedDriveUploadController = ({manager, createUploadId, crea
       return manager.publish(uploadId);
     });
 
-  const uploadFile = (file: File, path: string) => {
-    const registration = registerFile(file, path);
+  const uploadFile = (file: File, path: string, conversationQualifiedId: string) => {
+    const registration = registerFile(file, path, conversationQualifiedId);
     if (registration.isErr) {
       return Promise.resolve(Result.err(registration.error));
     }
+    notify();
     return startAndPublishFile(registration.value);
   };
 
   const hasSuccessfulUpload = (results: readonly Result<void, unknown>[]): boolean =>
     results.some(result => result.isOk);
 
-  const upload = async (files: readonly File[], path: string, onRefresh: () => void): Promise<void> => {
-    const results = await Promise.all(files.map(file => uploadFile(file, path)));
+  const upload = async (
+    files: readonly File[],
+    path: string,
+    onRefresh: () => void,
+    conversationQualifiedId: string,
+  ): Promise<void> => {
+    const results = await Promise.all(files.map(file => uploadFile(file, path, conversationQualifiedId)));
     if (hasSuccessfulUpload(results)) {
       onRefresh();
     }
     notify();
   };
 
-  const snapshots = (): readonly UploadState[] =>
+  const snapshots = (conversationQualifiedId: string): readonly UploadState[] =>
     ids.flatMap(id => {
+      if (conversationByUploadId.get(id) !== conversationQualifiedId) {
+        return [];
+      }
       const snapshot = manager.snapshot(id);
       return snapshot.isOk ? [snapshot.value] : [];
     });
