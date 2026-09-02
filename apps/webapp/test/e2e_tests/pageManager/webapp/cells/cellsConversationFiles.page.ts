@@ -22,29 +22,15 @@ import {Locator, Page} from '@playwright/test';
 export class CellsConversationFilesPage {
   filesList: Locator;
   readonly searchInput: Locator;
-  readonly newButton: Locator;
-  readonly uploadFileMenuItem: Locator;
-  readonly uploadInput: Locator;
 
   constructor(page: Page) {
-    const sharedDrive = page.getByRole('tabpanel', {name: 'Shared Drive'});
-
-    this.filesList = sharedDrive.locator('table td[data-cell="Name"]');
-    this.searchInput = sharedDrive.getByRole('textbox', {name: 'Search files and folders'});
-    this.newButton = sharedDrive.getByRole('button', {name: 'New'});
-    this.uploadFileMenuItem = page.getByRole('menuitem', {name: 'Upload file'});
-    this.uploadInput = sharedDrive.locator('input[type="file"]');
+    this.filesList = page.locator('table td[data-cell="Name"]');
+    this.searchInput = page.getByRole('textbox', {name: 'Search files and folders'});
   }
 
   async searchFile(fileName: string) {
     await this.searchInput.clear();
     await this.searchInput.fill(fileName);
-  }
-
-  async uploadFile(filePath: string) {
-    await this.newButton.click();
-    await this.uploadFileMenuItem.click();
-    await this.uploadInput.setInputFiles(filePath);
   }
 
   getFile(fileName: string) {
