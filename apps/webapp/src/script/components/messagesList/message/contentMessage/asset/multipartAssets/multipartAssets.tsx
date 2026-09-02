@@ -19,6 +19,7 @@
 
 import {useEffect} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
@@ -94,8 +95,11 @@ const MultipartAsset = ({
   senderName,
   timestamp,
 }: MultipartAssetProps): JSX.Element => {
+  if (isNullOrUndefined(initialName)) {
+    throw new Error('Multipart asset has no file name');
+  }
   const {fireAndForgetInvoker, translate} = useApplicationContext();
-  const extension = getFileExtension(initialName!);
+  const extension = getFileExtension(initialName);
   const size = formatBytes(Number(initialSize));
 
   const {elementRef, hasBeenInView} = useInView<HTMLLIElement>();
@@ -114,7 +118,7 @@ const MultipartAsset = ({
       retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
     });
 
-  const name = path !== undefined && path !== '' ? getName(path) : getName(initialName!);
+  const name = !isNullOrUndefined(path) && path !== '' ? getName(path) : getName(initialName);
   const canPreviewImage = isPreviewableImage({mimeType: contentType, extension}) || imagePreviewUrl !== undefined;
   const imageSrc = imagePreviewUrl ?? src;
   const hasFilePreview = hasPreview ?? false;

@@ -468,6 +468,14 @@ describe('useGetMultipartAsset', () => {
         expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
       });
 
+      await act(async () => {
+        await fireAndForgetInvoker.waitUntilAllSettled();
+      });
+
+      await waitFor(() => {
+        expect(result.current.hasPreview).toBe(true);
+      });
+
       // Wait for retry
       await act(async () => {
         jest.advanceTimersByTime(100);

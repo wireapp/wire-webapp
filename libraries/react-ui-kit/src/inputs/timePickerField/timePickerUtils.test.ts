@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {buildTimeOptions, filterTimeOptionsAfter, getTimeOptionTotalMinutes} from './timePickerUtils';
 
 describe('timePickerUtils', () => {
@@ -28,6 +30,10 @@ describe('timePickerUtils', () => {
 
     expect(filteredOptions.some(option => option.label === '4:15 PM')).toBe(false);
     expect(filteredOptions.some(option => option.label === '4:30 PM')).toBe(true);
-    expect(getTimeOptionTotalMinutes(filteredOptions[0]!)).toBeGreaterThan(16 * 60 + 27);
+    const firstFilteredOption = filteredOptions[0];
+    if (isUndefined(firstFilteredOption)) {
+      throw new Error('Expected filtered time options to be non-empty');
+    }
+    expect(getTimeOptionTotalMinutes(firstFilteredOption)).toBeGreaterThan(16 * 60 + 27);
   });
 });

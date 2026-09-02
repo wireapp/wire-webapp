@@ -30,6 +30,7 @@ import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
@@ -67,7 +68,7 @@ describe('E2EICertificateDetails', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeAll(async () => {
-    jest.spyOn(core.service?.conversation!, 'getMLSSelfConversation').mockResolvedValue(
+    jest.spyOn(requireValueForTest(core.service?.conversation), 'getMLSSelfConversation').mockResolvedValue(
       generateAPIConversation({
         id: {id: 'id', domain: 'domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,

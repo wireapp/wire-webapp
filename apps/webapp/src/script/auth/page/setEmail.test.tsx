@@ -27,6 +27,7 @@ import {ValidationError} from '../module/action/validationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/testUtil';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 const emailInputId = 'enter-email';
 const verifyButtonId = 'do-verify-email';
@@ -53,7 +54,7 @@ describe('SetEmail', () => {
     const emailInput = getByTestId(emailInputId);
 
     fireEvent.change(emailInput, {target: {value: 'e'}});
-    fireEvent.submit(container.querySelector('form')!);
+    fireEvent.submit(requireValueForTest(container.querySelector('form')));
 
     await waitFor(() => {
       const errorMessage = getByTestId(errorMessageId);

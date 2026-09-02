@@ -29,6 +29,7 @@ import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsSto
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 
@@ -206,7 +207,7 @@ describe('GroupVideoGrid', () => {
     };
 
     const {container} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
-    const video = container.querySelector('[data-uie-name="self-video-thumbnail"]')!;
+    const video = requireValueForTest(container.querySelector('[data-uie-name="self-video-thumbnail"]'));
 
     expect(container.querySelector('[data-uie-name="background-effect-initializing"]')).toBeInTheDocument();
 

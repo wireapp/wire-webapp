@@ -18,15 +18,9 @@ type Repository = {
   promoteNodeDraft: jest.Mock<Promise<void>, [{uuid: string; versionId: string}]>;
 };
 
-const createDeferred = <T,>() => {
-  let resolve!: (value: T) => void;
-  let reject!: (error: unknown) => void;
-  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
-    resolve = resolvePromise;
-    reject = rejectPromise;
-  });
-  return {promise, resolve, reject};
-};
+function createDeferred<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
+}
 
 const createFile = (id: string, preview = `blob:${id}`): FileWithPreview =>
   Object.assign(new File(['content'], `${id}.png`, {type: 'image/png'}), {

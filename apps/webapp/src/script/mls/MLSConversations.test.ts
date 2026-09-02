@@ -34,6 +34,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -46,6 +47,14 @@ import {
   initialiseSelfAndTeamConversations,
   readLocalMLSState,
 } from './MLSConversations';
+
+function getConversationServiceForTest(core: Account): NonNullable<NonNullable<Account['service']>['conversation']> {
+  return requireValueForTest(requireValueForTest(core.service).conversation);
+}
+
+function getMlsServiceForTest(core: Account): NonNullable<NonNullable<Account['service']>['mls']> {
+  return requireValueForTest(requireValueForTest(core.service).mls);
+}
 
 function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
   const conversation = new Conversation(randomUUID(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
@@ -83,7 +92,7 @@ describe('MLSConversations', () => {
 
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = conversationRepository['core'];
-      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      jest.spyOn(getConversationServiceForTest(repositoryCore), 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest
         .spyOn(
           (conversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
@@ -92,7 +101,7 @@ describe('MLSConversations', () => {
         )
         .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
       mockSafeEpoch(repositoryCore);
-      const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');
+      const joinSpy = jest.spyOn(getConversationServiceForTest(repositoryCore), 'joinByExternalCommit');
 
       await initMLSGroupConversations(mlsConversations, conversationRepository, {core: repositoryCore});
 
@@ -108,9 +117,9 @@ describe('MLSConversations', () => {
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = conversationRepository['core'];
 
-      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      jest.spyOn(getConversationServiceForTest(repositoryCore), 'mlsGroupExistsLocally').mockResolvedValue(false);
       mockSafeEpoch(repositoryCore);
-      const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');
+      const joinSpy = jest.spyOn(getConversationServiceForTest(repositoryCore), 'joinByExternalCommit');
 
       await initMLSGroupConversations([mlsConversation], conversationRepository, {core: repositoryCore});
 
@@ -123,7 +132,7 @@ describe('MLSConversations', () => {
 
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = conversationRepository['core'];
-      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      jest.spyOn(getConversationServiceForTest(repositoryCore), 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest
         .spyOn(
           (conversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
@@ -132,7 +141,7 @@ describe('MLSConversations', () => {
         )
         .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
       mockSafeEpoch(repositoryCore);
-      const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');
+      const joinSpy = jest.spyOn(getConversationServiceForTest(repositoryCore), 'joinByExternalCommit');
 
       await initMLSGroupConversations([meetingConversation], conversationRepository, {core: repositoryCore});
 
@@ -146,15 +155,15 @@ describe('MLSConversations', () => {
 
     const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
 
-    jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
+    jest.spyOn(getConversationServiceForTest(core), 'mlsGroupExistsLocally').mockResolvedValue(true);
     mockSafeEpoch(core);
-    jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
+    jest.spyOn(getMlsServiceForTest(core), 'scheduleKeyMaterialRenewal');
 
     const conversationRepository = await testFactory.exposeConversationActors();
     await initMLSGroupConversations(mlsConversations, conversationRepository, {core});
 
     for (const conversation of mlsConversations) {
-      expect(core.service!.mls!.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(conversation.groupId);
+      expect(getMlsServiceForTest(core).scheduleKeyMaterialRenewal).toHaveBeenCalledWith(conversation.groupId);
     }
   });
 
@@ -166,8 +175,8 @@ describe('MLSConversations', () => {
       const selfConversation = createMLSConversation(CONVERSATION_TYPE.SELF);
 
       const teamConversation = createMLSConversation(CONVERSATION_TYPE.GLOBAL_TEAM);
-      jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
-      jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
+      jest.spyOn(getConversationServiceForTest(core), 'mlsGroupExistsLocally').mockResolvedValue(true);
+      jest.spyOn(getMlsServiceForTest(core), 'scheduleKeyMaterialRenewal');
 
       const mlsConversations = createMLSConversations(nbMLSConversations);
       const conversations = [teamConversation, ...mlsConversations, selfConversation];
@@ -183,7 +192,7 @@ describe('MLSConversations', () => {
         core,
       );
 
-      expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(2);
+      expect(getMlsServiceForTest(core).registerConversation).toHaveBeenCalledTimes(2);
     });
 
     it('does not register self and team conversation that have epoch > 0', async () => {
@@ -203,7 +212,7 @@ describe('MLSConversations', () => {
 
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = conversationRepository['core'];
-      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(true);
+      jest.spyOn(getConversationServiceForTest(repositoryCore), 'mlsGroupExistsLocally').mockResolvedValue(true);
       mockSafeEpoch(core);
 
       await initialiseSelfAndTeamConversations(
@@ -214,7 +223,7 @@ describe('MLSConversations', () => {
         core,
       );
 
-      expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
+      expect(getMlsServiceForTest(core).registerConversation).toHaveBeenCalledTimes(0);
     });
 
     it('joins self and team conversation with external commit that have epoch > 0', async () => {
@@ -235,8 +244,8 @@ describe('MLSConversations', () => {
       const repositoryCore = conversationRepository['core'];
       mockSafeEpoch(repositoryCore);
       // MLS group is not yet established locally
-      jest.spyOn(repositoryCore.service!.mls!, 'isConversationEstablished').mockResolvedValue(false);
-      jest.spyOn(repositoryCore.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      jest.spyOn(getMlsServiceForTest(repositoryCore), 'isConversationEstablished').mockResolvedValue(false);
+      jest.spyOn(getConversationServiceForTest(repositoryCore), 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest
         .spyOn(
           (conversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
@@ -245,7 +254,7 @@ describe('MLSConversations', () => {
         )
         .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
 
-      const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');
+      const joinSpy = jest.spyOn(getConversationServiceForTest(repositoryCore), 'joinByExternalCommit');
       await initialiseSelfAndTeamConversations(
         conversations,
         conversationRepository,
@@ -254,7 +263,7 @@ describe('MLSConversations', () => {
         repositoryCore,
       );
 
-      expect(repositoryCore.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
+      expect(getMlsServiceForTest(repositoryCore).registerConversation).toHaveBeenCalledTimes(0);
       expect(joinSpy).toHaveBeenCalledTimes(2);
     });
 
@@ -273,7 +282,7 @@ describe('MLSConversations', () => {
       const mlsConversations = createMLSConversations(nbMLSConversations);
       const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
-      jest.spyOn(core.service!.mls!, 'isConversationEstablished').mockResolvedValue(true);
+      jest.spyOn(getMlsServiceForTest(core), 'isConversationEstablished').mockResolvedValue(true);
 
       const conversationRepository = await testFactory.exposeConversationActors();
       mockSafeEpoch(core);
@@ -286,8 +295,8 @@ describe('MLSConversations', () => {
         core,
       );
 
-      expect(core.service!.mls!.registerConversation).not.toHaveBeenCalled();
-      expect(core.service!.conversation!.joinByExternalCommit).not.toHaveBeenCalled();
+      expect(getMlsServiceForTest(core).registerConversation).not.toHaveBeenCalled();
+      expect(getConversationServiceForTest(core).joinByExternalCommit).not.toHaveBeenCalled();
     });
   });
 

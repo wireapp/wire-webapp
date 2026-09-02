@@ -50,6 +50,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {ConversationError} from 'src/script/error/conversationError';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -91,6 +92,12 @@ type MessageRepositoryPrivateMethodsForTest = {
   updateMessageAsFailed: () => Promise<void>;
   updateMessageAsSent: () => Promise<void>;
 };
+
+function getConversationServiceForTest(core: Account): NonNullable<NonNullable<Account['service']>['conversation']> {
+  const service = requireValueForTest(core.service);
+
+  return requireValueForTest(service.conversation);
+}
 
 async function buildMessageRepository(
   translate: Translate,
@@ -163,12 +170,12 @@ describe('MessageRepository', () => {
   describe('sendPing', () => {
     it('sends a ping', async () => {
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
       const conversation = generateConversation();
 
       await messageRepository.sendPing(conversation);
-      expect(core.service!.conversation.send).toHaveBeenCalledWith({
+      expect(getConversationServiceForTest(core).send).toHaveBeenCalledWith({
         ...commonSendResponse,
         conversationId: conversation.qualifiedId,
         nativePush: true,
@@ -212,7 +219,7 @@ describe('MessageRepository', () => {
   describe('sendMessageEdit', () => {
     it('sends an edit message if original message exists', async () => {
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       const originalMessage = new ContentMessage(createUuid(), translateForTest);
@@ -221,7 +228,7 @@ describe('MessageRepository', () => {
       conversation.addMessage(originalMessage);
 
       await messageRepository.sendMessageEdit(conversation, 'new text', originalMessage, []);
-      expect(core.service!.conversation.send).toHaveBeenCalledWith({
+      expect(getConversationServiceForTest(core).send).toHaveBeenCalledWith({
         ...commonSendResponse,
         conversationId: conversation.qualifiedId,
         nativePush: true,
@@ -240,7 +247,7 @@ describe('MessageRepository', () => {
       const {Multipart} = await import('Repositories/entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       const originalMessage = new ContentMessage(createUuid(), translateForTest);
@@ -253,7 +260,7 @@ describe('MessageRepository', () => {
 
       await messageRepository.sendMessageEdit(conversation, 'new text', originalMessage, []);
 
-      expect(core.service!.conversation.send).toHaveBeenCalledWith({
+      expect(getConversationServiceForTest(core).send).toHaveBeenCalledWith({
         ...commonSendResponse,
         conversationId: conversation.qualifiedId,
         nativePush: true,
@@ -275,7 +282,7 @@ describe('MessageRepository', () => {
       const {Multipart} = await import('Repositories/entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       const cellId1 = 'cell-uuid-1';
@@ -294,7 +301,7 @@ describe('MessageRepository', () => {
 
       await messageRepository.sendMessageEdit(conversation, 'edited text', originalMessage, []);
 
-      const sendCall = (core.service!.conversation.send as jest.Mock).mock.calls[0][0];
+      const sendCall = (getConversationServiceForTest(core).send as jest.Mock).mock.calls[0][0];
       expect(sendCall.payload.edited.multipart.text).toEqual(expect.objectContaining({content: 'edited text'}));
       expect(sendCall.payload.edited.multipart.attachments).toHaveLength(2);
       expect(sendCall.payload.edited.multipart.attachments).toEqual(
@@ -313,7 +320,7 @@ describe('MessageRepository', () => {
       const {Multipart} = await import('Repositories/entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       const originalMessage = new ContentMessage(createUuid(), translateForTest);
@@ -325,7 +332,7 @@ describe('MessageRepository', () => {
 
       await messageRepository.sendMessageEdit(conversation, 'edited text', originalMessage, []);
 
-      expect(core.service!.conversation.send).toHaveBeenCalledWith({
+      expect(getConversationServiceForTest(core).send).toHaveBeenCalledWith({
         ...commonSendResponse,
         conversationId: conversation.qualifiedId,
         nativePush: true,
@@ -346,7 +353,7 @@ describe('MessageRepository', () => {
       const {Multipart} = await import('Repositories/entity/message/multipart');
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       const cellId = 'valid-cell-id';
@@ -366,7 +373,7 @@ describe('MessageRepository', () => {
 
       await messageRepository.sendMessageEdit(conversation, 'edited text', originalMessage, []);
 
-      const sendCall = (core.service!.conversation.send as jest.Mock).mock.calls[0][0];
+      const sendCall = (getConversationServiceForTest(core).send as jest.Mock).mock.calls[0][0];
       const resultAttachments = sendCall.payload.edited.multipart.attachments;
 
       // Should have 2 valid attachments (null and undefined filtered out)
@@ -389,7 +396,7 @@ describe('MessageRepository', () => {
     it('when the message is sent, then should send without targeted parameters and update local state of button', async () => {
       // given
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       // Spy on the internal method that sendButtonAction actually calls
@@ -459,7 +466,7 @@ describe('MessageRepository', () => {
     it('when no changes are returned, then no update should be called', async () => {
       // given
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       // Spy on the internal method that sendButtonAction actually calls
@@ -510,11 +517,11 @@ describe('MessageRepository', () => {
       const [messageRepository, {eventRepository, core, propertiesRepository}] =
         await buildMessageRepository(translateForTest);
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
       const conversation = generateConversation();
       await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
-      expect(core.service!.conversation.send).toHaveBeenCalledWith({
+      expect(getConversationServiceForTest(core).send).toHaveBeenCalledWith({
         ...commonSendResponse,
         conversationId: conversation.qualifiedId,
         nativePush: true,
@@ -660,7 +667,7 @@ describe('MessageRepository', () => {
         await buildMessageRepository(translateForTest);
       clientState.currentClient = new ClientEntity(true, '', 'test-client-id');
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
-      jest.spyOn(core.service!.conversation, 'send').mockRejectedValue(new Error('backend send failed'));
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockRejectedValue(new Error('backend send failed'));
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
       const messageRepositoryPrivateMethods = messageRepository as unknown as MessageRepositoryPrivateMethodsForTest;
       jest.spyOn(messageRepositoryPrivateMethods, 'updateMessageAsFailed').mockResolvedValue(undefined);
@@ -745,14 +752,14 @@ describe('MessageRepository', () => {
       msgToDelete.user(sender);
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository(translateForTest);
-      spyOn(core.service!.conversation, 'send').and.returnValue(
+      spyOn(getConversationServiceForTest(core), 'send').and.returnValue(
         Promise.resolve({state: MessageSendingState.OUTGOING_SENT, sentAt: new Date().toISOString()}),
       );
 
       await expect(messageRepository.deleteMessageForEveryone(conversation, msgToDelete)).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
-      expect(core.service!.conversation.send).not.toHaveBeenCalled();
+      expect(getConversationServiceForTest(core).send).not.toHaveBeenCalled();
     });
 
     it('should send delete and deletes message for own messages', async () => {
@@ -764,11 +771,11 @@ describe('MessageRepository', () => {
       conversation.addMessage(messageToDelete);
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
 
       await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
-      expect(core.service!.conversation.send).toHaveBeenCalledWith(
+      expect(getConversationServiceForTest(core).send).toHaveBeenCalledWith(
         expect.objectContaining({
           payload: expect.objectContaining({deleted: {messageId: messageToDelete.id}}),
           userIds: {'': {selfid: [], user1: []}},
@@ -786,7 +793,7 @@ describe('MessageRepository', () => {
       conversation.addMessage(messageToDelete);
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
       spyOn(messageRepository, 'deleteMessageById');
 
@@ -799,7 +806,7 @@ describe('MessageRepository', () => {
   describe('resetSession', () => {
     it('resets the session with another device', async () => {
       const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository(translateForTest);
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest.spyOn(cryptographyRepository, 'getRemoteFingerprint').mockResolvedValue('first');
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
@@ -808,7 +815,7 @@ describe('MessageRepository', () => {
       const clientId = 'client1';
       await messageRepository.resetSession(userId, clientId, conversation);
       expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
-      expect(core.service!.conversation.send).toHaveBeenCalled();
+      expect(getConversationServiceForTest(core).send).toHaveBeenCalled();
     });
 
     it('unverifies device if fingerprint has changed', async () => {
@@ -823,7 +830,7 @@ describe('MessageRepository', () => {
 
       jest.spyOn(userRepository, 'findUserById').mockReturnValue(user);
 
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
       jest
         .spyOn(cryptographyRepository, 'getRemoteFingerprint')
         .mockResolvedValueOnce('first')
@@ -837,7 +844,7 @@ describe('MessageRepository', () => {
       await messageRepository.resetSession(userId, clientId, conversation);
       expect(device.meta.isVerified()).toBe(false);
       expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
-      expect(core.service!.conversation.send).toHaveBeenCalled();
+      expect(getConversationServiceForTest(core).send).toHaveBeenCalled();
     });
   });
 

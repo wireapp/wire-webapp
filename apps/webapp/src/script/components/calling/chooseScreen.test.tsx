@@ -24,6 +24,7 @@ import {CallState} from 'Repositories/calling/CallState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
@@ -127,7 +128,7 @@ describe('ChooseScreen', () => {
     const cancelButton = container.querySelector('[data-uie-name="do-choose-screen-cancel"]');
     expect(cancelButton).not.toBeNull();
 
-    fireEvent.click(cancelButton!);
+    fireEvent.click(requireValueForTest(cancelButton));
     expect(callState.selectableScreens()).toEqual([]);
     expect(callState.selectableWindows()).toEqual([]);
   });
@@ -211,7 +212,7 @@ describe('ChooseScreen', () => {
     const outside = document.createElement('button');
     document.body.appendChild(outside);
 
-    fireEvent.focusOut(dialog!, {relatedTarget: outside});
+    fireEvent.focusOut(requireValueForTest(dialog), {relatedTarget: outside});
 
     expect(document.activeElement).toBe(first);
 
@@ -228,7 +229,7 @@ describe('ChooseScreen', () => {
   it('calls focus restoration callback on cancel button click', () => {
     const {container, focusContext} = setup();
 
-    const cancelButton = container.querySelector('[data-uie-name="do-choose-screen-cancel"]')!;
+    const cancelButton = requireValueForTest(container.querySelector('[data-uie-name="do-choose-screen-cancel"]'));
     fireEvent.click(cancelButton);
 
     expect(focusContext.restoreMock).toHaveBeenCalled();
@@ -237,7 +238,7 @@ describe('ChooseScreen', () => {
   it('calls choose and restores focus when selecting a screen/window', () => {
     const {container, props, focusContext} = setup();
 
-    const firstScreen = container.querySelector('[data-uie-name="item-screen"]')!;
+    const firstScreen = requireValueForTest(container.querySelector('[data-uie-name="item-screen"]'));
     fireEvent.click(firstScreen);
 
     expect(props.choose).toHaveBeenCalledWith('screen:first');

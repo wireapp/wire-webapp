@@ -190,10 +190,7 @@ describe('submitDeleteMeeting', () => {
   });
 
   it('shows feedback when a second submit for the same meeting is already in flight', async () => {
-    let releaseDelete!: () => void;
-    const deleteGate = new Promise<void>(resolve => {
-      releaseDelete = resolve;
-    });
+    const {promise: deleteGate, resolve: releaseDelete} = Promise.withResolvers<void>();
     const deleteMeetingForAll = jest.fn().mockReturnValue(
       task.tryOrElse(
         () => meetingSubmitErrors.deleteFailed,

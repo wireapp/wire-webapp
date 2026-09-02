@@ -18,6 +18,7 @@
  */
 
 import assert from 'assert';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import nock from 'nock';
 import {AxiosHeaders, AxiosResponse} from 'axios';
 
@@ -91,7 +92,12 @@ describe('HttpClient', () => {
 
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
       client.refreshAccessToken = () => {
-        return Promise.resolve(mockedAccessTokenStore.accessTokenData!);
+        const accessTokenData = mockedAccessTokenStore.accessTokenData;
+        if (isNullOrUndefined(accessTokenData)) {
+          throw new Error('Expected test access token data to be available');
+        }
+
+        return Promise.resolve(accessTokenData);
       };
 
       await client._sendRequest({config: {method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS}});

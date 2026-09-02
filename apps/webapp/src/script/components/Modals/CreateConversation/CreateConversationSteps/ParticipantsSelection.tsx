@@ -19,6 +19,7 @@
 
 import {useMemo, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
@@ -68,6 +69,10 @@ export const ParticipantsSelection = () => {
 
   const filteredContacts = contacts.filter(user => user.isAvailable());
 
+  if (isUndefined(selfUser)) {
+    return null;
+  }
+
   return (
     <>
       <div css={participantsSelectionSearchCss}>
@@ -82,7 +87,7 @@ export const ParticipantsSelection = () => {
       <div className="modal__body" css={participantsSelectionListCss}>
         <FadingScrollbar>
           <UserSearchableList
-            selfUser={selfUser!}
+            selfUser={selfUser}
             users={filteredContacts}
             filter={participantsInput}
             selected={selectedContacts}

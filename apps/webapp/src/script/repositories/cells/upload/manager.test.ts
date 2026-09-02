@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 import {Task} from 'true-myth';
 
@@ -32,23 +33,34 @@ const required = <T>(value: T | undefined): T => {
   return value as T;
 };
 
-const deferred = () => {
-  let resolve!: (value?: DraftIdentity) => void;
-  let reject!: (error: CellsUploadGatewayError<'upload'>) => void;
+type DeferredUploadTask = {
+  readonly task: Task<DraftIdentity, CellsUploadGatewayError<'upload'>>;
+  readonly resolve: (value?: DraftIdentity) => void;
+  readonly reject: (error: CellsUploadGatewayError<'upload'>) => void;
+};
+
+function createDeferredUploadTask(): DeferredUploadTask {
+  let resolve: ((value?: DraftIdentity) => void) | undefined;
+  let reject: ((error: CellsUploadGatewayError<'upload'>) => void) | undefined;
   const task = new Task<DraftIdentity, CellsUploadGatewayError<'upload'>>((resolveTask, rejectTask) => {
     resolve = value => resolveTask(value ?? {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'});
     reject = rejectTask;
   });
+
+  if (isUndefined(resolve) || isUndefined(reject)) {
+    throw new Error('Deferred upload task callbacks were not created');
+  }
+
   return {task, resolve, reject};
-};
+}
 
 const deferredManager = () => {
   const requests: UploadDraftRequest[] = [];
-  const tasks: ReturnType<typeof deferred>[] = [];
+  const tasks: DeferredUploadTask[] = [];
   const gateway: CellsUploadGateway = {
     uploadDraft: request => {
       requests.push(request);
-      const result = deferred();
+      const result = createDeferredUploadTask();
       tasks.push(result);
       return result.task;
     },

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {Welcome} from '@wireapp/core-crypto';
@@ -70,7 +71,10 @@ describe('MLS welcomeMessage eventHandler', () => {
     it('returns a eventHandlerResult', async () => {
       const eventHandlerResult = await handleMLSWelcomeMessage(mockParams);
       expect(eventHandlerResult).toBeDefined();
-      expect(eventHandlerResult!.event).toEqual({data: Uint8Array.from([1, 2, 3]), type: 'conversation.mls-welcome'});
+      if (isNullOrUndefined(eventHandlerResult)) {
+        throw new Error('Expected an event handler result');
+      }
+      expect(eventHandlerResult.event).toEqual({data: Uint8Array.from([1, 2, 3]), type: 'conversation.mls-welcome'});
     });
 
     it('emits new epoch event after processing a welcome message', async () => {

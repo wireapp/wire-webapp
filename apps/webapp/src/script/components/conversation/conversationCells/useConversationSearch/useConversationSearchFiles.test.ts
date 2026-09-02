@@ -74,12 +74,8 @@ function createFakeUserRepository(): FakeUserRepository {
   return {getUsersById: jest.fn().mockResolvedValue([])};
 }
 
-function createDeferred<T>() {
-  let resolve!: (value: T) => void;
-  const promise = new Promise<T>(resolvePromise => {
-    resolve = resolvePromise;
-  });
-  return {promise, resolve};
+function createDeferred<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
 }
 
 function renderSearchHook({

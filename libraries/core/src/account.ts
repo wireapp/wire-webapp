@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {
   RegisterData,
   AUTH_COOKIE_KEY,
@@ -463,7 +463,11 @@ export class Account extends TypedEventEmitter<Events> {
       onNewPrekeys: async (prekeys: PreKey[]) => {
         this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
 
-        await this.apiClient.api.client.putClient(context.clientId!, {prekeys});
+        const clientId = context.clientId;
+        if (isUndefined(clientId)) {
+          throw new Error('Client id is not set in the account context.');
+        }
+        await this.apiClient.api.client.putClient(clientId, {prekeys});
         this.logger.debug(`Successfully uploaded '${prekeys.length}' PreKeys.`);
       },
     };
@@ -909,7 +913,11 @@ export class Account extends TypedEventEmitter<Events> {
             conversation,
           } = event as Events.ConversationMessageTimerUpdateEvent;
           const expireAfterMillis = Number(message_timer);
-          this.service!.conversation.messageTimer.setConversationLevelTimer(conversation, expireAfterMillis);
+          const accountServices = this.service;
+          if (isUndefined(accountServices)) {
+            throw new Error('Services are not set.');
+          }
+          accountServices.conversation.messageTimer.setConversationLevelTimer(conversation, expireAfterMillis);
           break;
         }
       }
@@ -945,7 +953,11 @@ export class Account extends TypedEventEmitter<Events> {
               onNotificationStreamProgress(notificationTime);
             }
 
-            const messages = this.service!.notification.handleNotification(notification, source);
+            const accountServices = this.service;
+            if (isUndefined(accountServices)) {
+              throw new Error('Services are not set.');
+            }
+            const messages = accountServices.notification.handleNotification(notification, source);
 
             for await (const message of messages) {
               await handleEvent(message, source);
@@ -1077,7 +1089,11 @@ export class Account extends TypedEventEmitter<Events> {
         `[WebSocketLifecycle] layer=account event=live-transition-start${getWebSocketLifecycleContext(connectionContext)}`,
       );
       await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
-      await this.service!.conversation.runDeferredEpochRecovery();
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      await accountServices.conversation.runDeferredEpochRecovery();
       resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
@@ -1102,7 +1118,11 @@ export class Account extends TypedEventEmitter<Events> {
   ): Promise<void> => {
     try {
       this.logger.info('Sending consumable notification for decryption');
-      const payloads = this.service!.notification.handleNotification(notification.data.event, source);
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      const payloads = accountServices.notification.handleNotification(notification.data.event, source);
 
       const firstEventPayload = notification.data.event.payload[0];
       const notificationTime =
@@ -1147,9 +1167,14 @@ export class Account extends TypedEventEmitter<Events> {
   ) => {
     return async (notificationId: string) => {
       if (this.hasMLSDevice) {
-        void queueConversationRejoin('all-conversations', () =>
-          this.service!.conversation.handleConversationsEpochMismatch(),
-        );
+        void queueConversationRejoin('all-conversations', () => {
+          const accountServices = this.service;
+          if (isUndefined(accountServices)) {
+            throw new Error('Services are not set.');
+          }
+
+          return accountServices.conversation.handleConversationsEpochMismatch();
+        });
       }
 
       return onMissedNotifications(notificationId);
@@ -1185,7 +1210,11 @@ export class Account extends TypedEventEmitter<Events> {
       pauseRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
 
-      const results = await this.service!.notification.legacyProcessNotificationStream(
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      const results = await accountServices.notification.legacyProcessNotificationStream(
         async (notification, source) => {
           await handleLegacyNotification(notification, source);
         },

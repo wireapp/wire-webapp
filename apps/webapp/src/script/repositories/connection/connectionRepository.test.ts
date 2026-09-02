@@ -33,6 +33,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
@@ -75,7 +76,7 @@ describe('ConnectionRepository', () => {
 
     it('sets the connection status to cancelled', () => {
       const user = createConnection();
-      connectionRepository.addConnectionEntity(user.connection()!);
+      connectionRepository.addConnectionEntity(requireValueForTest(user.connection()));
       jest.spyOn(connectionService, 'putConnections').mockResolvedValue({} as any);
       return connectionRepository.cancelRequest(user).then(() => {
         expect(connectionService.putConnections).toHaveBeenCalled();
@@ -84,7 +85,7 @@ describe('ConnectionRepository', () => {
 
     it('switches the conversation if requested', () => {
       const user = createConnection();
-      connectionRepository.addConnectionEntity(user.connection()!);
+      connectionRepository.addConnectionEntity(requireValueForTest(user.connection()));
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
@@ -99,7 +100,7 @@ describe('ConnectionRepository', () => {
     it('deletes connection request if the other user does not exist on backend anymore', async () => {
       const user = createConnection();
 
-      connectionRepository.addConnectionEntity(user.connection()!);
+      connectionRepository.addConnectionEntity(requireValueForTest(user.connection()));
 
       jest.spyOn(userRepository, 'refreshUser').mockImplementationOnce(async (uid: QualifiedId) => {
         user.isDeleted = true;
@@ -121,8 +122,10 @@ describe('ConnectionRepository', () => {
 
     it('should return the expected connection for the given conversation id', () => {
       const userA = createConnection();
-      connectionRepository.addConnectionEntity(userA.connection()!);
-      const connectionEntity = connectionRepository.getConnectionByConversationId(userA.connection()!.conversationId);
+      connectionRepository.addConnectionEntity(requireValueForTest(userA.connection()));
+      const connectionEntity = connectionRepository.getConnectionByConversationId(
+        requireValueForTest(userA.connection()).conversationId,
+      );
 
       expect(connectionEntity).toBe(userA.connection());
 

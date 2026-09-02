@@ -19,6 +19,7 @@
 
 import {MediaDeviceType} from './MediaDeviceType';
 import {MediaDevicesHandler} from './MediaDevicesHandler';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 
 /* yarn test:app --specs media/MediaDevicesHandler --nolegacy */
@@ -252,7 +253,7 @@ describe('MediaDevicesHandler', () => {
 
       const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
       enumerateDevicesSpy.and.returnValue(Promise.resolve(newCameras));
-      navigator.mediaDevices!.ondevicechange?.(Event.prototype);
+      requireValueForTest(navigator.mediaDevices).ondevicechange?.(Event.prototype);
 
       expect(enumerateDevicesSpy).toHaveBeenCalledTimes(3);
       setTimeout(() => {
