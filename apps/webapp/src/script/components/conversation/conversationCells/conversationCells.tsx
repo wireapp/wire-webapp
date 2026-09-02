@@ -52,6 +52,7 @@ import {
   loadMoreWrapperStyles,
   wrapperStyles,
 } from './conversationCells.styles';
+import {useSharedDriveUploadController} from './sharedDriveUploadContext';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
@@ -82,7 +83,8 @@ export const ConversationCells = memo(
     isUploadFilesEnabled,
     showViewerPermission,
   }: ConversationCellsProps) => {
-    const {fireAndForgetInvoker, translate, sharedDriveUploadController} = useApplicationContext();
+    const {fireAndForgetInvoker, translate} = useApplicationContext();
+    const sharedDriveUploadController = useSharedDriveUploadController();
     const uploadInput = useRef<HTMLInputElement>(null);
     const onUploadFiles = () => uploadInput.current?.click();
     const {
@@ -251,7 +253,7 @@ export const ConversationCells = memo(
             onChange={async event => {
               const files = Array.from(event.target.files ?? []);
               event.target.value = '';
-              if (!files.length || !sharedDriveUploadController) {
+              if (!files.length) {
                 return;
               }
               await sharedDriveUploadController.upload(

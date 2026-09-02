@@ -27,7 +27,6 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {Translate} from 'Util/localizerUtil';
 
-import type {SharedDriveUploadController} from '../../components/conversation/conversationCells/sharedDriveUploadController';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {RootContextValue, RootProvider} from '../rootProvider';
@@ -39,7 +38,6 @@ type CreateRootContextValueForTestParameters = {
   readonly mainViewModel?: MainViewModel;
   readonly translate: Translate;
   readonly wallClock?: WallClock;
-  readonly sharedDriveUploadController?: SharedDriveUploadController;
 };
 
 type RootProviderWrapperProperties = {
@@ -100,16 +98,6 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     mainViewModel = createMainViewModelForTest(),
     translate,
     wallClock = createWallClock(),
-    sharedDriveUploadController = {
-      upload: async () => undefined,
-      snapshots: () => [],
-      subscribe: () => () => undefined,
-      cancel: async () => undefined,
-      retryUpload: async () => undefined,
-      retryPublish: async () => undefined,
-      discard: async () => undefined,
-      retryDiscard: async () => undefined,
-    },
   } = parameters;
 
   return {
@@ -119,7 +107,6 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     mainViewModel,
     translate,
     wallClock,
-    sharedDriveUploadController,
     applicationNavigation: {
       get currentPathname(): string {
         return '/';
