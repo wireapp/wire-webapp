@@ -59,24 +59,39 @@ export const createSharedDriveUploadController = ({manager, createUploadId, crea
     notify();
   };
 
-  const upload = async (files: readonly File[], path: string, onRefresh: () => void): Promise<void> => {
-    const operations = files.map(file => {
-      const uploadId = createUploadId();
-      ids.push(uploadId);
-      const registered = manager.register(uploadId, createSource(file), path);
-      if (registered.isErr) {
-        return Promise.resolve(Result.err(registered.error));
+  const registerFile = (file: File, path: string) => {
+    const uploadId = createUploadId();
+    ids.push(uploadId);
+    const registered = manager.register(uploadId, createSource(file), path);
+    if (registered.isErr) {
+      return Result.err(registered.error);
+    }
+    attach(uploadId);
+    return Result.ok(uploadId);
+  };
+
+  const startAndPublishFile = (uploadId: string) =>
+    manager.start(uploadId).then(startResult => {
+      if (startResult.isErr) {
+        return startResult;
       }
-      attach(uploadId);
-      return manager.start(uploadId).then(async result => {
-        if (result.isErr) {
-          return result;
-        }
-        return manager.publish(uploadId);
-      });
+      return manager.publish(uploadId);
     });
-    const results = await Promise.all(operations);
-    if (results.some(result => result.isOk)) {
+
+  const uploadFile = (file: File, path: string) => {
+    const registration = registerFile(file, path);
+    if (registration.isErr) {
+      return Promise.resolve(Result.err(registration.error));
+    }
+    return startAndPublishFile(registration.value);
+  };
+
+  const hasSuccessfulUpload = (results: readonly Result<void, unknown>[]): boolean =>
+    results.some(result => result.isOk);
+
+  const upload = async (files: readonly File[], path: string, onRefresh: () => void): Promise<void> => {
+    const results = await Promise.all(files.map(file => uploadFile(file, path)));
+    if (hasSuccessfulUpload(results)) {
       onRefresh();
     }
     notify();
