@@ -40,7 +40,7 @@ import {
 } from '@wireapp/core-crypto';
 
 import {CORE_CRYPTO_ERROR_NAMES} from './coreCryptoMlsError';
-import {InitClientOptions, MLSService} from './mlsService';
+import {InitClientOptions, MLSService, MLSServiceEvents} from './mlsService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB} from '../../../storage/coreDb';
@@ -552,6 +552,124 @@ describe('MLSService', () => {
       expect(transactionContext.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
       expect(apiClient.api.client.putClient).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('MLS conversation recovery after key-package exhaustion', () => {
+    it('persists recovery after uploading when the backend count is zero', async () => {
+      const [mlsService, {apiClient, coreDatabase, transactionContext}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockImplementationOnce(async () => {
+        expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      });
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      await mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1');
+
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(true);
+      expect(emitSpy).toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('does not schedule recovery for a normal low-count refill', async () => {
+      const [mlsService, {apiClient, coreDatabase, transactionContext}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(1);
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      await mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1');
+
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      expect(emitSpy).not.toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('does not persist recovery and does not emit when the zero-count refill fails', async () => {
+      const [mlsService, {apiClient, coreDatabase, transactionContext}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockRejectedValueOnce(new Error('upload failed'));
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      await expect(mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1')).rejects.toThrow('upload failed');
+
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      expect(emitSpy).not.toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('does not fail refill when recovery marker persistence fails', async () => {
+      const [mlsService, {apiClient, coreDatabase, transactionContext}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(coreDatabase, 'put').mockRejectedValueOnce(new Error('DB write failed'));
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      await expect(mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1')).resolves.toBeUndefined();
+
+      expect(transactionContext.clientKeypackages).toHaveBeenCalled();
+      expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalled();
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      expect(emitSpy).not.toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('resumes persisted recovery after restart when packages are already available', async () => {
+      const [mlsService, {apiClient, coreDatabase}] = await createMLSService();
+      await coreDatabase.put('mlsConversationRecovery', {required: true}, 'required');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      expect(await mlsService.prepareMLSConversationRecovery('client-1')).toBe(true);
+
+      expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('clears recovery only when explicitly completed', async () => {
+      const [mlsService, {coreDatabase}] = await createMLSService();
+      await coreDatabase.put('mlsConversationRecovery', {required: true}, 'required');
+
+      await mlsService.completeMLSConversationRecovery();
+
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+    });
+
+    it('tracks pending conversation IDs during recovery', async () => {
+      const [mlsService, {coreDatabase}] = await createMLSService();
+      await coreDatabase.put('mlsConversationRecovery', {required: true}, 'required');
+
+      const pendingIds = [
+        {id: 'conv1', domain: 'domain.com'},
+        {id: 'conv2', domain: 'domain.com'},
+        {id: 'conv3', domain: 'domain.com'},
+      ];
+      await mlsService.updatePendingRecoveryConversationIds(pendingIds);
+
+      expect(await mlsService.getPendingRecoveryConversationIds()).toEqual(pendingIds);
+    });
+
+    it('removes conversations from pending list as they are recovered', async () => {
+      const [mlsService, {coreDatabase}] = await createMLSService();
+      await coreDatabase.put('mlsConversationRecovery', {required: true}, 'required');
+      const initialPendingIds = [
+        {id: 'conv1', domain: 'domain.com'},
+        {id: 'conv2', domain: 'domain.com'},
+        {id: 'conv3', domain: 'domain.com'},
+      ];
+      await mlsService.updatePendingRecoveryConversationIds(initialPendingIds);
+
+      const updatedPendingIds = initialPendingIds.filter(({id}) => id !== 'conv2');
+      await mlsService.updatePendingRecoveryConversationIds(updatedPendingIds);
+
+      expect(await mlsService.getPendingRecoveryConversationIds()).toEqual([
+        {id: 'conv1', domain: 'domain.com'},
+        {id: 'conv3', domain: 'domain.com'},
+      ]);
     });
   });
 

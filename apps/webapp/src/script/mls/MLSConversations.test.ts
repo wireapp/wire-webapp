@@ -45,6 +45,7 @@ import {
   initMLSGroupConversations,
   initialiseSelfAndTeamConversations,
   readLocalMLSState,
+  recoverMLSConversationsInBatches,
 } from './MLSConversations';
 
 function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
@@ -137,6 +138,98 @@ describe('MLSConversations', () => {
       await initMLSGroupConversations([meetingConversation], conversationRepository, {core: repositoryCore});
 
       expect(joinSpy).toHaveBeenCalledWith(meetingConversation.qualifiedId);
+    });
+  });
+
+  describe('recoverMLSConversationsInBatches', () => {
+    it('recovers active MLS and mixed conversations while skipping Proteus, past-member, and established groups', async () => {
+      const mlsGroup = createMLSConversation(CONVERSATION_TYPE.REGULAR, 1);
+      const mlsOneToOne = createMLSConversation(CONVERSATION_TYPE.ONE_TO_ONE, 1);
+      const mixedSelf = new Conversation(
+        randomUUID(),
+        '',
+        CONVERSATION_PROTOCOL.MIXED,
+        translateForTest,
+      ) as MLSConversation;
+      mixedSelf.groupId = `groupid-${randomUUID()}`;
+      mixedSelf.type(CONVERSATION_TYPE.SELF);
+      const established = createMLSConversation(CONVERSATION_TYPE.REGULAR, 1);
+      const pastMember = createMLSConversation(CONVERSATION_TYPE.REGULAR, 1);
+      pastMember.status(ConversationStatus.PAST_MEMBER);
+      const proteus = new Conversation(randomUUID(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const repositoryCore = conversationRepository['core'];
+      jest
+        .spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally')
+        .mockImplementation(async groupId => groupId === established.groupId);
+      const recoverSpy = jest
+        .spyOn(conversationRepository, 'safeEnsureConversationExists')
+        .mockReturnValue(task.resolve(undefined));
+
+      const result = await recoverMLSConversationsInBatches({
+        conversations: [mlsGroup, mlsOneToOne, mixedSelf, established, pastMember, proteus],
+        conversationRepository,
+        core: repositoryCore,
+        isActive: () => true,
+        batchSize: 2,
+      });
+
+      expect(result).toEqual({completed: true, failedConversationCount: 0, recoveredConversationCount: 3});
+      expect(recoverSpy).toHaveBeenCalledTimes(3);
+      expect(recoverSpy).toHaveBeenCalledWith({
+        conversationId: mlsOneToOne.qualifiedId,
+        groupId: mlsOneToOne.groupId,
+        core: repositoryCore,
+      });
+      expect(recoverSpy).toHaveBeenCalledWith({
+        conversationId: mixedSelf.qualifiedId,
+        groupId: mixedSelf.groupId,
+        core: repositoryCore,
+      });
+    });
+
+    it('pauses before the next batch when the application becomes inactive', async () => {
+      const conversations = createMLSConversations(12, CONVERSATION_TYPE.REGULAR);
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const repositoryCore = conversationRepository['core'];
+      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      const recoverSpy = jest
+        .spyOn(conversationRepository, 'safeEnsureConversationExists')
+        .mockReturnValue(task.resolve(undefined));
+      const isActive = jest.fn().mockReturnValueOnce(true).mockReturnValue(false);
+
+      const result = await recoverMLSConversationsInBatches({
+        conversations,
+        conversationRepository,
+        core: repositoryCore,
+        isActive,
+        batchSize: 5,
+      });
+
+      expect(result).toEqual({completed: false, failedConversationCount: 0, recoveredConversationCount: 5});
+      expect(recoverSpy).toHaveBeenCalledTimes(5);
+    });
+
+    it('keeps recovery incomplete after an individual failure and continues auditing the batch', async () => {
+      const conversations = createMLSConversations(3, CONVERSATION_TYPE.REGULAR);
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const repositoryCore = conversationRepository['core'];
+      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      const recoverSpy = jest
+        .spyOn(conversationRepository, 'safeEnsureConversationExists')
+        .mockReturnValueOnce(task.reject(new Error('join failed')))
+        .mockReturnValue(task.resolve(undefined));
+
+      const result = await recoverMLSConversationsInBatches({
+        conversations,
+        conversationRepository,
+        core: repositoryCore,
+        isActive: () => true,
+      });
+
+      expect(result).toEqual({completed: false, failedConversationCount: 1, recoveredConversationCount: 2});
+      expect(recoverSpy).toHaveBeenCalledTimes(3);
     });
   });
 

@@ -18,7 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {Maybe} from 'true-myth';
+import {Maybe, task} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
 import {Account, MLSService} from '@wireapp/core';
@@ -38,8 +38,132 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {getLogger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {isNonEmptyArray} from '@sindresorhus/is';
 
 const logger = getLogger('Webapp/MLSConversations');
+
+// Process 10 conversations per batch to balance recovery speed with system
+// responsiveness. Larger batches could block the event loop; smaller batches
+// increase total recovery time.
+const DEFAULT_RECOVERY_BATCH_SIZE = 10;
+
+export type MLSConversationRecoveryResult = {
+  completed: boolean;
+  failedConversationCount: number;
+  recoveredConversationCount: number;
+};
+
+/**
+ * Audits active MLS-capable conversations in bounded batches and rejoins groups
+ * which are missing from CoreCrypto. A completed result is only returned after
+ * every eligible conversation was checked successfully.
+ */
+export async function recoverMLSConversationsInBatches({
+  conversations,
+  conversationRepository,
+  core,
+  isActive,
+  mlsService,
+  batchSize = DEFAULT_RECOVERY_BATCH_SIZE,
+}: {
+  conversations: Conversation[];
+  conversationRepository: ConversationRepository;
+  core: Account;
+  isActive: () => boolean;
+  mlsService?: MLSService;
+  batchSize?: number;
+}): Promise<MLSConversationRecoveryResult> {
+  const conversationService = core.service?.conversation;
+  if (!conversationService) {
+    logger.error('Conversation service is not available for MLS conversation recovery');
+    return {completed: false, failedConversationCount: 1, recoveredConversationCount: 0};
+  }
+
+  const eligibleConversations = conversations.filter(
+    (conversation): conversation is MLSCapableConversation =>
+      isMLSCapableConversation(conversation) && !conversation.isSelfUserRemoved(),
+  );
+  const boundedBatchSize = Math.max(1, batchSize);
+  let failedConversationCount = 0;
+  let recoveredConversationCount = 0;
+
+  // Initialize pending conversation IDs on first run
+  if (mlsService && eligibleConversations.length > 0) {
+    const pendingIds = await mlsService.getPendingRecoveryConversationIds();
+    if (!isNonEmptyArray(pendingIds)) {
+      const allPendingIds = eligibleConversations.map(conv => conv.qualifiedId);
+      await mlsService.updatePendingRecoveryConversationIds(allPendingIds);
+    }
+  }
+
+  for (let offset = 0; offset < eligibleConversations.length; offset += boundedBatchSize) {
+    if (!isActive()) {
+      logger.info('Pausing MLS conversation recovery because the application is inactive', {
+        failedConversationCount,
+        recoveredConversationCount,
+      });
+      return {completed: false, failedConversationCount, recoveredConversationCount};
+    }
+
+    const batch = eligibleConversations.slice(offset, offset + boundedBatchSize);
+    for (const conversation of batch) {
+      const localGroupResult = await task.tryOrElse(
+        error => error,
+        () => conversationService.mlsGroupExistsLocally(conversation.groupId),
+      );
+
+      if (localGroupResult.isErr) {
+        failedConversationCount++;
+        logger.error('Failed to check local MLS conversation state during recovery', {
+          conversationId: conversation.qualifiedId,
+          error: localGroupResult.error,
+        });
+        continue;
+      }
+
+      if (localGroupResult.value) {
+        continue;
+      }
+
+      const recoveryResult = await conversationRepository.safeEnsureConversationExists({
+        conversationId: conversation.qualifiedId,
+        groupId: conversation.groupId,
+        core,
+      });
+
+      if (recoveryResult.isErr) {
+        failedConversationCount++;
+        logger.error('Failed to recover pending MLS conversation', {
+          conversationId: conversation.qualifiedId,
+          error: recoveryResult.error,
+        });
+        continue;
+      }
+
+      recoveredConversationCount++;
+
+      // Remove successfully recovered conversation from pending list
+      if (mlsService) {
+        const pendingIds = (await mlsService.getPendingRecoveryConversationIds()) ?? [];
+        const updatedPending = pendingIds.filter(id => !matchQualifiedIds(id, conversation.qualifiedId));
+        await mlsService.updatePendingRecoveryConversationIds(updatedPending);
+      }
+    }
+
+    logger.info('Processed MLS conversation recovery batch', {
+      batchSize: batch.length,
+      failedConversationCount,
+      recoveredConversationCount,
+    });
+  }
+
+  return {
+    completed: failedConversationCount === 0,
+    failedConversationCount,
+    recoveredConversationCount,
+  };
+}
 
 /**
  * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.
