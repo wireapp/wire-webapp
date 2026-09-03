@@ -19,14 +19,19 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const meetingCallingViewStyles: CSSObject = {
+import {meetingNotificationHostCollapsedOffset} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost.styles';
+
+const meetingCallingViewOffset = 24;
+
+export const meetingCallingViewStyles = (hasNotifications: boolean): CSSObject => ({
   position: 'absolute',
-  bottom: '24px',
-  left: '24px',
+  bottom: `${hasNotifications ? meetingNotificationHostCollapsedOffset : meetingCallingViewOffset}px`,
+  left: `${meetingCallingViewOffset}px`,
   width: 'min(420px, calc(100% - 48px))',
   zIndex: 2,
   pointerEvents: 'auto',
-};
+  transition: 'bottom var(--animation-timing-fast) ease-in-out',
+});
 
 export const meetingsContentWrapperStyles: CSSObject = {
   display: 'flex',
