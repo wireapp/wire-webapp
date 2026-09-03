@@ -203,7 +203,7 @@
   "acme.inProgress.button.close": "Fenster 'Zertifikat erhalten' schließen",
   "acme.inProgress.headline": "Zertifikat wird abgerufen...",
   "acme.inProgress.paragraph.alt": "Herunterladen…",
-  "acme.inProgress.paragraph.main": "Please navigate to your web browser and log in to the certiticate service. [br] In case the website does not open. you can also navigate there manually by following this URL: [br] [link] {url} [/link]",
+  "acme.inProgress.paragraph.main": "Bitte öffnen Sie Ihren Webbrowser und melden Sie sich beim Zertifikatsdienst an. [br] Falls die Website nicht geöffnet wird, können Sie die Seite auch manuell aufrufen, indem Sie dieser URL folgen: [br] [link] {url} [/link]",
   "acme.remindLater.button.primary": "OK",
   "acme.remindLater.paragraph": "Sie können das Zertifikat in Ihren [bold]Wire Einstellungen[/bold] in der/den nächsten {delayTime} erhalten. Öffnen Sie [bold]Geräte[/bold] und wählen Sie [bold]Zertifikat erhalten[/bold] für Ihr aktuelles Gerät. <br/> <br/> Um Wire ohne Unterbrechung nutzen zu können, rufen Sie es rechtzeitig ab – es dauert nicht lange. <br/> <br/> <a href=\"{url}\" target=\"_blank\"> Erfahren Sie mehr über Ende-zu-Ende-Identität </a>",
   "acme.renewCertificate.button.close": "Fenster 'Ende-zu-Ende-Identitätszertifikat aktualisieren' schließen",
