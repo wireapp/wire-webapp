@@ -1019,7 +1019,6 @@
   "deleteGroupModalMessage": "Это приведет к удалению группы и всего содержимого для всех участников на всех устройствах. Восстановить контент будет невозможно. Все участники будут оповещены.",
   "deleteGroupModalTitle": "Удалить {name}?",
   "deletedUser": "Удаленный пользователь",
-  "deletedUserBadge": "Удалено",
   "downloadLatestMLS": "Загрузить последнюю версию MLS Wire",
   "enumerationAnd": ", и ",
   "ephemeralRemaining": "осталось",

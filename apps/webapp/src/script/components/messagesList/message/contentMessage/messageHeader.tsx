@@ -79,7 +79,7 @@ function BadgeSection({sender}: {sender: User}) {
 
       {sender.isDeleted && (
         <p data-uie-name="sender-deleted" css={headerLabelBadge}>
-          {translate('deletedUserBadge')}
+          {translate('unavailableUser')}
         </p>
       )}
 
