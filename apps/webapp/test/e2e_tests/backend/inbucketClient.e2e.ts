@@ -18,7 +18,7 @@
  */
 
 import axios, {AxiosInstance} from 'axios';
-import { User } from '../data/user';
+import {User} from '../data/user';
 
 export class InbucketClientE2E {
   private readonly axiosInstance: AxiosInstance;
@@ -104,7 +104,10 @@ export class InbucketClientE2E {
         const message = response.data;
         const subject = response.data.subject;
         // const attachment
-        if (message.body.text.includes(`Team ID: ${teamOwner.teamId}`) && subject.includes('Thank you for your order')) {
+        if (
+          message.body.text.includes(`Team ID: ${teamOwner.teamId}`) &&
+          subject.includes('Thank you for your order')
+        ) {
           return true;
         }
       }

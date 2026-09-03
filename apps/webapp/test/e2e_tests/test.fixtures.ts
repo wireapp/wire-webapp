@@ -206,6 +206,7 @@ export const createTeam = async (
       meetings?: boolean;
       mls?: boolean | Parameters<BrigRepositoryE2E['configureMLSFeature']>[1];
       cells?: boolean;
+      sso?: boolean;
     };
   },
 ) => {
@@ -273,6 +274,11 @@ export const createTeam = async (
       await api.brig.unlockCellsFeature(teamId);
       await api.brig.enableCells(teamId);
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, teamId, owner.token);
+    }
+
+    if (options.features.sso) {
+      await api.brig.enableSSOFeature(teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.SSO, teamId, owner.token);
     }
   }
 
