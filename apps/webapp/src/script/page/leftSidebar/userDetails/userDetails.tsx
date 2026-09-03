@@ -21,15 +21,19 @@ import {memo} from 'react';
 
 import is from '@sindresorhus/is';
 import cx from 'classnames';
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {getUserVerificationBadgeLabel, useUserVerificationStatus, UserVerificationBadges} from 'Components/badge';
+import {
+  getUserVerificationBadgeLabel,
+  useUserVerificationStatus,
+  UserVerificationBadgesContent,
+} from 'Components/badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {availabilityTranslationKeys} from 'Util/availabilityStatus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import * as styles from './userDetails.styles';
@@ -42,6 +46,22 @@ interface AvailabilityStateButtonWrapperProps {
   ariaLabel: string;
   showAvailabilityContextMenu: (event: MouseEvent) => void;
 }
+
+const isAvailabilityType = (value: unknown): value is Availability.Type =>
+  Object.values(Availability.Type).some(availabilityType => availabilityType === value);
+
+const getAvailabilityTranslationKey = (availability: Availability.Type) => {
+  switch (availability) {
+    case Availability.Type.AVAILABLE:
+      return 'availability.available';
+    case Availability.Type.BUSY:
+      return 'availability.busy';
+    case Availability.Type.AWAY:
+      return 'availability.away';
+    case Availability.Type.NONE:
+      return 'availability.none';
+  }
+};
 
 const AvailabilityStateButtonWrapper = ({
   children,
@@ -95,7 +115,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
   const avatarAriaLabel = [
     userName,
     userHandle,
-    isTeam ? translate(availabilityTranslationKeys[availability]) : undefined,
+    isTeam && isAvailabilityType(availability) ? translate(getAvailabilityTranslationKey(availability)) : undefined,
     getUserVerificationBadgeLabel(translate, verificationStatus),
   ]
     .filter((label): label is string => is.nonEmptyString(label))
@@ -120,13 +140,17 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
         {isTeam ? (
           <>
             <div css={styles.userDetails} data-uie-name="status-availability">
-              <button css={styles.userFullName} onClick={event => showAvailabilityContextMenu(event.nativeEvent)}>
+              <button
+                css={styles.userFullName}
+                onClick={event => showAvailabilityContextMenu(event.nativeEvent)}
+                aria-haspopup="menu"
+              >
                 <span data-uie-name="status-label" css={{...styles.userName, ...styles.textEllipsis}} title={userName}>
                   {userName}
                 </span>
               </button>
 
-              <UserVerificationBadges user={user} isSelfUser groupId={groupId} />
+              <UserVerificationBadgesContent {...verificationStatus} />
             </div>
 
             {showLegalHold && (
