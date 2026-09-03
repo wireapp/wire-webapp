@@ -57,6 +57,7 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
       <UploadIcon
         css={sharedDriveUploadStatusPopupRowIconStyles}
         color="currentColor"
+        aria-hidden="true"
         data-uie-name="shared-drive-upload-uploading"
       />
     );
@@ -64,7 +65,11 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
 
   if (upload.kind === 'uploaded') {
     return (
-      <div css={sharedDriveUploadStatusPopupRowIconStyles} data-uie-name="shared-drive-upload-uploaded">
+      <div
+        css={sharedDriveUploadStatusPopupRowIconStyles}
+        aria-hidden="true"
+        data-uie-name="shared-drive-upload-uploaded"
+      >
         <FileTypeIcon extension={getFileExtension(upload.fileName)} size={24} />
       </div>
     );
@@ -74,6 +79,7 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
     <AlertIcon
       css={sharedDriveUploadStatusPopupRowIconStyles}
       color="currentColor"
+      aria-hidden="true"
       data-uie-name="shared-drive-upload-failed"
     />
   );
@@ -130,8 +136,12 @@ export const SharedDriveUploadStatusPopup = ({
       >
         {statusIcon(upload)}
         <div css={sharedDriveUploadStatusPopupRowTextStyles}>
-          <strong css={sharedDriveUploadStatusPopupRowFileNameStyles}>{upload.fileName}</strong>
-          <span css={sharedDriveUploadStatusPopupRowStatusStyles(upload.kind)}>{statusLabel}</span>
+          <strong css={sharedDriveUploadStatusPopupRowFileNameStyles} title={upload.fileName}>
+            {upload.fileName}
+          </strong>
+          <span css={sharedDriveUploadStatusPopupRowStatusStyles(upload.kind)} title={statusLabel}>
+            {statusLabel}
+          </span>
         </div>
       </div>
       {upload.kind === 'uploading' && (

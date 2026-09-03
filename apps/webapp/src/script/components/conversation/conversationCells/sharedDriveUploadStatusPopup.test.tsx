@@ -59,6 +59,25 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
   });
 
+  it.each([
+    ['uploading', 'shared-drive-upload-uploading'],
+    ['uploaded', 'shared-drive-upload-uploaded'],
+    ['failed', 'shared-drive-upload-failed'],
+  ] as const)('hides the decorative %s icon from assistive technology', (kind, iconName) => {
+    renderPopup(kind, true);
+
+    expect(
+      screen.getByTestId('shared-drive-upload-status-row').querySelector(`[data-uie-name="${iconName}"]`),
+    ).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('provides full text for ellipsized row content', () => {
+    renderPopup('uploading', true);
+
+    expect(screen.getByText('report.pdf')).toHaveAttribute('title', 'report.pdf');
+    expect(screen.getByText('Uploading 4 KB')).toHaveAttribute('title', 'Uploading 4 KB');
+  });
+
   it('shows uploaded status without a progress bar', () => {
     const {getByText, queryByTestId} = renderPopup('uploaded');
 
