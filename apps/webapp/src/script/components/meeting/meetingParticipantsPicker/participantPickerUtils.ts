@@ -17,7 +17,12 @@
  *
  */
 
+import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+
+export const getConversationKey = (conversation: Conversation): string =>
+  `${conversation.qualifiedId.domain}-${conversation.qualifiedId.id}`;
 
 export const searchUsersByQuery = (users: User[], query: string): User[] => {
   const normalizedQuery = query.trim().toLowerCase();
@@ -43,3 +48,18 @@ export const toggleUserInSelection = (selectedUsers: User[], user: User): User[]
 
   return [...selectedUsers, user];
 };
+
+export const mergeUsersIntoSelection = (selectedUsers: User[], importedUsers: User[]): User[] => {
+  const mergedUsers = [...selectedUsers];
+
+  for (const user of importedUsers) {
+    if (!mergedUsers.some(selectedUser => matchQualifiedIds(selectedUser.qualifiedId, user.qualifiedId))) {
+      mergedUsers.push(user);
+    }
+  }
+
+  return mergedUsers;
+};
+
+export const mergeConversationUsersIntoSelection = (selectedUsers: User[], conversation: Conversation): User[] =>
+  mergeUsersIntoSelection(selectedUsers, conversation.participating_user_ets());

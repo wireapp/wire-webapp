@@ -56,6 +56,10 @@ export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'convers
   filterRemoteTeamUsers?: boolean;
   /** When true, show every user from `users` after local search — skip conversation/connection visibility gate. */
   showAllProvidedUsers?: boolean;
+  /** When true, suppress the "no matching results" empty state, e.g. when a sibling list already has matches. */
+  hideEmptyState?: boolean;
+  /** When true, keep selected users visible regardless of the current search text. */
+  showSelectedUsersRegardlessOfFilter?: boolean;
 };
 
 const SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS = 300;
@@ -64,6 +68,8 @@ export const UserSearchableList = ({
   onUpdateSelectedUsers,
   filterRemoteTeamUsers = false,
   showAllProvidedUsers = false,
+  hideEmptyState = false,
+  showSelectedUsersRegardlessOfFilter = false,
   dataUieName = '',
   filter = '',
   highlightedUsers,
@@ -93,7 +99,12 @@ export const UserSearchableList = ({
     setRemoteTeamMembers([]);
   }, [filter]);
 
-  const filteredSelectedUsers = selectedUsers ? searchRepository.searchUserInSet(filter, selectedUsers) : undefined;
+  let filteredSelectedUsers: User[] | undefined;
+  if (showSelectedUsersRegardlessOfFilter) {
+    filteredSelectedUsers = selectedUsers;
+  } else if (selectedUsers) {
+    filteredSelectedUsers = searchRepository.searchUserInSet(filter, selectedUsers);
+  }
 
   const selfInTeam = teamState.isInTeam(selfUser);
 
@@ -199,27 +210,33 @@ export const UserSearchableList = ({
       props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)) !== true &&
       user.type === UserType.REGULAR,
   );
-  const isEmptyUserList = userList.length === 0;
+  const isEmptyUserList = userList.length === 0 && (filteredSelectedUsers?.length ?? 0) === 0;
   const isSearching = isNonEmptyString(filter);
   const noResultsDataUieName = !isSearching ? 'status-all-added' : 'status-no-matches';
   const noResultsTranslationText = !isSearching ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
+  let userListContent: React.ReactNode = null;
+  if (isEmptyUserList && !hideEmptyState) {
+    userListContent = (
+      <p className="user-list__no-results" data-uie-name={noResultsDataUieName}>
+        {translate(noResultsTranslationText)}
+      </p>
+    );
+  } else if (!isEmptyUserList) {
+    userListContent = (
+      <UserList
+        {...userListProps}
+        users={userList}
+        selectedUsers={filteredSelectedUsers}
+        highlightedUsers={highlightedUsers}
+        onSelectUser={toggleUserSelection}
+        selfUser={selfUser}
+      />
+    );
+  }
 
   return (
     <div className="user-list-wrapper" data-uie-name={dataUieName} role="list">
-      {isEmptyUserList ? (
-        <p className="user-list__no-results" data-uie-name={noResultsDataUieName}>
-          {translate(noResultsTranslationText)}
-        </p>
-      ) : (
-        <UserList
-          {...userListProps}
-          users={userList}
-          selectedUsers={filteredSelectedUsers}
-          highlightedUsers={highlightedUsers}
-          onSelectUser={toggleUserSelection}
-          selfUser={selfUser}
-        />
-      )}
+      {userListContent}
     </div>
   );
 };

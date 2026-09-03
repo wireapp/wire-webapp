@@ -17,9 +17,9 @@
  *
  */
 
-import {useCallback, useEffect, useId, useRef, useState} from 'react';
+import {useId} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {Button, Popover} from 'react-aria-components';
 
 import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
@@ -31,9 +31,11 @@ import type {User} from 'Repositories/entity/User';
 import type {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import type {TeamState} from 'Repositories/team/TeamState';
+import {meetingsM2FeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
+import {MeetingConversationsSearchableList} from './meetingConversationsSearchableList';
 import {
   chevronButtonStyles,
   chevronIconStyles,
@@ -47,6 +49,7 @@ import {
   valueContainerStyles,
   wrapperStyles,
 } from './meetingParticipantsPicker.styles';
+import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 
 export interface MeetingParticipantsPickerProps {
   id: string;
@@ -93,10 +96,7 @@ export const MeetingParticipantsPicker = ({
   noUnderline = false,
   popoverPortalContainer,
 }: MeetingParticipantsPickerProps) => {
-  const {translate} = useApplicationContext();
-  const [isOpen, setIsOpen] = useState(false);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const listboxId = useId();
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
 
@@ -105,56 +105,27 @@ export const MeetingParticipantsPicker = ({
     : undefined;
   const searchPlaceholder = placeholder ?? translate('meetings.scheduleModal.participantsPlaceholder');
   const showPlaceholder = filter.length === 0;
-
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      if (disabled && open) {
-        return;
-      }
-
-      if (!open) {
-        onFilterChange('');
-      }
-
-      setIsOpen(open);
-    },
-    [disabled, onFilterChange],
-  );
-
-  const handleSelectedUsersChange = useCallback(
-    (users: User[]) => {
-      onSelectedUsersChange(users);
-      onFilterChange('');
-    },
-    [onFilterChange, onSelectedUsersChange],
-  );
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const handlePointerDown = (event: PointerEvent) => {
-      const target = event.target as Node;
-      const trigger = triggerRef.current;
-      const popover = popoverRef.current;
-
-      if (
-        (!isNullOrUndefined(trigger) && trigger.contains(target)) ||
-        (!isNullOrUndefined(popover) && popover.contains(target))
-      ) {
-        return;
-      }
-
-      handleOpenChange(false);
-    };
-
-    document.addEventListener('pointerdown', handlePointerDown, true);
-
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown, true);
-    };
-  }, [handleOpenChange, isOpen]);
+  const meetingsM2Enabled = isFeatureToggleEnabled(meetingsM2FeatureToggleName);
+  const {
+    handleOpenChange,
+    handleSelectedUsersChange,
+    handleSelectConversation,
+    isConversationsOpen,
+    isOpen,
+    matchingConversations,
+    popoverRef,
+    selectedConversationIds,
+    setIsConversationsOpen,
+    triggerRef,
+  } = useMeetingParticipantsPicker({
+    disabled,
+    filter,
+    selectedUsers,
+    onSelectedUsersChange,
+    onFilterChange,
+    conversationRepository,
+    meetingsM2Enabled,
+  });
 
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
@@ -191,12 +162,12 @@ export const MeetingParticipantsPicker = ({
             onChange={event => {
               onFilterChange(event.target.value);
               if (!isOpen) {
-                setIsOpen(true);
+                handleOpenChange(true);
               }
             }}
             onFocus={() => {
               if (!disabled) {
-                setIsOpen(true);
+                handleOpenChange(true);
               }
             }}
             onKeyDown={event => {
@@ -246,14 +217,26 @@ export const MeetingParticipantsPicker = ({
               onUpdateSelectedUsers={handleSelectedUsersChange}
               searchRepository={searchRepository}
               teamRepository={teamRepository}
-              conversationRepository={conversationRepository}
+              conversationRepository={meetingsM2Enabled ? conversationRepository : undefined}
               conversationState={conversationState}
               teamState={teamState}
               noUnderline={noUnderline}
               allowRemoteSearch
               filterRemoteTeamUsers
               showAllProvidedUsers
+              hideEmptyState={meetingsM2Enabled && matchingConversations.length > 0}
+              showSelectedUsersRegardlessOfFilter
               dataUieName={dataUieName ? `${dataUieName}-list` : undefined}
+            />
+            <MeetingConversationsSearchableList
+              id={id}
+              conversations={matchingConversations}
+              selectedConversationIds={selectedConversationIds}
+              onSelectConversation={handleSelectConversation}
+              isOpen={isConversationsOpen}
+              onOpenChange={setIsConversationsOpen}
+              noUnderline={noUnderline}
+              dataUieName={dataUieName ? `${dataUieName}-conversation-dropdown` : undefined}
             />
           </div>
         </div>
