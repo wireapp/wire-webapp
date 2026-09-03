@@ -19,6 +19,7 @@
 
 import {act, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {noop} from 'noop-esm';
 import type {UploadState} from 'Repositories/cells/upload';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {SharedDriveUploadStatusPopupHost} from './sharedDriveUploadStatusPopupHost';
@@ -143,21 +144,10 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(controller.snapshots).toHaveBeenCalledWith(conversationQualifiedId);
   });
 
-  it('cancels the displayed upload and removes its status', async () => {
+  it('dismisses the popup immediately while cancellation is pending', async () => {
     const user = userEvent.setup();
     const controller = createController();
-    let state: UploadState = uploadState;
-    let notify: () => void = jest.fn();
-    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? [state] : []));
-    controller.subscribe.mockImplementation(listener => {
-      notify = listener;
-      return jest.fn();
-    });
-    controller.cancel.mockImplementation(async uploadId => {
-      expect(uploadId).toBe('upload-1');
-      state = {...uploadState, kind: 'cancelled'};
-      act(() => notify());
-    });
+    controller.cancel.mockReturnValue(new Promise<void>(noop));
 
     const view = renderHost(controller, conversationQualifiedId);
     const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
@@ -165,46 +155,24 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     });
     await user.click(cancel);
 
-    expect(controller.cancel).toHaveBeenCalledTimes(1);
+    expect(controller.cancel).toHaveBeenCalledWith('upload-1');
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
+    expect(view.queryByTestId('shared-drive-upload-status-popup')).not.toBeInTheDocument();
+  });
+
+  it('keeps the popup dismissed when cancellation fails', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    controller.cancel.mockRejectedValue(new Error('cancellation failed'));
+
+    const view = renderHost(controller, conversationQualifiedId);
+    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'conversationAssetUploadCancel',
+    });
+    await user.click(cancel);
+
+    expect(controller.cancel).toHaveBeenCalledWith('upload-1');
     await waitFor(() => expect(view.queryByRole('status')).not.toBeInTheDocument());
-  });
-
-  it('re-enables cancellation when the command completes without changing the upload state', async () => {
-    const user = userEvent.setup();
-    const controller = createController();
-
-    const view = renderHost(controller, conversationQualifiedId);
-    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
-      name: 'conversationAssetUploadCancel',
-    });
-    await user.click(cancel);
-
-    expect(controller.cancel).toHaveBeenCalledTimes(1);
-    await waitFor(() => expect(cancel).toBeEnabled());
-    expect(view.getByRole('status')).toBeInTheDocument();
-  });
-
-  it('blocks a second cancellation while the first command is pending', async () => {
-    const user = userEvent.setup();
-    const controller = createController();
-    let resolveCancellation: () => void = jest.fn();
-    const cancellation = new Promise<void>(resolve => {
-      resolveCancellation = resolve;
-    });
-    controller.cancel.mockReturnValue(cancellation);
-
-    const view = renderHost(controller, conversationQualifiedId);
-    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
-      name: 'conversationAssetUploadCancel',
-    });
-    await user.click(cancel);
-    await user.click(cancel);
-
-    expect(controller.cancel).toHaveBeenCalledTimes(1);
-    expect(cancel).toBeDisabled();
-
-    await act(async () => resolveCancellation());
-    await waitFor(() => expect(cancel).toBeEnabled());
   });
 
   it('formats the source size in the expanded status copy', async () => {
