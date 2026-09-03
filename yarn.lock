@@ -30789,12 +30789,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:5.8.0":
-  version: 5.8.0
-  resolution: "type-fest@npm:5.8.0"
+"type-fest@npm:5.9.0":
+  version: 5.9.0
+  resolution: "type-fest@npm:5.9.0"
   dependencies:
     tagged-tag: "npm:^1.0.0"
-  checksum: 10/4dbe4c78ac6933d3d165b01f9d552991a84d63e5352110e01bebb5c46499fb1f44d199fc88835b18ee5662ee44c73926621f59525e46f7faa031086ac00b2686
+  checksum: 10/915bee435848a8c36a01135afd239ca337df31f605da60684f053eb395846bfedd3d0c8cb6b00b14788814fb9c34ddb6e00ed1f6d06c4c2547f70475b76c1358
   languageName: node
   linkType: hard
 
@@ -32723,7 +32723,7 @@ __metadata:
     ts-pattern: "npm:5.9.0"
     tsc-watch: "npm:7.2.1"
     tslib: "npm:2.8.1"
-    type-fest: "npm:5.8.0"
+    type-fest: "npm:5.9.0"
     typescript: "npm:6.0.3"
     uuid: "npm:14.0.0"
     zod: "npm:3.25.76"
