@@ -73,6 +73,32 @@ export const sharedDriveUploadStatusPopupDestinationStyles: CSSObject = {
   whiteSpace: 'nowrap',
 };
 
+export const sharedDriveUploadStatusPopupHeaderActionsStyles: CSSObject = {
+  display: 'flex',
+  flex: '0 0 auto',
+  alignItems: 'center',
+  gap: 8,
+};
+
+export const sharedDriveUploadStatusPopupHeaderCancelStyles: CSSObject = {
+  minWidth: 74,
+  height: 32,
+  padding: '4px 12px',
+  border: '1px solid #dce0e3',
+  borderRadius: 12,
+  background: 'var(--app-bg, #fff)',
+  color: 'inherit',
+  fontSize: 14,
+  fontWeight: 700,
+  letterSpacing: '0.35px',
+  lineHeight: '22px',
+  cursor: 'pointer',
+  '&:disabled': {
+    cursor: 'default',
+    opacity: 0.5,
+  },
+};
+
 export const sharedDriveUploadStatusPopupToggleStyles: CSSObject = {
   display: 'flex',
   width: 24,
@@ -114,14 +140,18 @@ export const sharedDriveUploadStatusPopupRowTextStyles: CSSObject = {
   gap: 2,
 };
 
-export const sharedDriveUploadStatusPopupCancelStyles: CSSObject = {
+export const sharedDriveUploadStatusPopupRowCancelStyles: CSSObject = {
+  display: 'flex',
   flex: '0 0 auto',
+  width: 24,
+  height: 24,
+  alignItems: 'center',
+  justifyContent: 'center',
   padding: 0,
   border: 0,
+  borderRadius: 12,
   background: 'transparent',
-  color: 'var(--accent-color)',
-  fontSize: 12,
-  lineHeight: '14px',
+  color: 'inherit',
   cursor: 'pointer',
   '&:disabled': {
     cursor: 'default',

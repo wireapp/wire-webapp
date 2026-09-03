@@ -19,17 +19,19 @@
 
 import type {ReactNode} from 'react';
 
-import {AlertIcon, ChevronIcon, UploadIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon, ChevronIcon, CloseIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {getFileExtension} from 'Util/util';
 
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {
-  sharedDriveUploadStatusPopupCancelStyles,
   sharedDriveUploadStatusPopupContentStyles,
   sharedDriveUploadStatusPopupDestinationStyles,
+  sharedDriveUploadStatusPopupHeaderActionsStyles,
+  sharedDriveUploadStatusPopupHeaderCancelStyles,
   sharedDriveUploadStatusPopupProgressStyles,
+  sharedDriveUploadStatusPopupRowCancelStyles,
   sharedDriveUploadStatusPopupRowFileNameStyles,
   sharedDriveUploadStatusPopupRowIconStyles,
   sharedDriveUploadStatusPopupRowStatusStyles,
@@ -118,22 +120,35 @@ export const SharedDriveUploadStatusPopup = ({
             {destination}
           </span>
         </div>
-        <button
-          type="button"
-          css={sharedDriveUploadStatusPopupToggleStyles}
-          aria-label={toggleLabel}
-          aria-expanded={isExpanded}
-          aria-controls={statusRowId}
-          data-uie-name="shared-drive-upload-status-toggle"
-          onClick={onToggle}
-        >
-          <ChevronIcon
-            direction={isExpanded ? 'down' : 'up'}
-            css={sharedDriveUploadStatusPopupToggleIconStyles}
-            color="currentColor"
-            aria-hidden="true"
-          />
-        </button>
+        <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
+          {upload.canCancel && (
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+              disabled={isCancelling}
+              data-uie-name="shared-drive-upload-header-cancel"
+              onClick={onCancel}
+            >
+              {cancelLabel}
+            </button>
+          )}
+          <button
+            type="button"
+            css={sharedDriveUploadStatusPopupToggleStyles}
+            aria-label={toggleLabel}
+            aria-expanded={isExpanded}
+            aria-controls={statusRowId}
+            data-uie-name="shared-drive-upload-status-toggle"
+            onClick={onToggle}
+          >
+            <ChevronIcon
+              direction={isExpanded ? 'down' : 'up'}
+              css={sharedDriveUploadStatusPopupToggleIconStyles}
+              color="currentColor"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
       </div>
       <div
         id={statusRowId}
@@ -153,12 +168,13 @@ export const SharedDriveUploadStatusPopup = ({
         {upload.canCancel && (
           <button
             type="button"
-            css={sharedDriveUploadStatusPopupCancelStyles}
+            css={sharedDriveUploadStatusPopupRowCancelStyles}
+            aria-label={cancelLabel}
             disabled={isCancelling}
             data-uie-name="shared-drive-upload-cancel"
             onClick={onCancel}
           >
-            {cancelLabel}
+            <CloseIcon color="currentColor" aria-hidden="true" />
           </button>
         )}
       </div>

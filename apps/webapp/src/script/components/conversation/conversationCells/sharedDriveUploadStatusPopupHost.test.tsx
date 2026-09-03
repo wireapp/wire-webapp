@@ -17,7 +17,7 @@
  *
  */
 
-import {act, render, screen, waitFor} from '@testing-library/react';
+import {act, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {UploadState} from 'Repositories/cells/upload';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
@@ -160,8 +160,10 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     });
 
     const view = renderHost(controller, conversationQualifiedId);
-    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
-    await user.click(view.getByRole('button', {name: 'conversationAssetUploadCancel'}));
+    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'conversationAssetUploadCancel',
+    });
+    await user.click(cancel);
 
     expect(controller.cancel).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(view.queryByRole('status')).not.toBeInTheDocument());
@@ -172,8 +174,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const controller = createController();
 
     const view = renderHost(controller, conversationQualifiedId);
-    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
-    const cancel = view.getByRole('button', {name: 'conversationAssetUploadCancel'});
+    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'conversationAssetUploadCancel',
+    });
     await user.click(cancel);
 
     expect(controller.cancel).toHaveBeenCalledTimes(1);
@@ -191,8 +194,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     controller.cancel.mockReturnValue(cancellation);
 
     const view = renderHost(controller, conversationQualifiedId);
-    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
-    const cancel = view.getByRole('button', {name: 'conversationAssetUploadCancel'});
+    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'conversationAssetUploadCancel',
+    });
     await user.click(cancel);
     await user.click(cancel);
 

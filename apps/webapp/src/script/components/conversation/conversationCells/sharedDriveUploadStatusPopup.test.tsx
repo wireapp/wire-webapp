@@ -89,10 +89,12 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
   });
 
-  it('starts collapsed and exposes an accessible toggle for the file details', () => {
+  it('starts collapsed and exposes accessible cancel and toggle actions in the header', () => {
     renderPopup('uploading');
 
-    const toggle = screen.getByRole('button', {name: 'Expand upload details'});
+    const header = screen.getByTestId('shared-drive-upload-status-header');
+    const toggle = within(header).getByRole('button', {name: 'Expand upload details'});
+    expect(within(header).getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     expect(toggle).toHaveAttribute('aria-controls', 'shared-drive-upload-status-upload-1');
     expect(screen.getByRole('status').querySelector('button')).not.toBeInTheDocument();
@@ -141,7 +143,34 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(onToggle).toHaveBeenCalledTimes(2);
   });
 
-  it('shows a cancel action for an active upload and prevents duplicate interaction while cancelling', async () => {
+  it('invokes cancellation from the header', async () => {
+    const user = userEvent.setup();
+    const onCancel = jest.fn();
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={upload}
+          title="Uploading report.pdf"
+          statusLabel="Uploading"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          isCancelling={false}
+          onToggle={jest.fn()}
+          onCancel={onCancel}
+        />
+      </ThemeProvider>,
+    );
+
+    await user.click(
+      within(screen.getByTestId('shared-drive-upload-status-header')).getByRole('button', {name: 'Cancel'}),
+    );
+
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it('invokes cancellation from the expanded row icon action', async () => {
     const user = userEvent.setup();
     const onCancel = jest.fn();
     render(
@@ -154,17 +183,42 @@ describe('SharedDriveUploadStatusPopup', () => {
           isExpanded
           toggleLabel="Collapse upload details"
           cancelLabel="Cancel"
-          isCancelling
+          isCancelling={false}
           onToggle={jest.fn()}
           onCancel={onCancel}
         />
       </ThemeProvider>,
     );
 
-    const cancel = screen.getByRole('button', {name: 'Cancel'});
-    expect(cancel).toBeDisabled();
-    await user.click(cancel);
-    expect(onCancel).not.toHaveBeenCalled();
+    const row = screen.getByTestId('shared-drive-upload-status-row');
+    const rowCancel = within(row).getByRole('button', {name: 'Cancel'});
+    expect(rowCancel).toHaveAttribute('data-uie-name', 'shared-drive-upload-cancel');
+    expect(rowCancel.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    await user.click(rowCancel);
+
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables every cancel action while cancellation is pending', () => {
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={upload}
+          title="Uploading report.pdf"
+          statusLabel="Uploading"
+          destination="to Shared Drive"
+          isExpanded
+          toggleLabel="Collapse upload details"
+          cancelLabel="Cancel"
+          isCancelling
+          onToggle={jest.fn()}
+          onCancel={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getAllByRole('button', {name: 'Cancel'})).toHaveLength(2);
+    screen.getAllByRole('button', {name: 'Cancel'}).forEach(cancel => expect(cancel).toBeDisabled());
   });
 
   it.each(['uploaded', 'failed'] as const)('does not show cancel for %s status', kind => {
