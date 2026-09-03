@@ -40,11 +40,23 @@ interface SharedDriveUploadStatusPopupProps {
 
 const statusIcon = (kind: SharedDriveUploadStatus['kind']): ReactNode => {
   if (kind === 'uploaded') {
-    return <CheckIcon css={sharedDriveUploadStatusPopupIconStyles} data-uie-name="shared-drive-upload-success" />;
+    return (
+      <CheckIcon
+        css={sharedDriveUploadStatusPopupIconStyles}
+        aria-hidden="true"
+        data-uie-name="shared-drive-upload-success"
+      />
+    );
   }
 
   if (kind === 'failed') {
-    return <InfoIcon css={sharedDriveUploadStatusPopupIconStyles} data-uie-name="shared-drive-upload-failure" />;
+    return (
+      <InfoIcon
+        css={sharedDriveUploadStatusPopupIconStyles}
+        aria-hidden="true"
+        data-uie-name="shared-drive-upload-failure"
+      />
+    );
   }
 
   return null;
@@ -59,8 +71,12 @@ export const SharedDriveUploadStatusPopup = ({upload, title, destination}: Share
   >
     <div css={sharedDriveUploadStatusPopupContentStyles}>
       <div css={sharedDriveUploadStatusPopupTextStyles}>
-        <strong css={sharedDriveUploadStatusPopupTitleStyles}>{title}</strong>
-        <span css={sharedDriveUploadStatusPopupDestinationStyles}>{destination}</span>
+        <strong css={sharedDriveUploadStatusPopupTitleStyles} title={title}>
+          {title}
+        </strong>
+        <span css={sharedDriveUploadStatusPopupDestinationStyles} title={destination}>
+          {destination}
+        </span>
       </div>
       {statusIcon(upload.kind)}
     </div>

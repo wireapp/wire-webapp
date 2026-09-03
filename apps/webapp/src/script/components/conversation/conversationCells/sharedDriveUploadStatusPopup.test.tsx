@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
@@ -46,6 +46,25 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(getByText('uploading report.pdf')).toBeInTheDocument();
     expect(getByText('to Shared Drive')).toBeInTheDocument();
     expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+  });
+
+  it.each([
+    ['uploaded', 'shared-drive-upload-success'],
+    ['failed', 'shared-drive-upload-failure'],
+  ] as const)('hides the decorative %s icon from assistive technology', (kind, iconName) => {
+    renderPopup(kind);
+
+    expect(screen.getByRole('status').querySelector(`[data-uie-name="${iconName}"]`)).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+  });
+
+  it('provides full text for truncated status content', () => {
+    renderPopup('uploading');
+
+    expect(screen.getByText('uploading report.pdf')).toHaveAttribute('title', 'uploading report.pdf');
+    expect(screen.getByText('to Shared Drive')).toHaveAttribute('title', 'to Shared Drive');
   });
 
   it('shows uploaded status without a progress bar', () => {
