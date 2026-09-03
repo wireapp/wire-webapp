@@ -1019,7 +1019,6 @@
   "deleteGroupModalMessage": "Dies wird die Gruppe und alle Inhalte für alle Teilnehmer auf allen Geräten löschen. Es gibt keine Möglichkeit, den Inhalt wiederherzustellen. Alle Teilnehmer werden darüber benachrichtigt.",
   "deleteGroupModalTitle": "{name} löschen?",
   "deletedUser": "Gelöschter Nutzer",
-  "deletedUserBadge": "Deleted",
   "downloadLatestMLS": "Laden Sie die neueste MLS-Wire-Version herunter",
   "enumerationAnd": " und ",
   "ephemeralRemaining": "verbleibend",
