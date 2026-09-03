@@ -51,6 +51,7 @@ interface SharedDriveDropDependencies {
   readonly isAcceptedFile: (file: File) => boolean;
 }
 
+// eslint-disable-next-line no-magic-numbers
 const BYTES_IN_MEGABYTE = 1024 * 1024;
 
 export const validateSharedDriveDroppedFiles = (
