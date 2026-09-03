@@ -30,7 +30,6 @@ import {
   sharedDriveUploadStatusPopupDestinationStyles,
   sharedDriveUploadStatusPopupHeaderActionsStyles,
   sharedDriveUploadStatusPopupHeaderCancelStyles,
-  sharedDriveUploadStatusPopupHeaderRowStyles,
   sharedDriveUploadStatusPopupProgressStyles,
   sharedDriveUploadStatusPopupRowCancelStyles,
   sharedDriveUploadStatusPopupRowFileNameStyles,
@@ -113,48 +112,43 @@ export const SharedDriveUploadStatusPopup = ({
         data-uie-name="shared-drive-upload-status-header"
         data-testid="shared-drive-upload-status-header"
       >
-        <div css={sharedDriveUploadStatusPopupHeaderRowStyles}>
-          <div css={sharedDriveUploadStatusPopupTextStyles} role="status" aria-live="polite">
-            <strong css={sharedDriveUploadStatusPopupTitleStyles} title={title}>
-              {title}
-            </strong>
-            <span css={sharedDriveUploadStatusPopupDestinationStyles} title={destination}>
-              {destination}
-            </span>
-          </div>
-          <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
-            {upload.canCancel && (
-              <button
-                type="button"
-                css={sharedDriveUploadStatusPopupHeaderCancelStyles}
-                disabled={isCancelling}
-                data-uie-name="shared-drive-upload-header-cancel"
-                onClick={onCancel}
-              >
-                {cancelLabel}
-              </button>
-            )}
+        <div css={sharedDriveUploadStatusPopupTextStyles} role="status" aria-live="polite">
+          <strong css={sharedDriveUploadStatusPopupTitleStyles} title={title}>
+            {title}
+          </strong>
+          <span css={sharedDriveUploadStatusPopupDestinationStyles} title={destination}>
+            {destination}
+          </span>
+        </div>
+        <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
+          {upload.canCancel && (
             <button
               type="button"
-              css={sharedDriveUploadStatusPopupToggleStyles}
-              aria-label={toggleLabel}
-              aria-expanded={isExpanded}
-              aria-controls={statusRowId}
-              data-uie-name="shared-drive-upload-status-toggle"
-              onClick={onToggle}
+              css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+              disabled={isCancelling}
+              data-uie-name="shared-drive-upload-header-cancel"
+              onClick={onCancel}
             >
-              <ChevronIcon
-                direction={isExpanded ? 'down' : 'up'}
-                css={sharedDriveUploadStatusPopupToggleIconStyles}
-                color="currentColor"
-                aria-hidden="true"
-              />
+              {cancelLabel}
             </button>
-          </div>
+          )}
+          <button
+            type="button"
+            css={sharedDriveUploadStatusPopupToggleStyles}
+            aria-label={toggleLabel}
+            aria-expanded={isExpanded}
+            aria-controls={statusRowId}
+            data-uie-name="shared-drive-upload-status-toggle"
+            onClick={onToggle}
+          >
+            <ChevronIcon
+              direction={isExpanded ? 'down' : 'up'}
+              css={sharedDriveUploadStatusPopupToggleIconStyles}
+              color="currentColor"
+              aria-hidden="true"
+            />
+          </button>
         </div>
-        {upload.kind === 'uploading' && (
-          <div css={sharedDriveUploadStatusPopupProgressStyles} data-uie-name="shared-drive-upload-progress" />
-        )}
       </div>
       <div
         id={statusRowId}
@@ -184,6 +178,12 @@ export const SharedDriveUploadStatusPopup = ({
           </button>
         )}
       </div>
+      {upload.kind === 'uploading' && (
+        <div
+          css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
+          data-uie-name="shared-drive-upload-progress"
+        />
+      )}
     </div>
   );
 };

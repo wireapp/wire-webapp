@@ -23,6 +23,7 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
+import {sharedDriveUploadStatusPopupProgressStyles} from './sharedDriveUploadStatusPopup.styles';
 
 const upload: SharedDriveUploadStatus = {
   uploadId: 'upload-1',
@@ -54,6 +55,21 @@ const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false) 
   );
 
 describe('SharedDriveUploadStatusPopup', () => {
+  it('positions progress at the bottom when closed and below the header when expanded', () => {
+    expect(sharedDriveUploadStatusPopupProgressStyles(false)).toMatchObject({
+      position: 'absolute',
+      bottom: 0,
+      left: 3,
+      top: undefined,
+    });
+    expect(sharedDriveUploadStatusPopupProgressStyles(true)).toMatchObject({
+      position: 'absolute',
+      top: 51,
+      left: 0,
+      bottom: undefined,
+    });
+  });
+
   it('shows the filename and destination while uploading with indeterminate progress', () => {
     const {getByRole, getByText, getByTestId} = renderPopup('uploading');
 
