@@ -21,16 +21,48 @@ import {resolveApplicationLocale} from './Localizer';
 
 describe('resolveApplicationLocale', (): void => {
   it.each([
-    {browserRegionalLocale: 'en-GB', expectedApplicationLanguage: 'en', expectedRegionalDateLocale: 'en-GB'},
-    {browserRegionalLocale: 'en-US', expectedApplicationLanguage: 'en', expectedRegionalDateLocale: 'en-US'},
-    {browserRegionalLocale: 'de-DE', expectedApplicationLanguage: 'de', expectedRegionalDateLocale: 'de-DE'},
+    {
+      browserRegionalLocale: 'en-US',
+      desktopRegionalLocale: 'de-DE',
+      expectedApplicationLanguage: 'en',
+      expectedRegionalDateLocale: 'de-DE',
+      queryParameter: undefined,
+    },
+    {
+      browserRegionalLocale: 'en-GB',
+      desktopRegionalLocale: undefined,
+      expectedApplicationLanguage: 'en',
+      expectedRegionalDateLocale: 'en-GB',
+      queryParameter: undefined,
+    },
+    {
+      browserRegionalLocale: 'en-US',
+      desktopRegionalLocale: 'en-GB',
+      expectedApplicationLanguage: 'de',
+      expectedRegionalDateLocale: 'en-GB',
+      queryParameter: 'de',
+    },
+    {
+      browserRegionalLocale: 'en-GB',
+      desktopRegionalLocale: '',
+      expectedApplicationLanguage: 'en',
+      expectedRegionalDateLocale: 'en-GB',
+      queryParameter: undefined,
+    },
   ])(
-    'keeps the application language and regional locale separate for $browserRegionalLocale',
-    ({browserRegionalLocale, expectedApplicationLanguage, expectedRegionalDateLocale}): void => {
+    'resolves application and regional locales independently for $browserRegionalLocale',
+    ({
+      browserRegionalLocale,
+      desktopRegionalLocale,
+      expectedApplicationLanguage,
+      expectedRegionalDateLocale,
+      queryParameter,
+    }): void => {
       const actualLocaleSettings = resolveApplicationLocale({
-        queryParameter: undefined,
+        queryParameter,
         storedLocale: undefined,
         browserRegionalLocale,
+        desktopRegionalLocale,
       });
 
       expect(actualLocaleSettings.applicationTranslationLanguage).toBe(expectedApplicationLanguage);

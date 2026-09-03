@@ -49,6 +49,7 @@ import {setDateLocale, setRegionalDateLocale} from 'Util/timeUtil';
 import {getParameter} from 'Util/urlUtil';
 
 import {URLParameter} from '../auth/urlParameter';
+import {Config} from '../Config';
 
 const strings = {
   cs,
@@ -84,6 +85,7 @@ export type ApplicationLocaleResolutionInput = {
   queryParameter: unknown;
   storedLocale: unknown;
   browserRegionalLocale: string;
+  desktopRegionalLocale?: string;
 };
 
 export type ApplicationLocaleSettings = {
@@ -112,15 +114,20 @@ export function resolveApplicationLocale(input: ApplicationLocaleResolutionInput
     applicationTranslationLanguage = selectedLanguage;
   }
 
+  const regionalDateLocale = isNonEmptyString(input.desktopRegionalLocale)
+    ? input.desktopRegionalLocale
+    : input.browserRegionalLocale;
+
   return {
     applicationTranslationLanguage,
-    regionalDateLocale: input.browserRegionalLocale,
+    regionalDateLocale,
   };
 }
 
 export function setAppLocale(): void {
   const queryParam = getParameter(URLParameter.LOCALE);
   const currentBrowserRegionalLocale = navigator.language;
+  const desktopRegionalLocale = Config.getDesktopConfig()?.regionalLocale;
 
   if (isNonEmptyString(queryParam)) {
     storeValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
@@ -131,6 +138,7 @@ export function setAppLocale(): void {
     queryParameter: queryParam,
     storedLocale,
     browserRegionalLocale: currentBrowserRegionalLocale,
+    desktopRegionalLocale,
   });
   const {applicationTranslationLanguage, regionalDateLocale} = resolvedLocaleSettings;
 
