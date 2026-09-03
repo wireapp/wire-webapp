@@ -36,6 +36,13 @@ describe('resolveApplicationLocale', (): void => {
       queryParameter: undefined,
     },
     {
+      browserLocale: 'de-DE',
+      desktopRegionalLocale: undefined,
+      expectedApplicationLanguage: 'de',
+      expectedRegionalDateLocale: 'de-DE',
+      queryParameter: undefined,
+    },
+    {
       browserLocale: 'en-US',
       desktopRegionalLocale: 'en-GB',
       expectedApplicationLanguage: 'de',
