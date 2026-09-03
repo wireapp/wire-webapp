@@ -25,6 +25,15 @@ export const wrapperStyles: CSSObject = {
   width: '100%',
 };
 
+export const conversationListStyles: CSSObject = {
+  overflowY: 'auto',
+};
+
+export const conversationIconStyles: CSSObject = {
+  flexShrink: 0,
+  margin: '0 16px',
+};
+
 export const controlStyles = ({
   isDisabled,
   isOpen,
@@ -178,18 +187,4 @@ export const listContainerStyles: CSSObject = {
       borderTopColor: 'var(--gray-90)',
     },
   },
-};
-
-export const emptyStateStyles: CSSObject = {
-  color: 'var(--text-input-placeholder)',
-  fontSize: 'var(--font-size-medium)',
-  lineHeight: '20px',
-  padding: '12px 16px',
-};
-
-export const loadingStateStyles: CSSObject = {
-  color: 'var(--text-input-placeholder)',
-  fontSize: 'var(--font-size-medium)',
-  lineHeight: '20px',
-  padding: '12px 16px',
 };

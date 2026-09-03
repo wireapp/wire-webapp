@@ -1373,6 +1373,7 @@
   "meetings.scheduleModal.error.titleTooLong": "Use a title with a maximum of 64 characters",
   "meetings.scheduleModal.error.updateFailed": "Something went wrong while updating the meeting. Please try again.",
   "meetings.scheduleModal.error.updateFailedTitle": "Could not update meeting",
+  "meetings.scheduleModal.groupsAndChannels": "Groups and channels",
   "meetings.scheduleModal.nextMonthAriaLabel": "Next month",
   "meetings.scheduleModal.openCalendarAriaLabel": "Open calendar",
   "meetings.scheduleModal.participantsLabel": "Participants",
