@@ -22,6 +22,7 @@ import type {Result} from 'true-myth';
 
 import type {CellsUploadGateway, CellsUploadGatewayError, UploadDraftRequest} from './gateway';
 import type {DraftIdentity, UploadSource} from './identity';
+import type {UploadState} from './lifecycle';
 import {createCellsUploadProcess, type CellsUploadProcessDependencies} from './process';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'file.txt', contentType: 'text/plain', size: 4};
@@ -126,16 +127,47 @@ const unwrap = async <T, E>(promise: PromiseLike<{isOk: boolean; value?: T; erro
 };
 
 describe('createCellsUploadProcess', () => {
-  it('uploads successfully and emits ordered snapshots', async () => {
+  it('uploads successfully and reports initial, intermediate, and complete progress in order', async () => {
     const fixture = setup();
-    const snapshots: string[] = [];
-    const subscription = fixture.process.subscribe(snapshot => snapshots.push(snapshot.kind));
+    const snapshots: UploadState[] = [];
+    const subscription = fixture.process.subscribe(snapshot => snapshots.push(snapshot));
     expect(subscription.isOk).toBe(true);
     const start = fixture.process.start();
+    expect(fixture.process.snapshot()).toMatchObject({value: {kind: 'uploading', progress: 0, hasProgress: false}});
+    required(fixture.uploads[0]).onProgress(0);
     required(fixture.uploads[0]).onProgress(0.25);
+    required(fixture.uploads[0]).onProgress(1);
     required(fixture.uploadTasks[0]).resolve(undefined);
     await unwrap(start);
-    expect(snapshots).toEqual(['queued', 'uploading', 'uploading', 'draftReady']);
+    expect(snapshots.map(snapshot => snapshot.kind)).toEqual([
+      'queued',
+      'uploading',
+      'uploading',
+      'uploading',
+      'uploading',
+      'draftReady',
+    ]);
+    expect(snapshots[1]).toMatchObject({progress: 0, hasProgress: false});
+    expect(snapshots[2]).toMatchObject({progress: 0, hasProgress: true});
+    expect(snapshots[3]).toMatchObject({progress: 0.25, hasProgress: true});
+    expect(snapshots[4]).toMatchObject({progress: 1, hasProgress: true});
+  });
+
+  it('clamps invalid progress and ignores an out-of-order update', async () => {
+    const fixture = setup();
+    const start = fixture.process.start();
+    const request = required(fixture.uploads[0]);
+
+    request.onProgress(-1);
+    expect(fixture.process.snapshot()).toMatchObject({value: {progress: 0, hasProgress: true}});
+    request.onProgress(0.8);
+    request.onProgress(0.4);
+    expect(fixture.process.snapshot()).toMatchObject({value: {progress: 0.8, hasProgress: true}});
+    request.onProgress(2);
+    expect(fixture.process.snapshot()).toMatchObject({value: {progress: 1, hasProgress: true}});
+
+    required(fixture.uploadTasks[0]).resolve(undefined);
+    await unwrap(start);
   });
 
   it('uses the repository-returned remote identity after upload', async () => {

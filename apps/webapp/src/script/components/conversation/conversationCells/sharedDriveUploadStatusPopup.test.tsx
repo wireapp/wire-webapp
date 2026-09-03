@@ -30,6 +30,9 @@ const upload: SharedDriveUploadStatus = {
   fileName: 'report.pdf',
   fileSize: 4,
   kind: 'uploading',
+  progress: 0,
+  hasProgress: false,
+  isTransferActive: true,
   canCancel: true,
 };
 
@@ -37,7 +40,7 @@ const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false) 
   render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup
-        upload={{...upload, kind, canCancel: kind === 'uploading'}}
+        upload={{...upload, kind, isTransferActive: kind === 'uploading', canCancel: kind === 'uploading'}}
         title={`${kind} report.pdf`}
         statusLabel={
           kind === 'failed' ? 'Couldn’t upload file' : `${kind === 'uploading' ? 'Uploading' : 'Uploaded'} 4 KB`
@@ -61,6 +64,58 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(getByText('uploading report.pdf')).toBeInTheDocument();
     expect(getByText('to Shared Drive')).toBeInTheDocument();
     expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+    const progress = getByRole('progressbar', {name: 'report.pdf'});
+    expect(progress).not.toHaveAttribute('aria-valuenow');
+    expect(progress).not.toHaveAttribute('aria-valuemin');
+    expect(progress).not.toHaveAttribute('aria-valuemax');
+  });
+
+  it('shows determinate progress with semantic values when progress is reported', () => {
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, progress: 0.45, hasProgress: true}}
+          title="Uploading report.pdf"
+          statusLabel="Uploading 4 B"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          isCancelling={false}
+          onToggle={jest.fn()}
+          onCancel={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    const progress = screen.getByRole('progressbar');
+    expect(progress).toHaveAttribute('aria-valuemin', '0');
+    expect(progress).toHaveAttribute('aria-valuemax', '100');
+    expect(progress).toHaveAttribute('aria-valuenow', '45');
+    expect(progress).toHaveStyle({width: '45%'});
+    expect(screen.getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+  });
+
+  it('does not show active progress for a queued upload', () => {
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, isTransferActive: false}}
+          title="Uploading report.pdf"
+          statusLabel="Uploading 4 B"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          isCancelling={false}
+          onToggle={jest.fn()}
+          onCancel={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
   });
 
   it.each([

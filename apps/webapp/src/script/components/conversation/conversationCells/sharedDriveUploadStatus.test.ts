@@ -27,6 +27,7 @@ const state = (kind: string) => ({
   kind,
   identity: {uploadId: 'upload-1'},
   source,
+  ...(kind === 'uploading' ? {progress: 0, hasProgress: false} : {}),
 });
 
 describe('toSharedDriveUploadStatus', () => {
@@ -37,14 +38,32 @@ describe('toSharedDriveUploadStatus', () => {
       fileName: 'report.pdf',
       fileSize: 4,
       kind: 'uploading',
+      progress: 0,
+      hasProgress: false,
+      isTransferActive: kind === 'uploading',
       canCancel: true,
     });
   });
 
-  it.each(['draftReady', 'publishing'])('maps %s to uploading but marks it not cancellable', kind => {
+  it.each(['draftReady', 'publishing'])('maps %s to uploading but marks it not cancellable and indeterminate', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'uploading', canCancel: false}),
+      expect.objectContaining({
+        kind: 'uploading',
+        progress: 0,
+        hasProgress: false,
+        isTransferActive: false,
+        canCancel: false,
+      }),
     );
+  });
+
+  it('preserves determinate progress for an active upload', () => {
+    expect(
+      toSharedDriveUploadStatus(
+        {...state('uploading'), progress: 0.45, hasProgress: true} as never,
+        conversationQualifiedId,
+      ),
+    ).toEqual(expect.objectContaining({kind: 'uploading', progress: 0.45, hasProgress: true, isTransferActive: true}));
   });
 
   it('maps published to uploaded', () => {

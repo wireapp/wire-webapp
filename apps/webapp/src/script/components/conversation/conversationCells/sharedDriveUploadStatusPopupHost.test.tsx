@@ -37,6 +37,7 @@ const uploadState: UploadState = {
   identity: {uploadId: 'upload-1'},
   source: uploadSource,
   progress: 0,
+  hasProgress: false,
 };
 const uploadedState: UploadState = {
   kind: 'published',

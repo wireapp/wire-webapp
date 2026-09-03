@@ -39,6 +39,7 @@ const transitionFromQueued = (state: Extract<UploadState, {kind: 'queued'}>, act
       identity: state.identity,
       source: state.source,
       progress: 0,
+      hasProgress: false,
     });
   }
 
@@ -55,7 +56,12 @@ const transitionFromQueued = (state: Extract<UploadState, {kind: 'queued'}>, act
 
 const transitionFromUploading = (state: Extract<UploadState, {kind: 'uploading'}>, action: UploadAction) => {
   if (action.type === 'progress') {
-    return Result.ok<UploadState, UploadLifecycleError>({...state, progress: normalizeProgress(action.progress)});
+    const progress = normalizeProgress(action.progress);
+    return Result.ok<UploadState, UploadLifecycleError>({
+      ...state,
+      progress: Math.max(state.progress, progress),
+      hasProgress: true,
+    });
   }
 
   if (action.type === 'uploadSucceeded') {

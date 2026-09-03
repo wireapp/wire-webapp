@@ -29,7 +29,10 @@ export interface UploadingState {
   readonly kind: 'uploading';
   readonly identity: UploadIdentity;
   readonly source: UploadSource;
+  /** Last normalized progress reported by the current upload attempt. */
   readonly progress: number;
+  /** Whether the gateway has reported at least one progress event for this attempt. */
+  readonly hasProgress: boolean;
 }
 
 export interface DraftReadyState {

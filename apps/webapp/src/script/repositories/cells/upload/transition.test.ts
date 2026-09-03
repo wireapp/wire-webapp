@@ -15,7 +15,7 @@ import {normalizeProgress, transition} from './transition';
 
 const source = {blob: new Blob(['content']), name: 'file.txt', contentType: 'text/plain', size: 7};
 const queued: UploadState = {kind: 'queued', identity: {uploadId: 'upload-1'}, source};
-const uploading: UploadState = {...queued, kind: 'uploading', progress: 0};
+const uploading: UploadState = {...queued, kind: 'uploading', progress: 0, hasProgress: false};
 const draftReady: UploadState = {
   kind: 'draftReady',
   identity: {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
@@ -92,14 +92,43 @@ describe('transition', () => {
     expect(expectSuccess(state, action).kind).toBe(expected);
   });
 
-  it('normalizes progress while uploading and ignores it outside active upload', () => {
+  it('starts without determinate progress until the gateway reports it', () => {
+    expect(expectSuccess(queued, {type: 'startUpload'})).toMatchObject({
+      kind: 'uploading',
+      progress: 0,
+      hasProgress: false,
+    });
+  });
+
+  it('normalizes and marks progress while uploading and ignores it outside active upload', () => {
     expect(expectSuccess(uploading, {type: 'progress', progress: 0.5})).toMatchObject({
       kind: 'uploading',
       progress: 0.5,
+      hasProgress: true,
     });
     const result = transition(draftReady, {type: 'progress', progress: 0.8});
     expect(resultModule.isOk(result)).toBe(true);
     expect(resultModule.isOk(result) && result.value).toBe(draftReady);
+  });
+
+  it.each([
+    {reported: -0.5, expected: 0},
+    {reported: 1.5, expected: 1},
+    {reported: Number.NaN, expected: 0},
+  ])('clamps invalid progress $reported to $expected', ({reported, expected}) => {
+    expect(expectSuccess(uploading, {type: 'progress', progress: reported})).toMatchObject({
+      progress: expected,
+      hasProgress: true,
+    });
+  });
+
+  it('does not move progress backwards within an attempt', () => {
+    const intermediate = expectSuccess(uploading, {type: 'progress', progress: 0.75});
+
+    expect(expectSuccess(intermediate, {type: 'progress', progress: 0.25})).toMatchObject({
+      progress: 0.75,
+      hasProgress: true,
+    });
   });
 
   it('preserves upload and draft identities across transitions', () => {

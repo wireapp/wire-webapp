@@ -21,6 +21,8 @@ import type {CSSObject} from '@emotion/react';
 
 import type {SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
 
+const PROGRESS_PERCENTAGE_MAX = 100;
+
 export const sharedDriveUploadStatusPopupStyles: CSSObject = {
   position: 'absolute',
   right: 16,
@@ -157,14 +159,18 @@ export const sharedDriveUploadStatusPopupRowIconStyles: CSSObject = {
   flex: '0 0 auto',
 };
 
-export const sharedDriveUploadStatusPopupProgressStyles: CSSObject = {
+const sharedDriveUploadStatusPopupProgressBaseStyles: CSSObject = {
   position: 'absolute',
   bottom: 0,
   left: 3,
-  width: 'min(209px, calc(50% + 3px))',
   height: 3,
   overflow: 'hidden',
   backgroundColor: '#0667c8',
+};
+
+export const sharedDriveUploadStatusPopupProgressStyles: CSSObject = {
+  ...sharedDriveUploadStatusPopupProgressBaseStyles,
+  width: 'min(209px, calc(50% + 3px))',
   animation: 'shared-drive-upload-progress 1.5s ease-in-out infinite',
   '@keyframes shared-drive-upload-progress': {
     '0%': {transform: 'translateX(-100%)'},
@@ -174,3 +180,8 @@ export const sharedDriveUploadStatusPopupProgressStyles: CSSObject = {
     animation: 'none',
   },
 };
+
+export const sharedDriveUploadStatusPopupDeterminateProgressStyles = (progress: number): CSSObject => ({
+  ...sharedDriveUploadStatusPopupProgressBaseStyles,
+  width: `${progress * PROGRESS_PERCENTAGE_MAX}%`,
+});
