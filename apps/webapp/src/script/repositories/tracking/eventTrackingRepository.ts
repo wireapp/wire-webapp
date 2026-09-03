@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {HttpClient, LongRunningRetryDetails} from '@wireapp/api-client/lib/http';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {amplify} from 'amplify';
@@ -391,7 +392,11 @@ export class EventTrackingRepository {
       if (this.teamState.teamSize() >= TEAM_SIZE_THRESHOLD_VALUE) {
         const selfRole = this.teamState.selfRole();
         segmentation[Segmentation.COMMON.TEAM_USER_TYPE] = selfRole ? selfRole.toString() : '';
-        segmentation[Segmentation.COMMON.TEAM_TEAM_ID] = this.teamState.team().id!;
+        const teamId = this.teamState.team().id;
+        if (isUndefined(teamId)) {
+          throw new Error('Team tracking data is missing the team id');
+        }
+        segmentation[Segmentation.COMMON.TEAM_TEAM_ID] = teamId;
         segmentation[Segmentation.COMMON.TEAM_TEAM_SIZE] = this.teamState.teamSize();
       }
     } else {

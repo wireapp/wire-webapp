@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
@@ -567,7 +568,11 @@ export class CryptographyMapper {
       }
       const cipherTextArray = base64ToArray(eventData.data);
       const cipherText = cipherTextArray;
-      const externalMessageBuffer = await this.core.service!.asset.decryptAsset({
+      const coreServices = this.core.service;
+      if (isUndefined(coreServices)) {
+        throw new Error('Core services are not initialized');
+      }
+      const externalMessageBuffer = await coreServices.asset.decryptAsset({
         cipherText,
         keyBytes: otrKey,
         sha256,

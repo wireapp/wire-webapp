@@ -25,6 +25,7 @@ import {ValidationError} from '../module/action/validationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/testUtil';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 const passwordInputId = 'enter-password';
 const setPasswordButtonId = 'do-set-password';
@@ -49,7 +50,7 @@ describe('SetPassword', () => {
     const passwordInput = getByTestId(passwordInputId);
 
     fireEvent.change(passwordInput, {target: {value: 'e'}});
-    fireEvent.submit(container.querySelector('form')!);
+    fireEvent.submit(requireValueForTest(container.querySelector('form')));
 
     await waitFor(() => {
       const errorMessage = getByTestId(errorMessageId);

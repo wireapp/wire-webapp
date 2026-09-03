@@ -29,6 +29,7 @@ import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor, EditorState} from 'lexical';
 import {noop} from 'noop-esm';
 
@@ -146,7 +147,10 @@ export const RichTextEditor = ({
           <EditorRefPlugin
             editorRef={editor => {
               editorRef.current = editor;
-              onSetup(editor!);
+              if (isNullOrUndefined(editor)) {
+                return;
+              }
+              onSetup(editor);
             }}
           />
           <DraftStatePlugin loadDraftState={loadDraftState} />

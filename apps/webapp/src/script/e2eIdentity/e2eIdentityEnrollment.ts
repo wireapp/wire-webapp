@@ -329,9 +329,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
           return conversations.found
             .filter(conversation => isNonEmptyString(conversation.group_id))
-            .map(({group_id}) => ({
-              group_id: group_id!,
-            }));
+            .map(({group_id}) => {
+              if (!isNonEmptyString(group_id)) {
+                throw new Error('An MLS conversation is missing its group id');
+              }
+
+              return {group_id};
+            });
         },
       });
 

@@ -27,6 +27,7 @@ import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsSto
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
@@ -114,7 +115,7 @@ describe('GroupVideoGridTile', () => {
 
     const {container} = renderComponent({participant});
 
-    fireEvent.canPlay(container.querySelector('video')!);
+    fireEvent.canPlay(requireValueForTest(container.querySelector('video')));
 
     expect(container.querySelector(loadingOverlaySelector)).not.toBeInTheDocument();
   });

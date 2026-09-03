@@ -19,6 +19,7 @@
 
 import {ChangeEvent, useCallback, useId, useMemo, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -112,9 +113,6 @@ export const UserList = ({
   const highlightedUserIds = highlightedUsers.map(user => user.id);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
 
-  // subscribe to roles changes in order to react to them
-  useKoSubscribableChildren(conversation!, ['roles']);
-
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
 
@@ -183,7 +181,7 @@ export const UserList = ({
   const membersHeaderId = useId();
   let content;
 
-  const showRoles = !!conversation;
+  const showRoles = !isUndefined(conversation);
   if (showRoles) {
     let members: User[] = [];
     let admins: User[] = [];
@@ -328,6 +326,7 @@ export const UserList = ({
 
   return (
     <>
+      {!isUndefined(conversation) && <ConversationRolesSubscription conversation={conversation} />}
       {content}
 
       {hasMoreUsers && (
@@ -340,3 +339,9 @@ export const UserList = ({
     </>
   );
 };
+
+function ConversationRolesSubscription({conversation}: {conversation: Conversation}): null {
+  useKoSubscribableChildren(conversation, ['roles']);
+
+  return null;
+}

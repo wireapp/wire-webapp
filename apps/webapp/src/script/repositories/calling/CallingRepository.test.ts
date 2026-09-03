@@ -78,6 +78,7 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Translate} from 'Util/localizerUtil';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -137,6 +138,12 @@ function createCallingRepositoryForTest({
 const translateWithPrefixForTest: Translate = (translationKey, _substitutions, _dangerousSubstitutions, _skipEscape) =>
   `translated:${translationKey}`;
 
+function getSubconversationServiceForTest(): NonNullable<NonNullable<Core['service']>['subconversation']> {
+  const service = requireValueForTest(container.resolve(Core).service);
+
+  return requireValueForTest(service.subconversation);
+}
+
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository: CallingRepository;
@@ -172,8 +179,8 @@ describe('CallingRepository', () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
       const senderUserId = {domain: 'senderdomain', id: 'senderid'};
-      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
-      const selfClientId = callingRepository['selfClientId']!;
+      const selfUserId = requireValueForTest(callingRepository['selfUser']).qualifiedId;
+      const selfClientId = requireValueForTest(callingRepository['selfClientId']);
       const call = new Call(
         selfUserId,
         conversation,
@@ -218,8 +225,8 @@ describe('CallingRepository', () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
       const senderUserId = {domain: 'senderdomain', id: 'senderid'};
-      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
-      const selfClientId = callingRepository['selfClientId']!;
+      const selfUserId = requireValueForTest(callingRepository['selfUser']).qualifiedId;
+      const selfClientId = requireValueForTest(callingRepository['selfClientId']);
       const call = new Call(
         selfUserId,
         conversation,
@@ -264,7 +271,7 @@ describe('CallingRepository', () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
       const senderUserId = {domain: 'senderdomain', id: 'senderid'};
-      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+      const selfUserId = requireValueForTest(callingRepository['selfUser']).qualifiedId;
 
       const call = new Call(
         selfUserId,
@@ -311,9 +318,7 @@ describe('CallingRepository', () => {
 
   describe('startCall', () => {
     beforeEach(() => {
-      const subscribeToEpochUpdates = jest.mocked(
-        container.resolve(Core).service!.subconversation.subscribeToEpochUpdates,
-      );
+      const subscribeToEpochUpdates = jest.mocked(getSubconversationServiceForTest().subscribeToEpochUpdates);
       subscribeToEpochUpdates?.mockClear();
     });
 
@@ -414,9 +419,7 @@ describe('CallingRepository', () => {
 
   describe('answerCall', () => {
     beforeEach(() => {
-      const subscribeToEpochUpdates = jest.mocked(
-        container.resolve(Core).service!.subconversation.subscribeToEpochUpdates,
-      );
+      const subscribeToEpochUpdates = jest.mocked(getSubconversationServiceForTest().subscribeToEpochUpdates);
       subscribeToEpochUpdates?.mockClear();
     });
 
@@ -698,7 +701,7 @@ describe('CallingRepository', () => {
       const remoteParticipant = new Participant(user, remoteClientId);
 
       const call = new Call(
-        callingRepository['selfUser']!.qualifiedId,
+        requireValueForTest(callingRepository['selfUser']).qualifiedId,
         conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
@@ -1380,7 +1383,8 @@ describe('init AVS state', () => {
 
 const createLinkInsideDetachedWindow = (detachedWindow: Window, target = '_blank') => {
   detachedWindow.document.body.innerHTML = `<a href="https://wire.com" target="${target}">Wire</a>`;
-  return detachedWindow.document.querySelector('a')!;
+
+  return requireValueForTest(detachedWindow.document.querySelector('a'));
 };
 
 describe('setupDetachedWindowExternalLinksClick', () => {

@@ -33,6 +33,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
@@ -164,12 +165,13 @@ describe('ConversationListCallingCell', () => {
     const callDuration = container.querySelector('[data-uie-name="call-duration"]');
 
     expect(callDuration).not.toBeNull();
-    expect(callDuration!.textContent).toBe('00:00');
+    const callDurationElement = requireValueForTest(callDuration);
+    expect(callDurationElement.textContent).toBe('00:00');
     act(() => {
       jest.advanceTimersByTime(10000);
     });
 
-    expect(callDuration!.textContent).toBe('00:10');
+    expect(callDurationElement.textContent).toBe('00:10');
     jest.useRealTimers();
   });
 });

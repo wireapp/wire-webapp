@@ -96,6 +96,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {escapeRegex} from 'Util/sanitizationUtil';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -119,6 +120,22 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/coreSingleton';
+
+function getCoreConversationServiceForTest(): NonNullable<NonNullable<Core['service']>['conversation']> {
+  const service = requireValueForTest(container.resolve(Core).service);
+
+  return requireValueForTest(service.conversation);
+}
+
+function getMlsServiceForTest(core: Core = container.resolve(Core)): NonNullable<NonNullable<Core['service']>['mls']> {
+  const service = requireValueForTest(core.service);
+
+  return requireValueForTest(service.mls);
+}
+
+function getConversationServiceFromCoreForTest(core: Core): NonNullable<NonNullable<Core['service']>['conversation']> {
+  return requireValueForTest(requireValueForTest(core.service).conversation);
+}
 
 function buildConversationRepository(translate: Translate) {
   const teamState = new TeamState();
@@ -229,7 +246,7 @@ describe('ConversationRepository', () => {
   });
 
   beforeEach(async () => {
-    const conversationRepository = testFactory.conversation_repository!;
+    const conversationRepository = requireValueForTest(testFactory.conversation_repository);
 
     jest.spyOn(conversationRepository['conversationService'], 'saveConversationStateInDb').mockResolvedValue({} as any);
     await conversationRepository['saveConversation'](selfConversation);
@@ -241,7 +258,7 @@ describe('ConversationRepository', () => {
   });
 
   afterEach(() => {
-    const conversationRepository = testFactory.conversation_repository!;
+    const conversationRepository = requireValueForTest(testFactory.conversation_repository);
     conversationRepository['conversationState'].conversations.removeAll();
   });
 
@@ -288,7 +305,7 @@ describe('ConversationRepository', () => {
 
   describe('saveConversation', () => {
     it('preserves existing participants when new conversation lacks them', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const user = generateUser();
       const existing = _generateConversation({type: CONVERSATION_TYPE.ONE_TO_ONE, users: [user]});
       await conversationRepository['saveConversation'](existing);
@@ -296,13 +313,15 @@ describe('ConversationRepository', () => {
       const shell = _generateConversation({id: existing.qualifiedId, type: CONVERSATION_TYPE.ONE_TO_ONE, users: []});
       await conversationRepository['saveConversation'](shell);
 
-      const stored = conversationRepository['conversationState'].findConversation(existing.qualifiedId)!;
+      const stored = requireValueForTest(
+        conversationRepository['conversationState'].findConversation(existing.qualifiedId),
+      );
       expect(stored.participating_user_ids()).toHaveLength(1);
       expect(stored.participating_user_ids()[0]).toEqual(user.qualifiedId);
     });
 
     it('updates observable-backed properties when merging into an existing conversation', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const existing = _generateConversation({name: 'Old title'});
       await conversationRepository['saveConversation'](existing);
 
@@ -313,14 +332,16 @@ describe('ConversationRepository', () => {
       });
       await conversationRepository['saveConversation'](updated);
 
-      const stored = conversationRepository['conversationState'].findConversation(existing.qualifiedId)!;
+      const stored = requireValueForTest(
+        conversationRepository['conversationState'].findConversation(existing.qualifiedId),
+      );
       expect(stored.name()).toBe('New title');
       expect(stored.groupConversationType()).toBe(GROUP_CONVERSATION_TYPE.MEETING);
       expect(stored.display_name()).toBe('New title');
     });
 
     it('preserves guest status when merging into an existing conversation', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const existing = _generateConversation({name: 'Old title'});
       existing.isGuest(true);
       await conversationRepository['saveConversation'](existing);
@@ -332,7 +353,9 @@ describe('ConversationRepository', () => {
       });
       await conversationRepository['saveConversation'](updated);
 
-      const stored = conversationRepository['conversationState'].findConversation(existing.qualifiedId)!;
+      const stored = requireValueForTest(
+        conversationRepository['conversationState'].findConversation(existing.qualifiedId),
+      );
       expect(stored.name()).toBe('New title');
       expect(stored.isGuest()).toBe(true);
     });
@@ -340,7 +363,7 @@ describe('ConversationRepository', () => {
 
   describe('saveMeetingConversationFromBackend', () => {
     it('updates the name of an already-loaded meeting conversation', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
       const existing = _generateConversation({
         id: qualifiedId,
@@ -363,13 +386,13 @@ describe('ConversationRepository', () => {
       );
 
       expect(result.isOk).toBe(true);
-      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      const stored = requireValueForTest(conversationRepository['conversationState'].findConversation(qualifiedId));
       expect(stored.name()).toBe('Updated meeting title');
       expect(stored.display_name()).toBe('Updated meeting title');
     });
 
     it('preserves guest status when updating the meeting title', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
       const existing = _generateConversation({
         id: qualifiedId,
@@ -393,13 +416,13 @@ describe('ConversationRepository', () => {
       );
 
       expect(result.isOk).toBe(true);
-      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      const stored = requireValueForTest(conversationRepository['conversationState'].findConversation(qualifiedId));
       expect(stored.name()).toBe('Updated meeting title');
       expect(stored.isGuest()).toBe(true);
     });
 
     it('preserves loaded messages and local state when updating the meeting title', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
       const message = new ContentMessage(createUuid(), translateForTest);
       message.id = createUuid();
@@ -432,7 +455,7 @@ describe('ConversationRepository', () => {
       );
 
       expect(result.isOk).toBe(true);
-      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      const stored = requireValueForTest(conversationRepository['conversationState'].findConversation(qualifiedId));
       expect(stored.name()).toBe('Updated meeting title');
       expect(stored.display_name()).toBe('Updated meeting title');
       expect(stored.messages_unordered()).toHaveLength(1);
@@ -445,7 +468,7 @@ describe('ConversationRepository', () => {
     });
 
     it('preserves existing title and add permission when the update payload omits those fields', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const qualifiedId = {id: createUuid(), domain: 'test.wire.link'};
       const existing = _generateConversation({
         id: qualifiedId,
@@ -473,7 +496,7 @@ describe('ConversationRepository', () => {
       );
 
       expect(result.isOk).toBe(true);
-      const stored = conversationRepository['conversationState'].findConversation(qualifiedId)!;
+      const stored = requireValueForTest(conversationRepository['conversationState'].findConversation(qualifiedId));
       expect(stored.name()).toBe('Existing meeting title');
       expect(stored.conversationModerator()).toBe(ADD_PERMISSION.EVERYONE);
     });
@@ -572,7 +595,7 @@ describe('ConversationRepository', () => {
 
   describe('init1to1Conversation', () => {
     it('just returns a conversation if id of the other user cannot be found', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
 
       const conversation = _generateConversation({
         type: CONVERSATION_TYPE.ONE_TO_ONE,
@@ -584,8 +607,8 @@ describe('ConversationRepository', () => {
     });
 
     it('returns a conversation if we fail when fetching other users supported protocols', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -610,8 +633,8 @@ describe('ConversationRepository', () => {
     });
 
     it('returns a proteus conversation even if both users support mls but the user was deleted on backend', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-af03f38416', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -645,7 +668,7 @@ describe('ConversationRepository', () => {
     });
 
     it('returns a selected proteus 1:1 conversation with a team member even if there are multiple conversations with the same user', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
 
       const teamId = 'teamId';
       const domain = 'test-domain';
@@ -685,8 +708,8 @@ describe('ConversationRepository', () => {
     });
 
     it('just returns a proteus conversation with a bot/service', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-1733-479d-bd80-af03f38416', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -743,7 +766,7 @@ describe('ConversationRepository', () => {
 
     beforeAll(() => {
       jest
-        .spyOn(testFactory.conversation_repository!, 'saveConversation')
+        .spyOn(requireValueForTest(testFactory.conversation_repository), 'saveConversation')
         .mockImplementation((conversation: Conversation) => {
           testFactory.conversation_repository['conversationState'].conversations.push(conversation);
           return Promise.resolve(conversation);
@@ -751,8 +774,8 @@ describe('ConversationRepository', () => {
     });
 
     it('finds an existing 1:1 conversation within a team', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const team1to1Conversation: Partial<ConversationDatabaseData> = {
         access: [CONVERSATION_ACCESS.INVITE],
@@ -813,8 +836,8 @@ describe('ConversationRepository', () => {
     });
 
     it('returns proteus 1:1 conversation if one of the users does not support mls', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -855,8 +878,8 @@ describe('ConversationRepository', () => {
     });
 
     it('returns proteus 1:1 conversation and marks it as readonly if the other user does not support proteus', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -896,8 +919,8 @@ describe('ConversationRepository', () => {
     });
 
     it('returns established mls 1:1 conversation if both users support mls', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -932,8 +955,8 @@ describe('ConversationRepository', () => {
     });
 
     it('replaces proteus 1:1 with mls 1:1', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const mockedGroupId = 'groupId';
 
@@ -999,7 +1022,7 @@ describe('ConversationRepository', () => {
       }) as BackendMLSConversation;
 
       jest
-        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .spyOn(getCoreConversationServiceForTest(), 'establishMLS1to1Conversation')
         .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
 
       jest.spyOn(conversationRepository['eventService'], 'moveEventsToConversation');
@@ -1030,7 +1053,7 @@ describe('ConversationRepository', () => {
       expect(conversationRepository['conversationService'].blacklistConversation).toHaveBeenCalledWith(
         proteus1to1Conversation.qualifiedId,
       );
-      expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
+      expect(getCoreConversationServiceForTest().establishMLS1to1Conversation).toHaveBeenCalled();
       expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalled();
       expect(conversationRepository['conversationState'].conversations()).not.toEqual(
         expect.arrayContaining([proteus1to1Conversation]),
@@ -1038,8 +1061,8 @@ describe('ConversationRepository', () => {
     });
 
     it("establishes MLS 1:1 conversation if it's not yet established", async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
       const mockedGroupId = 'groupId';
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
@@ -1083,7 +1106,7 @@ describe('ConversationRepository', () => {
       }) as BackendMLSConversation;
 
       jest
-        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .spyOn(getCoreConversationServiceForTest(), 'establishMLS1to1Conversation')
         .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
 
       Object.defineProperty(container.resolve(Core), 'clientId', {
@@ -1095,7 +1118,7 @@ describe('ConversationRepository', () => {
 
       const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
-      expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalledWith(
+      expect(getCoreConversationServiceForTest().establishMLS1to1Conversation).toHaveBeenCalledWith(
         mockedGroupId,
         {client: mockSelfClientId, user: selfUserId},
         otherUserId,
@@ -1104,8 +1127,8 @@ describe('ConversationRepository', () => {
     });
 
     it('establishes MLS 1:1 conversation between team members', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
       const teamId = 'team-id';
       const mockedGroupId = 'groupId';
 
@@ -1153,7 +1176,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
         .mockResolvedValueOnce({conversation: establishedMls1to1ConversationResponse});
       jest
-        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .spyOn(getCoreConversationServiceForTest(), 'establishMLS1to1Conversation')
         .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
 
       selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
@@ -1161,12 +1184,12 @@ describe('ConversationRepository', () => {
 
       await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
-      expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
+      expect(getCoreConversationServiceForTest().establishMLS1to1Conversation).toHaveBeenCalled();
     });
 
     it("establishes MLS 1:1 conversation if it's a team-owned 1:1 conversation only if it was already established on backend", async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
       const teamId = 'team-id';
       const mockedGroupId = 'groupId';
 
@@ -1202,7 +1225,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
         .mockResolvedValueOnce({conversation: establishedMls1to1ConversationResponse});
       jest
-        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .spyOn(getCoreConversationServiceForTest(), 'establishMLS1to1Conversation')
         .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
 
       const [mls1to1Conversation] = conversationRepository.mapConversations([establishedMls1to1ConversationResponse]);
@@ -1216,12 +1239,12 @@ describe('ConversationRepository', () => {
       const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
-      expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
+      expect(getCoreConversationServiceForTest().establishMLS1to1Conversation).toHaveBeenCalled();
     });
 
     it('returns established mls 1:1 conversation if conversation exists locally even when proteus is choosen.', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -1260,8 +1283,8 @@ describe('ConversationRepository', () => {
     });
 
     it('marks mls 1:1 conversation as read-only if the other user does not support mls and mls 1:1 was never established', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -1303,8 +1326,8 @@ describe('ConversationRepository', () => {
     });
 
     it('marks mls 1:1 conversation as read-only if both users support mls but the other user has no keys available', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'a718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -1326,7 +1349,7 @@ describe('ConversationRepository', () => {
       const noKeysError = new ClientMLSError(ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE);
 
       jest
-        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .spyOn(getCoreConversationServiceForTest(), 'establishMLS1to1Conversation')
         .mockRejectedValueOnce(noKeysError);
 
       const [mls1to1Conversation] = conversationRepository.mapConversations([mls1to1ConversationResponse]);
@@ -1352,8 +1375,8 @@ describe('ConversationRepository', () => {
     });
 
     it('deos not mark mls 1:1 conversation as read-only if the other user does not support mls but mls 1:1 was already established', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -1393,8 +1416,8 @@ describe('ConversationRepository', () => {
     });
 
     it('re-evaluates 1:1 conversation with user after their supported protocols are updated', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
       const mockedGroupId = 'groupId';
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
@@ -1448,7 +1471,7 @@ describe('ConversationRepository', () => {
       }) as BackendMLSConversation;
 
       jest
-        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .spyOn(getCoreConversationServiceForTest(), 'establishMLS1to1Conversation')
         .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
 
       Object.defineProperty(container.resolve(Core), 'clientId', {
@@ -1471,8 +1494,8 @@ describe('ConversationRepository', () => {
     });
 
     it('does not re-evaluates 1:1 conversation with user after their supported protocols are updated if conversation did not exist before', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -1544,8 +1567,8 @@ describe('ConversationRepository', () => {
 
   describe('mapConnections', () => {
     it("maps a connection to connection request placeholder for 1:1 conversation when there's an outgoing connection request", async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const userRepository = testFactory.user_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const userRepository = requireValueForTest(testFactory.user_repository);
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain, translateForTest);
@@ -1690,9 +1713,9 @@ describe('ConversationRepository', () => {
     });
 
     it('clears all the messages from database and local state and re-applies creation message', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
-      const messageRepository = testFactory.message_repository!;
-      const eventRepository = testFactory.event_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const messageRepository = requireValueForTest(testFactory.message_repository);
+      const eventRepository = requireValueForTest(testFactory.event_repository);
 
       const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.REGULAR});
       const selfUser = generateUser();
@@ -1754,7 +1777,7 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.conversation_repository as any, 'fetchConversationById').and.callThrough();
       spyOn(testFactory.user_repository, 'getUserSupportedProtocols').and.returnValue([CONVERSATION_PROTOCOL.PROTEUS]);
       spyOn(testFactory.self_repository, 'getSelfSupportedProtocols').and.returnValue([CONVERSATION_PROTOCOL.PROTEUS]);
-      conversationService = testFactory.conversation_repository!['conversationService'];
+      conversationService = requireValueForTest(testFactory.conversation_repository)['conversationService'];
       spyOn(conversationService, 'getConversationById').and.returnValue(Promise.resolve(conversation_payload));
       spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
     });
@@ -1762,7 +1785,7 @@ describe('ConversationRepository', () => {
     it('should map a connection to an existing conversation', () => {
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const user = new User('id', 'domain', translateForTest);
       user.connection(connectionEntity);
       connectionEntity.userId = user.qualifiedId;
@@ -1778,7 +1801,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a connection to a new conversation', () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const user = new User('id1', 'domain1', translateForTest);
       user.connection(connectionEntity);
       connectionEntity.userId = user.qualifiedId;
@@ -1796,7 +1819,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a cancelled connection to an existing conversation and filter it', () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const user = new User('id', 'domain', translateForTest);
       user.connection(connectionEntity);
       connectionEntity.userId = user.qualifiedId;
@@ -1893,7 +1916,7 @@ describe('ConversationRepository', () => {
     });
 
     it('does not show an undefined conversation when archiving the only active conversation', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const conversation = _generateConversation();
       const selfUser = generateUser();
 
@@ -1922,7 +1945,7 @@ describe('ConversationRepository', () => {
 
     describe('conversation.mls-welcome', () => {
       it('should initialise mls 1:1 conversation after receiving a welcome', async () => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const mockedGroupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
 
         const conversation = _generateConversation({
@@ -1942,17 +1965,17 @@ describe('ConversationRepository', () => {
 
         const welcomeEvent: ConversationMLSWelcomeEvent = {
           conversation: conversation.id,
-          data: conversation.groupId!,
+          data: requireValueForTest(conversation.groupId),
           from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
           time: '2015-04-27T11:42:31.475Z',
           type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
         };
 
-        const coreConversationService = container.resolve(Core).service!.conversation!;
+        const coreConversationService = getCoreConversationServiceForTest();
 
         jest.spyOn(coreConversationService, 'isMLSGroupEstablishedLocally').mockResolvedValueOnce(false);
         const selfSupportedProtocolsSpy = jest
-          .spyOn(testFactory.self_repository!, 'getSelfSupportedProtocols')
+          .spyOn(requireValueForTest(testFactory.self_repository), 'getSelfSupportedProtocols')
           .mockResolvedValue([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
 
         const establishedMls1to1ConversationResponse = generateAPIConversation({
@@ -2316,7 +2339,7 @@ describe('ConversationRepository', () => {
       });
 
       it('injects a group creation message when create-meeting has participants', async () => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const injectEventSpy = jest
           .spyOn(conversationRepository['eventRepository'], 'injectEvent')
           .mockResolvedValue(undefined);
@@ -2427,7 +2450,7 @@ describe('ConversationRepository', () => {
       });
 
       const saveMeetingConversation = async () => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const meetingConversation = _generateConversation({
           protocol: CONVERSATION_PROTOCOL.MLS,
           overwites: {group_conv_type: GROUP_CONVERSATION_TYPE.MEETING},
@@ -2440,7 +2463,7 @@ describe('ConversationRepository', () => {
       let wipeMeetingConversationSpy: jest.SpyInstance;
 
       beforeEach(() => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         deleteFromDbSpy = jest
           .spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb')
           .mockResolvedValue('');
@@ -2455,7 +2478,7 @@ describe('ConversationRepository', () => {
       });
 
       it('deletes a local meeting conversation without a delete notification', async () => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const meetingConversation = await saveMeetingConversation();
         const publishSpy = jest.spyOn(amplify, 'publish');
 
@@ -2485,7 +2508,7 @@ describe('ConversationRepository', () => {
           params: {type: CONVERSATION_TYPE.ONE_TO_ONE},
         },
       ])('ignores conversation.delete-meeting for a $name', async ({params}) => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const conversation = _generateConversation(params);
         await conversationRepository['saveConversation'](conversation);
 
@@ -2497,7 +2520,7 @@ describe('ConversationRepository', () => {
       });
 
       it('does not throw when the conversation is unknown', async () => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const getConversationByIdSpy = jest
           .spyOn(conversationRepository, 'getConversationById')
           .mockRejectedValue(
@@ -2521,7 +2544,7 @@ describe('ConversationRepository', () => {
       });
 
       it('still deletes a conversation.delete event and notifies', async () => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const conversation = _generateConversation();
         await conversationRepository['saveConversation'](conversation);
         const publishSpy = jest.spyOn(amplify, 'publish');
@@ -2542,7 +2565,7 @@ describe('ConversationRepository', () => {
       });
 
       it('leaves an active call and clears calling state for a deleted meeting conversation', async () => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const meetingConversation = await saveMeetingConversation();
         const callState = container.resolve(CallState);
         const call = new Call(
@@ -2574,7 +2597,7 @@ describe('ConversationRepository', () => {
       });
 
       it('succeeds when there is no call for the meeting conversation', async () => {
-        const conversationRepository = testFactory.conversation_repository!;
+        const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const meetingConversation = await saveMeetingConversation();
         const leaveCallSpy = jest.spyOn(conversationRepository['callingRepository'], 'leaveCall');
 
@@ -2602,9 +2625,7 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.conversation_repository as any, 'onMemberJoin').and.callThrough();
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
-        spyOn(container.resolve(Core).service!.conversation, 'mlsGroupExistsLocally').and.returnValue(
-          Promise.resolve(true),
-        );
+        spyOn(getCoreConversationServiceForTest(), 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
 
         conversation_et = _generateConversation();
 
@@ -2660,9 +2681,9 @@ describe('ConversationRepository', () => {
             configurable: true,
           });
 
-          jest.spyOn(container.resolve(Core).service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
+          jest.spyOn(getMlsServiceForTest(), 'conversationExists').mockResolvedValueOnce(true);
 
-          const conversationRepo = testFactory.conversation_repository!;
+          const conversationRepo = requireValueForTest(testFactory.conversation_repository);
           jest.spyOn(conversationRepo['conversationService'], 'mlsGroupExistsLocally').mockResolvedValue(false);
 
           return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
@@ -2685,9 +2706,9 @@ describe('ConversationRepository', () => {
 
             Object.defineProperty(container.resolve(Core), 'clientId', {value: mockSelfClientId});
 
-            jest.spyOn(container.resolve(Core).service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
+            jest.spyOn(getMlsServiceForTest(), 'conversationExists').mockResolvedValueOnce(true);
 
-            const conversationRepo = testFactory.conversation_repository!;
+            const conversationRepo = requireValueForTest(testFactory.conversation_repository);
             jest.spyOn(conversationRepo['conversationService'], 'mlsGroupExistsLocally').mockResolvedValue(false);
 
             return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
@@ -2715,7 +2736,7 @@ describe('ConversationRepository', () => {
           type: CONVERSATION_EVENT.MEMBER_JOIN,
         } as ConversationMemberJoinEvent;
 
-        const conversationRepo = testFactory.conversation_repository!;
+        const conversationRepo = requireValueForTest(testFactory.conversation_repository);
         conversationRepo['conversationState'].conversations.push(conversation);
 
         // conversation has a corresponding pending connection
@@ -2723,9 +2744,9 @@ describe('ConversationRepository', () => {
         connectionEntity.conversationId = conversation.qualifiedId;
         connectionEntity.userId = {domain: '', id: ''};
         connectionEntity.status(ConnectionStatus.PENDING);
-        testFactory.connection_repository!.addConnectionEntity(connectionEntity);
+        requireValueForTest(testFactory.connection_repository).addConnectionEntity(connectionEntity);
 
-        spyOn(conversationRepo!['userState'], 'self').and.returnValue(selfUser);
+        spyOn(conversationRepo['userState'], 'self').and.returnValue(selfUser);
 
         return conversationRepo['handleConversationEvent'](memberJoinEvent).then(() => {
           expect(conversationRepo['onMemberJoin']).toHaveBeenCalled();
@@ -2754,8 +2775,8 @@ describe('ConversationRepository', () => {
           type: CONVERSATION_EVENT.MEMBER_JOIN,
         } as ConversationMemberJoinEvent;
 
-        const conversationRepo = testFactory.conversation_repository!;
-        const userRepo = testFactory.user_repository!;
+        const conversationRepo = requireValueForTest(testFactory.conversation_repository);
+        const userRepo = requireValueForTest(testFactory.user_repository);
         conversationRepo['conversationState'].conversations.push(conversation);
 
         jest.spyOn(conversationRepo, 'resolve1To1Conversation').mockResolvedValueOnce(conversation);
@@ -2770,9 +2791,9 @@ describe('ConversationRepository', () => {
         connectionEntity.conversationId = conversation.qualifiedId;
         connectionEntity.userId = otherUser.qualifiedId;
         connectionEntity.status(ConnectionStatus.SENT);
-        testFactory.connection_repository!.addConnectionEntity(connectionEntity);
+        requireValueForTest(testFactory.connection_repository).addConnectionEntity(connectionEntity);
 
-        spyOn(conversationRepo!['userState'], 'self').and.returnValue(selfUser);
+        spyOn(conversationRepo['userState'], 'self').and.returnValue(selfUser);
 
         return conversationRepo['handleConversationEvent'](memberJoinEvent).then(() => {
           expect(conversationRepo['onMemberJoin']).toHaveBeenCalled();
@@ -3299,16 +3320,16 @@ describe('ConversationRepository', () => {
     it('marks inaccessible conversations as past member', async () => {
       const inaccessibleGroup = _generateConversation();
       const activeGroup = _generateConversation();
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
 
-      jest.spyOn(testFactory.conversation_service!, 'getConversationByIds').mockResolvedValue({
+      jest.spyOn(requireValueForTest(testFactory.conversation_service), 'getConversationByIds').mockResolvedValue({
         not_found: [inaccessibleGroup],
       });
       await conversationRepository['saveConversation'](inaccessibleGroup);
       await conversationRepository['saveConversation'](activeGroup);
 
       const currentNbConversations = conversationRepository['conversationState'].conversations().length;
-      await testFactory.conversation_repository!.syncDeletedConversations();
+      await requireValueForTest(testFactory.conversation_repository).syncDeletedConversations();
 
       expect(conversationRepository['conversationState'].conversations()).toHaveLength(currentNbConversations);
       expect(inaccessibleGroup.status()).toBe(ConversationStatus.PAST_MEMBER);
@@ -3339,11 +3360,11 @@ describe('ConversationRepository', () => {
 
   describe('loadConversations', () => {
     beforeEach(() => {
-      testFactory.conversation_repository!['conversationState'].conversations.removeAll();
+      requireValueForTest(testFactory.conversation_repository)['conversationState'].conversations.removeAll();
     });
 
     it('loads all conversations from backend when there is no local conversations', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const conversationService = conversationRepository['conversationService'];
       const remoteConversations = {
         found: [
@@ -3380,7 +3401,7 @@ describe('ConversationRepository', () => {
     });
 
     it("does not load proteus 1:1 conversation if there's mls 1:1 conversation with the same user", async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const conversationService = conversationRepository['conversationService'];
       const userId = {id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b', domain: 'staging.zinfra.io'};
 
@@ -3425,7 +3446,7 @@ describe('ConversationRepository', () => {
     });
 
     it("still loads proteus 1:1 conversation if there's mls 1:1 conversation with the same user but conversation exists locally", async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const conversationService = conversationRepository['conversationService'];
       const userId = {id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b', domain: 'staging.zinfra.io'};
 
@@ -3470,7 +3491,7 @@ describe('ConversationRepository', () => {
     });
 
     it('does not load connection request (type 3) conversations if their users were deleted on backend', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const conversationService = conversationRepository['conversationService'];
       const userId = {id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b', domain: 'staging.zinfra.io'};
 
@@ -3508,7 +3529,7 @@ describe('ConversationRepository', () => {
     });
 
     it('keeps track of missing conversations', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const conversationService = conversationRepository['conversationService'];
       const conversationState = conversationRepository['conversationState'];
       const remoteConversations = {
@@ -3551,11 +3572,11 @@ describe('ConversationRepository', () => {
   });
   describe('loadMissingConversations', () => {
     beforeEach(() => {
-      testFactory.conversation_repository!['conversationState'].conversations.removeAll();
+      requireValueForTest(testFactory.conversation_repository)['conversationState'].conversations.removeAll();
     });
 
     it('make sure missing conversations are properly updated', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const conversationService = conversationRepository['conversationService'];
       const conversationState = conversationRepository['conversationState'];
 
@@ -3607,7 +3628,7 @@ describe('ConversationRepository', () => {
       conversation.participating_user_ets.push(unavailableUsers[0], unavailableUsers[1], unavailableUsers[2]);
 
       const conversationRepo = await testFactory.exposeConversationActors();
-      spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
+      spyOn(requireValueForTest(testFactory.user_repository), 'refreshUsers').and.callFake(() => {
         unavailableUsers.map(user => {
           user.id = createUuid();
           user.name(faker.person.fullName());
@@ -3616,7 +3637,7 @@ describe('ConversationRepository', () => {
 
       await conversationRepo.refreshUnavailableParticipants(conversation);
 
-      expect(testFactory.user_repository!.refreshUsers).toHaveBeenCalled();
+      expect(requireValueForTest(testFactory.user_repository).refreshUsers).toHaveBeenCalled();
       expect(unavailableUsers[0].name).toBeTruthy();
       expect(unavailableUsers[1].name).toBeTruthy();
       expect(unavailableUsers[2].name).toBeTruthy();
@@ -3642,9 +3663,12 @@ describe('ConversationRepository', () => {
       conversation2.participating_user_ets.push(unavailableUsers2[0], unavailableUsers2[1], unavailableUsers2[2]);
 
       const conversationRepo = await testFactory.exposeConversationActors();
-      testFactory.conversation_repository!['conversationState'].conversations([conversation1, conversation2]);
+      requireValueForTest(testFactory.conversation_repository)['conversationState'].conversations([
+        conversation1,
+        conversation2,
+      ]);
 
-      spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
+      spyOn(requireValueForTest(testFactory.user_repository), 'refreshUsers').and.callFake(() => {
         unavailableUsers1.map(user => {
           user.id = createUuid();
           user.name(faker.person.fullName());
@@ -3657,7 +3681,7 @@ describe('ConversationRepository', () => {
 
       await conversationRepo['refreshAllConversationsUnavailableParticipants']();
 
-      expect(testFactory.user_repository!.refreshUsers).toHaveBeenCalled();
+      expect(requireValueForTest(testFactory.user_repository).refreshUsers).toHaveBeenCalled();
       expect(unavailableUsers1[0].name).toBeTruthy();
       expect(unavailableUsers1[1].name).toBeTruthy();
       expect(unavailableUsers1[2].name).toBeTruthy();
@@ -3878,7 +3902,7 @@ describe('ConversationRepository', () => {
 
       const usersToAdd = [generateUser(), generateUser()];
 
-      const coreConversationService = container.resolve(Core).service!.conversation;
+      const coreConversationService = getCoreConversationServiceForTest();
       spyOn(coreConversationService, 'addUsersToProteusConversation');
 
       await conversationRepository.addUsers(conversation, usersToAdd);
@@ -3898,7 +3922,7 @@ describe('ConversationRepository', () => {
 
       const usersToAdd = [generateUser(), generateUser()];
 
-      const coreConversationService = container.resolve(Core).service!.conversation;
+      const coreConversationService = getCoreConversationServiceForTest();
       jest.spyOn(coreConversationService, 'addUsersToMLSConversation');
       jest.spyOn(coreConversationService, 'addUsersToProteusConversation').mockResolvedValueOnce({});
 
@@ -3921,7 +3945,7 @@ describe('ConversationRepository', () => {
 
       const usersToAdd = [generateUser(), generateUser()];
 
-      const coreConversationService = container.resolve(Core).service!.conversation;
+      const coreConversationService = getCoreConversationServiceForTest();
       spyOn(coreConversationService, 'addUsersToMLSConversation');
 
       await conversationRepository.addUsers(conversation, usersToAdd);
@@ -3949,7 +3973,7 @@ describe('ConversationRepository', () => {
 
         conversation.participating_user_ets([user1, user2]);
 
-        const coreConversationService = container.resolve(Core).service!.conversation;
+        const coreConversationService = getCoreConversationServiceForTest();
 
         jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
 
@@ -3975,7 +3999,7 @@ describe('ConversationRepository', () => {
 
       conversation.participating_user_ets([user1, user2]);
 
-      const coreConversationService = container.resolve(Core).service!.conversation;
+      const coreConversationService = getCoreConversationServiceForTest();
 
       jest
         .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
@@ -4040,7 +4064,10 @@ describe('leaveConversation', () => {
 
       conversation.participating_user_ets([generateUser(), generateUser()]);
 
-      const removeUserFromConversationSpy = jest.spyOn(core.service!.conversation, 'removeUserFromConversation');
+      const removeUserFromConversationSpy = jest.spyOn(
+        getConversationServiceFromCoreForTest(core),
+        'removeUserFromConversation',
+      );
 
       const injectEventsSpy = jest.spyOn(eventRepository, 'injectEvents');
 
@@ -4129,8 +4156,9 @@ describe('onMLSResetMessage', () => {
       },
     };
 
-    spyOn(core.service!.conversation, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
-    spyOn(core.service!.conversation, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(false));
+    const coreConversationService = getConversationServiceFromCoreForTest(core);
+    spyOn(coreConversationService, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
+    spyOn(coreConversationService, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(false));
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
     const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
 
@@ -4164,9 +4192,10 @@ describe('onMLSResetMessage', () => {
       },
     };
 
-    spyOn(core.service!.conversation, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
-    spyOn(core.service!.conversation, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
-    spyOn(core.service!.mls!, 'getEpoch').and.returnValue(Promise.resolve(5));
+    const coreConversationService = getConversationServiceFromCoreForTest(core);
+    spyOn(coreConversationService, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
+    spyOn(coreConversationService, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
+    spyOn(getMlsServiceForTest(core), 'getEpoch').and.returnValue(Promise.resolve(5));
 
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
     const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');

@@ -18,11 +18,14 @@
  */
 
 import {act, fireEvent, render} from '@testing-library/react';
+import {type ReactElement} from 'react';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
@@ -57,7 +60,17 @@ import {PanelState} from '../rightSidebar';
 
 jest.mock('Components/panel/enrichedFields', () => ({
   useEnrichedFields: (): never[] => [],
-  EnrichedFields: () => <div />,
+  EnrichedFields: function EnrichedFields({
+    showAvailability = false,
+  }: {
+    showAvailability?: boolean;
+  }): ReactElement | null {
+    if (!showAvailability) {
+      return null;
+    }
+
+    return <div data-uie-name="item-enriched-value" />;
+  },
   __esModule: true,
 }));
 jest.mock('Components/panel/userDetails', () => ({
@@ -295,5 +308,57 @@ describe('ConversationDetails', () => {
         expect(actionItem).not.toBeNull();
       });
     });
+  });
+
+  it('updates the block action when the participant blocking state changes', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+
+    const participant = new User('other-user', '', translateForTest);
+    const connection = new ConnectionEntity();
+    connection.status(ConnectionStatus.ACCEPTED);
+    participant.connection(connection);
+    conversation.participating_user_ets([participant]);
+
+    const defaultProps = getDefaultParams();
+    const {queryByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByTestId('do-block')).not.toBeNull();
+    expect(queryByTestId('do-unblock')).toBeNull();
+
+    act(() => {
+      connection.status(ConnectionStatus.BLOCKED);
+    });
+
+    expect(queryByTestId('do-block')).toBeNull();
+    expect(queryByTestId('do-unblock')).not.toBeNull();
+  });
+
+  it('updates participant availability when the participant becomes a temporary guest', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+
+    const participant = new User('other-user', '', translateForTest);
+    participant.teamId = 'team-id';
+    conversation.participating_user_ets([participant]);
+
+    const defaultProps = getDefaultParams();
+    const team = new TeamEntity();
+    team.id = 'team-id';
+    defaultProps.teamState.team(team);
+
+    const {queryByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByTestId('item-enriched-value')).not.toBeNull();
+
+    act(() => {
+      participant.isTemporaryGuest(true);
+    });
+
+    expect(queryByTestId('item-enriched-value')).toBeNull();
   });
 });

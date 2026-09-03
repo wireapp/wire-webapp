@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/lib/auth/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
@@ -48,10 +49,12 @@ export class CryptographyRepository {
   }
 
   get proteusService() {
-    if (!this.core.service) {
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
       throw new Error('Core is not initiated');
     }
-    return this.core.service!.proteus;
+
+    return coreServices.proteus;
   }
 
   /**

@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {act, renderHook} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
@@ -66,15 +67,8 @@ function buildLoggerMock(): LoggerMock {
   return {debug: jest.fn()};
 }
 
-function createControllablePromise<T>() {
-  let resolve!: (value: T) => void;
-  let reject!: (reason?: unknown) => void;
-  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
-    resolve = resolvePromise;
-    reject = rejectPromise;
-  });
-
-  return {promise, resolve, reject};
+function createControllablePromise<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
 }
 
 function buildRestNodeStub(name: string, uuid = name): RestNode {
@@ -314,14 +308,19 @@ describe('useSearchCellsNodes', () => {
 
     const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository, logger});
 
-    let currentSearchPromise!: Promise<void>;
+    let currentSearchPromise: Promise<void> | undefined;
     act(() => {
       currentSearchPromise = result.current.handleReload();
     });
 
+    if (isUndefined(currentSearchPromise)) {
+      throw new Error('The current search promise was not created');
+    }
+    const currentSearchRequestPromise = currentSearchPromise;
+
     await act(async () => {
       currentSearch.resolve({Nodes: [buildRestNodeStub('current-file.pdf')]});
-      await currentSearchPromise;
+      await currentSearchRequestPromise;
       await flushMicrotasks();
     });
 
@@ -340,14 +339,19 @@ describe('useSearchCellsNodes', () => {
     };
     const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository});
 
-    let currentSearchPromise!: Promise<void>;
+    let currentSearchPromise: Promise<void> | undefined;
     act(() => {
       currentSearchPromise = result.current.handleReload();
     });
 
+    if (isUndefined(currentSearchPromise)) {
+      throw new Error('The current search promise was not created');
+    }
+    const currentSearchRequestPromise = currentSearchPromise;
+
     await act(async () => {
       currentSearch.resolve({Nodes: [buildRestNodeStub('current-file.pdf')]});
-      await currentSearchPromise;
+      await currentSearchRequestPromise;
       staleSearch.reject(new Error('stale request failed'));
       await fireAndForgetInvoker.waitUntilAllSettled();
     });

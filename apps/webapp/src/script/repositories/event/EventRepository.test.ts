@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {BackendEvent, CONVERSATION_EVENT, MEETING_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {ConnectionState} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -32,8 +33,13 @@ import {EventSource} from './EventSource';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 const testFactory = new TestFactory();
+
+function getEventRepositoryForTest(): EventRepository {
+  return requireValueForTest(testFactory.event_repository);
+}
 
 describe('EventRepository', () => {
   beforeAll(() => testFactory.exposeClientActors());
@@ -44,40 +50,31 @@ describe('EventRepository', () => {
 
   describe('handleEvent', () => {
     beforeEach(() => {
-      testFactory.event_repository!.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      spyOn<any>(testFactory.event_repository!, 'distributeEvent');
+      getEventRepositoryForTest().notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      spyOn<any>(getEventRepositoryForTest(), 'distributeEvent');
     });
 
     it('should not save but distribute "user.*" events', () => {
-      return testFactory
-        .event_repository!['handleEvent'](
-          {event: {type: USER_EVENT.UPDATE, user: {id: ''}}},
-          EventSource.NOTIFICATION_STREAM,
-        )
+      return getEventRepositoryForTest()
+        ['handleEvent']({event: {type: USER_EVENT.UPDATE, user: {id: ''}}}, EventSource.NOTIFICATION_STREAM)
         .then(() => {
-          expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
+          expect(getEventRepositoryForTest()['distributeEvent']).toHaveBeenCalled();
         });
     });
 
     it('should not save but distribute "call.*" events', () => {
-      return testFactory
-        .event_repository!['handleEvent'](
-          {event: {type: ClientEvent.CALL.E_CALL} as any},
-          EventSource.NOTIFICATION_STREAM,
-        )
+      return getEventRepositoryForTest()
+        ['handleEvent']({event: {type: ClientEvent.CALL.E_CALL} as any}, EventSource.NOTIFICATION_STREAM)
         .then(() => {
-          expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
+          expect(getEventRepositoryForTest()['distributeEvent']).toHaveBeenCalled();
         });
     });
 
     it('should not save but distribute "conversation.create" events', () => {
-      return testFactory
-        .event_repository!['handleEvent'](
-          {event: {type: CONVERSATION_EVENT.CREATE} as any},
-          EventSource.NOTIFICATION_STREAM,
-        )
+      return getEventRepositoryForTest()
+        ['handleEvent']({event: {type: CONVERSATION_EVENT.CREATE} as any}, EventSource.NOTIFICATION_STREAM)
         .then(() => {
-          expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
+          expect(getEventRepositoryForTest()['distributeEvent']).toHaveBeenCalled();
         });
     });
 
@@ -91,9 +88,11 @@ describe('EventRepository', () => {
         type: 'conversation.rename',
       } as BackendEvent;
 
-      return testFactory.event_repository!['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
-        expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
-      });
+      return getEventRepositoryForTest()
+        ['handleEvent']({event}, EventSource.NOTIFICATION_STREAM)
+        .then(() => {
+          expect(getEventRepositoryForTest()['distributeEvent']).toHaveBeenCalled();
+        });
     });
 
     it('accepts "conversation.member-join" events', () => {
@@ -106,9 +105,11 @@ describe('EventRepository', () => {
         type: 'conversation.member-join',
       } as BackendEvent;
 
-      return testFactory.event_repository!['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
-        expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
-      });
+      return getEventRepositoryForTest()
+        ['handleEvent']({event}, EventSource.NOTIFICATION_STREAM)
+        .then(() => {
+          expect(getEventRepositoryForTest()['distributeEvent']).toHaveBeenCalled();
+        });
     });
 
     it('accepts "conversation.member-leave" events', () => {
@@ -121,9 +122,11 @@ describe('EventRepository', () => {
         type: 'conversation.member-leave',
       } as BackendEvent;
 
-      return testFactory.event_repository!['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
-        expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
-      });
+      return getEventRepositoryForTest()
+        ['handleEvent']({event}, EventSource.NOTIFICATION_STREAM)
+        .then(() => {
+          expect(getEventRepositoryForTest()['distributeEvent']).toHaveBeenCalled();
+        });
     });
 
     it('accepts "conversation.voice-channel-deactivate" (missed call) events', async () => {
@@ -157,9 +160,11 @@ describe('EventRepository', () => {
         type: 'conversation.unable-to-decrypt',
       } as ClientConversationEvent;
 
-      return testFactory.event_repository!.injectEvent(event).then(() => {
-        expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
-      });
+      return getEventRepositoryForTest()
+        .injectEvent(event)
+        .then(() => {
+          expect(getEventRepositoryForTest()['distributeEvent']).toHaveBeenCalled();
+        });
     });
   });
 
@@ -542,17 +547,22 @@ describe('EventRepository', () => {
       // Calls connectWebSocket, captures the onConnectionStateChanged callback,
       // transitions to LIVE, and clears mock call counts ready for assertions.
       const setup = async () => {
-        let stateCallback!: (state: ConnectionState) => void;
+        let stateCallback: ((state: ConnectionState) => void) | undefined;
         mockAccount.listen.mockImplementation(({onConnectionStateChanged}: any) => {
           stateCallback = onConnectionStateChanged;
           return Promise.resolve(jest.fn());
         });
         jest.spyOn(Runtime, 'isElectron').mockReturnValue(false);
         await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
-        stateCallback(ConnectionState.LIVE);
+        if (isUndefined(stateCallback)) {
+          throw new Error('The connection state callback was not created');
+        }
+        const connectionStateCallback = stateCallback;
+        connectionStateCallback(ConnectionState.LIVE);
         mockAccount.listen.mockClear();
         mockAccount.isWebsocketHealthy.mockClear();
-        return stateCallback;
+
+        return connectionStateCallback;
       };
 
       describe('reconnect decision by socket state (CLOSED vs CONNECTING/OPEN)', () => {
@@ -639,12 +649,8 @@ describe('EventRepository', () => {
       describe('no reconnect storm on concurrent focus/visibility/heartbeat triggers', () => {
         it('drops concurrent health checks when healthCheckInProgress', async () => {
           await setup();
-          let resolveHealth!: (check: boolean) => void;
-          mockAccount.isWebsocketHealthy.mockReturnValue(
-            new Promise<boolean>(resolve => {
-              resolveHealth = resolve;
-            }),
-          );
+          const {promise: healthCheckPromise, resolve: resolveHealth} = Promise.withResolvers<boolean>();
+          mockAccount.isWebsocketHealthy.mockReturnValue(healthCheckPromise);
 
           // Fire three visibility events before the first health check resolves
           triggerVisibility();
@@ -661,13 +667,9 @@ describe('EventRepository', () => {
 
         it('drops health check when connectionInProgress is true', async () => {
           await setup();
-          let resolveConnect!: (fn: jest.Mock) => void;
+          const {promise: connectionPromise, resolve: resolveConnect} = Promise.withResolvers<jest.Mock>();
           // Make the next listen call hang so connectionInProgress stays true
-          mockAccount.listen.mockReturnValueOnce(
-            new Promise<jest.Mock>(resolve => {
-              resolveConnect = resolve;
-            }),
-          );
+          mockAccount.listen.mockReturnValueOnce(connectionPromise);
 
           // online → handleOnline → connect() sets connectionInProgress = true synchronously
           const onlineHandler = (window.addEventListener as jest.Mock).mock.calls.find(
@@ -685,10 +687,10 @@ describe('EventRepository', () => {
         });
 
         it('deduplicates concurrent visibility and heartbeat triggers', async () => {
-          let heartbeatCb!: () => void;
+          let heartbeatCallback: (() => void) | undefined;
           // Capture the heartbeat callback before connectWebSocket registers it
           (window.setInterval as jest.Mock).mockImplementationOnce((cb: TimerHandler) => {
-            heartbeatCb = cb as () => void;
+            heartbeatCallback = cb as () => void;
             return 999 as any;
           });
 
@@ -697,16 +699,12 @@ describe('EventRepository', () => {
           mockAccount.listen.mockClear();
           mockAccount.isWebsocketHealthy.mockClear();
 
-          let resolveHealth!: (v: boolean) => void;
-          mockAccount.isWebsocketHealthy.mockReturnValue(
-            new Promise<boolean>(resolve => {
-              resolveHealth = resolve;
-            }),
-          );
+          const {promise: healthCheckPromise, resolve: resolveHealth} = Promise.withResolvers<boolean>();
+          mockAccount.isWebsocketHealthy.mockReturnValue(healthCheckPromise);
 
           // Fire all three concurrently: visibility, heartbeat, visibility again
           triggerVisibility();
-          heartbeatCb?.();
+          heartbeatCallback?.();
           triggerVisibility();
 
           resolveHealth(false);

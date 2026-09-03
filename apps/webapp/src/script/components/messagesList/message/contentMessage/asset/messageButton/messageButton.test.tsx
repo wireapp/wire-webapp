@@ -23,6 +23,7 @@ import ko from 'knockout';
 import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 
 import {MessageButton} from './messageButton';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {withTheme} from '../../../../../../auth/util/test/testUtil';
 
@@ -69,6 +70,6 @@ describe('MessageButton', () => {
     const selectedButton = container.querySelector(`button[data-uie-uid="${messageId}"]`);
     expect(selectedButton).not.toBeNull();
 
-    expect(selectedButton!.getAttribute('data-uie-selected')).toBe('true');
+    expect(requireValueForTest(selectedButton).getAttribute('data-uie-selected')).toBe('true');
   });
 });

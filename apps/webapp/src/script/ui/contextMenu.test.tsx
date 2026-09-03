@@ -21,6 +21,7 @@ import '@testing-library/jest-dom';
 import {act, screen, waitFor} from '@testing-library/react';
 
 import {showContextMenu} from './contextMenu';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import * as ActiveWindowMod from '../hooks/useActiveWindow';
 
@@ -102,7 +103,7 @@ describe('ContextMenu positioning', () => {
       offset: 10,
     });
 
-    const menu = queryMenu()!;
+    const menu = requireValueForTest(queryMenu());
     expect(menu.style.left).toBe(px(120)); // 140 - 20
     expect(menu.style.top).toBe(px(130)); // 120 + 10
     expect(menu.style.position).toBe('fixed');
@@ -119,7 +120,7 @@ describe('ContextMenu positioning', () => {
       identifier: 'message-options-menu',
     });
 
-    const menu = queryMenu()!;
+    const menu = requireValueForTest(queryMenu());
     expect(menu.style.left).toBe(px(300));
     expect(menu.style.top).toBe(px(400));
   });
@@ -137,7 +138,7 @@ describe('ContextMenu positioning', () => {
       identifier: 'message-options-menu',
     });
 
-    const menu = queryMenu()!;
+    const menu = requireValueForTest(queryMenu());
     expect(menu.style.left).toBe(px(230)); // 290 - 60
     expect(menu.style.top).toBe(px(155)); // 195 - 40
 
@@ -179,7 +180,7 @@ describe('ContextMenu positioning', () => {
       identifier: 'message-options-menu',
     });
 
-    const button = screen.getByRole('menuitem').querySelector('button')!;
+    const button = requireValueForTest(screen.getByRole('menuitem').querySelector('button'));
     expect(button).toHaveAttribute('aria-disabled', 'true');
 
     await act(async () => {

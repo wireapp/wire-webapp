@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {Cookie as ToughCookie} from 'tough-cookie';
 
 import {ObfuscationUtil} from './obfuscationUtil';
@@ -48,13 +49,19 @@ describe('ObfuscationUtil', () => {
 
   it('obfuscates a cookie', () => {
     expect(cookie).toBeDefined();
-    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie!);
-    expect(cookie!.value).not.toBe(obfuscatedCookie.value);
+    if (isNullOrUndefined(cookie)) {
+      throw new Error('Expected test cookie to be available');
+    }
+    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie);
+    expect(cookie.value).not.toBe(obfuscatedCookie.value);
   });
 
   it(`doesn't obfuscate a cookie when disabled`, () => {
     expect(cookie).toBeDefined();
-    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie!, false);
-    expect(cookie!.value).toBe(obfuscatedCookie.value);
+    if (isNullOrUndefined(cookie)) {
+      throw new Error('Expected test cookie to be available');
+    }
+    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie, false);
+    expect(cookie.value).toBe(obfuscatedCookie.value);
   });
 });

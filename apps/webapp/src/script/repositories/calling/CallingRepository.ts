@@ -667,7 +667,11 @@ export class CallingRepository {
     }
     const {conversation} = call;
 
-    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversation.qualifiedId);
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+    const allClients = await coreServices.conversation.fetchAllParticipantsClients(conversation.qualifiedId);
 
     if (!this.isMLSConference(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
@@ -982,7 +986,11 @@ export class CallingRepository {
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversationId);
+          const coreServices = this.core.service;
+          if (isUndefined(coreServices)) {
+            throw new Error('Core services are not initialized');
+          }
+          const allClients = await coreServices.conversation.fetchAllParticipantsClients(conversationId);
 
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
@@ -2365,13 +2373,21 @@ export class CallingRepository {
       const response = await axios.post(url, data);
       const {status, data: axiosData} = response;
       const jsonData = JSON.stringify(axiosData);
-      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+      const user = this.wUser;
+      if (isUndefined(user)) {
+        return;
+      }
+      this.wCall?.sftResp(user, status, jsonData, jsonData.length, context);
     };
     const avsSftResponseFailedCode = 1000;
     _sendSFTRequest().catch((error: unknown) => {
       this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${toError(error).message}`, error);
       avsLogger.warn(`Request to sft server failed with error`, error);
-      this.wCall?.sftResp(this.wUser!, avsSftResponseFailedCode, '', 0, context);
+      const user = this.wUser;
+      if (isUndefined(user)) {
+        return;
+      }
+      this.wCall?.sftResp(user, avsSftResponseFailedCode, '', 0, context);
     });
 
     return 0;

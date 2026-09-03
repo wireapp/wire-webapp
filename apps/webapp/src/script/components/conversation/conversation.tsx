@@ -17,8 +17,9 @@
  *
  */
 
-import {UIEvent, useCallback, useEffect, useMemo, useState} from 'react';
+import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
@@ -105,15 +106,31 @@ interface ConversationProps {
   reloadApp: () => void;
 }
 
+interface ConversationContentProps extends ConversationProps {
+  readonly activeConversation: ConversationEntity;
+}
+
 const CONFIG = Config.getConfig();
 
-export const Conversation = ({
+export function Conversation(props: ConversationProps): ReactElement | null {
+  const conversationState = container.resolve(ConversationState);
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+
+  if (isUndefined(activeConversation)) {
+    return null;
+  }
+
+  return <ConversationContent {...props} activeConversation={activeConversation} />;
+}
+
+function ConversationContent({
   teamState,
   selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
   reloadApp,
-}: ConversationProps) => {
+  activeConversation,
+}: ConversationContentProps): ReactElement {
   const messageListLogger = getLogger('ConversationList');
 
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
@@ -142,27 +159,22 @@ export const Conversation = ({
   const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
   const [isSharedDriveSearchViewOpen, setIsSharedDriveSearchViewOpen] = useState<boolean>(false);
 
-  const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isFileSharingSendingEnabled',
   ]);
 
-  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(
-    activeConversation!,
-    [
-      'is1to1',
-      'isRequest',
-      'readOnlyState',
-      'participating_user_ets',
-      'connection',
-      'isReadOnlyConversation',
-      'isSelfUserRemoved',
-      'selfUser',
-    ],
-  );
+  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(activeConversation, [
+    'is1to1',
+    'isRequest',
+    'readOnlyState',
+    'participating_user_ets',
+    'connection',
+    'isReadOnlyConversation',
+    'isSelfUserRemoved',
+    'selfUser',
+  ]);
 
   const inTeam = teamState.isInTeam(selfUser);
 
@@ -354,7 +366,12 @@ export const Conversation = ({
   };
 
   const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
-    safeMailOpen(messageDetails.href!);
+    if (isUndefined(messageDetails.href)) {
+      event.preventDefault();
+
+      return false;
+    }
+    safeMailOpen(messageDetails.href);
     event.preventDefault();
     return false;
   };
@@ -392,7 +409,12 @@ export const Conversation = ({
   };
 
   const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails) => {
-    const href = messageDetails.href!;
+    if (isUndefined(messageDetails.href)) {
+      event.preventDefault();
+
+      return false;
+    }
+    const href = messageDetails.href;
 
     const parsed = parseAccountDeepLink(href, CONFIG.URL.ACCOUNT_BASE);
 
@@ -823,4 +845,4 @@ export const Conversation = ({
       </ConversationFileDropzone>
     </CellsSelfUserDriveRoleProvider>
   );
-};
+}
