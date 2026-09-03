@@ -42,6 +42,13 @@ export const sharedDriveUploadStatusPopupStyles: CSSObject = {
 export const sharedDriveUploadStatusPopupContentStyles: CSSObject = {
   display: 'flex',
   minWidth: 0,
+  flexDirection: 'column',
+  gap: 5,
+};
+
+export const sharedDriveUploadStatusPopupHeaderRowStyles: CSSObject = {
+  display: 'flex',
+  minWidth: 0,
   minHeight: 36,
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -188,9 +195,7 @@ export const sharedDriveUploadStatusPopupRowIconStyles: CSSObject = {
 };
 
 export const sharedDriveUploadStatusPopupProgressStyles: CSSObject = {
-  position: 'absolute',
-  bottom: 0,
-  left: 3,
+  alignSelf: 'flex-start',
   width: 'min(209px, calc(50% + 3px))',
   height: 3,
   overflow: 'hidden',
