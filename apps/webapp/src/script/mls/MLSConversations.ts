@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, task} from 'true-myth';
 import {match, P} from 'ts-pattern';
@@ -39,7 +40,6 @@ import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {getLogger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
-import {isNonEmptyArray} from '@sindresorhus/is';
 
 const logger = getLogger('Webapp/MLSConversations');
 
