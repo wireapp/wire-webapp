@@ -82,10 +82,10 @@ setStrings(strings);
 type ApplicationTranslationLanguage = keyof typeof strings;
 
 export type ApplicationLocaleResolutionInput = {
+  browserLocale: string;
+  desktopRegionalLocale: unknown;
   queryParameter: unknown;
   storedLocale: unknown;
-  browserRegionalLocale: string;
-  desktopRegionalLocale?: string;
 };
 
 export type ApplicationLocaleSettings = {
@@ -98,7 +98,7 @@ function isApplicationTranslationLanguage(value: string): value is ApplicationTr
 }
 
 export function resolveApplicationLocale(input: ApplicationLocaleResolutionInput): ApplicationLocaleSettings {
-  const browserLanguage = input.browserRegionalLocale.split('-')[0];
+  const browserLanguage = input.browserLocale.split('-')[0];
   let selectedLanguage: string = DEFAULT_LOCALE;
 
   if (isNonEmptyString(input.queryParameter)) {
@@ -116,7 +116,7 @@ export function resolveApplicationLocale(input: ApplicationLocaleResolutionInput
 
   const regionalDateLocale = isNonEmptyString(input.desktopRegionalLocale)
     ? input.desktopRegionalLocale
-    : input.browserRegionalLocale;
+    : input.browserLocale;
 
   return {
     applicationTranslationLanguage,
@@ -126,7 +126,7 @@ export function resolveApplicationLocale(input: ApplicationLocaleResolutionInput
 
 export function setAppLocale(): void {
   const queryParam = getParameter(URLParameter.LOCALE);
-  const currentBrowserRegionalLocale = navigator.language;
+  const browserLocale = navigator.language;
   const desktopRegionalLocale = Config.getDesktopConfig()?.regionalLocale;
 
   if (isNonEmptyString(queryParam)) {
@@ -137,7 +137,7 @@ export function setAppLocale(): void {
   const resolvedLocaleSettings = resolveApplicationLocale({
     queryParameter: queryParam,
     storedLocale,
-    browserRegionalLocale: currentBrowserRegionalLocale,
+    browserLocale,
     desktopRegionalLocale,
   });
   const {applicationTranslationLanguage, regionalDateLocale} = resolvedLocaleSettings;

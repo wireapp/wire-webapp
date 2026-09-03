@@ -22,37 +22,37 @@ import {resolveApplicationLocale} from './Localizer';
 describe('resolveApplicationLocale', (): void => {
   it.each([
     {
-      browserRegionalLocale: 'en-US',
+      browserLocale: 'en-US',
       desktopRegionalLocale: 'de-DE',
       expectedApplicationLanguage: 'en',
       expectedRegionalDateLocale: 'de-DE',
       queryParameter: undefined,
     },
     {
-      browserRegionalLocale: 'en-GB',
+      browserLocale: 'en-GB',
       desktopRegionalLocale: undefined,
       expectedApplicationLanguage: 'en',
       expectedRegionalDateLocale: 'en-GB',
       queryParameter: undefined,
     },
     {
-      browserRegionalLocale: 'en-US',
+      browserLocale: 'en-US',
       desktopRegionalLocale: 'en-GB',
       expectedApplicationLanguage: 'de',
       expectedRegionalDateLocale: 'en-GB',
       queryParameter: 'de',
     },
     {
-      browserRegionalLocale: 'en-GB',
+      browserLocale: 'en-GB',
       desktopRegionalLocale: '',
       expectedApplicationLanguage: 'en',
       expectedRegionalDateLocale: 'en-GB',
       queryParameter: undefined,
     },
   ])(
-    'resolves application and regional locales independently for $browserRegionalLocale',
+    'resolves application and regional locales independently for $browserLocale',
     ({
-      browserRegionalLocale,
+      browserLocale,
       desktopRegionalLocale,
       expectedApplicationLanguage,
       expectedRegionalDateLocale,
@@ -61,7 +61,7 @@ describe('resolveApplicationLocale', (): void => {
       const actualLocaleSettings = resolveApplicationLocale({
         queryParameter,
         storedLocale: undefined,
-        browserRegionalLocale,
+        browserLocale,
         desktopRegionalLocale,
       });
 
