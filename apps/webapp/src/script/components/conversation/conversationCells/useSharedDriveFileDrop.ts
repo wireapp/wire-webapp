@@ -22,7 +22,7 @@ import {useCallback} from 'react';
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import {Config} from 'src/script/Config';
-import {isAllowedFile} from 'Util/fileTypeUtil';
+import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
 import type {Translate} from 'Util/localizerUtil';
 
 import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';
@@ -62,7 +62,7 @@ export const useSharedDriveFileDrop = ({
       handleSharedDriveDroppedFiles(files, {
         conversationQualifiedId,
         fireAndForgetInvoker,
-        isAcceptedFile: file => isAllowedFile(file.name, file.type),
+        isAcceptedFile: file => allowsAllFiles() || hasAllowedExtension(file.name),
         isInRecycleBin,
         isUploadFilesEnabled,
         maxFileSize: CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS,

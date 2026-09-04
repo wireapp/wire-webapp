@@ -90,12 +90,64 @@ describe('useSharedDriveFileDrop', () => {
     );
   });
 
-  it('starts upload for a dropped file that is allowed by the restrictive upload extension config', async () => {
+  it.each([
+    ['document.pdf', 'application/pdf'],
+    ['archive.zip', 'application/zip'],
+    ['report.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+  ])('starts upload for a dropped %s file allowed by the upload extension config', async (fileName, fileType) => {
+    jest.spyOn(Config, 'getConfig').mockReturnValue({
+      ...defaultConfiguration,
+      FEATURE: {
+        ...defaultConfiguration.FEATURE,
+        ALLOWED_FILE_UPLOAD_EXTENSIONS: ['.pdf', '.zip', '.docx'],
+      },
+    });
     const fireAndForgetInvoker = createFireAndForgetInvoker();
     const sharedDriveUploadController = createSharedDriveUploadController();
     const showFileDropzoneError = jest.fn();
     const onRefresh = jest.fn();
-    const file = new File(['content'], 'document.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], fileName, {type: fileType});
+    const {result} = renderHook(() =>
+      useSharedDriveFileDrop({
+        conversationQualifiedId,
+        fireAndForgetInvoker,
+        isInRecycleBin: false,
+        isUploadFilesEnabled: true,
+        onRefresh,
+        sharedDriveUploadController,
+        showFileDropzoneError,
+        translate: translateForTest,
+        uploadPath,
+      }),
+    );
+
+    act(() => result.current([file]));
+
+    expect(showFileDropzoneError).not.toHaveBeenCalled();
+    expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+    const uploadAction = jest.mocked(fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    await uploadAction();
+    expect(sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [file],
+      uploadPath,
+      onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it('starts upload for any dropped file when the upload extension config allows all files', async () => {
+    jest.spyOn(Config, 'getConfig').mockReturnValue({
+      ...defaultConfiguration,
+      FEATURE: {
+        ...defaultConfiguration.FEATURE,
+        ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'],
+      },
+    });
+    const fireAndForgetInvoker = createFireAndForgetInvoker();
+    const sharedDriveUploadController = createSharedDriveUploadController();
+    const showFileDropzoneError = jest.fn();
+    const onRefresh = jest.fn();
+    const file = new File(['content'], 'installer.exe', {type: 'application/octet-stream'});
     const {result} = renderHook(() =>
       useSharedDriveFileDrop({
         conversationQualifiedId,
