@@ -79,6 +79,7 @@ import {getCurrentFolderName} from './conversationCells/common/getCurrentFolderN
 import {ConversationCells} from './conversationCells/conversationCells';
 import {SharedDriveUploadProvider} from './conversationCells/sharedDriveUploadContext';
 import {createSharedDriveUploadController} from './conversationCells/sharedDriveUploadController';
+import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
 import {ConversationMessagesWrapper} from './conversationMessagesWrapper/conversationMessagesWrapper';
@@ -841,6 +842,14 @@ function ConversationContent({
 
         {isGiphyModalOpen && inputValue && (
           <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
+        )}
+        {activeConversation && (
+          <SharedDriveUploadStatusPopupHost
+            controller={sharedDriveUploadController}
+            conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+            isEnabled={isSharedDriveDirectUploadFeatureEnabled}
+            isFileTabActive={isFileTabActive}
+          />
         )}
       </ConversationFileDropzone>
     </CellsSelfUserDriveRoleProvider>
