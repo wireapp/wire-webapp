@@ -21,6 +21,9 @@ import type {CSSObject} from '@emotion/react';
 
 import type {SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
 
+const SHARED_DRIVE_UPLOAD_PROGRESS_EXPANDED_TOP = 51;
+const SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT = 3;
+
 export const sharedDriveUploadStatusPopupStyles: CSSObject = {
   position: 'absolute',
   right: 16,
@@ -73,6 +76,32 @@ export const sharedDriveUploadStatusPopupDestinationStyles: CSSObject = {
   whiteSpace: 'nowrap',
 };
 
+export const sharedDriveUploadStatusPopupHeaderActionsStyles: CSSObject = {
+  display: 'flex',
+  flex: '0 0 auto',
+  alignItems: 'center',
+  gap: 8,
+};
+
+export const sharedDriveUploadStatusPopupHeaderCancelStyles: CSSObject = {
+  minWidth: 74,
+  height: 32,
+  padding: '4px 12px',
+  border: '1px solid #dce0e3',
+  borderRadius: 12,
+  background: 'var(--app-bg, #fff)',
+  color: 'inherit',
+  fontSize: 14,
+  fontWeight: 700,
+  letterSpacing: '0.35px',
+  lineHeight: '22px',
+  cursor: 'pointer',
+  '&:disabled': {
+    cursor: 'default',
+    opacity: 0.5,
+  },
+};
+
 export const sharedDriveUploadStatusPopupToggleStyles: CSSObject = {
   display: 'flex',
   width: 24,
@@ -109,8 +138,28 @@ export const sharedDriveUploadStatusPopupRowStyles: CSSObject = {
 export const sharedDriveUploadStatusPopupRowTextStyles: CSSObject = {
   display: 'flex',
   minWidth: 0,
+  flex: 1,
   flexDirection: 'column',
   gap: 2,
+};
+
+export const sharedDriveUploadStatusPopupRowCancelStyles: CSSObject = {
+  display: 'flex',
+  flex: '0 0 auto',
+  width: 24,
+  height: 24,
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+  border: 0,
+  borderRadius: 12,
+  background: 'transparent',
+  color: 'inherit',
+  cursor: 'pointer',
+  '&:disabled': {
+    cursor: 'default',
+    opacity: 0.5,
+  },
 };
 
 export const sharedDriveUploadStatusPopupRowFileNameStyles: CSSObject = {
@@ -141,10 +190,11 @@ export const sharedDriveUploadStatusPopupRowIconStyles: CSSObject = {
   flex: '0 0 auto',
 };
 
-export const sharedDriveUploadStatusPopupProgressStyles: CSSObject = {
+export const sharedDriveUploadStatusPopupProgressStyles = (isExpanded: boolean): CSSObject => ({
   position: 'absolute',
-  bottom: 0,
-  left: 3,
+  top: isExpanded ? SHARED_DRIVE_UPLOAD_PROGRESS_EXPANDED_TOP : undefined,
+  bottom: isExpanded ? undefined : 0,
+  left: isExpanded ? 0 : SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT,
   width: 'min(209px, calc(50% + 3px))',
   height: 3,
   overflow: 'hidden',
@@ -157,4 +207,4 @@ export const sharedDriveUploadStatusPopupProgressStyles: CSSObject = {
   '@media (prefers-reduced-motion: reduce)': {
     animation: 'none',
   },
-};
+});

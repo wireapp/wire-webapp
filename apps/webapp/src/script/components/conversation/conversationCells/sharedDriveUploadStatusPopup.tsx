@@ -19,7 +19,7 @@
 
 import type {ReactNode} from 'react';
 
-import {AlertIcon, ChevronIcon, UploadIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon, ChevronIcon, CloseIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {getFileExtension} from 'Util/util';
@@ -28,7 +28,10 @@ import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {
   sharedDriveUploadStatusPopupContentStyles,
   sharedDriveUploadStatusPopupDestinationStyles,
+  sharedDriveUploadStatusPopupHeaderActionsStyles,
+  sharedDriveUploadStatusPopupHeaderCancelStyles,
   sharedDriveUploadStatusPopupProgressStyles,
+  sharedDriveUploadStatusPopupRowCancelStyles,
   sharedDriveUploadStatusPopupRowFileNameStyles,
   sharedDriveUploadStatusPopupRowIconStyles,
   sharedDriveUploadStatusPopupRowStatusStyles,
@@ -48,7 +51,10 @@ interface SharedDriveUploadStatusPopupProps {
   readonly destination: string;
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
+  readonly cancelLabel: string;
+  readonly isCancelling: boolean;
   readonly onToggle: () => void;
+  readonly onCancel: () => void;
 }
 
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
@@ -92,7 +98,10 @@ export const SharedDriveUploadStatusPopup = ({
   destination,
   isExpanded,
   toggleLabel,
+  cancelLabel,
+  isCancelling,
   onToggle,
+  onCancel,
 }: SharedDriveUploadStatusPopupProps) => {
   const statusRowId = `shared-drive-upload-status-${upload.uploadId}`;
 
@@ -111,22 +120,35 @@ export const SharedDriveUploadStatusPopup = ({
             {destination}
           </span>
         </div>
-        <button
-          type="button"
-          css={sharedDriveUploadStatusPopupToggleStyles}
-          aria-label={toggleLabel}
-          aria-expanded={isExpanded}
-          aria-controls={statusRowId}
-          data-uie-name="shared-drive-upload-status-toggle"
-          onClick={onToggle}
-        >
-          <ChevronIcon
-            direction={isExpanded ? 'down' : 'up'}
-            css={sharedDriveUploadStatusPopupToggleIconStyles}
-            color="currentColor"
-            aria-hidden="true"
-          />
-        </button>
+        <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
+          {upload.canCancel && (
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+              disabled={isCancelling}
+              data-uie-name="shared-drive-upload-header-cancel"
+              onClick={onCancel}
+            >
+              {cancelLabel}
+            </button>
+          )}
+          <button
+            type="button"
+            css={sharedDriveUploadStatusPopupToggleStyles}
+            aria-label={toggleLabel}
+            aria-expanded={isExpanded}
+            aria-controls={statusRowId}
+            data-uie-name="shared-drive-upload-status-toggle"
+            onClick={onToggle}
+          >
+            <ChevronIcon
+              direction={isExpanded ? 'down' : 'up'}
+              css={sharedDriveUploadStatusPopupToggleIconStyles}
+              color="currentColor"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
       </div>
       <div
         id={statusRowId}
@@ -143,9 +165,24 @@ export const SharedDriveUploadStatusPopup = ({
             {statusLabel}
           </span>
         </div>
+        {upload.canCancel && (
+          <button
+            type="button"
+            css={sharedDriveUploadStatusPopupRowCancelStyles}
+            aria-label={cancelLabel}
+            disabled={isCancelling}
+            data-uie-name="shared-drive-upload-cancel"
+            onClick={onCancel}
+          >
+            <CloseIcon color="currentColor" aria-hidden="true" />
+          </button>
+        )}
       </div>
       {upload.kind === 'uploading' && (
-        <div css={sharedDriveUploadStatusPopupProgressStyles} data-uie-name="shared-drive-upload-progress" />
+        <div
+          css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
+          data-uie-name="shared-drive-upload-progress"
+        />
       )}
     </div>
   );

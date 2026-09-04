@@ -30,14 +30,21 @@ const state = (kind: string) => ({
 });
 
 describe('toSharedDriveUploadStatus', () => {
-  it.each(['queued', 'uploading', 'draftReady', 'publishing'])('maps %s to uploading', kind => {
+  it.each(['queued', 'uploading'])('maps %s to uploading and marks it cancellable', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual({
       uploadId: 'upload-1',
       conversationQualifiedId,
       fileName: 'report.pdf',
       fileSize: 4,
       kind: 'uploading',
+      canCancel: true,
     });
+  });
+
+  it.each(['draftReady', 'publishing'])('maps %s to uploading but marks it not cancellable', kind => {
+    expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual(
+      expect.objectContaining({kind: 'uploading', canCancel: false}),
+    );
   });
 
   it('maps published to uploaded', () => {
@@ -46,6 +53,7 @@ describe('toSharedDriveUploadStatus', () => {
 
   it.each(['uploadFailed', 'publishFailed', 'discardFailed'])('maps %s to failed', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)?.kind).toBe('failed');
+    expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)?.canCancel).toBe(false);
   });
 
   it.each(['cancelled', 'discarding', 'discarded'])('does not expose %s', kind => {

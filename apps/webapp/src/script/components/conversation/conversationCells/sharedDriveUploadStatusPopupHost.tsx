@@ -19,12 +19,19 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {Maybe, maybe} from 'true-myth';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatBytes} from 'Util/util';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {toSharedDriveUploadStatus, type SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
+
+type DismissedUpload = {
+  readonly conversationQualifiedId: string;
+  readonly uploadId: string;
+};
 
 interface SharedDriveUploadStatusPopupHostProps {
   readonly controller: SharedDriveUploadController;
@@ -61,7 +68,31 @@ export const SharedDriveUploadStatusPopupHost = ({
     upload: readStatus(),
   }));
   const [isExpanded, setIsExpanded] = useState(false);
+  const [cancellingUploadId, setCancellingUploadId] = useState<Maybe<string>>(Maybe.nothing());
+  const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(Maybe.nothing());
   const upload = status.conversationQualifiedId === conversationQualifiedId ? status.upload : readStatus();
+  const isUploadDismissed =
+    maybe.isJust(dismissedUpload) &&
+    dismissedUpload.value.conversationQualifiedId === conversationQualifiedId &&
+    upload !== null &&
+    dismissedUpload.value.uploadId === upload.uploadId;
+
+  const cancelUpload = useCallback(
+    (uploadId: string): void => {
+      if (maybe.isJust(cancellingUploadId)) {
+        return;
+      }
+
+      setDismissedUpload(Maybe.just({conversationQualifiedId, uploadId}));
+      setCancellingUploadId(Maybe.just(uploadId));
+      const finishCancellation = () =>
+        setCancellingUploadId(current =>
+          maybe.isJust(current) && current.value === uploadId ? Maybe.nothing() : current,
+        );
+      void controller.cancel(uploadId).then(finishCancellation, finishCancellation);
+    },
+    [cancellingUploadId, controller, conversationQualifiedId],
+  );
 
   useEffect(() => {
     const updateStatus = () => setStatus({conversationQualifiedId, upload: readStatus()});
@@ -69,7 +100,7 @@ export const SharedDriveUploadStatusPopupHost = ({
     return controller.subscribe(updateStatus);
   }, [controller, conversationQualifiedId, readStatus]);
 
-  if (!isEnabled || !isFileTabActive || !upload) {
+  if (!isEnabled || !isFileTabActive || !upload || isUploadDismissed) {
     return null;
   }
 
@@ -97,7 +128,10 @@ export const SharedDriveUploadStatusPopupHost = ({
       destination={translate('cells.uploadStatus.destination', {destination: translate('cells.sharedDrive.title')})}
       isExpanded={isExpanded}
       toggleLabel={translate(isExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
+      cancelLabel={translate('conversationAssetUploadCancel')}
+      isCancelling={maybe.isJust(cancellingUploadId) && cancellingUploadId.value === upload.uploadId}
       onToggle={() => setIsExpanded(expanded => !expanded)}
+      onCancel={() => cancelUpload(upload.uploadId)}
     />
   );
 };

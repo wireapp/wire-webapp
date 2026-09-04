@@ -17,8 +17,9 @@
  *
  */
 
-import {act, render, screen} from '@testing-library/react';
+import {act, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {noop} from 'noop-esm';
 import type {UploadState} from 'Repositories/cells/upload';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {SharedDriveUploadStatusPopupHost} from './sharedDriveUploadStatusPopupHost';
@@ -52,13 +53,14 @@ const failedState: UploadState = {
 type TestController = SharedDriveUploadController & {
   snapshots: jest.MockedFunction<SharedDriveUploadController['snapshots']>;
   subscribe: jest.MockedFunction<SharedDriveUploadController['subscribe']>;
+  cancel: jest.MockedFunction<SharedDriveUploadController['cancel']>;
 };
 
 const createController = (state: UploadState = uploadState): TestController => ({
   snapshots: jest.fn(scope => (scope === conversationQualifiedId ? [state] : [])),
   subscribe: jest.fn((_listener: () => void) => jest.fn()),
   upload: jest.fn(),
-  cancel: jest.fn(),
+  cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
   retryUpload: jest.fn(),
   retryPublish: jest.fn(),
   discard: jest.fn(),
@@ -140,6 +142,37 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     expect(view.getByRole('status')).toBeInTheDocument();
     expect(controller.snapshots).toHaveBeenCalledWith(conversationQualifiedId);
+  });
+
+  it('dismisses the popup immediately while cancellation is pending', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    controller.cancel.mockReturnValue(new Promise<void>(noop));
+
+    const view = renderHost(controller, conversationQualifiedId);
+    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'conversationAssetUploadCancel',
+    });
+    await user.click(cancel);
+
+    expect(controller.cancel).toHaveBeenCalledWith('upload-1');
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
+    expect(view.queryByTestId('shared-drive-upload-status-popup')).not.toBeInTheDocument();
+  });
+
+  it('keeps the popup dismissed when cancellation fails', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    controller.cancel.mockRejectedValue(new Error('cancellation failed'));
+
+    const view = renderHost(controller, conversationQualifiedId);
+    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'conversationAssetUploadCancel',
+    });
+    await user.click(cancel);
+
+    expect(controller.cancel).toHaveBeenCalledWith('upload-1');
+    await waitFor(() => expect(view.queryByRole('status')).not.toBeInTheDocument());
   });
 
   it('formats the source size in the expanded status copy', async () => {
