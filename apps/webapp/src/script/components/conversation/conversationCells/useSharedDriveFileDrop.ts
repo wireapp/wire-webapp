@@ -22,12 +22,15 @@ import {useCallback} from 'react';
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import {Config} from 'src/script/Config';
+import {isAllowedFile} from 'Util/fileTypeUtil';
 import type {Translate} from 'Util/localizerUtil';
 
 import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
+
+type ShowFileDropzoneError = typeof showFileDropzoneErrorModal;
 
 const CONFIG = Config.getConfig();
 
@@ -37,6 +40,7 @@ interface UseSharedDriveFileDropParameters {
   readonly isUploadFilesEnabled: boolean;
   readonly onRefresh: () => void;
   readonly sharedDriveUploadController: SharedDriveUploadController;
+  readonly showFileDropzoneError?: ShowFileDropzoneError;
   readonly translate: Translate;
   readonly uploadPath: string;
 }
@@ -47,6 +51,7 @@ export const useSharedDriveFileDrop = ({
   isUploadFilesEnabled,
   onRefresh,
   sharedDriveUploadController,
+  showFileDropzoneError = showFileDropzoneErrorModal,
   translate,
   uploadPath,
 }: UseSharedDriveFileDropParameters): ((files: readonly File[]) => void) =>
@@ -54,7 +59,7 @@ export const useSharedDriveFileDrop = ({
     (files: readonly File[]): void =>
       handleSharedDriveDroppedFiles(files, {
         fireAndForgetInvoker,
-        isAcceptedFile: () => true,
+        isAcceptedFile: file => isAllowedFile(file.name, file.type),
         isInRecycleBin,
         isUploadFilesEnabled,
         maxFileSize: CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS,
@@ -66,7 +71,7 @@ export const useSharedDriveFileDrop = ({
             CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS,
           );
 
-          showFileDropzoneErrorModal({...feedback, translate});
+          showFileDropzoneError({...feedback, translate});
         },
         sharedDriveUploadController,
         uploadPath,
@@ -77,6 +82,7 @@ export const useSharedDriveFileDrop = ({
       isUploadFilesEnabled,
       onRefresh,
       sharedDriveUploadController,
+      showFileDropzoneError,
       translate,
       uploadPath,
     ],
