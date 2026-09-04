@@ -1055,7 +1055,7 @@
   "failedToAddParticipantsPluralDetailsOfflineBackend": "[bold]{names}[/bold] and [bold]{name}[/bold] could not be added to the group as the backend of [bold]{domain}[/bold] could not be reached.",
   "failedToAddParticipantsPluralDetailsOfflineForTooLong": "[bold]{names}[/bold] and [bold]{name}[/bold] could not be added to the group.",
   "failedToAddParticipantsSingularDetailsNonFederatingBackends": "[bold]{name}[/bold] could not be added to the group as their backends do not federate with each other.",
-  "failedToAddParticipantsSingularDetailsNotMlsCapable": "[bold]{name}[/bold] could not be added to the meeting. They may not have MLS-capable clients.",
+  "failedToAddParticipantsSingularDetailsNotMlsCapable": "[bold]{name}[/bold] could not be added to the meeting. [bold]{name}[/bold] may not use a device that is MLS-capable.",
   "failedToAddParticipantsSingularDetailsOfflineBackend": "[bold]{name}[/bold] could not be added to the group as the backend of [bold]{domain}[/bold] could not be reached.",
   "failedToAddParticipantsSingularDetailsOfflineForTooLong": "[bold]{name}[/bold] could not be added to the group.",
   "featureConfigChangeModalApplock": "Mandatory app lock is now disabled. You do not need a passcode or biometric authentication when returning to the app.",
