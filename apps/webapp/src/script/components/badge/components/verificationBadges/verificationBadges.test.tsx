@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {MLSStatuses} from 'src/script/e2eIdentity';
@@ -26,7 +27,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-import {VerificationBadges} from './verificationBadges';
+import {VerificationBadges, getUserVerificationBadgeLabel} from './verificationBadges';
 import {translateForTest} from 'Util/test/translateForTest';
 
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
@@ -90,5 +91,39 @@ describe('VerificationBadges', () => {
 
     const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRES_SOON);
+  });
+});
+
+describe('getUserVerificationBadgeLabel', () => {
+  it('returns MLS verified label for VALID status', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: Maybe.just(MLSStatuses.VALID),
+      isProteusVerified: false,
+    });
+    expect(label).toBe(translateForTest('E2EI.userDevicesVerified'));
+  });
+
+  it('returns Proteus device verified label when isProteusVerified is true', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: Maybe.nothing(),
+      isProteusVerified: true,
+    });
+    expect(label).toBe(translateForTest('proteusDeviceVerified'));
+  });
+
+  it('returns composed labels when both MLS and Proteus are verified', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: Maybe.just(MLSStatuses.VALID),
+      isProteusVerified: true,
+    });
+    expect(label).toBe(`${translateForTest('E2EI.userDevicesVerified')}, ${translateForTest('proteusDeviceVerified')}`);
+  });
+
+  it('returns undefined when neither MLS nor Proteus is verified', () => {
+    const label = getUserVerificationBadgeLabel(translateForTest, {
+      mlsStatus: Maybe.nothing(),
+      isProteusVerified: false,
+    });
+    expect(label).toBeUndefined();
   });
 });
