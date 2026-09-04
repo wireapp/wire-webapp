@@ -24,7 +24,7 @@
     "@faker-js/faker": "9.9.0",
     "@inquirer/prompts": "8.7.0",
     "@ls-lint/ls-lint": "2.3.1",
-    "@nx/jest": "22.7.8",
+    "@nx/jest": "22.7.9",
     "@nx/node": "22.7.8",
     "@nx/workspace": "22.7.8",
     "@stylistic/eslint-plugin": "5.10.0",
