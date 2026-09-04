@@ -137,7 +137,7 @@
     "@types/wicg-file-system-access": "2023.10.7",
     "@wireapp/store-engine": "workspace:^",
     "autoprefixer": "10.5.4",
-    "babel-jest": "30.5.0",
+    "babel-jest": "30.5.1",
     "babel-loader": "10.1.1",
     "babel-plugin-transform-import-meta": "2.3.3",
     "baseline-browser-mapping": "2.11.20",
