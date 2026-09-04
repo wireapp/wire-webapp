@@ -44,7 +44,9 @@ type CallingEventContent = {
         emojis: InCallEmojiType;
         isHandUp: boolean;
       }
-    : {type: EventType; version: string};
+    : EventType extends CALL_MESSAGE_TYPE.SETUP
+      ? {type: EventType; version: string; resp: boolean}
+      : {type: EventType; version: string};
 }[CALL_MESSAGE_TYPE];
 
 export interface CallingEvent {
