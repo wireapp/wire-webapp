@@ -27,18 +27,27 @@ type SharedDriveUploadInputDependencies = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly sharedDriveUploadController: SharedDriveUploadController;
   readonly uploadPath: string;
+  readonly conversationQualifiedId: string;
   readonly onRefresh: () => void;
 };
 
 export const handleSharedDriveUploadInput = (
   event: ChangeEvent<HTMLInputElement>,
-  {fireAndForgetInvoker, sharedDriveUploadController, uploadPath, onRefresh}: SharedDriveUploadInputDependencies,
+  {
+    fireAndForgetInvoker,
+    sharedDriveUploadController,
+    uploadPath,
+    conversationQualifiedId,
+    onRefresh,
+  }: SharedDriveUploadInputDependencies,
 ): void => {
-  const files = Array.from(event.target.files ?? []);
+  const file = event.target.files?.[0];
   event.target.value = '';
-  if (!files.length) {
+  if (!file) {
     return;
   }
 
-  fireAndForgetInvoker.fireAndForget(() => sharedDriveUploadController.upload(files, uploadPath, onRefresh));
+  fireAndForgetInvoker.fireAndForget(() =>
+    sharedDriveUploadController.upload([file], uploadPath, onRefresh, conversationQualifiedId),
+  );
 };

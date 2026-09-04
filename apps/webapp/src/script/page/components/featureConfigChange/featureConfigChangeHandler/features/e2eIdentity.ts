@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {E2EIHandler} from 'src/script/e2eIdentity';
@@ -58,8 +59,12 @@ export const configureE2EI = (config: FeatureList): undefined | Promise<E2EIHand
   if (!e2eiConfig) {
     return undefined;
   }
+  const discoveryUrl = e2eiConfig.config.acmeDiscoveryUrl;
+  if (isUndefined(discoveryUrl)) {
+    throw new Error('E2EI configuration is missing the ACME discovery URL');
+  }
   return E2EIHandler.getInstance().initialize({
-    discoveryUrl: e2eiConfig.config.acmeDiscoveryUrl!,
+    discoveryUrl,
     gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
   });
 };

@@ -199,7 +199,9 @@ export const ConversationCells = memo(
     }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
 
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
+    const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
     const handleDroppedFiles = useSharedDriveFileDrop({
+      conversationQualifiedId: sharedDriveConversationQualifiedId,
       fireAndForgetInvoker,
       isInRecycleBin,
       isUploadFilesEnabled,
@@ -215,8 +217,15 @@ export const ConversationCells = memo(
           onRefresh: handleRefresh,
           sharedDriveUploadController,
           uploadPath: sharedDriveUploadPath,
+          conversationQualifiedId: sharedDriveConversationQualifiedId,
         }),
-      [fireAndForgetInvoker, handleRefresh, sharedDriveUploadController, sharedDriveUploadPath],
+      [
+        fireAndForgetInvoker,
+        handleRefresh,
+        sharedDriveUploadController,
+        sharedDriveConversationQualifiedId,
+        sharedDriveUploadPath,
+      ],
     );
 
     const nodes = getNodes({conversationId});
@@ -275,7 +284,7 @@ export const ConversationCells = memo(
           onDropFiles={handleDroppedFiles}
         >
           <div css={wrapperStyles}>
-            <input ref={uploadInput} type="file" multiple hidden onChange={handleUploadFiles} />
+            <input ref={uploadInput} type="file" hidden onChange={handleUploadFiles} />
             <CellsHeader
               onRefresh={handleRefresh}
               conversationName={name}

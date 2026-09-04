@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {Task} from 'true-myth';
 import type {Result} from 'true-myth';
 
@@ -37,15 +38,34 @@ const unwrapResult = <T, E>(result: Result<T, E>): T => {
   return result.unwrapOr(undefined as never);
 };
 
-const deferred = <T, E>(defaultValue?: T) => {
-  let resolve!: (value?: T) => void;
-  let reject!: (error: E) => void;
-  const value = new Task<T, E>((resolveTask, rejectTask) => {
-    resolve = nextValue => resolveTask(nextValue ?? (defaultValue as T));
+type DeferredTask<Value, Failure> = {
+  readonly value: Task<Value, Failure>;
+  readonly resolve: (value?: Value) => void;
+  readonly reject: (error: Failure) => void;
+};
+
+function createDeferredTask<Value, Failure>(defaultValue: Value): DeferredTask<Value, Failure> {
+  let resolve: ((value?: Value) => void) | undefined;
+  let reject: ((error: Failure) => void) | undefined;
+  const value = new Task<Value, Failure>((resolveTask, rejectTask) => {
+    resolve = nextValue => {
+      if (isUndefined(nextValue)) {
+        resolveTask(defaultValue);
+
+        return;
+      }
+
+      resolveTask(nextValue);
+    };
     reject = rejectTask;
   });
+
+  if (isUndefined(resolve) || isUndefined(reject)) {
+    throw new Error('Deferred task callbacks were not created');
+  }
+
   return {value, resolve, reject};
-};
+}
 
 const setup = (
   failure?: 'publish' | 'discard' | 'mismatch',
@@ -53,7 +73,7 @@ const setup = (
   remoteIdentity: DraftIdentity = {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
 ) => {
   const uploads: UploadDraftRequest[] = [];
-  const uploadTasks: ReturnType<typeof deferred<DraftIdentity, CellsUploadGatewayError<'upload'>>>[] = [];
+  const uploadTasks: DeferredTask<DraftIdentity, CellsUploadGatewayError<'upload'>>[] = [];
   const aborts: AbortController[] = [];
   const published = [] as string[];
   const discarded = [] as string[];
@@ -68,7 +88,7 @@ const setup = (
           cause: 'mismatched-operation',
         });
       }
-      const task = deferred<DraftIdentity, CellsUploadGatewayError<'upload'>>(remoteIdentity);
+      const task = createDeferredTask<DraftIdentity, CellsUploadGatewayError<'upload'>>(remoteIdentity);
       uploadTasks.push(task);
       return task.value;
     },

@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {Page} from '@playwright/test';
 
 import {MarketingConsentModal} from './webapp/modals/marketingConsent.modal';
@@ -148,7 +149,12 @@ export class PageManager {
     if (!this.cache.has(key)) {
       this.cache.set(key, factory());
     }
-    return this.cache.get(key)!;
+    const cachedPage = this.cache.get(key);
+    if (isUndefined(cachedPage)) {
+      throw new Error(`Page manager cache did not contain ${key}`);
+    }
+
+    return cachedPage;
   }
 
   // ───────────── WEBAPP ─────────────

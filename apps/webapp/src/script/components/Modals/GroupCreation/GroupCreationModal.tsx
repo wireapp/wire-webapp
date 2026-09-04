@@ -19,6 +19,7 @@
 
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
@@ -109,7 +110,10 @@ const GroupCreationModal = ({
     });
   }, [defaultProtocol, translate]);
 
-  const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
+  const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol);
+  if (isUndefined(initialProtocol)) {
+    throw new Error(`No protocol option exists for ${defaultProtocol}`);
+  }
 
   // Read receipts are temorarily disabled for MLS groups and channels until it is supported
   const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
@@ -165,7 +169,11 @@ const GroupCreationModal = ({
   }, [isTeam]);
 
   useEffect(() => {
-    setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
+    const nextProtocol = protocolOptions.find(protocol => protocol.value === selectedProtocol.value);
+    if (isUndefined(nextProtocol)) {
+      throw new Error(`No protocol option exists for ${selectedProtocol.value}`);
+    }
+    setSelectedProtocol(nextProtocol);
   }, [protocolOptions, selectedProtocol.value]);
 
   const stateIsPreferences = groupCreationState === GroupCreationModalState.PREFERENCES;

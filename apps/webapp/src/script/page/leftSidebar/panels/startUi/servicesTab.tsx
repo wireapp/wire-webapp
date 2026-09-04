@@ -19,6 +19,7 @@
 
 import {useState, useEffect} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -50,7 +51,12 @@ export const ServicesTab = ({
   const [services, setServices] = useState<ServiceEntity[]>(integrationRepository.services());
   const manageServicesUrl = getManageServicesUrl('client_landing');
 
-  const openManageServices = () => safeWindowOpen(manageServicesUrl!);
+  const openManageServices = () => {
+    if (isUndefined(manageServicesUrl)) {
+      throw new Error('The manage services URL is not configured');
+    }
+    safeWindowOpen(manageServicesUrl);
+  };
 
   const debouncedSearch = useDebouncedCallback(async () => {
     const results = await integrationRepository.searchForServices(searchQuery);

@@ -21,6 +21,8 @@
  * Converts a date object into two strings of format `YYYY-MM-DD` and `HH:mm:ss`.
  * @param date The date to format
  */
+import {isUndefined} from '@sindresorhus/is';
+
 export function isoFormat(date: Date): {date: string; time: string} {
   const isoString = date.toISOString();
 
@@ -30,5 +32,9 @@ export function isoFormat(date: Date): {date: string; time: string} {
     throw new Error('Invalid ISO date string');
   }
   const [, formattedDate, formattedTime] = match;
-  return {date: formattedDate!, time: formattedTime!};
+  if (isUndefined(formattedDate) || isUndefined(formattedTime)) {
+    throw new Error('Invalid ISO date string components');
+  }
+
+  return {date: formattedDate, time: formattedTime};
 }

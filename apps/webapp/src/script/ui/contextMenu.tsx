@@ -20,6 +20,7 @@
 import {ComponentType, CSSProperties, ReactNode, SVGProps, useEffect, useMemo, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
 
@@ -108,7 +109,7 @@ const getPositionFromPlacement = (
   }
 };
 
-const getButtonId = (label: string): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
+const getButtonId = (label: string | undefined): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
 
 const contextMenuClassName = 'ctx-menu';
 const msgMenuIdentifier = 'message-options-menu';
@@ -170,8 +171,11 @@ const ContextMenu = ({
 
       // context menu options such as 10 seconds etc begings with digit which is an invalid querySelector
       // param append btn- to avoid such errors
+      if (isUndefined(labelWithoutQuotes)) {
+        return;
+      }
       const selectedButton = activeWindow.document.querySelector(
-        `#${CSS.escape(getButtonId(labelWithoutQuotes!))}`,
+        `#${CSS.escape(getButtonId(labelWithoutQuotes))}`,
       ) as HTMLButtonElement;
       selectedButton?.focus();
     }
@@ -195,13 +199,13 @@ const ContextMenu = ({
       }
 
       if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN])) {
-        if (!entries.includes(selected!)) {
+        if (isUndefined(selected) || !entries.includes(selected)) {
           const index = isKey(event, KEY.ARROW_DOWN) ? 0 : entries.length - 1;
           setSelected(entries[index]);
           return;
         }
         const direction = isKey(event, KEY.ARROW_DOWN) ? 1 : -1;
-        const nextIndex = (entries.indexOf(selected!) + direction + entries.length) % entries.length;
+        const nextIndex = (entries.indexOf(selected) + direction + entries.length) % entries.length;
         setSelected(entries[nextIndex]);
       }
       if (isEnterKey(event) || isSpaceKey(event)) {
@@ -274,7 +278,7 @@ const ContextMenu = ({
                   aria-haspopup="true"
                 >
                   <button
-                    id={getButtonId(entry.label!)}
+                    id={getButtonId(entry.label)}
                     className={`${contextMenuClassName}__button`}
                     type="button"
                     data-uie-name={entry.identifier || defaultIdentifier}

@@ -53,14 +53,9 @@ import {useMeetNowModal} from './useMeetNowModal';
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 const qualifiedMeetingId = {id: 'meeting-id', domain: 'example.com'};
 
-const createDeferred = <T,>() => {
-  let resolve!: (value: T) => void;
-  const promise = new Promise<T>(resolvePromise => {
-    resolve = resolvePromise;
-  });
-
-  return {promise, resolve};
-};
+function createDeferred<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
+}
 
 const createDeferredMeetNowMeeting = () => {
   const deferred = createDeferred<CreateMeetingSuccess>();

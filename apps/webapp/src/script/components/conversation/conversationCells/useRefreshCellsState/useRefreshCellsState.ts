@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -61,8 +62,9 @@ export const useRefreshCellsState = ({
       return undefined;
     }
 
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+    const previousInterval = intervalRef.current;
+    if (!isNullOrUndefined(previousInterval)) {
+      clearInterval(previousInterval);
       intervalRef.current = null;
     }
 
@@ -78,7 +80,11 @@ export const useRefreshCellsState = ({
 
     intervalRef.current = setInterval(() => {
       if (fetchCountRef.current >= MAX_REFRESH_COUNT) {
-        clearInterval(intervalRef.current!);
+        const currentInterval = intervalRef.current;
+        if (isNullOrUndefined(currentInterval)) {
+          return;
+        }
+        clearInterval(currentInterval);
         intervalRef.current = null;
         setIsRefreshing(false);
         return;
@@ -87,8 +93,9 @@ export const useRefreshCellsState = ({
     }, REFRESH_INTERVAL_MS);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      const currentInterval = intervalRef.current;
+      if (!isNullOrUndefined(currentInterval)) {
+        clearInterval(currentInterval);
         intervalRef.current = null;
       }
     };

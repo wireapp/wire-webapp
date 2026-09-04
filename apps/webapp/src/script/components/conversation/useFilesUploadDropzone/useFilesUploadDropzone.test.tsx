@@ -1,3 +1,4 @@
+import {isUndefined} from '@sindresorhus/is';
 import {act, renderHook, waitFor} from '@testing-library/react';
 
 import {useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
@@ -34,10 +35,9 @@ describe('useFilesUploadDropzone', () => {
   });
 
   it('waits for media metadata before starting an upload', async () => {
-    let resolveMetadata!: (metadata: {image: {width: number; height: number}}) => void;
-    const metadataPromise = new Promise<{image: {width: number; height: number}}>(resolve => {
-      resolveMetadata = resolve;
-    });
+    const {promise: metadataPromise, resolve: resolveMetadata} = Promise.withResolvers<{
+      image: {width: number; height: number};
+    }>();
     const cellsRepository = createRepository();
     cellsRepository.uploadNodeDraft.mockResolvedValue({uuid: 'remote-id', versionId: 'version-id'});
     const buildFileMetadata = jest.fn(() => metadataPromise);
@@ -57,17 +57,22 @@ describe('useFilesUploadDropzone', () => {
     );
     const file = new File(['content'], 'image.png', {type: 'image/png'});
 
-    let upload!: Promise<void>;
+    let upload: Promise<void> | undefined;
     await act(async () => {
       upload = result.current.handlePastedFile(file);
       await Promise.resolve();
     });
 
+    if (isUndefined(upload)) {
+      throw new Error('The upload promise was not created');
+    }
+    const completedUploadPromise = upload;
+
     expect(buildFileMetadata).toHaveBeenCalledWith(expect.objectContaining({name: 'image.png'}));
     expect(cellsRepository.uploadNodeDraft).not.toHaveBeenCalled();
 
     resolveMetadata({image: {width: 640, height: 480}});
-    await act(async () => await upload);
+    await act(async () => await completedUploadPromise);
 
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledTimes(1);
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})[0]).toMatchObject({
@@ -103,10 +108,14 @@ describe('useFilesUploadDropzone', () => {
     );
     const file = new File(['content'], 'document.txt', {type: 'text/plain'});
 
-    let upload!: Promise<void>;
+    let upload: Promise<void> | undefined;
     await act(async () => {
       upload = result.current.handlePastedFile(file);
     });
+    if (isUndefined(upload)) {
+      throw new Error('The upload promise was not created');
+    }
+    const completedUploadPromise = upload;
     await waitFor(() =>
       expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})).toHaveLength(1),
     );
@@ -123,7 +132,7 @@ describe('useFilesUploadDropzone', () => {
     });
 
     resolveUpload({uuid: 'remote-id', versionId: 'version-id'});
-    await act(async () => await upload);
+    await act(async () => await completedUploadPromise);
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})[0]).toMatchObject({
       remoteUuid: 'remote-id',
       remoteVersionId: 'version-id',

@@ -23,6 +23,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {AssetUploadButton} from './assetUploadButton';
@@ -51,7 +52,7 @@ describe('AssetUploadButton', () => {
     const {container} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />, {wrapper: rootProviderWrapper});
 
     const form = container.querySelector('form');
-    jest.spyOn(form!, 'reset');
+    jest.spyOn(requireValueForTest(form), 'reset');
 
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
@@ -61,6 +62,6 @@ describe('AssetUploadButton', () => {
 
     expect(onSelectFiles).toHaveBeenCalledWith([pngFile]);
     expect(fileInput.files?.[0].name).toEqual(pngFile.name);
-    expect(form!.reset).toHaveBeenCalled();
+    expect(requireValueForTest(form).reset).toHaveBeenCalled();
   });
 });

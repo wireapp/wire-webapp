@@ -28,6 +28,7 @@ import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
 
 const uploadPath = 'conversation-id@example.com';
+const conversationQualifiedId = 'conversation-id@example.com';
 
 const createFireAndForgetInvoker = (): FireAndForgetInvoker => ({
   fireAndForget: jest.fn(),
@@ -64,6 +65,7 @@ describe('useSharedDriveFileDrop', () => {
     const file = new File(['content'], 'malware.exe', {type: 'application/octet-stream'});
     const {result} = renderHook(() =>
       useSharedDriveFileDrop({
+        conversationQualifiedId,
         fireAndForgetInvoker,
         isInRecycleBin: false,
         isUploadFilesEnabled: true,
@@ -96,6 +98,7 @@ describe('useSharedDriveFileDrop', () => {
     const file = new File(['content'], 'document.pdf', {type: 'application/pdf'});
     const {result} = renderHook(() =>
       useSharedDriveFileDrop({
+        conversationQualifiedId,
         fireAndForgetInvoker,
         isInRecycleBin: false,
         isUploadFilesEnabled: true,
@@ -113,6 +116,6 @@ describe('useSharedDriveFileDrop', () => {
     expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
     const uploadAction = jest.mocked(fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
     await uploadAction();
-    expect(sharedDriveUploadController.upload).toHaveBeenCalledWith([file], uploadPath, onRefresh);
+    expect(sharedDriveUploadController.upload).toHaveBeenCalledWith([file], uploadPath, onRefresh, conversationQualifiedId);
   });
 });

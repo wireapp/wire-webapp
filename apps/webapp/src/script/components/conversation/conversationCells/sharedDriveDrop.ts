@@ -42,6 +42,7 @@ export interface SharedDriveDropFeedback {
 interface SharedDriveDropDependencies {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly sharedDriveUploadController: SharedDriveUploadController;
+  readonly conversationQualifiedId: string;
   readonly uploadPath: string;
   readonly onRefresh: () => void;
   readonly onReject: (rejection: SharedDriveDropRejection) => void;
@@ -97,6 +98,7 @@ export const handleSharedDriveDroppedFiles = (
   {
     fireAndForgetInvoker,
     sharedDriveUploadController,
+    conversationQualifiedId,
     uploadPath,
     onRefresh,
     onReject,
@@ -118,7 +120,9 @@ export const handleSharedDriveDroppedFiles = (
     return;
   }
 
-  fireAndForgetInvoker.fireAndForget(() => sharedDriveUploadController.upload(files, uploadPath, onRefresh));
+  fireAndForgetInvoker.fireAndForget(() =>
+    sharedDriveUploadController.upload(files, uploadPath, onRefresh, conversationQualifiedId),
+  );
 };
 
 export const getSharedDriveDropRejectionFeedback = (

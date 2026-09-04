@@ -32,6 +32,7 @@ import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -271,7 +272,7 @@ describe('MeetingList', () => {
     const meetingItem = screen.getByText('Visible meeting').closest('[aria-describedby]');
     const describedBy = meetingItem?.getAttribute('aria-describedby');
     expect(describedBy).toBeTruthy();
-    expect(document.getElementById(describedBy!)).toHaveTextContent(/meetings\.list\.today/);
+    expect(document.getElementById(requireValueForTest(describedBy))).toHaveTextContent(/meetings\.list\.today/);
   });
 
   it('does not treat the page tail as last-in-day while more occurrences remain on the same day', () => {

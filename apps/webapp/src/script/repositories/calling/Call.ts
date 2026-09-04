@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
@@ -101,7 +102,15 @@ export class Call {
     this.handRaisedParticipants = ko.pureComputed(() =>
       this.participants()
         .filter(participant => Boolean(participant.handRaisedAt()))
-        .toSorted((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
+        .toSorted((p1, p2) => {
+          const firstHandRaisedAt = p1.handRaisedAt();
+          const secondHandRaisedAt = p2.handRaisedAt();
+          if (isNullOrUndefined(firstHandRaisedAt) || isNullOrUndefined(secondHandRaisedAt)) {
+            throw new Error('A hand-raised participant is missing its timestamp');
+          }
+
+          return firstHandRaisedAt - secondHandRaisedAt;
+        }),
     );
     this.canvasMixer = new CanvasMediaStreamMixer();
     this.maximizedParticipant = ko.observable(null);

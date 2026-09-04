@@ -44,6 +44,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import type {UserRecord} from 'Repositories/storage';
 import type {Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
@@ -245,7 +246,7 @@ describe('UserRepository', () => {
         jest.spyOn(userService, 'loadUserFromDb').mockResolvedValue(departedUser);
         const backendUsersSpy = jest.spyOn(userService, 'getUsers');
 
-        const users = await userRepository.getUsersByIdsFromDb([departedUser.qualified_id!]);
+        const users = await userRepository.getUsersByIdsFromDb([requireValueForTest(departedUser.qualified_id)]);
 
         expect(users).toHaveLength(1);
         expect(users[0].name()).toBe('Former Member');
@@ -342,7 +343,7 @@ describe('UserRepository', () => {
         await userRepository.loadUsers(new User('self', '', translateForTest), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
-        expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => user.qualified_id!));
+        expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => requireValueForTest(user.qualified_id)));
       });
 
       it('assigns connections with users', async () => {
@@ -361,7 +362,7 @@ describe('UserRepository', () => {
       });
 
       it('loads users that are partially stored in the DB and maps availability', async () => {
-        const userIds = localUsers.map(user => user.qualified_id!);
+        const userIds = localUsers.map(user => requireValueForTest(user.qualified_id));
         const connections = createConnections(localUsers);
         const partialUsers = [
           {

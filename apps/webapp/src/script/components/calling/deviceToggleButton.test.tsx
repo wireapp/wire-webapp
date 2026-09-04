@@ -19,6 +19,8 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {DeviceToggleButton} from './DeviceToggleButton';
 
 describe('deviceToggleButton', () => {
@@ -51,7 +53,7 @@ describe('deviceToggleButton', () => {
     const deviceToggleButton = container.querySelector('button[data-uie-name="device-toggle-button-indicator-dot"]');
     expect(deviceToggleButton).not.toBeNull();
 
-    fireEvent.click(deviceToggleButton!);
+    fireEvent.click(requireValueForTest(deviceToggleButton));
     expect(props.onChooseDevice).toHaveBeenCalled();
   });
 });

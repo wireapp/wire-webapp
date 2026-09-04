@@ -17,8 +17,9 @@
  *
  */
 
-import {forwardRef, useEffect, useMemo, useState} from 'react';
+import {forwardRef, useEffect, useMemo, useState, type ReactElement} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {UserType} from '@wireapp/api-client/lib/user';
@@ -73,6 +74,48 @@ interface ConversationDetailsProps {
   teamState: TeamState;
   selfUser: User;
   isFederated?: boolean;
+}
+
+interface ConversationDetailsParticipantProps {
+  readonly activeConversation: Conversation;
+  readonly classifiedDomains: string[] | undefined;
+  readonly isFederated: boolean;
+  readonly isTeam: boolean;
+  readonly isVerified: boolean;
+  readonly participant: User;
+  readonly teamRepository: TeamRepository;
+  readonly teamState: TeamState;
+}
+
+function ConversationDetailsParticipant({
+  activeConversation,
+  classifiedDomains,
+  isFederated,
+  isTeam,
+  isVerified,
+  participant,
+  teamRepository,
+  teamState,
+}: ConversationDetailsParticipantProps): ReactElement {
+  const {isTemporaryGuest} = useKoSubscribableChildren(participant, ['isTemporaryGuest']);
+
+  return (
+    <>
+      <UserDetails
+        groupId={activeConversation.groupId}
+        participant={participant}
+        isVerified={isVerified}
+        badge={teamRepository.getRoleBadge(participant.id)}
+        classifiedDomains={classifiedDomains}
+      />
+
+      <EnrichedFields
+        user={participant}
+        showDomain={isFederated}
+        showAvailability={isTeam && !isTemporaryGuest && teamState.isInTeam(participant)}
+      />
+    </>
+  );
 }
 
 const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>(
@@ -132,8 +175,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'isGroupOrChannel',
       'cellsState',
     ]);
-
-    const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
 
     const {isTeam, classifiedDomains, team, isSelfDeletingMessagesEnforced, getEnforcedSelfDeletingMessagesTimeout} =
       useKoSubscribableChildren(teamState, [
@@ -246,15 +287,15 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
 
     const isSingleUserMode = is1to1 || isRequest;
-    const isServiceMode = isSingleUserMode && firstParticipant!.isService;
+    const isServiceMode = isSingleUserMode && !isUndefined(firstParticipant) && firstParticipant.isService;
 
     useEffect(() => {
       void conversationRepository.refreshUnavailableParticipants(activeConversation);
     }, [activeConversation, conversationRepository]);
 
     useEffect(() => {
-      if (team.id && isSingleUserMode) {
-        void teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
+      if (team.id && isSingleUserMode && !isUndefined(firstParticipant)) {
+        void teamRepository.updateTeamMembersByIds(team.id, [firstParticipant.id], true);
       }
     }, [firstParticipant, isSingleUserMode, team, teamRepository]);
 
@@ -295,21 +336,16 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && isServiceMode && selectedService && <ServiceDetails service={selectedService} />}
 
           {isSingleUserMode && !isServiceMode && firstParticipant && (
-            <>
-              <UserDetails
-                groupId={activeConversation.groupId}
-                participant={firstParticipant}
-                isVerified={isVerified}
-                badge={teamRepository.getRoleBadge(firstParticipant.id)}
-                classifiedDomains={classifiedDomains}
-              />
-
-              <EnrichedFields
-                user={firstParticipant}
-                showDomain={isFederated}
-                showAvailability={isTeam && !isTemporaryGuest && teamState.isInTeam(firstParticipant)}
-              />
-            </>
+            <ConversationDetailsParticipant
+              activeConversation={activeConversation}
+              classifiedDomains={classifiedDomains}
+              isFederated={isFederated}
+              isTeam={isTeam}
+              isVerified={isVerified}
+              participant={firstParticipant}
+              teamRepository={teamRepository}
+              teamState={teamState}
+            />
           )}
 
           {!isSingleUserMode && (

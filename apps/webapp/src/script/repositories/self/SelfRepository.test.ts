@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {ClientEntity} from 'Repositories/client';
 import {TestFactory} from 'test/helper/TestFactory';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {SelfRepository} from './SelfRepository';
@@ -61,7 +62,7 @@ describe('SelfRepository', () => {
     ])('Updates the list of supported protocols', async (initialProtocols, evaluatedProtocols) => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const selfUser = selfRepository['userState'].self()!;
+      const selfUser = requireValueForTest(selfRepository['userState'].self());
 
       selfUser.supportedProtocols(initialProtocols);
 
@@ -86,7 +87,7 @@ describe('SelfRepository', () => {
     it("Does not update supported protocols if they didn't change", async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const selfUser = selfRepository['userState'].self()!;
+      const selfUser = requireValueForTest(selfRepository['userState'].self());
 
       const initialProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
       selfUser.supportedProtocols(initialProtocols);
@@ -113,7 +114,7 @@ describe('SelfRepository', () => {
       const selfRepository = await testFactory.exposeSelfActors();
       const core = container.resolve(Core);
 
-      const selfUser = selfRepository['userState'].self()!;
+      const selfUser = requireValueForTest(selfRepository['userState'].self());
 
       const initialProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
       selfUser.supportedProtocols(initialProtocols);
@@ -146,7 +147,7 @@ describe('SelfRepository', () => {
     it('deletes the self user client and refreshes self supported protocols', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const selfUser = selfRepository['userState'].self()!;
+      const selfUser = requireValueForTest(selfRepository['userState'].self());
 
       selfRepository['clientRepository'].init(selfUser);
 
@@ -158,7 +159,7 @@ describe('SelfRepository', () => {
 
       const clientToDelete = initialClients[0];
 
-      jest.spyOn(container.resolve(Core).service?.client!, 'deleteClient');
+      jest.spyOn(requireValueForTest(container.resolve(Core).service?.client), 'deleteClient');
       jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
 
       const expectedClients = [...initialClients].filter(client => client.id !== clientToDelete.id);
@@ -174,7 +175,7 @@ describe('SelfRepository', () => {
     it('refreshes self supported protocols and updates backend with the new list', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const selfUser = selfRepository['userState'].self()!;
+      const selfUser = requireValueForTest(selfRepository['userState'].self());
 
       const initialProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
       selfUser.supportedProtocols(initialProtocols);
@@ -200,7 +201,7 @@ describe('SelfRepository', () => {
     it('does not update backend with supported protocols when not changed', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const selfUser = selfRepository['userState'].self()!;
+      const selfUser = requireValueForTest(selfRepository['userState'].self());
 
       const initialProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
       selfUser.supportedProtocols(initialProtocols);

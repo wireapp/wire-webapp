@@ -269,6 +269,19 @@ const emptyArrowFunctionRestrictions = [
   },
 ];
 
+const definiteAssignmentAssertionRestrictions = [
+  {
+    selector: 'PropertyDefinition[definite=true]',
+    message:
+      'Definite assignment assertions are not allowed. Initialize the value explicitly or model its absence in the type.',
+  },
+  {
+    selector: 'VariableDeclarator[definite=true]',
+    message:
+      'Definite assignment assertions are not allowed. Initialize the value explicitly or model its absence in the type.',
+  },
+];
+
 const restrictedSyntaxRule = [
   'error',
   {
@@ -285,9 +298,14 @@ const restrictedSyntaxRule = [
     message: 'Use named imports from @sindresorhus/is instead of a namespace import.',
   },
   ...emptyArrowFunctionRestrictions,
+  ...definiteAssignmentAssertionRestrictions,
 ];
 
-const emptyArrowFunctionRule = ['error', ...emptyArrowFunctionRestrictions];
+const testRestrictedSyntaxRule = [
+  'error',
+  ...emptyArrowFunctionRestrictions,
+  ...definiteAssignmentAssertionRestrictions,
+];
 
 const jestMockRestrictionRule = [
   'warn',
@@ -399,7 +417,7 @@ const productionConfigs = [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -711,6 +729,12 @@ const config = [
         },
       },
     },
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'error',
+    },
   },
   {
     files: testTsxFilePatterns,
@@ -724,6 +748,12 @@ const config = [
           jsx: true,
         },
       },
+    },
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'error',
     },
   },
   {
@@ -751,7 +781,7 @@ const config = [
       ...testJsxFilePatterns,
     ],
     rules: {
-      'no-restricted-syntax': emptyArrowFunctionRule,
+      'no-restricted-syntax': testRestrictedSyntaxRule,
     },
   },
   {

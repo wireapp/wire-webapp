@@ -202,14 +202,9 @@ describe('createCellsRepositoryGateway', () => {
   });
 
   it('lets manager cancellation abort the controller forwarded to the repository', async () => {
-    let resolveUpload!: () => void;
+    const {promise: uploadPromise, resolve: resolveUpload} = Promise.withResolvers<void>();
     const repository = createRepository();
-    repository.uploadNodeDraft.mockImplementation(
-      () =>
-        new Promise(resolve => {
-          resolveUpload = () => resolve(undefined);
-        }),
-    );
+    repository.uploadNodeDraft.mockImplementation(() => uploadPromise);
     const manager = createCellsUploadManager({
       gateway: createCellsRepositoryGateway(repository),
       createResourceUuid: () => identity.resourceUuid,

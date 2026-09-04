@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
@@ -101,7 +102,12 @@ export class ClientRepository {
    * @returns Resolves when the temporary client was deleted on the backend
    */
   private deleteLocalTemporaryClient() {
-    return this.core.service!.client.deleteLocalClient();
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+
+    return coreServices.client.deleteLocalClient();
   }
 
   /**
@@ -301,7 +307,11 @@ export class ClientRepository {
    */
   async deleteClient(clientId: string, password?: string): Promise<ClientEntity[]> {
     const selfUser = this.selfUser();
-    await this.core.service!.client.deleteClient(clientId, password);
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+    await coreServices.client.deleteClient(clientId, password);
     selfUser.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return selfUser.devices();

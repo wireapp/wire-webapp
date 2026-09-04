@@ -1,4 +1,5 @@
 import {Page} from 'playwright/test';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
@@ -7,16 +8,29 @@ import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} f
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {createAndSaveBackup, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
-test.describe('Federation', () => {
-  const federationBaseUrl = process.env.FEDERATION_WEBAPP_URL!;
-  const federationApiManager = new ApiManagerE2E({
-    backendUrl: process.env.FEDERATION_BACKEND_URL!,
-    basicAuth: process.env.FEDERATION_BASIC_AUTH!,
-  });
+function getRequiredEnvironmentVariable(variableName: string): string {
+  const variableValue = process.env[variableName];
+  if (!isNonEmptyString(variableValue)) {
+    throw new Error(`Missing required environment variable: ${variableName}`);
+  }
 
+  return variableValue;
+}
+
+test.describe('Federation', () => {
+  let federationBaseUrl: string;
+  let federationApiManager: ApiManagerE2E;
   let normalUser: User;
   let federatedUser: User;
   const groupName = 'Federated group';
+
+  test.beforeAll(() => {
+    federationBaseUrl = getRequiredEnvironmentVariable('FEDERATION_WEBAPP_URL');
+    federationApiManager = new ApiManagerE2E({
+      backendUrl: getRequiredEnvironmentVariable('FEDERATION_BACKEND_URL'),
+      basicAuth: getRequiredEnvironmentVariable('FEDERATION_BASIC_AUTH'),
+    });
+  });
 
   test.beforeEach(async ({api}) => {
     normalUser = (await createTeam(api, 'Normal Team', {features: {conferenceCalling: true, mls: true}})).owner;

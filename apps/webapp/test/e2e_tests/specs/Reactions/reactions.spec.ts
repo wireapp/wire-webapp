@@ -18,7 +18,7 @@
  */
 
 import {Page} from 'playwright/test';
-import {User} from 'test/e2e_tests/data/user';
+import {getRequiredUserId, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
@@ -117,7 +117,9 @@ test.describe('Reactions', () => {
         'Test Service Device',
         false,
       );
-      const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!, {protocol: 'mls'});
+      const conversationId = await api.conversation.getConversationWithUser(userB.token, getRequiredUserId(userA), {
+        protocol: 'mls',
+      });
       if (conversationId === undefined) throw new Error("Couldn't find MLS conversation of user B with user A");
       await api.testService.sendLocation(instanceId, conversationId, {
         locationName: 'Test Location',

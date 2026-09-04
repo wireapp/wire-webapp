@@ -21,6 +21,7 @@ import {container} from 'tsyringe';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {meetingCallingViewStyles} from 'Components/meeting/meetingCallingView/meetingCallingView.styles';
+import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {CallState} from 'Repositories/calling/CallState';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
@@ -35,13 +36,14 @@ export const MeetingCallingView = () => {
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {callingRepository} = callingViewModel;
+  const hasMeetingNotifications = useMeetingNotificationStore(state => state.notifications.length > 0);
 
   if (activeCalls.length === 0) {
     return null;
   }
 
   return (
-    <div css={meetingCallingViewStyles} data-uie-name="meeting-calling-view">
+    <div css={meetingCallingViewStyles(hasMeetingNotifications)} data-uie-name="meeting-calling-view">
       {activeCalls.map(call => (
         <CallingCell
           key={`${call.conversation.qualifiedId.id}-${call.conversation.qualifiedId.domain}`}
@@ -51,6 +53,7 @@ export const MeetingCallingView = () => {
           callingRepository={callingRepository}
           propertiesRepository={propertiesRepository}
           isFullUi
+          isNotificationHostVisible={false}
           hasAccessToCamera={callingViewModel.hasAccessToCamera()}
         />
       ))}

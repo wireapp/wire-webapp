@@ -26,6 +26,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
@@ -61,7 +62,7 @@ describe('EnrichedFields', () => {
 
     await waitFor(() => getAllByTestId('item-enriched-key'));
 
-    expect(getAllByTestId('item-enriched-key')).toHaveLength(richInfo.fields!.length);
+    expect(getAllByTestId('item-enriched-key')).toHaveLength(requireValueForTest(richInfo.fields).length);
   });
 
   it('displays the email if set on user', async () => {

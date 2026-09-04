@@ -14,18 +14,13 @@ import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFi
 import {Config} from 'src/script/Config';
 
 import {useMessageSend} from './useMessageSend';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 const conversationId = 'conversation';
 
-const createDeferred = <T,>() => {
-  let resolve!: (value: T) => void;
-  let reject!: (error: unknown) => void;
-  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
-    resolve = resolvePromise;
-    reject = rejectPromise;
-  });
-  return {promise, resolve, reject};
-};
+function createDeferred<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
+}
 
 const createFile = (
   id: string,
@@ -114,7 +109,7 @@ describe('useMessageSend', () => {
     expect(promoteNodeDraft).toHaveBeenCalledWith({uuid: 'remote-image', versionId: 'version-image'});
     expect(sendTextWithLinkPreview).not.toHaveBeenCalled();
     publication.resolve();
-    await act(async () => sendPromise!);
+    await act(async () => requireValueForTest(sendPromise));
     await act(async () => Promise.resolve());
 
     expect(sendTextWithLinkPreview).toHaveBeenCalledWith(

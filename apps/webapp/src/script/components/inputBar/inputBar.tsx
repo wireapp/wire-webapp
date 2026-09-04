@@ -17,8 +17,9 @@
  *
  */
 
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useRef, useState, type ReactElement} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
@@ -33,6 +34,7 @@ import {useFileUploadState} from 'Components/conversation/useFilesUploadState/us
 import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -99,7 +101,35 @@ interface InputBarProps {
   onCellAssetUpload: () => void;
 }
 
-export const InputBar = ({
+interface InputBarContentProps extends InputBarProps {
+  readonly isIncomingRequest: boolean;
+  readonly isOutgoingRequest: boolean;
+}
+
+interface InputBarWithConnectionProps extends InputBarProps {
+  readonly connection: ConnectionEntity;
+}
+
+export function InputBar(props: InputBarProps): ReactElement {
+  const {connection} = useKoSubscribableChildren(props.conversation, ['connection']);
+
+  if (isNullOrUndefined(connection)) {
+    return <InputBarContent {...props} isIncomingRequest={false} isOutgoingRequest={false} />;
+  }
+
+  return <InputBarWithConnection {...props} connection={connection} />;
+}
+
+function InputBarWithConnection({connection, ...props}: InputBarWithConnectionProps): ReactElement {
+  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
+    'isOutgoingRequest',
+    'isIncomingRequest',
+  ]);
+
+  return <InputBarContent {...props} isIncomingRequest={isIncomingRequest} isOutgoingRequest={isOutgoingRequest} />;
+}
+
+function InputBarContent({
   conversation,
   conversationRepository,
   cellsRepository,
@@ -119,26 +149,18 @@ export const InputBar = ({
   uploadPastedFiles,
   onCellImageUpload,
   onCellAssetUpload,
-}: InputBarProps) => {
+  isOutgoingRequest,
+  isIncomingRequest,
+}: InputBarContentProps): ReactElement {
   const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
-  const {connection, localMessageTimer, messageTimer, hasGlobalMessageTimer, isSelfUserRemoved, is1to1} =
-    useKoSubscribableChildren(conversation, [
-      'connection',
-      'localMessageTimer',
-      'messageTimer',
-      'hasGlobalMessageTimer',
-      'isSelfUserRemoved',
-      'is1to1',
-      'cellsState',
-    ]);
-  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection!, [
-    'isOutgoingRequest',
-    'isIncomingRequest',
-  ]);
+  const {localMessageTimer, messageTimer, hasGlobalMessageTimer, isSelfUserRemoved, is1to1} = useKoSubscribableChildren(
+    conversation,
+    ['localMessageTimer', 'messageTimer', 'hasGlobalMessageTimer', 'isSelfUserRemoved', 'is1to1', 'cellsState'],
+  );
 
   const {getFiles} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
@@ -404,4 +426,4 @@ export const InputBar = ({
       ) : null}
     </div>
   );
-};
+}

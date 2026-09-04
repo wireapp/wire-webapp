@@ -23,6 +23,7 @@ import type {Location} from 'Repositories/entity/message/location';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LocationAsset} from './locationAsset';
@@ -45,6 +46,6 @@ describe('LocationAsset', () => {
 
   it('sets the correct location name', () => {
     const {queryByText} = render(<LocationAsset asset={location as Location} />, {wrapper: rootProviderWrapper});
-    expect(queryByText(location.name!)).not.toBeNull();
+    expect(queryByText(requireValueForTest(location.name))).not.toBeNull();
   });
 });

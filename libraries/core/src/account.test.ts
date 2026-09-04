@@ -18,6 +18,7 @@
  */
 
 import {AuthAPI} from '@wireapp/api-client/lib/auth';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {
   ClientAPI,
   ClientCapability,
@@ -62,6 +63,14 @@ import {Account} from './account';
 import {ConnectionState} from './connectionState/connectionState';
 import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
+
+function getAccountServiceForTest(account: Account): NonNullable<Account['service']> {
+  if (isNullOrUndefined(account.service)) {
+    throw new Error('Expected account services to be initialized');
+  }
+
+  return account.service;
+}
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -239,7 +248,7 @@ describe('Account', () => {
 
       await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
 
-      expect(account.service!.conversation).toBeDefined();
+      expect(getAccountServiceForTest(account).conversation).toBeDefined();
 
       const message = GenericMessage.create({
         messageId: '2d7cb6d8-118f-11e8-b642-0ed5f89f718b',
@@ -335,10 +344,10 @@ describe('Account', () => {
       });
       account['currentClient'] = currentClient;
       jest
-        .spyOn(dependencies.account.service!.notification, 'handleNotification')
+        .spyOn(getAccountServiceForTest(dependencies.account).notification, 'handleNotification')
         .mockImplementation(notif => notif.payload as any);
       jest
-        .spyOn(dependencies.account.service!.notification['database'], 'getLastNotificationId')
+        .spyOn(getAccountServiceForTest(dependencies.account).notification['database'], 'getLastNotificationId')
         .mockResolvedValue('0');
 
       await account.useAPIVersion(MINIMUM_API_VERSION, MINIMUM_API_VERSION);
@@ -376,7 +385,7 @@ describe('Account', () => {
               onEvent.mockReset();
               await server.connected;
               jest
-                .spyOn(dependencies.account.service!.notification as any, 'handleNotification')
+                .spyOn(getAccountServiceForTest(dependencies.account).notification as any, 'handleNotification')
                 .mockReturnValue([{event: {testData: 1}}]);
               server.send(
                 JSON.stringify({
@@ -529,7 +538,9 @@ describe('Account', () => {
                     {domain: 'zinfra.io', type: 'federation.delete'},
                     NotificationSource.WEBSOCKET,
                   );
-                  expect(dependencies.account.service!.notification.handleNotification).toHaveBeenCalledTimes(2);
+                  expect(
+                    getAccountServiceForTest(dependencies.account).notification.handleNotification,
+                  ).toHaveBeenCalledTimes(2);
                   resolve();
               }
             },
@@ -542,7 +553,7 @@ describe('Account', () => {
       it('emits CLOSED without unlocking websocket when legacy notification catch-up fails after websocket open', async () => {
         const catchUpError = new Error('Legacy catch-up failed');
         jest
-          .spyOn(dependencies.account.service!.notification, 'legacyProcessNotificationStream')
+          .spyOn(getAccountServiceForTest(dependencies.account).notification, 'legacyProcessNotificationStream')
           .mockRejectedValue(catchUpError);
         const unlock = jest.spyOn(dependencies.apiClient.transport.ws, 'unlock');
         const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();

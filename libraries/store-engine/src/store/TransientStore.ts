@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 import {EventEmitter} from 'events';
 
@@ -87,9 +87,11 @@ export class TransientStore extends EventEmitter {
 
     const bundles = await Promise.all(readBundles);
 
-    for (const index in bundles) {
-      const bundle = bundles[index]!;
-      const cacheKey = cacheKeys[index]!;
+    for (const [index, bundle] of bundles.entries()) {
+      const cacheKey = cacheKeys[index];
+      if (isUndefined(cacheKey)) {
+        throw new Error(`Missing cache key for bundle at index ${index}`);
+      }
       await this.startTimer(cacheKey);
       this.bundles[cacheKey] = bundle;
     }
@@ -144,9 +146,13 @@ export class TransientStore extends EventEmitter {
   }
 
   private async expireBundle(cacheKey: string): Promise<ExpiredBundle> {
+    const bundle = this.bundles[cacheKey];
+    if (isUndefined(bundle)) {
+      throw new Error(`Cannot expire missing transient bundle ${cacheKey}`);
+    }
     const expiredBundle: ExpiredBundle = {
       cacheKey: cacheKey,
-      payload: this.bundles[cacheKey]!.payload,
+      payload: bundle.payload,
       primaryKey: this.constructPrimaryKey(cacheKey),
     };
 

@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {v4 as uuidv4} from 'uuid';
 
@@ -452,9 +453,14 @@ function buildAsset(payloadBundle: ImageAssetMessageOutgoing['content']): Asset 
 }
 
 export function wrapInEphemeral(originalGenericMessage: GenericMessage, expireAfterMillis: number): GenericMessage {
+  const contentType = originalGenericMessage.content;
+  if (isUndefined(contentType)) {
+    throw new Error('Cannot wrap a generic message without content');
+  }
+
   const ephemeralMessage = Ephemeral.create({
     expireAfterMillis,
-    [originalGenericMessage.content!]: originalGenericMessage[originalGenericMessage.content!],
+    [contentType]: originalGenericMessage[contentType],
   });
 
   const genericMessage = GenericMessage.create({

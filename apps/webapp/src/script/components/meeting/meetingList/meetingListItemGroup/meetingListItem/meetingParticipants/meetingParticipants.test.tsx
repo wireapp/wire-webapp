@@ -32,6 +32,7 @@ import en from 'I18n/en-US.json';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MeetingParticipants} from './meetingParticipants';
 
@@ -77,7 +78,7 @@ describe('MeetingParticipants', () => {
       expect(avatar).toBeInTheDocument();
       const tooltipWrapper = avatar.closest('[data-testid="tooltip-wrapper"]');
       expect(tooltipWrapper).toBeInTheDocument();
-      fireEvent.mouseEnter(tooltipWrapper!);
+      fireEvent.mouseEnter(requireValueForTest(tooltipWrapper));
       expect(document.querySelector('[data-testid="tooltip-content"]')).toHaveTextContent(
         `${specialCharacterName} (Organizer)`,
       );
@@ -129,7 +130,7 @@ describe('MeetingParticipants', () => {
       expect(screen.queryByText('Self Organizer')).not.toBeInTheDocument();
       const tooltipWrapper = avatar.closest('[data-testid="tooltip-wrapper"]');
       expect(tooltipWrapper).toBeInTheDocument();
-      fireEvent.mouseEnter(tooltipWrapper!);
+      fireEvent.mouseEnter(requireValueForTest(tooltipWrapper));
       expect(screen.getByText('Self Organizer (Organizer)')).toBeInTheDocument();
       rendered.unmount();
     } finally {

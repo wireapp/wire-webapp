@@ -28,6 +28,7 @@ import {User} from 'Repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -153,7 +154,7 @@ describe('image-asset', () => {
     });
 
     const wrapper = screen.getByTestId('image-asset-img').closest('div');
-    fireEvent.click(wrapper!);
+    fireEvent.click(requireValueForTest(wrapper));
     expect(onClickMock).toHaveBeenCalledWith(message, expect.any(Object));
   });
 

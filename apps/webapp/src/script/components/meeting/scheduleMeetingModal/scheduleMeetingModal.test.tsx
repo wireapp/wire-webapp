@@ -47,14 +47,9 @@ const testWallClock = createDeterministicWallClock({
   initialCurrentTimestampInMilliseconds: Date.parse('2026-08-12T10:00:00Z'),
 });
 
-const createDeferred = <T,>() => {
-  let resolve!: (value: T) => void;
-  const promise = new Promise<T>(resolvePromise => {
-    resolve = resolvePromise;
-  });
-
-  return {promise, resolve};
-};
+function createDeferred<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
+}
 
 const createMeetingStore = (scheduleMeeting: MeetingStoreState['scheduleMeeting']) =>
   createStore<MeetingStoreState>(() => ({

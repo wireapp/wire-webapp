@@ -28,6 +28,7 @@ import {
 
 const rootUploadPath = 'conversation-id@example.com';
 const nestedUploadPath = 'conversation-id@example.com/Marketing/Briefs';
+const conversationQualifiedId = 'conversation-id@example.com';
 const maxFileSize = 100;
 
 function createDependencies(options: Partial<Parameters<typeof handleSharedDriveDroppedFiles>[1]> = {}) {
@@ -44,6 +45,7 @@ function createDependencies(options: Partial<Parameters<typeof handleSharedDrive
   return {
     fireAndForgetInvoker,
     sharedDriveUploadController,
+    conversationQualifiedId,
     uploadPath: rootUploadPath,
     onRefresh,
     onReject,
@@ -70,6 +72,7 @@ describe('handleSharedDriveDroppedFiles', () => {
       [file],
       rootUploadPath,
       dependencies.onRefresh,
+      conversationQualifiedId,
     );
   });
 
@@ -85,6 +88,7 @@ describe('handleSharedDriveDroppedFiles', () => {
       [file],
       nestedUploadPath,
       dependencies.onRefresh,
+      conversationQualifiedId,
     );
   });
 

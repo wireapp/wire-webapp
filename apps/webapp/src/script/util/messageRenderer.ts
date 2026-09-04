@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import MarkdownIt from 'markdown-it';
 import {escape} from 'underscore';
@@ -79,14 +80,20 @@ markdownit.linkify.add('wire:', {
   },
 });
 
-const originalFenceRule = markdownit.renderer.rules.fence!;
+const originalFenceRule = markdownit.renderer.rules.fence;
+if (isUndefined(originalFenceRule)) {
+  throw new Error('Markdown renderer fence rule is not configured');
+}
 
 markdownit.renderer.rules.heading_open = (tokens, idx) => {
   const headingLevel = tokens[idx].tag.slice(1);
   return `<div class="md-heading md-heading--${headingLevel}">`;
 };
 markdownit.renderer.rules.heading_close = () => '</div>';
-const originalNormalizeLink = markdownit.normalizeLink!;
+const originalNormalizeLink = markdownit.normalizeLink;
+if (isUndefined(originalNormalizeLink)) {
+  throw new Error('Markdown link normalizer is not configured');
+}
 
 const isValidUrl = (url: string): boolean => {
   // only allow urls to wire://, https://, http:// and mailto:

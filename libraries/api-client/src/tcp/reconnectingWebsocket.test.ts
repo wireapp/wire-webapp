@@ -53,6 +53,15 @@ type MockReconnectingWebsocketWrapper = {
   send: jest.Mock;
 };
 
+function getSocketForTest(reconnectingWebsocket: ReconnectingWebsocket): NonNullable<ReconnectingWebsocket['socket']> {
+  const socket = reconnectingWebsocket['socket'];
+  if (isNullOrUndefined(socket)) {
+    throw new Error('Expected websocket socket to be initialized');
+  }
+
+  return socket;
+}
+
 function createMockReconnectingWebsocketWrapper(readyState: WEBSOCKET_STATE): MockReconnectingWebsocketWrapper {
   const socket: MockReconnectingWebsocketWrapper = {
     binaryType: 'blob',
@@ -767,7 +776,7 @@ describe('ReconnectingWebsocket', () => {
       reconnectCalls++;
       expect(onReconnect).toHaveBeenCalledTimes(reconnectCalls);
       if (reconnectCalls === 1) {
-        RWS['socket']!.reconnect();
+        getSocketForTest(RWS).reconnect();
       } else {
         RWS.disconnect();
       }
@@ -1425,7 +1434,7 @@ describe('ReconnectingWebsocket', () => {
       const testMessage = 'test';
 
       RWS.setOnOpen(() => {
-        const sendSpy = jest.spyOn(RWS['socket']!, 'send');
+        const sendSpy = jest.spyOn(getSocketForTest(RWS), 'send');
         RWS.send(testMessage);
 
         expect(sendSpy).toHaveBeenCalledWith(testMessage);
@@ -1478,7 +1487,7 @@ describe('ReconnectingWebsocket', () => {
       });
 
       RWS.setOnOpen(() => {
-        const reconnectSpy = jest.spyOn(RWS['socket']!, 'reconnect');
+        const reconnectSpy = jest.spyOn(getSocketForTest(RWS), 'reconnect');
         RWS['hasUnansweredPing'] = true;
         setTimeout(() => {
           RWS['sendPing']();
@@ -1518,7 +1527,7 @@ describe('ReconnectingWebsocket', () => {
       const RWS = createRWS(onReconnect);
 
       RWS.setOnOpen(() => {
-        expect(RWS['socket']!.binaryType).toBe('arraybuffer');
+        expect(getSocketForTest(RWS).binaryType).toBe('arraybuffer');
         RWS.disconnect();
         done();
       });

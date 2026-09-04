@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isObject} from '@sindresorhus/is';
+import {isNonEmptyString, isObject, isUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
@@ -165,7 +165,11 @@ export class DebugUtil {
       const startTime = performance.now();
 
       for (const notification of notificationResponse.notifications) {
-        const events = this.core.service!.notification.handleNotification(
+        const coreServices = this.core.service;
+        if (isUndefined(coreServices)) {
+          throw new Error('Core services are not initialized');
+        }
+        const events = coreServices.notification.handleNotification(
           notification,
           NotificationSource.NOTIFICATION_STREAM,
         );
@@ -388,7 +392,11 @@ export class DebugUtil {
 
   /** Used by QA test automation. */
   async breakSession(userId: QualifiedId, clientId: string): Promise<void> {
-    const proteusService = this.core.service!.proteus;
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+    const proteusService = coreServices.proteus;
     const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
@@ -467,7 +475,10 @@ export class DebugUtil {
       .__lexicalEditor as LexicalEditor;
 
     lexicalEditor.update(() => {
-      const root = $getRoot().getLastChild()!;
+      const root = $getRoot().getLastChild();
+      if (isUndefined(root)) {
+        throw new Error('The editor has no root child');
+      }
       const textNode = $createTextNode(text);
       // the "as any" can be removed when this issue is fixed https://github.com/facebook/lexical/issues/5502
       (root as any).append(textNode);

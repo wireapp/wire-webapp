@@ -213,6 +213,15 @@ export class ConversationRepository {
   private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
   private initiatingMlsConversationQualifiedIds: QualifiedId[] = [];
 
+  private get coreServices() {
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+
+    return coreServices;
+  }
+
   static get CONFIG() {
     return {
       CONFIRMATION_THRESHOLD: TIME_IN_MILLIS.WEEK,
@@ -487,9 +496,13 @@ export class ConversationRepository {
     };
 
     if (this.teamState.team().id) {
+      const teamId = this.teamState.team().id;
+      if (isUndefined(teamId)) {
+        throw new Error('Cannot create a team conversation without a team id');
+      }
       payload.team = {
         managed: false,
-        teamid: this.teamState.team().id!,
+        teamid: teamId,
       };
 
       if (accessState) {
@@ -517,13 +530,13 @@ export class ConversationRepository {
         throw new Error('Cannot create conversation before self user is available');
       }
       if (isMLSConversation) {
-        response = await this.core.service!.conversation.createMLSConversation(
+        response = await this.coreServices.conversation.createMLSConversation(
           payload,
           selfUser.qualifiedId,
           this.core.clientId,
         );
       } else {
-        const {conversation, failedToAdd} = await this.core.service!.conversation.createProteusConversation(payload);
+        const {conversation, failedToAdd} = await this.coreServices.conversation.createProteusConversation(payload);
         response = {conversation, failedToAdd};
       }
 
@@ -2410,7 +2423,7 @@ export class ConversationRepository {
           throw new Error('Cannot establish meeting conversation before self user is available');
         }
 
-        const {failedToAdd = []} = await this.core.service!.conversation.establishMLSGroupConversation(
+        const {failedToAdd = []} = await this.coreServices.conversation.establishMLSGroupConversation(
           groupId,
           userIdsToAdd,
           selfUser.qualifiedId,
@@ -2721,7 +2734,7 @@ export class ConversationRepository {
     try {
       if (isProteusConversation(conversation) || isMixedConversation(conversation)) {
         const {failedToAdd, event: memberJoinEvent} =
-          await this.core.service!.conversation.addUsersToProteusConversation({
+          await this.coreServices.conversation.addUsersToProteusConversation({
             conversationId,
             qualifiedUsers,
           });
@@ -2741,7 +2754,7 @@ export class ConversationRepository {
       }
 
       if (isMLSCapableConversation(conversation)) {
-        const {failedToAdd} = await this.core.service!.conversation.addUsersToMLSConversation({
+        const {failedToAdd} = await this.coreServices.conversation.addUsersToMLSConversation({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
           qualifiedUsers,
@@ -3003,7 +3016,7 @@ export class ConversationRepository {
    */
   private async removeMembersFromMLSConversation(conversationEntity: MLSConversation, userIds: QualifiedId[]) {
     const {groupId, qualifiedId} = conversationEntity;
-    await this.core.service!.conversation.removeUsersFromMLSConversation({
+    await this.coreServices.conversation.removeUsersFromMLSConversation({
       conversationId: qualifiedId,
       groupId,
       qualifiedUserIds: userIds,
@@ -3020,10 +3033,7 @@ export class ConversationRepository {
   private async removeMembersFromConversation(conversation: Conversation, userIds: QualifiedId[]) {
     return await Promise.all(
       userIds.map(async userId => {
-        const event = await this.core.service!.conversation.removeUserFromConversation(
-          conversation.qualifiedId,
-          userId,
-        );
+        const event = await this.coreServices.conversation.removeUserFromConversation(conversation.qualifiedId, userId);
         const roles = conversation.roles();
         delete roles[userId.id];
         conversation.roles(roles);

@@ -35,6 +35,7 @@ type ShowFileDropzoneError = typeof showFileDropzoneErrorModal;
 const CONFIG = Config.getConfig();
 
 interface UseSharedDriveFileDropParameters {
+  readonly conversationQualifiedId: string;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isInRecycleBin: boolean;
   readonly isUploadFilesEnabled: boolean;
@@ -46,6 +47,7 @@ interface UseSharedDriveFileDropParameters {
 }
 
 export const useSharedDriveFileDrop = ({
+  conversationQualifiedId,
   fireAndForgetInvoker,
   isInRecycleBin,
   isUploadFilesEnabled,
@@ -58,6 +60,7 @@ export const useSharedDriveFileDrop = ({
   useCallback(
     (files: readonly File[]): void =>
       handleSharedDriveDroppedFiles(files, {
+        conversationQualifiedId,
         fireAndForgetInvoker,
         isAcceptedFile: file => isAllowedFile(file.name, file.type),
         isInRecycleBin,
@@ -77,6 +80,7 @@ export const useSharedDriveFileDrop = ({
         uploadPath,
       }),
     [
+      conversationQualifiedId,
       fireAndForgetInvoker,
       isInRecycleBin,
       isUploadFilesEnabled,
