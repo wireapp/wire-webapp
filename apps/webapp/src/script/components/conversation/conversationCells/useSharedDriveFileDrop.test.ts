@@ -116,6 +116,11 @@ describe('useSharedDriveFileDrop', () => {
     expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
     const uploadAction = jest.mocked(fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
     await uploadAction();
-    expect(sharedDriveUploadController.upload).toHaveBeenCalledWith([file], uploadPath, onRefresh, conversationQualifiedId);
+    expect(sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [file],
+      uploadPath,
+      onRefresh,
+      conversationQualifiedId,
+    );
   });
 });
