@@ -714,6 +714,15 @@ export class ConversationRepository {
   }
 
   /**
+   * Refreshes the complete conversation list before auditing MLS membership.
+   * This discovers conversations created while this client had no key packages
+   * and therefore could not receive their Welcome messages.
+   */
+  public async refreshConversationsForMLSRecovery(): Promise<Conversation[]> {
+    return this.loadConversations(this.connectionState.connections(), this.connectionState.deadConnections());
+  }
+
+  /**
    * Will try to fetch and load all the missing conversations in memory
    * @returns all the missing conversations freshly fetched from backend appended to the locally stored conversations
    */

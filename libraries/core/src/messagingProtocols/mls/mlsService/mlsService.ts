@@ -119,6 +119,7 @@ export enum MLSServiceEvents {
   NEW_CRL_DISTRIBUTION_POINTS = 'newCrlDistributionPoints',
   MLS_EVENT_DISTRIBUTED = 'mlsEventDistributed',
   KEY_MATERIAL_UPDATE_FAILURE = 'keyMaterialUpdateFailure',
+  MLS_CONVERSATION_RECOVERY_REQUIRED = 'mlsConversationRecoveryRequired',
 }
 
 type Events = {
@@ -130,7 +131,10 @@ type Events = {
     events: any;
     time: string;
   };
+  [MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED]: void;
 };
+
+const MLS_CONVERSATION_RECOVERY_KEY = 'required';
 export class MLSService extends TypedEventEmitter<Events> {
   logger = LogFactory.getLogger('@wireapp/core/MLSService');
   private _config?: MLSConfig;
@@ -952,14 +956,66 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   private async verifyRemoteMLSKeyPackagesAmount(clientId: string) {
     const backendKeyPackagesCount = await this.getRemoteMLSKeyPackageCount(clientId);
+    let isConversationRecoveryRequired = await this.isMLSConversationRecoveryRequired();
 
     // If we have enough keys uploaded on backend, there's no need to upload more.
     if (backendKeyPackagesCount > this.minRequiredKeyPackages) {
+      if (isConversationRecoveryRequired) {
+        this.emit(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+      }
       return;
     }
 
     const keyPackages = await this.clientKeypackages(this.config.nbKeyPackages);
-    return this.uploadMLSKeyPackages(clientId, keyPackages);
+    await this.uploadMLSKeyPackages(clientId, keyPackages);
+
+    // Mark recovery only after a successful upload, so the marker never outlives a failed refill attempt.
+    if (backendKeyPackagesCount === 0 && !isConversationRecoveryRequired) {
+      try {
+        await this.coreDatabase.put('mlsConversationRecovery', {required: true}, MLS_CONVERSATION_RECOVERY_KEY);
+        isConversationRecoveryRequired = true;
+      } catch (error: unknown) {
+        this.logger.error('Failed to persist MLS conversation recovery marker', error);
+      }
+    }
+
+    if (isConversationRecoveryRequired) {
+      this.emit(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    }
+  }
+
+  public async isMLSConversationRecoveryRequired(): Promise<boolean> {
+    const recoveryState = await this.coreDatabase.get('mlsConversationRecovery', MLS_CONVERSATION_RECOVERY_KEY);
+    return recoveryState?.required === true;
+  }
+
+  public async prepareMLSConversationRecovery(clientId: string): Promise<boolean> {
+    if (!(await this.isMLSConversationRecoveryRequired())) {
+      return false;
+    }
+
+    await this.verifyRemoteMLSKeyPackagesAmount(clientId);
+    return true;
+  }
+
+  public async completeMLSConversationRecovery(): Promise<void> {
+    await this.coreDatabase.delete('mlsConversationRecovery', MLS_CONVERSATION_RECOVERY_KEY);
+  }
+
+  public async getPendingRecoveryConversationIds(): Promise<QualifiedId[] | undefined> {
+    const recoveryState = await this.coreDatabase.get('mlsConversationRecovery', MLS_CONVERSATION_RECOVERY_KEY);
+    return recoveryState?.pendingConversationIds;
+  }
+
+  public async updatePendingRecoveryConversationIds(conversationIds: QualifiedId[]): Promise<void> {
+    const recoveryState = await this.coreDatabase.get('mlsConversationRecovery', MLS_CONVERSATION_RECOVERY_KEY);
+    if (recoveryState !== undefined) {
+      await this.coreDatabase.put(
+        'mlsConversationRecovery',
+        {...recoveryState, pendingConversationIds: conversationIds},
+        MLS_CONVERSATION_RECOVERY_KEY,
+      );
+    }
   }
 
   private async getRemoteMLSKeyPackageCount(clientId: string) {
