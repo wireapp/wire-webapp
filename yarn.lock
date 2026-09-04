@@ -4418,10 +4418,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:9.9.0":
-  version: 9.9.0
-  resolution: "@faker-js/faker@npm:9.9.0"
-  checksum: 10/b24b1be0fb3090d54abaaa3a814f37d1a7551f1207dcd330a1af2c70f6312a8b95ebb82653577757dd62f4cbbb56caa3c83513053253654dc3e286a05040ecbe
+"@faker-js/faker@npm:10.5.0":
+  version: 10.5.0
+  resolution: "@faker-js/faker@npm:10.5.0"
+  checksum: 10/1f83f46bf4dd0aa4197b72b289d5a73706b0150c9ce2c93066bf4282db8c6f4af19e5da73f62819813cfa4134083ce3a6e708e875fb7e6da745e23a0558b6550
   languageName: node
   linkType: hard
 
@@ -32654,7 +32654,7 @@ __metadata:
     "@actions/core": "npm:1.11.1"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@enormora/objectory": "npm:0.0.15"
-    "@faker-js/faker": "npm:9.9.0"
+    "@faker-js/faker": "npm:10.5.0"
     "@inquirer/prompts": "npm:8.7.0"
     "@ls-lint/ls-lint": "npm:2.3.1"
     "@nx/jest": "npm:22.7.8"
