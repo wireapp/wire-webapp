@@ -17,43 +17,26 @@
  *
  */
 
-import {Result} from 'true-myth';
-
 import type {UploadSource} from 'Repositories/cells/upload';
-import type {CellsUploadManager, CellsUploadManagerError} from 'Repositories/cells/upload/manager';
-import type {UploadSnapshotListener} from 'Repositories/cells/upload/process';
+import type {CellsUploadManager} from 'Repositories/cells/upload/manager';
+import {Result} from 'true-myth';
 
 import {createSharedDriveUploadController} from './sharedDriveUploadController';
 
 const uploadPath = 'conversation-id@example.com/files';
 const conversationQualifiedId = 'conversation-id@example.com';
 
-function createManager() {
-  const manager = {
-    register: jest.fn(
-      (_uploadId: string, _source: UploadSource, _path: string): Result<void, CellsUploadManagerError> =>
-        Result.ok(undefined),
-    ),
-    subscribe: jest.fn(
-      (_uploadId: string, _listener: UploadSnapshotListener): Result<() => void, CellsUploadManagerError> =>
-        Result.ok(jest.fn()),
-    ),
-    snapshot: jest.fn((_uploadId: string) =>
-      Result.ok({
-        kind: 'queued',
-        identity: {uploadId: _uploadId},
-        source: {blob: new Blob(), name: _uploadId, contentType: '', size: 0},
-      }),
-    ),
-    start: jest.fn(async (_uploadId: string): Promise<Result<void, CellsUploadManagerError>> => Result.ok(undefined)),
-    publish: jest.fn(async (_uploadId: string): Promise<Result<void, CellsUploadManagerError>> => Result.ok(undefined)),
+function createCellsRepository() {
+  return {
+    uploadNode: jest.fn().mockResolvedValue({uuid: 'remote-id', versionId: 'version-id'}),
   };
-  return manager;
 }
 
-function createController(manager: ReturnType<typeof createManager>) {
+function createController(cellsRepository = createCellsRepository()) {
   const controller = createSharedDriveUploadController({
-    manager: manager as unknown as CellsUploadManager,
+    mode: 'direct',
+    cellsRepository,
+    createAbortController: () => new AbortController(),
     createUploadId: jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2'),
     createSource: jest.fn((file: File): UploadSource => ({
       blob: file,
@@ -62,13 +45,47 @@ function createController(manager: ReturnType<typeof createManager>) {
       size: file.size,
     })),
   });
-  return controller;
+  return {cellsRepository, controller};
+}
+
+function createDraftManager(): jest.Mocked<CellsUploadManager> {
+  const source: UploadSource = {blob: new Blob(['data']), name: 'one.txt', contentType: 'text/plain', size: 3};
+  const state = {kind: 'published', identity: {uploadId: 'upload-1', resourceUuid: 'remote-id', versionId: 'version-id'}, source};
+
+  return {
+    register: jest.fn().mockReturnValue(Result.ok(undefined)),
+    snapshot: jest.fn().mockReturnValue(Result.ok(state)),
+    subscribe: jest.fn().mockReturnValue(Result.ok(jest.fn())),
+    start: jest.fn().mockResolvedValue(Result.ok(undefined)),
+    cancel: jest.fn().mockResolvedValue(Result.ok(undefined)),
+    retryUpload: jest.fn().mockResolvedValue(Result.ok(undefined)),
+    publish: jest.fn().mockResolvedValue(Result.ok(undefined)),
+    retryPublish: jest.fn().mockResolvedValue(Result.ok(undefined)),
+    discard: jest.fn().mockResolvedValue(Result.ok(undefined)),
+    retryDiscard: jest.fn().mockResolvedValue(Result.ok(undefined)),
+    release: jest.fn().mockReturnValue(Result.ok(undefined)),
+  };
+}
+
+function createDraftController(manager = createDraftManager()) {
+  const controller = createSharedDriveUploadController({
+    mode: 'draft',
+    manager,
+    createUploadId: jest.fn().mockReturnValue('upload-1'),
+    createSource: jest.fn((sourceFile: File): UploadSource => ({
+      blob: sourceFile,
+      name: sourceFile.name,
+      contentType: sourceFile.type,
+      size: sourceFile.size,
+    })),
+  });
+
+  return {controller, manager};
 }
 
 describe('createSharedDriveUploadController', () => {
   it('notifies listeners as soon as a file is registered', async () => {
-    const manager = createManager();
-    const controller = createController(manager);
+    const {controller} = createController();
     const listener = jest.fn();
     controller.subscribe(listener);
 
@@ -81,15 +98,14 @@ describe('createSharedDriveUploadController', () => {
 
     expect(listener).toHaveBeenCalled();
     expect(controller.snapshots(conversationQualifiedId)).toEqual([
-      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'queued'}),
+      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'uploading'}),
     ]);
 
     await uploadPromise;
   });
 
-  it('registers, uploads, publishes, and refreshes after successful files', async () => {
-    const manager = createManager();
-    const controller = createController(manager);
+  it('directly uploads files and refreshes after successful files', async () => {
+    const {cellsRepository, controller} = createController();
     const onRefresh = jest.fn();
     const listener = jest.fn();
     const files = [new File(['one'], 'one.txt'), new File(['two'], 'two.txt')];
@@ -97,81 +113,160 @@ describe('createSharedDriveUploadController', () => {
 
     await controller.upload(files, uploadPath, onRefresh, conversationQualifiedId);
 
-    expect(manager.register).toHaveBeenNthCalledWith(
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(
       1,
-      'upload-1',
-      expect.objectContaining({name: 'one.txt'}),
-      uploadPath,
+      expect.objectContaining({uuid: 'upload-1', file: files[0], path: uploadPath}),
     );
-    expect(manager.register).toHaveBeenNthCalledWith(
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(
       2,
-      'upload-2',
-      expect.objectContaining({name: 'two.txt'}),
-      uploadPath,
+      expect.objectContaining({uuid: 'upload-2', file: files[1], path: uploadPath}),
     );
-    expect(manager.start).toHaveBeenCalledWith('upload-1');
-    expect(manager.start).toHaveBeenCalledWith('upload-2');
-    expect(manager.publish).toHaveBeenCalledWith('upload-1');
-    expect(manager.publish).toHaveBeenCalledWith('upload-2');
     expect(onRefresh).toHaveBeenCalledTimes(1);
     expect(listener).toHaveBeenCalled();
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-2'}), kind: 'published'}),
+    ]);
   });
 
-  it('does not start a file when registration fails and refreshes after another file succeeds', async () => {
-    const manager = createManager();
-    manager.register.mockReturnValueOnce(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
-    const controller = createController(manager);
-    const onRefresh = jest.fn();
-
-    await controller.upload(
-      [new File(['one'], 'one.txt'), new File(['two'], 'two.txt')],
-      uploadPath,
-      onRefresh,
-      conversationQualifiedId,
-    );
-
-    expect(manager.start).toHaveBeenCalledTimes(1);
-    expect(manager.start).toHaveBeenCalledWith('upload-2');
-    expect(manager.publish).toHaveBeenCalledWith('upload-2');
-    expect(onRefresh).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not refresh when starting an upload fails', async () => {
-    const manager = createManager();
-    manager.start.mockResolvedValue(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
-    const controller = createController(manager);
+  it('does not refresh when a direct upload fails', async () => {
+    const cellsRepository = createCellsRepository();
+    cellsRepository.uploadNode.mockRejectedValueOnce(new Error('upload failed'));
+    const {controller} = createController(cellsRepository);
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
 
     expect(onRefresh).not.toHaveBeenCalled();
-    expect(manager.publish).not.toHaveBeenCalled();
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'uploadFailed'}),
+    ]);
+  });
+
+  it('cancels an active direct upload', async () => {
+    const cellsRepository = createCellsRepository();
+    let rejectUpload: (error: unknown) => void = () => undefined;
+    cellsRepository.uploadNode.mockImplementationOnce(
+      ({abortController}: {abortController?: AbortController}) =>
+        new Promise((_resolve, reject) => {
+          rejectUpload = reject;
+          abortController?.signal.addEventListener('abort', () => reject(new Error('cancelled')));
+        }),
+    );
+    const {controller} = createController(cellsRepository);
+
+    const uploadPromise = controller.upload(
+      [new File(['one'], 'one.txt')],
+      uploadPath,
+      jest.fn(),
+      conversationQualifiedId,
+    );
+
+    await controller.cancel('upload-1');
+    rejectUpload(new Error('cancelled'));
+    await uploadPromise;
+
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'cancelled'}),
+    ]);
+  });
+
+  it('retries a failed direct upload', async () => {
+    const cellsRepository = createCellsRepository();
+    cellsRepository.uploadNode
+      .mockRejectedValueOnce(new Error('upload failed'))
+      .mockResolvedValueOnce({uuid: 'remote-id', versionId: 'version-id'});
+    const {controller} = createController(cellsRepository);
+    const file = new File(['one'], 'one.txt');
+
+    await controller.upload([file], uploadPath, jest.fn(), conversationQualifiedId);
+    await controller.retryUpload('upload-1');
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(2);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({uuid: 'upload-1', file, path: uploadPath}),
+    );
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
+    ]);
+  });
+
+  it('does not retry an already published direct upload', async () => {
+    const {cellsRepository, controller} = createController();
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, jest.fn(), conversationQualifiedId);
+    await controller.retryUpload('upload-1');
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(1);
   });
 
   it('returns only uploads belonging to the requested conversation', async () => {
-    const manager = createManager();
-    const controller = createController(manager);
+    const {controller} = createController();
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
     await controller.upload([new File(['two'], 'two.txt')], uploadPath, onRefresh, 'other-conversation@example.com');
 
     expect(controller.snapshots(conversationQualifiedId)).toEqual([
-      expect.objectContaining({identity: {uploadId: 'upload-1'}}),
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'})}),
     ]);
     expect(controller.snapshots('other-conversation@example.com')).toEqual([
-      expect.objectContaining({identity: {uploadId: 'upload-2'}}),
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-2'})}),
     ]);
   });
 
-  it('does not refresh when publishing an upload fails', async () => {
-    const manager = createManager();
-    manager.publish.mockResolvedValue(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
-    const controller = createController(manager);
+  it('can run with the draft manager strategy for staged uploads', async () => {
+    const onRefresh = jest.fn();
+    const file = new File(['one'], 'one.txt', {type: 'text/plain'});
+    const {controller, manager} = createDraftController();
+
+    await controller.upload([file], uploadPath, onRefresh, conversationQualifiedId);
+
+    expect(manager.register).toHaveBeenCalledWith('upload-1', expect.objectContaining({name: 'one.txt'}), uploadPath);
+    expect(manager.start).toHaveBeenCalledWith('upload-1');
+    expect(manager.publish).toHaveBeenCalledWith('upload-1');
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
+    ]);
+  });
+
+  it('does not publish draft uploads when start fails', async () => {
+    const manager = createDraftManager();
+    manager.start.mockResolvedValueOnce(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
+    const {controller} = createDraftController(manager);
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
 
+    expect(manager.publish).not.toHaveBeenCalled();
+    expect(onRefresh).not.toHaveBeenCalled();
+  });
+
+  it('does not start draft uploads when register fails', async () => {
+    const manager = createDraftManager();
+    manager.register.mockReturnValueOnce(Result.err({kind: 'duplicateUpload', uploadId: 'upload-1'}));
+    const {controller} = createDraftController(manager);
+    const onRefresh = jest.fn();
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
+
+    expect(manager.start).not.toHaveBeenCalled();
+    expect(manager.publish).not.toHaveBeenCalled();
+    expect(onRefresh).not.toHaveBeenCalled();
+  });
+
+  it('does not refresh when draft publish fails', async () => {
+    const manager = createDraftManager();
+    manager.publish.mockResolvedValueOnce(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
+    const {controller} = createDraftController(manager);
+    const onRefresh = jest.fn();
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
+
+    expect(manager.start).toHaveBeenCalledWith('upload-1');
+    expect(manager.publish).toHaveBeenCalledWith('upload-1');
     expect(onRefresh).not.toHaveBeenCalled();
   });
 });

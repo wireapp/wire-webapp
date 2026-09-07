@@ -37,8 +37,6 @@ import {showUserModal} from 'Components/Modals/UserModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/titleBar';
 import {CallState} from 'Repositories/calling/CallState';
-import {createCellsRepositoryGateway} from 'Repositories/cells/cellsRepositoryGateway';
-import {createCellsUploadManager} from 'Repositories/cells/upload/manager';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
@@ -141,16 +139,10 @@ function ConversationContent({
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
-    const gateway = createCellsRepositoryGateway(repositories.cells);
-    const manager = createCellsUploadManager({
-      gateway,
-      createResourceUuid: createUuid,
-      createVersionUuid: createUuid,
-      createAttemptId: createUuid,
-      createAbortController: () => new AbortController(),
-    });
     return createSharedDriveUploadController({
-      manager,
+      mode: 'direct',
+      cellsRepository: repositories.cells,
+      createAbortController: () => new AbortController(),
       createUploadId: createUuid,
       createSource: file => ({blob: file, name: file.name, contentType: file.type, size: file.size}),
     });
