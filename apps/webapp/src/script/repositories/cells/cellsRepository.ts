@@ -63,6 +63,36 @@ export class CellsRepository {
     this.isInitialized = true;
   }
 
+  async uploadNode({
+    uuid,
+    file,
+    path,
+    versionId = createUuid(),
+    progressCallback,
+    abortController,
+  }: {
+    uuid: string;
+    file: File;
+    path: string;
+    versionId?: string;
+    progressCallback?: (progress: number) => void;
+    abortController?: AbortController;
+  }): Promise<{uuid: string; versionId: string}> {
+    const uploadFilePath = file.webkitRelativePath || file.name;
+    const filePath = `${path || this.basePath}/${uploadFilePath}`;
+
+    await this.apiClient.api.cells.uploadNode({
+      path: filePath,
+      file,
+      uuid,
+      versionId,
+      progressCallback,
+      abortController,
+    });
+
+    return {uuid, versionId};
+  }
+
   async uploadNodeDraft({
     uuid,
     file,

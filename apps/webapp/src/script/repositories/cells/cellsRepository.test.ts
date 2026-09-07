@@ -103,9 +103,38 @@ describe('CellsRepository upload paths', () => {
   const createApiClient = () => ({
     api: {
       cells: {
+        uploadNode: jest.fn().mockResolvedValue(undefined),
         uploadNodeDraft: jest.fn().mockResolvedValue(undefined),
       },
     },
+  });
+
+  it('directly uploads shared drive files at the selected conversation path', async () => {
+    const apiClient = createApiClient();
+    const repository = new CellsRepository(apiClient as never);
+    const file = new File(['content'], 'document.txt');
+
+    await repository.uploadNode({uuid: 'upload-uuid', file, path: 'conversation-id@example.com/direct-upload'});
+
+    expect(apiClient.api.cells.uploadNode).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: 'conversation-id@example.com/direct-upload/document.txt',
+      }),
+    );
+  });
+
+  it('falls back to the cells storage root for direct uploads without a selected path', async () => {
+    const apiClient = createApiClient();
+    const repository = new CellsRepository(apiClient as never);
+    const file = new File(['content'], 'document.txt');
+
+    await repository.uploadNode({uuid: 'upload-uuid', file, path: ''});
+
+    expect(apiClient.api.cells.uploadNode).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: 'wire-cells-web/document.txt',
+      }),
+    );
   });
 
   it('uploads file picker files at the selected cells path', async () => {
