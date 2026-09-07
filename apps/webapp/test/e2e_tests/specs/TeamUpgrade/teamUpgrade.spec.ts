@@ -24,7 +24,7 @@ test('I want to upgrade team to paid', {tag: ['@TC-11757', '@regression']}, asyn
   const {owner: userA} = await createTeam('Critical Team', {users: [userB]});
 
   await test.step('Upgrade team and verify payment confirmation email is received', async () => {
-      await api.team.upgradeTeam(userA.teamId, userA);
-      expect(await api.inbucket.isPaymentConfirmationEmailReceived(userA)).toBe(true);
+    await api.team.upgradeTeam(userA.teamId, userA);
+    expect(await api.inbucket.isPaymentConfirmationEmailReceived(userA)).toBe(true);
   });
 });
