@@ -17,7 +17,7 @@
  *
  */
 
-import {memo, useCallback, useEffect, useRef} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
@@ -91,6 +91,8 @@ export const ConversationCells = memo(
     const {fireAndForgetInvoker, translate} = useApplicationContext();
     const sharedDriveUploadController = useSharedDriveUploadController();
     const uploadInput = useRef<HTMLInputElement>(null);
+    const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
+    const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const onUploadFiles = () => uploadInput.current?.click();
     const {
       cellsState: initialCellState,
@@ -228,6 +230,14 @@ export const ConversationCells = memo(
       ],
     );
 
+    const handleDropFilesToFolder = useCallback(
+      (files: readonly File[], targetUploadPath: string): void => {
+        handleDroppedFiles(files, targetUploadPath);
+        setFolderDropResetKey(key => key + 1);
+      },
+      [handleDroppedFiles],
+    );
+
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
     const loadMoreOffset = getLoadMoreOffset(pagination);
@@ -280,7 +290,9 @@ export const ConversationCells = memo(
     return (
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <SharedDriveDropzone
+          dragStateResetKey={folderDropResetKey}
           isEnabled={isCellsStateReady && isUploadFilesEnabled && !isInRecycleBin}
+          isOverlaySuppressed={activeFolderDropTargetName !== null}
           onDropFiles={handleDroppedFiles}
         >
           <div css={wrapperStyles}>
@@ -316,6 +328,8 @@ export const ConversationCells = memo(
                 getDirectionFor={getDirectionFor}
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}
+                onFolderDropTargetChange={setActiveFolderDropTargetName}
+                onDropFilesToFolder={!isInRecycleBin && isUploadFilesEnabled ? handleDropFilesToFolder : undefined}
               />
             )}
             {isCellsStatePending && !isRefreshing && (

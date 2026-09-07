@@ -17,7 +17,7 @@
  *
  */
 
-import {DragEvent, ReactNode, useRef, useState} from 'react';
+import {DragEvent, ReactNode, useEffect, useRef, useState} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -34,7 +34,9 @@ import {
 
 interface SharedDriveDropzoneProps {
   readonly children: ReactNode;
+  readonly dragStateResetKey?: number;
   readonly isEnabled: boolean;
+  readonly isOverlaySuppressed?: boolean;
   readonly onDropFiles: (files: readonly File[]) => void;
 }
 
@@ -57,16 +59,44 @@ const UploadFilesIcon = () => (
   </svg>
 );
 
-export const SharedDriveDropzone = ({children, isEnabled, onDropFiles}: SharedDriveDropzoneProps) => {
+export const SharedDriveDropzone = ({
+  children,
+  dragStateResetKey,
+  isEnabled,
+  isOverlaySuppressed = false,
+  onDropFiles,
+}: SharedDriveDropzoneProps) => {
   const {translate} = useApplicationContext();
   const [isDraggingFiles, setIsDraggingFiles] = useState(false);
   const nestedDragEventCount = useRef(0);
-  const isOverlayActive = isDraggingFiles && isEnabled;
+  const isOverlayActive = isDraggingFiles && isEnabled && !isOverlaySuppressed;
 
   const resetDragState = (): void => {
     nestedDragEventCount.current = 0;
     setIsDraggingFiles(false);
   };
+
+  useEffect(() => {
+    resetDragState();
+  }, [dragStateResetKey]);
+
+  useEffect(() => {
+    if (!isDraggingFiles) {
+      return undefined;
+    }
+
+    const resetActiveDragState = (): void => resetDragState();
+
+    window.addEventListener('drop', resetActiveDragState);
+    window.addEventListener('dragend', resetActiveDragState);
+    window.addEventListener('blur', resetActiveDragState);
+
+    return () => {
+      window.removeEventListener('drop', resetActiveDragState);
+      window.removeEventListener('dragend', resetActiveDragState);
+      window.removeEventListener('blur', resetActiveDragState);
+    };
+  }, [isDraggingFiles]);
 
   const handleDragEnter = (event: DragEvent<HTMLDivElement>): void => {
     if (!dragEventContainsFiles(event)) {

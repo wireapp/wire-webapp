@@ -88,6 +88,19 @@ describe('SharedDriveDropzone', () => {
     expect(screen.getByRole('status', {hidden: true})).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('clears the overlay when the file is released outside the dropzone', () => {
+    const {dropzone} = renderDropzone();
+
+    fireEvent.dragEnter(dropzone, {dataTransfer: createDataTransfer([])});
+    const overlayStatus = screen.getByRole('status');
+
+    expect(overlayStatus).toHaveAttribute('aria-hidden', 'false');
+
+    fireEvent.drop(window, {dataTransfer: createDataTransfer([])});
+
+    expect(overlayStatus).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('does not show the upload affordance while the Shared Drive target is disabled', () => {
     const {dropzone} = renderDropzone({isEnabled: false});
 

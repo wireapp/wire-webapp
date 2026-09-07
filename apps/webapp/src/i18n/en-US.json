@@ -2055,6 +2055,7 @@
   "setPassword.headline": "Set password",
   "setPassword.passwordPlaceholder": "Password",
   "sharedDriveDropOverlayDescription": "to Shared Drive",
+  "sharedDriveDropFolderOverlayDescription": "to",
   "sharedDriveDropOverlayTitle": "Upload files",
   "sharedDriveDropRecycleBinMessage": "You can’t upload files to the recycle bin.",
   "sharedDriveDropUnsupportedFileMessage": "This file type can’t be uploaded to Shared Drive.",

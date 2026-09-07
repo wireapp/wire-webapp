@@ -28,6 +28,7 @@ import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
 
 const uploadPath = 'conversation-id@example.com';
+const folderUploadPath = 'Folder';
 const conversationQualifiedId = 'conversation-id@example.com';
 
 const createFireAndForgetInvoker = (): FireAndForgetInvoker => ({
@@ -171,6 +172,47 @@ describe('useSharedDriveFileDrop', () => {
     expect(sharedDriveUploadController.upload).toHaveBeenCalledWith(
       [file],
       uploadPath,
+      onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it('starts upload at an explicit folder row target path', async () => {
+    jest.spyOn(Config, 'getConfig').mockReturnValue({
+      ...defaultConfiguration,
+      FEATURE: {
+        ...defaultConfiguration.FEATURE,
+        ALLOWED_FILE_UPLOAD_EXTENSIONS: ['.pdf'],
+      },
+    });
+    const fireAndForgetInvoker = createFireAndForgetInvoker();
+    const sharedDriveUploadController = createSharedDriveUploadController();
+    const showFileDropzoneError = jest.fn();
+    const onRefresh = jest.fn();
+    const file = new File(['content'], 'document.pdf', {type: 'application/pdf'});
+    const {result} = renderHook(() =>
+      useSharedDriveFileDrop({
+        conversationQualifiedId,
+        fireAndForgetInvoker,
+        isInRecycleBin: false,
+        isUploadFilesEnabled: true,
+        onRefresh,
+        sharedDriveUploadController,
+        showFileDropzoneError,
+        translate: translateForTest,
+        uploadPath,
+      }),
+    );
+
+    act(() => result.current([file], folderUploadPath));
+
+    expect(showFileDropzoneError).not.toHaveBeenCalled();
+    expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+    const uploadAction = jest.mocked(fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    await uploadAction();
+    expect(sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [file],
+      folderUploadPath,
       onRefresh,
       conversationQualifiedId,
     );
