@@ -109,7 +109,7 @@
     "@babel/preset-env": "7.29.7",
     "@babel/preset-react": "7.29.7",
     "@babel/preset-typescript": "7.29.7",
-    "@formatjs/cli": "6.16.22",
+    "@formatjs/cli": "6.16.23",
     "@nx/webpack": "22.7.9",
     "@playwright/test": "1.62.1",
     "@roamhq/wrtc": "0.10.0",
