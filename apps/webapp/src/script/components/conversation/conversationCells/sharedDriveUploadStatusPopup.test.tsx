@@ -45,7 +45,7 @@ const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false) 
         }
         destination="to Shared Drive"
         isExpanded={isExpanded}
-        toggleLabel={isExpanded ? 'Collapse upload details' : 'Expand upload details'}
+        toggleLabel={isExpanded ? 'Hide upload details' : 'Show upload details'}
         cancelLabel="Cancel"
         isCancelling={false}
         onToggle={jest.fn()}
@@ -109,7 +109,7 @@ describe('SharedDriveUploadStatusPopup', () => {
     renderPopup('uploading');
 
     const header = screen.getByTestId('shared-drive-upload-status-header');
-    const toggle = within(header).getByRole('button', {name: 'Expand upload details'});
+    const toggle = within(header).getByRole('button', {name: 'Show upload details'});
     expect(within(header).getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     expect(toggle).toHaveAttribute('aria-controls', 'shared-drive-upload-status-upload-1');
@@ -126,7 +126,7 @@ describe('SharedDriveUploadStatusPopup', () => {
 
     const header = screen.getByTestId('shared-drive-upload-status-header');
     const row = screen.getByTestId('shared-drive-upload-status-row');
-    expect(screen.getByRole('button', {name: 'Collapse upload details'})).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', {name: 'Hide upload details'})).toHaveAttribute('aria-expanded', 'true');
     expect(row).toBeVisible();
     expect(within(row).getByText('report.pdf')).toBeInTheDocument();
     expect(within(row).getByText(label)).toHaveStyle({color});
@@ -144,7 +144,7 @@ describe('SharedDriveUploadStatusPopup', () => {
         statusLabel="Uploading"
         destination="to Shared Drive"
         isExpanded={false}
-        toggleLabel="Expand upload details"
+        toggleLabel="Show upload details"
         cancelLabel="Cancel"
         isCancelling={false}
         onToggle={onToggle}
@@ -152,7 +152,7 @@ describe('SharedDriveUploadStatusPopup', () => {
       />,
     );
 
-    screen.getByRole('button', {name: 'Expand upload details'}).focus();
+    screen.getByRole('button', {name: 'Show upload details'}).focus();
     await user.keyboard('{Enter}');
     await user.keyboard(' ');
 
@@ -170,7 +170,7 @@ describe('SharedDriveUploadStatusPopup', () => {
           statusLabel="Uploading"
           destination="to Shared Drive"
           isExpanded={false}
-          toggleLabel="Expand upload details"
+          toggleLabel="Show upload details"
           cancelLabel="Cancel"
           isCancelling={false}
           onToggle={jest.fn()}
@@ -197,7 +197,7 @@ describe('SharedDriveUploadStatusPopup', () => {
           statusLabel="Uploading"
           destination="to Shared Drive"
           isExpanded
-          toggleLabel="Collapse upload details"
+          toggleLabel="Hide upload details"
           cancelLabel="Cancel"
           isCancelling={false}
           onToggle={jest.fn()}
@@ -224,7 +224,7 @@ describe('SharedDriveUploadStatusPopup', () => {
           statusLabel="Uploading"
           destination="to Shared Drive"
           isExpanded
-          toggleLabel="Collapse upload details"
+          toggleLabel="Hide upload details"
           cancelLabel="Cancel"
           isCancelling
           onToggle={jest.fn()}
