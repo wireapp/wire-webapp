@@ -177,6 +177,39 @@ describe('useSharedDriveFileDrop', () => {
     );
   });
 
+  it('rejects dropped files when uploads are disabled by permissions', () => {
+    const fireAndForgetInvoker = createFireAndForgetInvoker();
+    const sharedDriveUploadController = createSharedDriveUploadController();
+    const showFileDropzoneError = jest.fn();
+    const onRefresh = jest.fn();
+    const file = new File(['content'], 'document.pdf', {type: 'application/pdf'});
+    const {result} = renderHook(() =>
+      useSharedDriveFileDrop({
+        conversationQualifiedId,
+        fireAndForgetInvoker,
+        isInRecycleBin: false,
+        isUploadFilesEnabled: false,
+        onRefresh,
+        sharedDriveUploadController,
+        showFileDropzoneError,
+        translate: translateForTest,
+        uploadPath,
+      }),
+    );
+
+    act(() => result.current([file]));
+
+    expect(fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+    expect(sharedDriveUploadController.upload).not.toHaveBeenCalled();
+    expect(showFileDropzoneError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        invalidFiles: [],
+        message: 'conversationFileUploadRestrictedOverlayDescription',
+        title: 'conversationFileUploadRestrictedOverlayTitle',
+      }),
+    );
+  });
+
   it('starts upload at an explicit folder row target path', async () => {
     jest.spyOn(Config, 'getConfig').mockReturnValue({
       ...defaultConfiguration,

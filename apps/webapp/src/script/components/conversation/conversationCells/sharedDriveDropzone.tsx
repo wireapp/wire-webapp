@@ -19,6 +19,8 @@
 
 import {DragEvent, ReactNode, useEffect, useRef, useState} from 'react';
 
+import {BlockIcon} from '@wireapp/react-ui-kit';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -36,6 +38,7 @@ interface SharedDriveDropzoneProps {
   readonly children: ReactNode;
   readonly dragStateResetKey?: number;
   readonly isEnabled: boolean;
+  readonly isFileDropAllowed: boolean;
   readonly isOverlaySuppressed?: boolean;
   readonly onDropFiles: (files: readonly File[]) => void;
 }
@@ -63,6 +66,7 @@ export const SharedDriveDropzone = ({
   children,
   dragStateResetKey,
   isEnabled,
+  isFileDropAllowed,
   isOverlaySuppressed = false,
   onDropFiles,
 }: SharedDriveDropzoneProps) => {
@@ -70,6 +74,13 @@ export const SharedDriveDropzone = ({
   const [isDraggingFiles, setIsDraggingFiles] = useState(false);
   const nestedDragEventCount = useRef(0);
   const isOverlayActive = isDraggingFiles && isEnabled && !isOverlaySuppressed;
+  const isRestricted = !isFileDropAllowed;
+  const overlayTitle = isRestricted
+    ? translate('conversationFileUploadRestrictedOverlayTitle')
+    : translate('sharedDriveDropOverlayTitle');
+  const overlayDescription = isRestricted
+    ? translate('conversationFileUploadRestrictedOverlayDescription')
+    : translate('sharedDriveDropOverlayDescription');
 
   const resetDragState = (): void => {
     nestedDragEventCount.current = 0;
@@ -114,7 +125,7 @@ export const SharedDriveDropzone = ({
     }
 
     preventDefaultFileDrop(event);
-    event.dataTransfer.dropEffect = isEnabled ? 'copy' : 'none';
+    event.dataTransfer.dropEffect = isEnabled && isFileDropAllowed ? 'copy' : 'none';
   };
 
   const handleDragLeave = (event: DragEvent<HTMLDivElement>): void => {
@@ -137,7 +148,9 @@ export const SharedDriveDropzone = ({
 
     preventDefaultFileDrop(event);
     resetDragState();
-    onDropFiles(Array.from(event.dataTransfer.files));
+    if (isEnabled) {
+      onDropFiles(Array.from(event.dataTransfer.files));
+    }
   };
 
   return (
@@ -152,11 +165,11 @@ export const SharedDriveDropzone = ({
       <div css={isOverlayActive ? overlayActiveStyles : overlayStyles} aria-hidden={!isOverlayActive} role="status">
         <div css={contentStyles}>
           <span css={iconWrapperStyles}>
-            <UploadFilesIcon />
+            {isRestricted ? <BlockIcon width={24} height={24} aria-hidden="true" /> : <UploadFilesIcon />}
           </span>
           <span css={textWrapperStyles}>
-            <p css={titleStyles}>{translate('sharedDriveDropOverlayTitle')}</p>
-            <p css={descriptionStyles}>{translate('sharedDriveDropOverlayDescription')}</p>
+            <p css={titleStyles}>{overlayTitle}</p>
+            <p css={descriptionStyles}>{overlayDescription}</p>
           </span>
         </div>
       </div>

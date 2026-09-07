@@ -39,10 +39,18 @@ const createDataTransfer = (files: File[]) => ({
   dropEffect: 'move',
 });
 
-const renderDropzone = ({isEnabled = true, onDropFiles = jest.fn()} = {}) => {
+const renderDropzone = ({
+  isEnabled = true,
+  isFileDropAllowed = true,
+  onDropFiles = jest.fn(),
+}: {
+  isEnabled?: boolean;
+  isFileDropAllowed?: boolean;
+  onDropFiles?: jest.Mock;
+} = {}) => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
-      <SharedDriveDropzone isEnabled={isEnabled} onDropFiles={onDropFiles}>
+      <SharedDriveDropzone isEnabled={isEnabled} isFileDropAllowed={isFileDropAllowed} onDropFiles={onDropFiles}>
         <div>Shared Drive content</div>
       </SharedDriveDropzone>
     </StyledApp>,
@@ -107,5 +115,17 @@ describe('SharedDriveDropzone', () => {
     fireEvent.dragEnter(dropzone, {dataTransfer: createDataTransfer([])});
 
     expect(screen.getByRole('status', {hidden: true})).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('shows the restricted overlay while a viewer drags files over Shared Drive', () => {
+    const {dropzone} = renderDropzone({isFileDropAllowed: false});
+
+    fireEvent.dragEnter(dropzone, {dataTransfer: createDataTransfer([])});
+
+    expect(screen.getByText('conversationFileUploadRestrictedOverlayTitle').closest('[aria-hidden]')).toHaveAttribute(
+      'aria-hidden',
+      'false',
+    );
+    expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
   });
 });

@@ -202,11 +202,12 @@ export const ConversationCells = memo(
 
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+    const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
     const handleDroppedFiles = useSharedDriveFileDrop({
       conversationQualifiedId: sharedDriveConversationQualifiedId,
       fireAndForgetInvoker,
       isInRecycleBin,
-      isUploadFilesEnabled,
+      isUploadFilesEnabled: canUploadToSharedDrive,
       onRefresh: handleRefresh,
       sharedDriveUploadController,
       translate,
@@ -292,6 +293,7 @@ export const ConversationCells = memo(
         <SharedDriveDropzone
           dragStateResetKey={folderDropResetKey}
           isEnabled={isCellsStateReady && isUploadFilesEnabled && !isInRecycleBin}
+          isFileDropAllowed={canUploadToSharedDrive}
           isOverlaySuppressed={activeFolderDropTargetName !== null}
           onDropFiles={handleDroppedFiles}
         >
@@ -329,7 +331,7 @@ export const ConversationCells = memo(
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}
                 onFolderDropTargetChange={setActiveFolderDropTargetName}
-                onDropFilesToFolder={!isInRecycleBin && isUploadFilesEnabled ? handleDropFilesToFolder : undefined}
+                onDropFilesToFolder={!isInRecycleBin && canUploadToSharedDrive ? handleDropFilesToFolder : undefined}
               />
             )}
             {isCellsStatePending && !isRefreshing && (
