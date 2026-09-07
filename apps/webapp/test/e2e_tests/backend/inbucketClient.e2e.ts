@@ -101,12 +101,27 @@ export class InbucketClientE2E {
     while (attempt < maxAttempts) {
       const response = await this.getLatestEmail(teamOwner.email);
       if (response.status === 200) {
-        const message = response.data;
-        const subject = response.data.subject;
-        // const attachment
+        const message = response.data as {
+          from: string;
+          subject: string;
+          body: {text: string};
+          attachments: {filename: string; 'content-type': string}[];
+        };
+
+        const attachments = (message.attachments as any) ?? [];
+
+        const hasPdfAttachment = attachments.some(
+          (attachment: {filename: string; 'content-type': string}) =>
+            attachment['content-type'] === 'application/pdf' ||
+            attachment.filename?.toLowerCase().startsWith('wire_invoice') ||
+            attachment.filename?.toLowerCase().endsWith('.pdf'),
+        );
+
         if (
           message.body.text.includes(`Team ID: ${teamOwner.teamId}`) &&
-          subject.includes('Thank you for your order')
+          message.subject.includes('Thank you for your order') &&
+          message.from.includes('payments@wire.com') &&
+          hasPdfAttachment
         ) {
           return true;
         }
