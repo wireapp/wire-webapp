@@ -76,7 +76,10 @@ import {getCellsFilesPath} from './conversationCells/common/getCellsFilesPath/ge
 import {getCurrentFolderName} from './conversationCells/common/getCurrentFolderName/getCurrentFolderName';
 import {ConversationCells} from './conversationCells/conversationCells';
 import {SharedDriveUploadProvider} from './conversationCells/sharedDriveUploadContext';
-import {createSharedDriveUploadController} from './conversationCells/sharedDriveUploadController';
+import {
+  createDirectSharedDriveUploadStrategy,
+  createSharedDriveUploadController,
+} from './conversationCells/sharedDriveUploadController';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
@@ -139,12 +142,16 @@ function ConversationContent({
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
+    const createSource = (file: File) => ({blob: file, name: file.name, contentType: file.type, size: file.size});
+
     return createSharedDriveUploadController({
-      mode: 'direct',
-      cellsRepository: repositories.cells,
-      createAbortController: () => new AbortController(),
       createUploadId: createUuid,
-      createSource: file => ({blob: file, name: file.name, contentType: file.type, size: file.size}),
+      createSource,
+      uploadStrategy: createDirectSharedDriveUploadStrategy({
+        cellsRepository: repositories.cells,
+        createAbortController: () => new AbortController(),
+        createSource,
+      }),
     });
   }, [repositories.cells]);
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);

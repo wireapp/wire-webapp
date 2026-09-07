@@ -22,7 +22,6 @@ import {Result} from 'true-myth';
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {UploadSource, UploadState} from 'Repositories/cells/upload';
 import type {CellsUploadManager} from 'Repositories/cells/upload/manager';
-import type {UploadSnapshotListener} from 'Repositories/cells/upload/process';
 
 export type SharedDriveUploadController = {
   readonly upload: (
@@ -40,34 +39,17 @@ export type SharedDriveUploadController = {
   readonly retryDiscard: (uploadId: string) => Promise<void>;
 };
 
-type BaseDependencies = {
-  readonly createUploadId: () => string;
-  readonly createSource: (file: File) => UploadSource;
-};
-
-type DirectUploadDependencies = BaseDependencies & {
-  readonly mode: 'direct';
-  readonly cellsRepository: Pick<CellsRepository, 'uploadNode'>;
-  readonly createAbortController: () => AbortController;
-};
-
-type DraftUploadDependencies = BaseDependencies & {
-  readonly mode: 'draft';
-  readonly manager: CellsUploadManager;
-};
-
-type Dependencies = DirectUploadDependencies | DraftUploadDependencies;
-
-type UploadRequest = {
+export type SharedDriveUploadRequest = {
   readonly file: File;
   readonly path: string;
-  readonly conversationQualifiedId: string;
 };
 
-type UploadStrategy = {
+type SharedDriveUploadSnapshotListener = () => void;
+
+export type SharedDriveUploadStrategy = {
   readonly register: (uploadId: string, source: UploadSource, path: string) => Result<void, unknown>;
-  readonly attach: (uploadId: string) => void;
-  readonly run: (uploadId: string, request: UploadRequest) => Promise<boolean>;
+  readonly attach: (uploadId: string, listener: SharedDriveUploadSnapshotListener) => void;
+  readonly run: (uploadId: string, request: SharedDriveUploadRequest) => Promise<boolean>;
   readonly snapshot: (uploadId: string) => UploadState | undefined;
   readonly cancel: (uploadId: string) => Promise<void>;
   readonly retryUpload: (uploadId: string) => Promise<void>;
@@ -76,19 +58,75 @@ type UploadStrategy = {
   readonly retryDiscard: (uploadId: string) => Promise<void>;
 };
 
-export const createSharedDriveUploadController = ({
-  mode,
-  createUploadId,
-  createSource,
-  ...dependencies
-}: Dependencies) => {
-  const ids: string[] = [];
-  const conversationByUploadId = new Map<string, string>();
-  const statesByUploadId = new Map<string, UploadState>();
-  const requestsByUploadId = new Map<string, UploadRequest>();
-  const abortControllersByUploadId = new Map<string, AbortController>();
+type DirectUploadStrategyDependencies = {
+  readonly cellsRepository: Pick<CellsRepository, 'uploadNode'>;
+  readonly createAbortController: () => AbortController;
+  readonly createSource: (file: File) => UploadSource;
+};
+
+type DraftUploadStrategyDependencies = {
+  readonly manager: CellsUploadManager;
+};
+
+type Dependencies = {
+  readonly createUploadId: () => string;
+  readonly createSource: (file: File) => UploadSource;
+  readonly uploadStrategy: SharedDriveUploadStrategy;
+};
+
+export const createDraftSharedDriveUploadStrategy = ({
+  manager,
+}: DraftUploadStrategyDependencies): SharedDriveUploadStrategy => {
   const subscriptions = new Map<string, () => void>();
-  const listeners = new Set<() => void>();
+  const listenersByUploadId = new Map<string, SharedDriveUploadSnapshotListener>();
+
+  const attach = (uploadId: string, listener: SharedDriveUploadSnapshotListener): void => {
+    listenersByUploadId.set(uploadId, listener);
+    const subscription = manager.subscribe(uploadId, () => listener());
+    if (subscription.isOk) {
+      subscriptions.set(uploadId, subscription.value);
+    }
+  };
+
+  const startAndPublishFile = async (uploadId: string): Promise<boolean> => {
+    const startResult = await manager.start(uploadId);
+    if (startResult.isErr) {
+      listenersByUploadId.get(uploadId)?.();
+      return false;
+    }
+
+    const publishResult = await manager.publish(uploadId);
+    listenersByUploadId.get(uploadId)?.();
+    return publishResult.isOk;
+  };
+
+  const command = async (uploadId: string, action: (id: string) => Promise<unknown>): Promise<void> => {
+    await action(uploadId);
+    listenersByUploadId.get(uploadId)?.();
+  };
+
+  return {
+    register: (uploadId, source, path) => manager.register(uploadId, source, path),
+    attach,
+    run: startAndPublishFile,
+    snapshot: uploadId => manager.snapshot(uploadId).unwrapOr(undefined),
+    cancel: uploadId => command(uploadId, manager.cancel),
+    retryUpload: uploadId => command(uploadId, manager.retryUpload),
+    retryPublish: uploadId => command(uploadId, manager.retryPublish),
+    discard: uploadId => command(uploadId, manager.discard),
+    retryDiscard: uploadId => command(uploadId, manager.retryDiscard),
+  };
+};
+
+export const createDirectSharedDriveUploadStrategy = ({
+  cellsRepository,
+  createAbortController,
+  createSource,
+}: DirectUploadStrategyDependencies): SharedDriveUploadStrategy => {
+  const statesByUploadId = new Map<string, UploadState>();
+  const requestsByUploadId = new Map<string, SharedDriveUploadRequest>();
+  const abortControllersByUploadId = new Map<string, AbortController>();
+  const listeners = new Set<SharedDriveUploadSnapshotListener>();
   const notify = () => listeners.forEach(listener => listener());
 
   const setState = (uploadId: string, state: UploadState): void => {
@@ -96,124 +134,85 @@ export const createSharedDriveUploadController = ({
     notify();
   };
 
-  const createDraftUploadStrategy = ({manager}: DraftUploadDependencies): UploadStrategy => {
-    const attach = (uploadId: string): void => {
-      const listener: UploadSnapshotListener = () => notify();
-      const subscription = manager.subscribe(uploadId, listener);
-      if (subscription.isOk) {
-        subscriptions.set(uploadId, subscription.value);
-      }
-    };
+  const uploadDirectFile = async (uploadId: string, request: SharedDriveUploadRequest): Promise<boolean> => {
+    const source = createSource(request.file);
+    const abortController = createAbortController();
+    abortControllersByUploadId.set(uploadId, abortController);
+    setState(uploadId, {kind: 'uploading', identity: {uploadId}, source, progress: 0});
 
-    const startAndPublishFile = async (uploadId: string): Promise<boolean> => {
-      const startResult = await manager.start(uploadId);
-      if (startResult.isErr) {
-        notify();
+    try {
+      const {uuid, versionId} = await cellsRepository.uploadNode({
+        uuid: uploadId,
+        file: request.file,
+        path: request.path,
+        progressCallback: progress => setState(uploadId, {kind: 'uploading', identity: {uploadId}, source, progress}),
+        abortController,
+      });
+
+      setState(uploadId, {kind: 'published', identity: {uploadId, resourceUuid: uuid, versionId}, source});
+      return true;
+    } catch (error: unknown) {
+      if (abortController.signal.aborted) {
+        setState(uploadId, {kind: 'cancelled', identity: {uploadId}, source});
         return false;
       }
 
-      const publishResult = await manager.publish(uploadId);
-      notify();
-      return publishResult.isOk;
-    };
-
-    const command = async (uploadId: string, action: (id: string) => Promise<unknown>): Promise<void> => {
-      await action(uploadId);
-      notify();
-    };
-
-    return {
-      register: (uploadId, source, path) => manager.register(uploadId, source, path),
-      attach,
-      run: startAndPublishFile,
-      snapshot: uploadId => manager.snapshot(uploadId).unwrapOr(undefined),
-      cancel: uploadId => command(uploadId, manager.cancel),
-      retryUpload: uploadId => command(uploadId, manager.retryUpload),
-      retryPublish: uploadId => command(uploadId, manager.retryPublish),
-      discard: uploadId => command(uploadId, manager.discard),
-      retryDiscard: uploadId => command(uploadId, manager.retryDiscard),
-    };
+      setState(uploadId, {
+        kind: 'uploadFailed',
+        identity: {uploadId},
+        source,
+        error: {kind: 'uploadFailed', cause: error},
+      });
+      return false;
+    } finally {
+      abortControllersByUploadId.delete(uploadId);
+    }
   };
 
-  const createDirectUploadStrategy = ({
-    cellsRepository,
-    createAbortController,
-  }: DirectUploadDependencies): UploadStrategy => {
-    const uploadDirectFile = async (uploadId: string, request: UploadRequest): Promise<boolean> => {
-      const source = createSource(request.file);
-      const abortController = createAbortController();
-      abortControllersByUploadId.set(uploadId, abortController);
-      setState(uploadId, {kind: 'uploading', identity: {uploadId}, source, progress: 0});
+  const retryUpload = async (uploadId: string): Promise<void> => {
+    const request = requestsByUploadId.get(uploadId);
+    const currentState = statesByUploadId.get(uploadId);
+    if (!request || currentState?.kind !== 'uploadFailed') {
+      return;
+    }
 
-      try {
-        const {uuid, versionId} = await cellsRepository.uploadNode({
-          uuid: uploadId,
-          file: request.file,
-          path: request.path,
-          progressCallback: progress => setState(uploadId, {kind: 'uploading', identity: {uploadId}, source, progress}),
-          abortController,
-        });
+    await uploadDirectFile(uploadId, request);
+  };
 
-        setState(uploadId, {kind: 'published', identity: {uploadId, resourceUuid: uuid, versionId}, source});
-        return true;
-      } catch (error: unknown) {
-        if (abortController.signal.aborted) {
-          setState(uploadId, {kind: 'cancelled', identity: {uploadId}, source});
-          return false;
-        }
-
-        setState(uploadId, {
-          kind: 'uploadFailed',
-          identity: {uploadId},
-          source,
-          error: {kind: 'uploadFailed', cause: error},
-        });
-        return false;
-      } finally {
-        abortControllersByUploadId.delete(uploadId);
-      }
-    };
-
-    const retryUpload = async (uploadId: string): Promise<void> => {
-      const request = requestsByUploadId.get(uploadId);
-      const currentState = statesByUploadId.get(uploadId);
-      if (!request || currentState?.kind !== 'uploadFailed') {
-        return;
-      }
-
-      await uploadDirectFile(uploadId, request);
-    };
-
-    const cancelUpload = async (uploadId: string): Promise<void> => {
+  return {
+    register: (uploadId, source) => {
+      setState(uploadId, {kind: 'queued', identity: {uploadId}, source});
+      return Result.ok(undefined);
+    },
+    attach: (_uploadId, listener) => {
+      listeners.add(listener);
+    },
+    run: (uploadId, request) => {
+      requestsByUploadId.set(uploadId, request);
+      return uploadDirectFile(uploadId, request);
+    },
+    snapshot: uploadId => statesByUploadId.get(uploadId),
+    cancel: async uploadId => {
       abortControllersByUploadId.get(uploadId)?.abort();
-    };
-
-    return {
-      register: (uploadId, source) => {
-        setState(uploadId, {kind: 'queued', identity: {uploadId}, source});
-        return Result.ok(undefined);
-      },
-      attach: () => undefined,
-      run: uploadDirectFile,
-      snapshot: uploadId => statesByUploadId.get(uploadId),
-      cancel: cancelUpload,
-      retryUpload,
-      retryPublish: async () => undefined,
-      discard: async () => undefined,
-      retryDiscard: async () => undefined,
-    };
+    },
+    retryUpload,
+    retryPublish: async () => undefined,
+    discard: async () => undefined,
+    retryDiscard: async () => undefined,
   };
+};
 
-  // Draft mode is not wired into production yet; it stays here as the migration path for staged Cells uploads.
-  const uploadStrategy =
-    mode === 'draft'
-      ? createDraftUploadStrategy(dependencies as DraftUploadDependencies)
-      : createDirectUploadStrategy(dependencies as DirectUploadDependencies);
+export const createSharedDriveUploadController = ({createUploadId, createSource, uploadStrategy}: Dependencies) => {
+  const ids: string[] = [];
+  const conversationByUploadId = new Map<string, string>();
+  const requestsByUploadId = new Map<string, SharedDriveUploadRequest>();
+  const listeners = new Set<() => void>();
+  const notify = () => listeners.forEach(listener => listener());
 
   const registerFile = (file: File, path: string, conversationQualifiedId: string): Result<string, unknown> => {
     const uploadId = createUploadId();
     const source = createSource(file);
-    const request = {file, path, conversationQualifiedId};
+    const request = {file, path};
     const registered = uploadStrategy.register(uploadId, source, path);
 
     if (registered.isErr) {
@@ -223,12 +222,9 @@ export const createSharedDriveUploadController = ({
     ids.push(uploadId);
     conversationByUploadId.set(uploadId, conversationQualifiedId);
     requestsByUploadId.set(uploadId, request);
-    uploadStrategy.attach(uploadId);
+    uploadStrategy.attach(uploadId, notify);
     return Result.ok(uploadId);
   };
-
-  const runUpload = async (uploadId: string, request: UploadRequest): Promise<boolean> =>
-    uploadStrategy.run(uploadId, request);
 
   const uploadFile = async (file: File, path: string, conversationQualifiedId: string): Promise<boolean> => {
     const registration = registerFile(file, path, conversationQualifiedId);
@@ -237,7 +233,7 @@ export const createSharedDriveUploadController = ({
     }
 
     const request = requestsByUploadId.get(registration.value);
-    return request ? runUpload(registration.value, request) : false;
+    return request ? uploadStrategy.run(registration.value, request) : false;
   };
 
   const upload = async (

@@ -21,7 +21,11 @@ import type {UploadSource} from 'Repositories/cells/upload';
 import type {CellsUploadManager} from 'Repositories/cells/upload/manager';
 import {Result} from 'true-myth';
 
-import {createSharedDriveUploadController} from './sharedDriveUploadController';
+import {
+  createDirectSharedDriveUploadStrategy,
+  createDraftSharedDriveUploadStrategy,
+  createSharedDriveUploadController,
+} from './sharedDriveUploadController';
 
 const uploadPath = 'conversation-id@example.com/files';
 const conversationQualifiedId = 'conversation-id@example.com';
@@ -33,17 +37,20 @@ function createCellsRepository() {
 }
 
 function createController(cellsRepository = createCellsRepository()) {
+  const createSource = jest.fn((file: File): UploadSource => ({
+    blob: file,
+    name: file.name,
+    contentType: file.type,
+    size: file.size,
+  }));
   const controller = createSharedDriveUploadController({
-    mode: 'direct',
-    cellsRepository,
-    createAbortController: () => new AbortController(),
     createUploadId: jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2'),
-    createSource: jest.fn((file: File): UploadSource => ({
-      blob: file,
-      name: file.name,
-      contentType: file.type,
-      size: file.size,
-    })),
+    createSource,
+    uploadStrategy: createDirectSharedDriveUploadStrategy({
+      cellsRepository,
+      createAbortController: () => new AbortController(),
+      createSource,
+    }),
   });
   return {cellsRepository, controller};
 }
@@ -73,8 +80,6 @@ function createDraftManager(): jest.Mocked<CellsUploadManager> {
 
 function createDraftController(manager = createDraftManager()) {
   const controller = createSharedDriveUploadController({
-    mode: 'draft',
-    manager,
     createUploadId: jest.fn().mockReturnValue('upload-1'),
     createSource: jest.fn((sourceFile: File): UploadSource => ({
       blob: sourceFile,
@@ -82,6 +87,7 @@ function createDraftController(manager = createDraftManager()) {
       contentType: sourceFile.type,
       size: sourceFile.size,
     })),
+    uploadStrategy: createDraftSharedDriveUploadStrategy({manager}),
   });
 
   return {controller, manager};
