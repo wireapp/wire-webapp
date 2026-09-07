@@ -40,6 +40,7 @@ interface SharedDriveDropzoneProps {
   readonly isEnabled: boolean;
   readonly isFileDropAllowed: boolean;
   readonly isOverlaySuppressed?: boolean;
+  readonly onDragStateReset?: () => void;
   readonly onDropFiles: (files: readonly File[]) => void;
 }
 
@@ -68,6 +69,7 @@ export const SharedDriveDropzone = ({
   isEnabled,
   isFileDropAllowed,
   isOverlaySuppressed = false,
+  onDragStateReset,
   onDropFiles,
 }: SharedDriveDropzoneProps) => {
   const {translate} = useApplicationContext();
@@ -82,9 +84,12 @@ export const SharedDriveDropzone = ({
     ? translate('conversationFileUploadRestrictedOverlayDescription')
     : translate('sharedDriveDropOverlayDescription');
 
-  const resetDragState = (): void => {
+  const resetDragState = ({notifyParent = false}: {readonly notifyParent?: boolean} = {}): void => {
     nestedDragEventCount.current = 0;
     setIsDraggingFiles(false);
+    if (notifyParent) {
+      onDragStateReset?.();
+    }
   };
 
   useEffect(() => {
@@ -96,7 +101,7 @@ export const SharedDriveDropzone = ({
       return undefined;
     }
 
-    const resetActiveDragState = (): void => resetDragState();
+    const resetActiveDragState = (): void => resetDragState({notifyParent: true});
 
     window.addEventListener('drop', resetActiveDragState);
     window.addEventListener('dragend', resetActiveDragState);
@@ -137,7 +142,7 @@ export const SharedDriveDropzone = ({
     nestedDragEventCount.current -= 1;
 
     if (nestedDragEventCount.current <= 0) {
-      resetDragState();
+      resetDragState({notifyParent: true});
     }
   };
 
@@ -147,7 +152,7 @@ export const SharedDriveDropzone = ({
     }
 
     preventDefaultFileDrop(event);
-    resetDragState();
+    resetDragState({notifyParent: true});
     if (isEnabled) {
       onDropFiles(Array.from(event.dataTransfer.files));
     }

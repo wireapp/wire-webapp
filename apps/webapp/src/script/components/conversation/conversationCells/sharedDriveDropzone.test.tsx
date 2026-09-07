@@ -42,15 +42,22 @@ const createDataTransfer = (files: File[]) => ({
 const renderDropzone = ({
   isEnabled = true,
   isFileDropAllowed = true,
+  onDragStateReset,
   onDropFiles = jest.fn(),
 }: {
   isEnabled?: boolean;
   isFileDropAllowed?: boolean;
+  onDragStateReset?: () => void;
   onDropFiles?: jest.Mock;
 } = {}) => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
-      <SharedDriveDropzone isEnabled={isEnabled} isFileDropAllowed={isFileDropAllowed} onDropFiles={onDropFiles}>
+      <SharedDriveDropzone
+        isEnabled={isEnabled}
+        isFileDropAllowed={isFileDropAllowed}
+        onDragStateReset={onDragStateReset}
+        onDropFiles={onDropFiles}
+      >
         <div>Shared Drive content</div>
       </SharedDriveDropzone>
     </StyledApp>,
@@ -97,7 +104,8 @@ describe('SharedDriveDropzone', () => {
   });
 
   it('clears the overlay when the file is released outside the dropzone', () => {
-    const {dropzone} = renderDropzone();
+    const onDragStateReset = jest.fn();
+    const {dropzone} = renderDropzone({onDragStateReset});
 
     fireEvent.dragEnter(dropzone, {dataTransfer: createDataTransfer([])});
     const overlayStatus = screen.getByRole('status');
@@ -107,6 +115,7 @@ describe('SharedDriveDropzone', () => {
     fireEvent.drop(window, {dataTransfer: createDataTransfer([])});
 
     expect(overlayStatus).toHaveAttribute('aria-hidden', 'true');
+    expect(onDragStateReset).toHaveBeenCalledTimes(1);
   });
 
   it('does not show the upload affordance while the Shared Drive target is disabled', () => {

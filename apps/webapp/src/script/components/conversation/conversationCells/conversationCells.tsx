@@ -231,12 +231,17 @@ export const ConversationCells = memo(
       ],
     );
 
+    const resetSharedDriveDropState = useCallback((): void => {
+      setActiveFolderDropTargetName(null);
+      setFolderDropResetKey(key => key + 1);
+    }, []);
+
     const handleDropFilesToFolder = useCallback(
       (files: readonly File[], targetUploadPath: string): void => {
         handleDroppedFiles(files, targetUploadPath);
-        setFolderDropResetKey(key => key + 1);
+        resetSharedDriveDropState();
       },
-      [handleDroppedFiles],
+      [handleDroppedFiles, resetSharedDriveDropState],
     );
 
     const nodes = getNodes({conversationId});
@@ -295,6 +300,7 @@ export const ConversationCells = memo(
           isEnabled={isCellsStateReady && isUploadFilesEnabled && !isInRecycleBin}
           isFileDropAllowed={canUploadToSharedDrive}
           isOverlaySuppressed={activeFolderDropTargetName !== null}
+          onDragStateReset={resetSharedDriveDropState}
           onDropFiles={handleDroppedFiles}
         >
           <div css={wrapperStyles}>
@@ -327,6 +333,7 @@ export const ConversationCells = memo(
                 // opening a folder must close search view and open the browse view
                 // with that folder (and breadcrumbs)
                 onCloseSearchView={handleSearchViewClosure}
+                folderDropResetKey={folderDropResetKey}
                 getDirectionFor={getDirectionFor}
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}

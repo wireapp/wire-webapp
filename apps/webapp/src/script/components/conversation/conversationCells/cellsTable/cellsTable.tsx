@@ -58,6 +58,7 @@ interface CellsTableProps {
   conversationName: string;
   onRefresh: () => void;
   onCloseSearchView?: () => void;
+  folderDropResetKey?: number;
   onFolderDropTargetChange?: (folderName: string | null) => void;
   onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
@@ -104,6 +105,7 @@ export const CellsTable = ({
   conversationName,
   onRefresh,
   onCloseSearchView,
+  folderDropResetKey,
   onFolderDropTargetChange,
   onDropFilesToFolder,
   getDirectionFor,
@@ -146,6 +148,11 @@ export const CellsTable = ({
   useEffect(() => {
     return () => onFolderDropTargetChange?.(null);
   }, [onFolderDropTargetChange]);
+
+  useEffect(() => {
+    setActiveFolderDropTargetId(null);
+    setActiveFolderDropTargetName(null);
+  }, [folderDropResetKey]);
 
   const setActiveFolderDropTarget = (node: CellNode | null): void => {
     setActiveFolderDropTargetId(node?.id ?? null);

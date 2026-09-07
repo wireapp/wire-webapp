@@ -64,10 +64,12 @@ const renderCellsTable = ({
   folderPath = 'conversation-id@example.com/Marketing/images',
   onDropFilesToFolder = jest.fn(),
   onFolderDropTargetChange = jest.fn(),
+  folderDropResetKey,
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
   readonly onFolderDropTargetChange?: (folderName: string | null) => void;
+  readonly folderDropResetKey?: number;
 } = {}) => {
   const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
   const folder = createNode({id: 'folder-id', name: 'Marketing images', path: folderPath});
@@ -79,7 +81,7 @@ const renderCellsTable = ({
     extension: 'pdf',
   });
 
-  render(
+  const renderTable = (resetKey = folderDropResetKey) => (
     <ThemeProvider>
       <CellsTable
         nodes={[folder, file]}
@@ -90,15 +92,23 @@ const renderCellsTable = ({
         onRefresh={jest.fn()}
         onFolderDropTargetChange={onFolderDropTargetChange}
         onDropFilesToFolder={onDropFilesToFolder}
+        folderDropResetKey={resetKey}
         getDirectionFor={() => undefined}
         isSortingEnabled
         onToggleSort={jest.fn()}
       />
-    </ThemeProvider>,
-    {wrapper},
+    </ThemeProvider>
   );
 
-  return {file, folder, onDropFilesToFolder, onFolderDropTargetChange};
+  const {rerender} = render(renderTable(), {wrapper});
+
+  return {
+    file,
+    folder,
+    onDropFilesToFolder,
+    onFolderDropTargetChange,
+    rerenderWithResetKey: (resetKey: number) => rerender(renderTable(resetKey)),
+  };
 };
 
 describe('CellsTable folder row drop target', () => {
@@ -144,5 +154,21 @@ describe('CellsTable folder row drop target', () => {
     expect(fileRow).not.toHaveAttribute('data-folder-drop-active');
     expect(onDropFilesToFolder).not.toHaveBeenCalled();
     expect(onFolderDropTargetChange).not.toHaveBeenCalled();
+  });
+
+  it('clears the folder drop target when the shared drop state is reset', () => {
+    const droppedFile = new File(['content'], 'document.pdf', {type: 'application/pdf'});
+    const dataTransfer = createDataTransfer([droppedFile]);
+    const {rerenderWithResetKey} = renderCellsTable({folderDropResetKey: 0});
+    const folderRow = screen.getByRole('row', {name: /Marketing images/});
+
+    fireEvent.dragEnter(folderRow, {dataTransfer});
+
+    expect(folderRow).toHaveAttribute('data-folder-drop-active', 'true');
+
+    rerenderWithResetKey(1);
+
+    expect(folderRow).not.toHaveAttribute('data-folder-drop-active');
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });
