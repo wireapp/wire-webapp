@@ -19,7 +19,7 @@
 
 import {test, expect} from 'test/e2e_tests/test.fixtures';
 
-test('Team Upgrade', {tag: ['@TC-11757', '@regression']}, async ({createUser, createTeam, api}) => {
+test('I want to upgrade team to paid', {tag: ['@TC-11757', '@regression']}, async ({createUser, createTeam, api}) => {
   const userB = await createUser();
   const {owner: userA} = await createTeam('Critical Team', {users: [userB]});
 
