@@ -386,6 +386,67 @@ describe('MemberMessage', () => {
       );
     });
 
+    it('renders another sender name as React text when the feature toggle is enabled', () => {
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+      message.user().isMe = false;
+      message.user().name('R&D <Test>');
+
+      const {container} = render(
+        withThemeAndRootContext(
+          <MemberMessage
+            hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+            isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+            isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+            message={message}
+            onClickCancelRequest={baseProps.onClickCancelRequest}
+            onClickInvitePeople={baseProps.onClickInvitePeople}
+            onClickParticipants={baseProps.onClickParticipants}
+            shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+            conversationName={baseProps.conversationName}
+            isCellsConversation={baseProps.isCellsConversation}
+            isSelfGuest={baseProps.isSelfGuest}
+          />,
+          reactTranslationRenderingRootProviderWrapper,
+        ),
+      );
+      const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+      expect(groupCreationHeader?.textContent).toBe('R&D <Test> started the conversation');
+      expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('R&D <Test>');
+      expect(container.querySelector('test')).toBeNull();
+    });
+
+    it('keeps markup-like sender names as literal React text when the feature toggle is enabled', () => {
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+      message.user().isMe = false;
+      message.user().name('[bold]Admin[/bold]');
+
+      const {container} = render(
+        withThemeAndRootContext(
+          <MemberMessage
+            hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+            isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+            isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+            message={message}
+            onClickCancelRequest={baseProps.onClickCancelRequest}
+            onClickInvitePeople={baseProps.onClickInvitePeople}
+            onClickParticipants={baseProps.onClickParticipants}
+            shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+            conversationName={baseProps.conversationName}
+            isCellsConversation={baseProps.isCellsConversation}
+            isSelfGuest={baseProps.isSelfGuest}
+          />,
+          reactTranslationRenderingRootProviderWrapper,
+        ),
+      );
+      const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+      const strongElements = groupCreationHeader?.querySelectorAll('strong');
+
+      expect(groupCreationHeader?.textContent).toBe('[bold]Admin[/bold] started the conversation');
+      expect(strongElements).toHaveLength(1);
+      expect(strongElements?.[0]).toHaveTextContent('[bold]Admin[/bold]');
+    });
+
     it('renders arbitrary image markup as text when the feature toggle is enabled', async () => {
       await withTranslationStrings(
         {

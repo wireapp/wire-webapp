@@ -22,7 +22,10 @@ import type {ReactElement} from 'react';
 import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
+import {
+  groupCreationHeaderSenderNamePlaceholder,
+  MemberMessage as MemberMessageEntity,
+} from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
 import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -39,21 +42,34 @@ import {MessageTime} from './messageTime';
 
 type RenderGroupCreationHeaderOptions = {
   readonly htmlGroupCreationHeader: string;
+  readonly reactGroupCreationHeader: string;
+  readonly senderName: string;
   readonly isReactTranslationRenderingEnabled: boolean;
 };
 
 function renderGroupCreationHeader(options: RenderGroupCreationHeaderOptions): ReactElement {
-  const {htmlGroupCreationHeader, isReactTranslationRenderingEnabled} = options;
+  const {htmlGroupCreationHeader, reactGroupCreationHeader, senderName, isReactTranslationRenderingEnabled} = options;
 
   if (isReactTranslationRenderingEnabled) {
     return (
       <p className="message-group-creation-header-text">
-        {replaceReactComponents(htmlGroupCreationHeader, [
+        {replaceReactComponents(reactGroupCreationHeader, [
           {
             start: '<strong>',
             end: '</strong>',
             render(text): ReactElement {
-              return <strong>{text}</strong>;
+              return (
+                <strong>
+                  {replaceReactComponents(text, [
+                    {
+                      exactMatch: groupCreationHeaderSenderNamePlaceholder,
+                      render(): string {
+                        return senderName;
+                      },
+                    },
+                  ])}
+                </strong>
+              );
             },
           },
         ])}
@@ -96,10 +112,25 @@ export const MemberMessage = ({
   isSelfGuest,
 }: MemberMessageProps) => {
   const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
-    message,
-    ['otherUser', 'timestamp', 'user', 'htmlGroupCreationHeader', 'showNamedCreation', 'hasUsers'],
-  );
+  const {
+    otherUser,
+    timestamp,
+    user,
+    senderName,
+    htmlGroupCreationHeader,
+    reactGroupCreationHeader,
+    showNamedCreation,
+    hasUsers,
+  } = useKoSubscribableChildren(message, [
+    'otherUser',
+    'timestamp',
+    'user',
+    'senderName',
+    'htmlGroupCreationHeader',
+    'reactGroupCreationHeader',
+    'showNamedCreation',
+    'hasUsers',
+  ]);
 
   const isGroupCreation = message.isGroupCreation();
   const isMemberRemoval = message.isMemberRemoval();
@@ -135,6 +166,8 @@ export const MemberMessage = ({
         <div className="message-group-creation-header">
           {renderGroupCreationHeader({
             htmlGroupCreationHeader,
+            reactGroupCreationHeader,
+            senderName,
             isReactTranslationRenderingEnabled: isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName),
           })}
           <h2 className="message-group-creation-header-name" data-uie-name="conversation-name">
