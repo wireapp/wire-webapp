@@ -147,7 +147,7 @@ describe('CellsAPI', () => {
           Inputs: [{Type: 'LEAF', Locator: {Path: TEST_FILE_PATH, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
           FindAvailablePath: true,
         },
-        {abortController: undefined},
+        {signal: undefined, 'axios-retry': {retries: 3}},
       );
 
       expect(mockStorage.putObject).toHaveBeenCalledWith({
@@ -273,7 +273,7 @@ describe('CellsAPI', () => {
           Inputs: [{Type: 'LEAF', Locator: {Path: '', Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
           FindAvailablePath: true,
         },
-        {abortControllerntroller: undefined},
+        {signal: undefined, 'axios-retry': {retries: 3}},
       );
 
       expect(mockStorage.putObject).toHaveBeenCalledWith({
@@ -314,7 +314,7 @@ describe('CellsAPI', () => {
           Inputs: [{Type: 'LEAF', Locator: {Path: TEST_FILE_PATH, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
           FindAvailablePath: true,
         },
-        {signal: abortController.signal},
+        {signal: abortController.signal, 'axios-retry': {retries: 3}},
       );
       expect(result).toBe(response);
     });
@@ -402,6 +402,27 @@ describe('CellsAPI', () => {
         progressCallback: undefined,
         abortController: undefined,
       });
+    });
+  });
+
+  describe('checkNodeCreation', () => {
+    it('disables infinite network retries while checking a destination', async () => {
+      mockNodeServiceApi.createCheck.mockResolvedValueOnce(createMockResponse({Results: [{Exists: false}]}));
+
+      await cellsAPI.checkNodeCreation({
+        path: TEST_FILE_PATH,
+        uuid: MOCKED_UUID,
+        versionId: MOCKED_UUID,
+        type: 'LEAF',
+      });
+
+      expect(mockNodeServiceApi.createCheck).toHaveBeenCalledWith(
+        {
+          Inputs: [{Type: 'LEAF', Locator: {Path: TEST_FILE_PATH, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
+          FindAvailablePath: false,
+        },
+        {'axios-retry': {retries: 3}},
+      );
     });
   });
 
@@ -985,7 +1006,12 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.promoteNodeDraft({uuid, versionId});
 
-      expect(mockNodeServiceApi.promoteVersion).toHaveBeenCalledWith(uuid, versionId, {Publish: true});
+      expect(mockNodeServiceApi.promoteVersion).toHaveBeenCalledWith(
+        uuid,
+        versionId,
+        {Publish: true},
+        {'axios-retry': {retries: 3}},
+      );
       expect(result).toEqual(mockResponse);
     });
 
@@ -1023,7 +1049,7 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.deleteNodeDraft({uuid, versionId});
 
-      expect(mockNodeServiceApi.deleteVersion).toHaveBeenCalledWith(uuid, versionId);
+      expect(mockNodeServiceApi.deleteVersion).toHaveBeenCalledWith(uuid, versionId, {'axios-retry': {retries: 3}});
       expect(result).toEqual(mockResponse);
     });
 
