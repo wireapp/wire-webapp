@@ -17,21 +17,54 @@
  *
  */
 
+import type {ReactElement} from 'react';
+
 import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
 import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
 import {ConnectedMessage} from './memberMessage/connectedMessage';
 import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
+
+type RenderGroupCreationHeaderOptions = {
+  readonly htmlGroupCreationHeader: string;
+  readonly isReactTranslationRenderingEnabled: boolean;
+};
+
+function renderGroupCreationHeader(options: RenderGroupCreationHeaderOptions): ReactElement {
+  const {htmlGroupCreationHeader, isReactTranslationRenderingEnabled} = options;
+
+  if (isReactTranslationRenderingEnabled) {
+    return (
+      <p className="message-group-creation-header-text">
+        {replaceReactComponents(htmlGroupCreationHeader, [
+          {
+            start: '<strong>',
+            end: '</strong>',
+            render(text): ReactElement {
+              return <strong>{text}</strong>;
+            },
+          },
+        ])}
+      </p>
+    );
+  }
+
+  return (
+    <p className="message-group-creation-header-text" dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}} />
+  );
+}
 
 interface MemberMessageProps {
   classifiedDomains?: string[];
@@ -62,7 +95,7 @@ export const MemberMessage = ({
   isCellsConversation,
   isSelfGuest,
 }: MemberMessageProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
     message,
     ['otherUser', 'timestamp', 'user', 'htmlGroupCreationHeader', 'showNamedCreation', 'hasUsers'],
@@ -100,10 +133,10 @@ export const MemberMessage = ({
     <>
       {showNamedCreation && (
         <div className="message-group-creation-header">
-          <p
-            className="message-group-creation-header-text"
-            dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}}
-          />
+          {renderGroupCreationHeader({
+            htmlGroupCreationHeader,
+            isReactTranslationRenderingEnabled: isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName),
+          })}
           <h2 className="message-group-creation-header-name" data-uie-name="conversation-name">
             {conversationName}
           </h2>
