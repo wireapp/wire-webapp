@@ -404,7 +404,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
    */
   async loadTeamAppsAndCollaborators(teamId: string, abortController?: AbortController): Promise<void> {
     const domain = this.teamState.teamDomain();
-    const selfId = this.userState.self().id;
 
     const [appsData, collaborators] = await Promise.all([
       this.teamService.getApps(teamId, abortController),
@@ -413,23 +412,15 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     const teamOwnedApps = this.userRepository.userMapper.mapUsersFromJson(appsData, domain);
 
-    const collaboratorIds: QualifiedId[] = collaborators
-      .map(({user}) => ({domain, id: user}))
-      .filter(({id}) => id !== selfId);
+    const collaboratorIds: QualifiedId[] = collaborators.map(({user}) => ({domain, id: user}));
     const resolvedCollaborators = await this.userRepository.getUsersById(collaboratorIds);
 
-    const [appCollaborators, humanCollaborators] = partition(
+    const [humanCollaborators, appCollaborators] = partition(
       resolvedCollaborators,
-      collaborator => collaborator.type === UserType.APP,
+      collaborator => collaborator.type === UserType.REGULAR,
     );
 
-    const mergedApps = teamOwnedApps.slice();
-    appCollaborators.forEach(appCollaborator => {
-      const isAlreadyKnown = mergedApps.some(app => matchQualifiedIds(app.qualifiedId, appCollaborator.qualifiedId));
-      if (!isAlreadyKnown) {
-        mergedApps.push(appCollaborator);
-      }
-    });
+    const mergedApps = [...teamOwnedApps, ...appCollaborators];
 
     this.teamState.teamApps(mergedApps);
     this.teamState.teamCollaborators(humanCollaborators);

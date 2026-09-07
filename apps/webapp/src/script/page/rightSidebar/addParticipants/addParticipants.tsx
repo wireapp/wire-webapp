@@ -157,14 +157,16 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     if (!teamCollaborators.length) {
       return baseContacts;
     }
-    // Collaborators (team-level, without full team membership) are shown alongside team members
+
     const knownIds = new Set(baseContacts.map(contact => contact.id));
     const newCollaborators = teamCollaborators.filter(collaborator => !knownIds.has(collaborator.id));
+
     return [...baseContacts, ...newCollaborators];
   }, [baseContacts, teamCollaborators]);
 
   const apps = useMemo(() => {
     const normalizedQuery = searchInput.trim().toLowerCase();
+
     return teamApps
       .map(app => integrationRepository.mapServiceFromUser(app))
       .filter(app => compareTransliteration(app.name(), normalizedQuery))
@@ -173,7 +175,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
   const servicesList = useMemo(() => {
     const allApps = activeConversation.protocol === CONVERSATION_PROTOCOL.MLS ? apps : services;
-    return allApps.filter(app => !participatingUserIds.some(id => id.id === app.id)); // Make sure apps already added to the conversation don't show up again
+    return allApps.filter(app => !participatingUserIds.some(participant => participant.id === app.id)); // Make sure apps already added to the conversation don't show up again
   }, [activeConversation.protocol, apps, services, participatingUserIds]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
