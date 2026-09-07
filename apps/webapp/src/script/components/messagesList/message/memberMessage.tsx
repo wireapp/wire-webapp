@@ -17,13 +17,14 @@
  *
  */
 
-import type {ReactElement} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 
 import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {
-  groupCreationHeaderSenderNamePlaceholder,
+  groupCreationHeaderSenderNameMarkerEnd,
+  groupCreationHeaderSenderNameMarkerStart,
   MemberMessage as MemberMessageEntity,
 } from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
@@ -47,6 +48,18 @@ type RenderGroupCreationHeaderOptions = {
   readonly isReactTranslationRenderingEnabled: boolean;
 };
 
+function renderGroupCreationHeaderSenderName(text: string, senderName: string): ReactNode[] {
+  return replaceReactComponents(text, [
+    {
+      start: groupCreationHeaderSenderNameMarkerStart,
+      end: groupCreationHeaderSenderNameMarkerEnd,
+      render(): string {
+        return senderName;
+      },
+    },
+  ]);
+}
+
 function renderGroupCreationHeader(options: RenderGroupCreationHeaderOptions): ReactElement {
   const {htmlGroupCreationHeader, reactGroupCreationHeader, senderName, isReactTranslationRenderingEnabled} = options;
 
@@ -58,18 +71,14 @@ function renderGroupCreationHeader(options: RenderGroupCreationHeaderOptions): R
             start: '<strong>',
             end: '</strong>',
             render(text): ReactElement {
-              return (
-                <strong>
-                  {replaceReactComponents(text, [
-                    {
-                      exactMatch: groupCreationHeaderSenderNamePlaceholder,
-                      render(): string {
-                        return senderName;
-                      },
-                    },
-                  ])}
-                </strong>
-              );
+              return <strong>{renderGroupCreationHeaderSenderName(text, senderName)}</strong>;
+            },
+          },
+          {
+            start: groupCreationHeaderSenderNameMarkerStart,
+            end: groupCreationHeaderSenderNameMarkerEnd,
+            render(): string {
+              return senderName;
             },
           },
         ])}

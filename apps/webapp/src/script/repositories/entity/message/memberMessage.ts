@@ -33,7 +33,10 @@ import {SuperType} from '../../../message/superType';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {User} from '../User';
 
-export const groupCreationHeaderSenderNamePlaceholder = '{senderName}';
+export const groupCreationHeaderSenderNameMarkerStart = '__wire_group_creation_sender_name_start__';
+export const groupCreationHeaderSenderNameMarkerEnd = '__wire_group_creation_sender_name_end__';
+
+const groupCreationHeaderSenderNameMarker = `${groupCreationHeaderSenderNameMarkerStart}value${groupCreationHeaderSenderNameMarkerEnd}`;
 
 type GroupCreationHeaderTranslationOptions = {
   readonly isNamedCreation: boolean;
@@ -139,7 +142,7 @@ export class MemberMessage extends SystemMessage {
         isNamedCreation: this.showNamedCreation(),
         isTemporaryGuest: this.user().isTemporaryGuest(),
         isCurrentUser: this.user().isMe,
-        senderName: groupCreationHeaderSenderNamePlaceholder,
+        senderName: groupCreationHeaderSenderNameMarker,
         translate: this.translate,
       });
     });

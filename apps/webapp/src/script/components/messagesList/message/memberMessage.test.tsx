@@ -379,9 +379,11 @@ describe('MemberMessage', () => {
             ),
           );
           const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+          const strongElements = groupCreationHeader?.querySelectorAll('strong');
 
           expect(groupCreationHeader).toHaveTextContent('You started the conversation');
-          expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('You');
+          expect(strongElements).toHaveLength(1);
+          expect(strongElements?.[0]).toHaveTextContent('You');
         },
       );
     });
@@ -445,6 +447,118 @@ describe('MemberMessage', () => {
       expect(groupCreationHeader?.textContent).toBe('[bold]Admin[/bold] started the conversation');
       expect(strongElements).toHaveLength(1);
       expect(strongElements?.[0]).toHaveTextContent('[bold]Admin[/bold]');
+    });
+
+    it('renders the sender name outside formatting when the translation places it outside formatting', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedName: '{name} started the conversation',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = false;
+          message.user().name('Alice');
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+          expect(groupCreationHeader?.textContent).toBe('Alice started the conversation');
+          expect(groupCreationHeader?.querySelector('strong')).toBeNull();
+        },
+      );
+    });
+
+    it('follows translated word order and formatting around the sender name', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedName: 'Conversation started by [bold]{name}[/bold]',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = false;
+          message.user().name('Alice');
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+          expect(groupCreationHeader?.textContent).toBe('Conversation started by Alice');
+          expect(groupCreationHeader?.querySelectorAll('strong')).toHaveLength(1);
+          expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('Alice');
+        },
+      );
+    });
+
+    it('keeps a markup-like sender name literal when the translation places it outside formatting', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedName: '{name} started the conversation',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = false;
+          message.user().name('[bold]Admin[/bold]');
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+          expect(groupCreationHeader?.textContent).toBe('[bold]Admin[/bold] started the conversation');
+          expect(groupCreationHeader?.querySelector('strong')).toBeNull();
+        },
+      );
     });
 
     it('renders arbitrary image markup as text when the feature toggle is enabled', async () => {
