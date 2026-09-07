@@ -176,6 +176,8 @@ jobs:
             wire_build_target_branches_json='["q1-2024"]'
           elif [[ "${GITHUB_REF}" == *q2-2025* ]]; then
             wire_build_target_branches_json='["q2-2025"]'
+            elif [[ "${GITHUB_REF}" == *q3-2026* ]]; then
+              wire_build_target_branches_json='["2026-q3"]'
           fi
 
           if [[ -n "${wire_build_target_branches_json}" ]]; then
