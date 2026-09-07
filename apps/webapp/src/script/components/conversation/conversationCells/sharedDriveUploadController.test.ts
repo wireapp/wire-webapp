@@ -4,7 +4,7 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation: either version 3 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -278,5 +278,31 @@ describe('createSharedDriveUploadController', () => {
     expect(manager.start).toHaveBeenCalledWith('upload-1');
     expect(manager.publish).toHaveBeenCalledWith('upload-1');
     expect(onRefresh).not.toHaveBeenCalled();
+  });
+
+  it('publishes and refreshes after retrying a failed draft upload', async () => {
+    const manager = createDraftManager();
+    const {controller} = createDraftController(manager);
+    const onRefresh = jest.fn();
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
+    await controller.retryUpload('upload-1');
+
+    expect(manager.retryUpload).toHaveBeenCalledWith('upload-1');
+    expect(manager.publish).toHaveBeenCalledTimes(2);
+    expect(onRefresh).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not publish or refresh when retrying a draft upload fails', async () => {
+    const manager = createDraftManager();
+    manager.retryUpload.mockResolvedValueOnce(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
+    const {controller} = createDraftController(manager);
+    const onRefresh = jest.fn();
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
+    await controller.retryUpload('upload-1');
+
+    expect(manager.publish).toHaveBeenCalledTimes(1);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 });

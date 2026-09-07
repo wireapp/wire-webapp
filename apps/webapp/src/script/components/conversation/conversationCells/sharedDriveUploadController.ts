@@ -52,7 +52,7 @@ export type SharedDriveUploadStrategy = {
   readonly run: (uploadId: string, request: SharedDriveUploadRequest) => Promise<boolean>;
   readonly snapshot: (uploadId: string) => UploadState | undefined;
   readonly cancel: (uploadId: string) => Promise<void>;
-  readonly retryUpload: (uploadId: string) => Promise<void>;
+  readonly retryUpload: (uploadId: string) => Promise<boolean>;
   readonly retryPublish: (uploadId: string) => Promise<void>;
   readonly discard: (uploadId: string) => Promise<void>;
   readonly retryDiscard: (uploadId: string) => Promise<void>;
@@ -100,6 +100,18 @@ export const createDraftSharedDriveUploadStrategy = ({
     return publishResult.isOk;
   };
 
+  const retryUpload = async (uploadId: string): Promise<boolean> => {
+    const retryResult = await manager.retryUpload(uploadId);
+    if (retryResult.isErr) {
+      listenersByUploadId.get(uploadId)?.();
+      return false;
+    }
+
+    const publishResult = await manager.publish(uploadId);
+    listenersByUploadId.get(uploadId)?.();
+    return publishResult.isOk;
+  };
+
   const command = async (uploadId: string, action: (id: string) => Promise<unknown>): Promise<void> => {
     await action(uploadId);
     listenersByUploadId.get(uploadId)?.();
@@ -111,7 +123,7 @@ export const createDraftSharedDriveUploadStrategy = ({
     run: startAndPublishFile,
     snapshot: uploadId => manager.snapshot(uploadId).unwrapOr(undefined),
     cancel: uploadId => command(uploadId, manager.cancel),
-    retryUpload: uploadId => command(uploadId, manager.retryUpload),
+    retryUpload,
     retryPublish: uploadId => command(uploadId, manager.retryPublish),
     discard: uploadId => command(uploadId, manager.discard),
     retryDiscard: uploadId => command(uploadId, manager.retryDiscard),
@@ -169,14 +181,14 @@ export const createDirectSharedDriveUploadStrategy = ({
     }
   };
 
-  const retryUpload = async (uploadId: string): Promise<void> => {
+  const retryUpload = async (uploadId: string): Promise<boolean> => {
     const request = requestsByUploadId.get(uploadId);
     const currentState = statesByUploadId.get(uploadId);
     if (!request || currentState?.kind !== 'uploadFailed') {
-      return;
+      return false;
     }
 
-    await uploadDirectFile(uploadId, request);
+    return uploadDirectFile(uploadId, request);
   };
 
   return {
@@ -206,10 +218,11 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const ids: string[] = [];
   const conversationByUploadId = new Map<string, string>();
   const requestsByUploadId = new Map<string, SharedDriveUploadRequest>();
+  const refreshByUploadId = new Map<string, () => void>();
   const listeners = new Set<() => void>();
   const notify = () => listeners.forEach(listener => listener());
 
-  const registerFile = (file: File, path: string, conversationQualifiedId: string): Result<string, unknown> => {
+  const registerFile = (file: File, path: string, conversationQualifiedId: string, onRefresh: () => void): Result<string, unknown> => {
     const uploadId = createUploadId();
     const source = createSource(file);
     const request = {file, path};
@@ -222,12 +235,18 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     ids.push(uploadId);
     conversationByUploadId.set(uploadId, conversationQualifiedId);
     requestsByUploadId.set(uploadId, request);
+    refreshByUploadId.set(uploadId, onRefresh);
     uploadStrategy.attach(uploadId, notify);
     return Result.ok(uploadId);
   };
 
-  const uploadFile = async (file: File, path: string, conversationQualifiedId: string): Promise<boolean> => {
-    const registration = registerFile(file, path, conversationQualifiedId);
+  const uploadFile = async (
+    file: File,
+    path: string,
+    onRefresh: () => void,
+    conversationQualifiedId: string,
+  ): Promise<boolean> => {
+    const registration = registerFile(file, path, conversationQualifiedId, onRefresh);
     if (registration.isErr) {
       return false;
     }
@@ -242,7 +261,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     onRefresh: () => void,
     conversationQualifiedId: string,
   ): Promise<void> => {
-    const results = await Promise.all(files.map(file => uploadFile(file, path, conversationQualifiedId)));
+    const results = await Promise.all(files.map(file => uploadFile(file, path, onRefresh, conversationQualifiedId)));
     if (results.some(Boolean)) {
       onRefresh();
     }
@@ -267,7 +286,13 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
       return () => listeners.delete(listener);
     },
     cancel: uploadStrategy.cancel,
-    retryUpload: uploadStrategy.retryUpload,
+    retryUpload: async (id: string): Promise<void> => {
+      const succeeded = await uploadStrategy.retryUpload(id);
+      if (succeeded) {
+        refreshByUploadId.get(id)?.();
+      }
+      notify();
+    },
     retryPublish: uploadStrategy.retryPublish,
     discard: uploadStrategy.discard,
     retryDiscard: uploadStrategy.retryDiscard,

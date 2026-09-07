@@ -54,6 +54,7 @@ type TestController = SharedDriveUploadController & {
   snapshots: jest.MockedFunction<SharedDriveUploadController['snapshots']>;
   subscribe: jest.MockedFunction<SharedDriveUploadController['subscribe']>;
   cancel: jest.MockedFunction<SharedDriveUploadController['cancel']>;
+  retryUpload: jest.MockedFunction<SharedDriveUploadController['retryUpload']>;
 };
 
 const createController = (state: UploadState = uploadState): TestController => ({
@@ -173,6 +174,58 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     expect(controller.cancel).toHaveBeenCalledWith('upload-1');
     await waitFor(() => expect(view.queryByRole('status')).not.toBeInTheDocument());
+  });
+
+  it('calls retry for a failed upload and prevents concurrent retries', async () => {
+    const user = userEvent.setup();
+    const controller = createController(failedState);
+    controller.retryUpload.mockReturnValue(new Promise<void>(noop));
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    const retry = view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'});
+    await user.click(retry);
+    await user.click(retry);
+
+    expect(controller.retryUpload).toHaveBeenCalledTimes(1);
+    expect(controller.retryUpload).toHaveBeenCalledWith('upload-1');
+    expect(retry).toBeDisabled();
+  });
+
+  it('keeps retry available when a retry fails', async () => {
+    const user = userEvent.setup();
+    const controller = createController(failedState);
+    controller.retryUpload.mockRejectedValue(new Error('retry failed'));
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    await user.click(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
+
+    await waitFor(() =>
+      expect(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'})).not.toBeDisabled(),
+    );
+  });
+
+  it('shows the uploading status when retry updates the upload lifecycle', async () => {
+    const user = userEvent.setup();
+    const controller = createController(failedState);
+    let state: UploadState = failedState;
+    let notify: () => void = jest.fn();
+    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? [state] : []));
+    controller.subscribe.mockImplementation(listener => {
+      notify = listener;
+      return jest.fn();
+    });
+    controller.retryUpload.mockImplementation(async () => {
+      state = uploadState;
+      act(() => notify());
+    });
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    await user.click(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
+
+    expect(view.getByText('cells.uploadStatus.uploading')).toBeInTheDocument();
   });
 
   it('formats the source size in the expanded status copy', async () => {

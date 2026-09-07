@@ -69,6 +69,7 @@ export const SharedDriveUploadStatusPopupHost = ({
   }));
   const [isExpanded, setIsExpanded] = useState(false);
   const [cancellingUploadId, setCancellingUploadId] = useState<Maybe<string>>(Maybe.nothing());
+  const [retryingUploadId, setRetryingUploadId] = useState<Maybe<string>>(Maybe.nothing());
   const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(Maybe.nothing());
   const upload = status.conversationQualifiedId === conversationQualifiedId ? status.upload : readStatus();
   const isUploadDismissed =
@@ -92,6 +93,22 @@ export const SharedDriveUploadStatusPopupHost = ({
       void controller.cancel(uploadId).then(finishCancellation, finishCancellation);
     },
     [cancellingUploadId, controller, conversationQualifiedId],
+  );
+
+  const retryUpload = useCallback(
+    (uploadId: string): void => {
+      if (maybe.isJust(retryingUploadId)) {
+        return;
+      }
+
+      setRetryingUploadId(Maybe.just(uploadId));
+      const finishRetry = () =>
+        setRetryingUploadId(current =>
+          maybe.isJust(current) && current.value === uploadId ? Maybe.nothing() : current,
+        );
+      void controller.retryUpload(uploadId).then(finishRetry, finishRetry);
+    },
+    [controller, retryingUploadId],
   );
 
   useEffect(() => {
@@ -129,9 +146,14 @@ export const SharedDriveUploadStatusPopupHost = ({
       isExpanded={isExpanded}
       toggleLabel={translate(isExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
       cancelLabel={translate('conversationAssetUploadCancel')}
+      dismissLabel={translate('fileCardDefaultCloseButtonLabel')}
+      retryLabel={translate('conversationFilePreviewErrorRetry')}
       isCancelling={maybe.isJust(cancellingUploadId) && cancellingUploadId.value === upload.uploadId}
+      isRetrying={maybe.isJust(retryingUploadId) && retryingUploadId.value === upload.uploadId}
       onToggle={() => setIsExpanded(expanded => !expanded)}
       onCancel={() => cancelUpload(upload.uploadId)}
+      onRetry={() => retryUpload(upload.uploadId)}
+      onDismiss={() => setDismissedUpload(Maybe.just({conversationQualifiedId, uploadId: upload.uploadId}))}
     />
   );
 };
