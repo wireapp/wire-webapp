@@ -124,6 +124,7 @@ describe('CellsTable folder row drop target', () => {
     expect(onFolderDropTargetChange).toHaveBeenLastCalledWith('Marketing images');
     expect(screen.getByRole('status')).toHaveTextContent('sharedDriveDropOverlayTitle');
     expect(screen.getByRole('status')).toHaveTextContent('Marketing images');
+    expect(screen.getByRole('status').querySelector('[title="Marketing images"]')).toBeInTheDocument();
 
     fireEvent.drop(folderRow, {dataTransfer});
 

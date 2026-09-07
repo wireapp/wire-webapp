@@ -214,11 +214,13 @@ export const CellsTable = ({
       <div css={tableWrapperStyles}>
         {activeFolderDropTargetName !== null && (
           <div css={folderDropOverlayStyles} role="status">
-            <UploadIcon width={24} height={24} />
+            <UploadIcon width={24} height={24} aria-hidden="true" />
             <p css={folderDropOverlayTitleStyles}>{translate('sharedDriveDropOverlayTitle')}</p>
             <p css={folderDropOverlayDescriptionStyles}>
               {translate('sharedDriveDropFolderOverlayDescription')}{' '}
-              <span css={folderDropOverlayFolderNameStyles}>{activeFolderDropTargetName}</span>
+              <span css={folderDropOverlayFolderNameStyles} title={activeFolderDropTargetName}>
+                {activeFolderDropTargetName}
+              </span>
             </p>
           </div>
         )}
