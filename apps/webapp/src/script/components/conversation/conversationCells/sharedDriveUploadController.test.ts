@@ -50,7 +50,11 @@ function createController(cellsRepository = createCellsRepository()) {
 
 function createDraftManager(): jest.Mocked<CellsUploadManager> {
   const source: UploadSource = {blob: new Blob(['data']), name: 'one.txt', contentType: 'text/plain', size: 3};
-  const state = {kind: 'published', identity: {uploadId: 'upload-1', resourceUuid: 'remote-id', versionId: 'version-id'}, source};
+  const state = {
+    kind: 'published',
+    identity: {uploadId: 'upload-1', resourceUuid: 'remote-id', versionId: 'version-id'},
+    source,
+  };
 
   return {
     register: jest.fn().mockReturnValue(Result.ok(undefined)),

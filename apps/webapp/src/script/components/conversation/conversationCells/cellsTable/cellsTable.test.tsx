@@ -23,7 +23,10 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {translateForTest} from 'Util/test/translateForTest';
 
