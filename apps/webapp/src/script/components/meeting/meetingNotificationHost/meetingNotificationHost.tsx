@@ -108,6 +108,10 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
                 key={notification.id}
                 {...notification}
                 onDismiss={() => useMeetingNotificationStore.getState().dismissNotification(notification.id)}
+                onCallJoined={() => {
+                  useMeetingNotificationStore.getState().dismissNotification(notification.id);
+                  useMeetingNotificationStore.getState().setIsExpanded(false);
+                }}
               />
             ))}
           </div>
