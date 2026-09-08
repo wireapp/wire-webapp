@@ -33,6 +33,35 @@ import {SuperType} from '../../../message/superType';
 import {SystemMessageType} from '../../../message/systemMessageType';
 import {User} from '../User';
 
+export const groupCreationHeaderSenderNameMarkerStart = '__wire_group_creation_sender_name_start__';
+export const groupCreationHeaderSenderNameMarkerEnd = '__wire_group_creation_sender_name_end__';
+
+const groupCreationHeaderSenderNameMarker = `${groupCreationHeaderSenderNameMarkerStart}value${groupCreationHeaderSenderNameMarkerEnd}`;
+
+type GroupCreationHeaderTranslationOptions = {
+  readonly isNamedCreation: boolean;
+  readonly isTemporaryGuest: boolean;
+  readonly isCurrentUser: boolean;
+  readonly senderName: string;
+  readonly translate: Translate;
+};
+
+function translateGroupCreationHeader(options: GroupCreationHeaderTranslationOptions): string {
+  if (options.isNamedCreation === false) {
+    return '';
+  }
+
+  if (options.isTemporaryGuest) {
+    return options.translate('conversationCreateTemporary');
+  }
+
+  const groupCreationString = options.isCurrentUser
+    ? options.translate('conversationCreatedNameYou')
+    : options.translate('conversationCreatedName', {name: options.senderName});
+
+  return capitalizeFirstChar(groupCreationString);
+}
+
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[] | undefined;
   public readonly hasUsers: ko.PureComputed<boolean>;
@@ -44,6 +73,7 @@ export class MemberMessage extends SystemMessage {
   public readonly otherUser: ko.PureComputed<User>;
   public readonly showNamedCreation: ko.PureComputed<boolean>;
   public readonly htmlGroupCreationHeader: ko.PureComputed<string>;
+  public readonly reactGroupCreationHeader: ko.PureComputed<string>;
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public showServicesWarning: boolean;
   public memberMessageType: SystemMessageType;
@@ -99,17 +129,22 @@ export class MemberMessage extends SystemMessage {
     });
 
     this.htmlGroupCreationHeader = ko.pureComputed(() => {
-      if (this.showNamedCreation()) {
-        if (this.user().isTemporaryGuest()) {
-          return this.translate('conversationCreateTemporary');
-        }
-
-        const groupCreationString = this.user().isMe
-          ? this.translate('conversationCreatedNameYou')
-          : this.translate('conversationCreatedName', {name: this.senderName()});
-        return capitalizeFirstChar(groupCreationString);
-      }
-      return '';
+      return translateGroupCreationHeader({
+        isNamedCreation: this.showNamedCreation(),
+        isTemporaryGuest: this.user().isTemporaryGuest(),
+        isCurrentUser: this.user().isMe,
+        senderName: this.senderName(),
+        translate: this.translate,
+      });
+    });
+    this.reactGroupCreationHeader = ko.pureComputed(() => {
+      return translateGroupCreationHeader({
+        isNamedCreation: this.showNamedCreation(),
+        isTemporaryGuest: this.user().isTemporaryGuest(),
+        isCurrentUser: this.user().isMe,
+        senderName: groupCreationHeaderSenderNameMarker,
+        translate: this.translate,
+      });
     });
   }
 
