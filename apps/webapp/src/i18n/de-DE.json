@@ -2054,6 +2054,7 @@
   "setPassword.button": "Passwort festlegen",
   "setPassword.headline": "Passwort festlegen",
   "setPassword.passwordPlaceholder": "Passwort",
+  "sharedDriveDropFolderOverlayDescription": "in",
   "sharedDriveDropOverlayDescription": "auf Geteiltes Drive",
   "sharedDriveDropOverlayTitle": "Dateien hochladen",
   "sharedDriveDropRecycleBinMessage": "Sie können keine Dateien in den Papierkorb hochladen.",
