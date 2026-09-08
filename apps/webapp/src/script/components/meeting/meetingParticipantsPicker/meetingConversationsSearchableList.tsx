@@ -63,20 +63,22 @@ export const MeetingConversationsSearchableList = ({
         onClick={() => onOpenChange(!isOpen)}
         css={collapseButton}
         data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
+        aria-expanded={isOpen}
+        aria-controls={`${id}-conversation-list`}
       >
         <span css={collapseIcon(isOpen)} aria-hidden="true">
           <ChevronDownIcon width={16} height={16} />
         </span>
         {translate('meetings.scheduleModal.groupsAndChannels')}
       </button>
-      <div css={conversationListStyles} role="list">
+      <div id={`${id}-conversation-list`} css={conversationListStyles} role="list">
         {isOpen &&
           conversations.map(conversation => {
             const conversationKey = getConversationKey(conversation);
             const checkboxId = `${id}-${conversationKey}`;
 
             return (
-              <div key={conversationKey} css={listWrapper({noUnderline})}>
+              <div key={conversationKey} css={listWrapper({noUnderline})} role="listitem">
                 <Checkbox
                   id={checkboxId}
                   checked={selectedConversationIds.has(conversationKey)}

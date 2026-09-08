@@ -217,7 +217,7 @@ export const UserSearchableList = ({
   let userListContent: React.ReactNode = null;
   if (isEmptyUserList && !hideEmptyState) {
     userListContent = (
-      <p className="user-list__no-results" data-uie-name={noResultsDataUieName}>
+      <p className="user-list__no-results" data-uie-name={noResultsDataUieName} role="status" aria-live="polite">
         {translate(noResultsTranslationText)}
       </p>
     );
