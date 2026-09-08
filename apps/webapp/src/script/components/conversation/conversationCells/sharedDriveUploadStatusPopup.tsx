@@ -87,7 +87,7 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
         aria-hidden="true"
         data-uie-name="shared-drive-upload-uploaded"
       >
-        <FileTypeIcon extension={getFileExtension(upload.fileName)} size={24} />
+        <FileTypeIcon extension={getFileExtension(upload.fileName) || 'pdf'} size={24} />
       </div>
     );
   }
@@ -230,12 +230,10 @@ export const SharedDriveUploadStatusPopup = ({
           )}
         </div>
       </div>
-      {upload.kind === 'uploading' && (
-        <div
-          css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
-          data-uie-name="shared-drive-upload-progress"
-        />
-      )}
+      <div
+        css={sharedDriveUploadStatusPopupProgressStyles(isExpanded, upload.kind)}
+        data-uie-name="shared-drive-upload-progress"
+      />
     </div>
   );
 };
