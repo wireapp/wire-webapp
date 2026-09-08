@@ -22,7 +22,7 @@ import {task, type Task} from 'true-myth';
 
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isConversationForScheduledMeeting} from 'Repositories/conversation/ConversationSelectors';
+import {isMeetingConversation} from 'Repositories/conversation/ConversationSelectors';
 
 export type SyncMeetingConversationNameParams = {
   qualifiedConversationId: QualifiedId;
@@ -41,7 +41,7 @@ export const syncMeetingConversationName = (
     .safeGetConversationById(qualifiedConversationId)
     .mapRejected(() => meetingSubmitErrors.conversationRenameFailed)
     .andThen(conversation => {
-      if (!isConversationForScheduledMeeting(conversation)) {
+      if (!isMeetingConversation(conversation)) {
         return task.resolve(undefined);
       }
 

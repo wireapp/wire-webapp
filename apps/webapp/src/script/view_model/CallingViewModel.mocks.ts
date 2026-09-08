@@ -22,6 +22,7 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
+import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
@@ -47,6 +48,11 @@ export const mockCallingRepository = {
   supportsConferenceCalling: true,
 } as unknown as CallingRepository;
 
+export const mockAudioRepository = {
+  loop: jest.fn().mockResolvedValue(undefined),
+  stop: jest.fn(),
+} as unknown as AudioRepository;
+
 const mockMediaDevicesHandler = {
   initializeMediaDevices: jest.fn(() => Promise.resolve()),
 } as unknown as MediaDevicesHandler;
@@ -63,7 +69,7 @@ export function buildCallingViewModel(translate: Translate) {
   const mockCore = container.resolve(Core);
   const callingViewModel = new CallingViewModel(
     mockCallingRepository,
-    {} as any,
+    mockAudioRepository,
     mockMediaDevicesHandler,
     {} as any,
     {} as any,
