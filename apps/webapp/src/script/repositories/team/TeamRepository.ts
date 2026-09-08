@@ -52,7 +52,6 @@ import {Config} from 'src/script/Config';
 import {Environment} from 'Util/environment';
 import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {loadDataUrl} from 'Util/util';
 
