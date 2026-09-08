@@ -26,11 +26,11 @@ const SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT = 3;
 
 export const sharedDriveUploadStatusPopupStyles: CSSObject = {
   position: 'absolute',
-  right: 16,
-  bottom: 16,
+  right: 12,
+  bottom: 12,
   zIndex: 'var(--z-index-panel)',
   display: 'flex',
-  width: 'min(412px, calc(100% - 32px))',
+  width: 'min(412px, calc(100% - 24px))',
   minHeight: 52,
   boxSizing: 'border-box',
   flexDirection: 'column',
@@ -127,12 +127,20 @@ export const sharedDriveUploadStatusPopupRowStyles: CSSObject = {
   minWidth: 0,
   minHeight: 38,
   alignItems: 'center',
-  justifyContent: 'flex-start',
-  gap: 16,
+  justifyContent: 'space-between',
+  gap: 8,
   padding: '4px 0',
   '&[hidden]': {
     display: 'none',
   },
+};
+
+export const sharedDriveUploadStatusPopupRowLeadingStyles: CSSObject = {
+  display: 'flex',
+  minWidth: 0,
+  flex: '0 1 242px',
+  alignItems: 'center',
+  gap: 16,
 };
 
 export const sharedDriveUploadStatusPopupRowTextStyles: CSSObject = {
@@ -141,6 +149,34 @@ export const sharedDriveUploadStatusPopupRowTextStyles: CSSObject = {
   flex: 1,
   flexDirection: 'column',
   gap: 2,
+};
+
+export const sharedDriveUploadStatusPopupRowActionsStyles: CSSObject = {
+  display: 'flex',
+  width: 87,
+  flex: '0 0 87px',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: 16,
+};
+
+export const sharedDriveUploadStatusPopupRowActionButtonStyles: CSSObject = {
+  display: 'flex',
+  width: 14,
+  height: 24,
+  flex: '0 0 14px',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+  border: 0,
+  borderRadius: 12,
+  background: 'transparent',
+  color: 'inherit',
+  cursor: 'pointer',
+  '&:disabled': {
+    cursor: 'default',
+    opacity: 0.5,
+  },
 };
 
 export const sharedDriveUploadStatusPopupRowCancelStyles: CSSObject = {
@@ -166,6 +202,7 @@ export const sharedDriveUploadStatusPopupRowFileNameStyles: CSSObject = {
   overflow: 'hidden',
   fontSize: 12,
   fontWeight: 600,
+  letterSpacing: '0.25px',
   lineHeight: '14px',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -188,6 +225,29 @@ export const sharedDriveUploadStatusPopupRowIconStyles: CSSObject = {
   width: 24,
   height: 24,
   flex: '0 0 auto',
+};
+
+export const sharedDriveUploadStatusPopupErrorIconStyles: CSSObject = {
+  display: 'flex',
+  width: 24,
+  height: 24,
+  flex: '0 0 auto',
+  alignItems: 'center',
+  justifyContent: 'center',
+  boxSizing: 'border-box',
+  border: '3px solid #fce3e5',
+  borderRadius: '50%',
+  color: '#c20013',
+};
+
+export const sharedDriveUploadStatusPopupErrorIconInnerStyles: CSSObject = {
+  width: 14,
+  height: 14,
+};
+
+export const sharedDriveUploadStatusPopupRowActionIconStyles: CSSObject = {
+  width: 14,
+  height: 14,
 };
 
 export const sharedDriveUploadStatusPopupProgressStyles = (isExpanded: boolean): CSSObject => ({

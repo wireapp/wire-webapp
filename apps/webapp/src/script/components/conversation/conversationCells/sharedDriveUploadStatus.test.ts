@@ -38,6 +38,7 @@ describe('toSharedDriveUploadStatus', () => {
       fileSize: 4,
       kind: 'uploading',
       canCancel: true,
+      canRetry: false,
     });
   });
 
@@ -49,11 +50,19 @@ describe('toSharedDriveUploadStatus', () => {
 
   it('maps published to uploaded', () => {
     expect(toSharedDriveUploadStatus(state('published') as never, conversationQualifiedId)?.kind).toBe('uploaded');
+    expect(toSharedDriveUploadStatus(state('published') as never, conversationQualifiedId)?.canRetry).toBe(false);
   });
 
-  it.each(['uploadFailed', 'publishFailed', 'discardFailed'])('maps %s to failed', kind => {
-    expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)?.kind).toBe('failed');
-    expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)?.canCancel).toBe(false);
+  it('marks an upload failure as retryable', () => {
+    expect(toSharedDriveUploadStatus(state('uploadFailed') as never, conversationQualifiedId)).toEqual(
+      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: true}),
+    );
+  });
+
+  it.each(['publishFailed', 'discardFailed'])('does not make a %s retryable', kind => {
+    expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual(
+      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: false}),
+    );
   });
 
   it.each(['cancelled', 'discarding', 'discarded'])('does not expose %s', kind => {

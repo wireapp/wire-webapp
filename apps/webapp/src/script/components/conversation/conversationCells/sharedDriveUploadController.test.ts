@@ -279,4 +279,30 @@ describe('createSharedDriveUploadController', () => {
     expect(manager.publish).toHaveBeenCalledWith('upload-1');
     expect(onRefresh).not.toHaveBeenCalled();
   });
+
+  it('publishes and refreshes after retrying a failed draft upload', async () => {
+    const manager = createDraftManager();
+    const {controller} = createDraftController(manager);
+    const onRefresh = jest.fn();
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
+    await controller.retryUpload('upload-1');
+
+    expect(manager.retryUpload).toHaveBeenCalledWith('upload-1');
+    expect(manager.publish).toHaveBeenCalledTimes(2);
+    expect(onRefresh).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not publish or refresh when retrying a draft upload fails', async () => {
+    const manager = createDraftManager();
+    manager.retryUpload.mockResolvedValueOnce(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
+    const {controller} = createDraftController(manager);
+    const onRefresh = jest.fn();
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
+    await controller.retryUpload('upload-1');
+
+    expect(manager.publish).toHaveBeenCalledTimes(1);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
 });

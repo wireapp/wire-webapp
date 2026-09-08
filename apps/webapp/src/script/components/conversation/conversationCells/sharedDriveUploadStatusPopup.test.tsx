@@ -32,13 +32,14 @@ const upload: SharedDriveUploadStatus = {
   fileSize: 4,
   kind: 'uploading',
   canCancel: true,
+  canRetry: false,
 };
 
-const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false) =>
+const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false, isRetrying = false) =>
   render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup
-        upload={{...upload, kind, canCancel: kind === 'uploading'}}
+        upload={{...upload, kind, canCancel: kind === 'uploading', canRetry: kind === 'failed'}}
         title={`${kind} report.pdf`}
         statusLabel={
           kind === 'failed' ? 'Couldn’t upload file' : `${kind === 'uploading' ? 'Uploading' : 'Uploaded'} 4 KB`
@@ -47,9 +48,14 @@ const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false) 
         isExpanded={isExpanded}
         toggleLabel={isExpanded ? 'Hide upload details' : 'Show upload details'}
         cancelLabel="Cancel"
+        dismissLabel="Close"
+        retryLabel="Retry"
         isCancelling={false}
+        isRetrying={isRetrying}
         onToggle={jest.fn()}
         onCancel={jest.fn()}
+        onRetry={jest.fn()}
+        onDismiss={jest.fn()}
       />
     </ThemeProvider>,
   );
@@ -146,9 +152,12 @@ describe('SharedDriveUploadStatusPopup', () => {
         isExpanded={false}
         toggleLabel="Show upload details"
         cancelLabel="Cancel"
+        retryLabel="Retry"
         isCancelling={false}
+        isRetrying={false}
         onToggle={onToggle}
         onCancel={jest.fn()}
+        onRetry={jest.fn()}
       />,
     );
 
@@ -172,9 +181,12 @@ describe('SharedDriveUploadStatusPopup', () => {
           isExpanded={false}
           toggleLabel="Show upload details"
           cancelLabel="Cancel"
+          retryLabel="Retry"
           isCancelling={false}
+          isRetrying={false}
           onToggle={jest.fn()}
           onCancel={onCancel}
+          onRetry={jest.fn()}
         />
       </ThemeProvider>,
     );
@@ -199,9 +211,12 @@ describe('SharedDriveUploadStatusPopup', () => {
           isExpanded
           toggleLabel="Hide upload details"
           cancelLabel="Cancel"
+          retryLabel="Retry"
           isCancelling={false}
+          isRetrying={false}
           onToggle={jest.fn()}
           onCancel={onCancel}
+          onRetry={jest.fn()}
         />
       </ThemeProvider>,
     );
@@ -226,15 +241,86 @@ describe('SharedDriveUploadStatusPopup', () => {
           isExpanded
           toggleLabel="Hide upload details"
           cancelLabel="Cancel"
+          retryLabel="Retry"
           isCancelling
+          isRetrying={false}
           onToggle={jest.fn()}
           onCancel={jest.fn()}
+          onRetry={jest.fn()}
         />
       </ThemeProvider>,
     );
 
     expect(screen.getAllByRole('button', {name: 'Cancel'})).toHaveLength(2);
     screen.getAllByRole('button', {name: 'Cancel'}).forEach(cancel => expect(cancel).toBeDisabled());
+  });
+
+  it('invokes retry from the failed file row', async () => {
+    const user = userEvent.setup();
+    const onRetry = jest.fn();
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, kind: 'failed', canCancel: false, canRetry: true}}
+          title="Upload failed report.pdf"
+          statusLabel="Couldn’t upload file"
+          destination="to Shared Drive"
+          isExpanded
+          toggleLabel="Hide upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancel={jest.fn()}
+          onRetry={onRetry}
+        />
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole('button', {name: 'Retry'}));
+
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('invokes dismiss from the failed file row', async () => {
+    const user = userEvent.setup();
+    const onDismiss = jest.fn();
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, kind: 'failed', canCancel: false, canRetry: true}}
+          title="Upload failed report.pdf"
+          statusLabel="Couldn’t upload file"
+          destination="to Shared Drive"
+          isExpanded
+          toggleLabel="Hide upload details"
+          cancelLabel="Cancel"
+          dismissLabel="Close"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancel={jest.fn()}
+          onRetry={jest.fn()}
+          onDismiss={onDismiss}
+        />
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole('button', {name: 'Close'}));
+
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables retry while a failed upload is being retried', () => {
+    renderPopup('failed', true, true);
+
+    expect(screen.getByRole('button', {name: 'Retry'})).toBeDisabled();
+  });
+
+  it.each(['uploaded', 'uploading'] as const)('does not show retry for %s status', kind => {
+    expect(renderPopup(kind).queryByRole('button', {name: 'Retry'})).not.toBeInTheDocument();
   });
 
   it.each(['uploaded', 'failed'] as const)('does not show cancel for %s status', kind => {

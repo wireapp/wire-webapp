@@ -19,7 +19,7 @@
 
 import type {ReactNode} from 'react';
 
-import {AlertIcon, ChevronIcon, CloseIcon, UploadIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon, ChevronIcon, CloseIcon, ReloadIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {getFileExtension} from 'Util/util';
@@ -31,9 +31,15 @@ import {
   sharedDriveUploadStatusPopupHeaderActionsStyles,
   sharedDriveUploadStatusPopupHeaderCancelStyles,
   sharedDriveUploadStatusPopupProgressStyles,
+  sharedDriveUploadStatusPopupErrorIconInnerStyles,
+  sharedDriveUploadStatusPopupErrorIconStyles,
+  sharedDriveUploadStatusPopupRowActionButtonStyles,
+  sharedDriveUploadStatusPopupRowActionIconStyles,
+  sharedDriveUploadStatusPopupRowActionsStyles,
   sharedDriveUploadStatusPopupRowCancelStyles,
   sharedDriveUploadStatusPopupRowFileNameStyles,
   sharedDriveUploadStatusPopupRowIconStyles,
+  sharedDriveUploadStatusPopupRowLeadingStyles,
   sharedDriveUploadStatusPopupRowStatusStyles,
   sharedDriveUploadStatusPopupRowStyles,
   sharedDriveUploadStatusPopupRowTextStyles,
@@ -52,9 +58,14 @@ interface SharedDriveUploadStatusPopupProps {
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
   readonly cancelLabel: string;
+  readonly dismissLabel?: string;
+  readonly retryLabel: string;
   readonly isCancelling: boolean;
+  readonly isRetrying: boolean;
   readonly onToggle: () => void;
   readonly onCancel: () => void;
+  readonly onRetry: () => void;
+  readonly onDismiss?: () => void;
 }
 
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
@@ -82,12 +93,13 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
   }
 
   return (
-    <AlertIcon
-      css={sharedDriveUploadStatusPopupRowIconStyles}
-      color="currentColor"
+    <div
+      css={sharedDriveUploadStatusPopupErrorIconStyles}
       aria-hidden="true"
       data-uie-name="shared-drive-upload-failed"
-    />
+    >
+      <AlertIcon css={sharedDriveUploadStatusPopupErrorIconInnerStyles} color="currentColor" />
+    </div>
   );
 };
 
@@ -99,9 +111,14 @@ export const SharedDriveUploadStatusPopup = ({
   isExpanded,
   toggleLabel,
   cancelLabel,
+  dismissLabel = cancelLabel,
+  retryLabel,
   isCancelling,
+  isRetrying,
   onToggle,
   onCancel,
+  onRetry,
+  onDismiss,
 }: SharedDriveUploadStatusPopupProps) => {
   const statusRowId = `shared-drive-upload-status-${upload.uploadId}`;
 
@@ -156,27 +173,62 @@ export const SharedDriveUploadStatusPopup = ({
         data-uie-name="shared-drive-upload-status-row"
         hidden={!isExpanded}
       >
-        {statusIcon(upload)}
-        <div css={sharedDriveUploadStatusPopupRowTextStyles}>
-          <strong css={sharedDriveUploadStatusPopupRowFileNameStyles} title={upload.fileName}>
-            {upload.fileName}
-          </strong>
-          <span css={sharedDriveUploadStatusPopupRowStatusStyles(upload.kind)} title={statusLabel}>
-            {statusLabel}
-          </span>
+        <div css={sharedDriveUploadStatusPopupRowLeadingStyles}>
+          {statusIcon(upload)}
+          <div css={sharedDriveUploadStatusPopupRowTextStyles}>
+            <strong css={sharedDriveUploadStatusPopupRowFileNameStyles} title={upload.fileName}>
+              {upload.fileName}
+            </strong>
+            <span css={sharedDriveUploadStatusPopupRowStatusStyles(upload.kind)} title={statusLabel}>
+              {statusLabel}
+            </span>
+          </div>
         </div>
-        {upload.canCancel && (
-          <button
-            type="button"
-            css={sharedDriveUploadStatusPopupRowCancelStyles}
-            aria-label={cancelLabel}
-            disabled={isCancelling}
-            data-uie-name="shared-drive-upload-cancel"
-            onClick={onCancel}
-          >
-            <CloseIcon color="currentColor" aria-hidden="true" />
-          </button>
-        )}
+        <div css={sharedDriveUploadStatusPopupRowActionsStyles}>
+          {upload.canRetry && (
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupRowActionButtonStyles}
+              aria-label={retryLabel}
+              disabled={isRetrying}
+              data-uie-name="shared-drive-upload-retry"
+              onClick={onRetry}
+            >
+              <ReloadIcon
+                css={sharedDriveUploadStatusPopupRowActionIconStyles}
+                color="currentColor"
+                aria-hidden="true"
+              />
+            </button>
+          )}
+          {upload.canRetry && (
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupRowActionButtonStyles}
+              aria-label={dismissLabel}
+              data-uie-name="shared-drive-upload-dismiss"
+              onClick={() => onDismiss?.()}
+            >
+              <CloseIcon
+                css={sharedDriveUploadStatusPopupRowActionIconStyles}
+                color="currentColor"
+                aria-hidden="true"
+              />
+            </button>
+          )}
+          {upload.canCancel && (
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupRowCancelStyles}
+              aria-label={cancelLabel}
+              disabled={isCancelling}
+              data-uie-name="shared-drive-upload-cancel"
+              onClick={onCancel}
+            >
+              <CloseIcon color="currentColor" aria-hidden="true" />
+            </button>
+          )}
+        </div>
       </div>
       {upload.kind === 'uploading' && (
         <div

@@ -236,6 +236,7 @@ describe('createCellsUploadProcess', () => {
     const retry = fixture.process.retryUpload();
     const secondRequest = required(fixture.uploads[1]);
     expect(secondRequest.path).toBe(path);
+    expect(secondRequest.source.blob).toBe(source.blob);
     expect(secondRequest.identity).toMatchObject({resourceUuid: 'resource-1', versionId: 'version-2'});
     expect(secondRequest.attemptId).toBe('attempt-2');
     const snapshots: string[] = [];
