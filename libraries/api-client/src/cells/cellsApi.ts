@@ -56,6 +56,13 @@ const USER_META_TAGS_NAMESPACE = 'usermeta-tags';
 const USER_META_OWNER_UUID_NAMESPACE = 'usermeta-owner-uuid';
 const MIME_NAMESPACE = 'mime';
 
+const uploadNetworkRetryConfig = {
+  // Uploads have their own retry action, so keep automatic retries bounded while allowing transient recovery.
+  'axios-retry': {
+    retries: 3,
+  },
+} as const;
+
 // Each selected tag is sent as its own metadata filter with the `Should` operation so the
 // backend applies OR semantics across tags (a node matching any selected tag is returned).
 // Matches the iOS client shape in WireMessaging RestAPI.swift.
@@ -187,7 +194,7 @@ export class CellsAPI {
         Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
         FindAvailablePath: true,
       },
-      {signal: abortController?.signal},
+      {signal: abortController?.signal, ...uploadNetworkRetryConfig},
     );
 
     const firstCreateCheckResult = result.data.Results?.[0];
@@ -235,7 +242,7 @@ export class CellsAPI {
         Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
         FindAvailablePath: true,
       },
-      {signal: abortController?.signal},
+      {signal: abortController?.signal, ...uploadNetworkRetryConfig},
     );
 
     const firstCreateCheckResult = result.data.Results?.[0];
@@ -264,10 +271,13 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.createCheck({
-      Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
-      FindAvailablePath: false,
-    });
+    const result = await this.client.createCheck(
+      {
+        Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
+        FindAvailablePath: false,
+      },
+      uploadNetworkRetryConfig,
+    );
 
     return result.data;
   }
@@ -277,7 +287,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.promoteVersion(uuid, versionId, {Publish: true});
+    const result = await this.client.promoteVersion(uuid, versionId, {Publish: true}, uploadNetworkRetryConfig);
 
     return result.data;
   }
@@ -287,7 +297,7 @@ export class CellsAPI {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.deleteVersion(uuid, versionId);
+    const result = await this.client.deleteVersion(uuid, versionId, uploadNetworkRetryConfig);
 
     return result.data;
   }
