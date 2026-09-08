@@ -11963,7 +11963,7 @@ __metadata:
     jest: "npm:30.5.1"
     noop-esm: "npm:1.1.0"
     react: "npm:18.3.1"
-    react-aria-components: "npm:1.21.0"
+    react-aria-components: "npm:1.21.1"
     react-dom: "npm:18.3.1"
     react-helmet: "npm:6.1.0"
     react-select: "npm:5.10.2"
@@ -12227,7 +12227,7 @@ __metadata:
     qrcode-reader: "npm:1.0.4"
     raw-loader: "npm:4.0.2"
     react: "npm:18.3.1"
-    react-aria-components: "npm:1.21.0"
+    react-aria-components: "npm:1.21.1"
     react-dom: "npm:18.3.1"
     react-dropzone: "npm:14.4.1"
     react-error-boundary: "npm:5.0.0"
@@ -26761,27 +26761,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-aria-components@npm:1.21.0":
-  version: 1.21.0
-  resolution: "react-aria-components@npm:1.21.0"
+"react-aria-components@npm:1.21.1":
+  version: 1.21.1
+  resolution: "react-aria-components@npm:1.21.1"
   dependencies:
     "@internationalized/date": "npm:^3.12.4"
     "@internationalized/string": "npm:^3.2.10"
     "@react-types/shared": "npm:^3.36.1"
     "@swc/helpers": "npm:^0.5.0"
     client-only: "npm:^0.0.1"
-    react-aria: "npm:3.52.0"
+    react-aria: "npm:3.52.1"
     react-stately: "npm:3.50.0"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
     react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-  checksum: 10/3e77ee28255500a8c96086a1cc285cb53b8782bb6205195f59fb86822efce8265b4f31d9c33fc4d922536eafe21ff7d402baca9a3f03fcf75914b697e0d289e0
+  checksum: 10/91d3b06426fe8fb3eac5471ffc11d170617873301f6670d9cf5f6c16f4a002e1dd5af1222c0a68711c43907049037cdf2c93d0949a1289a166317fb0eede1023
   languageName: node
   linkType: hard
 
-"react-aria@npm:3.52.0":
-  version: 3.52.0
-  resolution: "react-aria@npm:3.52.0"
+"react-aria@npm:3.52.1":
+  version: 3.52.1
+  resolution: "react-aria@npm:3.52.1"
   dependencies:
     "@internationalized/date": "npm:^3.12.4"
     "@internationalized/number": "npm:^3.6.8"
@@ -26795,7 +26795,7 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
     react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-  checksum: 10/53edc0fd6733772529ae0c17b9665ea97ab9e29185282117f7d7474d0557d1cdc52a7f0be5e9acdcc2bb691e162a337ca43965412dc6366e67d4ab6e79eef288
+  checksum: 10/2ade8388ae2a8069c7da1ee016f2fdc95fe0f631ac3018ea41db3469257051c42ffd05d189a6811651e6b85eb51e6f54e6218c3525f6b4cd59a8ffeaadee0976
   languageName: node
   linkType: hard
 

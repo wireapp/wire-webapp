@@ -22,7 +22,7 @@
     "color": "4.2.3",
     "emotion-normalize": "11.0.1",
     "noop-esm": "1.1.0",
-    "react-aria-components": "1.21.0",
+    "react-aria-components": "1.21.1",
     "react-select": "5.10.2",
     "react-transition-group": "4.4.5"
   },
