@@ -87,7 +87,7 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
         aria-hidden="true"
         data-uie-name="shared-drive-upload-uploaded"
       >
-        <FileTypeIcon extension={getFileExtension(upload.fileName)} size={24} />
+        <FileTypeIcon extension={getFileExtension(upload.fileName) || 'pdf'} size={24} />
       </div>
     );
   }

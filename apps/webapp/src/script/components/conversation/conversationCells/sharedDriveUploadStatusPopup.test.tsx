@@ -35,11 +35,16 @@ const upload: SharedDriveUploadStatus = {
   canRetry: false,
 };
 
-const renderPopup = (kind: SharedDriveUploadStatus['kind'], isExpanded = false, isRetrying = false) =>
+const renderPopup = (
+  kind: SharedDriveUploadStatus['kind'],
+  isExpanded = false,
+  isRetrying = false,
+  fileName = upload.fileName,
+) =>
   render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup
-        upload={{...upload, kind, canCancel: kind === 'uploading', canRetry: kind === 'failed'}}
+        upload={{...upload, fileName, kind, canCancel: kind === 'uploading', canRetry: kind === 'failed'}}
         title={`${kind} report.pdf`}
         statusLabel={
           kind === 'failed' ? 'Couldn’t upload file' : `${kind === 'uploading' ? 'Uploading' : 'Uploaded'} 4 KB`
@@ -109,6 +114,12 @@ describe('SharedDriveUploadStatusPopup', () => {
 
     expect(getByText('uploaded report.pdf')).toBeInTheDocument();
     expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+  });
+
+  it('shows an icon when an uploaded file has no extension', () => {
+    const {getByTestId} = renderPopup('uploaded', true, false, 'Wire – New Features');
+
+    expect(getByTestId('shared-drive-upload-uploaded').querySelector('svg')).toBeInTheDocument();
   });
 
   it('shows a progress bar for failed status', () => {
