@@ -605,8 +605,8 @@ describe('MLSService', () => {
       await coreDatabase.clear('mlsConversationRecovery');
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
       jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
-      jest.spyOn(coreDatabase, 'put').mockRejectedValueOnce(new Error('DB write failed'));
-      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
+      coreDatabase.put = jest.fn().mockRejectedValueOnce(new Error('DB write failed')) as typeof coreDatabase.put;
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
       const emitSpy = jest.spyOn(mlsService, 'emit');
 
       await expect(mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1')).resolves.toBeUndefined();
