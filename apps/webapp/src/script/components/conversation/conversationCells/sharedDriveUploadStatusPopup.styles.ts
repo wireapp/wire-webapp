@@ -38,7 +38,7 @@ export const sharedDriveUploadStatusPopupStyles: CSSObject = {
   overflow: 'hidden',
   padding: '8px 16px',
   borderRadius: 12,
-  backgroundColor: '#fff',
+  backgroundColor: 'var(--dropdown-menu-bg, #fff)',
   boxShadow: '0 0 12px 0 rgb(0 0 0 / 25%)',
 };
 
@@ -69,7 +69,7 @@ export const sharedDriveUploadStatusPopupTitleStyles: CSSObject = {
 
 export const sharedDriveUploadStatusPopupDestinationStyles: CSSObject = {
   overflow: 'hidden',
-  color: '#676b71',
+  color: 'var(--text-input-placeholder, #676b71)',
   fontSize: 12,
   lineHeight: '14px',
   textOverflow: 'ellipsis',
@@ -87,9 +87,9 @@ export const sharedDriveUploadStatusPopupHeaderCancelStyles: CSSObject = {
   minWidth: 74,
   height: 32,
   padding: '4px 12px',
-  border: '1px solid #dce0e3',
+  border: '1px solid var(--button-tertiary-border, #dce0e3)',
   borderRadius: 12,
-  background: '#fff',
+  background: 'var(--button-tertiary-bg, #fff)',
   color: 'inherit',
   fontSize: 14,
   fontWeight: 700,
@@ -211,9 +211,9 @@ export const sharedDriveUploadStatusPopupRowFileNameStyles: CSSObject = {
 export const sharedDriveUploadStatusPopupRowStatusStyles = (kind: SharedDriveUploadStatusKind): CSSObject => ({
   overflow: 'hidden',
   color: {
-    uploading: '#0667c8',
-    uploaded: '#1d7833',
-    failed: '#c20013',
+    uploading: 'var(--accent-color, #0667c8)',
+    uploaded: 'var(--success-color, #1d7833)',
+    failed: 'var(--danger-color, #c20013)',
   }[kind],
   fontSize: 12,
   lineHeight: '14px',
@@ -235,9 +235,9 @@ export const sharedDriveUploadStatusPopupErrorIconStyles: CSSObject = {
   alignItems: 'center',
   justifyContent: 'center',
   boxSizing: 'border-box',
-  border: '1.5px solid #f9e6e8',
+  border: '1.5px solid var(--pdf-file-icon-bg, #f9e6e8)',
   borderRadius: '50%',
-  color: '#c20013',
+  color: 'var(--danger-color, #c20013)',
 };
 
 export const sharedDriveUploadStatusPopupErrorIconInnerStyles: CSSObject = {
@@ -261,7 +261,7 @@ export const sharedDriveUploadStatusPopupProgressStyles = (
   width: kind === 'uploading' ? 'min(209px, calc(50% + 3px))' : 'calc(100% + 4px)',
   height: 3,
   overflow: 'hidden',
-  backgroundColor: kind === 'failed' ? '#c20013' : '#0667c8',
+  backgroundColor: kind === 'failed' ? 'var(--danger-color, #c20013)' : 'var(--accent-color, #0667c8)',
   animation: kind === 'uploading' ? 'shared-drive-upload-progress 1.5s ease-in-out infinite' : 'none',
   '@keyframes shared-drive-upload-progress': {
     '0%': {transform: 'translateX(-100%)'},

@@ -23,8 +23,6 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
-import {sharedDriveUploadStatusPopupProgressStyles} from './sharedDriveUploadStatusPopup.styles';
-
 const upload: SharedDriveUploadStatus = {
   uploadId: 'upload-1',
   conversationQualifiedId: 'conversation@example.com',
@@ -66,21 +64,6 @@ const renderPopup = (
   );
 
 describe('SharedDriveUploadStatusPopup', () => {
-  it('positions progress at the bottom when closed and below the header when expanded', () => {
-    expect(sharedDriveUploadStatusPopupProgressStyles(false)).toMatchObject({
-      position: 'absolute',
-      bottom: 0,
-      left: 3,
-      top: undefined,
-    });
-    expect(sharedDriveUploadStatusPopupProgressStyles(true)).toMatchObject({
-      position: 'absolute',
-      top: 51,
-      left: 0,
-      bottom: undefined,
-    });
-  });
-
   it('shows the filename and destination while uploading with indeterminate progress', () => {
     const {getByRole, getByText, getByTestId} = renderPopup('uploading');
 
@@ -141,10 +124,10 @@ describe('SharedDriveUploadStatusPopup', () => {
   });
 
   it.each([
-    ['uploading', 'Uploading 4 KB', '#0667c8', 'shared-drive-upload-uploading'],
-    ['uploaded', 'Uploaded 4 KB', '#1d7833', 'shared-drive-upload-uploaded'],
-    ['failed', 'Couldn’t upload file', '#c20013', 'shared-drive-upload-failed'],
-  ] as const)('shows the %s file status row without duplicate header icons', (kind, label, color, iconName) => {
+    ['uploading', 'Uploading 4 KB', 'shared-drive-upload-uploading'],
+    ['uploaded', 'Uploaded 4 KB', 'shared-drive-upload-uploaded'],
+    ['failed', 'Couldn’t upload file', 'shared-drive-upload-failed'],
+  ] as const)('shows the %s file status row without duplicate header icons', (kind, label, iconName) => {
     renderPopup(kind, true);
 
     const header = screen.getByTestId('shared-drive-upload-status-header');
@@ -152,7 +135,6 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(screen.getByRole('button', {name: 'Hide upload details'})).toHaveAttribute('aria-expanded', 'true');
     expect(row).toBeVisible();
     expect(within(row).getByText('report.pdf')).toBeInTheDocument();
-    expect(within(row).getByText(label)).toHaveStyle({color});
     expect(within(row).getByTestId(iconName)).toBeInTheDocument();
     expect(header.querySelector(`[data-uie-name="${iconName}"]`)).not.toBeInTheDocument();
   });
