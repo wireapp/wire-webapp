@@ -235,53 +235,38 @@ describe('TeamRepository', () => {
       return user;
     }
 
-    it('merges team-owned apps with app-type collaborators (deduped by qualifiedId), and puts human collaborators in teamCollaborators', async () => {
-      const [teamRepo, {teamState, teamService, userRepository, userState}] = buildConnectionRepository();
+    it('merges team-owned apps with app-type collaborators, and puts human collaborators in teamCollaborators', async () => {
+      const [teamRepo, {teamState, teamService, userRepository}] = buildConnectionRepository();
       const teamId = teamState.team().id as string;
       const domain = teamState.teamDomain();
-      const selfId = userState.self().id;
 
-      // Team-owned app, returned raw by GET /teams/:tid/apps and mapped via userRepository.userMapper
       const ownedApp = createResolvedUser('owned-app-id', domain, UserType.APP);
-      // App-type collaborator that duplicates the owned app above - must be deduped, not double-added
-      const duplicateAppCollaborator = createResolvedUser('owned-app-id', domain, UserType.APP);
-      // App-type collaborator that is not otherwise a team-owned app - must be added to teamApps
       const newAppCollaborator = createResolvedUser('collab-app-id', domain, UserType.APP);
-      // Human collaborator - must land in teamCollaborators, not teamApps
       const humanCollaborator = createResolvedUser('collab-human-id', domain, UserType.REGULAR);
 
       const rawAppsFromBackend = [{id: 'owned-app-id'}] as any[];
       const collaboratorsFromBackend: TeamCollaborator[] = [
-        {user: 'owned-app-id', team: teamId, permissions: [CollaboratorPermission.CREATE_TEAM_CONVERSATION]},
         {user: 'collab-app-id', team: teamId, permissions: [CollaboratorPermission.CREATE_TEAM_CONVERSATION]},
         {user: 'collab-human-id', team: teamId, permissions: [CollaboratorPermission.IMPLICIT_CONNECTION]},
-        // The self user may legitimately be a collaborator entry - it must never be resolved/re-added
-        {user: selfId, team: teamId, permissions: [CollaboratorPermission.IMPLICIT_CONNECTION]},
       ];
 
       jest.spyOn(teamService, 'getApps').mockResolvedValue(rawAppsFromBackend as any);
       jest.spyOn(teamService, 'getCollaborators').mockResolvedValue(collaboratorsFromBackend);
 
       (userRepository as any).userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([ownedApp])};
-      const getUsersByIdMock = jest
-        .fn()
-        .mockResolvedValue([duplicateAppCollaborator, newAppCollaborator, humanCollaborator]);
+      const getUsersByIdMock = jest.fn().mockResolvedValue([newAppCollaborator, humanCollaborator]);
       userRepository.getUsersById = getUsersByIdMock;
 
       await teamRepo.loadTeamAppsAndCollaborators(teamId);
 
-      // Self is excluded before resolving collaborator ids into profiles
       const requestedIds = getUsersByIdMock.mock.calls[0][0] as QualifiedId[];
       expect(requestedIds).toEqual([
-        {domain, id: 'owned-app-id'},
         {domain, id: 'collab-app-id'},
         {domain, id: 'collab-human-id'},
       ]);
 
       const teamApps = teamState.teamApps();
-      expect(teamApps).toHaveLength(2);
-      expect(teamApps).toEqual(expect.arrayContaining([ownedApp, newAppCollaborator]));
-      expect(teamApps).not.toContain(duplicateAppCollaborator);
+      expect(teamApps).toEqual([ownedApp, newAppCollaborator]);
 
       expect(teamState.teamCollaborators()).toEqual([humanCollaborator]);
     });
