@@ -242,7 +242,7 @@ export class CellsAPI {
         Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
         FindAvailablePath: true,
       },
-      {signal: abortController?.signal},
+      {signal: abortController?.signal, ...uploadNetworkRetryConfig},
     );
 
     const firstCreateCheckResult = result.data.Results?.[0];
