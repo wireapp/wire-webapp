@@ -111,6 +111,12 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
   });
 
+  it('shows a progress bar for failed status', () => {
+    const {getByTestId} = renderPopup('failed', true);
+
+    expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+  });
+
   it('starts collapsed and exposes accessible cancel and toggle actions in the header', () => {
     renderPopup('uploading');
 

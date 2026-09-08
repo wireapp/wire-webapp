@@ -38,7 +38,7 @@ export const sharedDriveUploadStatusPopupStyles: CSSObject = {
   overflow: 'hidden',
   padding: '8px 16px',
   borderRadius: 12,
-  backgroundColor: 'var(--app-bg, #fff)',
+  backgroundColor: '#fff',
   boxShadow: '0 0 12px 0 rgb(0 0 0 / 25%)',
 };
 
@@ -89,7 +89,7 @@ export const sharedDriveUploadStatusPopupHeaderCancelStyles: CSSObject = {
   padding: '4px 12px',
   border: '1px solid #dce0e3',
   borderRadius: 12,
-  background: 'var(--app-bg, #fff)',
+  background: '#fff',
   color: 'inherit',
   fontSize: 14,
   fontWeight: 700,
@@ -235,14 +235,14 @@ export const sharedDriveUploadStatusPopupErrorIconStyles: CSSObject = {
   alignItems: 'center',
   justifyContent: 'center',
   boxSizing: 'border-box',
-  border: '3px solid #fce3e5',
+  border: '1.5px solid #f9e6e8',
   borderRadius: '50%',
   color: '#c20013',
 };
 
 export const sharedDriveUploadStatusPopupErrorIconInnerStyles: CSSObject = {
-  width: 14,
-  height: 14,
+  width: 10.5,
+  height: 10.5,
 };
 
 export const sharedDriveUploadStatusPopupRowActionIconStyles: CSSObject = {
@@ -250,16 +250,19 @@ export const sharedDriveUploadStatusPopupRowActionIconStyles: CSSObject = {
   height: 14,
 };
 
-export const sharedDriveUploadStatusPopupProgressStyles = (isExpanded: boolean): CSSObject => ({
+export const sharedDriveUploadStatusPopupProgressStyles = (
+  isExpanded: boolean,
+  kind: SharedDriveUploadStatusKind = 'uploading',
+): CSSObject => ({
   position: 'absolute',
   top: isExpanded ? SHARED_DRIVE_UPLOAD_PROGRESS_EXPANDED_TOP : undefined,
   bottom: isExpanded ? undefined : 0,
   left: isExpanded ? 0 : SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT,
-  width: 'min(209px, calc(50% + 3px))',
+  width: kind === 'failed' ? 'calc(100% + 4px)' : 'min(209px, calc(50% + 3px))',
   height: 3,
   overflow: 'hidden',
-  backgroundColor: '#0667c8',
-  animation: 'shared-drive-upload-progress 1.5s ease-in-out infinite',
+  backgroundColor: kind === 'failed' ? '#c20013' : '#0667c8',
+  animation: kind === 'failed' ? 'none' : 'shared-drive-upload-progress 1.5s ease-in-out infinite',
   '@keyframes shared-drive-upload-progress': {
     '0%': {transform: 'translateX(-100%)'},
     '100%': {transform: 'translateX(200%)'},

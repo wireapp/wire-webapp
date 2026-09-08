@@ -230,9 +230,9 @@ export const SharedDriveUploadStatusPopup = ({
           )}
         </div>
       </div>
-      {upload.kind === 'uploading' && (
+      {(upload.kind === 'uploading' || upload.kind === 'failed') && (
         <div
-          css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
+          css={sharedDriveUploadStatusPopupProgressStyles(isExpanded, upload.kind)}
           data-uie-name="shared-drive-upload-progress"
         />
       )}
