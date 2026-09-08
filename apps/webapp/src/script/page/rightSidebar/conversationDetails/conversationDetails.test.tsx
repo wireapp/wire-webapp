@@ -17,12 +17,15 @@
  *
  */
 
-import {act, render} from '@testing-library/react';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {act, fireEvent, render} from '@testing-library/react';
+import {type ReactElement} from 'react';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
@@ -52,10 +55,22 @@ import {ConversationDetails} from './conversationDetails';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
+import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {PanelState} from '../rightSidebar';
 
 jest.mock('Components/panel/enrichedFields', () => ({
   useEnrichedFields: (): never[] => [],
-  EnrichedFields: () => <div />,
+  EnrichedFields: function EnrichedFields({
+    showAvailability = false,
+  }: {
+    showAvailability?: boolean;
+  }): ReactElement | null {
+    if (!showAvailability) {
+      return null;
+    }
+
+    return <div data-uie-name="item-enriched-value" />;
+  },
   __esModule: true,
 }));
 jest.mock('Components/panel/userDetails', () => ({
@@ -68,6 +83,12 @@ let conversationRepository: ConversationRepository;
 let searchRepository: SearchRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+const viewerPermissionRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    isFeatureToggleEnabled: () => true,
+    translate: translateForTest,
+  }),
+);
 
 beforeAll(async () => {
   conversationRepository = await testFactory.exposeConversationActors();
@@ -123,6 +144,48 @@ const getDefaultParams = () => {
 };
 
 describe('ConversationDetails', () => {
+  it.each([
+    {selfUserTeamId: 'conversation-team', expectedStatus: 'cells.sharedDriveAccess.editorAccess'},
+    {selfUserTeamId: 'other-team', expectedStatus: 'cells.sharedDriveAccess.viewerAccess'},
+  ])('opens Shared Drive settings with $expectedStatus', ({selfUserTeamId, expectedStatus}) => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    conversation.teamId = 'conversation-team';
+
+    const defaultProps = getDefaultParams();
+    defaultProps.selfUser.teamId = selfUserTeamId;
+    const togglePanel = jest.fn();
+    const {getByTestId} = render(
+      withThemeAndRootContext(
+        <ConversationDetails
+          {...defaultProps}
+          activeConversation={conversation}
+          selfUser={defaultProps.selfUser}
+          togglePanel={togglePanel}
+        />,
+        viewerPermissionRootProviderWrapper,
+      ),
+    );
+
+    expect(getByTestId('status-cells-info')).toHaveTextContent(expectedStatus);
+    fireEvent.click(getByTestId('go-shared-drive'));
+
+    expect(togglePanel).toHaveBeenCalledWith(PanelState.SHARED_DRIVE, conversation);
+  });
+
+  it('keeps Shared Drive settings disabled when viewer permissions are disabled', () => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+
+    const defaultProps = getDefaultParams();
+    const {getByTestId, getByText} = render(
+      withTheme(<ConversationDetails {...defaultProps} activeConversation={conversation} />),
+    );
+
+    expect(getByText('conversationDetailsActionCellsOption')).toBeInTheDocument();
+    expect(getByTestId('cells-info')).toBeDisabled();
+  });
+
   it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
     'shows legacy bots and apps in %s groups',
     protocol => {
@@ -245,5 +308,57 @@ describe('ConversationDetails', () => {
         expect(actionItem).not.toBeNull();
       });
     });
+  });
+
+  it('updates the block action when the participant blocking state changes', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+
+    const participant = new User('other-user', '', translateForTest);
+    const connection = new ConnectionEntity();
+    connection.status(ConnectionStatus.ACCEPTED);
+    participant.connection(connection);
+    conversation.participating_user_ets([participant]);
+
+    const defaultProps = getDefaultParams();
+    const {queryByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByTestId('do-block')).not.toBeNull();
+    expect(queryByTestId('do-unblock')).toBeNull();
+
+    act(() => {
+      connection.status(ConnectionStatus.BLOCKED);
+    });
+
+    expect(queryByTestId('do-block')).toBeNull();
+    expect(queryByTestId('do-unblock')).not.toBeNull();
+  });
+
+  it('updates participant availability when the participant becomes a temporary guest', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+
+    const participant = new User('other-user', '', translateForTest);
+    participant.teamId = 'team-id';
+    conversation.participating_user_ets([participant]);
+
+    const defaultProps = getDefaultParams();
+    const team = new TeamEntity();
+    team.id = 'team-id';
+    defaultProps.teamState.team(team);
+
+    const {queryByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByTestId('item-enriched-value')).not.toBeNull();
+
+    act(() => {
+      participant.isTemporaryGuest(true);
+    });
+
+    expect(queryByTestId('item-enriched-value')).toBeNull();
   });
 });

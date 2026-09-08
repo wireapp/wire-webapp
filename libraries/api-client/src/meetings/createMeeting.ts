@@ -24,4 +24,5 @@ export interface CreateMeeting {
   recurrence?: MeetingRecurrence;
   start_time: string;
   title: string;
+  tzid: string;
 }

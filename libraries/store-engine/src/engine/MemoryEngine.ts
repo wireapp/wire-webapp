@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 import {CRUDEngine} from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
@@ -30,11 +30,21 @@ export class MemoryEngine implements CRUDEngine {
   private autoIncrementedPrimaryKey: number = 1;
 
   private get store(): Record<string, Record<string, any>> {
-    return this.stores[this.storeName]!;
+    const store = this.stores[this.storeName];
+    if (isUndefined(store)) {
+      throw new Error(`Store ${this.storeName} is not initialized`);
+    }
+
+    return store;
   }
 
   private getTable(tableName: string): Record<PropertyKey, any> {
-    return this.store[tableName]! as Record<PropertyKey, any>;
+    const table = this.store[tableName];
+    if (isUndefined(table)) {
+      throw new Error(`Table ${tableName} is not initialized`);
+    }
+
+    return table;
   }
 
   create<EntityType, PrimaryKey = string>(

@@ -70,8 +70,8 @@ describe('Call', () => {
   let fourthParticipant: Participant;
   let fifthParticipant: Participant;
   let conv: Conversation;
-  let wCall: Wcall;
-  let wUser: number;
+  let wCall: Wcall | undefined;
+  let wUser: number | undefined;
 
   beforeAll(() => {
     return testFactory.exposeCallingActors().then(injectedCallingRepository => {
@@ -118,7 +118,9 @@ describe('Call', () => {
   });
 
   afterAll(() => {
-    return wCall && wCall.destroy(wUser);
+    if (wCall !== undefined && wUser !== undefined) {
+      wCall.destroy(wUser);
+    }
   });
 
   describe('update pages', () => {

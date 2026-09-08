@@ -19,7 +19,7 @@
 
 import {useEffect} from 'react';
 
-import {SuccessShield} from '@wireapp/react-ui-kit/lib/Images/SuccessShield';
+import {SuccessShield} from '@wireapp/react-ui-kit/lib/images/successShield';
 
 import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
 

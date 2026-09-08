@@ -258,6 +258,30 @@ const strictBooleanExpressionsRule = [
   },
 ];
 
+const emptyArrowFunctionRestrictions = [
+  {
+    selector: "ArrowFunctionExpression[async=false][body.type='BlockStatement'][body.body.length=0]",
+    message: 'Use noop from noop-esm instead of an empty arrow function.',
+  },
+  {
+    selector: "ArrowFunctionExpression[async=true][body.type='BlockStatement'][body.body.length=0]",
+    message: 'Use asyncNoop from noop-esm instead of an empty async arrow function.',
+  },
+];
+
+const definiteAssignmentAssertionRestrictions = [
+  {
+    selector: 'PropertyDefinition[definite=true]',
+    message:
+      'Definite assignment assertions are not allowed. Initialize the value explicitly or model its absence in the type.',
+  },
+  {
+    selector: 'VariableDeclarator[definite=true]',
+    message:
+      'Definite assignment assertions are not allowed. Initialize the value explicitly or model its absence in the type.',
+  },
+];
+
 const restrictedSyntaxRule = [
   'error',
   {
@@ -273,6 +297,14 @@ const restrictedSyntaxRule = [
     selector: "ImportDeclaration[source.value='@sindresorhus/is'] > ImportNamespaceSpecifier",
     message: 'Use named imports from @sindresorhus/is instead of a namespace import.',
   },
+  ...emptyArrowFunctionRestrictions,
+  ...definiteAssignmentAssertionRestrictions,
+];
+
+const testRestrictedSyntaxRule = [
+  'error',
+  ...emptyArrowFunctionRestrictions,
+  ...definiteAssignmentAssertionRestrictions,
 ];
 
 const jestMockRestrictionRule = [
@@ -282,10 +314,7 @@ const jestMockRestrictionRule = [
   },
 ];
 
-const jestRecommendedProductionConfig = {
-  ...jestPlugin.configs['flat/recommended'],
-  plugins: {},
-};
+const jestRecommendedProductionConfig = jestPlugin.configs['flat/recommended'];
 
 const productionConfigs = [
   jestRecommendedProductionConfig,
@@ -388,7 +417,7 @@ const productionConfigs = [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -545,30 +574,30 @@ const productionConfigs = [
       'apps/webapp/src/script/components/CellsGlobalView/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTableRowOptions.tsx',
       'apps/webapp/src/script/components/CellsGlobalView/useSearchCellsNodes/useSearchCellsNodes.ts',
       'apps/webapp/src/script/components/ConfigToolbar/ConfigToolbar.tsx',
-      'apps/webapp/src/script/components/Conversation/Conversation.tsx',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/ConversationCells.tsx',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsNodeShareModal/CellsNodeShareModal.tsx',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsMoveNodeModal/CellsMoveNodeModal.tsx',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsMoveNodeModal/useGetCellsFolders/useGetCellsFolders.ts',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTableRowOptions.tsx',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTagsModal/useTagsManagement/useGetAllTags/useGetAllTags.ts',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTagsModal/useTagsManagement/useTagsManagement.ts',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags.ts',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/useConversationSearch/useConversationSearchFiles.ts',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/useGetAllCellsNodes/useGetAllCellsNodes.ts',
-      'apps/webapp/src/script/components/Conversation/ConversationCells/useRefreshCellsState/useRefreshCellsState.ts',
+      'apps/webapp/src/script/components/conversation/conversation.tsx',
+      'apps/webapp/src/script/components/conversation/conversationCells/conversationCells.tsx',
+      'apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsNodeShareModal/cellsNodeShareModal.tsx',
+      'apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsMoveNodeModal.tsx',
+      'apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/useGetCellsFolders/useGetCellsFolders.ts',
+      'apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTableRowOptions.tsx',
+      'apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTagsModal/useTagsManagement/useGetAllTags/useGetAllTags.ts',
+      'apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTagsModal/useTagsManagement/useTagsManagement.ts',
+      'apps/webapp/src/script/components/conversation/conversationCells/common/useGetAllTags/useGetAllTags.ts',
+      'apps/webapp/src/script/components/conversation/conversationCells/useConversationSearch/useConversationSearchFiles.ts',
+      'apps/webapp/src/script/components/conversation/conversationCells/useGetAllCellsNodes/useGetAllCellsNodes.ts',
+      'apps/webapp/src/script/components/conversation/conversationCells/useRefreshCellsState/useRefreshCellsState.ts',
       'apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx',
-      'apps/webapp/src/script/components/InputBar/InputBar.tsx',
-      'apps/webapp/src/script/components/InputBar/FilePreviews/useFilePreview/useFilePreview.ts',
-      'apps/webapp/src/script/components/InputBar/usePing/usePing.ts',
-      'apps/webapp/src/script/components/InputBar/useMessageHandling/useDraftState/useDraftState.ts',
-      'apps/webapp/src/script/components/MessagesList/Message/ContentMessage/asset/common/useGetAssetUrl/useGetAssetUrl.ts',
-      'apps/webapp/src/script/components/MessagesList/Message/ContentMessage/asset/MultipartAssets/MultipartAssets.tsx',
-      'apps/webapp/src/script/components/MessagesList/Message/ContentMessage/asset/MultipartAssets/useGetMultipartAsset/useGetMultipartAsset.ts',
-      'apps/webapp/src/script/components/MessagesList/Message/MessageWrapper.tsx',
-      'apps/webapp/src/script/components/MessagesList/VirtualizedMessagesList/VirtualizedMessagesList.tsx',
-      'apps/webapp/src/script/components/MessagesList/VirtualizedMessagesList/useLoadMessages.ts',
-      'apps/webapp/src/script/components/MessagesList/utils/useLoadConversation.ts',
+      'apps/webapp/src/script/components/inputBar/InputBar.tsx',
+      'apps/webapp/src/script/components/inputBar/FilePreviews/useFilePreview/useFilePreview.ts',
+      'apps/webapp/src/script/components/inputBar/usePing/usePing.ts',
+      'apps/webapp/src/script/components/inputBar/useMessageHandling/useDraftState/useDraftState.ts',
+      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useGetAssetUrl/useGetAssetUrl.ts',
+      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/multipartAssets.tsx',
+      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/useGetMultipartAsset/useGetMultipartAsset.ts',
+      'apps/webapp/src/script/components/messagesList/message/messageWrapper.tsx',
+      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/virtualizedMessagesList.tsx',
+      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/useLoadMessages.ts',
+      'apps/webapp/src/script/components/messagesList/utils/useLoadConversation.ts',
       'apps/webapp/src/script/components/Modals/FileHistoryModal/FileVersionItem.tsx',
       'apps/webapp/src/script/components/Modals/FileHistoryModal/hooks/useFileVersions.ts',
       'apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx',
@@ -700,6 +729,12 @@ const config = [
         },
       },
     },
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'error',
+    },
   },
   {
     files: testTsxFilePatterns,
@@ -713,6 +748,12 @@ const config = [
           jsx: true,
         },
       },
+    },
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'error',
     },
   },
   {
@@ -730,6 +771,17 @@ const config = [
           jsx: true,
         },
       },
+    },
+  },
+  {
+    files: [
+      ...testTypeScriptFilePatterns,
+      ...testTsxFilePatterns,
+      ...testJavaScriptFilePatterns,
+      ...testJsxFilePatterns,
+    ],
+    rules: {
+      'no-restricted-syntax': testRestrictedSyntaxRule,
     },
   },
   {

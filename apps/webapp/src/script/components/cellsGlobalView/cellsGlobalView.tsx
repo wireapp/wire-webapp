@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {hasActiveGlobalDriveFilters} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
-import {useCellsSorting} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
+import {hasActiveGlobalDriveFilters} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
+import {useCellsSorting} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';

@@ -153,7 +153,7 @@ describe('Client Config', () => {
       expect(config.MAX_GROUP_PARTICIPANTS).toBe(500);
       expect(config.MAX_VIDEO_PARTICIPANTS).toBe(4);
       expect(config.NEW_PASSWORD_MINIMUM_LENGTH).toBe(8);
-      expect(config.MAX_API_VERSION).toBe(16);
+      expect(config.MAX_API_VERSION).toBe(17);
     });
 
     it('should parse file upload extensions correctly', () => {

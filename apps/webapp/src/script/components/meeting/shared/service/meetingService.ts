@@ -113,12 +113,14 @@ export const scheduleMeeting = (
   command: ScheduleMeetingCommand,
   deps: MeetingServiceDeps,
 ): Task<ScheduleMeetingSuccess, MeetingSubmitErrors> =>
-  createMeetingAndSyncParticipants(mapScheduleCommandToCreateMeeting(command), command.selectedUsers, deps).map(
-    ({failedToAdd, qualifiedMeetingId}) => ({
-      failedToAdd,
-      qualifiedMeetingId,
-    }),
-  );
+  createMeetingAndSyncParticipants(
+    mapScheduleCommandToCreateMeeting(command, deps.deviceTimeZone),
+    command.selectedUsers,
+    deps,
+  ).map(({failedToAdd, qualifiedMeetingId}) => ({
+    failedToAdd,
+    qualifiedMeetingId,
+  }));
 
 /**
  * Creates an instant meeting and establishes the MLS conversation with selected participants.
@@ -128,7 +130,7 @@ export const meetNowMeeting = (
   deps: MeetingServiceDeps,
 ): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
   createMeetingAndSyncParticipants(
-    mapMeetNowCommandToCreateMeeting(command, deps.wallClock),
+    mapMeetNowCommandToCreateMeeting(command, deps.wallClock, deps.deviceTimeZone),
     command.selectedUsers,
     deps,
   );

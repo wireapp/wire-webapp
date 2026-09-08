@@ -18,6 +18,7 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {CopyIcon, EditIcon, PickupIcon} from 'Components/icon';
 
@@ -25,7 +26,7 @@ import {PanelActions, MenuItem} from './panelActions';
 
 describe('PanelActions', () => {
   it('displays a single action', () => {
-    const items: MenuItem[] = [{click: () => {}, Icon: EditIcon, identifier: 'testIdentifier', label: 'testLabel'}];
+    const items: MenuItem[] = [{click: noop, Icon: EditIcon, identifier: 'testIdentifier', label: 'testLabel'}];
     const itemSpy = jest.spyOn(items[0], 'click');
 
     const {getByTestId, queryByText} = render(<PanelActions items={items} />);
@@ -41,8 +42,8 @@ describe('PanelActions', () => {
 
   it('displays more than one action', () => {
     const items: MenuItem[] = [
-      {click: () => {}, Icon: CopyIcon, identifier: 'mainIdentifier', label: 'mainLabel'},
-      {click: () => {}, Icon: PickupIcon, identifier: 'secondaryIdentifier', label: 'secondaryLabel'},
+      {click: noop, Icon: CopyIcon, identifier: 'mainIdentifier', label: 'mainLabel'},
+      {click: noop, Icon: PickupIcon, identifier: 'secondaryIdentifier', label: 'secondaryLabel'},
     ];
 
     const {queryByText, getByTestId} = render(<PanelActions items={items} />);

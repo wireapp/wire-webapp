@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 
@@ -54,7 +56,11 @@ const insertChronologically = (candidates: MeetingInstance[], meetingInstance: M
   while (lowerBound < upperBound) {
     const middleIndex = Math.floor((lowerBound + upperBound) / BINARY_SEARCH_DIVISOR);
 
-    if (compareMeetingInstances(candidates[middleIndex]!, meetingInstance) <= 0) {
+    const candidate = candidates[middleIndex];
+    if (isUndefined(candidate)) {
+      throw new Error(`Missing meeting instance at index ${middleIndex}`);
+    }
+    if (compareMeetingInstances(candidate, meetingInstance) <= 0) {
       lowerBound = middleIndex + 1;
     } else {
       upperBound = middleIndex;
@@ -69,7 +75,10 @@ export const getNextMeetingInstancePage = (cursor: MeetingInstancePageCursor, li
   const meetingInstances: MeetingInstance[] = [];
 
   while (meetingInstances.length < limit && candidates.length > 0) {
-    const meetingInstance = candidates.shift()!;
+    const meetingInstance = candidates.shift();
+    if (isUndefined(meetingInstance)) {
+      throw new Error('Meeting instance candidates became empty unexpectedly');
+    }
     meetingInstances.push(meetingInstance);
 
     const nextMeetingInstance = getNextMeetingInstance(meetingInstance);

@@ -42,6 +42,7 @@ const futureStartIso = futureStartDate.toISOString();
 const futureEndIso = futureEndDate.toISOString();
 
 const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+const deviceTimeZone = {ianaTimeZoneId: 'Europe/Berlin'};
 
 const scheduleCommand: ScheduleMeetingCommand = {
   title: 'Weekly sync',
@@ -163,6 +164,7 @@ describe('scheduleMeeting', () => {
         conversationRepository,
         callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
         wallClock,
+        deviceTimeZone,
       },
       createMeetingMock,
       establishMeetingConversation,
@@ -184,6 +186,7 @@ describe('scheduleMeeting', () => {
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
+      tzid: 'Europe/Berlin',
     });
     expect(saveMeetingConversationFromBackend).toHaveBeenCalledWith(meetingConversationResponse);
     expect(establishMeetingConversation).toHaveBeenCalledWith({
@@ -286,6 +289,7 @@ describe('meetNowMeeting', () => {
         conversationRepository,
         callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
         wallClock,
+        deviceTimeZone,
       },
       createMeetingMock,
       establishMeetingConversation,
@@ -313,6 +317,7 @@ describe('meetNowMeeting', () => {
       title: 'Standup',
       start_time: fixedNow.toISOString(),
       end_time: new Date(fixedNow.getTime() + 60 * 60 * 1000).toISOString(),
+      tzid: 'Europe/Berlin',
     });
   });
 });
@@ -377,6 +382,7 @@ describe('updateMeeting', () => {
         conversationRepository,
         callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
         wallClock,
+        deviceTimeZone,
       },
       updateMeetingMock,
       saveMeetingConversationFromBackend,

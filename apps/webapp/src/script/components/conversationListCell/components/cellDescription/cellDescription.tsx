@@ -20,7 +20,7 @@
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
-import {DraftState, generateConversationInputStorageKey} from 'Components/InputBar/common/draftState/draftState';
+import {DraftState, generateConversationInputStorageKey} from 'Components/inputBar/common/draftState/draftState';
 import {useLocalStorage} from 'Hooks/useLocalStorage';
 import {generateCellState} from 'Repositories/conversation/ConversationCellState';
 import {Conversation, UnreadState} from 'Repositories/entity/Conversation';

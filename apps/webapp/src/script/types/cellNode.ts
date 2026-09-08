@@ -19,7 +19,7 @@
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {CellsSelfUserDriveRole} from 'src/script/components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CellsSelfUserDriveRole} from 'src/script/components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 export enum CellNodeType {
   FILE = 'file',

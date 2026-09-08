@@ -19,18 +19,26 @@
 
 import {useMemo} from 'react';
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';
 
-export const useMeetingParticipants = (conversation: Conversation): User[] => {
-  const selfUser = container.resolve(UserState).self();
+export const useMeetingParticipants = (conversation: Conversation, qualifiedCreator: QualifiedId): User[] => {
+  const userState = container.resolve(UserState);
+  const selfUser = userState.self();
   const {participating_user_ets: participants} = useKoSubscribableChildren(conversation, ['participating_user_ets']);
+  const {users} = useKoSubscribableChildren(userState, ['users']);
+  const organizerUser = users.find(user => matchQualifiedIds(user.qualifiedId, qualifiedCreator));
 
-  return useMemo(() => getMeetingParticipantsForDisplay(participants, selfUser), [participants, selfUser]);
+  return useMemo(
+    () => getMeetingParticipantsForDisplay(participants, selfUser, qualifiedCreator, organizerUser),
+    [participants, selfUser, qualifiedCreator, organizerUser],
+  );
 };

@@ -22,7 +22,7 @@ import cx from 'classnames';
 
 import {DeviceVerificationBadges} from 'Components/badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {type ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';

@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
@@ -182,44 +183,52 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
         if (payload.audio?.input?.devices !== undefined) {
           state.audio.input.devices = filterInvalidDevices(payload.audio.input.devices);
         }
-        if (payload.audio?.input?.selectedId !== undefined) {
-          state.audio.input.selectedId = payload.audio.input.selectedId!;
+        const audioInputSelectedId = payload.audio?.input?.selectedId;
+        if (!isUndefined(audioInputSelectedId)) {
+          state.audio.input.selectedId = audioInputSelectedId;
         }
-        if (payload.audio?.input?.supported !== undefined) {
-          state.audio.input.supported = payload.audio.input.supported!;
+        const audioInputSupported = payload.audio?.input?.supported;
+        if (!isUndefined(audioInputSupported)) {
+          state.audio.input.supported = audioInputSupported;
         }
 
         // audio.output
         if (payload.audio?.output?.devices !== undefined) {
           state.audio.output.devices = filterInvalidDevices(payload.audio.output.devices);
         }
-        if (payload.audio?.output?.selectedId !== undefined) {
-          state.audio.output.selectedId = payload.audio.output.selectedId!;
+        const audioOutputSelectedId = payload.audio?.output?.selectedId;
+        if (!isUndefined(audioOutputSelectedId)) {
+          state.audio.output.selectedId = audioOutputSelectedId;
         }
-        if (payload.audio?.output?.supported !== undefined) {
-          state.audio.output.supported = payload.audio.output.supported!;
+        const audioOutputSupported = payload.audio?.output?.supported;
+        if (!isUndefined(audioOutputSupported)) {
+          state.audio.output.supported = audioOutputSupported;
         }
 
         // video.input
         if (payload.video?.input?.devices !== undefined) {
           state.video.input.devices = filterInvalidDevices(payload.video.input.devices);
         }
-        if (payload.video?.input?.selectedId !== undefined) {
-          state.video.input.selectedId = payload.video.input.selectedId!;
+        const videoInputSelectedId = payload.video?.input?.selectedId;
+        if (!isUndefined(videoInputSelectedId)) {
+          state.video.input.selectedId = videoInputSelectedId;
         }
-        if (payload.video?.input?.supported !== undefined) {
-          state.video.input.supported = payload.video.input.supported!;
+        const videoInputSupported = payload.video?.input?.supported;
+        if (!isUndefined(videoInputSupported)) {
+          state.video.input.supported = videoInputSupported;
         }
 
         // screen.input
         if (payload.screen?.input?.devices !== undefined) {
           state.screen.input.devices = payload.screen.input.devices;
         }
-        if (payload.screen?.input?.selectedId !== undefined) {
-          state.screen.input.selectedId = payload.screen.input.selectedId!;
+        const screenInputSelectedId = payload.screen?.input?.selectedId;
+        if (!isUndefined(screenInputSelectedId)) {
+          state.screen.input.selectedId = screenInputSelectedId;
         }
-        if (payload.screen?.input?.supported !== undefined) {
-          state.screen.input.supported = payload.screen.input.supported!;
+        const screenInputSupported = payload.screen?.input?.supported;
+        if (!isUndefined(screenInputSupported)) {
+          state.screen.input.supported = screenInputSupported;
         }
       }),
 

@@ -19,8 +19,11 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {container} from 'tsyringe';
 
 import en from 'I18n/en-US.json';
+import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/userState';
 import {MeetingNotificationCard} from './meetingNotificationCard';
 import {
   type MeetingNotification,
@@ -38,8 +41,15 @@ const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
+const specialCharacterName = `Eldon Bauch ±§!@#{}[]:"|;'\\<>?,./$%^&*()`;
 const translateForNotificationTest: Translate = (key, substitutions) =>
-  key === 'meetings.notifications.title' ? `${substitutions?.label} ${substitutions?.meetingTitle}` : key;
+  key === 'meetings.notifications.title'
+    ? `${substitutions?.label} ${substitutions?.meetingTitle}`
+    : key === 'meetings.notifications.by'
+      ? `By ${substitutions?.organizer}`
+      : key === 'meetings.meetingStatus.startedAt'
+        ? `Started at ${substitutions?.time}`
+        : key;
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForNotificationTest}),
 );
@@ -66,6 +76,7 @@ describe('MeetingNotificationCard', () => {
       kind: MeetingNotificationKind.UPDATE,
       meetingTitle: 'meeting Title',
       qualifiedId,
+      qualifiedCreator,
       meetingStartTime,
     },
     {
@@ -105,20 +116,24 @@ describe('MeetingNotificationCard', () => {
       notification.kind === MeetingNotificationKind.INVITE ||
       notification.kind === MeetingNotificationKind.CANCELLED
     ) {
-      expect(card).toHaveTextContent(`creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
+      expect(card).toHaveTextContent(`By creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
     }
 
     if (notification.kind === MeetingNotificationKind.UPDATE) {
-      expect(card).toHaveTextContent('meetings.notifications.newTime');
+      expect(card).toHaveTextContent(`By creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
+      expect(card).not.toHaveTextContent('meetings.notifications.newTime');
     }
 
     if (notification.kind === MeetingNotificationKind.ONGOING) {
-      expect(card).toHaveTextContent('creator-id');
-      expect(card).toHaveTextContent('meetings.meetingStatus.startedAt');
-      expect(screen.getByText('meetings.meetingStatus.startedAt')).toHaveStyle({color: 'var(--accent-color)'});
+      expect(card).toHaveTextContent('By creator-id');
+      expect(card).toHaveTextContent(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`);
+      expect(screen.getByText(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`)).toHaveStyle({
+        color: 'var(--accent-color)',
+      });
     }
 
     if (notification.kind === MeetingNotificationKind.CANCELLED) {
+      expect(card).toHaveTextContent('By creator-id');
       expect(screen.queryByRole('button', {name: 'meetings.notifications.view'})).not.toBeInTheDocument();
     } else {
       expect(screen.getByRole('button', {name: 'meetings.notifications.view'})).toBeInTheDocument();
@@ -137,7 +152,9 @@ describe('MeetingNotificationCard', () => {
         onDismiss={jest.fn()}
       />,
     );
-    expect(screen.getByText('meetings.meetingStatus.startedAt')).toHaveStyle({color: 'var(--accent-color)'});
+    expect(screen.getByText(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`)).toHaveStyle({
+      color: 'var(--accent-color)',
+    });
   });
 
   it('omits View for canceled cards and dismisses every variant', () => {
@@ -189,7 +206,9 @@ describe('MeetingNotificationCard', () => {
       />,
     );
 
-    expect(screen.getByRole('listitem')).toHaveTextContent(`creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`);
+    expect(screen.getByRole('listitem')).toHaveTextContent(
+      `By creator-id • ${formatLocale(meetingStartTime, 'PP, p')}`,
+    );
   });
 
   it('renders an apostrophe in the meeting title instead of an HTML entity', () => {
@@ -214,5 +233,37 @@ describe('MeetingNotificationCard', () => {
     const card = screen.getByRole('listitem');
     expect(card).toHaveTextContent("Invitation: Cleopatra's meeting");
     expect(card).not.toHaveTextContent('&#x27;');
+  });
+
+  it('renders special characters in the organizer name without encoding them', () => {
+    setStrings({en});
+    const user = new User(qualifiedCreator.id, qualifiedCreator.domain, translate);
+    user.name(specialCharacterName);
+    const userState = container.resolve(UserState);
+    const previousUsers = userState.users();
+    userState.users([user]);
+
+    try {
+      render(
+        <ThemeProvider>
+          <MeetingNotificationCard
+            id="notification-invite"
+            kind={MeetingNotificationKind.INVITE}
+            meetingTitle="Meeting Title"
+            qualifiedId={qualifiedId}
+            qualifiedCreator={qualifiedCreator}
+            meetingStartTime={meetingStartTime}
+            onDismiss={jest.fn()}
+          />
+        </ThemeProvider>,
+        {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
+      );
+
+      const card = screen.getByRole('listitem');
+      expect(card).toHaveTextContent(`By ${specialCharacterName} • ${formatLocale(meetingStartTime, 'PP, p')}`);
+      expect(card).not.toHaveTextContent(/&quot;|&#x27;|&lt;|&gt;|&amp;/);
+    } finally {
+      userState.users(previousUsers);
+    }
   });
 });

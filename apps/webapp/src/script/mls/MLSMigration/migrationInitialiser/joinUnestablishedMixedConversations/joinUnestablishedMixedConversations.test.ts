@@ -25,11 +25,18 @@ import {MixedConversation} from 'Repositories/conversation/ConversationSelectors
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/coreSingleton';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';
 import {translateForTest} from 'Util/test/translateForTest';
+
+function getConversationServiceForTest(core: Core): NonNullable<NonNullable<Core['service']>['conversation']> {
+  const service = requireValueForTest(core.service);
+
+  return requireValueForTest(service.conversation);
+}
 
 const createMixedConversation = (mockGroupId: string, epoch = 5): MixedConversation => {
   const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED, translateForTest);
@@ -58,7 +65,7 @@ describe('joinUnestablishedMixedConversations', () => {
     // Use the exact same core instance the repository was constructed with to avoid mismatched spies
     const repositoryCore = (mockedConversationRepository as any).core as Core; // core is a private ctor arg
 
-    jest.spyOn(repositoryCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
+    jest.spyOn(getConversationServiceForTest(repositoryCore), 'mlsGroupExistsLocally').mockImplementation(groupId => {
       return Promise.resolve(!groupId.includes('unestablished'));
     });
 
@@ -67,7 +74,7 @@ describe('joinUnestablishedMixedConversations', () => {
       .mockResolvedValue(task.fromResult(result.ok(1)));
 
     // Spy on joinByExternalCommit of the repository's core instance
-    const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');
+    const joinSpy = jest.spyOn(getConversationServiceForTest(repositoryCore), 'joinByExternalCommit');
     jest
       .spyOn(
         (mockedConversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
@@ -99,7 +106,7 @@ describe('joinUnestablishedMixedConversations', () => {
     const selfUser = new User(createUuid(), 'domain', translateForTest);
     const mockedConversationRepository = await testFactory.exposeConversationActors();
     const repositoryCore = (mockedConversationRepository as any).core as Core;
-    jest.spyOn(repositoryCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
+    jest.spyOn(getConversationServiceForTest(repositoryCore), 'mlsGroupExistsLocally').mockImplementation(groupId => {
       return Promise.resolve(!groupId.includes('unestablished'));
     });
     jest.spyOn(mockedConversationRepository, 'tryEstablishingMLSGroup');

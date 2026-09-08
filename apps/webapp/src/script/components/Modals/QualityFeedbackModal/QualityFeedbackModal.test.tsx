@@ -85,10 +85,9 @@ describe('QualityFeedbackModal', () => {
       callingRepository = injectedCallingRepository;
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
-      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
 
       call = new Call(
-        selfUserId,
+        user.qualifiedId,
         conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,

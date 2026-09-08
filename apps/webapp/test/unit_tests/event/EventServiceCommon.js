@@ -18,6 +18,7 @@
  */
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
+import {noop} from 'noop-esm';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {ConversationError} from 'src/script/error/conversationError';
 import {StorageError} from 'src/script/error/storageError';
@@ -76,7 +77,7 @@ const testEventServiceClass = (testedServiceName, className) => {
           return eventService
             .loadEvent(...args)
             .then(() => fail('should have thrown'))
-            .catch(() => {});
+            .catch(noop);
         });
         return Promise.all(promises);
       });

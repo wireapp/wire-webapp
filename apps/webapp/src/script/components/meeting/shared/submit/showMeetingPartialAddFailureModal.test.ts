@@ -89,7 +89,7 @@ describe('formatMeetingPartialAddFailureMessage', () => {
     expect(message).toContain('2 participants');
     expect(message).toContain('Alice');
     expect(message).toContain('Bob');
-    expect(message).toContain('MLS-capable clients');
+    expect(message).toContain('devices that are MLS-capable');
   });
 });
 

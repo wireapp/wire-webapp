@@ -155,7 +155,7 @@ describe('toBase64', () => {
     };
 
     const arrayBufferView = bazinga64.Converter.jsonToArrayBufferView(json);
-    const arrayBuffer = arrayBufferView.buffer;
+    const arrayBuffer = arrayBufferView.buffer as ArrayBuffer;
     const encoded = bazinga64.Encoder.toBase64(arrayBuffer);
     const expected =
       'owABARn//wKiAKEAWEDEX0UODINkYDHbu76tv17jYQX9SBtvclYEQ7765c26Xd9g90BBZTorb+oHtgqPUJ2PDKWb/XXcQbDiUEenRWUlAaEAWCDfYPdAQWU6K2/qB7YKj1Cdjwylm/113EGw4lBHp0VlJQ==';

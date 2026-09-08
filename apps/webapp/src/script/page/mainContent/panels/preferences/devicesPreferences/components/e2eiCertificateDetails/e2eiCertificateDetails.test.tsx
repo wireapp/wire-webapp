@@ -20,6 +20,7 @@
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {User} from 'Repositories/entity/User';
@@ -29,6 +30,7 @@ import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
@@ -47,7 +49,7 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
     notAfter: BigInt(0),
     notBefore: BigInt(0),
     serialNumber: '',
-    [Symbol.dispose]: () => {},
+    [Symbol.dispose]: noop,
   },
   credentialType,
   deviceId: '',
@@ -66,7 +68,7 @@ describe('E2EICertificateDetails', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeAll(async () => {
-    jest.spyOn(core.service?.conversation!, 'getMLSSelfConversation').mockResolvedValue(
+    jest.spyOn(requireValueForTest(core.service?.conversation), 'getMLSSelfConversation').mockResolvedValue(
       generateAPIConversation({
         id: {id: 'id', domain: 'domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,

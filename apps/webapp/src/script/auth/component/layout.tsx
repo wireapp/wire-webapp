@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {WavesPattern} from '@wireapp/react-ui-kit/lib/Images/WavesPattern';
+import {WavesPattern} from '@wireapp/react-ui-kit/lib/images/wavesPattern';
 
 import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
 

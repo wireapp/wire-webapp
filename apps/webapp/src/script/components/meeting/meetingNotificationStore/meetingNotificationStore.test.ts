@@ -42,6 +42,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
+      qualifiedCreator,
       meetingStartTime,
     });
     addNotification({
@@ -62,6 +63,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
+      qualifiedCreator,
       meetingStartTime,
     });
     addNotification({
@@ -125,6 +127,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
+      qualifiedCreator,
       meetingStartTime,
     });
     store.addNotification({
@@ -164,6 +167,7 @@ describe('useMeetingNotificationStore', () => {
         kind: MeetingNotificationKind.UPDATE,
         qualifiedId,
         meetingTitle: 'Updated meeting',
+        qualifiedCreator,
         meetingStartTime,
       },
       {
@@ -226,6 +230,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
+      qualifiedCreator,
       meetingStartTime,
     });
     store.addNotification({
@@ -239,6 +244,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId: otherMeetingId,
       meetingTitle: 'Other meeting',
+      qualifiedCreator,
       meetingStartTime,
     });
     store.addNotification({
@@ -269,6 +275,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
+      qualifiedCreator,
       meetingStartTime,
     });
     store.setIsExpanded(true);

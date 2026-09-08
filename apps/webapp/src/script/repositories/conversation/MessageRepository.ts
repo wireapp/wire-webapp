@@ -178,6 +178,15 @@ export class MessageRepository {
   private isBlockingNotificationHandling: boolean;
   private onClientMismatch?: ClientMismatchHandlerFn;
 
+  private get coreServices() {
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+
+    return coreServices;
+  }
+
   constructor(
     private readonly conversationRepositoryProvider: () => ConversationRepository,
     private readonly cryptography_repository: CryptographyRepository,
@@ -205,7 +214,7 @@ export class MessageRepository {
   }
 
   private get conversationService() {
-    return this.core.service!.conversation;
+    return this.coreServices.conversation;
   }
 
   private initSubscriptions(): void {
@@ -588,7 +597,7 @@ export class MessageRepository {
         {
           ...textPayload,
           linkPreview: linkPreview.image
-            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(
+            ? await this.coreServices.linkPreview.uploadLinkPreviewImage(
                 linkPreview as LinkPreviewContent,
                 conversationId,
                 isAuditLogEnabled,
@@ -1030,10 +1039,14 @@ export class MessageRepository {
         }
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+        const selfUser = this.userState.self();
+        if (isUndefined(selfUser)) {
+          throw new Error('No self user found, cannot send message optimistically');
+        }
         const optimisticEvent = EventBuilder.buildMessageAdd({
           conversationEntity: conversation,
           currentTimestamp,
-          senderId: this.userState.self()!.id,
+          senderId: selfUser.id,
           clientId,
         });
         this.trackContributed(conversation, payload);
@@ -1313,7 +1326,15 @@ export class MessageRepository {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = options.targetedUsers || conversation.allUserEntities().map(user => user!.qualifiedId);
+      const userIds =
+        options.targetedUsers ??
+        conversation.allUserEntities().map(user => {
+          if (isUndefined(user)) {
+            throw new Error('Conversation member list contains an empty user');
+          }
+
+          return user.qualifiedId;
+        });
       const payload = MessageBuilder.buildDeleteMessage({
         messageId: message.id,
       });

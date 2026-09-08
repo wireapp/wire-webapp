@@ -18,6 +18,11 @@
  */
 
 import {getConnectionQualityHander} from './';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+
+function getAvailableConnectionQualityHandlerForTest(): NonNullable<ReturnType<typeof getConnectionQualityHander>> {
+  return requireValueForTest(getConnectionQualityHander());
+}
 
 describe('connectionQualityListener', () => {
   let originalNavigator: any;
@@ -44,33 +49,33 @@ describe('connectionQualityListener', () => {
   });
 
   it('should initialize the handler if navigator.connection is supported', () => {
-    const handler = getConnectionQualityHander();
+    const handler = getAvailableConnectionQualityHandlerForTest();
     expect(handler).not.toBeNull();
-    expect(typeof handler!.refresh).toBe('function');
-    expect(typeof handler!.subscribe).toBe('function');
+    expect(typeof handler.refresh).toBe('function');
+    expect(typeof handler.subscribe).toBe('function');
   });
 
   it.each(['slow-2g', '2g', '3g'])('should detect slow connections correctly', (quality: string) => {
     mockConnection.effectiveType = quality;
-    const handler = getConnectionQualityHander();
+    const handler = getAvailableConnectionQualityHandlerForTest();
     const callback = jest.fn();
-    handler!.refresh(callback);
+    handler.refresh(callback);
     expect(callback).toHaveBeenCalledWith(true);
   });
 
   it('should detect stable correctly', () => {
     mockConnection.effectiveType = '4g';
-    const handler = getConnectionQualityHander();
+    const handler = getAvailableConnectionQualityHandlerForTest();
     const callback = jest.fn();
-    handler!.refresh(callback);
+    handler.refresh(callback);
     expect(callback).toHaveBeenCalledWith(false);
   });
 
   it('should call the callback on connection change', () => {
-    const handler = getConnectionQualityHander();
+    const handler = getAvailableConnectionQualityHandlerForTest();
     const callback = jest.fn();
 
-    handler!.subscribe(callback);
+    handler.subscribe(callback);
     expect(callback).toHaveBeenCalled();
 
     const changeEvent = new Event('change');
@@ -84,9 +89,9 @@ describe('connectionQualityListener', () => {
   });
 
   it('should unsubscribe properly', () => {
-    const handler = getConnectionQualityHander();
+    const handler = getAvailableConnectionQualityHandlerForTest();
     const callback = jest.fn();
-    const unsubscribe = handler!.subscribe(callback);
+    const unsubscribe = handler.subscribe(callback);
 
     unsubscribe();
 
@@ -95,10 +100,10 @@ describe('connectionQualityListener', () => {
 
   it('should refresh the connection quality periodically', () => {
     jest.useFakeTimers();
-    const handler = getConnectionQualityHander();
+    const handler = getAvailableConnectionQualityHandlerForTest();
     const callback = jest.fn();
 
-    handler!.subscribe(callback);
+    handler.subscribe(callback);
 
     jest.advanceTimersByTime(60000);
     expect(callback).toHaveBeenCalledTimes(2); // Initial call + 1 refresh

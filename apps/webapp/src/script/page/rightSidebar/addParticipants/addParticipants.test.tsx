@@ -218,13 +218,13 @@ describe('AddParticipants', () => {
       withThemeAndRootContext(
         <AddParticipants
           activeConversation={createActiveConversation()}
-          conversationRepository={conversationRepositoryDouble as ConversationRepository}
-          integrationRepository={integrationRepositoryDouble as IntegrationRepository}
+          conversationRepository={conversationRepositoryDouble as unknown as ConversationRepository}
+          integrationRepository={integrationRepositoryDouble as unknown as IntegrationRepository}
           onBack={jest.fn()}
           onClose={jest.fn()}
-          searchRepository={searchRepositoryDouble as SearchRepository}
+          searchRepository={searchRepositoryDouble as unknown as SearchRepository}
           selfUser={selfUser}
-          teamRepository={teamRepositoryDouble as TeamRepository}
+          teamRepository={teamRepositoryDouble as unknown as TeamRepository}
           teamState={teamStateDouble as TeamState}
           togglePanel={jest.fn()}
           userState={userStateDouble as UserState}

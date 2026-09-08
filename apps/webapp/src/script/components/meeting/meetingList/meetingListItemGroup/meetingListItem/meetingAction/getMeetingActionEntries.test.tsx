@@ -38,6 +38,7 @@ const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => 
   qualified_id: {id: 'meeting-id', domain: 'example.com'},
   qualified_creator: {id: 'host-id', domain: 'example.com'},
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
   ...overrides,
 });
 
@@ -97,8 +98,8 @@ describe('getMeetingActionEntries', () => {
     expect(getEntryLabels(entries)).not.toContain('meetings.action.startMeeting');
   });
 
-  it.each([futureNowMilliseconds, ongoingNowMilliseconds])(
-    'includes Join now for upcoming and ongoing meetings',
+  it.each([futureNowMilliseconds, ongoingNowMilliseconds, pastNowMilliseconds])(
+    'includes Join now for upcoming, ongoing, and completed meetings',
     nowMilliseconds => {
       const onJoin = jest.fn();
       const entries = getMeetingActionEntries({
@@ -115,6 +116,7 @@ describe('getMeetingActionEntries', () => {
 
       const joinEntry = getJoinEntry(entries);
       expect(joinEntry).toBeDefined();
+      expect(joinEntry?.isDisabled).toBe(false);
       joinEntry?.click?.();
       expect(onJoin).toHaveBeenCalledTimes(1);
     },
@@ -150,7 +152,7 @@ describe('getMeetingActionEntries', () => {
     expect(getEditEntryLabel(entries)).toBeUndefined();
   });
 
-  it('omits Edit meeting when the instance has started', () => {
+  it('includes Edit meeting when the instance is ongoing', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -162,7 +164,7 @@ describe('getMeetingActionEntries', () => {
       onDeleteForMe: noop,
     });
 
-    expect(getEditEntryLabel(entries)).toBeUndefined();
+    expect(getEditEntryLabel(entries)).toBeDefined();
   });
 
   it('omits Edit meeting when the instance is in the past', () => {
@@ -281,7 +283,7 @@ describe('getMeetingActionEntries', () => {
 
     expect(getDeleteForAllEntryLabel(entries)).toBeDefined();
     expect(getDeleteForMeEntryLabel(entries)).toBeUndefined();
-    expect(getJoinEntry(entries)).toBeUndefined();
+    expect(getJoinEntry(entries)).toBeDefined();
   });
 
   it('includes Delete meeting for me for a participant when the instance is in the past', () => {
@@ -298,7 +300,7 @@ describe('getMeetingActionEntries', () => {
 
     expect(getDeleteForMeEntryLabel(entries)).toBeDefined();
     expect(getDeleteForAllEntryLabel(entries)).toBeUndefined();
-    expect(getJoinEntry(entries)).toBeUndefined();
+    expect(getJoinEntry(entries)).toBeDefined();
   });
 
   it('keeps Join now visible but disables it while joining or in a call', () => {

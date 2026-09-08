@@ -42,8 +42,8 @@ jest.mock('tsyringe', () => ({
       promoteNodeDraft: mockPromoteNodeDraft,
     })),
   },
-  singleton: () => () => {},
-  injectable: () => () => {},
+  singleton: jest.fn(() => jest.fn()),
+  injectable: jest.fn(() => jest.fn()),
 }));
 
 jest.mock('Util/util', () => ({

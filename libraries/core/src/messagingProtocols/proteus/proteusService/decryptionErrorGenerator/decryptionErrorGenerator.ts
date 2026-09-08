@@ -35,6 +35,8 @@ export const ProteusErrors = {
   RemoteIdentityChanged: 204,
   InvalidSignature: 207,
   DuplicateMessage: 209,
+  TooDistantFuture: 212,
+  PreKeyMessageUnMatchedSignature: 406,
   Unknown: 999,
 } as const;
 
@@ -62,7 +64,9 @@ function getErrorCode(error: unknown): number {
   }
 
   if (isProteusError(error, ProteusErrorType.Other)) {
-    return ProteusErrors.Unknown;
+    return typeof error.context.context.errorCode === 'number'
+      ? error.context.context.errorCode
+      : ProteusErrors.Unknown;
   }
 
   if (hasProteusErrorCode(error)) {

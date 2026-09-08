@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {MeetingCancellationOptions} from 'Components/meeting/meetingNotificationEventHandlers';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
@@ -32,6 +33,7 @@ export type SubscribeToMeetingLifecycleEventsDependencies = {
   getSelfUserQualifiedId: () => QualifiedId;
   notifyMeetingChange: (meeting: MeetingSeries) => void;
   notifyUpdate: (meeting: MeetingSeries) => void;
+  onMeetingCancelled: (meetingId: QualifiedId, options?: MeetingCancellationOptions) => void;
 };
 
 /**
@@ -43,6 +45,7 @@ export const subscribeToMeetingLifecycleEvents = ({
   getSelfUserQualifiedId,
   notifyMeetingChange,
   notifyUpdate,
+  onMeetingCancelled,
 }: SubscribeToMeetingLifecycleEventsDependencies): (() => void) => {
   const onMeetingCreated = (meetingId: QualifiedId) => {
     dispatcher.enqueueMeetingSync(meetingId);
@@ -66,7 +69,11 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingSync(meetingId, notifyMeetingChange);
   };
 
-  const onMeetingDeleted = (meetingId: QualifiedId) => {
+  const onMeetingDeleted = (meetingId: QualifiedId, actorId: QualifiedId) => {
+    onMeetingCancelled(meetingId, {
+      notify: !matchQualifiedIds(actorId, getSelfUserQualifiedId()),
+    });
+
     dispatcher.enqueueMeetingRemoval(meetingId);
   };
 

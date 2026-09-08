@@ -20,6 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
@@ -213,7 +214,7 @@ export class CallingViewModel {
             text: this.translate('conversation.E2EICallAnyway'),
           },
           secondaryAction: {
-            action: () => {},
+            action: noop,
             text: this.translate('conversation.E2EICancel'),
           },
           text: {

@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, RenderResult} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {AccountForm} from './accountForm';
 
@@ -35,7 +36,7 @@ describe('when entering account data', () => {
   describe('the submit button', () => {
     it('is disabled if input is insufficient', () => {
       wrapper = mountComponent(
-        <AccountForm onSubmit={() => {}} />,
+        <AccountForm onSubmit={noop} />,
         mockStoreFactory()({
           ...initialRootState,
           authState: {
@@ -53,7 +54,7 @@ describe('when entering account data', () => {
 
     it('is enabled when data is prefilled', () => {
       wrapper = mountComponent(
-        <AccountForm onSubmit={() => {}} />,
+        <AccountForm onSubmit={noop} />,
         mockStoreFactory()({
           ...initialRootState,
           authState: {
@@ -77,7 +78,7 @@ describe('when entering account data', () => {
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       wrapper = mountComponent(
-        <AccountForm onSubmit={() => {}} />,
+        <AccountForm onSubmit={noop} />,
         mockStoreFactory()({
           ...initialRootState,
           authState: {
@@ -107,7 +108,7 @@ describe('when entering account data', () => {
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       wrapper = mountComponent(
-        <AccountForm onSubmit={() => {}} />,
+        <AccountForm onSubmit={noop} />,
         mockStoreFactory()({
           ...initialRootState,
           authState: {

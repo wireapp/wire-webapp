@@ -17,8 +17,12 @@
  *
  */
 
-export function randomArrayElement<T>(array: T[]): T {
-  return array[randomInt(array.length - 1)]!;
+import {isUndefined} from '@sindresorhus/is';
+
+export function randomArrayElement<T>(array: T[]): T | undefined {
+  const randomElement = array[randomInt(array.length - 1)];
+
+  return isUndefined(randomElement) ? undefined : randomElement;
 }
 
 export function randomInt(max: number): number {

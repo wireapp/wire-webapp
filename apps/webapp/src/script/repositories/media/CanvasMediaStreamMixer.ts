@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 // Canvas configuration
 const DEFAULT_CANVAS_WIDTH = 1920;
 const DEFAULT_CANVAS_HEIGHT = 1080;
@@ -58,21 +60,29 @@ export class CanvasMediaStreamMixer {
     this.canvas.style.display = 'none';
     document.body.appendChild(this.canvas);
 
-    this.context = this.canvas.getContext('2d', {
+    const context = this.canvas.getContext('2d', {
       alpha: false,
       desynchronized: true,
       willReadFrequently: false,
-    })!;
+    });
+    if (isNullOrUndefined(context)) {
+      throw new Error('Unable to create the canvas drawing context');
+    }
+    this.context = context;
 
     this.context.imageSmoothingEnabled = true;
     this.context.imageSmoothingQuality = 'high';
 
     // Create temp canvas for better performance
     this.tempCanvas = document.createElement('canvas');
-    this.tempContext = this.tempCanvas.getContext('2d', {
+    const tempContext = this.tempCanvas.getContext('2d', {
       alpha: false,
       desynchronized: true,
-    })!;
+    });
+    if (isNullOrUndefined(tempContext)) {
+      throw new Error('Unable to create the temporary canvas drawing context');
+    }
+    this.tempContext = tempContext;
   }
 
   async startMixing(screenShare: MediaStream, camera: MediaStream): Promise<MediaStream> {

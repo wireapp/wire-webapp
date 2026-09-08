@@ -45,6 +45,7 @@ import {GuestServicesOptions} from './guestServicesOptions';
 import {MessageDetails} from './messageDetails';
 import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
+import {SharedDrive} from './sharedDrive';
 import {TimedMessages} from './timedMessages';
 
 import {isReadableMessage} from '../../guards/Message';
@@ -77,6 +78,7 @@ export enum PanelState {
   NOTIFICATIONS = 'NOTIFICATIONS',
   PARTICIPANT_DEVICES = 'DEVICES',
   SERVICES_OPTIONS = 'SERVICES_OPTIONS',
+  SHARED_DRIVE = 'SHARED_DRIVE',
   TIMED_MESSAGES = 'TIMED_MESSAGES',
   ACCESS = 'ACCESS',
   CONVERSATION_HISTORY = 'CONVERSATION_HISTORY',
@@ -262,6 +264,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onClose={closePanel}
               onGoBack={onBackClick}
             />
+          )}
+
+          {currentState === PanelState.SHARED_DRIVE && (
+            <SharedDrive activeConversation={activeConversation} onClose={closePanel} onBack={onBackClick} />
           )}
 
           {(currentState === PanelState.GUEST_OPTIONS || currentState === PanelState.SERVICES_OPTIONS) && (

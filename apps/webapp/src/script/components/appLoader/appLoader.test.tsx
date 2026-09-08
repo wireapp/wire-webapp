@@ -18,6 +18,7 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {User} from 'Repositories/entity/User';
 
@@ -27,8 +28,8 @@ import {translateForTest} from 'Util/test/translateForTest';
 describe('AppLoader', () => {
   it('triggers loading of the app once mounted', async () => {
     jest.useFakeTimers();
-    let nextStep: (message: string) => void = () => {};
-    let done: () => void = () => {};
+    let nextStep: (message: string) => void = noop;
+    let done: () => void = noop;
     const init = jest.fn(async (onProgress: (m: string) => void) => {
       nextStep = (message: string) => onProgress(message);
       return new Promise<User>(resolve => (done = () => resolve(new User('', '', translateForTest))));

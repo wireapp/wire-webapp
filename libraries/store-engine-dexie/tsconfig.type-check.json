@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node", "jest"],
+    "noUncheckedIndexedAccess": false,
+    "rootDir": "..",
+    "baseUrl": ".",
+    "paths": {
+      "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
+      "@wireapp/store-engine/lib/*": ["../store-engine/src/*"],
+      "@wireapp/store-engine": ["../store-engine/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "lib"]
+}

@@ -18,6 +18,7 @@
  */
 
 import {Maybe, maybe} from 'true-myth';
+import {noop} from 'noop-esm';
 
 import {createStringKeyValueStorageFromWebStorage} from './createStringKeyValueStorageFromWebStorage';
 
@@ -82,7 +83,7 @@ function createThrowingWebStorage(throwingOperation: ThrowingWebStorageOperation
     get length(): number {
       return 0;
     },
-    clear: (): void => {},
+    clear: noop,
     getItem: () => {
       if (throwingOperation === 'getItem') {
         throw new Error('Storage getItem failed');

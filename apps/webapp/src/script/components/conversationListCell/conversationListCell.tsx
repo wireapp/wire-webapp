@@ -26,6 +26,7 @@ import React, {
 } from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 
@@ -120,6 +121,7 @@ export const ConversationListCell = ({
 
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const isActive = isSelected(conversation);
+  const firstUserEntity = conversation.firstUserEntity();
 
   const conversationRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLButtonElement>(null);
@@ -273,8 +275,8 @@ export const ConversationListCell = ({
         </div>
 
         <div className="conversation-list-cell-center">
-          {is1to1 ? (
-            <UserInfo user={conversation.firstUserEntity()!} isActive={isActive}>
+          {is1to1 && !isUndefined(firstUserEntity) ? (
+            <UserInfo user={firstUserEntity} isActive={isActive}>
               {isConversationWithBlockedUser && <UserBlockedBadge />}
             </UserInfo>
           ) : (

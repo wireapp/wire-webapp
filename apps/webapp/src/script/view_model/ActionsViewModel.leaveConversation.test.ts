@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 
@@ -106,7 +105,7 @@ describe('ActionsViewModel.leaveConversation', () => {
   beforeEach(() => {
     mockShow = jest.fn();
     jest.spyOn(useLeaveGroupAdminModalStore, 'getState').mockReturnValue({show: mockShow} as any);
-    jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {});
+    jest.spyOn(PrimaryModal, 'show').mockReturnValue(undefined);
   });
 
   afterEach(() => jest.restoreAllMocks());

@@ -18,6 +18,7 @@
  */
 
 import {User} from 'Repositories/entity/User';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {defaultAudioOutputId, mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/userState';
 import {createUuid} from 'Util/uuid';
@@ -111,6 +112,8 @@ describe('MediaConstraintsHandler', () => {
         false,
       ) as ExtendedMediaTrackConstraints;
 
+      assertNotNullOrUndefined(constraints.audio.deviceId);
+      assertNotNullOrUndefined(constraints.video.deviceId);
       expect(constraints.audio.deviceId.exact).toBe('mic');
       expect(constraints.video.deviceId.exact).toBe('camera1');
     });
@@ -234,6 +237,7 @@ describe('MediaConstraintsHandler', () => {
 
         const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
 
+        assertNotNullOrUndefined(constraints.audio.deviceId);
         expect(constraints.audio.deviceId.exact).toBe('specific-mic-id');
       });
 
@@ -314,6 +318,7 @@ describe('MediaConstraintsHandler', () => {
 
         const constraints = constraintsHandler.getMediaStreamConstraints(false, true) as ExtendedMediaTrackConstraints;
 
+        assertNotNullOrUndefined(constraints.video.deviceId);
         expect(constraints.video.deviceId.exact).toBe('webcam-123');
         expect(constraints.video.facingMode).toBeUndefined();
       });

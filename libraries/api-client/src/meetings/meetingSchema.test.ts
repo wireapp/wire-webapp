@@ -17,6 +17,8 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {
   ADD_PERMISSION,
   CONVERSATION_ACCESS,
@@ -40,7 +42,7 @@ describe('meetingSchema', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    trial: false,
+    tzid: 'Europe/Berlin',
   };
 
   const validMeetingConversation = {
@@ -215,6 +217,27 @@ describe('meetingSchema', () => {
 
   it('accepts a valid meeting payload', () => {
     expect(meetingSchema.safeParse(validMeeting).success).toBe(true);
+  });
+
+  it('requires tzid on meeting payloads', () => {
+    const {tzid: _tzid, ...meetingWithoutTzid} = validMeeting;
+
+    expect(meetingSchema.safeParse(meetingWithoutTzid).success).toBe(false);
+  });
+
+  it('rejects a list item that has trial but no tzid', () => {
+    const {tzid: _tzid, ...meetingWithoutTzid} = validMeeting;
+
+    expect(meetingsListResponseSchema.safeParse([{...meetingWithoutTzid, trial: false}]).success).toBe(false);
+  });
+
+  it('strips deprecated trial and keeps tzid on a V17 payload', () => {
+    const result = meetingSchema.safeParse({...validMeeting, trial: false});
+
+    assert(result.success);
+
+    expect(result.data.tzid).toBe('Europe/Berlin');
+    expect(result.data).not.toHaveProperty('trial');
   });
 
   it('accepts optional recurrence and strips unknown backend fields', () => {

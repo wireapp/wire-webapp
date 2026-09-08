@@ -17,9 +17,12 @@
  *
  */
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {waitFor} from '@testing-library/react';
 
-import {configureRoutes, navigate, setHistoryParam} from './Router';
+import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+
+import {configureRouterWallClock, configureRoutes, navigate, setHistoryParam} from './Router';
 
 describe('Router', () => {
   afterEach(() => {
@@ -60,6 +63,21 @@ describe('Router', () => {
 
       expect(routes.user).toHaveBeenCalled();
     });
+
+    it('evaluates an unchanged conversation route only once', () => {
+      const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+      configureRouterWallClock(deterministicWallClock);
+
+      window.location.hash = '#/conversation/conversation-id';
+      const conversationRoute = jest.fn();
+      configureRoutes({'/conversation/:id': conversationRoute});
+      conversationRoute.mockClear();
+
+      navigate('/conversation/conversation-id');
+      deterministicWallClock.advanceByMilliseconds(0);
+
+      expect(conversationRoute).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('hash change event listener', () => {
@@ -90,6 +108,87 @@ describe('Router', () => {
 
       setHistoryParam('/test-path');
       expect(window.location.hash).toBe('#/test-path');
+    });
+
+    it('forces route re-evaluation when the hash is already at the target path', () => {
+      const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+      configureRouterWallClock(deterministicWallClock);
+
+      const routes = {'/': jest.fn()};
+      configureRoutes(routes);
+      routes['/'].mockClear();
+      window.location.hash = '#/';
+
+      // Hash is already '/', so the browser won't fire a native hashchange event -
+      // setHistoryParam must force route re-evaluation itself.
+      setHistoryParam('/');
+      expect(routes['/']).not.toHaveBeenCalled();
+
+      deterministicWallClock.advanceByMilliseconds(0);
+      expect(routes['/']).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not force route re-evaluation when the hash actually changes', () => {
+      const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+      configureRouterWallClock(deterministicWallClock);
+
+      const routes = {'/': jest.fn(), '/other': jest.fn()};
+      configureRoutes(routes);
+      routes['/'].mockClear();
+
+      setHistoryParam('/other');
+
+      deterministicWallClock.advanceByMilliseconds(0);
+      expect(routes['/']).not.toHaveBeenCalled();
+    });
+
+    it('does not force route re-evaluation for an unchanged conversation hash', () => {
+      const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+      configureRouterWallClock(deterministicWallClock);
+
+      const conversationRoute = jest.fn();
+      configureRoutes({'/conversation/:id': conversationRoute});
+      window.location.hash = '#/conversation/conversation-id';
+      conversationRoute.mockClear();
+
+      setHistoryParam('/conversation/conversation-id');
+      deterministicWallClock.advanceByMilliseconds(0);
+
+      expect(conversationRoute).not.toHaveBeenCalled();
+    });
+
+    it('skips deferred root re-evaluation if the sidebar leaves the conversation list', () => {
+      const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+      configureRouterWallClock(deterministicWallClock);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.RECENT);
+
+      const rootRoute = jest.fn();
+      configureRoutes({'/': rootRoute});
+      rootRoute.mockClear();
+      window.location.hash = '#/';
+
+      setHistoryParam('/');
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.CONNECT);
+      deterministicWallClock.advanceByMilliseconds(0);
+
+      expect(rootRoute).not.toHaveBeenCalled();
+    });
+
+    it('does not evaluate the unchanged root route twice through navigate', () => {
+      const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+      configureRouterWallClock(deterministicWallClock);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.RECENT);
+
+      const rootRoute = jest.fn();
+      configureRoutes({'/': rootRoute});
+      rootRoute.mockClear();
+      window.location.hash = '#/';
+
+      navigate('/');
+      expect(rootRoute).not.toHaveBeenCalled();
+
+      deterministicWallClock.advanceByMilliseconds(0);
+      expect(rootRoute).toHaveBeenCalledTimes(1);
     });
   });
 });

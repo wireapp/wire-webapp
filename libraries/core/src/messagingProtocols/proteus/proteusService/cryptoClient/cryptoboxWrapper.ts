@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {PreKey} from '@wireapp/api-client/lib/auth';
 
 import {Cryptobox} from '@wireapp/cryptobox';
@@ -80,10 +81,14 @@ export class CryptoboxWrapper implements CryptoClient {
         return {id: -1, key: ''};
       })
       .filter(serializedPreKey => serializedPreKey.key.length > 0);
+    const lastResortPreKey = this.cryptobox.lastResortPreKey;
+    if (isUndefined(lastResortPreKey)) {
+      throw new Error('The last resort prekey was not created');
+    }
 
     return {
       prekeys,
-      lastPrekey: this.cryptobox.serialize_prekey(this.cryptobox.lastResortPreKey!),
+      lastPrekey: this.cryptobox.serialize_prekey(lastResortPreKey),
     };
   }
 

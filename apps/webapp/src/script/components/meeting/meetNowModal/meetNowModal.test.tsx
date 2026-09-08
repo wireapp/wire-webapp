@@ -51,15 +51,11 @@ import {MeetNowModal} from './meetNowModal';
 import {useMeetNowModal} from './useMeetNowModal';
 
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
+const qualifiedMeetingId = {id: 'meeting-id', domain: 'example.com'};
 
-const createDeferred = <T,>() => {
-  let resolve!: (value: T) => void;
-  const promise = new Promise<T>(resolvePromise => {
-    resolve = resolvePromise;
-  });
-
-  return {promise, resolve};
-};
+function createDeferred<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
+}
 
 const createDeferredMeetNowMeeting = () => {
   const deferred = createDeferred<CreateMeetingSuccess>();
@@ -71,7 +67,9 @@ const createDeferredMeetNowMeeting = () => {
         () => deferred.promise,
       ),
     ),
-    resolveMeetNowMeeting: (value: CreateMeetingSuccess = {failedToAdd: [], qualifiedConversation}) => {
+    resolveMeetNowMeeting: (
+      value: CreateMeetingSuccess = {failedToAdd: [], qualifiedConversation, qualifiedMeetingId},
+    ) => {
       deferred.resolve(value);
     },
   };
@@ -121,6 +119,10 @@ const createMeetingStore = (meetNowMeeting: MeetingStoreState['meetNowMeeting'])
     meetNowMeeting,
     updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+    removeMeetingByQualifiedId: jest.fn(),
+    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
   }));
 
 const setupContainerMocks = () => {

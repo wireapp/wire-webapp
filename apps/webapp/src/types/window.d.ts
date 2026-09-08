@@ -33,6 +33,13 @@ declare global {
     wire: WireModule;
     amplify: amplify.Static;
     showOpenFilePicker: () => Promise<FileSystemFileHandle[]>;
+    desktopAppConfig?: {
+      version: string;
+      regionalLocale?: string;
+      supportsCallingPopoutWindow?: boolean;
+      supportsWebViewRefresh?: boolean;
+      managedConfig?: {applockOverride: boolean};
+    };
     z: any;
   }
 

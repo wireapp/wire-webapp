@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {
   ClientCapability,
@@ -158,10 +159,12 @@ export class ClientService {
   public async synchronizeClients(currentClient: string): Promise<MetaClient[]> {
     const registeredClients = await this.backend.getClients();
     const filteredClients = registeredClients.filter(client => client.id !== currentClient);
-    return this.database.createClientList(
-      {id: this.apiClient.context!.userId, domain: this.apiClient.context!.domain ?? ''},
-      filteredClients,
-    );
+    const context = this.apiClient.context;
+    if (isUndefined(context)) {
+      throw new Error('Context is not set.');
+    }
+
+    return this.database.createClientList({id: context.userId, domain: context.domain ?? ''}, filteredClients);
   }
 
   // TODO: Split functionality into "create" and "register" client

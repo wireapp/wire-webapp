@@ -18,6 +18,7 @@
  */
 
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+import {isUndefined} from '@sindresorhus/is';
 import {AxiosResponse} from 'axios';
 
 import {AuthRepositoryE2E} from './authRepository.e2e';
@@ -193,7 +194,16 @@ export class ApiManagerE2E {
 
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {
     try {
-      return registerResponse.headers['set-cookie']!.find((cookieStr: string) => cookieStr.startsWith('zuid='))!;
+      const cookies = registerResponse.headers['set-cookie'];
+      if (isUndefined(cookies)) {
+        throw new Error('Response did not contain cookies');
+      }
+      const zuidCookie = cookies.find((cookieString: string) => cookieString.startsWith('zuid='));
+      if (isUndefined(zuidCookie)) {
+        throw new Error('Response did not contain a zuid cookie');
+      }
+
+      return zuidCookie;
     } catch (error: unknown) {
       throw new Error(
         `Error extracting zuid cookie from register response: ${error instanceof Error ? error.message : error}`,

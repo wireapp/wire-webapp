@@ -20,12 +20,19 @@
 import {CSSObject} from '@emotion/react';
 
 export const createConversationStepWrapperCss: CSSObject = {
-  height: '456px',
+  height: '480px',
+  minHeight: 0,
+  overflow: 'hidden',
 };
 
 export const createConversationStepRightContainerCss: CSSObject = {
-  margin: '1rem 1.5rem',
+  boxSizing: 'border-box',
   flex: 1,
+  maxHeight: '100%',
+  minHeight: 0,
+  overflowX: 'hidden',
+  overflowY: 'auto',
+  padding: '1rem 1.5rem',
 };
 
 export const participantsSelectionSearchCss = {

@@ -21,12 +21,16 @@ export const applockRefactoredFeatureToggleName = 'applock-refactored';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 export const viewerPermissionFeatureToggleName = 'viewer-permission';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
+export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upload';
+export const reactTranslationRenderingFeatureToggleName = 'react-translation-rendering';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   viewerPermissionFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
+  sharedDriveDirectUploadFeatureToggleName,
+  reactTranslationRenderingFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

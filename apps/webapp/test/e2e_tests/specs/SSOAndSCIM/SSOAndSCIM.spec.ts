@@ -35,11 +35,9 @@ test.describe('SSO and SCIM', () => {
 
   test.beforeEach(async ({createTeam, api}) => {
     // Creating a team and enabling SSO feature.
-    const team = await createTeam('Test Team');
+    const team = await createTeam('Test Team', {features: {sso: true}});
     userA = team.owner;
 
-    await api.team.upgradeTeam(userA.teamId, userA);
-    await api.brig.enableSSOFeature(userA.teamId);
     await api.waitForFeatureToBeEnabled(FEATURE_KEY.SSO, userA.teamId, userA.token);
 
     // Register a Keycloak user. This user will be used to log in via SSO and SCIM.

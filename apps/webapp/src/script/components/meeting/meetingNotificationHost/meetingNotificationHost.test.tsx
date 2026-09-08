@@ -45,7 +45,9 @@ const translateForCountTest: Translate = (_key, substitutions) => {
   return '';
 };
 
-const getHost = () => document.querySelector('[data-uie-name="meeting-notification-host"]');
+const getHost = () => {
+  return document.querySelector('.meeting-notification-host');
+};
 const getList = () => document.getElementById('meeting-notification-list');
 
 const renderHost = (isStandalone = true, translate: Translate = translateForTest) =>
@@ -75,9 +77,13 @@ describe('MeetingNotificationHost', () => {
       qualifiedCreator,
       meetingStartTime,
     });
-    useMeetingNotificationStore
-      .getState()
-      .addNotification({kind: MeetingNotificationKind.UPDATE, qualifiedId, meetingTitle: 'Updated', meetingStartTime});
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
+      meetingTitle: 'Updated',
+      qualifiedCreator,
+      meetingStartTime,
+    });
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.ONGOING,
       qualifiedId,
@@ -144,7 +150,13 @@ describe('MeetingNotificationHost', () => {
       qualifiedCreator,
       meetingStartTime,
     });
-    addNotification({kind: MeetingNotificationKind.UPDATE, qualifiedId, meetingTitle: 'Updated', meetingStartTime});
+    addNotification({
+      kind: MeetingNotificationKind.UPDATE,
+      qualifiedId,
+      meetingTitle: 'Updated',
+      qualifiedCreator,
+      meetingStartTime,
+    });
 
     renderHost();
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
@@ -161,6 +173,26 @@ describe('MeetingNotificationHost', () => {
     fireEvent.click(screen.getAllByRole('button', {name: 'meetings.notifications.dismiss'})[0]);
     expect(screen.getAllByRole('listitem')).toHaveLength(4);
     expect(screen.getAllByText('meetings.notifications.title')).toHaveLength(4);
+  });
+
+  it('collapses when clicking outside while keeping clicks inside active', () => {
+    useMeetingNotificationStore.getState().addNotification({
+      kind: MeetingNotificationKind.INVITE,
+      qualifiedId,
+      meetingTitle: 'Meeting',
+      qualifiedCreator,
+      meetingStartTime,
+    });
+
+    renderHost();
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
+    fireEvent.click(screen.getByRole('listitem'));
+
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(true);
+
+    fireEvent.click(document.body);
+
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(false);
   });
 
   it('dismisses all cards and collapse preserves cards', () => {

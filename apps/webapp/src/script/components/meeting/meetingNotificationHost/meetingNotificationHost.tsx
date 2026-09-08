@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useRef} from 'react';
+
 import {ChevronIcon} from '@wireapp/react-ui-kit';
 
 import {MeetingNotificationCard} from 'Components/meeting/meetingNotificationCard/meetingNotificationCard';
@@ -43,6 +45,30 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
   const {translate} = useApplicationContext();
   const notifications = useMeetingNotificationStore(state => state.notifications);
   const isExpanded = useMeetingNotificationStore(state => state.isExpanded);
+  const hostRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (notifications.length === 0) {
+      return;
+    }
+
+    const collapseWhenClickedOutside = (event: MouseEvent) => {
+      const target = event.target;
+      const isInsideNotificationHost =
+        target instanceof Node &&
+        (hostRef.current?.contains(target) ||
+          (target instanceof Element && target.closest('.meeting-notification-host') !== null));
+
+      if (!(target instanceof Node) || isInsideNotificationHost) {
+        return;
+      }
+
+      useMeetingNotificationStore.getState().setIsExpanded(false);
+    };
+
+    document.addEventListener('click', collapseWhenClickedOutside);
+    return () => document.removeEventListener('click', collapseWhenClickedOutside);
+  }, [notifications.length]);
 
   if (notifications.length === 0) {
     return null;
@@ -50,11 +76,13 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
 
   return (
     <div
+      ref={hostRef}
       css={{
         ...meetingNotificationHostStyles,
         ...(isStandalone ? meetingNotificationHostFallbackStyles : {}),
       }}
       data-uie-name="meeting-notification-host"
+      className="meeting-notification-host"
     >
       <div css={meetingNotificationHostContainerStyles}>
         <div css={meetingNotificationHostHeaderStyles}>

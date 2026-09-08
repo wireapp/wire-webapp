@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
@@ -73,7 +74,12 @@ export class AssetRepository {
   }
 
   get assetCoreService() {
-    return this.core.service!.asset;
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+
+    return coreServices.asset;
   }
 
   public addToProcessQueue(message: GenericMessage, conversationId: string) {
@@ -130,11 +136,12 @@ export class AssetRepository {
     };
 
     if (!isEncryptedAsset) {
-      return this.core.service!.asset.downloadRawAsset(asset.urlData, progressCallback);
+      return this.assetCoreService.downloadRawAsset(asset.urlData, progressCallback);
     }
     const otrKey = asset.otrKey instanceof Uint8Array ? asset.otrKey : Uint8Array.from(Object.values(asset.otrKey));
     const sha256 = asset.sha256 instanceof Uint8Array ? asset.sha256 : Uint8Array.from(Object.values(asset.sha256));
-    return this.core.service!.asset.downloadAsset(asset.urlData, otrKey, sha256, progressCallback);
+
+    return this.assetCoreService.downloadAsset(asset.urlData, otrKey, sha256, progressCallback);
   }
 
   public async download(asset: AssetRemoteData, fileName: string) {

@@ -37,11 +37,12 @@
     "hash.js": "1.1.7",
     "idb": "8.0.3",
     "lodash": "4.18.1",
+    "noop-esm": "1.1.0",
     "p-queue": "9.3.3",
     "true-myth": "9.4.0"
   },
   "devDependencies": {
-    "@swc/core": "1.16.0",
+    "@swc/core": "1.16.2",
     "@swc/jest": "0.2.39",
     "@types/lodash": "4.17.25",
     "commander": "14.0.3",

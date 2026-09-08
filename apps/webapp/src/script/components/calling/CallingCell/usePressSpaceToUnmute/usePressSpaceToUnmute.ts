@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -50,7 +51,10 @@ export const usePressSpaceToUnmute = ({
 
   const {detachedWindow, viewMode} = callState;
 
-  const activeWindow = viewMode() === CallingViewMode.DETACHED_WINDOW ? detachedWindow()! : window;
+  const activeWindow = viewMode() === CallingViewMode.DETACHED_WINDOW ? detachedWindow() : window;
+  if (isNullOrUndefined(activeWindow)) {
+    throw new Error('The detached calling window is not available');
+  }
 
   const micOnNotification = useAppNotification({
     message: notificationMessage,

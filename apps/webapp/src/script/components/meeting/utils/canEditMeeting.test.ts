@@ -38,6 +38,7 @@ const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => 
   qualified_id: {id: 'meeting-id', domain: 'example.com'},
   qualified_creator: {id: 'host-id', domain: 'example.com'},
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
   ...overrides,
 });
 
@@ -76,18 +77,18 @@ describe('canEditMeeting', () => {
     expect(canEditMeeting(meetingInstance, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(false);
   });
 
-  it('returns false when the instance has started', () => {
-    const meetingInstance = createMeetingInstance();
-    const selfUser = createSelfUser();
-
-    expect(canEditMeeting(meetingInstance, selfUser, ONGOING_MEETING_TIMESTAMP)).toBe(false);
-  });
-
-  it('returns false when the instance is in the past', () => {
+  it('returns false when the instance has ended', () => {
     const meetingInstance = createMeetingInstance();
     const selfUser = createSelfUser();
 
     expect(canEditMeeting(meetingInstance, selfUser, PAST_MEETING_TIMESTAMP)).toBe(false);
+  });
+
+  it('returns true when the instance is ongoing', () => {
+    const meetingInstance = createMeetingInstance();
+    const selfUser = createSelfUser();
+
+    expect(canEditMeeting(meetingInstance, selfUser, ONGOING_MEETING_TIMESTAMP)).toBe(true);
   });
 
   it('returns true for a recurring series whose anchor has started when the instance is upcoming', () => {

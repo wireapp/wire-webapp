@@ -19,11 +19,11 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CellsSelfUserDriveRoleProvider} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CellsSelfUserDriveRoleProvider} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
-import {sortTagsAlphabetically} from '../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
+import {sortTagsAlphabetically} from '../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 // This component is duplicated across global view and conversation view
@@ -35,7 +35,8 @@ export const CellsFilePreviewModal = () => {
     return null;
   }
 
-  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags} = selectedFile;
+  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags, conversationName} =
+    selectedFile;
 
   const getFileUrl = () => {
     const type = getFileTypeFromExtension(extension);
@@ -70,6 +71,8 @@ export const CellsFilePreviewModal = () => {
         status={getFileUrl() === undefined ? 'unavailable' : 'success'}
         senderName={owner}
         timestamp={uploadedAtTimestamp}
+        fallbackConversationName={conversationName}
+        sourceConversation={selectedFile.conversation}
         badges={sortTagsAlphabetically(tags)}
         isEditMode={isEditMode}
       />

@@ -25,12 +25,19 @@ import {container} from 'tsyringe';
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/coreSingleton';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from '.';
 import {translateForTest} from 'Util/test/translateForTest';
+
+function getConversationServiceForTest(core: Core): NonNullable<NonNullable<Core['service']>['conversation']> {
+  const service = requireValueForTest(core.service);
+
+  return requireValueForTest(service.conversation);
+}
 
 const createMockedDBConversationEntry = (
   id: string,
@@ -135,7 +142,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     mockSafeEpoch(mockCore);
 
-    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+    jest.spyOn(getConversationServiceForTest(mockCore), 'mlsGroupExistsLocally').mockResolvedValue(false);
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
@@ -181,7 +188,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     mockSafeEpoch(mockCore);
 
-    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+    jest.spyOn(getConversationServiceForTest(mockCore), 'mlsGroupExistsLocally').mockResolvedValue(false);
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
@@ -218,7 +225,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     mockSafeEpoch(mockCore);
 
-    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+    jest.spyOn(getConversationServiceForTest(mockCore), 'mlsGroupExistsLocally').mockResolvedValue(false);
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
@@ -255,7 +262,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     mockSafeEpoch(mockCore);
 
-    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+    jest.spyOn(getConversationServiceForTest(mockCore), 'mlsGroupExistsLocally').mockResolvedValue(false);
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';

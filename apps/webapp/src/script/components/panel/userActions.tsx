@@ -305,8 +305,8 @@ const UserActions = ({
             if (!conversation) {
               // Only open the new conversation if we aren't currently in a conversation context
               await actionsViewModel.open1to1Conversation(savedConversation);
+              setCurrentSidebarTab(SidebarTabs.RECENT);
             }
-            setCurrentSidebarTab(SidebarTabs.RECENT);
             onAction(Actions.SEND_REQUEST);
           },
           Icon: Icon.PlusIcon,

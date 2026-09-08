@@ -23,7 +23,7 @@ import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {scheduleFormErrors} from '../scheduleFormErrors';
 
-import {requireScheduleMeetingTimes} from './requireScheduleMeetingTimes';
+import {requireScheduleMeetingTimes, requireScheduleMeetingTimesForUpdate} from './requireScheduleMeetingTimes';
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
@@ -108,5 +108,29 @@ describe('requireScheduleMeetingTimes', () => {
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(scheduleFormErrors.endInPast);
+  });
+});
+
+describe('requireScheduleMeetingTimesForUpdate', () => {
+  it('returns start and end even when both are in the past', () => {
+    const pastEndDate = new Date('2026-06-23T11:00:00.000Z');
+    const result = requireScheduleMeetingTimesForUpdate({
+      ...baseFormState(),
+      start: maybe.just(pastStartDate),
+      end: maybe.just(pastEndDate),
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result)).toEqual({start: pastStartDate, end: pastEndDate});
+  });
+
+  it('returns missingTimes when start is missing', () => {
+    const result = requireScheduleMeetingTimesForUpdate({
+      ...baseFormState(),
+      start: maybe.nothing(),
+    });
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(scheduleFormErrors.missingTimes);
   });
 });

@@ -19,6 +19,7 @@
 
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {noop} from 'noop-esm';
 
 import {DomainMlsError, MlsErrorMapper} from './mlsErrorMapper';
 import {
@@ -243,7 +244,7 @@ describe('MlsRecoveryOrchestrator', () => {
     const orch = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, deps);
 
     // Simulate slow recovery function to keep the window open
-    let resolveJoin: () => void = () => {};
+    let resolveJoin: () => void = noop;
     const joinPromise = new Promise<void>(resolve => {
       resolveJoin = resolve;
     });

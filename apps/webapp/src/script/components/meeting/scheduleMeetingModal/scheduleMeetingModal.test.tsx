@@ -47,14 +47,9 @@ const testWallClock = createDeterministicWallClock({
   initialCurrentTimestampInMilliseconds: Date.parse('2026-08-12T10:00:00Z'),
 });
 
-const createDeferred = <T,>() => {
-  let resolve!: (value: T) => void;
-  const promise = new Promise<T>(resolvePromise => {
-    resolve = resolvePromise;
-  });
-
-  return {promise, resolve};
-};
+function createDeferred<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
+}
 
 const createMeetingStore = (scheduleMeeting: MeetingStoreState['scheduleMeeting']) =>
   createStore<MeetingStoreState>(() => ({
@@ -66,6 +61,10 @@ const createMeetingStore = (scheduleMeeting: MeetingStoreState['scheduleMeeting'
     meetNowMeeting: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed)),
     updateMeeting: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
     loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+    removeMeetingByQualifiedId: jest.fn(),
+    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
   }));
 
 const setupContainerMocks = () => {

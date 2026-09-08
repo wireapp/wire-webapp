@@ -46,3 +46,13 @@ export const requireScheduleMeetingTimes = (
 
   return result.ok({start, end});
 };
+
+export const requireScheduleMeetingTimesForUpdate = (
+  formState: ScheduleMeetingFormState,
+): Result<{start: Date; end: Date}, ScheduleFormErrors> => {
+  if (formState.start.isNothing || formState.end.isNothing) {
+    return result.err(scheduleFormErrors.missingTimes);
+  }
+
+  return result.ok({start: formState.start.value, end: formState.end.value});
+};

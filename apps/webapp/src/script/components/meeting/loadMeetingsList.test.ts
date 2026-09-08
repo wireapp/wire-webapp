@@ -33,7 +33,7 @@ describe('loadMeetingsList', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    trial: false,
+    tzid: 'Europe/Berlin',
   };
 
   const createRepository = (getMeetingsList: jest.Mock) => ({getMeetingsList}) as unknown as MeetingsRepository;
@@ -54,6 +54,14 @@ describe('loadMeetingsList', () => {
     expect(result.meetingSeries[0]?.title).toBe('Weekly sync');
     expect(result.meetingSeries[0]?.series_start_date).toBe('2026-06-16T10:00:00.000Z');
     expect(result.meetingSeries[0]?.duration_ms).toBe(3_600_000);
+    expect(result.meetingSeries[0]?.tzid).toBe('Europe/Berlin');
+  });
+
+  it('fails closed when the meetings list request fails', async () => {
+    const getMeetingsList = jest.fn().mockReturnValue(task.reject(new Error('schema')));
+    const result = await loadMeetingsList(createRepository(getMeetingsList));
+
+    expect(result).toEqual({meetingSeries: [], hasLoadError: true});
   });
 
   it('drops invalid meetings from a successful response without failing the load', async () => {

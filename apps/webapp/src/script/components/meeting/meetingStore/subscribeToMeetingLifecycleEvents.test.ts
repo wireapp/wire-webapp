@@ -45,15 +45,17 @@ describe('subscribeToMeetingLifecycleEvents', () => {
   const subscribe = (dispatcher: MeetingLifecycleDispatcherDouble) => {
     const notifyMeetingChange = jest.fn();
     const notifyUpdate = jest.fn();
+    const onMeetingCancelled = jest.fn();
     const unsubscribe = subscribeToMeetingLifecycleEvents({
       dispatcher,
       getSelfUserQualifiedId: () => selfUserId,
       notifyMeetingChange,
       notifyUpdate,
+      onMeetingCancelled,
     });
     activeUnsubscribeCallbacks.push(unsubscribe);
 
-    return {notifyMeetingChange, notifyUpdate, unsubscribe};
+    return {notifyMeetingChange, notifyUpdate, onMeetingCancelled, unsubscribe};
   };
 
   afterEach(() => {
@@ -92,12 +94,23 @@ describe('subscribeToMeetingLifecycleEvents', () => {
 
   it('queues a meeting removal when a meeting deleted event is published', () => {
     const dispatcher = createDispatcherDouble();
-    subscribe(dispatcher);
+    const {onMeetingCancelled} = subscribe(dispatcher);
 
-    amplify.publish(WebAppEvents.MEETING.DELETED, meetingId);
+    amplify.publish(WebAppEvents.MEETING.DELETED, meetingId, otherUserId);
 
+    expect(onMeetingCancelled).toHaveBeenCalledWith(meetingId, {notify: true});
     expect(dispatcher.enqueueMeetingRemoval).toHaveBeenCalledWith(meetingId);
     expect(dispatcher.enqueueMeetingSync).not.toHaveBeenCalled();
+  });
+
+  it('does not notify cancellation when the current user deleted the meeting', () => {
+    const dispatcher = createDispatcherDouble();
+    const {onMeetingCancelled} = subscribe(dispatcher);
+
+    amplify.publish(WebAppEvents.MEETING.DELETED, meetingId, selfUserId);
+
+    expect(onMeetingCancelled).toHaveBeenCalledWith(meetingId, {notify: false});
+    expect(dispatcher.enqueueMeetingRemoval).toHaveBeenCalledWith(meetingId);
   });
 
   it('queues a sync without a notification callback for an update authored by the current user', () => {

@@ -71,6 +71,7 @@ function renderCellDescription(conversation: Conversation): RenderResult {
       mutedState={conversation.mutedState()}
       isActive={false}
       isRequest={conversation.isRequest()}
+      isGhostGroup={false}
       unreadState={conversation.unreadState()}
     />,
     {wrapper: rootProviderWrapper},
@@ -84,6 +85,7 @@ function createCellDescriptionElement(conversation: Conversation): ReactElement 
       mutedState={conversation.mutedState()}
       isActive={false}
       isRequest={conversation.isRequest()}
+      isGhostGroup={false}
       unreadState={conversation.unreadState()}
     />
   );

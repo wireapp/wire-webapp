@@ -68,6 +68,38 @@ describe('build artifact metadata validation', () => {
     expect(validationResult.isOk).toBe(true);
   });
 
+  it('accepts a single-quoted local cache-busted asset', () => {
+    const validationResult = validateBuildArtifactMetadata({
+      expectedCommit: mainBuildMetadata.commit,
+      expectedVersion: mainBuildMetadata.version,
+      htmlDocuments: [
+        {
+          archiveFilePath: 'static/index.html',
+          contents: `<!--! ${mainBuildMetadata.version} --><script src='/min/app.js?v=${mainBuildMetadata.assetVersion}'>`,
+        },
+      ],
+      metadata: mainBuildMetadata,
+    });
+
+    expect(validationResult.isOk).toBe(true);
+  });
+
+  it('accepts an unquoted local cache-busted asset', () => {
+    const validationResult = validateBuildArtifactMetadata({
+      expectedCommit: mainBuildMetadata.commit,
+      expectedVersion: mainBuildMetadata.version,
+      htmlDocuments: [
+        {
+          archiveFilePath: 'static/unsupported/index.html',
+          contents: `<!--! ${mainBuildMetadata.version} --><link href=/image/favicon.ico?${mainBuildMetadata.assetVersion}>`,
+        },
+      ],
+      metadata: mainBuildMetadata,
+    });
+
+    expect(validationResult.isOk).toBe(true);
+  });
+
   it('ignores query strings outside intentional local cache-busted asset URLs', () => {
     const htmlDocument = createHtmlDocument(mainBuildMetadata);
     const validationResult = validateBuildArtifactMetadata({

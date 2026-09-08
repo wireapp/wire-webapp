@@ -25,21 +25,15 @@ describe('createRestartQueue', () => {
   it('runs restarts sequentially', async () => {
     const calls: string[] = [];
 
-    let resolveFirst!: () => void;
+    const {promise: firstRestartGate, resolve: resolveFirst} = Promise.withResolvers<void>();
 
     const restart = jest
       .fn()
-      .mockImplementationOnce(
-        () =>
-          new Promise<void>(resolve => {
-            calls.push('first-start');
-
-            resolveFirst = () => {
-              calls.push('first-end');
-              resolve();
-            };
-          }),
-      )
+      .mockImplementationOnce(async () => {
+        calls.push('first-start');
+        await firstRestartGate;
+        calls.push('first-end');
+      })
       .mockImplementationOnce(async () => {
         calls.push('second-start');
         calls.push('second-end');

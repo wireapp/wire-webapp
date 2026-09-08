@@ -21,7 +21,80 @@ import {renderMessage, getRenderedTextContent} from './messageRenderer';
 
 import {MentionEntity} from '../message/mentionEntity';
 
-const escapeLink = (link: string) => link.replace(/&/g, '&amp;');
+function escapeLink(link: string): string {
+  return link.replace(/&/g, '&amp;');
+}
+
+type MarkdownStructureCharacterizationTestCase = {
+  readonly description: string;
+  readonly inputMarkdown: string;
+  readonly expectedHtml: string;
+};
+
+const markdownStructureCharacterizationTestCases: readonly MarkdownStructureCharacterizationTestCase[] = [
+  {
+    description: 'an ordered list',
+    inputMarkdown: '1. first\n2. second',
+    expectedHtml: '<ol>\n<li>first</li>\n<li>second</li>\n</ol>',
+  },
+  {
+    description: 'an ordered list with a non-default starting number',
+    inputMarkdown: '14. first\n15. second',
+    expectedHtml: '<ol start="14">\n<li>first</li>\n<li>second</li>\n</ol>',
+  },
+  {
+    description: 'a dash unordered list',
+    inputMarkdown: '- first\n- second',
+    expectedHtml: '<ul>\n<li>first</li>\n<li>second</li>\n</ul>',
+  },
+  {
+    description: 'an asterisk unordered list',
+    inputMarkdown: '* first\n* second',
+    expectedHtml: '<ul>\n<li>first</li>\n<li>second</li>\n</ul>',
+  },
+  {
+    description: 'a plus unordered list',
+    inputMarkdown: '+ first\n+ second',
+    expectedHtml: '<ul>\n<li>first</li>\n<li>second</li>\n</ul>',
+  },
+  {
+    description: 'a mixed nested list',
+    inputMarkdown: '1. one\n   - nested',
+    expectedHtml: '<ol>\n<li>one\n<ul>\n<li>nested</li>\n</ul>\n</li>\n</ol>',
+  },
+  {
+    description: 'an ordered list followed by ordinary text',
+    inputMarkdown: '1. item\n\ntext',
+    expectedHtml: '<ol>\n<li>item</li>\n</ol>\n<br>text',
+  },
+  {
+    description: 'ordinary text followed by an unordered list',
+    inputMarkdown: 'text\n\n- item',
+    expectedHtml: 'text<ul>\n<li>item</li>\n</ul>',
+  },
+  {
+    description: 'a multiline blockquote',
+    inputMarkdown: '> quote\n> next',
+    expectedHtml: '<blockquote class="md-blockquote">quote<br>next</blockquote>',
+  },
+  {
+    description: 'a blockquote with inline formatting and a link',
+    inputMarkdown: '> **quoted** [link](https://wire.com)',
+    expectedHtml:
+      '<blockquote class="md-blockquote"><strong>quoted</strong> <a href="https://wire.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">link</a></blockquote>',
+  },
+  {
+    description: 'all nested list levels produced by the ambiguous date-like input',
+    inputMarkdown: '14. - 25. september',
+    expectedHtml:
+      '<ol start="14">\n<li>\n<ul>\n<li>\n<ol start="25">\n<li>september</li>\n</ol>\n</li>\n</ul>\n</li>\n</ol>',
+  },
+  {
+    description: 'an escaped date-like list input as plain text',
+    inputMarkdown: '14\\. - 25. september',
+    expectedHtml: '14. - 25. september',
+  },
+];
 
 describe('renderMessage', () => {
   it('renders a normal link', () => {
@@ -409,6 +482,7 @@ describe('renderMessage', () => {
     tests.forEach(({expected, mentions, testCase, text}) => {
       const mentionEntities = mentions.map(mention => {
         const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
+
         return mentionEntity;
       });
 
@@ -425,6 +499,7 @@ describe('renderMessage', () => {
       const mentions = [{length: 5, startIndex: 4, userId: 'pain-id'}];
       const mentionEntities = mentions.map(mention => {
         const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
+
         return mentionEntity;
       });
       const result = renderMessage('hey @user', undefined, mentionEntities);
@@ -527,6 +602,14 @@ describe('Markdown for headings', () => {
     expect(renderMessage('## heading')).toBe('<div class="md-heading md-heading--2">heading</div>');
     expect(renderMessage('### heading')).toBe('<div class="md-heading md-heading--3">heading</div>');
     expect(renderMessage('#### heading')).toBe('<div class="md-heading md-heading--4">heading</div>');
+    expect(renderMessage('##### heading')).toBe('<div class="md-heading md-heading--5">heading</div>');
+    expect(renderMessage('###### heading')).toBe('<div class="md-heading md-heading--6">heading</div>');
+  });
+});
+
+describe('Markdown block structures', () => {
+  it.each(markdownStructureCharacterizationTestCases)('renders $description', characterizationTestCase => {
+    expect(renderMessage(characterizationTestCase.inputMarkdown)).toBe(characterizationTestCase.expectedHtml);
   });
 });
 

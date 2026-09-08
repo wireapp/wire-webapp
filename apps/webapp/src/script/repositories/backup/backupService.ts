@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
@@ -59,11 +60,12 @@ export class BackupService {
   }
 
   getTables() {
-    return [
-      this.storageService.db!.conversations,
-      this.storageService.db!.events,
-      this.storageService.db!.users,
-    ] as const;
+    const database = this.storageService.db;
+    if (isUndefined(database)) {
+      throw new Error('The backup database is not initialized');
+    }
+
+    return [database.conversations, database.events, database.users] as const;
   }
 
   async runDbSchemaUpdates(archiveVersion: number): Promise<void> {
@@ -110,8 +112,12 @@ export class BackupService {
   }
 
   async getConversationCreationEvents() {
-    const events = await this.storageService
-      .db!.events.where('type')
+    const database = this.storageService.db;
+    if (isUndefined(database)) {
+      throw new Error('The backup database is not initialized');
+    }
+    const events = await database.events
+      .where('type')
       .anyOf([CONVERSATION.ONE2ONE_CREATION, CONVERSATION.GROUP_CREATION])
       .toArray();
     return events;

@@ -18,6 +18,7 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
@@ -55,6 +56,7 @@ describe('DeviceDetailsPreferences', () => {
     const {getByText, getAllByText} = renderDeviceDetailsPreferences();
     await waitFor(() => getAllByText('00'));
 
+    assertNotNullOrUndefined(device.model);
     expect(getByText(device.model)).toBeDefined();
   });
 

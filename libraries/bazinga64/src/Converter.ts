@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {UnsupportedInputError} from './UnsupportedInputError';
 
 export class Converter {
@@ -66,7 +68,11 @@ export class Converter {
 
     for (const key in objectSource) {
       if (objectSource.hasOwnProperty(key)) {
-        arrayBufferView[parseInt(key, 10)] = objectSource[key]!;
+        const value = objectSource[key];
+        if (isUndefined(value)) {
+          throw new Error(`Missing value for byte index ${key}`);
+        }
+        arrayBufferView[parseInt(key, 10)] = value;
       }
     }
 
@@ -78,7 +84,11 @@ export class Converter {
     const arrayBufferView = new Uint8Array(arrayBuffer);
 
     for (let i = 0; i < arrayBufferView.length; i++) {
-      arrayBufferView[i] = array[i]!;
+      const value = array[i];
+      if (isUndefined(value)) {
+        throw new Error(`Missing value for byte index ${i}`);
+      }
+      arrayBufferView[i] = value;
     }
 
     return arrayBufferView;

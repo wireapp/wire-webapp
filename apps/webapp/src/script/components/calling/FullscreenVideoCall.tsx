@@ -19,6 +19,7 @@
 
 import {ChangeEvent, useEffect, useRef, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -209,9 +210,11 @@ const FullscreenVideoCall = ({
     }
   };
 
-  const callNotification = useAppNotification({
-    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
-  });
+  const activeWindow = viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow : window;
+  if (isNullOrUndefined(activeWindow)) {
+    throw new Error('The detached calling window is not available');
+  }
+  const callNotification = useAppNotification({activeWindow});
 
   useEffect(() => {
     const handRaisedHandler = (event: Event) => {

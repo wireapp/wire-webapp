@@ -17,13 +17,46 @@
  *
  */
 
-import {generateDecryptionError} from './decryptionErrorGenerator';
+import {generateDecryptionError, ProteusErrors} from './decryptionErrorGenerator';
+
+import {ErrorType, ProteusErrorType} from '@wireapp/core-crypto';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 
 const basePayload = {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'};
 
+const createStructuredProteusError = (errorCode?: number) =>
+  Object.assign(new Error('proteus decryption error'), {
+    name: 'ProteusErrorOther',
+    errorStack: [],
+    type: ErrorType.Proteus,
+    context: {
+      type: ProteusErrorType.Other,
+      context: errorCode === undefined ? {} : {errorCode},
+    },
+  });
+
 describe('generateDecryptionError', () => {
+  it.each([ProteusErrors.TooDistantFuture, ProteusErrors.PreKeyMessageUnMatchedSignature])(
+    'preserves structured CoreCrypto Proteus error code %s',
+    errorCode => {
+      const coreCryptoError = createStructuredProteusError(errorCode);
+
+      const error = generateDecryptionError(basePayload, coreCryptoError);
+
+      expect(error).toBeInstanceOf(DecryptionError);
+      expect(error.code).toBe(errorCode);
+    },
+  );
+
+  it('falls back to the unknown code for a malformed structured CoreCrypto Proteus error', () => {
+    const coreCryptoError = createStructuredProteusError();
+
+    const error = generateDecryptionError(basePayload, coreCryptoError);
+
+    expect(error.code).toBe(ProteusErrors.Unknown);
+  });
+
   it.each([Math.floor(Math.random() * 100), 0])('handles coreCrypto error', proteusErrorCode => {
     const coreCryptoError = {proteusErrorCode, message: 'decryption error'};
     const error = generateDecryptionError(basePayload, coreCryptoError);

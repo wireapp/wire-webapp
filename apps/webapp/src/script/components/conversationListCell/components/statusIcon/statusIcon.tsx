@@ -122,7 +122,7 @@ export const StatusIcon = ({conversation}: Props) => {
         <span
           className="conversation-list-cell-badge cell-badge-light conversation-ghosted"
           data-uie-name="status-ghost-group"
-          title={translate('accessibility.conversationStatusGhosted')}
+          title={translate('accessibility.conversationStatusGroupWithoutAdmin')}
           aria-hidden="true"
         >
           <Icon.InfoIcon className="svg-icon" />

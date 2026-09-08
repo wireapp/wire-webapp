@@ -17,6 +17,8 @@
  *
  */
 
+import {AxiosHeaders} from 'axios';
+
 import {APIClient} from '../apiClient';
 import {ClientType} from '../client/clientType';
 import {StatusCode} from '../http';
@@ -37,7 +39,7 @@ describe('AuthAPI', () => {
 
     jest.spyOn(apiClient.transport.http, 'sendJSON').mockReturnValue(
       Promise.resolve({
-        config: {},
+        config: {headers: new AxiosHeaders()},
         data: '',
         headers: {},
         status: StatusCode.OK,
@@ -70,7 +72,7 @@ describe('AuthAPI', () => {
 
     jest.spyOn(apiClient.transport.http, 'sendJSON').mockReturnValue(
       Promise.resolve({
-        config: {},
+        config: {headers: new AxiosHeaders()},
         data: '',
         headers: {},
         status: StatusCode.OK,

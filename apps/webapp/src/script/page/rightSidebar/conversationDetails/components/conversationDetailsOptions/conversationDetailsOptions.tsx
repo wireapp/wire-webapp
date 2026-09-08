@@ -17,6 +17,9 @@
  *
  */
 
+import {type ReactElement} from 'react';
+
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
@@ -24,6 +27,10 @@ import {amplify} from 'amplify';
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  getSelfUserDriveRole,
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import * as Icon from 'Components/icon';
 import {PanelActions} from 'Components/panel/panelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
@@ -33,6 +40,7 @@ import {isGroupMLSConversation} from 'Repositories/conversation/ConversationSele
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -61,7 +69,41 @@ interface ConversationDetailsOptionsProps {
   isChannelPublic?: boolean;
 }
 
-const ConversationDetailsOptions = ({
+interface ConversationDetailsOptionsContentProps extends ConversationDetailsOptionsProps {
+  readonly firstParticipant?: User;
+  readonly isParticipantBlocked?: boolean;
+}
+
+interface ConversationDetailsOptionsWithParticipantProps extends ConversationDetailsOptionsProps {
+  readonly firstParticipant: User;
+}
+
+function ConversationDetailsOptions(props: ConversationDetailsOptionsProps): ReactElement {
+  const {firstUserEntity: firstParticipant} = useKoSubscribableChildren(props.activeConversation, ['firstUserEntity']);
+
+  if (isUndefined(firstParticipant)) {
+    return <ConversationDetailsOptionsContent {...props} />;
+  }
+
+  return <ConversationDetailsOptionsWithParticipant {...props} firstParticipant={firstParticipant} />;
+}
+
+function ConversationDetailsOptionsWithParticipant({
+  firstParticipant,
+  ...props
+}: ConversationDetailsOptionsWithParticipantProps): ReactElement {
+  const {isBlocked: isParticipantBlocked} = useKoSubscribableChildren(firstParticipant, ['isBlocked']);
+
+  return (
+    <ConversationDetailsOptionsContent
+      {...props}
+      firstParticipant={firstParticipant}
+      isParticipantBlocked={isParticipantBlocked}
+    />
+  );
+}
+
+function ConversationDetailsOptionsContent({
   actionsViewModel,
   activeConversation,
   conversationRepository,
@@ -75,41 +117,32 @@ const ConversationDetailsOptions = ({
   teamState,
   updateConversationReceiptMode,
   isChannelPublic,
-}: ConversationDetailsOptionsProps) => {
-  const {translate} = useApplicationContext();
-  const {
-    isMutable,
-    receiptMode,
-    is1to1,
-    isRequest,
-    isSelfUserRemoved,
-    firstUserEntity: firstParticipant,
-    isChannel,
-    isGroupOrChannel,
-    cellsState,
-  } = useKoSubscribableChildren(activeConversation, [
-    'isMutable',
-    'receiptMode',
-    'is1to1',
-    'isRequest',
-    'isSelfUserRemoved',
-    'firstUserEntity',
-    'isChannel',
-    'isGroupOrChannel',
-    'cellsState',
-  ]);
+  firstParticipant,
+  isParticipantBlocked,
+}: ConversationDetailsOptionsContentProps): ReactElement {
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {isMutable, receiptMode, is1to1, isRequest, isSelfUserRemoved, isChannel, isGroupOrChannel, cellsState} =
+    useKoSubscribableChildren(activeConversation, [
+      'isMutable',
+      'receiptMode',
+      'is1to1',
+      'isRequest',
+      'isSelfUserRemoved',
+      'isChannel',
+      'isGroupOrChannel',
+      'cellsState',
+    ]);
   const {isSelfDeletingMessagesEnabled, isTeam} = useKoSubscribableChildren(teamState, [
     'isSelfDeletingMessagesEnabled',
     'isTeam',
   ]);
   const {isChannelsHistorySharingEnabled, isChannelsEnabled} = useChannelsFeatureFlag();
   const {isActivatedAccount, teamRole} = useKoSubscribableChildren(selfUser, ['isActivatedAccount', 'teamRole']);
-  const {isBlocked: isParticipantBlocked} = useKoSubscribableChildren(firstParticipant!, ['isBlocked']);
 
   const teamId = activeConversation.teamId;
 
   const isSingleUserMode = is1to1 || isRequest;
-  const isServiceMode = isSingleUserMode && firstParticipant!.isService;
+  const isServiceMode = isSingleUserMode && !isUndefined(firstParticipant) && firstParticipant.isService;
 
   const conversationActions = getConversationActions({
     conversationEntity: activeConversation,
@@ -125,6 +158,8 @@ const ConversationDetailsOptions = ({
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = !!teamId;
   const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
+  const selfUserDriveRole = getSelfUserDriveRole({conversationTeamId: teamId, selfUserTeamId: selfUser.teamId});
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
@@ -143,6 +178,8 @@ const ConversationDetailsOptions = ({
 
   const openTimedMessagePanel = () => togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
 
+  const openSharedDrivePanel = () => togglePanel(PanelState.SHARED_DRIVE, activeConversation);
+
   const openGuestPanel = () => togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
 
   const openServicePanel = () => togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
@@ -153,7 +190,22 @@ const ConversationDetailsOptions = ({
 
   const openConversationHistoryPanel = () => togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
 
-  const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant!, false, 'left');
+  const openParticipantDevices = () => {
+    if (isUndefined(firstParticipant)) {
+      throw new Error('Cannot open participant devices without a participant');
+    }
+    togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
+  };
+
+  const getSharedDriveStatusTranslationKey = () => {
+    if (!isViewerPermissionFeatureEnabled) {
+      return 'conversationDetailsActionCellsOption';
+    }
+
+    return selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
+      ? 'cells.sharedDriveAccess.editorAccess'
+      : 'cells.sharedDriveAccess.viewerAccess';
+  };
 
   return (
     <div className="conversation-details__options">
@@ -207,12 +259,13 @@ const ConversationDetailsOptions = ({
         {isCellsConversation && (
           <ConversationDetailsOption
             className="conversation-details__cells-info"
-            dataUieName="cells-info"
+            dataUieName={isViewerPermissionFeatureEnabled ? 'go-shared-drive' : 'cells-info'}
             icon={<CollectionIcon />}
+            onClick={isViewerPermissionFeatureEnabled ? openSharedDrivePanel : undefined}
             title={translate('conversationDetailsActionCellsTitle')}
             statusUieName="status-cells-info"
-            statusText={translate('conversationDetailsActionCellsOption')}
-            disabled
+            statusText={translate(getSharedDriveStatusTranslationKey())}
+            disabled={!isViewerPermissionFeatureEnabled}
           />
         )}
 
@@ -326,6 +379,6 @@ const ConversationDetailsOptions = ({
       </ul>
     </div>
   );
-};
+}
 
 export {ConversationDetailsOptions};

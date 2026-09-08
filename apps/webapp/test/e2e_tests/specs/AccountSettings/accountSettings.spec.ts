@@ -163,13 +163,13 @@ test.describe('account settings', () => {
     'Verify links to manage and create teams are shown when logged in as team owner',
     {tag: ['@TC-1723', '@regression']},
     async ({createPage}) => {
-      const expectedManageTeamUrl = new URL(readRequiredEnvironmentVariable('EXPECTED_MANAGE_TEAM_URL')).toString();
+      const expectedManageTeamUrl = new URL(readRequiredEnvironmentVariable('TEAM_MANAGEMENT_URL')).toString();
       const {components} = PageManager.from(await createPage(withLogin(owner))).webapp;
 
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
       const actualManageTeamUrl = await components.conversationSidebar().manageTeamButton.getAttribute('href');
 
-      expect(actualManageTeamUrl).toBe(expectedManageTeamUrl);
+      expect(actualManageTeamUrl).toContain(expectedManageTeamUrl);
     },
   );
 

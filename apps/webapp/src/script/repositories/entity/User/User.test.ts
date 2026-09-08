@@ -110,7 +110,7 @@ describe('User', () => {
         expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[accentId]);
       });
 
-      userEntity.accent_id(undefined);
+      userEntity.accent_id(undefined as unknown as number);
 
       expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[ACCENT_ID.BLUE]);
     });

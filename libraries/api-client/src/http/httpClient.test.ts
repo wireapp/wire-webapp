@@ -18,6 +18,7 @@
  */
 
 import assert from 'assert';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import nock from 'nock';
 import {AxiosHeaders, AxiosResponse} from 'axios';
 
@@ -40,7 +41,7 @@ function createHttpClientDependenciesForTest(): HttpClientDependenciesForTest {
     observedDelayInMilliseconds.push(delayInMilliseconds);
     handler();
 
-    return 1 as ReturnType<typeof globalThis.setTimeout>;
+    return 1 as unknown as ReturnType<typeof globalThis.setTimeout>;
   });
   const clearTimeout = jest.fn();
 
@@ -91,7 +92,12 @@ describe('HttpClient', () => {
 
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
       client.refreshAccessToken = () => {
-        return Promise.resolve(mockedAccessTokenStore.accessTokenData!);
+        const accessTokenData = mockedAccessTokenStore.accessTokenData;
+        if (isNullOrUndefined(accessTokenData)) {
+          throw new Error('Expected test access token data to be available');
+        }
+
+        return Promise.resolve(accessTokenData);
       };
 
       await client._sendRequest({config: {method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS}});
@@ -283,7 +289,7 @@ describe('HttpClient', () => {
         assert(resolveWaitWasScheduled !== undefined);
         resolveWaitWasScheduled();
 
-        return 1 as ReturnType<typeof globalThis.setTimeout>;
+        return 1 as unknown as ReturnType<typeof globalThis.setTimeout>;
       });
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
         dependencies: {
@@ -328,7 +334,7 @@ describe('HttpClient', () => {
         assert(resolveWaitWasScheduled !== undefined);
         resolveWaitWasScheduled();
 
-        return 1 as ReturnType<typeof globalThis.setTimeout>;
+        return 1 as unknown as ReturnType<typeof globalThis.setTimeout>;
       });
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
         dependencies: {

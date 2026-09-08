@@ -17,7 +17,7 @@
  *
  */
 
-import {isEmptySet} from '@sindresorhus/is';
+import {isEmptySet, isUndefined} from '@sindresorhus/is';
 import {
   Conversation,
   DefaultConversationRoleName,
@@ -86,6 +86,14 @@ type DeferredEpochRecoveryEntry = {
   subconvId?: SUBCONVERSATION_ID;
   trigger?: MlsEpochRecoveryTrigger;
 };
+
+function requireMlsRecoveryOrchestrator(orchestrator: MlsRecoveryOrchestrator | undefined): MlsRecoveryOrchestrator {
+  if (isUndefined(orchestrator)) {
+    throw new Error('MLS recovery orchestrator is not initialized');
+  }
+
+  return orchestrator;
+}
 
 type Events = {
   MLSConversationRecovered: {conversationId: QualifiedId};
@@ -389,7 +397,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
     if (this._mlsService === undefined) {
       throw new Error('MLSService is required to establish MLS group conversation');
     }
-    return this.MLSRecoveryOrchestrator!.execute({
+
+    return requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {
         operationName: OperationName.establishGroup,
         qualifiedConversationId: conversationQualifiedId,
@@ -452,7 +461,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
     if (this._mlsService === undefined) {
       throw new Error('MLSService is required to send MLS messages');
     }
-    return this.MLSRecoveryOrchestrator!.execute({
+
+    return requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {operationName: OperationName.send, qualifiedConversationId: conversationId, groupId},
       callBack: () => this.performSendMLSMessageAPI(params),
     });
@@ -511,7 +521,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
     if (this._mlsService === undefined) {
       throw new Error('MLSService is required to add users to MLS conversation');
     }
-    return this.MLSRecoveryOrchestrator!.execute({
+
+    return requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
       callBack: () =>
         this.performAddUsersToMLSConversationAPI({
@@ -578,7 +589,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
     if (this._mlsService === undefined) {
       throw new Error('MLSService is required to remove users from MLS conversation');
     }
-    return this.MLSRecoveryOrchestrator!.execute({
+
+    return requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {operationName: OperationName.removeUsers, qualifiedConversationId: conversationId, groupId},
       callBack: () => this.performRemoveUsersFromMLSConversationAPI({groupId, conversationId, qualifiedUserIds}),
     });
@@ -615,7 +627,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     if (this._mlsService === undefined) {
       throw new Error('MLSService is required to join MLS conversation');
     }
-    await this.MLSRecoveryOrchestrator!.execute({
+    await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {operationName: OperationName.joinExternalCommit, qualifiedConversationId: conversationId},
       callBack: () => this.performJoinByExternalCommitAPI(conversationId),
     });
@@ -666,7 +678,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     }
 
     try {
-      await this.MLSRecoveryOrchestrator!.execute({
+      await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
         context: {
           operationName: OperationName.keyMaterialUpdate,
           qualifiedConversationId: conversation.qualified_id,
@@ -1122,7 +1134,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
       if (this._mlsService === undefined) {
         throw new Error('MLSService is required to handle MLS message-add event');
       }
-      return await this.MLSRecoveryOrchestrator!.execute<HandledEventPayload | null>({
+
+      return await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute<HandledEventPayload | null>({
         context: {
           operationName: OperationName.handleMessageAdd,
           qualifiedConversationId,
@@ -1234,7 +1247,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     if (this._mlsService === undefined) {
       throw new Error('MLSService is required to handle MLS welcome message event');
     }
-    await this.MLSRecoveryOrchestrator!.execute({
+    await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {
         operationName: OperationName.handleWelcome,
         qualifiedConversationId: event.qualified_conversation,

@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
@@ -31,12 +31,13 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-import {FileHeader} from './FileHeader';
+import {FileHeader, getConversationIconType} from './FileHeader';
 
 const translate = (key: string) =>
   ({
     'cells.imageFullScreenModal.closeButton': 'Close',
     'cells.imageFullScreenModal.downloadButton': 'Download',
+    'cells.imageFullScreenModal.viewerAccessLabel': 'Viewer access',
     'cells.options.label': 'More options',
     'cells.options.versionHistory': 'Version History',
   })[key] ?? key;
@@ -108,5 +109,47 @@ describe('FileHeader', () => {
     renderHeader({isViewerPermissionFeatureEnabled: false});
 
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
+  });
+
+  it('shows file metadata beside the file name', () => {
+    const {container: renderContainer} = renderHeader({
+      props: {
+        fallbackConversationName: 'Marketing Channel',
+        senderName: 'Kim Dawson',
+      },
+    });
+
+    expect(screen.getByRole('heading', {name: 'document'})).toBeInTheDocument();
+    expect(screen.getByText('Marketing Channel')).toBeInTheDocument();
+    expect(screen.getByText('Kim Dawson')).toBeInTheDocument();
+    expect(renderContainer.querySelector('[data-uie-name="group-avatar-box-wrapper"]')).toBeInTheDocument();
+  });
+
+  it.each([
+    {isChannel: false, isChannelsEnabled: true, expectedIconType: 'group'},
+    {isChannel: true, isChannelsEnabled: false, expectedIconType: 'group'},
+    {isChannel: true, isChannelsEnabled: true, expectedIconType: 'channel'},
+  ])(
+    'returns $expectedIconType icon when isChannel is $isChannel and isChannelsEnabled is $isChannelsEnabled',
+    ({isChannel, isChannelsEnabled, expectedIconType}) => {
+      expect(getConversationIconType({isChannel, isChannelsEnabled})).toBe(expectedIconType);
+    },
+  );
+
+  it('shows viewer access state and removes other action buttons', () => {
+    const {container: renderContainer} = renderHeader({
+      isViewerPermissionFeatureEnabled: true,
+      props: {isEditable: true, showViewOnlyLabel: true},
+    });
+
+    expect(screen.getByText('Viewer access')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Viewing'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Editing'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'More options'})).not.toBeInTheDocument();
+    expect(renderContainer.querySelector('[data-uie-name="file-header-view-only-icon"]')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
   });
 });

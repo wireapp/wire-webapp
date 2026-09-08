@@ -692,8 +692,8 @@ describe('MediaEmbeds', () => {
 
     it('converts invalid values to 0', () => {
       expect(MediaEmbeds.convertYouTubeTimestampToSeconds('hms')).toBe(0);
-      expect(MediaEmbeds.convertYouTubeTimestampToSeconds(null)).toBe(0);
-      expect(MediaEmbeds.convertYouTubeTimestampToSeconds(undefined)).toBe(0);
+      expect(MediaEmbeds.convertYouTubeTimestampToSeconds(null as unknown as string)).toBe(0);
+      expect(MediaEmbeds.convertYouTubeTimestampToSeconds(undefined as unknown as string)).toBe(0);
     });
   });
 });

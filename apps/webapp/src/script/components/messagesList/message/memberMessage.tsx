@@ -1,0 +1,306 @@
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {ReactElement, ReactNode} from 'react';
+
+import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
+
+import * as Icon from 'Components/icon';
+import {
+  groupCreationHeaderSenderNameMarkerEnd,
+  groupCreationHeaderSenderNameMarkerStart,
+  MemberMessage as MemberMessageEntity,
+} from 'Repositories/entity/message/memberMessage';
+import {User} from 'Repositories/entity/User';
+import {Config} from 'src/script/Config';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+
+import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
+import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
+import {ConnectedMessage} from './memberMessage/connectedMessage';
+import {MessageContent} from './memberMessage/messageContent';
+import {MessageTime} from './messageTime';
+
+type RenderGroupCreationHeaderOptions = {
+  readonly htmlGroupCreationHeader: string;
+  readonly reactGroupCreationHeader: string;
+  readonly senderName: string;
+  readonly isReactTranslationRenderingEnabled: boolean;
+};
+
+function renderGroupCreationHeaderSenderName(text: string, senderName: string): ReactNode[] {
+  return replaceReactComponents(text, [
+    {
+      start: groupCreationHeaderSenderNameMarkerStart,
+      end: groupCreationHeaderSenderNameMarkerEnd,
+      render(): string {
+        return senderName;
+      },
+    },
+  ]);
+}
+
+function renderGroupCreationHeader(options: RenderGroupCreationHeaderOptions): ReactElement {
+  const {htmlGroupCreationHeader, reactGroupCreationHeader, senderName, isReactTranslationRenderingEnabled} = options;
+
+  if (isReactTranslationRenderingEnabled) {
+    return (
+      <p className="message-group-creation-header-text">
+        {replaceReactComponents(reactGroupCreationHeader, [
+          {
+            start: '<strong>',
+            end: '</strong>',
+            render(text): ReactElement {
+              return <strong>{renderGroupCreationHeaderSenderName(text, senderName)}</strong>;
+            },
+          },
+          {
+            start: groupCreationHeaderSenderNameMarkerStart,
+            end: groupCreationHeaderSenderNameMarkerEnd,
+            render(): string {
+              return senderName;
+            },
+          },
+        ])}
+      </p>
+    );
+  }
+
+  return (
+    <p className="message-group-creation-header-text" dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}} />
+  );
+}
+
+interface MemberMessageProps {
+  classifiedDomains?: string[];
+  hasReadReceiptsTurnedOn: boolean;
+  isSelfDeletingMessagesOff: boolean;
+  isSelfTemporaryGuest: boolean;
+  message: MemberMessageEntity;
+  onClickCancelRequest: (message: MemberMessageEntity) => void;
+  onClickInvitePeople: () => void;
+  onClickParticipants: (participants: User[]) => void;
+  shouldShowInvitePeople: boolean;
+  conversationName: string;
+  isCellsConversation: boolean;
+  isSelfGuest: boolean;
+}
+
+export const MemberMessage = ({
+  message,
+  shouldShowInvitePeople,
+  isSelfTemporaryGuest,
+  hasReadReceiptsTurnedOn,
+  isSelfDeletingMessagesOff,
+  onClickInvitePeople,
+  onClickParticipants,
+  onClickCancelRequest,
+  classifiedDomains,
+  conversationName,
+  isCellsConversation,
+  isSelfGuest,
+}: MemberMessageProps) => {
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {
+    otherUser,
+    timestamp,
+    user,
+    senderName,
+    htmlGroupCreationHeader,
+    reactGroupCreationHeader,
+    showNamedCreation,
+    hasUsers,
+  } = useKoSubscribableChildren(message, [
+    'otherUser',
+    'timestamp',
+    'user',
+    'senderName',
+    'htmlGroupCreationHeader',
+    'reactGroupCreationHeader',
+    'showNamedCreation',
+    'hasUsers',
+  ]);
+
+  const isGroupCreation = message.isGroupCreation();
+  const isMemberRemoval = message.isMemberRemoval();
+  const isMemberJoin = message.isMemberJoin();
+  const isMemberLeave = message.isMemberLeave();
+  const isMemberChange = message.isMemberChange();
+
+  const cellsConversationLabel = translate(
+    isSelfGuest ? 'conversationCellsConversationEnabledViewer' : 'conversationCellsConversationEnabledEditor',
+  );
+  const receiptsEnabledLabel = translate('conversationCreateReceiptsEnabled');
+  const timedMessagesDisabledLabel = translate('conversationDetailsActionTimedMessagesDisabled');
+  const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE;
+
+  const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
+    message.memberMessageType,
+  );
+
+  if (isConnectedMessage) {
+    return (
+      <ConnectedMessage
+        user={otherUser}
+        showServicesWarning={message.showServicesWarning}
+        onClickCancelRequest={() => onClickCancelRequest(message)}
+        classifiedDomains={classifiedDomains}
+      />
+    );
+  }
+
+  return (
+    <>
+      {showNamedCreation && (
+        <div className="message-group-creation-header">
+          {renderGroupCreationHeader({
+            htmlGroupCreationHeader,
+            reactGroupCreationHeader,
+            senderName,
+            isReactTranslationRenderingEnabled: isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName),
+          })}
+          <h2 className="message-group-creation-header-name" data-uie-name="conversation-name">
+            {conversationName}
+          </h2>
+        </div>
+      )}
+
+      {hasUsers && (
+        <div className="message-header" role="status" aria-live="polite">
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
+            {isGroupCreation && <Icon.MessageIcon />}
+            {isMemberRemoval && <span className="icon-minus" />}
+            {isMemberJoin && <span className="icon-plus" />}
+          </div>
+          <div className="message-header-label">
+            <MessageContent onClickParticipants={onClickParticipants} message={message} />
+          </div>
+          {isMemberChange && (
+            <div className="message-body-actions">
+              <MessageTime
+                timestamp={timestamp}
+                data-uie-uid={message.id}
+                data-uie-name="item-message-member-timestamp"
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {hasUsers && message.showServicesWarning && (
+        <p className="message-services-warning" data-uie-name="label-services-warning">
+          {translate('conversationAppsWarning')}
+        </p>
+      )}
+
+      {isGroupCreation && shouldShowInvitePeople && (
+        <div className="message-member-footer">
+          <p>{translate('guestRoomConversationHead')}</p>
+
+          <Button
+            variant={ButtonVariant.TERTIARY}
+            type="button"
+            onClick={onClickInvitePeople}
+            data-uie-name="do-invite-people"
+            style={{marginTop: '1em'}}
+          >
+            {translate('guestRoomConversationButton')}
+          </Button>
+        </div>
+      )}
+
+      {isGroupCreation && isSelfTemporaryGuest && (
+        <div className="message-member-footer">
+          <p className="message-member-footer-message">{translate('temporaryGuestJoinMessage')}</p>
+          <p className="message-member-footer-description">{translate('temporaryGuestJoinDescription')}</p>
+        </div>
+      )}
+
+      {isGroupCreation && isCellsConversation && (
+        <div className="message-header" data-uie-name="label-cells-conversation" role="status" aria-live="polite">
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
+            <CollectionIcon />
+          </div>
+          <p className="message-header-label">
+            <span title={cellsConversationLabel}>
+              {cellsConversationLabel}
+              &nbsp;
+              <Link
+                css={{
+                  ...e2eMessageContentLinkCss,
+                  fontWeight: 'var(--font-weight-bold)',
+                  textDecoration: 'underline',
+                }}
+                variant={LinkVariant.PRIMARY}
+                href={sharedDriveSupportUrl}
+                target="_blank"
+                data-uie-name="cells-conversation-learn-more"
+              >
+                {translate('systemMessageLearnMore')}
+              </Link>
+            </span>
+          </p>
+        </div>
+      )}
+
+      {isGroupCreation && hasReadReceiptsTurnedOn && (
+        <div className="message-header" data-uie-name="label-group-creation-receipts" role="status" aria-live="polite">
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
+            <Icon.ReadIcon />
+          </div>
+          <p className="message-header-label">
+            <span className="ellipsis" title={receiptsEnabledLabel}>
+              {receiptsEnabledLabel}
+            </span>
+          </p>
+        </div>
+      )}
+
+      {isGroupCreation && isSelfDeletingMessagesOff && (
+        <div
+          className="message-header"
+          data-uie-name="label-self-deleting-messages-off"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
+            <Icon.TimerIcon />
+          </div>
+          <p className="message-header-label">
+            <span className="ellipsis" title={timedMessagesDisabledLabel}>
+              {timedMessagesDisabledLabel}
+            </span>
+          </p>
+        </div>
+      )}
+
+      {isMemberLeave && user.isMe && isSelfTemporaryGuest && (
+        <div className="message-member-footer">
+          <p className="message-member-footer-description">{translate('temporaryGuestLeaveDescription')}</p>
+        </div>
+      )}
+
+      {isGroupCreation && <E2eEncryptionMessage isCellsConversation={isCellsConversation} />}
+    </>
+  );
+};

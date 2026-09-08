@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import type {WorkerProcessVideoTrackOptions} from 'Repositories/media/backgroundEffects/pipe/options';
 import {defaultWorkerOpts} from 'Repositories/media/backgroundEffects/pipe/options';
 import {
@@ -84,6 +85,14 @@ jest.mock('Repositories/media/backgroundEffects/helper/metrics', () => ({
   buildMetrics: jest.fn(() => ({})),
 }));
 
+async function writeVideoFrameToSink(writerSink: UnderlyingSink<VideoFrame>, frame: VideoFrame): Promise<void> {
+  if (isUndefined(writerSink.write)) {
+    throw new Error('The video frame writer was not created');
+  }
+
+  await writerSink.write(frame, {} as WritableStreamDefaultController);
+}
+
 describe('segmenter tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -138,11 +147,12 @@ describe('segmenter tests', () => {
 
       (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(firstSegmenter);
 
-      let writerSink!: UnderlyingSink<VideoFrame>;
+      const {promise: writerSinkPromise, resolve: resolveWriterSink} =
+        Promise.withResolvers<UnderlyingSink<VideoFrame>>();
 
       const readable = {
         pipeTo: jest.fn(writer => {
-          writerSink = writer.sink;
+          resolveWriterSink(writer.sink);
           return Promise.resolve();
         }),
       } as unknown as ReadableStream;
@@ -177,7 +187,8 @@ describe('segmenter tests', () => {
         close: jest.fn(),
       } as unknown as VideoFrame;
 
-      await writerSink.write!(frame, {} as WritableStreamDefaultController);
+      const writerSink = await writerSinkPromise;
+      await writeVideoFrameToSink(writerSink, frame);
 
       expect(firstSegmenter.setOptions).toHaveBeenCalledWith({
         baseOptions: {
@@ -280,16 +291,12 @@ describe('segmenter tests', () => {
         segmentForVideo: jest.fn(),
       };
 
-      let resolveSecondCreate!: () => void;
+      const {promise: secondSegmenterPromise, resolve: resolveSecondSegmenter} =
+        Promise.withResolvers<typeof secondSegmenter>();
 
       (ImageSegmenter.createFromOptions as jest.Mock)
         .mockResolvedValueOnce(firstSegmenter)
-        .mockImplementationOnce(
-          () =>
-            new Promise(resolve => {
-              resolveSecondCreate = () => resolve(secondSegmenter);
-            }),
-        )
+        .mockImplementationOnce(() => secondSegmenterPromise)
         .mockResolvedValueOnce(thirdSegmenter);
 
       const canvas = {
@@ -351,7 +358,7 @@ describe('segmenter tests', () => {
       expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(2);
 
       // Finish first queued restart.
-      resolveSecondCreate();
+      resolveSecondSegmenter(secondSegmenter);
 
       await Promise.resolve();
       await Promise.resolve();
@@ -373,11 +380,12 @@ describe('segmenter tests', () => {
 
       (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(segmenter);
 
-      let writerSink!: UnderlyingSink<VideoFrame>;
+      const {promise: writerSinkPromise, resolve: resolveWriterSink} =
+        Promise.withResolvers<UnderlyingSink<VideoFrame>>();
 
       const readable = {
         pipeTo: jest.fn(writer => {
-          writerSink = writer.sink;
+          resolveWriterSink(writer.sink);
           return Promise.resolve();
         }),
       } as unknown as ReadableStream;
@@ -411,7 +419,8 @@ describe('segmenter tests', () => {
         close: jest.fn(),
       } as unknown as VideoFrame;
 
-      await writerSink.write!(frame, {} as WritableStreamDefaultController);
+      const writerSink = await writerSinkPromise;
+      await writeVideoFrameToSink(writerSink, frame);
 
       const {WebGLRenderer} = await import('./renderer');
 
@@ -460,11 +469,12 @@ describe('segmenter tests', () => {
 
       (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(segmenter);
 
-      let writerSink!: UnderlyingSink<VideoFrame>;
+      const {promise: writerSinkPromise, resolve: resolveWriterSink} =
+        Promise.withResolvers<UnderlyingSink<VideoFrame>>();
 
       const readable = {
         pipeTo: jest.fn(writer => {
-          writerSink = writer.sink;
+          resolveWriterSink(writer.sink);
           return Promise.resolve();
         }),
       } as unknown as ReadableStream;
@@ -494,7 +504,8 @@ describe('segmenter tests', () => {
         close: jest.fn(),
       } as unknown as VideoFrame;
 
-      await writerSink.write!(frame, {} as WritableStreamDefaultController);
+      const writerSink = await writerSinkPromise;
+      await writeVideoFrameToSink(writerSink, frame);
 
       const {WebGLRenderer} = await import('./renderer');
 
@@ -544,10 +555,11 @@ describe('segmenter tests', () => {
 
         (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(segmenter);
 
-        let writerSink!: UnderlyingSink<VideoFrame>;
+        const {promise: writerSinkPromise, resolve: resolveWriterSink} =
+          Promise.withResolvers<UnderlyingSink<VideoFrame>>();
         const readable = {
           pipeTo: jest.fn((writer: {sink: UnderlyingSink<VideoFrame>}) => {
-            writerSink = writer.sink;
+            resolveWriterSink(writer.sink);
             return Promise.resolve();
           }),
         } as unknown as ReadableStream;
@@ -578,8 +590,9 @@ describe('segmenter tests', () => {
             close: jest.fn(),
           }) as unknown as VideoFrame;
 
-        await writerSink.write!(createFrame(1), {} as WritableStreamDefaultController);
-        await writerSink.write!(createFrame(2), {} as WritableStreamDefaultController);
+        const writerSink = await writerSinkPromise;
+        await writeVideoFrameToSink(writerSink, createFrame(1));
+        await writeVideoFrameToSink(writerSink, createFrame(2));
 
         const {WebGLRenderer} = await import('./renderer');
         const renderer = (WebGLRenderer as unknown as jest.Mock).mock.results[0].value;
@@ -609,11 +622,12 @@ describe('segmenter tests', () => {
 
       (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(segmenter);
 
-      let writerSink!: UnderlyingSink<VideoFrame>;
+      const {promise: writerSinkPromise, resolve: resolveWriterSink} =
+        Promise.withResolvers<UnderlyingSink<VideoFrame>>();
 
       const readable = {
         pipeTo: jest.fn(writer => {
-          writerSink = writer.sink;
+          resolveWriterSink(writer.sink);
           return Promise.resolve();
         }),
       } as unknown as ReadableStream;
@@ -648,7 +662,8 @@ describe('segmenter tests', () => {
         close: jest.fn(),
       } as unknown as VideoFrame;
 
-      await writerSink.write!(frame, {} as WritableStreamDefaultController);
+      const writerSink = await writerSinkPromise;
+      await writeVideoFrameToSink(writerSink, frame);
 
       const {WebGLRenderer} = await import('./renderer');
 

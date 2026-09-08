@@ -32,6 +32,7 @@ const createMeetingSeries = (title: string): MeetingSeries => ({
   qualified_id: {id: title, domain: 'example.com'},
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
   title,
+  tzid: 'Europe/Berlin',
 });
 
 const createMeetingInstance = (title: string, start: string, end: string): MeetingInstance => ({

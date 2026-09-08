@@ -156,13 +156,13 @@ export const ScheduleMeetingForm = ({
   );
 
   const startMinTime = useMemo(
-    () => getMinTimeForDate(toDateTimePickerValue(formState.start)),
-    [formState.start, getMinTimeForDate],
+    () => (mode === 'edit' ? null : getMinTimeForDate(toDateTimePickerValue(formState.start))),
+    [formState.start, getMinTimeForDate, mode],
   );
 
   const endMinTime = useMemo(
-    () => getMinTimeForDate(toDateTimePickerValue(formState.end)),
-    [formState.end, getMinTimeForDate],
+    () => (mode === 'edit' ? null : getMinTimeForDate(toDateTimePickerValue(formState.end))),
+    [formState.end, getMinTimeForDate, mode],
   );
 
   const endDateMinValue = useMemo(() => {

@@ -31,6 +31,7 @@ import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQuali
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
@@ -63,7 +64,11 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
-import {NetworkQualityInfo, NetworkQualityInfoSchema} from 'Repositories/calling/calling.schema';
+import {
+  NetworkQualityInfo,
+  NetworkQualityInfoSchema,
+  UNKNOWN_NETWORK_QUALITY,
+} from 'Repositories/calling/calling.schema';
 import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -158,7 +163,7 @@ type SubconversationData = {
 
 export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window) => {
   if (!Runtime.isDesktopApp()) {
-    return () => {};
+    return noop;
   }
 
   const handleClick = (event: MouseEvent) => {
@@ -223,7 +228,7 @@ export class CallingRepository {
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('CallingRepository');
-    this.incomingCallCallback = () => {};
+    this.incomingCallCallback = noop;
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -296,7 +301,7 @@ export class CallingRepository {
 
     this.subscribeToEvents();
 
-    this.onChooseScreen = (deviceId: string) => {};
+    this.onChooseScreen = noop;
 
     // Request the video streams whenever the mode changes to active speaker
     ko.computed(() => {
@@ -603,8 +608,8 @@ export class CallingRepository {
       this.sendSFTRequest, // `sfth`
       this.incomingCall, // `incomingh`,
       this.handleMissedCall, // `missedh`,
-      () => {}, // `answer
-      () => {}, // `estabh`,
+      noop, // `answer
+      noop, // `estabh`,
       this.callClosed, // `closeh`,
       this.metricsReceived, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
@@ -662,7 +667,11 @@ export class CallingRepository {
     }
     const {conversation} = call;
 
-    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversation.qualifiedId);
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+    const allClients = await coreServices.conversation.fetchAllParticipantsClients(conversation.qualifiedId);
 
     if (!this.isMLSConference(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
@@ -710,11 +719,16 @@ export class CallingRepository {
       return;
     }
 
+    const {quality} = qualityInfo;
+    if (quality === UNKNOWN_NETWORK_QUALITY) {
+      return;
+    }
+
     const call = this.findCall(this.parseQualifiedId(conversationId));
     if (!call) {
       return;
     }
-    const {quality} = qualityInfo;
+
     if (quality !== QUALITY.NORMAL) {
       // @note: This should be reverted back once avs is sending correct quality metrics
       // Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
@@ -972,7 +986,11 @@ export class CallingRepository {
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversationId);
+          const coreServices = this.core.service;
+          if (isUndefined(coreServices)) {
+            throw new Error('Core services are not initialized');
+          }
+          const allClients = await coreServices.conversation.fetchAllParticipantsClients(conversationId);
 
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
@@ -2355,13 +2373,21 @@ export class CallingRepository {
       const response = await axios.post(url, data);
       const {status, data: axiosData} = response;
       const jsonData = JSON.stringify(axiosData);
-      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+      const user = this.wUser;
+      if (isUndefined(user)) {
+        return;
+      }
+      this.wCall?.sftResp(user, status, jsonData, jsonData.length, context);
     };
     const avsSftResponseFailedCode = 1000;
     _sendSFTRequest().catch((error: unknown) => {
       this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${toError(error).message}`, error);
       avsLogger.warn(`Request to sft server failed with error`, error);
-      this.wCall?.sftResp(this.wUser!, avsSftResponseFailedCode, '', 0, context);
+      const user = this.wUser;
+      if (isUndefined(user)) {
+        return;
+      }
+      this.wCall?.sftResp(user, avsSftResponseFailedCode, '', 0, context);
     });
 
     return 0;

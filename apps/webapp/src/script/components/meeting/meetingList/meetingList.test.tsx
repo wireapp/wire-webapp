@@ -17,7 +17,7 @@
  *
  */
 
-import {createRef, useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import type {Virtualizer} from '@tanstack/react-virtual';
@@ -32,6 +32,7 @@ import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -81,6 +82,7 @@ const createMeetingSeries = (start: string, end: string, title: string): Meeting
   qualified_id: {id: `meeting-${title}`, domain: 'example.com'},
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
 });
 
 const createMainViewModelForTest = (): MainViewModel =>
@@ -107,6 +109,7 @@ const createMeetingStoreForTest = () =>
     deleteMeetingForAll: jest.fn(),
     removeMeetingByQualifiedId: jest.fn(),
     loadMeetingForEdit: jest.fn(),
+    syncMeetingByQualifiedId: jest.fn(),
   }));
 
 const renderMeetingList = (
@@ -140,6 +143,13 @@ const renderMeetingList = (
 };
 
 describe('MeetingList', () => {
+  it('shows a loading state before the first meetings response is received', () => {
+    renderMeetingList({meetingSeries: [], isLoading: true, hasLoadError: false});
+
+    expect(screen.getByTestId('status-loading')).toBeInTheDocument();
+    expect(screen.queryByTestId('empty-meetings-list')).not.toBeInTheDocument();
+  });
+
   it('shows the load error when the first load fails before any meetings are available', () => {
     renderMeetingList({meetingSeries: [], isLoading: false, hasLoadError: true});
 
@@ -262,7 +272,7 @@ describe('MeetingList', () => {
     const meetingItem = screen.getByText('Visible meeting').closest('[aria-describedby]');
     const describedBy = meetingItem?.getAttribute('aria-describedby');
     expect(describedBy).toBeTruthy();
-    expect(document.getElementById(describedBy!)).toHaveTextContent(/meetings\.list\.today/);
+    expect(document.getElementById(requireValueForTest(describedBy))).toHaveTextContent(/meetings\.list\.today/);
   });
 
   it('does not treat the page tail as last-in-day while more occurrences remain on the same day', () => {
@@ -334,8 +344,7 @@ describe('MeetingList', () => {
       clientHeight: {value: 100, configurable: true},
       scrollHeight: {value: 1000, configurable: true},
     });
-    const scrollElementRef = createRef<HTMLElement>();
-    scrollElementRef.current = scrollElement;
+    const scrollElementRef = {current: scrollElement};
 
     renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false, scrollElementRef}, wallClock);
     expect(screen.queryByText('Meeting 51')).not.toBeInTheDocument();

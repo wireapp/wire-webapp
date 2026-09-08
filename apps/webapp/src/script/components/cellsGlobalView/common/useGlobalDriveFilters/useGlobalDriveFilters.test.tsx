@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import type {
   FilterConfig,
   PopoverFilterConfig,
-} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
+} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

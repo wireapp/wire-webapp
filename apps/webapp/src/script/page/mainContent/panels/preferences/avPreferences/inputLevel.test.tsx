@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {
   createRootContextValueForTest,
@@ -47,7 +48,7 @@ describe('InputLevel', () => {
             arr.fill(128);
           },
         }) as AnalyserNode,
-      createMediaStreamSource: (stream: MediaStream) => ({connect: () => {}, disconnect: () => {}}),
+      createMediaStreamSource: (stream: MediaStream) => ({connect: noop, disconnect: noop}),
     }));
 
     jest.spyOn(global, 'setInterval').mockImplementation((callback: () => void, interval: any) => {

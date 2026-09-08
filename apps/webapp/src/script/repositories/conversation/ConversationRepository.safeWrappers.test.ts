@@ -23,6 +23,18 @@ import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {generateConversation as _generateConversation} from 'test/helper/ConversationGenerator';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateUser} from 'test/helper/UserGenerator';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {Core} from 'src/script/service/coreSingleton';
+
+import {ConversationRepository} from './ConversationRepository';
+
+function getConversationServiceForTest(
+  conversationRepository: ConversationRepository,
+): NonNullable<NonNullable<Core['service']>['conversation']> {
+  const service = requireValueForTest(conversationRepository['core'].service);
+
+  return requireValueForTest(service.conversation);
+}
 
 describe('ConversationRepository safe* wrappers', () => {
   const testFactory = new TestFactory();
@@ -34,7 +46,7 @@ describe('ConversationRepository safe* wrappers', () => {
   describe('safeGetConversationById', () => {
     it('resolves to Ok when getConversationById succeeds', async () => {
       const conversation = _generateConversation();
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       jest.spyOn(conversationRepository, 'getConversationById').mockResolvedValue(conversation);
 
       const settled = await conversationRepository.safeGetConversationById(conversation.qualifiedId);
@@ -46,7 +58,7 @@ describe('ConversationRepository safe* wrappers', () => {
     it('resolves to Err when getConversationById throws', async () => {
       const conversationId: QualifiedId = {id: 'missing', domain: 'wire.com'};
       const error = new Error('not found');
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       jest.spyOn(conversationRepository, 'getConversationById').mockRejectedValue(error);
 
       const settled = await conversationRepository.safeGetConversationById(conversationId);
@@ -61,9 +73,9 @@ describe('ConversationRepository safe* wrappers', () => {
       const conversation = _generateConversation();
       const selfUser = generateUser();
       const failedToAdd = [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}];
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
-      conversationRepository['core'].service!.conversation.establishMLSGroupConversation = jest
+      getConversationServiceForTest(conversationRepository).establishMLSGroupConversation = jest
         .fn()
         .mockResolvedValue({failedToAdd});
 
@@ -81,9 +93,9 @@ describe('ConversationRepository safe* wrappers', () => {
       const conversation = _generateConversation();
       const selfUser = generateUser();
       const error = new Error('MLS commit failed');
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
-      conversationRepository['core'].service!.conversation.establishMLSGroupConversation = jest
+      getConversationServiceForTest(conversationRepository).establishMLSGroupConversation = jest
         .fn()
         .mockRejectedValue(error);
 
@@ -104,8 +116,8 @@ describe('ConversationRepository safe* wrappers', () => {
       conversation.groupId = 'group-id';
       const user = generateUser();
       const failedToAdd = [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}];
-      const conversationRepository = testFactory.conversation_repository!;
-      conversationRepository['core'].service!.conversation.addUsersToMLSConversation = jest
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      getConversationServiceForTest(conversationRepository).addUsersToMLSConversation = jest
         .fn()
         .mockResolvedValue({failedToAdd});
 
@@ -113,7 +125,7 @@ describe('ConversationRepository safe* wrappers', () => {
 
       expect(settled.isOk).toBe(true);
       expect(settled.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual(failedToAdd);
-      expect(conversationRepository['core'].service!.conversation.addUsersToMLSConversation).toHaveBeenCalledWith({
+      expect(getConversationServiceForTest(conversationRepository).addUsersToMLSConversation).toHaveBeenCalledWith({
         conversationId: conversation.qualifiedId,
         groupId: conversation.groupId,
         qualifiedUsers: [user.qualifiedId],
@@ -123,14 +135,14 @@ describe('ConversationRepository safe* wrappers', () => {
     it('resolves to Ok with empty failedToAdd when no users are provided', async () => {
       const conversation = _generateConversation();
       conversation.groupId = 'group-id';
-      const conversationRepository = testFactory.conversation_repository!;
-      conversationRepository['core'].service!.conversation.addUsersToMLSConversation = jest.fn();
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      getConversationServiceForTest(conversationRepository).addUsersToMLSConversation = jest.fn();
 
       const settled = await conversationRepository.safeAddUsers(conversation, []);
 
       expect(settled.isOk).toBe(true);
       expect(settled.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual([]);
-      expect(conversationRepository['core'].service!.conversation.addUsersToMLSConversation).not.toHaveBeenCalled();
+      expect(getConversationServiceForTest(conversationRepository).addUsersToMLSConversation).not.toHaveBeenCalled();
     });
 
     it('resolves to Err when adding users throws', async () => {
@@ -138,8 +150,8 @@ describe('ConversationRepository safe* wrappers', () => {
       conversation.groupId = 'group-id';
       const user = generateUser();
       const error = new Error('MLS commit failed');
-      const conversationRepository = testFactory.conversation_repository!;
-      conversationRepository['core'].service!.conversation.addUsersToMLSConversation = jest
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      getConversationServiceForTest(conversationRepository).addUsersToMLSConversation = jest
         .fn()
         .mockRejectedValue(error);
 
@@ -153,7 +165,7 @@ describe('ConversationRepository safe* wrappers', () => {
       const conversation = _generateConversation();
       conversation.groupId = undefined;
       const user = generateUser();
-      const conversationRepository = testFactory.conversation_repository!;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
 
       const settled = await conversationRepository.safeAddUsers(conversation, [user]);
 

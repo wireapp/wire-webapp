@@ -20,6 +20,7 @@
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {STATE as CALL_STATE, CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {asyncNoop} from 'noop-esm';
 import {task} from 'true-myth';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
@@ -69,8 +70,8 @@ const createDeps = (overrides: Partial<JoinMeetingCallDeps> = {}): JoinMeetingCa
 
   const callingViewModel = {
     callActions: {
-      answer: async () => {},
-      startAudio: async () => {},
+      answer: asyncNoop,
+      startAudio: asyncNoop,
     },
   } as unknown as CallingViewModel;
 
@@ -85,8 +86,8 @@ const createDeps = (overrides: Partial<JoinMeetingCallDeps> = {}): JoinMeetingCa
 
 describe('joinMeetingCall', () => {
   it('starts an outgoing call when the meeting conversation is found locally and no incoming call exists', async () => {
-    const startAudio = jest.fn(async () => {});
-    const answer = jest.fn(async () => {});
+    const startAudio = jest.fn().mockResolvedValue(undefined);
+    const answer = jest.fn().mockResolvedValue(undefined);
     const deps = createDeps({
       callingViewModel: {
         callActions: {answer, startAudio},
@@ -102,7 +103,7 @@ describe('joinMeetingCall', () => {
 
   it('ensures the MLS group exists locally before starting the call', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn(async () => {});
+    const startAudio = jest.fn().mockResolvedValue(undefined);
     const safeEnsureConversationExists = jest.fn(() => task.resolve(undefined));
 
     const deps = createDeps({
@@ -130,7 +131,7 @@ describe('joinMeetingCall', () => {
 
   it('returns joinFailed when ensuring the MLS group fails', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn(async () => {});
+    const startAudio = jest.fn().mockResolvedValue(undefined);
 
     const deps = createDeps({
       conversationState: {
@@ -155,8 +156,8 @@ describe('joinMeetingCall', () => {
   it('answers an incoming call when one exists in the meeting conversation', async () => {
     const conversation = createMeetingConversation();
     const incomingCall = createIncomingCall(conversation);
-    const startAudio = jest.fn(async () => {});
-    const answer = jest.fn(async () => {});
+    const startAudio = jest.fn().mockResolvedValue(undefined);
+    const answer = jest.fn().mockResolvedValue(undefined);
 
     const deps = createDeps({
       conversationState: {
@@ -179,7 +180,7 @@ describe('joinMeetingCall', () => {
 
   it('fetches the conversation when it is not available locally', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn(async () => {});
+    const startAudio = jest.fn().mockResolvedValue(undefined);
     const findConversation = jest.fn(() => undefined);
     const safeGetConversationById = jest.fn(() => task.resolve(conversation));
     const safeEnsureConversationExists = jest.fn(() => task.resolve(undefined));

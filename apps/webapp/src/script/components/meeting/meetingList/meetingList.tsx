@@ -259,7 +259,7 @@ export const MeetingList = ({
   const hasVisibleMeetingInstances = visibleDayGroups.length > 0;
   const now = new Date(nowMilliseconds);
 
-  if (isLoading && isNonEmptyArray(meetingSeries)) {
+  if (isLoading) {
     return (
       <div css={emptyListContainerStyles} data-uie-name="meetings-list-loading">
         <Loading data-uie-name="status-loading" />

@@ -259,7 +259,7 @@ jobs:
           deployment-package-path: edge-artifact/ebs.zip
           wait-for-deployment: true
           wait-for-environment-recovery: true
-          deployment-timeout: 150
+          deployment-timeout: 300
           use-existing-application-version-if-available: true
 
       - name: Summarize Edge deployment
@@ -406,7 +406,7 @@ jobs:
           deployment-package-path: dev-artifact/ebs.zip
           wait-for-deployment: true
           wait-for-environment-recovery: true
-          deployment-timeout: 150
+          deployment-timeout: 300
           use-existing-application-version-if-available: true
 
       - name: Verify Hosted Dev runtime

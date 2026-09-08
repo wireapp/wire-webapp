@@ -25,7 +25,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is|noop-esm)/)'],
   coverageDirectory: '../../coverage/libraries/priority-queue',
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',

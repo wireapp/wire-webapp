@@ -29,23 +29,61 @@ const createUser = (id: string, name: string) => {
 };
 
 describe('getMeetingParticipantsForDisplay', () => {
-  it('places the self user first when they are in the participants list', () => {
+  it('places the organizer first, followed by the self user and other participants', () => {
+    const selfUser = createUser('self', 'Kim Organizer');
+    const otherUser = createUser('other', 'Jaqueline Olaho');
+    const organizer = createUser('organizer', 'Organizer');
+
+    expect(getMeetingParticipantsForDisplay([otherUser, selfUser, organizer], selfUser, organizer.qualifiedId)).toEqual(
+      [organizer, selfUser, otherUser],
+    );
+  });
+
+  it('handles the production participant list where self is absent', () => {
+    const selfUser = createUser('self', 'Kim Self');
+    const otherUser = createUser('other', 'Jaqueline Olaho');
+    const organizer = createUser('organizer', 'Organizer');
+
+    expect(getMeetingParticipantsForDisplay([otherUser, organizer], selfUser, organizer.qualifiedId)).toEqual([
+      organizer,
+      selfUser,
+      otherUser,
+    ]);
+  });
+
+  it('places the self user first when they are the organizer', () => {
     const selfUser = createUser('self', 'Kim Organizer');
     const otherUser = createUser('other', 'Jaqueline Olaho');
 
-    expect(getMeetingParticipantsForDisplay([otherUser, selfUser], selfUser)).toEqual([selfUser, otherUser]);
+    expect(getMeetingParticipantsForDisplay([otherUser, selfUser], selfUser, selfUser.qualifiedId)).toEqual([
+      selfUser,
+      otherUser,
+    ]);
   });
 
-  it('prepends the self user when they are not in the participants list', () => {
+  it('falls back to the self user when the organizer is not visible', () => {
     const selfUser = createUser('self', 'Kim Organizer');
+
+    expect(getMeetingParticipantsForDisplay([], selfUser, {id: 'organizer', domain: 'example.com'})).toEqual([
+      selfUser,
+    ]);
+  });
+
+  it('keeps the self user when they are the organizer but are not in the participants list', () => {
+    const selfUser = createUser('self', 'Kim Organizer');
+
+    expect(getMeetingParticipantsForDisplay([], selfUser, selfUser.qualifiedId)).toEqual([selfUser]);
+  });
+
+  it('places a known organizer first when they are absent from the participant list', () => {
+    const selfUser = createUser('self', 'Kim Self');
+    const organizer = createUser('organizer', 'Organizer');
     const otherUser = createUser('other', 'Jaqueline Olaho');
 
-    expect(getMeetingParticipantsForDisplay([otherUser], selfUser)).toEqual([selfUser, otherUser]);
-  });
-
-  it('returns only the self user when there are no other participants', () => {
-    const selfUser = createUser('self', 'Kim Organizer');
-
-    expect(getMeetingParticipantsForDisplay([], selfUser)).toEqual([selfUser]);
+    expect(getMeetingParticipantsForDisplay([otherUser], selfUser, organizer.qualifiedId, organizer)).toEqual([
+      organizer,
+      selfUser,
+      otherUser,
+    ]);
   });
 });

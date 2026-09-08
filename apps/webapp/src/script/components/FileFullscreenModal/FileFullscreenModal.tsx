@@ -24,16 +24,18 @@ import {Maybe} from 'true-myth';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
-import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/fullscreenModal/fullscreenModal';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getBestPreviewSource} from 'Util/imageUtil';
 import {getFileExtensionFromUrl} from 'Util/util';
 
 import {FileEditor} from './FileEditor/FileEditor';
+import {useFileFullscreenModalSourceConversation} from './FileFullscreenModalSourceConversationContext';
 import {FileHeader} from './FileHeader/FileHeader';
 import {FileLoader} from './FileLoader/FileLoader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
@@ -52,6 +54,8 @@ interface FileFullscreenModalProps {
   status?: Status;
   senderName: string;
   timestamp: number;
+  fallbackConversationName?: string;
+  sourceConversation?: Conversation;
   badges?: string[];
   isEditMode?: boolean;
   checkIsInRecycleBin?: () => boolean;
@@ -68,15 +72,18 @@ export const FileFullscreenModal = ({
   fileExtension,
   senderName,
   timestamp,
+  fallbackConversationName,
+  sourceConversation,
   badges,
   isEditMode = false,
   checkIsInRecycleBin = isInRecycleBin,
 }: FileFullscreenModalProps) => {
+  const sourceConversationFromContext = useFileFullscreenModalSourceConversation();
+  const sourceConversationForMetadata = sourceConversation ?? sourceConversationFromContext;
   const notInRecycleBin = !checkIsInRecycleBin();
   const canPerformCellsAction = useCellsActionPermissions();
-  const [isInEditMode, setIsInEditMode] = useState(
-    isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT),
-  );
+  const canEdit = canPerformCellsAction(CELLS_ACTION.EDIT);
+  const [isInEditMode, setIsInEditMode] = useState(isEditMode && notInRecycleBin && canEdit);
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
 
@@ -90,8 +97,8 @@ export const FileFullscreenModal = ({
   };
 
   useEffect(() => {
-    setIsInEditMode(isEditMode && notInRecycleBin && canPerformCellsAction(CELLS_ACTION.EDIT));
-  }, [canPerformCellsAction, isEditMode, notInRecycleBin]);
+    setIsInEditMode(isEditMode && notInRecycleBin && canEdit);
+  }, [canEdit, isEditMode, notInRecycleBin]);
 
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
@@ -102,12 +109,15 @@ export const FileFullscreenModal = ({
         fileUrl={fileUrl}
         senderName={senderName}
         timestamp={timestamp}
+        fallbackConversationName={fallbackConversationName}
+        sourceConversation={sourceConversationForMetadata}
         badges={badges}
         isInEditMode={isInEditMode}
         onEditModeChange={setIsInEditMode}
         isEditable={isEditable}
         id={id}
         onFileContentRefresh={refreshModalContent}
+        showViewOnlyLabel={!canEdit}
       />
       {isInEditMode && isEditable ? (
         <FileEditor key={refreshKey} id={id} />

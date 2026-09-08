@@ -22,7 +22,7 @@ import {ReactNode} from 'react';
 import {act, render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
+import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -86,13 +86,15 @@ const file: CellFile = {
 const FakeFilePreviewProvider = ({
   children,
   selfUserDriveRole,
+  selectedFile = file,
 }: {
   children: ReactNode;
   selfUserDriveRole: CellFile['selfUserDriveRole'];
+  selectedFile?: CellFile;
 }) => {
   const value: CellsFilePreviewModalContextValue = {
     id: 'preview-context-id',
-    selectedFile: {...file, selfUserDriveRole},
+    selectedFile: {...selectedFile, selfUserDriveRole},
     isEditMode: true,
     handleOpenFile: jest.fn(),
     handleCloseFile: jest.fn(),
@@ -123,15 +125,17 @@ describe('CellsFilePreviewModal', () => {
   const renderModal = ({
     isViewerPermissionFeatureEnabled = true,
     selfUserDriveRole,
+    selectedFile,
   }: {
     isViewerPermissionFeatureEnabled?: boolean;
     selfUserDriveRole: CellFile['selfUserDriveRole'];
+    selectedFile?: CellFile;
   }) => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     render(
       withThemeAndRootContext(
-        <FakeFilePreviewProvider selfUserDriveRole={selfUserDriveRole}>
+        <FakeFilePreviewProvider selfUserDriveRole={selfUserDriveRole} selectedFile={selectedFile}>
           <CellsFilePreviewModal />
         </FakeFilePreviewProvider>,
         createRootProviderWrapper({fireAndForgetInvoker, isViewerPermissionFeatureEnabled}),

@@ -20,6 +20,9 @@
 import {fireEvent, waitFor} from '@testing-library/react';
 
 import {TypeUtil} from '@wireapp/commons';
+import {noop} from 'noop-esm';
+
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
@@ -129,7 +132,7 @@ describe('SingleSignOnForm', () => {
 
     expect(submitButton.disabled).toBe(false);
 
-    fireEvent.submit(container.querySelector('form')!);
+    fireEvent.submit(requireValueForTest(container.querySelector('form')));
 
     const errorMessage = getByTestId(errorId);
     expect(errorMessage.dataset.uieValue).toBe(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH);
@@ -157,7 +160,7 @@ describe('SingleSignOnForm', () => {
 
     expect(submitButton.disabled).toBe(false);
 
-    fireEvent.submit(container.querySelector('form')!);
+    fireEvent.submit(requireValueForTest(container.querySelector('form')));
 
     const errorMessage = getByTestId(errorId);
     expect(errorMessage.dataset.uieValue).toBe(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH);
@@ -178,7 +181,7 @@ describe('SingleSignOnForm', () => {
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
     );
-    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
+    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(noop);
 
     const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
@@ -194,7 +197,7 @@ describe('SingleSignOnForm', () => {
 
     expect(submitButton.disabled).toBe(false);
 
-    fireEvent.submit(container.querySelector('form')!);
+    fireEvent.submit(requireValueForTest(container.querySelector('form')));
 
     await waitFor(() => {
       expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
@@ -217,7 +220,7 @@ describe('SingleSignOnForm', () => {
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
     );
-    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
+    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(noop);
 
     const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
@@ -235,7 +238,7 @@ describe('SingleSignOnForm', () => {
 
     expect(submitButton.disabled).toBe(false);
 
-    fireEvent.submit(container.querySelector('form')!);
+    fireEvent.submit(requireValueForTest(container.querySelector('form')));
 
     await waitFor(() => {
       expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);

@@ -20,6 +20,7 @@
 import {act, render, waitFor} from '@testing-library/react';
 
 import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
+import {noop} from 'noop-esm';
 
 import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
@@ -121,7 +122,7 @@ describe('fullscreenVideoCall', () => {
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
-    props.setActiveCallViewTab = () => {};
+    props.setActiveCallViewTab = noop;
     props.call.addParticipant(new Participant(new User('a', '', translateForTest), 'a'));
     props.call.addParticipant(new Participant(new User('b', '', translateForTest), 'b'));
     props.call.addParticipant(new Participant(new User('c', '', translateForTest), 'd'));

@@ -289,6 +289,122 @@ describe('CellsAPI', () => {
     });
   });
 
+  describe('uploadNode', () => {
+    it('checks file creation with the abort signal', async () => {
+      const abortController = new AbortController();
+      const response = {
+        Results: [
+          {
+            Exists: false,
+          },
+        ],
+      };
+      mockNodeServiceApi.createCheck.mockResolvedValueOnce(createMockResponse(response));
+
+      const result = await cellsAPI.uploadNode({
+        uuid: MOCKED_UUID,
+        versionId: MOCKED_UUID,
+        path: TEST_FILE_PATH,
+        file: testFile,
+        abortController,
+      });
+
+      expect(mockNodeServiceApi.createCheck).toHaveBeenCalledWith(
+        {
+          Inputs: [{Type: 'LEAF', Locator: {Path: TEST_FILE_PATH, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
+          FindAvailablePath: true,
+        },
+        {signal: abortController.signal},
+      );
+      expect(result).toBe(response);
+    });
+
+    it('auto-renames existing files before uploading to storage', async () => {
+      const nextPath = `${TEST_FOLDER_PATH}/test (1).txt`;
+      mockNodeServiceApi.createCheck.mockResolvedValueOnce(
+        createMockResponse({
+          Results: [
+            {
+              Exists: true,
+              NextPath: nextPath,
+            },
+          ],
+        }),
+      );
+
+      await cellsAPI.uploadNode({
+        uuid: MOCKED_UUID,
+        versionId: MOCKED_UUID,
+        path: TEST_FILE_PATH,
+        file: testFile,
+      });
+
+      expect(mockStorage.putObject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: nextPath,
+        }),
+      );
+    });
+
+    it('uploads the file to storage with progress and abort options', async () => {
+      const abortController = new AbortController();
+      const progressCallback = jest.fn();
+      mockNodeServiceApi.createCheck.mockResolvedValueOnce(
+        createMockResponse({
+          Results: [
+            {
+              Exists: false,
+            },
+          ],
+        }),
+      );
+
+      await cellsAPI.uploadNode({
+        uuid: MOCKED_UUID,
+        versionId: MOCKED_UUID,
+        path: TEST_FILE_PATH,
+        file: testFile,
+        progressCallback,
+        abortController,
+      });
+
+      expect(mockStorage.putObject).toHaveBeenCalledWith({
+        path: TEST_FILE_PATH,
+        file: testFile,
+        progressCallback,
+        abortController,
+      });
+    });
+
+    it('keeps the original storage path when autoRename is false', async () => {
+      mockNodeServiceApi.createCheck.mockResolvedValueOnce(
+        createMockResponse({
+          Results: [
+            {
+              Exists: true,
+              NextPath: `${TEST_FOLDER_PATH}/test (1).txt`,
+            },
+          ],
+        }),
+      );
+
+      await cellsAPI.uploadNode({
+        uuid: MOCKED_UUID,
+        versionId: MOCKED_UUID,
+        path: TEST_FILE_PATH,
+        file: testFile,
+        autoRename: false,
+      });
+
+      expect(mockStorage.putObject).toHaveBeenCalledWith({
+        path: TEST_FILE_PATH,
+        file: testFile,
+        progressCallback: undefined,
+        abortController: undefined,
+      });
+    });
+  });
+
   describe('getNode', () => {
     it('retrieves a file by ID', async () => {
       const fileId = 'file-uuid';

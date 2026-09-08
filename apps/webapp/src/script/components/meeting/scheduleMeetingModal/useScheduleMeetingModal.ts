@@ -232,8 +232,9 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
   setSelectedUsers: selectedUsers => set(state => ({formState: {...state.formState, selectedUsers}})),
   setParticipantsFilter: participantsFilter => set(state => ({formState: {...state.formState, participantsFilter}})),
   validate: wallClock => {
-    const {title, start, end} = get().formState;
-    const errors = getScheduleMeetingFormErrors({title, start, end, wallClock});
+    const {formState, mode} = get();
+    const {title, start, end} = formState;
+    const errors = getScheduleMeetingFormErrors({title, start, end, wallClock, mode});
     set({errors});
     return errors;
   },

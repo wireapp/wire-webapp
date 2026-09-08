@@ -32,7 +32,9 @@ import {
 } from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CONVERSATION} from 'Repositories/event/Client';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {StatusType} from 'src/script/message/statusType';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 export function createMessageAddEvent({
@@ -45,7 +47,7 @@ export function createMessageAddEvent({
   dataOverrides?: Partial<MessageAddEvent['data']>;
 } = {}): MessageAddEvent {
   const from = createUuid();
-  const conversation = new Conversation(createUuid(), 'domain');
+  const conversation = new Conversation(createUuid(), 'domain', CONVERSATION_PROTOCOL.PROTEUS, translate);
   const baseEvent = EventBuilder.buildMessageAdd({
     conversationEntity: conversation,
     currentTimestamp: Date.now(),
@@ -75,7 +77,7 @@ export function createMultipartMessageAddEvent({
   dataOverrides?: Partial<MultipartMessageAddEvent['data']>;
 } = {}): MultipartMessageAddEvent {
   const from = createUuid();
-  const conversation = new Conversation(createUuid(), 'domain');
+  const conversation = new Conversation(createUuid(), 'domain', CONVERSATION_PROTOCOL.PROTEUS, translate);
   return {
     conversation: conversation.id,
     data: {

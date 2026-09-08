@@ -20,12 +20,14 @@
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
+import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {getMeetNowMeetingTimes} from 'Components/meeting/shared/defaults/meetingDateTimeDefaults';
 import type {MeetNowMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
 
 export const mapMeetNowCommandToCreateMeeting = (
   command: MeetNowMeetingCommand,
   wallClock: WallClock,
+  deviceTimeZone: DeviceTimeZone,
 ): CreateMeeting => {
   const {start, end} = getMeetNowMeetingTimes(wallClock);
 
@@ -33,5 +35,6 @@ export const mapMeetNowCommandToCreateMeeting = (
     title: command.title,
     start_time: start.toISOString(),
     end_time: end.toISOString(),
+    tzid: deviceTimeZone.ianaTimeZoneId,
   };
 };

@@ -28,7 +28,7 @@ export type {ValidatedMeetingConversation} from '../conversation/conversationSch
 
 /**
  * Runtime validation schemas for the Wire meetings API according to
- * https://staging-nginz-https.zinfra.io/v16/api/swagger-ui/#/default/get_meetings_list
+ * https://staging-nginz-https.zinfra.io/v17/api/swagger-ui/#/default/get_meetings_list
  *
  * MeetingsAPI validates responses with parse() and throws on invalid data.
  */
@@ -50,7 +50,7 @@ const meetingFieldsSchema = {
   recurrence: meetingRecurrenceSchema.optional(),
   start_time: utcTimeSchema,
   title: z.string().min(1).max(256),
-  trial: z.boolean(),
+  tzid: z.string().min(1),
   updated_at: utcTimeSchema,
 } as const;
 

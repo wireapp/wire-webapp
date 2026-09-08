@@ -26,6 +26,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {
@@ -57,6 +58,7 @@ import {createUuid} from 'Util/uuid';
 import {Call} from './Call';
 import {CallingRepository, setupDetachedWindowExternalLinksClick} from './CallingRepository';
 import {CallingViewMode, CallState, MuteState} from './CallState';
+import {type NetworkQuality, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
@@ -76,6 +78,7 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Translate} from 'Util/localizerUtil';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -135,6 +138,12 @@ function createCallingRepositoryForTest({
 const translateWithPrefixForTest: Translate = (translationKey, _substitutions, _dangerousSubstitutions, _skipEscape) =>
   `translated:${translationKey}`;
 
+function getSubconversationServiceForTest(): NonNullable<NonNullable<Core['service']>['subconversation']> {
+  const service = requireValueForTest(container.resolve(Core).service);
+
+  return requireValueForTest(service.subconversation);
+}
+
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository: CallingRepository;
@@ -170,8 +179,8 @@ describe('CallingRepository', () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
       const senderUserId = {domain: 'senderdomain', id: 'senderid'};
-      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
-      const selfClientId = callingRepository['selfClientId']!;
+      const selfUserId = requireValueForTest(callingRepository['selfUser']).qualifiedId;
+      const selfClientId = requireValueForTest(callingRepository['selfClientId']);
       const call = new Call(
         selfUserId,
         conversation,
@@ -216,8 +225,8 @@ describe('CallingRepository', () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
       const senderUserId = {domain: 'senderdomain', id: 'senderid'};
-      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
-      const selfClientId = callingRepository['selfClientId']!;
+      const selfUserId = requireValueForTest(callingRepository['selfUser']).qualifiedId;
+      const selfClientId = requireValueForTest(callingRepository['selfClientId']);
       const call = new Call(
         selfUserId,
         conversation,
@@ -262,7 +271,7 @@ describe('CallingRepository', () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
       const senderUserId = {domain: 'senderdomain', id: 'senderid'};
-      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+      const selfUserId = requireValueForTest(callingRepository['selfUser']).qualifiedId;
 
       const call = new Call(
         selfUserId,
@@ -309,9 +318,7 @@ describe('CallingRepository', () => {
 
   describe('startCall', () => {
     beforeEach(() => {
-      const subscribeToEpochUpdates = jest.mocked(
-        container.resolve(Core).service!.subconversation.subscribeToEpochUpdates,
-      );
+      const subscribeToEpochUpdates = jest.mocked(getSubconversationServiceForTest().subscribeToEpochUpdates);
       subscribeToEpochUpdates?.mockClear();
     });
 
@@ -412,9 +419,7 @@ describe('CallingRepository', () => {
 
   describe('answerCall', () => {
     beforeEach(() => {
-      const subscribeToEpochUpdates = jest.mocked(
-        container.resolve(Core).service!.subconversation.subscribeToEpochUpdates,
-      );
+      const subscribeToEpochUpdates = jest.mocked(getSubconversationServiceForTest().subscribeToEpochUpdates);
       subscribeToEpochUpdates?.mockClear();
     });
 
@@ -669,7 +674,7 @@ describe('CallingRepository', () => {
     const userId = 'user-id';
     const remoteClientId = 'client-id';
 
-    const qualityInfo = (quality: QUALITY) =>
+    const qualityInfo = (quality: NetworkQuality) =>
       JSON.stringify({
         quality,
         rtt: 80,
@@ -696,7 +701,7 @@ describe('CallingRepository', () => {
       const remoteParticipant = new Participant(user, remoteClientId);
 
       const call = new Call(
-        callingRepository['selfUser']!.qualifiedId,
+        requireValueForTest(callingRepository['selfUser']).qualifiedId,
         conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
@@ -711,6 +716,25 @@ describe('CallingRepository', () => {
 
       jest.spyOn(Warnings, 'showWarning');
       jest.spyOn(Warnings, 'hideWarning');
+    });
+
+    it('keeps unknown network quality as a no-op', () => {
+      jest.spyOn(callingRepository['logger'], 'warn');
+      jest.spyOn(callingRepository, 'findCall');
+
+      expect(() => {
+        callingRepository['updateCallQuality'](
+          conversationId,
+          userId,
+          remoteClientId,
+          qualityInfo(UNKNOWN_NETWORK_QUALITY),
+        );
+      }).not.toThrow();
+
+      expect(callingRepository['logger'].warn).not.toHaveBeenCalled();
+      expect(Warnings.showWarning).not.toHaveBeenCalled();
+      expect(Warnings.hideWarning).not.toHaveBeenCalled();
+      expect(callingRepository.findCall).not.toHaveBeenCalled();
     });
 
     // skipping test for now. Once we have correct stats about network
@@ -1102,7 +1126,7 @@ describe('CallingRepository ISO', () => {
 
 describe.skip('E2E audio call', () => {
   const {repository: client} = createCallingRepositoryForTest({
-    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+    eventRepository: {injectEvent: noop} as unknown as EventRepository,
   });
   type E2ECallingRepositorySpies = {
     checkConcurrentJoinedCall: () => Promise<boolean>;
@@ -1160,8 +1184,8 @@ describe.skip('E2E audio call', () => {
 
   let joinedCallSub: Subscription;
   let activeCallsSub: Subscription;
-  let onCallClosed = () => {};
-  let onCallConnected = () => {};
+  let onCallClosed: () => void = noop;
+  let onCallConnected: () => void = noop;
   beforeEach(() => {
     joinedCallSub = client['callState'].joinedCall.subscribe(call => {
       if (call) {
@@ -1242,9 +1266,9 @@ describe.skip('E2E audio call', () => {
 
 describe('NotificationHandlingState', () => {
   const {repository: client} = createCallingRepositoryForTest({
-    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+    eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
-      setOnMediaDevicesRefreshHandler: () => {},
+      setOnMediaDevicesRefreshHandler: noop,
     } as unknown as MediaDevicesHandler,
   });
   const user = new User('user-1', '', translateForTest);
@@ -1289,9 +1313,9 @@ describe('NotificationHandlingState', () => {
 
 describe('init AVS state', () => {
   const {repository: client} = createCallingRepositoryForTest({
-    eventRepository: {injectEvent: () => {}} as unknown as EventRepository,
+    eventRepository: {injectEvent: noop} as unknown as EventRepository,
     mediaDevicesHandler: {
-      setOnMediaDevicesRefreshHandler: () => {},
+      setOnMediaDevicesRefreshHandler: noop,
     } as unknown as MediaDevicesHandler,
   });
   const user = new User('user-1', '', translateForTest);
@@ -1359,7 +1383,8 @@ describe('init AVS state', () => {
 
 const createLinkInsideDetachedWindow = (detachedWindow: Window, target = '_blank') => {
   detachedWindow.document.body.innerHTML = `<a href="https://wire.com" target="${target}">Wire</a>`;
-  return detachedWindow.document.querySelector('a')!;
+
+  return requireValueForTest(detachedWindow.document.querySelector('a'));
 };
 
 describe('setupDetachedWindowExternalLinksClick', () => {
@@ -1787,7 +1812,7 @@ describe('set background effect', () => {
 
       jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
       jest.spyOn(selfParticipant, 'videoStream').mockReturnValue(originalStream);
-      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(ko.pureComputed<boolean>(() => true));
+      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true);
 
       const applySpy = jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant');
 
@@ -1817,7 +1842,7 @@ describe('set background effect', () => {
       const inputStream = createMediaStream('inputStream');
 
       jest.spyOn(callState, 'joinedCall').mockImplementation(ko.pureComputed<Call | undefined>(() => activeCall));
-      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(ko.pureComputed<boolean>(() => true));
+      jest.spyOn(selfParticipant, 'sharesScreen').mockReturnValue(true);
 
       const result = await callingRepository['applyCurrentBackgroundEffectOnSelfParticipant'](inputStream, true);
 
@@ -2053,18 +2078,18 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
   const wUser = wCall.create(
     selfUserId,
     selfClientId,
-    () => {}, // `readyh`,
+    noop, // `readyh`,
     sendMsg, // `sendh`,
     () => 0, // `sfth`
     incoming, // `incomingh`,
-    () => {}, // `missedh`,
-    () => {}, // `answerh`,
-    () => {}, // `estabh`,
-    () => {}, // `closeh`,
-    () => {}, // `metricsh`,
+    noop, // `missedh`,
+    noop, // `answerh`,
+    noop, // `estabh`,
+    noop, // `closeh`,
+    noop, // `metricsh`,
     requestConfig, // `cfg_reqh`,
-    (() => {}) as WcallAudioCbrChangeHandler, // `acbrh`,
-    () => {}, // `vstateh`,
+    noop as WcallAudioCbrChangeHandler, // `acbrh`,
+    noop, // `vstateh`,
     0,
   );
   return wUser;

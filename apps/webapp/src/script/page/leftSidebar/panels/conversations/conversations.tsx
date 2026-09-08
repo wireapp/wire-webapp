@@ -20,6 +20,7 @@
 import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -47,7 +48,7 @@ import {Preferences} from 'src/script/page/leftSidebar/panels/preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/mainContent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {ContentState, ListState} from 'src/script/page/useAppState';
+import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
@@ -64,21 +65,25 @@ import {getTabConversations, scrollToConversation} from './helpers';
 import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {
-  SidebarStatus,
   ConversationListStatus,
-  SidebarTabs,
-  useSidebarStore,
   getCanCollapseConversationList,
   getIsConversationListCollapsed,
   isConversationListTab,
+  SidebarStatus,
+  SidebarTabs,
+  useSidebarStore,
 } from './useSidebarStore';
 
 import {Config} from '../../../../Config';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../listWrapper';
 import {StartUI} from '../startUi';
+
+export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean =>
+  ![SidebarTabs.PREFERENCES, SidebarTabs.MEETINGS].includes(tab);
 
 type ConversationsProps = {
   callState?: CallState;
@@ -297,8 +302,14 @@ export const Conversations = ({
   };
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+    const handleConversationShow = (conversation?: Conversation) => {
       if (!conversation) {
+        return;
+      }
+
+      if (
+        [SidebarTabs.CONNECT, SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(currentTab)
+      ) {
         return;
       }
 
@@ -307,8 +318,11 @@ export const Conversations = ({
       if (!includesConversation) {
         setCurrentTab(SidebarTabs.RECENT);
       }
-    });
-  }, [currentTabConversations, setCurrentTab]);
+    };
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
+    return () => amplify.unsubscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
+  }, [currentTab, currentTabConversations, setCurrentTab]);
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
@@ -319,7 +333,7 @@ export const Conversations = ({
 
   useEffect(() => {
     if (!activeConversation) {
-      return () => {};
+      return noop;
     }
 
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
@@ -334,11 +348,14 @@ export const Conversations = ({
   const switchList = listViewModel.switchList;
   const switchContent = listViewModel.contentViewModel.switchContent;
 
-  const onExitPreferences = useCallback(() => {
-    setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
-    switchList(ListState.CONVERSATIONS);
-    switchContent(ContentState.CONVERSATION);
-  }, [setCurrentView, switchList, switchContent]);
+  const onExitPreferences = useCallback(
+    (loadPreviousContent = true) => {
+      setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+      switchList(ListState.CONVERSATIONS, loadPreviousContent);
+      switchContent(ContentState.CONVERSATION);
+    },
+    [setCurrentView, switchList, switchContent],
+  );
 
   const changeTab = useCallback(
     (nextTab: SidebarTabs, folderId?: string) => {
@@ -351,8 +368,22 @@ export const Conversations = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(nextTab)) {
-        onExitPreferences();
+      if (nextTab === SidebarTabs.MEETINGS && !isMeetingsEnabled) {
+        return;
+      }
+
+      clearConversationFilter();
+      setCurrentTab(nextTab);
+
+      const {listState} = useAppState.getState();
+      const isSwitchingConversationListTab = listState === ListState.CONVERSATIONS && isConversationListTab(nextTab);
+
+      if (shouldClearDeepLinkForTab(nextTab) && !isSwitchingConversationListTab) {
+        setHistoryParam('/');
+
+        if (nextTab !== SidebarTabs.CELLS && nextTab !== SidebarTabs.MEETINGS) {
+          onExitPreferences(isConversationListTab(nextTab));
+        }
       }
 
       if (nextTab === SidebarTabs.CELLS) {
@@ -361,15 +392,8 @@ export const Conversations = ({
       }
 
       if (nextTab === SidebarTabs.MEETINGS) {
-        if (!isMeetingsEnabled) {
-          return;
-        }
-        switchList(ListState.MEETINGS);
-        switchContent(ContentState.MEETINGS);
+        listViewModel.openMeetingsList();
       }
-
-      clearConversationFilter();
-      setCurrentTab(nextTab);
     },
     [
       conversationRepository,
@@ -380,6 +404,7 @@ export const Conversations = ({
       isMeetingsEnabled,
       clearConversationFilter,
       setCurrentTab,
+      listViewModel,
     ],
   );
 
@@ -404,14 +429,14 @@ export const Conversations = ({
       setCurrentTab(SidebarTabs.RECENT);
       switchList(ListState.CONVERSATIONS);
       switchContent(ContentState.CONVERSATION);
+      setHistoryParam('/');
     }
   }, [currentTab, isMeetingsEnabled, setCurrentTab, switchContent, switchList]);
 
   const onClickPreferences = useCallback(
     (itemId: ContentState) => {
-      switchList(ListState.PREFERENCES);
+      listViewModel.openPreferences(itemId);
       setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
-      switchContent(itemId);
 
       setTimeout(() => {
         const centerColumn = document.getElementById('center-column');
@@ -419,7 +444,7 @@ export const Conversations = ({
         nextElementToFocus?.focus();
       }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
     },
-    [switchList, setCurrentView, switchContent],
+    [listViewModel, setCurrentView],
   );
 
   const handleEnterSearchClick = useCallback(

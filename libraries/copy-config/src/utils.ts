@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import axios from 'axios';
 import copy from 'copy';
 import {ensureDir, remove, readFile, writeFile, createWriteStream} from 'fs-extra';
@@ -71,7 +72,11 @@ export async function extractAsync(zipFile: string, destination: string): Promis
 
   await jszip.loadAsync(data, {createFolders: true});
   jszip.forEach((filePath, entry) => entries.push([filePath, entry]));
-  const stripEntry = entries[0]![0];
+  const firstEntry = entries[0];
+  if (isUndefined(firstEntry)) {
+    throw new Error('The archive contains no entries');
+  }
+  const stripEntry = firstEntry[0];
 
   await Promise.all(
     entries.map(async ([filePath, entry]) => {

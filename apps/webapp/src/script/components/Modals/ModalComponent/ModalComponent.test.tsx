@@ -20,6 +20,7 @@
 import {act, fireEvent, render} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ModalComponent} from './ModalComponent';
 
@@ -143,7 +144,7 @@ describe('ModalComponent', () => {
     const iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
 
-    const iframeDocument = iframe.contentDocument!;
+    const iframeDocument = requireValueForTest(iframe.contentDocument);
     const iframeContainer = iframeDocument.createElement('div');
     iframeDocument.body.appendChild(iframeContainer);
 
@@ -157,7 +158,7 @@ describe('ModalComponent', () => {
     const iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
 
-    const iframeDocument = iframe.contentDocument!;
+    const iframeDocument = requireValueForTest(iframe.contentDocument);
     const iframeContainer = iframeDocument.createElement('div');
     iframeDocument.body.appendChild(iframeContainer);
 
@@ -170,7 +171,7 @@ describe('ModalComponent', () => {
     const iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
 
-    const iframeDocument = iframe.contentDocument!;
+    const iframeDocument = requireValueForTest(iframe.contentDocument);
     const iframeContainer = iframeDocument.createElement('div');
     iframeDocument.body.appendChild(iframeContainer);
 

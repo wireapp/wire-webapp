@@ -40,7 +40,7 @@ const toResponseText = (responseBody: string | ArrayBuffer | null): string => {
 const toResponseBody = (
   responseBody: string,
   responseType: XMLHttpRequestResponseType,
-): ArrayBuffer | object | string => {
+): ArrayBuffer | object | string | null => {
   if (responseType === 'arraybuffer') {
     return new TextEncoder().encode(responseBody).buffer;
   }

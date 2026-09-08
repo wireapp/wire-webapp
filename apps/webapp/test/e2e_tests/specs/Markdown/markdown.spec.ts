@@ -33,6 +33,69 @@ test.describe('Markdown', () => {
     userA = team.owner;
   });
 
+  test(
+    'I want to paste text with CRLF (carriage return/ line feed) characters in the message',
+    {tag: ['@regression', '@TC-11735']},
+    async ({createPage}) => {
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      await userAPages.conversationList().getConversation(userB.fullName).open();
+
+      const messageInput = userAPages.conversation().messageInput;
+      await messageInput.click();
+      await userAPage.evaluate(async pastedText => {
+        await navigator.clipboard.writeText(pastedText);
+      }, 'first line\r\nsecond line');
+      await messageInput.press('ControlOrMeta+v');
+
+      await expect(messageInput).toContainText('first line');
+      await expect(messageInput).toContainText('second line');
+
+      const actualEditorText = await messageInput.evaluate((element: HTMLElement): string => element.innerText);
+      const expectedEditorText = 'first line\nsecond line';
+
+      expect(actualEditorText).toBe(expectedEditorText);
+    },
+  );
+
+  test(
+    'I want to paste text with HTML code in the message',
+    {tag: ['@regression', '@TC-11736']},
+    async ({createPage}) => {
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      await userAPages.conversationList().getConversation(userB.fullName).open();
+
+      const messageInput = userAPages.conversation().messageInput;
+      await messageInput.click();
+      await userAPage.evaluate(
+        async clipboardContents => {
+          const clipboardItem = new ClipboardItem({
+            'text/html': new Blob([clipboardContents.html], {type: 'text/html'}),
+            'text/plain': new Blob([clipboardContents.plainText], {type: 'text/plain'}),
+          });
+
+          await navigator.clipboard.write([clipboardItem]);
+        },
+        {
+          html: '<p><strong>Pasted bold</strong> <a href="https://wire.com">Wire</a></p><ul><li>first</li><li>second</li></ul>',
+          plainText: 'Pasted bold Wire\nfirst\nsecond',
+        },
+      );
+      await messageInput.press('ControlOrMeta+v');
+
+      await expect(messageInput.locator('strong')).toHaveText('Pasted bold');
+      await expect(messageInput.locator('a')).toHaveAttribute('href', 'https://wire.com/');
+      await expect(messageInput.locator('a')).toHaveText('Wire');
+      await expect(messageInput.locator('ul')).toHaveCount(1);
+      await expect(messageInput.locator('li')).toHaveText(['first', 'second']);
+    },
+  );
+
   [
     {
       description: 'I want to write a bold message',

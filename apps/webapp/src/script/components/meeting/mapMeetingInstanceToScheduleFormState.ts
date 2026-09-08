@@ -21,16 +21,16 @@ import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {maybe} from 'true-myth';
 
 import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import {getUpcomingMeetingInstanceStart} from 'Components/meeting/selectors/getMeetingInstancesInRange';
+import {getEditAnchorMeetingInstance} from 'Components/meeting/selectors/getMeetingInstancesInRange';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {User} from 'Repositories/entity/User';
 
 /**
  * Builds edit-form state from the selected list row.
  *
- * For recurring series, start/end come from the upcoming instance (first occurrence on or
- * after now), not the selected row. That keeps the update anchor from jumping forward and
- * wiping earlier instances. Series metadata (title, recurrence, id) comes from `meetingSeries`.
+ * For recurring series, start/end come from today's not-yet-ended occurrence when one
+ * exists, otherwise the next instance on or after now — not the selected list row.
+ * Series metadata (title, recurrence, id) comes from `meetingSeries`.
  */
 export const mapMeetingInstanceToScheduleFormState = (
   meetingInstance: MeetingInstance,
@@ -38,13 +38,12 @@ export const mapMeetingInstanceToScheduleFormState = (
   wallClock: WallClock,
 ): ScheduleMeetingFormState => {
   const {meetingSeries} = meetingInstance;
-  const upcomingStart = getUpcomingMeetingInstanceStart(meetingSeries, wallClock.currentDate);
-  const upcomingEnd = new Date(upcomingStart.getTime() + meetingSeries.duration_ms);
+  const anchorInstance = getEditAnchorMeetingInstance(meetingSeries, wallClock.currentDate);
 
   return {
     title: meetingSeries.title,
-    start: maybe.just(upcomingStart),
-    end: maybe.just(upcomingEnd),
+    start: maybe.just(anchorInstance.start),
+    end: maybe.just(anchorInstance.end),
     recurrence: meetingSeries.recurrence,
     selectedUsers,
     participantsFilter: '',

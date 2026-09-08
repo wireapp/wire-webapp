@@ -18,13 +18,14 @@
  */
 
 import {fireEvent, render, act} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {FadingScrollbar, parseColor} from './fadingScrollbar';
 
 jest.useFakeTimers();
 
 describe('FadingScrollbar', () => {
-  let step: () => void = () => {};
+  let step: () => void = noop;
   beforeEach(() => {
     jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: any) => (step = cb));
   });

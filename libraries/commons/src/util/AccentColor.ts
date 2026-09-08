@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import * as RandomUtil from './RandomUtil';
 
 export enum AccentColorID {
@@ -88,7 +90,14 @@ export const ACCENT_COLORS: AccentColor[] = [
 ];
 
 export const getById = (id: number): AccentColor | undefined => ACCENT_COLORS.find(color => color.id === id);
-export const getRandom = (): AccentColor => RandomUtil.randomArrayElement(ACCENT_COLORS);
+export const getRandom = (): AccentColor => {
+  const randomAccentColor = RandomUtil.randomArrayElement(ACCENT_COLORS);
+  if (isUndefined(randomAccentColor)) {
+    throw new Error('Accent colors must contain at least one color');
+  }
+
+  return randomAccentColor;
+};
 
 /**
  * Use with caution:

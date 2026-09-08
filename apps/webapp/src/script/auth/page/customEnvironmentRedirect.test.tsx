@@ -18,6 +18,7 @@
  */
 
 import {act} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {CustomEnvironmentRedirect} from './customEnvironmentRedirect';
 
@@ -44,7 +45,7 @@ describe('CustomEnvironmentRedirect', () => {
     const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent&sso_auto_login=true';
     const originalURLSearchParams = window.URLSearchParams;
     window.URLSearchParams = createMockedURLSearchParams(expectedHost);
-    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
+    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(noop);
     mountComponent(<CustomEnvironmentRedirect />, mockStoreFactory()(initialRootState));
 
     act(() => {

@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {
   differenceInDays,
   differenceInHours,
@@ -83,14 +84,88 @@ export enum TIME_IN_MILLIS {
   WEEK = DAY * 7,
   YEAR = DAY * 365,
 }
-const locales = {cs, da, de, el, es, et, fi, fr, hr, hu, it, lt, nl, pl, pt, ro, ru, sk, sl, tr, uk};
-const defaultLocale = enUS;
-let locale = defaultLocale;
-export type LocaleType = keyof typeof locales;
-export const setDateLocale = (newLocale: LocaleType) => (locale = locales[newLocale] ?? defaultLocale);
+const dateFnsLocales = {
+  cs,
+  da,
+  de,
+  el,
+  en: enUS,
+  es,
+  et,
+  fi,
+  fr,
+  hr,
+  hu,
+  it,
+  lt,
+  nl,
+  pl,
+  pt,
+  ro,
+  ru,
+  sk,
+  sl,
+  tr,
+  uk,
+};
+const defaultDateFnsLocale = enUS;
+let dateFnsLocale = defaultDateFnsLocale;
+export type LocaleType = keyof typeof dateFnsLocales;
+
+const DEFAULT_REGIONAL_DATE_LOCALE = 'en-US';
+let regionalDateLocale = DEFAULT_REGIONAL_DATE_LOCALE;
+
+const numeralDateFormatOptions: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+};
+const dayMonthNumeralFormatOptions: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+};
+
+function findDateFnsLocale(localeName: string): typeof enUS {
+  const matchingLocale = Object.entries(dateFnsLocales).find(
+    ([supportedLocaleName]): boolean => supportedLocaleName === localeName,
+  );
+
+  if (isUndefined(matchingLocale)) {
+    return defaultDateFnsLocale;
+  }
+
+  return matchingLocale[1];
+}
+
+function resolveRegionalDateLocale(localeName: string): string {
+  try {
+    const supportedLocales = Intl.DateTimeFormat.supportedLocalesOf(localeName);
+    const firstSupportedLocale = supportedLocales[0];
+
+    if (isUndefined(firstSupportedLocale)) {
+      return DEFAULT_REGIONAL_DATE_LOCALE;
+    }
+
+    return firstSupportedLocale;
+  } catch {
+    return DEFAULT_REGIONAL_DATE_LOCALE;
+  }
+}
+
+export function setDateLocale(newLocale: string): void {
+  dateFnsLocale = findDateFnsLocale(newLocale);
+}
+
+export function setRegionalDateLocale(newLocale: string): void {
+  regionalDateLocale = resolveRegionalDateLocale(newLocale);
+}
 
 export const formatLocale = (date: FnDate | string | number, formatString: string) =>
-  format(new Date(date), formatString, {locale});
+  format(new Date(date), formatString, {locale: dateFnsLocale});
+
+function formatRegionalDate(date: FnDate | string | number, options: Intl.DateTimeFormatOptions): string {
+  return new Intl.DateTimeFormat(regionalDateLocale, options).format(new Date(date));
+}
 
 /**
  * Format the time as `12:00 AM`.
@@ -106,17 +181,18 @@ export const formatDateShort = (date: FnDate | string | number) => formatLocale(
 export const formatDayMonth = (date: FnDate | string | number) =>
   formatDateShort(date)
     .replace(/[0-9]{4}/g, '')
-    .replace(locale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
+    .replace(dateFnsLocale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
 
 /**
- * Format the date as `05/29/2020`.
- * This is equivalent to momentjs' `L` formatting
+ * Format the date numerically according to the browser's regional locale.
  */
-export const formatDateNumeral = (date: FnDate | string | number) => formatLocale(date, 'P');
-export const formatDayMonthNumeral = (date: FnDate | string | number) =>
-  formatDateNumeral(date)
-    .replace(/[0-9]{4}/g, '')
-    .replace(locale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
+export function formatDateNumeral(date: FnDate | string | number): string {
+  return formatRegionalDate(date, numeralDateFormatOptions);
+}
+
+export function formatDayMonthNumeral(date: FnDate | string | number): string {
+  return formatRegionalDate(date, dayMonthNumeralFormatOptions);
+}
 
 const durationUnits = (translate: Translate) => [
   {
@@ -290,7 +366,7 @@ export const isYoungerThanMinute = (date: FnDate): boolean => differenceInMinute
 export const isYoungerThan1Hour = (date: FnDate) => differenceInHours(new Date(), date) < 1;
 export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(), date) < 7;
 
-export const fromNowLocale = (date: FnDate) => formatDistanceToNow(date, {addSuffix: true, locale});
+export const fromNowLocale = (date: FnDate) => formatDistanceToNow(date, {addSuffix: true, locale: dateFnsLocale});
 
 export {isToday, fromUnixTime, isYesterday, isSameDay, isSameMonth, isThisYear, differenceInHours, differenceInMinutes};
 

@@ -51,6 +51,7 @@ import {showInitialModal} from 'Repositories/user/availabilityModal';
 import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
+import {canUseMeetings} from 'Util/canUseMeetings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
@@ -70,7 +71,8 @@ import {ContentState, useAppState} from './useAppState';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {configureRoutes, navigate} from '../router/Router';
+import {configureRouterWallClock, configureRoutes, navigate} from '../router/Router';
+import {Core} from '../service/coreSingleton';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 
@@ -100,6 +102,7 @@ export const AppMain = (properties: AppMainProps) => {
     selfUser,
     conversationState = container.resolve(ConversationState),
     callState = container.resolve(CallState),
+    wallClock,
     locked,
   } = properties;
   const translate = mainView.translate;
@@ -127,6 +130,7 @@ export const AppMain = (properties: AppMainProps) => {
   ]);
 
   const teamState = container.resolve(TeamState);
+  const core = container.resolve(Core);
   const userState = container.resolve(UserState);
   const appLockRepository = useMemo(() => new AppLockRepository(translate), [translate]);
 
@@ -242,6 +246,7 @@ export const AppMain = (properties: AppMainProps) => {
       showUserModal({domain, id: userId}, () => navigate('/'));
     };
 
+    configureRouterWallClock(wallClock);
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId/:domain': showConversationMessages,
@@ -255,7 +260,13 @@ export const AppMain = (properties: AppMainProps) => {
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/meetings': () => (teamState.isMeetingsEnabled() ? mainView.list.openMeetingsList() : navigate('/')),
+      '/meetings': () =>
+        canUseMeetings({
+          isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
+          apiVersion: core.backendFeatures.version,
+        })
+          ? mainView.list.openMeetingsList()
+          : navigate('/'),
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,

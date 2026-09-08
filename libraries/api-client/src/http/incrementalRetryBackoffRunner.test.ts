@@ -33,9 +33,9 @@ type IncrementalRetryBackoffRunnerDependenciesForTest = {
 };
 
 function createIncrementalRetryBackoffRunnerDependenciesForTest(): IncrementalRetryBackoffRunnerDependenciesForTest {
-  const waitForDurationInMilliseconds = jest.fn<Promise<void>, [number, Maybe<AbortSignal>]>(
-    async (_durationInMilliseconds: number, _abortSignal: Maybe<AbortSignal>) => {},
-  );
+  const waitForDurationInMilliseconds = jest
+    .fn<Promise<void>, [number, Maybe<AbortSignal>]>()
+    .mockResolvedValue(undefined);
 
   return {
     abortableWait: {

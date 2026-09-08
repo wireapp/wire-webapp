@@ -19,10 +19,13 @@
 
 import type {CSSObject} from '@emotion/react';
 
+/** height of notification host + padding */
+export const meetingNotificationHostCollapsedOffset = 72;
+
 export const meetingNotificationHostStyles: CSSObject = {
   position: 'absolute',
   bottom: 0,
-  zIndex: 'var(--z-index-panel)',
+  zIndex: 'var(--z-index-badge)',
   display: 'flex',
   flexDirection: 'column',
   width: '100%',

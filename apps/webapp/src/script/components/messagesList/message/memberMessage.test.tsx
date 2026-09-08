@@ -1,0 +1,731 @@
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {render} from '@testing-library/react';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+
+import {randomInt} from 'crypto';
+
+import {generateUser} from 'test/helper/UserGenerator';
+
+import en from 'I18n/en-US.json';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
+import {User} from 'Repositories/entity/User';
+import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from 'Util/localizerUtil';
+
+import {MemberMessage} from './memberMessage';
+import {CONFIG} from './memberMessage/messageContent';
+
+jest.mock('Components/avatar', () => ({
+  AVATAR_SIZE: {
+    X_LARGE: 'avatar-xl',
+  },
+  Avatar: () => <div data-uie-name="mock-avatar" />,
+}));
+
+setStrings({en});
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    isFeatureToggleEnabled(featureToggleName) {
+      return featureToggleName === reactTranslationRenderingFeatureToggleName;
+    },
+    translate,
+  }),
+);
+
+type TranslationTestFunction = () => void | Promise<void>;
+
+async function withTranslationStrings(strings: typeof en, testFunction: TranslationTestFunction): Promise<void> {
+  setStrings({en: strings});
+
+  try {
+    await testFunction();
+  } finally {
+    setStrings({en});
+  }
+}
+
+function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
+  const message = new MemberMessageEntity(translate);
+  if (systemType !== undefined) {
+    message.memberMessageType = systemType;
+  }
+  if (type !== undefined) {
+    message.type = type;
+  }
+  const actor = generateUser();
+  message.user(actor);
+  if (users) {
+    message.userIds(users.map(user => user.qualifiedId));
+    message.userEntities(users);
+  } else {
+    message.userIds([actor.qualifiedId]);
+    message.userEntities([actor]);
+  }
+  message.name('message');
+
+  return message;
+}
+
+const baseProps = {
+  hasReadReceiptsTurnedOn: false,
+  isSelfDeletingMessagesOff: false,
+  isSelfTemporaryGuest: false,
+  onClickCancelRequest: jest.fn(),
+  onClickInvitePeople: jest.fn(),
+  onClickParticipants: jest.fn(),
+  shouldShowInvitePeople: false,
+  conversationName: 'group 1',
+  isCellsConversation: false,
+  isSelfGuest: false,
+};
+
+describe('MemberMessage', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('shows connected message', async () => {
+    const props = {
+      ...baseProps,
+      message: createMemberMessage({systemType: SystemMessageType.CONNECTION_ACCEPTED}, [
+        new User('id', '', translate),
+      ]),
+    };
+
+    const {getByTestId} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+    expect(getByTestId('element-connected-message')).not.toBeNull();
+  });
+
+  it('shows self-deleting messages off banner when group is created and self-deleting messages are disabled', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true,
+    };
+
+    const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+  });
+
+  it('does not show self-deleting messages off banner when self-deleting messages are enabled', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: false,
+    };
+
+    const {queryByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+    expect(queryByText('Self-deleting messages are off')).not.toBeInTheDocument();
+  });
+
+  it('shows self-deleting messages off banner when Cells is enabled (even with global timer)', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true, // This would be true when isCellsConversation is true (per MessageWrapper logic)
+      isCellsConversation: true,
+    };
+
+    const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+  });
+
+  it('shows self-deleting messages off banner when Cells is enabled because Cells disables ephemeral messages', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true, // Always true when isCellsConversation is true (computed in MessageWrapper)
+      isCellsConversation: true,
+    };
+
+    const {container, getByText, getByTitle} = render(withTheme(<MemberMessage {...props} />), {
+      wrapper: rootProviderWrapper,
+    });
+    // Both banners should be visible
+    expect(
+      getByTitle('Shared Drive is on. You have editor access. People outside your team only have viewer access.'),
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="label-cells-conversation"] .ellipsis')).not.toBeInTheDocument();
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+  });
+
+  it('shows the guest Shared Drive system message for guests', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isCellsConversation: true,
+      isSelfGuest: true,
+    };
+
+    const {container, getByTitle} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+
+    expect(
+      getByTitle('Shared Drive is on. You can view, but you can’t upload, edit, or manage files.'),
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="cells-conversation-learn-more"]')).toBeInTheDocument();
+  });
+
+  describe('CONVERSATION_CREATE', () => {
+    it('displays participants of a newly created conversation', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      users.forEach(user => {
+        expect(getByText(user.name())).not.toBeNull();
+      });
+    });
+
+    it('displays a showMore when there are more than MAX_USERS_VISIBLE users', () => {
+      const nbExtraUsers = randomInt(1, 10);
+      const nbUsers = CONFIG.MAX_USERS_VISIBLE + nbExtraUsers;
+
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText, container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+
+      expect(container.querySelectorAll('strong')).toHaveLength(CONFIG.REDUCED_USERS_COUNT + 1);
+      const showMoreButton = getByText(`${nbUsers - CONFIG.REDUCED_USERS_COUNT} more`);
+      showMoreButton.click();
+
+      expect(props.onClickParticipants).toHaveBeenCalledTimes(1);
+    });
+
+    it('displays all team members', () => {
+      const nbExtraUsers = randomInt(1, 10);
+      const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, teamUsers);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      const showMoreButton = getByText('all team members');
+      showMoreButton.click();
+
+      expect(props.onClickParticipants).toHaveBeenCalledTimes(1);
+    });
+
+    it('displays all team members and one guest message', () => {
+      const nbExtraUsers = randomInt(1, 10);
+      const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const guest = generateUser();
+      guest.isGuest(true);
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [...teamUsers, guest]);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(getByText('all team members and one guest')).not.toBeNull();
+    });
+
+    it('displays all team members and multiple guests message', () => {
+      const nbGuests = randomInt(2, 10);
+      const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const guests = Array.from({length: nbGuests}, () => {
+        const guest = generateUser();
+        guest.isGuest(true);
+        return guest;
+      });
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [
+        ...teamUsers,
+        ...guests,
+      ]);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(getByText(`all team members and ${nbGuests} guests`)).not.toBeNull();
+    });
+
+    it('displays that another user created a conversation', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
+      message.name('');
+      message.user().name('Creator');
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('Creator started a conversation with');
+    });
+
+    it('displays that self user created a conversation', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
+      message.name('');
+      message.user().isMe = true;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('You started a conversation with');
+    });
+
+    it('renders the named group creation header with the legacy renderer when the feature toggle is disabled', () => {
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+      message.user().isMe = true;
+
+      const {container} = render(
+        withTheme(
+          <MemberMessage
+            hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+            isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+            isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+            message={message}
+            onClickCancelRequest={baseProps.onClickCancelRequest}
+            onClickInvitePeople={baseProps.onClickInvitePeople}
+            onClickParticipants={baseProps.onClickParticipants}
+            shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+            conversationName={baseProps.conversationName}
+            isCellsConversation={baseProps.isCellsConversation}
+            isSelfGuest={baseProps.isSelfGuest}
+          />,
+        ),
+        {wrapper: rootProviderWrapper},
+      );
+
+      expect(container.querySelector('.message-group-creation-header-text strong')).toBeInTheDocument();
+      expect(container.textContent).toContain('You started the conversation');
+    });
+
+    it('renders supported bold translation markup as a React element when the feature toggle is enabled', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedNameYou: '[bold]You[/bold] started the conversation',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = true;
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+          const strongElements = groupCreationHeader?.querySelectorAll('strong');
+
+          expect(groupCreationHeader).toHaveTextContent('You started the conversation');
+          expect(strongElements).toHaveLength(1);
+          expect(strongElements?.[0]).toHaveTextContent('You');
+        },
+      );
+    });
+
+    it('renders another sender name as React text when the feature toggle is enabled', () => {
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+      message.user().isMe = false;
+      message.user().name('R&D <Test>');
+
+      const {container} = render(
+        withThemeAndRootContext(
+          <MemberMessage
+            hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+            isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+            isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+            message={message}
+            onClickCancelRequest={baseProps.onClickCancelRequest}
+            onClickInvitePeople={baseProps.onClickInvitePeople}
+            onClickParticipants={baseProps.onClickParticipants}
+            shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+            conversationName={baseProps.conversationName}
+            isCellsConversation={baseProps.isCellsConversation}
+            isSelfGuest={baseProps.isSelfGuest}
+          />,
+          reactTranslationRenderingRootProviderWrapper,
+        ),
+      );
+      const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+      expect(groupCreationHeader?.textContent).toBe('R&D <Test> started the conversation');
+      expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('R&D <Test>');
+      expect(container.querySelector('test')).toBeNull();
+    });
+
+    it('keeps markup-like sender names as literal React text when the feature toggle is enabled', () => {
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+      message.user().isMe = false;
+      message.user().name('[bold]Admin[/bold]');
+
+      const {container} = render(
+        withThemeAndRootContext(
+          <MemberMessage
+            hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+            isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+            isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+            message={message}
+            onClickCancelRequest={baseProps.onClickCancelRequest}
+            onClickInvitePeople={baseProps.onClickInvitePeople}
+            onClickParticipants={baseProps.onClickParticipants}
+            shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+            conversationName={baseProps.conversationName}
+            isCellsConversation={baseProps.isCellsConversation}
+            isSelfGuest={baseProps.isSelfGuest}
+          />,
+          reactTranslationRenderingRootProviderWrapper,
+        ),
+      );
+      const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+      const strongElements = groupCreationHeader?.querySelectorAll('strong');
+
+      expect(groupCreationHeader?.textContent).toBe('[bold]Admin[/bold] started the conversation');
+      expect(strongElements).toHaveLength(1);
+      expect(strongElements?.[0]).toHaveTextContent('[bold]Admin[/bold]');
+    });
+
+    it('renders the sender name outside formatting when the translation places it outside formatting', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedName: '{name} started the conversation',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = false;
+          message.user().name('Alice');
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+          expect(groupCreationHeader?.textContent).toBe('Alice started the conversation');
+          expect(groupCreationHeader?.querySelector('strong')).toBeNull();
+        },
+      );
+    });
+
+    it('follows translated word order and formatting around the sender name', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedName: 'Conversation started by [bold]{name}[/bold]',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = false;
+          message.user().name('Alice');
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+          expect(groupCreationHeader?.textContent).toBe('Conversation started by Alice');
+          expect(groupCreationHeader?.querySelectorAll('strong')).toHaveLength(1);
+          expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('Alice');
+        },
+      );
+    });
+
+    it('keeps a markup-like sender name literal when the translation places it outside formatting', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedName: '{name} started the conversation',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = false;
+          message.user().name('[bold]Admin[/bold]');
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+          expect(groupCreationHeader?.textContent).toBe('[bold]Admin[/bold] started the conversation');
+          expect(groupCreationHeader?.querySelector('strong')).toBeNull();
+        },
+      );
+    });
+
+    it('renders arbitrary image markup as text when the feature toggle is enabled', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedNameYou: '<img src="example">[bold]You[/bold] started the conversation',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = true;
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+          expect(groupCreationHeader).toHaveTextContent('<img src="example">You started the conversation');
+          expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('You');
+          expect(container.querySelector('img')).toBeNull();
+        },
+      );
+    });
+
+    it('renders arbitrary meta markup as text when the feature toggle is enabled', async () => {
+      await withTranslationStrings(
+        {
+          ...en,
+          conversationCreatedNameYou: '<meta name="example" content="value">[bold]You[/bold] started the conversation',
+        },
+        () => {
+          const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+          message.user().isMe = true;
+
+          const {container} = render(
+            withThemeAndRootContext(
+              <MemberMessage
+                hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
+                isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
+                isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
+                message={message}
+                onClickCancelRequest={baseProps.onClickCancelRequest}
+                onClickInvitePeople={baseProps.onClickInvitePeople}
+                onClickParticipants={baseProps.onClickParticipants}
+                shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
+                conversationName={baseProps.conversationName}
+                isCellsConversation={baseProps.isCellsConversation}
+                isSelfGuest={baseProps.isSelfGuest}
+              />,
+              reactTranslationRenderingRootProviderWrapper,
+            ),
+          );
+          const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
+
+          expect(groupCreationHeader).toHaveTextContent(
+            '<meta name="example" content="value">You started the conversation',
+          );
+          expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('You');
+          expect(container.querySelector('meta')).toBeNull();
+        },
+      );
+    });
+  });
+
+  describe('MEMBER_JOIN', () => {
+    it('displays that self user added new members', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_JOIN}, users);
+      message.user().isMe = true;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('You added ');
+    });
+
+    it('displays that a new members were added by someone', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_JOIN}, users);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain(`${message.user().name()} added `);
+    });
+
+    it('displays that a new members joined the conversation', () => {
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_JOIN});
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain(`${message.user().name()} joined`);
+    });
+  });
+
+  describe('MEMBER_LEAVE', () => {
+    it('displays that self user left the conversation', () => {
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE});
+      message.user().isMe = true;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('You left');
+    });
+
+    it('displays that a member left the conversation', () => {
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE});
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain(`${message.user().name()} left`);
+    });
+
+    it('displays that a member was removed by someone', () => {
+      const removedUser = generateUser();
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE}, [removedUser]);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain(`${message.user().name()} removed ${removedUser.name()}`);
+    });
+
+    it('displays that many users were removed', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE}, users);
+      message.user().id = '';
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});
+      expect(container.textContent).toContain('were removed');
+    });
+  });
+});

@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {
@@ -38,7 +39,7 @@ describe('ServiceList', () => {
     const serviceEntity2 = new ServiceEntity({id: createUuid()});
 
     const props = {
-      onServiceClick: () => {},
+      onServiceClick: noop,
       isSearching: false,
       services: [serviceEntity1, serviceEntity2],
     };
@@ -51,7 +52,7 @@ describe('ServiceList', () => {
 
   it('shows the "no results found" element when there are no services', () => {
     const props = {
-      onServiceClick: () => {},
+      onServiceClick: noop,
       isSearching: true,
       services: [] as ServiceEntity[],
     };

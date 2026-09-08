@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "noUncheckedIndexedAccess": false,
+    "paths": {
+      "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
+      "@enormora/objectory": ["../../node_modules/@enormora/objectory/main.d.ts"],
+      "Components/*": ["./src/script/components/*"],
+      "Hooks/*": ["./src/script/hooks/*"],
+      "I18n/*": ["./src/i18n/*"],
+      "Repositories/*": ["./src/script/repositories/*"],
+      "Resource/*": ["./resource/*"],
+      "Util/*": ["./src/script/util/*"],
+      "apps/*": ["apps/*"]
+    }
+  },
+  "exclude": ["node_modules", "../server/", "src/sw.js", "src/worker/"]
+}

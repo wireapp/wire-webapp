@@ -17,6 +17,8 @@
  *
  */
 
+import {noop} from 'noop-esm';
+
 import {choosePipeline, detectCapabilities} from './capability';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import * as capabilityModule from './capability';
@@ -103,7 +105,7 @@ describe('capability', () => {
       // Mock HTMLVideoElement with requestVideoFrameCallback
       class MockHTMLVideoElement {}
       Object.defineProperty(MockHTMLVideoElement.prototype, 'requestVideoFrameCallback', {
-        value: () => {},
+        value: noop,
         writable: true,
         configurable: true,
       });
@@ -206,7 +208,7 @@ describe('capability', () => {
     it('detects requestVideoFrameCallback when available', () => {
       class MockHTMLVideoElement {}
       Object.defineProperty(MockHTMLVideoElement.prototype, 'requestVideoFrameCallback', {
-        value: () => {},
+        value: noop,
         writable: true,
         configurable: true,
       });

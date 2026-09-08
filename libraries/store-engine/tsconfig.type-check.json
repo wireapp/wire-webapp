@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node", "jest"],
+    "noUncheckedIndexedAccess": false,
+    "baseUrl": ".",
+    "paths": {
+      "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "lib"]
+}

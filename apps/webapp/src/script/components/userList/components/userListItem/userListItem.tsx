@@ -32,7 +32,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
-interface UserListItemProps {
+export interface UserListItemProps {
   groupId?: string;
   canSelect: boolean;
   customInfo?: string;
@@ -102,29 +102,27 @@ export const UserListItem = ({
 
   const contentInfoText = getContentInfoText();
 
-  const RenderParticipant = () => {
-    return (
-      <div css={listItem(noInteraction)} data-uie-name="item-user" data-uie-value={userName}>
-        <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
+  const participantContent = (
+    <div css={listItem(noInteraction)} data-uie-name="item-user" data-uie-value={userName}>
+      <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
 
-        <ParticipantItemContent
-          groupId={groupId}
-          participant={user}
-          shortDescription={contentInfoText}
-          {...(isSelf && {selfString})}
-          hasUsernameInfo={hasUsernameInfo}
-        />
+      <ParticipantItemContent
+        groupId={groupId}
+        participant={user}
+        shortDescription={contentInfoText}
+        {...(isSelf && {selfString})}
+        hasUsernameInfo={hasUsernameInfo}
+      />
 
-        <UserStatusBadges
-          config={{
-            guest: !isOthersMode && isDirectGuest && !isFederated,
-            federated: isFederated,
-            external,
-          }}
-        />
-      </div>
-    );
-  };
+      <UserStatusBadges
+        config={{
+          guest: !isOthersMode && isDirectGuest && !isFederated,
+          federated: isFederated,
+          external,
+        }}
+      />
+    </div>
+  );
 
   const dataUieValues = {
     'data-uie-name': 'highlighted',
@@ -147,9 +145,7 @@ export const UserListItem = ({
             outlineOffset="0"
           >
             <CheckboxLabel htmlFor={checkboxId}>
-              <div {...dataUieValues}>
-                <RenderParticipant />
-              </div>
+              <div {...dataUieValues}>{participantContent}</div>
             </CheckboxLabel>
           </Checkbox>
         </div>
@@ -165,7 +161,7 @@ export const UserListItem = ({
           })}
           {...dataUieValues}
         >
-          <RenderParticipant />
+          {participantContent}
         </div>
       )}
     </>

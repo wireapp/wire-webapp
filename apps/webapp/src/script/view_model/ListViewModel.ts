@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
+import type {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
@@ -53,6 +54,7 @@ import {
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
+import {setHistoryParam} from '../router/Router';
 import {showContextMenu} from '../ui/contextMenu';
 import {showLabelContextMenu} from '../ui/labelContextMenu';
 import {Shortcut} from '../ui/shortcut';
@@ -88,6 +90,7 @@ export class ListViewModel {
     mainViewModel: MainViewModel,
     repositories: ViewModelRepositories,
     private readonly translate: Translate,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
   ) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
@@ -264,36 +267,48 @@ export class ListViewModel {
     this.switchList(listState);
   };
 
-  openPreferencesAccount = async (): Promise<void> => {
-    await this.teamRepository.getTeam();
+  openPreferencesAccount = (): void => {
+    this.fireAndForgetInvoker.fireAndForget(() => this.teamRepository.getTeam());
+    this.openPreferences(ContentState.PREFERENCES_ACCOUNT);
+  };
+
+  readonly openPreferences = (contentState: ContentState): void => {
+    const {listState, contentState: currentContentState} = useAppState.getState();
+    if (listState === ListState.PREFERENCES && currentContentState === contentState) {
+      return;
+    }
+
+    const preferencePaths: Partial<Record<ContentState, string>> = {
+      [ContentState.PREFERENCES_ABOUT]: '/preferences/about',
+      [ContentState.PREFERENCES_ACCOUNT]: '/preferences/account',
+      [ContentState.PREFERENCES_AV]: '/preferences/av',
+      [ContentState.PREFERENCES_DEVICES]: '/preferences/devices',
+      [ContentState.PREFERENCES_OPTIONS]: '/preferences/options',
+    };
+
+    const preferencePath = preferencePaths[contentState];
+    if (preferencePath) {
+      setHistoryParam(preferencePath);
+    }
 
     this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
-
-    this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
+    this.contentViewModel.switchContent(contentState);
   };
 
   readonly openPreferencesDevices = (): void => {
-    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
-
-    return this.contentViewModel.switchContent(ContentState.PREFERENCES_DEVICES);
+    this.openPreferences(ContentState.PREFERENCES_DEVICES);
   };
 
   readonly openPreferencesAbout = (): void => {
-    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
-
-    return this.contentViewModel.switchContent(ContentState.PREFERENCES_ABOUT);
+    this.openPreferences(ContentState.PREFERENCES_ABOUT);
   };
 
   readonly openPreferencesAudioVideo = (): void => {
-    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
-
-    return this.contentViewModel.switchContent(ContentState.PREFERENCES_AV);
+    this.openPreferences(ContentState.PREFERENCES_AV);
   };
 
   readonly openPreferencesOptions = (): void => {
-    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
-
-    return this.contentViewModel.switchContent(ContentState.PREFERENCES_OPTIONS);
+    this.openPreferences(ContentState.PREFERENCES_OPTIONS);
   };
 
   readonly openStartUI = (): void => {
@@ -301,9 +316,14 @@ export class ListViewModel {
   };
 
   readonly openMeetingsList = (): void => {
-    this.switchListAndSetTab(ListState.MEETINGS, SidebarTabs.MEETINGS);
+    const {listState, contentState} = useAppState.getState();
+    if (listState === ListState.MEETINGS && contentState === ContentState.MEETINGS) {
+      return;
+    }
 
-    return this.contentViewModel.switchContent(ContentState.MEETINGS);
+    setHistoryParam('/meetings');
+    this.switchListAndSetTab(ListState.MEETINGS, SidebarTabs.MEETINGS);
+    this.contentViewModel.switchContent(ContentState.MEETINGS);
   };
 
   readonly switchList = (newListState: ListState, loadPreviousContent = true): void => {
@@ -327,7 +347,7 @@ export class ListViewModel {
 
     if (archive) {
       setCurrentTab(SidebarTabs.ARCHIVES);
-    } else {
+    } else if (currentTab !== SidebarTabs.CONNECT) {
       setCurrentTab(getConversationListTab(currentTab));
     }
   };

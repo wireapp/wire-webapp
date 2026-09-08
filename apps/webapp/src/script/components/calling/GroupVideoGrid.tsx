@@ -20,6 +20,7 @@
 import {CSSProperties, ReactNode, useEffect, useState} from 'react';
 
 import {css} from '@emotion/react';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Loading, QUERY} from '@wireapp/react-ui-kit';
@@ -67,6 +68,112 @@ const COLUMNS = {
 
 const PARTICIPANTS_DESKTOP_EDGE_CASE = 3;
 const MIN_PARTICIPANTS_FOR_MAXIMIZED_VIEW = 2;
+
+interface GroupVideoThumbnailProps {
+  readonly thumbnail: Participant;
+  readonly minimized: boolean;
+  readonly maximizedParticipant: Participant | null;
+  readonly selfParticipant: Participant;
+}
+
+function GroupVideoThumbnail({
+  thumbnail: thumbnailParticipant,
+  minimized,
+  maximizedParticipant,
+  selfParticipant,
+}: GroupVideoThumbnailProps): ReactNode {
+  const thumbnail = useKoSubscribableChildren(thumbnailParticipant, [
+    'hasActiveVideo',
+    'sharesScreen',
+    'videoStream',
+    'processedVideoStream',
+  ]);
+  const {showLoadingOverlay, onVideoCanPlay} = useShowLoadingOverlay(
+    true,
+    thumbnail.hasActiveVideo,
+    thumbnail.processedVideoStream,
+  );
+  const {isMuted: selfIsMuted, handRaisedAt: selfHandRaisedAt} = useKoSubscribableChildren(selfParticipant, [
+    'isMuted',
+    'handRaisedAt',
+  ]);
+
+  return (
+    <>
+      {!isNullOrUndefined(thumbnail.videoStream) && maximizedParticipant === null && (
+        <GroupVideoThumbnailWrapper minimized={minimized}>
+          <Video
+            className="group-video__thumbnail-video"
+            autoPlay
+            playsInline
+            /* This is needed to keep playing the video when detached to a new window,
+               only muted video can be played automatically without user interacting with the window first,
+               see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
+            */
+            muted
+            data-uie-name="self-video-thumbnail"
+            onCanPlay={onVideoCanPlay}
+            css={{
+              transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
+            }}
+            srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
+          />
+          {showLoadingOverlay && (
+            <div
+              aria-busy={showLoadingOverlay}
+              css={groupVideoBackgroundInitializingOverlay}
+              data-uie-name="background-effect-initializing"
+            >
+              <Loading size={32} />
+            </div>
+          )}
+          {selfIsMuted && !minimized && (
+            <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+              <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+            </span>
+          )}
+          {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
+            <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
+              ✋
+            </span>
+          )}
+        </GroupVideoThumbnailWrapper>
+      )}
+      {!thumbnail.hasActiveVideo && (
+        <GroupVideoThumbnailWrapper minimized={minimized}>
+          <div
+            css={{
+              alignItems: 'center',
+              display: 'flex',
+              height: '100%',
+              justifyContent: 'center',
+              width: '100%',
+            }}
+          >
+            {selfIsMuted && !minimized && (
+              <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+                <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+              </span>
+            )}
+            {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
+              <span
+                className="group-video-grid__element__label__hand_icon small"
+                data-uie-name="status-call-audio-muted"
+              >
+                ✋
+              </span>
+            )}
+            <Avatar
+              avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
+              participant={selfParticipant.user}
+              hideAvailabilityStatus
+            />
+          </div>
+        </GroupVideoThumbnailWrapper>
+      )}
+    </>
+  );
+}
 
 interface CalculateRowsAndColumsParams {
   totalCount: number;
@@ -144,18 +251,6 @@ const GroupVideoGrid = ({
   const isMedium = useActiveWindowMatchMedia(HEIGHT_QUERIES.MEDIUM);
   const isTall = useActiveWindowMatchMedia(HEIGHT_QUERIES.TALL);
 
-  const thumbnail = useKoSubscribableChildren(grid.thumbnail!, [
-    'hasActiveVideo',
-    'sharesScreen',
-    'videoStream',
-    'processedVideoStream',
-  ]);
-  const {showLoadingOverlay, onVideoCanPlay} = useShowLoadingOverlay(
-    true,
-    thumbnail.hasActiveVideo,
-    thumbnail.processedVideoStream,
-  );
-
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
     calculateRowsAndColumns({
       totalCount: grid?.grid.length,
@@ -229,11 +324,6 @@ const GroupVideoGrid = ({
     }
   }, [call, grid.thumbnail, isTablet, isDesktop, isMobile, isShort, isMedium, isTall]);
 
-  const {isMuted: selfIsMuted, handRaisedAt: selfHandRaisedAt} = useKoSubscribableChildren(selfParticipant, [
-    'isMuted',
-    'handRaisedAt',
-  ]);
-
   return (
     <div className="group-video">
       <div
@@ -281,76 +371,13 @@ const GroupVideoGrid = ({
           />
         ))}
       </div>
-      {thumbnail.videoStream != null && maximizedParticipant === null && (
-        <GroupVideoThumbnailWrapper minimized={minimized}>
-          <Video
-            className="group-video__thumbnail-video"
-            autoPlay
-            playsInline
-            /* This is needed to keep playing the video when detached to a new window,
-               only muted video can be played automatically without user interacting with the window first,
-               see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
-            */
-            muted
-            data-uie-name="self-video-thumbnail"
-            onCanPlay={onVideoCanPlay}
-            css={{
-              transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
-            }}
-            srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
-          />
-          {showLoadingOverlay && (
-            <div
-              aria-busy={showLoadingOverlay}
-              css={groupVideoBackgroundInitializingOverlay}
-              data-uie-name="background-effect-initializing"
-            >
-              <Loading size={32} />
-            </div>
-          )}
-          {selfIsMuted && !minimized && (
-            <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
-              <Icon.MicOffIcon data-uie-name="mic-icon-off" />
-            </span>
-          )}
-          {selfHandRaisedAt != null && !minimized && (
-            <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
-              ✋
-            </span>
-          )}
-        </GroupVideoThumbnailWrapper>
-      )}
-      {grid.thumbnail && !thumbnail.hasActiveVideo && (
-        <GroupVideoThumbnailWrapper minimized={minimized}>
-          <div
-            css={{
-              alignItems: 'center',
-              display: 'flex',
-              height: '100%',
-              justifyContent: 'center',
-              width: '100%',
-            }}
-          >
-            {selfIsMuted && !minimized && (
-              <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
-                <Icon.MicOffIcon data-uie-name="mic-icon-off" />
-              </span>
-            )}
-            {selfHandRaisedAt != null && !minimized && (
-              <span
-                className="group-video-grid__element__label__hand_icon small"
-                data-uie-name="status-call-audio-muted"
-              >
-                ✋
-              </span>
-            )}
-            <Avatar
-              avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
-              participant={selfParticipant.user}
-              hideAvailabilityStatus
-            />
-          </div>
-        </GroupVideoThumbnailWrapper>
+      {!isNullOrUndefined(grid.thumbnail) && (
+        <GroupVideoThumbnail
+          thumbnail={grid.thumbnail}
+          minimized={minimized}
+          maximizedParticipant={maximizedParticipant}
+          selfParticipant={selfParticipant}
+        />
       )}
     </div>
   );

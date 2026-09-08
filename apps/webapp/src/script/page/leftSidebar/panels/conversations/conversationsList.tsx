@@ -239,6 +239,29 @@ export const ConversationsList = ({
     }
   }, [clickedFilteredConversationId, conversationsFilter, conversationsToDisplay, rowVirtualizer]);
 
+  function renderGroupParticipants(): React.ReactNode {
+    if (!isGroupParticipantsVisible) {
+      return null;
+    }
+
+    return (
+      <li>
+        <h3 className="conversation-list-heading" css={headingTitle}>
+          {translate('searchGroupParticipants')}
+        </h3>
+        <ul
+          css={conversationsList}
+          data-uie-name="group-participants-conversations-view"
+          className="group-participants-conversations"
+        >
+          {groupParticipantsConversations.map((conversation, index) => (
+            <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+          ))}
+        </ul>
+      </li>
+    );
+  }
+
   return (
     <>
       <h2 className="visually-hidden">{translate('conversationViewTooltip')}</h2>
@@ -307,24 +330,8 @@ export const ConversationsList = ({
 
           return null;
         })}
+        {renderGroupParticipants()}
       </ul>
-
-      {isGroupParticipantsVisible && (
-        <>
-          <h3 className="conversation-list-heading" css={headingTitle}>
-            {translate('searchGroupParticipants')}
-          </h3>
-          <ul
-            css={conversationsList}
-            data-uie-name="group-participants-conversations-view"
-            className="group-participants-conversations"
-          >
-            {groupParticipantsConversations.map((conversation, index) => (
-              <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
-            ))}
-          </ul>
-        </>
-      )}
     </>
   );
 };

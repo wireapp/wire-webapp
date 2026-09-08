@@ -32,8 +32,73 @@ interface StringReplacement {
 
 type Replacement = ComponentReplacement | StringReplacement;
 
+export type ReactTranslationMarker = {
+  readonly start: string;
+  readonly end: string;
+  readonly substitution: string;
+};
+
+export type ReactTranslationComponentReplacement = {
+  readonly start: string;
+  readonly end: string;
+  render(children: React.ReactNode[]): React.ReactNode;
+};
+
+export type ReactTranslationValueReplacement = {
+  readonly marker: ReactTranslationMarker;
+  readonly runtimeText: string;
+};
+
+type RenderReactTranslationOptions = {
+  readonly translatedText: string;
+  readonly componentReplacements: readonly ReactTranslationComponentReplacement[];
+  readonly valueReplacements: readonly ReactTranslationValueReplacement[];
+};
+
 function sanitizeRegexp(text: string) {
   return text.replaceAll('[', '\\[').replaceAll(']', '\\]');
+}
+
+export function createReactTranslationMarker(markerName: string): ReactTranslationMarker {
+  const markerIdentifier = markerName.replaceAll(/[^a-zA-Z0-9]/g, '_');
+  const markerStart = `__wire_react_translation_${markerIdentifier}_start__`;
+  const markerEnd = `__wire_react_translation_${markerIdentifier}_end__`;
+
+  return {
+    start: markerStart,
+    end: markerEnd,
+    substitution: `${markerStart}value${markerEnd}`,
+  };
+}
+
+export function renderReactTranslation(options: RenderReactTranslationOptions): React.ReactNode[] {
+  const {translatedText, componentReplacements, valueReplacements} = options;
+
+  const renderedValueReplacements = valueReplacements.map(valueReplacement => {
+    return {
+      start: valueReplacement.marker.start,
+      end: valueReplacement.marker.end,
+      render() {
+        return valueReplacement.runtimeText;
+      },
+    };
+  });
+
+  function renderRuntimeValues(text: string): React.ReactNode[] {
+    return replaceReactComponents(text, renderedValueReplacements);
+  }
+
+  const renderedComponentReplacements = componentReplacements.map(componentReplacement => {
+    return {
+      start: componentReplacement.start,
+      end: componentReplacement.end,
+      render(text: string) {
+        return componentReplacement.render(renderRuntimeValues(text));
+      },
+    };
+  });
+
+  return replaceReactComponents(translatedText, [...renderedComponentReplacements, ...renderedValueReplacements]);
 }
 
 /**

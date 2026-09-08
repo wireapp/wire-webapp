@@ -19,6 +19,7 @@
 
 import {render} from '@testing-library/react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {noop} from 'noop-esm';
 
 import {translateForTest} from 'Util/test/translateForTest';
 import {
@@ -35,7 +36,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 describe('ReceiptModeToggle', () => {
   it('checks the checkbox when receipts are turned on', () => {
     const props = {
-      onReceiptModeChanged: () => {},
+      onReceiptModeChanged: noop,
       receiptMode: RECEIPT_MODE.OFF,
     };
 
@@ -47,7 +48,7 @@ describe('ReceiptModeToggle', () => {
 
   it('unchecks the checkbox when receipts are turned off', () => {
     const props = {
-      onReceiptModeChanged: () => {},
+      onReceiptModeChanged: noop,
       receiptMode: RECEIPT_MODE.ON,
     };
 

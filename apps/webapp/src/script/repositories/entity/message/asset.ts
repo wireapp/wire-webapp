@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {AssetType} from 'Repositories/assets/assetType';
 
 import type {FileAsset} from './fileAsset';
@@ -71,9 +73,10 @@ export class Asset {
   }
 
   isAudio(): boolean {
-    const is_audio_asset = this.type === AssetType.FILE && this.file_type?.startsWith('audio');
-    if (is_audio_asset) {
-      const can_play = document.createElement('audio').canPlayType(this.file_type!);
+    const fileType = this.file_type;
+    const is_audio_asset = this.type === AssetType.FILE && !isUndefined(fileType) && fileType.startsWith('audio');
+    if (is_audio_asset && !isUndefined(fileType)) {
+      const can_play = document.createElement('audio').canPlayType(fileType);
       if (can_play !== '') {
         return true;
       }

@@ -26,6 +26,14 @@ import {Config} from 'src/script/Config';
 import {AppLockState} from './appLockState';
 
 describe('AppLockState', () => {
+  function createConfigWithMdmEnabled(isMdmEnabled: boolean): ReturnType<typeof Config.getConfig> {
+    return {
+      FEATURE: {
+        ENABLE_MDM_CONFIG: isMdmEnabled,
+      },
+    } as unknown as ReturnType<typeof Config.getConfig>;
+  }
+
   let appLockState: AppLockState;
   let teamState: TeamState;
   let configSpy: jest.SpyInstance;
@@ -34,11 +42,7 @@ describe('AppLockState', () => {
   beforeEach(() => {
     teamState = container.resolve(TeamState);
     appLockState = new AppLockState(teamState);
-    configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
-      FEATURE: {
-        ENABLE_MDM_CONFIG: false,
-      },
-    });
+    configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue(createConfigWithMdmEnabled(false));
     desktopConfigSpy = jest.spyOn(Config, 'getDesktopConfig').mockReturnValue(undefined);
   });
 
@@ -51,11 +55,7 @@ describe('AppLockState', () => {
   describe('isAppLockEnabled', () => {
     describe('when MDM config is disabled', () => {
       beforeEach(() => {
-        configSpy.mockReturnValue({
-          FEATURE: {
-            ENABLE_MDM_CONFIG: false,
-          },
-        });
+        configSpy.mockReturnValue(createConfigWithMdmEnabled(false));
       });
 
       it('should return false when app lock is not enforced and not activated in preferences', () => {
@@ -71,11 +71,7 @@ describe('AppLockState', () => {
 
     describe('when MDM config is enabled', () => {
       beforeEach(() => {
-        configSpy.mockReturnValue({
-          FEATURE: {
-            ENABLE_MDM_CONFIG: true,
-          },
-        });
+        configSpy.mockReturnValue(createConfigWithMdmEnabled(true));
       });
 
       describe('and MDM override is enabled', () => {
@@ -93,6 +89,7 @@ describe('AppLockState', () => {
               status: FEATURE_STATUS.ENABLED,
               config: {
                 enforceAppLock: false,
+                inactivityTimeoutSecs: 10,
               },
             },
           });
@@ -111,6 +108,7 @@ describe('AppLockState', () => {
               status: FEATURE_STATUS.ENABLED,
               config: {
                 enforceAppLock: true,
+                inactivityTimeoutSecs: 10,
               },
             },
           });
@@ -132,7 +130,7 @@ describe('AppLockState', () => {
           jest.spyOn(teamState, 'teamFeatures').mockReturnValue({
             appLock: {
               status: FEATURE_STATUS.DISABLED,
-              config: {},
+              config: {enforceAppLock: false, inactivityTimeoutSecs: 10},
             },
           });
         });
@@ -159,7 +157,7 @@ describe('AppLockState', () => {
           jest.spyOn(teamState, 'teamFeatures').mockReturnValue({
             appLock: {
               status: FEATURE_STATUS.DISABLED,
-              config: {},
+              config: {enforceAppLock: false, inactivityTimeoutSecs: 10},
             },
           });
         });
@@ -179,7 +177,7 @@ describe('AppLockState', () => {
           jest.spyOn(teamState, 'teamFeatures').mockReturnValue({
             appLock: {
               status: FEATURE_STATUS.DISABLED,
-              config: {},
+              config: {enforceAppLock: false, inactivityTimeoutSecs: 10},
             },
           });
         });
@@ -199,17 +197,13 @@ describe('AppLockState', () => {
         jest.spyOn(teamState, 'teamFeatures').mockReturnValue({
           appLock: {
             status: FEATURE_STATUS.DISABLED,
-            config: {},
+            config: {enforceAppLock: false, inactivityTimeoutSecs: 10},
           },
         });
       });
 
       it('should handle applockOverride as non-boolean value safely', () => {
-        configSpy.mockReturnValue({
-          FEATURE: {
-            ENABLE_MDM_CONFIG: true,
-          },
-        });
+        configSpy.mockReturnValue(createConfigWithMdmEnabled(true));
         desktopConfigSpy.mockReturnValue({
           version: '1.0',
           managedConfig: {
@@ -224,11 +218,7 @@ describe('AppLockState', () => {
       });
 
       it('should handle stale desktop config gracefully', () => {
-        configSpy.mockReturnValue({
-          FEATURE: {
-            ENABLE_MDM_CONFIG: true,
-          },
-        });
+        configSpy.mockReturnValue(createConfigWithMdmEnabled(true));
         // Old config format without managedConfig
         desktopConfigSpy.mockReturnValue({
           version: '0.5',
@@ -241,11 +231,7 @@ describe('AppLockState', () => {
       });
 
       it('should handle applockOverride with undefined value', () => {
-        configSpy.mockReturnValue({
-          FEATURE: {
-            ENABLE_MDM_CONFIG: true,
-          },
-        });
+        configSpy.mockReturnValue(createConfigWithMdmEnabled(true));
         desktopConfigSpy.mockReturnValue({
           version: '1.0',
           managedConfig: {
@@ -259,11 +245,7 @@ describe('AppLockState', () => {
       });
 
       it('should handle applockOverride with null value', () => {
-        configSpy.mockReturnValue({
-          FEATURE: {
-            ENABLE_MDM_CONFIG: true,
-          },
-        });
+        configSpy.mockReturnValue(createConfigWithMdmEnabled(true));
         desktopConfigSpy.mockReturnValue({
           version: '1.0',
           managedConfig: {
@@ -284,7 +266,7 @@ describe('AppLockState', () => {
         jest.spyOn(teamState, 'teamFeatures').mockReturnValue({
           appLock: {
             status: FEATURE_STATUS.DISABLED,
-            config: {},
+            config: {enforceAppLock: false, inactivityTimeoutSecs: 10},
           },
         });
       });
@@ -303,11 +285,7 @@ describe('AppLockState', () => {
       });
 
       it('should return false when MDM overrides app lock even with passphrase', () => {
-        configSpy.mockReturnValue({
-          FEATURE: {
-            ENABLE_MDM_CONFIG: true,
-          },
-        });
+        configSpy.mockReturnValue(createConfigWithMdmEnabled(true));
         desktopConfigSpy.mockReturnValue({
           version: '1.0',
           managedConfig: {

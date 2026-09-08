@@ -17,8 +17,8 @@
  *
  */
 
-import {CellsFiltersBar} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/CellsFiltersBar';
-import type {FilterConfig} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
+import {CellsFiltersBar} from 'Components/conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
+import type {FilterConfig} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsHeader.styles';

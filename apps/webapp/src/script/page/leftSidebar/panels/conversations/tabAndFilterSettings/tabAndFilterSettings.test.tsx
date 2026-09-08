@@ -33,7 +33,11 @@ import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
 jest.mock('Util/useChannelsFeatureFlag', () => ({
   useChannelsFeatureFlag: jest.fn(() => ({
+    canCreateChannels: false,
     isChannelsEnabled: false,
+    isChannelsFeatureEnabled: false,
+    isChannelsHistorySharingEnabled: false,
+    isPublicChannelsEnabled: false,
     shouldShowChannelTab: false,
   })),
 }));
@@ -45,7 +49,11 @@ describe('TabAndFilterSettings', () => {
 
   beforeEach(() => {
     jest.mocked(useChannelsFeatureFlag).mockReturnValue({
+      canCreateChannels: false,
       isChannelsEnabled: false,
+      isChannelsFeatureEnabled: false,
+      isChannelsHistorySharingEnabled: false,
+      isPublicChannelsEnabled: false,
       shouldShowChannelTab: false,
     });
     Config._dangerouslySetConfigFeaturesForDebug({
@@ -74,7 +82,11 @@ describe('TabAndFilterSettings', () => {
 
   it('inserts the channels tab between groups and directs when channels are enabled', () => {
     jest.mocked(useChannelsFeatureFlag).mockReturnValue({
+      canCreateChannels: false,
       isChannelsEnabled: true,
+      isChannelsFeatureEnabled: true,
+      isChannelsHistorySharingEnabled: true,
+      isPublicChannelsEnabled: true,
       shouldShowChannelTab: true,
     });
 

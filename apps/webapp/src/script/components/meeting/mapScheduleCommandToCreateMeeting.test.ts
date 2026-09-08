@@ -27,20 +27,24 @@ const futureStartIso = futureStartDate.toISOString();
 const futureEndIso = futureEndDate.toISOString();
 
 describe('mapScheduleCommandToCreateMeeting', () => {
-  it('maps title, times, and recurrence metadata only', () => {
-    const result = mapScheduleCommandToCreateMeeting({
-      title: 'Weekly sync',
-      start: futureStartDate,
-      end: futureEndDate,
-      recurrence: 'weekly',
-      selectedUsers: [],
-    });
+  it('maps title, times, recurrence, and device tzid', () => {
+    const result = mapScheduleCommandToCreateMeeting(
+      {
+        title: 'Weekly sync',
+        start: futureStartDate,
+        end: futureEndDate,
+        recurrence: 'weekly',
+        selectedUsers: [],
+      },
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
 
     expect(result).toEqual({
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
+      tzid: 'Pacific/Auckland',
     });
   });
 });

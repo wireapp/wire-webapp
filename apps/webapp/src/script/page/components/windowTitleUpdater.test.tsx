@@ -110,7 +110,7 @@ describe('WindowTitleUpdater', () => {
         activeNotificationStateHandlers.delete(notificationStateHandler);
       },
     );
-    (useAppState as jest.Mock).mockImplementation(selector => {
+    (useAppState as unknown as jest.Mock).mockImplementation(selector => {
       return selector({contentState: ContentState.CONVERSATION, setUnreadMessagesCount});
     });
     (useKoSubscribableChildren as jest.Mock).mockImplementation((_state: unknown, properties: string[]) => {

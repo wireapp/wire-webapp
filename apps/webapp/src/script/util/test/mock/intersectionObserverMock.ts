@@ -26,6 +26,7 @@ function createIntersectionObserver(
     observe: jest.fn(),
     root: options.root ?? null,
     rootMargin: options.rootMargin ?? '0px',
+    scrollMargin: '0px',
     takeRecords: jest.fn(() => {
       return [];
     }),

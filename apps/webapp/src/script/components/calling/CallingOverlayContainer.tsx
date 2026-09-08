@@ -17,8 +17,9 @@
  *
  */
 
-import {Fragment, useEffect} from 'react';
+import {Fragment, useEffect, type ReactNode} from 'react';
 
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
@@ -48,22 +49,35 @@ interface CallingContainerProps {
   readonly toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
 }
 
-const CallingContainer = ({
+interface CallingContainerWithJoinedCallProps extends CallingContainerProps {
+  readonly callState: CallState;
+  readonly joinedCall: Call;
+}
+
+function CallingContainer(props: CallingContainerProps): ReactNode {
+  const callState = isUndefined(props.callState) ? container.resolve(CallState) : props.callState;
+  const {joinedCall} = useKoSubscribableChildren(callState, ['joinedCall']);
+
+  if (isUndefined(joinedCall)) {
+    return null;
+  }
+
+  return <CallingContainerWithJoinedCall {...props} callState={callState} joinedCall={joinedCall} />;
+}
+
+function CallingContainerWithJoinedCall({
   propertiesRepository,
   callingRepository,
   fireAndForgetInvoker,
-  callState = container.resolve(CallState),
+  callState,
+  joinedCall,
   toggleScreenshare,
-}: CallingContainerProps) => {
+}: CallingContainerWithJoinedCallProps): ReactNode {
   const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
-  const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} =
-    useKoSubscribableChildren(callState, [
-      'activeCallViewTab',
-      'joinedCall',
-      'hasAvailableScreensToShare',
-      'desktopScreenShareMenu',
-      'viewMode',
-    ]);
+  const {activeCallViewTab, hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} = useKoSubscribableChildren(
+    callState,
+    ['activeCallViewTab', 'hasAvailableScreensToShare', 'desktopScreenShareMenu', 'viewMode'],
+  );
 
   const isFullScreenOrDetached = [CallingViewMode.DETACHED_WINDOW, CallingViewMode.FULL_SCREEN].includes(viewMode);
 
@@ -71,7 +85,7 @@ const CallingContainer = ({
     maximizedParticipant,
     state: currentCallState,
     muteState,
-  } = useKoSubscribableChildren(joinedCall!, ['maximizedParticipant', 'state', 'muteState']);
+  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'state', 'muteState']);
 
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
@@ -83,7 +97,7 @@ const CallingContainer = ({
     }
   }, [callingRepository, currentCallState, fireAndForgetInvoker]);
 
-  const videoGrid = useVideoGrid(joinedCall!);
+  const videoGrid = useVideoGrid(joinedCall);
 
   const changePage = (newPage: number, call: Call) => callingRepository.changeCallPage(call, newPage);
 
@@ -149,9 +163,9 @@ const CallingContainer = ({
 
   const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
 
-  const conversation = joinedCall?.conversation;
+  const conversation = joinedCall.conversation;
 
-  if (!joinedCall || !conversation || conversation.isSelfUserRemoved()) {
+  if (isNullOrUndefined(conversation) || conversation.isSelfUserRemoved()) {
     return null;
   }
 
@@ -199,6 +213,6 @@ const CallingContainer = ({
       {isScreenshareActive && <ChooseScreen choose={callingRepository.onChooseScreen} />}
     </Fragment>
   );
-};
+}
 
 export {CallingContainer};

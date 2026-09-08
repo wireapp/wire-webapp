@@ -21,6 +21,7 @@ import {Maybe, Result} from 'true-myth';
 
 import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
+import {match, P} from 'ts-pattern';
 
 export type BuildArtifactHtmlDocument = {
   readonly archiveFilePath: string;
@@ -35,12 +36,25 @@ export type BuildArtifactMetadataValidationInput = {
 };
 
 const localStaticAssetDirectoryNames = ['assets', 'audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker'];
+const htmlResourceAttributePattern = /\b(?:src|href)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+))/giu;
 
 function readHtmlResourceAttributeValues(htmlContents: string): readonly string[] {
-  return [...htmlContents.matchAll(/\b(?:src|href)\s*=\s*(["'])(.*?)\1/giu)].flatMap(attributeMatch => {
-    return Maybe.of(attributeMatch[2])
-      .map(attributeValue => [attributeValue])
-      .unwrapOr([]);
+  return [...htmlContents.matchAll(htmlResourceAttributePattern)].flatMap(attributeMatch => {
+    const attributeValueCaptures = attributeMatch.slice(1, 4);
+
+    return match(attributeValueCaptures)
+      .with([P.string, P._, P._], ([doubleQuotedAttributeValue]) => {
+        return [doubleQuotedAttributeValue];
+      })
+      .with([P._, P.string, P._], ([, singleQuotedAttributeValue]) => {
+        return [singleQuotedAttributeValue];
+      })
+      .with([P._, P._, P.string], ([, , unquotedAttributeValue]) => {
+        return [unquotedAttributeValue];
+      })
+      .otherwise(() => {
+        return [];
+      });
   });
 }
 

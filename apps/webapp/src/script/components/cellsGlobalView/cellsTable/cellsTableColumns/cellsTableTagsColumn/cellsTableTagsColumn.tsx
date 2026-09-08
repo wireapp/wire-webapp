@@ -21,7 +21,7 @@ import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
 import {wrapperStyles} from './cellsTableTagsColumn.styles';
 
-import {sortTagsAlphabetically} from '../../../../Conversation/ConversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
+import {sortTagsAlphabetically} from '../../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
 
 interface CellsTableTagsColumnProps {
   tags: string[];

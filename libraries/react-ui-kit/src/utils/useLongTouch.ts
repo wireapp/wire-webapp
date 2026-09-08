@@ -19,6 +19,8 @@
 
 import {useEffect} from 'react';
 
+import {noop} from 'noop-esm';
+
 import {useTimeout} from './useTimeout';
 
 const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touchDuration = 800) => {
@@ -26,7 +28,7 @@ const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touc
 
   useEffect(() => {
     if (element === null) {
-      return () => {};
+      return noop;
     }
 
     const onTouchStart = () => {

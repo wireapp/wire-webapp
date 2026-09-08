@@ -19,10 +19,13 @@
 
 import React from 'react';
 
-import {fireEvent, render} from '@testing-library/react';
+import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {UserList} from 'Components/userList/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
@@ -39,14 +42,15 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-beforeAll(() => {
-  testFactory.exposeConversationActors().then(factory => {
-    conversationRepository = factory;
-    return conversationRepository;
-  });
+beforeAll(async () => {
+  conversationRepository = await testFactory.exposeConversationActors();
 });
 
 describe('UserList', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('lists all selected users', () => {
     const user = new User('test-id', '', translateForTest);
     user.isMe = true;
@@ -94,5 +98,37 @@ describe('UserList', () => {
     expect(contactsList).toHaveLength(4);
     fireEvent.click(contactsList[0]);
     expect(mockOnSelectUser).toHaveBeenCalledWith(users[0]);
+  });
+
+  it('moves a user to the admins list when their conversation role changes', async () => {
+    const selfUser = new User('self-id', '', translateForTest);
+    selfUser.isMe = true;
+
+    const user = new User('member-id', '', translateForTest);
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const userListProperties = {
+      conversation,
+      conversationRepository,
+      selfUser,
+      users: [user],
+    };
+
+    const {getByTestId, queryByTestId} = render(withTheme(<UserList {...userListProperties} />), {
+      wrapper: rootProviderWrapper,
+    });
+    const membersList = getByTestId('list-members');
+    expect(membersList).toContainElement(getByTestId('item-user'));
+
+    act(() => {
+      conversation.roles({
+        [user.id]: DefaultConversationRoleName.WIRE_ADMIN,
+      });
+    });
+
+    await waitFor(() => {
+      const adminsList = getByTestId('list-admins');
+      expect(adminsList).toContainElement(getByTestId('item-user'));
+      expect(queryByTestId('list-members')).not.toBeInTheDocument();
+    });
   });
 });

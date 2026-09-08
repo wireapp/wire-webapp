@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
+import {getRequiredUserId, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
@@ -256,7 +256,7 @@ test.describe('Reply', () => {
         'Test Service Device',
         false,
       );
-      const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+      const conversationId = await api.conversation.getConversationWithUser(userA.token, getRequiredUserId(userB));
       if (conversationId === undefined) throw new Error("Couldn't find conversation of userA with userB");
       await api.testService.sendLocation(instanceId, conversationId, {
         locationName: 'Test Location',

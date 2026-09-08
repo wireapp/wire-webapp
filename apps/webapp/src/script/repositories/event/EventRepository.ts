@@ -28,6 +28,7 @@ import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notific
 import {sequentialQueueOptions} from '@wireapp/core/lib/queue/sequentialQueueOptions';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {noop} from 'noop-esm';
 import PromiseQueue from 'p-queue';
 import {container} from 'tsyringe';
 
@@ -219,7 +220,7 @@ export class EventRepository {
     await this.handleTimeDrift();
 
     const cleanupHandlers: Array<() => void> = [];
-    let actualDisconnect: () => void = () => {};
+    let actualDisconnect: () => void = noop;
     let connectionInProgress = false;
     let healthCheckInProgress = false;
     let currentConnectionState: ConnectionState | undefined;
@@ -271,7 +272,7 @@ export class EventRepository {
         );
       } catch (error: unknown) {
         const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
-        actualDisconnect = () => {};
+        actualDisconnect = noop;
         this.logger.warn(
           `[WebSocketLifecycle] layer=event-repository event=connect-failure trigger=${trigger} connectCycleId=${currentConnectCycleId} errorName=${errorName} errorMessage=${errorMessage}`,
         );
@@ -425,7 +426,7 @@ export class EventRepository {
   /**
    * Close the WebSocket connection. (will be set only once the connectWebSocket is called)
    */
-  disconnectWebSocket: () => void = () => {};
+  disconnectWebSocket: () => void = noop;
 
   //##############################################################################
   // Notification Stream handling

@@ -19,6 +19,7 @@
 
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {noop} from 'noop-esm';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -341,7 +342,7 @@ export const afterRender = (callback: TimerHandler): number =>
 /**
  * No operation
  */
-export const noop = (): void => {};
+export {noop};
 
 const focusableElementsSelector =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';

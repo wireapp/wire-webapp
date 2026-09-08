@@ -17,21 +17,34 @@
  *
  */
 
-import {addDays} from 'date-fns';
+import {TZDate} from '@date-fns/tz';
+import {isUndefined} from '@sindresorhus/is';
+import {addDays, startOfDay} from 'date-fns';
 
 import type {ScheduleMeetingRecurrenceOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import {getMeetingTemporalStatusAt, MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
 
 const daysPerWeek = 7;
 const daysPerBiweeklyPeriod = 14;
 const daysPerFourWeeksPeriod = 28;
 
-const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): MeetingInstance => ({
-  meetingSeries,
-  start,
-  end: new Date(start.getTime() + meetingSeries.duration_ms),
-});
+const inMeetingSeriesTimeZone = (date: Date, meetingSeries: MeetingSeries): TZDate =>
+  new TZDate(date.getTime(), meetingSeries.tzid);
+
+const getSeriesAnchorInTimeZone = (meetingSeries: MeetingSeries): TZDate =>
+  new TZDate(Date.parse(meetingSeries.series_start_date), meetingSeries.tzid);
+
+const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): MeetingInstance => {
+  const utcStart = new Date(start.getTime());
+
+  return {
+    meetingSeries,
+    start: utcStart,
+    end: new Date(utcStart.getTime() + meetingSeries.duration_ms),
+  };
+};
 
 const isMeetingInstanceStartInRange = (meetingInstance: MeetingInstance, from: Date, to: Date): boolean =>
   meetingInstance.start.getTime() >= from.getTime() && meetingInstance.start.getTime() < to.getTime();
@@ -39,7 +52,7 @@ const isMeetingInstanceStartInRange = (meetingInstance: MeetingInstance, from: D
 const isAfterRecurrenceUntil = (start: Date, recurrenceUntil?: string): boolean =>
   recurrenceUntil !== undefined && start.getTime() > Date.parse(recurrenceUntil);
 
-const advanceInstanceStart = (start: Date, recurrence: ScheduleMeetingRecurrenceOption): Date => {
+const advanceInstanceStart = (start: TZDate, recurrence: ScheduleMeetingRecurrenceOption): TZDate => {
   switch (recurrence) {
     case 'doesNotRepeat':
       return start;
@@ -61,10 +74,10 @@ const advanceInstanceStart = (start: Date, recurrence: ScheduleMeetingRecurrence
  * This advances by whole recurrence steps (one day, week, etc.) until the candidate start is >= `from`.
  */
 const advanceToFirstInstanceOnOrAfter = (
-  anchor: Date,
+  anchor: TZDate,
   from: Date,
   recurrence: ScheduleMeetingRecurrenceOption,
-): Date => {
+): TZDate => {
   let current = anchor;
 
   // Step by whole recurrence periods (day/week/month), not by milliseconds.
@@ -75,26 +88,61 @@ const advanceToFirstInstanceOnOrAfter = (
   return current;
 };
 
-/**
- * First instance start on or after `now`, walking forward from the series anchor.
- *
- * Used when prefilling the edit form for recurring meetings so updates do not move
- * the series anchor to a later selected occurrence and wipe earlier instances.
- */
-export const getUpcomingMeetingInstanceStart = (meetingSeries: MeetingSeries, now: Date): Date => {
-  if (meetingSeries.recurrence === 'doesNotRepeat') {
-    return new Date(meetingSeries.series_start_date);
+const getLastMeetingInstanceAtOrBeforeUntil = (meetingSeries: MeetingSeries): MeetingInstance => {
+  const anchor = getSeriesAnchorInTimeZone(meetingSeries);
+
+  if (meetingSeries.recurrence === 'doesNotRepeat' || meetingSeries.recurrence_until === undefined) {
+    return createMeetingInstance(meetingSeries, anchor);
   }
 
-  const anchor = new Date(meetingSeries.series_start_date);
-  return advanceToFirstInstanceOnOrAfter(anchor, now, meetingSeries.recurrence);
+  let current = anchor;
+  let lastStart = anchor;
+
+  while (!isAfterRecurrenceUntil(current, meetingSeries.recurrence_until)) {
+    lastStart = current;
+    current = advanceInstanceStart(current, meetingSeries.recurrence);
+  }
+
+  return createMeetingInstance(meetingSeries, lastStart);
+};
+
+/**
+ * Instance whose start/end should anchor a recurring edit PUT.
+ *
+ * When today still has an upcoming or ongoing occurrence, use that slot so
+ * editing a future list row does not jump the series start to the next day
+ * (WPB-27894). Otherwise fall back to the next instance on or after `now`,
+ * or the last occurrence at or before `recurrence_until` when the series has ended.
+ */
+export const getEditAnchorMeetingInstance = (meetingSeries: MeetingSeries, now: Date): MeetingInstance => {
+  if (meetingSeries.recurrence === 'doesNotRepeat') {
+    return createMeetingInstance(meetingSeries, getSeriesAnchorInTimeZone(meetingSeries));
+  }
+
+  const startOfToday = startOfDay(now);
+  const startOfTomorrow = addDays(startOfToday, 1);
+  const todaysNotYetEnded = getMeetingInstancesInRange(meetingSeries, startOfToday, startOfTomorrow).find(
+    meetingInstance => meetingInstance.end.getTime() > now.getTime(),
+  );
+
+  if (!isUndefined(todaysNotYetEnded)) {
+    return todaysNotYetEnded;
+  }
+
+  const nextInstance = getFirstMeetingInstanceOnOrAfter(meetingSeries, now);
+
+  if (!isUndefined(nextInstance)) {
+    return nextInstance;
+  }
+
+  return getLastMeetingInstanceAtOrBeforeUntil(meetingSeries);
 };
 
 export const getFirstMeetingInstanceOnOrAfter = (
   meetingSeries: MeetingSeries,
   from: Date,
 ): MeetingInstance | undefined => {
-  const anchor = new Date(meetingSeries.series_start_date);
+  const anchor = getSeriesAnchorInTimeZone(meetingSeries);
 
   if (meetingSeries.recurrence === 'doesNotRepeat') {
     return anchor.getTime() >= from.getTime() ? createMeetingInstance(meetingSeries, anchor) : undefined;
@@ -114,7 +162,10 @@ export const getNextMeetingInstance = (meetingInstance: MeetingInstance): Meetin
     return undefined;
   }
 
-  const start = advanceInstanceStart(meetingInstance.start, meetingSeries.recurrence);
+  const start = advanceInstanceStart(
+    inMeetingSeriesTimeZone(meetingInstance.start, meetingSeries),
+    meetingSeries.recurrence,
+  );
 
   return isAfterRecurrenceUntil(start, meetingSeries.recurrence_until)
     ? undefined
@@ -122,7 +173,7 @@ export const getNextMeetingInstance = (meetingInstance: MeetingInstance): Meetin
 };
 
 const getRecurringMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
-  const anchor = new Date(meetingSeries.series_start_date);
+  const anchor = getSeriesAnchorInTimeZone(meetingSeries);
   const meetingInstances: MeetingInstance[] = [];
   let current = advanceToFirstInstanceOnOrAfter(anchor, from, meetingSeries.recurrence);
 
@@ -156,10 +207,27 @@ const getRecurringMeetingInstancesInRange = (meetingSeries: MeetingSeries, from:
  */
 export const getMeetingInstancesInRange = (meetingSeries: MeetingSeries, from: Date, to: Date): MeetingInstance[] => {
   if (meetingSeries.recurrence === 'doesNotRepeat') {
-    const meetingInstance = createMeetingInstance(meetingSeries, new Date(meetingSeries.series_start_date));
+    const meetingInstance = createMeetingInstance(meetingSeries, getSeriesAnchorInTimeZone(meetingSeries));
 
     return isMeetingInstanceStartInRange(meetingInstance, from, to) ? [meetingInstance] : [];
   }
 
   return getRecurringMeetingInstancesInRange(meetingSeries, from, to);
+};
+
+/**
+ * Finds the concrete instance that is ongoing at `now`, if any.
+ *
+ * The search starts one meeting duration before `now`, because an ongoing
+ * instance may have started before the current time. The upper bound is just
+ * after `now` so an instance starting exactly at `now` is included.
+ */
+export const getMeetingInstanceAt = (meetingSeries: MeetingSeries, now: Date): MeetingInstance | undefined => {
+  const from = new Date(now.getTime() - meetingSeries.duration_ms);
+  const to = new Date(now.getTime() + 1);
+
+  return getMeetingInstancesInRange(meetingSeries, from, to).find(
+    meetingInstance =>
+      getMeetingTemporalStatusAt(now, meetingInstance.start, meetingInstance.end) === MeetingTemporalStatuses.ON_GOING,
+  );
 };

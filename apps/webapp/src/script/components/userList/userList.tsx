@@ -17,8 +17,10 @@
  *
  */
 
-import {ChangeEvent, useCallback, useId, useMemo, useState} from 'react';
+import {ChangeEvent, Fragment, useCallback, useId, useMemo, useState} from 'react';
+import type {ReactNode} from 'react';
 
+import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -112,9 +114,6 @@ export const UserList = ({
   const highlightedUserIds = highlightedUsers.map(user => user.id);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
 
-  // subscribe to roles changes in order to react to them
-  useKoSubscribableChildren(conversation!, ['roles']);
-
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
 
@@ -179,77 +178,23 @@ export const UserList = ({
     ],
   );
 
-  const adminsHeaderId = useId();
-  const membersHeaderId = useId();
   let content;
 
-  const showRoles = !!conversation;
+  const showRoles = !isUndefined(conversation);
   if (showRoles) {
-    let members: User[] = [];
-    let admins: User[] = [];
-    let adminCount = 0;
-    let memberCount = 0;
-
-    filteredUsers.forEach((userEntity: User) => {
-      if (userEntity.isService) {
-        return;
-      }
-      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity) === true) {
-        admins.push(userEntity);
-      } else {
-        members.push(userEntity);
-      }
-    });
-    adminCount = admins.length;
-    memberCount = members.length;
-
-    if (truncate && admins.length + members.length > maxVisibleUsers) {
-      admins = admins.slice(0, reducedUserCount);
-      members = members.slice(0, reducedUserCount - admins.length);
-    }
-
     content = (
-      <>
-        {(admins.length > 0 || showEmptyAdmin) && (
-          <>
-            <h3 id={adminsHeaderId} className="user-list__header" data-uie-name="label-conversation-admins">
-              {translate('searchListAdmins', {count: adminCount})}
-            </h3>
-
-            {admins.length > 0 && (
-              <ul
-                className={cx('search-list', cssClasses)}
-                data-uie-name="list-admins"
-                aria-labelledby={adminsHeaderId}
-              >
-                {admins.slice(0, maxShownUsers).map(user => renderListItem(user))}
-              </ul>
-            )}
-
-            {!(admins.length > 0) && (
-              <div className="user-list__no-admin" data-uie-name="status-no-admins">
-                {translate('searchListNoAdmins')}
-              </div>
-            )}
-          </>
-        )}
-
-        {members.length > 0 && maxShownUsers > admins.length && (
-          <>
-            <h3 id={membersHeaderId} className="user-list__header" data-uie-name="label-conversation-members">
-              {translate('searchListMembers', {count: memberCount})}
-            </h3>
-
-            <ul
-              className={cx('search-list', cssClasses)}
-              data-uie-name="list-members"
-              aria-labelledby={membersHeaderId}
-            >
-              {members.slice(0, maxShownUsers - admins.length).map(user => renderListItem(user))}
-            </ul>
-          </>
-        )}
-      </>
+      <ConversationUserList
+        conversation={conversation}
+        conversationRepository={conversationRepository}
+        filteredUsers={filteredUsers}
+        maxShownUsers={maxShownUsers}
+        maxVisibleUsers={maxVisibleUsers}
+        mode={mode}
+        reducedUserCount={reducedUserCount}
+        renderListItem={renderListItem}
+        showEmptyAdmin={showEmptyAdmin}
+        truncate={truncate}
+      />
     );
   } else {
     const truncatedUsers = truncate ? filteredUsers.slice(0, reducedUserCount) : filteredUsers;
@@ -270,9 +215,9 @@ export const UserList = ({
     const unselectedUsers = truncatedUsers.slice(0, maxShownUsers).filter(user => !isSelected(user));
 
     content = (
-      <>
+      <Fragment>
         {isSelectable && hasSelectedUsers && (
-          <>
+          <Fragment>
             <button
               onClick={() => toggleFolder(UserListSections.SELECTED_CONTACTS)}
               css={collapseButton}
@@ -297,7 +242,7 @@ export const UserList = ({
                   return renderListItem(user, isLastItem);
                 })}
             </ul>
-          </>
+          </Fragment>
         )}
 
         {isSelectable && (
@@ -322,12 +267,12 @@ export const UserList = ({
               return renderListItem(user, isLastItem);
             })}
         </ul>
-      </>
+      </Fragment>
     );
   }
 
   return (
-    <>
+    <Fragment>
       {content}
 
       {hasMoreUsers && (
@@ -337,6 +282,102 @@ export const UserList = ({
           style={{height: 10, transform: 'translateY(-60px)', width: 10}}
         />
       )}
-    </>
+    </Fragment>
   );
 };
+
+interface ConversationUserListProps {
+  conversation: Conversation;
+  conversationRepository?: ConversationRepository;
+  filteredUsers: User[];
+  maxShownUsers: number;
+  maxVisibleUsers: number;
+  mode: UserlistMode;
+  reducedUserCount: number;
+  renderListItem: (user: User) => ReactNode;
+  showEmptyAdmin: boolean;
+  truncate: boolean;
+}
+
+function ConversationUserList({
+  conversation,
+  conversationRepository,
+  filteredUsers,
+  maxShownUsers,
+  maxVisibleUsers,
+  mode,
+  reducedUserCount,
+  renderListItem,
+  showEmptyAdmin,
+  truncate,
+}: ConversationUserListProps): ReactNode {
+  const {translate} = useApplicationContext();
+  const adminsHeaderId = useId();
+  const membersHeaderId = useId();
+  useKoSubscribableChildren(conversation, ['roles']);
+
+  const isCompactMode = mode === UserlistMode.COMPACT;
+  const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
+
+  let members: User[] = [];
+  let admins: User[] = [];
+  let adminCount = 0;
+  let memberCount = 0;
+
+  filteredUsers.forEach((userEntity: User) => {
+    if (userEntity.isService) {
+      return;
+    }
+    if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity) === true) {
+      admins.push(userEntity);
+    } else {
+      members.push(userEntity);
+    }
+  });
+  adminCount = admins.length;
+  memberCount = members.length;
+
+  if (truncate && admins.length + members.length > maxVisibleUsers) {
+    admins = admins.slice(0, reducedUserCount);
+    members = members.slice(0, reducedUserCount - admins.length);
+  }
+
+  const hasAdmins = isNonEmptyArray(admins);
+  const hasMembers = isNonEmptyArray(members);
+
+  return (
+    <Fragment>
+      {(hasAdmins || showEmptyAdmin) && (
+        <Fragment>
+          <h3 id={adminsHeaderId} className="user-list__header" data-uie-name="label-conversation-admins">
+            {translate('searchListAdmins', {count: adminCount})}
+          </h3>
+
+          {hasAdmins && (
+            <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins" aria-labelledby={adminsHeaderId}>
+              {admins.slice(0, maxShownUsers).map(user => renderListItem(user))}
+            </ul>
+          )}
+
+          {isEmptyArray(admins) && (
+            <div className="user-list__no-admin" data-uie-name="status-no-admins">
+              {translate('searchListNoAdmins')}
+            </div>
+          )}
+        </Fragment>
+      )}
+
+      {hasMembers && maxShownUsers > admins.length && (
+        <Fragment>
+          <h3 id={membersHeaderId} className="user-list__header" data-uie-name="label-conversation-members">
+            {translate('searchListMembers', {count: memberCount})}
+          </h3>
+
+          <ul className={cx('search-list', cssClasses)} data-uie-name="list-members" aria-labelledby={membersHeaderId}>
+            {members.slice(0, maxShownUsers - admins.length).map(user => renderListItem(user))}
+          </ul>
+        </Fragment>
+      )}
+    </Fragment>
+  );
+}

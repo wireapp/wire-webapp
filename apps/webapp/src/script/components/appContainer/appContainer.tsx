@@ -95,10 +95,12 @@ export const AppContainer = (properties: AppProps) => {
     return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
   }, [config, translate]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
-
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
-  const mainView = useMemo(() => new MainViewModel(app.repository, translate), [app.repository, translate]);
+  const mainView = useMemo(
+    () => new MainViewModel(app.repository, translate, fireAndForgetInvoker),
+    [app.repository, fireAndForgetInvoker, translate],
+  );
   useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
   useAccentColor();
   const themePreference = useUserPropertyValue(

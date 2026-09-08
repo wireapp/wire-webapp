@@ -19,11 +19,9 @@
 
 import {type ReactNode, useEffect, useMemo} from 'react';
 
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
+import {createBrowserDeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {createMeetingNotificationEventHandlers} from 'Components/meeting/meetingNotificationEventHandlers';
 import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
@@ -57,9 +55,16 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     conversation: conversationRepository,
     calling: callingRepository,
   } = mainViewModel.content.repositories;
+  const deviceTimeZone = useMemo(() => createBrowserDeviceTimeZone(), []);
 
   const store = useMemo(() => {
-    const meetingServiceDeps = {meetingsRepository, conversationRepository, callingRepository, wallClock};
+    const meetingServiceDeps = {
+      meetingsRepository,
+      conversationRepository,
+      callingRepository,
+      wallClock,
+      deviceTimeZone,
+    };
 
     return createMeetingStore({
       ...meetingServiceDeps,
@@ -71,7 +76,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
         deleteMeetingForAll: command => deleteMeetingForAll(command, meetingServiceDeps),
       },
     });
-  }, [meetingsRepository, conversationRepository, callingRepository, wallClock]);
+  }, [meetingsRepository, conversationRepository, callingRepository, wallClock, deviceTimeZone]);
 
   useEffect(() => {
     if (!isMeetingsEnabled) {
@@ -90,12 +95,11 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const notificationStore = useMeetingNotificationStore.getState();
     const notificationHandlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => store.getState().meetingSeries,
+      wallClock,
       addNotification: notificationStore.addNotification,
       dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
       logger,
     });
-
-    amplify.subscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingCancelled);
 
     const getSelfUserQualifiedId = () => container.resolve(UserState).self().qualifiedId;
 
@@ -104,6 +108,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       getSelfUserQualifiedId,
       notifyMeetingChange: notificationHandlers.notifyMeetingChange,
       notifyUpdate: notificationHandlers.notifyUpdate,
+      onMeetingCancelled: notificationHandlers.onMeetingCancelled,
     });
     const unsubscribeFromMeetingConversationEvents = subscribeToMeetingConversationEvents({
       dispatcher,
@@ -122,7 +127,6 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       unsubscribeFromMeetingLifecycleEvents();
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
-      amplify.unsubscribe(WebAppEvents.MEETING.DELETED, notificationHandlers.onMeetingCancelled);
     };
   }, [isMeetingsEnabled, store]);
 

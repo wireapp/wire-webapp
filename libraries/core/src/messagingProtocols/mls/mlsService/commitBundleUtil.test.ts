@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {mls} from '@wireapp/protocol-messaging/web/mls';
 import {Encoder} from 'bazinga64';
 
@@ -37,9 +38,12 @@ describe('toProtobufCommitBundle', () => {
     };
     const result = toProtobufCommitBundle(payload);
     const {commit, welcome, groupInfoBundle} = mls.CommitBundle.decode(result);
+    if (isNullOrUndefined(payload.welcome)) {
+      throw new Error('Expected test welcome to be available');
+    }
 
     expect(Encoder.toBase64(commit)).toEqual(Encoder.toBase64(payload.commit));
-    expect(Encoder.toBase64(welcome)).toEqual(Encoder.toBase64(payload.welcome?.copyBytes()!));
+    expect(Encoder.toBase64(welcome)).toEqual(Encoder.toBase64(payload.welcome.copyBytes()));
     expect(Encoder.toBase64(groupInfoBundle.groupInfo)).toEqual(
       Encoder.toBase64(payload.groupInfo.payload.copyBytes()),
     );

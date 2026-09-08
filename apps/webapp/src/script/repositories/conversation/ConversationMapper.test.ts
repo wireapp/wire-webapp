@@ -31,6 +31,7 @@ import {
   DefaultConversationRoleName,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
@@ -69,6 +70,7 @@ describe('ConversationMapper', () => {
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
+      // @ts-expect-error intentionally exercises an invalid array item
       const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined], 1, translate);
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
@@ -228,7 +230,9 @@ describe('ConversationMapper', () => {
         members: {others: [], self: {id: createUuid(), status_ref: '0.0', status_time: '1970-01-01T00:00:00.000Z'}},
       };
 
-      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(conversationData);
+      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(
+        conversationData as unknown as ConversationBackendData,
+      );
 
       expect(updatableProperties).not.toHaveProperty('name');
       expect(updatableProperties).not.toHaveProperty('conversationModerator');
@@ -258,7 +262,9 @@ describe('ConversationMapper', () => {
         members: {others: [], self: {id: createUuid(), status_ref: '0.0', status_time: '1970-01-01T00:00:00.000Z'}},
       };
 
-      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(conversationData);
+      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(
+        conversationData as unknown as ConversationBackendData,
+      );
 
       expect(updatableProperties).toEqual(
         expect.objectContaining({
@@ -307,7 +313,7 @@ describe('ConversationMapper', () => {
   });
 
   describe('updateSelfStatus', () => {
-    let conversationEntity: Conversation = undefined;
+    let conversationEntity: Conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     beforeEach(() => {
       const conversationsData = [payload.conversations.get.conversations[0]];
@@ -315,6 +321,7 @@ describe('ConversationMapper', () => {
     });
 
     it('returns without updating if conversation entity does not exist', () => {
+      // @ts-expect-error intentionally exercises an absent conversation entity
       conversationEntity = undefined;
       const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {muted_state: 1};
 
@@ -427,7 +434,7 @@ describe('ConversationMapper', () => {
 
   describe('mergeConversations', () => {
     function getDataWithReadReceiptMode(
-      localReceiptMode: RECEIPT_MODE,
+      localReceiptMode: RECEIPT_MODE | null,
       remoteReceiptMode: RECEIPT_MODE,
     ): Partial<ConversationDatabaseData>[] {
       const conversationCreatorId = createUuid();
@@ -436,7 +443,7 @@ describe('ConversationMapper', () => {
       const selfUserId = createUuid();
       const teamId = createUuid();
 
-      const localData: Partial<ConversationDatabaseData> = {
+      const localData = {
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,
@@ -457,9 +464,9 @@ describe('ConversationMapper', () => {
         team_id: teamId,
         type: 0,
         verification_state: ConversationVerificationState.UNVERIFIED,
-      };
+      } as unknown as Partial<ConversationDatabaseData>;
 
-      const remoteData: Partial<ConversationDatabaseData> = {
+      const remoteData = {
         access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
         access_role: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
         creator: conversationCreatorId,
@@ -490,12 +497,12 @@ describe('ConversationMapper', () => {
         receipt_mode: remoteReceiptMode,
         team: teamId,
         type: 0,
-      };
+      } as unknown as Partial<ConversationDatabaseData>;
 
       return [localData, remoteData];
     }
 
-    const remoteData: Partial<ConversationBackendData> = {
+    const remoteData = {
       access: [CONVERSATION_ACCESS.PRIVATE],
       creator: '532af01e-1e24-4366-aacf-33b67d4ee376',
       qualified_id: {domain: 'wire.com', id: 'de7466b0-985c-4dc3-ad57-17877db45b4c'},
@@ -517,7 +524,16 @@ describe('ConversationMapper', () => {
       name: 'Family Gathering',
       team: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
       type: 2,
-    };
+    } as unknown as ConversationBackendData;
+
+    function getRemoteSelf(): MemberBackendData {
+      const remoteSelf = remoteData.members?.self;
+      if (remoteSelf === undefined) {
+        throw new Error('Expected remote self member');
+      }
+
+      return remoteSelf;
+    }
 
     it('incorporates remote data from backend into local data', () => {
       const local_data: Partial<ConversationDatabaseData> = {
@@ -588,12 +604,14 @@ describe('ConversationMapper', () => {
       expect(merged_conversation.last_server_timestamp).toBe(localData.last_event_timestamp);
       expect(merged_conversation.verification_state).toBe(localData.verification_state);
 
-      const expectedArchivedTimestamp = new Date(remoteData.members.self.otr_archived_ref).getTime();
+      const remoteSelf = getRemoteSelf();
+      assertNotNullOrUndefined(remoteSelf.otr_archived_ref);
+      const expectedArchivedTimestamp = new Date(remoteSelf.otr_archived_ref).getTime();
 
       expect(merged_conversation.archived_timestamp).toBe(expectedArchivedTimestamp);
-      expect(merged_conversation.archived_state).toBe(remoteData.members.self.otr_archived);
+      expect(merged_conversation.archived_state).toBe(remoteSelf.otr_archived);
 
-      const expectedNotificationTimestamp = new Date(remoteData.members.self.otr_muted_ref).getTime();
+      const expectedNotificationTimestamp = new Date(remoteSelf.otr_muted_ref ?? 0).getTime();
 
       expect(merged_conversation.muted_state).toBe(NOTIFICATION_STATE.EVERYTHING);
       expect(merged_conversation.muted_timestamp).toBe(expectedNotificationTimestamp);
@@ -707,7 +725,8 @@ describe('ConversationMapper', () => {
         otr_muted_status: NOTIFICATION_STATE.NOTHING,
       };
 
-      remoteData.members.self = {...remoteData.members.self, ...selfUpdate};
+      const remoteSelf = getRemoteSelf();
+      remoteData.members = {...remoteData.members, self: {...remoteSelf, ...selfUpdate}};
 
       const [merged_conversation] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
@@ -729,12 +748,15 @@ describe('ConversationMapper', () => {
       expect(merged_conversation.verification_state).toBe(localData.verification_state);
 
       // remote one is newer
-      const expectedArchivedTimestamp = new Date(remoteData.members.self.otr_archived_ref).getTime();
+      const updatedRemoteSelf = getRemoteSelf();
+      assertNotNullOrUndefined(updatedRemoteSelf.otr_archived_ref);
+      const expectedArchivedTimestamp = new Date(updatedRemoteSelf.otr_archived_ref).getTime();
 
       expect(merged_conversation.archived_timestamp).toBe(expectedArchivedTimestamp);
-      expect(merged_conversation.archived_state).toBe(remoteData.members.self.otr_archived);
+      expect(merged_conversation.archived_state).toBe(updatedRemoteSelf.otr_archived);
 
-      const expectedNotificationTimestamp = new Date(remoteData.members.self.otr_muted_ref).getTime();
+      assertNotNullOrUndefined(updatedRemoteSelf.otr_muted_ref);
+      const expectedNotificationTimestamp = new Date(updatedRemoteSelf.otr_muted_ref).getTime();
 
       expect(merged_conversation.muted_state).toBe(NOTIFICATION_STATE.NOTHING);
       expect(merged_conversation.muted_timestamp).toBe(expectedNotificationTimestamp);

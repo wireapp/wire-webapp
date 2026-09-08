@@ -26,6 +26,8 @@ import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
+  reactTranslationRenderingFeatureToggleName,
+  sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
   viewerPermissionFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -35,6 +37,8 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   conversationListCollapseFeatureToggleName,
   viewerPermissionFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
+  sharedDriveDirectUploadFeatureToggleName,
+  reactTranslationRenderingFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -42,6 +46,7 @@ describe('startupFeatureToggles', function () {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
   });
 
@@ -119,6 +124,22 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName)).toBe(true);
   });
 
+  it('enables the shared drive direct upload feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${sharedDriveDirectUploadFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName)).toBe(true);
+  });
+
+  it('enables the React translation rendering feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${reactTranslationRenderingFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName)).toBe(true);
+  });
+
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -161,6 +182,8 @@ describe('startupFeatureToggles', function () {
       conversationListCollapseFeatureToggleName,
       viewerPermissionFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
+      sharedDriveDirectUploadFeatureToggleName,
+      reactTranslationRenderingFeatureToggleName,
     ]);
   });
 

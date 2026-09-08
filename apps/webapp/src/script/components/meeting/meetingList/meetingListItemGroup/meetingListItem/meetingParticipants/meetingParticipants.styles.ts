@@ -24,19 +24,3 @@ export const wrapperStyles: CSSObject = {
   alignItems: 'center',
   minWidth: 0,
 };
-
-export const singleParticipantStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-  minWidth: 0,
-};
-
-export const participantNameStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontSize: 14,
-  fontWeight: 'var(--font-weight-regular)',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-};

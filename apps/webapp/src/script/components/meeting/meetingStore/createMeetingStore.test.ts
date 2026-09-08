@@ -24,6 +24,7 @@ import {MEETING_EVENT} from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {noop} from 'noop-esm';
 import {maybe, task} from 'true-myth';
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -48,7 +49,7 @@ describe('createMeetingStore', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    trial: false,
+    tzid: 'Europe/Berlin',
   };
 
   const meetingSeriesEntry = {
@@ -61,6 +62,7 @@ describe('createMeetingStore', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     recurrence: 'doesNotRepeat' as const,
+    tzid: 'Europe/Berlin',
   };
 
   const listMeetingInstance = {
@@ -95,16 +97,19 @@ describe('createMeetingStore', () => {
     getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting)),
     safeGetConversationById = jest.fn(),
     serviceTasks = createServiceTasks(),
+    wallClock: wallClockOverride = wallClock,
   }: {
     getMeetingsList?: jest.Mock;
     getMeeting?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     serviceTasks?: MeetingStoreServiceTasks;
+    wallClock?: typeof wallClock;
   } = {}): MeetingStoreDeps => ({
     meetingsRepository: {getMeetingsList, getMeeting} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
     callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
-    wallClock,
+    wallClock: wallClockOverride,
+    deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
     serviceTasks,
   });
 
@@ -125,7 +130,7 @@ describe('createMeetingStore', () => {
   });
 
   it('keeps the list visible while reloading meetings that are already shown', async () => {
-    let finishFetch: () => void = () => {};
+    let finishFetch: () => void = noop;
     const fetchGate = new Promise<void>(resolve => {
       finishFetch = resolve;
     });
@@ -172,7 +177,7 @@ describe('createMeetingStore', () => {
   });
 
   it('does not restore a removed meeting when an older list reload finishes', async () => {
-    let finishFetch: () => void = () => {};
+    let finishFetch: () => void = noop;
     const fetchGate = new Promise<void>(resolve => {
       finishFetch = resolve;
     });
@@ -197,7 +202,7 @@ describe('createMeetingStore', () => {
   });
 
   it('does not remove a newly synchronized meeting when an older list reload finishes', async () => {
-    let finishFetch: () => void = () => {};
+    let finishFetch: () => void = noop;
     const fetchGate = new Promise<void>(resolve => {
       finishFetch = resolve;
     });
@@ -306,7 +311,7 @@ describe('createMeetingStore', () => {
     expect(result.value.formState.end.value).toEqual(new Date('2026-06-16T11:00:00.000Z'));
   });
 
-  it('prefills edit form with the upcoming instance times for recurring meetings', async () => {
+  it('prefills edit form with the edit anchor times for recurring meetings', async () => {
     const conversation = new Conversation(
       'conversation-id',
       'example.com',
@@ -338,6 +343,43 @@ describe('createMeetingStore', () => {
     expect(result.value.formState.start.value).toEqual(new Date('2026-06-22T10:00:00.000Z'));
     assert(maybe.isJust(result.value.formState.end));
     expect(result.value.formState.end.value).toEqual(new Date('2026-06-22T11:00:00.000Z'));
+  });
+
+  it('prefills today’s in-progress occurrence when editing a future row (WPB-27894)', async () => {
+    const conversation = new Conversation(
+      'conversation-id',
+      'example.com',
+      CONVERSATION_PROTOCOL.MLS,
+      translateForTest,
+    );
+    const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
+    const ongoingWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T10:30:00.000Z'),
+    });
+    const store = createMeetingStore(createDeps({safeGetConversationById, wallClock: ongoingWallClock}));
+    const recurringMeetingInstance = {
+      meetingSeries: {
+        ...meetingSeriesEntry,
+        series_start_date: '2026-06-01T10:00:00.000Z',
+        series_end_date: '2026-06-01T11:00:00.000Z',
+        recurrence: 'weekly' as const,
+      },
+      start: new Date('2026-06-22T10:00:00.000Z'),
+      end: new Date('2026-06-22T11:00:00.000Z'),
+    };
+
+    const result = await store.getState().loadMeetingForEdit(recurringMeetingInstance);
+
+    expect(result.isOk).toBe(true);
+
+    if (!result.isOk) {
+      throw new Error('Expected loadMeetingForEdit to succeed');
+    }
+
+    assert(maybe.isJust(result.value.formState.start));
+    expect(result.value.formState.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
+    assert(maybe.isJust(result.value.formState.end));
+    expect(result.value.formState.end.value).toEqual(new Date('2026-06-15T11:00:00.000Z'));
   });
 
   it('maps deleteMeetingForAll to a DeleteMeetingCommand for serviceTasks', async () => {
@@ -429,7 +471,7 @@ describe('createMeetingStore', () => {
     });
 
     it('does not restore a locally removed meeting when an older sync finishes', async () => {
-      let finishFetch: () => void = () => {};
+      let finishFetch: () => void = noop;
       const fetchGate = new Promise<void>(resolve => {
         finishFetch = resolve;
       });

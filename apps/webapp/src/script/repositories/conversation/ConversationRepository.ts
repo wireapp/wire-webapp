@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {
   ADD_PERMISSION,
   Conversation as BackendConversation,
@@ -59,6 +59,7 @@ import {AddUsersFailure, BaseCreateConversationResponse} from '@wireapp/core/lib
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {asyncNoop, noop} from 'noop-esm';
 import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 import {flatten, isError} from 'underscore';
@@ -67,7 +68,7 @@ import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -211,6 +212,15 @@ export class ConversationRepository {
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
   private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
   private initiatingMlsConversationQualifiedIds: QualifiedId[] = [];
+
+  private get coreServices() {
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+
+    return coreServices;
+  }
 
   static get CONFIG() {
     return {
@@ -370,8 +380,8 @@ export class ConversationRepository {
 
   public registerMLSConversationVerificationStateHandler = (
     domain: string,
-    onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
-    onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
+    onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = noop,
+    onSelfClientCertificateRevoked: () => Promise<void> = asyncNoop,
   ): void => {
     this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
       domain,
@@ -486,9 +496,13 @@ export class ConversationRepository {
     };
 
     if (this.teamState.team().id) {
+      const teamId = this.teamState.team().id;
+      if (isUndefined(teamId)) {
+        throw new Error('Cannot create a team conversation without a team id');
+      }
       payload.team = {
         managed: false,
-        teamid: this.teamState.team().id!,
+        teamid: teamId,
       };
 
       if (accessState) {
@@ -516,13 +530,13 @@ export class ConversationRepository {
         throw new Error('Cannot create conversation before self user is available');
       }
       if (isMLSConversation) {
-        response = await this.core.service!.conversation.createMLSConversation(
+        response = await this.coreServices.conversation.createMLSConversation(
           payload,
           selfUser.qualifiedId,
           this.core.clientId,
         );
       } else {
-        const {conversation, failedToAdd} = await this.core.service!.conversation.createProteusConversation(payload);
+        const {conversation, failedToAdd} = await this.coreServices.conversation.createProteusConversation(payload);
         response = {conversation, failedToAdd};
       }
 
@@ -2418,7 +2432,7 @@ export class ConversationRepository {
           throw new Error('Cannot establish meeting conversation before self user is available');
         }
 
-        const {failedToAdd = []} = await this.core.service!.conversation.establishMLSGroupConversation(
+        const {failedToAdd = []} = await this.coreServices.conversation.establishMLSGroupConversation(
           groupId,
           userIdsToAdd,
           selfUser.qualifiedId,
@@ -2729,7 +2743,7 @@ export class ConversationRepository {
     try {
       if (isProteusConversation(conversation) || isMixedConversation(conversation)) {
         const {failedToAdd, event: memberJoinEvent} =
-          await this.core.service!.conversation.addUsersToProteusConversation({
+          await this.coreServices.conversation.addUsersToProteusConversation({
             conversationId,
             qualifiedUsers,
           });
@@ -2749,7 +2763,7 @@ export class ConversationRepository {
       }
 
       if (isMLSCapableConversation(conversation)) {
-        const {failedToAdd} = await this.core.service!.conversation.addUsersToMLSConversation({
+        const {failedToAdd} = await this.coreServices.conversation.addUsersToMLSConversation({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
           qualifiedUsers,
@@ -3011,7 +3025,7 @@ export class ConversationRepository {
    */
   private async removeMembersFromMLSConversation(conversationEntity: MLSConversation, userIds: QualifiedId[]) {
     const {groupId, qualifiedId} = conversationEntity;
-    await this.core.service!.conversation.removeUsersFromMLSConversation({
+    await this.coreServices.conversation.removeUsersFromMLSConversation({
       conversationId: qualifiedId,
       groupId,
       qualifiedUserIds: userIds,
@@ -3028,10 +3042,7 @@ export class ConversationRepository {
   private async removeMembersFromConversation(conversation: Conversation, userIds: QualifiedId[]) {
     return await Promise.all(
       userIds.map(async userId => {
-        const event = await this.core.service!.conversation.removeUserFromConversation(
-          conversation.qualifiedId,
-          userId,
-        );
+        const event = await this.coreServices.conversation.removeUserFromConversation(conversation.qualifiedId, userId);
         const roles = conversation.roles();
         delete roles[userId.id];
         conversation.roles(roles);
@@ -3754,6 +3765,18 @@ export class ConversationRepository {
               // we ignore leave/join events that are sent by the user actually leaving or joining
               return conversationEntity;
             }
+            break;
+
+          // member-update events can be sent by the team owner or system
+          // without being part of the conversation. This happens e.g. for the
+          // "adminless group prevention" feature when a user gets
+          // auto-promoted to group admin.
+          case CONVERSATION_EVENT.MEMBER_UPDATE:
+          case CONVERSATION_EVENT.SYSTEM_MEMBER_UPDATE:
+            this.logger.info(
+              `Skipping auto-join for unknown sender '${senderId}' of '${eventJson.type}' event in '${conversationEntity.id}'`,
+            );
+            return conversationEntity;
         }
 
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;
@@ -4438,7 +4461,7 @@ export class ConversationRepository {
       await this.clearConversationContent(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
-    if (isActiveConversation && conversationEntity.is_archived()) {
+    if (isActiveConversation && conversationEntity.is_archived() && !isUndefined(nextConversationEntity)) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }

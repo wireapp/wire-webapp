@@ -17,7 +17,7 @@
  *
  */
 
-import {isString} from '@sindresorhus/is';
+import {isString, isUndefined} from '@sindresorhus/is';
 import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
 import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/verificationActionType';
@@ -28,6 +28,7 @@ import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
+import {asyncNoop} from 'noop-esm';
 
 import {toError} from 'Util/toError';
 import {isAxiosError, isBackendError} from 'Util/typePredicateUtil';
@@ -86,8 +87,8 @@ export class AuthAction {
 
   doLoginPlain = (
     loginData: LoginData,
-    onBeforeLogin: LoginLifecycleFunction = async () => {},
-    onAfterLogin: LoginLifecycleFunction = async () => {},
+    onBeforeLogin: LoginLifecycleFunction = asyncNoop,
+    onAfterLogin: LoginLifecycleFunction = asyncNoop,
     getEntropy?: () => Promise<Uint8Array>,
   ): ThunkAction => {
     return async (dispatch, getState, global) => {
@@ -103,7 +104,11 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         let entropyData: Uint8Array | undefined = undefined;
         if (getEntropy !== undefined) {
-          const existingClient = await core.service!.client.loadClient();
+          const coreServices = core.service;
+          if (isUndefined(coreServices)) {
+            throw new Error('Core services are not initialized.');
+          }
+          const existingClient = await coreServices.client.loadClient();
           entropyData = existingClient ? undefined : await getEntropy();
         }
         await onAfterLogin(dispatch, getState, global);

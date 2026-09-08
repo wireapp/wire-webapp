@@ -19,7 +19,7 @@
 
 import {Locator, Page} from 'playwright/test';
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
-import {User} from 'test/e2e_tests/data/user';
+import {getRequiredUserId, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
@@ -297,7 +297,7 @@ test.describe('Delete', () => {
           false,
         );
 
-        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+        const conversationId = await api.conversation.getConversationWithUser(userA.token, getRequiredUserId(userB), {
           protocol: 'mls',
         });
         if (conversationId === undefined) throw new Error("Couldn't find MLS conversation of userB with userA");

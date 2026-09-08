@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import * as fs from 'fs-extra';
 import logdown from 'logdown';
 import pkginfo from 'npm-registry-package-info';
@@ -112,11 +113,15 @@ export class LicenseCollector {
       const id = crypto.randomBytes(CLONE_DIR_ID_BYTE_LENGTH).toString('hex');
       const cloneDir = path.join(this.TMP_DIR, id);
       const name = gitUrlRegex.exec(url) ?? ['', url];
-      repository.name = name[1]!;
+      const repositoryName = name[1];
+      if (isUndefined(repositoryName)) {
+        throw new Error(`Unable to determine repository name from ${url}`);
+      }
+      repository.name = repositoryName;
 
       repository.dir = cloneDir;
 
-      this.logger.info(`${name[1]}: Cloning "${url}" into "${cloneDir}" ...`);
+      this.logger.info(`${repositoryName}: Cloning "${url}" into "${cloneDir}" ...`);
 
       const {stderr: stderrClone} = await execAsync(`git clone --depth 1 "${url}" "${cloneDir}"`);
 
@@ -216,7 +221,10 @@ export class LicenseCollector {
     this.logger.info(`Extracted ${packages.length} licenses.`);
 
     for (const packageName of packages) {
-      const currentPackage = result.data[packageName]!;
+      const currentPackage = result.data[packageName];
+      if (isUndefined(currentPackage)) {
+        throw new Error(`Missing package data for ${packageName}`);
+      }
 
       const link = currentPackage.homepage ?? currentPackage.repository?.url ?? 'none';
 

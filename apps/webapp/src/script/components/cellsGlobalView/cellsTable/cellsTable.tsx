@@ -19,12 +19,12 @@
 
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 
-import {CellsSortDirection} from 'Components/Conversation/ConversationCells/common/CellsSortIcon/CellsSortIcon';
+import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
 import {
   CellsSortField,
   SORTABLE_COLUMN_FIELD,
   toAriaSort,
-} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
+} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';

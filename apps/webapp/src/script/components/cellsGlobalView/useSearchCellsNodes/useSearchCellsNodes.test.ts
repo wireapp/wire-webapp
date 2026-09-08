@@ -17,8 +17,9 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {act, renderHook} from '@testing-library/react';
-import {RestNodeCollection} from 'cells-sdk-ts';
+import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -28,8 +29,8 @@ import type {Logger} from 'Util/logger';
 
 import {useSearchCellsNodes} from './useSearchCellsNodes';
 
-import type {GlobalDriveFiltersState} from '../../Conversation/ConversationCells/common/driveFilters/driveFilters';
-import type {CellsSort} from '../../Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
+import type {GlobalDriveFiltersState} from '../../conversation/conversationCells/common/driveFilters/driveFilters';
+import type {CellsSort} from '../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 const emptyFilters: GlobalDriveFiltersState = {
@@ -66,26 +67,19 @@ function buildLoggerMock(): LoggerMock {
   return {debug: jest.fn()};
 }
 
-function createControllablePromise<T>() {
-  let resolve!: (value: T) => void;
-  let reject!: (reason?: unknown) => void;
-  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
-    resolve = resolvePromise;
-    reject = rejectPromise;
-  });
-
-  return {promise, resolve, reject};
+function createControllablePromise<T>(): PromiseWithResolvers<T> {
+  return Promise.withResolvers<T>();
 }
 
-function buildRestNodeStub(name: string, uuid = name) {
+function buildRestNodeStub(name: string, uuid = name): RestNode {
   return {
     Uuid: uuid,
     Path: `wire-cells-web/${name}`,
     Type: 'LEAF',
-    Modified: 1,
-    Size: 1,
+    Modified: '1',
+    Size: '1',
     UserMetadata: [],
-    ContextWorkspace: {Uuid: 'conversation-id@example.com', Label: 'Conversation'},
+    ContextWorkspace: {Uuid: 'conversation-id@example.com', Label: 'Conversation', Slug: 'conversation'},
   };
 }
 
@@ -314,14 +308,19 @@ describe('useSearchCellsNodes', () => {
 
     const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository, logger});
 
-    let currentSearchPromise!: Promise<void>;
+    let currentSearchPromise: Promise<void> | undefined;
     act(() => {
       currentSearchPromise = result.current.handleReload();
     });
 
+    if (isUndefined(currentSearchPromise)) {
+      throw new Error('The current search promise was not created');
+    }
+    const currentSearchRequestPromise = currentSearchPromise;
+
     await act(async () => {
       currentSearch.resolve({Nodes: [buildRestNodeStub('current-file.pdf')]});
-      await currentSearchPromise;
+      await currentSearchRequestPromise;
       await flushMicrotasks();
     });
 
@@ -340,14 +339,19 @@ describe('useSearchCellsNodes', () => {
     };
     const {fireAndForgetInvoker, result} = renderSearchHook({cellsRepository});
 
-    let currentSearchPromise!: Promise<void>;
+    let currentSearchPromise: Promise<void> | undefined;
     act(() => {
       currentSearchPromise = result.current.handleReload();
     });
 
+    if (isUndefined(currentSearchPromise)) {
+      throw new Error('The current search promise was not created');
+    }
+    const currentSearchRequestPromise = currentSearchPromise;
+
     await act(async () => {
       currentSearch.resolve({Nodes: [buildRestNodeStub('current-file.pdf')]});
-      await currentSearchPromise;
+      await currentSearchRequestPromise;
       staleSearch.reject(new Error('stale request failed'));
       await fireAndForgetInvoker.waitUntilAllSettled();
     });

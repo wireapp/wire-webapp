@@ -19,6 +19,8 @@
 
 import {useLayoutEffect} from 'react';
 
+import {noop} from 'noop-esm';
+
 const observedElements = new Map<Element, (element: Element) => void>();
 
 const resizeObserver = new ResizeObserver(entries => {
@@ -49,7 +51,7 @@ export const useResizeObserver = (
   // We need to use a layout effect here as we want to make sure the observer is set up (and removed!) before the component is rendered
   useLayoutEffect(() => {
     if (!element) {
-      return () => {};
+      return noop;
     }
 
     observedElements.set(element, skipFirstCall(callback));

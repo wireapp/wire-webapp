@@ -32,19 +32,24 @@ import {
   ShowIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {ChannelAvatar, GroupAvatar} from 'Components/avatar';
+import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
-} from 'Components/Conversation/ConversationCells/common/CellsSelfUserDriveRole/CellsSelfUserDriveRoleContext';
-import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsViewerAccessLabel} from 'Components/conversation/conversationCells/common/cellsViewerAccessLabel';
+import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
 import {EditIcon} from 'Components/icon';
-import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
-import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
+import {iconStyles} from 'Components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions/fileAssetOptions.styles';
+import {MessageTime} from 'Components/messagesList/message/messageTime';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {
@@ -52,8 +57,12 @@ import {
   leftColumnStyles,
   closeButtonStyles,
   metadataStyles,
+  metadataTextStyles,
   nameStyles,
+  sourceConversationIconStyles,
+  sourceConversationMetadataStyles,
   textStyles,
+  timeStyles,
   downloadButtonStyles,
   actionButtonsStyles,
   editModeButtonStyles,
@@ -66,13 +75,26 @@ interface FileHeaderProps {
   fileExtension: string;
   senderName: string;
   timestamp: number;
+  fallbackConversationName?: string;
+  sourceConversation?: Conversation;
   badges?: string[];
   fileUrl?: string;
   isEditable?: boolean;
   isInEditMode?: boolean;
+  showViewOnlyLabel?: boolean;
   onEditModeChange: (isEditable: boolean) => void;
   onFileContentRefresh: () => void;
 }
+
+type ConversationIconType = 'channel' | 'group';
+
+export const getConversationIconType = ({
+  isChannel,
+  isChannelsEnabled,
+}: {
+  isChannel: boolean;
+  isChannelsEnabled: boolean;
+}): ConversationIconType => (isChannel && isChannelsEnabled ? 'channel' : 'group');
 
 export const FileHeader = ({
   id,
@@ -82,9 +104,12 @@ export const FileHeader = ({
   fileExtension,
   senderName,
   timestamp,
+  fallbackConversationName,
+  sourceConversation,
   badges,
   isEditable,
   isInEditMode,
+  showViewOnlyLabel = false,
   onEditModeChange,
   onFileContentRefresh,
 }: FileHeaderProps) => {
@@ -102,7 +127,6 @@ export const FileHeader = ({
   const isRecycleBin = isInRecycleBin();
   const cellsRepository = container.resolve(CellsRepository);
   const {showModal} = useFileHistoryModal();
-  const canViewVersionHistory = canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY);
 
   const handleFileDownload = async () => {
     if (fileUrl !== undefined && fileUrl.length > 0) {
@@ -125,15 +149,21 @@ export const FileHeader = ({
         </button>
         <div css={metadataStyles}>
           <FileTypeIcon extension={fileExtension} />
-          <h3 css={nameStyles}>{fileName}</h3>
-          <p css={textStyles}>{senderName}</p>
-          <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={textStyles}>
-            {timeAgo}
-          </MessageTime>
+          <div css={metadataTextStyles}>
+            <h3 css={nameStyles}>{fileName}</h3>
+            {(sourceConversation !== undefined ||
+              (fallbackConversationName !== undefined && fallbackConversationName.length > 0)) && (
+              <ConversationLabel conversation={sourceConversation} fallbackName={fallbackConversationName ?? ''} />
+            )}
+            <span css={textStyles}>{senderName}</span>
+            <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={timeStyles}>
+              {timeAgo}
+            </MessageTime>
+          </div>
           {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
-      {isEditable === true && (
+      {isEditable === true && !showViewOnlyLabel && (
         <div css={editModeButtonStyles}>
           <button
             title="Viewing"
@@ -158,7 +188,13 @@ export const FileHeader = ({
         </div>
       )}
       <div css={actionButtonsStyles}>
-        {!isRecycleBin && canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && (
+        {showViewOnlyLabel && (
+          <CellsViewerAccessLabel
+            label={translate('cells.imageFullScreenModal.viewerAccessLabel')}
+            iconUieName="file-header-view-only-icon"
+          />
+        )}
+        {!showViewOnlyLabel && !isRecycleBin && canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && (
           <Button
             variant={ButtonVariant.TERTIARY}
             css={downloadButtonStyles}
@@ -169,25 +205,65 @@ export const FileHeader = ({
             <DownloadIcon />
           </Button>
         )}
-        {!isRecycleBin && isEditable === true && canViewVersionHistory && (
-          <DropdownMenu>
-            <DropdownMenu.Trigger asChild>
-              <Button
-                variant={ButtonVariant.TERTIARY}
-                css={downloadButtonStyles}
-                aria-label={translate('cells.options.label')}
-              >
-                <MoreIcon css={iconStyles} />
-              </Button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content>
-              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
-                {translate('cells.options.versionHistory')}
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu>
-        )}
+        {!showViewOnlyLabel &&
+          !isRecycleBin &&
+          isEditable === true &&
+          canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY) && (
+            <DropdownMenu>
+              <DropdownMenu.Trigger asChild>
+                <Button
+                  variant={ButtonVariant.TERTIARY}
+                  css={downloadButtonStyles}
+                  aria-label={translate('cells.options.label')}
+                >
+                  <MoreIcon css={iconStyles} />
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content>
+                <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
+                  {translate('cells.options.versionHistory')}
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu>
+          )}
       </div>
     </header>
+  );
+};
+
+const ConversationLabel = ({conversation, fallbackName}: {conversation?: Conversation; fallbackName: string}) => {
+  if (conversation === undefined) {
+    return <FallbackConversationLabel fallbackName={fallbackName} />;
+  }
+
+  return <ConversationEntityLabel conversation={conversation} fallbackName={fallbackName} />;
+};
+
+const FallbackConversationLabel = ({fallbackName}: {fallbackName: string}) => (
+  <span css={sourceConversationMetadataStyles}>
+    <span css={sourceConversationIconStyles} aria-hidden="true">
+      <GroupAvatar size="small" />
+    </span>
+    <span css={textStyles}>{fallbackName}</span>
+  </span>
+);
+
+const ConversationEntityLabel = ({conversation, fallbackName}: {conversation: Conversation; fallbackName: string}) => {
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
+  const {isChannel, display_name: displayName} = useKoSubscribableChildren(conversation, ['isChannel', 'display_name']);
+  const name = displayName || fallbackName;
+  const iconType = getConversationIconType({isChannel, isChannelsEnabled});
+
+  return (
+    <span css={sourceConversationMetadataStyles}>
+      <span css={sourceConversationIconStyles} aria-hidden="true">
+        {iconType === 'channel' ? (
+          <ChannelAvatar conversationID={conversation.id} isLocked={false} size="small" />
+        ) : (
+          <GroupAvatar conversationID={conversation.id} size="small" />
+        )}
+      </span>
+      <span css={textStyles}>{name}</span>
+    </span>
   );
 };

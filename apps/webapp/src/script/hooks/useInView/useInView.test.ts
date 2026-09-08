@@ -18,6 +18,7 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
+import {noop} from 'noop-esm';
 
 import {useInView} from './useInView';
 
@@ -29,7 +30,7 @@ describe('useInView', () => {
   beforeEach(() => {
     mockObserve = jest.fn();
     mockDisconnect = jest.fn();
-    observerCallback = () => {};
+    observerCallback = noop;
 
     window.IntersectionObserver = jest.fn((callback, options) => {
       observerCallback = callback;

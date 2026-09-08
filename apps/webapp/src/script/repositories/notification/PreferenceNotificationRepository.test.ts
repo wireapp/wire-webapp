@@ -32,15 +32,15 @@ import {Notification, PreferenceNotificationRepository} from './PreferenceNotifi
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('PreferenceNotificationRepository', () => {
-  const user = new User(createUuid(), null, translateForTest);
+  const user = new User(createUuid(), '', translateForTest);
   const userObservable = ko.observable(user);
 
   beforeEach(() => {
-    spyOn(amplify, 'store').and.callFake(() => {});
+    spyOn(amplify, 'store').and.stub();
   });
 
   it('subscribes to preference change events', () => {
-    spyOn(amplify, 'subscribe').and.callFake(() => {});
+    spyOn(amplify, 'subscribe').and.stub();
 
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 

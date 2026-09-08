@@ -44,6 +44,7 @@ const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => 
   qualified_id: meetingId,
   qualified_creator: {id: 'host-id', domain: 'example.com'},
   qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+  tzid: 'Europe/Berlin',
   ...overrides,
 });
 
@@ -189,10 +190,7 @@ describe('submitDeleteMeeting', () => {
   });
 
   it('shows feedback when a second submit for the same meeting is already in flight', async () => {
-    let releaseDelete!: () => void;
-    const deleteGate = new Promise<void>(resolve => {
-      releaseDelete = resolve;
-    });
+    const {promise: deleteGate, resolve: releaseDelete} = Promise.withResolvers<void>();
     const deleteMeetingForAll = jest.fn().mockReturnValue(
       task.tryOrElse(
         () => meetingSubmitErrors.deleteFailed,

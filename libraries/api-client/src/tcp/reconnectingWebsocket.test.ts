@@ -21,9 +21,8 @@ import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 import {once} from 'events';
 import type {CloseEvent, ErrorEvent} from 'partysocket/ws';
 import {Maybe} from 'true-myth';
+import {noop} from 'noop-esm';
 import {Server as WebSocketServer} from 'ws';
-
-import {AddressInfo} from 'net';
 
 import {
   CloseEventCode,
@@ -53,6 +52,15 @@ type MockReconnectingWebsocketWrapper = {
   reconnect: jest.Mock;
   send: jest.Mock;
 };
+
+function getSocketForTest(reconnectingWebsocket: ReconnectingWebsocket): NonNullable<ReconnectingWebsocket['socket']> {
+  const socket = reconnectingWebsocket['socket'];
+  if (isNullOrUndefined(socket)) {
+    throw new Error('Expected websocket socket to be initialized');
+  }
+
+  return socket;
+}
 
 function createMockReconnectingWebsocketWrapper(readyState: WEBSOCKET_STATE): MockReconnectingWebsocketWrapper {
   const socket: MockReconnectingWebsocketWrapper = {
@@ -120,7 +128,9 @@ function createDeterministicTimeoutWallClock(
       runDueTimeoutRegistrations();
     },
 
-    clearInterval: globalThis.clearInterval.bind(globalThis),
+    clearInterval(intervalIdentifier: ReturnType<typeof globalThis.setInterval>): void {
+      globalThis.clearInterval(intervalIdentifier);
+    },
 
     clearTimeout(timeoutIdentifier): void {
       timeoutRegistrations.delete(timeoutIdentifier as unknown as number);
@@ -130,16 +140,16 @@ function createDeterministicTimeoutWallClock(
       return currentTimestampInMilliseconds;
     },
 
-    setInterval: globalThis.setInterval.bind(globalThis),
+    setInterval(callback: () => void, delayInMilliseconds: number): ReturnType<typeof globalThis.setInterval> {
+      return globalThis.setInterval(callback, delayInMilliseconds);
+    },
 
-    setTimeout(handler, delayInMilliseconds, ...handlerArguments) {
+    setTimeout(callback: () => void, delayInMilliseconds: number): ReturnType<typeof globalThis.setTimeout> {
       const timeoutIdentifier = nextTimeoutIdentifier;
       nextTimeoutIdentifier += 1;
 
       timeoutRegistrations.set(timeoutIdentifier, {
-        execute: () => {
-          handler(...handlerArguments);
-        },
+        execute: callback,
         executionTimestampInMilliseconds: currentTimestampInMilliseconds + delayInMilliseconds,
       });
 
@@ -177,21 +187,31 @@ async function startEchoServer(): Promise<WebSocketServer> {
 }
 
 describe('ReconnectingWebsocket', () => {
+  type ReconnectingWebsocketTestOptions = NonNullable<ConstructorParameters<typeof ReconnectingWebsocket>[1]>;
+
   let server: WebSocketServer | undefined;
   let currentTimestampInMilliseconds = 1_000_000;
   const activeConnections: ReconnectingWebsocket[] = [];
-  const testWallClock = {
-    clearInterval: globalThis.clearInterval.bind(globalThis),
-    clearTimeout: globalThis.clearTimeout.bind(globalThis),
+  const testWallClock: ReconnectingWebsocketWallClock = {
+    clearInterval(intervalIdentifier): void {
+      globalThis.clearInterval(intervalIdentifier);
+    },
+    clearTimeout(timeoutIdentifier): void {
+      globalThis.clearTimeout(timeoutIdentifier);
+    },
 
     get currentTimestampInMilliseconds() {
       return currentTimestampInMilliseconds;
     },
 
-    setInterval: globalThis.setInterval.bind(globalThis),
-    setTimeout: globalThis.setTimeout.bind(globalThis),
+    setInterval(callback, delayInMilliseconds): ReturnType<typeof globalThis.setInterval> {
+      return globalThis.setInterval(callback, delayInMilliseconds);
+    },
+    setTimeout(callback, delayInMilliseconds): ReturnType<typeof globalThis.setTimeout> {
+      return globalThis.setTimeout(callback, delayInMilliseconds);
+    },
   };
-  const defaultReconnectingWebsocketTestOptions = {
+  const defaultReconnectingWebsocketTestOptions: ReconnectingWebsocketTestOptions = {
     backFromSleepHandler: Maybe.nothing(),
     pingInterval: Maybe.nothing<number>(),
     wallClock: testWallClock,
@@ -211,7 +231,7 @@ describe('ReconnectingWebsocket', () => {
 
   function createRWS(
     onReconnect: () => Promise<string>,
-    options = defaultReconnectingWebsocketTestOptions,
+    options: ReconnectingWebsocketTestOptions = defaultReconnectingWebsocketTestOptions,
   ): ReconnectingWebsocket {
     const rws = new ReconnectingWebsocket(onReconnect, options);
     activeConnections.push(rws);
@@ -265,7 +285,7 @@ describe('ReconnectingWebsocket', () => {
   ])('reconnects the existing $socketStateName socket in place when connect is called again', ({socketState}) => {
     const onReconnect = jest.fn().mockReturnValue(getServerAddress());
     const socket = createMockReconnectingWebsocketWrapper(socketState);
-    const websocketFactory = jest.fn(() => {
+    const websocketFactory = jest.fn<MockReconnectingWebsocketWrapper, []>((): MockReconnectingWebsocketWrapper => {
       return socket;
     });
     const RWS = createRWS(onReconnect, {
@@ -290,8 +310,8 @@ describe('ReconnectingWebsocket', () => {
     const closedSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CLOSED);
     const nextSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
     const sockets = [closedSocket, nextSocket];
-    const websocketFactory = jest.fn(() => {
-      const socket = sockets[websocketFactory.mock.calls.length - 1];
+    const websocketFactory = jest.fn<MockReconnectingWebsocketWrapper, []>((): MockReconnectingWebsocketWrapper => {
+      const socket: MockReconnectingWebsocketWrapper | undefined = sockets[websocketFactory.mock.calls.length - 1];
 
       if (!socket) {
         throw new Error('Unexpected websocketFactory call');
@@ -322,8 +342,8 @@ describe('ReconnectingWebsocket', () => {
     const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.OPEN);
     const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
     const sockets = [firstSocket, secondSocket];
-    const websocketFactory = jest.fn(() => {
-      const socket = sockets[websocketFactory.mock.calls.length - 1];
+    const websocketFactory = jest.fn<MockReconnectingWebsocketWrapper, []>((): MockReconnectingWebsocketWrapper => {
+      const socket: MockReconnectingWebsocketWrapper | undefined = sockets[websocketFactory.mock.calls.length - 1];
 
       if (!socket) {
         throw new Error('Unexpected websocketFactory call');
@@ -401,7 +421,7 @@ describe('ReconnectingWebsocket', () => {
       const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket);
-      let resolveReconnectUrl: (websocketUrl: string) => void = () => {};
+      let resolveReconnectUrl: (websocketUrl: string) => void = noop;
       const reconnectUrlPromise = new Promise<string>(resolve => {
         resolveReconnectUrl = resolve;
       });
@@ -443,7 +463,7 @@ describe('ReconnectingWebsocket', () => {
       const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const thirdSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
       const websocketFactory = createSocketFactory(firstSocket, secondSocket, thirdSocket);
-      let resolveReconnectUrl: (websocketUrl: string) => void = () => {};
+      let resolveReconnectUrl: (websocketUrl: string) => void = noop;
       const reconnectUrlPromise = new Promise<string>(resolve => {
         resolveReconnectUrl = resolve;
       });
@@ -756,7 +776,7 @@ describe('ReconnectingWebsocket', () => {
       reconnectCalls++;
       expect(onReconnect).toHaveBeenCalledTimes(reconnectCalls);
       if (reconnectCalls === 1) {
-        RWS['socket']!.reconnect();
+        getSocketForTest(RWS).reconnect();
       } else {
         RWS.disconnect();
       }
@@ -1414,7 +1434,7 @@ describe('ReconnectingWebsocket', () => {
       const testMessage = 'test';
 
       RWS.setOnOpen(() => {
-        const sendSpy = jest.spyOn(RWS['socket']!, 'send');
+        const sendSpy = jest.spyOn(getSocketForTest(RWS), 'send');
         RWS.send(testMessage);
 
         expect(sendSpy).toHaveBeenCalledWith(testMessage);
@@ -1467,7 +1487,7 @@ describe('ReconnectingWebsocket', () => {
       });
 
       RWS.setOnOpen(() => {
-        const reconnectSpy = jest.spyOn(RWS['socket']!, 'reconnect');
+        const reconnectSpy = jest.spyOn(getSocketForTest(RWS), 'reconnect');
         RWS['hasUnansweredPing'] = true;
         setTimeout(() => {
           RWS['sendPing']();
@@ -1507,7 +1527,7 @@ describe('ReconnectingWebsocket', () => {
       const RWS = createRWS(onReconnect);
 
       RWS.setOnOpen(() => {
-        expect(RWS['socket']!.binaryType).toBe('arraybuffer');
+        expect(getSocketForTest(RWS).binaryType).toBe('arraybuffer');
         RWS.disconnect();
         done();
       });

@@ -15,6 +15,7 @@ import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-w
 import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {RootProvider} from 'src/script/page/rootProvider';
+import type {MainViewModel} from 'src/script/view_model/MainViewModel';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
@@ -96,7 +97,7 @@ describe('GroupCreationModal', () => {
       };
       const rootContextValue = createRootContextValueForTest({
         translate: translateForTest,
-        mainViewModel: mockRootContext.mainViewModel,
+        mainViewModel: mockRootContext.mainViewModel as unknown as MainViewModel,
         wallClock: createDeterministicWallClock(),
       });
 
