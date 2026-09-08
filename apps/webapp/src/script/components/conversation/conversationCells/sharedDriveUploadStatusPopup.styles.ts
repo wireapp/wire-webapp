@@ -258,11 +258,11 @@ export const sharedDriveUploadStatusPopupProgressStyles = (
   top: isExpanded ? SHARED_DRIVE_UPLOAD_PROGRESS_EXPANDED_TOP : undefined,
   bottom: isExpanded ? undefined : 0,
   left: isExpanded ? 0 : SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT,
-  width: kind === 'failed' ? 'calc(100% + 4px)' : 'min(209px, calc(50% + 3px))',
+  width: kind === 'uploading' ? 'min(209px, calc(50% + 3px))' : 'calc(100% + 4px)',
   height: 3,
   overflow: 'hidden',
   backgroundColor: kind === 'failed' ? '#c20013' : '#0667c8',
-  animation: kind === 'failed' ? 'none' : 'shared-drive-upload-progress 1.5s ease-in-out infinite',
+  animation: kind === 'uploading' ? 'shared-drive-upload-progress 1.5s ease-in-out infinite' : 'none',
   '@keyframes shared-drive-upload-progress': {
     '0%': {transform: 'translateX(-100%)'},
     '100%': {transform: 'translateX(200%)'},

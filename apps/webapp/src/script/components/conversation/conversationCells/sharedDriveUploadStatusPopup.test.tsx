@@ -104,11 +104,11 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(screen.getByText('Uploading 4 KB')).toHaveAttribute('title', 'Uploading 4 KB');
   });
 
-  it('shows uploaded status without a progress bar', () => {
-    const {getByText, queryByTestId} = renderPopup('uploaded');
+  it('shows uploaded status with a completed progress bar', () => {
+    const {getByText, getByTestId} = renderPopup('uploaded');
 
     expect(getByText('uploaded report.pdf')).toBeInTheDocument();
-    expect(queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
+    expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
   });
 
   it('shows a progress bar for failed status', () => {
