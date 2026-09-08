@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {isNull} from '@sindresorhus/is';
 
 import en from 'I18n/en-US.json';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/federationStopMessage';
@@ -31,8 +32,6 @@ import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FederationStopMessage} from './federationStopMessage';
 
-setStrings({en});
-
 const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({
@@ -44,8 +43,12 @@ const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperFo
 );
 
 type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
 
-function withTranslationStrings(strings: typeof en, testFunction: TranslationTestFunction): TranslationTestFunction {
+function withTranslationStrings(
+  strings: typeof en,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
   return async function runTranslationTest(): Promise<void> {
     setStrings({en: strings});
 
@@ -63,86 +66,101 @@ function createFederationStopMessage(domains: string[]): FederationStopMessageEn
 
 function getTranslationTextContainer(container: HTMLElement): HTMLElement {
   const translationTextContainer = container.querySelector<HTMLElement>('.message-header-label > span');
-  if (translationTextContainer === null) {
+  if (isNull(translationTextContainer)) {
     throw new Error('Expected the federation translation text container to be rendered');
   }
   return translationTextContainer;
 }
 
 describe('FederationStopMessage', () => {
-  it('preserves legacy rendering when React translation rendering is disabled', () => {
-    const {container} = render(
-      withThemeAndRootContext(
-        <FederationStopMessage message={createFederationStopMessage(['example.test'])} isMessageFocused={false} />,
-        legacyRootProviderWrapper,
-      ),
-    );
-    const translationTextContainer = getTranslationTextContainer(container);
+  it(
+    'preserves legacy rendering when React translation rendering is disabled',
+    withTranslationStrings(en, () => {
+      const {container} = render(
+        withThemeAndRootContext(
+          <FederationStopMessage message={createFederationStopMessage(['example.test'])} isMessageFocused={false} />,
+          legacyRootProviderWrapper,
+        ),
+      );
+      const translationTextContainer = getTranslationTextContainer(container);
 
-    expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with example.test.');
-    expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
-  });
+      expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with example.test.');
+      expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
+    }),
+  );
 
-  it('renders the one-domain translation with React formatting when enabled', () => {
-    const {container} = render(
-      withThemeAndRootContext(
-        <FederationStopMessage message={createFederationStopMessage(['example.test'])} isMessageFocused={false} />,
-        reactTranslationRenderingRootProviderWrapper,
-      ),
-    );
-    const translationTextContainer = getTranslationTextContainer(container);
+  it(
+    'renders the one-domain translation with React formatting when enabled',
+    withTranslationStrings(en, () => {
+      const {container} = render(
+        withThemeAndRootContext(
+          <FederationStopMessage message={createFederationStopMessage(['example.test'])} isMessageFocused={false} />,
+          reactTranslationRenderingRootProviderWrapper,
+        ),
+      );
+      const translationTextContainer = getTranslationTextContainer(container);
 
-    expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with example.test.');
-    expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
-  });
+      expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with example.test.');
+      expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
+    }),
+  );
 
-  it('renders the two-domain translation with React formatting when enabled', () => {
-    const {container} = render(
-      withThemeAndRootContext(
-        <FederationStopMessage
-          message={createFederationStopMessage(['example-one.test', 'example-two.test'])}
-          isMessageFocused={false}
-        />,
-        reactTranslationRenderingRootProviderWrapper,
-      ),
-    );
-    const translationTextContainer = getTranslationTextContainer(container);
+  it(
+    'renders the two-domain translation with React formatting when enabled',
+    withTranslationStrings(en, () => {
+      const {container} = render(
+        withThemeAndRootContext(
+          <FederationStopMessage
+            message={createFederationStopMessage(['example-one.test', 'example-two.test'])}
+            isMessageFocused={false}
+          />,
+          reactTranslationRenderingRootProviderWrapper,
+        ),
+      );
+      const translationTextContainer = getTranslationTextContainer(container);
 
-    expect(translationTextContainer).toHaveTextContent(
-      'The backends example-one.test and example-two.test stopped federating.',
-    );
-    expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
-  });
+      expect(translationTextContainer).toHaveTextContent(
+        'The backends example-one.test and example-two.test stopped federating.',
+      );
+      expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
+    }),
+  );
 
-  it('renders HTML-looking runtime domains as text', () => {
-    const {container} = render(
-      withThemeAndRootContext(
-        <FederationStopMessage message={createFederationStopMessage(['R&D <Test>'])} isMessageFocused={false} />,
-        reactTranslationRenderingRootProviderWrapper,
-      ),
-    );
-    const translationTextContainer = getTranslationTextContainer(container);
+  it(
+    'renders HTML-looking runtime domains as text',
+    withTranslationStrings(en, () => {
+      const {container} = render(
+        withThemeAndRootContext(
+          <FederationStopMessage message={createFederationStopMessage(['R&D <Test>'])} isMessageFocused={false} />,
+          reactTranslationRenderingRootProviderWrapper,
+        ),
+      );
+      const translationTextContainer = getTranslationTextContainer(container);
 
-    expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with R&D <Test>.');
-    expect(translationTextContainer.querySelector('test')).toBeNull();
-    expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
-  });
+      expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with R&D <Test>.');
+      expect(translationTextContainer.querySelector('test')).toBeNull();
+      expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
+    }),
+  );
 
-  it('keeps translation-looking runtime domains literal', () => {
-    const {container} = render(
-      withThemeAndRootContext(
-        <FederationStopMessage
-          message={createFederationStopMessage(['[bold]example[/bold]'])}
-          isMessageFocused={false}
-        />,
-        reactTranslationRenderingRootProviderWrapper,
-      ),
-    );
-    const translationTextContainer = getTranslationTextContainer(container);
+  it(
+    'keeps translation-looking runtime domains literal',
+    withTranslationStrings(en, () => {
+      const {container} = render(
+        withThemeAndRootContext(
+          <FederationStopMessage
+            message={createFederationStopMessage(['[bold]example[/bold]'])}
+            isMessageFocused={false}
+          />,
+          reactTranslationRenderingRootProviderWrapper,
+        ),
+      );
+      const translationTextContainer = getTranslationTextContainer(container);
 
-    expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with [bold]example[/bold].');
-    expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
-  });
+      expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with [bold]example[/bold].');
+      expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
+    }),
+  );
 
   it(
     'renders a runtime domain outside translation-authored formatting',
@@ -172,7 +190,8 @@ describe('FederationStopMessage', () => {
     withTranslationStrings(
       {
         ...en,
-        federationDelete: '<img src="example">[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]',
+        federationDelete:
+          '<img src="example">[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]',
       },
       () => {
         const {container} = render(
