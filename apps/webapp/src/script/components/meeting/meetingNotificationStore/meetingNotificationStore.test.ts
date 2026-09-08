@@ -20,6 +20,7 @@
 import {MeetingNotificationKind, useMeetingNotificationStore} from './meetingNotificationStore';
 
 const qualifiedId = {id: 'meeting-id', domain: 'example.com'};
+const qualifiedConversationId = {id: 'conversation-id', domain: 'example.com'};
 const qualifiedCreator = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 
@@ -34,6 +35,7 @@ describe('useMeetingNotificationStore', () => {
     addNotification({
       kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Canceled meeting',
       qualifiedCreator,
       meetingStartTime,
@@ -41,6 +43,7 @@ describe('useMeetingNotificationStore', () => {
     addNotification({
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Updated meeting',
       qualifiedCreator,
       meetingStartTime,
@@ -48,6 +51,7 @@ describe('useMeetingNotificationStore', () => {
     addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'New meeting',
       qualifiedCreator,
       meetingStartTime,
@@ -55,6 +59,7 @@ describe('useMeetingNotificationStore', () => {
     addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId: {id: 'another-meeting-id', domain: 'example.com'},
+      qualifiedConversationId,
       meetingTitle: 'Another meeting',
       qualifiedCreator,
       meetingStartTime,
@@ -62,6 +67,7 @@ describe('useMeetingNotificationStore', () => {
     addNotification({
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Updated meeting',
       qualifiedCreator,
       meetingStartTime,
@@ -69,6 +75,7 @@ describe('useMeetingNotificationStore', () => {
     addNotification({
       kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Canceled meeting',
       qualifiedCreator,
       meetingStartTime,
@@ -98,6 +105,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -106,6 +114,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -120,6 +129,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Invite meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -127,6 +137,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -134,6 +145,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
       meetingTitle: 'Cancelled meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -141,6 +153,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.ONGOING,
       qualifiedId,
       meetingTitle: 'Ongoing meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -151,6 +164,7 @@ describe('useMeetingNotificationStore', () => {
         kind: MeetingNotificationKind.ONGOING,
         qualifiedId,
         meetingTitle: 'Ongoing meeting',
+        qualifiedConversationId,
         qualifiedCreator,
         meetingStartTime,
       },
@@ -159,6 +173,7 @@ describe('useMeetingNotificationStore', () => {
         kind: MeetingNotificationKind.CANCELLED,
         qualifiedId,
         meetingTitle: 'Cancelled meeting',
+        qualifiedConversationId,
         qualifiedCreator,
         meetingStartTime,
       },
@@ -167,6 +182,7 @@ describe('useMeetingNotificationStore', () => {
         kind: MeetingNotificationKind.UPDATE,
         qualifiedId,
         meetingTitle: 'Updated meeting',
+        qualifiedConversationId,
         qualifiedCreator,
         meetingStartTime,
       },
@@ -175,6 +191,7 @@ describe('useMeetingNotificationStore', () => {
         kind: MeetingNotificationKind.INVITE,
         qualifiedId,
         meetingTitle: 'Invite meeting',
+        qualifiedConversationId,
         qualifiedCreator,
         meetingStartTime,
       },
@@ -187,6 +204,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -194,6 +212,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -210,6 +229,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -230,6 +250,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -237,6 +258,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Invited meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -244,6 +266,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId: otherMeetingId,
       meetingTitle: 'Other meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -251,6 +274,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
       meetingTitle: 'Cancelled meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -275,6 +299,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
       meetingTitle: 'Updated meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -291,6 +316,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -306,6 +332,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -315,6 +342,7 @@ describe('useMeetingNotificationStore', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });

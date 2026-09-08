@@ -33,7 +33,18 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
+jest.mock('Components/meeting/useJoinMeetingCall', () => ({
+  useJoinMeetingCall: jest.fn(() => ({
+    joinMeeting: jest.fn(),
+    isJoinDisabled: false,
+    isCallActive: false,
+    isCallConnecting: false,
+    isJoining: false,
+  })),
+}));
+
 const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
+const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 
@@ -73,6 +84,7 @@ describe('MeetingNotificationHost', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Canceled',
       qualifiedCreator,
       meetingStartTime,
@@ -80,6 +92,7 @@ describe('MeetingNotificationHost', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Updated',
       qualifiedCreator,
       meetingStartTime,
@@ -87,6 +100,7 @@ describe('MeetingNotificationHost', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.ONGOING,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Ongoing',
       qualifiedCreator,
       meetingStartTime,
@@ -94,6 +108,7 @@ describe('MeetingNotificationHost', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Invited',
       qualifiedCreator,
       meetingStartTime,
@@ -109,6 +124,7 @@ describe('MeetingNotificationHost', () => {
     useMeetingNotificationStore.getState().addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'One',
       qualifiedCreator,
       meetingStartTime,
@@ -125,6 +141,7 @@ describe('MeetingNotificationHost', () => {
     addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'One',
       qualifiedCreator,
       meetingStartTime,
@@ -132,6 +149,7 @@ describe('MeetingNotificationHost', () => {
     addNotification({
       kind: MeetingNotificationKind.ONGOING,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Ongoing',
       qualifiedCreator,
       meetingStartTime,
@@ -139,6 +157,7 @@ describe('MeetingNotificationHost', () => {
     addNotification({
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Two',
       qualifiedCreator,
       meetingStartTime,
@@ -146,6 +165,7 @@ describe('MeetingNotificationHost', () => {
     addNotification({
       kind: MeetingNotificationKind.CANCELLED,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Canceled',
       qualifiedCreator,
       meetingStartTime,
@@ -153,6 +173,7 @@ describe('MeetingNotificationHost', () => {
     addNotification({
       kind: MeetingNotificationKind.UPDATE,
       qualifiedId,
+      qualifiedConversationId,
       meetingTitle: 'Updated',
       qualifiedCreator,
       meetingStartTime,
@@ -173,6 +194,7 @@ describe('MeetingNotificationHost', () => {
     fireEvent.click(screen.getAllByRole('button', {name: 'meetings.notifications.dismiss'})[0]);
     expect(screen.getAllByRole('listitem')).toHaveLength(4);
     expect(screen.getAllByText('meetings.notifications.title')).toHaveLength(4);
+    expect(useMeetingNotificationStore.getState().isExpanded).toBe(true);
   });
 
   it('collapses when clicking outside while keeping clicks inside active', () => {
@@ -180,6 +202,7 @@ describe('MeetingNotificationHost', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -200,6 +223,7 @@ describe('MeetingNotificationHost', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -219,6 +243,7 @@ describe('MeetingNotificationHost', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -236,6 +261,7 @@ describe('MeetingNotificationHost', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
@@ -258,6 +284,7 @@ describe('MeetingNotificationHost', () => {
       kind: MeetingNotificationKind.INVITE,
       qualifiedId,
       meetingTitle: 'Meeting',
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     });
