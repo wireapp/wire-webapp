@@ -272,7 +272,7 @@ describe('AddParticipants', () => {
     });
   });
 
-  it('merges human collaborators into the people list and shows the deduped team apps in the Apps tab', async () => {
+  it('merges human collaborators into the people list and shows team apps in the Apps tab', async () => {
     const user = userEvent.setup();
     const aliceExample = createUser({id: 'alice-id', name: 'Alice Example', username: 'aliceexample'});
     const daveCollaborator = createUser({id: 'dave-id', name: 'Dave Collaborator', username: 'davecollaborator'});
@@ -371,7 +371,7 @@ describe('AddParticipants', () => {
       expect(screen.getByText('Dave Collaborator')).toBeInTheDocument();
     });
 
-    // Switch to the Apps tab: it is sourced from the deduped teamState.teamApps, not from `contacts`
+    // Switch to the Apps tab: it is sourced from teamState.teamApps, not from `contacts`
     await user.click(screen.getByTestId('do-add-services'));
 
     await waitFor(() => {

@@ -146,8 +146,7 @@ export class TeamAPI {
   }
 
   /**
-   * Returns the team-owned apps (i.e. apps that are full members of the team, `type: 'app'`).
-   * This does not include apps that are collaborators only - see `getCollaborators`.
+   * Returns the team-owned apps.
    */
   public async getApps(teamId: string, abortController?: AbortController): Promise<User[]> {
     const config: AxiosRequestConfig = {

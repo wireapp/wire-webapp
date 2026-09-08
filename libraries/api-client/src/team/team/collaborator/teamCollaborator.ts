@@ -22,11 +22,6 @@ export enum CollaboratorPermission {
   IMPLICIT_CONNECTION = 'implicit_connection',
 }
 
-/**
- * Note: `permissions` is a plain array, as returned by the backend (`GET /teams/:tid/collaborators`).
- * Do not change this to a `Set` - that is not how the JSON payload deserializes. Convert to a `Set`
- * only at the point of consumption (e.g. in a repository) if O(1) membership checks are needed there.
- */
 export interface TeamCollaborator {
   permissions: CollaboratorPermission[];
   team: string;

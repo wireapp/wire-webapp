@@ -58,7 +58,7 @@ export class TeamState {
   readonly teamMembers: ko.PureComputed<User[]>;
   /** all the members of the team + the users the selfUser is connected with */
   readonly teamUsers: ko.PureComputed<User[]>;
-  /** team-owned apps merged with app-type collaborators, deduped by qualifiedId - see TeamRepository.loadTeamAppsAndCollaborators */
+  /** team-owned apps merged with app-type collaborators, see TeamRepository.loadTeamAppsAndCollaborators */
   readonly teamApps: ko.Observable<User[]>;
   /** human (non-app) team collaborators, resolved from GET /teams/:tid/collaborators - see TeamRepository.loadTeamAppsAndCollaborators */
   readonly teamCollaborators: ko.Observable<User[]>;
