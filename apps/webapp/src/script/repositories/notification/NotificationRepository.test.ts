@@ -18,7 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {NotificationPreference} from '@wireapp/api-client/lib/user/data';
@@ -295,6 +295,16 @@ describe('NotificationRepository', () => {
         0,
         translateForTest,
       ) as any;
+
+      return notificationRepository.notify(message, undefined, conversation).then(() => {
+        expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+      });
+    });
+
+    it('for an activated scheduled meeting call', () => {
+      conversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+      message = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0, translateForTest) as any;
+      message.user(user);
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).not.toHaveBeenCalled();

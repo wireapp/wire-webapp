@@ -36,6 +36,7 @@ import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import type {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {isMeetingConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {CallMessage} from 'Repositories/entity/message/callMessage';
@@ -52,7 +53,7 @@ import {getPermissionState, setPermissionState} from 'Repositories/permission/pe
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {UserState} from 'Repositories/user/userState';
-import {type Translate, Declension, getUserName} from 'Util/localizerUtil';
+import {Declension, getUserName, type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {truncate} from 'Util/stringUtil';
@@ -823,6 +824,10 @@ export class NotificationRepository {
    * @returns Returns `true` if the notification should be shown, `false` otherwise
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
+    if (conversationEntity !== undefined && isMeetingConversation(conversationEntity)) {
+      return false;
+    }
+
     const inActiveConversation = conversationEntity
       ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
