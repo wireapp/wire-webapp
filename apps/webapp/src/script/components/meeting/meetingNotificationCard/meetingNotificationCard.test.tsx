@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
+import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
 import {MeetingNotificationCard} from './meetingNotificationCard';
 import {
   type MeetingNotification,
@@ -36,6 +37,11 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+
+jest.mock('Components/meeting/useJoinMeetingCall', () => ({
+  useJoinMeetingCall: jest.fn(),
+}));
 
 const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
@@ -51,8 +57,12 @@ const translateForNotificationTest: Translate = (key, substitutions) =>
       : key === 'meetings.meetingStatus.startedAt'
         ? `Started at ${substitutions?.time}`
         : key;
+const mainViewModel = {
+  content: {repositories: {conversation: {}, calling: {}}},
+  calling: {callActions: {answer: jest.fn(), startAudio: jest.fn()}},
+} as unknown as MainViewModel;
 const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForNotificationTest}),
+  createRootContextValueForTest({translate: translateForNotificationTest, mainViewModel}),
 );
 
 const renderCard = (card: ReactElement) =>
@@ -61,6 +71,13 @@ const renderCard = (card: ReactElement) =>
 describe('MeetingNotificationCard', () => {
   beforeEach(() => {
     window.history.replaceState(null, '', '#/');
+    jest.mocked(useJoinMeetingCall).mockReturnValue({
+      joinMeeting: jest.fn(),
+      isJoinDisabled: false,
+      isCallActive: false,
+      isCallConnecting: false,
+      isJoining: false,
+    });
   });
 
   const notifications = [
@@ -140,6 +157,9 @@ describe('MeetingNotificationCard', () => {
     if (notification.kind === MeetingNotificationKind.CANCELLED) {
       expect(card).toHaveTextContent('By creator-id');
       expect(screen.queryByRole('button', {name: 'meetings.notifications.view'})).not.toBeInTheDocument();
+    } else if (notification.kind === MeetingNotificationKind.ONGOING) {
+      expect(screen.getByRole('button', {name: 'callJoin'})).toBeEnabled();
+      expect(screen.queryByRole('button', {name: 'meetings.notifications.view'})).not.toBeInTheDocument();
     } else {
       expect(screen.getByRole('button', {name: 'meetings.notifications.view'})).toBeInTheDocument();
     }
@@ -161,6 +181,64 @@ describe('MeetingNotificationCard', () => {
     expect(screen.getByText(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`)).toHaveStyle({
       color: 'var(--accent-color)',
     });
+  });
+
+  it('joins the meeting conversation when Join is clicked', () => {
+    const joinMeeting = jest.fn();
+    const onDismiss = jest.fn();
+    jest.mocked(useJoinMeetingCall).mockReturnValue({
+      joinMeeting,
+      isJoinDisabled: false,
+      isCallActive: false,
+      isCallConnecting: false,
+      isJoining: false,
+    });
+
+    renderCard(
+      <MeetingNotificationCard
+        id="notification-ongoing"
+        kind={MeetingNotificationKind.ONGOING}
+        meetingTitle="Meeting Title"
+        qualifiedId={qualifiedId}
+        qualifiedConversationId={qualifiedConversationId}
+        qualifiedCreator={qualifiedCreator}
+        meetingStartTime={ongoingMeetingStartTime}
+        onDismiss={onDismiss}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
+
+    expect(useJoinMeetingCall).toHaveBeenCalledWith(qualifiedConversationId);
+    expect(joinMeeting).toHaveBeenCalledTimes(1);
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
+  it('uses the panel-closing callback once the call is active', () => {
+    const onCallJoined = jest.fn();
+    jest.mocked(useJoinMeetingCall).mockReturnValue({
+      joinMeeting: jest.fn(),
+      isJoinDisabled: true,
+      isCallActive: true,
+      isCallConnecting: false,
+      isJoining: false,
+    });
+
+    renderCard(
+      <MeetingNotificationCard
+        id="notification-ongoing"
+        kind={MeetingNotificationKind.ONGOING}
+        meetingTitle="Meeting Title"
+        qualifiedId={qualifiedId}
+        qualifiedConversationId={qualifiedConversationId}
+        qualifiedCreator={qualifiedCreator}
+        meetingStartTime={ongoingMeetingStartTime}
+        onDismiss={jest.fn()}
+        onCallJoined={onCallJoined}
+      />,
+    );
+
+    expect(onCallJoined).toHaveBeenCalledTimes(1);
   });
 
   it('omits View for canceled cards and dismisses every variant', () => {

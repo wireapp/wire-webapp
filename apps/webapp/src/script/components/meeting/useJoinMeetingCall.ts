@@ -112,6 +112,12 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
   const {isCallConnecting, isCallActive} = useMeetingConversationCall(qualifiedConversationId);
   const [isJoining, setIsJoining] = useState(false);
 
+  useEffect(() => {
+    if (isCallActive) {
+      setIsJoining(false);
+    }
+  }, [isCallActive]);
+
   const callNotEstablishedCopy = useMemo(
     () => ({
       description: translate('callNotEstablishedDescription'),
@@ -162,9 +168,8 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
 
       const result = await joinMeetingCall(deps, qualifiedConversationId);
 
-      setIsJoining(false);
-
       if (result.isErr) {
+        setIsJoining(false);
         handleJoinMeetingCallResult(result, {
           showConversationNotFoundModal,
           showJoinFailedModal: () => showCallNotEstablishedModal(callNotEstablishedCopy),
@@ -184,5 +189,5 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
 
   const isJoinDisabled = isJoining || isCallConnecting || isCallActive;
 
-  return {joinMeeting, isJoinDisabled, isCallActive};
+  return {joinMeeting, isJoinDisabled, isCallActive, isCallConnecting, isJoining};
 };
