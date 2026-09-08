@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {replaceReactComponents} from './reactLocalizerUtil';
+import {createReactTranslationMarker, renderReactTranslation, replaceReactComponents} from './reactLocalizerUtil';
 
 describe('replaceReactComponents', () => {
   it('return the string untouched if no replacements are given', () => {
@@ -160,5 +160,77 @@ describe('replaceReactComponents', () => {
 
     expect(result).toHaveLength(7);
     expect(getByTestId('parent').textContent).toEqual('Hello Jake, Paul and Marco!');
+  });
+
+  it('renders runtime values as text inside and outside translated components', () => {
+    const senderNameMarker = createReactTranslationMarker('sender-name');
+    const senderName = 'R&D <Test>';
+    const translatedText = `<strong>${senderNameMarker.substitution}</strong> started the conversation with ${senderNameMarker.substitution}`;
+    const result = renderReactTranslation({
+      translatedText,
+      componentReplacements: [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(children) {
+            return <strong>{children}</strong>;
+          },
+        },
+      ],
+      valueReplacements: [{marker: senderNameMarker, runtimeText: senderName}],
+    });
+
+    const {container} = render(<p>{result}</p>);
+    const actualText = container.querySelector('p')?.textContent;
+    const expectedText = 'R&D <Test> started the conversation with R&D <Test>';
+
+    expect(actualText).toBe(expectedText);
+    expect(container.querySelectorAll('strong')).toHaveLength(1);
+    expect(container.querySelector('test')).toBeNull();
+  });
+
+  it('keeps translation-looking runtime values literal', () => {
+    const senderNameMarker = createReactTranslationMarker('sender-name');
+    const senderName = '[bold]Admin[/bold]';
+    const result = renderReactTranslation({
+      translatedText: `<strong>${senderNameMarker.substitution}</strong> started the conversation`,
+      componentReplacements: [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(children) {
+            return <strong>{children}</strong>;
+          },
+        },
+      ],
+      valueReplacements: [{marker: senderNameMarker, runtimeText: senderName}],
+    });
+
+    const {container} = render(<p>{result}</p>);
+
+    expect(container.querySelector('p')?.textContent).toBe('[bold]Admin[/bold] started the conversation');
+    expect(container.querySelectorAll('strong')).toHaveLength(1);
+  });
+
+  it('keeps unsupported translation markup as text', () => {
+    const result = renderReactTranslation({
+      translatedText: '<img src="example"><strong>Started</strong>',
+      componentReplacements: [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(children) {
+            return <strong>{children}</strong>;
+          },
+        },
+      ],
+      valueReplacements: [],
+    });
+
+    const {container} = render(<p>{result}</p>);
+
+    expect(container.querySelector('p')?.textContent).toBe('<img src="example">Started');
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.querySelector('strong')).toHaveTextContent('Started');
   });
 });
