@@ -17,7 +17,7 @@
  *
  */
 
-import {memo, useCallback, useEffect, useRef} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
@@ -91,6 +91,8 @@ export const ConversationCells = memo(
     const {fireAndForgetInvoker, translate} = useApplicationContext();
     const sharedDriveUploadController = useSharedDriveUploadController();
     const uploadInput = useRef<HTMLInputElement>(null);
+    const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
+    const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const onUploadFiles = () => uploadInput.current?.click();
     const {
       cellsState: initialCellState,
@@ -200,11 +202,12 @@ export const ConversationCells = memo(
 
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+    const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
     const handleDroppedFiles = useSharedDriveFileDrop({
       conversationQualifiedId: sharedDriveConversationQualifiedId,
       fireAndForgetInvoker,
       isInRecycleBin,
-      isUploadFilesEnabled,
+      isUploadFilesEnabled: canUploadToSharedDrive,
       onRefresh: handleRefresh,
       sharedDriveUploadController,
       translate,
@@ -226,6 +229,19 @@ export const ConversationCells = memo(
         sharedDriveConversationQualifiedId,
         sharedDriveUploadPath,
       ],
+    );
+
+    const resetSharedDriveDropState = useCallback((): void => {
+      setActiveFolderDropTargetName(null);
+      setFolderDropResetKey(key => key + 1);
+    }, []);
+
+    const handleDropFilesToFolder = useCallback(
+      (files: readonly File[], targetUploadPath: string): void => {
+        handleDroppedFiles(files, targetUploadPath);
+        resetSharedDriveDropState();
+      },
+      [handleDroppedFiles, resetSharedDriveDropState],
     );
 
     const nodes = getNodes({conversationId});
@@ -280,7 +296,11 @@ export const ConversationCells = memo(
     return (
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <SharedDriveDropzone
+          dragStateResetKey={folderDropResetKey}
           isEnabled={isCellsStateReady && isUploadFilesEnabled && !isInRecycleBin}
+          isFileDropAllowed={canUploadToSharedDrive}
+          isOverlaySuppressed={activeFolderDropTargetName !== null}
+          onDragStateReset={resetSharedDriveDropState}
           onDropFiles={handleDroppedFiles}
         >
           <div css={wrapperStyles}>
@@ -313,9 +333,12 @@ export const ConversationCells = memo(
                 // opening a folder must close search view and open the browse view
                 // with that folder (and breadcrumbs)
                 onCloseSearchView={handleSearchViewClosure}
+                folderDropResetKey={folderDropResetKey}
                 getDirectionFor={getDirectionFor}
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}
+                onFolderDropTargetChange={setActiveFolderDropTargetName}
+                onDropFilesToFolder={!isInRecycleBin && canUploadToSharedDrive ? handleDropFilesToFolder : undefined}
               />
             )}
             {isCellsStatePending && !isRefreshing && (

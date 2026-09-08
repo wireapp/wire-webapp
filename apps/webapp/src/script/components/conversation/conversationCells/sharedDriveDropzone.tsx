@@ -17,7 +17,9 @@
  *
  */
 
-import {DragEvent, ReactNode, useRef, useState} from 'react';
+import {DragEvent, ReactNode, useEffect, useRef, useState} from 'react';
+
+import {BlockIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -34,7 +36,11 @@ import {
 
 interface SharedDriveDropzoneProps {
   readonly children: ReactNode;
+  readonly dragStateResetKey?: number;
   readonly isEnabled: boolean;
+  readonly isFileDropAllowed: boolean;
+  readonly isOverlaySuppressed?: boolean;
+  readonly onDragStateReset?: () => void;
   readonly onDropFiles: (files: readonly File[]) => void;
 }
 
@@ -57,16 +63,56 @@ const UploadFilesIcon = () => (
   </svg>
 );
 
-export const SharedDriveDropzone = ({children, isEnabled, onDropFiles}: SharedDriveDropzoneProps) => {
+export const SharedDriveDropzone = ({
+  children,
+  dragStateResetKey,
+  isEnabled,
+  isFileDropAllowed,
+  isOverlaySuppressed = false,
+  onDragStateReset,
+  onDropFiles,
+}: SharedDriveDropzoneProps) => {
   const {translate} = useApplicationContext();
   const [isDraggingFiles, setIsDraggingFiles] = useState(false);
   const nestedDragEventCount = useRef(0);
-  const isOverlayActive = isDraggingFiles && isEnabled;
+  const isOverlayActive = isDraggingFiles && isEnabled && !isOverlaySuppressed;
+  const isRestricted = !isFileDropAllowed;
+  const overlayTitle = isRestricted
+    ? translate('conversationFileUploadRestrictedOverlayTitle')
+    : translate('sharedDriveDropOverlayTitle');
+  const overlayDescription = isRestricted
+    ? translate('conversationFileUploadRestrictedOverlayDescription')
+    : translate('sharedDriveDropOverlayDescription');
 
-  const resetDragState = (): void => {
+  const resetDragState = ({notifyParent = false}: {readonly notifyParent?: boolean} = {}): void => {
     nestedDragEventCount.current = 0;
     setIsDraggingFiles(false);
+    if (notifyParent) {
+      onDragStateReset?.();
+    }
   };
+
+  useEffect(() => {
+    resetDragState();
+  }, [dragStateResetKey]);
+
+  useEffect(() => {
+    if (!isDraggingFiles) {
+      return undefined;
+    }
+
+    const resetActiveDragState = (): void => resetDragState({notifyParent: true});
+
+    window.addEventListener('drop', resetActiveDragState);
+    window.addEventListener('dragend', resetActiveDragState);
+    window.addEventListener('blur', resetActiveDragState);
+
+    return () => {
+      window.removeEventListener('drop', resetActiveDragState);
+      window.removeEventListener('dragend', resetActiveDragState);
+      window.removeEventListener('blur', resetActiveDragState);
+    };
+  }, [isDraggingFiles]);
 
   const handleDragEnter = (event: DragEvent<HTMLDivElement>): void => {
     if (!dragEventContainsFiles(event)) {
@@ -84,7 +130,7 @@ export const SharedDriveDropzone = ({children, isEnabled, onDropFiles}: SharedDr
     }
 
     preventDefaultFileDrop(event);
-    event.dataTransfer.dropEffect = isEnabled ? 'copy' : 'none';
+    event.dataTransfer.dropEffect = isEnabled && isFileDropAllowed ? 'copy' : 'none';
   };
 
   const handleDragLeave = (event: DragEvent<HTMLDivElement>): void => {
@@ -96,7 +142,7 @@ export const SharedDriveDropzone = ({children, isEnabled, onDropFiles}: SharedDr
     nestedDragEventCount.current -= 1;
 
     if (nestedDragEventCount.current <= 0) {
-      resetDragState();
+      resetDragState({notifyParent: true});
     }
   };
 
@@ -106,8 +152,10 @@ export const SharedDriveDropzone = ({children, isEnabled, onDropFiles}: SharedDr
     }
 
     preventDefaultFileDrop(event);
-    resetDragState();
-    onDropFiles(Array.from(event.dataTransfer.files));
+    resetDragState({notifyParent: true});
+    if (isEnabled) {
+      onDropFiles(Array.from(event.dataTransfer.files));
+    }
   };
 
   return (
@@ -122,11 +170,11 @@ export const SharedDriveDropzone = ({children, isEnabled, onDropFiles}: SharedDr
       <div css={isOverlayActive ? overlayActiveStyles : overlayStyles} aria-hidden={!isOverlayActive} role="status">
         <div css={contentStyles}>
           <span css={iconWrapperStyles}>
-            <UploadFilesIcon />
+            {isRestricted ? <BlockIcon width={24} height={24} aria-hidden="true" /> : <UploadFilesIcon />}
           </span>
           <span css={textWrapperStyles}>
-            <p css={titleStyles}>{translate('sharedDriveDropOverlayTitle')}</p>
-            <p css={descriptionStyles}>{translate('sharedDriveDropOverlayDescription')}</p>
+            <p css={titleStyles}>{overlayTitle}</p>
+            <p css={descriptionStyles}>{overlayDescription}</p>
           </span>
         </div>
       </div>

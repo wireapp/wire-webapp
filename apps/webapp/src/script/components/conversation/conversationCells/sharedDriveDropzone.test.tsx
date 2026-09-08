@@ -39,10 +39,25 @@ const createDataTransfer = (files: File[]) => ({
   dropEffect: 'move',
 });
 
-const renderDropzone = ({isEnabled = true, onDropFiles = jest.fn()} = {}) => {
+const renderDropzone = ({
+  isEnabled = true,
+  isFileDropAllowed = true,
+  onDragStateReset,
+  onDropFiles = jest.fn(),
+}: {
+  isEnabled?: boolean;
+  isFileDropAllowed?: boolean;
+  onDragStateReset?: () => void;
+  onDropFiles?: jest.Mock;
+} = {}) => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
-      <SharedDriveDropzone isEnabled={isEnabled} onDropFiles={onDropFiles}>
+      <SharedDriveDropzone
+        isEnabled={isEnabled}
+        isFileDropAllowed={isFileDropAllowed}
+        onDragStateReset={onDragStateReset}
+        onDropFiles={onDropFiles}
+      >
         <div>Shared Drive content</div>
       </SharedDriveDropzone>
     </StyledApp>,
@@ -88,11 +103,38 @@ describe('SharedDriveDropzone', () => {
     expect(screen.getByRole('status', {hidden: true})).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('clears the overlay when the file is released outside the dropzone', () => {
+    const onDragStateReset = jest.fn();
+    const {dropzone} = renderDropzone({onDragStateReset});
+
+    fireEvent.dragEnter(dropzone, {dataTransfer: createDataTransfer([])});
+    const overlayStatus = screen.getByRole('status');
+
+    expect(overlayStatus).toHaveAttribute('aria-hidden', 'false');
+
+    fireEvent.drop(window, {dataTransfer: createDataTransfer([])});
+
+    expect(overlayStatus).toHaveAttribute('aria-hidden', 'true');
+    expect(onDragStateReset).toHaveBeenCalledTimes(1);
+  });
+
   it('does not show the upload affordance while the Shared Drive target is disabled', () => {
     const {dropzone} = renderDropzone({isEnabled: false});
 
     fireEvent.dragEnter(dropzone, {dataTransfer: createDataTransfer([])});
 
     expect(screen.getByRole('status', {hidden: true})).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('shows the restricted overlay while a viewer drags files over Shared Drive', () => {
+    const {dropzone} = renderDropzone({isFileDropAllowed: false});
+
+    fireEvent.dragEnter(dropzone, {dataTransfer: createDataTransfer([])});
+
+    expect(screen.getByText('conversationFileUploadRestrictedOverlayTitle').closest('[aria-hidden]')).toHaveAttribute(
+      'aria-hidden',
+      'false',
+    );
+    expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
   });
 });

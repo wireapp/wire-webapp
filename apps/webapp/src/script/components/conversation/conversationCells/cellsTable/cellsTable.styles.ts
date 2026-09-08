@@ -22,6 +22,7 @@ import {CSSObject} from '@emotion/react';
 import {styleBreakpoint} from '../common/styleBreakpoint/styleBreakpoint';
 
 export const wrapperStyles: CSSObject = {
+  position: 'relative',
   maxWidth: '100%',
   overflowX: 'auto',
   overflowY: 'auto',
@@ -114,4 +115,71 @@ export const tableCellRow: CSSObject = {
     padding: '0',
     border: 'none',
   },
+};
+
+export const folderDropTargetRowStyles: CSSObject = {
+  position: 'relative',
+
+  '& > td': {
+    backgroundColor: 'var(--accent-color-fade-8)',
+  },
+
+  '&::after': {
+    position: 'absolute',
+    zIndex: 1,
+    top: '4px',
+    right: '8px',
+    bottom: '4px',
+    left: '8px',
+    border: '2px dashed var(--accent-color)',
+    borderRadius: '8px',
+    content: '""',
+    pointerEvents: 'none',
+  },
+};
+
+export const folderDropOverlayStyles: CSSObject = {
+  position: 'absolute',
+  zIndex: 2,
+  top: '50%',
+  left: '50%',
+  display: 'flex',
+  width: '204px',
+  minHeight: '136px',
+  padding: '16px',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+  borderRadius: '24px',
+  backgroundColor: 'var(--accent-color-50)',
+  color: 'var(--main-color)',
+  pointerEvents: 'none',
+  textAlign: 'center',
+  transform: 'translate(-50%, -50%)',
+
+  'body.theme-dark &': {
+    backgroundColor: 'var(--accent-color-800)',
+  },
+};
+
+export const folderDropOverlayTitleStyles: CSSObject = {
+  margin: 0,
+  fontSize: '14px',
+  fontWeight: 600,
+  lineHeight: '20px',
+};
+
+export const folderDropOverlayDescriptionStyles: CSSObject = {
+  margin: 0,
+  fontSize: '12px',
+  fontWeight: 400,
+  lineHeight: '16px',
+};
+
+export const folderDropOverlayFolderNameStyles: CSSObject = {
+  maxWidth: '100%',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'normal',
 };

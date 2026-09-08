@@ -207,6 +207,48 @@ export class CellsAPI {
     return result.data;
   }
 
+  async uploadNode({
+    uuid,
+    versionId,
+    path,
+    file,
+    autoRename = true,
+    progressCallback,
+    abortController,
+  }: {
+    uuid: string;
+    versionId: string;
+    path: string;
+    file: File;
+    autoRename?: boolean;
+    progressCallback?: (progress: number) => void;
+    abortController?: AbortController;
+  }): Promise<RestCreateCheckResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    let filePath = `${path}`.normalize('NFC');
+
+    const result = await this.client.createCheck(
+      {
+        Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
+        FindAvailablePath: true,
+      },
+      {signal: abortController?.signal},
+    );
+
+    const firstCreateCheckResult = result.data.Results?.[0];
+
+    if (autoRename === true && firstCreateCheckResult?.Exists === true) {
+      filePath = firstCreateCheckResult.NextPath ?? filePath;
+    }
+
+    await this.storageService.putObject({path: filePath, file, progressCallback, abortController});
+
+    return result.data;
+  }
+
   async checkNodeCreation({
     path,
     uuid,

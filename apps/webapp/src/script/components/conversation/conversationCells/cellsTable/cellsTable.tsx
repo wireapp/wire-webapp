@@ -17,16 +17,25 @@
  *
  */
 
+import {DragEvent, useEffect, useState} from 'react';
+
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {UploadIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
+  folderDropOverlayDescriptionStyles,
+  folderDropOverlayFolderNameStyles,
+  folderDropOverlayStyles,
+  folderDropOverlayTitleStyles,
+  folderDropTargetRowStyles,
   headerCellStyles,
   tableActionsCellStyles,
   tableCellRow,
@@ -49,6 +58,9 @@ interface CellsTableProps {
   conversationName: string;
   onRefresh: () => void;
   onCloseSearchView?: () => void;
+  folderDropResetKey?: number;
+  onFolderDropTargetChange?: (folderName: string | null) => void;
+  onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
@@ -77,6 +89,14 @@ const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: Cells
   );
 };
 
+const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean =>
+  Array.from(event.dataTransfer.types).includes('Files');
+
+const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
+  event.preventDefault();
+  event.stopPropagation();
+};
+
 export const CellsTable = ({
   nodes,
   cellsRepository,
@@ -85,11 +105,16 @@ export const CellsTable = ({
   conversationName,
   onRefresh,
   onCloseSearchView,
+  folderDropResetKey,
+  onFolderDropTargetChange,
+  onDropFilesToFolder,
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
 }: CellsTableProps) => {
   const {translate} = useApplicationContext();
+  const [activeFolderDropTargetId, setActiveFolderDropTargetId] = useState<string | null>(null);
+  const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
   const labels = {
     actions: translate('cells.tableRow.actions'),
     created: translate('cells.tableRow.modified'),
@@ -120,9 +145,85 @@ export const CellsTable = ({
   const rows = table.getRowModel().rows;
   const tableWrapperStyles = rows.length > 0 ? [wrapperStyles, wrapperWithRowsStyles] : wrapperStyles;
 
+  useEffect(() => {
+    return () => onFolderDropTargetChange?.(null);
+  }, [onFolderDropTargetChange]);
+
+  useEffect(() => {
+    setActiveFolderDropTargetId(null);
+    setActiveFolderDropTargetName(null);
+  }, [folderDropResetKey]);
+
+  const setActiveFolderDropTarget = (node: CellNode | null): void => {
+    setActiveFolderDropTargetId(node?.id ?? null);
+    setActiveFolderDropTargetName(node?.name ?? null);
+    onFolderDropTargetChange?.(node?.name ?? null);
+  };
+
+  const getFolderDropHandlers = (node: CellNode) => {
+    if (node.type !== CellNodeType.FOLDER || onDropFilesToFolder === undefined) {
+      return {};
+    }
+
+    return {
+      onDragEnter: (event: DragEvent<HTMLTableRowElement>): void => {
+        if (!dragEventContainsFiles(event)) {
+          return;
+        }
+
+        preventDefaultFileDrop(event);
+        setActiveFolderDropTarget(node);
+      },
+      onDragOver: (event: DragEvent<HTMLTableRowElement>): void => {
+        if (!dragEventContainsFiles(event)) {
+          return;
+        }
+
+        preventDefaultFileDrop(event);
+        event.dataTransfer.dropEffect = 'copy';
+        setActiveFolderDropTarget(node);
+      },
+      onDragLeave: (event: DragEvent<HTMLTableRowElement>): void => {
+        if (!dragEventContainsFiles(event)) {
+          return;
+        }
+
+        preventDefaultFileDrop(event);
+
+        const nextTarget = event.relatedTarget;
+        if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) {
+          return;
+        }
+
+        setActiveFolderDropTarget(null);
+      },
+      onDrop: (event: DragEvent<HTMLTableRowElement>): void => {
+        if (!dragEventContainsFiles(event)) {
+          return;
+        }
+
+        preventDefaultFileDrop(event);
+        setActiveFolderDropTarget(null);
+        onDropFilesToFolder(Array.from(event.dataTransfer.files), node.path);
+      },
+    };
+  };
+
   return (
     <CellsFilePreviewModalProvider>
       <div css={tableWrapperStyles}>
+        {activeFolderDropTargetName !== null && (
+          <div css={folderDropOverlayStyles} role="status">
+            <UploadIcon width={24} height={24} aria-hidden="true" />
+            <p css={folderDropOverlayTitleStyles}>{translate('sharedDriveDropOverlayTitle')}</p>
+            <p css={folderDropOverlayDescriptionStyles}>
+              {translate('sharedDriveDropFolderOverlayDescription')}{' '}
+              <span css={folderDropOverlayFolderNameStyles} title={activeFolderDropTargetName}>
+                {activeFolderDropTargetName}
+              </span>
+            </p>
+          </div>
+        )}
         <table css={tableStyles}>
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
@@ -140,22 +241,34 @@ export const CellsTable = ({
           </thead>
           {rows.length > 0 && (
             <tbody>
-              {rows.map(row => (
-                <tr key={row.id} css={tableCellRow}>
-                  {row.getVisibleCells().map(cell => (
-                    <td
-                      key={cell.id}
-                      css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cellLabels[cell.column.id]}
-                      style={{
-                        width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {rows.map(row => {
+                const node = row.original;
+                const rowStyles =
+                  activeFolderDropTargetId === node.id ? [tableCellRow, folderDropTargetRowStyles] : tableCellRow;
+
+                return (
+                  <tr
+                    key={row.id}
+                    css={rowStyles}
+                    data-folder-drop-active={activeFolderDropTargetId === node.id || undefined}
+                    data-uie-name="cells-table-row"
+                    {...getFolderDropHandlers(node)}
+                  >
+                    {row.getVisibleCells().map(cell => (
+                      <td
+                        key={cell.id}
+                        css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                        data-cell={cellLabels[cell.column.id]}
+                        style={{
+                          width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                        }}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           )}
         </table>

@@ -56,9 +56,9 @@ export const useSharedDriveFileDrop = ({
   showFileDropzoneError = showFileDropzoneErrorModal,
   translate,
   uploadPath,
-}: UseSharedDriveFileDropParameters): ((files: readonly File[]) => void) =>
+}: UseSharedDriveFileDropParameters): ((files: readonly File[], targetUploadPath?: string) => void) =>
   useCallback(
-    (files: readonly File[]): void =>
+    (files: readonly File[], targetUploadPath = uploadPath): void =>
       handleSharedDriveDroppedFiles(files, {
         conversationQualifiedId,
         fireAndForgetInvoker,
@@ -77,7 +77,7 @@ export const useSharedDriveFileDrop = ({
           showFileDropzoneError({...feedback, translate});
         },
         sharedDriveUploadController,
-        uploadPath,
+        uploadPath: targetUploadPath,
       }),
     [
       conversationQualifiedId,
