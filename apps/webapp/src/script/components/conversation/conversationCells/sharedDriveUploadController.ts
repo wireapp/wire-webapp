@@ -222,7 +222,12 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const listeners = new Set<() => void>();
   const notify = () => listeners.forEach(listener => listener());
 
-  const registerFile = (file: File, path: string, conversationQualifiedId: string, onRefresh: () => void): Result<string, unknown> => {
+  const registerFile = (
+    file: File,
+    path: string,
+    conversationQualifiedId: string,
+    onRefresh: () => void,
+  ): Result<string, unknown> => {
     const uploadId = createUploadId();
     const source = createSource(file);
     const request = {file, path};
