@@ -283,7 +283,7 @@ export function createWebAppVersionSynchronizationGitHubClient(
       return listPullRequestsPage(listPullRequestsOptions, 1, []);
     },
 
-    async createPullRequest(createPullRequestOptions: CreateWebAppVersionSynchronizationPullRequestOptions) {
+    async createPullRequest(createPullRequestOptions) {
       const request = createHttpRequest(
         'post',
         pullRequestsEndpoint,
