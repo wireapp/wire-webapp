@@ -49,15 +49,21 @@ const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperFo
 );
 
 type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
 
-async function withTranslationStrings(strings: typeof en, testFunction: TranslationTestFunction): Promise<void> {
-  setStrings({en: strings});
+function withTranslationStrings(
+  strings: typeof en,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
+  return async function runTranslationTest(): Promise<void> {
+    setStrings({en: strings});
 
-  try {
-    await testFunction();
-  } finally {
-    setStrings({en});
-  }
+    try {
+      await testFunction();
+    } finally {
+      setStrings({en});
+    }
+  };
 }
 
 describe('WarningsContainer', () => {
@@ -160,8 +166,9 @@ describe('WarningsContainer', () => {
     expect(WarningElement).toBeTruthy();
   });
 
-  it('keeps legacy permission request rendering when React translation rendering is disabled', async () => {
-    await withTranslationStrings(en, () => {
+  it(
+    'keeps legacy permission request rendering when React translation rendering is disabled',
+    withTranslationStrings(en, () => {
       const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
         wrapper: legacyTranslationRootProviderWrapper,
       });
@@ -171,11 +178,12 @@ describe('WarningsContainer', () => {
 
       expect(container.querySelector('.warning-bar-message')).toHaveTextContent('Allow access to camera');
       expect(container.querySelector('.icon-camera')).toBeTruthy();
-    });
-  });
+    }),
+  );
 
-  it('renders the camera permission request icon as a React node', async () => {
-    await withTranslationStrings(en, () => {
+  it(
+    'renders the camera permission request icon as a React node',
+    withTranslationStrings(en, () => {
       const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
         wrapper: reactTranslationRenderingRootProviderWrapper,
       });
@@ -185,11 +193,12 @@ describe('WarningsContainer', () => {
 
       expect(container.querySelector('.warning-bar-message')).toHaveTextContent('Allow access to camera');
       expect(container.querySelector('.icon-camera')).toBeTruthy();
-    });
-  });
+    }),
+  );
 
-  it('renders exactly one microphone permission request icon as a React node', async () => {
-    await withTranslationStrings(en, () => {
+  it(
+    'renders exactly one microphone permission request icon as a React node',
+    withTranslationStrings(en, () => {
       const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
         wrapper: reactTranslationRenderingRootProviderWrapper,
       });
@@ -199,11 +208,12 @@ describe('WarningsContainer', () => {
 
       expect(container.querySelector('.warning-bar-message')).toHaveTextContent('Allow access to microphone');
       expect(container.querySelectorAll('.warning-bar-icon')).toHaveLength(1);
-    });
-  });
+    }),
+  );
 
-  it('renders the screen and notification permission request icons as React nodes', async () => {
-    await withTranslationStrings(en, () => {
+  it(
+    'renders the screen and notification permission request icons as React nodes',
+    withTranslationStrings(en, () => {
       const {container: screenContainer} = render(<WarningsContainer onRefresh={jest.fn()} />, {
         wrapper: reactTranslationRenderingRootProviderWrapper,
       });
@@ -228,11 +238,12 @@ describe('WarningsContainer', () => {
 
       expect(notificationContainer.querySelector('.warning-bar-message')).toHaveTextContent('Allow notifications');
       expect(notificationContainer.querySelector('.icon-envelope')).toBeTruthy();
-    });
-  });
+    }),
+  );
 
-  it('follows a translated permission icon marker moved after the text', async () => {
-    await withTranslationStrings(
+  it(
+    'follows a translated permission icon marker moved after the text',
+    withTranslationStrings(
       {
         ...en,
         warningPermissionRequestCamera: 'Allow access to camera [icon]',
@@ -249,11 +260,12 @@ describe('WarningsContainer', () => {
         expect(warningMessage).toHaveTextContent('Allow access to camera');
         expect(warningMessage?.querySelector('.icon-camera')).toBeTruthy();
       },
-    );
-  });
+    ),
+  );
 
-  it('keeps unsupported permission translation markup as text', async () => {
-    await withTranslationStrings(
+  it(
+    'keeps unsupported permission translation markup as text',
+    withTranslationStrings(
       {
         ...en,
         warningPermissionRequestCamera: '<img src="example">[icon] Allow access to camera',
@@ -271,8 +283,8 @@ describe('WarningsContainer', () => {
         expect(warningMessage?.querySelector('img')).toBeNull();
         expect(warningMessage?.querySelector('.icon-camera')).toBeTruthy();
       },
-    );
-  });
+    ),
+  );
 
   it('correctly renders warning of type unsupported_incoming_call', () => {
     const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});

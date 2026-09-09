@@ -44,15 +44,21 @@ const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperFo
 );
 
 type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
 
-async function withTranslationStrings(strings: typeof en, testFunction: TranslationTestFunction): Promise<void> {
-  setStrings({en: strings});
+function withTranslationStrings(
+  strings: typeof en,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
+  return async function runTranslationTest(): Promise<void> {
+    setStrings({en: strings});
 
-  try {
-    await testFunction();
-  } finally {
-    setStrings({en});
-  }
+    try {
+      await testFunction();
+    } finally {
+      setStrings({en});
+    }
+  };
 }
 
 function createPropertiesRepositoryForTest(): PropertiesRepository {
@@ -95,8 +101,9 @@ function createSelfUserForTest(): User {
 }
 
 describe('OptionPreferences', () => {
-  it('keeps the legacy emoji detail rendering when React translation rendering is disabled', async () => {
-    await withTranslationStrings(en, () => {
+  it(
+    'keeps the legacy emoji detail rendering when React translation rendering is disabled',
+    withTranslationStrings(en, () => {
       const {container} = render(
         withThemeAndRootContext(
           <OptionPreferences
@@ -108,11 +115,12 @@ describe('OptionPreferences', () => {
       );
 
       expect(container.querySelector('.icon-emoji')).toBeTruthy();
-    });
-  });
+    }),
+  );
 
-  it('renders the emoji detail icon as a React node when React translation rendering is enabled', async () => {
-    await withTranslationStrings(en, () => {
+  it(
+    'renders the emoji detail icon as a React node when React translation rendering is enabled',
+    withTranslationStrings(en, () => {
       const {container} = render(
         withThemeAndRootContext(
           <OptionPreferences
@@ -124,11 +132,12 @@ describe('OptionPreferences', () => {
       );
 
       expect(container.querySelector('.icon-emoji')).toBeTruthy();
-    });
-  });
+    }),
+  );
 
-  it('follows the translated emoji icon marker position', async () => {
-    await withTranslationStrings(
+  it(
+    'follows the translated emoji icon marker position',
+    withTranslationStrings(
       {
         ...en,
         preferencesOptionsEmojiReplaceDetail: '[icon] :-)',
@@ -147,11 +156,12 @@ describe('OptionPreferences', () => {
         const emojiDetail = container.querySelector('.preferences-detail-intended');
         expect(emojiDetail?.firstElementChild).toHaveClass('icon-emoji');
       },
-    );
-  });
+    ),
+  );
 
-  it('keeps unsupported emoji translation markup as text', async () => {
-    await withTranslationStrings(
+  it(
+    'keeps unsupported emoji translation markup as text',
+    withTranslationStrings(
       {
         ...en,
         preferencesOptionsEmojiReplaceDetail: '<img src="example"> :-) → [icon]',
@@ -172,6 +182,6 @@ describe('OptionPreferences', () => {
         expect(emojiDetail?.querySelector('img')).toBeNull();
         expect(emojiDetail?.querySelector('.icon-emoji')).toBeTruthy();
       },
-    );
-  });
+    ),
+  );
 });

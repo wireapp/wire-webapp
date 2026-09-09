@@ -54,15 +54,21 @@ const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperFo
 );
 
 type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
 
-async function withTranslationStrings(strings: typeof en, testFunction: TranslationTestFunction): Promise<void> {
-  setStrings({en: strings});
+function withTranslationStrings(
+  strings: typeof en,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
+  return async function runTranslationTest(): Promise<void> {
+    setStrings({en: strings});
 
-  try {
-    await testFunction();
-  } finally {
-    setStrings({en});
-  }
+    try {
+      await testFunction();
+    } finally {
+      setStrings({en});
+    }
+  };
 }
 
 const appLockCrypto: AppLockCrypto = {
@@ -111,8 +117,9 @@ const createAppLockRepository = (appLockState?: AppLockState) => {
   return appLockRepository;
 };
 describe('AppLock', () => {
-  it('keeps the legacy setup message rendering when React translation rendering is disabled', async () => {
-    await withTranslationStrings(en, () => {
+  it(
+    'keeps the legacy setup message rendering when React translation rendering is disabled',
+    withTranslationStrings(en, () => {
       const appLockState = createAppLockState();
       const appLockRepository = createAppLockRepository(appLockState);
       appLockState.hasPassphrase(false);
@@ -128,11 +135,12 @@ describe('AppLock', () => {
       const setupMessage = getByTestId('label-applock-set-text');
 
       expect(setupMessage.querySelectorAll('br')).toHaveLength(2);
-    });
-  });
+    }),
+  );
 
-  it('renders setup line breaks as React nodes when React translation rendering is enabled', async () => {
-    await withTranslationStrings(en, () => {
+  it(
+    'renders setup line breaks as React nodes when React translation rendering is enabled',
+    withTranslationStrings(en, () => {
       const appLockState = createAppLockState();
       const appLockRepository = createAppLockRepository(appLockState);
       appLockState.hasPassphrase(false);
@@ -151,11 +159,12 @@ describe('AppLock', () => {
 
       expect(setupMessage).toHaveTextContent('Wire will lock itself after 1 minute of inactivity.');
       expect(setupMessage.querySelectorAll('br')).toHaveLength(2);
-    });
-  });
+    }),
+  );
 
-  it('keeps unsupported setup translation markup as text', async () => {
-    await withTranslationStrings(
+  it(
+    'keeps unsupported setup translation markup as text',
+    withTranslationStrings(
       {
         ...en,
         modalAppLockSetupMessage: '<img src="example">Wire will lock itself.[br]Enter your passcode.',
@@ -181,8 +190,8 @@ describe('AppLock', () => {
         expect(setupMessage.querySelector('img')).toBeNull();
         expect(setupMessage.querySelectorAll('br')).toHaveLength(2);
       },
-    );
-  });
+    ),
+  );
 
   describe('disabled feature', () => {
     it('does not shows up if applock is disabled', () => {
