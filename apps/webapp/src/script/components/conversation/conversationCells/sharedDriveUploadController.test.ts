@@ -18,8 +18,10 @@
  */
 
 import type {UploadSource} from 'Repositories/cells/upload';
-import type {CellsUploadManager} from 'Repositories/cells/upload/manager';
-import {Result} from 'true-myth';
+import {createCellsUploadManager, type CellsUploadManager} from 'Repositories/cells/upload/manager';
+import type {CellsUploadGateway, CellsUploadGatewayError, UploadDraftRequest} from 'Repositories/cells/upload/gateway';
+import type {DraftIdentity} from 'Repositories/cells/upload/identity';
+import {Result, Task} from 'true-myth';
 
 import {
   createDirectSharedDriveUploadStrategy,
@@ -78,9 +80,12 @@ function createDraftManager(): jest.Mocked<CellsUploadManager> {
   };
 }
 
-function createDraftController(manager = createDraftManager()) {
+function createDraftController<T extends CellsUploadManager = jest.Mocked<CellsUploadManager>>(
+  manager: T = createDraftManager() as T,
+  createUploadId: jest.Mock = jest.fn().mockReturnValue('upload-1'),
+): {controller: ReturnType<typeof createSharedDriveUploadController>; manager: T} {
   const controller = createSharedDriveUploadController({
-    createUploadId: jest.fn().mockReturnValue('upload-1'),
+    createUploadId,
     createSource: jest.fn((sourceFile: File): UploadSource => ({
       blob: sourceFile,
       name: sourceFile.name,
@@ -91,6 +96,19 @@ function createDraftController(manager = createDraftManager()) {
   });
 
   return {controller, manager};
+}
+
+function createDeferredTask<Value, Failure>(defaultValue: Value) {
+  let resolveTask: ((value?: Value) => void) | undefined;
+  const value = new Task<Value, Failure>(resolve => {
+    resolveTask = nextValue => resolve(nextValue === undefined ? defaultValue : nextValue);
+  });
+
+  if (resolveTask === undefined) {
+    throw new Error('Deferred task callback was not created');
+  }
+
+  return {value, resolve: resolveTask};
 }
 
 describe('createSharedDriveUploadController', () => {
@@ -181,6 +199,40 @@ describe('createSharedDriveUploadController', () => {
     ]);
   });
 
+  it('ignores late progress from a cancelled direct upload before the next upload', async () => {
+    const cellsRepository = createCellsRepository();
+    let firstProgress: ((progress: number) => void) | undefined;
+    cellsRepository.uploadNode.mockImplementationOnce(
+      ({
+        progressCallback,
+        abortController,
+      }: {
+        progressCallback?: (progress: number) => void;
+        abortController?: AbortController;
+      }) => {
+        firstProgress = progressCallback;
+        return new Promise((_resolve, reject) => {
+          abortController?.signal.addEventListener('abort', () => reject(new Error('cancelled')));
+        });
+      },
+    );
+    const {controller} = createController(cellsRepository);
+    const firstUpload = controller.upload(
+      [new File(['one'], 'one.txt')],
+      uploadPath,
+      jest.fn(),
+      conversationQualifiedId,
+    );
+
+    await controller.cancel('upload-1');
+    await firstUpload;
+    firstProgress?.(0.9);
+
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'cancelled'}),
+    ]);
+  });
+
   it('retries a failed direct upload', async () => {
     const cellsRepository = createCellsRepository();
     cellsRepository.uploadNode
@@ -240,6 +292,65 @@ describe('createSharedDriveUploadController', () => {
     expect(controller.snapshots(conversationQualifiedId)).toEqual([
       expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
     ]);
+  });
+
+  it('ignores late progress from a cancelled upload when the next upload starts', async () => {
+    const uploadRequests: UploadDraftRequest[] = [];
+    const uploadTasks: Array<{resolve: (value?: DraftIdentity) => void}> = [];
+    const remoteIdentity: DraftIdentity = {
+      uploadId: 'remote-upload',
+      resourceUuid: 'remote-resource',
+      versionId: 'remote-version',
+    };
+    const gateway: CellsUploadGateway = {
+      uploadDraft: request => {
+        uploadRequests.push(request);
+        const deferred = createDeferredTask<DraftIdentity, CellsUploadGatewayError<'upload'>>(remoteIdentity);
+        uploadTasks.push(deferred);
+        return deferred.value;
+      },
+      publishDraft: () => Task.resolve<void, never>(undefined),
+      discardDraft: () => Task.resolve<void, never>(undefined),
+    };
+    const manager = createCellsUploadManager({
+      gateway,
+      createResourceUuid: () => 'resource-1',
+      createVersionUuid: () => 'version-1',
+      createAttemptId: () => 'attempt-1',
+      createAbortController: () => new AbortController(),
+    });
+    const createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2');
+    const {controller} = createDraftController(manager, createUploadId);
+    const firstUpload = controller.upload(
+      [new File(['one'], 'one.txt')],
+      uploadPath,
+      jest.fn(),
+      conversationQualifiedId,
+    );
+
+    expect(uploadRequests).toHaveLength(1);
+    await controller.cancel('upload-1');
+    uploadRequests[0].onProgress(0.9);
+
+    const secondUpload = controller.upload(
+      [new File(['two'], 'two.txt')],
+      uploadPath,
+      jest.fn(),
+      conversationQualifiedId,
+    );
+    expect(uploadRequests).toHaveLength(2);
+    uploadRequests[1].onProgress(0.1);
+    uploadRequests[1].onProgress(0.45);
+    uploadRequests[1].onProgress(0.8);
+
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'cancelled'}),
+      expect.objectContaining({identity: {uploadId: 'upload-2'}, kind: 'uploading', progress: 0.8}),
+    ]);
+
+    uploadTasks[0].resolve();
+    uploadTasks[1].resolve();
+    await Promise.all([firstUpload, secondUpload]);
   });
 
   it('does not publish draft uploads when start fails', async () => {

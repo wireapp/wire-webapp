@@ -19,6 +19,7 @@
 
 import {S3Client, S3ServiceException} from '@aws-sdk/client-s3';
 import {Upload} from '@aws-sdk/lib-storage';
+import {XhrHttpHandler} from '@aws-sdk/xhr-http-handler';
 
 import {CellsStorage, CellsStorageError} from './cellsStorage';
 
@@ -33,6 +34,13 @@ interface S3ServiceConfig {
 
 export const MAX_QUEUE_SIZE = 3;
 export const PART_SIZE = 10 * 1024 * 1024; // 10MB
+
+export const createAbortableXhrHttpHandler = (abortSignal: AbortSignal): XhrHttpHandler => {
+  const requestHandler = new XhrHttpHandler();
+  const handle = requestHandler.handle.bind(requestHandler);
+  requestHandler.handle = (request, options) => handle(request, {...(options ?? {}), abortSignal});
+  return requestHandler;
+};
 
 export class S3Service implements CellsStorage {
   private config: S3ServiceConfig;
@@ -63,7 +71,7 @@ export class S3Service implements CellsStorage {
     progressCallback?: (progress: number) => void;
     abortController?: AbortController;
   }): Promise<void> {
-    const client = this.getS3Client();
+    const client = this.getS3Client(abortController?.signal);
 
     const upload = new Upload({
       client,
@@ -113,7 +121,11 @@ export class S3Service implements CellsStorage {
     }
   }
 
-  private getS3Client(): S3Client {
+  private getS3Client(abortSignal?: AbortSignal): S3Client {
+    if (abortSignal !== undefined) {
+      return this.createS3Client({accessToken: this.accessTokenStore.getAccessToken(), abortSignal});
+    }
+
     if (this.config.apiKey !== undefined && this.config.apiKey.length > 0) {
       return this.client;
     }
@@ -135,11 +147,18 @@ export class S3Service implements CellsStorage {
     return this.client;
   }
 
-  private createS3Client({accessToken}: {accessToken: string | undefined}): S3Client {
+  private createS3Client({
+    accessToken,
+    abortSignal,
+  }: {
+    accessToken: string | undefined;
+    abortSignal?: AbortSignal;
+  }): S3Client {
     return new S3Client({
       endpoint: this.config.endpoint,
       forcePathStyle: true,
       region: this.config.region,
+      requestHandler: abortSignal === undefined ? new XhrHttpHandler() : createAbortableXhrHttpHandler(abortSignal),
       credentials: async () => {
         if (this.config.apiKey !== undefined && this.config.apiKey.length > 0) {
           return {
