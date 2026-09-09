@@ -59,7 +59,7 @@ type TestController = SharedDriveUploadController & {
 
 const createController = (state: UploadState | null = null) => {
   let currentState = state;
-  let notify = () => undefined;
+  let notify: () => void = () => undefined;
   const controller: TestController = {
     snapshots: jest.fn(scope => (scope === conversationQualifiedIdString && currentState ? [currentState] : [])),
     subscribe: jest.fn(listener => {
