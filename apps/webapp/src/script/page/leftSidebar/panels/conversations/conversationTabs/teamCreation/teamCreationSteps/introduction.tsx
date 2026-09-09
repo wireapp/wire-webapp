@@ -17,10 +17,14 @@
  *
  */
 
+import type {ReactNode} from 'react';
+
 import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {StepProps} from './stepProps';
 import {
@@ -33,8 +37,49 @@ import {
 
 import {buttonCss} from '../teamCreation.styles';
 
+type RenderIntroductionListItemOptions = {
+  readonly isReactTranslationRenderingEnabled: boolean;
+  readonly translatedText: string;
+};
+
+function renderIntroductionListItem(options: RenderIntroductionListItemOptions): ReactNode {
+  const {isReactTranslationRenderingEnabled, translatedText} = options;
+
+  if (isReactTranslationRenderingEnabled) {
+    return (
+      <span className="text" data-uie-name="team-creation-intro-list-item">
+        {renderReactTranslation({
+          translatedText,
+          componentReplacements: [
+            {
+              start: '<strong>',
+              end: '</strong>',
+              render(children): ReactNode {
+                return <strong>{children}</strong>;
+              },
+            },
+          ],
+          nodeReplacements: [],
+          valueReplacements: [],
+        })}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      dangerouslySetInnerHTML={{
+        __html: translatedText,
+      }}
+      className="text"
+      data-uie-name="team-creation-intro-list-item"
+    />
+  );
+}
+
 export const Introduction = ({onNextStep}: StepProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
   const featuresList = [
     translate('teamCreationIntroListItem1'),
     translate('teamCreationIntroListItem2'),
@@ -51,19 +96,18 @@ export const Introduction = ({onNextStep}: StepProps) => {
       <p className="text-regular" data-uie-name="team-creation-intro-sub-title" css={introStepSubHeaderCss}>
         {translate('teamCreationIntroSubTitle')}
       </p>
-      {featuresList.map(listItem => (
-        <div css={introItemCss} key={listItem}>
-          <CheckRoundIcon css={checkIconCss} />
+      {featuresList.map(listItem => {
+        return (
+          <div css={introItemCss} key={listItem}>
+            <CheckRoundIcon css={checkIconCss} />
 
-          <span
-            dangerouslySetInnerHTML={{
-              __html: listItem,
-            }}
-            className="text"
-            data-uie-name="team-creation-intro-list-item"
-          />
-        </div>
-      ))}
+            {renderIntroductionListItem({
+              isReactTranslationRenderingEnabled,
+              translatedText: listItem,
+            })}
+          </div>
+        );
+      })}
 
       <Link block css={introStepLinkCss} href={Config.getConfig().URL.PRICING} targetBlank>
         <span className="text-medium" data-uie-name="team-creation-intro-link">
