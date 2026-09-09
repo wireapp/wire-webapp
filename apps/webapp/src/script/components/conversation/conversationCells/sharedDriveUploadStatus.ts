@@ -19,6 +19,8 @@
 
 import type {UploadState} from 'Repositories/cells/upload';
 
+import type {SharedDriveUploadController} from './sharedDriveUploadController';
+
 export type SharedDriveUploadStatusKind = 'uploading' | 'uploaded' | 'failed';
 
 export type SharedDriveUploadStatus = {
@@ -68,4 +70,16 @@ export const toSharedDriveUploadStatus = (
     canCancel: state.kind === 'queued' || state.kind === 'uploading',
     canRetry: state.kind === 'uploadFailed',
   };
+};
+
+export const getLatestSharedDriveUploadStatus = (
+  controller: SharedDriveUploadController,
+  conversationQualifiedId: string,
+): SharedDriveUploadStatus | null => {
+  const statuses = controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
+    const status = toSharedDriveUploadStatus(snapshot, conversationQualifiedId);
+    return status ? [status] : [];
+  });
+
+  return statuses[statuses.length - 1] ?? null;
 };
