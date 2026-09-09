@@ -1382,6 +1382,7 @@
   "meetings.scheduleModal.error.titleTooLong": "Используйте название длиной не более 64 символов",
   "meetings.scheduleModal.error.updateFailed": "Что-то пошло не так при обновлении встречи. Попробуйте еще раз.",
   "meetings.scheduleModal.error.updateFailedTitle": "Не удалось обновить встречу",
+  "meetings.scheduleModal.groupsAndChannels": "Группы и каналы",
   "meetings.scheduleModal.nextMonthAriaLabel": "Следующий месяц",
   "meetings.scheduleModal.openCalendarAriaLabel": "Открыть календарь",
   "meetings.scheduleModal.participantsLabel": "Участники",
