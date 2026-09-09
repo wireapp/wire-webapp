@@ -25,7 +25,7 @@ import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {Account} from '@wireapp/core';
-import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {Confirmation, GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -43,6 +43,8 @@ import {Message} from 'Repositories/entity/message/message';
 import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {ClientEvent} from 'Repositories/event/Client';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {EventService} from 'Repositories/event/EventService';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {ReactionMap} from 'Repositories/storage';
@@ -57,6 +59,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
+import {ConversationMapper} from './ConversationMapper';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
@@ -166,6 +169,32 @@ describe('MessageRepository', () => {
     id: createUuid(),
     state: MessageSendingState.OUTGOING_SENT,
   };
+
+  describe('read receipts after migration', () => {
+    it.each([
+      [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_TYPE.REGULAR, true],
+      [CONVERSATION_PROTOCOL.MIXED, CONVERSATION_TYPE.REGULAR, false],
+      [CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.REGULAR, false],
+      [CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.ONE_TO_ONE, true],
+    ])('checks the current protocol %s and conversation type %s before sending', async (protocol, type, shouldSend) => {
+      const [messageRepository] = await buildMessageRepository(translateForTest);
+      const send = jest
+        .spyOn(messageRepository as unknown as MessageRepositoryPrivateMethodsForTest, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation(type);
+      conversation.receiptMode(RECEIPT_MODE.ON);
+      const message = new ContentMessage('unread-message', translateForTest);
+      message.type = ClientEvent.CONVERSATION.MESSAGE_ADD;
+      message.user(new User('sender', '', translateForTest));
+      message.expectsReadConfirmation = true;
+
+      // The message was received before migration; group metadata may still be missing.
+      ConversationMapper.updateProperties(conversation, {protocol});
+      await messageRepository.sendConfirmationStatus(conversation, message, Confirmation.Type.READ, [message]);
+
+      expect(send).toHaveBeenCalledTimes(shouldSend ? 1 : 0);
+    });
+  });
 
   describe('sendPing', () => {
     it('sends a ping', async () => {

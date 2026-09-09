@@ -36,7 +36,7 @@ import {PanelActions} from 'Components/panel/panelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {isGroupMLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {supportsReadReceipts} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -165,7 +165,7 @@ function ConversationDetailsOptionsContent({
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
   const showOptionServices = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotifications1To1 = isMutable && !isGroupOrChannel;
-  const showOptionReadReceipts = isTeamConversation && !isGroupMLSConversation(activeConversation);
+  const showOptionReadReceipts = isTeamConversation && supportsReadReceipts(activeConversation);
   const showChannelOptions = isChannel && isChannelsEnabled;
 
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
