@@ -32,13 +32,13 @@ import {
 const uploadPath = 'conversation-id@example.com/files';
 const conversationQualifiedId = 'conversation-id@example.com';
 
-function createCellsRepository() {
+function createCellsRepositoryMock() {
   return {
     uploadNode: jest.fn().mockResolvedValue({uuid: 'remote-id', versionId: 'version-id'}),
   };
 }
 
-function createController(cellsRepository = createCellsRepository()) {
+function createDirectUploadControllerHelper(cellsRepository = createCellsRepositoryMock()) {
   const createSource = jest.fn((file: File): UploadSource => ({
     blob: file,
     name: file.name,
@@ -57,7 +57,7 @@ function createController(cellsRepository = createCellsRepository()) {
   return {cellsRepository, controller};
 }
 
-function createDraftManager(): jest.Mocked<CellsUploadManager> {
+function createDraftUploadManagerMock(): jest.Mocked<CellsUploadManager> {
   const source: UploadSource = {blob: new Blob(['data']), name: 'one.txt', contentType: 'text/plain', size: 3};
   const state = {
     kind: 'published',
@@ -80,8 +80,8 @@ function createDraftManager(): jest.Mocked<CellsUploadManager> {
   };
 }
 
-function createDraftController<T extends CellsUploadManager = jest.Mocked<CellsUploadManager>>(
-  manager: T = createDraftManager() as T,
+function createDraftUploadControllerHelper<T extends CellsUploadManager = jest.Mocked<CellsUploadManager>>(
+  manager: T = createDraftUploadManagerMock() as T,
   createUploadId: jest.Mock = jest.fn().mockReturnValue('upload-1'),
 ): {controller: ReturnType<typeof createSharedDriveUploadController>; manager: T} {
   const controller = createSharedDriveUploadController({
@@ -98,7 +98,7 @@ function createDraftController<T extends CellsUploadManager = jest.Mocked<CellsU
   return {controller, manager};
 }
 
-function createDeferredTask<Value, Failure>(defaultValue: Value) {
+function createDeferredTaskHelper<Value, Failure>(defaultValue: Value) {
   let resolveTask: ((value?: Value) => void) | undefined;
   const value = new Task<Value, Failure>(resolve => {
     resolveTask = nextValue => resolve(nextValue === undefined ? defaultValue : nextValue);
@@ -113,7 +113,7 @@ function createDeferredTask<Value, Failure>(defaultValue: Value) {
 
 describe('createSharedDriveUploadController', () => {
   it('notifies listeners as soon as a file is registered', async () => {
-    const {controller} = createController();
+    const {controller} = createDirectUploadControllerHelper();
     const listener = jest.fn();
     controller.subscribe(listener);
 
@@ -133,7 +133,7 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('directly uploads files and refreshes after successful files', async () => {
-    const {cellsRepository, controller} = createController();
+    const {cellsRepository, controller} = createDirectUploadControllerHelper();
     const onRefresh = jest.fn();
     const listener = jest.fn();
     const files = [new File(['one'], 'one.txt'), new File(['two'], 'two.txt')];
@@ -158,9 +158,9 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('does not refresh when a direct upload fails', async () => {
-    const cellsRepository = createCellsRepository();
+    const cellsRepository = createCellsRepositoryMock();
     cellsRepository.uploadNode.mockRejectedValueOnce(new Error('upload failed'));
-    const {controller} = createController(cellsRepository);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository);
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
@@ -172,7 +172,7 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('cancels an active direct upload', async () => {
-    const cellsRepository = createCellsRepository();
+    const cellsRepository = createCellsRepositoryMock();
     let rejectUpload: (error: unknown) => void = () => undefined;
     cellsRepository.uploadNode.mockImplementationOnce(
       ({abortController}: {abortController?: AbortController}) =>
@@ -181,7 +181,7 @@ describe('createSharedDriveUploadController', () => {
           abortController?.signal.addEventListener('abort', () => reject(new Error('cancelled')));
         }),
     );
-    const {controller} = createController(cellsRepository);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository);
 
     const uploadPromise = controller.upload(
       [new File(['one'], 'one.txt')],
@@ -200,7 +200,7 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('ignores late progress from a cancelled direct upload before the next upload', async () => {
-    const cellsRepository = createCellsRepository();
+    const cellsRepository = createCellsRepositoryMock();
     let firstProgress: ((progress: number) => void) | undefined;
     cellsRepository.uploadNode.mockImplementationOnce(
       ({
@@ -216,7 +216,8 @@ describe('createSharedDriveUploadController', () => {
         });
       },
     );
-    const {controller} = createController(cellsRepository);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository);
+
     const firstUpload = controller.upload(
       [new File(['one'], 'one.txt')],
       uploadPath,
@@ -234,11 +235,11 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('retries a failed direct upload', async () => {
-    const cellsRepository = createCellsRepository();
+    const cellsRepository = createCellsRepositoryMock();
     cellsRepository.uploadNode
       .mockRejectedValueOnce(new Error('upload failed'))
       .mockResolvedValueOnce({uuid: 'remote-id', versionId: 'version-id'});
-    const {controller} = createController(cellsRepository);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository);
     const file = new File(['one'], 'one.txt');
 
     await controller.upload([file], uploadPath, jest.fn(), conversationQualifiedId);
@@ -255,7 +256,7 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('does not retry an already published direct upload', async () => {
-    const {cellsRepository, controller} = createController();
+    const {cellsRepository, controller} = createDirectUploadControllerHelper();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, jest.fn(), conversationQualifiedId);
     await controller.retryUpload('upload-1');
@@ -264,7 +265,7 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('returns only uploads belonging to the requested conversation', async () => {
-    const {controller} = createController();
+    const {controller} = createDirectUploadControllerHelper();
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
@@ -281,7 +282,7 @@ describe('createSharedDriveUploadController', () => {
   it('can run with the draft manager strategy for staged uploads', async () => {
     const onRefresh = jest.fn();
     const file = new File(['one'], 'one.txt', {type: 'text/plain'});
-    const {controller, manager} = createDraftController();
+    const {controller, manager} = createDraftUploadControllerHelper();
 
     await controller.upload([file], uploadPath, onRefresh, conversationQualifiedId);
 
@@ -305,7 +306,7 @@ describe('createSharedDriveUploadController', () => {
     const gateway: CellsUploadGateway = {
       uploadDraft: request => {
         uploadRequests.push(request);
-        const deferred = createDeferredTask<DraftIdentity, CellsUploadGatewayError<'upload'>>(remoteIdentity);
+        const deferred = createDeferredTaskHelper<DraftIdentity, CellsUploadGatewayError<'upload'>>(remoteIdentity);
         uploadTasks.push(deferred);
         return deferred.value;
       },
@@ -320,7 +321,7 @@ describe('createSharedDriveUploadController', () => {
       createAbortController: () => new AbortController(),
     });
     const createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2');
-    const {controller} = createDraftController(manager, createUploadId);
+    const {controller} = createDraftUploadControllerHelper(manager, createUploadId);
     const firstUpload = controller.upload(
       [new File(['one'], 'one.txt')],
       uploadPath,
@@ -354,9 +355,9 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('does not publish draft uploads when start fails', async () => {
-    const manager = createDraftManager();
+    const manager = createDraftUploadManagerMock();
     manager.start.mockResolvedValueOnce(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
-    const {controller} = createDraftController(manager);
+    const {controller} = createDraftUploadControllerHelper(manager);
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
@@ -366,9 +367,9 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('does not start draft uploads when register fails', async () => {
-    const manager = createDraftManager();
+    const manager = createDraftUploadManagerMock();
     manager.register.mockReturnValueOnce(Result.err({kind: 'duplicateUpload', uploadId: 'upload-1'}));
-    const {controller} = createDraftController(manager);
+    const {controller} = createDraftUploadControllerHelper(manager);
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
@@ -379,9 +380,9 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('does not refresh when draft publish fails', async () => {
-    const manager = createDraftManager();
+    const manager = createDraftUploadManagerMock();
     manager.publish.mockResolvedValueOnce(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
-    const {controller} = createDraftController(manager);
+    const {controller} = createDraftUploadControllerHelper(manager);
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
@@ -392,8 +393,8 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('publishes and refreshes after retrying a failed draft upload', async () => {
-    const manager = createDraftManager();
-    const {controller} = createDraftController(manager);
+    const manager = createDraftUploadManagerMock();
+    const {controller} = createDraftUploadControllerHelper(manager);
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
@@ -405,9 +406,9 @@ describe('createSharedDriveUploadController', () => {
   });
 
   it('does not publish or refresh when retrying a draft upload fails', async () => {
-    const manager = createDraftManager();
+    const manager = createDraftUploadManagerMock();
     manager.retryUpload.mockResolvedValueOnce(Result.err({kind: 'unknownUpload', uploadId: 'upload-1'}));
-    const {controller} = createDraftController(manager);
+    const {controller} = createDraftUploadControllerHelper(manager);
     const onRefresh = jest.fn();
 
     await controller.upload([new File(['one'], 'one.txt')], uploadPath, onRefresh, conversationQualifiedId);
