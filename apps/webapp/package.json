@@ -111,7 +111,7 @@
     "@babel/preset-typescript": "7.29.7",
     "@formatjs/cli": "6.16.23",
     "@nx/webpack": "22.7.9",
-    "@playwright/test": "1.62.1",
+    "@playwright/test": "1.63.0",
     "@roamhq/wrtc": "0.10.0",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
