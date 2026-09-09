@@ -92,6 +92,7 @@ function renderDecryptErrorCaption(options: RenderDecryptErrorCaptionOptions): R
           },
         },
       ],
+      nodeReplacements: [],
       valueReplacements: [{marker: decryptErrorUserMarker, runtimeText: userName}],
     });
   }

@@ -89,6 +89,7 @@ function renderFederationStopMessage(options: RenderFederationStopMessageOptions
               },
             },
           ],
+          nodeReplacements: [],
           valueReplacements,
         })}
       </span>

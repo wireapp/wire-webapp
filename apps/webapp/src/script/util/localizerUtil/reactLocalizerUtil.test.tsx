@@ -177,6 +177,7 @@ describe('replaceReactComponents', () => {
           },
         },
       ],
+      nodeReplacements: [],
       valueReplacements: [{marker: senderNameMarker, runtimeText: senderName}],
     });
 
@@ -187,6 +188,103 @@ describe('replaceReactComponents', () => {
     expect(actualText).toBe(expectedText);
     expect(container.querySelectorAll('strong')).toHaveLength(1);
     expect(container.querySelector('test')).toBeNull();
+  });
+
+  it('renders a trusted React node outside translated components', () => {
+    const iconMarker = createReactTranslationMarker('permission-icon');
+    const result = renderReactTranslation({
+      translatedText: `Allow ${iconMarker.substitution} access`,
+      componentReplacements: [],
+      nodeReplacements: [
+        {
+          marker: iconMarker,
+          render() {
+            return <span data-uie-name="permission-icon" />;
+          },
+        },
+      ],
+      valueReplacements: [],
+    });
+
+    const {getByTestId} = render(<p>{result}</p>);
+
+    expect(getByTestId('permission-icon')).toBeInTheDocument();
+  });
+
+  it('renders a trusted React node inside a translated component', () => {
+    const lineBreakMarker = createReactTranslationMarker('line-break');
+    const result = renderReactTranslation({
+      translatedText: `<strong>First${lineBreakMarker.substitution}Second</strong>`,
+      componentReplacements: [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(children) {
+            return <strong>{children}</strong>;
+          },
+        },
+      ],
+      nodeReplacements: [
+        {
+          marker: lineBreakMarker,
+          render() {
+            return <br data-uie-name="line-break" />;
+          },
+        },
+      ],
+      valueReplacements: [],
+    });
+
+    const {container, getByTestId} = render(<p>{result}</p>);
+    const strongElement = container.querySelector('strong');
+
+    expect(getByTestId('line-break')).toBeInTheDocument();
+    expect(strongElement).toHaveTextContent('FirstSecond');
+  });
+
+  it('renders multiple occurrences of the same trusted React node marker', () => {
+    const iconMarker = createReactTranslationMarker('permission-icon');
+    const result = renderReactTranslation({
+      translatedText: `${iconMarker.substitution} Camera ${iconMarker.substitution} Microphone`,
+      componentReplacements: [],
+      nodeReplacements: [
+        {
+          marker: iconMarker,
+          render() {
+            return <span data-uie-name="permission-icon" />;
+          },
+        },
+      ],
+      valueReplacements: [],
+    });
+
+    const {getAllByTestId} = render(<p>{result}</p>);
+
+    expect(getAllByTestId('permission-icon')).toHaveLength(2);
+  });
+
+  it('renders runtime text and trusted React nodes in translator-controlled order', () => {
+    const userNameMarker = createReactTranslationMarker('user-name');
+    const iconMarker = createReactTranslationMarker('permission-icon');
+    const result = renderReactTranslation({
+      translatedText: `${userNameMarker.substitution} ${iconMarker.substitution} was granted`,
+      componentReplacements: [],
+      nodeReplacements: [
+        {
+          marker: iconMarker,
+          render() {
+            return <span data-uie-name="permission-icon" />;
+          },
+        },
+      ],
+      valueReplacements: [{marker: userNameMarker, runtimeText: 'R&D <Test>'}],
+    });
+
+    const {container, getByTestId} = render(<p>{result}</p>);
+
+    expect(container.querySelector('test')).toBeNull();
+    expect(container.querySelector('p')).toHaveTextContent('R&D <Test> was granted');
+    expect(getByTestId('permission-icon')).toBeInTheDocument();
   });
 
   it('keeps translation-looking runtime values literal', () => {
@@ -203,6 +301,7 @@ describe('replaceReactComponents', () => {
           },
         },
       ],
+      nodeReplacements: [],
       valueReplacements: [{marker: senderNameMarker, runtimeText: senderName}],
     });
 
@@ -224,6 +323,7 @@ describe('replaceReactComponents', () => {
           },
         },
       ],
+      nodeReplacements: [],
       valueReplacements: [],
     });
 
