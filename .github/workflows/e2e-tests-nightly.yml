@@ -32,7 +32,7 @@ jobs:
   report:
     name: Report test results
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, office]
     needs: e2e_tests
 
     steps:

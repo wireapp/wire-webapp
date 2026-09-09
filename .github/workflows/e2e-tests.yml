@@ -65,7 +65,7 @@ env:
 jobs:
   bootstrap_smoke_test:
     name: Run bootstrap smoke test
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, office]
 
     services:
       testservice:
@@ -105,7 +105,7 @@ jobs:
   # Since not always all e2e tests are run the number of shards to start up is computed dynamically from the amount of tests which will run
   compute_shards:
     name: Compute number of shards to use
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, office]
 
     outputs:
       matrixShards: ${{ steps.computeShards.outputs.matrixShards }}
@@ -137,7 +137,7 @@ jobs:
 
   test:
     name: Run E2E Tests
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, office]
     timeout-minutes: 45
     needs: [bootstrap_smoke_test, compute_shards]
     container:
@@ -214,7 +214,7 @@ jobs:
           retention-days: 1
 
   e2e-report:
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, office]
     if: ${{ always() && needs.test.result != 'skipped' && needs.test.result != 'cancelled' }}
     needs: [test]
     timeout-minutes: 20
