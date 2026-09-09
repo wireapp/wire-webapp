@@ -11,16 +11,6 @@
   "lockFileMaintenance": {
     "enabled": false
   },
-  "customManagers": [
-    {
-      "customType": "regex",
-      "managerFilePatterns": ["/^\\.github/workflows/e2e-tests\\.yml$/"],
-      "matchStrings": ["image:\\s+quay\\.io/wire/mirror-images/playwright:(?<currentValue>v\\d+\\.\\d+\\.\\d+-noble)"],
-      "depNameTemplate": "quay.io/wire/mirror-images/playwright",
-      "datasourceTemplate": "docker",
-      "extractVersionTemplate": "^v(?<version>\\d+\\.\\d+\\.\\d+)-noble$"
-    }
-  ],
   "packageRules": [
     {
       "matchUpdateTypes": ["major"],
@@ -37,6 +27,10 @@
     {
       "matchManagers": ["dockerfile"],
       "groupName": "docker images"
+    },
+    {
+      "matchPackageNames": ["quay.io/wire/mirror-images/playwright"],
+      "minimumReleaseAge": null
     },
     {
       "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
