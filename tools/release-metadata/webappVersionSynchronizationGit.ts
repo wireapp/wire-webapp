@@ -206,23 +206,25 @@ function createPackageDocumentContents(packageDocument: WebAppPackageDocument): 
   return `${JSON.stringify(packageDocument, null, packageJsonIndentationSpaces)}\n`;
 }
 
-function parseRemoteBranchNames(remoteBranchesOutput: string, branchPrefix: string): readonly string[] {
-  return remoteBranchesOutput.split('\n').flatMap(remoteBranchLine => {
-    const remoteBranchFields = remoteBranchLine.split('\t');
-    const remoteReference = remoteBranchFields.at(1);
+function parseRemoteBranchNames(remoteBranchesOutput: string, branchPrefix: string): ReadonlySet<string> {
+  return new Set(
+    remoteBranchesOutput.split('\n').flatMap(remoteBranchLine => {
+      const remoteBranchFields = remoteBranchLine.split('\t');
+      const remoteReference = remoteBranchFields.at(1);
 
-    if (isString(remoteReference) === false || remoteReference.startsWith('refs/heads/') === false) {
-      return [];
-    }
+      if (isString(remoteReference) === false || remoteReference.startsWith('refs/heads/') === false) {
+        return [];
+      }
 
-    const branchName = remoteReference.slice('refs/heads/'.length);
+      const branchName = remoteReference.slice('refs/heads/'.length);
 
-    if (branchName.startsWith(branchPrefix) === false) {
-      return [];
-    }
+      if (branchName.startsWith(branchPrefix) === false) {
+        return [];
+      }
 
-    return [branchName];
-  });
+      return [branchName];
+    }),
+  );
 }
 
 function parseCommitSha(commitOutput: string, description: string): Result<string, Error> {
@@ -418,7 +420,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
       return Result.err(remoteBranchesResult.error);
     }
 
-    return Result.ok(parseRemoteBranchNames(remoteBranchesResult.value, branchPrefix));
+    return Result.ok([...parseRemoteBranchNames(remoteBranchesResult.value, branchPrefix)].toSorted());
   }
 
   async function readPackageDocumentsFromWorkingTree(): Promise<Result<WebAppPackageDocuments, Error>> {
@@ -453,7 +455,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
       remoteBranchOutputResult.value,
       `${synchronizationBranchPrefix}${inspectOptions.branchName.slice(synchronizationBranchPrefix.length)}`,
     );
-    const remoteBranchExists = remoteBranchNames.includes(inspectOptions.branchName);
+    const remoteBranchExists = remoteBranchNames.has(inspectOptions.branchName);
     let branchReference: string;
 
     if (remoteBranchExists) {
