@@ -24,19 +24,47 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import en from 'I18n/en-US.json';
 import type {ClientRepository} from 'Repositories/client';
 import {User} from 'Repositories/entity/User/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {UserState} from 'Repositories/user/userState';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './appLock';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 const clientRepository = {} as unknown as ClientRepository;
+const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    isFeatureToggleEnabled(featureName) {
+      return featureName === reactTranslationRenderingFeatureToggleName;
+    },
+    translate,
+  }),
+);
+
+type TranslationTestFunction = () => void | Promise<void>;
+
+async function withTranslationStrings(strings: typeof en, testFunction: TranslationTestFunction): Promise<void> {
+  setStrings({en: strings});
+
+  try {
+    await testFunction();
+  } finally {
+    setStrings({en});
+  }
+}
+
 const appLockCrypto: AppLockCrypto = {
   cryptoPwhashMemLimitInteractive: 1,
   cryptoPwhashOpsLimitInteractive: 1,
@@ -83,6 +111,79 @@ const createAppLockRepository = (appLockState?: AppLockState) => {
   return appLockRepository;
 };
 describe('AppLock', () => {
+  it('keeps the legacy setup message rendering when React translation rendering is disabled', async () => {
+    await withTranslationStrings(en, () => {
+      const appLockState = createAppLockState();
+      const appLockRepository = createAppLockRepository(appLockState);
+      appLockState.hasPassphrase(false);
+      appLockState.isActivatedInPreferences(true);
+
+      const props = {
+        appLockRepository,
+        appLockState,
+        clientRepository,
+      };
+
+      const {getByTestId} = render(withTheme(<AppLock {...props} />));
+      const setupMessage = getByTestId('label-applock-set-text');
+
+      expect(setupMessage.querySelectorAll('br')).toHaveLength(2);
+    });
+  });
+
+  it('renders setup line breaks as React nodes when React translation rendering is enabled', async () => {
+    await withTranslationStrings(en, () => {
+      const appLockState = createAppLockState();
+      const appLockRepository = createAppLockRepository(appLockState);
+      appLockState.hasPassphrase(false);
+      appLockState.isActivatedInPreferences(true);
+
+      const props = {
+        appLockRepository,
+        appLockState,
+        clientRepository,
+      };
+
+      const {getByTestId} = render(
+        withThemeAndRootContext(<AppLock {...props} />, reactTranslationRenderingRootProviderWrapper),
+      );
+      const setupMessage = getByTestId('label-applock-set-text');
+
+      expect(setupMessage).toHaveTextContent('Wire will lock itself after 1 minute of inactivity.');
+      expect(setupMessage.querySelectorAll('br')).toHaveLength(2);
+    });
+  });
+
+  it('keeps unsupported setup translation markup as text', async () => {
+    await withTranslationStrings(
+      {
+        ...en,
+        modalAppLockSetupMessage: '<img src="example">Wire will lock itself.[br]Enter your passcode.',
+      },
+      () => {
+        const appLockState = createAppLockState();
+        const appLockRepository = createAppLockRepository(appLockState);
+        appLockState.hasPassphrase(false);
+        appLockState.isActivatedInPreferences(true);
+
+        const props = {
+          appLockRepository,
+          appLockState,
+          clientRepository,
+        };
+
+        const {getByTestId} = render(
+          withThemeAndRootContext(<AppLock {...props} />, reactTranslationRenderingRootProviderWrapper),
+        );
+        const setupMessage = getByTestId('label-applock-set-text');
+
+        expect(setupMessage).toHaveTextContent('<img src="example">Wire will lock itself.Enter your passcode.');
+        expect(setupMessage.querySelector('img')).toBeNull();
+        expect(setupMessage.querySelectorAll('br')).toHaveLength(2);
+      },
+    );
+  });
+
   describe('disabled feature', () => {
     it('does not shows up if applock is disabled', () => {
       const appLockState = createAppLockState(createTeamState({status: FEATURE_STATUS.DISABLED}));
