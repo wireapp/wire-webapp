@@ -98,16 +98,13 @@ const renderTabs = (controller: SharedDriveUploadController, isUploadStatusIndic
   );
 
 describe('ConversationTabs', () => {
-  beforeEach(() => {
-    window.location.hash = '';
-  });
-
   it('does not render a shared drive upload icon when there is no file upload', () => {
     const {controller} = createController();
     const view = renderTabs(controller);
 
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
     expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('renders a moving shared drive upload indicator while a file is uploading', () => {
@@ -117,6 +114,7 @@ describe('ConversationTabs', () => {
     expect(view.getByTestId('shared-drive-tab-upload-uploading')).toHaveClass(
       'conversation-tabs__upload-status-icon--uploading',
     );
+    expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.uploading');
     expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
   });
 
@@ -130,6 +128,7 @@ describe('ConversationTabs', () => {
 
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
     expect(view.getByTestId('shared-drive-tab-upload-completed')).toBeInTheDocument();
+    expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.uploaded');
   });
 
   it('renders the completion icon for failed uploads', () => {
@@ -137,6 +136,7 @@ describe('ConversationTabs', () => {
     const view = renderTabs(controller);
 
     expect(view.getByTestId('shared-drive-tab-upload-completed')).toBeInTheDocument();
+    expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.failed');
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
   });
 
@@ -146,5 +146,6 @@ describe('ConversationTabs', () => {
 
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
     expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
   });
 });

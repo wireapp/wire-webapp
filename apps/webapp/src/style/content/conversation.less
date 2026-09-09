@@ -147,6 +147,10 @@
 
     &--uploading {
       animation: conversation-tab-upload-spinner 1s linear infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
     }
   }
 }
