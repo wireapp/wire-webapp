@@ -106,9 +106,13 @@ export const SharedDriveUploadStatusPopupHost = ({
         setRetryingUploadId(current =>
           maybe.isJust(current) && current.value === uploadId ? Maybe.nothing() : current,
         );
-      void controller.retryUpload(uploadId).then(finishRetry, finishRetry);
+      const snapshot = controller
+        .snapshots(conversationQualifiedId)
+        .find(state => state.identity.uploadId === uploadId);
+      const retry = snapshot?.kind === 'publishFailed' ? controller.retryPublish : controller.retryUpload;
+      void retry(uploadId).then(finishRetry, finishRetry);
     },
-    [controller, retryingUploadId],
+    [controller, conversationQualifiedId, retryingUploadId],
   );
 
   useEffect(() => {

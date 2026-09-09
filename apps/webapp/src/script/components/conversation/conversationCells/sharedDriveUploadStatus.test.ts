@@ -27,6 +27,7 @@ const state = (kind: string) => ({
   kind,
   identity: {uploadId: 'upload-1'},
   source,
+  ...(kind === 'uploading' ? {progress: 0} : {}),
 });
 
 describe('toSharedDriveUploadStatus', () => {
@@ -37,6 +38,9 @@ describe('toSharedDriveUploadStatus', () => {
       fileName: 'report.pdf',
       fileSize: 4,
       kind: 'uploading',
+      progress: 0,
+      hasProgress: false,
+      isTransferActive: kind === 'uploading',
       canCancel: true,
       canRetry: false,
     });
@@ -44,8 +48,20 @@ describe('toSharedDriveUploadStatus', () => {
 
   it.each(['draftReady', 'publishing'])('maps %s to uploading but marks it not cancellable', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'uploading', canCancel: false}),
+      expect.objectContaining({
+        kind: 'uploading',
+        progress: 0,
+        hasProgress: false,
+        isTransferActive: false,
+        canCancel: false,
+      }),
     );
+  });
+
+  it('preserves reported transfer progress', () => {
+    expect(
+      toSharedDriveUploadStatus({...state('uploading'), progress: 0.45} as never, conversationQualifiedId),
+    ).toEqual(expect.objectContaining({progress: 0.45, hasProgress: true, isTransferActive: true}));
   });
 
   it('maps published to uploaded', () => {
@@ -59,8 +75,14 @@ describe('toSharedDriveUploadStatus', () => {
     );
   });
 
-  it.each(['publishFailed', 'discardFailed'])('does not make a %s retryable', kind => {
-    expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual(
+  it('makes a publish failure retryable without allowing upload cancellation', () => {
+    expect(toSharedDriveUploadStatus(state('publishFailed') as never, conversationQualifiedId)).toEqual(
+      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: true}),
+    );
+  });
+
+  it('does not make a discard failure retryable', () => {
+    expect(toSharedDriveUploadStatus(state('discardFailed') as never, conversationQualifiedId)).toEqual(
       expect.objectContaining({kind: 'failed', canCancel: false, canRetry: false}),
     );
   });

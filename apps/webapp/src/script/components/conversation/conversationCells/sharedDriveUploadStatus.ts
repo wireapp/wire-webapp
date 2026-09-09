@@ -27,6 +27,9 @@ export type SharedDriveUploadStatus = {
   readonly fileName: string;
   readonly fileSize: number;
   readonly kind: SharedDriveUploadStatusKind;
+  readonly progress: number;
+  readonly hasProgress: boolean;
+  readonly isTransferActive: boolean;
   readonly canCancel: boolean;
   readonly canRetry: boolean;
 };
@@ -65,7 +68,10 @@ export const toSharedDriveUploadStatus = (
     fileName: state.source.name,
     fileSize: state.source.size,
     kind,
+    progress: state.kind === 'uploading' ? state.progress : 0,
+    hasProgress: state.kind === 'uploading' && state.progress > 0,
+    isTransferActive: state.kind === 'uploading',
     canCancel: state.kind === 'queued' || state.kind === 'uploading',
-    canRetry: state.kind === 'uploadFailed',
+    canRetry: state.kind === 'uploadFailed' || state.kind === 'publishFailed',
   };
 };

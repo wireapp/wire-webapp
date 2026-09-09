@@ -23,6 +23,7 @@ import type {SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
 
 const SHARED_DRIVE_UPLOAD_PROGRESS_EXPANDED_TOP = 51;
 const SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT = 3;
+const PROGRESS_PERCENTAGE_MAX = 100;
 
 export const sharedDriveUploadStatusPopupStyles: CSSObject = {
   position: 'absolute',
@@ -250,17 +251,21 @@ export const sharedDriveUploadStatusPopupRowActionIconStyles: CSSObject = {
   height: 14,
 };
 
-export const sharedDriveUploadStatusPopupProgressStyles = (
-  isExpanded: boolean,
-  kind: SharedDriveUploadStatusKind = 'uploading',
-): CSSObject => ({
+const sharedDriveUploadStatusPopupProgressBaseStyles = (isExpanded: boolean): CSSObject => ({
   position: 'absolute',
   top: isExpanded ? SHARED_DRIVE_UPLOAD_PROGRESS_EXPANDED_TOP : undefined,
   bottom: isExpanded ? undefined : 0,
   left: isExpanded ? 0 : SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT,
-  width: kind === 'uploading' ? 'min(209px, calc(50% + 3px))' : 'calc(100% + 4px)',
   height: 3,
   overflow: 'hidden',
+});
+
+export const sharedDriveUploadStatusPopupProgressStyles = (
+  isExpanded: boolean,
+  kind: SharedDriveUploadStatusKind = 'uploading',
+): CSSObject => ({
+  ...sharedDriveUploadStatusPopupProgressBaseStyles(isExpanded),
+  width: kind === 'uploading' ? 'min(209px, calc(50% + 3px))' : 'calc(100% + 4px)',
   backgroundColor: kind === 'failed' ? 'var(--danger-color, #c20013)' : 'var(--accent-color, #0667c8)',
   animation: kind === 'uploading' ? 'shared-drive-upload-progress 1.5s ease-in-out infinite' : 'none',
   '@keyframes shared-drive-upload-progress': {
@@ -270,4 +275,11 @@ export const sharedDriveUploadStatusPopupProgressStyles = (
   '@media (prefers-reduced-motion: reduce)': {
     animation: 'none',
   },
+});
+
+export const sharedDriveUploadStatusPopupDeterminateProgressStyles = (isExpanded: boolean): CSSObject => ({
+  ...sharedDriveUploadStatusPopupProgressBaseStyles(isExpanded),
+  width: `${PROGRESS_PERCENTAGE_MAX}%`,
+  transformOrigin: 'left center',
+  backgroundColor: 'var(--accent-color, #0667c8)',
 });

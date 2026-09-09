@@ -19,9 +19,10 @@
 
 import {S3Client, S3ServiceException} from '@aws-sdk/client-s3';
 import {Upload} from '@aws-sdk/lib-storage';
+import {XhrHttpHandler} from '@aws-sdk/xhr-http-handler';
 
 import {CellsStorageError} from './cellsStorage';
-import {MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './s3Service';
+import {createAbortableXhrHttpHandler, MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './s3Service';
 
 import {AccessTokenStore} from '../../auth/accessTokenStore';
 
@@ -63,9 +64,64 @@ describe('S3Service', () => {
         endpoint: testConfig.endpoint,
         forcePathStyle: true,
         region: testConfig.region,
+        requestHandler: expect.any(XhrHttpHandler),
         requestChecksumCalculation: 'WHEN_REQUIRED',
       }),
     );
+  });
+
+  it('passes the upload abort signal to the XHR handler', async () => {
+    const abortController = new AbortController();
+    const request = {} as never;
+    const handle = jest.spyOn(XhrHttpHandler.prototype, 'handle').mockResolvedValue({response: {} as never});
+    const requestHandler = createAbortableXhrHttpHandler(abortController.signal);
+
+    await requestHandler.handle(request);
+
+    expect(handle).toHaveBeenCalledWith(request, expect.objectContaining({abortSignal: abortController.signal}));
+    handle.mockRestore();
+  });
+
+  it('aborts the underlying XHR when the upload signal is cancelled', async () => {
+    const abortController = new AbortController();
+    const xhr = {
+      upload: {addEventListener: jest.fn()},
+      addEventListener: jest.fn(),
+      open: jest.fn(),
+      setRequestHeader: jest.fn(),
+      send: jest.fn(),
+      abort: jest.fn(),
+    };
+    const originalXMLHttpRequest = globalThis.XMLHttpRequest;
+    Object.defineProperty(globalThis, 'XMLHttpRequest', {
+      configurable: true,
+      value: jest.fn(() => xhr),
+      writable: true,
+    });
+
+    try {
+      const requestHandler = createAbortableXhrHttpHandler(abortController.signal);
+      const pending = requestHandler.handle({
+        protocol: 'https:',
+        hostname: 's3.example.test',
+        path: '/bucket/object',
+        method: 'PUT',
+        headers: {},
+        query: {},
+      } as never);
+
+      await Promise.resolve();
+      abortController.abort();
+
+      await expect(pending).rejects.toMatchObject({name: 'AbortError'});
+      expect(xhr.abort).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(globalThis, 'XMLHttpRequest', {
+        configurable: true,
+        value: originalXMLHttpRequest,
+        writable: true,
+      });
+    }
   });
 
   describe('putObject', () => {
@@ -164,12 +220,14 @@ describe('S3Service', () => {
       await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toBe(error);
     });
 
-    it('calls progress callback with correct progress values', async () => {
+    it('forwards every incremental progress event to the callback', async () => {
       const progressCallback = jest.fn();
       const mockUpload = {
         on: jest.fn().mockImplementation((event, callback) => {
           if (event === 'httpUploadProgress') {
-            callback({loaded: 50, total: 100});
+            callback({loaded: 10, total: 100});
+            callback({loaded: 45, total: 100});
+            callback({loaded: 80, total: 100});
           }
         }),
         done: jest.fn().mockResolvedValue(undefined),
@@ -179,7 +237,9 @@ describe('S3Service', () => {
 
       await service.putObject({path: testFilePath, file: testFile, progressCallback});
 
-      expect(progressCallback).toHaveBeenCalledWith(0.5);
+      expect(progressCallback).toHaveBeenNthCalledWith(1, 0.1);
+      expect(progressCallback).toHaveBeenNthCalledWith(2, 0.45);
+      expect(progressCallback).toHaveBeenNthCalledWith(3, 0.8);
     });
 
     it('does not call progress callback when progress information is missing', async () => {
