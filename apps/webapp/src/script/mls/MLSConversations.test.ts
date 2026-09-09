@@ -169,8 +169,12 @@ describe('MLSConversations', () => {
 
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = conversationRepository['core'];
+      const conversationService = repositoryCore.service?.conversation;
+      if (conversationService === undefined) {
+        throw new Error('Conversation service is not initialized');
+      }
       jest
-        .spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally')
+        .spyOn(conversationService, 'mlsGroupExistsLocally')
         .mockImplementation(async groupId => groupId === established.groupId);
       const recoverSpy = jest
         .spyOn(conversationRepository, 'safeEnsureConversationExists')
@@ -202,7 +206,11 @@ describe('MLSConversations', () => {
       const conversations = createMLSConversations(12, CONVERSATION_TYPE.REGULAR);
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = conversationRepository['core'];
-      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      const conversationService = repositoryCore.service?.conversation;
+      if (conversationService === undefined) {
+        throw new Error('Conversation service is not initialized');
+      }
+      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockResolvedValue(false);
       const recoverSpy = jest
         .spyOn(conversationRepository, 'safeEnsureConversationExists')
         .mockReturnValue(task.resolve(undefined));
@@ -224,7 +232,11 @@ describe('MLSConversations', () => {
       const conversations = createMLSConversations(3, CONVERSATION_TYPE.REGULAR);
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = conversationRepository['core'];
-      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      const conversationService = repositoryCore.service?.conversation;
+      if (conversationService === undefined) {
+        throw new Error('Conversation service is not initialized');
+      }
+      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockResolvedValue(false);
       const recoverSpy = jest
         .spyOn(conversationRepository, 'safeEnsureConversationExists')
         .mockReturnValueOnce(task.reject(new Error('join failed')))
