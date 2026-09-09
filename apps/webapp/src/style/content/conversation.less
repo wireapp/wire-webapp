@@ -116,6 +116,12 @@
     cursor: pointer;
     font-size: var(--font-size-medium);
 
+    &-content {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     &:focus {
       outline: none;
     }
@@ -132,6 +138,22 @@
         content: '';
       }
     }
+  }
+
+  &__upload-status-icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+
+    &--uploading {
+      animation: conversation-tab-upload-spinner 1s linear infinite;
+    }
+  }
+}
+
+@keyframes conversation-tab-upload-spinner {
+  100% {
+    transform: rotate(360deg);
   }
 }
 

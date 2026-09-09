@@ -25,7 +25,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatBytes} from 'Util/util';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {toSharedDriveUploadStatus, type SharedDriveUploadStatus} from './sharedDriveUploadStatus';
+import {getLatestSharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
 
 type DismissedUpload = {
@@ -40,18 +40,6 @@ interface SharedDriveUploadStatusPopupHostProps {
   readonly isFileTabActive: boolean;
 }
 
-const getLatestStatus = (
-  controller: SharedDriveUploadController,
-  conversationQualifiedId: string,
-): SharedDriveUploadStatus | null => {
-  const statuses = controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
-    const status = toSharedDriveUploadStatus(snapshot, conversationQualifiedId);
-    return status ? [status] : [];
-  });
-
-  return statuses[statuses.length - 1] ?? null;
-};
-
 export const SharedDriveUploadStatusPopupHost = ({
   controller,
   conversationQualifiedId,
@@ -60,7 +48,7 @@ export const SharedDriveUploadStatusPopupHost = ({
 }: SharedDriveUploadStatusPopupHostProps) => {
   const {translate} = useApplicationContext();
   const readStatus = useCallback(
-    () => getLatestStatus(controller, conversationQualifiedId),
+    () => getLatestSharedDriveUploadStatus(controller, conversationQualifiedId),
     [controller, conversationQualifiedId],
   );
   const [status, setStatus] = useState(() => ({

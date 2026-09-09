@@ -720,6 +720,8 @@ function ConversationContent({
                       activeTabIndex={activeTabIndex}
                       onIndexChange={setActiveTabIndex}
                       conversationQualifiedId={activeConversation.qualifiedId}
+                      sharedDriveUploadController={sharedDriveUploadController}
+                      isUploadStatusIndicatorEnabled={isSharedDriveDirectUploadFeatureEnabled}
                     />
                   </div>
                   {isSharedDriveSearchViewOpen && (

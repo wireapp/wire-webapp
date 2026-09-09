@@ -89,6 +89,8 @@ export * from './searchIcon';
 export * from './servicesIcon';
 export * from './settingsIcon';
 export * from './shareLinkIcon';
+export * from './sharedDriveUploadCompletedIcon';
+export * from './sharedDriveUploadSpinnerIcon';
 export * from './showIcon';
 export * from './signIcon';
 export * from './sortIcon';

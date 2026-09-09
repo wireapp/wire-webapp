@@ -17,27 +17,51 @@
  *
  */
 
-import {useCallback, KeyboardEvent, MouseEvent, useEffect} from 'react';
+import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {SharedDriveUploadCompletedIcon, SharedDriveUploadSpinnerIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {KEY} from 'Util/keyboardUtil';
 
+import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
+import {
+  getLatestSharedDriveUploadStatus,
+  type SharedDriveUploadStatusKind,
+} from '../conversationCells/sharedDriveUploadStatus';
+
 interface ConversationTabsProps {
   activeTabIndex: number;
   onIndexChange: (index: number) => void;
   conversationQualifiedId: QualifiedId;
+  sharedDriveUploadController: SharedDriveUploadController;
+  isUploadStatusIndicatorEnabled: boolean;
 }
 
 const FILE_PATH = 'files';
 
-export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQualifiedId}: ConversationTabsProps) => {
+const toConversationQualifiedIdString = ({id, domain}: QualifiedId): string => `${id}@${domain}`;
+
+export const ConversationTabs = ({
+  activeTabIndex,
+  onIndexChange,
+  conversationQualifiedId,
+  sharedDriveUploadController,
+  isUploadStatusIndicatorEnabled,
+}: ConversationTabsProps) => {
   const {translate} = useApplicationContext();
   const filesUrl = generateConversationUrl({...conversationQualifiedId, filePath: FILE_PATH});
   const messagesUrl = generateConversationUrl(conversationQualifiedId);
+  const conversationQualifiedIdString = toConversationQualifiedIdString(conversationQualifiedId);
+  const readUploadStatusKind = useCallback(
+    () => getLatestSharedDriveUploadStatus(sharedDriveUploadController, conversationQualifiedIdString)?.kind ?? null,
+    [sharedDriveUploadController, conversationQualifiedIdString],
+  );
+  const [uploadStatusKind, setUploadStatusKind] = useState<SharedDriveUploadStatusKind | null>(readUploadStatusKind);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -79,6 +103,12 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQua
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [handleHashChange]);
 
+  useEffect(() => {
+    const updateUploadStatusKind = () => setUploadStatusKind(readUploadStatusKind());
+    updateUploadStatusKind();
+    return sharedDriveUploadController.subscribe(updateUploadStatusKind);
+  }, [readUploadStatusKind, sharedDriveUploadController]);
+
   return (
     <div className="conversation-tabs">
       <div className="conversation-tabs__list" role="tablist" aria-label={translate('conversationTabs')}>
@@ -96,6 +126,7 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQua
           id="files"
           label={translate('conversationDetailsActionCellsTitle')}
           isActive={activeTabIndex === 1}
+          uploadStatusKind={isUploadStatusIndicatorEnabled ? uploadStatusKind : null}
           onClick={event => {
             createNavigate(filesUrl)(event);
             onIndexChange(1);
@@ -111,11 +142,12 @@ interface ConversationTabProps {
   id: string;
   label: string;
   isActive: boolean;
+  uploadStatusKind?: SharedDriveUploadStatusKind | null;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
 }
 
-const ConversationTab = ({id, label, isActive, onClick, onKeyDown}: ConversationTabProps) => {
+const ConversationTab = ({id, label, isActive, uploadStatusKind = null, onClick, onKeyDown}: ConversationTabProps) => {
   return (
     <button
       id={`conversation-tab-${id}`}
@@ -127,7 +159,36 @@ const ConversationTab = ({id, label, isActive, onClick, onKeyDown}: Conversation
       onKeyDown={onKeyDown}
       className="conversation-tabs__button"
     >
-      {label}
+      <span className="conversation-tabs__button-content">
+        {label}
+        {uploadStatusKind && <SharedDriveTabUploadStatusIcon kind={uploadStatusKind} />}
+      </span>
     </button>
+  );
+};
+
+const SharedDriveTabUploadStatusIcon = ({kind}: {kind: SharedDriveUploadStatusKind}) => {
+  if (kind === 'uploading') {
+    return (
+      <SharedDriveUploadSpinnerIcon
+        className="conversation-tabs__upload-status-icon conversation-tabs__upload-status-icon--uploading"
+        width={16}
+        height={16}
+        data-uie-name="shared-drive-tab-upload-uploading"
+        data-testid="shared-drive-tab-upload-uploading"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  return (
+    <SharedDriveUploadCompletedIcon
+      className="conversation-tabs__upload-status-icon"
+      width={16}
+      height={16}
+      data-uie-name="shared-drive-tab-upload-completed"
+      data-testid="shared-drive-tab-upload-completed"
+      aria-hidden="true"
+    />
   );
 };
