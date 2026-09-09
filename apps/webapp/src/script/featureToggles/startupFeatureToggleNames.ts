@@ -23,6 +23,7 @@ export const viewerPermissionFeatureToggleName = 'viewer-permission';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upload';
 export const reactTranslationRenderingFeatureToggleName = 'react-translation-rendering';
+export const meetingsM2FeatureToggleName = 'meetings-m2';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
@@ -31,6 +32,7 @@ export const startupFeatureToggleNames = [
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   reactTranslationRenderingFeatureToggleName,
+  meetingsM2FeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

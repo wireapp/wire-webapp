@@ -27,6 +27,7 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   reactTranslationRenderingFeatureToggleName,
+  meetingsM2FeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
   viewerPermissionFeatureToggleName,
@@ -39,6 +40,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   reactTranslationRenderingFeatureToggleName,
+  meetingsM2FeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -75,12 +77,12 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
   });
 
-  it('does not treat meetings as a startup feature toggle', () => {
+  it('enables the meetings M2 feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=meetings`,
+      `?${startupFeatureToggleQueryParameterName}=${meetingsM2FeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsM2FeatureToggleName)).toBe(true);
   });
 
   it('keeps only whitelisted feature toggles when known and unknown values are mixed', () => {
@@ -184,6 +186,7 @@ describe('startupFeatureToggles', function () {
       disableMessagePreprocessingFeatureToggleName,
       sharedDriveDirectUploadFeatureToggleName,
       reactTranslationRenderingFeatureToggleName,
+      meetingsM2FeatureToggleName,
     ]);
   });
 
