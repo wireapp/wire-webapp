@@ -17,14 +17,17 @@
  *
  */
 
-import {useEffect} from 'react';
+import {ReactNode, useEffect} from 'react';
 
 import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/icon';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {afterRender} from 'Util/util';
 
 import {closeWarning, useWarningsState} from './WarningsState';
@@ -36,8 +39,59 @@ interface WarningProps {
   readonly onRefresh: () => void;
 }
 
+type PermissionRequestTranslationKey =
+  | 'warningPermissionRequestCamera'
+  | 'warningPermissionRequestMicrophone'
+  | 'warningPermissionRequestNotification'
+  | 'warningPermissionRequestScreen';
+
+type RenderPermissionRequestTranslationOptions = {
+  readonly icon: ReactNode;
+  readonly translate: Translate;
+  readonly translationKey: PermissionRequestTranslationKey;
+};
+
+type RenderPermissionRequestWarningMessageOptions = RenderPermissionRequestTranslationOptions & {
+  readonly isReactTranslationRenderingEnabled: boolean;
+  readonly legacyMessage: ReactNode;
+};
+
+const permissionRequestIconMarker = createReactTranslationMarker('permission-request-icon');
+
+function renderPermissionRequestTranslation(options: RenderPermissionRequestTranslationOptions): ReactNode[] {
+  const {icon, translate, translationKey} = options;
+  const iconSubstitution = permissionRequestIconMarker.substitution;
+  const translatedText = translate(translationKey, {icon: iconSubstitution}, {icon: iconSubstitution});
+
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [],
+    nodeReplacements: [
+      {
+        marker: permissionRequestIconMarker,
+        render() {
+          return icon;
+        },
+      },
+    ],
+    valueReplacements: [],
+  });
+}
+
+function renderPermissionRequestWarningMessage(options: RenderPermissionRequestWarningMessageOptions): ReactNode {
+  const {icon, isReactTranslationRenderingEnabled, legacyMessage, translate, translationKey} = options;
+
+  if (isReactTranslationRenderingEnabled) {
+    return (
+      <div className="warning-bar-message">{renderPermissionRequestTranslation({icon, translate, translationKey})}</div>
+    );
+  }
+
+  return legacyMessage;
+}
+
 const WarningsContainer = ({onRefresh}: WarningProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const name = useWarningsState(state => state.name);
   const warnings = useWarningsState(state => state.warnings);
   const type = TYPE;
@@ -61,6 +115,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
 
   const brandName = Config.getConfig().BRAND_NAME;
   const URL = Config.getConfig().URL;
+  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   const closeButton = (
     <button
@@ -79,14 +134,22 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
     <div className={cx('warning', {'warning-dimmed': warningDimmed})}>
       {visibleWarning === type.REQUEST_CAMERA && (
         <div data-uie-name="request-camera" className="warning-bar warning-bar-feature">
-          <div
-            className="warning-bar-message"
-            dangerouslySetInnerHTML={{
-              __html: translate('warningPermissionRequestCamera', undefined, {
-                icon: "<span class='warning-bar-icon icon-camera'></span>",
-              }),
-            }}
-          />
+          {renderPermissionRequestWarningMessage({
+            icon: <span className="warning-bar-icon icon-camera" />,
+            isReactTranslationRenderingEnabled,
+            legacyMessage: (
+              <div
+                className="warning-bar-message"
+                dangerouslySetInnerHTML={{
+                  __html: translate('warningPermissionRequestCamera', undefined, {
+                    icon: "<span class='warning-bar-icon icon-camera'></span>",
+                  }),
+                }}
+              />
+            ),
+            translate,
+            translationKey: 'warningPermissionRequestCamera',
+          })}
           {closeButton}
         </div>
       )}
@@ -108,12 +171,22 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       )}
       {visibleWarning === type.REQUEST_MICROPHONE && (
         <div data-uie-name="request-microphone" className="warning-bar warning-bar-feature">
-          <div className="warning-bar-message">
-            <Icon.MicOnIcon className="warning-bar-icon" />
-            <span
-              dangerouslySetInnerHTML={{__html: translate('warningPermissionRequestMicrophone', undefined, {icon: ''})}}
-            />
-          </div>
+          {renderPermissionRequestWarningMessage({
+            icon: <Icon.MicOnIcon className="warning-bar-icon" />,
+            isReactTranslationRenderingEnabled,
+            legacyMessage: (
+              <div className="warning-bar-message">
+                <Icon.MicOnIcon className="warning-bar-icon" />
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: translate('warningPermissionRequestMicrophone', undefined, {icon: ''}),
+                  }}
+                />
+              </div>
+            ),
+            translate,
+            translationKey: 'warningPermissionRequestMicrophone',
+          })}
           {closeButton}
         </div>
       )}
@@ -135,14 +208,22 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       )}
       {visibleWarning === type.REQUEST_SCREEN && (
         <div data-uie-name="request-screen" className="warning-bar warning-bar-feature">
-          <div
-            className="warning-bar-message"
-            dangerouslySetInnerHTML={{
-              __html: translate('warningPermissionRequestScreen', undefined, {
-                icon: "<span class='warning-bar-icon icon-screensharing'></span>",
-              }),
-            }}
-          />
+          {renderPermissionRequestWarningMessage({
+            icon: <span className="warning-bar-icon icon-screensharing" />,
+            isReactTranslationRenderingEnabled,
+            legacyMessage: (
+              <div
+                className="warning-bar-message"
+                dangerouslySetInnerHTML={{
+                  __html: translate('warningPermissionRequestScreen', undefined, {
+                    icon: "<span class='warning-bar-icon icon-screensharing'></span>",
+                  }),
+                }}
+              />
+            ),
+            translate,
+            translationKey: 'warningPermissionRequestScreen',
+          })}
           {closeButton}
         </div>
       )}
@@ -196,14 +277,22 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       )}
       {visibleWarning === type.REQUEST_NOTIFICATION && (
         <div data-uie-name="request-notification" className="warning-bar warning-bar-feature">
-          <div
-            className="warning-bar-message"
-            dangerouslySetInnerHTML={{
-              __html: translate('warningPermissionRequestNotification', undefined, {
-                icon: "<span class='warning-bar-icon icon-envelope'></span>",
-              }),
-            }}
-          />
+          {renderPermissionRequestWarningMessage({
+            icon: <span className="warning-bar-icon icon-envelope" />,
+            isReactTranslationRenderingEnabled,
+            legacyMessage: (
+              <div
+                className="warning-bar-message"
+                dangerouslySetInnerHTML={{
+                  __html: translate('warningPermissionRequestNotification', undefined, {
+                    icon: "<span class='warning-bar-icon icon-envelope'></span>",
+                  }),
+                }}
+              />
+            ),
+            translate,
+            translationKey: 'warningPermissionRequestNotification',
+          })}
           {closeButton}
         </div>
       )}

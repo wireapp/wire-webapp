@@ -78,6 +78,7 @@ function renderCompleteFailureToSendWarning(options: RenderCompleteFailureToSend
               },
             },
           ],
+          nodeReplacements: [],
           valueReplacements,
         })}
       </span>

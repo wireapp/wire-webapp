@@ -19,6 +19,9 @@
 
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 
+import en from 'I18n/en-US.json';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
@@ -33,6 +36,35 @@ import {Warnings} from '.';
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
+const legacyTranslationRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate}),
+);
+const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    isFeatureToggleEnabled(featureName) {
+      return featureName === reactTranslationRenderingFeatureToggleName;
+    },
+    translate,
+  }),
+);
+
+type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
+
+function withTranslationStrings(
+  strings: typeof en,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
+  return async function runTranslationTest(): Promise<void> {
+    setStrings({en: strings});
+
+    try {
+      await testFunction();
+    } finally {
+      setStrings({en});
+    }
+  };
+}
 
 describe('WarningsContainer', () => {
   beforeEach(() => {
@@ -133,6 +165,126 @@ describe('WarningsContainer', () => {
     const WarningElement = getByTestId('request-notification');
     expect(WarningElement).toBeTruthy();
   });
+
+  it(
+    'keeps legacy permission request rendering when React translation rendering is disabled',
+    withTranslationStrings(en, () => {
+      const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
+        wrapper: legacyTranslationRootProviderWrapper,
+      });
+      act(() => {
+        Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);
+      });
+
+      expect(container.querySelector('.warning-bar-message')).toHaveTextContent('Allow access to camera');
+      expect(container.querySelector('.icon-camera')).toBeTruthy();
+    }),
+  );
+
+  it(
+    'renders the camera permission request icon as a React node',
+    withTranslationStrings(en, () => {
+      const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
+        wrapper: reactTranslationRenderingRootProviderWrapper,
+      });
+      act(() => {
+        Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);
+      });
+
+      expect(container.querySelector('.warning-bar-message')).toHaveTextContent('Allow access to camera');
+      expect(container.querySelector('.icon-camera')).toBeTruthy();
+    }),
+  );
+
+  it(
+    'renders exactly one microphone permission request icon as a React node',
+    withTranslationStrings(en, () => {
+      const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
+        wrapper: reactTranslationRenderingRootProviderWrapper,
+      });
+      act(() => {
+        Warnings.showWarning(Warnings.TYPE.REQUEST_MICROPHONE);
+      });
+
+      expect(container.querySelector('.warning-bar-message')).toHaveTextContent('Allow access to microphone');
+      expect(container.querySelectorAll('.warning-bar-icon')).toHaveLength(1);
+    }),
+  );
+
+  it(
+    'renders the screen and notification permission request icons as React nodes',
+    withTranslationStrings(en, () => {
+      const {container: screenContainer} = render(<WarningsContainer onRefresh={jest.fn()} />, {
+        wrapper: reactTranslationRenderingRootProviderWrapper,
+      });
+      act(() => {
+        Warnings.showWarning(Warnings.TYPE.REQUEST_SCREEN);
+      });
+
+      expect(screenContainer.querySelector('.warning-bar-message')).toHaveTextContent('Allow access to screen');
+      expect(screenContainer.querySelector('.icon-screensharing')).toBeTruthy();
+
+      cleanup();
+      act(() => {
+        Warnings.hideWarning();
+      });
+
+      const {container: notificationContainer} = render(<WarningsContainer onRefresh={jest.fn()} />, {
+        wrapper: reactTranslationRenderingRootProviderWrapper,
+      });
+      act(() => {
+        Warnings.showWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
+      });
+
+      expect(notificationContainer.querySelector('.warning-bar-message')).toHaveTextContent('Allow notifications');
+      expect(notificationContainer.querySelector('.icon-envelope')).toBeTruthy();
+    }),
+  );
+
+  it(
+    'follows a translated permission icon marker moved after the text',
+    withTranslationStrings(
+      {
+        ...en,
+        warningPermissionRequestCamera: 'Allow access to camera [icon]',
+      },
+      () => {
+        const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
+          wrapper: reactTranslationRenderingRootProviderWrapper,
+        });
+        act(() => {
+          Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);
+        });
+
+        const warningMessage = container.querySelector('.warning-bar-message');
+        expect(warningMessage).toHaveTextContent('Allow access to camera');
+        expect(warningMessage?.querySelector('.icon-camera')).toBeTruthy();
+      },
+    ),
+  );
+
+  it(
+    'keeps unsupported permission translation markup as text',
+    withTranslationStrings(
+      {
+        ...en,
+        warningPermissionRequestCamera: '<img src="example">[icon] Allow access to camera',
+      },
+      () => {
+        const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
+          wrapper: reactTranslationRenderingRootProviderWrapper,
+        });
+        act(() => {
+          Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);
+        });
+
+        const warningMessage = container.querySelector('.warning-bar-message');
+        expect(warningMessage).toHaveTextContent('<img src="example"> Allow access to camera');
+        expect(warningMessage?.querySelector('img')).toBeNull();
+        expect(warningMessage?.querySelector('.icon-camera')).toBeTruthy();
+      },
+    ),
+  );
 
   it('correctly renders warning of type unsupported_incoming_call', () => {
     const {getByTestId} = render(<WarningsContainer onRefresh={jest.fn()} />, {wrapper: rootProviderWrapper});

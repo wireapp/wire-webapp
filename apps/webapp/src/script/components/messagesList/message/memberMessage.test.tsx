@@ -59,15 +59,21 @@ const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperFo
 );
 
 type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
 
-async function withTranslationStrings(strings: typeof en, testFunction: TranslationTestFunction): Promise<void> {
-  setStrings({en: strings});
+function withTranslationStrings(
+  strings: typeof en,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
+  return async function runTranslationTest(): Promise<void> {
+    setStrings({en: strings});
 
-  try {
-    await testFunction();
-  } finally {
-    setStrings({en});
-  }
+    try {
+      await testFunction();
+    } finally {
+      setStrings({en});
+    }
+  };
 }
 
 function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
@@ -350,8 +356,9 @@ describe('MemberMessage', () => {
       expect(container.textContent).toContain('You started the conversation');
     });
 
-    it('renders supported bold translation markup as a React element when the feature toggle is enabled', async () => {
-      await withTranslationStrings(
+    it(
+      'renders supported bold translation markup as a React element when the feature toggle is enabled',
+      withTranslationStrings(
         {
           ...en,
           conversationCreatedNameYou: '[bold]You[/bold] started the conversation',
@@ -385,8 +392,8 @@ describe('MemberMessage', () => {
           expect(strongElements).toHaveLength(1);
           expect(strongElements?.[0]).toHaveTextContent('You');
         },
-      );
-    });
+      ),
+    );
 
     it('renders another sender name as React text when the feature toggle is enabled', () => {
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
@@ -449,8 +456,9 @@ describe('MemberMessage', () => {
       expect(strongElements?.[0]).toHaveTextContent('[bold]Admin[/bold]');
     });
 
-    it('renders the sender name outside formatting when the translation places it outside formatting', async () => {
-      await withTranslationStrings(
+    it(
+      'renders the sender name outside formatting when the translation places it outside formatting',
+      withTranslationStrings(
         {
           ...en,
           conversationCreatedName: '{name} started the conversation',
@@ -483,11 +491,12 @@ describe('MemberMessage', () => {
           expect(groupCreationHeader?.textContent).toBe('Alice started the conversation');
           expect(groupCreationHeader?.querySelector('strong')).toBeNull();
         },
-      );
-    });
+      ),
+    );
 
-    it('follows translated word order and formatting around the sender name', async () => {
-      await withTranslationStrings(
+    it(
+      'follows translated word order and formatting around the sender name',
+      withTranslationStrings(
         {
           ...en,
           conversationCreatedName: 'Conversation started by [bold]{name}[/bold]',
@@ -521,11 +530,12 @@ describe('MemberMessage', () => {
           expect(groupCreationHeader?.querySelectorAll('strong')).toHaveLength(1);
           expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('Alice');
         },
-      );
-    });
+      ),
+    );
 
-    it('keeps a markup-like sender name literal when the translation places it outside formatting', async () => {
-      await withTranslationStrings(
+    it(
+      'keeps a markup-like sender name literal when the translation places it outside formatting',
+      withTranslationStrings(
         {
           ...en,
           conversationCreatedName: '{name} started the conversation',
@@ -558,11 +568,12 @@ describe('MemberMessage', () => {
           expect(groupCreationHeader?.textContent).toBe('[bold]Admin[/bold] started the conversation');
           expect(groupCreationHeader?.querySelector('strong')).toBeNull();
         },
-      );
-    });
+      ),
+    );
 
-    it('renders arbitrary image markup as text when the feature toggle is enabled', async () => {
-      await withTranslationStrings(
+    it(
+      'renders arbitrary image markup as text when the feature toggle is enabled',
+      withTranslationStrings(
         {
           ...en,
           conversationCreatedNameYou: '<img src="example">[bold]You[/bold] started the conversation',
@@ -595,11 +606,12 @@ describe('MemberMessage', () => {
           expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('You');
           expect(container.querySelector('img')).toBeNull();
         },
-      );
-    });
+      ),
+    );
 
-    it('renders arbitrary meta markup as text when the feature toggle is enabled', async () => {
-      await withTranslationStrings(
+    it(
+      'renders arbitrary meta markup as text when the feature toggle is enabled',
+      withTranslationStrings(
         {
           ...en,
           conversationCreatedNameYou: '<meta name="example" content="value">[bold]You[/bold] started the conversation',
@@ -634,8 +646,8 @@ describe('MemberMessage', () => {
           expect(groupCreationHeader?.querySelector('strong')).toHaveTextContent('You');
           expect(container.querySelector('meta')).toBeNull();
         },
-      );
-    });
+      ),
+    );
   });
 
   describe('MEMBER_JOIN', () => {

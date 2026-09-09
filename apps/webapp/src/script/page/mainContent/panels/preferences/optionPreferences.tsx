@@ -31,8 +31,11 @@ import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {Config} from 'src/script/Config';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
@@ -60,9 +63,58 @@ const notificationPreferenceValues = {
 } as const satisfies Record<'NONE' | 'OBFUSCATE' | 'OBFUSCATE_MESSAGE' | 'ON', NotificationPreferenceValue>;
 
 const fontSizes = Object.values(RootFontSize);
+const emojiIconMarker = createReactTranslationMarker('emoji-preference-icon');
+
+type RenderEmojiReplaceDetailOptions = {
+  readonly isReactTranslationRenderingEnabled: boolean;
+  readonly translate: Translate;
+};
+
+function renderEmojiReplaceDetail(options: RenderEmojiReplaceDetailOptions): React.ReactNode {
+  const {isReactTranslationRenderingEnabled, translate} = options;
+
+  if (isReactTranslationRenderingEnabled) {
+    const iconSubstitution = emojiIconMarker.substitution;
+    const translatedText = translate(
+      'preferencesOptionsEmojiReplaceDetail',
+      {icon: iconSubstitution},
+      {icon: iconSubstitution},
+    );
+
+    return (
+      <p className="preferences-detail preferences-detail-intended" aria-hidden="true">
+        {renderReactTranslation({
+          translatedText,
+          componentReplacements: [],
+          nodeReplacements: [
+            {
+              marker: emojiIconMarker,
+              render() {
+                return <span className="font-size-xs icon-emoji" />;
+              },
+            },
+          ],
+          valueReplacements: [],
+        })}
+      </p>
+    );
+  }
+
+  return (
+    <p
+      className="preferences-detail preferences-detail-intended"
+      aria-hidden="true"
+      dangerouslySetInnerHTML={{
+        __html: translate('preferencesOptionsEmojiReplaceDetail', undefined, {
+          icon: "<span class='font-size-xs icon-emoji'></span>",
+        }),
+      }}
+    />
+  );
+}
 
 const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {
     properties: {settings},
@@ -153,6 +205,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
 
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
   const isLinkPreviewsEnabled = Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS;
+  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   return (
     <PreferencesPage title={translate('preferencesOptions')}>
@@ -255,15 +308,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
                 </CheckboxLabel>
               </Checkbox>
 
-              <p
-                className="preferences-detail preferences-detail-intended"
-                aria-hidden="true"
-                dangerouslySetInnerHTML={{
-                  __html: translate('preferencesOptionsEmojiReplaceDetail', undefined, {
-                    icon: "<span class='font-size-xs icon-emoji'></span>",
-                  }),
-                }}
-              />
+              {renderEmojiReplaceDetail({isReactTranslationRenderingEnabled, translate})}
             </div>
 
             {isMessageFormatButtonsFlagEnabled && (

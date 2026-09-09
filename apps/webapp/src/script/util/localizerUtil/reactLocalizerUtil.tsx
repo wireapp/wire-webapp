@@ -49,9 +49,15 @@ export type ReactTranslationValueReplacement = {
   readonly runtimeText: string;
 };
 
+export type ReactTranslationNodeReplacement = {
+  readonly marker: ReactTranslationMarker;
+  render(): ReactNode;
+};
+
 type RenderReactTranslationOptions = {
   readonly translatedText: string;
   readonly componentReplacements: readonly ReactTranslationComponentReplacement[];
+  readonly nodeReplacements: readonly ReactTranslationNodeReplacement[];
   readonly valueReplacements: readonly ReactTranslationValueReplacement[];
 };
 
@@ -72,7 +78,7 @@ export function createReactTranslationMarker(markerName: string): ReactTranslati
 }
 
 export function renderReactTranslation(options: RenderReactTranslationOptions): React.ReactNode[] {
-  const {translatedText, componentReplacements, valueReplacements} = options;
+  const {translatedText, componentReplacements, nodeReplacements, valueReplacements} = options;
 
   const renderedValueReplacements = valueReplacements.map(valueReplacement => {
     return {
@@ -84,8 +90,20 @@ export function renderReactTranslation(options: RenderReactTranslationOptions): 
     };
   });
 
-  function renderRuntimeValues(text: string): React.ReactNode[] {
-    return replaceReactComponents(text, renderedValueReplacements);
+  const renderedNodeReplacements = nodeReplacements.map(nodeReplacement => {
+    return {
+      start: nodeReplacement.marker.start,
+      end: nodeReplacement.marker.end,
+      render() {
+        return nodeReplacement.render();
+      },
+    };
+  });
+
+  const renderedNestedReplacements = [...renderedValueReplacements, ...renderedNodeReplacements];
+
+  function renderNestedReplacements(text: string): React.ReactNode[] {
+    return replaceReactComponents(text, renderedNestedReplacements);
   }
 
   const renderedComponentReplacements = componentReplacements.map(componentReplacement => {
@@ -93,12 +111,16 @@ export function renderReactTranslation(options: RenderReactTranslationOptions): 
       start: componentReplacement.start,
       end: componentReplacement.end,
       render(text: string) {
-        return componentReplacement.render(renderRuntimeValues(text));
+        return componentReplacement.render(renderNestedReplacements(text));
       },
     };
   });
 
-  return replaceReactComponents(translatedText, [...renderedComponentReplacements, ...renderedValueReplacements]);
+  return replaceReactComponents(translatedText, [
+    ...renderedComponentReplacements,
+    ...renderedValueReplacements,
+    ...renderedNodeReplacements,
+  ]);
 }
 
 /**
