@@ -23,7 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, CalendarIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CallIcon, CalendarIcon} from '@wireapp/react-ui-kit';
 
 import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
 import {UserState} from 'Repositories/user/userState';
@@ -36,6 +36,7 @@ import {
   meetingNotificationCardActionsStyles,
   meetingNotificationCardActionStyles,
   meetingNotificationCardContainerStyles,
+  meetingNotificationCardJoinIconStyles,
   meetingNotificationCardMetadataStyles,
   meetingNotificationCardOngoingTimeStyles,
   meetingNotificationCardTitleStyles,
@@ -76,14 +77,13 @@ const MeetingNotificationJoinButton = ({
       variant={ButtonVariant.PRIMARY}
       css={meetingNotificationCardActionStyles}
       type="button"
-      onClick={() => {
-        joinMeeting();
-      }}
+      onClick={joinMeeting}
       disabled={isJoinDisabled}
       showLoading={isJoining || isCallConnecting}
       aria-label={translate('callJoin')}
       data-uie-name="join-meeting-call"
     >
+      <CallIcon aria-hidden="true" css={meetingNotificationCardJoinIconStyles} />
       {translate('callJoin')}
     </Button>
   );
@@ -197,7 +197,7 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
         }}
         aria-label={translate('meetings.notifications.view')}
       >
-        <CalendarIcon css={meetingNotificationViewBtnStyles} aria-hidden="true" />{' '}
+        <CalendarIcon css={meetingNotificationViewBtnStyles} aria-hidden="true" />
         {translate('meetings.notifications.view')}
       </Button>
     );
