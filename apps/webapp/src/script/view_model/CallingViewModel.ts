@@ -35,6 +35,7 @@ import type {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {isMeetingConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -49,7 +50,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {ROLE} from 'Repositories/user/userPermission';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import {replaceLink, type Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
@@ -128,6 +129,10 @@ export class CallingViewModel {
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, toggleState); // This event needs to be kept, it is sent by the wrapper
 
     const ring = (call: Call): void => {
+      if (isMeetingConversation(call.conversation)) {
+        return;
+      }
+
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
         [CALL_STATE.INCOMING]: AudioType.INCOMING_CALL,
         [CALL_STATE.OUTGOING]: AudioType.OUTGOING_CALL,

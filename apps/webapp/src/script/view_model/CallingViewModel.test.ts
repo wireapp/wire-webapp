@@ -18,14 +18,22 @@
  */
 
 import {STATE} from '@wireapp/avs';
+import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {type Translate, translate} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
-import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from './CallingViewModel.mocks';
+import {
+  buildCall,
+  buildCallingViewModel,
+  callState,
+  mockAudioRepository,
+  mockCallingRepository,
+} from './CallingViewModel.mocks';
+import {AudioType} from 'Repositories/audio/audioType';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -35,6 +43,8 @@ describe('CallingViewModel', () => {
   afterEach(() => {
     callState.calls.removeAll();
     PrimaryModal.show = originalPrimaryModalShow;
+    (mockCallingRepository.startCall as jest.Mock).mockReset();
+    (mockAudioRepository.loop as jest.Mock).mockClear();
     jest.clearAllMocks();
   });
 
@@ -76,6 +86,30 @@ describe('CallingViewModel', () => {
       const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       await callingViewModel.callActions.startAudio(conversation);
       expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation);
+    });
+
+    it('does not ring for a scheduled meeting call', async () => {
+      const [callingViewModel] = buildCallingViewModel(translateForTest);
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
+      conversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+      const call = buildCall(conversation);
+      (mockCallingRepository.startCall as jest.Mock).mockResolvedValue(call);
+
+      await callingViewModel.callActions.startAudio(conversation);
+
+      expect(mockAudioRepository.loop).not.toHaveBeenCalled();
+    });
+
+    it('rings for a regular call', async () => {
+      const [callingViewModel] = buildCallingViewModel(translateForTest);
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const call = buildCall(conversation);
+      call.state(STATE.OUTGOING);
+      (mockCallingRepository.startCall as jest.Mock).mockResolvedValue(call);
+
+      await callingViewModel.callActions.startAudio(conversation);
+
+      expect(mockAudioRepository.loop).toHaveBeenCalledWith(AudioType.OUTGOING_CALL);
     });
 
     it('lets the user leave previous call before starting a new one', async () => {

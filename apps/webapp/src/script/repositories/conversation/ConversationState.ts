@@ -29,14 +29,14 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
 import {
-  MLSConversation,
-  ProteusConversation,
+  isMeetingConversation,
   isMLS1to1ConversationWithUser,
   isMLSConversation,
   isProteus1to1ConversationWithUser,
-  isSelfConversation,
   isReadableConversation,
-  isConversationForScheduledMeeting,
+  isSelfConversation,
+  MLSConversation,
+  ProteusConversation,
 } from './ConversationSelectors';
 
 @singleton()
@@ -79,7 +79,7 @@ export class ConversationState {
   ) {
     this.sortedConversations = ko.pureComputed(() =>
       this.filteredConversations()
-        .filter(conversation => !isConversationForScheduledMeeting(conversation))
+        .filter(conversation => !isMeetingConversation(conversation))
         .toSorted(sortGroupsByLastEvent),
     );
     this.selfProteusConversation = ko.pureComputed(() =>
