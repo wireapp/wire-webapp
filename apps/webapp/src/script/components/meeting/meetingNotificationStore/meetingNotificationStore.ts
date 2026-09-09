@@ -32,6 +32,7 @@ export enum MeetingNotificationKind {
 
 type MeetingNotificationBase = {
   qualifiedId: QualifiedId;
+  qualifiedConversationId: QualifiedId;
   meetingTitle: string;
   meetingStartTime: string;
 };
@@ -79,9 +80,10 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
         match(input)
           .with(
             {kind: MeetingNotificationKind.INVITE},
-            ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
+            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
               kind,
               qualifiedId,
+              qualifiedConversationId,
               meetingTitle,
               id: `meeting-notification-${nextNotificationId++}`,
               qualifiedCreator,
@@ -90,9 +92,10 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
           )
           .with(
             {kind: MeetingNotificationKind.UPDATE},
-            ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
+            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
               kind,
               qualifiedId,
+              qualifiedConversationId,
               meetingTitle,
               id: `meeting-notification-${nextNotificationId++}`,
               qualifiedCreator,
@@ -101,9 +104,10 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
           )
           .with(
             {kind: MeetingNotificationKind.CANCELLED},
-            ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
+            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
               kind,
               qualifiedId,
+              qualifiedConversationId,
               meetingTitle,
               id: `meeting-notification-${nextNotificationId++}`,
               qualifiedCreator,
@@ -112,9 +116,10 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
           )
           .with(
             {kind: MeetingNotificationKind.ONGOING},
-            ({kind, qualifiedId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
+            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
               kind,
               qualifiedId,
+              qualifiedConversationId,
               meetingTitle,
               id: `meeting-notification-${nextNotificationId++}`,
               qualifiedCreator,
@@ -131,7 +136,7 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
 
       return {
         notifications,
-        ...(state.notifications.length > 0 && notifications.length === 0 ? {isExpanded: false} : {}),
+        isExpanded: notifications.length === 0 ? false : state.isExpanded,
       };
     }),
   dismissNotificationsForMeeting: (meetingId, kinds) =>

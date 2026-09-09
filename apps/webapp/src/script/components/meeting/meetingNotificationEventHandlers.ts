@@ -80,6 +80,7 @@ export const createMeetingNotificationEventHandlers = ({
       meetingTitle: meeting.title,
       meetingStartTime: meeting.series_start_date,
       qualifiedId: meeting.qualified_id,
+      qualifiedConversationId: meeting.qualified_conversation,
     };
 
     addNotification({...notificationBase, kind, qualifiedCreator: meeting.qualified_creator});

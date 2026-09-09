@@ -38,6 +38,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
+const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
@@ -68,6 +69,7 @@ describe('MeetingNotificationCard', () => {
       kind: MeetingNotificationKind.INVITE,
       meetingTitle: 'meeting Title',
       qualifiedId,
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     },
@@ -76,6 +78,7 @@ describe('MeetingNotificationCard', () => {
       kind: MeetingNotificationKind.UPDATE,
       meetingTitle: 'meeting Title',
       qualifiedId,
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     },
@@ -84,6 +87,7 @@ describe('MeetingNotificationCard', () => {
       kind: MeetingNotificationKind.CANCELLED,
       meetingTitle: 'meeting Title',
       qualifiedId,
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime,
     },
@@ -92,6 +96,7 @@ describe('MeetingNotificationCard', () => {
       kind: MeetingNotificationKind.ONGOING,
       meetingTitle: 'meeting Title',
       qualifiedId,
+      qualifiedConversationId,
       qualifiedCreator,
       meetingStartTime: ongoingMeetingStartTime,
     },
@@ -147,6 +152,7 @@ describe('MeetingNotificationCard', () => {
         kind={MeetingNotificationKind.ONGOING}
         meetingTitle="Meeting Title"
         qualifiedId={qualifiedId}
+        qualifiedConversationId={qualifiedConversationId}
         qualifiedCreator={qualifiedCreator}
         meetingStartTime={ongoingMeetingStartTime}
         onDismiss={jest.fn()}
@@ -165,6 +171,7 @@ describe('MeetingNotificationCard', () => {
         kind={MeetingNotificationKind.CANCELLED}
         meetingTitle="Meeting Title"
         qualifiedId={qualifiedId}
+        qualifiedConversationId={qualifiedConversationId}
         qualifiedCreator={qualifiedCreator}
         meetingStartTime={meetingStartTime}
         onDismiss={onDismiss}
@@ -180,6 +187,7 @@ describe('MeetingNotificationCard', () => {
           kind={MeetingNotificationKind.INVITE}
           meetingTitle="Meeting Title"
           qualifiedId={qualifiedId}
+          qualifiedConversationId={qualifiedConversationId}
           qualifiedCreator={qualifiedCreator}
           meetingStartTime={meetingStartTime}
           onDismiss={onDismiss}
@@ -200,6 +208,7 @@ describe('MeetingNotificationCard', () => {
         kind={MeetingNotificationKind.INVITE}
         meetingTitle="Meeting Title"
         qualifiedId={qualifiedId}
+        qualifiedConversationId={qualifiedConversationId}
         qualifiedCreator={qualifiedCreator}
         meetingStartTime={meetingStartTime}
         onDismiss={jest.fn()}
@@ -222,6 +231,7 @@ describe('MeetingNotificationCard', () => {
           kind={MeetingNotificationKind.INVITE}
           meetingTitle="Cleopatra's meeting"
           qualifiedId={qualifiedId}
+          qualifiedConversationId={qualifiedConversationId}
           qualifiedCreator={qualifiedCreator}
           meetingStartTime={meetingStartTime}
           onDismiss={jest.fn()}
@@ -251,6 +261,7 @@ describe('MeetingNotificationCard', () => {
             kind={MeetingNotificationKind.INVITE}
             meetingTitle="Meeting Title"
             qualifiedId={qualifiedId}
+            qualifiedConversationId={qualifiedConversationId}
             qualifiedCreator={qualifiedCreator}
             meetingStartTime={meetingStartTime}
             onDismiss={jest.fn()}
