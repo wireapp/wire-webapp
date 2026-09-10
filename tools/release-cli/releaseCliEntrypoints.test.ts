@@ -39,6 +39,10 @@ const releaseMetadataEntrypointPath = join(process.cwd(), 'tools/release-cli/rel
 const productionDistributionEntrypointPath = join(process.cwd(), 'tools/release-cli/productionDistributionCli.mts');
 const releaseAppearanceEntrypointPath = join(process.cwd(), 'tools/release-cli/releaseAppearanceCommand.mts');
 const previewNextBetaEntrypointPath = join(process.cwd(), 'tools/release-cli/previewNextBetaCommand.mts');
+const webAppVersionSynchronizationEntrypointPath = join(
+  process.cwd(),
+  'tools/release-cli/webappVersionSynchronization.mts',
+);
 const ensureProductionGitHubReleaseEntrypointPath = join(
   process.cwd(),
   'tools/release-cli/ensureProductionGitHubRelease.mts',
@@ -126,6 +130,22 @@ describe('ensure Production GitHub Release CLI entrypoint', () => {
 
     expect(actualResult.exitCode).toBe(1);
     expect(actualResult.standardError).toContain("error: missing required argument 'production-tag'");
+  });
+});
+
+describe('WebApp version synchronization CLI entrypoint', () => {
+  it('writes help to standard output without requiring runtime credentials', () => {
+    const actualResult = runNativeCommand(webAppVersionSynchronizationEntrypointPath, ['--help']);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toContain('Usage: webappVersionSynchronization');
+  });
+
+  it('rejects a missing synchronization command without contacting GitHub', () => {
+    const actualResult = runNativeCommand(webAppVersionSynchronizationEntrypointPath, ['inspect']);
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.standardError).toContain("error: missing required argument 'release-identifier'");
   });
 });
 

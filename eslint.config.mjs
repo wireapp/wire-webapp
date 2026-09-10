@@ -93,7 +93,7 @@ const legacySettings = {
     version: 'detect',
   },
   'import/parsers': {
-    '@typescript-eslint/parser': ['.js', '.jsx', '.ts', '.tsx'],
+    '@typescript-eslint/parser': ['.js', '.jsx', '.ts', '.tsx', '.mts'],
   },
   'import/resolver': {
     typescript: {
@@ -344,7 +344,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx}', 'tools/release-cli/webappVersionSynchronization.mts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -443,6 +443,15 @@ const productionConfigs = [
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
+      },
+    },
+  },
+  {
+    files: ['tools/release-cli/webappVersionSynchronization.mts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.release-cli.json',
+        projectService: false,
       },
     },
   },
