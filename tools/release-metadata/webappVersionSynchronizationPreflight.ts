@@ -53,6 +53,7 @@ export function decideWebAppVersionSynchronizationPreflight(
   inspection: WebAppVersionSynchronizationInspection,
 ): WebAppVersionSynchronizationPreflightDecision {
   return match(inspection)
+    .returnType<WebAppVersionSynchronizationPreflightDecision>()
     .with({kind: P.union('available', 'matching-open', 'matching-merged')}, allowedInspection => {
       return {
         state: 'allowed',
