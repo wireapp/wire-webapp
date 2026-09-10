@@ -54,6 +54,14 @@ export function isGroupMLSConversation(conversation: Conversation): conversation
   return isMLSConversation(conversation) && conversation.isGroupOrChannel();
 }
 
+/** MLS groups cannot target read receipts to individual members yet. */
+export function supportsReadReceipts(conversation: Conversation): boolean {
+  return (
+    !conversation.isGroupOrChannel() ||
+    (conversation.protocol !== CONVERSATION_PROTOCOL.MIXED && conversation.protocol !== CONVERSATION_PROTOCOL.MLS)
+  );
+}
+
 export function isSelfConversation(conversation: Conversation): boolean {
   return conversation.type() === CONVERSATION_TYPE.SELF;
 }

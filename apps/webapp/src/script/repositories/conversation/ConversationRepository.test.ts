@@ -3281,6 +3281,17 @@ describe('ConversationRepository', () => {
   });
 
   describe('shouldSendReadReceipt', () => {
+    it.each([CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
+      'does not expect group read receipts for %s even with a stale enabled setting',
+      protocol => {
+        const conversation = _generateConversation({type: CONVERSATION_TYPE.REGULAR, protocol});
+        conversation.teamId = 'team';
+        conversation.receiptMode(RECEIPT_MODE.ON);
+
+        expect(testFactory.conversation_repository.expectReadReceipt(conversation)).toBe(false);
+      },
+    );
+
     it('uses the account preference for 1:1 conversations', () => {
       // Set a receipt mode on account-level
       const preferenceMode = RECEIPT_MODE.ON;
@@ -3736,12 +3747,61 @@ describe('ConversationRepository', () => {
   });
 
   describe('updateConversationProtocol', () => {
+    it('clears receipt mode when another client starts migration', async () => {
+      const conversation = _generateConversation({type: CONVERSATION_TYPE.REGULAR});
+      conversation.receiptMode(RECEIPT_MODE.ON);
+      const repository = await testFactory.exposeConversationActors();
+      jest.spyOn(repository['conversationService'], 'saveConversationStateInDb').mockResolvedValue(conversation);
+      jest
+        .spyOn(repository['conversationService'], 'getConversationById')
+        .mockResolvedValue(generateAPIConversation({protocol: CONVERSATION_PROTOCOL.MIXED}));
+      const eventHandler = repository as unknown as {
+        addEventToConversation: ConversationRepository['addEventToConversation'];
+      };
+      jest.spyOn(eventHandler, 'addEventToConversation').mockResolvedValue({
+        conversationEntity: conversation,
+        messageEntity: new Message('protocol-update', undefined, translateForTest),
+      });
+      const event = {
+        data: {protocol: CONVERSATION_PROTOCOL.MIXED},
+        qualified_conversation: conversation.qualifiedId,
+        time: '2020-10-13T14:00:00.000Z',
+        type: CONVERSATION_EVENT.PROTOCOL_UPDATE,
+      } as ConversationProtocolUpdateEvent;
+
+      await repository['onProtocolUpdate'](conversation, event);
+
+      expect(conversation.receiptMode()).toBe(RECEIPT_MODE.OFF);
+    });
+
+    it.each([CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
+      'clears and persists group receipt mode when refreshing protocol %s',
+      async protocol => {
+        const conversation = _generateConversation({type: CONVERSATION_TYPE.REGULAR});
+        conversation.receiptMode(RECEIPT_MODE.ON);
+        const repository = await testFactory.exposeConversationActors();
+        const save = jest
+          .spyOn(repository['conversationService'], 'saveConversationStateInDb')
+          .mockResolvedValue(conversation);
+        jest
+          .spyOn(repository['conversationService'], 'getConversationById')
+          .mockResolvedValue(generateAPIConversation({protocol, overwites: {receipt_mode: RECEIPT_MODE.ON}}));
+
+        const updated = await repository['refreshConversationProtocolProperties'](conversation);
+
+        expect(updated.receiptMode()).toBe(RECEIPT_MODE.OFF);
+        expect(save).toHaveBeenCalledWith(updated);
+        expect(updated.serialize().receipt_mode).toBe(RECEIPT_MODE.OFF);
+      },
+    );
+
     afterEach(() => {
       jest.clearAllMocks();
     });
 
     it('should update the protocol-related fields after protocol was updated to mixed and inject event', async () => {
-      const conversation = _generateConversation();
+      const conversation = _generateConversation({type: CONVERSATION_TYPE.REGULAR});
+      conversation.receiptMode(RECEIPT_MODE.ON);
       const conversationRepository = await testFactory.exposeConversationActors();
 
       const mockedProtocolUpdateEventResponse = {
@@ -3789,6 +3849,7 @@ describe('ConversationRepository', () => {
         EventRepository.SOURCE.BACKEND_RESPONSE,
       );
 
+      expect(updatedConversation.receiptMode()).toBe(RECEIPT_MODE.OFF);
       expect(updatedConversation.protocol).toEqual(CONVERSATION_PROTOCOL.MIXED);
       expect(updatedConversation.cipherSuite).toEqual(newCipherSuite);
       expect(updatedConversation.epoch).toEqual(newEpoch);
