@@ -103,7 +103,7 @@ export const PeopleTab = ({
   const teamId = teamState.team()?.id;
 
   useEffect(() => {
-    if (!isTeam || !teamId) {
+    if (!isTeam || teamId === undefined) {
       return undefined;
     }
 
@@ -122,7 +122,7 @@ export const PeopleTab = ({
 
   const filteredApps = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
-    if (!normalizedQuery) {
+    if (normalizedQuery === '') {
       return teamApps;
     }
     return teamApps.filter(

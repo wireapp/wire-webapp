@@ -128,7 +128,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const teamId = teamState.team()?.id;
 
   useEffect(() => {
-    if (!isTeam || !teamId) {
+    if (!isTeam || teamId === undefined) {
       return undefined;
     }
 
