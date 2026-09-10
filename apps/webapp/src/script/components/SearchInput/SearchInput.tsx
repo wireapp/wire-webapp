@@ -55,7 +55,7 @@ export const SearchInput = ({
   const noSelectedUsers = selectedUsers.length === 0;
 
   useLayoutEffect(() => {
-    if (inputElement.current && innerElement.current) {
+    if (inputElement.current !== null && innerElement.current !== null) {
       inputElement.current.focus();
       innerElement.current.scrollTop = inputElement.current.scrollHeight;
     }

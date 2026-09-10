@@ -52,7 +52,7 @@ const BaseToggle = ({
 
   const handleToggleChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    if (inputRef.current) {
+    if (inputRef.current !== null) {
       setIsChecked(inputRef.current.checked);
     }
   };

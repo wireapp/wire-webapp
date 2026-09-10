@@ -27,10 +27,12 @@ export const useClickOutside = (
 ) => {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
-      const isOutsideClick = ref.current && ref.current !== event.target && !ref.current.contains(event.target as Node);
+      const isOutsideClick =
+        ref.current !== null && ref.current !== event.target && !ref.current.contains(event.target as Node);
       if (isOutsideClick) {
-        const isNonExcludedAreaClicked = exclude && exclude.current && !exclude.current.contains(event.target as Node);
-        if (isNonExcludedAreaClicked || !exclude) {
+        const isNonExcludedAreaClicked =
+          exclude !== undefined && exclude.current !== null && !exclude.current.contains(event.target as Node);
+        if (isNonExcludedAreaClicked || exclude === undefined) {
           onClick(event);
         }
       }
