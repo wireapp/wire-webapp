@@ -25,6 +25,7 @@ import {z} from 'zod';
 
 import {readFile as readFileFromFileSystem, writeFile as writeFileToFileSystem} from 'node:fs/promises';
 import {resolve} from 'node:path';
+import {isDeepStrictEqual} from 'node:util';
 
 import {resolveNextWebAppVersion, validateMatchingWebAppPackageVersions} from './webappVersion.ts';
 import type {WebAppPackageDocument, WebAppPackageDocuments} from './webappVersion.ts';
@@ -128,6 +129,12 @@ type CreateBranchInspectionOptions = {
   readonly branchPackageDocuments: WebAppPackageDocuments | undefined;
 };
 
+type ValidatePackageDocumentVersionChangeOptions = {
+  readonly basePackageDocument: unknown;
+  readonly branchPackageDocument: unknown;
+  readonly packagePath: string;
+};
+
 const synchronizationBranchPrefix = 'webapp-version-';
 const commitShaPattern = /^[0-9a-f]{40}$/;
 const packageJsonIndentationSpaces = 2;
@@ -222,6 +229,39 @@ function parseChangedFilePaths(changedFilesOutput: string): readonly string[] {
     .toSorted();
 }
 
+function removePackageDocumentVersion(packageDocument: WebAppPackageDocument): Readonly<Record<string, unknown>> {
+  return Object.fromEntries(
+    Object.entries(packageDocument).filter(([propertyName]) => {
+      return propertyName !== 'version';
+    }),
+  );
+}
+
+function validatePackageDocumentVersionChange(
+  options: ValidatePackageDocumentVersionChangeOptions,
+): Result<Unit, Error> {
+  const basePackageDocumentResult = webAppPackageDocumentSchema.safeParse(options.basePackageDocument);
+
+  if (basePackageDocumentResult.success === false) {
+    return Result.err(new Error(`Synchronization branch base has an invalid ${options.packagePath}`));
+  }
+
+  const branchPackageDocumentResult = webAppPackageDocumentSchema.safeParse(options.branchPackageDocument);
+
+  if (branchPackageDocumentResult.success === false) {
+    return Result.err(new Error(`Synchronization branch tip has an invalid ${options.packagePath}`));
+  }
+
+  const basePackageDocumentWithoutVersion = removePackageDocumentVersion(basePackageDocumentResult.data);
+  const branchPackageDocumentWithoutVersion = removePackageDocumentVersion(branchPackageDocumentResult.data);
+
+  if (isDeepStrictEqual(basePackageDocumentWithoutVersion, branchPackageDocumentWithoutVersion) === false) {
+    return Result.err(new Error(`Synchronization branch changes ${options.packagePath} beyond its version field`));
+  }
+
+  return Result.ok();
+}
+
 type ReadPackageDocumentAtRevisionOptions = {
   readonly git: SimpleGit;
   readonly revision: string;
@@ -297,7 +337,8 @@ export function createRuntimeWebAppVersionSynchronizationFileSystem(): WebAppVer
 export function validateWebAppVersionSynchronizationBranch(
   options: ValidateWebAppVersionSynchronizationBranchOptions,
 ): Result<WebAppVersionSynchronizationBranch, Error> {
-  const branchNameResult = validateWebAppVersionSynchronizationBranchName(options.branchInspection.branchName);
+  const {branchInspection} = options;
+  const branchNameResult = validateWebAppVersionSynchronizationBranchName(branchInspection.branchName);
 
   if (branchNameResult.isErr) {
     return Result.err(branchNameResult.error);
@@ -313,23 +354,23 @@ export function validateWebAppVersionSynchronizationBranch(
     return Result.err(new Error('Synchronization branch contains an unexpected WebApp version'));
   }
 
-  if (options.branchInspection.mainCommitSha.length === 0) {
+  if (branchInspection.mainCommitSha.length === 0) {
     return Result.err(new Error('Synchronization branch has no validated main commit'));
   }
 
-  if (options.branchInspection.branchTipCommitSha === options.branchInspection.baseCommitSha) {
+  if (branchInspection.branchTipCommitSha === branchInspection.baseCommitSha) {
     return Result.err(new Error('Synchronization branch tip is not ahead of its base commit'));
   }
 
-  if (options.branchInspection.commitParentCount !== 1 || options.branchInspection.isNormalCommit === false) {
+  if (branchInspection.commitParentCount !== 1 || branchInspection.isNormalCommit === false) {
     return Result.err(new Error('Synchronization branch must contain exactly one normal commit'));
   }
 
-  if (options.branchInspection.isBasedOnMainHistory === false) {
+  if (branchInspection.isBasedOnMainHistory === false) {
     return Result.err(new Error('Synchronization branch base is not part of main history'));
   }
 
-  const changedFilePaths = options.branchInspection.changedFilePaths.toSorted();
+  const changedFilePaths = branchInspection.changedFilePaths.toSorted();
 
   if (changedFilePaths.join('\n') !== webAppVersionSynchronizationPackageFilePaths.join('\n')) {
     return Result.err(
@@ -338,8 +379,8 @@ export function validateWebAppVersionSynchronizationBranch(
   }
 
   const basePackageVersionsResult = validateMatchingWebAppPackageVersions(
-    options.branchInspection.baseRootPackageDocument,
-    options.branchInspection.baseWebAppPackageDocument,
+    branchInspection.baseRootPackageDocument,
+    branchInspection.baseWebAppPackageDocument,
   );
 
   if (basePackageVersionsResult.isErr) {
@@ -360,8 +401,8 @@ export function validateWebAppVersionSynchronizationBranch(
   }
 
   const branchPackageVersionsResult = validateMatchingWebAppPackageVersions(
-    options.branchInspection.branchRootPackageDocument,
-    options.branchInspection.branchWebAppPackageDocument,
+    branchInspection.branchRootPackageDocument,
+    branchInspection.branchWebAppPackageDocument,
   );
 
   if (branchPackageVersionsResult.isErr) {
@@ -374,6 +415,26 @@ export function validateWebAppVersionSynchronizationBranch(
 
   if (branchPackageVersions.rootVersion !== options.expectedWebAppVersion) {
     return Result.err(new Error('Synchronization branch package files contain an unexpected version'));
+  }
+
+  const rootPackageDocumentChangeResult = validatePackageDocumentVersionChange({
+    basePackageDocument: branchInspection.baseRootPackageDocument,
+    branchPackageDocument: branchInspection.branchRootPackageDocument,
+    packagePath: 'package.json',
+  });
+
+  if (rootPackageDocumentChangeResult.isErr) {
+    return Result.err(rootPackageDocumentChangeResult.error);
+  }
+
+  const webAppPackageDocumentChangeResult = validatePackageDocumentVersionChange({
+    basePackageDocument: branchInspection.baseWebAppPackageDocument,
+    branchPackageDocument: branchInspection.branchWebAppPackageDocument,
+    packagePath: 'apps/webapp/package.json',
+  });
+
+  if (webAppPackageDocumentChangeResult.isErr) {
+    return Result.err(webAppPackageDocumentChangeResult.error);
   }
 
   return Result.ok(validatedBranchName);

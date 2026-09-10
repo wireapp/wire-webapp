@@ -211,6 +211,15 @@ describe('WebApp synchronization branch validation', () => {
       expectedReleaseIdentifier: releaseIdentifier,
       expectedWebAppVersion: '1.0.0',
     },
+    {
+      description: 'an unexpected package metadata change',
+      branchInspection: {
+        ...createValidBranchInspection(),
+        branchRootPackageDocument: {...createPackageDocument('1.0.0'), description: 'unexpected'},
+      },
+      expectedReleaseIdentifier: releaseIdentifier,
+      expectedWebAppVersion: '1.0.0',
+    },
   ])('rejects %s', ({branchInspection, expectedReleaseIdentifier, expectedWebAppVersion}) => {
     const actualResult = validateBranch({
       branchInspection,
