@@ -138,6 +138,56 @@ function countOccurrences(value: string, searchedValue: string): number {
   return value.split(searchedValue).length - 1;
 }
 
+type ReleaseSummaryOutcomeScenario = {
+  readonly expectedOutcome: string;
+  readonly input: WebappReleaseSummaryInput;
+  readonly name: string;
+};
+
+type CompletedProductionSynchronizationScenario = {
+  readonly expectedStage: string;
+  readonly name: string;
+  readonly synchronizationJobResult: 'failure' | 'cancelled' | 'skipped';
+};
+
+function createCompletedProductionReleaseInput(
+  synchronizationJobResult: 'failure' | 'cancelled' | 'skipped',
+): WebappReleaseSummaryInput {
+  return {
+    ...baselineWebappReleaseSummaryInput,
+    distribution: {
+      ...baselineWebappReleaseSummaryInput.distribution,
+      distributionJobResult: Maybe.just('success'),
+      distributionResult: Maybe.just('success'),
+    },
+    githubRelease: {
+      action: Maybe.just('created'),
+      jobResult: Maybe.just('success'),
+      state: Maybe.just('draft'),
+      tagName: Maybe.just(productionTagName),
+      url: Maybe.just(githubReleaseUrl),
+    },
+    production: {
+      ...baselineWebappReleaseSummaryInput.production,
+      createdTagName: Maybe.just(productionTagName),
+      deploymentResult: Maybe.just('success'),
+      deploymentRequired: Maybe.just(true),
+      preflightJobResult: Maybe.just('success'),
+      preflightResult: Maybe.just('ready'),
+      runtimeVerificationResult: Maybe.just('success'),
+      tagCreationResult: Maybe.just('success'),
+    },
+    webAppVersionSynchronization: {
+      ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+      initialPreflightJobResult: Maybe.just('success'),
+      initialPreflightState: Maybe.just('available'),
+      productionPreflightJobResult: Maybe.just('success'),
+      productionPreflightState: Maybe.just('available'),
+      synchronizationJobResult: Maybe.just(synchronizationJobResult),
+    },
+  };
+}
+
 function assertMarkdownContract(summary: string, includesDistribution: boolean): void {
   const visibleContent = visibleSummary(summary);
   const detailsContent = technicalEvidence(summary);
@@ -471,6 +521,129 @@ describe('WebApp release summary renderer', () => {
     expect(detailsContent).toContain('- Synchronization job: failed');
     expect(detailsContent).toContain('- WebApp package version: `1.0.0`');
   });
+
+  const skippedSynchronizationAfterFailedReleaseScenarios: readonly ReleaseSummaryOutcomeScenario[] = [
+    {
+      name: 'E2E failure',
+      input: {
+        ...baselineWebappReleaseSummaryInput,
+        e2e: {...baselineWebappReleaseSummaryInput.e2e, result: Maybe.just('failure')},
+        webAppVersionSynchronization: {
+          ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+          synchronizationJobResult: Maybe.just('skipped'),
+        },
+      },
+      expectedOutcome: 'Release stopped because the E2E system gate failed',
+    },
+    {
+      name: 'Production deployment failure',
+      input: {
+        ...baselineWebappReleaseSummaryInput,
+        production: {
+          ...baselineWebappReleaseSummaryInput.production,
+          preflightJobResult: Maybe.just('success'),
+          preflightResult: Maybe.just('ready'),
+          approvalResult: Maybe.just('success'),
+          deploymentResult: Maybe.just('failure'),
+          runtimeVerificationResult: Maybe.just('skipped'),
+          tagCreationResult: Maybe.just('skipped'),
+        },
+        webAppVersionSynchronization: {
+          ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+          synchronizationJobResult: Maybe.just('skipped'),
+        },
+      },
+      expectedOutcome: 'Release stopped because Hosted Production deployment failed',
+    },
+    {
+      name: 'Production runtime verification failure',
+      input: {
+        ...baselineWebappReleaseSummaryInput,
+        production: {
+          ...baselineWebappReleaseSummaryInput.production,
+          preflightJobResult: Maybe.just('success'),
+          preflightResult: Maybe.just('ready'),
+          approvalResult: Maybe.just('success'),
+          deploymentResult: Maybe.just('success'),
+          runtimeVerificationResult: Maybe.just('failure'),
+          tagCreationResult: Maybe.just('skipped'),
+        },
+        webAppVersionSynchronization: {
+          ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+          synchronizationJobResult: Maybe.just('skipped'),
+        },
+      },
+      expectedOutcome: 'Hosted Production was deployed, but runtime verification failed',
+    },
+    {
+      name: 'Production distribution failure',
+      input: {
+        ...createCompletedProductionReleaseInput('skipped'),
+        distribution: {
+          ...baselineWebappReleaseSummaryInput.distribution,
+          distributionJobResult: Maybe.just('failure'),
+          distributionResult: Maybe.just('failure'),
+        },
+      },
+      expectedOutcome: 'Hosted Production completed, but release distribution failed',
+    },
+    {
+      name: 'GitHub Release handoff failure',
+      input: {
+        ...createCompletedProductionReleaseInput('skipped'),
+        githubRelease: {
+          ...baselineWebappReleaseSummaryInput.githubRelease,
+          jobResult: Maybe.just('failure'),
+        },
+      },
+      expectedOutcome: 'Hosted Production and release distribution completed, but GitHub Release handoff failed',
+    },
+  ];
+
+  it.each(skippedSynchronizationAfterFailedReleaseScenarios)(
+    'does not report skipped synchronization as incomplete bookkeeping after $name',
+    ({input, expectedOutcome}) => {
+      const summary = renderWebappReleaseSummary(input);
+      const visibleContent = visibleSummary(summary);
+
+      expect(visibleContent).toContain(`- Outcome: ${expectedOutcome}`);
+      expect(visibleContent).toContain('- WebApp version synchronization: not run');
+      expect(visibleContent).not.toContain('bookkeeping incomplete');
+    },
+  );
+
+  const completedProductionSynchronizationScenarios: readonly CompletedProductionSynchronizationScenario[] = [
+    {
+      name: 'failure',
+      synchronizationJobResult: 'failure',
+      expectedStage: 'failed; release bookkeeping incomplete',
+    },
+    {
+      name: 'cancellation',
+      synchronizationJobResult: 'cancelled',
+      expectedStage: 'cancelled; release bookkeeping incomplete',
+    },
+    {
+      name: 'unexpected skip',
+      synchronizationJobResult: 'skipped',
+      expectedStage: 'not run; release bookkeeping incomplete',
+    },
+  ];
+
+  it.each(completedProductionSynchronizationScenarios)(
+    'reports completed Production with synchronization $name as incomplete bookkeeping',
+    scenario => {
+      const summary = renderWebappReleaseSummary(
+        createCompletedProductionReleaseInput(scenario.synchronizationJobResult),
+      );
+      const visibleContent = visibleSummary(summary);
+
+      expect(visibleContent).toContain(
+        '- Outcome: Production release completed successfully, but WebApp version synchronization bookkeeping is incomplete',
+      );
+      expect(visibleContent).toContain(`- WebApp version synchronization: ${scenario.expectedStage}`);
+    },
+  );
 
   it('renders an existing published GitHub Release as a successful handoff', () => {
     const input: WebappReleaseSummaryInput = {

@@ -782,31 +782,42 @@ function formatWebAppVersionSynchronizationPreflight(
 }
 
 function formatWebAppVersionSynchronizationStageOverview(input: WebappReleaseSummaryInput): string {
-  if (hasWorkflowJobResult(input.webAppVersionSynchronization.synchronizationJobResult, 'failure')) {
-    return 'failed; release bookkeeping incomplete';
-  }
+  const synchronizationJobResult = input.webAppVersionSynchronization.synchronizationJobResult;
+  const bookkeepingIncomplete = isWebAppVersionSynchronizationBookkeepingIncomplete(input);
 
-  if (hasWorkflowJobResult(input.webAppVersionSynchronization.synchronizationJobResult, 'cancelled')) {
-    return 'cancelled; release bookkeeping incomplete';
-  }
-
-  if (hasWorkflowJobResult(input.webAppVersionSynchronization.synchronizationJobResult, 'skipped')) {
-    return 'not run; release bookkeeping incomplete';
-  }
-
-  if (hasWorkflowJobResult(input.webAppVersionSynchronization.synchronizationJobResult, 'success')) {
-    return [
-      'completed successfully',
-      `WebApp package version: ${formatCodeValue(input.webAppVersionSynchronization.webAppVersion)}`,
-      `Version synchronization action: ${formatWebAppVersionSynchronizationAction(input.webAppVersionSynchronization.synchronizationAction)}`,
-      `Version synchronization PR: ${formatWebAppVersionSynchronizationPullRequest(
-        input.webAppVersionSynchronization.synchronizationPullRequestNumber,
-        input.webAppVersionSynchronization.synchronizationPullRequestUrl,
-      )}`,
-    ].join('; ');
-  }
-
-  return 'not available';
+  return synchronizationJobResult.mapOr('not available', actualSynchronizationJobResult => {
+    return match({actualSynchronizationJobResult, bookkeepingIncomplete})
+      .with({actualSynchronizationJobResult: 'failure', bookkeepingIncomplete: true}, () => {
+        return 'failed; release bookkeeping incomplete';
+      })
+      .with({actualSynchronizationJobResult: 'cancelled', bookkeepingIncomplete: true}, () => {
+        return 'cancelled; release bookkeeping incomplete';
+      })
+      .with({actualSynchronizationJobResult: 'skipped', bookkeepingIncomplete: true}, () => {
+        return 'not run; release bookkeeping incomplete';
+      })
+      .with({actualSynchronizationJobResult: 'failure'}, () => {
+        return 'failed';
+      })
+      .with({actualSynchronizationJobResult: 'cancelled'}, () => {
+        return 'cancelled';
+      })
+      .with({actualSynchronizationJobResult: 'skipped'}, () => {
+        return 'not run';
+      })
+      .with({actualSynchronizationJobResult: 'success'}, () => {
+        return [
+          'completed successfully',
+          `WebApp package version: ${formatCodeValue(input.webAppVersionSynchronization.webAppVersion)}`,
+          `Version synchronization action: ${formatWebAppVersionSynchronizationAction(input.webAppVersionSynchronization.synchronizationAction)}`,
+          `Version synchronization PR: ${formatWebAppVersionSynchronizationPullRequest(
+            input.webAppVersionSynchronization.synchronizationPullRequestNumber,
+            input.webAppVersionSynchronization.synchronizationPullRequestUrl,
+          )}`,
+        ].join('; ');
+      })
+      .exhaustive();
+  });
 }
 
 function formatRuntimeVerificationResult(result: WorkflowJobResult): string {
@@ -1308,19 +1319,27 @@ function hasSuccessfulReleaseDistribution(input: WebappReleaseSummaryInput): boo
   );
 }
 
-function hasWebAppVersionSynchronizationFailure(input: WebappReleaseSummaryInput): boolean {
-  return (
-    hasWorkflowJobResult(input.webAppVersionSynchronization.synchronizationJobResult, 'failure') ||
-    hasWorkflowJobResult(input.webAppVersionSynchronization.synchronizationJobResult, 'cancelled') ||
-    hasWorkflowJobResult(input.webAppVersionSynchronization.synchronizationJobResult, 'skipped')
-  );
-}
-
 function hasSuccessfulProductionReleaseLifecycle(input: WebappReleaseSummaryInput): boolean {
   return (
     hasHostedProductionCompleted(input.production) &&
     hasSuccessfulReleaseDistribution(input) &&
     hasSuccessfulGitHubReleaseHandoff(input)
+  );
+}
+
+function isWebAppVersionSynchronizationBookkeepingIncomplete(input: WebappReleaseSummaryInput): boolean {
+  return (
+    hasSuccessfulProductionReleaseLifecycle(input) &&
+    input.webAppVersionSynchronization.synchronizationJobResult.mapOr(false, synchronizationJobResult => {
+      return match(synchronizationJobResult)
+        .with('success', () => {
+          return false;
+        })
+        .with(P.union('failure', 'cancelled', 'skipped'), () => {
+          return true;
+        })
+        .exhaustive();
+    })
   );
 }
 
@@ -1539,7 +1558,7 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
     return 'Hosted Production and release distribution completed, but GitHub Release handoff did not run';
   }
 
-  if (hasSuccessfulProductionReleaseLifecycle(input) && hasWebAppVersionSynchronizationFailure(input)) {
+  if (isWebAppVersionSynchronizationBookkeepingIncomplete(input)) {
     return 'Production release completed successfully, but WebApp version synchronization bookkeeping is incomplete';
   }
 

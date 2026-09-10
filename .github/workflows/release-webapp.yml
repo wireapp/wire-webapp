@@ -180,7 +180,7 @@ jobs:
       - name: Enforce WebApp version synchronization preflight
         if: ${{ steps.inspect.outcome == 'failure' }}
         run: |
-          echo 'Merge or resolve the previous WebApp version synchronization pull request before starting this Production release.' >&2
+          echo 'WebApp version synchronization preflight failed. See the inspection error above.' >&2
           exit 1
 
   prepare_release_branch:
@@ -790,7 +790,7 @@ jobs:
       - name: Enforce WebApp version synchronization preflight before Production approval
         if: ${{ steps.inspect.outcome == 'failure' }}
         run: |
-          echo 'Merge or resolve the previous WebApp version synchronization pull request before Production approval.' >&2
+          echo 'WebApp version synchronization preflight before Production approval failed. See the inspection error above.' >&2
           exit 1
 
   notify_e2e_success:
