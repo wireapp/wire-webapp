@@ -19,12 +19,18 @@
 
 import {memo} from 'react';
 
+import is from '@sindresorhus/is';
 import cx from 'classnames';
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {UserVerificationBadges} from 'Components/badge';
+import {
+  getUserVerificationBadgeLabel,
+  useUserVerificationStatus,
+  UserVerificationBadgesContent,
+} from 'Components/badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -37,18 +43,38 @@ import {AvailabilityContextMenu} from '../../../ui/availabilityContextMenu';
 interface AvailabilityStateButtonWrapperProps {
   children: React.ReactElement;
   isTeam: boolean;
+  ariaLabel: string;
   showAvailabilityContextMenu: (event: MouseEvent) => void;
 }
+
+const isAvailabilityType = (value: unknown): value is Availability.Type =>
+  Object.values(Availability.Type).some(availabilityType => availabilityType === value);
+
+const getAvailabilityTranslationKey = (availability: Availability.Type) => {
+  switch (availability) {
+    case Availability.Type.AVAILABLE:
+      return 'availability.available';
+    case Availability.Type.BUSY:
+      return 'availability.busy';
+    case Availability.Type.AWAY:
+      return 'availability.away';
+    case Availability.Type.NONE:
+      return 'availability.none';
+  }
+};
 
 const AvailabilityStateButtonWrapper = ({
   children,
   isTeam = false,
+  ariaLabel,
   showAvailabilityContextMenu,
 }: AvailabilityStateButtonWrapperProps) => {
   return isTeam ? (
     <button
       onClick={event => showAvailabilityContextMenu(event.nativeEvent)}
       className="button-reset-default user-details-avatar"
+      aria-label={ariaLabel}
+      aria-haspopup="menu"
     >
       {children}
     </button>
@@ -69,9 +95,11 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
   const {
     name: userName,
     username: userHandle,
+    availability,
     isOnLegalHold,
     hasPendingLegalHold,
-  } = useKoSubscribableChildren(user, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
+  } = useKoSubscribableChildren(user, ['availability', 'hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
+  const verificationStatus = useUserVerificationStatus({user, groupId, isSelfUser: isTeam});
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
@@ -84,14 +112,27 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
     });
   };
 
+  const avatarAriaLabel = [
+    userName,
+    userHandle,
+    isTeam && isAvailabilityType(availability) ? translate(getAvailabilityTranslationKey(availability)) : undefined,
+    getUserVerificationBadgeLabel(translate, verificationStatus),
+  ]
+    .filter((label): label is string => is.nonEmptyString(label))
+    .join(', ');
+
   return (
     <div css={styles.wrapper(isSideBarOpen)}>
-      <AvailabilityStateButtonWrapper isTeam={isTeam} showAvailabilityContextMenu={showAvailabilityContextMenu}>
+      <AvailabilityStateButtonWrapper
+        isTeam={isTeam}
+        ariaLabel={avatarAriaLabel}
+        showAvailabilityContextMenu={showAvailabilityContextMenu}
+      >
         <Avatar
           className={cx('see-through', {'user-details-avatar': !isTeam})}
           participant={user}
           avatarSize={AVATAR_SIZE.MEDIUM}
-          avatarAlt={translate('selfProfileImageAlt')}
+          avatarAlt={isTeam ? '' : translate('selfProfileImageAlt')}
         />
       </AvailabilityStateButtonWrapper>
 
@@ -99,13 +140,17 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
         {isTeam ? (
           <>
             <div css={styles.userDetails} data-uie-name="status-availability">
-              <button css={styles.userFullName} onClick={event => showAvailabilityContextMenu(event.nativeEvent)}>
+              <button
+                css={styles.userFullName}
+                onClick={event => showAvailabilityContextMenu(event.nativeEvent)}
+                aria-haspopup="menu"
+              >
                 <span data-uie-name="status-label" css={{...styles.userName, ...styles.textEllipsis}} title={userName}>
                   {userName}
                 </span>
               </button>
 
-              <UserVerificationBadges user={user} isSelfUser groupId={groupId} />
+              <UserVerificationBadgesContent {...verificationStatus} />
             </div>
 
             {showLegalHold && (
