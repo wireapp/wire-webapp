@@ -18,6 +18,7 @@
  */
 
 import {memo, useCallback, useEffect, useRef, useState} from 'react';
+import type {ReactNode} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -25,7 +26,10 @@ import * as Icon from 'Components/icon';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './deviceSelect';
@@ -43,8 +47,90 @@ interface CameraPreferencesProps {
 
 const DEBOUNCE_TIMEOUT = 100;
 
+const cameraBrandNameMarker = createReactTranslationMarker('camera-brand-name');
+const cameraLineBreakMarker = createReactTranslationMarker('camera-line-break');
+const cameraFaqLinkMarker = createReactTranslationMarker('camera-faq-link');
+
+type RenderNoCameraMessageOptions = {
+  readonly brandName: string;
+  readonly isReactTranslationRenderingEnabled: boolean;
+  readonly translate: Translate;
+};
+
+function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode {
+  const {brandName, isReactTranslationRenderingEnabled, translate} = options;
+
+  if (isReactTranslationRenderingEnabled) {
+    const translatedText = translate(
+      'preferencesAVNoCamera',
+      {brandName: cameraBrandNameMarker.substitution},
+      {
+        '/faqLink': cameraFaqLinkMarker.end,
+        br: cameraLineBreakMarker.substitution,
+        faqLink: cameraFaqLinkMarker.start,
+      },
+    );
+
+    return (
+      <div className="preferences-av-video-disabled__info">
+        {renderReactTranslation({
+          translatedText,
+          componentReplacements: [
+            {
+              start: cameraFaqLinkMarker.start,
+              end: cameraFaqLinkMarker.end,
+              render(children): ReactNode {
+                return (
+                  <a
+                    href={Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED}
+                    data-uie-name="go-no-camera-faq"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {children}
+                  </a>
+                );
+              },
+            },
+          ],
+          nodeReplacements: [
+            {
+              marker: cameraLineBreakMarker,
+              render(): ReactNode {
+                return <br />;
+              },
+            },
+          ],
+          valueReplacements: [{marker: cameraBrandNameMarker, runtimeText: brandName}],
+        })}
+      </div>
+    );
+  }
+
+  const legacyTranslatedText = translate(
+    'preferencesAVNoCamera',
+    {brandName},
+    {
+      '/faqLink': '</a>',
+      br: '<br>',
+      faqLink: `<a href='${
+        Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+      }' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>`,
+    },
+  );
+
+  return (
+    <div
+      className="preferences-av-video-disabled__info"
+      dangerouslySetInnerHTML={{
+        __html: legacyTranslatedText,
+      }}
+    />
+  );
+}
+
 const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
@@ -56,6 +142,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   }));
 
   const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
+  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   const requestStream = useCallback(async () => {
     setIsRequesting(true);
@@ -150,22 +237,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
             <video className="preferences-av-video mirror" autoPlay playsInline muted ref={videoElement} />
           ) : (
             <div className="preferences-av-video-disabled">
-              <div
-                className="preferences-av-video-disabled__info"
-                dangerouslySetInnerHTML={{
-                  __html: translate(
-                    'preferencesAVNoCamera',
-                    {brandName},
-                    {
-                      '/faqLink': '</a>',
-                      br: '<br>',
-                      faqLink: `<a href='${
-                        Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-                      }' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>`,
-                    },
-                  ),
-                }}
-              />
+              {renderNoCameraMessage({brandName, isReactTranslationRenderingEnabled, translate})}
               <button
                 type="button"
                 className="button-reset-default preferences-av-video-disabled__try-again"
