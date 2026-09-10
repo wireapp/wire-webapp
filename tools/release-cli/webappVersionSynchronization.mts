@@ -44,6 +44,7 @@ import {
   inspectWebAppVersionSynchronization,
   synchronizeWebAppVersion,
 } from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
+import {validateWebAppVersionSynchronizationPreflight} from '../release-metadata/webappVersionSynchronizationPreflight.ts';
 import {
   readInspectionRuntimeEnvironment,
   readSynchronizationRuntimeEnvironment,
@@ -117,6 +118,12 @@ async function executeInspectionCommand(
   const output = createWebAppVersionSynchronizationInspectionOutput(inspection);
 
   writeOutput(serializeWebAppVersionSynchronizationOutput(output));
+
+  const preflightResult = validateWebAppVersionSynchronizationPreflight(inspection);
+
+  if (preflightResult.isErr) {
+    throw preflightResult.error;
+  }
 }
 
 async function executeSynchronizationCommand(
