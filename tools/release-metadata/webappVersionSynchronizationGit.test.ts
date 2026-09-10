@@ -18,8 +18,11 @@
  */
 
 import assert from 'node:assert';
+import {Buffer} from 'node:buffer';
 
 import {
+  createWebAppVersionSynchronizationGitAuthenticationEnvironment,
+  redactWebAppVersionSynchronizationGitFailureMessage,
   parseWebAppVersionSynchronizationPackageDocument,
   validateWebAppVersionSynchronizationBranch,
   webAppVersionSynchronizationPackageFilePaths,
@@ -104,6 +107,36 @@ function validateBranch(
     expectedWebAppVersion: options.expectedWebAppVersion ?? '1.0.0',
   });
 }
+
+describe('WebApp synchronization Git authentication', () => {
+  it('creates process-scoped GitHub authentication configuration', () => {
+    const githubToken = 'otto-write-token';
+    const basicCredential = Buffer.from(`x-access-token:${githubToken}`, 'utf8').toString('base64');
+    const actualEnvironment = createWebAppVersionSynchronizationGitAuthenticationEnvironment({githubToken});
+
+    expect(actualEnvironment).toEqual({
+      GIT_CONFIG_COUNT: '1',
+      GIT_CONFIG_KEY_0: 'http.https://github.com/.extraheader',
+      GIT_CONFIG_VALUE_0: `AUTHORIZATION: basic ${basicCredential}`,
+      GIT_TERMINAL_PROMPT: '0',
+    });
+    expect(JSON.stringify(actualEnvironment)).not.toContain(githubToken);
+  });
+
+  it('redacts credentials from a simulated Git push failure', () => {
+    const githubToken = 'otto-write-token';
+    const basicCredential = Buffer.from(`x-access-token:${githubToken}`, 'utf8').toString('base64');
+    const simulatedFailureMessage = `fatal: authorization failed for ${githubToken} (${basicCredential})`;
+    const actualFailureMessage = redactWebAppVersionSynchronizationGitFailureMessage(simulatedFailureMessage, [
+      githubToken,
+      basicCredential,
+    ]);
+
+    expect(actualFailureMessage).toBe('fatal: authorization failed for [REDACTED] ([REDACTED])');
+    expect(actualFailureMessage).not.toContain(githubToken);
+    expect(actualFailureMessage).not.toContain(basicCredential);
+  });
+});
 
 describe('WebApp synchronization branch validation', () => {
   it('accepts a branch with one safe synchronization commit', () => {

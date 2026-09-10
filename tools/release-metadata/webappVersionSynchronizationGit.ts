@@ -23,6 +23,7 @@ import type {SimpleGit} from 'simple-git';
 import {Result, Task, Unit, task} from 'true-myth';
 import {z} from 'zod';
 
+import {Buffer} from 'node:buffer';
 import {readFile as readFileFromFileSystem, writeFile as writeFileToFileSystem} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
@@ -104,6 +105,11 @@ export type PushWebAppVersionSynchronizationBranchOptions = {
 export type CreateWebAppVersionSynchronizationGitClientOptions = {
   readonly repositoryPath: string;
   readonly fileSystem: WebAppVersionSynchronizationFileSystem;
+  readonly authentication: WebAppVersionSynchronizationGitAuthentication;
+};
+
+export type WebAppVersionSynchronizationGitAuthentication = {
+  readonly githubToken: string;
 };
 
 export type WebAppVersionSynchronizationFileSystem = {
@@ -116,6 +122,7 @@ export const webAppVersionSynchronizationPackageFilePaths = ['apps/webapp/packag
 type RunGitOperationOptions<valueType> = {
   readonly description: string;
   readonly execute: () => Promise<valueType>;
+  readonly redactedSecretValues?: readonly string[];
 };
 
 type CreateBranchInspectionOptions = {
@@ -141,6 +148,9 @@ const packageJsonIndentationSpaces = 2;
 const normalCommitPartCount = 2;
 const singleCommitParentCount = 1;
 const webAppPackageDocumentSchema = z.record(z.string(), z.unknown());
+const githubServerOrigin = 'https://github.com';
+const gitAuthenticationHeaderKey = `http.${githubServerOrigin}/.extraheader`;
+const gitAuthenticationHeaderPrefix = 'AUTHORIZATION: basic';
 
 function errorMessage(error: unknown): string {
   if (isError(error)) {
@@ -150,10 +160,51 @@ function errorMessage(error: unknown): string {
   return 'Unknown Git failure';
 }
 
+export function redactWebAppVersionSynchronizationGitFailureMessage(
+  failureMessage: string,
+  redactedSecretValues: readonly string[],
+): string {
+  return redactedSecretValues.reduce((redactedMessage, secretValue) => {
+    if (isNonEmptyString(secretValue) === false) {
+      return redactedMessage;
+    }
+
+    return redactedMessage.replaceAll(secretValue, '[REDACTED]');
+  }, failureMessage);
+}
+
+function createGitHubBasicCredential(githubToken: string): string {
+  return Buffer.from(`x-access-token:${githubToken}`, 'utf8').toString('base64');
+}
+
+export function createWebAppVersionSynchronizationGitAuthenticationEnvironment(
+  authentication: WebAppVersionSynchronizationGitAuthentication,
+): Readonly<Record<string, string>> {
+  const basicCredential = createGitHubBasicCredential(authentication.githubToken);
+
+  return {
+    GIT_CONFIG_COUNT: '1',
+    GIT_CONFIG_KEY_0: gitAuthenticationHeaderKey,
+    GIT_CONFIG_VALUE_0: `${gitAuthenticationHeaderPrefix} ${basicCredential}`,
+    GIT_TERMINAL_PROMPT: '0',
+  };
+}
+
 function runGitOperation<valueType>(options: RunGitOperationOptions<valueType>): Task<valueType, Error> {
+  const redactedSecretValues = options.redactedSecretValues ?? [];
+
   return task.tryOrElse(
     (error: unknown): Error => {
-      return new Error(`${options.description}: ${errorMessage(error)}`, {cause: error});
+      const redactedFailureMessage = redactWebAppVersionSynchronizationGitFailureMessage(
+        errorMessage(error),
+        redactedSecretValues,
+      );
+
+      if (redactedSecretValues.length > 0) {
+        return new Error(`${options.description}: ${redactedFailureMessage}`);
+      }
+
+      return new Error(`${options.description}: ${redactedFailureMessage}`, {cause: error});
     },
     async (): Promise<valueType> => {
       return options.execute();
@@ -444,6 +495,12 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
   options: CreateWebAppVersionSynchronizationGitClientOptions,
 ): WebAppVersionSynchronizationGitClient {
   const git = simpleGit(options.repositoryPath);
+  const authenticationEnvironment = createWebAppVersionSynchronizationGitAuthenticationEnvironment(
+    options.authentication,
+  );
+  const authenticatedGit = simpleGit(options.repositoryPath).env(authenticationEnvironment);
+  const basicCredential = createGitHubBasicCredential(options.authentication.githubToken);
+  const redactedAuthenticationValues = [options.authentication.githubToken, basicCredential];
 
   function readCurrentMainCommit(): Task<string, Error> {
     return runGitOperation({
@@ -803,8 +860,13 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
       return runGitOperation({
         description: `Unable to push synchronization branch ${pushOptions.branchName}`,
         async execute() {
-          return git.raw(['push', 'origin', `${pushOptions.branchName}:refs/heads/${pushOptions.branchName}`]);
+          return authenticatedGit.raw([
+            'push',
+            'origin',
+            `${pushOptions.branchName}:refs/heads/${pushOptions.branchName}`,
+          ]);
         },
+        redactedSecretValues: redactedAuthenticationValues,
       }).map(() => Unit);
     },
 

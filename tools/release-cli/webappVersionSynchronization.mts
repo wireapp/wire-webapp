@@ -128,6 +128,7 @@ async function executeSynchronizationCommand(
   const gitClient = createSimpleGitWebAppVersionSynchronizationClient({
     repositoryPath: runtimeEnvironment.repositoryPath,
     fileSystem: createRuntimeWebAppVersionSynchronizationFileSystem(),
+    authentication: {githubToken: runtimeEnvironment.ottoTheBotGitHubToken},
   });
   const synchronizationOptions: SynchronizeWebAppVersionOptions = {
     releaseIdentifier: command.releaseIdentifier,
