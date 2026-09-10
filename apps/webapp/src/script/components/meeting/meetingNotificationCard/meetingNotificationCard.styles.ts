@@ -64,6 +64,11 @@ export const meetingNotificationCardActionStyles: CSSObject = {
   margin: '16px 0 0 0',
 };
 
+export const meetingNotificationCardJoinIconStyles: CSSObject = {
+  marginRight: 8,
+  fill: 'var(--text-input-background)',
+};
+
 export const meetingNotificationViewBtnStyles: CSSObject = {
   height: 16,
   width: 16,
