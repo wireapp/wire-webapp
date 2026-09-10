@@ -33,7 +33,7 @@
     "@types/jest": "30.0.0",
     "@types/js-yaml": "4.0.9",
     "@types/jsdom": "28.0.3",
-    "@types/node": "24.13.1",
+    "@types/node": "24.13.3",
     "@types/tough-cookie": "4.0.5",
     "@typescript-eslint/eslint-plugin": "8.69.0",
     "@typescript-eslint/parser": "8.69.0",
