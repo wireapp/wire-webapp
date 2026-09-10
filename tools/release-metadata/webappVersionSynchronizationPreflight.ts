@@ -17,6 +17,7 @@
  *
  */
 
+import {Result, Unit} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
 import type {WebAppVersionSynchronizationInspection} from './webappVersionSynchronization.ts';
@@ -65,4 +66,17 @@ export function decideWebAppVersionSynchronizationPreflight(
         diagnostic: createBlockingDiagnostic(blockedInspection),
       };
     });
+}
+
+export function validateWebAppVersionSynchronizationPreflight(
+  inspection: WebAppVersionSynchronizationInspection,
+): Result<Unit, Error> {
+  return match(decideWebAppVersionSynchronizationPreflight(inspection))
+    .with({state: 'allowed'}, () => {
+      return Result.ok();
+    })
+    .with({state: 'blocked'}, blockedDecision => {
+      return Result.err(new Error(blockedDecision.diagnostic));
+    })
+    .exhaustive();
 }

@@ -17,7 +17,10 @@
  *
  */
 
-import {decideWebAppVersionSynchronizationPreflight} from './webappVersionSynchronizationPreflight.ts';
+import {
+  decideWebAppVersionSynchronizationPreflight,
+  validateWebAppVersionSynchronizationPreflight,
+} from './webappVersionSynchronizationPreflight.ts';
 import {
   createWebAppVersionSynchronizationBranchName,
   type WebAppVersionSynchronizationBranchName,
@@ -138,5 +141,34 @@ describe('WebApp version synchronization preflight', () => {
     expect(decision).toMatchObject({
       diagnostic: expect.stringContaining('Multiple unresolved synchronization records exist'),
     });
+  });
+
+  it('returns an error for a blocked preflight decision', () => {
+    const inspection: WebAppVersionSynchronizationInspection = {
+      kind: 'conflict',
+      releaseIdentifier: '2026-09-09.1',
+      productionTagName: '2026-09-09.1-production',
+      reason: 'Multiple unresolved synchronization records exist',
+    };
+
+    const result = validateWebAppVersionSynchronizationPreflight(inspection);
+
+    expect(result.isErr).toBe(true);
+
+    if (result.isErr) {
+      expect(result.error.message).toContain('Multiple unresolved synchronization records exist');
+    }
+  });
+
+  it('returns success for an allowed preflight decision', () => {
+    const inspection: WebAppVersionSynchronizationInspection = {
+      kind: 'available',
+      releaseIdentifier: '2026-09-09.1',
+      productionTagName: '2026-09-09.1-production',
+    };
+
+    const result = validateWebAppVersionSynchronizationPreflight(inspection);
+
+    expect(result.isOk).toBe(true);
   });
 });
