@@ -107,6 +107,8 @@ function validateWebAppPackageDocuments(
     return Result.err(new Error(validatedRootPackageDocumentResult.error.message));
   }
 
+  const {value: validatedRootPackageDocument} = validatedRootPackageDocumentResult;
+
   const validatedWebAppPackageDocumentResult = validateWebAppPackageDocument(
     webAppPackageDocument,
     'apps/webapp/package.json',
@@ -116,14 +118,18 @@ function validateWebAppPackageDocuments(
     return Result.err(new Error(validatedWebAppPackageDocumentResult.error.message));
   }
 
-  const rootVersionResult = validatePackageDocumentVersion(validatedRootPackageDocumentResult.value, 'package.json');
+  const {value: validatedWebAppPackageDocument} = validatedWebAppPackageDocumentResult;
+
+  const rootVersionResult = validatePackageDocumentVersion(validatedRootPackageDocument, 'package.json');
 
   if (rootVersionResult.isErr) {
     return Result.err(new Error(rootVersionResult.error.message));
   }
 
+  const {value: rootVersion} = rootVersionResult;
+
   const webAppVersionResult = validatePackageDocumentVersion(
-    validatedWebAppPackageDocumentResult.value,
+    validatedWebAppPackageDocument,
     'apps/webapp/package.json',
   );
 
@@ -131,19 +137,21 @@ function validateWebAppPackageDocuments(
     return Result.err(new Error(webAppVersionResult.error.message));
   }
 
-  if (rootVersionResult.value !== webAppVersionResult.value) {
+  const {value: webAppVersion} = webAppVersionResult;
+
+  if (rootVersion !== webAppVersion) {
     return Result.err(
       new Error(
-        `WebApp package versions disagree: package.json=${rootVersionResult.value}, apps/webapp/package.json=${webAppVersionResult.value}`,
+        `WebApp package versions disagree: package.json=${rootVersion}, apps/webapp/package.json=${webAppVersion}`,
       ),
     );
   }
 
   return Result.ok({
-    rootPackageDocument: validatedRootPackageDocumentResult.value,
-    webAppPackageDocument: validatedWebAppPackageDocumentResult.value,
-    rootVersion: rootVersionResult.value,
-    webAppVersion: webAppVersionResult.value,
+    rootPackageDocument: validatedRootPackageDocument,
+    webAppPackageDocument: validatedWebAppPackageDocument,
+    rootVersion,
+    webAppVersion,
   });
 }
 
@@ -156,7 +164,9 @@ function createWebAppVersionSynchronizationMarkerValue(
     return Result.err(new Error(productionTagResult.error.message));
   }
 
-  if (productionTagResult.value !== options.productionTagName) {
+  const {value: validatedProductionTagName} = productionTagResult;
+
+  if (validatedProductionTagName !== options.productionTagName) {
     return Result.err(
       new Error(
         `Production tag ${options.productionTagName} does not match release identifier ${options.releaseIdentifier}`,
@@ -170,10 +180,12 @@ function createWebAppVersionSynchronizationMarkerValue(
     return Result.err(new Error(webAppVersionResult.error.message));
   }
 
+  const {value: validatedWebAppVersion} = webAppVersionResult;
+
   return Result.ok({
     releaseIdentifier: options.releaseIdentifier as ReleaseIdentifier,
-    productionTagName: productionTagResult.value,
-    webAppVersion: webAppVersionResult.value,
+    productionTagName: validatedProductionTagName,
+    webAppVersion: validatedWebAppVersion,
   });
 }
 
@@ -196,7 +208,8 @@ export function resolveNextWebAppVersion(currentVersion: string): Result<WebAppV
     return Result.err(new Error(currentVersionResult.error.message));
   }
 
-  const [majorVersion, minorVersion, patchVersion] = currentVersionResult.value.split('.');
+  const {value: validatedCurrentVersion} = currentVersionResult;
+  const [majorVersion, minorVersion, patchVersion] = validatedCurrentVersion.split('.');
 
   if (majorVersion === '0') {
     return Result.ok('1.0.0' as WebAppVersion);
@@ -215,9 +228,11 @@ export function validateMatchingWebAppPackageVersions(
     return Result.err(new Error(validatedPackageDocumentsResult.error.message));
   }
 
+  const {value: validatedPackageDocuments} = validatedPackageDocumentsResult;
+
   return Result.ok({
-    rootVersion: validatedPackageDocumentsResult.value.rootVersion,
-    webAppVersion: validatedPackageDocumentsResult.value.webAppVersion,
+    rootVersion: validatedPackageDocuments.rootVersion,
+    webAppVersion: validatedPackageDocuments.webAppVersion,
   });
 }
 
@@ -239,11 +254,14 @@ export function updateWebAppPackageDocuments(
     return Result.err(new Error(targetVersionResult.error.message));
   }
 
-  const {rootPackageDocument, webAppPackageDocument} = validatedPackageDocumentsResult.value;
+  const {value: targetVersion} = targetVersionResult;
+
+  const {value: validatedPackageDocuments} = validatedPackageDocumentsResult;
+  const {rootPackageDocument, webAppPackageDocument} = validatedPackageDocuments;
 
   return Result.ok({
-    rootPackageDocument: {...rootPackageDocument, version: targetVersionResult.value},
-    webAppPackageDocument: {...webAppPackageDocument, version: targetVersionResult.value},
+    rootPackageDocument: {...rootPackageDocument, version: targetVersion},
+    webAppPackageDocument: {...webAppPackageDocument, version: targetVersion},
   });
 }
 
@@ -256,7 +274,7 @@ export function createWebAppVersionSynchronizationMarker(
     return Result.err(new Error(markerValueResult.error.message));
   }
 
-  const marker = markerValueResult.value;
+  const {value: marker} = markerValueResult;
 
   return Result.ok(
     `<!-- wire-webapp-version-sync release=${marker.releaseIdentifier} production-tag=${marker.productionTagName} version=${marker.webAppVersion} -->`,
