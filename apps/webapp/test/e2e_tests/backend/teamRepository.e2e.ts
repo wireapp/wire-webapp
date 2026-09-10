@@ -99,6 +99,7 @@ export class TeamRepositoryE2E extends BackendClientE2E {
       city: 'Berlin',
       country: 'DE',
     };
+    const start = new Date().getTime();
 
     for (let i = 0; i < 5; i++) {
       const res = await this.axiosInstance.put(`/teams/${teamId}/billing/info`, billingInfo, {
@@ -146,5 +147,8 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     if (upgradedTeam.status !== 'active') {
       throw new Error('Failed to upgrade team');
     }
+
+    let elapsed = new Date().getTime() - start;
+    console.log(`Team upgrade process for team with id ${teamId} took ${elapsed / 1000} seconds`);
   }
 }
