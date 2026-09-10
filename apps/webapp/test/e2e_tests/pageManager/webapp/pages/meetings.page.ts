@@ -37,8 +37,8 @@ export class MeetingsPage {
   readonly meetingsTab: Locator;
   readonly meetingsList: Locator;
   readonly emptyMeetingsList: Locator;
+  readonly meetNowButton: Locator;
   readonly scheduleMeetingButton: Locator;
-  readonly createMeetingButton: Locator;
   readonly scheduleMeetingModal: Locator;
   readonly meetNowModal: Locator;
   readonly notificationHost: Locator;
@@ -49,8 +49,8 @@ export class MeetingsPage {
     this.meetingsTab = page.getByTestId('go-meetings');
     this.meetingsList = page.getByTestId('meetings-list');
     this.emptyMeetingsList = page.getByTestId('empty-meetings-list');
+    this.meetNowButton = page.getByTestId('meet-now');
     this.scheduleMeetingButton = page.getByTestId('schedule-meeting');
-    this.createMeetingButton = page.getByTestId('create-meeting');
     this.scheduleMeetingModal = page.getByTestId('schedule-meeting-modal');
     this.meetNowModal = page.getByTestId('meet-now-modal');
     this.notificationHost = page.getByTestId('meeting-notification-host');
@@ -70,14 +70,12 @@ export class MeetingsPage {
       return;
     }
 
-    await this.createMeetingButton.click();
-    await this.page.getByRole('menu').getByRole('button', {name: 'Schedule Meeting'}).click();
+    await this.scheduleMeetingButton.click();
   }
 
   async openMeetNowModal() {
     await this.openMeetingsTab();
-    await this.createMeetingButton.click();
-    await this.page.getByRole('menu').getByRole('button', {name: 'Meet now'}).click();
+    await this.meetNowButton.click();
     await expect(this.meetNowModal).toBeVisible();
   }
 
