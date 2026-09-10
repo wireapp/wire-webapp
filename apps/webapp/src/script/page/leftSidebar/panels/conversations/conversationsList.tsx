@@ -22,7 +22,6 @@ import React, {
   KeyboardEvent as ReactKeyBoardEvent,
   useEffect,
   useState,
-  MutableRefObject,
   useCallback,
   useRef,
 } from 'react';
@@ -40,7 +39,7 @@ import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conve
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKeyboardEvent} from 'Util/keyboardUtil';
@@ -55,7 +54,7 @@ import {
   virtualizationSpacerStyles,
   virtualizationStyles,
 } from './conversationsList.styles';
-import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
+import {getConversationFocusCandidates, getConversationsToDisplay} from './helpers';
 
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
@@ -82,7 +81,6 @@ interface ConversationsListProps {
   groupParticipantsConversations: Conversation[];
   isGroupParticipantsVisible: boolean;
   isEmpty: boolean;
-  searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }
 
 export const ConversationsList = ({
@@ -100,7 +98,6 @@ export const ConversationsList = ({
   groupParticipantsConversations,
   isGroupParticipantsVisible,
   isEmpty,
-  searchInputRef,
 }: ConversationsListProps) => {
   const {translate} = useApplicationContext();
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -142,13 +139,20 @@ export const ConversationsList = ({
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
-  const isFolderView = currentTab === SidebarTabs.FOLDER;
-  const filteredConversations =
-    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
-
-  const conversationsToDisplay = filteredConversations.length
-    ? filteredConversations
-    : getConversationsWithHeadings(conversations, conversationsFilter, currentTab);
+  const conversationsToDisplay = getConversationsToDisplay({
+    conversations,
+    conversationsFilter,
+    currentFolder,
+    currentTab,
+  });
+  const conversationFocusCandidates = getConversationFocusCandidates({
+    conversations,
+    conversationsFilter,
+    currentFolder,
+    currentTab,
+    groupParticipantsConversations,
+    isGroupParticipantsVisible,
+  });
 
   const parentRef = useRef(null);
 
@@ -210,19 +214,22 @@ export const ConversationsList = ({
     [debouncedOnConversationClick],
   );
 
-  const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
-    isFocused:
-      document.activeElement !== searchInputRef.current && !conversationsFilter && currentFocus === conversation.id,
-    handleArrowKeyDown: handleArrowKeyDown(index),
-    resetConversationFocus,
-    dataUieName: 'item-conversation',
-    conversation,
-    onClick: onConversationClick(conversation),
-    isSelected: isActiveConversation,
-    onJoinCall: answerCall,
-    rightClick: openContextMenu,
-    showJoinButton: hasJoinableCall(conversation),
-  });
+  const getCommonConversationCellProps = (conversation: Conversation) => {
+    const focusIndex = conversationFocusCandidates.findIndex(candidate => candidate.id === conversation.id);
+
+    return {
+      isFocused: currentFocus === conversation.id,
+      handleArrowKeyDown: handleArrowKeyDown(focusIndex),
+      resetConversationFocus,
+      dataUieName: 'item-conversation',
+      conversation,
+      onClick: onConversationClick(conversation),
+      isSelected: isActiveConversation,
+      onJoinCall: answerCall,
+      rightClick: openContextMenu,
+      showJoinButton: hasJoinableCall(conversation),
+    };
+  };
 
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
@@ -254,8 +261,8 @@ export const ConversationsList = ({
           data-uie-name="group-participants-conversations-view"
           className="group-participants-conversations"
         >
-          {groupParticipantsConversations.map((conversation, index) => (
-            <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+          {groupParticipantsConversations.map(conversation => (
+            <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation)} />
           ))}
         </ul>
       </li>
@@ -323,7 +330,7 @@ export const ConversationsList = ({
                   height: `${virtualItem.size}px`,
                   transform: `translateY(${virtualItem.start}px)`,
                 }}
-                {...getCommonConversationCellProps(conversation, virtualItem.index)}
+                {...getCommonConversationCellProps(conversation)}
               />
             );
           }

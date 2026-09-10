@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, KeyboardEvent, MutableRefObject, useEffect} from 'react';
+import {KeyboardEvent, MutableRefObject, useEffect} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -31,7 +31,7 @@ import {User} from 'Repositories/entity/User';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEnterDown, handleEscDown} from 'Util/keyboardUtil';
+import {handleEnterDown, handleEscDown, isTabKey} from 'Util/keyboardUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
@@ -64,6 +64,7 @@ interface ConversationHeaderProps {
   searchInputPlaceholder: string;
   currentFolder?: ConversationLabel;
   onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onSearchTab: (event: KeyboardEvent<HTMLInputElement>) => void;
   jumpToRecentSearch: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
   isListCollapsed?: boolean;
@@ -79,6 +80,7 @@ export const ConversationHeaderComponent = ({
   currentFolder,
   searchInputPlaceholder,
   onSearchEnterClick,
+  onSearchTab,
   jumpToRecentSearch,
   searchInputRef,
   isListCollapsed = false,
@@ -106,6 +108,10 @@ export const ConversationHeaderComponent = ({
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     handleEscDown(event, () => setSearchValue(''));
     handleEnterDown(event, () => onSearchEnterClick(event));
+
+    if (!event.shiftKey && isTabKey(event)) {
+      onSearchTab(event);
+    }
   };
 
   useEffect(() => {
@@ -220,4 +226,4 @@ export const ConversationHeaderComponent = ({
   );
 };
 
-export const ConversationHeader = forwardRef(ConversationHeaderComponent);
+export const ConversationHeader = ConversationHeaderComponent;

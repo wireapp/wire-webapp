@@ -61,7 +61,7 @@ import {ConversationSidebar} from './conversationSidebar/conversationSidebar';
 import {ConversationsList} from './conversationsList';
 import {EmptyConversationList} from './emptyConversationList';
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
-import {getTabConversations, scrollToConversation} from './helpers';
+import {getConversationFocusCandidates, getTabConversations, scrollToConversation} from './helpers';
 import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {
@@ -185,8 +185,6 @@ export const Conversations = ({
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
     useShallow(state => state),
   );
-  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
-
   // false when screen is larger than 1000px
   // true when screen is smaller than 1000px
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
@@ -260,6 +258,30 @@ export const Conversations = ({
     !!conversationsFilter &&
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
     groupParticipantsConversations.length > 0;
+
+  const conversationsForFocus = useMemo(
+    () =>
+      getConversationFocusCandidates({
+        conversations: currentTabConversations,
+        conversationsFilter,
+        currentFolder,
+        currentTab,
+        groupParticipantsConversations,
+        isGroupParticipantsVisible,
+      }),
+    [
+      currentTab,
+      currentTabConversations,
+      conversationsFilter,
+      currentFolder,
+      groupParticipantsConversations,
+      isGroupParticipantsVisible,
+    ],
+  );
+  const {currentFocus, handleKeyDown, resetConversationFocus, setCurrentFocus} = useConversationFocus(
+    conversationsForFocus,
+    conversationsFilter,
+  );
 
   const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
   const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionRequests;
@@ -460,6 +482,24 @@ export const Conversations = ({
     [currentTabConversations],
   );
 
+  const handleSearchTab = useCallback(
+    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+      const firstResult = conversationsFilter ? conversationsForFocus[0] : undefined;
+
+      if (!firstResult) {
+        return;
+      }
+
+      event.preventDefault();
+      setCurrentFocus(firstResult.id);
+      const firstResultElement = document.querySelector<HTMLElement>(
+        `[data-uie-uid="${firstResult.id}"] [data-uie-name="go-open-conversation"]`,
+      );
+      firstResultElement?.focus();
+    },
+    [conversationsFilter, conversationsForFocus, setCurrentFocus],
+  );
+
   const onSearch = useCallback(
     (searchValue: string) => {
       setConversationsFilter(searchValue);
@@ -524,7 +564,6 @@ export const Conversations = ({
             isEmpty={hasEmptyConversationsList}
             groupParticipantsConversations={groupParticipantsConversations}
             isGroupParticipantsVisible={isGroupParticipantsVisible}
-            searchInputRef={searchInputRef}
           />
         )}
       </>
@@ -546,6 +585,7 @@ export const Conversations = ({
             setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
             onSearchEnterClick={handleEnterSearchClick}
+            onSearchTab={handleSearchTab}
             jumpToRecentSearch={jumpToRecentSearch}
             searchInputRef={searchInputRef}
             isListCollapsed={isConversationListCollapsed}

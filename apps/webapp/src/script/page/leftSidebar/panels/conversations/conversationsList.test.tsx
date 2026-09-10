@@ -28,7 +28,8 @@ jest.mock('@tanstack/react-virtual', () => ({
 
 import {createRef} from 'react';
 
-import {render} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
@@ -44,11 +45,12 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
+import {SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {ConversationsList} from './conversationsList';
 
 const create1to1Conversation = (userName: string) => {
-  const conversation = new Conversation('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation(userName, 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const user = new User('id', 'domain', translateForTest);
   user.name(userName);
   conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -80,11 +82,12 @@ describe('ConversationsList', () => {
     currentFocus = '';
     currentFolder = {} as ConversationLabel;
     resetConversationFocus = jest.fn();
-    handleArrowKeyDown = jest.fn();
+    handleArrowKeyDown = jest.fn(() => jest.fn());
     clearSearchFilter = jest.fn();
+    useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
   });
 
-  const renderComponent = (conversations: Conversation[], searchFilter: string = '') =>
+  const renderComponent = (conversations: Conversation[], searchFilter: string = '', isEmpty = false) =>
     render(
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
@@ -101,8 +104,7 @@ describe('ConversationsList', () => {
         clearSearchFilter={clearSearchFilter}
         groupParticipantsConversations={[]}
         isGroupParticipantsVisible={false}
-        isEmpty={false}
-        searchInputRef={createRef()}
+        isEmpty={isEmpty}
       />,
       {wrapper: rootProviderWrapper},
     );
@@ -116,6 +118,136 @@ describe('ConversationsList', () => {
     const {findByText} = renderComponent(conversations);
 
     await Promise.all(userNames.map(async userName => expect(await findByText(userName)).toBeDefined()));
+  });
+
+  it.each(['', 'Alice'])('keeps pending requests before conversation results in the DOM order (filter: %s)', searchFilter => {
+    const conversation = create1to1Conversation('Alice');
+    const pendingRequest = new User('pending', 'domain', translateForTest);
+    connectRequests = [pendingRequest];
+    currentFocus = conversation.id;
+
+    const {container} = renderComponent([conversation], searchFilter);
+    const requestButton = container.querySelector('[data-uie-name="connection-request"] [role="button"]');
+    const conversationButton = container.querySelector('[data-uie-name="go-open-conversation"]');
+
+    if (!requestButton || !conversationButton) {
+      throw new Error('Expected pending request and conversation controls to be rendered');
+    }
+
+    expect(requestButton).toHaveAttribute('tabindex', '0');
+    expect(conversationButton).toHaveAttribute('tabindex', '0');
+    expect(requestButton.compareDocumentPosition(conversationButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('keeps pending requests focusable when filtering has no conversation results', () => {
+    const pendingRequest = new User('pending', 'domain', translateForTest);
+    connectRequests = [pendingRequest];
+
+    const {container} = renderComponent([], 'no match', true);
+    const requestButton = container.querySelector('[data-uie-name="connection-request"] [role="button"]');
+
+    expect(requestButton).toHaveAttribute('tabindex', '0');
+    expect(container.querySelectorAll('[data-uie-name="go-open-conversation"]')).toHaveLength(0);
+  });
+
+  it('focuses the first filtered conversation when tabbing from the search input', async () => {
+    const firstConversation = create1to1Conversation('Alice');
+    const filteredConversation = create1to1Conversation('Bob');
+    const searchInputRef = createRef<HTMLInputElement>();
+
+    const {container} = render(
+      <>
+        <input ref={searchInputRef} aria-label="Search conversations" />
+        <ConversationsList
+          conversationLabelRepository={conversationLabelRepository}
+          conversations={[filteredConversation]}
+          conversationsFilter="Bob"
+          listViewModel={listViewModel}
+          connectRequests={connectRequests}
+          conversationState={conversationState}
+          callState={callState}
+          currentFocus={filteredConversation.id}
+          currentFolder={currentFolder}
+          resetConversationFocus={resetConversationFocus}
+          handleArrowKeyDown={handleArrowKeyDown}
+          clearSearchFilter={clearSearchFilter}
+          groupParticipantsConversations={[firstConversation]}
+          isGroupParticipantsVisible={true}
+          isEmpty={false}
+        />
+      </>,
+      {wrapper: rootProviderWrapper},
+    );
+
+    const firstResult = container.querySelector('[data-uie-name="go-open-conversation"]');
+    expect(firstResult).toHaveAttribute('tabindex', '0');
+
+    const user = userEvent.setup();
+    searchInputRef.current?.focus();
+    await user.tab();
+
+    expect(firstResult).toHaveFocus();
+
+    const results = container.querySelectorAll('[data-uie-name="go-open-conversation"]');
+    expect(results).toHaveLength(2);
+    fireEvent.keyDown(results[1], {key: 'ArrowUp'});
+    expect(handleArrowKeyDown).toHaveBeenCalledWith(1);
+  });
+
+  it('keeps the search input focused while filtered results are updated', () => {
+    const searchInputRef = createRef<HTMLInputElement>();
+    const conversation = create1to1Conversation('Alice');
+
+    const {rerender} = render(
+      <>
+        <input ref={searchInputRef} aria-label="Search conversations" />
+        <ConversationsList
+          conversationLabelRepository={conversationLabelRepository}
+          conversations={[conversation]}
+          conversationsFilter="Alice"
+          listViewModel={listViewModel}
+          connectRequests={connectRequests}
+          conversationState={conversationState}
+          callState={callState}
+          currentFocus={conversation.id}
+          currentFolder={currentFolder}
+          resetConversationFocus={resetConversationFocus}
+          handleArrowKeyDown={handleArrowKeyDown}
+          clearSearchFilter={clearSearchFilter}
+          groupParticipantsConversations={[]}
+          isGroupParticipantsVisible={false}
+          isEmpty={false}
+        />
+      </>,
+      {wrapper: rootProviderWrapper},
+    );
+
+    searchInputRef.current?.focus();
+    const updatedConversation = create1to1Conversation('Bob');
+    rerender(
+      <>
+        <input ref={searchInputRef} aria-label="Search conversations" />
+        <ConversationsList
+          conversationLabelRepository={conversationLabelRepository}
+          conversations={[updatedConversation]}
+          conversationsFilter="Bob"
+          listViewModel={listViewModel}
+          connectRequests={connectRequests}
+          conversationState={conversationState}
+          callState={callState}
+          currentFocus={updatedConversation.id}
+          currentFolder={currentFolder}
+          resetConversationFocus={resetConversationFocus}
+          handleArrowKeyDown={handleArrowKeyDown}
+          clearSearchFilter={clearSearchFilter}
+          groupParticipantsConversations={[]}
+          isGroupParticipantsVisible={false}
+          isEmpty={false}
+        />
+      </>,
+    );
+
+    expect(searchInputRef.current).toHaveFocus();
   });
 
   it('keeps group participant results inside the conversation results scroll container', async () => {
@@ -139,7 +271,6 @@ describe('ConversationsList', () => {
         groupParticipantsConversations={[participantNameResult]}
         isGroupParticipantsVisible={true}
         isEmpty={false}
-        searchInputRef={createRef()}
       />,
       {wrapper: rootProviderWrapper},
     );

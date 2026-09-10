@@ -17,9 +17,11 @@
  *
  */
 
+import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {replaceAccents} from 'Util/stringUtil';
+import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import {SidebarTabs} from './useSidebarStore';
 
@@ -249,6 +251,65 @@ export const conversationSearchFilter = (filter: string) => (conversation: Conve
   const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
 
   return conversationDisplayName.includes(filterWord);
+};
+
+type ConversationListDisplayParams = {
+  conversations: Conversation[];
+  conversationsFilter: string;
+  currentFolder?: ConversationLabel;
+  currentTab: SidebarTabs;
+};
+
+export const getConversationsToDisplay = ({
+  conversations,
+  conversationsFilter,
+  currentFolder,
+  currentTab,
+}: ConversationListDisplayParams) => {
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const filteredConversations =
+    isFolderView && currentFolder !== undefined
+      ? currentFolder.conversations().filter(conversationSearchFilter(conversationsFilter))
+      : [];
+
+  return filteredConversations.length > 0
+    ? filteredConversations
+    : getConversationsWithHeadings(conversations, conversationsFilter, currentTab);
+};
+
+type ConversationFocusCandidatesParams = ConversationListDisplayParams & {
+  groupParticipantsConversations: Conversation[];
+  isGroupParticipantsVisible: boolean;
+};
+
+export const getConversationFocusCandidates = ({
+  conversations,
+  conversationsFilter,
+  currentFolder,
+  currentTab,
+  groupParticipantsConversations,
+  isGroupParticipantsVisible,
+}: ConversationFocusCandidatesParams) => {
+  const conversationsToDisplay = getConversationsToDisplay({
+    conversations,
+    conversationsFilter,
+    currentFolder,
+    currentTab,
+  });
+  const conversationResults = conversationsToDisplay.filter(isConversationEntity);
+  const focusCandidates = isGroupParticipantsVisible
+    ? [...conversationResults, ...groupParticipantsConversations]
+    : conversationResults;
+  const seenConversationIds = new Set<string>();
+
+  return focusCandidates.filter(conversation => {
+    if (seenConversationIds.has(conversation.id)) {
+      return false;
+    }
+
+    seenConversationIds.add(conversation.id);
+    return true;
+  });
 };
 
 export const scrollToConversation = (conversationId: string) => {
