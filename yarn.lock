@@ -375,6 +375,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aws-sdk/xhr-http-handler@npm:3.1127.0":
+  version: 3.1127.0
+  resolution: "@aws-sdk/xhr-http-handler@npm:3.1127.0"
+  dependencies:
+    "@aws-sdk/types": "npm:^3.974.5"
+    "@smithy/core": "npm:^3.33.3"
+    "@smithy/types": "npm:^4.17.2"
+    events: "npm:3.3.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10/54ed5abee01bff1b5939da1c7ec582622cedbc2fe1c23ae77f94f33cadc36852e339b4d2ff33a7eb9e37c4727f7ad58215cb4c53b4f198c662ab33985cac4b9e
+  languageName: node
+  linkType: hard
+
 "@aws-sdk/xml-builder@npm:^3.972.40":
   version: 3.972.40
   resolution: "@aws-sdk/xml-builder@npm:3.972.40"
@@ -11642,6 +11655,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": "npm:3.1127.0"
     "@aws-sdk/lib-storage": "npm:3.1127.0"
+    "@aws-sdk/xhr-http-handler": "npm:3.1127.0"
     "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:1.16.2"
     "@swc/jest": "npm:0.2.39"

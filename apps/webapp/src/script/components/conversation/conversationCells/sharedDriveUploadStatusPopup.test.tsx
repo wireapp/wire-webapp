@@ -29,6 +29,9 @@ const upload: SharedDriveUploadStatus = {
   fileName: 'report.pdf',
   fileSize: 4,
   kind: 'uploading',
+  progress: 0,
+  hasProgress: false,
+  isTransferActive: true,
   canCancel: true,
   canRetry: false,
 };
@@ -42,7 +45,14 @@ const renderPopup = (
   render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup
-        upload={{...upload, fileName, kind, canCancel: kind === 'uploading', canRetry: kind === 'failed'}}
+        upload={{
+          ...upload,
+          fileName,
+          kind,
+          isTransferActive: kind === 'uploading',
+          canCancel: kind === 'uploading',
+          canRetry: kind === 'failed',
+        }}
         title={`${kind} report.pdf`}
         statusLabel={
           kind === 'failed' ? 'Couldn’t upload file' : `${kind === 'uploading' ? 'Uploading' : 'Uploaded'} 4 KB`
@@ -70,7 +80,90 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(getByRole('status')).toBeInTheDocument();
     expect(getByText('uploading report.pdf')).toBeInTheDocument();
     expect(getByText('to Shared Drive')).toBeInTheDocument();
+    const progress = getByRole('progressbar', {name: 'report.pdf'});
+    expect(progress).not.toHaveAttribute('aria-valuenow');
+    expect(progress).not.toHaveAttribute('aria-valuemin');
+    expect(progress).not.toHaveAttribute('aria-valuemax');
     expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+  });
+
+  it('shows determinate progress when Cells reports bytes sent', () => {
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, progress: 0.45, hasProgress: true}}
+          title="Uploading report.pdf"
+          statusLabel="Uploading 4 B"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancel={jest.fn()}
+          onRetry={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    const progress = screen.getByRole('progressbar', {name: 'report.pdf'});
+    expect(progress).toHaveAttribute('aria-valuemin', '0');
+    expect(progress).toHaveAttribute('aria-valuemax', '100');
+    expect(progress).toHaveAttribute('aria-valuenow', '45');
+    expect(progress).toHaveStyle({width: '100%', transform: 'scaleX(0.45)'});
+  });
+
+  it('updates progress without replacing the bar or its style rule', () => {
+    const {rerender} = render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, progress: 0.45, hasProgress: true}}
+          title="Uploading report.pdf"
+          statusLabel="Uploading 4 B"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancel={jest.fn()}
+          onRetry={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    const progress = screen.getByRole('progressbar', {name: 'report.pdf'});
+    const progressClassName = progress.className;
+    const statusIcon = screen.getByTestId('shared-drive-upload-uploading');
+
+    rerender(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, progress: 0.46, hasProgress: true}}
+          title="Uploading report.pdf"
+          statusLabel="Uploading 4 B"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancel={jest.fn()}
+          onRetry={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toBe(progress);
+    expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toHaveClass(progressClassName);
+    expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toHaveStyle({transform: 'scaleX(0.46)'});
+    expect(screen.getByTestId('shared-drive-upload-uploading')).toBe(statusIcon);
   });
 
   it.each([

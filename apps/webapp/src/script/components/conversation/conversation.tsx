@@ -77,7 +77,7 @@ import {getCurrentFolderName} from './conversationCells/common/getCurrentFolderN
 import {ConversationCells} from './conversationCells/conversationCells';
 import {SharedDriveUploadProvider} from './conversationCells/sharedDriveUploadContext';
 import {
-  createDirectSharedDriveUploadStrategy,
+  createDraftSharedDriveUploadStrategy,
   createSharedDriveUploadController,
 } from './conversationCells/sharedDriveUploadController';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
@@ -98,6 +98,8 @@ import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
+import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
+import {createCellsUploadManager} from '../../repositories/cells/upload/manager';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 
 interface ConversationProps {
@@ -143,15 +145,18 @@ function ConversationContent({
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
     const createSource = (file: File) => ({blob: file, name: file.name, contentType: file.type, size: file.size});
+    const uploadManager = createCellsUploadManager({
+      gateway: createCellsRepositoryGateway(repositories.cells),
+      createResourceUuid: createUuid,
+      createVersionUuid: createUuid,
+      createAttemptId: createUuid,
+      createAbortController: () => new AbortController(),
+    });
 
     return createSharedDriveUploadController({
       createUploadId: createUuid,
       createSource,
-      uploadStrategy: createDirectSharedDriveUploadStrategy({
-        cellsRepository: repositories.cells,
-        createAbortController: () => new AbortController(),
-        createSource,
-      }),
+      uploadStrategy: createDraftSharedDriveUploadStrategy({manager: uploadManager}),
     });
   }, [repositories.cells]);
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);

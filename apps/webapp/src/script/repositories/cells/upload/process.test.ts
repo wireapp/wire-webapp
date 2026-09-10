@@ -158,6 +158,26 @@ describe('createCellsUploadProcess', () => {
     expect(snapshots).toEqual(['queued', 'uploading', 'uploading', 'draftReady']);
   });
 
+  it('forwards every progress update before upload completion', async () => {
+    const fixture = setup();
+    const progressSnapshots: number[] = [];
+    fixture.process.subscribe(snapshot => {
+      if (snapshot.kind === 'uploading') {
+        progressSnapshots.push(snapshot.progress);
+      }
+    });
+
+    const start = fixture.process.start();
+    const request = required(fixture.uploads[0]);
+    request.onProgress(0.1);
+    request.onProgress(0.45);
+    request.onProgress(0.8);
+    expect(progressSnapshots).toEqual([0, 0.1, 0.45, 0.8]);
+
+    required(fixture.uploadTasks[0]).resolve(undefined);
+    await unwrap(start);
+  });
+
   it('uses the repository-returned remote identity after upload', async () => {
     const remoteIdentity: DraftIdentity = {
       uploadId: 'upload-1',

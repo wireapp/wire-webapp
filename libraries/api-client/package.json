@@ -23,6 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.1127.0",
     "@aws-sdk/lib-storage": "3.1127.0",
+    "@aws-sdk/xhr-http-handler": "3.1127.0",
     "@sindresorhus/is": "8.1.0",
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",

@@ -27,6 +27,7 @@ import {getFileExtension} from 'Util/util';
 import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
 import {
   sharedDriveUploadStatusPopupContentStyles,
+  sharedDriveUploadStatusPopupDeterminateProgressStyles,
   sharedDriveUploadStatusPopupDestinationStyles,
   sharedDriveUploadStatusPopupHeaderActionsStyles,
   sharedDriveUploadStatusPopupHeaderCancelStyles,
@@ -49,6 +50,10 @@ import {
   sharedDriveUploadStatusPopupToggleIconStyles,
   sharedDriveUploadStatusPopupToggleStyles,
 } from './sharedDriveUploadStatusPopup.styles';
+
+const PROGRESS_PERCENTAGE_MAX = 100;
+
+const getProgressTransform = (progress: number): string => `scaleX(${Math.min(1, Math.max(0, progress))})`;
 
 interface SharedDriveUploadStatusPopupProps {
   readonly upload: SharedDriveUploadStatus;
@@ -121,6 +126,47 @@ export const SharedDriveUploadStatusPopup = ({
   onDismiss,
 }: SharedDriveUploadStatusPopupProps) => {
   const statusRowId = `shared-drive-upload-status-${upload.uploadId}`;
+  const progressIndicator = (() => {
+    if (upload.isTransferActive && upload.hasProgress) {
+      return (
+        <div
+          role="progressbar"
+          aria-label={upload.fileName}
+          aria-valuemin={0}
+          aria-valuemax={PROGRESS_PERCENTAGE_MAX}
+          aria-valuenow={Math.round(upload.progress * PROGRESS_PERCENTAGE_MAX)}
+          css={sharedDriveUploadStatusPopupDeterminateProgressStyles(isExpanded)}
+          style={{transform: getProgressTransform(upload.progress)}}
+          data-testid="shared-drive-upload-progress"
+          data-uie-name="shared-drive-upload-progress"
+        />
+      );
+    }
+
+    if (upload.isTransferActive) {
+      return (
+        <div
+          role="progressbar"
+          aria-label={upload.fileName}
+          css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
+          data-testid="shared-drive-upload-progress"
+          data-uie-name="shared-drive-upload-progress"
+        />
+      );
+    }
+
+    if (upload.kind !== 'uploading') {
+      return (
+        <div
+          css={sharedDriveUploadStatusPopupProgressStyles(isExpanded, upload.kind)}
+          data-testid="shared-drive-upload-progress"
+          data-uie-name="shared-drive-upload-progress"
+        />
+      );
+    }
+
+    return null;
+  })();
 
   return (
     <div css={sharedDriveUploadStatusPopupStyles} data-uie-name="shared-drive-upload-status-popup">
@@ -230,10 +276,7 @@ export const SharedDriveUploadStatusPopup = ({
           )}
         </div>
       </div>
-      <div
-        css={sharedDriveUploadStatusPopupProgressStyles(isExpanded, upload.kind)}
-        data-uie-name="shared-drive-upload-progress"
-      />
+      {progressIndicator}
     </div>
   );
 };

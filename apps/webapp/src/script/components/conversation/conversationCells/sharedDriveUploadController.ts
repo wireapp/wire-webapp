@@ -157,7 +157,13 @@ export const createDirectSharedDriveUploadStrategy = ({
         uuid: uploadId,
         file: request.file,
         path: request.path,
-        progressCallback: progress => setState(uploadId, {kind: 'uploading', identity: {uploadId}, source, progress}),
+        progressCallback: progress => {
+          if (abortController.signal.aborted || abortControllersByUploadId.get(uploadId) !== abortController) {
+            return;
+          }
+
+          setState(uploadId, {kind: 'uploading', identity: {uploadId}, source, progress});
+        },
         abortController,
       });
 

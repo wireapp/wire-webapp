@@ -50,11 +50,18 @@ const failedState: UploadState = {
   source: uploadSource,
   error: {kind: 'uploadFailed', cause: new Error('upload failed')},
 };
+const publishFailedState: UploadState = {
+  kind: 'publishFailed',
+  identity: {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
+  source: uploadSource,
+  error: {kind: 'publishFailed', cause: new Error('publish failed')},
+};
 type TestController = SharedDriveUploadController & {
   snapshots: jest.MockedFunction<SharedDriveUploadController['snapshots']>;
   subscribe: jest.MockedFunction<SharedDriveUploadController['subscribe']>;
   cancel: jest.MockedFunction<SharedDriveUploadController['cancel']>;
   retryUpload: jest.MockedFunction<SharedDriveUploadController['retryUpload']>;
+  retryPublish: jest.MockedFunction<SharedDriveUploadController['retryPublish']>;
 };
 
 const createController = (state: UploadState = uploadState): TestController => ({
@@ -204,6 +211,52 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await waitFor(() =>
       expect(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'})).not.toBeDisabled(),
     );
+  });
+
+  it('retries publication when the upload succeeded but promotion failed', async () => {
+    const user = userEvent.setup();
+    const controller = createController(publishFailedState);
+    controller.retryPublish.mockResolvedValue(undefined);
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    await user.click(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
+
+    expect(controller.retryPublish).toHaveBeenCalledWith('upload-1');
+    expect(controller.retryUpload).not.toHaveBeenCalled();
+  });
+
+  it('renders every incremental progress update before completion', () => {
+    const controller = createController(uploadState);
+    let state: UploadState = uploadState;
+    let notify: () => void = jest.fn();
+    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? [state] : []));
+    controller.subscribe.mockImplementation(listener => {
+      notify = listener;
+      return jest.fn();
+    });
+
+    renderHost(controller, conversationQualifiedId);
+    const progress = screen.getByRole('progressbar', {name: 'report.pdf'});
+    const indeterminateClassName = progress.className;
+    let determinateClassName: string | undefined;
+
+    for (const [index, nextProgress] of [0.1, 0.45, 0.8].entries()) {
+      state = {...uploadState, progress: nextProgress};
+      act(() => notify());
+      expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
+      expect(screen.getAllByTestId('shared-drive-upload-progress')).toHaveLength(1);
+      expect(screen.getAllByTestId('shared-drive-upload-uploading')).toHaveLength(1);
+      expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toBe(progress);
+      expect(progress).toHaveAttribute('aria-valuenow', `${nextProgress * 100}`);
+      expect(progress).toHaveStyle({transform: `scaleX(${nextProgress})`});
+      if (index === 0) {
+        determinateClassName = progress.className;
+        expect(progress).not.toHaveClass(indeterminateClassName);
+      } else {
+        expect(progress.className).toBe(determinateClassName);
+      }
+    }
   });
 
   it('shows the uploading status when retry updates the upload lifecycle', async () => {
