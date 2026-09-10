@@ -17,9 +17,8 @@
  *
  */
 
-import {isError, isNonEmptyStringAndNotWhitespace, isString} from '@sindresorhus/is';
+import {isError, isString} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
-import {Result} from 'true-myth';
 
 import {resolve} from 'node:path';
 import process from 'node:process';
@@ -45,6 +44,11 @@ import {
   inspectWebAppVersionSynchronization,
   synchronizeWebAppVersion,
 } from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
+import {
+  readInspectionRuntimeEnvironment,
+  readSynchronizationRuntimeEnvironment,
+} from '../release-metadata/webappVersionSynchronizationRuntime.ts';
+import type {WebAppVersionSynchronizationSynchronizationRuntimeEnvironment} from '../release-metadata/webappVersionSynchronizationRuntime.ts';
 
 type InspectCommand = {
   readonly kind: 'inspect';
@@ -66,69 +70,9 @@ type CreateWebAppVersionSynchronizationCommandOptions = {
   readonly writeError: (message: string) => void;
 };
 
-type RuntimeEnvironment = {
-  readonly githubApiUrl: URL;
-  readonly githubRepository: string;
-  readonly githubToken: string;
-  readonly repositoryPath: string;
-};
-
 const ottoTheBotName = 'otto-the-bot';
 const ottoTheBotEmail = '8736538+otto-the-bot@users.noreply.github.com';
 const runtimeCommandLineArgumentStartIndex = 2;
-
-function readRequiredEnvironmentValue(
-  environment: NodeJS.ProcessEnv,
-  environmentVariableName: string,
-): Result<string, Error> {
-  const environmentValue = environment[environmentVariableName];
-
-  if (isNonEmptyStringAndNotWhitespace(environmentValue) === false) {
-    return Result.err(new Error(`Required environment variable is missing: ${environmentVariableName}`));
-  }
-
-  return Result.ok(environmentValue);
-}
-
-function readRuntimeEnvironment(environment: NodeJS.ProcessEnv): Result<RuntimeEnvironment, Error> {
-  const githubApiUrlValueResult = readRequiredEnvironmentValue(environment, 'GITHUB_API_URL');
-  const githubRepositoryResult = readRequiredEnvironmentValue(environment, 'GITHUB_REPOSITORY');
-  const githubTokenResult = readRequiredEnvironmentValue(environment, 'OTTO_THE_BOT_GH_TOKEN');
-  const repositoryPath = environment.GITHUB_WORKSPACE;
-
-  if (githubApiUrlValueResult.isErr) {
-    return Result.err(githubApiUrlValueResult.error);
-  }
-
-  if (githubRepositoryResult.isErr) {
-    return Result.err(githubRepositoryResult.error);
-  }
-
-  if (githubTokenResult.isErr) {
-    return Result.err(githubTokenResult.error);
-  }
-
-  const {value: githubApiUrlValue} = githubApiUrlValueResult;
-  const {value: githubRepository} = githubRepositoryResult;
-  const {value: githubToken} = githubTokenResult;
-
-  let githubApiUrl: URL;
-
-  try {
-    githubApiUrl = new URL(githubApiUrlValue);
-  } catch (error: unknown) {
-    const errorMessage = isError(error) ? error.message : String(error);
-
-    return Result.err(new Error(`Invalid GITHUB_API_URL: ${errorMessage}`, {cause: error}));
-  }
-
-  return Result.ok({
-    githubApiUrl,
-    githubRepository,
-    githubToken,
-    repositoryPath: isNonEmptyStringAndNotWhitespace(repositoryPath) ? repositoryPath : process.cwd(),
-  });
-}
 
 function writeRuntimeError(message: string): void {
   process.stderr.write(`${message}\n`);
@@ -138,12 +82,18 @@ function writeRuntimeOutput(message: string): void {
   process.stdout.write(`${message}\n`);
 }
 
-function createRuntimeGitHubClient(runtimeEnvironment: RuntimeEnvironment): WebAppVersionSynchronizationGitHubClient {
+type RuntimeGitHubClientOptions = {
+  readonly githubApiUrl: URL;
+  readonly githubRepository: string;
+  readonly githubToken: string;
+};
+
+function createRuntimeGitHubClient(options: RuntimeGitHubClientOptions): WebAppVersionSynchronizationGitHubClient {
   return createWebAppVersionSynchronizationGitHubClient({
     httpClient: createRuntimeKyHttpClient(),
-    githubApiUrl: runtimeEnvironment.githubApiUrl,
-    githubRepository: runtimeEnvironment.githubRepository,
-    githubToken: runtimeEnvironment.githubToken,
+    githubApiUrl: options.githubApiUrl,
+    githubRepository: options.githubRepository,
+    githubToken: options.githubToken,
   });
 }
 
@@ -171,7 +121,7 @@ async function executeInspectionCommand(
 
 async function executeSynchronizationCommand(
   command: SynchronizeCommand,
-  runtimeEnvironment: RuntimeEnvironment,
+  runtimeEnvironment: WebAppVersionSynchronizationSynchronizationRuntimeEnvironment,
   githubClient: WebAppVersionSynchronizationGitHubClient,
   writeOutput: (message: string) => void,
 ): Promise<void> {
@@ -258,20 +208,37 @@ export async function runWebAppVersionSynchronizationCommand(
 }
 
 async function executeRuntimeCommand(command: WebAppVersionSynchronizationCommand): Promise<void> {
-  const runtimeEnvironmentResult = readRuntimeEnvironment(process.env);
+  if (command.kind === 'inspect') {
+    const runtimeEnvironmentResult = readInspectionRuntimeEnvironment(process.env);
+
+    if (runtimeEnvironmentResult.isErr) {
+      throw runtimeEnvironmentResult.error;
+    }
+
+    const {value: runtimeEnvironment} = runtimeEnvironmentResult;
+    const githubClient = createRuntimeGitHubClient({
+      githubApiUrl: runtimeEnvironment.githubApiUrl,
+      githubRepository: runtimeEnvironment.githubRepository,
+      githubToken: runtimeEnvironment.githubToken,
+    });
+
+    await executeInspectionCommand(command, githubClient, writeRuntimeOutput);
+
+    return;
+  }
+
+  const runtimeEnvironmentResult = readSynchronizationRuntimeEnvironment(process.env);
 
   if (runtimeEnvironmentResult.isErr) {
     throw runtimeEnvironmentResult.error;
   }
 
   const {value: runtimeEnvironment} = runtimeEnvironmentResult;
-  const githubClient = createRuntimeGitHubClient(runtimeEnvironment);
-
-  if (command.kind === 'inspect') {
-    await executeInspectionCommand(command, githubClient, writeRuntimeOutput);
-
-    return;
-  }
+  const githubClient = createRuntimeGitHubClient({
+    githubApiUrl: runtimeEnvironment.githubApiUrl,
+    githubRepository: runtimeEnvironment.githubRepository,
+    githubToken: runtimeEnvironment.ottoTheBotGitHubToken,
+  });
 
   await executeSynchronizationCommand(command, runtimeEnvironment, githubClient, writeRuntimeOutput);
 }

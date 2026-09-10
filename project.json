@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/release-appearance tools/release-metadata/webappVersionSynchronizationCli.ts tools/release-cli/webappVersionSynchronization.mts 'tools/**/*.test.ts'"
+        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/release-appearance tools/release-metadata/webappVersionSynchronizationCli.ts tools/release-metadata/webappVersionSynchronizationRuntime.ts tools/release-cli/webappVersionSynchronization.mts 'tools/**/*.test.ts'"
       }
     },
     "e2e": {
