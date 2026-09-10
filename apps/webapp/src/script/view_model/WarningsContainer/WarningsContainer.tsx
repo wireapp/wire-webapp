@@ -99,17 +99,6 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
   const warningDimmed = warnings.some(warning => CONFIG.DIMMED_MODES.includes(warning));
 
   useEffect(() => {
-    const visibleWarning = warnings[warnings.length - 1];
-    const isConnectivityRecovery = visibleWarning === TYPE.CONNECTIVITY_RECOVERY;
-    const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
-    const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
-
-    const app = document.querySelector('#app');
-    if (app) {
-      app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
-      app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
-    }
-
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }, [warnings]);
 
