@@ -10254,12 +10254,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:24.13.1":
-  version: 24.13.1
-  resolution: "@types/node@npm:24.13.1"
+"@types/node@npm:24.13.3":
+  version: 24.13.3
+  resolution: "@types/node@npm:24.13.3"
   dependencies:
     undici-types: "npm:~7.18.0"
-  checksum: 10/44aef6ada09b68f69b22d8dc6e84e2a40135af97ee4c0c5203c77fc27d7363a1b3659b71e82e4530de7786ed5e4ea6dd42579dcc9708dea9c1ab40e5bdd9c48e
+  checksum: 10/cfa6ed1e16c4624d1e83b09aeb72a2f50a7e17d837bf5a1259a52e346f33a693afd289402d3b6118ce3abea7aff35f2a4f13a0284b96bc5807a50f0e22e1ec77
   languageName: node
   linkType: hard
 
@@ -11951,7 +11951,7 @@ __metadata:
     "@testing-library/user-event": "npm:14.6.7"
     "@types/color": "npm:3.0.7"
     "@types/jest": "npm:30.0.0"
-    "@types/node": "npm:24.13.1"
+    "@types/node": "npm:24.13.3"
     "@types/react": "npm:18.3.31"
     "@types/react-dom": "npm:18.3.7"
     "@types/react-test-renderer": "npm:18.3.1"
@@ -32597,7 +32597,7 @@ __metadata:
     "@types/jest": "npm:30.0.0"
     "@types/js-yaml": "npm:4.0.9"
     "@types/jsdom": "npm:28.0.3"
-    "@types/node": "npm:24.13.1"
+    "@types/node": "npm:24.13.3"
     "@types/tough-cookie": "npm:4.0.5"
     "@typescript-eslint/eslint-plugin": "npm:8.69.0"
     "@typescript-eslint/parser": "npm:8.69.0"
