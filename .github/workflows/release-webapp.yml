@@ -1212,6 +1212,93 @@ jobs:
           PRODUCTION_TAG_NAME: ${{ needs.create_production_tag.outputs.production_tag_name || needs.production_preflight.outputs.production_tag_name }}
         run: node ./tools/release-cli/ensureProductionGitHubRelease.mts "${PRODUCTION_TAG_NAME}" >> "${GITHUB_OUTPUT}"
 
+  synchronize_webapp_version:
+    name: Synchronize WebApp version
+    runs-on: ubuntu-24.04
+    needs:
+      [
+        build_artifact,
+        production_preflight,
+        deploy_to_production,
+        verify_production_runtime,
+        create_production_tag,
+        publish_production_distribution,
+        ensure_github_release,
+      ]
+    if: >-
+      ${{
+        always() &&
+        needs.production_preflight.result == 'success' &&
+        needs.production_preflight.outputs.production_preflight_result == 'ready' &&
+        needs.deploy_to_production.result == 'success' &&
+        needs.verify_production_runtime.result == 'success' &&
+        needs.create_production_tag.result == 'success' &&
+        needs.publish_production_distribution.result == 'success' &&
+        needs.ensure_github_release.result == 'success'
+      }}
+    permissions:
+      contents: read
+    concurrency:
+      group: webapp-version-synchronization
+      cancel-in-progress: false
+      queue: max
+    outputs:
+      webapp_version: ${{ steps.synchronize.outputs.webapp_version }}
+      version_sync_action: ${{ steps.synchronize.outputs.action }}
+      version_sync_pr_number: ${{ steps.synchronize.outputs.pull_request_number }}
+      version_sync_pr_url: ${{ steps.synchronize.outputs.pull_request_url }}
+      version_sync_branch_name: ${{ steps.synchronize.outputs.branch_name }}
+
+    steps:
+      - name: Checkout workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install synchronization tooling dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Synchronize WebApp version with Production
+        id: synchronize
+        env:
+          OTTO_THE_BOT_GH_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
+          PRODUCTION_TAG_NAME: ${{ needs.create_production_tag.outputs.production_tag_name }}
+          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+        run: |
+          set -euo pipefail
+
+          synchronization_output="$(node ./tools/release-cli/webappVersionSynchronization.mts synchronize "${RELEASE_IDENTIFIER}" "${PRODUCTION_TAG_NAME}")"
+
+          jq -e '
+            type == "object" and
+            (.action | type == "string") and
+            (.webapp_version | type == "string") and
+            (.branch_name | type == "string") and
+            (.pull_request_number | type == "number") and
+            (.pull_request_url | type == "string")
+          ' <<< "${synchronization_output}" > /dev/null
+
+          {
+            echo "webapp_version=$(jq --raw-output '.webapp_version' <<< "${synchronization_output}")"
+            echo "action=$(jq --raw-output '.action' <<< "${synchronization_output}")"
+            echo "pull_request_number=$(jq --raw-output '.pull_request_number' <<< "${synchronization_output}")"
+            echo "pull_request_url=$(jq --raw-output '.pull_request_url' <<< "${synchronization_output}")"
+            echo "branch_name=$(jq --raw-output '.branch_name' <<< "${synchronization_output}")"
+          } >> "$GITHUB_OUTPUT"
+
   notify_production_release_success:
     name: Notify successful Production release
     runs-on: ubuntu-24.04
