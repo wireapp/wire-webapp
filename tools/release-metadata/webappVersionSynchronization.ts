@@ -17,8 +17,8 @@
  *
  */
 
-import {isNull, isString, isUndefined} from '@sindresorhus/is';
-import {Maybe, Result} from 'true-myth';
+import {isNull, isString} from '@sindresorhus/is';
+import {Maybe, maybe, Result} from 'true-myth';
 
 import {createProductionTagName} from './releaseMetadata.ts';
 import type {ProductionTagName, ReleaseIdentifier} from './releaseMetadata.ts';
@@ -113,7 +113,9 @@ function createSynchronizationRequest(
     return Result.err(productionTagNameResult.error);
   }
 
-  if (productionTagNameResult.value !== productionTagName) {
+  const {value: validatedProductionTagName} = productionTagNameResult;
+
+  if (validatedProductionTagName !== productionTagName) {
     return Result.err(
       new Error(`Production tag ${productionTagName} does not match release identifier ${releaseIdentifier}`),
     );
@@ -121,7 +123,7 @@ function createSynchronizationRequest(
 
   return Result.ok({
     releaseIdentifier: releaseIdentifier as ReleaseIdentifier,
-    productionTagName: productionTagNameResult.value,
+    productionTagName: validatedProductionTagName,
   });
 }
 
@@ -166,8 +168,10 @@ export function createWebAppVersionSynchronizationBranchName(
     return Result.err(webAppVersionResult.error);
   }
 
+  const {value: validatedWebAppVersion} = webAppVersionResult;
+
   return Result.ok(
-    `${synchronizationBranchPrefix}${releaseIdentifier}-${webAppVersionResult.value}` as WebAppVersionSynchronizationBranchName,
+    `${synchronizationBranchPrefix}${releaseIdentifier}-${validatedWebAppVersion}` as WebAppVersionSynchronizationBranchName,
   );
 }
 
@@ -193,12 +197,14 @@ export function validateWebAppVersionSynchronizationBranchName(
     return Result.err(expectedBranchNameResult.error);
   }
 
-  if (expectedBranchNameResult.value !== branchName) {
+  const {value: expectedBranchName} = expectedBranchNameResult;
+
+  if (expectedBranchName !== branchName) {
     return Result.err(new Error(`Invalid WebApp version synchronization branch name: ${branchName}`));
   }
 
   return Result.ok({
-    branchName: expectedBranchNameResult.value,
+    branchName: expectedBranchName,
     releaseIdentifier: releaseIdentifier as ReleaseIdentifier,
     webAppVersion: webAppVersion as WebAppVersion,
   });
@@ -221,6 +227,8 @@ export function parseWebAppVersionSynchronizationPullRequest(
     );
   }
 
+  const {value: marker} = markerResult;
+
   if (pullRequest.baseBranch !== 'main') {
     return Result.err(
       new Error(`WebApp version synchronization pull request #${pullRequest.number} does not target main`),
@@ -228,15 +236,17 @@ export function parseWebAppVersionSynchronizationPullRequest(
   }
 
   const expectedBranchNameResult = createWebAppVersionSynchronizationBranchName(
-    markerResult.value.releaseIdentifier,
-    markerResult.value.webAppVersion,
+    marker.releaseIdentifier,
+    marker.webAppVersion,
   );
 
   if (expectedBranchNameResult.isErr) {
     return Result.err(expectedBranchNameResult.error);
   }
 
-  if (expectedBranchNameResult.value !== pullRequest.headBranch) {
+  const {value: expectedBranchName} = expectedBranchNameResult;
+
+  if (expectedBranchName !== pullRequest.headBranch) {
     return Result.err(
       new Error(
         `WebApp version synchronization pull request #${pullRequest.number} has unexpected branch ${pullRequest.headBranch}`,
@@ -248,7 +258,7 @@ export function parseWebAppVersionSynchronizationPullRequest(
     return Result.err(new Error(`Open WebApp version synchronization pull request #${pullRequest.number} is merged`));
   }
 
-  return Result.ok(Maybe.just({pullRequest, marker: markerResult.value}));
+  return Result.ok(Maybe.just({pullRequest, marker}));
 }
 
 export function resolveWebAppVersionSynchronizationState(
@@ -262,6 +272,8 @@ export function resolveWebAppVersionSynchronizationState(
     return Result.err(synchronizationRequestResult.error);
   }
 
+  const {value: synchronizationRequest} = synchronizationRequestResult;
+
   const synchronizationRecords: WebAppVersionSynchronizationRecord[] = [];
 
   for (const pullRequest of pullRequests) {
@@ -271,73 +283,85 @@ export function resolveWebAppVersionSynchronizationState(
       return Result.err(synchronizationRecordResult.error);
     }
 
-    if (synchronizationRecordResult.value.isJust) {
-      synchronizationRecords.push(synchronizationRecordResult.value.value);
+    const {value: synchronizationRecordMaybe} = synchronizationRecordResult;
+
+    if (synchronizationRecordMaybe.isJust) {
+      const {value: synchronizationRecord} = synchronizationRecordMaybe;
+
+      synchronizationRecords.push(synchronizationRecord);
     }
   }
 
   const requestedReleaseRecords = synchronizationRecords.filter(record => {
-    return record.marker.releaseIdentifier === synchronizationRequestResult.value.releaseIdentifier;
+    return record.marker.releaseIdentifier === synchronizationRequest.releaseIdentifier;
   });
 
-  const conflictingProductionTagRecord = requestedReleaseRecords.find(record => {
-    return record.marker.productionTagName !== synchronizationRequestResult.value.productionTagName;
-  });
+  const conflictingProductionTagRecord = maybe.find(record => {
+    return record.marker.productionTagName !== synchronizationRequest.productionTagName;
+  }, requestedReleaseRecords);
 
-  if (isUndefined(conflictingProductionTagRecord) === false) {
+  if (conflictingProductionTagRecord.isJust) {
+    const {value: conflictingRecord} = conflictingProductionTagRecord;
+
     return Result.ok({
       kind: 'conflict',
-      releaseIdentifier: synchronizationRequestResult.value.releaseIdentifier,
-      productionTagName: synchronizationRequestResult.value.productionTagName,
-      reason: `A synchronization record for the release uses a different Production tag: ${conflictingProductionTagRecord.marker.productionTagName}`,
+      releaseIdentifier: synchronizationRequest.releaseIdentifier,
+      productionTagName: synchronizationRequest.productionTagName,
+      reason: `A synchronization record for the release uses a different Production tag: ${conflictingRecord.marker.productionTagName}`,
     });
   }
 
   if (requestedReleaseRecords.length > 1) {
     return Result.ok({
       kind: 'conflict',
-      releaseIdentifier: synchronizationRequestResult.value.releaseIdentifier,
-      productionTagName: synchronizationRequestResult.value.productionTagName,
+      releaseIdentifier: synchronizationRequest.releaseIdentifier,
+      productionTagName: synchronizationRequest.productionTagName,
       reason: 'Multiple synchronization records exist for the requested release',
     });
   }
 
-  const requestedReleaseRecord = requestedReleaseRecords.at(0);
+  const requestedReleaseRecord = maybe.find(record => {
+    return record.marker.releaseIdentifier === synchronizationRequest.releaseIdentifier;
+  }, synchronizationRecords);
 
-  if (isUndefined(requestedReleaseRecord) === false) {
-    if (requestedReleaseRecord.pullRequest.state === 'open') {
-      return Result.ok(createExistingSynchronizationInspection('matching-open', requestedReleaseRecord));
+  if (requestedReleaseRecord.isJust) {
+    const {value: synchronizationRecord} = requestedReleaseRecord;
+
+    if (synchronizationRecord.pullRequest.state === 'open') {
+      return Result.ok(createExistingSynchronizationInspection('matching-open', synchronizationRecord));
     }
 
-    if (isNull(requestedReleaseRecord.pullRequest.mergedAt)) {
-      return Result.ok(createExistingSynchronizationInspection('closed-without-merge', requestedReleaseRecord));
+    if (isNull(synchronizationRecord.pullRequest.mergedAt)) {
+      return Result.ok(createExistingSynchronizationInspection('closed-without-merge', synchronizationRecord));
     }
 
-    return Result.ok(createExistingSynchronizationInspection('matching-merged', requestedReleaseRecord));
+    return Result.ok(createExistingSynchronizationInspection('matching-merged', synchronizationRecord));
   }
 
-  const previousOpenRecord = synchronizationRecords.find(record => {
+  const previousOpenRecord = maybe.find(record => {
     return record.pullRequest.state === 'open';
-  });
+  }, synchronizationRecords);
 
-  if (isUndefined(previousOpenRecord) === false) {
+  if (previousOpenRecord.isJust) {
+    const {value: synchronizationRecord} = previousOpenRecord;
+
     return Result.ok({
       kind: 'blocked-by-previous-open',
-      releaseIdentifier: synchronizationRequestResult.value.releaseIdentifier,
-      productionTagName: synchronizationRequestResult.value.productionTagName,
-      blockingReleaseIdentifier: previousOpenRecord.marker.releaseIdentifier,
-      blockingProductionTagName: previousOpenRecord.marker.productionTagName,
-      blockingWebAppVersion: previousOpenRecord.marker.webAppVersion,
-      pullRequestNumber: previousOpenRecord.pullRequest.number,
-      pullRequestUrl: previousOpenRecord.pullRequest.url,
-      branchName: previousOpenRecord.pullRequest.headBranch as WebAppVersionSynchronizationBranchName,
+      releaseIdentifier: synchronizationRequest.releaseIdentifier,
+      productionTagName: synchronizationRequest.productionTagName,
+      blockingReleaseIdentifier: synchronizationRecord.marker.releaseIdentifier,
+      blockingProductionTagName: synchronizationRecord.marker.productionTagName,
+      blockingWebAppVersion: synchronizationRecord.marker.webAppVersion,
+      pullRequestNumber: synchronizationRecord.pullRequest.number,
+      pullRequestUrl: synchronizationRecord.pullRequest.url,
+      branchName: synchronizationRecord.pullRequest.headBranch as WebAppVersionSynchronizationBranchName,
     });
   }
 
   return Result.ok({
     kind: 'available',
-    releaseIdentifier: synchronizationRequestResult.value.releaseIdentifier,
-    productionTagName: synchronizationRequestResult.value.productionTagName,
+    releaseIdentifier: synchronizationRequest.releaseIdentifier,
+    productionTagName: synchronizationRequest.productionTagName,
   });
 }
 
@@ -348,7 +372,9 @@ export function createWebAppVersionSynchronizationPullRequestTitle(webAppVersion
     return Result.err(webAppVersionResult.error);
   }
 
-  return Result.ok(`${synchronizationPullRequestTitlePrefix}${webAppVersionResult.value}`);
+  const {value: validatedWebAppVersion} = webAppVersionResult;
+
+  return Result.ok(`${synchronizationPullRequestTitlePrefix}${validatedWebAppVersion}`);
 }
 
 export function createWebAppVersionSynchronizationPullRequestBody(
@@ -360,6 +386,8 @@ export function createWebAppVersionSynchronizationPullRequestBody(
     return Result.err(markerResult.error);
   }
 
+  const {value: marker} = markerResult;
+
   return Result.ok(
     [
       'Synchronizes the WebApp package version with the successfully deployed Production release.',
@@ -370,7 +398,7 @@ export function createWebAppVersionSynchronizationPullRequestBody(
       '',
       'Production was already deployed and runtime-verified. This pull request only synchronizes repository package metadata; it does not modify the released artifact.',
       '',
-      markerResult.value,
+      marker,
     ].join('\n'),
   );
 }

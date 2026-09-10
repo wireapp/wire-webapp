@@ -17,10 +17,10 @@
  *
  */
 
-import {isError, isNonEmptyString, isString} from '@sindresorhus/is';
+import {isError, isNonEmptyString, isString, isUndefined} from '@sindresorhus/is';
 import {simpleGit} from 'simple-git';
 import type {SimpleGit} from 'simple-git';
-import {Result, Unit} from 'true-myth';
+import {Result, Task, Unit, task} from 'true-myth';
 import {z} from 'zod';
 
 import {readFile as readFileFromFileSystem, writeFile as writeFileToFileSystem} from 'node:fs/promises';
@@ -62,22 +62,20 @@ export type ValidateWebAppVersionSynchronizationBranchOptions = {
 };
 
 export type WebAppVersionSynchronizationGitClient = {
-  readonly prepareLatestMain: () => Promise<Result<WebAppVersionSynchronizationMainSnapshot, Error>>;
-  readonly listExistingBranchNames: (releaseIdentifier: string) => Promise<Result<readonly string[], Error>>;
+  readonly prepareLatestMain: () => Task<WebAppVersionSynchronizationMainSnapshot, Error>;
+  readonly listExistingBranchNames: (releaseIdentifier: string) => Task<readonly string[], Error>;
   readonly inspectBranch: (
     options: InspectWebAppVersionSynchronizationBranchOptions,
-  ) => Promise<Result<WebAppVersionSynchronizationBranchInspection | undefined, Error>>;
-  readonly createBranchFromMain: (
-    options: CreateWebAppVersionSynchronizationBranchOptions,
-  ) => Promise<Result<Unit, Error>>;
-  readonly readWorkingTreePackageDocuments: () => Promise<Result<WebAppPackageDocuments, Error>>;
+  ) => Task<WebAppVersionSynchronizationBranchInspection | undefined, Error>;
+  readonly createBranchFromMain: (options: CreateWebAppVersionSynchronizationBranchOptions) => Task<Unit, Error>;
+  readonly readWorkingTreePackageDocuments: () => Task<WebAppPackageDocuments, Error>;
   readonly writePackageDocuments: (
     options: WriteWebAppVersionSynchronizationPackageDocumentsOptions,
-  ) => Promise<Result<Unit, Error>>;
-  readonly getWorkingTreeChangedFilePaths: () => Promise<Result<readonly string[], Error>>;
-  readonly commit: (options: CommitWebAppVersionSynchronizationOptions) => Promise<Result<string, Error>>;
-  readonly pushBranch: (options: PushWebAppVersionSynchronizationBranchOptions) => Promise<Result<Unit, Error>>;
-  readonly verifyMainCommit: (mainCommitSha: string) => Promise<Result<Unit, Error>>;
+  ) => Task<Unit, Error>;
+  readonly getWorkingTreeChangedFilePaths: () => Task<readonly string[], Error>;
+  readonly commit: (options: CommitWebAppVersionSynchronizationOptions) => Task<string, Error>;
+  readonly pushBranch: (options: PushWebAppVersionSynchronizationBranchOptions) => Task<Unit, Error>;
+  readonly verifyMainCommit: (mainCommitSha: string) => Task<Unit, Error>;
 };
 
 export type InspectWebAppVersionSynchronizationBranchOptions = {
@@ -114,9 +112,9 @@ export type WebAppVersionSynchronizationFileSystem = {
 
 export const webAppVersionSynchronizationPackageFilePaths = ['apps/webapp/package.json', 'package.json'] as const;
 
-type RunGitCommandOptions = {
+type RunGitOperationOptions<valueType> = {
   readonly description: string;
-  readonly execute: () => Promise<string>;
+  readonly execute: () => Promise<valueType>;
 };
 
 type CreateBranchInspectionOptions = {
@@ -145,12 +143,15 @@ function errorMessage(error: unknown): string {
   return 'Unknown Git failure';
 }
 
-async function runGitCommand(options: RunGitCommandOptions): Promise<Result<string, Error>> {
-  try {
-    return Result.ok(await options.execute());
-  } catch (error: unknown) {
-    return Result.err(new Error(`${options.description}: ${errorMessage(error)}`, {cause: error}));
-  }
+function runGitOperation<valueType>(options: RunGitOperationOptions<valueType>): Task<valueType, Error> {
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      return new Error(`${options.description}: ${errorMessage(error)}`, {cause: error});
+    },
+    async (): Promise<valueType> => {
+      return options.execute();
+    },
+  );
 }
 
 export function parseWebAppVersionSynchronizationPackageDocument(
@@ -172,34 +173,6 @@ export function parseWebAppVersionSynchronizationPackageDocument(
   } catch (error: unknown) {
     return Result.err(new Error(`Malformed package document: ${packagePath}: ${errorMessage(error)}`, {cause: error}));
   }
-}
-
-function parsePackageDocumentPaths(
-  contents: readonly string[],
-  paths: readonly string[],
-): Result<WebAppPackageDocuments, Error> {
-  const rootPackageContents = contents.at(0);
-  const webAppPackageContents = contents.at(1);
-
-  if (isString(rootPackageContents) === false || isString(webAppPackageContents) === false) {
-    return Result.err(new Error('Git did not return both WebApp package documents'));
-  }
-
-  const rootPackageDocumentResult = parseWebAppVersionSynchronizationPackageDocument(rootPackageContents, paths[0]);
-  const webAppPackageDocumentResult = parseWebAppVersionSynchronizationPackageDocument(webAppPackageContents, paths[1]);
-
-  if (rootPackageDocumentResult.isErr) {
-    return Result.err(rootPackageDocumentResult.error);
-  }
-
-  if (webAppPackageDocumentResult.isErr) {
-    return Result.err(webAppPackageDocumentResult.error);
-  }
-
-  return Result.ok({
-    rootPackageDocument: rootPackageDocumentResult.value,
-    webAppPackageDocument: webAppPackageDocumentResult.value,
-  });
 }
 
 function createPackageDocumentContents(packageDocument: WebAppPackageDocument): string {
@@ -249,28 +222,39 @@ function parseChangedFilePaths(changedFilesOutput: string): readonly string[] {
     .toSorted();
 }
 
-async function readPackageDocumentsAtRevision(
-  git: SimpleGit,
-  revision: string,
-): Promise<Result<WebAppPackageDocuments, Error>> {
-  const packageContents: string[] = [];
+type ReadPackageDocumentAtRevisionOptions = {
+  readonly git: SimpleGit;
+  readonly revision: string;
+  readonly packageFilePath: string;
+};
 
-  for (const packageFilePath of ['package.json', 'apps/webapp/package.json']) {
-    const packageContentsResult = await runGitCommand({
-      description: `Unable to read ${packageFilePath} at ${revision}`,
-      async execute() {
-        return git.raw(['show', `${revision}:${packageFilePath}`]);
-      },
+function readPackageDocumentAtRevision(
+  options: ReadPackageDocumentAtRevisionOptions,
+): Task<WebAppPackageDocument, Error> {
+  return runGitOperation({
+    description: `Unable to read ${options.packageFilePath} at ${options.revision}`,
+    async execute() {
+      return options.git.raw(['show', `${options.revision}:${options.packageFilePath}`]);
+    },
+  }).andThen(packageContents => {
+    return parseWebAppVersionSynchronizationPackageDocument(packageContents, options.packageFilePath);
+  });
+}
+
+function readPackageDocumentsAtRevision(git: SimpleGit, revision: string): Task<WebAppPackageDocuments, Error> {
+  return readPackageDocumentAtRevision({
+    git,
+    revision,
+    packageFilePath: 'package.json',
+  }).andThen(rootPackageDocument => {
+    return readPackageDocumentAtRevision({
+      git,
+      revision,
+      packageFilePath: 'apps/webapp/package.json',
+    }).map(webAppPackageDocument => {
+      return {rootPackageDocument, webAppPackageDocument};
     });
-
-    if (packageContentsResult.isErr) {
-      return Result.err(packageContentsResult.error);
-    }
-
-    packageContents.push(packageContentsResult.value);
-  }
-
-  return parsePackageDocumentPaths(packageContents, ['package.json', 'apps/webapp/package.json']);
+  });
 }
 
 function createBranchInspection(options: CreateBranchInspectionOptions): WebAppVersionSynchronizationBranchInspection {
@@ -319,11 +303,13 @@ export function validateWebAppVersionSynchronizationBranch(
     return Result.err(branchNameResult.error);
   }
 
-  if (branchNameResult.value.releaseIdentifier !== options.expectedReleaseIdentifier) {
+  const {value: validatedBranchName} = branchNameResult;
+
+  if (validatedBranchName.releaseIdentifier !== options.expectedReleaseIdentifier) {
     return Result.err(new Error('Synchronization branch belongs to a different release identifier'));
   }
 
-  if (branchNameResult.value.webAppVersion !== options.expectedWebAppVersion) {
+  if (validatedBranchName.webAppVersion !== options.expectedWebAppVersion) {
     return Result.err(new Error('Synchronization branch contains an unexpected WebApp version'));
   }
 
@@ -360,13 +346,16 @@ export function validateWebAppVersionSynchronizationBranch(
     return Result.err(new Error(`Synchronization branch base is invalid: ${basePackageVersionsResult.error.message}`));
   }
 
-  const expectedNextVersionResult = resolveNextWebAppVersion(basePackageVersionsResult.value.rootVersion);
+  const {value: basePackageVersions} = basePackageVersionsResult;
+  const expectedNextVersionResult = resolveNextWebAppVersion(basePackageVersions.rootVersion);
 
   if (expectedNextVersionResult.isErr) {
     return Result.err(expectedNextVersionResult.error);
   }
 
-  if (expectedNextVersionResult.value !== options.expectedWebAppVersion) {
+  const {value: expectedNextVersion} = expectedNextVersionResult;
+
+  if (expectedNextVersion !== options.expectedWebAppVersion) {
     return Result.err(new Error('Synchronization branch version does not follow its main base version'));
   }
 
@@ -381,11 +370,13 @@ export function validateWebAppVersionSynchronizationBranch(
     );
   }
 
-  if (branchPackageVersionsResult.value.rootVersion !== options.expectedWebAppVersion) {
+  const {value: branchPackageVersions} = branchPackageVersionsResult;
+
+  if (branchPackageVersions.rootVersion !== options.expectedWebAppVersion) {
     return Result.err(new Error('Synchronization branch package files contain an unexpected version'));
   }
 
-  return Result.ok(branchNameResult.value);
+  return Result.ok(validatedBranchName);
 }
 
 export function createSimpleGitWebAppVersionSynchronizationClient(
@@ -393,435 +384,386 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
 ): WebAppVersionSynchronizationGitClient {
   const git = simpleGit(options.repositoryPath);
 
-  async function readCurrentMainCommit(): Promise<Result<string, Error>> {
-    const commitOutputResult = await runGitCommand({
+  function readCurrentMainCommit(): Task<string, Error> {
+    return runGitOperation({
       description: 'Unable to read origin/main commit',
       async execute() {
         return git.raw(['rev-parse', 'refs/remotes/origin/main']);
       },
+    }).andThen(commitOutput => {
+      return parseCommitSha(commitOutput, 'origin/main');
     });
-
-    if (commitOutputResult.isErr) {
-      return Result.err(commitOutputResult.error);
-    }
-
-    return parseCommitSha(commitOutputResult.value, 'origin/main');
   }
 
-  async function readBranchNamesFromRemote(branchPrefix: string): Promise<Result<readonly string[], Error>> {
-    const remoteBranchesResult = await runGitCommand({
+  function readBranchNamesFromRemote(branchPrefix: string): Task<readonly string[], Error> {
+    return runGitOperation({
       description: 'Unable to list remote WebApp version synchronization branches',
       async execute() {
         return git.raw(['ls-remote', '--heads', 'origin']);
       },
+    }).map(remoteBranchesOutput => {
+      return [...parseRemoteBranchNames(remoteBranchesOutput, branchPrefix)].toSorted();
     });
-
-    if (remoteBranchesResult.isErr) {
-      return Result.err(remoteBranchesResult.error);
-    }
-
-    return Result.ok([...parseRemoteBranchNames(remoteBranchesResult.value, branchPrefix)].toSorted());
   }
 
-  async function readPackageDocumentsFromWorkingTree(): Promise<Result<WebAppPackageDocuments, Error>> {
-    const packageContents: string[] = [];
-
-    for (const packageFilePath of ['package.json', 'apps/webapp/package.json']) {
-      try {
-        packageContents.push(await options.fileSystem.readFile(resolve(options.repositoryPath, packageFilePath)));
-      } catch (error: unknown) {
-        return Result.err(new Error(`Unable to read ${packageFilePath}: ${errorMessage(error)}`, {cause: error}));
-      }
-    }
-
-    return parsePackageDocumentPaths(packageContents, ['package.json', 'apps/webapp/package.json']);
+  function readPackageContentsFromWorkingTree(packageFilePath: string): Task<WebAppPackageDocument, Error> {
+    return runGitOperation({
+      description: `Unable to read ${packageFilePath}`,
+      async execute() {
+        return options.fileSystem.readFile(resolve(options.repositoryPath, packageFilePath));
+      },
+    }).andThen(packageContents => {
+      return parseWebAppVersionSynchronizationPackageDocument(packageContents, packageFilePath);
+    });
   }
 
-  async function inspectRemoteOrLocalBranch(
-    inspectOptions: InspectWebAppVersionSynchronizationBranchOptions,
-  ): Promise<Result<WebAppVersionSynchronizationBranchInspection | undefined, Error>> {
-    const remoteBranchOutputResult = await runGitCommand({
-      description: `Unable to inspect whether branch ${inspectOptions.branchName} exists remotely`,
-      async execute() {
-        return git.raw(['ls-remote', '--heads', 'origin', inspectOptions.branchName]);
-      },
-    });
-
-    if (remoteBranchOutputResult.isErr) {
-      return Result.err(remoteBranchOutputResult.error);
-    }
-
-    const remoteBranchNames = parseRemoteBranchNames(
-      remoteBranchOutputResult.value,
-      `${synchronizationBranchPrefix}${inspectOptions.branchName.slice(synchronizationBranchPrefix.length)}`,
-    );
-    const remoteBranchExists = remoteBranchNames.has(inspectOptions.branchName);
-    let branchReference: string;
-
-    if (remoteBranchExists) {
-      const fetchBranchResult = await runGitCommand({
-        description: `Unable to fetch synchronization branch ${inspectOptions.branchName}`,
-        async execute() {
-          return git.raw([
-            'fetch',
-            '--no-tags',
-            'origin',
-            `${inspectOptions.branchName}:refs/remotes/origin/${inspectOptions.branchName}`,
-          ]);
-        },
+  function readPackageDocumentsFromWorkingTree(): Task<WebAppPackageDocuments, Error> {
+    return readPackageContentsFromWorkingTree('package.json').andThen(rootPackageDocument => {
+      return readPackageContentsFromWorkingTree('apps/webapp/package.json').map(webAppPackageDocument => {
+        return {rootPackageDocument, webAppPackageDocument};
       });
-
-      if (fetchBranchResult.isErr) {
-        return Result.err(fetchBranchResult.error);
-      }
-
-      branchReference = `refs/remotes/origin/${inspectOptions.branchName}`;
-    } else {
-      const localBranches = await git.branchLocal();
-
-      if (localBranches.all.includes(inspectOptions.branchName) === false) {
-        return Result.ok(undefined);
-      }
-
-      branchReference = `refs/heads/${inspectOptions.branchName}`;
-    }
-
-    const branchTipCommitOutputResult = await runGitCommand({
-      description: `Unable to read synchronization branch ${inspectOptions.branchName} tip`,
-      async execute() {
-        return git.raw(['rev-parse', branchReference]);
-      },
     });
+  }
 
-    if (branchTipCommitOutputResult.isErr) {
-      return Result.err(branchTipCommitOutputResult.error);
-    }
+  type ResolveBranchReferenceOptions = {
+    readonly inspectOptions: InspectWebAppVersionSynchronizationBranchOptions;
+    readonly git: SimpleGit;
+  };
 
-    const branchTipCommitResult = parseCommitSha(
-      branchTipCommitOutputResult.value,
-      `synchronization branch ${inspectOptions.branchName}`,
-    );
+  type InspectBranchReferenceOptions = ResolveBranchReferenceOptions & {
+    readonly branchReference: string;
+  };
 
-    if (branchTipCommitResult.isErr) {
-      return Result.err(branchTipCommitResult.error);
-    }
-
-    const commitTypeResult = await runGitCommand({
-      description: `Unable to validate synchronization branch ${inspectOptions.branchName} tip`,
+  function resolveBranchReference(options: ResolveBranchReferenceOptions): Task<string | undefined, Error> {
+    return runGitOperation({
+      description: `Unable to inspect whether branch ${options.inspectOptions.branchName} exists remotely`,
       async execute() {
-        return git.raw(['cat-file', '-t', branchTipCommitResult.value]);
+        return options.git.raw(['ls-remote', '--heads', 'origin', options.inspectOptions.branchName]);
       },
-    });
+    }).andThen(remoteBranchOutput => {
+      const remoteBranchNames = parseRemoteBranchNames(
+        remoteBranchOutput,
+        `${synchronizationBranchPrefix}${options.inspectOptions.branchName.slice(synchronizationBranchPrefix.length)}`,
+      );
 
-    if (commitTypeResult.isErr) {
-      return Result.err(commitTypeResult.error);
-    }
-
-    const parentCommitOutputResult = await runGitCommand({
-      description: `Unable to read synchronization branch ${inspectOptions.branchName} history`,
-      async execute() {
-        return git.raw(['rev-list', '--parents', '-n', '1', branchReference]);
-      },
-    });
-
-    if (parentCommitOutputResult.isErr) {
-      return Result.err(parentCommitOutputResult.error);
-    }
-
-    const parentCommitParts = parentCommitOutputResult.value.trim().split(/\s+/);
-    const baseCommitSha = parentCommitParts.at(1);
-    let isBasedOnMainHistory = false;
-
-    if (isString(baseCommitSha)) {
-      const mergeBaseResult = await runGitCommand({
-        description: `Unable to validate synchronization branch ${inspectOptions.branchName} base`,
-        async execute() {
-          return git.raw(['merge-base', baseCommitSha, inspectOptions.mainCommitSha]);
-        },
-      });
-
-      isBasedOnMainHistory = mergeBaseResult.isOk && mergeBaseResult.value.trim() === baseCommitSha;
-    }
-
-    const changedFilePathsResult = isString(baseCommitSha)
-      ? await runGitCommand({
-          description: `Unable to inspect synchronization branch ${inspectOptions.branchName} changes`,
+      if (remoteBranchNames.has(options.inspectOptions.branchName)) {
+        return runGitOperation({
+          description: `Unable to fetch synchronization branch ${options.inspectOptions.branchName}`,
           async execute() {
-            return git.raw(['diff', '--name-only', `${baseCommitSha}..${branchTipCommitResult.value}`]);
+            return options.git.raw([
+              'fetch',
+              '--no-tags',
+              'origin',
+              `${options.inspectOptions.branchName}:refs/remotes/origin/${options.inspectOptions.branchName}`,
+            ]);
           },
-        })
-      : Result.ok('');
+        }).map(() => {
+          return `refs/remotes/origin/${options.inspectOptions.branchName}`;
+        });
+      }
 
-    if (changedFilePathsResult.isErr) {
-      return Result.err(changedFilePathsResult.error);
-    }
+      return runGitOperation({
+        description: `Unable to inspect local synchronization branches`,
+        async execute() {
+          return options.git.branchLocal();
+        },
+      }).map(localBranches => {
+        if (localBranches.all.includes(options.inspectOptions.branchName)) {
+          return `refs/heads/${options.inspectOptions.branchName}`;
+        }
 
-    const basePackageDocuments = isString(baseCommitSha)
-      ? await readPackageDocumentsAtRevision(git, baseCommitSha)
-      : Result.ok<WebAppPackageDocuments | undefined, Error>(undefined);
-    const branchPackageDocuments = await readPackageDocumentsAtRevision(git, branchTipCommitResult.value);
+        return undefined;
+      });
+    });
+  }
 
-    if (basePackageDocuments.isErr) {
-      return Result.err(basePackageDocuments.error);
-    }
+  function inspectBranchReference(
+    options: InspectBranchReferenceOptions,
+  ): Task<WebAppVersionSynchronizationBranchInspection, Error> {
+    return runGitOperation({
+      description: `Unable to read synchronization branch ${options.inspectOptions.branchName} tip`,
+      async execute() {
+        return options.git.raw(['rev-parse', options.branchReference]);
+      },
+    }).andThen(branchTipCommitOutput => {
+      const branchTipCommitResult = parseCommitSha(
+        branchTipCommitOutput,
+        `synchronization branch ${options.inspectOptions.branchName}`,
+      );
 
-    if (branchPackageDocuments.isErr) {
-      return Result.err(branchPackageDocuments.error);
-    }
+      if (branchTipCommitResult.isErr) {
+        return Task.reject<WebAppVersionSynchronizationBranchInspection, Error>(branchTipCommitResult.error);
+      }
 
-    return Result.ok(
-      createBranchInspection({
-        branchName: inspectOptions.branchName,
-        mainCommitSha: inspectOptions.mainCommitSha,
-        branchTipCommitSha: branchTipCommitResult.value,
-        parentCommitOutput: parentCommitOutputResult.value,
-        isBasedOnMainHistory: isBasedOnMainHistory && commitTypeResult.value.trim() === 'commit',
-        changedFilePaths: parseChangedFilePaths(changedFilePathsResult.value),
-        basePackageDocuments: basePackageDocuments.value,
-        branchPackageDocuments: branchPackageDocuments.value,
-      }),
-    );
+      const {value: branchTipCommitSha} = branchTipCommitResult;
+
+      return runGitOperation({
+        description: `Unable to validate synchronization branch ${options.inspectOptions.branchName} tip`,
+        async execute() {
+          return options.git.raw(['cat-file', '-t', branchTipCommitSha]);
+        },
+      }).andThen(commitTypeOutput => {
+        return runGitOperation({
+          description: `Unable to read synchronization branch ${options.inspectOptions.branchName} history`,
+          async execute() {
+            return options.git.raw(['rev-list', '--parents', '-n', '1', options.branchReference]);
+          },
+        }).andThen(parentCommitOutput => {
+          const parentCommitParts = parentCommitOutput.trim().split(/\s+/);
+          const baseCommitSha = parentCommitParts.at(1);
+          const basedOnMainHistoryTask = isString(baseCommitSha)
+            ? runGitOperation({
+                description: `Unable to validate synchronization branch ${options.inspectOptions.branchName} base`,
+                async execute() {
+                  return options.git.raw(['merge-base', baseCommitSha, options.inspectOptions.mainCommitSha]);
+                },
+              }).map(mergeBaseOutput => {
+                return mergeBaseOutput.trim() === baseCommitSha;
+              })
+            : Task.resolve(false);
+          const changedFilePathsTask = isString(baseCommitSha)
+            ? runGitOperation({
+                description: `Unable to inspect synchronization branch ${options.inspectOptions.branchName} changes`,
+                async execute() {
+                  return options.git.raw(['diff', '--name-only', `${baseCommitSha}..${branchTipCommitSha}`]);
+                },
+              }).map(parseChangedFilePaths)
+            : Task.resolve<readonly string[], Error>([]);
+          const basePackageDocumentsTask = isString(baseCommitSha)
+            ? readPackageDocumentsAtRevision(options.git, baseCommitSha)
+            : Task.resolve<WebAppPackageDocuments | undefined, Error>(undefined);
+
+          return basedOnMainHistoryTask.andThen(isBasedOnMainHistory => {
+            return changedFilePathsTask.andThen(changedFilePaths => {
+              return basePackageDocumentsTask.andThen(basePackageDocuments => {
+                return readPackageDocumentsAtRevision(options.git, branchTipCommitSha).map(branchPackageDocuments => {
+                  return createBranchInspection({
+                    branchName: options.inspectOptions.branchName,
+                    mainCommitSha: options.inspectOptions.mainCommitSha,
+                    branchTipCommitSha,
+                    parentCommitOutput,
+                    isBasedOnMainHistory: isBasedOnMainHistory && commitTypeOutput.trim() === 'commit',
+                    changedFilePaths,
+                    basePackageDocuments,
+                    branchPackageDocuments,
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  }
+
+  function inspectRemoteOrLocalBranch(
+    inspectOptions: InspectWebAppVersionSynchronizationBranchOptions,
+  ): Task<WebAppVersionSynchronizationBranchInspection | undefined, Error> {
+    return resolveBranchReference({git, inspectOptions}).andThen(branchReference => {
+      if (isUndefined(branchReference)) {
+        return Task.resolve<WebAppVersionSynchronizationBranchInspection | undefined, Error>(undefined);
+      }
+
+      return inspectBranchReference({git, inspectOptions, branchReference});
+    });
+  }
+
+  function writePackageDocument(packageFilePath: string, packageDocument: WebAppPackageDocument): Task<Unit, Error> {
+    return runGitOperation({
+      description: `Unable to write ${packageFilePath}`,
+      async execute() {
+        await options.fileSystem.writeFile(
+          resolve(options.repositoryPath, packageFilePath),
+          createPackageDocumentContents(packageDocument),
+        );
+      },
+    }).map(() => Unit);
   }
 
   return {
-    async prepareLatestMain() {
-      const status = await git.status();
-
-      if (status.isClean() === false) {
-        return Result.err(new Error('Git working tree must be clean before WebApp version synchronization'));
-      }
-
-      const fetchMainResult = await runGitCommand({
-        description: 'Unable to fetch origin/main',
+    prepareLatestMain() {
+      return runGitOperation({
+        description: 'Unable to inspect Git working tree',
         async execute() {
-          return git.raw(['fetch', '--no-tags', 'origin', 'main']);
+          return git.status();
         },
-      });
+      })
+        .andThen(status => {
+          if (status.isClean() === false) {
+            return Result.err(new Error('Git working tree must be clean before WebApp version synchronization'));
+          }
 
-      if (fetchMainResult.isErr) {
-        return Result.err(fetchMainResult.error);
-      }
-
-      const checkoutMainResult = await runGitCommand({
-        description: 'Unable to checkout origin/main',
-        async execute() {
-          return git.raw(['switch', '--detach', 'refs/remotes/origin/main']);
-        },
-      });
-
-      if (checkoutMainResult.isErr) {
-        return Result.err(checkoutMainResult.error);
-      }
-
-      const mainCommitResult = await readCurrentMainCommit();
-
-      if (mainCommitResult.isErr) {
-        return Result.err(mainCommitResult.error);
-      }
-
-      const packageDocumentsResult = await readPackageDocumentsAtRevision(git, mainCommitResult.value);
-
-      if (packageDocumentsResult.isErr) {
-        return Result.err(packageDocumentsResult.error);
-      }
-
-      return Result.ok({
-        commitSha: mainCommitResult.value,
-        rootPackageDocument: packageDocumentsResult.value.rootPackageDocument,
-        webAppPackageDocument: packageDocumentsResult.value.webAppPackageDocument,
-      });
+          return runGitOperation({
+            description: 'Unable to fetch origin/main',
+            async execute() {
+              return git.raw(['fetch', '--no-tags', 'origin', 'main']);
+            },
+          });
+        })
+        .andThen(() => {
+          return runGitOperation({
+            description: 'Unable to checkout origin/main',
+            async execute() {
+              return git.raw(['switch', '--detach', 'refs/remotes/origin/main']);
+            },
+          });
+        })
+        .andThen(() => {
+          return readCurrentMainCommit();
+        })
+        .andThen(commitSha => {
+          return readPackageDocumentsAtRevision(git, commitSha).map(packageDocuments => {
+            return {
+              commitSha,
+              rootPackageDocument: packageDocuments.rootPackageDocument,
+              webAppPackageDocument: packageDocuments.webAppPackageDocument,
+            };
+          });
+        });
     },
 
-    async listExistingBranchNames(releaseIdentifier) {
+    listExistingBranchNames(releaseIdentifier) {
       const branchNameResult = createWebAppVersionSynchronizationBranchName(releaseIdentifier, '1.0.0');
 
       if (branchNameResult.isErr) {
-        return Result.err(branchNameResult.error);
+        return Task.reject<readonly string[], Error>(branchNameResult.error);
       }
 
-      const branchPrefix = branchNameResult.value.slice(0, -'1.0.0'.length);
-      const remoteBranchNamesResult = await readBranchNamesFromRemote(branchPrefix);
+      const {value: bootstrapBranchName} = branchNameResult;
+      const branchPrefix = bootstrapBranchName.slice(0, -'1.0.0'.length);
 
-      if (remoteBranchNamesResult.isErr) {
-        return Result.err(remoteBranchNamesResult.error);
-      }
+      return readBranchNamesFromRemote(branchPrefix).andThen(remoteBranchNames => {
+        return runGitOperation({
+          description: 'Unable to inspect local synchronization branches',
+          async execute() {
+            return git.branchLocal();
+          },
+        }).map(localBranches => {
+          const localBranchNames = localBranches.all.filter(branchName => {
+            return branchName.startsWith(branchPrefix);
+          });
 
-      const localBranches = await git.branchLocal();
-      const localBranchNames = localBranches.all.filter(branchName => {
-        return branchName.startsWith(branchPrefix);
+          return [...new Set([...remoteBranchNames, ...localBranchNames])].toSorted();
+        });
       });
-
-      return Result.ok([...new Set([...remoteBranchNamesResult.value, ...localBranchNames])].toSorted());
     },
 
-    async inspectBranch(inspectOptions) {
+    inspectBranch(inspectOptions) {
       const branchNameResult = validateWebAppVersionSynchronizationBranchName(inspectOptions.branchName);
 
       if (branchNameResult.isErr) {
-        return Result.err(branchNameResult.error);
+        return Task.reject<WebAppVersionSynchronizationBranchInspection | undefined, Error>(branchNameResult.error);
       }
 
       return inspectRemoteOrLocalBranch(inspectOptions);
     },
 
-    async createBranchFromMain(createBranchOptions) {
+    createBranchFromMain(createBranchOptions) {
       const branchNameResult = validateWebAppVersionSynchronizationBranchName(createBranchOptions.branchName);
 
       if (branchNameResult.isErr) {
-        return Result.err(branchNameResult.error);
+        return Task.reject<Unit, Error>(branchNameResult.error);
       }
 
-      const mainCommitResult = await readCurrentMainCommit();
+      return readCurrentMainCommit().andThen(mainCommitSha => {
+        if (mainCommitSha !== createBranchOptions.mainCommitSha) {
+          return Result.err(new Error('origin/main changed before synchronization branch creation'));
+        }
 
-      if (mainCommitResult.isErr) {
-        return Result.err(mainCommitResult.error);
-      }
-
-      if (mainCommitResult.value !== createBranchOptions.mainCommitSha) {
-        return Result.err(new Error('origin/main changed before synchronization branch creation'));
-      }
-
-      const createBranchResult = await runGitCommand({
-        description: `Unable to create synchronization branch ${createBranchOptions.branchName}`,
-        async execute() {
-          return git.raw(['switch', '--create', createBranchOptions.branchName, createBranchOptions.mainCommitSha]);
-        },
+        return runGitOperation({
+          description: `Unable to create synchronization branch ${createBranchOptions.branchName}`,
+          async execute() {
+            return git.raw(['switch', '--create', createBranchOptions.branchName, createBranchOptions.mainCommitSha]);
+          },
+        }).map(() => Unit);
       });
-
-      if (createBranchResult.isErr) {
-        return Result.err(createBranchResult.error);
-      }
-
-      return Result.ok();
     },
 
-    async readWorkingTreePackageDocuments() {
+    readWorkingTreePackageDocuments() {
       return readPackageDocumentsFromWorkingTree();
     },
 
-    async writePackageDocuments(writeOptions) {
-      const packageFiles = [
-        {
-          path: 'package.json',
-          document: writeOptions.rootPackageDocument,
-        },
-        {
-          path: 'apps/webapp/package.json',
-          document: writeOptions.webAppPackageDocument,
-        },
-      ];
-
-      try {
-        for (const packageFile of packageFiles) {
-          await options.fileSystem.writeFile(
-            resolve(options.repositoryPath, packageFile.path),
-            createPackageDocumentContents(packageFile.document),
-          );
-        }
-      } catch (error: unknown) {
-        return Result.err(
-          new Error(`Unable to write WebApp package documents: ${errorMessage(error)}`, {cause: error}),
-        );
-      }
-
-      return Result.ok();
+    writePackageDocuments(writeOptions) {
+      return writePackageDocument('package.json', writeOptions.rootPackageDocument).andThen(() => {
+        return writePackageDocument('apps/webapp/package.json', writeOptions.webAppPackageDocument);
+      });
     },
 
-    async getWorkingTreeChangedFilePaths() {
-      try {
-        const status = await git.status();
-
-        return Result.ok(status.files.map(file => file.path).toSorted());
-      } catch (error: unknown) {
-        return Result.err(new Error(`Unable to inspect Git working tree: ${errorMessage(error)}`, {cause: error}));
-      }
+    getWorkingTreeChangedFilePaths() {
+      return runGitOperation({
+        description: 'Unable to inspect Git working tree',
+        async execute() {
+          return git.status();
+        },
+      }).map(status => {
+        return status.files.map(file => file.path).toSorted();
+      });
     },
 
-    async commit(commitOptions) {
-      const addResult = await runGitCommand({
+    commit(commitOptions) {
+      return runGitOperation({
         description: 'Unable to stage WebApp package documents',
         async execute() {
           return git.raw(['add', '--', ...webAppVersionSynchronizationPackageFilePaths]);
         },
-      });
-
-      if (addResult.isErr) {
-        return Result.err(addResult.error);
-      }
-
-      const commitResult = await runGitCommand({
-        description: 'Unable to commit WebApp version synchronization',
-        async execute() {
-          return git.raw([
-            '-c',
-            `user.name=${commitOptions.authorName}`,
-            '-c',
-            `user.email=${commitOptions.authorEmail}`,
-            'commit',
-            '--message',
-            commitOptions.message,
-            '--',
-            ...webAppVersionSynchronizationPackageFilePaths,
-          ]);
-        },
-      });
-
-      if (commitResult.isErr) {
-        return Result.err(commitResult.error);
-      }
-
-      const commitShaResult = await runGitCommand({
-        description: 'Unable to read WebApp synchronization commit',
-        async execute() {
-          return git.raw(['rev-parse', 'HEAD']);
-        },
-      });
-
-      if (commitShaResult.isErr) {
-        return Result.err(commitShaResult.error);
-      }
-
-      return parseCommitSha(commitShaResult.value, 'WebApp synchronization commit');
+      })
+        .andThen(() => {
+          return runGitOperation({
+            description: 'Unable to commit WebApp version synchronization',
+            async execute() {
+              return git.raw([
+                '-c',
+                `user.name=${commitOptions.authorName}`,
+                '-c',
+                `user.email=${commitOptions.authorEmail}`,
+                'commit',
+                '--message',
+                commitOptions.message,
+                '--',
+                ...webAppVersionSynchronizationPackageFilePaths,
+              ]);
+            },
+          });
+        })
+        .andThen(() => {
+          return runGitOperation({
+            description: 'Unable to read WebApp synchronization commit',
+            async execute() {
+              return git.raw(['rev-parse', 'HEAD']);
+            },
+          });
+        })
+        .andThen(commitShaOutput => {
+          return parseCommitSha(commitShaOutput, 'WebApp synchronization commit');
+        });
     },
 
-    async pushBranch(pushOptions) {
-      const pushResult = await runGitCommand({
+    pushBranch(pushOptions) {
+      return runGitOperation({
         description: `Unable to push synchronization branch ${pushOptions.branchName}`,
         async execute() {
           return git.raw(['push', 'origin', `${pushOptions.branchName}:refs/heads/${pushOptions.branchName}`]);
         },
-      });
-
-      if (pushResult.isErr) {
-        return Result.err(pushResult.error);
-      }
-
-      return Result.ok();
+      }).map(() => Unit);
     },
 
-    async verifyMainCommit(mainCommitSha) {
-      const fetchMainResult = await runGitCommand({
+    verifyMainCommit(mainCommitSha) {
+      return runGitOperation({
         description: 'Unable to refresh origin/main before synchronization mutation',
         async execute() {
           return git.raw(['fetch', '--no-tags', 'origin', 'main']);
         },
-      });
+      })
+        .andThen(() => {
+          return readCurrentMainCommit();
+        })
+        .andThen(currentMainCommitSha => {
+          if (currentMainCommitSha !== mainCommitSha) {
+            return Result.err(new Error('origin/main changed during WebApp version synchronization'));
+          }
 
-      if (fetchMainResult.isErr) {
-        return Result.err(fetchMainResult.error);
-      }
-
-      const currentMainCommitResult = await readCurrentMainCommit();
-
-      if (currentMainCommitResult.isErr) {
-        return Result.err(currentMainCommitResult.error);
-      }
-
-      if (currentMainCommitResult.value !== mainCommitSha) {
-        return Result.err(new Error('origin/main changed during WebApp version synchronization'));
-      }
-
-      return Result.ok();
+          return Result.ok(Unit);
+        });
     },
   };
 }

@@ -18,7 +18,7 @@
  */
 
 import {isError} from '@sindresorhus/is';
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Result, Task, task} from 'true-myth';
 import {z} from 'zod';
 
 import type {WebAppVersionSynchronizationPullRequest} from './webappVersionSynchronization.ts';
@@ -33,10 +33,10 @@ export type CreateWebAppVersionSynchronizationPullRequestOptions = {
 };
 
 export type WebAppVersionSynchronizationGitHubClient = {
-  readonly listPullRequests: () => Promise<Result<readonly WebAppVersionSynchronizationPullRequest[], Error>>;
+  readonly listPullRequests: () => Task<readonly WebAppVersionSynchronizationPullRequest[], Error>;
   readonly createPullRequest: (
     options: CreateWebAppVersionSynchronizationPullRequestOptions,
-  ) => Promise<Result<WebAppVersionSynchronizationPullRequest, Error>>;
+  ) => Task<WebAppVersionSynchronizationPullRequest, Error>;
 };
 
 export type CreateWebAppVersionSynchronizationGitHubClientOptions = {
@@ -186,16 +186,17 @@ function parsePullRequestPage(githubResponse: unknown): Result<ParsedPullRequest
   });
 }
 
-async function requestGitHubJson(options: RequestGitHubJsonOptions): Promise<Result<unknown, Error>> {
-  try {
-    return Result.ok(await options.httpClient.requestJson(options.request));
-  } catch (error: unknown) {
-    return Result.err(
-      new Error(`${options.failureMessage}: ${redactSecret(errorMessage(error), options.githubToken)}`, {
+function requestGitHubJson(options: RequestGitHubJsonOptions): Task<unknown, Error> {
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      return new Error(`${options.failureMessage}: ${redactSecret(errorMessage(error), options.githubToken)}`, {
         cause: error,
-      }),
-    );
-  }
+      });
+    },
+    async (): Promise<unknown> => {
+      return options.httpClient.requestJson(options.request);
+    },
+  );
 }
 
 function createPullRequestRequestBody(
@@ -216,7 +217,8 @@ function parseCreatedPullRequest(githubResponse: unknown): Result<WebAppVersionS
     return Result.err(new Error('Malformed GitHub created pull request response'));
   }
 
-  const createdPullRequest = pullRequestResult.value.pullRequests.at(0);
+  const {value: parsedPullRequestPage} = pullRequestResult;
+  const createdPullRequest = parsedPullRequestPage.pullRequests.at(0);
 
   if (createdPullRequest === undefined) {
     return Result.err(new Error('Malformed GitHub created pull request response'));
@@ -225,41 +227,38 @@ function parseCreatedPullRequest(githubResponse: unknown): Result<WebAppVersionS
   return Result.ok(createdPullRequest);
 }
 
-async function listPullRequestsPage(
+function listPullRequestsPage(
   options: ListPullRequestsPageOptions,
   page: number,
   accumulatedPullRequests: readonly WebAppVersionSynchronizationPullRequest[],
-): Promise<Result<readonly WebAppVersionSynchronizationPullRequest[], Error>> {
+): Task<readonly WebAppVersionSynchronizationPullRequest[], Error> {
   const request = createHttpRequest(
     'get',
     createPageUrl(options.endpoint, page),
     options.headers,
     Maybe.nothing<NonNullable<unknown>>(),
   );
-  const githubResponseResult = await requestGitHubJson({
+  return requestGitHubJson({
     httpClient: options.httpClient,
     request,
     failureMessage: 'Unable to list GitHub pull requests',
     githubToken: options.githubToken,
+  }).andThen(githubResponse => {
+    const pageResult = parsePullRequestPage(githubResponse);
+
+    if (pageResult.isErr) {
+      return Task.reject<readonly WebAppVersionSynchronizationPullRequest[], Error>(pageResult.error);
+    }
+
+    const {value: parsedPullRequestPage} = pageResult;
+    const pullRequests = [...accumulatedPullRequests, ...parsedPullRequestPage.pullRequests];
+
+    if (parsedPullRequestPage.rawItemCount !== githubPageSize) {
+      return Task.resolve<readonly WebAppVersionSynchronizationPullRequest[], Error>(pullRequests);
+    }
+
+    return listPullRequestsPage(options, page + 1, pullRequests);
   });
-
-  if (githubResponseResult.isErr) {
-    return Result.err(githubResponseResult.error);
-  }
-
-  const pageResult = parsePullRequestPage(githubResponseResult.value);
-
-  if (pageResult.isErr) {
-    return Result.err(pageResult.error);
-  }
-
-  const pullRequests = [...accumulatedPullRequests, ...pageResult.value.pullRequests];
-
-  if (pageResult.value.rawItemCount !== githubPageSize) {
-    return Result.ok(pullRequests);
-  }
-
-  return listPullRequestsPage(options, page + 1, pullRequests);
 }
 
 export function createWebAppVersionSynchronizationGitHubClient(
@@ -279,29 +278,23 @@ export function createWebAppVersionSynchronizationGitHubClient(
   };
 
   return {
-    async listPullRequests() {
+    listPullRequests() {
       return listPullRequestsPage(listPullRequestsOptions, 1, []);
     },
 
-    async createPullRequest(createPullRequestOptions) {
+    createPullRequest(createPullRequestOptions) {
       const request = createHttpRequest(
         'post',
         pullRequestsEndpoint,
         writeHeaders,
         Maybe.just(createPullRequestRequestBody(createPullRequestOptions)),
       );
-      const githubResponseResult = await requestGitHubJson({
+      return requestGitHubJson({
         httpClient: options.httpClient,
         request,
         failureMessage: 'Unable to create WebApp version synchronization pull request',
         githubToken: options.githubToken,
-      });
-
-      if (githubResponseResult.isErr) {
-        return Result.err(githubResponseResult.error);
-      }
-
-      return parseCreatedPullRequest(githubResponseResult.value);
+      }).andThen(parseCreatedPullRequest);
     },
   };
 }
