@@ -18,7 +18,7 @@
  */
 
 import {isError} from '@sindresorhus/is';
-import {Maybe, Result, Task, task} from 'true-myth';
+import {Maybe, maybe, Result, Task, task} from 'true-myth';
 import {z} from 'zod';
 
 import type {WebAppVersionSynchronizationPullRequest} from './webappVersionSynchronization.ts';
@@ -46,9 +46,11 @@ export type CreateWebAppVersionSynchronizationGitHubClientOptions = {
   readonly githubToken: string;
 };
 
-type ParsedPullRequestPage = {
+type ParsedPullRequestSearchPage = {
+  readonly totalCount: number;
+  readonly incompleteResults: boolean;
   readonly rawItemCount: number;
-  readonly pullRequests: readonly WebAppVersionSynchronizationPullRequest[];
+  readonly pullRequestNumbers: readonly number[];
 };
 
 type GitHubPullRequestRequestBody = {
@@ -65,7 +67,15 @@ type RequestGitHubJsonOptions = {
   readonly githubToken: string;
 };
 
-type ListPullRequestsPageOptions = {
+type SearchPullRequestsPageOptions = {
+  readonly httpClient: HttpClient;
+  readonly endpoint: URL;
+  readonly headers: Readonly<Record<string, string>>;
+  readonly searchQuery: string;
+  readonly githubToken: string;
+};
+
+type GetPullRequestOptions = {
   readonly httpClient: HttpClient;
   readonly endpoint: URL;
   readonly headers: Readonly<Record<string, string>>;
@@ -73,7 +83,10 @@ type ListPullRequestsPageOptions = {
 };
 
 const githubPageSize = 100;
+const githubSearchResultLimit = 1000;
 const githubApiVersion = '2022-11-28';
+const synchronizationMarkerSearchTerm = 'wire-webapp-version-sync';
+const synchronizationPullRequestTitleSearchTerm = 'Update WebApp version to';
 
 const githubPullRequestResponseSchema = z.object({
   number: z.number().int().positive(),
@@ -90,7 +103,22 @@ const githubPullRequestResponseSchema = z.object({
   }),
 });
 
-const githubPullRequestPageResponseSchema = z.array(githubPullRequestResponseSchema);
+const githubPullRequestSearchItemResponseSchema = z.object({
+  number: z.number().int().positive(),
+  html_url: z.string().url(),
+  title: z.string().min(1),
+  body: z.string().nullable(),
+  pull_request: z.object({
+    url: z.string().url(),
+    html_url: z.string().url(),
+  }),
+});
+
+const githubPullRequestSearchResponseSchema = z.object({
+  total_count: z.number().int().nonnegative(),
+  incomplete_results: z.boolean(),
+  items: z.array(githubPullRequestSearchItemResponseSchema),
+});
 
 function errorMessage(error: unknown): string {
   if (isHttpRequestFailure(error)) {
@@ -141,16 +169,20 @@ function createGitHubHeaders(githubToken: string, includesBody: boolean): Readon
   return headers;
 }
 
-function createPageUrl(endpoint: URL, page: number): URL {
+function createSearchPageUrl(endpoint: URL, searchQuery: string, page: number): URL {
   const pageUrl = new URL(endpoint);
 
-  pageUrl.searchParams.set('state', 'all');
+  pageUrl.searchParams.set('q', searchQuery);
   pageUrl.searchParams.set('sort', 'created');
-  pageUrl.searchParams.set('direction', 'asc');
+  pageUrl.searchParams.set('order', 'asc');
   pageUrl.searchParams.set('per_page', githubPageSize.toString());
   pageUrl.searchParams.set('page', page.toString());
 
   return pageUrl;
+}
+
+function createPullRequestDetailUrl(endpoint: URL, pullRequestNumber: number): URL {
+  return new URL(`${pullRequestNumber}`, `${endpoint.toString()}/`);
 }
 
 function createHttpRequest(
@@ -162,26 +194,42 @@ function createHttpRequest(
   return {method, url, headers, json};
 }
 
-function parsePullRequestPage(githubResponse: unknown): Result<ParsedPullRequestPage, Error> {
-  const validationResult = githubPullRequestPageResponseSchema.safeParse(githubResponse);
+function parsePullRequest(githubResponse: unknown): Result<WebAppVersionSynchronizationPullRequest, Error> {
+  const validationResult = githubPullRequestResponseSchema.safeParse(githubResponse);
 
   if (validationResult.success === false) {
     return Result.err(new Error('Malformed GitHub pull request response'));
   }
 
+  const {data: pullRequest} = validationResult;
+
   return Result.ok({
-    rawItemCount: validationResult.data.length,
-    pullRequests: validationResult.data.map(pullRequest => {
-      return {
-        number: pullRequest.number,
-        url: pullRequest.html_url,
-        title: pullRequest.title,
-        body: pullRequest.body ?? '',
-        state: pullRequest.state,
-        mergedAt: pullRequest.merged_at,
-        baseBranch: pullRequest.base.ref,
-        headBranch: pullRequest.head.ref,
-      };
+    number: pullRequest.number,
+    url: pullRequest.html_url,
+    title: pullRequest.title,
+    body: pullRequest.body ?? '',
+    state: pullRequest.state,
+    mergedAt: pullRequest.merged_at,
+    baseBranch: pullRequest.base.ref,
+    headBranch: pullRequest.head.ref,
+  });
+}
+
+function parsePullRequestSearchPage(githubResponse: unknown): Result<ParsedPullRequestSearchPage, Error> {
+  const validationResult = githubPullRequestSearchResponseSchema.safeParse(githubResponse);
+
+  if (validationResult.success === false) {
+    return Result.err(new Error('Malformed GitHub pull request search response'));
+  }
+
+  const {data: searchResponse} = validationResult;
+
+  return Result.ok({
+    totalCount: searchResponse.total_count,
+    incompleteResults: searchResponse.incomplete_results,
+    rawItemCount: searchResponse.items.length,
+    pullRequestNumbers: searchResponse.items.map(searchItem => {
+      return searchItem.number;
     }),
   });
 }
@@ -211,30 +259,22 @@ function createPullRequestRequestBody(
 }
 
 function parseCreatedPullRequest(githubResponse: unknown): Result<WebAppVersionSynchronizationPullRequest, Error> {
-  const pullRequestResult = parsePullRequestPage([githubResponse]);
+  const pullRequestResult = parsePullRequest(githubResponse);
 
   if (pullRequestResult.isErr) {
     return Result.err(new Error('Malformed GitHub created pull request response'));
   }
 
-  const {value: parsedPullRequestPage} = pullRequestResult;
-  const createdPullRequest = parsedPullRequestPage.pullRequests.at(0);
-
-  if (createdPullRequest === undefined) {
-    return Result.err(new Error('Malformed GitHub created pull request response'));
-  }
-
-  return Result.ok(createdPullRequest);
+  return pullRequestResult;
 }
 
-function listPullRequestsPage(
-  options: ListPullRequestsPageOptions,
+function searchPullRequestsPage(
+  options: SearchPullRequestsPageOptions,
   page: number,
-  accumulatedPullRequests: readonly WebAppVersionSynchronizationPullRequest[],
-): Task<readonly WebAppVersionSynchronizationPullRequest[], Error> {
+): Task<ParsedPullRequestSearchPage, Error> {
   const request = createHttpRequest(
     'get',
-    createPageUrl(options.endpoint, page),
+    createSearchPageUrl(options.endpoint, options.searchQuery, page),
     options.headers,
     Maybe.nothing<NonNullable<unknown>>(),
   );
@@ -243,21 +283,77 @@ function listPullRequestsPage(
     request,
     failureMessage: 'Unable to list GitHub pull requests',
     githubToken: options.githubToken,
-  }).andThen(githubResponse => {
-    const pageResult = parsePullRequestPage(githubResponse);
+  }).andThen(parsePullRequestSearchPage);
+}
 
-    if (pageResult.isErr) {
-      return Task.reject<readonly WebAppVersionSynchronizationPullRequest[], Error>(pageResult.error);
+function searchPullRequestNumbers(
+  options: SearchPullRequestsPageOptions,
+  page: number,
+  accumulatedPullRequestNumbers: readonly number[],
+): Task<readonly number[], Error> {
+  return searchPullRequestsPage(options, page).andThen(parsedSearchPage => {
+    if (parsedSearchPage.incompleteResults) {
+      return Task.reject<readonly number[], Error>(new Error('GitHub pull request search returned incomplete results'));
     }
 
-    const {value: parsedPullRequestPage} = pageResult;
-    const pullRequests = [...accumulatedPullRequests, ...parsedPullRequestPage.pullRequests];
-
-    if (parsedPullRequestPage.rawItemCount !== githubPageSize) {
-      return Task.resolve<readonly WebAppVersionSynchronizationPullRequest[], Error>(pullRequests);
+    if (parsedSearchPage.totalCount > githubSearchResultLimit) {
+      return Task.reject<readonly number[], Error>(
+        new Error(`GitHub pull request search returned more than ${githubSearchResultLimit} results`),
+      );
     }
 
-    return listPullRequestsPage(options, page + 1, pullRequests);
+    const pullRequestNumbers = [...accumulatedPullRequestNumbers, ...parsedSearchPage.pullRequestNumbers];
+
+    if (pullRequestNumbers.length >= parsedSearchPage.totalCount) {
+      return Task.resolve<readonly number[], Error>(pullRequestNumbers);
+    }
+
+    if (parsedSearchPage.rawItemCount !== githubPageSize) {
+      return Task.reject<readonly number[], Error>(
+        new Error('GitHub pull request search pagination ended before all results were retrieved'),
+      );
+    }
+
+    return searchPullRequestNumbers(options, page + 1, pullRequestNumbers);
+  });
+}
+
+function getPullRequest(
+  options: GetPullRequestOptions,
+  pullRequestNumber: number,
+): Task<WebAppVersionSynchronizationPullRequest, Error> {
+  const request = createHttpRequest(
+    'get',
+    createPullRequestDetailUrl(options.endpoint, pullRequestNumber),
+    options.headers,
+    Maybe.nothing<NonNullable<unknown>>(),
+  );
+
+  return requestGitHubJson({
+    httpClient: options.httpClient,
+    request,
+    failureMessage: `Unable to read GitHub pull request #${pullRequestNumber}`,
+    githubToken: options.githubToken,
+  }).andThen(parsePullRequest);
+}
+
+function getPullRequests(
+  options: GetPullRequestOptions,
+  pullRequestNumbers: readonly number[],
+  accumulatedPullRequests: readonly WebAppVersionSynchronizationPullRequest[],
+): Task<readonly WebAppVersionSynchronizationPullRequest[], Error> {
+  const pullRequestNumberMaybe = maybe.first(pullRequestNumbers).andThen(maybePullRequestNumber => {
+    return maybePullRequestNumber;
+  });
+
+  if (pullRequestNumberMaybe.isNothing) {
+    return Task.resolve(accumulatedPullRequests);
+  }
+
+  const {value: pullRequestNumber} = pullRequestNumberMaybe;
+
+  return getPullRequest(options, pullRequestNumber).andThen(pullRequest => {
+    return getPullRequests(options, pullRequestNumbers.slice(1), [...accumulatedPullRequests, pullRequest]);
   });
 }
 
@@ -269,8 +365,18 @@ export function createWebAppVersionSynchronizationGitHubClient(
   const readHeaders = createGitHubHeaders(options.githubToken, false);
   const writeHeaders = createGitHubHeaders(options.githubToken, true);
   const pullRequestsEndpoint = new URL(`repos/${encodedRepositoryName}/pulls`, githubApiRoot);
+  const pullRequestSearchEndpoint = new URL('search/issues', githubApiRoot);
+  const synchronizationSearchQuery = `repo:${options.githubRepository} is:pr (in:body "${synchronizationMarkerSearchTerm}" OR in:title "${synchronizationPullRequestTitleSearchTerm}")`;
 
-  const listPullRequestsOptions = {
+  const searchPullRequestsPageOptions = {
+    httpClient: options.httpClient,
+    endpoint: pullRequestSearchEndpoint,
+    headers: readHeaders,
+    searchQuery: synchronizationSearchQuery,
+    githubToken: options.githubToken,
+  };
+
+  const getPullRequestOptions = {
     httpClient: options.httpClient,
     endpoint: pullRequestsEndpoint,
     headers: readHeaders,
@@ -279,7 +385,9 @@ export function createWebAppVersionSynchronizationGitHubClient(
 
   return {
     listPullRequests() {
-      return listPullRequestsPage(listPullRequestsOptions, 1, []);
+      return searchPullRequestNumbers(searchPullRequestsPageOptions, 1, []).andThen(pullRequestNumbers => {
+        return getPullRequests(getPullRequestOptions, pullRequestNumbers, []);
+      });
     },
 
     createPullRequest(createPullRequestOptions) {
