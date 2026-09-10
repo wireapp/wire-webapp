@@ -1224,7 +1224,6 @@ jobs:
         create_production_tag,
         publish_production_distribution,
         ensure_github_release,
-        synchronize_webapp_version,
       ]
     if: >-
       ${{
@@ -1235,8 +1234,7 @@ jobs:
         needs.verify_production_runtime.result == 'success' &&
         needs.create_production_tag.result == 'success' &&
         needs.publish_production_distribution.result == 'success' &&
-        needs.ensure_github_release.result == 'success' &&
-        needs.synchronize_webapp_version.result == 'success'
+        needs.ensure_github_release.result == 'success'
       }}
     permissions:
       contents: read
@@ -1314,6 +1312,7 @@ jobs:
         create_production_tag,
         publish_production_distribution,
         ensure_github_release,
+        synchronize_webapp_version,
       ]
     if: >-
       ${{
@@ -1322,7 +1321,8 @@ jobs:
         needs.verify_production_runtime.result == 'success' &&
         needs.create_production_tag.result == 'success' &&
         needs.publish_production_distribution.result == 'success' &&
-        needs.ensure_github_release.result == 'success'
+        needs.ensure_github_release.result == 'success' &&
+        needs.synchronize_webapp_version.result == 'success'
       }}
     continue-on-error: true
     permissions:
