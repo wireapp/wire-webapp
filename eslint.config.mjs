@@ -522,6 +522,25 @@ const productionConfigs = [
     },
   },
   {
+    files: [
+      'apps/webapp/src/script/components/LoadingBar/LoadingBar.tsx',
+      'apps/webapp/src/script/components/Note/Note.tsx',
+      'apps/webapp/src/script/components/ProgressBar/ProgressBar.tsx',
+      'apps/webapp/src/script/components/Radio/RadioGroup.tsx',
+      'apps/webapp/src/script/components/SearchInput/SearchInput.tsx',
+      'apps/webapp/src/script/components/SelectText/SelectText.tsx',
+      'apps/webapp/src/script/components/TextInput/TextInput.tsx',
+      'apps/webapp/src/script/components/UserName/UserName.tsx',
+      'apps/webapp/src/script/components/VerificationIcon/VerificationIcon.tsx',
+      'apps/webapp/src/script/components/fadingScrollbar/fadingScrollbar.tsx',
+      'apps/webapp/src/script/components/inViewport/inViewport.tsx',
+      'apps/webapp/src/script/components/ZoomableImage/ZoomableImage.tsx',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
     files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',
