@@ -539,6 +539,13 @@ const productionConfigs = [
       'apps/webapp/src/script/components/draggableClickWrapper/draggableClickWrapper.tsx',
       'apps/webapp/src/script/components/dropFileArea/dropFileArea.tsx',
       'apps/webapp/src/script/components/toggle/BaseToggle.tsx',
+      'apps/webapp/src/script/hooks/useActiveWindow.ts',
+      'apps/webapp/src/script/hooks/useClickOutside.tsx',
+      'apps/webapp/src/script/hooks/useElementSize/useElementSize.ts',
+      'apps/webapp/src/script/hooks/useInView/useInView.ts',
+      'apps/webapp/src/script/hooks/useKeyPressAndHold/useKeyPressAndHold.ts',
+      'apps/webapp/src/script/hooks/useRoveFocus.ts',
+      'apps/webapp/src/script/hooks/useToggleState.ts',
     ],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
