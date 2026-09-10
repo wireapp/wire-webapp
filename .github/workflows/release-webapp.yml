@@ -1224,6 +1224,7 @@ jobs:
         create_production_tag,
         publish_production_distribution,
         ensure_github_release,
+        synchronize_webapp_version,
       ]
     if: >-
       ${{
@@ -1234,7 +1235,8 @@ jobs:
         needs.verify_production_runtime.result == 'success' &&
         needs.create_production_tag.result == 'success' &&
         needs.publish_production_distribution.result == 'success' &&
-        needs.ensure_github_release.result == 'success'
+        needs.ensure_github_release.result == 'success' &&
+        needs.synchronize_webapp_version.result == 'success'
       }}
     permissions:
       contents: read
@@ -1359,6 +1361,9 @@ jobs:
             GitHub Release URL: ${{ needs.ensure_github_release.outputs.github_release_url }}
             GitHub Release handoff: ${{ needs.ensure_github_release.outputs.github_release_action }}
             ${{ needs.ensure_github_release.outputs.github_release_state == 'draft' && 'The GitHub Release is a draft. Review or edit the generated customer-facing changelog and publish it manually.' || 'The existing published GitHub Release was preserved.' }}
+            WebApp package version: ${{ needs.synchronize_webapp_version.outputs.webapp_version }}
+            Version synchronization action: ${{ needs.synchronize_webapp_version.outputs.version_sync_action }}
+            Version synchronization PR: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_url }}
             Triggering actor: ${{ github.actor }}
             Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
@@ -1378,6 +1383,9 @@ jobs:
         create_production_tag,
         publish_production_distribution,
         ensure_github_release,
+        webapp_version_synchronization_preflight,
+        webapp_version_synchronization_production_preflight,
+        synchronize_webapp_version,
       ]
     if: ${{ always() }}
     permissions:
@@ -1438,6 +1446,20 @@ jobs:
           GITHUB_RELEASE_STATE: ${{ needs.ensure_github_release.outputs.github_release_state }}
           GITHUB_RELEASE_TAG_NAME: ${{ needs.ensure_github_release.outputs.production_tag_name }}
           GITHUB_RELEASE_URL: ${{ needs.ensure_github_release.outputs.github_release_url }}
+          WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_JOB_RESULT: ${{ needs.webapp_version_synchronization_preflight.result }}
+          WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_PR_NUMBER: ${{ needs.webapp_version_synchronization_preflight.outputs.pull_request_number }}
+          WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_PR_URL: ${{ needs.webapp_version_synchronization_preflight.outputs.pull_request_url }}
+          WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_STATE: ${{ needs.webapp_version_synchronization_preflight.outputs.state }}
+          WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_JOB_RESULT: ${{ needs.webapp_version_synchronization_production_preflight.result }}
+          WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_PR_NUMBER: ${{ needs.webapp_version_synchronization_production_preflight.outputs.pull_request_number }}
+          WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_PR_URL: ${{ needs.webapp_version_synchronization_production_preflight.outputs.pull_request_url }}
+          WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_STATE: ${{ needs.webapp_version_synchronization_production_preflight.outputs.state }}
+          WEBAPP_VERSION_SYNC_ACTION: ${{ needs.synchronize_webapp_version.outputs.version_sync_action }}
+          WEBAPP_VERSION_SYNC_BRANCH_NAME: ${{ needs.synchronize_webapp_version.outputs.version_sync_branch_name }}
+          WEBAPP_VERSION_SYNC_JOB_RESULT: ${{ needs.synchronize_webapp_version.result }}
+          WEBAPP_VERSION_SYNC_PR_NUMBER: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_number }}
+          WEBAPP_VERSION_SYNC_PR_URL: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_url }}
+          WEBAPP_VERSION: ${{ needs.synchronize_webapp_version.outputs.webapp_version }}
           PRODUCTION_DEPLOYMENT_REQUIRED: ${{ needs.production_preflight.outputs.should_deploy }}
           PRODUCTION_ENVIRONMENT_NAME: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
           PRODUCTION_PREFLIGHT_JOB_RESULT: ${{ needs.production_preflight.result }}
@@ -1482,8 +1504,23 @@ jobs:
         create_production_tag,
         publish_production_distribution,
         ensure_github_release,
+        webapp_version_synchronization_preflight,
+        webapp_version_synchronization_production_preflight,
+        synchronize_webapp_version,
       ]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
+    env:
+      POST_PRODUCTION_SYNCHRONIZATION_FAILURE: >-
+        ${{
+          needs.synchronize_webapp_version.result == 'failure' &&
+          needs.deploy_to_production.result == 'success' &&
+          needs.verify_production_runtime.result == 'success' &&
+          needs.create_production_tag.result == 'success' &&
+          needs.publish_production_distribution.result == 'success' &&
+          needs.ensure_github_release.result == 'success' &&
+          'true' ||
+          'false'
+        }}
     permissions:
       contents: read
 
@@ -1500,11 +1537,16 @@ jobs:
           webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           status: failure
           text: |
-            ❌ WebApp release failed ❌
+            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && '⚠️ Production release succeeded; WebApp version synchronization bookkeeping is incomplete ⚠️' || '❌ WebApp release failed ❌' }}
 
             Release: ${{ needs.build_artifact.outputs.release_identifier || 'unavailable' }}
             Branch: ${{ needs.build_artifact.outputs.release_branch || needs.validate_request.outputs.release_branch || 'unavailable' }}
             Triggered by: ${{ github.actor }}
+
+            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'Production deployment, runtime verification, immutable tagging, distribution, and GitHub Release handoff succeeded.' || '' }}
+            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'WebApp version synchronization bookkeeping failed.' || '' }}
+            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'Release bookkeeping: incomplete.' || '' }}
+            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'Production must not be rolled back. Resolve the synchronization problem and rerun the failed bookkeeping operation.' || '' }}
 
             Request validation: ${{ needs.validate_request.result }}
             Build: ${{ needs.build_artifact.result }}
@@ -1523,6 +1565,12 @@ jobs:
             GitHub Release URL: ${{ needs.ensure_github_release.outputs.github_release_url || 'unavailable' }}
             GitHub Release state: ${{ needs.ensure_github_release.outputs.github_release_state || 'unavailable' }}
             GitHub Release action: ${{ needs.ensure_github_release.outputs.github_release_action || 'unavailable' }}
+            WebApp synchronization preflight: ${{ needs.webapp_version_synchronization_preflight.result }}
+            WebApp synchronization Production preflight: ${{ needs.webapp_version_synchronization_production_preflight.result }}
+            WebApp version synchronization: ${{ needs.synchronize_webapp_version.result }}
+            WebApp package version: ${{ needs.synchronize_webapp_version.outputs.webapp_version || 'unavailable' }}
+            Version synchronization action: ${{ needs.synchronize_webapp_version.outputs.version_sync_action || 'unavailable' }}
+            Version synchronization PR: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_url || 'unavailable' }}
 
             Production runtime verification result: ${{ needs.verify_production_runtime.result }}
             Expected Production webapp version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
@@ -1535,8 +1583,8 @@ jobs:
             Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
             Source workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-            ${{ needs.production_preflight.outputs.production_preflight_result == 'already_tagged' && needs.ensure_github_release.result == 'failure' && 'Production was already tagged; deployment was not repeated.' || needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'Hosted Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
-            ${{ needs.production_preflight.outputs.production_preflight_result == 'already_tagged' && needs.ensure_github_release.result == 'failure' && 'The existing Production tag remains unchanged.' || needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'The Production tag exists.' || 'Production tag creation was blocked by the failed release gate.' }}
+            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'Production lifecycle succeeded.' || needs.production_preflight.outputs.production_preflight_result == 'already_tagged' && needs.ensure_github_release.result == 'failure' && 'Production was already tagged; deployment was not repeated.' || needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'Hosted Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
+            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'The immutable Production tag remains unchanged.' || needs.production_preflight.outputs.production_preflight_result == 'already_tagged' && needs.ensure_github_release.result == 'failure' && 'The existing Production tag remains unchanged.' || needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'The Production tag exists.' || 'Production tag creation was blocked by the failed release gate.' }}
             ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Docker, Helm, or wire-builds publication failed.' || needs.ensure_github_release.result == 'failure' && (needs.create_production_tag.result == 'success' || needs.production_preflight.outputs.production_preflight_result == 'already_tagged') && 'GitHub Release draft creation or verification failed.' || '' }}
             ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The release is incomplete for on-premises distribution.' || needs.ensure_github_release.result == 'failure' && (needs.create_production_tag.result == 'success' || needs.production_preflight.outputs.production_preflight_result == 'already_tagged') && 'The automated release lifecycle is incomplete until the GitHub Release handoff succeeds.' || '' }}
             ${{ needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'No Production tag was moved or deleted.' || '' }}
