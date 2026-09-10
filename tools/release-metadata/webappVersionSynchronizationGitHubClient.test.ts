@@ -21,6 +21,7 @@ import assert from 'node:assert';
 
 import {isUndefined} from '@sindresorhus/is';
 
+import {resolveWebAppVersionSynchronizationState} from './webappVersionSynchronization.ts';
 import {createWebAppVersionSynchronizationGitHubClient} from './webappVersionSynchronizationGitHubClient.ts';
 
 import type {HttpClient, HttpRequest} from '../release-appearance/httpClient.ts';
@@ -29,6 +30,7 @@ const githubToken = 'otto-secret-token';
 
 type CreateGitHubPullRequestResponseOptions = {
   readonly number: number;
+  readonly title?: string;
   readonly state?: 'open' | 'closed';
   readonly mergedAt?: string | null;
   readonly body?: string | null;
@@ -42,7 +44,7 @@ function createGitHubPullRequestResponse(options: CreateGitHubPullRequestRespons
   return {
     number: options.number,
     html_url: `https://github.com/wireapp/wire-webapp/pull/${options.number}`,
-    title: 'Update WebApp version to 1.0.0',
+    title: options.title ?? 'Update WebApp version to 1.0.0',
     body: responseBody,
     state: options.state ?? 'open',
     merged_at: options.mergedAt ?? null,
@@ -143,6 +145,7 @@ describe('WebApp version synchronization GitHub client', () => {
   it('lists pull requests and normalizes GitHub fields', async () => {
     const fakeHttpClient = createFakeHttpClient([
       createGitHubPullRequestSearchResponse([42]),
+      createGitHubPullRequestSearchResponse([]),
       createGitHubPullRequestResponse({
         number: 42,
         body: null,
@@ -169,14 +172,17 @@ describe('WebApp version synchronization GitHub client', () => {
     ]);
     expect(fakeHttpClient.requests[0].url.searchParams).toEqual(
       new URLSearchParams({
-        q: 'repo:wireapp/wire-webapp is:pr (in:body "wire-webapp-version-sync" OR in:title "Update WebApp version to")',
+        q: 'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
         sort: 'created',
         order: 'asc',
         per_page: '100',
         page: '1',
       }),
     );
-    expect(fakeHttpClient.requests[1].url.toString()).toBe(
+    expect(fakeHttpClient.requests[1].url.searchParams.get('q')).toBe(
+      'repo:wireapp/wire-webapp is:pr in:title "Update WebApp version to"',
+    );
+    expect(fakeHttpClient.requests[2].url.toString()).toBe(
       'https://api.github.example/repos/wireapp/wire-webapp/pulls/42',
     );
   });
@@ -187,6 +193,7 @@ describe('WebApp version synchronization GitHub client', () => {
   ])('retrieves a $description synchronization pull request through targeted discovery', async options => {
     const fakeHttpClient = createFakeHttpClient([
       createGitHubPullRequestSearchResponse([7]),
+      createGitHubPullRequestSearchResponse([]),
       createGitHubPullRequestResponse({number: 7, state: options.state, mergedAt: options.mergedAt}),
     ]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
@@ -197,19 +204,26 @@ describe('WebApp version synchronization GitHub client', () => {
     expect(actualResult.value).toHaveLength(1);
     expect(actualResult.value[0].state).toBe(options.state);
     expect(actualResult.value[0].mergedAt).toBeNull();
-    expect(fakeHttpClient.requests).toHaveLength(2);
+    expect(fakeHttpClient.requests).toHaveLength(3);
   });
 
-  it('paginates until a page is shorter than the GitHub page size', async () => {
-    const firstPageNumbers = Array.from({length: 100}, (_, index) => {
+  it('paginates both searches independently and deduplicates pull requests', async () => {
+    const firstMarkerSearchPageNumbers = Array.from({length: 100}, (_, index) => {
       return index + 1;
     });
-    const pullRequestDetails = Array.from({length: 101}, (_, index) => {
+    const secondMarkerSearchPageNumbers = [101];
+    const firstTitleSearchPageNumbers = Array.from({length: 100}, (_, index) => {
+      return index + 101;
+    });
+    const secondTitleSearchPageNumbers = [201];
+    const pullRequestDetails = Array.from({length: 201}, (_, index) => {
       return createGitHubPullRequestResponse({number: index + 1});
     });
     const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse(firstPageNumbers, 101),
-      createGitHubPullRequestSearchResponse([101], 101),
+      createGitHubPullRequestSearchResponse(firstMarkerSearchPageNumbers, 101),
+      createGitHubPullRequestSearchResponse(secondMarkerSearchPageNumbers, 101),
+      createGitHubPullRequestSearchResponse(firstTitleSearchPageNumbers, 101),
+      createGitHubPullRequestSearchResponse(secondTitleSearchPageNumbers, 101),
       ...pullRequestDetails,
     ]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
@@ -217,9 +231,101 @@ describe('WebApp version synchronization GitHub client', () => {
     const actualResult = await githubClient.listPullRequests();
 
     assert(actualResult.isOk);
-    expect(actualResult.value).toHaveLength(101);
-    expect(fakeHttpClient.requests).toHaveLength(103);
+    expect(actualResult.value).toHaveLength(201);
+    expect(actualResult.value.map(pullRequest => pullRequest.number)).toEqual(
+      Array.from({length: 201}, (_, index) => {
+        return index + 1;
+      }),
+    );
+    expect(fakeHttpClient.requests).toHaveLength(205);
+    expect(fakeHttpClient.requests[0].url.searchParams.get('q')).toBe(
+      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
+    );
+    expect(fakeHttpClient.requests[1].url.searchParams.get('q')).toBe(
+      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
+    );
     expect(fakeHttpClient.requests[1].url.searchParams.get('page')).toBe('2');
+    expect(fakeHttpClient.requests[2].url.searchParams.get('q')).toBe(
+      'repo:wireapp/wire-webapp is:pr in:title "Update WebApp version to"',
+    );
+    expect(fakeHttpClient.requests[3].url.searchParams.get('q')).toBe(
+      'repo:wireapp/wire-webapp is:pr in:title "Update WebApp version to"',
+    );
+    expect(fakeHttpClient.requests[3].url.searchParams.get('page')).toBe('2');
+  });
+
+  it('combines search results in deterministic order and fetches duplicate pull requests once', async () => {
+    const fakeHttpClient = createFakeHttpClient([
+      createGitHubPullRequestSearchResponse([42, 99]),
+      createGitHubPullRequestSearchResponse([7, 42]),
+      createGitHubPullRequestResponse({number: 7}),
+      createGitHubPullRequestResponse({number: 42}),
+      createGitHubPullRequestResponse({number: 99}),
+    ]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.listPullRequests();
+
+    assert(actualResult.isOk);
+    expect(actualResult.value.map(pullRequest => pullRequest.number)).toEqual([7, 42, 99]);
+    expect(fakeHttpClient.requests.map(request => request.url.pathname)).toEqual([
+      '/search/issues',
+      '/search/issues',
+      '/repos/wireapp/wire-webapp/pulls/7',
+      '/repos/wireapp/wire-webapp/pulls/42',
+      '/repos/wireapp/wire-webapp/pulls/99',
+    ]);
+  });
+
+  it('discovers a marker-only synchronization pull request', async () => {
+    const fakeHttpClient = createFakeHttpClient([
+      createGitHubPullRequestSearchResponse([42]),
+      createGitHubPullRequestSearchResponse([]),
+      createGitHubPullRequestResponse({
+        number: 42,
+        title: 'Synchronize package metadata',
+        body: '<!-- wire-webapp-version-sync release=2026-09-09.1 production-tag=2026-09-09.1-production version=1.0.0 -->',
+      }),
+    ]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.listPullRequests();
+
+    assert(actualResult.isOk);
+    const synchronizationStateResult = resolveWebAppVersionSynchronizationState(
+      '2026-09-09.1',
+      '2026-09-09.1-production',
+      actualResult.value,
+    );
+
+    assert(synchronizationStateResult.isOk);
+    expect(synchronizationStateResult.value.kind).toBe('matching-open');
+  });
+
+  it('discovers and rejects a title-only synchronization claim without a marker', async () => {
+    const fakeHttpClient = createFakeHttpClient([
+      createGitHubPullRequestSearchResponse([]),
+      createGitHubPullRequestSearchResponse([42]),
+      createGitHubPullRequestResponse({
+        number: 42,
+        title: 'Update WebApp version to 1.0.0',
+        body: '',
+        headBranch: 'release-not-metadata',
+      }),
+    ]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.listPullRequests();
+
+    assert(actualResult.isOk);
+    const synchronizationStateResult = resolveWebAppVersionSynchronizationState(
+      '2026-09-09.1',
+      '2026-09-09.1-production',
+      actualResult.value,
+    );
+
+    assert(synchronizationStateResult.isErr);
+    expect(synchronizationStateResult.error.message).toContain('invalid marker');
   });
 
   it.each([
@@ -334,7 +440,11 @@ describe('WebApp version synchronization GitHub client', () => {
       response: {...createGitHubPullRequestResponse({number: 42}), head: {ref: 42}},
     },
   ])('rejects malformed pull request responses: $description', async ({response}) => {
-    const fakeHttpClient = createFakeHttpClient([createGitHubPullRequestSearchResponse([42]), response]);
+    const fakeHttpClient = createFakeHttpClient([
+      createGitHubPullRequestSearchResponse([42]),
+      createGitHubPullRequestSearchResponse([]),
+      response,
+    ]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
     const actualResult = await githubClient.listPullRequests();
@@ -387,8 +497,17 @@ describe('WebApp version synchronization GitHub client', () => {
     expect(actualResult.error.message).toBe('Malformed GitHub pull request search response');
   });
 
-  it('rejects incomplete search results', async () => {
-    const fakeHttpClient = createFakeHttpClient([createGitHubPullRequestSearchResponse([], 0, true)]);
+  it.each([
+    {
+      description: 'the marker search',
+      responses: [createGitHubPullRequestSearchResponse([], 0, true)],
+    },
+    {
+      description: 'the title search',
+      responses: [createGitHubPullRequestSearchResponse([]), createGitHubPullRequestSearchResponse([], 0, true)],
+    },
+  ])('rejects incomplete results from $description', async ({responses}) => {
+    const fakeHttpClient = createFakeHttpClient(responses);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
     const actualResult = await githubClient.listPullRequests();
@@ -397,8 +516,17 @@ describe('WebApp version synchronization GitHub client', () => {
     expect(actualResult.error.message).toBe('GitHub pull request search returned incomplete results');
   });
 
-  it('rejects search results beyond the GitHub result limit', async () => {
-    const fakeHttpClient = createFakeHttpClient([createGitHubPullRequestSearchResponse([], 1001)]);
+  it.each([
+    {
+      description: 'the marker search',
+      responses: [createGitHubPullRequestSearchResponse([], 1001)],
+    },
+    {
+      description: 'the title search',
+      responses: [createGitHubPullRequestSearchResponse([]), createGitHubPullRequestSearchResponse([], 1001)],
+    },
+  ])('rejects results beyond the GitHub limit from $description', async ({responses}) => {
+    const fakeHttpClient = createFakeHttpClient(responses);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
     const actualResult = await githubClient.listPullRequests();
@@ -420,16 +548,23 @@ describe('WebApp version synchronization GitHub client', () => {
   });
 
   it('uses targeted search instead of enumerating repository pull requests', async () => {
-    const fakeHttpClient = createFakeHttpClient([createGitHubPullRequestSearchResponse([])]);
+    const fakeHttpClient = createFakeHttpClient([
+      createGitHubPullRequestSearchResponse([]),
+      createGitHubPullRequestSearchResponse([]),
+    ]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
     const actualResult = await githubClient.listPullRequests();
 
     assert(actualResult.isOk);
-    expect(fakeHttpClient.requests).toHaveLength(1);
+    expect(fakeHttpClient.requests).toHaveLength(2);
     expect(fakeHttpClient.requests[0].url.pathname).toBe('/search/issues');
     expect(fakeHttpClient.requests[0].url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr (in:body "wire-webapp-version-sync" OR in:title "Update WebApp version to")',
+      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
+    );
+    expect(fakeHttpClient.requests[1].url.pathname).toBe('/search/issues');
+    expect(fakeHttpClient.requests[1].url.searchParams.get('q')).toBe(
+      'repo:wireapp/wire-webapp is:pr in:title "Update WebApp version to"',
     );
   });
 

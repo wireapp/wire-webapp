@@ -318,6 +318,17 @@ function searchPullRequestNumbers(
   });
 }
 
+function combinePullRequestNumbers(
+  bodySearchPullRequestNumbers: readonly number[],
+  titleSearchPullRequestNumbers: readonly number[],
+): readonly number[] {
+  return [...new Set([...bodySearchPullRequestNumbers, ...titleSearchPullRequestNumbers])].toSorted(
+    (firstPullRequestNumber, secondPullRequestNumber) => {
+      return firstPullRequestNumber - secondPullRequestNumber;
+    },
+  );
+}
+
 function getPullRequest(
   options: GetPullRequestOptions,
   pullRequestNumber: number,
@@ -366,13 +377,22 @@ export function createWebAppVersionSynchronizationGitHubClient(
   const writeHeaders = createGitHubHeaders(options.githubToken, true);
   const pullRequestsEndpoint = new URL(`repos/${encodedRepositoryName}/pulls`, githubApiRoot);
   const pullRequestSearchEndpoint = new URL('search/issues', githubApiRoot);
-  const synchronizationSearchQuery = `repo:${options.githubRepository} is:pr (in:body "${synchronizationMarkerSearchTerm}" OR in:title "${synchronizationPullRequestTitleSearchTerm}")`;
+  const synchronizationMarkerSearchQuery = `repo:${options.githubRepository} is:pr in:body "${synchronizationMarkerSearchTerm}"`;
+  const synchronizationTitleSearchQuery = `repo:${options.githubRepository} is:pr in:title "${synchronizationPullRequestTitleSearchTerm}"`;
 
-  const searchPullRequestsPageOptions = {
+  const synchronizationMarkerSearchOptions = {
     httpClient: options.httpClient,
     endpoint: pullRequestSearchEndpoint,
     headers: readHeaders,
-    searchQuery: synchronizationSearchQuery,
+    searchQuery: synchronizationMarkerSearchQuery,
+    githubToken: options.githubToken,
+  };
+
+  const synchronizationTitleSearchOptions = {
+    httpClient: options.httpClient,
+    endpoint: pullRequestSearchEndpoint,
+    headers: readHeaders,
+    searchQuery: synchronizationTitleSearchQuery,
     githubToken: options.githubToken,
   };
 
@@ -385,9 +405,20 @@ export function createWebAppVersionSynchronizationGitHubClient(
 
   return {
     listPullRequests() {
-      return searchPullRequestNumbers(searchPullRequestsPageOptions, 1, []).andThen(pullRequestNumbers => {
-        return getPullRequests(getPullRequestOptions, pullRequestNumbers, []);
-      });
+      return searchPullRequestNumbers(synchronizationMarkerSearchOptions, 1, []).andThen(
+        synchronizationMarkerPullRequestNumbers => {
+          return searchPullRequestNumbers(synchronizationTitleSearchOptions, 1, []).andThen(
+            synchronizationTitlePullRequestNumbers => {
+              const pullRequestNumbers = combinePullRequestNumbers(
+                synchronizationMarkerPullRequestNumbers,
+                synchronizationTitlePullRequestNumbers,
+              );
+
+              return getPullRequests(getPullRequestOptions, pullRequestNumbers, []);
+            },
+          );
+        },
+      );
     },
 
     createPullRequest(createPullRequestOptions) {
