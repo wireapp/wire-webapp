@@ -131,6 +131,7 @@ import {
   MLSCapableConversation,
   MLSConversation,
   ProteusConversation,
+  supportsReadReceipts,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -3170,6 +3171,10 @@ export class ConversationRepository {
       protocol: newProtocol,
     });
 
+    if (!supportsReadReceipts(updatedConversation)) {
+      updatedConversation.receiptMode(RECEIPT_MODE.OFF);
+    }
+
     await this.saveConversationStateInDb(updatedConversation);
     return updatedConversation;
   }
@@ -4978,6 +4983,10 @@ export class ConversationRepository {
   //##############################################################################
 
   expectReadReceipt(conversationEntity: Conversation): boolean {
+    if (!supportsReadReceipts(conversationEntity)) {
+      return false;
+    }
+
     if (conversationEntity.is1to1()) {
       return this.propertyRepository.receiptMode() === RECEIPT_MODE.ON;
     }

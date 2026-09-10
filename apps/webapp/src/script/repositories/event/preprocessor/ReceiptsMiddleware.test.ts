@@ -17,6 +17,13 @@
  *
  */
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
+import {Conversation} from 'Repositories/entity/Conversation';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {IncomingEvent} from '../EventProcessor';
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
 import {StatusType} from 'src/script/message/statusType';
@@ -36,6 +43,30 @@ function buildReadReceiptMiddleware() {
 
 describe('ReceiptsMiddleware', () => {
   describe('processEvent', () => {
+    it.each([
+      [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_TYPE.REGULAR, true],
+      [CONVERSATION_PROTOCOL.MIXED, CONVERSATION_TYPE.REGULAR, false],
+      [CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.REGULAR, false],
+      [CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.ONE_TO_ONE, true],
+    ])('sets receipt expectations for protocol %s and type %s', async (protocol, type, expected) => {
+      const conversation = new Conversation('conversation', '', protocol, translateForTest);
+      conversation.type(type);
+      conversation.receiptMode(RECEIPT_MODE.ON);
+      const repository = {
+        getConversationById: jest.fn().mockResolvedValue(conversation),
+      } as unknown as ConversationRepository;
+      const middleware = new ReceiptsMiddleware({} as any, repository, new User('self', '', translateForTest));
+      const event = {
+        conversation: conversation.id,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        data: {expects_read_confirmation: true},
+      };
+
+      await middleware.processEvent(event as IncomingEvent);
+
+      expect(event.data.expects_read_confirmation).toBe(expected);
+    });
+
     it('ignores read receipt for which original message is not found', async () => {
       const event = createConfirmationEvent(3);
       const [readReceiptMiddleware, {eventService}] = buildReadReceiptMiddleware();

@@ -99,7 +99,7 @@ import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
-import {isMLSConversation} from './ConversationSelectors';
+import {isMLSConversation, supportsReadReceipts} from './ConversationSelectors';
 import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from './EventBuilder';
@@ -1129,6 +1129,10 @@ export class MessageRepository {
     type: Confirmation.Type,
     moreMessageEntities: Message[] = [],
   ) {
+    if (type === Confirmation.Type.READ && !supportsReadReceipts(conversationEntity)) {
+      return;
+    }
+
     const typeToConfirm = (EventTypeHandling.CONFIRM as string[]).includes(messageEntity.type);
 
     if (messageEntity.user().isMe || !typeToConfirm) {
@@ -1194,6 +1198,10 @@ export class MessageRepository {
   }
 
   private expectReadReceipt(conversationEntity: Conversation): boolean {
+    if (!supportsReadReceipts(conversationEntity)) {
+      return false;
+    }
+
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
     }
