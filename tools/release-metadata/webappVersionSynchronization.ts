@@ -274,23 +274,25 @@ export function resolveWebAppVersionSynchronizationState(
 
   const {value: synchronizationRequest} = synchronizationRequestResult;
 
-  const synchronizationRecords: WebAppVersionSynchronizationRecord[] = [];
+  const synchronizationRecordsResult = pullRequests.reduce((recordsResult, pullRequest) => {
+    return recordsResult.andThen(synchronizationRecords => {
+      return parseWebAppVersionSynchronizationPullRequest(pullRequest).andThen(synchronizationRecordMaybe => {
+        if (synchronizationRecordMaybe.isNothing) {
+          return Result.ok(synchronizationRecords);
+        }
 
-  for (const pullRequest of pullRequests) {
-    const synchronizationRecordResult = parseWebAppVersionSynchronizationPullRequest(pullRequest);
+        const {value: synchronizationRecord} = synchronizationRecordMaybe;
 
-    if (synchronizationRecordResult.isErr) {
-      return Result.err(synchronizationRecordResult.error);
-    }
+        return Result.ok([...synchronizationRecords, synchronizationRecord]);
+      });
+    });
+  }, Result.ok<readonly WebAppVersionSynchronizationRecord[], Error>([]));
 
-    const {value: synchronizationRecordMaybe} = synchronizationRecordResult;
-
-    if (synchronizationRecordMaybe.isJust) {
-      const {value: synchronizationRecord} = synchronizationRecordMaybe;
-
-      synchronizationRecords.push(synchronizationRecord);
-    }
+  if (synchronizationRecordsResult.isErr) {
+    return Result.err(synchronizationRecordsResult.error);
   }
+
+  const {value: synchronizationRecords} = synchronizationRecordsResult;
 
   const requestedReleaseRecords = synchronizationRecords.filter(record => {
     return record.marker.releaseIdentifier === synchronizationRequest.releaseIdentifier;
