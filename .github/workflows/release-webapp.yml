@@ -60,6 +60,7 @@ jobs:
     outputs:
       release_identifier: ${{ steps.validate_request.outputs.release_identifier }}
       release_branch: ${{ steps.validate_request.outputs.release_branch }}
+      production_tag_name: ${{ steps.validate_request.outputs.production_tag_name }}
 
     steps:
       - name: Checkout workflow tools
@@ -106,16 +107,86 @@ jobs:
           fi
 
           release_branch="$(node ./tools/release-cli/releaseMetadataCli.mts release-branch "${RELEASE_IDENTIFIER}")"
+          production_tag_name="$(node ./tools/release-cli/releaseMetadataCli.mts production-tag "${RELEASE_IDENTIFIER}")"
 
           {
             echo "release_identifier=${RELEASE_IDENTIFIER}"
             echo "release_branch=${release_branch}"
+            echo "production_tag_name=${production_tag_name}"
           } >> "$GITHUB_OUTPUT"
+
+  webapp_version_synchronization_preflight:
+    name: WebApp version synchronization preflight
+    runs-on: ubuntu-24.04
+    needs: validate_request
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      state: ${{ steps.inspect.outputs.state }}
+      pull_request_number: ${{ steps.inspect.outputs.pull_request_number }}
+      pull_request_url: ${{ steps.inspect.outputs.pull_request_url }}
+
+    steps:
+      - name: Checkout workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install synchronization tooling dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Inspect WebApp version synchronization
+        id: inspect
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PRODUCTION_TAG_NAME: ${{ needs.validate_request.outputs.production_tag_name }}
+          RELEASE_IDENTIFIER: ${{ needs.validate_request.outputs.release_identifier }}
+        run: |
+          set -euo pipefail
+
+          inspection_output=''
+          set +e
+          inspection_output="$(node ./tools/release-cli/webappVersionSynchronization.mts inspect "${RELEASE_IDENTIFIER}" "${PRODUCTION_TAG_NAME}")"
+          inspection_exit_code="$?"
+          set -e
+
+          if [[ -n "${inspection_output}" ]]; then
+            {
+              echo "state=$(jq --raw-output '.state // empty' <<< "${inspection_output}")"
+              echo "pull_request_number=$(jq --raw-output '.pull_request_number // empty' <<< "${inspection_output}")"
+              echo "pull_request_url=$(jq --raw-output '.pull_request_url // empty' <<< "${inspection_output}")"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+          if [[ "${inspection_exit_code}" -ne 0 ]]; then
+            exit "${inspection_exit_code}"
+          fi
+
+      - name: Enforce WebApp version synchronization preflight
+        if: ${{ steps.inspect.outcome == 'failure' }}
+        run: |
+          echo 'Merge or resolve the previous WebApp version synchronization pull request before starting this Production release.' >&2
+          exit 1
 
   prepare_release_branch:
     name: Prepare release branch
     runs-on: ubuntu-24.04
-    needs: validate_request
+    needs: [validate_request, webapp_version_synchronization_preflight]
     permissions:
       contents: write
     concurrency:
@@ -653,6 +724,75 @@ jobs:
       WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
       TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
 
+  webapp_version_synchronization_production_preflight:
+    name: WebApp version synchronization Production preflight
+    runs-on: ubuntu-24.04
+    needs: [build_artifact, create_beta_tag, run_e2e]
+    if: ${{ needs.run_e2e.result == 'success' }}
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      state: ${{ steps.inspect.outputs.state }}
+      pull_request_number: ${{ steps.inspect.outputs.pull_request_number }}
+      pull_request_url: ${{ steps.inspect.outputs.pull_request_url }}
+
+    steps:
+      - name: Checkout workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.sha }}
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install synchronization tooling dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Inspect WebApp version synchronization before Production approval
+        id: inspect
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PRODUCTION_TAG_NAME: ${{ needs.build_artifact.outputs.release_identifier }}-production
+          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+        run: |
+          set -euo pipefail
+
+          inspection_output=''
+          set +e
+          inspection_output="$(node ./tools/release-cli/webappVersionSynchronization.mts inspect "${RELEASE_IDENTIFIER}" "${PRODUCTION_TAG_NAME}")"
+          inspection_exit_code="$?"
+          set -e
+
+          if [[ -n "${inspection_output}" ]]; then
+            {
+              echo "state=$(jq --raw-output '.state // empty' <<< "${inspection_output}")"
+              echo "pull_request_number=$(jq --raw-output '.pull_request_number // empty' <<< "${inspection_output}")"
+              echo "pull_request_url=$(jq --raw-output '.pull_request_url // empty' <<< "${inspection_output}")"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+          if [[ "${inspection_exit_code}" -ne 0 ]]; then
+            exit "${inspection_exit_code}"
+          fi
+
+      - name: Enforce WebApp version synchronization preflight before Production approval
+        if: ${{ steps.inspect.outcome == 'failure' }}
+        run: |
+          echo 'Merge or resolve the previous WebApp version synchronization pull request before Production approval.' >&2
+          exit 1
+
   notify_e2e_success:
     name: Notify successful release E2E gate
     runs-on: ubuntu-24.04
@@ -708,7 +848,7 @@ jobs:
   production_preflight:
     name: Production preflight
     runs-on: ubuntu-24.04
-    needs: [build_artifact, create_beta_tag, run_e2e]
+    needs: [build_artifact, create_beta_tag, run_e2e, webapp_version_synchronization_production_preflight]
     permissions:
       contents: read
     outputs:
