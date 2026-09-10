@@ -310,7 +310,8 @@ const testRestrictedSyntaxRule = [
 const jestMockRestrictionRule = [
   'warn',
   {
-    mock: 'Do not use jest.mock(). Pass dependencies explicitly instead of intercepting modules.',
+    mock: 'Do not use jest.mock() or jest.mocked(). Pass dependencies explicitly instead of intercepting modules.',
+    mocked: 'Do not use jest.mock() or jest.mocked(). Pass dependencies explicitly instead of intercepting modules.',
   },
 ];
 
