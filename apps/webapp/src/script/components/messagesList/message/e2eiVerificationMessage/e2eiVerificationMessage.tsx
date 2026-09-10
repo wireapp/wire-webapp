@@ -19,6 +19,9 @@
 
 import type {ReactNode} from 'react';
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Maybe} from 'true-myth';
+
 import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -68,10 +71,10 @@ interface E2EIVerificationMessageProps {
 
 type RenderE2EITranslationOptions = {
   readonly isReactTranslationRenderingEnabled: boolean;
-  readonly legacyDangerousSubstitutions: Record<string, string> | undefined;
+  readonly legacyDangerousSubstitutions: Maybe<Record<string, string>>;
   readonly translationKey: TranslationKey;
   readonly translate: Translate;
-  readonly userName: string | undefined;
+  readonly userName: Maybe<string>;
 };
 
 const e2eiUserMarker = createReactTranslationMarker('e2ei-user');
@@ -85,6 +88,17 @@ const e2eiReactDangerousSubstitutions = {
   link: e2eiLearnMoreLinkMarker.start,
 };
 
+const noE2EIUserName = Maybe.nothing<string>();
+const noE2EILegacyDangerousSubstitutions = Maybe.nothing<Record<string, string>>();
+
+function getSingleMessageUserId(userIds: readonly QualifiedId[]): Maybe<QualifiedId> {
+  if (userIds.length === 1) {
+    return Maybe.of(userIds[0]);
+  }
+
+  return Maybe.nothing();
+}
+
 function renderE2EITranslation(options: RenderE2EITranslationOptions): ReactNode {
   const {isReactTranslationRenderingEnabled, legacyDangerousSubstitutions, translationKey, translate, userName} =
     options;
@@ -93,12 +107,12 @@ function renderE2EITranslation(options: RenderE2EITranslationOptions): ReactNode
     let translatedText: string;
     let valueReplacements: ReactTranslationValueReplacement[];
 
-    if (userName === undefined) {
-      translatedText = translate(translationKey, undefined, e2eiReactDangerousSubstitutions);
+    if (userName.isNothing) {
+      translatedText = translate(translationKey, {}, e2eiReactDangerousSubstitutions);
       valueReplacements = [];
     } else {
       translatedText = translate(translationKey, {user: e2eiUserMarker.substitution}, e2eiReactDangerousSubstitutions);
-      valueReplacements = [{marker: e2eiUserMarker, runtimeText: userName}];
+      valueReplacements = [{marker: e2eiUserMarker, runtimeText: userName.value}];
     }
 
     return (
@@ -139,10 +153,16 @@ function renderE2EITranslation(options: RenderE2EITranslationOptions): ReactNode
   }
 
   let legacyTranslation: string;
-  if (userName === undefined) {
-    legacyTranslation = translate(translationKey, undefined, legacyDangerousSubstitutions);
+  if (userName.isJust) {
+    if (legacyDangerousSubstitutions.isNothing) {
+      legacyTranslation = translate(translationKey, {user: userName.value});
+    } else {
+      legacyTranslation = translate(translationKey, {user: userName.value}, legacyDangerousSubstitutions.value);
+    }
+  } else if (legacyDangerousSubstitutions.isNothing) {
+    legacyTranslation = translate(translationKey);
   } else {
-    legacyTranslation = translate(translationKey, {user: userName}, legacyDangerousSubstitutions);
+    legacyTranslation = translate(translationKey, {}, legacyDangerousSubstitutions.value);
   }
 
   return <span dangerouslySetInnerHTML={{__html: legacyTranslation}} />;
@@ -157,9 +177,14 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
     'selfUser',
   ]);
 
-  const messageUserId = userIds.length === 1 ? userIds[0] : undefined;
-  const isSelfUser =
-    messageUserId !== undefined && selfUser !== undefined && matchQualifiedIds(messageUserId, selfUser.qualifiedId);
+  const messageUserId = getSingleMessageUserId(userIds);
+  const isSelfUser = messageUserId
+    .andThen(messageUserId => {
+      return Maybe.of(selfUser).map(selfUser => {
+        return matchQualifiedIds(messageUserId, selfUser.qualifiedId);
+      });
+    })
+    .unwrapOr(false);
 
   const degradedUsers = participatingUserEts.filter(user =>
     userIds.find(userId => matchQualifiedIds(userId, user.qualifiedId)),
@@ -174,7 +199,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
   const isRevoked = messageType === E2EIVerificationMessageType.REVOKED;
   const isNoLongerVerified = messageType === E2EIVerificationMessageType.NO_LONGER_VERIFIED;
 
-  const learnMoreReplacement = replaceLink(Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION);
+  const learnMoreReplacement = Maybe.just(replaceLink(Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION));
   const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   const getCertificate = async () => {
@@ -206,17 +231,17 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
             legacyDangerousSubstitutions: learnMoreReplacement,
             translationKey: 'conversation.AllE2EIDevicesVerified',
             translate,
-            userName: undefined,
+            userName: noE2EIUserName,
           })}
 
         {isExpired &&
           (isSelfUser === false ? (
             renderE2EITranslation({
               isReactTranslationRenderingEnabled,
-              legacyDangerousSubstitutions: undefined,
+              legacyDangerousSubstitutions: noE2EILegacyDangerousSubstitutions,
               translationKey: 'conversation.E2EICertificateExpired',
               translate,
-              userName: usersName,
+              userName: Maybe.of(usersName),
             })
           ) : (
             <span>
@@ -234,10 +259,10 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           (isSelfUser === false ? (
             renderE2EITranslation({
               isReactTranslationRenderingEnabled,
-              legacyDangerousSubstitutions: undefined,
+              legacyDangerousSubstitutions: noE2EILegacyDangerousSubstitutions,
               translationKey: 'conversation.E2EINewDeviceAdded',
               translate,
-              userName: usersName,
+              userName: Maybe.of(usersName),
             })
           ) : (
             <span>
@@ -255,10 +280,10 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           (isSelfUser === false ? (
             renderE2EITranslation({
               isReactTranslationRenderingEnabled,
-              legacyDangerousSubstitutions: undefined,
+              legacyDangerousSubstitutions: noE2EILegacyDangerousSubstitutions,
               translationKey: 'conversation.E2EINewUserAdded',
               translate,
-              userName: usersName,
+              userName: Maybe.of(usersName),
             })
           ) : (
             <span>
@@ -279,14 +304,14 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
                 legacyDangerousSubstitutions: learnMoreReplacement,
                 translationKey: 'conversation.E2EICertificateRevoked',
                 translate,
-                userName: usersName,
+                userName: Maybe.of(usersName),
               })
             : renderE2EITranslation({
                 isReactTranslationRenderingEnabled,
                 legacyDangerousSubstitutions: learnMoreReplacement,
                 translationKey: 'conversation.E2EISelfUserCertificateRevoked',
                 translate,
-                userName: undefined,
+                userName: noE2EIUserName,
               }))}
 
         {isNoLongerVerified &&
@@ -295,7 +320,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
             legacyDangerousSubstitutions: learnMoreReplacement,
             translationKey: 'conversation.E2EICertificateNoLongerVerifiedGeneric',
             translate,
-            userName: undefined,
+            userName: noE2EIUserName,
           })}
       </div>
     </div>

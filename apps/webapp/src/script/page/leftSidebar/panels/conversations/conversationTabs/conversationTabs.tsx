@@ -192,6 +192,21 @@ function renderEnvironmentDisclaimerSection(options: RenderEnvironmentDisclaimer
   );
 }
 
+function renderEnvironmentDisclaimerIfNeeded(options: RenderEnvironmentDisclaimerOptions): ReactNode {
+  const {isReactTranslationRenderingEnabled, translate} = options;
+  const webEnvironment = getWebEnvironment();
+
+  if (webEnvironment.isProduction) {
+    return null;
+  }
+
+  if (isDataDogEnabled() === false) {
+    return null;
+  }
+
+  return renderEnvironmentDisclaimerSection({isReactTranslationRenderingEnabled, translate});
+}
+
 interface ConversationTabsProps {
   unreadConversations: Conversation[];
   favoriteConversations: Conversation[];
@@ -473,9 +488,7 @@ export const ConversationTabs = ({
       >
         {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
 
-        {!getWebEnvironment().isProduction &&
-          isDataDogEnabled() &&
-          renderEnvironmentDisclaimerSection({isReactTranslationRenderingEnabled, translate})}
+        {renderEnvironmentDisclaimerIfNeeded({isReactTranslationRenderingEnabled, translate})}
 
         <SettingsTab
           settingsLabel={translate('preferencesHeadline')}

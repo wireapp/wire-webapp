@@ -20,6 +20,7 @@
 import {render} from '@testing-library/react';
 import {isNull} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {Maybe} from 'true-myth';
 
 import en from 'I18n/en-US.json';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -109,13 +110,13 @@ function createConversation(options: CreateConversationOptions = {}): Conversati
   const {participatingUser, selfUser} = options;
   const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
-  if (participatingUser !== undefined) {
+  Maybe.of(participatingUser).inspect(participatingUser => {
     conversation.participating_user_ets([participatingUser]);
-  }
+  });
 
-  if (selfUser !== undefined) {
+  Maybe.of(selfUser).inspect(selfUser => {
     conversation.selfUser(selfUser);
-  }
+  });
 
   return conversation;
 }
