@@ -223,11 +223,122 @@ describe('WebApp version synchronization state resolution', () => {
 
     assert(actualResult.isOk);
     expect(actualResult.value).toMatchObject({
-      kind: 'blocked-by-previous-open',
+      kind: 'blocked-by-previous-unresolved',
       blockingReleaseIdentifier: '2026-09-02.1',
       blockingWebAppVersion: '1.0.0',
+      blockingSynchronizationState: 'open',
       pullRequestNumber: 2,
     });
+  });
+
+  it('blocks a new release when another synchronization pull request is closed without merging', () => {
+    const actualResult = resolveWebAppVersionSynchronizationState(releaseIdentifier, productionTagName, [
+      createPullRequest({
+        releaseIdentifier: '2026-09-02.1',
+        productionTagName: '2026-09-02.1-production',
+        state: 'closed',
+        number: 2,
+      }),
+    ]);
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toMatchObject({
+      kind: 'blocked-by-previous-unresolved',
+      blockingReleaseIdentifier: '2026-09-02.1',
+      blockingWebAppVersion: '1.0.0',
+      blockingSynchronizationState: 'closed-without-merge',
+      pullRequestNumber: 2,
+    });
+  });
+
+  it('does not block a new release when another synchronization pull request was merged', () => {
+    const actualResult = resolveWebAppVersionSynchronizationState(releaseIdentifier, productionTagName, [
+      createPullRequest({
+        releaseIdentifier: '2026-09-02.1',
+        productionTagName: '2026-09-02.1-production',
+        state: 'closed',
+        mergedAt: '2026-09-02T12:00:00Z',
+        number: 2,
+      }),
+    ]);
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toMatchObject({kind: 'available'});
+  });
+
+  it.each([
+    {
+      description: 'multiple open synchronization pull requests',
+      pullRequests: [
+        createPullRequest({
+          releaseIdentifier: '2026-09-02.1',
+          productionTagName: '2026-09-02.1-production',
+          number: 2,
+        }),
+        createPullRequest({
+          releaseIdentifier: '2026-09-03.1',
+          productionTagName: '2026-09-03.1-production',
+          number: 3,
+        }),
+      ],
+    },
+    {
+      description: 'a matching open pull request and another open synchronization pull request',
+      pullRequests: [
+        createPullRequest(),
+        createPullRequest({
+          releaseIdentifier: '2026-09-02.1',
+          productionTagName: '2026-09-02.1-production',
+          number: 2,
+        }),
+      ],
+    },
+    {
+      description: 'a matching open pull request and another closed-unmerged synchronization pull request',
+      pullRequests: [
+        createPullRequest(),
+        createPullRequest({
+          releaseIdentifier: '2026-09-02.1',
+          productionTagName: '2026-09-02.1-production',
+          state: 'closed',
+          number: 2,
+        }),
+      ],
+    },
+    {
+      description: 'a matching merged pull request and another closed-unmerged synchronization pull request',
+      pullRequests: [
+        createPullRequest({state: 'closed', mergedAt: '2026-09-09T12:00:00Z'}),
+        createPullRequest({
+          releaseIdentifier: '2026-09-02.1',
+          productionTagName: '2026-09-02.1-production',
+          state: 'closed',
+          number: 2,
+        }),
+      ],
+    },
+    {
+      description: 'multiple closed-unmerged synchronization pull requests',
+      pullRequests: [
+        createPullRequest({
+          releaseIdentifier: '2026-09-02.1',
+          productionTagName: '2026-09-02.1-production',
+          state: 'closed',
+          number: 2,
+        }),
+        createPullRequest({
+          releaseIdentifier: '2026-09-03.1',
+          productionTagName: '2026-09-03.1-production',
+          state: 'closed',
+          number: 3,
+        }),
+      ],
+    },
+  ])('reports a conflict for $description', ({pullRequests}) => {
+    const actualResult = resolveWebAppVersionSynchronizationState(releaseIdentifier, productionTagName, pullRequests);
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toMatchObject({kind: 'conflict'});
   });
 
   it('reports a conflict when multiple records exist for one release', () => {

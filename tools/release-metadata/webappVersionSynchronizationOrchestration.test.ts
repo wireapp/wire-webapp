@@ -502,6 +502,78 @@ describe('WebApp version synchronization orchestration', () => {
     expect(fakeGitClient.state.prepareLatestMainCallCount).toBe(0);
   });
 
+  it('blocks allocation when a previous release synchronization pull request was closed without merging', async () => {
+    const previousReleasePullRequest = createSynchronizationPullRequest({
+      releaseIdentifier: '2026-09-02.1',
+      state: 'closed',
+      number: 7,
+    });
+    const fakeGitHubClient = createFakeGitHubClient({pullRequestsByListCall: [[previousReleasePullRequest]]});
+    const fakeGitClient = createFakeGitClient();
+
+    const actualResult = await synchronizeWebAppVersion(
+      createSynchronizationOptions({
+        githubClient: fakeGitHubClient.client,
+        gitClient: fakeGitClient.client,
+      }),
+    );
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('closed-without-merge');
+    expect(actualResult.error.message).toContain('#7');
+    expect(fakeGitClient.state.prepareLatestMainCallCount).toBe(0);
+    expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(0);
+  });
+
+  it('allocates after a previous release synchronization pull request was merged', async () => {
+    const previousReleasePullRequest = createSynchronizationPullRequest({
+      releaseIdentifier: '2026-09-02.1',
+      state: 'closed',
+      mergedAt: '2026-09-02T12:00:00Z',
+      number: 7,
+    });
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByListCall: [[previousReleasePullRequest], [], [], []],
+    });
+    const fakeGitClient = createFakeGitClient();
+
+    const actualResult = await synchronizeWebAppVersion(
+      createSynchronizationOptions({
+        githubClient: fakeGitHubClient.client,
+        gitClient: fakeGitClient.client,
+      }),
+    );
+
+    expect(expectSynchronizationResult(actualResult)).toMatchObject({
+      action: 'created',
+      webAppVersion: '1.0.0',
+    });
+  });
+
+  it('fails closed when a matching synchronization pull request hides another unresolved release', async () => {
+    const matchingPullRequest = createSynchronizationPullRequest();
+    const previousReleasePullRequest = createSynchronizationPullRequest({
+      releaseIdentifier: '2026-09-02.1',
+      number: 7,
+    });
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByListCall: [[matchingPullRequest, previousReleasePullRequest]],
+    });
+    const fakeGitClient = createFakeGitClient();
+
+    const actualResult = await synchronizeWebAppVersion(
+      createSynchronizationOptions({
+        githubClient: fakeGitHubClient.client,
+        gitClient: fakeGitClient.client,
+      }),
+    );
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('conflict');
+    expect(fakeGitClient.state.prepareLatestMainCallCount).toBe(0);
+    expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(0);
+  });
+
   it('fails closed when duplicate synchronization records exist for the release', async () => {
     const firstPullRequest = createSynchronizationPullRequest({number: 1});
     const secondPullRequest = createSynchronizationPullRequest({number: 2});

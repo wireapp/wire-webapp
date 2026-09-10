@@ -157,10 +157,10 @@ function resolveInspectionOutcome(
     );
   }
 
-  if (inspection.kind === 'blocked-by-previous-open') {
+  if (inspection.kind === 'blocked-by-previous-unresolved') {
     return Result.err(
       new Error(
-        `WebApp version synchronization is blocked by unresolved pull request #${inspection.pullRequestNumber} for ${inspection.blockingReleaseIdentifier}: ${inspection.pullRequestUrl}`,
+        `WebApp version synchronization is blocked by ${inspection.blockingSynchronizationState} pull request #${inspection.pullRequestNumber} for ${inspection.blockingReleaseIdentifier}: ${inspection.pullRequestUrl}`,
       ),
     );
   }

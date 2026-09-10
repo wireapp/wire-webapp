@@ -36,12 +36,13 @@ export type WebAppVersionSynchronizationInspectionOutput =
       readonly branch_name: string;
     }
   | {
-      readonly state: 'blocked-by-previous-open';
+      readonly state: 'blocked-by-previous-unresolved';
       readonly release_identifier: string;
       readonly production_tag_name: string;
       readonly blocking_release_identifier: string;
       readonly blocking_production_tag_name: string;
       readonly blocking_webapp_version: string;
+      readonly blocking_synchronization_state: 'open' | 'closed-without-merge';
       readonly pull_request_number: number;
       readonly pull_request_url: string;
       readonly branch_name: string;
@@ -101,7 +102,7 @@ export function createWebAppVersionSynchronizationInspectionOutput(
     };
   }
 
-  if (inspection.kind === 'blocked-by-previous-open') {
+  if (inspection.kind === 'blocked-by-previous-unresolved') {
     return {
       state: inspection.kind,
       release_identifier: inspection.releaseIdentifier,
@@ -109,6 +110,7 @@ export function createWebAppVersionSynchronizationInspectionOutput(
       blocking_release_identifier: inspection.blockingReleaseIdentifier,
       blocking_production_tag_name: inspection.blockingProductionTagName,
       blocking_webapp_version: inspection.blockingWebAppVersion,
+      blocking_synchronization_state: inspection.blockingSynchronizationState,
       pull_request_number: inspection.pullRequestNumber,
       pull_request_url: inspection.pullRequestUrl,
       branch_name: inspection.branchName,

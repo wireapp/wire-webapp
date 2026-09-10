@@ -105,12 +105,13 @@ describe('WebApp version synchronization CLI output', () => {
 
   it('serializes a previous open synchronization blocker', () => {
     const inspection: WebAppVersionSynchronizationInspection = {
-      kind: 'blocked-by-previous-open',
+      kind: 'blocked-by-previous-unresolved',
       releaseIdentifier: '2026-09-16.1',
       productionTagName: '2026-09-16.1-production',
       blockingReleaseIdentifier: '2026-09-09.1',
       blockingProductionTagName: '2026-09-09.1-production',
       blockingWebAppVersion: createWebAppVersion('1.0.0'),
+      blockingSynchronizationState: 'open',
       branchName: createSynchronizationBranchName(),
       ...pullRequestDetails,
     };
@@ -118,12 +119,13 @@ describe('WebApp version synchronization CLI output', () => {
     const output = createWebAppVersionSynchronizationInspectionOutput(inspection);
 
     expect(output).toEqual({
-      state: 'blocked-by-previous-open',
+      state: 'blocked-by-previous-unresolved',
       release_identifier: '2026-09-16.1',
       production_tag_name: '2026-09-16.1-production',
       blocking_release_identifier: '2026-09-09.1',
       blocking_production_tag_name: '2026-09-09.1-production',
       blocking_webapp_version: '1.0.0',
+      blocking_synchronization_state: 'open',
       pull_request_number: 123,
       pull_request_url: 'https://github.com/wireapp/wire-webapp/pull/123',
       branch_name: createSynchronizationBranchName(),

@@ -51,6 +51,8 @@ export type WebAppVersionSynchronizationRecord = {
   readonly marker: WebAppVersionSynchronizationMarker;
 };
 
+export type WebAppVersionSynchronizationUnresolvedState = 'open' | 'closed-without-merge';
+
 export type WebAppVersionSynchronizationInspection =
   | {
       readonly kind: 'available';
@@ -67,12 +69,13 @@ export type WebAppVersionSynchronizationInspection =
       readonly branchName: WebAppVersionSynchronizationBranchName;
     }
   | {
-      readonly kind: 'blocked-by-previous-open';
+      readonly kind: 'blocked-by-previous-unresolved';
       readonly releaseIdentifier: ReleaseIdentifier;
       readonly productionTagName: ProductionTagName;
       readonly blockingReleaseIdentifier: ReleaseIdentifier;
       readonly blockingProductionTagName: ProductionTagName;
       readonly blockingWebAppVersion: WebAppVersion;
+      readonly blockingSynchronizationState: WebAppVersionSynchronizationUnresolvedState;
       readonly pullRequestNumber: number;
       readonly pullRequestUrl: string;
       readonly branchName: WebAppVersionSynchronizationBranchName;
@@ -326,6 +329,32 @@ export function resolveWebAppVersionSynchronizationState(
     return record.marker.releaseIdentifier === synchronizationRequest.releaseIdentifier;
   }, synchronizationRecords);
 
+  const unresolvedSynchronizationRecords = synchronizationRecords.filter(record => {
+    return record.pullRequest.state === 'open' || isNull(record.pullRequest.mergedAt);
+  });
+
+  if (unresolvedSynchronizationRecords.length > 1) {
+    return Result.ok({
+      kind: 'conflict',
+      releaseIdentifier: synchronizationRequest.releaseIdentifier,
+      productionTagName: synchronizationRequest.productionTagName,
+      reason: 'Multiple unresolved synchronization records exist',
+    });
+  }
+
+  const unresolvedDifferentReleaseRecord = maybe.find(record => {
+    return record.marker.releaseIdentifier !== synchronizationRequest.releaseIdentifier;
+  }, unresolvedSynchronizationRecords);
+
+  if (requestedReleaseRecord.isJust && unresolvedDifferentReleaseRecord.isJust) {
+    return Result.ok({
+      kind: 'conflict',
+      releaseIdentifier: synchronizationRequest.releaseIdentifier,
+      productionTagName: synchronizationRequest.productionTagName,
+      reason: 'A synchronization record for the requested release coexists with an unresolved different release',
+    });
+  }
+
   if (requestedReleaseRecord.isJust) {
     const {value: synchronizationRecord} = requestedReleaseRecord;
 
@@ -340,20 +369,23 @@ export function resolveWebAppVersionSynchronizationState(
     return Result.ok(createExistingSynchronizationInspection('matching-merged', synchronizationRecord));
   }
 
-  const previousOpenRecord = maybe.find(record => {
-    return record.pullRequest.state === 'open';
+  const previousUnresolvedRecord = maybe.find(record => {
+    return record.pullRequest.state === 'open' || isNull(record.pullRequest.mergedAt);
   }, synchronizationRecords);
 
-  if (previousOpenRecord.isJust) {
-    const {value: synchronizationRecord} = previousOpenRecord;
+  if (previousUnresolvedRecord.isJust) {
+    const {value: synchronizationRecord} = previousUnresolvedRecord;
+    const blockingSynchronizationState: WebAppVersionSynchronizationUnresolvedState =
+      synchronizationRecord.pullRequest.state === 'open' ? 'open' : 'closed-without-merge';
 
     return Result.ok({
-      kind: 'blocked-by-previous-open',
+      kind: 'blocked-by-previous-unresolved',
       releaseIdentifier: synchronizationRequest.releaseIdentifier,
       productionTagName: synchronizationRequest.productionTagName,
       blockingReleaseIdentifier: synchronizationRecord.marker.releaseIdentifier,
       blockingProductionTagName: synchronizationRecord.marker.productionTagName,
       blockingWebAppVersion: synchronizationRecord.marker.webAppVersion,
+      blockingSynchronizationState,
       pullRequestNumber: synchronizationRecord.pullRequest.number,
       pullRequestUrl: synchronizationRecord.pullRequest.url,
       branchName: synchronizationRecord.pullRequest.headBranch as WebAppVersionSynchronizationBranchName,
