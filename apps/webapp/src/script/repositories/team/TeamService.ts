@@ -24,7 +24,7 @@ import {TeamMigrationPayload} from '@wireapp/api-client/lib/team/invitation/team
 import type {LegalHoldMemberData} from '@wireapp/api-client/lib/team/legalhold/';
 import type {MemberData, Members} from '@wireapp/api-client/lib/team/member/';
 import type {Services} from '@wireapp/api-client/lib/team/service/';
-import type {TeamData} from '@wireapp/api-client/lib/team/team/';
+import type {TeamCollaborator, TeamData} from '@wireapp/api-client/lib/team/team/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../../service/apiClientSingleton';
@@ -62,6 +62,10 @@ export class TeamService {
 
   getWhitelistedServices(teamId: string): Promise<Services> {
     return this.apiClient.api.teams.service.getTeamServices(teamId);
+  }
+
+  getCollaborators(teamId: string): Promise<TeamCollaborator[]> {
+    return this.apiClient.api.teams.team.getCollaborators(teamId);
   }
 
   async conversationHasGuestLink(conversationId: string): Promise<boolean> {
