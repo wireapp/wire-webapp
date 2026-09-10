@@ -535,6 +535,10 @@ const productionConfigs = [
       'apps/webapp/src/script/components/fadingScrollbar/fadingScrollbar.tsx',
       'apps/webapp/src/script/components/inViewport/inViewport.tsx',
       'apps/webapp/src/script/components/ZoomableImage/ZoomableImage.tsx',
+      'apps/webapp/src/script/components/copyToClipboardButton/copyToClipboardButton.tsx',
+      'apps/webapp/src/script/components/draggableClickWrapper/draggableClickWrapper.tsx',
+      'apps/webapp/src/script/components/dropFileArea/dropFileArea.tsx',
+      'apps/webapp/src/script/components/toggle/BaseToggle.tsx',
     ],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
