@@ -33,10 +33,13 @@ import {UserDetails} from 'Components/panel/userDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {replaceLink} from 'Util/localizerUtil';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {useUserModalState} from './UserModal.state';
 import {
@@ -61,13 +64,53 @@ export interface UserModalProps {
 }
 
 const brandName = Config.getConfig().BRAND_NAME;
+const legalHoldLinkMarker = createReactTranslationMarker('legal-hold-link');
+
+type RenderBlockedForLegalHoldMessageOptions = {
+  readonly legalHoldBlockUrl: string;
+  readonly translate: Translate;
+};
+
+function renderBlockedForLegalHoldMessage(options: RenderBlockedForLegalHoldMessageOptions): ReactNode[] {
+  const {legalHoldBlockUrl, translate} = options;
+  const translatedText = translate('modalUserBlockedForLegalHold', undefined, {
+    link: legalHoldLinkMarker.start,
+    '/link': legalHoldLinkMarker.end,
+  });
+
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [
+      {
+        start: legalHoldLinkMarker.start,
+        end: legalHoldLinkMarker.end,
+        render(children): ReactNode {
+          return (
+            <a
+              data-uie-name="read-more-legal-hold"
+              href={legalHoldBlockUrl}
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              {children}
+            </a>
+          );
+        },
+      },
+    ],
+    nodeReplacements: [],
+    valueReplacements: [],
+  });
+}
 
 interface UserModalUserActionsSectionProps {
   user: User;
   onAction: () => void;
   isSelfActivated: boolean;
   selfUser: User;
-  blockedForLegalHoldMessageHtml: string;
+  isReactTranslationRenderingEnabled: boolean;
+  legalHoldBlockUrl: string;
+  translate: Translate;
 }
 
 const UserModalUserActionsSection = ({
@@ -75,17 +118,33 @@ const UserModalUserActionsSection = ({
   onAction,
   isSelfActivated,
   selfUser,
-  blockedForLegalHoldMessageHtml,
+  isReactTranslationRenderingEnabled,
+  legalHoldBlockUrl,
+  translate,
 }: UserModalUserActionsSectionProps) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
   const {mainViewModel} = useApplicationContext();
 
   if (isBlockedLegalHold) {
+    if (isReactTranslationRenderingEnabled) {
+      return (
+        <div className="modal__message" data-uie-name="status-blocked-legal-hold">
+          {renderBlockedForLegalHoldMessage({legalHoldBlockUrl, translate})}
+        </div>
+      );
+    }
+
     return (
       <div
         className="modal__message"
         data-uie-name="status-blocked-legal-hold"
-        dangerouslySetInnerHTML={{__html: blockedForLegalHoldMessageHtml}}
+        dangerouslySetInnerHTML={{
+          __html: translate(
+            'modalUserBlockedForLegalHold',
+            undefined,
+            replaceLink(legalHoldBlockUrl, '', 'read-more-legal-hold'),
+          ),
+        }}
       />
     );
   }
@@ -177,7 +236,9 @@ const UserModal = ({
   core = container.resolve(Core),
   teamState = container.resolve(TeamState),
 }: UserModalProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
+  const legalHoldBlockUrl = Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK;
   const onClose = useUserModalState(state => state.onClose);
   const userId = useUserModalState(state => state.userId);
   const resetState = useUserModalState(state => state.resetState);
@@ -229,9 +290,6 @@ const UserModal = ({
       setUserNotFound(false);
     };
   }, [userId, userRepository]);
-
-  const replaceLinkLegalHold = replaceLink(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold');
-  const blockedForLegalHoldMessageHtml = translate('modalUserBlockedForLegalHold', undefined, replaceLinkLegalHold);
 
   let modalDataUieName = '';
   if (user) {
@@ -292,7 +350,9 @@ const UserModal = ({
               onAction={hide}
               isSelfActivated={isActivatedAccount}
               selfUser={selfUser}
-              blockedForLegalHoldMessageHtml={blockedForLegalHoldMessageHtml}
+              isReactTranslationRenderingEnabled={isReactTranslationRenderingEnabled}
+              legalHoldBlockUrl={legalHoldBlockUrl}
+              translate={translate}
             />
           </>
         )}
