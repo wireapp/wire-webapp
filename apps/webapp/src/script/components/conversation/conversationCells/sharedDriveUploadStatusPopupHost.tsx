@@ -47,7 +47,11 @@ export const SharedDriveUploadStatusPopupHost = ({
   isFileTabActive,
 }: SharedDriveUploadStatusPopupHostProps) => {
   const {translate} = useApplicationContext();
-  const {dismissedUpload: contextDismissedUpload, dismissUpload: onDismissUpload, isProvided} = useSharedDriveUploadStatus();
+  const {
+    dismissedUpload: contextDismissedUpload,
+    dismissUpload: onDismissUpload,
+    isProvided,
+  } = useSharedDriveUploadStatus();
   const readStatus = useCallback(
     () => getLatestSharedDriveUploadStatus(controller, conversationQualifiedId),
     [controller, conversationQualifiedId],
@@ -59,9 +63,7 @@ export const SharedDriveUploadStatusPopupHost = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [cancellingUploadId, setCancellingUploadId] = useState<Maybe<string>>(Maybe.nothing());
   const [retryingUploadId, setRetryingUploadId] = useState<Maybe<string>>(Maybe.nothing());
-  const [localDismissedUpload, setLocalDismissedUpload] = useState<Maybe<DismissedUpload>>(
-    Maybe.nothing(),
-  );
+  const [localDismissedUpload, setLocalDismissedUpload] = useState<Maybe<DismissedUpload>>(Maybe.nothing());
   const dismissedUpload = isProvided ? contextDismissedUpload : localDismissedUpload;
   const dismissUpload = useCallback(
     (upload: DismissedUpload) => {

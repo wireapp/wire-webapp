@@ -19,10 +19,9 @@
 
 import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState} from 'react';
 
-import {maybe} from 'true-myth';
-
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {maybe} from 'true-myth';
 
 import {SharedDriveUploadCompletedIcon, SharedDriveUploadSpinnerIcon} from '@wireapp/react-ui-kit';
 
@@ -32,7 +31,10 @@ import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBi
 import {KEY} from 'Util/keyboardUtil';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
-import {getLatestSharedDriveUploadStatus, type SharedDriveUploadStatus} from '../conversationCells/sharedDriveUploadStatus';
+import {
+  getLatestSharedDriveUploadStatus,
+  type SharedDriveUploadStatus,
+} from '../conversationCells/sharedDriveUploadStatus';
 import {useSharedDriveUploadStatus} from '../conversationCells/sharedDriveUploadStatusContext';
 
 interface ConversationTabsProps {
