@@ -20,6 +20,7 @@
 import {Backend} from '@wireapp/api-client/lib/env';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_STATUS, FeatureList, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
+import {UserType} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
@@ -53,10 +54,14 @@ export class TeamState {
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
   public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SELF_DELETING_TIMEOUT>;
-  /** all the members of the team */
+  /** all the members of the team (excludes apps, which are never legitimately selectable team members) */
   readonly teamMembers: ko.PureComputed<User[]>;
   /** all the members of the team + the users the selfUser is connected with */
   readonly teamUsers: ko.PureComputed<User[]>;
+  /** team-owned apps merged with app-type collaborators, see TeamRepository.loadTeamAppsAndCollaborators */
+  readonly teamApps: ko.Observable<User[]>;
+  /** human (non-app) team collaborators, resolved from GET /teams/:tid/collaborators - see TeamRepository.loadTeamAppsAndCollaborators */
+  readonly teamCollaborators: ko.Observable<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly team = ko.observable(new TeamEntity());
   readonly teamDomain: ko.PureComputed<string>;
@@ -71,11 +76,15 @@ export class TeamState {
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
     this.isTeamDeleted = ko.observable(false);
 
-    /** Note: this does not include the self user */
-    this.teamMembers = ko.pureComputed(() => this.userState.users().filter(user => !user.isMe && this.isInTeam(user)));
+    /** Note: this does not include the self user, nor apps (type === UserType.APP) */
+    this.teamMembers = ko.pureComputed(() =>
+      this.userState.users().filter(user => !user.isMe && this.isInTeam(user) && user.type !== UserType.APP),
+    );
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
+    this.teamApps = ko.observable([]);
+    this.teamCollaborators = ko.observable([]);
 
     this.teamDomain = ko.pureComputed(() => userState.self().domain);
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.userState.self().name()));

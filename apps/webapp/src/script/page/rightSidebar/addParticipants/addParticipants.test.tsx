@@ -34,6 +34,7 @@ import {User} from 'src/script/repositories/entity/User';
 import {IntegrationRepository} from 'src/script/repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/repositories/integration/ServiceEntity';
 import {SearchRepository} from 'src/script/repositories/search/searchRepository';
+import {TeamEntity} from 'src/script/repositories/team/TeamEntity';
 import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
 import {TeamState} from 'src/script/repositories/team/TeamState';
 import {UserState} from 'src/script/repositories/user/userState';
@@ -52,8 +53,14 @@ type MinimalIntegrationRepository = Pick<
   'mapServiceFromUser' | 'searchForServices' | 'services'
 >;
 type MinimalSearchRepository = Pick<SearchRepository, 'normalizeQuery' | 'searchByName' | 'searchUserInSet'>;
-type MinimalTeamRepository = Pick<TeamRepository, 'filterExternals' | 'filterRemoteDomainUsers' | 'isSelfConnectedTo'>;
-type MinimalTeamState = Pick<TeamState, 'isAppsEnabled' | 'isInTeam' | 'isTeam' | 'teamMembers' | 'teamUsers'>;
+type MinimalTeamRepository = Pick<
+  TeamRepository,
+  'filterExternals' | 'filterRemoteDomainUsers' | 'isSelfConnectedTo' | 'loadTeamAppsAndCollaborators'
+>;
+type MinimalTeamState = Pick<
+  TeamState,
+  'isAppsEnabled' | 'isInTeam' | 'isTeam' | 'team' | 'teamApps' | 'teamCollaborators' | 'teamMembers' | 'teamUsers'
+>;
 type MinimalUserState = Pick<UserState, 'connectedUsers'>;
 
 function createUser(userDefinition: UserDefinition): User {
@@ -76,11 +83,13 @@ function searchUsersByQuery(query: string, users: User[]): User[] {
   });
 }
 
-function createActiveConversation(): Conversation {
+function createActiveConversation(
+  overrides: {protocol?: CONVERSATION_PROTOCOL; isServicesRoom?: boolean} = {},
+): Conversation {
   const activeConversation = new Conversation(
     'conversation-id',
     'example.com',
-    CONVERSATION_PROTOCOL.PROTEUS,
+    overrides.protocol ?? CONVERSATION_PROTOCOL.PROTEUS,
     translateForTest,
   );
   activeConversation.teamId = 'team-id';
@@ -108,7 +117,7 @@ function createActiveConversation(): Conversation {
     },
     isServicesRoom: {
       value: ko.pureComputed(() => {
-        return false;
+        return overrides.isServicesRoom ?? false;
       }),
     },
     isTeamOnly: {
@@ -121,10 +130,17 @@ function createActiveConversation(): Conversation {
   return activeConversation;
 }
 
-function createTeamState(candidateUsers: User[]): MinimalTeamState {
+function createTeamState(
+  candidateUsers: User[],
+  {
+    apps = [],
+    collaborators = [],
+    isAppsEnabled = false,
+  }: {apps?: User[]; collaborators?: User[]; isAppsEnabled?: boolean} = {},
+): MinimalTeamState {
   return {
     isAppsEnabled: ko.pureComputed(() => {
-      return false;
+      return isAppsEnabled;
     }),
     isInTeam: () => {
       return true;
@@ -132,6 +148,9 @@ function createTeamState(candidateUsers: User[]): MinimalTeamState {
     isTeam: ko.pureComputed(() => {
       return true;
     }),
+    team: ko.observable(new TeamEntity('team-id')),
+    teamApps: ko.observable(apps),
+    teamCollaborators: ko.observable(collaborators),
     teamMembers: ko.pureComputed(() => {
       return candidateUsers;
     }),
@@ -200,6 +219,9 @@ describe('AddParticipants', () => {
       isSelfConnectedTo: () => {
         return true;
       },
+      loadTeamAppsAndCollaborators: async () => {
+        return undefined;
+      },
     } satisfies MinimalTeamRepository;
     const teamStateDouble = createTeamState(candidateUsers);
     const userStateDouble = {
@@ -247,6 +269,113 @@ describe('AddParticipants', () => {
       expect(screen.getByText('Bob Test')).toBeInTheDocument();
       expect(screen.queryByText('Alice Example')).toBeNull();
       expect(screen.queryByText('Charlie Example')).toBeNull();
+    });
+  });
+
+  it('merges human collaborators into the people list and shows team apps in the Apps tab', async () => {
+    const user = userEvent.setup();
+    const aliceExample = createUser({id: 'alice-id', name: 'Alice Example', username: 'aliceexample'});
+    const daveCollaborator = createUser({id: 'dave-id', name: 'Dave Collaborator', username: 'davecollaborator'});
+    const emmaApp = createUser({id: 'emma-app-id', name: 'Emma App', username: 'emmaapp'});
+    const selfUser = createUser({id: 'self-id', name: 'Self User', username: 'selfuser'});
+    const candidateUsers = [aliceExample];
+
+    const conversationRepositoryDouble = {
+      addUsers: async () => {
+        return undefined;
+      },
+    } satisfies MinimalConversationRepository;
+    const integrationRepositoryDouble = {
+      mapServiceFromUser: (candidate: User) => {
+        return new ServiceEntity({id: candidate.id, name: candidate.name()});
+      },
+      searchForServices: async () => {
+        return undefined;
+      },
+      services: ko.observableArray<ServiceEntity>([]),
+    } satisfies MinimalIntegrationRepository;
+    const searchRepositoryDouble = {
+      normalizeQuery: (query: string) => {
+        return {query: query.trim().toLowerCase(), isHandleQuery: false};
+      },
+      searchByName: async () => {
+        return [];
+      },
+      searchUserInSet: (query: string, users: User[]) => {
+        return searchUsersByQuery(query, users);
+      },
+    } satisfies MinimalSearchRepository;
+    const loadTeamAppsAndCollaborators = jest.fn(async () => {
+      return undefined;
+    });
+    const teamRepositoryDouble = {
+      filterExternals: async (users: User[]) => {
+        return users;
+      },
+      filterRemoteDomainUsers: async (users: User[]) => {
+        return users;
+      },
+      isSelfConnectedTo: () => {
+        return true;
+      },
+      loadTeamAppsAndCollaborators,
+    } satisfies MinimalTeamRepository;
+    const teamStateDouble = createTeamState(candidateUsers, {
+      apps: [emmaApp],
+      collaborators: [daveCollaborator],
+      isAppsEnabled: true,
+    });
+    const userStateDouble = {
+      connectedUsers: ko.pureComputed(() => {
+        return candidateUsers;
+      }),
+    } satisfies MinimalUserState;
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+        translate: translateForTest,
+      }),
+    );
+
+    render(
+      withThemeAndRootContext(
+        <AddParticipants
+          // MLS protocol + isServicesRoom drives the Apps tab to read from teamState.teamApps
+          activeConversation={createActiveConversation({
+            protocol: CONVERSATION_PROTOCOL.MLS,
+            isServicesRoom: true,
+          })}
+          conversationRepository={conversationRepositoryDouble as unknown as ConversationRepository}
+          integrationRepository={integrationRepositoryDouble as unknown as IntegrationRepository}
+          onBack={jest.fn()}
+          onClose={jest.fn()}
+          searchRepository={searchRepositoryDouble as unknown as SearchRepository}
+          selfUser={selfUser}
+          teamRepository={teamRepositoryDouble as unknown as TeamRepository}
+          teamState={teamStateDouble as TeamState}
+          togglePanel={jest.fn()}
+          userState={userStateDouble as UserState}
+        />,
+        rootProviderWrapper,
+      ),
+    );
+
+    // TeamRepository.loadTeamAppsAndCollaborators is triggered on mount so TeamState gets populated
+    await waitFor(() => {
+      expect(loadTeamAppsAndCollaborators).toHaveBeenCalledWith('team-id', expect.any(AbortController));
+    });
+
+    // The collaborator (human, not a team member) is merged into the regular people list
+    await waitFor(() => {
+      expect(screen.getByText('Alice Example')).toBeInTheDocument();
+      expect(screen.getByText('Dave Collaborator')).toBeInTheDocument();
+    });
+
+    // Switch to the Apps tab: it is sourced from teamState.teamApps, not from `contacts`
+    await user.click(screen.getByTestId('do-add-services'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId(`service-list-service-${emmaApp.id}`)).toBeInTheDocument();
     });
   });
 });

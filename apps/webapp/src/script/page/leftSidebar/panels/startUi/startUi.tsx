@@ -142,6 +142,7 @@ const StartUI = ({
     });
   };
 
+  const openApp = (user: User) => openService(integrationRepository.mapServiceFromUser(user));
   const openInviteModal = () => showInviteModal({translate, selfUser});
 
   const before = (
@@ -203,6 +204,7 @@ const StartUI = ({
           conversationRepository={conversationRepository}
           canInviteTeamMembers={canInviteTeamMembers()}
           userRepository={userRepository}
+          onClickApp={openApp}
           onClickContact={openContact}
           onClickUser={openOther}
           onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}

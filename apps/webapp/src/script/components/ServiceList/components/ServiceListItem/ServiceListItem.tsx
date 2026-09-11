@@ -35,7 +35,6 @@ interface ServiceListItemProps {
 export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
   const {translate} = useApplicationContext();
   const {name: serviceName} = useKoSubscribableChildren(service, ['name']);
-  const serviceShortDescription = service.isApp ? service.description : service.summary;
 
   const onServiceClick = () => onClick(service);
 
@@ -59,7 +58,7 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       <div css={listItem()}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={service} aria-hidden="true" css={{margin: '0 16px'}} />
 
-        <ParticipantItemContent participant={service} shortDescription={serviceShortDescription} showArrow />
+        <ParticipantItemContent participant={service} showArrow />
       </div>
     </div>
   );

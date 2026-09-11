@@ -17,11 +17,10 @@
  *
  */
 
-import {FC, useCallback, useMemo, useState} from 'react';
+import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {UserType} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
@@ -45,6 +44,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {getLogger} from 'Util/logger';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/stringUtil';
 
@@ -54,6 +54,8 @@ import {PanelEntity, PanelState} from '../rightSidebar';
 
 const ENABLE_ADD_ACTIONS_LENGTH = 0;
 const ENABLE_IS_SEARCHING_LENGTH = 0;
+
+const logger = getLogger('AddParticipants');
 
 enum PARTICIPANTS_STATE {
   ADD_PEOPLE = 'ADD_PEOPLE',
@@ -104,12 +106,10 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     'isTeamOnly',
     'participating_user_ids',
   ]);
-  const {isTeam, teamMembers, teamUsers, isAppsEnabled} = useKoSubscribableChildren(teamState, [
-    'isTeam',
-    'teamMembers',
-    'teamUsers',
-    'isAppsEnabled',
-  ]);
+  const {isTeam, teamMembers, teamUsers, isAppsEnabled, teamApps, teamCollaborators} = useKoSubscribableChildren(
+    teamState,
+    ['isTeam', 'teamMembers', 'teamUsers', 'isAppsEnabled', 'teamApps', 'teamCollaborators'],
+  );
   const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {services} = useKoSubscribableChildren(integrationRepository, ['services']);
@@ -124,7 +124,28 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
 
   const [isInitialServiceSearch, setIsInitialServiceSearch] = useState<boolean>(true);
-  const contacts = useMemo(() => {
+
+  const teamId = teamState.team()?.id;
+
+  useEffect(() => {
+    if (!isTeam || teamId === undefined) {
+      return undefined;
+    }
+
+    const abortController = new AbortController();
+
+    void teamRepository.loadTeamAppsAndCollaborators(teamId, abortController).catch((error: unknown) => {
+      if (!abortController.signal.aborted) {
+        logger.error('Failed to load team apps and collaborators', error);
+      }
+    });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [isTeam, teamId, teamRepository]);
+
+  const baseContacts = useMemo(() => {
     if (isTeam) {
       const isTeamOrServices = isTeamOnly || isServicesRoom;
       return isTeamOrServices ? teamMembers.toSorted(sortUsersByPriority) : teamUsers;
@@ -132,18 +153,29 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     return connectedUsers;
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
 
+  const contacts = useMemo(() => {
+    if (!teamCollaborators.length) {
+      return baseContacts;
+    }
+
+    const knownIds = new Set(baseContacts.map(contact => contact.id));
+    const newCollaborators = teamCollaborators.filter(collaborator => !knownIds.has(collaborator.id));
+
+    return [...baseContacts, ...newCollaborators];
+  }, [baseContacts, teamCollaborators]);
+
   const apps = useMemo(() => {
     const normalizedQuery = searchInput.trim().toLowerCase();
-    return contacts
-      .filter(contact => contact.type === UserType.APP)
-      .map(contact => integrationRepository.mapServiceFromUser(contact))
-      .filter(contact => compareTransliteration(contact.name(), normalizedQuery))
+
+    return teamApps
+      .map(app => integrationRepository.mapServiceFromUser(app))
+      .filter(app => compareTransliteration(app.name(), normalizedQuery))
       .toSorted((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
-  }, [contacts, integrationRepository, searchInput]);
+  }, [teamApps, integrationRepository, searchInput]);
 
   const servicesList = useMemo(() => {
     const allApps = activeConversation.protocol === CONVERSATION_PROTOCOL.MLS ? apps : services;
-    return allApps.filter(app => !participatingUserIds.some(id => id.id === app.id)); // Make sure apps already added to the conversation don't show up again
+    return allApps.filter(app => !participatingUserIds.some(participant => participant.id === app.id)); // Make sure apps already added to the conversation don't show up again
   }, [activeConversation.protocol, apps, services, participatingUserIds]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
