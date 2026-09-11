@@ -25,7 +25,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatBytes} from 'Util/util';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {getLatestSharedDriveUploadStatus} from './sharedDriveUploadStatus';
+import {getLatestSharedDriveUploadStatus, getSharedDriveUploadStatuses} from './sharedDriveUploadStatus';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
 
 type DismissedUpload = {
@@ -60,6 +60,9 @@ export const SharedDriveUploadStatusPopupHost = ({
   const [retryingUploadId, setRetryingUploadId] = useState<Maybe<string>>(Maybe.nothing());
   const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(Maybe.nothing());
   const upload = status.conversationQualifiedId === conversationQualifiedId ? status.upload : readStatus();
+  const uploadStatuses = getSharedDriveUploadStatuses(controller, conversationQualifiedId);
+  const canDismissUploadStatus =
+    upload !== null && uploadStatuses.length > 0 && uploadStatuses.every(({kind}) => kind === 'uploaded');
   const isUploadDismissed =
     maybe.isJust(dismissedUpload) &&
     dismissedUpload.value.conversationQualifiedId === conversationQualifiedId &&
@@ -139,6 +142,8 @@ export const SharedDriveUploadStatusPopupHost = ({
       toggleLabel={translate(isExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
       cancelLabel={translate('conversationAssetUploadCancel')}
       dismissLabel={translate('fileCardDefaultCloseButtonLabel')}
+      dismissAriaLabel={translate('cells.uploadStatus.closeAriaLabel')}
+      canDismiss={canDismissUploadStatus}
       retryLabel={translate('conversationFilePreviewErrorRetry')}
       isCancelling={maybe.isJust(cancellingUploadId) && cancellingUploadId.value === upload.uploadId}
       isRetrying={maybe.isJust(retryingUploadId) && retryingUploadId.value === upload.uploadId}

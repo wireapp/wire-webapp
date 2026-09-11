@@ -62,6 +62,7 @@ const renderPopup = (
         toggleLabel={isExpanded ? 'Hide upload details' : 'Show upload details'}
         cancelLabel="Cancel"
         dismissLabel="Close"
+        dismissAriaLabel="Close upload status"
         retryLabel="Retry"
         isCancelling={false}
         isRetrying={isRetrying}
@@ -375,20 +376,21 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
-  it('invokes dismiss from the failed file row', async () => {
+  it('invokes dismiss from the uploaded header action', async () => {
     const user = userEvent.setup();
     const onDismiss = jest.fn();
     render(
       <ThemeProvider>
         <SharedDriveUploadStatusPopup
-          upload={{...upload, kind: 'failed', canCancel: false, canRetry: true}}
-          title="Upload failed report.pdf"
-          statusLabel="Couldn’t upload file"
+          upload={{...upload, kind: 'uploaded', isTransferActive: false, canCancel: false, canRetry: false}}
+          title="Uploaded report.pdf"
+          statusLabel="Uploaded 4 KB"
           destination="to Shared Drive"
-          isExpanded
-          toggleLabel="Hide upload details"
+          isExpanded={false}
+          toggleLabel="Show upload details"
           cancelLabel="Cancel"
           dismissLabel="Close"
+          dismissAriaLabel="Close upload status"
           retryLabel="Retry"
           isCancelling={false}
           isRetrying={false}
@@ -400,9 +402,21 @@ describe('SharedDriveUploadStatusPopup', () => {
       </ThemeProvider>,
     );
 
-    await user.click(screen.getByRole('button', {name: 'Close'}));
+    const headerClose = within(screen.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'Close upload status',
+    });
+    expect(headerClose).toHaveTextContent('Close');
+    expect(headerClose).toHaveAttribute('data-uie-name', 'shared-drive-upload-header-dismiss');
+
+    await user.click(headerClose);
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['uploading', 'failed'] as const)('does not show close while %s status is actionable', kind => {
+    renderPopup(kind, true);
+
+    expect(screen.queryByRole('button', {name: 'Close upload status'})).not.toBeInTheDocument();
   });
 
   it('disables retry while a failed upload is being retried', () => {
