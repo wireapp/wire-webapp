@@ -844,19 +844,18 @@ function ConversationContent({
                 <div className="icon-spinner spin accent-text"></div>
               </div>
             </ConversationMessagesWrapper>
+
+            <SharedDriveUploadStatusPopupHost
+              controller={sharedDriveUploadController}
+              conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+              isEnabled={isSharedDriveDirectUploadFeatureEnabled}
+              isFileTabActive={isFileTabActive}
+            />
           </SharedDriveUploadStatusProvider>
         )}
 
         {isGiphyModalOpen && inputValue && (
           <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
-        )}
-        {activeConversation && (
-          <SharedDriveUploadStatusPopupHost
-            controller={sharedDriveUploadController}
-            conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
-            isEnabled={isSharedDriveDirectUploadFeatureEnabled}
-            isFileTabActive={isFileTabActive}
-          />
         )}
       </ConversationFileDropzone>
     </CellsSelfUserDriveRoleProvider>
