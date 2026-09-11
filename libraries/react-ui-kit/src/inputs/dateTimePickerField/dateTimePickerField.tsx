@@ -53,6 +53,8 @@ export interface DateTimePickerFieldProps {
   label?: string;
   labels: DateTimePickerFieldLabels;
   locale?: string;
+  /** Regional locale for time formatting, separate from `locale`, which controls the application language. */
+  timeLocale?: string;
   markInvalid?: boolean;
   disabled?: boolean;
   dateDisabled?: boolean;
@@ -76,6 +78,7 @@ export const DateTimePickerField = ({
   label,
   labels,
   locale = 'de-DE',
+  timeLocale,
   markInvalid = false,
   disabled = false,
   dateDisabled,
@@ -89,7 +92,10 @@ export const DateTimePickerField = ({
 }: DateTimePickerFieldProps) => {
   const labelId = `${dataUieName}-label`;
   const selectedDate = useMemo(() => (value !== null ? dateValueFromDate(value) : null), [value]);
-  const selectedTime = useMemo(() => (value !== null ? nearestTimeOptionFromDate(value) : null), [value]);
+  const selectedTime = useMemo(
+    () => (value !== null ? nearestTimeOptionFromDate(value, timeLocale) : null),
+    [timeLocale, value],
+  );
   const isDateDisabled = dateDisabled ?? disabled;
   const isTimeDisabled = timeDisabled ?? disabled;
   const effectiveMinTime = useMemo(() => {
@@ -153,6 +159,7 @@ export const DateTimePickerField = ({
           ariaLabel={labels.timeAriaLabel}
           markInvalid={markInvalid}
           disabled={isTimeDisabled}
+          locale={timeLocale}
           minTime={effectiveMinTime}
           menuPortalTarget={menuPortalTarget}
           wrapperCSS={dateTimePickerTimeFieldWrapperStyles}

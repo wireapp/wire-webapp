@@ -160,6 +160,8 @@ export function setRegionalDateLocale(newLocale: string): void {
   regionalDateLocale = resolveRegionalDateLocale(newLocale);
 }
 
+export const getRegionalDateLocale = (): string => regionalDateLocale;
+
 export const formatLocale = (date: FnDate | string | number, formatString: string) =>
   format(new Date(date), formatString, {locale: dateFnsLocale});
 

@@ -18,6 +18,7 @@
  */
 
 import {formatMeetingTimeRange} from './formatMeetingTimeRange';
+import {getRegionalDateLocale, setRegionalDateLocale} from 'Util/timeUtil';
 
 describe('formatMeetingTimeRange', () => {
   it('places the meridiem once for a same-period range', () => {
@@ -29,5 +30,16 @@ describe('formatMeetingTimeRange', () => {
     expect(formatMeetingTimeRange(new Date(2026, 5, 15, 11, 30), new Date(2026, 5, 15, 13, 15))).toBe(
       '11:30 AM - 01:15 PM',
     );
+  });
+
+  it('uses the system locale time convention', () => {
+    const originalLocale = getRegionalDateLocale();
+    setRegionalDateLocale('de-DE');
+    try {
+      expect(formatMeetingTimeRange(new Date(2026, 5, 15, 7, 30), new Date(2026, 5, 15, 7, 40))).toBe('07:30 - 07:40');
+      expect(formatMeetingTimeRange(new Date(2026, 5, 15, 14), new Date(2026, 5, 15, 15, 15))).toBe('14:00 - 15:15');
+    } finally {
+      setRegionalDateLocale(originalLocale);
+    }
   });
 });
