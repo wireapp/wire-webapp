@@ -19,8 +19,19 @@
 
 import {ReactNode} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {SystemMessage} from 'Repositories/entity/message/systemMessage';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
+
+import {
+  getSystemMessageCaptionContent,
+  renderSystemMessageCaption,
+  type SystemMessageCaptionContent,
+} from './systemMessageCaption';
 
 import {MessageTime} from '../messageTime';
 
@@ -28,10 +39,43 @@ interface SystemMessageProps {
   message: SystemMessage;
   isSenderNameVisible?: boolean;
   icon?: ReactNode;
+  captionContent?: SystemMessageCaptionContent;
 }
 
-export const SystemMessageBase = ({message, isSenderNameVisible = false, icon}: SystemMessageProps) => {
+type RenderSystemMessageCaptionOptions = {
+  readonly captionContent: SystemMessageCaptionContent | undefined;
+  readonly isReactTranslationRenderingEnabled: boolean;
+  readonly messageCaption: string | undefined;
+  readonly translate: Translate;
+};
+
+function renderSystemMessageCaptionContent(options: RenderSystemMessageCaptionOptions): ReactNode {
+  const {captionContent, isReactTranslationRenderingEnabled, messageCaption, translate} = options;
+
+  if (isNonEmptyString(messageCaption) === false) {
+    return null;
+  }
+
+  if (isReactTranslationRenderingEnabled) {
+    if (captionContent === undefined) {
+      return <span className="system-message-caption ellipsis">{messageCaption}</span>;
+    }
+
+    return (
+      <span className="system-message-caption ellipsis">
+        {renderSystemMessageCaption({content: captionContent, translate})}
+      </span>
+    );
+  }
+
+  return <span className="system-message-caption ellipsis" dangerouslySetInnerHTML={{__html: messageCaption}} />;
+}
+
+export const SystemMessageBase = ({message, isSenderNameVisible = false, icon, captionContent}: SystemMessageProps) => {
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const {unsafeSenderName, timestamp} = useKoSubscribableChildren(message, ['unsafeSenderName', 'timestamp']);
+  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
+  const resolvedCaptionContent = captionContent ?? getSystemMessageCaptionContent({message, translate});
 
   return (
     <div className="message-header" data-uie-name="element-message-system">
@@ -43,9 +87,12 @@ export const SystemMessageBase = ({message, isSenderNameVisible = false, icon}: 
       <p className="message-header-label">
         <span className="message-header-label__multiline">
           {isSenderNameVisible && <span className="message-header-sender-name">{unsafeSenderName}</span>}
-          {message.caption !== undefined && message.caption !== '' && (
-            <span className="system-message-caption ellipsis" dangerouslySetInnerHTML={{__html: message.caption}} />
-          )}
+          {renderSystemMessageCaptionContent({
+            captionContent: resolvedCaptionContent,
+            isReactTranslationRenderingEnabled,
+            messageCaption: message.caption,
+            translate,
+          })}
         </span>
       </p>
       <div className="message-body-actions">

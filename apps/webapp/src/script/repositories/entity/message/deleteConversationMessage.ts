@@ -27,11 +27,14 @@ import {SystemMessageType} from '../../../message/systemMessageType';
 import type {Conversation} from '../Conversation';
 
 export class DeleteConversationMessage extends SystemMessage {
+  public readonly conversationName: string | undefined;
+
   constructor(conversationEntity: Conversation, translate: Translate) {
     super(translate);
 
     this.type = TEAM_EVENT.DELETE;
     this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
+    this.conversationName = conversationEntity ? conversationEntity.name() : undefined;
 
     this.caption = conversationEntity
       ? this.translate('notificationConversationDeletedNamed', {name: conversationEntity.name()})

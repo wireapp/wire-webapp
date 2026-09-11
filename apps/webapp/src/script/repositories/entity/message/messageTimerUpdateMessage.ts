@@ -28,6 +28,7 @@ import {SystemMessage} from './systemMessage';
 import {SystemMessageType} from '../../../message/systemMessageType';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
+  public readonly isSelfUser: boolean;
   public readonly message_timer: number | null;
 
   constructor(messageTimer: number | null, translate: Translate) {
@@ -37,8 +38,9 @@ export class MessageTimerUpdateMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
 
     this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
+    this.isSelfUser = this.user().isMe;
 
-    this.caption = getCaption(this.message_timer, this.user().isMe, this.translate);
+    this.caption = getCaption(this.message_timer, this.isSelfUser, this.translate);
   }
 }
 
