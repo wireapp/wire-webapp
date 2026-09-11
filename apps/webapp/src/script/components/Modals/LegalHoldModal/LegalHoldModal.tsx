@@ -17,8 +17,9 @@
  *
  */
 
-import {FC, useCallback, useEffect, useRef, useState} from 'react';
+import {FC, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -36,14 +37,92 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
+import {
+  createReactTranslationMarker,
+  renderReactTranslation,
+  replaceReactComponents,
+} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
+import {splitFingerprint} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;
+const legalHoldModalLineBreakMarker = createReactTranslationMarker('legal-hold-modal-line-break');
+const legalHoldModalFingerprintMarker = createReactTranslationMarker('legal-hold-modal-fingerprint');
+
+const legalHoldDescriptionReactReplacements = [
+  {
+    exactMatch: '<br />',
+    render(): ReactNode {
+      return <br />;
+    },
+  },
+];
+
+type RenderLegalHoldModalRequestTextOptions = {
+  readonly fingerprint: string;
+  readonly translate: Translate;
+};
+
+function formatFingerprintForLegacyRendering(fingerprint: string): string {
+  return splitFingerprint(fingerprint)
+    .map(part => {
+      return `<span>${part} </span>`;
+    })
+    .join('');
+}
+
+function renderLegalHoldModalRequestText(options: RenderLegalHoldModalRequestTextOptions): ReactNode[] {
+  const {fingerprint, translate} = options;
+  const translatedText = translate('legalHoldModalText', undefined, {
+    br: legalHoldModalLineBreakMarker.substitution,
+    fingerprint: legalHoldModalFingerprintMarker.substitution,
+  });
+
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [],
+    nodeReplacements: [
+      {
+        marker: legalHoldModalLineBreakMarker,
+        render(): ReactNode {
+          return <br />;
+        },
+      },
+      {
+        marker: legalHoldModalFingerprintMarker,
+        render(): ReactNode {
+          return (
+            <span className="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">
+              {splitFingerprint(fingerprint).map((fingerprintPart, fingerprintPartIndex) => {
+                return <span key={fingerprintPartIndex}>{fingerprintPart} </span>;
+              })}
+            </span>
+          );
+        },
+      },
+    ],
+    valueReplacements: [],
+  });
+}
+
+type RenderLegalHoldDescriptionOptions = {
+  readonly isSelfInfo: boolean;
+  readonly translate: Translate;
+};
+
+function renderLegalHoldDescription(options: RenderLegalHoldDescriptionOptions): ReactNode {
+  const {isSelfInfo, translate} = options;
+  const translatedText = isSelfInfo ? translate('legalHoldDescriptionSelf') : translate('legalHoldDescriptionOthers');
+
+  return replaceReactComponents(translatedText, legalHoldDescriptionReactReplacements);
+}
 
 export enum LegalHoldModalType {
   REQUEST = 'request',
@@ -69,7 +148,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   cryptographyRepository,
   messageRepository,
 }) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const skipShowUsersRef = useRef(false);
 
   const {
@@ -92,6 +171,8 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
   const isRequest = type === LegalHoldModalType.REQUEST;
   const isUsers = type === LegalHoldModalType.USERS;
+  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
+  const currentFingerprint = isUndefined(fingerprint) ? '' : fingerprint;
 
   const [isPending, setIsPending] = useState<boolean>(false);
   const [isSendingApprove, setIsSendingApprove] = useState<boolean>(false);
@@ -339,14 +420,18 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
         {isRequest && (
           <>
             <div className="modal__text" data-uie-name="status-modal-text">
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: translate('legalHoldModalText', undefined, {
-                    br: '<br>',
-                    fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
-                  }),
-                }}
-              />
+              {isReactTranslationRenderingEnabled ? (
+                <p>{renderLegalHoldModalRequestText({fingerprint: currentFingerprint, translate})}</p>
+              ) : (
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: translate('legalHoldModalText', undefined, {
+                      br: '<br>',
+                      fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formatFingerprintForLegacyRendering(currentFingerprint)}</span>`,
+                    }),
+                  }}
+                />
+              )}
 
               {requiresPassword && <div>{translate('legalHoldModalTextPassword')}</div>}
             </div>
@@ -408,15 +493,21 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                   {translate('legalHoldHeadline')}
                 </div>
 
-                <p
-                  className="legal-hold-modal__info"
-                  data-uie-name="status-modal-text"
-                  dangerouslySetInnerHTML={{
-                    __html: isSelfInfo
-                      ? translate('legalHoldDescriptionSelf')
-                      : translate('legalHoldDescriptionOthers'),
-                  }}
-                />
+                {isReactTranslationRenderingEnabled ? (
+                  <p className="legal-hold-modal__info" data-uie-name="status-modal-text">
+                    {renderLegalHoldDescription({isSelfInfo, translate})}
+                  </p>
+                ) : (
+                  <p
+                    className="legal-hold-modal__info"
+                    data-uie-name="status-modal-text"
+                    dangerouslySetInnerHTML={{
+                      __html: isSelfInfo
+                        ? translate('legalHoldDescriptionSelf')
+                        : translate('legalHoldDescriptionOthers'),
+                    }}
+                  />
+                )}
 
                 <div className="legal-hold-modal__subjects">{translate('legalHoldSubjects')}</div>
 
