@@ -25,12 +25,15 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import en from 'I18n/en-US.json';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
 import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/oneToOneMigratedToMlsMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
 import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
 import {User} from 'Repositories/entity/User';
+import {Config} from 'src/script/Config';
 import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
@@ -45,6 +48,9 @@ import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/test
 jest.mock('Components/icon', () => ({
   EditIcon: () => {
     return <span data-uie-name="editicon" className="editicon"></span>;
+  },
+  InfoIcon: () => {
+    return <span data-uie-name="infoicon" className="infoicon"></span>;
   },
   ReadIcon: () => {
     return <span data-uie-name="readicon" className="readicon"></span>;
@@ -96,6 +102,39 @@ function getSystemMessageCaption(container: HTMLElement): HTMLElement {
   }
 
   return caption;
+}
+
+function getSystemMessageLink(container: HTMLElement): HTMLAnchorElement {
+  const link = container.querySelector<HTMLAnchorElement>('.system-message-caption a');
+
+  if (isNull(link)) {
+    throw new Error('Expected a system message link to be rendered');
+  }
+
+  return link;
+}
+
+function withMlsSupportUrl(testFunction: TranslationTestFunction): IsolatedTranslationTestFunction {
+  return async function runWithMlsSupportUrl(): Promise<void> {
+    const originalConfig = Config.getConfig();
+    const configWithTestValues = {
+      ...originalConfig,
+      URL: {
+        ...originalConfig.URL,
+        SUPPORT: {
+          ...originalConfig.URL.SUPPORT,
+          MLS_LEARN_MORE: 'https://support.example/mls',
+        },
+      },
+    };
+    const configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue(configWithTestValues);
+
+    try {
+      await testFunction();
+    } finally {
+      configSpy.mockRestore();
+    }
+  };
 }
 
 describe('SystemMessage', () => {
@@ -286,6 +325,61 @@ describe('SystemMessage', () => {
 
       expect(caption).toHaveTextContent('turned off the message timer');
     }),
+  );
+
+  it(
+    'renders the one-to-one MLS caption with a React link when enabled',
+    withMlsSupportUrl(
+      withTranslationStrings(
+        {
+          ...en,
+          conversationProtocolUpdatedToMLS: '[link]Read about MLS[/link] before continuing.',
+        },
+        () => {
+          const message = new OneToOneMigratedToMlsMessage(translate);
+
+          const {container} = render(
+            withThemeAndRootContext(<SystemMessage message={message} />, reactTranslationRenderingRootProviderWrapper),
+          );
+          const link = getSystemMessageLink(container);
+
+          expect(getSystemMessageCaption(container)).toHaveTextContent('Read about MLS before continuing.');
+          expect(link).toHaveTextContent('Read about MLS');
+          expect(link).toHaveAttribute('href', 'https://support.example/mls');
+          expect(link).toHaveAttribute('target', '_blank');
+          expect(link).toHaveAttribute('rel', 'nofollow noopener noreferrer');
+        },
+      ),
+    ),
+  );
+
+  it(
+    'renders the joined-after-MLS caption with a React link when enabled',
+    withMlsSupportUrl(
+      withTranslationStrings(
+        {
+          ...en,
+          conversationJoinedAfterMLSMigrationFinalisation:
+            '[link]Read about MLS[/link] before checking older messages.',
+        },
+        () => {
+          const message = new JoinedAfterMLSMigrationFinalisationMessage(translate);
+
+          const {container} = render(
+            withThemeAndRootContext(<SystemMessage message={message} />, reactTranslationRenderingRootProviderWrapper),
+          );
+          const link = getSystemMessageLink(container);
+
+          expect(getSystemMessageCaption(container)).toHaveTextContent(
+            'Read about MLS before checking older messages.',
+          );
+          expect(link).toHaveTextContent('Read about MLS');
+          expect(link).toHaveAttribute('href', 'https://support.example/mls');
+          expect(link).toHaveAttribute('target', '_blank');
+          expect(link).toHaveAttribute('rel', 'nofollow noopener noreferrer');
+        },
+      ),
+    ),
   );
 
   it('preserves the sender name and message layout', () => {

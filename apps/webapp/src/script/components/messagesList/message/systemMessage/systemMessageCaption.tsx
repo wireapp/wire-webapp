@@ -22,9 +22,12 @@ import type {ReactNode} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
 import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
+import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/oneToOneMigratedToMlsMessage';
 import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
+import {Config} from 'src/script/Config';
 import {
   createReactTranslationMarker,
   renderReactTranslation,
@@ -66,9 +69,15 @@ type RenderSystemMessageCaptionOptions = {
   readonly translate: Translate;
 };
 
+type MlsSystemMessageTranslationKey =
+  | 'conversationJoinedAfterMLSMigrationFinalisation'
+  | 'conversationProtocolUpdatedToMLS'
+  | 'conversationProtocolUpdatedToMixedPart1';
+
 const systemMessageBoldMarker = createReactTranslationMarker('system-message-bold');
 const systemMessageNameMarker = createReactTranslationMarker('system-message-conversation-name');
 const systemMessageTimeMarker = createReactTranslationMarker('system-message-time');
+const systemMessageMlsLinkMarker = createReactTranslationMarker('system-message-mls-link');
 
 const systemMessageBoldComponentReplacement: ReactTranslationComponentReplacement = {
   start: systemMessageBoldMarker.start,
@@ -83,6 +92,29 @@ const systemMessageBoldDangerousSubstitutions = {
   '/bold': systemMessageBoldMarker.end,
 };
 
+const systemMessageMlsLinkDangerousSubstitutions = {
+  link: systemMessageMlsLinkMarker.start,
+  '/link': systemMessageMlsLinkMarker.end,
+};
+
+const systemMessageMlsLinkComponentReplacement: ReactTranslationComponentReplacement = {
+  start: systemMessageMlsLinkMarker.start,
+  end: systemMessageMlsLinkMarker.end,
+  render(children): ReactNode {
+    return (
+      <a
+        href={Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE}
+        data-uie-name=""
+        className=""
+        rel="nofollow noopener noreferrer"
+        target="_blank"
+      >
+        {children}
+      </a>
+    );
+  },
+};
+
 function createSystemMessageTextCaption(text: string): SystemMessageCaptionContent {
   return {kind: 'text', text};
 }
@@ -91,6 +123,18 @@ export function createSystemMessageTranslationCaption(
   options: SystemMessageTranslationCaptionOptions,
 ): SystemMessageCaptionContent {
   return {kind: 'translation', ...options};
+}
+
+export function createMlsSystemMessageCaption(
+  translationKey: MlsSystemMessageTranslationKey,
+): SystemMessageCaptionContent {
+  return createSystemMessageTranslationCaption({
+    translationKey,
+    substitutions: {},
+    dangerousSubstitutions: systemMessageMlsLinkDangerousSubstitutions,
+    componentReplacements: [systemMessageMlsLinkComponentReplacement],
+    valueReplacements: [],
+  });
 }
 
 export function getSystemMessageCaptionContent(
@@ -147,6 +191,14 @@ export function getSystemMessageCaptionContent(
       componentReplacements: [],
       valueReplacements: [{marker: systemMessageNameMarker, runtimeText: message.conversationName}],
     });
+  }
+
+  if (message instanceof JoinedAfterMLSMigrationFinalisationMessage) {
+    return createMlsSystemMessageCaption('conversationJoinedAfterMLSMigrationFinalisation');
+  }
+
+  if (message instanceof OneToOneMigratedToMlsMessage) {
+    return createMlsSystemMessageCaption('conversationProtocolUpdatedToMLS');
   }
 
   return createSystemMessageTextCaption(caption);

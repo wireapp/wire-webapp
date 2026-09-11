@@ -27,34 +27,55 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {type Translate, replaceLink} from 'Util/localizerUtil';
 
 import {SystemMessageBase} from '../systemMessage/systemMessageBase';
+import {
+  createMlsSystemMessageCaption,
+  createSystemMessageTranslationCaption,
+} from '../systemMessage/systemMessageCaption';
 
 interface ProtocolUpdateMessageProps {
   message: ProtocolUpdateMessageEntity;
 }
 
-const createSystemMessage = (caption: string, translate: Translate) => {
+function createSystemMessage(caption: string, translate: Translate): SystemMessage {
   const message = new SystemMessage(translate);
   message.caption = caption;
   return message;
-};
+}
 
 export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => {
   const {translate} = useApplicationContext();
   if (message.protocol === CONVERSATION_PROTOCOL.MIXED) {
-    const captions = [
+    const mixedPart1Message = createSystemMessage(
       translate(
         'conversationProtocolUpdatedToMixedPart1',
         undefined,
         replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
       ),
-      translate('conversationProtocolUpdatedToMixedPart2'),
-    ];
-    const messages = captions.map(caption => createSystemMessage(caption, translate));
+      translate,
+    );
+    const mixedPart2Message = createSystemMessage(translate('conversationProtocolUpdatedToMixedPart2'), translate);
+    const mixedPart2Caption = createSystemMessageTranslationCaption({
+      translationKey: 'conversationProtocolUpdatedToMixedPart2',
+      substitutions: {},
+      dangerousSubstitutions: {},
+      componentReplacements: [],
+      valueReplacements: [],
+    });
+
     return (
       <>
-        {messages.map(message => (
-          <SystemMessageBase key={message.caption} icon={<Icon.InfoIcon />} message={message} />
-        ))}
+        <SystemMessageBase
+          key={mixedPart1Message.caption}
+          captionContent={createMlsSystemMessageCaption('conversationProtocolUpdatedToMixedPart1')}
+          icon={<Icon.InfoIcon />}
+          message={mixedPart1Message}
+        />
+        <SystemMessageBase
+          key={mixedPart2Message.caption}
+          captionContent={mixedPart2Caption}
+          icon={<Icon.InfoIcon />}
+          message={mixedPart2Message}
+        />
       </>
     );
   }
@@ -67,5 +88,11 @@ export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => 
     ),
     translate,
   );
-  return <SystemMessageBase message={migratedToMLSMessage} icon={<Icon.InfoIcon />} />;
+  return (
+    <SystemMessageBase
+      captionContent={createMlsSystemMessageCaption('conversationProtocolUpdatedToMLS')}
+      message={migratedToMLSMessage}
+      icon={<Icon.InfoIcon />}
+    />
+  );
 };
