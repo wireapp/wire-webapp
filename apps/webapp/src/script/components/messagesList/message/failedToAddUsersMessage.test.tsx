@@ -18,10 +18,12 @@
  */
 
 import {act, render} from '@testing-library/react';
+import {isNull, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import de from 'I18n/de-DE.json';
 import en from 'I18n/en-US.json';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
@@ -52,7 +54,7 @@ type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
 
 function withTranslationStrings(
-  strings: typeof en,
+  strings: Record<string, string>,
   testFunction: TranslationTestFunction,
 ): IsolatedTranslationTestFunction {
   return async function runTranslationTest(): Promise<void> {
@@ -88,6 +90,48 @@ function createUser(qualifiedId: QualifiedId, name: string): User {
   const user = new User(qualifiedId.id, qualifiedId.domain, translateForTest);
   user.name(name);
   return user;
+}
+
+function createFailureForReason(users: QualifiedId[], reason: AddUsersFailureReasons): AddUsersFailure {
+  if (reason === AddUsersFailureReasons.NON_FEDERATING_BACKENDS) {
+    return {
+      users,
+      reason,
+      backends: [],
+    };
+  }
+
+  if (reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS) {
+    return {
+      users,
+      reason,
+      backends: ['backend.example'],
+    };
+  }
+
+  return {users, reason};
+}
+
+function findMessageDetailByText(messageDetails: HTMLElement[], text: string): HTMLElement {
+  const matchingMessageDetail = messageDetails.find(messageDetail => messageDetail.textContent?.includes(text));
+
+  if (isUndefined(matchingMessageDetail)) {
+    throw new Error(`Expected a message detail containing: ${text}`);
+  }
+
+  return matchingMessageDetail;
+}
+
+function assertLearnMoreLink(messageDetail: HTMLElement, expectedDataUieName: string): void {
+  const learnMoreLink = messageDetail.querySelector<HTMLAnchorElement>('a');
+
+  if (isNull(learnMoreLink)) {
+    throw new Error('Expected a learn-more link to be rendered');
+  }
+
+  expect(learnMoreLink).toHaveTextContent('Learn more');
+  expect(learnMoreLink).toHaveAttribute('data-uie-name', expectedDataUieName);
+  expect(learnMoreLink).toHaveAttribute('target', '_blank');
 }
 
 describe('FailedToAddUsersMessage', () => {
@@ -487,5 +531,244 @@ describe('FailedToAddUsersMessage', () => {
         expect(messageSummary.querySelector('strong')).toHaveTextContent('participants total=2');
       },
     ),
+  );
+
+  const failedToAddSingularDetailsTestCases = [
+    {
+      reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
+      expectedText: 'Target could not be added to the group as their backends do not federate with each other.',
+      expectedStrongCount: 1,
+      expectedLinkName: 'go-offline-backend',
+    },
+    {
+      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+      expectedText: 'Target could not be added to the group as the backend of backend.example could not be reached.',
+      expectedStrongCount: 2,
+      expectedLinkName: 'go-offline-backend',
+    },
+    {
+      reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG,
+      expectedText: 'Target could not be added to the group.',
+      expectedStrongCount: 1,
+      expectedLinkName: 'go-offline-backend',
+    },
+    {
+      reason: AddUsersFailureReasons.NOT_MLS_CAPABLE,
+      expectedText: 'Target could not be added to the meeting. Target may not use a device that is MLS-capable.',
+      expectedStrongCount: 2,
+      expectedLinkName: 'mls-learn-more',
+    },
+  ] as const;
+
+  it.each(failedToAddSingularDetailsTestCases)(
+    'renders singular $reason details through React',
+    ({reason, expectedText, expectedStrongCount, expectedLinkName}): void => {
+      const userState = new UserState();
+      const [targetQualifiedId, otherQualifiedId] = generateQualifiedIds(2, 'test.domain');
+      userState.users([createUser(targetQualifiedId, 'Target'), createUser(otherQualifiedId, 'Other')]);
+
+      const message = createFailedToAddUsersMessages([
+        createFailureForReason([targetQualifiedId], reason),
+        createFailureForReason([otherQualifiedId], AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG),
+      ]);
+
+      const {getByTestId, getAllByTestId} = render(
+        withReactTranslationTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+      );
+
+      act(() => {
+        getByTestId('toggle-failed-to-add-users').click();
+      });
+
+      const messageDetail = findMessageDetailByText(getAllByTestId('multi-user-not-added-details'), 'Target');
+      expect(messageDetail).toHaveTextContent(expectedText);
+      expect(messageDetail.querySelectorAll('strong')).toHaveLength(expectedStrongCount);
+      assertLearnMoreLink(messageDetail, expectedLinkName);
+    },
+  );
+
+  const failedToAddPluralDetailsTestCases = [
+    {
+      reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
+      expectedText:
+        'Second, Third and First could not be added to the group as their backends do not federate with each other.',
+      expectedStrongCount: 2,
+      expectedLinkName: 'go-offline-backend',
+    },
+    {
+      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+      expectedText:
+        'Second, Third and First could not be added to the group as the backend of backend.example could not be reached.',
+      expectedStrongCount: 3,
+      expectedLinkName: 'go-offline-backend',
+    },
+    {
+      reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG,
+      expectedText: 'Second, Third and First could not be added to the group.',
+      expectedStrongCount: 2,
+      expectedLinkName: 'go-offline-backend',
+    },
+    {
+      reason: AddUsersFailureReasons.NOT_MLS_CAPABLE,
+      expectedText:
+        'Second, Third and First could not be added to the conversation. They may not use devices that are MLS-capable.',
+      expectedStrongCount: 2,
+      expectedLinkName: 'mls-learn-more',
+    },
+  ] as const;
+
+  it.each(failedToAddPluralDetailsTestCases)(
+    'renders plural $reason details through React',
+    ({reason, expectedText, expectedStrongCount, expectedLinkName}): void => {
+      const userState = new UserState();
+      const qualifiedIds = generateQualifiedIds(3, 'test.domain');
+      userState.users([
+        createUser(qualifiedIds[0], 'First'),
+        createUser(qualifiedIds[1], 'Second'),
+        createUser(qualifiedIds[2], 'Third'),
+      ]);
+
+      const message = createFailedToAddUsersMessages([createFailureForReason(qualifiedIds, reason)]);
+
+      const {getByTestId, getAllByTestId} = render(
+        withReactTranslationTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+      );
+
+      act(() => {
+        getByTestId('toggle-failed-to-add-users').click();
+      });
+
+      const messageDetail = findMessageDetailByText(getAllByTestId('multi-user-not-added-details'), 'First');
+      expect(messageDetail).toHaveTextContent(expectedText);
+      expect(messageDetail.querySelectorAll('strong')).toHaveLength(expectedStrongCount);
+      assertLearnMoreLink(messageDetail, expectedLinkName);
+    },
+  );
+
+  it(
+    'keeps runtime names and domains opaque in plural details',
+    withTranslationStrings(
+      {
+        ...en,
+        failedToAddParticipantsPluralDetailsOfflineBackend:
+          '<meta name="example" content="value">[bold]{names}[/bold] on {domain}: [bold]{name}[/bold]',
+      },
+      (): void => {
+        const userState = new UserState();
+        const qualifiedIds = generateQualifiedIds(3, 'test.domain');
+        userState.users([
+          createUser(qualifiedIds[0], 'R&D <Test>'),
+          createUser(qualifiedIds[1], '[bold]Admin[/bold]'),
+          createUser(qualifiedIds[2], 'Third'),
+        ]);
+
+        const message = createFailedToAddUsersMessages([
+          {
+            users: qualifiedIds,
+            reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+            backends: ['backend.<example>'],
+          },
+        ]);
+
+        const {getByTestId} = render(
+          withReactTranslationTheme(
+            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
+          ),
+        );
+
+        act(() => {
+          getByTestId('toggle-failed-to-add-users').click();
+        });
+
+        const messageDetail = getByTestId('multi-user-not-added-details');
+        expect(messageDetail).toHaveTextContent(
+          '<meta name="example" content="value">[bold]Admin[/bold], Third on backend.<example>: R&D <Test>',
+        );
+        expect(messageDetail.querySelector('meta')).toBeNull();
+        expect(messageDetail.querySelector('test')).toBeNull();
+        expect(messageDetail.querySelector('example')).toBeNull();
+
+        const strongElements = messageDetail.querySelectorAll('strong');
+        expect(strongElements).toHaveLength(2);
+        expect(strongElements[0]).toHaveTextContent('[bold]Admin[/bold], Third');
+        expect(strongElements[1]).toHaveTextContent('R&D <Test>');
+        expect(strongElements[0].querySelector('strong')).toBeNull();
+        expect(strongElements[1].querySelector('strong')).toBeNull();
+        assertLearnMoreLink(messageDetail, 'go-offline-backend');
+      },
+    ),
+  );
+
+  it(
+    'renders repeated runtime names as opaque values in singular details',
+    withTranslationStrings(
+      {
+        ...en,
+        failedToAddParticipantsSingularDetailsNotMlsCapable: '[bold]{name}[/bold] failed. Again [bold]{name}[/bold].',
+      },
+      (): void => {
+        const userState = new UserState();
+        const [targetQualifiedId, otherQualifiedId] = generateQualifiedIds(2, 'test.domain');
+        userState.users([createUser(targetQualifiedId, 'R&D <Test>'), createUser(otherQualifiedId, 'Other')]);
+
+        const message = createFailedToAddUsersMessages([
+          createFailureForReason([targetQualifiedId], AddUsersFailureReasons.NOT_MLS_CAPABLE),
+          createFailureForReason([otherQualifiedId], AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG),
+        ]);
+
+        const {getByTestId, getAllByTestId} = render(
+          withReactTranslationTheme(
+            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
+          ),
+        );
+
+        act(() => {
+          getByTestId('toggle-failed-to-add-users').click();
+        });
+
+        const messageDetail = findMessageDetailByText(getAllByTestId('multi-user-not-added-details'), 'R&D <Test>');
+        expect(messageDetail).toHaveTextContent('R&D <Test> failed. Again R&D <Test>.');
+        expect(messageDetail.querySelector('test')).toBeNull();
+
+        const strongElements = messageDetail.querySelectorAll('strong');
+        expect(strongElements).toHaveLength(2);
+        expect(strongElements[0]).toHaveTextContent('R&D <Test>');
+        expect(strongElements[1]).toHaveTextContent('R&D <Test>');
+        expect(strongElements[0].querySelector('strong')).toBeNull();
+        expect(strongElements[1].querySelector('strong')).toBeNull();
+        assertLearnMoreLink(messageDetail, 'mls-learn-more');
+      },
+    ),
+  );
+
+  it(
+    'keeps the audited German detail translation compatible with React rendering',
+    withTranslationStrings(de, (): void => {
+      const userState = new UserState();
+      const qualifiedIds = generateQualifiedIds(3, 'test.domain');
+      userState.users([
+        createUser(qualifiedIds[0], 'First'),
+        createUser(qualifiedIds[1], 'Second'),
+        createUser(qualifiedIds[2], 'Third'),
+      ]);
+
+      const message = createFailedToAddUsersMessages([
+        createFailureForReason(qualifiedIds, AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG),
+      ]);
+
+      const {getByTestId} = render(
+        withReactTranslationTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+      );
+
+      act(() => {
+        getByTestId('toggle-failed-to-add-users').click();
+      });
+
+      const messageDetail = getByTestId('multi-user-not-added-details');
+      expect(messageDetail).toHaveTextContent('Second, Third und First konnten der Gruppe nicht hinzugefügt werden.');
+      expect(messageDetail).not.toHaveTextContent('__wire_react_translation_');
+      expect(messageDetail.querySelectorAll('strong')).toHaveLength(1);
+      expect(messageDetail.querySelector('strong')).toHaveTextContent('First');
+    }),
   );
 });

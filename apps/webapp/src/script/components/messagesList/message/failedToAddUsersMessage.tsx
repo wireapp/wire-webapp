@@ -78,7 +78,8 @@ interface MessageDetailsProps {
   failure: AddUsersFailure;
   isMessageFocused: boolean;
   allUsers: User[];
-  translate: (translationKey: TranslationKey, replacements?: Record<string, string>) => string;
+  isReactTranslationRenderingEnabled: boolean;
+  translate: Translate;
 }
 
 const singularDetailsTranslationKeyByReason = {
@@ -312,7 +313,121 @@ function renderFailedToAddPluralSummary(options: RenderFailedToAddPluralSummaryO
   );
 }
 
-function MessageDetails({failure, isMessageFocused, allUsers, translate}: MessageDetailsProps): ReactNode {
+type RenderFailedToAddDetailsTranslationOptions = {
+  readonly domain: string | undefined;
+  readonly failure: AddUsersFailure;
+  readonly isReactTranslationRenderingEnabled: boolean;
+  readonly translate: Translate;
+  readonly users: readonly User[];
+};
+
+function renderFailedToAddDetailsTranslation(options: RenderFailedToAddDetailsTranslationOptions): ReactNode {
+  const {domain, failure, isReactTranslationRenderingEnabled, translate, users} = options;
+  const {reason} = failure;
+  const {translationLabel} = reasonToMessageDataMap[reason];
+  const runtimeUserName = getUserNameWithTranslate(users[0], translate);
+  let translationKey: TranslationKey;
+  let translationValues: readonly FailedToAddTranslationValue[];
+
+  if (users.length === 1) {
+    translationKey = singularDetailsTranslationKeyByReason[reason];
+
+    if (translationLabel === 'OfflineBackend') {
+      translationValues = [
+        {
+          placeholder: 'name',
+          marker: failedToAddNameMarker,
+          runtimeText: runtimeUserName,
+        },
+        {
+          placeholder: 'domain',
+          marker: failedToAddDomainMarker,
+          runtimeText: domain as string,
+        },
+      ];
+    } else {
+      translationValues = [
+        {
+          placeholder: 'name',
+          marker: failedToAddNameMarker,
+          runtimeText: runtimeUserName,
+        },
+      ];
+    }
+  } else {
+    translationKey = pluralDetailsTranslationKeyByReason[reason];
+    const runtimeNames = users
+      .slice(1)
+      .map(user => getUserNameWithTranslate(user, translate))
+      .join(', ');
+
+    if (translationLabel === 'OfflineBackend') {
+      translationValues = [
+        {
+          placeholder: 'name',
+          marker: failedToAddNameMarker,
+          runtimeText: runtimeUserName,
+        },
+        {
+          placeholder: 'names',
+          marker: failedToAddNamesMarker,
+          runtimeText: runtimeNames,
+        },
+        {
+          placeholder: 'domain',
+          marker: failedToAddDomainMarker,
+          runtimeText: domain as string,
+        },
+      ];
+    } else {
+      translationValues = [
+        {
+          placeholder: 'name',
+          marker: failedToAddNameMarker,
+          runtimeText: runtimeUserName,
+        },
+        {
+          placeholder: 'names',
+          marker: failedToAddNamesMarker,
+          runtimeText: runtimeNames,
+        },
+      ];
+    }
+  }
+
+  if (isReactTranslationRenderingEnabled === true) {
+    return (
+      <span css={warning}>
+        {renderFailedToAddReactTranslation({
+          translate,
+          translationKey,
+          values: translationValues,
+        })}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      css={warning}
+      dangerouslySetInnerHTML={{
+        __html: translateFailedToAddTranslation({
+          translate,
+          translationKey,
+          values: translationValues,
+        }),
+      }}
+    />
+  );
+}
+
+function MessageDetails({
+  failure,
+  isMessageFocused,
+  allUsers,
+  isReactTranslationRenderingEnabled,
+  translate,
+}: MessageDetailsProps): ReactNode {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const {users: userIds, reason} = failure;
@@ -325,13 +440,10 @@ function MessageDetails({failure, isMessageFocused, allUsers, translate}: Messag
     return users;
   }, [allUsers, userIds]);
 
-  const baseTranslationKey =
-    users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
-
   const uniqueDomains = 'backends' in failure ? Array.from(new Set(failure.backends)) : undefined;
   const domainStr = uniqueDomains && uniqueDomains.join(', ');
 
-  const {link, translationLabel} = reasonToMessageDataMap[reason];
+  const {link} = reasonToMessageDataMap[reason];
 
   const learnMoreLink = (
     <>
@@ -349,56 +461,15 @@ function MessageDetails({failure, isMessageFocused, allUsers, translate}: Messag
     </>
   );
 
-  function getText(): string {
-    if (baseTranslationKey === 'failedToAddParticipantsSingularDetails') {
-      if (translationLabel === 'OfflineBackend') {
-        return translate(singularDetailsTranslationKeyByReason[reason], {
-          name: getUserNameWithTranslate(users[0], translate),
-          domain: domainStr as string,
-        });
-      }
-
-      return translate(singularDetailsTranslationKeyByReason[reason], {
-        name: getUserNameWithTranslate(users[0], translate),
-      });
-    }
-
-    if (baseTranslationKey === 'failedToAddParticipantsPluralDetails') {
-      if (translationLabel === 'OfflineBackend') {
-        return translate(pluralDetailsTranslationKeyByReason[reason], {
-          name: getUserNameWithTranslate(users[0], translate),
-          names: users
-            .slice(1)
-            .map(user => getUserNameWithTranslate(user, translate))
-            .join(', '),
-          domain: domainStr as string,
-        });
-      }
-
-      return translate(pluralDetailsTranslationKeyByReason[reason], {
-        name: getUserNameWithTranslate(users[0], translate),
-        names: users
-          .slice(1)
-          .map(user => getUserNameWithTranslate(user, translate))
-          .join(', '),
-      });
-    }
-
-    return '';
-  }
-
-  const text = getText();
-
   return (
     <p data-uie-name="multi-user-not-added-details" data-uie-value={domainStr}>
-      {text && (
-        <span
-          css={warning}
-          dangerouslySetInnerHTML={{
-            __html: text,
-          }}
-        />
-      )}
+      {renderFailedToAddDetailsTranslation({
+        domain: domainStr,
+        failure,
+        isReactTranslationRenderingEnabled,
+        translate,
+        users,
+      })}
       {learnMoreLink}
     </p>
   );
@@ -487,6 +558,7 @@ function FailedToAddUsersMessage({
             <MessageDetails
               allUsers={allUsers}
               isMessageFocused={isMessageFocused}
+              isReactTranslationRenderingEnabled={isReactTranslationRenderingEnabled}
               key={index}
               failure={failure}
               translate={translate}
