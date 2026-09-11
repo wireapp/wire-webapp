@@ -20,6 +20,7 @@
 // Polyfill for "tsyringe" dependency injection
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
@@ -31,6 +32,7 @@ import 'core-js/full/reflect';
 import pWaitFor from 'p-wait-for';
 import platform from 'platform';
 import {pdfjs} from 'react-pdf';
+import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
@@ -98,6 +100,7 @@ import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
@@ -121,7 +124,7 @@ import {
   startNewVersionPolling,
 } from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
-import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
+import {initialiseSelfAndTeamConversations, initMLSGroupConversations, recoverMLSConversationsInBatches} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import type {ApplicationObservability} from '../observability/applicationObservability';
 import type {ApplicationStartupReport} from '../observability/applicationStartupReport';
@@ -190,6 +193,7 @@ export class App {
   debug?: DebugUtil;
   util?: {debug: DebugUtil};
   private newVersionPollingCleanup: (() => void) | undefined;
+  private mlsConversationRecoveryCleanup: (() => void) | undefined;
 
   static get CONFIG() {
     return {
@@ -788,6 +792,12 @@ export class App {
       // resume the notification queue now that we're fully initialized
       this.core.resumeNotificationQueue();
 
+      this.initializeMLSConversationRecovery({
+        conversationRepository,
+        eventRepository,
+        fireAndForgetInvoker,
+      });
+
       return selfUser;
     } catch (error: unknown) {
       return reportStartupFailure(error, {
@@ -806,6 +816,92 @@ export class App {
         .register(`/sw.js?${Environment.version(false)}`)
         .then(({scope}) => this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`));
     }
+  }
+
+  private initializeMLSConversationRecovery({
+    conversationRepository,
+    eventRepository,
+    fireAndForgetInvoker,
+  }: {
+    conversationRepository: ConversationRepository;
+    eventRepository: EventRepository;
+    fireAndForgetInvoker: FireAndForgetInvoker;
+  }): void {
+    const mlsService = this.core.service?.mls;
+    if (!mlsService) {
+      return;
+    }
+
+    let recoveryInProgress = false;
+    const isApplicationActive = () => document.visibilityState === 'visible';
+    const isNotificationSyncLive = () =>
+      eventRepository.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+    const recoverConversations = async (): Promise<void> => {
+      // Atomic check-and-set to prevent concurrent recovery attempts
+      if (recoveryInProgress || !isApplicationActive() || !isNotificationSyncLive()) {
+        return;
+      }
+
+      recoveryInProgress = true;
+      const recoveryTask = await task.tryOrElse(
+        error => error,
+        async () => {
+          if (!(await mlsService.prepareMLSConversationRecovery(this.core.clientId))) {
+            return;
+          }
+
+          const allConversations = await conversationRepository.refreshConversationsForMLSRecovery();
+          const pendingIds = await mlsService.getPendingRecoveryConversationIds();
+
+          // Only process conversations that haven't been recovered yet
+          const conversations = isNonEmptyArray(pendingIds)
+            ? allConversations.filter(conv => pendingIds.some(pending => matchQualifiedIds(pending, conv.qualifiedId)))
+            : allConversations;
+
+          const result = await recoverMLSConversationsInBatches({
+            conversations,
+            conversationRepository,
+            core: this.core,
+            isActive: isApplicationActive,
+            mlsService,
+          });
+
+          if (result.completed && isApplicationActive()) {
+            await mlsService.completeMLSConversationRecovery();
+            this.logger.info('Completed MLS conversation recovery', {
+              recoveredConversationCount: result.recoveredConversationCount,
+            });
+          }
+        },
+      );
+      recoveryInProgress = false;
+
+      if (recoveryTask.isErr) {
+        this.logger.error('Failed to run MLS conversation recovery', recoveryTask.error);
+      }
+    };
+
+    const triggerRecovery = () => fireAndForgetInvoker.fireAndForget(recoverConversations);
+    const handleVisibilityChange = () => {
+      if (isApplicationActive()) {
+        triggerRecovery();
+      }
+    };
+
+    mlsService.on(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED, triggerRecovery);
+    window.addEventListener('focus', triggerRecovery);
+    window.addEventListener('online', triggerRecovery);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    this.mlsConversationRecoveryCleanup = () => {
+      mlsService.off(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED, triggerRecovery);
+      window.removeEventListener('focus', triggerRecovery);
+      window.removeEventListener('online', triggerRecovery);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+
+    triggerRecovery();
   }
 
   private _appInitFailure(error: BaseError) {
@@ -923,6 +1019,11 @@ export class App {
       if (this.newVersionPollingCleanup !== undefined) {
         this.newVersionPollingCleanup();
         this.newVersionPollingCleanup = undefined;
+      }
+
+      if (this.mlsConversationRecoveryCleanup !== undefined) {
+        this.mlsConversationRecoveryCleanup();
+        this.mlsConversationRecoveryCleanup = undefined;
       }
 
       if (selfUser.isActivatedAccount()) {
