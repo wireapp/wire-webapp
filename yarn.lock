@@ -4108,10 +4108,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@enormora/objectory@npm:0.0.21":
-  version: 0.0.21
-  resolution: "@enormora/objectory@npm:0.0.21"
-  checksum: 10/c796f81c5832315d28963a95445806f501cf0b77289d6567967f68cbf35a5b42c2812a949d5c9f4b53780497d3dd6e7ebb6b5190112a878663cce296324da32c
+"@enormora/objectory@npm:0.0.22":
+  version: 0.0.22
+  resolution: "@enormora/objectory@npm:0.0.22"
+  checksum: 10/a25ab9f3d259cf2224db1839dd9f1c2db7445bd5abb2f6ec514351c850f7f4fd4dafae4727a8ce56ba0217790dd0100bd5cf2f798c9d98f37e2adb4a96d09f2e
   languageName: node
   linkType: hard
 
@@ -32597,7 +32597,7 @@ __metadata:
   dependencies:
     "@actions/core": "npm:1.11.1"
     "@emotion/eslint-plugin": "npm:11.12.0"
-    "@enormora/objectory": "npm:0.0.21"
+    "@enormora/objectory": "npm:0.0.22"
     "@faker-js/faker": "npm:9.9.0"
     "@inquirer/prompts": "npm:8.7.1"
     "@ls-lint/ls-lint": "npm:2.3.1"
