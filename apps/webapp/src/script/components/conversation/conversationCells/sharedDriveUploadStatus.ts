@@ -23,6 +23,11 @@ import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
 export type SharedDriveUploadStatusKind = 'uploading' | 'uploaded' | 'failed';
 
+export type DismissedUpload = {
+  readonly conversationQualifiedId: string;
+  readonly uploadId: string;
+};
+
 export type SharedDriveUploadStatus = {
   readonly uploadId: string;
   readonly conversationQualifiedId: string;

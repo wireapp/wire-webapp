@@ -81,6 +81,7 @@ import {
   createSharedDriveUploadController,
 } from './conversationCells/sharedDriveUploadController';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
+import {SharedDriveUploadStatusProvider} from './conversationCells/sharedDriveUploadStatusContext';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
 import {ConversationMessagesWrapper} from './conversationMessagesWrapper/conversationMessagesWrapper';
@@ -699,7 +700,7 @@ function ConversationContent({
         inputProps={getInputProps()}
       >
         {activeConversation && (
-          <>
+          <SharedDriveUploadStatusProvider>
             <TitleBar
               repositories={repositories}
               conversation={activeConversation}
@@ -843,7 +844,7 @@ function ConversationContent({
                 <div className="icon-spinner spin accent-text"></div>
               </div>
             </ConversationMessagesWrapper>
-          </>
+          </SharedDriveUploadStatusProvider>
         )}
 
         {isGiphyModalOpen && inputValue && (

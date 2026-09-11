@@ -19,6 +19,8 @@
 
 import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState} from 'react';
 
+import {maybe} from 'true-myth';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
@@ -30,10 +32,8 @@ import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBi
 import {KEY} from 'Util/keyboardUtil';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
-import {
-  getLatestSharedDriveUploadStatus,
-  type SharedDriveUploadStatus,
-} from '../conversationCells/sharedDriveUploadStatus';
+import {getLatestSharedDriveUploadStatus, type SharedDriveUploadStatus} from '../conversationCells/sharedDriveUploadStatus';
+import {useSharedDriveUploadStatus} from '../conversationCells/sharedDriveUploadStatusContext';
 
 interface ConversationTabsProps {
   activeTabIndex: number;
@@ -58,6 +58,7 @@ export const ConversationTabs = ({
   isUploadStatusIndicatorEnabled,
 }: ConversationTabsProps) => {
   const {translate} = useApplicationContext();
+  const {dismissedUpload} = useSharedDriveUploadStatus();
   const filesUrl = generateConversationUrl({...conversationQualifiedId, filePath: FILE_PATH});
   const messagesUrl = generateConversationUrl(conversationQualifiedId);
   const conversationQualifiedIdString = stringifyQualifiedId(conversationQualifiedId);
@@ -66,6 +67,10 @@ export const ConversationTabs = ({
     [sharedDriveUploadController, conversationQualifiedIdString],
   );
   const [uploadStatus, setUploadStatus] = useState<SharedDriveUploadStatus | null>(readUploadStatus);
+  const isUploadDismissed =
+    maybe.isJust(dismissedUpload) &&
+    dismissedUpload.value.conversationQualifiedId === conversationQualifiedIdString &&
+    uploadStatus?.uploadId === dismissedUpload.value.uploadId;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -130,7 +135,7 @@ export const ConversationTabs = ({
           id="files"
           label={translate('conversationDetailsActionCellsTitle')}
           isActive={activeTabIndex === 1}
-          uploadStatus={isUploadStatusIndicatorEnabled ? uploadStatus : null}
+          uploadStatus={isUploadStatusIndicatorEnabled && !isUploadDismissed ? uploadStatus : null}
           onClick={event => {
             createNavigate(filesUrl)(event);
             onIndexChange(1);
