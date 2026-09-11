@@ -78,14 +78,20 @@ export const toSharedDriveUploadStatus = (
   };
 };
 
+export const getSharedDriveUploadStatuses = (
+  controller: SharedDriveUploadController,
+  conversationQualifiedId: string,
+): SharedDriveUploadStatus[] =>
+  controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
+    const status = toSharedDriveUploadStatus(snapshot, conversationQualifiedId);
+    return status ? [status] : [];
+  });
+
 export const getLatestSharedDriveUploadStatus = (
   controller: SharedDriveUploadController,
   conversationQualifiedId: string,
 ): SharedDriveUploadStatus | null => {
-  const statuses = controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
-    const status = toSharedDriveUploadStatus(snapshot, conversationQualifiedId);
-    return status ? [status] : [];
-  });
+  const statuses = getSharedDriveUploadStatuses(controller, conversationQualifiedId);
 
   return statuses[statuses.length - 1] ?? null;
 };

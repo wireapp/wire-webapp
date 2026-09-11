@@ -183,6 +183,40 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await waitFor(() => expect(view.queryByRole('status')).not.toBeInTheDocument());
   });
 
+  it('dismisses a successful upload from the header close action', async () => {
+    const user = userEvent.setup();
+    const controller = createController(uploadedState);
+    const view = renderHost(controller, conversationQualifiedId);
+
+    const close = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'cells.uploadStatus.closeAriaLabel',
+    });
+    expect(close).toHaveTextContent('fileCardDefaultCloseButtonLabel');
+
+    await user.click(close);
+
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('does not show close for a failed upload because retry is still actionable', () => {
+    const controller = createController(failedState);
+    const view = renderHost(controller, conversationQualifiedId);
+
+    expect(view.queryByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).not.toBeInTheDocument();
+  });
+
+  it('does not show close when the latest upload succeeded but another upload is still actionable', () => {
+    const controller = createController(uploadedState);
+    controller.snapshots.mockImplementation(scope =>
+      scope === conversationQualifiedId ? [failedState, uploadedState] : [],
+    );
+
+    const view = renderHost(controller, conversationQualifiedId);
+
+    expect(view.getByText('cells.uploadStatus.uploaded')).toBeInTheDocument();
+    expect(view.queryByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).not.toBeInTheDocument();
+  });
+
   it('calls retry for a failed upload and prevents concurrent retries', async () => {
     const user = userEvent.setup();
     const controller = createController(failedState);

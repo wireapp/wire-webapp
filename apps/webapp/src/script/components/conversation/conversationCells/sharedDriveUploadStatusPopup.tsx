@@ -64,6 +64,8 @@ interface SharedDriveUploadStatusPopupProps {
   readonly toggleLabel: string;
   readonly cancelLabel: string;
   readonly dismissLabel?: string;
+  readonly dismissAriaLabel?: string;
+  readonly canDismiss?: boolean;
   readonly retryLabel: string;
   readonly isCancelling: boolean;
   readonly isRetrying: boolean;
@@ -116,6 +118,8 @@ export const SharedDriveUploadStatusPopup = ({
   toggleLabel,
   cancelLabel,
   dismissLabel = cancelLabel,
+  dismissAriaLabel = dismissLabel,
+  canDismiss = upload.kind === 'uploaded',
   retryLabel,
   isCancelling,
   isRetrying,
@@ -194,6 +198,17 @@ export const SharedDriveUploadStatusPopup = ({
               {cancelLabel}
             </button>
           )}
+          {canDismiss && (
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+              aria-label={dismissAriaLabel}
+              data-uie-name="shared-drive-upload-header-dismiss"
+              onClick={() => onDismiss?.()}
+            >
+              {dismissLabel}
+            </button>
+          )}
           <button
             type="button"
             css={sharedDriveUploadStatusPopupToggleStyles}
@@ -240,21 +255,6 @@ export const SharedDriveUploadStatusPopup = ({
               onClick={onRetry}
             >
               <ReloadIcon
-                css={sharedDriveUploadStatusPopupRowActionIconStyles}
-                color="currentColor"
-                aria-hidden="true"
-              />
-            </button>
-          )}
-          {upload.canRetry && (
-            <button
-              type="button"
-              css={sharedDriveUploadStatusPopupRowActionButtonStyles}
-              aria-label={dismissLabel}
-              data-uie-name="shared-drive-upload-dismiss"
-              onClick={() => onDismiss?.()}
-            >
-              <CloseIcon
                 css={sharedDriveUploadStatusPopupRowActionIconStyles}
                 color="currentColor"
                 aria-hidden="true"
