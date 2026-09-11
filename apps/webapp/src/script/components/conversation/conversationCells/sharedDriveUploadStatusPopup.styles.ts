@@ -229,8 +229,8 @@ export const sharedDriveUploadStatusPopupRowIconStyles: CSSObject = {
 };
 
 export const sharedDriveUploadStatusPopupUploadSpinnerStyles: CSSObject = {
-  transformBox: 'fill-box',
-  transformOrigin: 'center',
+  transformBox: 'view-box',
+  transformOrigin: '12px 12px',
   animation: 'shared-drive-upload-spinner 1s linear infinite',
   '@keyframes shared-drive-upload-spinner': {
     from: {transform: 'rotate(0deg)'},
