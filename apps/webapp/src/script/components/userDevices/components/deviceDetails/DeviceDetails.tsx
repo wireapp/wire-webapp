@@ -18,6 +18,7 @@
  */
 
 import {useEffect, useMemo, useState} from 'react';
+import type {ReactNode} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -31,9 +32,12 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/e2eIdentity';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import type {Logger} from 'Util/logger';
 import {splitFingerprint} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
@@ -55,6 +59,80 @@ interface DeviceDetailsProps {
   user: User;
 }
 
+type RenderDeviceDetailsHeadlineOptions = {
+  readonly isReactTranslationRenderingEnabled: boolean;
+  readonly translate: Translate;
+  readonly userName: string;
+};
+
+const deviceDetailsBoldMarker = createReactTranslationMarker('device-details-bold');
+const deviceDetailsUserMarker = createReactTranslationMarker('device-details-user');
+
+function translateDeviceDetailsHeadline(translate: Translate, userName: string): string {
+  return translate('participantDevicesDetailHeadline', {user: userName});
+}
+
+function translateDeviceDetailsHeadlineWithReactMarkers(translate: Translate): string {
+  return translate(
+    'participantDevicesDetailHeadline',
+    {user: deviceDetailsUserMarker.substitution},
+    {
+      '/bold': deviceDetailsBoldMarker.end,
+      bold: deviceDetailsBoldMarker.start,
+    },
+  );
+}
+
+function normalizeDeviceDetailsHeadlineFormatting(translatedText: string): string {
+  const boldMarkerStartIndex = translatedText.indexOf(deviceDetailsBoldMarker.start);
+  const boldMarkerEndIndex = translatedText.indexOf(deviceDetailsBoldMarker.end);
+
+  if (boldMarkerStartIndex === -1) {
+    return boldMarkerEndIndex === -1 ? translatedText : translatedText.replace(deviceDetailsBoldMarker.end, '');
+  }
+
+  if (boldMarkerEndIndex === -1) {
+    return `${translatedText}${deviceDetailsBoldMarker.end}`;
+  }
+
+  if (boldMarkerStartIndex < boldMarkerEndIndex) {
+    return translatedText;
+  }
+
+  return `${translatedText.replace(deviceDetailsBoldMarker.end, '')}${deviceDetailsBoldMarker.end}`;
+}
+
+function renderDeviceDetailsHeadline(options: RenderDeviceDetailsHeadlineOptions): ReactNode {
+  const {isReactTranslationRenderingEnabled, translate, userName} = options;
+
+  if (isReactTranslationRenderingEnabled) {
+    const translatedText = normalizeDeviceDetailsHeadlineFormatting(
+      translateDeviceDetailsHeadlineWithReactMarkers(translate),
+    );
+
+    return (
+      <span>
+        {renderReactTranslation({
+          translatedText,
+          componentReplacements: [
+            {
+              start: deviceDetailsBoldMarker.start,
+              end: deviceDetailsBoldMarker.end,
+              render(children): ReactNode {
+                return <strong>{children}</strong>;
+              },
+            },
+          ],
+          nodeReplacements: [],
+          valueReplacements: [{marker: deviceDetailsUserMarker, runtimeText: userName}],
+        })}
+      </span>
+    );
+  }
+
+  return <span dangerouslySetInnerHTML={{__html: translateDeviceDetailsHeadline(translate, userName)}} />;
+}
+
 export const DeviceDetails = ({
   device,
   cryptographyRepository,
@@ -67,7 +145,7 @@ export const DeviceDetails = ({
   logger,
   conversationState = container.resolve(ConversationState),
 }: DeviceDetailsProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const [fingerprintRemote, setFingerprintRemote] = useState<string>();
   const [isResettingSession, setIsResettingSession] = useState(false);
 
@@ -75,6 +153,7 @@ export const DeviceDetails = ({
 
   const {isVerified} = useKoSubscribableChildren(clientMeta, ['isVerified']);
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
+  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   useEffect(() => {
     setFingerprintRemote(undefined);
@@ -121,11 +200,7 @@ export const DeviceDetails = ({
         </h3>
 
         <p className="panel__info-text">
-          <span
-            dangerouslySetInnerHTML={{
-              __html: translate('participantDevicesDetailHeadline', {user: userName}),
-            }}
-          />
+          {renderDeviceDetailsHeadline({isReactTranslationRenderingEnabled, translate, userName})}
 
           <a
             className="participant-devices__link accent-text"
