@@ -46,7 +46,7 @@ export const MeetingMultiActionButton = ({
         data-uie-name="meet-now"
         css={callingButtonStyles}
       >
-        <CallIcon css={callingButtonIconStyles} /> {translate('meetings.action.meetNow')}
+        <CallIcon css={callingButtonIconStyles} aria-hidden="true" /> {translate('meetings.action.meetNow')}
       </Button>
       <Button
         className="buttons-group-button buttons-group-button-right"
@@ -55,7 +55,7 @@ export const MeetingMultiActionButton = ({
         data-uie-name="schedule-meeting"
         css={callingButtonStyles}
       >
-        <CalendarIcon css={callingButtonIconStyles} /> {translate('meetings.action.scheduleMeeting')}
+        <CalendarIcon css={callingButtonIconStyles} aria-hidden="true" /> {translate('meetings.action.scheduleMeeting')}
       </Button>
     </div>
   );
