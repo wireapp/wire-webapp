@@ -19,7 +19,7 @@
 
 import type {ReactNode} from 'react';
 
-import {AlertIcon, ChevronIcon, CloseIcon, ReloadIcon, UploadIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon, ChevronIcon, CloseIcon, ReloadIcon, SharedDriveUploadStatusIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {getFileExtension} from 'Util/util';
@@ -76,9 +76,8 @@ interface SharedDriveUploadStatusPopupProps {
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
   if (upload.kind === 'uploading') {
     return (
-      <UploadIcon
+      <SharedDriveUploadStatusIcon
         css={sharedDriveUploadStatusPopupRowIconStyles}
-        color="currentColor"
         aria-hidden="true"
         data-uie-name="shared-drive-upload-uploading"
       />
