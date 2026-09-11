@@ -228,19 +228,6 @@ export const sharedDriveUploadStatusPopupRowIconStyles: CSSObject = {
   flex: '0 0 auto',
 };
 
-export const sharedDriveUploadStatusPopupUploadSpinnerStyles: CSSObject = {
-  transformBox: 'view-box',
-  transformOrigin: '12px 12px',
-  animation: 'shared-drive-upload-spinner 1s linear infinite',
-  '@keyframes shared-drive-upload-spinner': {
-    from: {transform: 'rotate(0deg)'},
-    to: {transform: 'rotate(360deg)'},
-  },
-  '@media (prefers-reduced-motion: reduce)': {
-    animation: 'none',
-  },
-};
-
 export const sharedDriveUploadStatusPopupErrorIconStyles: CSSObject = {
   display: 'flex',
   width: 24,
