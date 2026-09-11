@@ -19,7 +19,7 @@
 
 import type {CSSObject} from '@emotion/react';
 
-import {SVGIcon, SVGIconProps} from './svgIcon';
+import type {SVGIconProps} from './svgIcon';
 
 const spinnerStyles: CSSObject = {
   transformBox: 'view-box',
@@ -35,7 +35,7 @@ const spinnerStyles: CSSObject = {
 };
 
 export const SharedDriveUploadStatusIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={24} realHeight={25} {...props}>
+  <svg width="24" height="25" viewBox="0 0 24 25" fill="none" {...props}>
     <circle cx="12" cy="12" r="11.25" fill="none" stroke="var(--accent-color-highlight, #e7f0fa)" strokeWidth="1.5" />
     <g css={spinnerStyles}>
       <path
@@ -48,5 +48,5 @@ export const SharedDriveUploadStatusIcon = (props: SVGIconProps) => (
       d="M11.3418 9.91852L7.90336 13.3569L6.97528 12.4289L12.0001 7.40405L17.0249 12.4289L16.0968 13.3569L12.6543 9.91439L12.6543 16.5916L11.3418 16.5916L11.3418 9.91852Z"
       fill="var(--accent-color, #0667c8)"
     />
-  </SVGIcon>
+  </svg>
 );
