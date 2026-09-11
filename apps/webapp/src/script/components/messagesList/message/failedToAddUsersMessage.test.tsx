@@ -27,6 +27,7 @@ import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Reposito
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -37,19 +38,53 @@ import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
 import {translateForTest} from 'Util/test/translateForTest';
 
 setStrings({en});
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translate}));
+const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    isFeatureToggleEnabled(featureName): boolean {
+      return featureName === reactTranslationRenderingFeatureToggleName;
+    },
+    translate,
+  }),
+);
+
+type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
+
+function withTranslationStrings(
+  strings: typeof en,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
+  return async function runTranslationTest(): Promise<void> {
+    setStrings({en: strings});
+
+    try {
+      await testFunction();
+    } finally {
+      setStrings({en});
+    }
+  };
+}
 
 function withTheme(component: React.ReactNode): React.ReactElement {
-  return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children: component})}</StyledApp>;
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{legacyRootProviderWrapper({children: component})}</StyledApp>;
+}
+
+function withReactTranslationTheme(component: React.ReactNode): React.ReactElement {
+  return (
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      {reactTranslationRenderingRootProviderWrapper({children: component})}
+    </StyledApp>
+  );
 }
 
 const createFailedToAddUsersMessages = (
   failures: AddUsersFailure[] = [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}],
-) => {
+): FailedToAddUsersMessageEntity => {
   return new FailedToAddUsersMessageEntity(failures, Date.now(), translateForTest);
 };
 
-function createUser(qualifiedId: QualifiedId, name: string) {
+function createUser(qualifiedId: QualifiedId, name: string): User {
   const user = new User(qualifiedId.id, qualifiedId.domain, translateForTest);
   user.name(name);
   return user;
@@ -300,4 +335,157 @@ describe('FailedToAddUsersMessage', () => {
 
     expect(details3.length).toBeGreaterThanOrEqual(1);
   });
+
+  it(
+    'renders a single-user unreachable-backend summary with opaque runtime text when enabled',
+    withTranslationStrings(en, () => {
+      const userState = new UserState();
+      const [qualifiedId] = generateQualifiedIds(1, 'backend.<example>');
+      const user = createUser(qualifiedId, 'R&D <Test>');
+      userState.users.push(user);
+
+      const message = createFailedToAddUsersMessages([
+        {
+          users: [qualifiedId],
+          reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+          backends: [],
+        },
+      ]);
+
+      const {getByTestId} = render(
+        withReactTranslationTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+      );
+      const messageDetails = getByTestId('1-user-not-added-details');
+      const strongElements = messageDetails.querySelectorAll('strong');
+      const learnMoreLink = getByTestId('go-offline-backend');
+
+      expect(messageDetails).toHaveTextContent(
+        'R&D <Test> could not be added to the group as the backend of backend.<example> could not be reached.',
+      );
+      expect(strongElements).toHaveLength(2);
+      expect(strongElements[0]).toHaveTextContent('R&D <Test>');
+      expect(strongElements[1]).toHaveTextContent('backend.<example>');
+      expect(messageDetails.querySelector('test')).toBeNull();
+      expect(messageDetails.querySelector('example')).toBeNull();
+      expect(learnMoreLink).toHaveTextContent('Learn more');
+      expect(learnMoreLink).toHaveAttribute('data-uie-name', 'go-offline-backend');
+      expect(learnMoreLink).toHaveAttribute('target', '_blank');
+    }),
+  );
+
+  it(
+    'keeps translation-looking and internal-marker-looking names literal when enabled',
+    withTranslationStrings(en, () => {
+      const runtimeNames = [
+        '[bold]Admin[/bold]',
+        '__wire_react_translation_name_start__value__wire_react_translation_name_end__',
+      ];
+
+      for (const runtimeName of runtimeNames) {
+        const userState = new UserState();
+        const [qualifiedId] = generateQualifiedIds(1, 'test.domain');
+        const user = createUser(qualifiedId, runtimeName);
+        userState.users.push(user);
+
+        const message = createFailedToAddUsersMessages([
+          {
+            users: [qualifiedId],
+            reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+            backends: [],
+          },
+        ]);
+
+        const {getByTestId, unmount} = render(
+          withReactTranslationTheme(
+            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
+          ),
+        );
+        const messageDetails = getByTestId('1-user-not-added-details');
+        const nameStrongElement = messageDetails.querySelector('strong');
+
+        expect(messageDetails).toHaveTextContent(runtimeName);
+        expect(nameStrongElement).toHaveTextContent(runtimeName);
+        expect(nameStrongElement?.querySelector('strong')).toBeNull();
+
+        unmount();
+      }
+    }),
+  );
+
+  it(
+    'keeps unsupported summary markup as text and preserves translated name and domain placement',
+    withTranslationStrings(
+      {
+        ...en,
+        failedToAddParticipantSingularOfflineBackend:
+          '<img src="example">The backend {domain} rejected [bold]{name}[/bold].',
+      },
+      () => {
+        const userState = new UserState();
+        const [qualifiedId] = generateQualifiedIds(1, '[bold]backend[/bold]');
+        const user = createUser(qualifiedId, 'R&D <Test>');
+        userState.users.push(user);
+
+        const message = createFailedToAddUsersMessages([
+          {
+            users: [qualifiedId],
+            reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+            backends: [],
+          },
+        ]);
+
+        const {getByTestId} = render(
+          withReactTranslationTheme(
+            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
+          ),
+        );
+        const messageDetails = getByTestId('1-user-not-added-details');
+
+        expect(messageDetails).toHaveTextContent(
+          '<img src="example">The backend [bold]backend[/bold] rejected R&D <Test>.',
+        );
+        expect(messageDetails.querySelector('img')).toBeNull();
+        expect(messageDetails.querySelectorAll('strong')).toHaveLength(1);
+        expect(messageDetails.querySelector('strong')).toHaveTextContent('R&D <Test>');
+      },
+    ),
+  );
+
+  it(
+    'renders a translator-positioned plural summary through React',
+    withTranslationStrings(
+      {
+        ...en,
+        failedToAddParticipantsPlural:
+          '<meta name="example" content="value">Rejected: [bold]participants total={total}[/bold].',
+      },
+      () => {
+        const userState = new UserState();
+        const qualifiedIds = generateQualifiedIds(2, 'test.domain');
+        userState.users(qualifiedIds.map(qualifiedId => createUser(qualifiedId, qualifiedId.id)));
+
+        const message = createFailedToAddUsersMessages([
+          {
+            users: qualifiedIds,
+            reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG,
+          },
+        ]);
+
+        const {getByTestId} = render(
+          withReactTranslationTheme(
+            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
+          ),
+        );
+        const messageSummary = getByTestId('element-message-failed-to-add-users');
+
+        expect(messageSummary).toHaveAttribute('data-uie-value', 'multi-users-not-added');
+        expect(messageSummary).toHaveTextContent(
+          '<meta name="example" content="value">Rejected: participants total=2.',
+        );
+        expect(messageSummary.querySelector('meta')).toBeNull();
+        expect(messageSummary.querySelectorAll('strong')).toHaveLength(1);
+        expect(messageSummary.querySelector('strong')).toHaveTextContent('participants total=2');
+      },
+    ),
+  );
 });
