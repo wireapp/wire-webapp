@@ -94,12 +94,12 @@ const renderTabs = (
     <ThemeProvider>
       <SharedDriveUploadStatusProvider initialDismissedUpload={dismissedUpload}>
         <ConversationTabs
-        activeTabIndex={0}
-        onIndexChange={jest.fn()}
-        conversationQualifiedId={conversationQualifiedId}
-        sharedDriveUploadController={controller}
-        isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
-        dismissedUpload={dismissedUpload}
+          activeTabIndex={0}
+          onIndexChange={jest.fn()}
+          conversationQualifiedId={conversationQualifiedId}
+          sharedDriveUploadController={controller}
+          isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
+          dismissedUpload={dismissedUpload}
         />
       </SharedDriveUploadStatusProvider>
     </ThemeProvider>,
@@ -151,7 +151,11 @@ describe('ConversationTabs', () => {
 
   it('does not render a dismissed shared drive upload indicator', () => {
     const {controller} = createController(uploadedState);
-    const view = renderTabs(controller, true, Maybe.just({conversationQualifiedId: conversationQualifiedIdString, uploadId: 'upload-1'}));
+    const view = renderTabs(
+      controller,
+      true,
+      Maybe.just({conversationQualifiedId: conversationQualifiedIdString, uploadId: 'upload-1'}),
+    );
 
     expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
     expect(view.queryByRole('status')).not.toBeInTheDocument();
