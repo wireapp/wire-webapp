@@ -29,6 +29,7 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
+import type {DismissedUpload} from '../conversationCells/sharedDriveUploadStatus';
 
 import {ConversationTabs} from './conversationTabs';
 import {SharedDriveUploadStatusProvider} from '../conversationCells/sharedDriveUploadStatusContext';
@@ -88,7 +89,7 @@ const createController = (state: UploadState | null = null) => {
 const renderTabs = (
   controller: SharedDriveUploadController,
   isUploadStatusIndicatorEnabled = true,
-  dismissedUpload = Maybe.nothing(),
+  dismissedUpload: Maybe<DismissedUpload> = Maybe.nothing<DismissedUpload>(),
 ) =>
   render(
     <ThemeProvider>
@@ -99,7 +100,6 @@ const renderTabs = (
           conversationQualifiedId={conversationQualifiedId}
           sharedDriveUploadController={controller}
           isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
-          dismissedUpload={dismissedUpload}
         />
       </SharedDriveUploadStatusProvider>
     </ThemeProvider>,
