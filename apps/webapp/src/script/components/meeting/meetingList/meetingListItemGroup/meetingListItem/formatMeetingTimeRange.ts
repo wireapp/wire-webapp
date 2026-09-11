@@ -17,12 +17,30 @@
  *
  */
 
-import {formatLocale} from 'Util/timeUtil';
+import {getRegionalDateLocale} from 'Util/timeUtil';
+
+const timeFormatterOptions: Intl.DateTimeFormatOptions = {
+  hour: '2-digit',
+  minute: '2-digit',
+};
+
+const getTimeParts = (date: Date): Intl.DateTimeFormatPart[] =>
+  new Intl.DateTimeFormat(getRegionalDateLocale(), timeFormatterOptions).formatToParts(date);
+
+const formatTime = (parts: Intl.DateTimeFormatPart[], includeDayPeriod: boolean): string =>
+  parts
+    .filter(({type}) => includeDayPeriod || type !== 'dayPeriod')
+    .map(({value}) => value)
+    .join('')
+    .trim()
+    .replace(/[\u00a0\u202f]/g, ' ');
 
 export const formatMeetingTimeRange = (start: Date, end: Date): string => {
-  const sameMeridiem = formatLocale(start, 'a') === formatLocale(end, 'a');
+  const startParts = getTimeParts(start);
+  const endParts = getTimeParts(end);
+  const startDayPeriod = startParts.find(({type}) => type === 'dayPeriod')?.value;
+  const endDayPeriod = endParts.find(({type}) => type === 'dayPeriod')?.value;
+  const sameDayPeriod = startDayPeriod === endDayPeriod;
 
-  return sameMeridiem
-    ? `${formatLocale(start, 'hh:mm')} - ${formatLocale(end, 'hh:mm a')}`
-    : `${formatLocale(start, 'hh:mm a')} - ${formatLocale(end, 'hh:mm a')}`;
+  return `${formatTime(startParts, !sameDayPeriod)} - ${formatTime(endParts, true)}`;
 };

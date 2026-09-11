@@ -47,6 +47,7 @@ export interface TimePickerFieldProps {
   ariaLabel?: string;
   markInvalid?: boolean;
   disabled?: boolean;
+  locale?: string;
   /** When set, only time options strictly after this time of day are shown. */
   minTime?: Date | null;
   menuPortalTarget?: HTMLElement;
@@ -64,6 +65,7 @@ export const TimePickerField = ({
   ariaLabel,
   markInvalid = false,
   disabled = false,
+  locale,
   minTime = null,
   menuPortalTarget,
   menuPlacement = 'bottom',
@@ -71,7 +73,7 @@ export const TimePickerField = ({
   wrapperCSS = {},
 }: TimePickerFieldProps) => {
   const timeOptions = useMemo(() => {
-    let options = buildTimeOptions();
+    let options = buildTimeOptions(locale);
 
     if (minTime !== null) {
       options = filterTimeOptionsAfter(options, minTime);
@@ -82,7 +84,7 @@ export const TimePickerField = ({
     }
 
     return options;
-  }, [minTime, value]);
+  }, [locale, minTime, value]);
   const portalTarget = menuPortalTarget ?? (typeof document !== 'undefined' ? document.body : undefined);
   const labelId = `${id}-label`;
 

@@ -22,58 +22,78 @@ import type {Option} from '../select';
 export const TIME_INTERVAL_MINUTES = 15;
 export const TIME_OPTIONS_COUNT = 96;
 
+const HOURS_PER_HALF_DAY = 12;
+const MINUTES_PER_HOUR = 60;
+const TIME_LABEL_DIGITS = 2;
+const TIME_LABEL_REFERENCE_YEAR = 2026;
+
+const timeFormatterOptions: Intl.DateTimeFormatOptions = {
+  hour: 'numeric',
+  minute: '2-digit',
+};
+
+const getTimeFormatter = (locale: string = navigator.language): Intl.DateTimeFormat =>
+  new Intl.DateTimeFormat(locale, timeFormatterOptions);
+
 export const parseTimeLabel = (value: string | number): {hour24: number; minutes: number} => {
-  const [timePart, periodPart] = `${value}`.trim().split(' ');
+  const [timePart, periodPart] = `${value}`.trim().split(/\s+/);
   const [hourPart, minutePart] = (Boolean(timePart) ? timePart : '').split(':');
   const hour = Number(hourPart);
   const minutes = Number(minutePart);
   const isPm = (Boolean(periodPart) ? periodPart : '').toUpperCase() === 'PM';
   let hour24 = 0;
   if (Number.isFinite(hour)) {
-    hour24 = isPm ? (hour % 12) + 12 : hour % 12;
+    if (Boolean(periodPart)) {
+      hour24 = isPm ? (hour % HOURS_PER_HALF_DAY) + HOURS_PER_HALF_DAY : hour % HOURS_PER_HALF_DAY;
+    } else {
+      hour24 = hour;
+    }
   }
   const safeMinutes = Number.isFinite(minutes) ? minutes : 0;
 
   return {hour24, minutes: safeMinutes};
 };
 
-export const formatTimeLabel = (hour24: number, minutes: number): string => {
-  const hour12 = ((hour24 + 11) % 12) + 1;
-  const period = hour24 < 12 ? 'AM' : 'PM';
-  return `${hour12}:${String(minutes).padStart(2, '0')} ${period}`;
+export const formatTimeLabel = (hour24: number, minutes: number, locale?: string): string => {
+  const date = new Date(TIME_LABEL_REFERENCE_YEAR, 0, 1, hour24, minutes);
+  return getTimeFormatter(locale)
+    .format(date)
+    .replace(/[\u00a0\u202f]/g, ' ');
 };
 
-export const buildTimeOptions = (): Option[] =>
-  Array.from({length: TIME_OPTIONS_COUNT}, (_, index) => {
+export const buildTimeOptions = (locale?: string): Option[] =>
+  Array.from({length: TIME_OPTIONS_COUNT}, (_value, index) => {
     const totalMinutes = index * TIME_INTERVAL_MINUTES;
-    const hour24 = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    const label = formatTimeLabel(hour24, minutes);
-    return {value: label, label};
+    const hour24 = Math.floor(totalMinutes / MINUTES_PER_HOUR);
+    const minutes = totalMinutes % MINUTES_PER_HOUR;
+    const value = `${String(hour24).padStart(TIME_LABEL_DIGITS, '0')}:${String(minutes).padStart(TIME_LABEL_DIGITS, '0')}`;
+    return {value, label: formatTimeLabel(hour24, minutes, locale)};
   });
 
 export const getTimeOptionTotalMinutes = (option: Option): number => {
   const {hour24, minutes} = parseTimeLabel(option.value);
-  return hour24 * 60 + minutes;
+  return hour24 * MINUTES_PER_HOUR + minutes;
 };
 
 export const filterTimeOptionsAfter = (options: Option[], minTime: Date): Option[] => {
-  const minTotalMinutes = minTime.getHours() * 60 + minTime.getMinutes();
+  const minTotalMinutes = minTime.getHours() * MINUTES_PER_HOUR + minTime.getMinutes();
 
   return options.filter(option => getTimeOptionTotalMinutes(option) > minTotalMinutes);
 };
 
-export const timeOptionFromDate = (date: Date): Option => {
-  const label = formatTimeLabel(date.getHours(), date.getMinutes());
-  return {value: label, label};
+export const timeOptionFromDate = (date: Date, locale?: string): Option => {
+  const hour24 = date.getHours();
+  const minutes = date.getMinutes();
+  const value = `${String(hour24).padStart(TIME_LABEL_DIGITS, '0')}:${String(minutes).padStart(TIME_LABEL_DIGITS, '0')}`;
+  return {value, label: formatTimeLabel(hour24, minutes, locale)};
 };
 
-export const nearestTimeOptionFromDate = (date: Date): Option => {
-  const totalMinutes = date.getHours() * 60 + date.getMinutes();
+export const nearestTimeOptionFromDate = (date: Date, locale?: string): Option => {
+  const totalMinutes = date.getHours() * MINUTES_PER_HOUR + date.getMinutes();
   const roundedMinutes = Math.round(totalMinutes / TIME_INTERVAL_MINUTES) * TIME_INTERVAL_MINUTES;
   const normalizedMinutes = Math.min(roundedMinutes, (TIME_OPTIONS_COUNT - 1) * TIME_INTERVAL_MINUTES);
-  const hour24 = Math.floor(normalizedMinutes / 60);
-  const minutes = normalizedMinutes % 60;
-  const label = formatTimeLabel(hour24, minutes);
-  return {value: label, label};
+  const hour24 = Math.floor(normalizedMinutes / MINUTES_PER_HOUR);
+  const minutes = normalizedMinutes % MINUTES_PER_HOUR;
+  const value = `${String(hour24).padStart(TIME_LABEL_DIGITS, '0')}:${String(minutes).padStart(TIME_LABEL_DIGITS, '0')}`;
+  return {value, label: formatTimeLabel(hour24, minutes, locale)};
 };
