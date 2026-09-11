@@ -19,6 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {Maybe} from 'true-myth';
 
 import type {UploadState} from 'Repositories/cells/upload';
 import {
@@ -28,8 +29,10 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
+import type {DismissedUpload} from '../conversationCells/sharedDriveUploadStatus';
 
 import {ConversationTabs} from './conversationTabs';
+import {SharedDriveUploadStatusProvider} from '../conversationCells/sharedDriveUploadStatusContext';
 
 const conversationQualifiedId = {id: 'conversation', domain: 'example.com'};
 const conversationQualifiedIdString = 'conversation@example.com';
@@ -83,16 +86,22 @@ const createController = (state: UploadState | null = null) => {
   };
 };
 
-const renderTabs = (controller: SharedDriveUploadController, isUploadStatusIndicatorEnabled = true) =>
+const renderTabs = (
+  controller: SharedDriveUploadController,
+  isUploadStatusIndicatorEnabled = true,
+  dismissedUpload: Maybe<DismissedUpload> = Maybe.nothing<DismissedUpload>(),
+) =>
   render(
     <ThemeProvider>
-      <ConversationTabs
-        activeTabIndex={0}
-        onIndexChange={jest.fn()}
-        conversationQualifiedId={conversationQualifiedId}
-        sharedDriveUploadController={controller}
-        isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
-      />
+      <SharedDriveUploadStatusProvider initialDismissedUpload={dismissedUpload}>
+        <ConversationTabs
+          activeTabIndex={0}
+          onIndexChange={jest.fn()}
+          conversationQualifiedId={conversationQualifiedId}
+          sharedDriveUploadController={controller}
+          isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
+        />
+      </SharedDriveUploadStatusProvider>
     </ThemeProvider>,
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
   );
@@ -138,6 +147,18 @@ describe('ConversationTabs', () => {
     expect(view.getByTestId('shared-drive-tab-upload-completed')).toBeInTheDocument();
     expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.failed');
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
+  });
+
+  it('does not render a dismissed shared drive upload indicator', () => {
+    const {controller} = createController(uploadedState);
+    const view = renderTabs(
+      controller,
+      true,
+      Maybe.just({conversationQualifiedId: conversationQualifiedIdString, uploadId: 'upload-1'}),
+    );
+
+    expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('does not render a shared drive upload icon when the indicator is disabled', () => {

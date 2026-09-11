@@ -25,13 +25,13 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatBytes} from 'Util/util';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {getLatestSharedDriveUploadStatus, getSharedDriveUploadStatuses} from './sharedDriveUploadStatus';
+import {
+  getLatestSharedDriveUploadStatus,
+  getSharedDriveUploadStatuses,
+  type DismissedUpload,
+} from './sharedDriveUploadStatus';
+import {useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
-
-type DismissedUpload = {
-  readonly conversationQualifiedId: string;
-  readonly uploadId: string;
-};
 
 interface SharedDriveUploadStatusPopupHostProps {
   readonly controller: SharedDriveUploadController;
@@ -47,6 +47,11 @@ export const SharedDriveUploadStatusPopupHost = ({
   isFileTabActive,
 }: SharedDriveUploadStatusPopupHostProps) => {
   const {translate} = useApplicationContext();
+  const {
+    dismissedUpload: contextDismissedUpload,
+    dismissUpload: onDismissUpload,
+    isProvided,
+  } = useSharedDriveUploadStatus();
   const readStatus = useCallback(
     () => getLatestSharedDriveUploadStatus(controller, conversationQualifiedId),
     [controller, conversationQualifiedId],
@@ -58,7 +63,15 @@ export const SharedDriveUploadStatusPopupHost = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [cancellingUploadId, setCancellingUploadId] = useState<Maybe<string>>(Maybe.nothing());
   const [retryingUploadId, setRetryingUploadId] = useState<Maybe<string>>(Maybe.nothing());
-  const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(Maybe.nothing());
+  const [localDismissedUpload, setLocalDismissedUpload] = useState<Maybe<DismissedUpload>>(Maybe.nothing());
+  const dismissedUpload = isProvided ? contextDismissedUpload : localDismissedUpload;
+  const dismissUpload = useCallback(
+    (upload: DismissedUpload) => {
+      setLocalDismissedUpload(Maybe.just(upload));
+      onDismissUpload(upload);
+    },
+    [onDismissUpload],
+  );
   const upload = status.conversationQualifiedId === conversationQualifiedId ? status.upload : readStatus();
   const uploadStatuses = getSharedDriveUploadStatuses(controller, conversationQualifiedId);
   const canDismissUploadStatus =
@@ -75,7 +88,7 @@ export const SharedDriveUploadStatusPopupHost = ({
         return;
       }
 
-      setDismissedUpload(Maybe.just({conversationQualifiedId, uploadId}));
+      dismissUpload({conversationQualifiedId, uploadId});
       setCancellingUploadId(Maybe.just(uploadId));
       const finishCancellation = () =>
         setCancellingUploadId(current =>
@@ -83,7 +96,7 @@ export const SharedDriveUploadStatusPopupHost = ({
         );
       void controller.cancel(uploadId).then(finishCancellation, finishCancellation);
     },
-    [cancellingUploadId, controller, conversationQualifiedId],
+    [cancellingUploadId, controller, conversationQualifiedId, dismissUpload],
   );
 
   const retryUpload = useCallback(
@@ -150,7 +163,7 @@ export const SharedDriveUploadStatusPopupHost = ({
       onToggle={() => setIsExpanded(expanded => !expanded)}
       onCancel={() => cancelUpload(upload.uploadId)}
       onRetry={() => retryUpload(upload.uploadId)}
-      onDismiss={() => setDismissedUpload(Maybe.just({conversationQualifiedId, uploadId: upload.uploadId}))}
+      onDismiss={() => dismissUpload({conversationQualifiedId, uploadId: upload.uploadId})}
     />
   );
 };
