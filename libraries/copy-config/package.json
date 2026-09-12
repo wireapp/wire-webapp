@@ -18,7 +18,7 @@
     "copy": "0.3.2",
     "cosmiconfig": "9.0.2",
     "fs-extra": "11.4.0",
-    "jszip": "3.10.1",
+    "jszip": "3.10.2",
     "logdown": "3.3.1",
     "noop-esm": "1.1.0",
     "rimraf": "6.1.3"
