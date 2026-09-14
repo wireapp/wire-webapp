@@ -154,9 +154,15 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(
       within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {name: 'Cancel all'}),
     ).toBeInTheDocument();
-    expect(within(rows[0]).getByText('report.pdf')).toBeInTheDocument();
-    expect(within(rows[1]).getByText('second.jpg')).toBeInTheDocument();
-    expect(within(rows[2]).getByText('report.pdf')).toBeInTheDocument();
+    expect(Array.from(rows).map(row => row.querySelector('strong')?.textContent)).toEqual([
+      'report.pdf',
+      'second.jpg',
+      'report.pdf',
+      'uploaded-4.txt',
+      'uploaded-5.txt',
+      'uploaded-6.txt',
+      'uploaded-7.txt',
+    ]);
     expect(within(rows[2]).getByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).toBeInTheDocument();
   });
 
