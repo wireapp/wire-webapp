@@ -66,9 +66,7 @@ type TestController = SharedDriveUploadController & {
 };
 
 const createController = (state: UploadState | readonly UploadState[] = uploadState): TestController => ({
-  snapshots: jest.fn(scope =>
-    scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [],
-  ),
+  snapshots: jest.fn(scope => (scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [])),
   subscribe: jest.fn((_listener: () => void) => jest.fn()),
   upload: jest.fn(),
   cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
@@ -129,7 +127,11 @@ describe('SharedDriveUploadStatusPopupHost', () => {
       {...failedState, identity: {uploadId: 'upload-3'}},
       ...Array.from({length: 4}, (_, index) => ({
         ...uploadedState,
-        identity: {uploadId: `upload-${index + 4}`, resourceUuid: `resource-${index + 4}`, versionId: `version-${index + 4}`},
+        identity: {
+          uploadId: `upload-${index + 4}`,
+          resourceUuid: `resource-${index + 4}`,
+          versionId: `version-${index + 4}`,
+        },
         source: {...uploadSource, name: `uploaded-${index + 4}.txt`},
       })),
     ];

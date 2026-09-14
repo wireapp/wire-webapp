@@ -95,10 +95,12 @@ describe('SharedDriveUploadStatusPopup', () => {
           aggregateKind="uploading"
           title="Uploading 2 files"
           statusLabel="Uploading"
-          statusLabels={new Map([
-            [upload.uploadId, 'Uploading 4 B'],
-            [secondUpload.uploadId, 'Queued'],
-          ])}
+          statusLabels={
+            new Map([
+              [upload.uploadId, 'Uploading 4 B'],
+              [secondUpload.uploadId, 'Queued'],
+            ])
+          }
           destination="to Shared Drive"
           isExpanded
           toggleLabel="Hide upload details"
