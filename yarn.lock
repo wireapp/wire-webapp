@@ -12181,7 +12181,7 @@ __metadata:
     express-useragent: "npm:1.0.15"
     fs-extra: "npm:11.4.0"
     geolite2: "npm:1.3.0"
-    hbs: "npm:4.3.0"
+    hbs: "npm:4.3.1"
     helmet: "npm:8.3.0"
     http-proxy-middleware: "npm:3.0.7"
     http-status-codes: "npm:2.3.0"
@@ -19264,13 +19264,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hbs@npm:4.3.0":
-  version: 4.3.0
-  resolution: "hbs@npm:4.3.0"
+"hbs@npm:4.3.1":
+  version: 4.3.1
+  resolution: "hbs@npm:4.3.1"
   dependencies:
     handlebars: "npm:4.7.9"
     walk: "npm:2.3.15"
-  checksum: 10/b3258950d1d9b0f8b3f1f03308b3bd6f412802840dcc2201c16468fbe4145eeca13c11efc3bdbca504aa0543a56e5cc18b53edecb07751a0c354aa20bf4c73b3
+  checksum: 10/ea61bd34aae733f3a78405db17d920fb578783ac5ab2a9bbab3197a0e66ccf64939a1da1ce5e63740ff0133a7ebc63108f68a6249480754fee0ae3a840a46e43
   languageName: node
   linkType: hard
 
