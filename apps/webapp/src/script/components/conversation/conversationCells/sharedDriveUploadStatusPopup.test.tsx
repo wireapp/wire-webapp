@@ -462,10 +462,23 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it.each(['uploading', 'failed'] as const)('does not show close while %s status is actionable', kind => {
+  it.each(['uploading', 'failed'] as const)('does not show header close while %s status is actionable', kind => {
     renderPopup(kind, true);
 
-    expect(screen.queryByRole('button', {name: 'Close upload status'})).not.toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('shared-drive-upload-status-header')).queryByRole('button', {
+        name: 'Close upload status',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows dismiss alongside retry for an expanded failed row', () => {
+    renderPopup('failed', true);
+
+    expect(screen.getByRole('button', {name: 'Close upload status'})).toHaveAttribute(
+      'data-uie-name',
+      'shared-drive-upload-dismiss',
+    );
   });
 
   it('disables retry while a failed upload is being retried', () => {

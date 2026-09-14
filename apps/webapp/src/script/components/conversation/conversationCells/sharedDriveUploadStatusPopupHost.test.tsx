@@ -21,6 +21,7 @@ import {act, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 import type {UploadState} from 'Repositories/cells/upload';
+import type {Translate} from 'Util/localizerUtil';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {SharedDriveUploadStatusPopupHost} from './sharedDriveUploadStatusPopupHost';
 import {
@@ -120,29 +121,41 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).toBeInTheDocument();
   });
 
-  it('renders all files in order and cancels every active or queued file from the header', async () => {
+  it('renders seven ordered files, aggregate header copy, and failed-row dismiss action', async () => {
     const user = userEvent.setup();
-    const queuedState: UploadState = {
-      kind: 'queued',
-      identity: {uploadId: 'upload-2'},
-      source: {...uploadSource, name: 'queued.txt'},
+    const statuses: UploadState[] = [
+      uploadState,
+      {...uploadState, identity: {uploadId: 'upload-2'}, source: {...uploadSource, name: 'second.jpg'}},
+      {...failedState, identity: {uploadId: 'upload-3'}},
+      ...Array.from({length: 4}, (_, index) => ({
+        ...uploadedState,
+        identity: {uploadId: `upload-${index + 4}`, resourceUuid: `resource-${index + 4}`, versionId: `version-${index + 4}`},
+        source: {...uploadSource, name: `uploaded-${index + 4}.txt`},
+      })),
+    ];
+    const controller = createController(statuses);
+    const translateAggregate: Translate = (key, substitutions) => {
+      if (key === 'cells.uploadStatus.uploadingItems') {
+        return `Uploading ${substitutions?.count} items`;
+      }
+      if (key === 'cells.uploadStatus.cancelAll') {
+        return 'Cancel all';
+      }
+      return translateForTest(key);
     };
-    const controller = createController([uploadState, queuedState]);
-    const view = renderHost(controller, conversationQualifiedId);
+    const view = renderHost(controller, conversationQualifiedId, true, true, translateAggregate);
 
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
     const rows = view.getAllByTestId('shared-drive-upload-status-row');
-    expect(rows).toHaveLength(2);
+    expect(rows).toHaveLength(7);
+    expect(view.getByText('Uploading 7 items')).toBeInTheDocument();
+    expect(
+      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {name: 'Cancel all'}),
+    ).toBeInTheDocument();
     expect(within(rows[0]).getByText('report.pdf')).toBeInTheDocument();
-    expect(within(rows[1]).getByText('queued.txt')).toBeInTheDocument();
-
-    await user.click(
-      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
-        name: 'conversationAssetUploadCancel',
-      }),
-    );
-    expect(controller.cancel).toHaveBeenCalledWith('upload-1');
-    expect(controller.cancel).toHaveBeenCalledWith('upload-2');
+    expect(within(rows[1]).getByText('second.jpg')).toBeInTheDocument();
+    expect(within(rows[2]).getByText('report.pdf')).toBeInTheDocument();
+    expect(within(rows[2]).getByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).toBeInTheDocument();
   });
 
   it.each([
@@ -216,7 +229,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
     await user.click(
       within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
-        name: 'conversationAssetUploadCancel',
+        name: 'cells.uploadStatus.cancelAll',
       }),
     );
     const rowCancels = view
@@ -283,7 +296,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     const view = renderHost(controller, conversationQualifiedId);
 
-    expect(view.getByText('cells.uploadStatus.failed')).toBeInTheDocument();
+    expect(view.getByText('cells.uploadStatus.failedItems')).toBeInTheDocument();
     expect(view.queryByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).not.toBeInTheDocument();
   });
 
