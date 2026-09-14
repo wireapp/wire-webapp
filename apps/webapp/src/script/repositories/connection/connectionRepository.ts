@@ -224,6 +224,26 @@ export class ConnectionRepository {
                     undefined,
                     replaceLinkLegalHold,
                   ),
+                  translatedMessage: {
+                    compatibilityReplacements: [],
+                    components: [
+                      {
+                        className: '',
+                        dataUieName: 'read-more-legal-hold',
+                        href: Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+                        kind: 'link',
+                        legacyClosingTokens: [],
+                        legacyOpeningTokens: [],
+                        markerName: 'link',
+                        rel: 'nofollow noopener noreferrer',
+                        target: '_blank',
+                      },
+                    ],
+                    kind: 'translation',
+                    layout: 'default',
+                    translationKey: 'modalUserCannotSendConnectionLegalHoldMessage',
+                    values: [],
+                  },
                   title: this.translate('modalUserCannotConnectHeadline'),
                 },
               },
@@ -241,6 +261,20 @@ export class ConnectionRepository {
                   htmlMessage: this.translate('modalUserCannotSendConnectionNotFederatingMessage', {
                     username: userEntity.name(),
                   }),
+                  translatedMessage: {
+                    compatibilityReplacements: [],
+                    components: [],
+                    kind: 'translation',
+                    layout: 'default',
+                    translationKey: 'modalUserCannotSendConnectionNotFederatingMessage',
+                    values: [
+                      {
+                        alternatePlaceholders: ['Benutzername'],
+                        placeholder: 'username',
+                        runtimeText: userEntity.name(),
+                      },
+                    ],
+                  },
                   title: this.translate('modalUserCannotConnectHeadline'),
                 },
               },
@@ -257,6 +291,14 @@ export class ConnectionRepository {
               {
                 text: {
                   htmlMessage: this.translate('modalUserCannotSendConnectionMessage'),
+                  translatedMessage: {
+                    compatibilityReplacements: [],
+                    components: [],
+                    kind: 'translation',
+                    layout: 'default',
+                    translationKey: 'modalUserCannotSendConnectionMessage',
+                    values: [],
+                  },
                   title: this.translate('modalUserCannotConnectHeadline'),
                 },
               },
@@ -384,6 +426,14 @@ export class ConnectionRepository {
             {
               text: {
                 htmlMessage: this.translate('modalUserCannotAcceptConnectionMessage'),
+                translatedMessage: {
+                  compatibilityReplacements: [],
+                  components: [],
+                  kind: 'translation',
+                  layout: 'default',
+                  translationKey: 'modalUserCannotAcceptConnectionMessage',
+                  values: [],
+                },
                 title: this.translate('modalUserCannotConnectHeadline'),
               },
             },
@@ -398,6 +448,14 @@ export class ConnectionRepository {
             {
               text: {
                 htmlMessage: this.translate('modalUserCannotCancelConnectionMessage'),
+                translatedMessage: {
+                  compatibilityReplacements: [],
+                  components: [],
+                  kind: 'translation',
+                  layout: 'default',
+                  translationKey: 'modalUserCannotCancelConnectionMessage',
+                  values: [],
+                },
                 title: this.translate('modalUserCannotConnectHeadline'),
               },
             },
@@ -412,6 +470,14 @@ export class ConnectionRepository {
             {
               text: {
                 htmlMessage: this.translate('modalUserCannotIgnoreConnectionMessage'),
+                translatedMessage: {
+                  compatibilityReplacements: [],
+                  components: [],
+                  kind: 'translation',
+                  layout: 'default',
+                  translationKey: 'modalUserCannotIgnoreConnectionMessage',
+                  values: [],
+                },
                 title: this.translate('modalUserCannotConnectHeadline'),
               },
             },

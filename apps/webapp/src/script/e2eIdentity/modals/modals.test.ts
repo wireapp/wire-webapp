@@ -17,6 +17,8 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {translate} from 'Util/localizerUtil';
 
@@ -55,6 +57,26 @@ describe('getModalOptions', () => {
 
     expect(options.modalOptions.secondaryAction).toBeUndefined();
     expect(options.modalOptions.primaryAction).toBeUndefined();
+  });
+
+  it('should provide React translation data for the success message', () => {
+    const options = getModalOptions({type: ModalType.SUCCESS}, translate);
+    const translatedMessage = options.modalOptions.text?.translatedMessage;
+
+    expect(translatedMessage).toMatchObject({
+      kind: 'translation',
+      layout: 'e2ei-success',
+      translationKey: 'acme.done.paragraph',
+    });
+    assert(translatedMessage?.kind === 'translation');
+
+    expect(translatedMessage.components).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({kind: 'bold'}),
+        expect.objectContaining({kind: 'line-break'}),
+        expect.objectContaining({kind: 'link'}),
+      ]),
+    );
   });
 
   // Add more test cases as needed to cover different combinations of hide functionality

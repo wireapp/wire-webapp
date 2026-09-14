@@ -29,6 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import 'Components/calling/ChooseScreen';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import {AudioType} from 'Repositories/audio/audioType';
 import type {Call} from 'Repositories/calling/Call';
@@ -250,6 +251,20 @@ export class CallingViewModel {
             htmlMessage: `<div class="modal-description">
             ${this.translate('groupCallConfirmationModalTitle', {memberCount})}
           </div>`,
+            translatedMessage: {
+              compatibilityReplacements: [],
+              components: [],
+              kind: 'translation',
+              layout: 'group-call-description',
+              translationKey: 'groupCallConfirmationModalTitle',
+              values: [
+                {
+                  alternatePlaceholders: [],
+                  placeholder: 'memberCount',
+                  runtimeText: memberCount.toString(),
+                },
+              ],
+            } satisfies PrimaryModalTranslatedMessage,
             closeBtnLabel: this.translate('groupCallModalCloseBtnLabel'),
           },
         },
@@ -455,6 +470,32 @@ export class CallingViewModel {
                 {brandName: Config.getConfig().BRAND_NAME},
                 replaceEnterprise,
               ),
+              translatedMessage: {
+                compatibilityReplacements: [],
+                components: [
+                  {
+                    className: 'modal__text__read-more',
+                    dataUieName: 'read-more-pricing',
+                    href: Config.getConfig().URL.PRICING,
+                    kind: 'link',
+                    legacyClosingTokens: [],
+                    legacyOpeningTokens: [],
+                    markerName: 'link',
+                    rel: 'nofollow noopener noreferrer',
+                    target: '_blank',
+                  },
+                ],
+                kind: 'translation',
+                layout: 'default',
+                translationKey: 'callingRestrictedConferenceCallOwnerModalDescription',
+                values: [
+                  {
+                    alternatePlaceholders: [],
+                    placeholder: 'brandName',
+                    runtimeText: Config.getConfig().BRAND_NAME,
+                  },
+                ],
+              },
               title: this.translate('callingRestrictedConferenceCallOwnerModalTitle'),
             },
           },
@@ -482,6 +523,20 @@ export class CallingViewModel {
             htmlMessage: this.translate('callingRestrictedConferenceCallPersonalModalDescription', {
               brandName: Config.getConfig().BRAND_NAME,
             }),
+            translatedMessage: {
+              compatibilityReplacements: [],
+              components: [],
+              kind: 'translation',
+              layout: 'default',
+              translationKey: 'callingRestrictedConferenceCallPersonalModalDescription',
+              values: [
+                {
+                  alternatePlaceholders: [],
+                  placeholder: 'brandName',
+                  runtimeText: Config.getConfig().BRAND_NAME,
+                },
+              ],
+            },
             title: this.translate('callingRestrictedConferenceCallPersonalModalTitle'),
           },
         },

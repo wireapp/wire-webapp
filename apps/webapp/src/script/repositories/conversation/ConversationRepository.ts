@@ -3526,6 +3526,26 @@ export class ConversationRepository {
       {
         text: {
           htmlMessage: messageText,
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [
+              {
+                className: '',
+                dataUieName: 'read-more-legal-hold',
+                href: Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+                kind: 'link',
+                legacyClosingTokens: [],
+                legacyOpeningTokens: [],
+                markerName: 'link',
+                rel: 'nofollow noopener noreferrer',
+                target: '_blank',
+              },
+            ],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'modalLegalHoldConversationMissingConsentMessage',
+            values: [],
+          },
           title: titleText,
         },
       },
