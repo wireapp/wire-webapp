@@ -80,6 +80,7 @@ import {
   createDraftSharedDriveUploadStrategy,
   createSharedDriveUploadController,
 } from './conversationCells/sharedDriveUploadController';
+import {SharedDriveUploadStatusProvider} from './conversationCells/sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
@@ -699,7 +700,7 @@ function ConversationContent({
         inputProps={getInputProps()}
       >
         {activeConversation && (
-          <>
+          <SharedDriveUploadStatusProvider>
             <TitleBar
               repositories={repositories}
               conversation={activeConversation}
@@ -843,19 +844,18 @@ function ConversationContent({
                 <div className="icon-spinner spin accent-text"></div>
               </div>
             </ConversationMessagesWrapper>
-          </>
+
+            <SharedDriveUploadStatusPopupHost
+              controller={sharedDriveUploadController}
+              conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+              isEnabled={isSharedDriveDirectUploadFeatureEnabled}
+              isFileTabActive={isFileTabActive}
+            />
+          </SharedDriveUploadStatusProvider>
         )}
 
         {isGiphyModalOpen && inputValue && (
           <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
-        )}
-        {activeConversation && (
-          <SharedDriveUploadStatusPopupHost
-            controller={sharedDriveUploadController}
-            conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
-            isEnabled={isSharedDriveDirectUploadFeatureEnabled}
-            isFileTabActive={isFileTabActive}
-          />
         )}
       </ConversationFileDropzone>
     </CellsSelfUserDriveRoleProvider>
