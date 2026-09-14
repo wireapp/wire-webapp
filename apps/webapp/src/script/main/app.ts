@@ -828,7 +828,7 @@ export class App {
     fireAndForgetInvoker: FireAndForgetInvoker;
   }): void {
     const mlsService = this.core.service?.mls;
-    if (!mlsService) {
+    if (mlsService === undefined) {
       return;
     }
 
