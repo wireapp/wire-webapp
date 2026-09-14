@@ -116,6 +116,7 @@ export const sharedDriveUploadStatusPopupToggleStyles: CSSObject = {
   background: 'transparent',
   color: 'inherit',
   cursor: 'pointer',
+  transform: 'translateX(3px)',
 };
 
 export const sharedDriveUploadStatusPopupToggleIconStyles: CSSObject = {
@@ -167,12 +168,12 @@ export const sharedDriveUploadStatusPopupRowActionsStyles: CSSObject = {
   alignItems: 'center',
   justifyContent: 'flex-end',
   gap: 16,
+  transform: 'translateX(7px)',
 };
 
 export const sharedDriveUploadStatusPopupFailedRowActionsStyles: CSSObject = {
   ...sharedDriveUploadStatusPopupRowActionsStyles,
   gap: 13,
-  transform: 'translateX(7px)',
 };
 
 export const sharedDriveUploadStatusPopupRowActionButtonStyles: CSSObject = {
