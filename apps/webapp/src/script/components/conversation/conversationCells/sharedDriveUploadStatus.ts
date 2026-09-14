@@ -21,7 +21,7 @@ import type {UploadState} from 'Repositories/cells/upload';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
-export type SharedDriveUploadStatusKind = 'uploading' | 'uploaded' | 'failed';
+export type SharedDriveUploadStatusKind = 'queued' | 'uploading' | 'uploaded' | 'failed';
 
 export type DismissedUpload = {
   readonly conversationQualifiedId: string;
@@ -50,6 +50,7 @@ const getSharedDriveUploadStatusKind = (state: UploadState): SharedDriveUploadSt
     case 'discardFailed':
       return 'failed';
     case 'queued':
+      return 'queued';
     case 'uploading':
     case 'draftReady':
     case 'publishing':
@@ -91,6 +92,21 @@ export const getSharedDriveUploadStatuses = (
     const status = toSharedDriveUploadStatus(snapshot, conversationQualifiedId);
     return status ? [status] : [];
   });
+
+export const getSharedDriveUploadAggregateKind = (
+  statuses: readonly SharedDriveUploadStatus[],
+): SharedDriveUploadStatusKind | null => {
+  if (statuses.some(status => status.kind === 'uploading')) {
+    return 'uploading';
+  }
+  if (statuses.some(status => status.kind === 'queued')) {
+    return 'queued';
+  }
+  if (statuses.some(status => status.kind === 'failed')) {
+    return 'failed';
+  }
+  return statuses.length > 0 ? 'uploaded' : null;
+};
 
 export const getLatestSharedDriveUploadStatus = (
   controller: SharedDriveUploadController,

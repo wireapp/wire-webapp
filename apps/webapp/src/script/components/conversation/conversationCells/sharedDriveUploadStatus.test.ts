@@ -19,7 +19,7 @@
 
 import type {UploadSource} from 'Repositories/cells/upload';
 
-import {toSharedDriveUploadStatus} from './sharedDriveUploadStatus';
+import {getSharedDriveUploadAggregateKind, toSharedDriveUploadStatus} from './sharedDriveUploadStatus';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'report.pdf', contentType: 'application/pdf', size: 4};
 const conversationQualifiedId = 'conversation@example.com';
@@ -31,13 +31,13 @@ const state = (kind: string) => ({
 });
 
 describe('toSharedDriveUploadStatus', () => {
-  it.each(['queued', 'uploading'])('maps %s to uploading and marks it cancellable', kind => {
+  it.each(['queued', 'uploading'])('maps %s to its distinct status and marks it cancellable', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual({
       uploadId: 'upload-1',
       conversationQualifiedId,
       fileName: 'report.pdf',
       fileSize: 4,
-      kind: 'uploading',
+      kind,
       progress: 0,
       hasProgress: false,
       isTransferActive: kind === 'uploading',
@@ -89,5 +89,24 @@ describe('toSharedDriveUploadStatus', () => {
 
   it.each(['cancelled', 'discarding', 'discarded'])('does not expose %s', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toBeNull();
+  });
+
+  it('aggregates statuses using active, queued, failed, then uploaded precedence', () => {
+    const statuses = ['queued', 'uploading', 'uploadFailed', 'published'].map(kind =>
+      toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId),
+    );
+    const visibleStatuses = statuses.filter(
+      (status): status is NonNullable<typeof status> => status !== null,
+    );
+
+    expect(getSharedDriveUploadAggregateKind(visibleStatuses)).toBe('uploading');
+    expect(getSharedDriveUploadAggregateKind(visibleStatuses.filter(status => status.kind !== 'uploading'))).toBe('queued');
+    expect(
+      getSharedDriveUploadAggregateKind(
+        visibleStatuses.filter(status => !['uploading', 'queued'].includes(status.kind)),
+      ),
+    ).toBe('failed');
+    expect(getSharedDriveUploadAggregateKind(visibleStatuses.filter(status => status.kind === 'uploaded'))).toBe('uploaded');
+    expect(getSharedDriveUploadAggregateKind([])).toBeNull();
   });
 });
