@@ -144,7 +144,7 @@ export async function recoverMLSConversationsInBatches({
       recoveredConversationCount++;
 
       // Remove successfully recovered conversation from pending list
-      if (mlsService) {
+      if (mlsService !== undefined) {
         const pendingIds = (await mlsService.getPendingRecoveryConversationIds()) ?? [];
         const updatedPending = pendingIds.filter(id => !matchQualifiedIds(id, conversation.qualifiedId));
         await mlsService.updatePendingRecoveryConversationIds(updatedPending);
