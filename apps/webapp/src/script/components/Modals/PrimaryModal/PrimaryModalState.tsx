@@ -257,6 +257,26 @@ const updateCurrentModalContent = (
         undefined,
         replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT),
       );
+      content.translatedMessage = {
+        compatibilityReplacements: [],
+        components: [
+          {
+            className: '',
+            dataUieName: '',
+            href: Config.getConfig().URL.SUPPORT.BUG_REPORT,
+            kind: 'link',
+            legacyClosingTokens: ['/link]'],
+            legacyOpeningTokens: ['[линк]'],
+            markerName: 'link',
+            rel: 'nofollow noopener noreferrer',
+            target: '_blank',
+          },
+        ],
+        kind: 'translation',
+        layout: 'default',
+        translationKey: 'modalSessionResetMessage',
+        values: [],
+      };
       break;
     }
   }

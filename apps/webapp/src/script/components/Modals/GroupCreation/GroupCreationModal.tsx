@@ -310,6 +310,32 @@ const GroupCreationModal = ({
                   {backends: backendString},
                   replaceBackends,
                 ),
+                translatedMessage: {
+                  compatibilityReplacements: [],
+                  components: [
+                    {
+                      className: 'modal__text__read-more',
+                      dataUieName: 'read-more-backends',
+                      href: Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
+                      kind: 'link',
+                      legacyClosingTokens: [],
+                      legacyOpeningTokens: [],
+                      markerName: 'link',
+                      rel: 'nofollow noopener noreferrer',
+                      target: '_blank',
+                    },
+                  ],
+                  kind: 'translation',
+                  layout: 'default',
+                  translationKey: 'groupCreationPreferencesNonFederatingMessage',
+                  values: [
+                    {
+                      alternatePlaceholders: [],
+                      placeholder: 'backends',
+                      runtimeText: backendString,
+                    },
+                  ],
+                },
                 title: translate('groupCreationPreferencesNonFederatingHeadline'),
               },
             },

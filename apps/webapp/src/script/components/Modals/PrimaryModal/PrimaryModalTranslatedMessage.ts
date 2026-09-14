@@ -25,6 +25,11 @@ export type PrimaryModalTranslatedValue = {
   readonly runtimeText: string;
 };
 
+export type PrimaryModalTranslatedCompatibilityReplacement = {
+  readonly replacementMarkerName: string;
+  readonly source: string;
+};
+
 export type PrimaryModalTranslatedComponent =
   | {
       readonly kind: 'bold';
@@ -50,6 +55,7 @@ export type PrimaryModalTranslatedComponent =
 export type PrimaryModalTranslatedLayout = 'default' | 'e2ei-success' | 'group-call-description';
 
 export type PrimaryModalTranslatedTranslation = {
+  readonly compatibilityReplacements: readonly PrimaryModalTranslatedCompatibilityReplacement[];
   readonly components: readonly PrimaryModalTranslatedComponent[];
   readonly kind: 'translation';
   readonly layout: PrimaryModalTranslatedLayout;

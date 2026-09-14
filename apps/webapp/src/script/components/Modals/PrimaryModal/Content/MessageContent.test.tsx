@@ -59,6 +59,7 @@ function createTranslateForTest(translation: string): Translate {
 
 function createTranslatedMessage(): PrimaryModalTranslatedMessage {
   return {
+    compatibilityReplacements: [],
     components: [
       {kind: 'bold', markerName: 'bold'},
       {kind: 'line-break', legacyTokens: [], markerName: 'br'},
@@ -193,6 +194,53 @@ describe('MessageContent', () => {
 
     expect(container.querySelector('img')).toBeNull();
     expect(container).toHaveTextContent('<img src="example">System update');
+  });
+
+  it('renders repeated runtime values as opaque text', () => {
+    const {container} = render(
+      <MessageContent
+        message={null}
+        translate={createTranslateForTest('[bold]{name}[/bold] and [bold]{name}[/bold]')}
+        translatedMessage={createTranslatedMessage()}
+      />,
+      {wrapper: createRootProviderWrapper(true)},
+    );
+
+    expect(container.querySelectorAll('strong')).toHaveLength(2);
+    expect(container.querySelectorAll('strong')[0]).toHaveTextContent('R&D <Test>');
+    expect(container.querySelectorAll('strong')[1]).toHaveTextContent('R&D <Test>');
+    expect(container.querySelector('a')).toBeNull();
+    expect(container.querySelector('test')).toBeNull();
+  });
+
+  it('renders audited literal line-break tokens as React line breaks', () => {
+    const translatedMessage: PrimaryModalTranslatedMessage = {
+      compatibilityReplacements: [],
+      components: [{kind: 'line-break', legacyTokens: ['<br/>'], markerName: 'br'}],
+      kind: 'translation',
+      layout: 'default',
+      translationKey: 'modalOpenLinkMessage',
+      values: [
+        {
+          alternatePlaceholders: [],
+          placeholder: 'name',
+          runtimeText: '[link]Admin[/link]',
+        },
+      ],
+    };
+
+    const {container} = render(
+      <MessageContent
+        message={null}
+        translate={createTranslateForTest('{name}<br/>{name}')}
+        translatedMessage={translatedMessage}
+      />,
+      {wrapper: createRootProviderWrapper(true)},
+    );
+
+    expect(container.querySelectorAll('br')).toHaveLength(1);
+    expect(container).toHaveTextContent('[link]Admin[/link][link]Admin[/link]');
+    expect(container.querySelector('a')).toBeNull();
   });
 
   it('keeps empty messages absent', () => {

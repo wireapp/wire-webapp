@@ -24,6 +24,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
 import {TranslatedMessageContent} from './TranslatedMessageContent';
+
 import type {PrimaryModalTranslatedMessage} from '../PrimaryModalTranslatedMessage';
 
 interface MessageContentProps {

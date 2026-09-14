@@ -61,6 +61,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
@@ -3083,6 +3084,33 @@ export class CallingRepository {
             }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
           },
         ),
+        translatedMessage: {
+          compatibilityReplacements: [],
+          components: [
+            {kind: 'line-break', legacyTokens: [], markerName: 'br'},
+            {
+              className: '',
+              dataUieName: 'go-no-camera-faq',
+              href: Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED,
+              kind: 'link',
+              legacyClosingTokens: [],
+              legacyOpeningTokens: [],
+              markerName: 'faqLink',
+              rel: 'noopener noreferrer',
+              target: '_blank',
+            },
+          ],
+          kind: 'translation',
+          layout: 'default',
+          translationKey: 'modalNoCameraMessage',
+          values: [
+            {
+              alternatePlaceholders: [],
+              placeholder: 'brandName',
+              runtimeText: Config.getConfig().BRAND_NAME,
+            },
+          ],
+        } satisfies PrimaryModalTranslatedMessage,
         title: this.translate('modalNoCameraTitle'),
       },
       close: restoreFocusCallback(),

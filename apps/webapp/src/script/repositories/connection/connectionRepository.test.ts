@@ -187,6 +187,10 @@ describe('ConnectionRepository', () => {
         expect.objectContaining({
           text: expect.objectContaining({
             htmlMessage: 'translated:modalUserCannotSendConnectionNotFederatingMessage',
+            translatedMessage: expect.objectContaining({
+              translationKey: 'modalUserCannotSendConnectionNotFederatingMessage',
+              values: [expect.objectContaining({placeholder: 'username', runtimeText: user.name()})],
+            }),
             title: 'translated:modalUserCannotConnectHeadline',
           }),
         }),

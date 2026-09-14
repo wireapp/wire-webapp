@@ -26,6 +26,7 @@ import type {PrimaryModalTranslatedMessage} from './PrimaryModalTranslatedMessag
 
 export type {
   PrimaryModalTranslatedComponent,
+  PrimaryModalTranslatedCompatibilityReplacement,
   PrimaryModalTranslatedLayout,
   PrimaryModalTranslatedMessage,
   PrimaryModalTranslatedTranslation,

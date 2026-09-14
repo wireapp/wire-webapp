@@ -21,6 +21,7 @@ import {Fragment, ReactNode} from 'react';
 
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
+import type {Translate} from 'Util/localizerUtil';
 import {
   createReactTranslationMarker,
   ReactTranslationComponentReplacement,
@@ -29,7 +30,6 @@ import {
   ReactTranslationValueReplacement,
   renderReactTranslation,
 } from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil';
 
 import type {
   PrimaryModalTranslatedComponent,
@@ -191,7 +191,10 @@ function createTranslationMarkers(translation: PrimaryModalTranslatedTranslation
   };
 }
 
-function renderLink(component: Extract<PrimaryModalTranslatedComponent, {kind: 'link'}>, children: ReactNode[]): ReactNode {
+function renderLink(
+  component: Extract<PrimaryModalTranslatedComponent, {kind: 'link'}>,
+  children: ReactNode[],
+): ReactNode {
   const linkProperties: {
     className?: string;
     'data-uie-name'?: string;
@@ -298,7 +301,11 @@ function renderTranslatedTranslation(options: RenderTranslatedTranslationOptions
   const {translate, translation} = options;
   const {dangerousSubstitutions, markers, substitutions} = createTranslationMarkers(translation);
   const translatedText = translate(translation.translationKey, substitutions, dangerousSubstitutions);
-  const compatibleTranslatedText = replaceLegacyComponentTokens(translatedText, translation, markers);
+  const compatibleTranslatedText = replaceLegacyComponentTokens(
+    replaceCompatibilityTokens(translatedText, translation, markers),
+    translation,
+    markers,
+  );
 
   return renderReactTranslation({
     componentReplacements: createComponentReplacements(translation, markers),
