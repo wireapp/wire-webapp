@@ -169,6 +169,12 @@ export const sharedDriveUploadStatusPopupRowActionsStyles: CSSObject = {
   gap: 16,
 };
 
+export const sharedDriveUploadStatusPopupFailedRowActionsStyles: CSSObject = {
+  ...sharedDriveUploadStatusPopupRowActionsStyles,
+  gap: 13,
+  transform: 'translateX(7px)',
+};
+
 export const sharedDriveUploadStatusPopupRowActionButtonStyles: CSSObject = {
   display: 'flex',
   width: 14,

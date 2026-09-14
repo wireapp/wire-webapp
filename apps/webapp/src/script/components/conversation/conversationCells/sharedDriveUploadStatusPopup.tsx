@@ -34,6 +34,7 @@ import {
   sharedDriveUploadStatusPopupProgressStyles,
   sharedDriveUploadStatusPopupErrorIconInnerStyles,
   sharedDriveUploadStatusPopupErrorIconStyles,
+  sharedDriveUploadStatusPopupFailedRowActionsStyles,
   sharedDriveUploadStatusPopupRowActionButtonStyles,
   sharedDriveUploadStatusPopupRowActionIconStyles,
   sharedDriveUploadStatusPopupRowActionsStyles,
@@ -275,7 +276,13 @@ export const SharedDriveUploadStatusPopup = ({
                 </span>
               </div>
             </div>
-            <div css={sharedDriveUploadStatusPopupRowActionsStyles}>
+            <div
+              css={
+                row.kind === 'failed'
+                  ? sharedDriveUploadStatusPopupFailedRowActionsStyles
+                  : sharedDriveUploadStatusPopupRowActionsStyles
+              }
+            >
               {row.canRetry && (
                 <button
                   type="button"
