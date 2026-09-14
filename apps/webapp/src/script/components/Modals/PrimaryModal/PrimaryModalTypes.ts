@@ -22,6 +22,16 @@ import React from 'react';
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {Translate as TranslationFunction} from 'Util/localizerUtil';
 
+import type {PrimaryModalTranslatedMessage} from './PrimaryModalTranslatedMessage';
+
+export type {
+  PrimaryModalTranslatedComponent,
+  PrimaryModalTranslatedLayout,
+  PrimaryModalTranslatedMessage,
+  PrimaryModalTranslatedTranslation,
+  PrimaryModalTranslatedValue,
+} from './PrimaryModalTranslatedMessage';
+
 export interface ButtonAction {
   action?: Function;
   runActionOnEnterClick?: Boolean;
@@ -37,6 +47,7 @@ export interface Text {
   option?: string;
   title?: string;
   closeBtnLabel?: string;
+  translatedMessage?: PrimaryModalTranslatedMessage;
 }
 
 export type ModalSize = 'small' | 'medium' | 'large';
@@ -97,6 +108,7 @@ export interface ModalContent {
   message: React.ReactNode;
   /** @deprecated please use `message` instead */
   messageHtml?: string;
+  translatedMessage?: PrimaryModalTranslatedMessage;
   modalUie: string;
   onBgClick: () => void;
   primaryAction: ButtonAction | null;

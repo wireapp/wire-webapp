@@ -76,6 +76,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     inputPlaceholder,
     message,
     messageHtml,
+    translatedMessage,
     modalUie,
     onBgClick,
     primaryAction,
@@ -320,7 +321,12 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         closeAction={closeAction}
       />
       <FadingScrollbar className="modal__body">
-        <MessageContent message={message} messageHtml={messageHtml} />
+        <MessageContent
+          message={message}
+          messageHtml={messageHtml}
+          translatedMessage={translatedMessage}
+          translate={translate}
+        />
 
         {isGuestLinkPassword && (
           <GuestLinkPasswordForm
