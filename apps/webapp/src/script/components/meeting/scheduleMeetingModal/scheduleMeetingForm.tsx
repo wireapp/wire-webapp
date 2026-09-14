@@ -50,6 +50,7 @@ import {
 import type {User} from 'Repositories/entity/User';
 import {currentLanguage} from 'src/script/auth/localeConfig';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {getRegionalDateLocale} from 'src/script/util/timeUtil';
 
 import {
   SCHEDULE_MEETING_RECURRENCE_OPTIONS,
@@ -101,6 +102,7 @@ export const ScheduleMeetingForm = ({
   const {mainViewModel, translate, wallClock} = useApplicationContext();
   const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
+  const regionalLocale = getRegionalDateLocale();
 
   const contentViewModel = mainViewModel.content;
   const conversationRepository = contentViewModel.repositories.conversation;
@@ -254,6 +256,7 @@ export const ScheduleMeetingForm = ({
           onChange={date => onStartChange(fromDateTimePickerValue(date))}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
+          timeLocale={regionalLocale}
           markInvalid={isNonEmptyString(startErrorText)}
           errorText={startErrorText}
           minValue={todayValue}
@@ -269,6 +272,7 @@ export const ScheduleMeetingForm = ({
           onChange={date => onEndChange(fromDateTimePickerValue(date))}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
+          timeLocale={regionalLocale}
           markInvalid={isNonEmptyString(endErrorText)}
           errorText={endErrorText}
           minValue={endDateMinValue}

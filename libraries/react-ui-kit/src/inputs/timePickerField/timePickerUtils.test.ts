@@ -19,11 +19,11 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {buildTimeOptions, filterTimeOptionsAfter, getTimeOptionTotalMinutes} from './timePickerUtils';
+import {buildTimeOptions, filterTimeOptionsAfter, getTimeOptionTotalMinutes, parseTimeLabel} from './timePickerUtils';
 
 describe('timePickerUtils', () => {
   it('filters out time options at or before the minimum time', () => {
-    const options = buildTimeOptions();
+    const options = buildTimeOptions('en-US');
     const minTime = new Date(2026, 6, 13, 16, 27, 0, 0);
 
     const filteredOptions = filterTimeOptionsAfter(options, minTime);
@@ -35,5 +35,25 @@ describe('timePickerUtils', () => {
       throw new Error('Expected filtered time options to be non-empty');
     }
     expect(getTimeOptionTotalMinutes(firstFilteredOption)).toBeGreaterThan(16 * 60 + 27);
+  });
+
+  it('formats options according to the provided regional locale', () => {
+    const options = buildTimeOptions('de-DE');
+
+    expect(options.find(option => option.value === '14:00')).toEqual({value: '14:00', label: '14:00'});
+  });
+
+  it('formats a regional locale not supported for application translations', () => {
+    const options = buildTimeOptions('en-GB');
+
+    expect(options.find(option => option.value === '14:00')).toEqual({value: '14:00', label: '14:00'});
+  });
+
+  it.each([
+    {input: '3:00 PM', expected: {hour24: 15, minutes: 0}},
+    {input: ' 3:00   PM ', expected: {hour24: 15, minutes: 0}},
+    {input: '15:00', expected: {hour24: 15, minutes: 0}},
+  ])('parses both legacy and canonical time values: $input', ({input, expected}) => {
+    expect(parseTimeLabel(input)).toEqual(expected);
   });
 });
