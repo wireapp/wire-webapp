@@ -199,10 +199,7 @@ describe('createSharedDriveUploadController', () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
-    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(
-      4,
-      expect.objectContaining({file: files[3]}),
-    );
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(4, expect.objectContaining({file: files[3]}));
     expect(maximumActiveUploads).toBe(3);
 
     pendingUploads[0].resolve();

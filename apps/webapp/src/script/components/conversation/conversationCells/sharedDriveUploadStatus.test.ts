@@ -95,18 +95,20 @@ describe('toSharedDriveUploadStatus', () => {
     const statuses = ['queued', 'uploading', 'uploadFailed', 'published'].map(kind =>
       toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId),
     );
-    const visibleStatuses = statuses.filter(
-      (status): status is NonNullable<typeof status> => status !== null,
-    );
+    const visibleStatuses = statuses.filter((status): status is NonNullable<typeof status> => status !== null);
 
     expect(getSharedDriveUploadAggregateKind(visibleStatuses)).toBe('uploading');
-    expect(getSharedDriveUploadAggregateKind(visibleStatuses.filter(status => status.kind !== 'uploading'))).toBe('queued');
+    expect(getSharedDriveUploadAggregateKind(visibleStatuses.filter(status => status.kind !== 'uploading'))).toBe(
+      'queued',
+    );
     expect(
       getSharedDriveUploadAggregateKind(
         visibleStatuses.filter(status => !['uploading', 'queued'].includes(status.kind)),
       ),
     ).toBe('failed');
-    expect(getSharedDriveUploadAggregateKind(visibleStatuses.filter(status => status.kind === 'uploaded'))).toBe('uploaded');
+    expect(getSharedDriveUploadAggregateKind(visibleStatuses.filter(status => status.kind === 'uploaded'))).toBe(
+      'uploaded',
+    );
     expect(getSharedDriveUploadAggregateKind([])).toBeNull();
   });
 });
