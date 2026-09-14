@@ -41,7 +41,24 @@ function createDependencies() {
   } as unknown as SharedDriveUploadController;
   const onRefresh = jest.fn();
 
-  return {fireAndForgetInvoker, sharedDriveUploadController, onRefresh, conversationQualifiedId};
+  const onReject = jest.fn();
+
+  return {
+    fireAndForgetInvoker,
+    sharedDriveUploadController,
+    onRefresh,
+    onReject,
+    conversationQualifiedId,
+    isUploadFilesEnabled: true,
+    isInRecycleBin: false,
+    maxFileSize: 100,
+    isAcceptedFile: jest.fn((_file: File) => true),
+  };
+}
+
+function getUploadAction(fireAndForgetInvoker: FireAndForgetInvoker) {
+  return (fireAndForgetInvoker.fireAndForget as jest.MockedFunction<FireAndForgetInvoker['fireAndForget']>).mock
+    .calls[0][0];
 }
 
 describe('handleSharedDriveUploadInput', () => {
@@ -54,7 +71,7 @@ describe('handleSharedDriveUploadInput', () => {
 
     expect(event.target.value).toBe('');
     expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
-    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
     await uploadAction();
     expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
       [file],
@@ -64,32 +81,56 @@ describe('handleSharedDriveUploadInput', () => {
     );
   });
 
-  it('uploads only the first file when multiple files are supplied', async () => {
+  it('uploads multiple supplied files as one batch', async () => {
     const firstFile = new File(['first'], 'first.txt');
     const secondFile = new File(['second'], 'second.txt');
     const dependencies = createDependencies();
 
     handleSharedDriveUploadInput(createEvent([firstFile, secondFile]), {...dependencies, uploadPath});
 
-    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
     await uploadAction();
 
     expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
-      [firstFile],
+      [firstFile, secondFile],
       uploadPath,
       dependencies.onRefresh,
       conversationQualifiedId,
     );
   });
 
+  it('rejects invalid selected files before dispatching upload', () => {
+    const validFile = new File(['valid'], 'valid.txt');
+    const invalidFile = new File(['invalid'], 'invalid.exe');
+    const dependencies = createDependencies();
+    dependencies.isAcceptedFile.mockImplementation(file => file !== invalidFile);
+
+    handleSharedDriveUploadInput(createEvent([validFile, invalidFile]), {...dependencies, uploadPath});
+
+    expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'notAccepted', invalidFiles: [invalidFile]});
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
+  it('rejects oversized selected files before dispatching upload', () => {
+    const validFile = new File(['valid'], 'valid.txt');
+    const oversizedFile = new File(['oversized'], 'oversized.txt');
+    Object.defineProperty(oversizedFile, 'size', {value: 101});
+    const dependencies = createDependencies();
+
+    handleSharedDriveUploadInput(createEvent([validFile, oversizedFile]), {...dependencies, uploadPath});
+
+    expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'tooLarge', invalidFiles: [oversizedFile]});
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
   it('passes upload rejection to the fire-and-forget invoker', async () => {
     const uploadError = new Error('upload failed');
     const dependencies = createDependencies();
-    jest.mocked(dependencies.sharedDriveUploadController.upload).mockRejectedValue(uploadError);
+    (dependencies.sharedDriveUploadController.upload as jest.Mock).mockRejectedValue(uploadError);
 
     handleSharedDriveUploadInput(createEvent([new File(['content'], 'document.txt')]), {...dependencies, uploadPath});
 
-    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
     await expect(uploadAction()).rejects.toBe(uploadError);
   });
 
@@ -100,6 +141,7 @@ describe('handleSharedDriveUploadInput', () => {
     handleSharedDriveUploadInput(event, {...dependencies, uploadPath});
 
     expect(event.target.value).toBe('');
+    expect(dependencies.onReject).not.toHaveBeenCalled();
     expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
 });

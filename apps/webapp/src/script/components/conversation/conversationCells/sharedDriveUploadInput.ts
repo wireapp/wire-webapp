@@ -19,8 +19,11 @@
 
 import type {ChangeEvent} from 'react';
 
+import {Result} from 'true-myth';
+
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
+import type {SharedDriveDropRejection} from './sharedDriveDrop';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
 type SharedDriveUploadInputDependencies = {
@@ -29,6 +32,48 @@ type SharedDriveUploadInputDependencies = {
   readonly uploadPath: string;
   readonly conversationQualifiedId: string;
   readonly onRefresh: () => void;
+  readonly onReject: (rejection: SharedDriveDropRejection) => void;
+  readonly isUploadFilesEnabled: boolean;
+  readonly isInRecycleBin: boolean;
+  readonly maxFileSize: number;
+  readonly isAcceptedFile: (file: File) => boolean;
+};
+
+const validateSharedDriveUploadInputFiles = (
+  files: readonly File[],
+  {
+    isUploadFilesEnabled,
+    isInRecycleBin,
+    maxFileSize,
+    isAcceptedFile,
+  }: Pick<
+    SharedDriveUploadInputDependencies,
+    'isUploadFilesEnabled' | 'isInRecycleBin' | 'maxFileSize' | 'isAcceptedFile'
+  >,
+): Result<void, SharedDriveDropRejection> => {
+  if (!isUploadFilesEnabled) {
+    return Result.err({reason: 'notAllowed', invalidFiles: files});
+  }
+
+  if (isInRecycleBin) {
+    return Result.err({reason: 'recycleBin', invalidFiles: files});
+  }
+
+  if (files.length === 0) {
+    return Result.err({reason: 'empty', invalidFiles: []});
+  }
+
+  const invalidTypeFiles = files.filter(file => !isAcceptedFile(file));
+  if (invalidTypeFiles.length > 0) {
+    return Result.err({reason: 'notAccepted', invalidFiles: invalidTypeFiles});
+  }
+
+  const oversizedFiles = files.filter(file => file.size > maxFileSize);
+  if (oversizedFiles.length > 0) {
+    return Result.err({reason: 'tooLarge', invalidFiles: oversizedFiles});
+  }
+
+  return Result.ok(undefined);
 };
 
 export const handleSharedDriveUploadInput = (
@@ -39,15 +84,31 @@ export const handleSharedDriveUploadInput = (
     uploadPath,
     conversationQualifiedId,
     onRefresh,
+    onReject,
+    isUploadFilesEnabled,
+    isInRecycleBin,
+    maxFileSize,
+    isAcceptedFile,
   }: SharedDriveUploadInputDependencies,
 ): void => {
-  const file = event.target.files?.[0];
+  const files = Array.from(event.target.files ?? []);
   event.target.value = '';
-  if (!file) {
+  if (files.length === 0) {
+    return;
+  }
+
+  const validation = validateSharedDriveUploadInputFiles(files, {
+    isUploadFilesEnabled,
+    isInRecycleBin,
+    maxFileSize,
+    isAcceptedFile,
+  });
+  if (validation.isErr) {
+    onReject(validation.error);
     return;
   }
 
   fireAndForgetInvoker.fireAndForget(() =>
-    sharedDriveUploadController.upload([file], uploadPath, onRefresh, conversationQualifiedId),
+    sharedDriveUploadController.upload(files, uploadPath, onRefresh, conversationQualifiedId),
   );
 };
