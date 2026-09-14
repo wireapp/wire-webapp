@@ -82,6 +82,21 @@ describe('S3Service', () => {
     handle.mockRestore();
   });
 
+  it('rejects an XHR that completes without an HTTP response', async () => {
+    const handle = jest
+      .spyOn(XhrHttpHandler.prototype, 'handle')
+      .mockResolvedValue({response: {statusCode: 0} as never});
+    const requestHandler = createAbortableXhrHttpHandler(new AbortController().signal);
+
+    try {
+      await expect(requestHandler.handle({} as never)).rejects.toThrow(
+        'XHR request failed before receiving an HTTP response',
+      );
+    } finally {
+      handle.mockRestore();
+    }
+  });
+
   it('aborts the underlying XHR when the upload signal is cancelled', async () => {
     const abortController = new AbortController();
     const xhr = {

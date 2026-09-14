@@ -35,12 +35,23 @@ interface S3ServiceConfig {
 export const MAX_QUEUE_SIZE = 3;
 export const PART_SIZE = 10 * 1024 * 1024; // 10MB
 
-export const createAbortableXhrHttpHandler = (abortSignal: AbortSignal): XhrHttpHandler => {
+const createReliableXhrHttpHandler = (abortSignal?: AbortSignal): XhrHttpHandler => {
   const requestHandler = new XhrHttpHandler();
   const handle = requestHandler.handle.bind(requestHandler);
-  requestHandler.handle = (request, options) => handle(request, {...(options ?? {}), abortSignal});
+  requestHandler.handle = async (request, options) => {
+    const handlerOptions = abortSignal === undefined ? options : {...(options ?? {}), abortSignal};
+    const result = await handle(request, handlerOptions);
+    if (result.response.statusCode === 0) {
+      throw new Error('XHR request failed before receiving an HTTP response');
+    }
+
+    return result;
+  };
   return requestHandler;
 };
+
+export const createAbortableXhrHttpHandler = (abortSignal: AbortSignal): XhrHttpHandler =>
+  createReliableXhrHttpHandler(abortSignal);
 
 export class S3Service implements CellsStorage {
   private config: S3ServiceConfig;
@@ -158,7 +169,7 @@ export class S3Service implements CellsStorage {
       endpoint: this.config.endpoint,
       forcePathStyle: true,
       region: this.config.region,
-      requestHandler: abortSignal === undefined ? new XhrHttpHandler() : createAbortableXhrHttpHandler(abortSignal),
+      requestHandler: createReliableXhrHttpHandler(abortSignal),
       credentials: async () => {
         if (this.config.apiKey !== undefined && this.config.apiKey.length > 0) {
           return {

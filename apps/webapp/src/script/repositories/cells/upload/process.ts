@@ -234,6 +234,7 @@ export const createCellsUploadProcess = (
     if (resultModule.isErr(result)) {
       return Result.err(result.error);
     }
+    resourceUuid = Maybe.nothing();
     return start();
   };
 
