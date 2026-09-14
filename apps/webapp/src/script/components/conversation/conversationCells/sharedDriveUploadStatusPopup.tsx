@@ -70,6 +70,7 @@ interface SharedDriveUploadStatusPopupProps {
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
   readonly cancelLabel: string;
+  readonly headerCancelLabel?: string;
   readonly dismissLabel?: string;
   readonly dismissAriaLabel?: string;
   readonly canDismiss?: boolean;
@@ -79,7 +80,7 @@ interface SharedDriveUploadStatusPopupProps {
   readonly onToggle: () => void;
   readonly onCancel: (uploadId?: string) => void;
   readonly onRetry: (uploadId?: string) => void;
-  readonly onDismiss?: () => void;
+  readonly onDismiss?: (uploadId?: string) => void;
 }
 
 const isActionPending = (state: UploadActionState, uploadId: string): boolean =>
@@ -172,6 +173,7 @@ export const SharedDriveUploadStatusPopup = ({
   isExpanded,
   toggleLabel,
   cancelLabel,
+  headerCancelLabel = cancelLabel,
   dismissLabel = cancelLabel,
   dismissAriaLabel = dismissLabel,
   canDismiss = upload.kind === 'uploaded',
@@ -216,7 +218,7 @@ export const SharedDriveUploadStatusPopup = ({
               data-uie-name="shared-drive-upload-header-cancel"
               onClick={() => onCancel()}
             >
-              {cancelLabel}
+              {headerCancelLabel}
             </button>
           )}
           {canDismiss && (
@@ -297,6 +299,17 @@ export const SharedDriveUploadStatusPopup = ({
                   disabled={isActionPending(isCancelling, row.uploadId)}
                   data-uie-name="shared-drive-upload-cancel"
                   onClick={() => onCancel(row.uploadId)}
+                >
+                  <CloseIcon color="currentColor" aria-hidden="true" />
+                </button>
+              )}
+              {row.kind === 'failed' && (
+                <button
+                  type="button"
+                  css={sharedDriveUploadStatusPopupRowCancelStyles}
+                  aria-label={dismissAriaLabel}
+                  data-uie-name="shared-drive-upload-dismiss"
+                  onClick={() => onDismiss?.(row.uploadId)}
                 >
                   <CloseIcon color="currentColor" aria-hidden="true" />
                 </button>
