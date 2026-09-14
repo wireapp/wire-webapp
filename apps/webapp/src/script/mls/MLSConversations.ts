@@ -75,7 +75,7 @@ export async function recoverMLSConversationsInBatches({
   batchSize?: number;
 }): Promise<MLSConversationRecoveryResult> {
   const conversationService = core.service?.conversation;
-  if (!conversationService) {
+  if (conversationService === undefined) {
     logger.error('Conversation service is not available for MLS conversation recovery');
     return {completed: false, failedConversationCount: 1, recoveredConversationCount: 0};
   }
