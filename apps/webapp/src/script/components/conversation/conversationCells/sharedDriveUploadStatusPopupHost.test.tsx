@@ -64,8 +64,10 @@ type TestController = SharedDriveUploadController & {
   retryPublish: jest.MockedFunction<SharedDriveUploadController['retryPublish']>;
 };
 
-const createController = (state: UploadState = uploadState): TestController => ({
-  snapshots: jest.fn(scope => (scope === conversationQualifiedId ? [state] : [])),
+const createController = (state: UploadState | readonly UploadState[] = uploadState): TestController => ({
+  snapshots: jest.fn(scope =>
+    scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [],
+  ),
   subscribe: jest.fn((_listener: () => void) => jest.fn()),
   upload: jest.fn(),
   cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
@@ -118,6 +120,31 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).toBeInTheDocument();
   });
 
+  it('renders all files in order and cancels every active or queued file from the header', async () => {
+    const user = userEvent.setup();
+    const queuedState: UploadState = {
+      kind: 'queued',
+      identity: {uploadId: 'upload-2'},
+      source: {...uploadSource, name: 'queued.txt'},
+    };
+    const controller = createController([uploadState, queuedState]);
+    const view = renderHost(controller, conversationQualifiedId);
+
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+    const rows = view.getAllByTestId('shared-drive-upload-status-row');
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0]).getByText('report.pdf')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('queued.txt')).toBeInTheDocument();
+
+    await user.click(
+      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+        name: 'conversationAssetUploadCancel',
+      }),
+    );
+    expect(controller.cancel).toHaveBeenCalledWith('upload-1');
+    expect(controller.cancel).toHaveBeenCalledWith('upload-2');
+  });
+
   it.each([
     ['uploading', uploadState],
     ['uploaded', uploadedState],
@@ -152,7 +179,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(controller.snapshots).toHaveBeenCalledWith(conversationQualifiedId);
   });
 
-  it('dismisses the popup immediately while cancellation is pending', async () => {
+  it('keeps other status rows visible while row cancellation is pending', async () => {
     const user = userEvent.setup();
     const controller = createController();
     controller.cancel.mockReturnValue(new Promise<void>(noop));
@@ -164,11 +191,50 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(cancel);
 
     expect(controller.cancel).toHaveBeenCalledWith('upload-1');
-    expect(view.queryByRole('status')).not.toBeInTheDocument();
-    expect(view.queryByTestId('shared-drive-upload-status-popup')).not.toBeInTheDocument();
+    expect(view.queryByRole('status')).toBeInTheDocument();
+    expect(view.queryByTestId('shared-drive-upload-status-popup')).toBeInTheDocument();
   });
 
-  it('keeps the popup dismissed when cancellation fails', async () => {
+  it('keeps each row cancel disabled until its own batch cancellation settles', async () => {
+    const user = userEvent.setup();
+    const secondUploadState = {...uploadState, identity: {...uploadState.identity, uploadId: 'upload-2'}};
+    let rejectFirst: () => void = () => undefined;
+    let resolveSecond: () => void = () => undefined;
+    const controller = createController([uploadState, secondUploadState]);
+    controller.cancel.mockImplementation(
+      uploadId =>
+        new Promise<void>((resolve, reject) => {
+          if (uploadId === 'upload-1') {
+            rejectFirst = () => reject(new Error('first cancellation failed'));
+          } else {
+            resolveSecond = resolve;
+          }
+        }),
+    );
+    const view = renderHost(controller, conversationQualifiedId);
+
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+    await user.click(
+      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+        name: 'conversationAssetUploadCancel',
+      }),
+    );
+    const rowCancels = view
+      .getAllByTestId('shared-drive-upload-status-row')
+      .map(row => within(row).getByRole('button', {name: 'conversationAssetUploadCancel'}));
+    expect(rowCancels).toHaveLength(2);
+    expect(rowCancels[0]).toBeDisabled();
+    expect(rowCancels[1]).toBeDisabled();
+
+    rejectFirst();
+    await waitFor(() => expect(rowCancels[0]).not.toBeDisabled());
+    expect(rowCancels[1]).toBeDisabled();
+
+    resolveSecond();
+    await waitFor(() => expect(rowCancels[1]).not.toBeDisabled());
+  });
+
+  it('keeps the popup visible when row cancellation fails', async () => {
     const user = userEvent.setup();
     const controller = createController();
     controller.cancel.mockRejectedValue(new Error('cancellation failed'));
@@ -180,7 +246,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(cancel);
 
     expect(controller.cancel).toHaveBeenCalledWith('upload-1');
-    await waitFor(() => expect(view.queryByRole('status')).not.toBeInTheDocument());
+    await waitFor(() => expect(view.queryByRole('status')).toBeInTheDocument());
   });
 
   it('dismisses a successful upload from the header close action', async () => {
@@ -207,13 +273,17 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
   it('does not show close when the latest upload succeeded but another upload is still actionable', () => {
     const controller = createController(uploadedState);
+    const secondUploadedState = {
+      ...uploadedState,
+      identity: {...uploadedState.identity, uploadId: 'upload-2'},
+    };
     controller.snapshots.mockImplementation(scope =>
-      scope === conversationQualifiedId ? [failedState, uploadedState] : [],
+      scope === conversationQualifiedId ? [failedState, secondUploadedState] : [],
     );
 
     const view = renderHost(controller, conversationQualifiedId);
 
-    expect(view.getByText('cells.uploadStatus.uploaded')).toBeInTheDocument();
+    expect(view.getByText('cells.uploadStatus.failed')).toBeInTheDocument();
     expect(view.queryByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).not.toBeInTheDocument();
   });
 

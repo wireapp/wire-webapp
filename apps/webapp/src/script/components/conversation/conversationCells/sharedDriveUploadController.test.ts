@@ -39,7 +39,10 @@ function createCellsRepositoryMock() {
   };
 }
 
-function createDirectUploadControllerHelper(cellsRepository = createCellsRepositoryMock()) {
+function createDirectUploadControllerHelper(
+  cellsRepository = createCellsRepositoryMock(),
+  createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2'),
+) {
   const createSource = jest.fn((file: File): UploadSource => ({
     blob: file,
     name: file.name,
@@ -47,7 +50,7 @@ function createDirectUploadControllerHelper(cellsRepository = createCellsReposit
     size: file.size,
   }));
   const controller = createSharedDriveUploadController({
-    createUploadId: jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2'),
+    createUploadId,
     createSource,
     uploadStrategy: createDirectSharedDriveUploadStrategy({
       cellsRepository,
@@ -156,6 +159,98 @@ describe('createSharedDriveUploadController', () => {
       expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
       expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-2'}), kind: 'published'}),
     ]);
+  });
+
+  it('limits overlapping batches to three active uploads and preserves queue order', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void}> = [];
+    let activeUploads = 0;
+    let maximumActiveUploads = 0;
+    cellsRepository.uploadNode.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          activeUploads += 1;
+          maximumActiveUploads = Math.max(maximumActiveUploads, activeUploads);
+          pendingUploads.push({
+            resolve: () => {
+              activeUploads -= 1;
+              resolve({uuid: 'remote-id', versionId: 'version-id'});
+            },
+          });
+        }),
+    );
+    let nextUploadId = 0;
+    const createUploadId = jest.fn(() => `upload-${++nextUploadId}`);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const files = Array.from({length: 5}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const uploadPromise = controller.upload(files, uploadPath, jest.fn(), conversationQualifiedId);
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+    expect(controller.snapshots(conversationQualifiedId)).toHaveLength(5);
+    expect(controller.snapshots(conversationQualifiedId).slice(0, 3)).toEqual(
+      expect.arrayContaining([expect.objectContaining({kind: 'uploading'})]),
+    );
+    expect(controller.snapshots(conversationQualifiedId).slice(3)).toEqual(
+      expect.arrayContaining([expect.objectContaining({kind: 'queued'})]),
+    );
+
+    pendingUploads[1].resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({file: files[3]}),
+    );
+    expect(maximumActiveUploads).toBe(3);
+
+    pendingUploads[0].resolve();
+    pendingUploads[2].resolve();
+    pendingUploads[3].resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(5);
+    pendingUploads[4].resolve();
+    await uploadPromise;
+    expect(maximumActiveUploads).toBe(3);
+  });
+
+  it('cancels queued work without starting it and advances the queue', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void}> = [];
+    cellsRepository.uploadNode.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          pendingUploads.push({resolve: () => resolve({uuid: 'remote-id', versionId: 'version-id'})});
+        }),
+    );
+    let nextUploadId = 0;
+    const createUploadId = jest.fn(() => `upload-${++nextUploadId}`);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const files = Array.from({length: 5}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const uploadPromise = controller.upload(files, uploadPath, jest.fn(), conversationQualifiedId);
+    await controller.cancel('upload-4');
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'uploading'}),
+      expect.objectContaining({identity: {uploadId: 'upload-2'}, kind: 'uploading'}),
+      expect.objectContaining({identity: {uploadId: 'upload-3'}, kind: 'uploading'}),
+      expect.objectContaining({identity: {uploadId: 'upload-4'}, kind: 'cancelled'}),
+      expect.objectContaining({identity: {uploadId: 'upload-5'}, kind: 'queued'}),
+    ]);
+
+    pendingUploads[0].resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    pendingUploads.slice(1).forEach(upload => upload.resolve());
+    await Promise.resolve();
+    await Promise.resolve();
+    pendingUploads[3]?.resolve();
+    await uploadPromise;
   });
 
   it('does not refresh when a direct upload fails', async () => {

@@ -75,6 +75,55 @@ const renderPopup = (
   );
 
 describe('SharedDriveUploadStatusPopup', () => {
+  it('renders ordered rows with distinct queued and active states', async () => {
+    const user = userEvent.setup();
+    const onCancel = jest.fn();
+    const secondUpload: SharedDriveUploadStatus = {
+      ...upload,
+      uploadId: 'upload-2',
+      fileName: 'queued.txt',
+      kind: 'queued',
+      isTransferActive: false,
+      canCancel: true,
+    };
+
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={upload}
+          uploads={[upload, secondUpload]}
+          aggregateKind="uploading"
+          title="Uploading 2 files"
+          statusLabel="Uploading"
+          statusLabels={new Map([
+            [upload.uploadId, 'Uploading 4 B'],
+            [secondUpload.uploadId, 'Queued'],
+          ])}
+          destination="to Shared Drive"
+          isExpanded
+          toggleLabel="Hide upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancel={onCancel}
+          onRetry={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    const rows = screen.getAllByTestId('shared-drive-upload-status-row');
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0]).getByText('report.pdf')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('queued.txt')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('Queued')).toBeInTheDocument();
+    expect(within(rows[1]).queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
+
+    await user.click(within(rows[1]).getByRole('button', {name: 'Cancel'}));
+    expect(onCancel).toHaveBeenCalledWith('upload-2');
+  });
+
   it('shows the filename and destination while uploading with indeterminate progress', () => {
     const {getByRole, getByText, getByTestId} = renderPopup('uploading');
 

@@ -46,6 +46,16 @@ export type SharedDriveUploadRequest = {
 
 type SharedDriveUploadSnapshotListener = () => void;
 
+type UploadWork = {
+  readonly uploadId: string;
+  readonly execute: () => Promise<boolean>;
+  readonly promise: Promise<boolean>;
+  readonly resolve: (succeeded: boolean) => void;
+  state: 'queued' | 'active' | 'settled';
+};
+
+const MAX_ACTIVE_UPLOADS = 3;
+
 export type SharedDriveUploadStrategy = {
   readonly register: (uploadId: string, source: UploadSource, path: string) => Result<void, unknown>;
   readonly attach: (uploadId: string, listener: SharedDriveUploadSnapshotListener) => void;
@@ -211,6 +221,10 @@ export const createDirectSharedDriveUploadStrategy = ({
     },
     snapshot: uploadId => statesByUploadId.get(uploadId),
     cancel: async uploadId => {
+      const state = statesByUploadId.get(uploadId);
+      if (state?.kind === 'queued') {
+        setState(uploadId, {kind: 'cancelled', identity: state.identity, source: state.source});
+      }
       abortControllersByUploadId.get(uploadId)?.abort();
     },
     retryUpload,
@@ -226,7 +240,65 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const requestsByUploadId = new Map<string, SharedDriveUploadRequest>();
   const refreshByUploadId = new Map<string, () => void>();
   const listeners = new Set<() => void>();
+  const workByUploadId = new Map<string, UploadWork>();
+  const queuedWork: UploadWork[] = [];
+  let activeWorkCount = 0;
   const notify = () => listeners.forEach(listener => listener());
+
+  const createDeferredWork = (uploadId: string, execute: () => Promise<boolean>): UploadWork => {
+    let resolvePromise: ((succeeded: boolean) => void) | undefined;
+    const promise = new Promise<boolean>(resolve => {
+      resolvePromise = resolve;
+    });
+    if (!resolvePromise) {
+      throw new Error('Upload work resolver was not created');
+    }
+
+    return {uploadId, execute, promise, resolve: resolvePromise, state: 'queued'};
+  };
+
+  const settleWork = (work: UploadWork, succeeded: boolean): void => {
+    if (work.state === 'settled') {
+      return;
+    }
+
+    const wasActive = work.state === 'active';
+    work.state = 'settled';
+    if (wasActive) {
+      activeWorkCount -= 1;
+    }
+    work.resolve(succeeded);
+    if (workByUploadId.get(work.uploadId) === work) {
+      workByUploadId.delete(work.uploadId);
+    }
+    pumpQueue();
+  };
+
+  const startWork = (work: UploadWork): void => {
+    work.state = 'active';
+    activeWorkCount += 1;
+    let execution: Promise<boolean>;
+    try {
+      execution = work.execute();
+    } catch {
+      settleWork(work, false);
+      return;
+    }
+    void execution.then(
+      succeeded => settleWork(work, succeeded),
+      () => settleWork(work, false),
+    );
+  };
+
+  function pumpQueue(): void {
+    while (activeWorkCount < MAX_ACTIVE_UPLOADS && queuedWork.length > 0) {
+      const work = queuedWork.shift();
+      if (!work || work.state !== 'queued') {
+        continue;
+      }
+      startWork(work);
+    }
+  }
 
   const registerFile = (
     file: File,
@@ -251,19 +323,9 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     return Result.ok(uploadId);
   };
 
-  const uploadFile = async (
-    file: File,
-    path: string,
-    onRefresh: () => void,
-    conversationQualifiedId: string,
-  ): Promise<boolean> => {
-    const registration = registerFile(file, path, conversationQualifiedId, onRefresh);
-    if (registration.isErr) {
-      return false;
-    }
-
-    const request = requestsByUploadId.get(registration.value);
-    return request ? uploadStrategy.run(registration.value, request) : false;
+  const enqueueWork = (work: UploadWork): void => {
+    workByUploadId.set(work.uploadId, work);
+    queuedWork.push(work);
   };
 
   const upload = async (
@@ -272,9 +334,74 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     onRefresh: () => void,
     conversationQualifiedId: string,
   ): Promise<void> => {
-    const results = await Promise.all(files.map(file => uploadFile(file, path, onRefresh, conversationQualifiedId)));
+    const works: UploadWork[] = [];
+
+    for (const file of files) {
+      const registration = registerFile(file, path, conversationQualifiedId, onRefresh);
+      if (registration.isErr) {
+        continue;
+      }
+
+      const uploadId = registration.value;
+      const request = requestsByUploadId.get(uploadId);
+      if (!request) {
+        continue;
+      }
+
+      const work = createDeferredWork(uploadId, () => uploadStrategy.run(uploadId, request));
+      enqueueWork(work);
+      works.push(work);
+    }
+
+    // Registration must be observable before any worker changes queued to uploading.
+    notify();
+    pumpQueue();
+
+    const results = await Promise.all(works.map(work => work.promise));
     if (results.some(Boolean)) {
       onRefresh();
+    }
+    notify();
+  };
+
+  const cancel = async (id: string): Promise<void> => {
+    const work = workByUploadId.get(id);
+    if (work?.state === 'queued') {
+      settleWork(work, false);
+      notify();
+    }
+
+    try {
+      await uploadStrategy.cancel(id);
+    } finally {
+      pumpQueue();
+      notify();
+    }
+  };
+
+  const retryUpload = async (id: string): Promise<void> => {
+    const currentWork = workByUploadId.get(id);
+    if (currentWork) {
+      await currentWork.promise;
+      return;
+    }
+
+    if (!requestsByUploadId.has(id)) {
+      const succeeded = await uploadStrategy.retryUpload(id);
+      if (succeeded) {
+        refreshByUploadId.get(id)?.();
+      }
+      notify();
+      return;
+    }
+
+    const work = createDeferredWork(id, () => uploadStrategy.retryUpload(id));
+    enqueueWork(work);
+    notify();
+    pumpQueue();
+    const succeeded = await work.promise;
+    if (succeeded) {
+      refreshByUploadId.get(id)?.();
     }
     notify();
   };
@@ -296,14 +423,8 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
       listeners.add(listener);
       return () => listeners.delete(listener);
     },
-    cancel: uploadStrategy.cancel,
-    retryUpload: async (id: string): Promise<void> => {
-      const succeeded = await uploadStrategy.retryUpload(id);
-      if (succeeded) {
-        refreshByUploadId.get(id)?.();
-      }
-      notify();
-    },
+    cancel,
+    retryUpload,
     retryPublish: uploadStrategy.retryPublish,
     discard: uploadStrategy.discard,
     retryDiscard: uploadStrategy.retryDiscard,

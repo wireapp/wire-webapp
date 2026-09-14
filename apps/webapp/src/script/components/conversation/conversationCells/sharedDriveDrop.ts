@@ -25,8 +25,7 @@ import type {Translate} from 'Util/localizerUtil';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
-export type SharedDriveDropRejectionReason =
-  'empty' | 'multipleFiles' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
+export type SharedDriveDropRejectionReason = 'empty' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
 
 export interface SharedDriveDropRejection {
   readonly reason: SharedDriveDropRejectionReason;
@@ -76,21 +75,25 @@ export const validateSharedDriveDroppedFiles = (
     return Result.err({reason: 'empty', invalidFiles: []});
   }
 
-  if (files.length > 1) {
-    return Result.err({reason: 'multipleFiles', invalidFiles: files});
+  const invalidFiles: File[] = [];
+  let firstRejectionReason: Extract<SharedDriveDropRejectionReason, 'notAccepted' | 'tooLarge'> | undefined;
+
+  for (const file of files) {
+    if (!isAcceptedFile(file)) {
+      invalidFiles.push(file);
+      firstRejectionReason ??= 'notAccepted';
+      continue;
+    }
+
+    if (file.size > maxFileSize) {
+      invalidFiles.push(file);
+      firstRejectionReason ??= 'tooLarge';
+    }
   }
 
-  const file = files[0];
-
-  if (!isAcceptedFile(file)) {
-    return Result.err({reason: 'notAccepted', invalidFiles: [file]});
-  }
-
-  if (file.size > maxFileSize) {
-    return Result.err({reason: 'tooLarge', invalidFiles: [file]});
-  }
-
-  return Result.ok(undefined);
+  return invalidFiles.length > 0
+    ? Result.err({reason: firstRejectionReason ?? 'notAccepted', invalidFiles})
+    : Result.ok(undefined);
 };
 
 export const handleSharedDriveDroppedFiles = (
@@ -130,14 +133,6 @@ export const getSharedDriveDropRejectionFeedback = (
   translate: Translate,
   maxFileSize: number,
 ): SharedDriveDropFeedback => {
-  if (reason === 'multipleFiles') {
-    return {
-      title: translate('conversationFileUploadFailedTooManyFilesHeading'),
-      message: translate('conversationFileUploadFailedTooManyFilesMessage', {maxFiles: 1}),
-      invalidFiles: [...invalidFiles],
-    };
-  }
-
   if (reason === 'tooLarge') {
     return {
       title: translate('conversationFileUploadFailedTooLargeFilesHeading'),
