@@ -120,6 +120,8 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(within(rows[0]).getByText('report.pdf')).toBeInTheDocument();
     expect(within(rows[1]).getByText('queued.txt')).toBeInTheDocument();
     expect(within(rows[1]).getByText('Queued')).toBeInTheDocument();
+    expect(screen.getAllByTestId('shared-drive-upload-progress')).toHaveLength(1);
+    expect(within(rows[0]).queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
     expect(within(rows[1]).queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
 
     await user.click(within(rows[1]).getByRole('button', {name: 'Cancel'}));
