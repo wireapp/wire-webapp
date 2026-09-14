@@ -250,6 +250,7 @@ export const SharedDriveUploadStatusPopup = ({
           </button>
         </div>
       </div>
+      {isExpanded && renderProgress(upload, true)}
       <div
         id={statusRowId}
         css={sharedDriveUploadStatusPopupRowsStyles}
@@ -315,7 +316,6 @@ export const SharedDriveUploadStatusPopup = ({
                 </button>
               )}
             </div>
-            {isExpanded && renderProgress(row, true)}
           </div>
         ))}
       </div>

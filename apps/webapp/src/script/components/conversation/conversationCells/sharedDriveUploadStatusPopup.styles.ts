@@ -127,6 +127,7 @@ export const sharedDriveUploadStatusPopupRowsStyles: CSSObject = {
   display: 'flex',
   minWidth: 0,
   flexDirection: 'column',
+  gap: 8,
   '&[hidden]': {
     display: 'none',
   },
