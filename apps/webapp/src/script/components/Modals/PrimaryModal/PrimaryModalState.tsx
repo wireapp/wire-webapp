@@ -172,6 +172,7 @@ const updateCurrentModalContent = (
     inputPlaceholder: text.input ?? '',
     messageHtml: text.htmlMessage,
     message: text.message,
+    translatedMessage: text.translatedMessage,
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
     primaryAction: primaryAction ?? null,
