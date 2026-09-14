@@ -161,7 +161,7 @@ describe('createSharedDriveUploadController', () => {
     ]);
   });
 
-  it('limits overlapping batches to three active uploads and preserves queue order', async () => {
+  it('limits a single batch to three active uploads and preserves queue order', async () => {
     const cellsRepository = createCellsRepositoryMock();
     const pendingUploads: Array<{resolve: () => void}> = [];
     let activeUploads = 0;
@@ -211,6 +211,87 @@ describe('createSharedDriveUploadController', () => {
     pendingUploads[4].resolve();
     await uploadPromise;
     expect(maximumActiveUploads).toBe(3);
+  });
+
+  it('advances queued work after an active failure and refreshes mixed outcomes', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void; reject: () => void}> = [];
+    cellsRepository.uploadNode.mockImplementation(
+      () =>
+        new Promise((resolve, reject) => {
+          pendingUploads.push({
+            resolve: () => resolve({uuid: 'remote-id', versionId: 'version-id'}),
+            reject: () => reject(new Error('upload failed')),
+          });
+        }),
+    );
+    let nextUploadId = 0;
+    const createUploadId = jest.fn(() => `upload-${++nextUploadId}`);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const onRefresh = jest.fn();
+    const files = Array.from({length: 4}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const uploadPromise = controller.upload(files, uploadPath, onRefresh, conversationQualifiedId);
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+
+    pendingUploads[0].reject();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(4, expect.objectContaining({file: files[3]}));
+
+    pendingUploads[1].resolve();
+    pendingUploads[2].resolve();
+    pendingUploads[3].resolve();
+    await uploadPromise;
+
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    const snapshots = controller.snapshots(conversationQualifiedId);
+    expect(snapshots).toHaveLength(4);
+    expect(snapshots).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'uploadFailed'}),
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-2'}), kind: 'published'}),
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-3'}), kind: 'published'}),
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-4'}), kind: 'published'}),
+      ]),
+    );
+  });
+
+  it('advances queued work after an active cancellation', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void}> = [];
+    cellsRepository.uploadNode.mockImplementation(
+      ({abortController}: {abortController?: AbortController}) =>
+        new Promise((resolve, reject) => {
+          pendingUploads.push({resolve: () => resolve({uuid: 'remote-id', versionId: 'version-id'})});
+          abortController?.signal.addEventListener('abort', () => reject(new Error('upload cancelled')));
+        }),
+    );
+    let nextUploadId = 0;
+    const createUploadId = jest.fn(() => `upload-${++nextUploadId}`);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const files = Array.from({length: 4}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const uploadPromise = controller.upload(files, uploadPath, jest.fn(), conversationQualifiedId);
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+
+    await controller.cancel('upload-1');
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(4, expect.objectContaining({file: files[3]}));
+    const snapshots = controller.snapshots(conversationQualifiedId);
+    expect(snapshots).toHaveLength(4);
+    expect(snapshots).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'cancelled'}),
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-4'}), kind: 'uploading'}),
+      ]),
+    );
+
+    pendingUploads.slice(1).forEach(upload => upload.resolve());
+    await uploadPromise;
   });
 
   it('cancels queued work without starting it and advances the queue', async () => {
