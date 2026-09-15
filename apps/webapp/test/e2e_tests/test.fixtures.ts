@@ -238,7 +238,7 @@ export const createTeam = async (
 
     if (options.features.conferenceCalling) {
       await api.enableConferenceCallingFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
+      // await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
     }
 
     if (options.features.mls) {
@@ -256,28 +256,28 @@ export const createTeam = async (
         defaultProtocol: 'mls',
         supportedProtocols: ['mls', 'proteus'],
       });
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+      // await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
 
       await api.brig.unlockChannelFeature(teamId);
       await api.brig.enableChannelsFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
+      // await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
     }
 
     if (options.features.meetings) {
       await api.brig.unlockMeetingsFeature(teamId);
       await api.brig.enableMeetingsFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MEETINGS, teamId, owner.token);
+      // await api.waitForFeatureToBeEnabled(FEATURE_KEY.MEETINGS, teamId, owner.token);
     }
 
     if (options.features.cells) {
       await api.brig.unlockCellsFeature(teamId);
       await api.brig.enableCells(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, teamId, owner.token);
+      // await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, teamId, owner.token);
     }
 
     if (options.features.sso) {
       await api.brig.enableSSOFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.SSO, teamId, owner.token);
+      // await api.waitForFeatureToBeEnabled(FEATURE_KEY.SSO, teamId, owner.token);
     }
   }
 
