@@ -429,6 +429,57 @@ describe('createSharedDriveUploadController', () => {
     ]);
   });
 
+  it('retries a failed row while another upload from the same batch remains active', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads = new Map<string, Array<{resolve: () => void; reject: () => void}>>();
+    cellsRepository.uploadNode.mockImplementation(({uuid}: {uuid: string}) => {
+      const pending = new Promise<{uuid: string; versionId: string}>((resolve, reject) => {
+        const attempts = pendingUploads.get(uuid) ?? [];
+        attempts.push({
+          resolve: () => resolve({uuid: 'remote-id', versionId: 'version-id'}),
+          reject: () => reject(new Error('upload failed')),
+        });
+        pendingUploads.set(uuid, attempts);
+      });
+      return pending;
+    });
+    const createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2');
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const files = [new File(['one'], 'one.txt'), new File(['two'], 'two.txt')];
+
+    const batchPromise = controller.upload(files, uploadPath, jest.fn(), conversationQualifiedId);
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(2);
+
+    pendingUploads.get('upload-1')?.[0].reject();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'uploadFailed'}),
+      expect.objectContaining({identity: {uploadId: 'upload-2'}, kind: 'uploading'}),
+    ]);
+
+    const retryPromise = controller.retryUpload('upload-1');
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({uuid: 'upload-1', file: files[0], path: uploadPath}),
+    );
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'uploading'}),
+      expect.objectContaining({identity: {uploadId: 'upload-2'}, kind: 'uploading'}),
+    ]);
+
+    pendingUploads.get('upload-1')?.[1].resolve();
+    pendingUploads.get('upload-2')?.[0].resolve();
+    await Promise.all([batchPromise, retryPromise]);
+
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-2'}), kind: 'published'}),
+    ]);
+  });
+
   it('does not retry an already published direct upload', async () => {
     const {cellsRepository, controller} = createDirectUploadControllerHelper();
 
