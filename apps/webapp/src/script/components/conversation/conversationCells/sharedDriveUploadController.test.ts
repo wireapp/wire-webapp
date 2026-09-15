@@ -500,7 +500,7 @@ describe('createSharedDriveUploadController', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
-  it('registers and starts every file in a batch immediately', async () => {
+  it('registers every file and starts up to three files at a time', async () => {
     const resolveUploadById = new Map<string, (succeeded: boolean) => void>();
     const uploadStrategy: SharedDriveUploadStrategy = {
       register: jest.fn().mockReturnValue(Result.ok(undefined)),
@@ -540,9 +540,13 @@ describe('createSharedDriveUploadController', () => {
     );
 
     expect(uploadStrategy.register).toHaveBeenCalledTimes(4);
-    expect(uploadStrategy.run).toHaveBeenCalledTimes(4);
+    expect(uploadStrategy.run).toHaveBeenCalledTimes(3);
 
     resolveUploadById.get('upload-1')?.(true);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(uploadStrategy.run).toHaveBeenCalledTimes(4);
+
     resolveUploadById.get('upload-2')?.(true);
     resolveUploadById.get('upload-3')?.(true);
     resolveUploadById.get('upload-4')?.(true);
