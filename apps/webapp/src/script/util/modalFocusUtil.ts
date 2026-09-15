@@ -17,7 +17,7 @@
  *
  */
 
-import {isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isFunction, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 interface ModalFocusContext {
   /**
@@ -77,7 +77,7 @@ export function captureModalFocusContext(context: ModalFocusContext = {}): Modal
       }
 
       // Restore focus to the previously focused element
-      if (!isNull(previouslyFocusedElement) && typeof previouslyFocusedElement.focus === 'function') {
+      if (!isNull(previouslyFocusedElement) && isFunction(previouslyFocusedElement.focus)) {
         try {
           // Check if the element is still in the document before focusing
           if (
