@@ -19,17 +19,8 @@
 
 import React from 'react';
 
-jest.mock('@tanstack/react-virtual', () => ({
-  useVirtualizer: ({count}: {count: number}) => ({
-    getVirtualItems: () =>
-      Array.from({length: count}, (_, index) => ({index, key: index, size: 56, start: index * 56})),
-    getTotalSize: () => count * 56,
-    scrollToIndex: jest.fn(),
-  }),
-}));
-
 import userEvent from '@testing-library/user-event';
-import {act, render} from '@testing-library/react';
+import {act, render, waitFor} from '@testing-library/react';
 import {observable} from 'knockout';
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
@@ -100,6 +91,11 @@ describe('Conversations', () => {
     const testFactory = new TestFactory();
     conversationRepository = await testFactory.exposeConversationActors();
     searchRepository = new SearchRepository({} as UserRepository);
+    window.Element.prototype.getBoundingClientRect = jest.fn().mockReturnValue({height: 1000, width: 1000});
+    Object.defineProperty(window.HTMLElement.prototype, 'clientHeight', {configurable: true, value: 1000});
+    Object.defineProperty(window.HTMLElement.prototype, 'clientWidth', {configurable: true, value: 1000});
+    Object.defineProperty(window.HTMLElement.prototype, 'offsetHeight', {configurable: true, value: 1000});
+    Object.defineProperty(window.HTMLElement.prototype, 'offsetWidth', {configurable: true, value: 1000});
     useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
   });
 
@@ -126,14 +122,18 @@ describe('Conversations', () => {
     const searchInput = getByRole('textbox');
     await user.type(searchInput, 'Ali');
 
-    const firstResult = container.querySelector<HTMLElement>(
-      `[data-uie-uid="${firstConversation.id}"] [data-uie-name="go-open-conversation"]`,
-    );
-    const secondResult = container.querySelector<HTMLElement>(
-      `[data-uie-uid="${secondConversation.id}"] [data-uie-name="go-open-conversation"]`,
-    );
-    expect(firstResult).toBeInTheDocument();
-    expect(secondResult).toBeInTheDocument();
+    let firstResult: HTMLElement | null = null;
+    let secondResult: HTMLElement | null = null;
+    await waitFor(() => {
+      firstResult = container.querySelector<HTMLElement>(
+        `[data-uie-uid="${firstConversation.id}"] [data-uie-name="go-open-conversation"]`,
+      );
+      secondResult = container.querySelector<HTMLElement>(
+        `[data-uie-uid="${secondConversation.id}"] [data-uie-name="go-open-conversation"]`,
+      );
+      expect(firstResult).toBeInTheDocument();
+      expect(secondResult).toBeInTheDocument();
+    });
 
     searchInput.focus();
     const searchTabEvent = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Tab'});
