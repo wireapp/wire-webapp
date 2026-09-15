@@ -63,10 +63,10 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <a
-    className="emotion-1"
+    class="emotion-1"
   >
     ButtonLink
   </a>
@@ -136,10 +136,10 @@ exports[`"ButtonLink" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <a
-    className="emotion-1"
+    class="emotion-1"
   >
     Submit
   </a>
@@ -242,23 +242,18 @@ exports[`"ButtonLink" renders in loading state 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <a
-    className="emotion-1"
+    class="emotion-1"
   >
     <svg
       fill="none"
-      height={30}
-      strokeWidth="3"
-      style={
-        {
-          "display": "flex",
-          "margin": "auto",
-        }
-      }
+      height="30"
+      stroke-width="3"
+      style="display: flex; margin: auto;"
       viewBox="0 0 43 43"
-      width={30}
+      width="30"
     >
       <circle
         cx="21.5"
@@ -267,13 +262,13 @@ exports[`"ButtonLink" renders in loading state 1`] = `
         stroke="rgba(255, 255, 255, 0.07999999999999996)"
       />
       <circle
-        className="emotion-2"
+        class="emotion-2"
         cx="21.5"
         cy="21.5"
         r="20"
         stroke="#fff"
-        strokeDasharray={125.68}
-        strokeLinecap="round"
+        stroke-dasharray="125.68"
+        stroke-linecap="round"
       />
     </svg>
   </a>

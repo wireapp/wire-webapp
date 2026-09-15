@@ -19,10 +19,13 @@
 
 import {ReactElement} from 'react';
 
-import {create} from 'react-test-renderer';
+import {render} from '@testing-library/react';
 
 import {THEME_ID} from '../identity';
 import {StyledApp} from '../layout';
 
-export const matchComponent = (component: ReactElement, themeId = THEME_ID.LIGHT) =>
-  expect(create(<StyledApp themeId={themeId}>{component}</StyledApp>).toJSON()).toMatchSnapshot();
+export function matchComponent(component: ReactElement, themeId = THEME_ID.LIGHT): void {
+  const {container} = render(<StyledApp themeId={themeId}>{component}</StyledApp>);
+
+  expect(container.firstChild).toMatchSnapshot();
+}

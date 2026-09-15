@@ -85,13 +85,13 @@ exports[`"ErrorMessage" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
   >
     <span
-      className="emotion-2"
+      class="emotion-2"
     >
       ErrorMessage
     </span>

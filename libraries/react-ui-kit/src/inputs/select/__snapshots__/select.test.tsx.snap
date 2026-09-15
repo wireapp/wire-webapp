@@ -231,42 +231,38 @@ exports[`"Select" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    autoFocus={false}
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="test"
   >
     <div
-      className="emotion-2"
-      onKeyDown={[Function]}
+      class="emotion-2"
     >
       <div
-        className="emotion-3"
-        tabIndex={0}
+        class="emotion-3"
+        tabindex="0"
       >
         <span
-          className="emotion-4"
+          class="emotion-4"
           id="react-select-2-live-region"
         />
         <span
           aria-atomic="false"
           aria-live="polite"
           aria-relevant="additions text"
-          className="emotion-4"
+          class="emotion-4"
           role="log"
         />
         <div
-          className="emotion-6"
-          onMouseDown={[Function]}
-          onTouchEnd={[Function]}
+          class="emotion-6"
         >
           <div
-            className="emotion-7"
+            class="emotion-7"
           >
             <div
-              className="emotion-8"
+              class="emotion-8"
               id="react-select-2-placeholder"
             >
               Select...
@@ -276,38 +272,32 @@ exports[`"Select" renders 1`] = `
               aria-activedescendant=""
               aria-autocomplete="list"
               aria-describedby="react-select-2-placeholder"
-              aria-expanded={false}
-              aria-haspopup={true}
-              aria-readonly={true}
-              className="emotion-9"
-              disabled={false}
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-readonly="true"
+              class="emotion-9"
               id="test"
-              inputMode="none"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
+              inputmode="none"
               role="combobox"
-              tabIndex={-1}
+              tabindex="-1"
               value=""
             />
           </div>
           <div
-            className="emotion-10"
+            class="emotion-10"
           >
             <span
-              className="emotion-11"
+              class="emotion-11"
             />
             <div
               aria-hidden="true"
-              className="emotion-12"
-              onMouseDown={[Function]}
-              onTouchEnd={[Function]}
+              class="emotion-12"
             >
               <svg
-                className="emotion-13"
-                height={16}
+                class="emotion-13"
+                height="16"
                 viewBox="0 0 16 16"
-                width={16}
+                width="16"
               >
                 <g>
                   <path
@@ -546,43 +536,39 @@ exports[`"Select" renders as disabled 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    autoFocus={false}
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="test"
   >
     <div
-      className="emotion-2"
-      onKeyDown={[Function]}
+      class="emotion-2"
     >
       <div
-        className="emotion-3"
-        tabIndex={0}
+        class="emotion-3"
+        tabindex="0"
       >
         <span
-          className="emotion-4"
+          class="emotion-4"
           id="react-select-3-live-region"
         />
         <span
           aria-atomic="false"
           aria-live="polite"
           aria-relevant="additions text"
-          className="emotion-4"
+          class="emotion-4"
           role="log"
         />
         <div
-          aria-disabled={true}
-          className="emotion-6"
-          onMouseDown={[Function]}
-          onTouchEnd={[Function]}
+          aria-disabled="true"
+          class="emotion-6"
         >
           <div
-            className="emotion-7"
+            class="emotion-7"
           >
             <div
-              className="emotion-8"
+              class="emotion-8"
               id="react-select-3-placeholder"
             >
               Select...
@@ -592,38 +578,33 @@ exports[`"Select" renders as disabled 1`] = `
               aria-activedescendant=""
               aria-autocomplete="list"
               aria-describedby="react-select-3-placeholder"
-              aria-expanded={false}
-              aria-haspopup={true}
-              aria-readonly={true}
-              className="emotion-9"
-              disabled={true}
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-readonly="true"
+              class="emotion-9"
+              disabled=""
               id="test"
-              inputMode="none"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
+              inputmode="none"
               role="combobox"
-              tabIndex={-1}
+              tabindex="-1"
               value=""
             />
           </div>
           <div
-            className="emotion-10"
+            class="emotion-10"
           >
             <span
-              className="emotion-11"
+              class="emotion-11"
             />
             <div
               aria-hidden="true"
-              className="emotion-12"
-              onMouseDown={[Function]}
-              onTouchEnd={[Function]}
+              class="emotion-12"
             >
               <svg
-                className="emotion-13"
-                height={16}
+                class="emotion-13"
+                height="16"
                 viewBox="0 0 16 16"
-                width={16}
+                width="16"
               >
                 <g>
                   <path
@@ -863,42 +844,38 @@ exports[`"Select" renders as invalid 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    autoFocus={false}
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="test"
   >
     <div
-      className="emotion-2"
-      onKeyDown={[Function]}
+      class="emotion-2"
     >
       <div
-        className="emotion-3"
-        tabIndex={0}
+        class="emotion-3"
+        tabindex="0"
       >
         <span
-          className="emotion-4"
+          class="emotion-4"
           id="react-select-4-live-region"
         />
         <span
           aria-atomic="false"
           aria-live="polite"
           aria-relevant="additions text"
-          className="emotion-4"
+          class="emotion-4"
           role="log"
         />
         <div
-          className="emotion-6"
-          onMouseDown={[Function]}
-          onTouchEnd={[Function]}
+          class="emotion-6"
         >
           <div
-            className="emotion-7"
+            class="emotion-7"
           >
             <div
-              className="emotion-8"
+              class="emotion-8"
               id="react-select-4-placeholder"
             >
               Select...
@@ -908,38 +885,32 @@ exports[`"Select" renders as invalid 1`] = `
               aria-activedescendant=""
               aria-autocomplete="list"
               aria-describedby="react-select-4-placeholder"
-              aria-expanded={false}
-              aria-haspopup={true}
-              aria-readonly={true}
-              className="emotion-9"
-              disabled={false}
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-readonly="true"
+              class="emotion-9"
               id="test"
-              inputMode="none"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
+              inputmode="none"
               role="combobox"
-              tabIndex={-1}
+              tabindex="-1"
               value=""
             />
           </div>
           <div
-            className="emotion-10"
+            class="emotion-10"
           >
             <span
-              className="emotion-11"
+              class="emotion-11"
             />
             <div
               aria-hidden="true"
-              className="emotion-12"
-              onMouseDown={[Function]}
-              onTouchEnd={[Function]}
+              class="emotion-12"
             >
               <svg
-                className="emotion-13"
-                height={16}
+                class="emotion-13"
+                height="16"
                 viewBox="0 0 16 16"
-                width={16}
+                width="16"
               >
                 <g>
                   <path

@@ -18,10 +18,10 @@ exports[`"Title" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
   >
     Title
   </div>
@@ -46,10 +46,10 @@ exports[`"Title" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
   >
     Title
   </div>

@@ -17,10 +17,10 @@ exports[`"Text" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -44,10 +44,10 @@ exports[`"Text" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -71,10 +71,10 @@ exports[`"Text" renders as block 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -98,10 +98,10 @@ exports[`"Text" renders bold 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -125,10 +125,10 @@ exports[`"Text" renders centered 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -152,10 +152,10 @@ exports[`"Text" renders light 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -179,10 +179,10 @@ exports[`"Text" renders muted 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -207,10 +207,10 @@ exports[`"Text" renders no wrap 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -234,10 +234,10 @@ exports[`"Text" renders with color 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -261,10 +261,10 @@ exports[`"Text" renders with size 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -288,10 +288,10 @@ exports[`"Text" renders with textTransform 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Text
   </span>
@@ -315,10 +315,10 @@ exports[`"Text" renders with truncation 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   </span>
@@ -342,10 +342,10 @@ exports[`Utility components renders Bold 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Bold
   </span>
@@ -369,10 +369,10 @@ exports[`Utility components renders Large 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Large
   </span>
@@ -396,10 +396,10 @@ exports[`Utility components renders Muted 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Muted
   </span>
@@ -423,10 +423,10 @@ exports[`Utility components renders Small 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Small
   </span>
@@ -450,10 +450,10 @@ exports[`Utility components renders Uppercase 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Uppercase
   </span>

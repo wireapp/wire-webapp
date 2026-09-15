@@ -67,7 +67,7 @@ describe('"RangeInput"', () => {
     const {getByRole} = render(<ThemedRangeInput {...props} />);
 
     const rangeInput = getByRole('slider');
-    fireEvent.change(rangeInput, {value: 2});
+    fireEvent.change(rangeInput, {target: {value: '2'}});
 
     expect(props.onChange).toHaveBeenCalled();
   });

@@ -51,10 +51,10 @@ exports[`"TextArea" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <textarea
-    className="textarea emotion-1"
+    class="textarea emotion-1"
   >
     TextArea
   </textarea>
@@ -112,11 +112,11 @@ exports[`"TextArea" renders as disabled 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <textarea
-    className="textarea emotion-1"
-    disabled={true}
+    class="textarea emotion-1"
+    disabled=""
   >
     TextArea
   </textarea>
@@ -170,10 +170,10 @@ exports[`"TextArea" renders as invalid 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <textarea
-    className="textarea emotion-1"
+    class="textarea emotion-1"
   >
     TextArea
   </textarea>
@@ -231,10 +231,10 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <textarea
-    className="textarea emotion-1"
+    class="textarea emotion-1"
     placeholder="TextArea"
   >
     TextArea
