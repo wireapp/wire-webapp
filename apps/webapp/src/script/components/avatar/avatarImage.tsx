@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/serialize';
 import {Transition} from 'react-transition-group';
@@ -56,6 +56,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   const [avatarImage, setAvatarImage] = useState('');
   const [showTransition, setShowTransition] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (!isVisible) {
@@ -98,10 +99,11 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
   return (
     <InViewport onVisible={() => setIsVisible(true)}>
-      <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
+      <Transition in={!!avatarImage} nodeRef={imageRef} timeout={showTransition ? 700 : 0}>
         {(state: string) => {
           return (
             <img
+              ref={imageRef}
               css={{
                 ...CSS_FILL_PARENT,
                 backgroundColor,
@@ -116,7 +118,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
                 width: '100%',
                 ...transitionImageStyles[state],
               }}
-              src={avatarImage}
+              src={avatarImage === '' ? undefined : avatarImage}
               alt={avatarAlt}
             />
           );

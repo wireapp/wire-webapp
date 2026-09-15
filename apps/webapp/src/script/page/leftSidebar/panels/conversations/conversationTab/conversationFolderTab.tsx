@@ -17,9 +17,7 @@
  *
  */
 
-import {ReactElement} from 'react';
-
-import {useMemo} from 'react';
+import {ReactElement, useMemo} from 'react';
 
 import cx from 'classnames';
 
