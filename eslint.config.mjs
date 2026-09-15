@@ -618,6 +618,23 @@ const productionConfigs = [
     },
   },
   {
+    files: [
+      'apps/webapp/src/script/guards/common.ts',
+      'apps/webapp/src/script/guards/Event.ts',
+      'apps/webapp/src/script/guards/HTMLElement.ts',
+      'apps/webapp/src/script/guards/Mouse.ts',
+      'apps/webapp/src/script/main/reportStartupFailure.ts',
+      'apps/webapp/src/script/observability/**/*.{ts,tsx}',
+      'apps/webapp/src/script/service/apiClientSingleton.ts',
+      'apps/webapp/src/script/service/backendEnvironment.ts',
+      'apps/webapp/src/script/telemetry/app_init/**/*.{ts,tsx}',
+      'apps/webapp/src/script/featureToggles/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
     files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',
