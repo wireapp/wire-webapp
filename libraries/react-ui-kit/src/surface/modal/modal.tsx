@@ -181,9 +181,9 @@ export const Modal: React.FC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
   actions = [],
   children,
   bodyStyle,
-  fullscreen,
-  onClose,
-  onBackgroundClick,
+  fullscreen = false,
+  onClose = noop,
+  onBackgroundClick = noop,
   ...props
 }) => (
   <OverlayWrapper {...props} data-uie-name="modal">
@@ -200,10 +200,3 @@ export const Modal: React.FC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
     )}
   </OverlayWrapper>
 );
-
-Modal.defaultProps = {
-  actions: [],
-  fullscreen: false,
-  onBackgroundClick: noop,
-  onClose: noop,
-};

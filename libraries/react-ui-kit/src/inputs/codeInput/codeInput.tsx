@@ -196,7 +196,9 @@ export const CodeInput = ({
             onKeyDown={event => handleKeyDown(index, event)}
             onKeyUp={forceSelection}
             markInvalid={markInvalid}
-            ref={node => (inputs[index] = node)}
+            ref={(node): void => {
+              inputs[index] = node;
+            }}
             value={values[index]}
             disabled={disabled}
             id={`code-input-digit-${index}`}
