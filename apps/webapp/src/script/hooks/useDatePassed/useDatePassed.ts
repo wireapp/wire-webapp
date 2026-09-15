@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef} from 'react';
 
-import {isNull, isTruthy} from '@sindresorhus/is';
+import {isNull} from '@sindresorhus/is';
 
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -42,7 +42,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
     const currentTime = Date.now();
     if (currentTime >= target.getTime()) {
       hasPassed.current = true;
-      if (isTruthy(intervalId.current)) {
+      if (intervalId.current !== undefined) {
         clearInterval(intervalId.current);
       }
       callback();
@@ -54,7 +54,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
     if (!enabled || isNull(target)) {
       hasPassed.current = false;
       targetTime.current = null;
-      if (isTruthy(intervalId.current)) {
+      if (intervalId.current !== undefined) {
         clearInterval(intervalId.current);
       }
       return undefined;
@@ -67,7 +67,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
       hasPassed.current = false;
       targetTime.current = newTargetTime;
 
-      if (isTruthy(intervalId.current)) {
+      if (intervalId.current !== undefined) {
         clearInterval(intervalId.current);
       }
     }
@@ -82,7 +82,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
     intervalId.current = setInterval(checkTime, TIME_IN_MILLIS.SECOND);
 
     return () => {
-      if (isTruthy(intervalId.current)) {
+      if (intervalId.current !== undefined) {
         clearInterval(intervalId.current);
       }
     };

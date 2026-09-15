@@ -17,7 +17,6 @@
  *
  */
 
-import {isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -46,8 +45,9 @@ export class AppInitStatistics {
   }
 
   add(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
-    if (isTruthy(bucket_size) && typeof value === 'number') {
-      const buckets = Math.floor(value / bucket_size) + (isTruthy(value % bucket_size) ? 1 : 0);
+    if (bucket_size !== undefined && bucket_size !== 0 && !Number.isNaN(bucket_size) && typeof value === 'number') {
+      const remainder = value % bucket_size;
+      const buckets = Math.floor(value / bucket_size) + (remainder !== 0 && !Number.isNaN(remainder) ? 1 : 0);
 
       this.statistics[statistic] = value === 0 ? 0 : bucket_size * buckets;
     } else {

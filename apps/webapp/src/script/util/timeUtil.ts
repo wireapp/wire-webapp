@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy, isUndefined} from '@sindresorhus/is';
+import {isUndefined} from '@sindresorhus/is';
 import {
   differenceInDays,
   differenceInHours,
@@ -324,7 +324,7 @@ export const formatDurationCaption = (duration: number, translate: Translate): s
  * @returns Formatted string
  */
 export const formatSeconds = (duration: number): string => {
-  duration = Math.round(isTruthy(duration) ? duration : 0);
+  duration = Math.round(duration !== 0 && !Number.isNaN(duration) ? duration : 0);
 
   const hours = Math.floor(duration / (60 * 60));
 

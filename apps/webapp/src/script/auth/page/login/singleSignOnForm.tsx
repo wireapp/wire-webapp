@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
-import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
+import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
@@ -227,7 +227,7 @@ const SingleSignOnFormComponent = ({
       setIsCodeOrMailInputValid(isValid);
 
       try {
-        if (isTruthy(currentValidationError)) {
+        if (isError(currentValidationError)) {
           throw currentValidationError;
         }
         const email = codeOrMail.trim();
