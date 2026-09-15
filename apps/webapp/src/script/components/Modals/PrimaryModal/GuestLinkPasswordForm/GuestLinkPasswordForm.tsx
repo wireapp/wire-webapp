@@ -33,7 +33,7 @@ interface GuestLinkPasswordFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onGeneratePassword: (password: string) => void;
   passwordValue: string;
-  passwordValueRef: React.RefObject<HTMLInputElement>;
+  passwordValueRef: React.RefObject<HTMLInputElement | null>;
   onPasswordValueChange: (value: string) => void;
   isPasswordInputMarkInvalid: boolean;
   passwordConfirmationValue: string;

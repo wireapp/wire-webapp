@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactFragment, useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import * as React from 'react';
 
 import {QUERY, QueryKeys} from '../../utils';
@@ -31,10 +31,10 @@ const resolveMediaQuery = (query: Query): string => {
   return (Object.values(QueryKeys) as string[]).includes(query) ? QUERY[query as QueryKeys] : query;
 };
 
-export interface MatchMediaProps extends React.HTMLProps<ReactFragment> {
+export type MatchMediaProps = React.PropsWithChildren<{
   not?: boolean;
   query: Query;
-}
+}>;
 
 export const useMatchMedia = (query: Query, customWindowObj?: Window) => {
   const windowObj = customWindowObj !== undefined ? customWindowObj : window;

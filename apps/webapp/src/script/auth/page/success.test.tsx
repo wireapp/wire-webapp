@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import {fireEvent} from '@testing-library/react';
 
 import {Success} from './success';
@@ -45,7 +47,7 @@ describe('Success', () => {
     jest.clearAllMocks();
   });
 
-  const renderComponent = (component: JSX.Element) => {
+  const renderComponent = (component: ReactElement) => {
     return mountComponent(component, mockStoreFactory()(initialRootState));
   };
 

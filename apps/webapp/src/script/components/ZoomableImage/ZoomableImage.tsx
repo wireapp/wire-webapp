@@ -48,7 +48,10 @@ function calculateZoomRatio(element: HTMLImageElement) {
 }
 
 // if we will add more image zooming, we need to pass 2 props, for check if is image is zoomed and imageScale
-function calculateMaxOffset(containerRef: RefObject<HTMLDivElement>, imgRef: RefObject<HTMLImageElement>) {
+function calculateMaxOffset(
+  containerRef: RefObject<HTMLDivElement | null>,
+  imgRef: RefObject<HTMLImageElement | null>,
+) {
   if (containerRef.current === null || imgRef.current === null) {
     return {
       maxXOffset: 0,

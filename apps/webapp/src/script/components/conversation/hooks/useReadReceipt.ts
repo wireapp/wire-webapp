@@ -31,7 +31,7 @@ const DEBOUNCE = 500;
 
 export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sendReadReceipt'>) => {
   const readMessagesBuffer = useRef<ReadMessageBuffer[]>([]);
-  const flushTimer = useRef<number>();
+  const flushTimer = useRef<number | undefined>(undefined);
 
   const flush = useCallback(() => {
     const readMessages = readMessagesBuffer.current;

@@ -176,7 +176,9 @@ export const TabAndFilterSettings = () => {
           {availableTabs.map((tab, index) => (
             <div key={tab.type}>
               <div
-                ref={el => (itemRefs.current[index] = el)}
+                ref={el => {
+                  itemRefs.current[index] = el;
+                }}
                 css={dropdownCheckboxItem}
                 role="menuitemcheckbox"
                 aria-checked={visibleTabs.includes(tab.type)}

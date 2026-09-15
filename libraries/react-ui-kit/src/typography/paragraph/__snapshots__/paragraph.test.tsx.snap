@@ -25,10 +25,10 @@ exports[`"Lead" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <p
-    className="emotion-1"
+    class="emotion-1"
   >
     Lead
   </p>
@@ -60,10 +60,10 @@ exports[`"Lead" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <p
-    className="emotion-1"
+    class="emotion-1"
   >
     Lead
   </p>
@@ -89,10 +89,10 @@ exports[`"Paragraph" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <p
-    className="emotion-1"
+    class="emotion-1"
   >
     Paragraph
   </p>
@@ -118,10 +118,10 @@ exports[`"Paragraph" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <p
-    className="emotion-1"
+    class="emotion-1"
   >
     Paragraph
   </p>

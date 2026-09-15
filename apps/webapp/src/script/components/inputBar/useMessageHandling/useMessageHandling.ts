@@ -49,7 +49,7 @@ interface UseMessageHandlingProps {
   messageRepository: MessageRepository;
   storageRepository: StorageRepository;
   cellsRepository: CellsRepository;
-  editorRef: React.RefObject<LexicalEditor>;
+  editorRef: React.RefObject<LexicalEditor | null>;
   pastedFile: File | null;
   sendPastedFile: () => void;
   translate: RootContextValue['translate'];

@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {ReactElement, useEffect} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -57,7 +57,7 @@ export const MultipartAssets = ({
   cellsRepository = container.resolve(CellsRepository),
   senderName,
   timestamp,
-}: MultipartAssetsProps): JSX.Element => {
+}: MultipartAssetsProps): ReactElement => {
   return (
     <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
@@ -94,7 +94,7 @@ const MultipartAsset = ({
   image: imageMetadata,
   senderName,
   timestamp,
-}: MultipartAssetProps): JSX.Element => {
+}: MultipartAssetProps): ReactElement => {
   if (isNullOrUndefined(initialName)) {
     throw new Error('Multipart asset has no file name');
   }

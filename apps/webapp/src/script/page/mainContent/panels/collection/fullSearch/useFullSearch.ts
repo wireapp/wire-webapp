@@ -63,7 +63,7 @@ export function useFullSearch(options: UseFullSearchOptions): UseFullSearchResul
 
   const latestSearchQueryRef = useRef('');
   const latestSearchIdRef = useRef(0);
-  const abortControllerRef = useRef<AbortController | undefined>();
+  const abortControllerRef = useRef<AbortController | undefined>(undefined);
   const searchProviderRef = useRef(searchProvider);
 
   useEffect(() => {

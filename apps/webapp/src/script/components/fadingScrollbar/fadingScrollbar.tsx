@@ -50,7 +50,7 @@ const fadeStep = (state: number, {step, goal}: {step: number; goal: number}) => 
 
 export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
   const isAnimating = useRef(false);
-  const initalColor = useRef<[number, number, number, number]>();
+  const initalColor = useRef<[number, number, number, number] | undefined>(undefined);
   const currentAlpha = useRef<number>(0);
 
   const getInitialColor = (element: HTMLElement) => {

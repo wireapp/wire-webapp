@@ -15,13 +15,11 @@ exports[`"Line" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <hr
-    className="emotion-1"
-  >
-    Line
-  </hr>
+    class="emotion-1"
+  />
 </div>
 `;
 
@@ -40,13 +38,11 @@ exports[`"Line" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <hr
-    className="emotion-1"
-  >
-    Line
-  </hr>
+    class="emotion-1"
+  />
 </div>
 `;
 
@@ -65,13 +61,11 @@ exports[`"Line" renders with color 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <hr
-    className="emotion-1"
+    class="emotion-1"
     color="#e02020"
-  >
-    Line
-  </hr>
+  />
 </div>
 `;

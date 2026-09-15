@@ -59,7 +59,7 @@ interface UseMessageSendProps {
   cancelMessageReply: () => void;
   editedMessage: ContentMessage | undefined;
   replyMessageCallback: (messageEntity: ContentMessage | null) => void;
-  editorRef: React.RefObject<LexicalEditor>;
+  editorRef: React.RefObject<LexicalEditor | null>;
   pastedFile: File | null;
   sendPastedFile: () => void;
   messageContent: MessageContent;

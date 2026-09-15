@@ -100,29 +100,26 @@ exports[`"DropFileInput" matches snapshot 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-0"
+    class="emotion-0"
   >
     <div
-      className="emotion-2"
+      class="emotion-2"
     >
       <div
-        className="emotion-3"
+        class="emotion-3"
         data-testid="dropzone"
-        onDragLeave={[Function]}
-        onDragOver={[Function]}
-        onDrop={[Function]}
       >
         <div
-          className="emotion-4"
+          class="emotion-4"
         >
           <svg
-            className="emotion-5"
-            height={16}
+            class="emotion-5"
+            height="16"
             viewBox="0 0 16 16"
-            width={16}
+            width="16"
           >
             <g>
               <path
@@ -131,10 +128,10 @@ exports[`"DropFileInput" matches snapshot 1`] = `
             </g>
           </svg>
           <div
-            className="emotion-6"
+            class="emotion-6"
           >
             <span
-              className="emotion-7"
+              class="emotion-7"
             >
               Drag & Drop an image 
 or
@@ -142,16 +139,15 @@ or
             <label
               aria-label="Drag & Drop an image 
 or select one from your device (Image (JPG/PNG) size up to 1 MB, minimum 200 x 600 px)"
-              className="emotion-8"
+              class="emotion-8"
             >
               <span>
                 select one from your device
               </span>
               <input
                 accept="image/png, image/jpeg"
-                className="emotion-9"
+                class="emotion-9"
                 data-testid="file-input"
-                onChange={[Function]}
                 type="file"
               />
             </label>
@@ -159,7 +155,7 @@ or select one from your device (Image (JPG/PNG) size up to 1 MB, minimum 200 x 6
         </div>
       </div>
       <p
-        className="emotion-10"
+        class="emotion-10"
       >
         Image (JPG/PNG) size up to 1 MB, minimum 200 x 600 px
       </p>

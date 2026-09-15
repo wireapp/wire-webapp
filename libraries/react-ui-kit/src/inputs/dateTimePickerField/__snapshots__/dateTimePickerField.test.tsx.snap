@@ -442,265 +442,159 @@ exports[`"DateTimePickerField" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="datetime-picker-test"
   >
     <div
-      className="emotion-2"
+      class="emotion-2"
       role="group"
     >
       <div
-        className="emotion-3"
+        class="emotion-3"
         data-uie-name="datetime-picker-test-date"
       >
         <div
-          className="react-aria-DatePicker"
+          class="react-aria-DatePicker"
           data-rac=""
-          onBlur={[Function]}
-          onFocus={[Function]}
         >
           <div
             aria-describedby="react-aria-description-0"
-            aria-disabled={null}
             aria-label="Select date"
             aria-labelledby="datetime-picker-test-date"
-            className="emotion-4"
+            class="emotion-4"
             data-rac=""
-            data-react-aria-pressable={true}
+            data-react-aria-pressable="true"
             id="datetime-picker-test-date"
-            onBlur={[Function]}
-            onClick={[Function]}
-            onDragStart={[Function]}
-            onFocus={[Function]}
-            onKeyDown={[Function]}
-            onKeyUp={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onTouchCancel={[Function]}
-            onTouchEnd={[Function]}
-            onTouchMove={[Function]}
-            onTouchStart={[Function]}
             role="group"
           >
             <div
-              className="emotion-5"
+              class="emotion-5"
               data-rac=""
-              data-react-aria-pressable={true}
-              id="react-aria-:r2:"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyUp={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchCancel={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
+              data-react-aria-pressable="true"
+              id="react-aria-_r_2_"
               role="presentation"
-              style={
-                {
-                  "unicodeBidi": "isolate",
-                }
-              }
+              style="unicode-bidi: isolate;"
             >
               <span
                 aria-describedby="react-aria-description-0"
                 aria-label="Tag, Select date"
-                aria-valuemax={31}
-                aria-valuemin={1}
-                aria-valuenow={15}
+                aria-valuemax="31"
+                aria-valuemin="1"
+                aria-valuenow="15"
                 aria-valuetext="15"
-                autoCorrect="off"
-                className="emotion-6"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-6"
+                contenteditable="true"
                 data-rac=""
                 data-type="day"
-                enterKeyHint="next"
-                id="react-aria-:rd:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_d_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 15
               </span>
               <span
-                aria-hidden={true}
-                className="emotion-6"
+                aria-hidden="true"
+                class="emotion-6"
                 data-rac=""
                 data-type="literal"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onTouchStart={[Function]}
               >
                 .
               </span>
               <span
                 aria-label="Monat, Select date"
-                aria-valuemax={12}
-                aria-valuemin={1}
-                aria-valuenow={6}
+                aria-valuemax="12"
+                aria-valuemin="1"
+                aria-valuenow="6"
                 aria-valuetext="6 – Juni"
-                autoCorrect="off"
-                className="emotion-6"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-6"
+                contenteditable="true"
                 data-rac=""
                 data-type="month"
-                enterKeyHint="next"
-                id="react-aria-:rh:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_h_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 6
               </span>
               <span
-                aria-hidden={true}
-                className="emotion-6"
+                aria-hidden="true"
+                class="emotion-6"
                 data-rac=""
                 data-type="literal"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onTouchStart={[Function]}
               >
                 .
               </span>
               <span
                 aria-label="Jahr, Select date"
-                aria-valuemax={9999}
-                aria-valuemin={1}
-                aria-valuenow={2026}
+                aria-valuemax="9999"
+                aria-valuemin="1"
+                aria-valuenow="2026"
                 aria-valuetext="2026"
-                autoCorrect="off"
-                className="emotion-6"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-6"
+                contenteditable="true"
                 data-rac=""
                 data-type="year"
-                enterKeyHint="next"
-                id="react-aria-:rl:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_l_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 2026
               </span>
             </div>
             <input
+              class=""
               data-rac=""
-              disabled={false}
-              hidden={true}
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onTouchStart={[Function]}
+              hidden=""
+              title=""
               type="text"
               value="2026-06-15"
             />
             <button
               aria-describedby="react-aria-description-0"
-              aria-expanded={false}
+              aria-expanded="false"
               aria-haspopup="dialog"
               aria-label="Open calendar"
-              aria-labelledby="react-aria-:r0: datetime-picker-test-date"
-              className="emotion-11"
+              aria-labelledby="react-aria-_r_0_ datetime-picker-test-date"
+              class="emotion-11"
               data-rac=""
-              data-react-aria-pressable={true}
-              disabled={false}
-              id="react-aria-:r0:"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchCancel={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
-              tabIndex={0}
+              data-react-aria-pressable="true"
+              id="react-aria-_r_0_"
+              tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                className="emotion-12"
-                height={16}
+                class="emotion-12"
+                height="16"
                 viewBox="0 0 16 16"
-                width={16}
+                width="16"
               >
                 <g>
                   <path
                     d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
                     fill="none"
                     stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
                   />
                 </g>
               </svg>
@@ -708,83 +602,62 @@ exports[`"DateTimePickerField" renders 1`] = `
           </div>
         </div>
         <div
-          aria-hidden={true}
+          aria-hidden="true"
           data-a11y-ignore="aria-hidden-focus"
-          data-react-aria-prevent-focus={true}
+          data-react-aria-prevent-focus="true"
           data-testid="hidden-dateinput-container"
-          style={
-            {
-              "border": 0,
-              "clip": "rect(0 0 0 0)",
-              "clipPath": "inset(50%)",
-              "height": "1px",
-              "left": 0,
-              "margin": "-1px",
-              "overflow": "hidden",
-              "padding": 0,
-              "position": "fixed",
-              "top": 0,
-              "whiteSpace": "nowrap",
-              "width": "1px",
-            }
-          }
+          style="border: 0px; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: fixed; width: 1px; white-space: nowrap; top: 0px; left: 0px;"
         >
           <input
-            disabled={false}
             form=""
-            onChange={[Function]}
-            step={60}
-            tabIndex={-1}
+            step="60"
+            tabindex="-1"
             type="date"
             value="2026-06-15"
           />
         </div>
       </div>
       <div
-        className="emotion-13"
+        class="emotion-13"
         data-uie-name="datetime-picker-test-time"
       >
         <label
-          className="emotion-14"
-          htmlFor="datetime-picker-test-time"
+          class="emotion-14"
+          for="datetime-picker-test-time"
           id="datetime-picker-test-time-label"
         >
           Select time
         </label>
         <div
-          autoFocus={false}
-          className="emotion-15"
+          class="emotion-15"
           data-uie-name="datetime-picker-test-time"
         >
           <div
-            className="emotion-16"
-            onKeyDown={[Function]}
+            class="emotion-16"
           >
             <div
-              className="emotion-17"
-              tabIndex={0}
+              class="emotion-17"
+              tabindex="0"
             >
               <span
-                className="emotion-18"
+                class="emotion-18"
                 id="react-select-2-live-region"
               />
               <span
                 aria-atomic="false"
                 aria-live="polite"
                 aria-relevant="additions text"
-                className="emotion-18"
+                class="emotion-18"
                 role="log"
               />
               <div
-                className="emotion-20"
-                onMouseDown={[Function]}
-                onTouchEnd={[Function]}
+                class="emotion-20"
               >
                 <div
-                  className="emotion-21"
+                  class="emotion-21"
                 >
                   <div
-                    className="emotion-22"
+                    class="emotion-22"
                   >
                     3:00 PM
                   </div>
@@ -792,38 +665,32 @@ exports[`"DateTimePickerField" renders 1`] = `
                   <input
                     aria-activedescendant=""
                     aria-autocomplete="list"
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    aria-readonly={true}
-                    className="emotion-23"
-                    disabled={false}
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-readonly="true"
+                    class="emotion-23"
                     id="datetime-picker-test-time"
-                    inputMode="none"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    onFocus={[Function]}
+                    inputmode="none"
                     role="combobox"
-                    tabIndex={-1}
+                    tabindex="-1"
                     value=""
                   />
                 </div>
                 <div
-                  className="emotion-24"
+                  class="emotion-24"
                 >
                   <span
-                    className="emotion-25"
+                    class="emotion-25"
                   />
                   <div
                     aria-hidden="true"
-                    className="emotion-26"
-                    onMouseDown={[Function]}
-                    onTouchEnd={[Function]}
+                    class="emotion-26"
                   >
                     <svg
-                      className="emotion-27"
-                      height={16}
+                      class="emotion-27"
+                      height="16"
                       viewBox="0 0 16 16"
-                      width={16}
+                      width="16"
                     >
                       <g>
                         <path
@@ -1278,262 +1145,158 @@ exports[`"DateTimePickerField" renders as disabled 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="datetime-picker-test"
   >
     <div
-      className="emotion-2"
+      class="emotion-2"
       role="group"
     >
       <div
-        className="emotion-3"
+        class="emotion-3"
         data-uie-name="datetime-picker-test-date"
       >
         <div
-          className="react-aria-DatePicker"
-          data-disabled={true}
+          class="react-aria-DatePicker"
+          data-disabled="true"
           data-rac=""
-          onBlur={[Function]}
-          onFocus={[Function]}
         >
           <div
-            aria-describedby="react-aria-description-0"
-            aria-disabled={true}
+            aria-describedby="react-aria-description-3"
+            aria-disabled="true"
             aria-label="Select date"
             aria-labelledby="datetime-picker-test-date"
-            className="emotion-4"
-            data-disabled={true}
+            class="emotion-4"
+            data-disabled="true"
             data-rac=""
-            data-react-aria-pressable={true}
+            data-react-aria-pressable="true"
             id="datetime-picker-test-date"
-            onBlur={[Function]}
-            onClick={[Function]}
-            onDragStart={[Function]}
-            onFocus={[Function]}
-            onKeyDown={[Function]}
-            onKeyUp={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onTouchCancel={[Function]}
-            onTouchEnd={[Function]}
-            onTouchMove={[Function]}
-            onTouchStart={[Function]}
             role="group"
           >
             <div
-              className="emotion-5"
-              data-disabled={true}
+              class="emotion-5"
+              data-disabled="true"
               data-rac=""
-              data-react-aria-pressable={true}
-              id="react-aria-:r2d:"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyUp={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchCancel={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
+              data-react-aria-pressable="true"
+              id="react-aria-_r_2d_"
               role="presentation"
-              style={
-                {
-                  "unicodeBidi": "isolate",
-                }
-              }
+              style="unicode-bidi: isolate;"
             >
               <span
-                aria-describedby="react-aria-description-0"
-                aria-disabled={true}
+                aria-describedby="react-aria-description-3"
+                aria-disabled="true"
                 aria-label="Tag, Select date"
-                aria-valuemax={31}
-                aria-valuemin={1}
-                aria-valuenow={15}
+                aria-valuemax="31"
+                aria-valuemin="1"
+                aria-valuenow="15"
                 aria-valuetext="15"
-                className="emotion-6"
-                contentEditable={false}
-                data-disabled={true}
+                class="emotion-6"
+                contenteditable="false"
+                data-disabled="true"
                 data-rac=""
                 data-type="day"
-                id="react-aria-:r2o:"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                id="react-aria-_r_2o_"
                 role="spinbutton"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={false}
+                style="caret-color: transparent;"
               >
                 15
               </span>
               <span
-                aria-hidden={true}
-                className="emotion-6"
-                data-disabled={true}
+                aria-hidden="true"
+                class="emotion-6"
+                data-disabled="true"
                 data-rac=""
                 data-type="literal"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onTouchStart={[Function]}
               >
                 .
               </span>
               <span
-                aria-disabled={true}
+                aria-disabled="true"
                 aria-label="Monat, Select date"
-                aria-valuemax={12}
-                aria-valuemin={1}
-                aria-valuenow={6}
+                aria-valuemax="12"
+                aria-valuemin="1"
+                aria-valuenow="6"
                 aria-valuetext="6 – Juni"
-                className="emotion-6"
-                contentEditable={false}
-                data-disabled={true}
+                class="emotion-6"
+                contenteditable="false"
+                data-disabled="true"
                 data-rac=""
                 data-type="month"
-                id="react-aria-:r2s:"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                id="react-aria-_r_2s_"
                 role="spinbutton"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={false}
+                style="caret-color: transparent;"
               >
                 6
               </span>
               <span
-                aria-hidden={true}
-                className="emotion-6"
-                data-disabled={true}
+                aria-hidden="true"
+                class="emotion-6"
+                data-disabled="true"
                 data-rac=""
                 data-type="literal"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onTouchStart={[Function]}
               >
                 .
               </span>
               <span
-                aria-disabled={true}
+                aria-disabled="true"
                 aria-label="Jahr, Select date"
-                aria-valuemax={9999}
-                aria-valuemin={1}
-                aria-valuenow={2026}
+                aria-valuemax="9999"
+                aria-valuemin="1"
+                aria-valuenow="2026"
                 aria-valuetext="2026"
-                className="emotion-6"
-                contentEditable={false}
-                data-disabled={true}
+                class="emotion-6"
+                contenteditable="false"
+                data-disabled="true"
                 data-rac=""
                 data-type="year"
-                id="react-aria-:r30:"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                id="react-aria-_r_30_"
                 role="spinbutton"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={false}
+                style="caret-color: transparent;"
               >
                 2026
               </span>
             </div>
             <input
-              data-disabled={true}
+              class=""
+              data-disabled="true"
               data-rac=""
-              disabled={true}
-              hidden={true}
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onTouchStart={[Function]}
+              disabled=""
+              hidden=""
               type="text"
               value="2026-06-15"
             />
             <button
-              aria-describedby="react-aria-description-0"
-              aria-expanded={false}
+              aria-describedby="react-aria-description-3"
+              aria-expanded="false"
               aria-haspopup="dialog"
               aria-label="Open calendar"
-              aria-labelledby="react-aria-:r2b: datetime-picker-test-date"
-              className="emotion-11"
-              data-disabled={true}
+              aria-labelledby="react-aria-_r_2b_ datetime-picker-test-date"
+              class="emotion-11"
+              data-disabled="true"
               data-rac=""
-              data-react-aria-pressable={true}
-              disabled={true}
-              id="react-aria-:r2b:"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchCancel={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
+              data-react-aria-pressable="true"
+              disabled=""
+              id="react-aria-_r_2b_"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                className="emotion-12"
-                height={16}
+                class="emotion-12"
+                height="16"
                 viewBox="0 0 16 16"
-                width={16}
+                width="16"
               >
                 <g>
                   <path
                     d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
                     fill="none"
                     stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
                   />
                 </g>
               </svg>
@@ -1541,84 +1304,64 @@ exports[`"DateTimePickerField" renders as disabled 1`] = `
           </div>
         </div>
         <div
-          aria-hidden={true}
+          aria-hidden="true"
           data-a11y-ignore="aria-hidden-focus"
-          data-react-aria-prevent-focus={true}
+          data-react-aria-prevent-focus="true"
           data-testid="hidden-dateinput-container"
-          style={
-            {
-              "border": 0,
-              "clip": "rect(0 0 0 0)",
-              "clipPath": "inset(50%)",
-              "height": "1px",
-              "left": 0,
-              "margin": "-1px",
-              "overflow": "hidden",
-              "padding": 0,
-              "position": "fixed",
-              "top": 0,
-              "whiteSpace": "nowrap",
-              "width": "1px",
-            }
-          }
+          style="border: 0px; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: fixed; width: 1px; white-space: nowrap; top: 0px; left: 0px;"
         >
           <input
-            disabled={true}
+            disabled=""
             form=""
-            onChange={[Function]}
-            step={60}
-            tabIndex={-1}
+            step="60"
+            tabindex="-1"
             type="date"
             value="2026-06-15"
           />
         </div>
       </div>
       <div
-        className="emotion-13"
+        class="emotion-13"
         data-uie-name="datetime-picker-test-time"
       >
         <label
-          className="emotion-14"
-          htmlFor="datetime-picker-test-time"
+          class="emotion-14"
+          for="datetime-picker-test-time"
           id="datetime-picker-test-time-label"
         >
           Select time
         </label>
         <div
-          autoFocus={false}
-          className="emotion-15"
+          class="emotion-15"
           data-uie-name="datetime-picker-test-time"
         >
           <div
-            className="emotion-16"
-            onKeyDown={[Function]}
+            class="emotion-16"
           >
             <div
-              className="emotion-17"
-              tabIndex={0}
+              class="emotion-17"
+              tabindex="0"
             >
               <span
-                className="emotion-18"
+                class="emotion-18"
                 id="react-select-5-live-region"
               />
               <span
                 aria-atomic="false"
                 aria-live="polite"
                 aria-relevant="additions text"
-                className="emotion-18"
+                class="emotion-18"
                 role="log"
               />
               <div
-                aria-disabled={true}
-                className="emotion-20"
-                onMouseDown={[Function]}
-                onTouchEnd={[Function]}
+                aria-disabled="true"
+                class="emotion-20"
               >
                 <div
-                  className="emotion-21"
+                  class="emotion-21"
                 >
                   <div
-                    className="emotion-22"
+                    class="emotion-22"
                   >
                     3:00 PM
                   </div>
@@ -1626,38 +1369,33 @@ exports[`"DateTimePickerField" renders as disabled 1`] = `
                   <input
                     aria-activedescendant=""
                     aria-autocomplete="list"
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    aria-readonly={true}
-                    className="emotion-23"
-                    disabled={true}
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-readonly="true"
+                    class="emotion-23"
+                    disabled=""
                     id="datetime-picker-test-time"
-                    inputMode="none"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    onFocus={[Function]}
+                    inputmode="none"
                     role="combobox"
-                    tabIndex={-1}
+                    tabindex="-1"
                     value=""
                   />
                 </div>
                 <div
-                  className="emotion-24"
+                  class="emotion-24"
                 >
                   <span
-                    className="emotion-25"
+                    class="emotion-25"
                   />
                   <div
                     aria-hidden="true"
-                    className="emotion-26"
-                    onMouseDown={[Function]}
-                    onTouchEnd={[Function]}
+                    class="emotion-26"
                   >
                     <svg
-                      className="emotion-27"
-                      height={16}
+                      class="emotion-27"
+                      height="16"
                       viewBox="0 0 16 16"
-                      width={16}
+                      width="16"
                     >
                       <g>
                         <path
@@ -2119,265 +1857,159 @@ exports[`"DateTimePickerField" renders as invalid 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="datetime-picker-test"
   >
     <div
-      className="emotion-2"
+      class="emotion-2"
       role="group"
     >
       <div
-        className="emotion-3"
+        class="emotion-3"
         data-uie-name="datetime-picker-test-date"
       >
         <div
-          className="react-aria-DatePicker"
+          class="react-aria-DatePicker"
           data-rac=""
-          onBlur={[Function]}
-          onFocus={[Function]}
         >
           <div
-            aria-describedby="react-aria-description-0"
-            aria-disabled={null}
+            aria-describedby="react-aria-description-2"
             aria-label="Select date"
             aria-labelledby="datetime-picker-test-date"
-            className="emotion-4"
+            class="emotion-4"
             data-rac=""
-            data-react-aria-pressable={true}
+            data-react-aria-pressable="true"
             id="datetime-picker-test-date"
-            onBlur={[Function]}
-            onClick={[Function]}
-            onDragStart={[Function]}
-            onFocus={[Function]}
-            onKeyDown={[Function]}
-            onKeyUp={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onTouchCancel={[Function]}
-            onTouchEnd={[Function]}
-            onTouchMove={[Function]}
-            onTouchStart={[Function]}
             role="group"
           >
             <div
-              className="emotion-5"
+              class="emotion-5"
               data-rac=""
-              data-react-aria-pressable={true}
-              id="react-aria-:r1k:"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyUp={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchCancel={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
+              data-react-aria-pressable="true"
+              id="react-aria-_r_1k_"
               role="presentation"
-              style={
-                {
-                  "unicodeBidi": "isolate",
-                }
-              }
+              style="unicode-bidi: isolate;"
             >
               <span
-                aria-describedby="react-aria-description-0"
+                aria-describedby="react-aria-description-2"
                 aria-label="Tag, Select date"
-                aria-valuemax={31}
-                aria-valuemin={1}
-                aria-valuenow={15}
+                aria-valuemax="31"
+                aria-valuemin="1"
+                aria-valuenow="15"
                 aria-valuetext="15"
-                autoCorrect="off"
-                className="emotion-6"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-6"
+                contenteditable="true"
                 data-rac=""
                 data-type="day"
-                enterKeyHint="next"
-                id="react-aria-:r1v:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_1v_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 15
               </span>
               <span
-                aria-hidden={true}
-                className="emotion-6"
+                aria-hidden="true"
+                class="emotion-6"
                 data-rac=""
                 data-type="literal"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onTouchStart={[Function]}
               >
                 .
               </span>
               <span
                 aria-label="Monat, Select date"
-                aria-valuemax={12}
-                aria-valuemin={1}
-                aria-valuenow={6}
+                aria-valuemax="12"
+                aria-valuemin="1"
+                aria-valuenow="6"
                 aria-valuetext="6 – Juni"
-                autoCorrect="off"
-                className="emotion-6"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-6"
+                contenteditable="true"
                 data-rac=""
                 data-type="month"
-                enterKeyHint="next"
-                id="react-aria-:r23:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_23_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 6
               </span>
               <span
-                aria-hidden={true}
-                className="emotion-6"
+                aria-hidden="true"
+                class="emotion-6"
                 data-rac=""
                 data-type="literal"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onTouchStart={[Function]}
               >
                 .
               </span>
               <span
                 aria-label="Jahr, Select date"
-                aria-valuemax={9999}
-                aria-valuemin={1}
-                aria-valuenow={2026}
+                aria-valuemax="9999"
+                aria-valuemin="1"
+                aria-valuenow="2026"
                 aria-valuetext="2026"
-                autoCorrect="off"
-                className="emotion-6"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-6"
+                contenteditable="true"
                 data-rac=""
                 data-type="year"
-                enterKeyHint="next"
-                id="react-aria-:r27:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_27_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 2026
               </span>
             </div>
             <input
+              class=""
               data-rac=""
-              disabled={false}
-              hidden={true}
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onTouchStart={[Function]}
+              hidden=""
+              title=""
               type="text"
               value="2026-06-15"
             />
             <button
-              aria-describedby="react-aria-description-0"
-              aria-expanded={false}
+              aria-describedby="react-aria-description-2"
+              aria-expanded="false"
               aria-haspopup="dialog"
               aria-label="Open calendar"
-              aria-labelledby="react-aria-:r1i: datetime-picker-test-date"
-              className="emotion-11"
+              aria-labelledby="react-aria-_r_1i_ datetime-picker-test-date"
+              class="emotion-11"
               data-rac=""
-              data-react-aria-pressable={true}
-              disabled={false}
-              id="react-aria-:r1i:"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchCancel={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
-              tabIndex={0}
+              data-react-aria-pressable="true"
+              id="react-aria-_r_1i_"
+              tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                className="emotion-12"
-                height={16}
+                class="emotion-12"
+                height="16"
                 viewBox="0 0 16 16"
-                width={16}
+                width="16"
               >
                 <g>
                   <path
                     d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
                     fill="none"
                     stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
                   />
                 </g>
               </svg>
@@ -2385,83 +2017,62 @@ exports[`"DateTimePickerField" renders as invalid 1`] = `
           </div>
         </div>
         <div
-          aria-hidden={true}
+          aria-hidden="true"
           data-a11y-ignore="aria-hidden-focus"
-          data-react-aria-prevent-focus={true}
+          data-react-aria-prevent-focus="true"
           data-testid="hidden-dateinput-container"
-          style={
-            {
-              "border": 0,
-              "clip": "rect(0 0 0 0)",
-              "clipPath": "inset(50%)",
-              "height": "1px",
-              "left": 0,
-              "margin": "-1px",
-              "overflow": "hidden",
-              "padding": 0,
-              "position": "fixed",
-              "top": 0,
-              "whiteSpace": "nowrap",
-              "width": "1px",
-            }
-          }
+          style="border: 0px; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: fixed; width: 1px; white-space: nowrap; top: 0px; left: 0px;"
         >
           <input
-            disabled={false}
             form=""
-            onChange={[Function]}
-            step={60}
-            tabIndex={-1}
+            step="60"
+            tabindex="-1"
             type="date"
             value="2026-06-15"
           />
         </div>
       </div>
       <div
-        className="emotion-13"
+        class="emotion-13"
         data-uie-name="datetime-picker-test-time"
       >
         <label
-          className="emotion-14"
-          htmlFor="datetime-picker-test-time"
+          class="emotion-14"
+          for="datetime-picker-test-time"
           id="datetime-picker-test-time-label"
         >
           Select time
         </label>
         <div
-          autoFocus={false}
-          className="emotion-15"
+          class="emotion-15"
           data-uie-name="datetime-picker-test-time"
         >
           <div
-            className="emotion-16"
-            onKeyDown={[Function]}
+            class="emotion-16"
           >
             <div
-              className="emotion-17"
-              tabIndex={0}
+              class="emotion-17"
+              tabindex="0"
             >
               <span
-                className="emotion-18"
+                class="emotion-18"
                 id="react-select-4-live-region"
               />
               <span
                 aria-atomic="false"
                 aria-live="polite"
                 aria-relevant="additions text"
-                className="emotion-18"
+                class="emotion-18"
                 role="log"
               />
               <div
-                className="emotion-20"
-                onMouseDown={[Function]}
-                onTouchEnd={[Function]}
+                class="emotion-20"
               >
                 <div
-                  className="emotion-21"
+                  class="emotion-21"
                 >
                   <div
-                    className="emotion-22"
+                    class="emotion-22"
                   >
                     3:00 PM
                   </div>
@@ -2469,38 +2080,32 @@ exports[`"DateTimePickerField" renders as invalid 1`] = `
                   <input
                     aria-activedescendant=""
                     aria-autocomplete="list"
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    aria-readonly={true}
-                    className="emotion-23"
-                    disabled={false}
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-readonly="true"
+                    class="emotion-23"
                     id="datetime-picker-test-time"
-                    inputMode="none"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    onFocus={[Function]}
+                    inputmode="none"
                     role="combobox"
-                    tabIndex={-1}
+                    tabindex="-1"
                     value=""
                   />
                 </div>
                 <div
-                  className="emotion-24"
+                  class="emotion-24"
                 >
                   <span
-                    className="emotion-25"
+                    class="emotion-25"
                   />
                   <div
                     aria-hidden="true"
-                    className="emotion-26"
-                    onMouseDown={[Function]}
-                    onTouchEnd={[Function]}
+                    class="emotion-26"
                   >
                     <svg
-                      className="emotion-27"
-                      height={16}
+                      class="emotion-27"
+                      height="16"
                       viewBox="0 0 16 16"
-                      width={16}
+                      width="16"
                     >
                       <g>
                         <path
@@ -2517,7 +2122,7 @@ exports[`"DateTimePickerField" renders as invalid 1`] = `
       </div>
     </div>
     <p
-      className="emotion-28"
+      class="emotion-28"
     >
       Please select a future date and time.
     </p>
@@ -2976,272 +2581,166 @@ exports[`"DateTimePickerField" renders with label 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="datetime-picker-test"
   >
     <label
-      className="emotion-2"
+      class="emotion-2"
       id="datetime-picker-test-label"
     >
       Starts at
     </label>
     <div
       aria-labelledby="datetime-picker-test-label"
-      className="emotion-3"
+      class="emotion-3"
       role="group"
     >
       <div
-        className="emotion-4"
+        class="emotion-4"
         data-uie-name="datetime-picker-test-date"
       >
         <div
-          className="react-aria-DatePicker"
+          class="react-aria-DatePicker"
           data-rac=""
-          onBlur={[Function]}
-          onFocus={[Function]}
         >
           <div
-            aria-describedby="react-aria-description-0"
-            aria-disabled={null}
+            aria-describedby="react-aria-description-1"
             aria-label="Select date"
             aria-labelledby="datetime-picker-test-date"
-            className="emotion-5"
+            class="emotion-5"
             data-rac=""
-            data-react-aria-pressable={true}
+            data-react-aria-pressable="true"
             id="datetime-picker-test-date"
-            onBlur={[Function]}
-            onClick={[Function]}
-            onDragStart={[Function]}
-            onFocus={[Function]}
-            onKeyDown={[Function]}
-            onKeyUp={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onTouchCancel={[Function]}
-            onTouchEnd={[Function]}
-            onTouchMove={[Function]}
-            onTouchStart={[Function]}
             role="group"
           >
             <div
-              className="emotion-6"
+              class="emotion-6"
               data-rac=""
-              data-react-aria-pressable={true}
-              id="react-aria-:rr:"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyUp={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchCancel={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
+              data-react-aria-pressable="true"
+              id="react-aria-_r_r_"
               role="presentation"
-              style={
-                {
-                  "unicodeBidi": "isolate",
-                }
-              }
+              style="unicode-bidi: isolate;"
             >
               <span
-                aria-describedby="react-aria-description-0"
+                aria-describedby="react-aria-description-1"
                 aria-label="Tag, Select date"
-                aria-valuemax={31}
-                aria-valuemin={1}
-                aria-valuenow={15}
+                aria-valuemax="31"
+                aria-valuemin="1"
+                aria-valuenow="15"
                 aria-valuetext="15"
-                autoCorrect="off"
-                className="emotion-7"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-7"
+                contenteditable="true"
                 data-rac=""
                 data-type="day"
-                enterKeyHint="next"
-                id="react-aria-:r16:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_16_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 15
               </span>
               <span
-                aria-hidden={true}
-                className="emotion-7"
+                aria-hidden="true"
+                class="emotion-7"
                 data-rac=""
                 data-type="literal"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onTouchStart={[Function]}
               >
                 .
               </span>
               <span
                 aria-label="Monat, Select date"
-                aria-valuemax={12}
-                aria-valuemin={1}
-                aria-valuenow={6}
+                aria-valuemax="12"
+                aria-valuemin="1"
+                aria-valuenow="6"
                 aria-valuetext="6 – Juni"
-                autoCorrect="off"
-                className="emotion-7"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-7"
+                contenteditable="true"
                 data-rac=""
                 data-type="month"
-                enterKeyHint="next"
-                id="react-aria-:r1a:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_1a_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 6
               </span>
               <span
-                aria-hidden={true}
-                className="emotion-7"
+                aria-hidden="true"
+                class="emotion-7"
                 data-rac=""
                 data-type="literal"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onTouchStart={[Function]}
               >
                 .
               </span>
               <span
                 aria-label="Jahr, Select date"
-                aria-valuemax={9999}
-                aria-valuemin={1}
-                aria-valuenow={2026}
+                aria-valuemax="9999"
+                aria-valuemin="1"
+                aria-valuenow="2026"
                 aria-valuetext="2026"
-                autoCorrect="off"
-                className="emotion-7"
-                contentEditable={true}
+                autocorrect="off"
+                class="emotion-7"
+                contenteditable="true"
                 data-rac=""
                 data-type="year"
-                enterKeyHint="next"
-                id="react-aria-:r1e:"
-                inputMode="numeric"
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPointerDown={[Function]}
-                onTouchStart={[Function]}
+                enterkeyhint="next"
+                id="react-aria-_r_1e_"
+                inputmode="numeric"
                 role="spinbutton"
-                spellCheck="false"
-                style={
-                  {
-                    "caretColor": "transparent",
-                  }
-                }
-                suppressContentEditableWarning={true}
-                tabIndex={0}
+                spellcheck="false"
+                style="caret-color: transparent;"
+                tabindex="0"
               >
                 2026
               </span>
             </div>
             <input
+              class=""
               data-rac=""
-              disabled={false}
-              hidden={true}
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onTouchStart={[Function]}
+              hidden=""
+              title=""
               type="text"
               value="2026-06-15"
             />
             <button
-              aria-describedby="react-aria-description-0"
-              aria-expanded={false}
+              aria-describedby="react-aria-description-1"
+              aria-expanded="false"
               aria-haspopup="dialog"
               aria-label="Open calendar"
-              aria-labelledby="react-aria-:rp: datetime-picker-test-date"
-              className="emotion-12"
+              aria-labelledby="react-aria-_r_p_ datetime-picker-test-date"
+              class="emotion-12"
               data-rac=""
-              data-react-aria-pressable={true}
-              disabled={false}
-              id="react-aria-:rp:"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchCancel={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
-              tabIndex={0}
+              data-react-aria-pressable="true"
+              id="react-aria-_r_p_"
+              tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                className="emotion-13"
-                height={16}
+                class="emotion-13"
+                height="16"
                 viewBox="0 0 16 16"
-                width={16}
+                width="16"
               >
                 <g>
                   <path
                     d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
                     fill="none"
                     stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
                   />
                 </g>
               </svg>
@@ -3249,83 +2748,62 @@ exports[`"DateTimePickerField" renders with label 1`] = `
           </div>
         </div>
         <div
-          aria-hidden={true}
+          aria-hidden="true"
           data-a11y-ignore="aria-hidden-focus"
-          data-react-aria-prevent-focus={true}
+          data-react-aria-prevent-focus="true"
           data-testid="hidden-dateinput-container"
-          style={
-            {
-              "border": 0,
-              "clip": "rect(0 0 0 0)",
-              "clipPath": "inset(50%)",
-              "height": "1px",
-              "left": 0,
-              "margin": "-1px",
-              "overflow": "hidden",
-              "padding": 0,
-              "position": "fixed",
-              "top": 0,
-              "whiteSpace": "nowrap",
-              "width": "1px",
-            }
-          }
+          style="border: 0px; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: fixed; width: 1px; white-space: nowrap; top: 0px; left: 0px;"
         >
           <input
-            disabled={false}
             form=""
-            onChange={[Function]}
-            step={60}
-            tabIndex={-1}
+            step="60"
+            tabindex="-1"
             type="date"
             value="2026-06-15"
           />
         </div>
       </div>
       <div
-        className="emotion-14"
+        class="emotion-14"
         data-uie-name="datetime-picker-test-time"
       >
         <label
-          className="emotion-15"
-          htmlFor="datetime-picker-test-time"
+          class="emotion-15"
+          for="datetime-picker-test-time"
           id="datetime-picker-test-time-label"
         >
           Select time
         </label>
         <div
-          autoFocus={false}
-          className="emotion-16"
+          class="emotion-16"
           data-uie-name="datetime-picker-test-time"
         >
           <div
-            className="emotion-17"
-            onKeyDown={[Function]}
+            class="emotion-17"
           >
             <div
-              className="emotion-18"
-              tabIndex={0}
+              class="emotion-18"
+              tabindex="0"
             >
               <span
-                className="emotion-19"
+                class="emotion-19"
                 id="react-select-3-live-region"
               />
               <span
                 aria-atomic="false"
                 aria-live="polite"
                 aria-relevant="additions text"
-                className="emotion-19"
+                class="emotion-19"
                 role="log"
               />
               <div
-                className="emotion-21"
-                onMouseDown={[Function]}
-                onTouchEnd={[Function]}
+                class="emotion-21"
               >
                 <div
-                  className="emotion-22"
+                  class="emotion-22"
                 >
                   <div
-                    className="emotion-23"
+                    class="emotion-23"
                   >
                     3:00 PM
                   </div>
@@ -3333,38 +2811,32 @@ exports[`"DateTimePickerField" renders with label 1`] = `
                   <input
                     aria-activedescendant=""
                     aria-autocomplete="list"
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    aria-readonly={true}
-                    className="emotion-24"
-                    disabled={false}
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-readonly="true"
+                    class="emotion-24"
                     id="datetime-picker-test-time"
-                    inputMode="none"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    onFocus={[Function]}
+                    inputmode="none"
                     role="combobox"
-                    tabIndex={-1}
+                    tabindex="-1"
                     value=""
                   />
                 </div>
                 <div
-                  className="emotion-25"
+                  class="emotion-25"
                 >
                   <span
-                    className="emotion-26"
+                    class="emotion-26"
                   />
                   <div
                     aria-hidden="true"
-                    className="emotion-27"
-                    onMouseDown={[Function]}
-                    onTouchEnd={[Function]}
+                    class="emotion-27"
                   >
                     <svg
-                      className="emotion-28"
-                      height={16}
+                      class="emotion-28"
+                      height="16"
                       viewBox="0 0 16 16"
-                      width={16}
+                      width="16"
                     >
                       <g>
                         <path

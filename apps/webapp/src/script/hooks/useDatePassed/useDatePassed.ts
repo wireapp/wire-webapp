@@ -29,7 +29,7 @@ interface UseDatePassedProps {
 
 export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedProps) => {
   const hasPassed = useRef(false);
-  const intervalId = useRef<ReturnType<typeof setInterval>>();
+  const intervalId = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const targetTime = useRef<number | null>(null);
 
   const checkTime = useCallback(() => {

@@ -33,10 +33,10 @@ exports[`"Link" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <a
-    className="emotion-1"
+    class="emotion-1"
     rel="noopener noreferrer"
   >
     Link
@@ -77,10 +77,10 @@ exports[`"Link" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <a
-    className="emotion-1"
+    class="emotion-1"
     rel="noopener noreferrer"
   >
     Link
