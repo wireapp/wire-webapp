@@ -7009,13 +7009,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:22.7.9":
-  version: 22.7.9
-  resolution: "@nx/webpack@npm:22.7.9"
+"@nx/webpack@npm:22.7.12":
+  version: 22.7.12
+  resolution: "@nx/webpack@npm:22.7.12"
   dependencies:
     "@babel/core": "npm:^7.23.2"
-    "@nx/devkit": "npm:22.7.9"
-    "@nx/js": "npm:22.7.9"
+    "@nx/devkit": "npm:22.7.12"
+    "@nx/js": "npm:22.7.12"
     "@phenomnomnominal/tsquery": "npm:~6.2.0"
     ajv: "npm:^8.12.0"
     autoprefixer: "npm:^10.4.9"
@@ -7049,7 +7049,7 @@ __metadata:
     webpack-dev-server: "npm:^5.2.1"
     webpack-node-externals: "npm:^3.0.0"
     webpack-subresource-integrity: "npm:^5.1.0"
-  checksum: 10/4b9a2d9548b63cdf053bcaaf1025d802c8a143b4b3ceda85c9d489e107b71a4f11316568014a48281dd756cb3c409fdfcae6ed03ec507013124cec6aadc99ecf
+  checksum: 10/d19eb75ce3d89611ade8ff858b6c2062149ae9c6258cebbdf303be33022b18ee033eaa3bf972d9f46c6f163ba3d04ecacd0395251e8d75d6896493a2cd4fe318
   languageName: node
   linkType: hard
 
@@ -12308,7 +12308,7 @@ __metadata:
     "@lexical/react": "npm:0.27.2"
     "@lexical/rich-text": "npm:0.27.2"
     "@mediapipe/tasks-vision": "npm:0.10.35"
-    "@nx/webpack": "npm:22.7.9"
+    "@nx/webpack": "npm:22.7.12"
     "@playwright/test": "npm:1.63.0"
     "@roamhq/wrtc": "npm:0.10.0"
     "@sindresorhus/is": "npm:8.1.0"
@@ -12348,7 +12348,7 @@ __metadata:
     "@wireapp/telemetry": "workspace:^"
     "@wireapp/webapp-events": "workspace:^"
     amplify: "https://github.com/wireapp/amplify#head=master"
-    autoprefixer: "npm:10.5.5"
+    autoprefixer: "npm:10.5.6"
     babel-jest: "npm:30.5.1"
     babel-loader: "npm:10.1.1"
     babel-plugin-transform-import-meta: "npm:2.3.3"
@@ -13266,9 +13266,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:10.5.5":
-  version: 10.5.5
-  resolution: "autoprefixer@npm:10.5.5"
+"autoprefixer@npm:10.5.6":
+  version: 10.5.6
+  resolution: "autoprefixer@npm:10.5.6"
   dependencies:
     browserslist: "npm:^4.28.9"
     caniuse-lite: "npm:^1.0.30001810"
@@ -13279,7 +13279,7 @@ __metadata:
     postcss: ^8.1.0
   bin:
     autoprefixer: bin/autoprefixer
-  checksum: 10/1ee9f194bae95014edc482d6148dcc28ecc2845f9e27f9577b1615b225dfe49946dc7fa225703d85921c40b814c3766d6bb864d4b6040c2fc986f918aed6b971
+  checksum: 10/94488a13c7586aafd32542b20cb3480c114d48bf09f9fe56d9ebb8221ef02f77303aae11b7db4e487fa7bc00664969aef3971f3e31c22f14b2ba3c0f500e9d58
   languageName: node
   linkType: hard
 
