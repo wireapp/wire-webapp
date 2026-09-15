@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {currentLanguage, findLanguage, mapLanguage} from '../../localeConfig';
 import {AppActions, LANGUAGE_ACTION} from '../action/creator/';
 
@@ -30,10 +32,12 @@ export const initialLanguageState: LanguageState = {
 
 export function languageReducer(state: LanguageState = initialLanguageState, action: AppActions): LanguageState {
   switch (action.type) {
-    case LANGUAGE_ACTION.SWITCH_LANGUAGE_SUCCESS:
+    case LANGUAGE_ACTION.SWITCH_LANGUAGE_SUCCESS: {
+      const language = findLanguage(action.payload);
       return {
-        language: findLanguage(action.payload) || state.language,
+        language: isNonEmptyString(language) ? language : state.language,
       };
+    }
     default:
       return state;
   }

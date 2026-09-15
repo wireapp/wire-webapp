@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {NewTeamInvitation} from '@wireapp/api-client/lib/team/';
 import {Role} from '@wireapp/api-client/lib/team/member/';
@@ -39,7 +40,7 @@ export class InvitationAction {
       const inviteList = InviteSelector.getInvites(state);
       const invitationEmail = invitation.email.toLowerCase();
       const alreadyInvited = inviteList.find(inviteItem => inviteItem.email.toLowerCase() === invitationEmail);
-      if (alreadyInvited) {
+      if (!isUndefined(alreadyInvited)) {
         const error = new BackendError(
           'This email has already been invited',
           SyntheticErrorLabel.ALREADY_INVITED,

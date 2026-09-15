@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -45,8 +46,9 @@ export class AppInitStatistics {
   }
 
   add(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
-    if (bucket_size && typeof value === 'number') {
-      const buckets = Math.floor(value / bucket_size) + (value % bucket_size ? 1 : 0);
+    if (!isUndefined(bucket_size) && bucket_size !== 0 && !isNan(bucket_size) && typeof value === 'number') {
+      const remainder = value % bucket_size;
+      const buckets = Math.floor(value / bucket_size) + (remainder !== 0 && !isNan(remainder) ? 1 : 0);
 
       this.statistics[statistic] = value === 0 ? 0 : bucket_size * buckets;
     } else {

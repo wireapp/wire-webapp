@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {ClientInfo} from '@wireapp/core/lib/client/';
@@ -74,7 +75,7 @@ export class ClientAction {
 
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
-      const creationStatus = localClient
+      const creationStatus = !isNullOrUndefined(localClient)
         ? {isNew: false, client: localClient}
         : {
             isNew: true,
@@ -95,7 +96,9 @@ export class ClientAction {
     if (clientType === ClientType.NONE) {
       return undefined;
     }
-    const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version ? ` ${Runtime.getOS().version}` : ''}`;
+    const deviceLabel = `${Runtime.getOS()}${
+      isNonEmptyString(Runtime.getOS().version) ? ` ${Runtime.getOS().version}` : ''
+    }`;
     let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
     let developmentSuffix = '';
     if (Runtime.isEdgeEnvironment()) {

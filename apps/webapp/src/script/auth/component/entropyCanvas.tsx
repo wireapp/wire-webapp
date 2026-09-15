@@ -20,6 +20,7 @@
 import {MouseEvent, useRef, useEffect, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {isNull} from '@sindresorhus/is';
 
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 import {EntropyData} from '../../util/entropy';
@@ -73,7 +74,7 @@ const EntropyCanvas = (props: CanvasProps) => {
   };
 
   const draw = (ctx: CanvasRenderingContext2D) => {
-    if (!previousPoint || !lastPoint) {
+    if (isNull(previousPoint) || isNull(lastPoint)) {
       return;
     }
     ctx.beginPath();
@@ -88,11 +89,11 @@ const EntropyCanvas = (props: CanvasProps) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {
+    if (isNull(canvas)) {
       return;
     }
     const context = canvas.getContext('2d');
-    if (!context) {
+    if (isNull(context)) {
       return;
     }
     draw(context);
