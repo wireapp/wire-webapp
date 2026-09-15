@@ -552,6 +552,22 @@ const productionConfigs = [
     },
   },
   {
+    files: ['apps/webapp/src/script/auth/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/auth/component/joinGuestLinkPasswordModal.tsx',
+      'apps/webapp/src/script/auth/module/action/conversationAction.ts',
+      'apps/webapp/src/script/auth/module/action/creator/conversationActionCreator.ts',
+      'apps/webapp/src/script/auth/module/reducer/conversationReducer.ts',
+      'apps/webapp/src/script/auth/module/selector/conversationSelector.ts',
+      'apps/webapp/src/script/auth/page/conversationJoin.tsx',
+      'apps/webapp/src/script/auth/page/conversationJoinComponents.tsx',
+      'apps/webapp/src/script/auth/page/conversationJoinInvalid.tsx',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
     files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',

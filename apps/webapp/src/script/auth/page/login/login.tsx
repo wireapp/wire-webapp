@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -191,8 +191,8 @@ const LoginComponent = ({
   }, [defaultSSOCode, embedded, navigate]);
 
   useEffect(() => {
-    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
 
     const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
@@ -258,7 +258,7 @@ const LoginComponent = ({
 
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-      if (validationErrors.length) {
+      if (isNonEmptyArray(validationErrors)) {
         throw validationErrors[0];
       }
 
@@ -449,7 +449,7 @@ const LoginComponent = ({
                 centerText
                 style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '16px'}}
               >
-                {twoFactorLoginData ? (
+                {!isUndefined(twoFactorLoginData) ? (
                   <div>
                     <Text
                       fontSize="1.5rem"

@@ -19,7 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useSelector} from 'react-redux';
 
@@ -56,7 +56,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       return;
     }
 
-    if (!emailInput.current || !passwordInput.current) {
+    if (isNull(emailInput.current) || isNull(passwordInput.current)) {
       return;
     }
 
@@ -69,7 +69,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         emailInput.current.name,
         emailInput.current.validity,
       );
-      if (emailValidationError) {
+      if (!isNull(emailValidationError)) {
         validationErrors.push(emailValidationError);
       }
     }
@@ -83,7 +83,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         passwordInput.current.name,
         passwordInput.current.validity,
       );
-      if (passwordValidationError) {
+      if (!isNull(passwordValidationError)) {
         validationErrors.push(passwordValidationError);
       }
     }
