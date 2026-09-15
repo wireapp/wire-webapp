@@ -36,7 +36,7 @@ interface EmojiPickerProperties {
   readonly posY: number;
   readonly onKeyPress: () => void;
   readonly resetActionMenuStates: () => void;
-  readonly wrapperRef: RefObject<HTMLDivElement>;
+  readonly wrapperRef: RefObject<HTMLDivElement | null>;
   readonly handleReactionClick: (emoji: string) => void;
 }
 

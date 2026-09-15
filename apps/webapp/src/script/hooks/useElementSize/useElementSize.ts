@@ -20,7 +20,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 interface ResizeObserverResult<Element extends HTMLElement = HTMLDivElement> {
-  ref: React.RefObject<Element>;
+  ref: React.RefObject<Element | null>;
   width: number;
   height: number;
 }

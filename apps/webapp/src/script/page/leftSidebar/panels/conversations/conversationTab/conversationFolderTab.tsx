@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import {useMemo} from 'react';
 
 import cx from 'classnames';
@@ -42,7 +44,7 @@ interface ConversationFolderTabProps {
   type: SidebarTabs;
   conversationTabIndex: number;
   onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
-  Icon: JSX.Element;
+  Icon: ReactElement;
   dataUieName: string;
   unreadConversations: Conversation[];
   conversationRepository: ConversationRepository;

@@ -20,9 +20,9 @@
 import {useRef, useEffect, useState} from 'react';
 
 export const usePausableInterval = (callback: () => void, timer: number) => {
-  const intervalIdRef = useRef<() => void>();
+  const intervalIdRef = useRef<(() => void) | undefined>(undefined);
   const totalTimeRun = useRef(0);
-  const intervalId = useRef<number>();
+  const intervalId = useRef<number | undefined>(undefined);
   const startTime = useRef(new Date().getTime());
   const [pause, setPause] = useState(true);
 

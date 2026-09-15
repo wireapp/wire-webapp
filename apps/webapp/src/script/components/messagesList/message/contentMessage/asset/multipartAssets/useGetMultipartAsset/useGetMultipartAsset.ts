@@ -78,7 +78,7 @@ export const useGetMultipartAsset = ({
   const [status, setStatus] = useState<Status>('idle');
   const [isRecycled, setIsRecycled] = useState<boolean | undefined>(undefined);
 
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<number | undefined>(undefined);
   const isMounted = useRef(true);
   const attemptRef = useRef(1);
   const hasStartedFetchRef = useRef(false);

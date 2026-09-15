@@ -26,7 +26,7 @@ import {clamp} from 'Util/numberUtil';
 interface UseAudioSeekBarProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
-  svgRef: React.RefObject<SVGSVGElement>;
+  svgRef: React.RefObject<SVGSVGElement | null>;
 }
 
 interface AudioState {

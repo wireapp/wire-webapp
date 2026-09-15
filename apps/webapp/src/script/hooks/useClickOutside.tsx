@@ -20,9 +20,9 @@
 import {useEffect, RefObject} from 'react';
 
 export const useClickOutside = (
-  ref: RefObject<Element>,
+  ref: RefObject<Element | null>,
   onClick: (e: MouseEvent) => void,
-  exclude?: RefObject<Element>,
+  exclude?: RefObject<Element | null>,
   windowDocument = window.document,
 ) => {
   useEffect(() => {

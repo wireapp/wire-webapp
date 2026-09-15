@@ -21,6 +21,7 @@ import {
   ChangeEvent,
   FormEvent,
   HTMLProps,
+  ReactElement,
   useCallback,
   useEffect,
   useRef,
@@ -143,7 +144,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         })
       : '?';
 
-  const formatName = (model: string, clazz: string): string | JSX.Element => {
+  const formatName = (model: string, clazz: string): string | ReactElement => {
     if (isNonEmptyString(model)) {
       return model;
     }
@@ -235,7 +236,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const smoothHeight = animationPosition * inputContainerHeightPixels;
   const smoothMarginTop = animationPosition * cardHorizontalSpacingPixels;
 
-  const renderErrorMessage = (): JSX.Element | null => {
+  const renderErrorMessage = (): ReactElement | null => {
     if (validationError && selected) {
       return (
         <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>

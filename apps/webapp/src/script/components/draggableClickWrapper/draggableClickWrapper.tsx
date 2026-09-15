@@ -21,12 +21,15 @@ import React from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
-interface DraggableClickWrapperProps {
-  children: React.ReactElement;
-  onClick: React.MouseEventHandler;
+interface DraggableClickWrapperProps<Element extends HTMLElement> {
+  children: React.ReactElement<React.HTMLAttributes<Element>>;
+  onClick: React.MouseEventHandler<Element>;
 }
 
-export const DraggableClickWrapper = ({onClick, children}: DraggableClickWrapperProps) => {
+export function DraggableClickWrapper<Element extends HTMLElement>({
+  onClick,
+  children,
+}: DraggableClickWrapperProps<Element>): React.ReactElement {
   const isMacDesktop = Runtime.isDesktopApp() && Runtime.isMacOS();
   if (!isMacDesktop) {
     return React.cloneElement(children, {onClick});
@@ -38,13 +41,13 @@ export const DraggableClickWrapper = ({onClick, children}: DraggableClickWrapper
   let startY = 0;
 
   return React.cloneElement(children, {
-    onMouseDown: ({screenX, screenY}: React.MouseEvent) => {
+    onMouseDown: ({screenX, screenY}: React.MouseEvent<Element>) => {
       isDragging = true;
       isMoved = false;
       startX = screenX;
       startY = screenY;
     },
-    onMouseMove: ({screenX, screenY}: React.MouseEvent) => {
+    onMouseMove: ({screenX, screenY}: React.MouseEvent<Element>) => {
       if (isDragging && !isMoved) {
         const diffX = Math.abs(startX - screenX);
         const diffY = Math.abs(startY - screenY);
@@ -53,11 +56,11 @@ export const DraggableClickWrapper = ({onClick, children}: DraggableClickWrapper
         }
       }
     },
-    onMouseUp: (event: React.MouseEvent) => {
+    onMouseUp: (event: React.MouseEvent<Element>) => {
       if (!isMoved) {
         onClick(event);
       }
       isDragging = false;
     },
   });
-};
+}

@@ -42,7 +42,7 @@ export interface MessageReactionsProps {
   handleKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
   handleCurrentMsgAction: (actionName: string) => void;
   resetActionMenuStates: () => void;
-  wrapperRef: RefObject<HTMLDivElement>;
+  wrapperRef: RefObject<HTMLDivElement | null>;
   handleReactionClick: (emoji: string) => void;
 }
 

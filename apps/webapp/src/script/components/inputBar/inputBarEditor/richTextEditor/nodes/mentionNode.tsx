@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import {
   SerializedLexicalNode,
   Spread,
@@ -54,7 +56,7 @@ function convertElement(domNode: HTMLElement): DOMConversionOutput | null {
 /**
  * This node is used to represent a mention used in the MentionPlugin.
  */
-export class MentionNode extends DecoratorNode<JSX.Element> {
+export class MentionNode extends DecoratorNode<ReactElement> {
   __value: string;
   __trigger: string;
 

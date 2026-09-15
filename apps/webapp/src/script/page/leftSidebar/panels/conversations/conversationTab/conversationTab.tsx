@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import cx from 'classnames';
 
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
@@ -36,7 +38,7 @@ type ConversationTabProps = {
   label?: string;
   type: SidebarTabs;
   conversationTabIndex: number;
-  Icon: JSX.Element;
+  Icon: ReactElement;
   unreadConversations?: number;
   dataUieName: string;
   isActive?: boolean;

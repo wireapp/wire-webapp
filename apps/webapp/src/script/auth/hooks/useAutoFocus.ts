@@ -20,7 +20,7 @@
 import {useEffect, RefObject} from 'react';
 
 interface UseAutoFocusProps {
-  elementRef: RefObject<HTMLElement>;
+  elementRef: RefObject<HTMLElement | null>;
   preventScroll?: boolean;
   cursorAtEnd?: boolean;
   shouldFocus?: boolean;

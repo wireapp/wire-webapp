@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect} from 'react';
+import {ReactElement, useCallback, useEffect} from 'react';
 
 import {$generateNodesFromDOM} from '@lexical/html';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -55,7 +55,7 @@ type Selection = BaseSelection | null;
  * - If a mentioned user exists in the current conversation, the mention is preserved as a MentionNode
  * - If a mentioned user doesn't exist, the mention is converted to plain text with @ symbol
  */
-export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginProps): JSX.Element | null => {
+export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginProps): ReactElement | null => {
   const [editor] = useLexicalComposerContext();
 
   /**

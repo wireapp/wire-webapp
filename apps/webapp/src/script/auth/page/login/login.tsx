@@ -154,8 +154,8 @@ const LoginComponent = ({
     (isDomainDiscoveryEnabled === true || isSSOEnabled === true || isAccountRegistrationEnabled === true);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
-  const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
-  const entropy = useRef<Uint8Array | undefined>();
+  const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>(undefined);
+  const entropy = useRef<Uint8Array | undefined>(undefined);
 
   const getEntropy = useMemo(() => {
     if (isEntropyRequired !== true) {
