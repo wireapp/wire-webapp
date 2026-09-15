@@ -108,11 +108,12 @@ export const getSharedDriveUploadAggregateKind = (
   return statuses.length > 0 ? 'uploaded' : null;
 };
 
-export const getLatestSharedDriveUploadStatus = (
-  controller: SharedDriveUploadController,
-  conversationQualifiedId: string,
-): SharedDriveUploadStatus | null => {
-  const statuses = getSharedDriveUploadStatuses(controller, conversationQualifiedId);
-
-  return statuses[statuses.length - 1] ?? null;
-};
+export const getRepresentativeSharedDriveUploadStatus = (
+  statuses: readonly SharedDriveUploadStatus[],
+  aggregateKind: SharedDriveUploadStatusKind,
+): SharedDriveUploadStatus | null =>
+  statuses.find(status => status.kind === aggregateKind) ??
+  statuses.find(status => status.kind === 'uploading') ??
+  statuses.find(status => status.kind === 'queued') ??
+  statuses[0] ??
+  null;
