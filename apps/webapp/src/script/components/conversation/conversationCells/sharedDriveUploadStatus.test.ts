@@ -19,7 +19,11 @@
 
 import type {UploadSource} from 'Repositories/cells/upload';
 
-import {getSharedDriveUploadAggregateKind, toSharedDriveUploadStatus} from './sharedDriveUploadStatus';
+import {
+  getRepresentativeSharedDriveUploadStatus,
+  getSharedDriveUploadAggregateKind,
+  toSharedDriveUploadStatus,
+} from './sharedDriveUploadStatus';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'report.pdf', contentType: 'application/pdf', size: 4};
 const conversationQualifiedId = 'conversation@example.com';
@@ -89,6 +93,17 @@ describe('toSharedDriveUploadStatus', () => {
 
   it.each(['cancelled', 'discarding', 'discarded'])('does not expose %s', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toBeNull();
+  });
+
+  it('selects a representative using aggregate precedence', () => {
+    const statuses = (['queued', 'uploading', 'uploadFailed', 'published'] as const).flatMap((kind, index) => {
+      const status = toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId);
+      return status ? [{...status, uploadId: `upload-${index}`}] : [];
+    });
+
+    expect(getRepresentativeSharedDriveUploadStatus(statuses, 'failed')?.uploadId).toBe('upload-2');
+    expect(getRepresentativeSharedDriveUploadStatus(statuses, 'uploading')?.uploadId).toBe('upload-1');
+    expect(getRepresentativeSharedDriveUploadStatus(statuses, 'queued')?.uploadId).toBe('upload-0');
   });
 
   it('aggregates statuses using active, queued, failed, then uploaded precedence', () => {

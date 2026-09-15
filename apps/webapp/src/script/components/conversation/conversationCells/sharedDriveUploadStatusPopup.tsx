@@ -79,9 +79,11 @@ interface SharedDriveUploadStatusPopupProps {
   readonly isCancelling: UploadActionState;
   readonly isRetrying: UploadActionState;
   readonly onToggle: () => void;
-  readonly onCancel: (uploadId?: string) => void;
-  readonly onRetry: (uploadId?: string) => void;
-  readonly onDismiss?: (uploadId?: string) => void;
+  readonly onCancelAll: () => void;
+  readonly onCancelUpload: (uploadId: string) => void;
+  readonly onRetry: (uploadId: string) => void;
+  readonly onDismissAll?: () => void;
+  readonly onDismissRow?: (uploadId: string) => void;
 }
 
 const isActionPending = (state: UploadActionState, uploadId: string): boolean =>
@@ -182,9 +184,11 @@ export const SharedDriveUploadStatusPopup = ({
   isCancelling,
   isRetrying,
   onToggle,
-  onCancel,
+  onCancelAll,
+  onCancelUpload,
   onRetry,
-  onDismiss,
+  onDismissAll,
+  onDismissRow,
 }: SharedDriveUploadStatusPopupProps) => {
   const statusRowId =
     uploads.length === 1 ? `shared-drive-upload-status-${upload.uploadId}` : 'shared-drive-upload-status-rows';
@@ -217,7 +221,7 @@ export const SharedDriveUploadStatusPopup = ({
               css={sharedDriveUploadStatusPopupHeaderCancelStyles}
               disabled={uploads.some(row => isActionPending(isCancelling, row.uploadId))}
               data-uie-name="shared-drive-upload-header-cancel"
-              onClick={() => onCancel()}
+              onClick={onCancelAll}
             >
               {headerCancelLabel}
             </button>
@@ -228,7 +232,7 @@ export const SharedDriveUploadStatusPopup = ({
               css={sharedDriveUploadStatusPopupHeaderCancelStyles}
               aria-label={dismissAriaLabel}
               data-uie-name="shared-drive-upload-header-dismiss"
-              onClick={() => onDismiss?.()}
+              onClick={onDismissAll}
             >
               {dismissLabel}
             </button>
@@ -306,7 +310,7 @@ export const SharedDriveUploadStatusPopup = ({
                   aria-label={cancelLabel}
                   disabled={isActionPending(isCancelling, row.uploadId)}
                   data-uie-name="shared-drive-upload-cancel"
-                  onClick={() => onCancel(row.uploadId)}
+                  onClick={() => onCancelUpload(row.uploadId)}
                 >
                   <CloseIcon color="currentColor" aria-hidden="true" />
                 </button>
@@ -317,7 +321,7 @@ export const SharedDriveUploadStatusPopup = ({
                   css={sharedDriveUploadStatusPopupRowCancelStyles}
                   aria-label={dismissAriaLabel}
                   data-uie-name="shared-drive-upload-dismiss"
-                  onClick={() => onDismiss?.(row.uploadId)}
+                  onClick={() => onDismissRow?.(row.uploadId)}
                 >
                   <CloseIcon color="currentColor" aria-hidden="true" />
                 </button>

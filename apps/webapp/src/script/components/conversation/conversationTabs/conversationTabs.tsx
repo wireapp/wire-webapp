@@ -32,6 +32,7 @@ import {KEY} from 'Util/keyboardUtil';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
 import {
+  getRepresentativeSharedDriveUploadStatus,
   getSharedDriveUploadAggregateKind,
   getSharedDriveUploadStatuses,
   type SharedDriveUploadStatus,
@@ -73,10 +74,7 @@ export const ConversationTabs = ({
       return null;
     }
 
-    const representative =
-      statuses.find(status => status.kind === aggregateKind) ??
-      statuses.find(status => status.kind === 'uploading') ??
-      statuses[0];
+    const representative = getRepresentativeSharedDriveUploadStatus(statuses, aggregateKind);
     return representative ? {...representative, kind: aggregateKind} : null;
   }, [sharedDriveUploadController, conversationQualifiedIdString]);
   const [uploadStatus, setUploadStatus] = useState<SharedDriveUploadStatus | null>(readUploadStatus);
