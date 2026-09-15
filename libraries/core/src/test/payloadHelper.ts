@@ -37,7 +37,7 @@ export function mockUserPayload(userId: string): Object {
     assets: [],
     id: userId,
     locale: 'en',
-    name: faker.name.fullName(),
+    name: faker.person.fullName(),
     picture: [
       {
         content_length: 263345,
