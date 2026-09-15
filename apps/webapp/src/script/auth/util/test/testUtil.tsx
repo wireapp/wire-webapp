@@ -106,9 +106,9 @@ const withStore = (
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
 ) => <Provider store={store}>{children}</Provider>;
 
-const withRouter = (component: React.ReactNode) => (
-  <Router future={{v7_relativeSplatPath: true, v7_startTransition: true}}>{component}</Router>
-);
+function withRouter(component: React.ReactNode): React.ReactElement {
+  return <Router>{component}</Router>;
+}
 
 const rootContextValue = createRootContextValueForTest({translate});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
