@@ -23,7 +23,9 @@ import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
 
-function useConversationFocus(conversations: Conversation[], focusKey = '') {
+type FocusConversation = (conversationId: string) => void;
+
+function useConversationFocus(conversations: Conversation[], focusKey = '', focusConversation?: FocusConversation) {
   const [currentFocus, setCurrentFocus] = useState(conversations[0]?.id || '');
   const conversationIds = conversations.map(conversation => conversation.id).join('\u0000');
   const focusStateKey = `${focusKey}\u0000${conversationIds}`;
@@ -37,19 +39,21 @@ function useConversationFocus(conversations: Conversation[], focusKey = '') {
 
       if (isKey(event, KEY.ARROW_DOWN)) {
         event.preventDefault();
-        const nextConversation = conversations[index + 1];
+        const nextConversation = conversations[index + 1] || conversations[0];
 
-        setCurrentFocus(nextConversation?.id || conversations[0].id);
+        setCurrentFocus(nextConversation.id);
+        focusConversation?.(nextConversation.id);
       } else if (isKey(event, KEY.ARROW_UP)) {
         event.preventDefault();
-        const prevConversation = conversations[index - 1];
+        const prevConversation = conversations[index - 1] || conversations[conversations.length - 1];
 
-        setCurrentFocus(prevConversation?.id || conversations[conversations.length - 1].id);
+        setCurrentFocus(prevConversation.id);
+        focusConversation?.(prevConversation.id);
       } else if (isTabKey(event) || (event.shiftKey && isTabKey(event))) {
         setCurrentFocus(conversations[0].id);
       }
     },
-    [conversations],
+    [conversations, focusConversation],
   );
 
   const resetConversationFocus = useCallback(() => setCurrentFocus(conversations[0]?.id || ''), [conversations]);

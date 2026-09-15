@@ -85,6 +85,19 @@ import {StartUI} from '../startUi';
 export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean =>
   ![SidebarTabs.PREFERENCES, SidebarTabs.MEETINGS].includes(tab);
 
+const focusConversation = (conversationId: string): boolean => {
+  const conversationElement = document.querySelector<HTMLElement>(
+    `[data-uie-uid="${conversationId}"] [data-uie-name="go-open-conversation"]`,
+  );
+
+  if (!conversationElement) {
+    return false;
+  }
+
+  conversationElement.focus();
+  return document.activeElement === conversationElement;
+};
+
 type ConversationsProps = {
   callState?: CallState;
   conversationRepository: ConversationRepository;
@@ -281,6 +294,7 @@ export const Conversations = ({
   const {currentFocus, handleKeyDown, resetConversationFocus, setCurrentFocus} = useConversationFocus(
     conversationsForFocus,
     conversationsFilter,
+    focusConversation,
   );
 
   const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
@@ -490,12 +504,12 @@ export const Conversations = ({
         return;
       }
 
+      if (!focusConversation(firstResult.id)) {
+        return;
+      }
+
       event.preventDefault();
       setCurrentFocus(firstResult.id);
-      const firstResultElement = document.querySelector<HTMLElement>(
-        `[data-uie-uid="${firstResult.id}"] [data-uie-name="go-open-conversation"]`,
-      );
-      firstResultElement?.focus();
     },
     [conversationsFilter, conversationsForFocus, setCurrentFocus],
   );

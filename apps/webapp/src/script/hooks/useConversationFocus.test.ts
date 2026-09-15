@@ -17,6 +17,7 @@
  *
  */
 
+import userEvent from '@testing-library/user-event';
 import {renderHook} from '@testing-library/react';
 import {act} from 'react';
 import {noop} from 'noop-esm';
@@ -62,6 +63,53 @@ describe('useConversationFocus', () => {
     act(() => result.current.setCurrentFocus('second'));
     rerender({focusKey: 'b'});
 
+    expect(result.current.currentFocus).toBe('first');
+  });
+
+  it('moves from the first Tab-entered result with arrow navigation and wraps at both boundaries', async () => {
+    const conversations = [createConversation('first'), createConversation('second')];
+    const searchInput = document.createElement('input');
+    const focusableElements = new Map(
+      conversations.map(conversation => [conversation.id, document.createElement('button')]),
+    );
+    document.body.append(searchInput, ...focusableElements.values());
+    const focusConversation = (conversationId: string) => focusableElements.get(conversationId)?.focus();
+    const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
+
+    searchInput.focus();
+    await userEvent.setup().tab();
+    expect(document.activeElement).toBe(focusableElements.get('first'));
+
+    act(() => result.current.handleKeyDown(0)(createEvent('ArrowDown')));
+
+    expect(document.activeElement).toBe(focusableElements.get('second'));
+    expect(result.current.currentFocus).toBe('second');
+
+    act(() => result.current.handleKeyDown(1)(createEvent('ArrowDown')));
+    expect(document.activeElement).toBe(focusableElements.get('first'));
+    expect(result.current.currentFocus).toBe('first');
+
+    act(() => result.current.handleKeyDown(0)(createEvent('ArrowUp')));
+    expect(document.activeElement).toBe(focusableElements.get('second'));
+    expect(result.current.currentFocus).toBe('second');
+
+    searchInput.remove();
+    for (const element of focusableElements.values()) {
+      element.remove();
+    }
+  });
+
+  it('does not intercept Tab while resetting the roving focus candidate', () => {
+    const conversations = [createConversation('first'), createConversation('second')];
+    const focusConversation = jest.fn();
+    const preventDefault = jest.fn();
+    const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
+
+    act(() => result.current.setCurrentFocus('second'));
+    act(() => result.current.handleKeyDown(1)({key: 'Tab', preventDefault} as unknown as KeyboardEvent));
+
+    expect(preventDefault).not.toHaveBeenCalled();
+    expect(focusConversation).not.toHaveBeenCalled();
     expect(result.current.currentFocus).toBe('first');
   });
 
