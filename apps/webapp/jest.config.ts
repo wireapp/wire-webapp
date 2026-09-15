@@ -38,6 +38,7 @@ const esmPackagesToTransform = [
   '@enormora/objectory',
   '@enormora/wall-clock',
   '@sindresorhus/is',
+  '@faker-js/faker',
 ];
 
 const config: Config = {
