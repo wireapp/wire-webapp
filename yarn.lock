@@ -8021,13 +8021,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/router@npm:1.23.4":
-  version: 1.23.4
-  resolution: "@remix-run/router@npm:1.23.4"
-  checksum: 10/1b7dd04465a542a8110ee398195ac4b9ac1de5521312f9953041874f0295bf64ff224a0ff88ff36a91c88004529667f566b95fdf94b35fc26b17b1f0d61f03d8
-  languageName: node
-  linkType: hard
-
 "@roamhq/wrtc-darwin-arm64@npm:0.10.0":
   version: 0.10.0
   resolution: "@roamhq/wrtc-darwin-arm64@npm:0.10.0"
@@ -12249,7 +12242,7 @@ __metadata:
     react-pdf: "npm:9.2.1"
     react-redux: "npm:9.3.0"
     react-router: "npm:7.18.0"
-    react-router-dom: "npm:6.30.6"
+    react-router-dom: "npm:7.18.0"
     react-transition-group: "npm:4.4.5"
     redux: "npm:5.0.1"
     redux-logdown: "npm:1.0.4"
@@ -27048,27 +27041,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:6.30.6":
-  version: 6.30.6
-  resolution: "react-router-dom@npm:6.30.6"
+"react-router-dom@npm:7.18.0":
+  version: 7.18.0
+  resolution: "react-router-dom@npm:7.18.0"
   dependencies:
-    "@remix-run/router": "npm:1.23.4"
-    react-router: "npm:6.30.6"
+    react-router: "npm:7.18.0"
   peerDependencies:
-    react: ">=16.8"
-    react-dom: ">=16.8"
-  checksum: 10/6e501c45fd85894b197a84437c12cd0ab6d9c14277af41a7546f965ee0a0861aff1da5d72d56020a1ac2d4d4b1c4ec848a16554372004fdef5cdb1bce75a155e
-  languageName: node
-  linkType: hard
-
-"react-router@npm:6.30.6":
-  version: 6.30.6
-  resolution: "react-router@npm:6.30.6"
-  dependencies:
-    "@remix-run/router": "npm:1.23.4"
-  peerDependencies:
-    react: ">=16.8"
-  checksum: 10/df751de74dc460abc9023aecfd09284170939e8ad8892373ec0015aa04187e0b9c66fffcb546bfb0f1ca5c9edb14b67c93a46306a61efcf15a7dc20eca1e16b7
+    react: ">=18"
+    react-dom: ">=18"
+  checksum: 10/7725f261e308d2a8131c3857db828820e0f0db3e64ae86b84c8fdf309e112f4373ca5625a66a68105fd16f2159f558563440fd82487fa3818988a69956c851bf
   languageName: node
   linkType: hard
 
