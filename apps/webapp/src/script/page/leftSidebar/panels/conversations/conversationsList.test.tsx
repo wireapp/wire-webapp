@@ -120,24 +120,27 @@ describe('ConversationsList', () => {
     await Promise.all(userNames.map(async userName => expect(await findByText(userName)).toBeDefined()));
   });
 
-  it.each(['', 'Alice'])('keeps pending requests before conversation results in the DOM order (filter: %s)', searchFilter => {
-    const conversation = create1to1Conversation('Alice');
-    const pendingRequest = new User('pending', 'domain', translateForTest);
-    connectRequests = [pendingRequest];
-    currentFocus = conversation.id;
+  it.each(['', 'Alice'])(
+    'keeps pending requests before conversation results in the DOM order (filter: %s)',
+    searchFilter => {
+      const conversation = create1to1Conversation('Alice');
+      const pendingRequest = new User('pending', 'domain', translateForTest);
+      connectRequests = [pendingRequest];
+      currentFocus = conversation.id;
 
-    const {container} = renderComponent([conversation], searchFilter);
-    const requestButton = container.querySelector('[data-uie-name="connection-request"] [role="button"]');
-    const conversationButton = container.querySelector('[data-uie-name="go-open-conversation"]');
+      const {container} = renderComponent([conversation], searchFilter);
+      const requestButton = container.querySelector('[data-uie-name="connection-request"] [role="button"]');
+      const conversationButton = container.querySelector('[data-uie-name="go-open-conversation"]');
 
-    if (!requestButton || !conversationButton) {
-      throw new Error('Expected pending request and conversation controls to be rendered');
-    }
+      if (!requestButton || !conversationButton) {
+        throw new Error('Expected pending request and conversation controls to be rendered');
+      }
 
-    expect(requestButton).toHaveAttribute('tabindex', '0');
-    expect(conversationButton).toHaveAttribute('tabindex', '0');
-    expect(requestButton.compareDocumentPosition(conversationButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
+      expect(requestButton).toHaveAttribute('tabindex', '0');
+      expect(conversationButton).toHaveAttribute('tabindex', '0');
+      expect(requestButton.compareDocumentPosition(conversationButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    },
+  );
 
   it('keeps pending requests focusable when filtering has no conversation results', () => {
     const pendingRequest = new User('pending', 'domain', translateForTest);

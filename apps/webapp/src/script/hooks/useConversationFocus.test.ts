@@ -25,7 +25,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 
 import {useConversationFocus} from './useConversationFocus';
 
-const createConversation = (id: string) => ({id} as Conversation);
+const createConversation = (id: string) => ({id}) as Conversation;
 
 const createEvent = (key: string) => ({key, preventDefault: noop}) as KeyboardEvent;
 
