@@ -21,9 +21,10 @@ import {amplify} from 'amplify';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {ConversationError} from '../error/conversationError';
 import {OPEN_CONVERSATION_DETAILS} from '../page/rightSidebar/rightSidebar';
@@ -31,12 +32,7 @@ import {OPEN_CONVERSATION_DETAILS} from '../page/rightSidebar/rightSidebar';
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
   conversationDegraded: boolean,
-  translate: (
-    key: TranslationKey,
-    substitutions?: Substitutions,
-    dangerousSubstitutions?: Record<string, string>,
-    skipEscaping?: boolean,
-  ) => string,
+  translate: Translate,
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     const secondaryAction = [
@@ -80,6 +76,7 @@ export const showLegalHoldWarningModal = (
         secondaryAction,
         text: {
           htmlMessage: translate('legalHoldWarningMessage', undefined, {br: '<br>'}),
+          translatedMessage: createLegalHoldWarningMessage(),
           title: translate('legalHoldWarningTitle'),
         },
       },
@@ -88,3 +85,14 @@ export const showLegalHoldWarningModal = (
     );
   });
 };
+
+function createLegalHoldWarningMessage(): PrimaryModalTranslatedMessage {
+  return {
+    compatibilityReplacements: [],
+    components: [{kind: 'line-break', legacyTokens: [], markerName: 'br'}],
+    kind: 'translation',
+    layout: 'default',
+    translationKey: 'legalHoldWarningMessage',
+    values: [],
+  };
+}

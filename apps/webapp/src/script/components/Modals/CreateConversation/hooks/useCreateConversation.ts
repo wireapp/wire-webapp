@@ -125,6 +125,7 @@ export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFed
         },
         text: {
           htmlMessage: nonFederatingParticipantsModalCopy.getMessageHtml(backendString, replaceBackends),
+          translatedMessage: nonFederatingParticipantsModalCopy.getTranslatedMessage(backendString),
           title: nonFederatingParticipantsModalCopy.titleText,
         },
       },
