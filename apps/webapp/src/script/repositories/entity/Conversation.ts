@@ -1005,7 +1005,7 @@ export class Conversation {
         if (message_et.timestamp_affects_order() || forceUpdate) {
           this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
-          const from_self = message_et.user()?.isMe;
+          const from_self = message_et.user()?.isMe && !message_et.isSystem();
           if (from_self) {
             this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_READ);
           }
