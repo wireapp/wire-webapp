@@ -693,6 +693,7 @@ function ConversationContent({
         isDragAccept={isDragAccept}
         isFileDropAllowed={isFileDropAllowed}
         isCellsEnabled={isCellsEnabled}
+        isConversationFileDropzoneEnabled={!isFileTabActive}
         isConversationLoaded={isConversationLoaded}
         activeConversationId={activeConversation?.id}
         onFileDropped={checkFileSharingPermission(uploadDroppedFiles, translate)}

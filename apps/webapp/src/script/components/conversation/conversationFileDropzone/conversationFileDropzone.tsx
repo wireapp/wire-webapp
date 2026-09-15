@@ -29,6 +29,7 @@ import {FileDropzone} from './fileDropzone/fileDropzone';
 
 interface ConversationFileDropzoneProps {
   isCellsEnabled: boolean;
+  isConversationFileDropzoneEnabled: boolean;
   isConversationLoaded: boolean;
   activeConversationId?: string;
   onFileDropped: (files: File[]) => void;
@@ -41,6 +42,7 @@ interface ConversationFileDropzoneProps {
 
 export const ConversationFileDropzone = ({
   isCellsEnabled,
+  isConversationFileDropzoneEnabled,
   isConversationLoaded,
   activeConversationId,
   onFileDropped,
@@ -50,7 +52,18 @@ export const ConversationFileDropzone = ({
   inputProps,
   children,
 }: ConversationFileDropzoneProps) => {
-  if (isCellsEnabled) {
+  const conversationLayout = (
+    <div
+      id="conversation"
+      className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
+      ref={removeAnimationsClass}
+      key={activeConversationId}
+    >
+      {children}
+    </div>
+  );
+
+  if (isCellsEnabled && isConversationFileDropzoneEnabled) {
     return (
       <FileDropzone
         isDragAccept={isDragAccept}
@@ -58,16 +71,13 @@ export const ConversationFileDropzone = ({
         rootProps={rootProps}
         inputProps={inputProps}
       >
-        <div
-          id="conversation"
-          className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
-          ref={removeAnimationsClass}
-          key={activeConversationId}
-        >
-          {children}
-        </div>
+        {conversationLayout}
       </FileDropzone>
     );
+  }
+
+  if (isCellsEnabled) {
+    return conversationLayout;
   }
 
   return (
