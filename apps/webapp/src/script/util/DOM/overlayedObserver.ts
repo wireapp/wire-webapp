@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 interface OverlayElement {
   onChange?: (isChanged: boolean) => void;
   onVisible?: () => void;
@@ -31,7 +33,7 @@ let overlayCheckerInterval: number | undefined = undefined;
 function checkOverlayedElements() {
   overlayedElements.forEach(({onVisible, onChange}, element) => {
     const isVisible = !isOverlayed(element);
-    if (onChange) {
+    if (!isUndefined(onChange)) {
       return onChange(isVisible);
     }
     if (isVisible) {

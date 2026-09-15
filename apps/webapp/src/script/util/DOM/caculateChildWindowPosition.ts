@@ -17,18 +17,25 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 export const calculateChildWindowPosition = (childHeight: number, childWidth: number) => {
-  const screenLeft = window.screenLeft || window.screenX;
-  const screenTop = window.screenTop || window.screenY;
+  const screenLeft = isTruthy(window.screenLeft) ? window.screenLeft : window.screenX;
+  const screenTop = isTruthy(window.screenTop) ? window.screenTop : window.screenY;
 
-  const hasInnerMeasurements = window.innerHeight && window.innerWidth;
+  const hasInnerMeasurements = isTruthy(window.innerHeight) && isTruthy(window.innerWidth);
 
-  const parentHeight = hasInnerMeasurements
-    ? window.innerHeight
-    : document.documentElement.clientHeight || window.screen.height;
-  const parentWidth = hasInnerMeasurements
-    ? window.innerWidth
-    : document.documentElement.clientWidth || window.screen.width;
+  let parentHeight = hasInnerMeasurements ? window.innerHeight : window.screen.height;
+  let parentWidth = hasInnerMeasurements ? window.innerWidth : window.screen.width;
+
+  if (!hasInnerMeasurements) {
+    if (isTruthy(document.documentElement.clientHeight)) {
+      parentHeight = document.documentElement.clientHeight;
+    }
+    if (isTruthy(document.documentElement.clientWidth)) {
+      parentWidth = document.documentElement.clientWidth;
+    }
+  }
 
   const left = parentWidth / 2 - childWidth / 2 + screenLeft;
   const top = parentHeight / 2 - childHeight / 2 + screenTop;

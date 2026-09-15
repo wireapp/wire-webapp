@@ -19,6 +19,8 @@
 
 import {Fragment, ReactNode} from 'react';
 
+import {isNonEmptyArray, isNull, isTruthy, isUndefined} from '@sindresorhus/is';
+
 interface ComponentReplacement {
   start: string;
   end: string;
@@ -143,17 +145,17 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
     return [html];
   }
 
-  const componentsSplitRegexpStr = componentReplacements.length
+  const componentsSplitRegexpStr = isNonEmptyArray(componentReplacements)
     ? `(${componentReplacements
         .map(replacement => `${sanitizeRegexp(replacement.start)}.+?${sanitizeRegexp(replacement.end)}`)
         .join('|')})`
     : null;
 
-  const stringSplitRegexpStr = stringReplacements.length
+  const stringSplitRegexpStr = isNonEmptyArray(stringReplacements)
     ? `(${stringReplacements.map(replacement => sanitizeRegexp(replacement.exactMatch)).join('|')})`
     : null;
 
-  const regexpStr = [componentsSplitRegexpStr, stringSplitRegexpStr].filter(Boolean).join('|');
+  const regexpStr = [componentsSplitRegexpStr, stringSplitRegexpStr].filter(value => !isNull(value)).join('|');
 
   const splitRegexp = new RegExp(regexpStr, 'g');
 
@@ -167,7 +169,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
         replacement => node.startsWith(replacement.start) && node.endsWith(replacement.end),
       );
 
-      if (componentsReplacementMatch) {
+      if (!isUndefined(componentsReplacementMatch)) {
         const text = node.substring(
           componentsReplacementMatch.start.length,
           node.length - componentsReplacementMatch.end.length,
@@ -180,12 +182,12 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
           return split
             .map(node => {
               const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.exactMatch);
-              if (stringReplacementMatch) {
+              if (!isUndefined(stringReplacementMatch)) {
                 return stringReplacementMatch.render();
               }
               return componentsReplacementMatch.render(node);
             })
-            .filter(Boolean)
+            .filter(isTruthy)
             .map((node, index) => <Fragment key={index}>{node}</Fragment>);
         }
 
@@ -194,12 +196,12 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
 
       const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.exactMatch);
 
-      if (stringReplacementMatch) {
+      if (!isUndefined(stringReplacementMatch)) {
         return stringReplacementMatch.render();
       }
 
       return node;
     })
-    .filter(Boolean)
+    .filter(isTruthy)
     .map((node, index) => <Fragment key={index}>{node}</Fragment>); // Make sure we have a different key for each node.
 }
