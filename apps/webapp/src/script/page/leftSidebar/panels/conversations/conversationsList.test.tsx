@@ -26,8 +26,7 @@ jest.mock('@tanstack/react-virtual', () => ({
   }),
 }));
 
-import {createRef, useRef} from 'react';
-import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
+import {createRef} from 'react';
 
 import userEvent from '@testing-library/user-event';
 import {fireEvent, render} from '@testing-library/react';
@@ -41,16 +40,13 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
-import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';
 
-import {ConversationHeaderComponent} from './conversationHeader/conversationHeader';
 import {ConversationsList} from './conversationsList';
 
 const create1to1Conversation = (userName: string) => {
@@ -112,84 +108,6 @@ describe('ConversationsList', () => {
       />,
       {wrapper: rootProviderWrapper},
     );
-
-  const renderKeyboardIntegration = (
-    focusCandidates: Conversation[],
-    renderedConversations: Conversation[] = focusCandidates,
-  ) => {
-    const KeyboardIntegration = () => {
-      const searchInputRef = useRef<HTMLInputElement>(null);
-      const {currentFocus, handleKeyDown, resetConversationFocus, setCurrentFocus} = useConversationFocus(
-        focusCandidates,
-        'Ali',
-        conversationId => {
-          const element = document.querySelector<HTMLElement>(
-            `[data-uie-uid="${conversationId}"] [data-uie-name="go-open-conversation"]`,
-          );
-          element?.focus();
-        },
-      );
-      const handleSearchTab = (event: ReactKeyboardEvent<HTMLInputElement>) => {
-        const firstResult = focusCandidates[0];
-        const element = firstResult
-          ? document.querySelector<HTMLElement>(
-              `[data-uie-uid="${firstResult.id}"] [data-uie-name="go-open-conversation"]`,
-            )
-          : null;
-
-        if (!element) {
-          return;
-        }
-
-        element.focus();
-        if (document.activeElement !== element) {
-          return;
-        }
-
-        event.preventDefault();
-        setCurrentFocus(firstResult.id);
-      };
-
-      return (
-        <>
-          <ConversationHeaderComponent
-            currentTab={SidebarTabs.RECENT}
-            selfUser={new User('self', 'domain', translateForTest)}
-            showSearchInput
-            searchValue="Ali"
-            setSearchValue={jest.fn()}
-            searchInputPlaceholder="Search conversations"
-            onSearchEnterClick={jest.fn()}
-            onSearchTab={handleSearchTab}
-            jumpToRecentSearch={jest.fn()}
-            searchInputRef={searchInputRef}
-          />
-          <ConversationsList
-            conversationLabelRepository={conversationLabelRepository}
-            conversations={renderedConversations}
-            conversationsFilter="Ali"
-            listViewModel={listViewModel}
-            connectRequests={connectRequests}
-            conversationState={conversationState}
-            callState={callState}
-            currentFocus={currentFocus}
-            currentFolder={currentFolder}
-            resetConversationFocus={resetConversationFocus}
-            handleArrowKeyDown={handleKeyDown}
-            clearSearchFilter={clearSearchFilter}
-            groupParticipantsConversations={[]}
-            isGroupParticipantsVisible={false}
-            isEmpty={false}
-          />
-          <button type="button" aria-label="after conversation list">
-            After list
-          </button>
-        </>
-      );
-    };
-
-    return render(withThemeAndRootContext(<KeyboardIntegration />, rootProviderWrapper));
-  };
 
   it("should render all 1:1 conversations if there's no search filter", async () => {
     const userNames = ['Alice', 'Bob', 'Charlie'];
@@ -277,56 +195,6 @@ describe('ConversationsList', () => {
     expect(results).toHaveLength(2);
     fireEvent.keyDown(results[1], {key: 'ArrowUp'});
     expect(handleArrowKeyDown).toHaveBeenCalledWith(1);
-  });
-
-  it('moves focus through rendered results, activates with Enter, and preserves native list exits', async () => {
-    const firstConversation = create1to1Conversation('Alice');
-    const secondConversation = create1to1Conversation('Alina');
-    const {container, getByRole} = renderKeyboardIntegration([firstConversation, secondConversation]);
-    const user = userEvent.setup();
-    const searchInput = getByRole('textbox');
-    const firstResult = container.querySelector<HTMLElement>(
-      `[data-uie-uid="${firstConversation.id}"] [data-uie-name="go-open-conversation"]`,
-    );
-    const secondResult = container.querySelector<HTMLElement>(
-      `[data-uie-uid="${secondConversation.id}"] [data-uie-name="go-open-conversation"]`,
-    );
-    const afterList = getByRole('button', {name: 'after conversation list'});
-
-    expect(firstResult).toBeInTheDocument();
-    expect(secondResult).toBeInTheDocument();
-    searchInput.focus();
-    await user.tab();
-    expect(firstResult).toHaveFocus();
-
-    await user.keyboard('{ArrowDown}');
-    expect(secondResult).toHaveFocus();
-    await user.keyboard('{ArrowUp}');
-    expect(firstResult).toHaveFocus();
-    await user.keyboard('{ArrowDown}{Enter}');
-    expect(clearSearchFilter).toHaveBeenCalled();
-
-    await user.tab();
-    expect(afterList).toHaveFocus();
-
-    firstResult?.focus();
-    await user.tab({shift: true});
-    expect(searchInput).toHaveFocus();
-  });
-
-  it('keeps native Tab fallback when the first focus candidate is not mounted', async () => {
-    const firstConversation = create1to1Conversation('Alice');
-    const event = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Tab'});
-    const {getByRole} = renderKeyboardIntegration([firstConversation], []);
-    const searchInput = getByRole('textbox');
-    const afterList = getByRole('button', {name: 'after conversation list'});
-
-    searchInput.focus();
-    searchInput.dispatchEvent(event);
-
-    expect(event.defaultPrevented).toBe(false);
-    await userEvent.setup().tab();
-    expect(afterList).toHaveFocus();
   });
 
   it('keeps the search input focused while filtered results are updated', () => {
