@@ -31,6 +31,7 @@
  *
  */
 
+import {isNull} from '@sindresorhus/is';
 import Cookies from 'js-cookie';
 
 import {QUERY_KEY} from '../auth/route';
@@ -93,7 +94,7 @@ const supportsIndexDB = (): Promise<boolean> =>
 
     dbOpenRequest.onerror = event => {
       clearTimeout(connectionTimeout);
-      if (dbOpenRequest.error) {
+      if (!isNull(dbOpenRequest.error)) {
         event.preventDefault();
         return resolve(false);
       }

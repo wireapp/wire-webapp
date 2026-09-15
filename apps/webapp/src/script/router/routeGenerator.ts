@@ -17,16 +17,17 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export const generateConversationUrl = ({id, domain, filePath}: QualifiedId & {filePath?: string}): string => {
   let baseUrl = `/conversation/${id}`;
 
-  if (domain) {
+  if (isNonEmptyString(domain)) {
     baseUrl += `/${domain}`;
   }
 
-  if (filePath) {
+  if (isNonEmptyString(filePath)) {
     baseUrl += `/${filePath}`;
   }
 
