@@ -39,7 +39,10 @@ function createCellsRepositoryMock() {
   };
 }
 
-function createDirectUploadControllerHelper(cellsRepository = createCellsRepositoryMock()) {
+function createDirectUploadControllerHelper(
+  cellsRepository = createCellsRepositoryMock(),
+  createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2'),
+) {
   const createSource = jest.fn((file: File): UploadSource => ({
     blob: file,
     name: file.name,
@@ -47,7 +50,7 @@ function createDirectUploadControllerHelper(cellsRepository = createCellsReposit
     size: file.size,
   }));
   const controller = createSharedDriveUploadController({
-    createUploadId: jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2'),
+    createUploadId,
     createSource,
     uploadStrategy: createDirectSharedDriveUploadStrategy({
       cellsRepository,
@@ -156,6 +159,176 @@ describe('createSharedDriveUploadController', () => {
       expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
       expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-2'}), kind: 'published'}),
     ]);
+  });
+
+  it('limits a single batch to three active uploads and preserves queue order', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void}> = [];
+    let activeUploads = 0;
+    let maximumActiveUploads = 0;
+    cellsRepository.uploadNode.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          activeUploads += 1;
+          maximumActiveUploads = Math.max(maximumActiveUploads, activeUploads);
+          pendingUploads.push({
+            resolve: () => {
+              activeUploads -= 1;
+              resolve({uuid: 'remote-id', versionId: 'version-id'});
+            },
+          });
+        }),
+    );
+    let nextUploadId = 0;
+    const createUploadId = jest.fn(() => `upload-${++nextUploadId}`);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const files = Array.from({length: 5}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const uploadPromise = controller.upload(files, uploadPath, jest.fn(), conversationQualifiedId);
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+    expect(controller.snapshots(conversationQualifiedId)).toHaveLength(5);
+    expect(controller.snapshots(conversationQualifiedId).slice(0, 3)).toEqual(
+      expect.arrayContaining([expect.objectContaining({kind: 'uploading'})]),
+    );
+    expect(controller.snapshots(conversationQualifiedId).slice(3)).toEqual(
+      expect.arrayContaining([expect.objectContaining({kind: 'queued'})]),
+    );
+
+    pendingUploads[1].resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(4, expect.objectContaining({file: files[3]}));
+    expect(maximumActiveUploads).toBe(3);
+
+    pendingUploads[0].resolve();
+    pendingUploads[2].resolve();
+    pendingUploads[3].resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(5);
+    pendingUploads[4].resolve();
+    await uploadPromise;
+    expect(maximumActiveUploads).toBe(3);
+  });
+
+  it('advances queued work after an active failure and refreshes mixed outcomes', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void; reject: () => void}> = [];
+    cellsRepository.uploadNode.mockImplementation(
+      () =>
+        new Promise((resolve, reject) => {
+          pendingUploads.push({
+            resolve: () => resolve({uuid: 'remote-id', versionId: 'version-id'}),
+            reject: () => reject(new Error('upload failed')),
+          });
+        }),
+    );
+    let nextUploadId = 0;
+    const createUploadId = jest.fn(() => `upload-${++nextUploadId}`);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const onRefresh = jest.fn();
+    const files = Array.from({length: 4}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const uploadPromise = controller.upload(files, uploadPath, onRefresh, conversationQualifiedId);
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+
+    pendingUploads[0].reject();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(4, expect.objectContaining({file: files[3]}));
+
+    pendingUploads[1].resolve();
+    pendingUploads[2].resolve();
+    pendingUploads[3].resolve();
+    await uploadPromise;
+
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    const snapshots = controller.snapshots(conversationQualifiedId);
+    expect(snapshots).toHaveLength(4);
+    expect(snapshots).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'uploadFailed'}),
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-2'}), kind: 'published'}),
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-3'}), kind: 'published'}),
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-4'}), kind: 'published'}),
+      ]),
+    );
+  });
+
+  it('advances queued work after an active cancellation', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void}> = [];
+    cellsRepository.uploadNode.mockImplementation(
+      ({abortController}: {abortController?: AbortController}) =>
+        new Promise((resolve, reject) => {
+          pendingUploads.push({resolve: () => resolve({uuid: 'remote-id', versionId: 'version-id'})});
+          abortController?.signal.addEventListener('abort', () => reject(new Error('upload cancelled')));
+        }),
+    );
+    let nextUploadId = 0;
+    const createUploadId = jest.fn(() => `upload-${++nextUploadId}`);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const files = Array.from({length: 4}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const uploadPromise = controller.upload(files, uploadPath, jest.fn(), conversationQualifiedId);
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+
+    await controller.cancel('upload-1');
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(4, expect.objectContaining({file: files[3]}));
+    const snapshots = controller.snapshots(conversationQualifiedId);
+    expect(snapshots).toHaveLength(4);
+    expect(snapshots).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'cancelled'}),
+        expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-4'}), kind: 'uploading'}),
+      ]),
+    );
+
+    pendingUploads.slice(1).forEach(upload => upload.resolve());
+    await uploadPromise;
+  });
+
+  it('cancels queued work without starting it and advances the queue', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void}> = [];
+    cellsRepository.uploadNode.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          pendingUploads.push({resolve: () => resolve({uuid: 'remote-id', versionId: 'version-id'})});
+        }),
+    );
+    let nextUploadId = 0;
+    const createUploadId = jest.fn(() => `upload-${++nextUploadId}`);
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const files = Array.from({length: 5}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const uploadPromise = controller.upload(files, uploadPath, jest.fn(), conversationQualifiedId);
+    await controller.cancel('upload-4');
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'uploading'}),
+      expect.objectContaining({identity: {uploadId: 'upload-2'}, kind: 'uploading'}),
+      expect.objectContaining({identity: {uploadId: 'upload-3'}, kind: 'uploading'}),
+      expect.objectContaining({identity: {uploadId: 'upload-4'}, kind: 'cancelled'}),
+      expect.objectContaining({identity: {uploadId: 'upload-5'}, kind: 'queued'}),
+    ]);
+
+    pendingUploads[0].resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    pendingUploads.slice(1).forEach(upload => upload.resolve());
+    await Promise.resolve();
+    await Promise.resolve();
+    pendingUploads[3]?.resolve();
+    await uploadPromise;
   });
 
   it('does not refresh when a direct upload fails', async () => {
@@ -327,7 +500,7 @@ describe('createSharedDriveUploadController', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
-  it('registers and starts every file in a batch immediately', async () => {
+  it('registers every file and starts up to three files at a time', async () => {
     const resolveUploadById = new Map<string, (succeeded: boolean) => void>();
     const uploadStrategy: SharedDriveUploadStrategy = {
       register: jest.fn().mockReturnValue(Result.ok(undefined)),
@@ -367,9 +540,13 @@ describe('createSharedDriveUploadController', () => {
     );
 
     expect(uploadStrategy.register).toHaveBeenCalledTimes(4);
-    expect(uploadStrategy.run).toHaveBeenCalledTimes(4);
+    expect(uploadStrategy.run).toHaveBeenCalledTimes(3);
 
     resolveUploadById.get('upload-1')?.(true);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(uploadStrategy.run).toHaveBeenCalledTimes(4);
+
     resolveUploadById.get('upload-2')?.(true);
     resolveUploadById.get('upload-3')?.(true);
     resolveUploadById.get('upload-4')?.(true);

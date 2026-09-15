@@ -32,7 +32,9 @@ import {KEY} from 'Util/keyboardUtil';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
 import {
-  getLatestSharedDriveUploadStatus,
+  getRepresentativeSharedDriveUploadStatus,
+  getSharedDriveUploadAggregateKind,
+  getSharedDriveUploadStatuses,
   type SharedDriveUploadStatus,
 } from '../conversationCells/sharedDriveUploadStatus';
 import {useSharedDriveUploadStatus} from '../conversationCells/sharedDriveUploadStatusContext';
@@ -47,6 +49,7 @@ interface ConversationTabsProps {
 
 const FILE_PATH = 'files';
 const sharedDriveUploadTabStatusLabelKey = {
+  queued: 'cells.uploadStatus.uploading',
   uploading: 'cells.uploadStatus.uploading',
   uploaded: 'cells.uploadStatus.uploaded',
   failed: 'cells.uploadStatus.failed',
@@ -64,10 +67,16 @@ export const ConversationTabs = ({
   const filesUrl = generateConversationUrl({...conversationQualifiedId, filePath: FILE_PATH});
   const messagesUrl = generateConversationUrl(conversationQualifiedId);
   const conversationQualifiedIdString = stringifyQualifiedId(conversationQualifiedId);
-  const readUploadStatus = useCallback(
-    () => getLatestSharedDriveUploadStatus(sharedDriveUploadController, conversationQualifiedIdString),
-    [sharedDriveUploadController, conversationQualifiedIdString],
-  );
+  const readUploadStatus = useCallback((): SharedDriveUploadStatus | null => {
+    const statuses = getSharedDriveUploadStatuses(sharedDriveUploadController, conversationQualifiedIdString);
+    const aggregateKind = getSharedDriveUploadAggregateKind(statuses);
+    if (!aggregateKind) {
+      return null;
+    }
+
+    const representative = getRepresentativeSharedDriveUploadStatus(statuses, aggregateKind);
+    return representative ? {...representative, kind: aggregateKind} : null;
+  }, [sharedDriveUploadController, conversationQualifiedIdString]);
   const [uploadStatus, setUploadStatus] = useState<SharedDriveUploadStatus | null>(readUploadStatus);
   const isUploadDismissed =
     maybe.isJust(dismissedUpload) &&
@@ -190,7 +199,7 @@ const ConversationTab = ({id, label, isActive, uploadStatus = null, onClick, onK
 };
 
 const SharedDriveTabUploadStatusIcon = ({kind}: {kind: SharedDriveUploadStatus['kind']}) => {
-  if (kind === 'uploading') {
+  if (kind === 'uploading' || kind === 'queued') {
     return (
       <SharedDriveUploadSpinnerIcon
         className="conversation-tabs__upload-status-icon conversation-tabs__upload-status-icon--uploading"

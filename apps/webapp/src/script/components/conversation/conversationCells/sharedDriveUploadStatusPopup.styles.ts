@@ -116,6 +116,7 @@ export const sharedDriveUploadStatusPopupToggleStyles: CSSObject = {
   background: 'transparent',
   color: 'inherit',
   cursor: 'pointer',
+  transform: 'translateX(3px)',
 };
 
 export const sharedDriveUploadStatusPopupToggleIconStyles: CSSObject = {
@@ -123,7 +124,18 @@ export const sharedDriveUploadStatusPopupToggleIconStyles: CSSObject = {
   height: 16,
 };
 
+export const sharedDriveUploadStatusPopupRowsStyles: CSSObject = {
+  display: 'flex',
+  minWidth: 0,
+  flexDirection: 'column',
+  gap: 8,
+  '&[hidden]': {
+    display: 'none',
+  },
+};
+
 export const sharedDriveUploadStatusPopupRowStyles: CSSObject = {
+  position: 'relative',
   display: 'flex',
   minWidth: 0,
   minHeight: 38,
@@ -131,9 +143,6 @@ export const sharedDriveUploadStatusPopupRowStyles: CSSObject = {
   justifyContent: 'space-between',
   gap: 8,
   padding: '4px 0',
-  '&[hidden]': {
-    display: 'none',
-  },
 };
 
 export const sharedDriveUploadStatusPopupRowLeadingStyles: CSSObject = {
@@ -159,6 +168,12 @@ export const sharedDriveUploadStatusPopupRowActionsStyles: CSSObject = {
   alignItems: 'center',
   justifyContent: 'flex-end',
   gap: 16,
+  transform: 'translateX(7px)',
+};
+
+export const sharedDriveUploadStatusPopupFailedRowActionsStyles: CSSObject = {
+  ...sharedDriveUploadStatusPopupRowActionsStyles,
+  gap: 13,
 };
 
 export const sharedDriveUploadStatusPopupRowActionButtonStyles: CSSObject = {
@@ -212,6 +227,7 @@ export const sharedDriveUploadStatusPopupRowFileNameStyles: CSSObject = {
 export const sharedDriveUploadStatusPopupRowStatusStyles = (kind: SharedDriveUploadStatusKind): CSSObject => ({
   overflow: 'hidden',
   color: {
+    queued: 'var(--accent-color, #0667c8)',
     uploading: 'var(--accent-color, #0667c8)',
     uploaded: 'var(--success-color, #1d7833)',
     failed: 'var(--danger-color, #c20013)',
