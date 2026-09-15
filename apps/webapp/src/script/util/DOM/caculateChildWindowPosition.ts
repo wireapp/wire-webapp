@@ -17,24 +17,23 @@
  *
  */
 
+import {isNan} from '@sindresorhus/is';
+
 export const calculateChildWindowPosition = (childHeight: number, childWidth: number) => {
-  const screenLeft = window.screenLeft !== 0 && !Number.isNaN(window.screenLeft) ? window.screenLeft : window.screenX;
-  const screenTop = window.screenTop !== 0 && !Number.isNaN(window.screenTop) ? window.screenTop : window.screenY;
+  const screenLeft = window.screenLeft !== 0 && !isNan(window.screenLeft) ? window.screenLeft : window.screenX;
+  const screenTop = window.screenTop !== 0 && !isNan(window.screenTop) ? window.screenTop : window.screenY;
 
   const hasInnerMeasurements =
-    window.innerHeight !== 0 &&
-    !Number.isNaN(window.innerHeight) &&
-    window.innerWidth !== 0 &&
-    !Number.isNaN(window.innerWidth);
+    window.innerHeight !== 0 && !isNan(window.innerHeight) && window.innerWidth !== 0 && !isNan(window.innerWidth);
 
   let parentHeight = hasInnerMeasurements ? window.innerHeight : window.screen.height;
   let parentWidth = hasInnerMeasurements ? window.innerWidth : window.screen.width;
 
   if (!hasInnerMeasurements) {
-    if (document.documentElement.clientHeight !== 0 && !Number.isNaN(document.documentElement.clientHeight)) {
+    if (document.documentElement.clientHeight !== 0 && !isNan(document.documentElement.clientHeight)) {
       parentHeight = document.documentElement.clientHeight;
     }
-    if (document.documentElement.clientWidth !== 0 && !Number.isNaN(document.documentElement.clientWidth)) {
+    if (document.documentElement.clientWidth !== 0 && !isNan(document.documentElement.clientWidth)) {
       parentWidth = document.documentElement.clientWidth;
     }
   }

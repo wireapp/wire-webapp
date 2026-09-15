@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyArray, isUndefined} from '@sindresorhus/is';
+import {isFiniteNumber, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 
 export function chunk<T>(array: T[], size: number): T[][];
 export function chunk(array: Float32Array, size: number): Float32Array[];
@@ -90,7 +90,7 @@ export const interpolate = (array: number[], length: number) => {
 export const isLastItem = <T>(array: T[], item: T) => array.indexOf(item) === array.length - 1;
 
 export const iterateIndex = <T>(array: T, currentIndex: number, reverse = false): number | undefined => {
-  if (isNonEmptyArray(array) && Number.isFinite(currentIndex)) {
+  if (isNonEmptyArray(array) && isFiniteNumber(currentIndex)) {
     if (reverse) {
       const isZeroIndex = currentIndex === 0;
       return isZeroIndex ? array.length - 1 : (currentIndex - 1) % array.length;

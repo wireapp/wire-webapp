@@ -19,7 +19,15 @@
 
 import {Fragment, ReactNode} from 'react';
 
-import {isNan, isNonEmptyArray, isNonEmptyString, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {
+  isNan,
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNull,
+  isNullOrUndefined,
+  isString,
+  isUndefined,
+} from '@sindresorhus/is';
 
 interface ComponentReplacement {
   start: string;
@@ -38,7 +46,7 @@ function hasNonEmptyReactNodeValue(node: ReactNode): boolean {
   if (node === false || isNullOrUndefined(node)) {
     return false;
   }
-  if (typeof node === 'string') {
+  if (isString(node)) {
     return isNonEmptyString(node);
   }
   if (typeof node === 'number') {
