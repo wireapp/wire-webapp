@@ -17,7 +17,7 @@
  *
  */
 
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router';
 
 import {Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';

@@ -22,7 +22,7 @@ import {HTMLProps, useEffect, useState} from 'react';
 import {isBoolean, isString} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router';
 
 import {UrlUtil} from '@wireapp/commons';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';

@@ -17,14 +17,12 @@
  *
  */
 
-import * as RouterDOM from 'react-router-dom';
+import {Link, LinkProps as ReactRouterLinkProps} from 'react-router';
 
 import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
 
-type RouterLinkProps = LinkProps & RouterDOM.LinkProps;
+type RouterLinkProps = LinkProps & ReactRouterLinkProps;
 
-const RRLink = RouterDOM.Link;
-
-const RouterLink = (props: RouterLinkProps) => <RRLink css={(theme: Theme) => linkStyle(theme, props)} {...props} />;
+const RouterLink = (props: RouterLinkProps) => <Link css={(theme: Theme) => linkStyle(theme, props)} {...props} />;
 
 export {RouterLink};

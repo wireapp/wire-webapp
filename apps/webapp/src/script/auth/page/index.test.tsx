@@ -18,7 +18,7 @@
  */
 
 import {act, waitFor} from '@testing-library/react';
-import {Navigate} from 'react-router-dom';
+import {Navigate} from 'react-router';
 
 import {Index} from './index';
 
@@ -30,8 +30,8 @@ import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/testUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
   Navigate: jest.fn().mockImplementation(),
 }));
 

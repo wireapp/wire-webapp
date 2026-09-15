@@ -24,7 +24,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
-import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
+import {HashRouter as Router, Navigate, Route, Routes} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {FireAndForgetInvoker} from '@wireapp/core';

@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {EntropyContainer} from './entropyContainer';

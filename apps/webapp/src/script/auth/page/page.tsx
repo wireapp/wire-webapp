@@ -22,7 +22,7 @@ import React from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {TeamData} from '@wireapp/api-client/lib/team';
 import {connect} from 'react-redux';
-import {Navigate} from 'react-router-dom';
+import {Navigate} from 'react-router';
 
 import {Layout} from '../component/layout';
 import {RootState} from '../module/reducer';

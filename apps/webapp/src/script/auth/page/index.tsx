@@ -22,7 +22,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import {container} from 'tsyringe';
 

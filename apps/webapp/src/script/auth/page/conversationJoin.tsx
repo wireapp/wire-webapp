@@ -23,7 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
-import {Navigate} from 'react-router-dom';
+import {Navigate} from 'react-router';
 
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';

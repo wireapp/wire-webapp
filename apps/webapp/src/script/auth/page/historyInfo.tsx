@@ -22,7 +22,7 @@ import React, {useEffect} from 'react';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit';

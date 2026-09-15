@@ -19,7 +19,7 @@
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {useSelector} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router';
 
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
