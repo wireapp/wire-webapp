@@ -27,8 +27,10 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
 
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
@@ -52,15 +54,18 @@ import {
   loadMoreWrapperStyles,
   wrapperStyles,
 } from './conversationCells.styles';
+import {type SharedDriveDropRejection, getSharedDriveDropRejectionFeedback} from './sharedDriveDrop';
 import {SharedDriveDropzone} from './sharedDriveDropzone';
 import {useSharedDriveUploadController} from './sharedDriveUploadContext';
-import {handleSharedDriveUploadInput} from './sharedDriveUploadInput';
+import {SharedDriveUploadFileInput} from './sharedDriveUploadFileInput';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
+
+import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;
@@ -203,6 +208,15 @@ export const ConversationCells = memo(
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
     const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
+    const maxSharedDriveUploadFileSize = Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_CELLS;
+    const handleSharedDriveUploadRejection = useCallback(
+      (rejection: SharedDriveDropRejection): void => {
+        const feedback = getSharedDriveDropRejectionFeedback(rejection, translate, maxSharedDriveUploadFileSize);
+
+        showFileDropzoneErrorModal({...feedback, translate});
+      },
+      [maxSharedDriveUploadFileSize, translate],
+    );
     const handleDroppedFiles = useSharedDriveFileDrop({
       conversationQualifiedId: sharedDriveConversationQualifiedId,
       fireAndForgetInvoker,
@@ -213,23 +227,18 @@ export const ConversationCells = memo(
       translate,
       uploadPath: sharedDriveUploadPath,
     });
-    const handleUploadFiles = useCallback(
-      (event: React.ChangeEvent<HTMLInputElement>): void =>
-        handleSharedDriveUploadInput(event, {
-          fireAndForgetInvoker,
-          onRefresh: handleRefresh,
-          sharedDriveUploadController,
-          uploadPath: sharedDriveUploadPath,
-          conversationQualifiedId: sharedDriveConversationQualifiedId,
-        }),
-      [
-        fireAndForgetInvoker,
-        handleRefresh,
-        sharedDriveUploadController,
-        sharedDriveConversationQualifiedId,
-        sharedDriveUploadPath,
-      ],
-    );
+    const sharedDriveUploadFileInputDependencies = {
+      fireAndForgetInvoker,
+      onRefresh: handleRefresh,
+      onReject: handleSharedDriveUploadRejection,
+      isUploadFilesEnabled: canUploadToSharedDrive,
+      isInRecycleBin,
+      maxFileSize: maxSharedDriveUploadFileSize,
+      isAcceptedFile: (file: File) => allowsAllFiles() || hasAllowedExtension(file.name),
+      sharedDriveUploadController,
+      uploadPath: sharedDriveUploadPath,
+      conversationQualifiedId: sharedDriveConversationQualifiedId,
+    };
 
     const resetSharedDriveDropState = useCallback((): void => {
       setActiveFolderDropTargetName(null);
@@ -304,7 +313,7 @@ export const ConversationCells = memo(
           onDropFiles={handleDroppedFiles}
         >
           <div css={wrapperStyles}>
-            <input ref={uploadInput} type="file" hidden onChange={handleUploadFiles} />
+            <SharedDriveUploadFileInput ref={uploadInput} {...sharedDriveUploadFileInputDependencies} />
             <CellsHeader
               onRefresh={handleRefresh}
               conversationName={name}

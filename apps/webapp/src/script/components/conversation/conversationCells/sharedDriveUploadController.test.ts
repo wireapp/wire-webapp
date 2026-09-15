@@ -27,6 +27,7 @@ import {
   createDirectSharedDriveUploadStrategy,
   createDraftSharedDriveUploadStrategy,
   createSharedDriveUploadController,
+  type SharedDriveUploadStrategy,
 } from './sharedDriveUploadController';
 
 const uploadPath = 'conversation-id@example.com/files';
@@ -293,6 +294,86 @@ describe('createSharedDriveUploadController', () => {
     expect(controller.snapshots(conversationQualifiedId)).toEqual([
       expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
     ]);
+  });
+
+  it('uploads and promotes multiple draft files as one batch', async () => {
+    const manager = createDraftUploadManagerMock();
+    const createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2');
+    const {controller} = createDraftUploadControllerHelper(manager, createUploadId);
+    const onRefresh = jest.fn();
+    const files = [
+      new File(['one'], 'one.txt', {type: 'text/plain'}),
+      new File(['two'], 'two.txt', {type: 'text/plain'}),
+    ];
+
+    await controller.upload(files, uploadPath, onRefresh, conversationQualifiedId);
+
+    expect(manager.register).toHaveBeenNthCalledWith(
+      1,
+      'upload-1',
+      expect.objectContaining({name: 'one.txt'}),
+      uploadPath,
+    );
+    expect(manager.register).toHaveBeenNthCalledWith(
+      2,
+      'upload-2',
+      expect.objectContaining({name: 'two.txt'}),
+      uploadPath,
+    );
+    expect(manager.start).toHaveBeenNthCalledWith(1, 'upload-1');
+    expect(manager.publish).toHaveBeenNthCalledWith(1, 'upload-1');
+    expect(manager.start).toHaveBeenNthCalledWith(2, 'upload-2');
+    expect(manager.publish).toHaveBeenNthCalledWith(2, 'upload-2');
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('registers and starts every file in a batch immediately', async () => {
+    const resolveUploadById = new Map<string, (succeeded: boolean) => void>();
+    const uploadStrategy: SharedDriveUploadStrategy = {
+      register: jest.fn().mockReturnValue(Result.ok(undefined)),
+      attach: jest.fn(),
+      run: jest.fn(uploadId => {
+        return new Promise<boolean>(resolve => {
+          resolveUploadById.set(uploadId, resolve);
+        });
+      }),
+      snapshot: jest.fn(),
+      cancel: jest.fn().mockResolvedValue(undefined),
+      retryUpload: jest.fn().mockResolvedValue(false),
+      retryPublish: jest.fn().mockResolvedValue(undefined),
+      discard: jest.fn().mockResolvedValue(undefined),
+      retryDiscard: jest.fn().mockResolvedValue(undefined),
+    };
+    const batchController = createSharedDriveUploadController({
+      createUploadId: jest
+        .fn()
+        .mockReturnValueOnce('upload-1')
+        .mockReturnValueOnce('upload-2')
+        .mockReturnValueOnce('upload-3')
+        .mockReturnValueOnce('upload-4'),
+      createSource: file => ({blob: file, name: file.name, contentType: file.type, size: file.size}),
+      uploadStrategy,
+    });
+    const uploadPromise = batchController.upload(
+      [
+        new File(['one'], 'one.txt'),
+        new File(['two'], 'two.txt'),
+        new File(['three'], 'three.txt'),
+        new File(['four'], 'four.txt'),
+      ],
+      uploadPath,
+      jest.fn(),
+      conversationQualifiedId,
+    );
+
+    expect(uploadStrategy.register).toHaveBeenCalledTimes(4);
+    expect(uploadStrategy.run).toHaveBeenCalledTimes(4);
+
+    resolveUploadById.get('upload-1')?.(true);
+    resolveUploadById.get('upload-2')?.(true);
+    resolveUploadById.get('upload-3')?.(true);
+    resolveUploadById.get('upload-4')?.(true);
+    await uploadPromise;
   });
 
   it('ignores late progress from a cancelled upload when the next upload starts', async () => {
