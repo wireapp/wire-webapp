@@ -94,6 +94,21 @@ describe('SharedDriveDropzone', () => {
     expect(onDropFiles).toHaveBeenCalledWith([file]);
   });
 
+  it('dispatches all dropped files for Shared Drive multi-file upload', () => {
+    const files = [
+      new File(['first'], 'first.txt', {type: 'text/plain'}),
+      new File(['second'], 'second.png', {type: 'image/png'}),
+      new File(['third'], 'third.pdf', {type: 'application/pdf'}),
+    ];
+    const onDropFiles = jest.fn();
+    const {dropzone} = renderDropzone({onDropFiles});
+
+    fireEvent.drop(dropzone, {dataTransfer: createDataTransfer(files)});
+
+    expect(onDropFiles).toHaveBeenCalledTimes(1);
+    expect(onDropFiles).toHaveBeenCalledWith(files);
+  });
+
   it('clears the overlay after leaving the dropzone', () => {
     const {dropzone} = renderDropzone();
 
@@ -126,6 +141,16 @@ describe('SharedDriveDropzone', () => {
     expect(screen.getByRole('status', {hidden: true})).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('does not dispatch dropped files while direct upload is disabled', () => {
+    const file = new File(['content'], 'document.txt', {type: 'text/plain'});
+    const onDropFiles = jest.fn();
+    const {dropzone} = renderDropzone({isEnabled: false, onDropFiles});
+
+    fireEvent.drop(dropzone, {dataTransfer: createDataTransfer([file])});
+
+    expect(onDropFiles).not.toHaveBeenCalled();
+  });
+
   it('shows the restricted overlay while a viewer drags files over Shared Drive', () => {
     const {dropzone} = renderDropzone({isFileDropAllowed: false});
 
@@ -136,5 +161,15 @@ describe('SharedDriveDropzone', () => {
       'false',
     );
     expect(screen.getByText('conversationFileUploadRestrictedOverlayDescription')).toBeInTheDocument();
+  });
+
+  it('does not dispatch dropped files for viewers', () => {
+    const file = new File(['content'], 'document.txt', {type: 'text/plain'});
+    const onDropFiles = jest.fn();
+    const {dropzone} = renderDropzone({isFileDropAllowed: false, onDropFiles});
+
+    fireEvent.drop(dropzone, {dataTransfer: createDataTransfer([file])});
+
+    expect(onDropFiles).not.toHaveBeenCalled();
   });
 });

@@ -153,7 +153,7 @@ export const SharedDriveDropzone = ({
 
     preventDefaultFileDrop(event);
     resetDragState({notifyParent: true});
-    if (isEnabled) {
+    if (isEnabled && isFileDropAllowed) {
       onDropFiles(Array.from(event.dataTransfer.files));
     }
   };
