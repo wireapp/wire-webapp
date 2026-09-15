@@ -27,7 +27,7 @@ import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import ko from 'knockout';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
-import {HashRouter as Router} from 'react-router-dom';
+import {HashRouter as Router} from 'react-router';
 import {AnyAction} from 'redux';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';

@@ -20,7 +20,7 @@
 import React, {useEffect} from 'react';
 
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router';
 
 import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 

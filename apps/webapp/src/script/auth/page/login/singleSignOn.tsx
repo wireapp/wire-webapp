@@ -24,7 +24,7 @@ import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
-import {useParams} from 'react-router-dom';
+import {useParams} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {

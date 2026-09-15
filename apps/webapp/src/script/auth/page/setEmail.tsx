@@ -20,7 +20,7 @@
 import React, {useRef, useState} from 'react';
 
 import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';

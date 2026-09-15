@@ -19,7 +19,7 @@
 
 import {useEffect} from 'react';
 
-import {useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router';
 
 export function useRouteA11y(screenKey?: string) {
   const location = useLocation();
