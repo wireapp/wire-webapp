@@ -19,38 +19,32 @@
 
 import {useId} from 'react';
 
-import {CSSObject} from '@emotion/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import {
+  titleStyles,
+  subTitleStyles,
+  wrapperStyles,
+  protocolButtonStyles,
+  protocolLabelStyles,
+  protocolValueStyles,
+} from './conversationProtocolDetails.styles';
+
 interface ConversationProtocolDetailsProps {
   protocol: CONVERSATION_PROTOCOL;
   cipherSuite?: number;
+  onProtocolActivated?: () => void;
 }
 
-const titleStyles: CSSObject = {
-  fontSize: '0.875rem',
-  fontWeight: 400,
-};
-
-const subTitleStyles: CSSObject = {
-  color: 'var(--text-input-placeholder)',
-  fontSize: '0.75rem',
-  fontWeight: 400,
-  marginBottom: 16,
-  wordBreak: 'break-all',
-};
-
-const wrapperStyles: CSSObject = {
-  marginLeft: 'auto',
-  maxWidth: 'calc(100% - 20px)',
-  paddingTop: 4,
-};
-
-export const ConversationProtocolDetails = ({protocol, cipherSuite}: ConversationProtocolDetailsProps) => {
+export const ConversationProtocolDetails = ({
+  protocol,
+  cipherSuite,
+  onProtocolActivated,
+}: ConversationProtocolDetailsProps) => {
   const {translate} = useApplicationContext();
   const protocolLabelId = useId();
   const cipherSuiteLabelId = useId();
@@ -60,18 +54,33 @@ export const ConversationProtocolDetails = ({protocol, cipherSuite}: Conversatio
       <h3 className="conversation-details__list-head">{translate('conversationDetailsProtocolDetails')}</h3>
 
       <div css={wrapperStyles}>
-        <div id={protocolLabelId} css={titleStyles}>
-          Protocol
-        </div>
-
-        <div aria-labelledby={protocolLabelId} css={subTitleStyles} data-uie-name="protocol-name">
-          {protocol.toUpperCase()}
-        </div>
+        {onProtocolActivated ? (
+          <button
+            type="button"
+            onClick={onProtocolActivated}
+            data-uie-name="manual-migration-protocol"
+            css={protocolButtonStyles}
+          >
+            <span css={protocolLabelStyles}>{translate('modalCreateGroupProtocolHeading')}</span>
+            <span css={protocolValueStyles} data-uie-name="protocol-name">
+              {protocol.toUpperCase()}
+            </span>
+          </button>
+        ) : (
+          <>
+            <div id={protocolLabelId} css={titleStyles}>
+              {translate('modalCreateGroupProtocolHeading')}
+            </div>
+            <div aria-labelledby={protocolLabelId} css={subTitleStyles} data-uie-name="protocol-name">
+              {protocol.toUpperCase()}
+            </div>
+          </>
+        )}
 
         {protocol === CONVERSATION_PROTOCOL.MLS && cipherSuite != null && (
           <>
             <div id={cipherSuiteLabelId} css={titleStyles}>
-              Cipher Suite
+              {translate('conversationDetailsCipherSuite')}
             </div>
             <div aria-labelledby={cipherSuiteLabelId} css={subTitleStyles} data-uie-name="cipher-suite">
               {Ciphersuite[cipherSuite]}

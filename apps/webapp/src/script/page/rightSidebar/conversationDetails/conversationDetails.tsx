@@ -29,7 +29,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
-import {ConversationProtocolDetails} from 'Components/panel/conversationProtocolDetails/conversationProtocolDetails';
+import {ManualMigrationProtocolDetails} from 'Components/panel/conversationProtocolDetails/manualMigrationProtocolDetails';
 import {EnrichedFields} from 'Components/panel/enrichedFields';
 import {ServiceDetails} from 'Components/panel/serviceDetails';
 import {UserDetails} from 'Components/panel/userDetails';
@@ -417,9 +417,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
             isChannelPublic={isChannelPublic}
           />
 
-          <ConversationProtocolDetails
-            protocol={activeConversation.protocol}
-            cipherSuite={activeConversation.cipherSuite}
+          <ManualMigrationProtocolDetails
+            key={JSON.stringify(activeConversation.qualifiedId)}
+            conversation={activeConversation}
+            selfUser={selfUser}
+            teamState={teamState}
+            repository={conversationRepository}
           />
         </FadingScrollbar>
       </div>

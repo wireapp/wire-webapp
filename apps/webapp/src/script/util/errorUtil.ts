@@ -19,9 +19,11 @@
 
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 
+import {TranslationKey} from './localizerUtil';
+
 import {LabeledError} from '../auth/module/action/labeledError';
 
-export const errorHandlerStrings = {
+export const errorHandlerStrings: Record<string, TranslationKey> = {
   [BackendErrorLabel.NO_CONVERSATION_CODE]: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
   [BackendErrorLabel.NO_CONVERSATION]: 'BackendError.LABEL.CONVERSATION_NOT_FOUND',
   [BackendErrorLabel.TOO_MANY_MEMBERS]: 'BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS',
@@ -70,4 +72,5 @@ export const errorHandlerStrings = {
   [LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS]: 'LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS',
   [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: 'BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND',
   [BackendErrorLabel.INVALID_CONVERSATION_PASSWORD]: 'BackendErrorLabel.INVALID_CONVERSATION_PASSWORD',
+  [BackendErrorLabel.MLS_MIGRATION_CRITERIA_NOT_SATISFIED]: 'BackendError.LABEL.MLS_MIGRATION_CRITERIA_NOT_SATISFIED',
 };
