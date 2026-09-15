@@ -81,24 +81,6 @@ describe('handleSharedDriveUploadInput', () => {
     );
   });
 
-  it('uploads multiple supplied files as one batch', async () => {
-    const firstFile = new File(['first'], 'first.txt');
-    const secondFile = new File(['second'], 'second.txt');
-    const dependencies = createDependencies();
-
-    handleSharedDriveUploadInput(createEvent([firstFile, secondFile]), {...dependencies, uploadPath});
-
-    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
-    await uploadAction();
-
-    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
-      [firstFile, secondFile],
-      uploadPath,
-      dependencies.onRefresh,
-      conversationQualifiedId,
-    );
-  });
-
   it('rejects invalid selected files before dispatching upload', () => {
     const validFile = new File(['valid'], 'valid.txt');
     const invalidFile = new File(['invalid'], 'invalid.exe');

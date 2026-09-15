@@ -26,7 +26,7 @@ import type {FireAndForgetInvoker} from '@wireapp/core';
 import type {SharedDriveDropRejection} from './sharedDriveDrop';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
-type SharedDriveUploadInputDependencies = {
+export type SharedDriveUploadInputDependencies = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly sharedDriveUploadController: SharedDriveUploadController;
   readonly uploadPath: string;
