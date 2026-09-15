@@ -19,7 +19,7 @@
 
 import {Fragment, ReactNode} from 'react';
 
-import {isNonEmptyArray, isNull, isUndefined} from '@sindresorhus/is';
+import {isNan, isNonEmptyArray, isNonEmptyString, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 interface ComponentReplacement {
   start: string;
@@ -35,13 +35,16 @@ interface StringReplacement {
 type Replacement = ComponentReplacement | StringReplacement;
 
 function hasNonEmptyReactNodeValue(node: ReactNode): boolean {
-  return (
-    node !== false &&
-    node !== null &&
-    node !== undefined &&
-    (typeof node !== 'string' || node.length > 0) &&
-    (typeof node !== 'number' || (node !== 0 && !Number.isNaN(node)))
-  );
+  if (node === false || isNullOrUndefined(node)) {
+    return false;
+  }
+  if (typeof node === 'string') {
+    return isNonEmptyString(node);
+  }
+  if (typeof node === 'number') {
+    return node !== 0 && !isNan(node);
+  }
+  return true;
 }
 
 export type ReactTranslationMarker = {
