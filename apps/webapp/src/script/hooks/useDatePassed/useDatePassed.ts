@@ -19,6 +19,8 @@
 
 import {useCallback, useEffect, useRef} from 'react';
 
+import {isNull, isTruthy} from '@sindresorhus/is';
+
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 interface UseDatePassedProps {
@@ -33,14 +35,14 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
   const targetTime = useRef<number | null>(null);
 
   const checkTime = useCallback(() => {
-    if (!target || !enabled) {
+    if (isNull(target) || !enabled) {
       return;
     }
 
     const currentTime = Date.now();
     if (currentTime >= target.getTime()) {
       hasPassed.current = true;
-      if (intervalId.current) {
+      if (isTruthy(intervalId.current)) {
         clearInterval(intervalId.current);
       }
       callback();
@@ -49,10 +51,10 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
 
   useEffect(() => {
     // Clear interval if disabled or no target
-    if (!enabled || !target) {
+    if (!enabled || isNull(target)) {
       hasPassed.current = false;
       targetTime.current = null;
-      if (intervalId.current) {
+      if (isTruthy(intervalId.current)) {
         clearInterval(intervalId.current);
       }
       return undefined;
@@ -65,7 +67,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
       hasPassed.current = false;
       targetTime.current = newTargetTime;
 
-      if (intervalId.current) {
+      if (isTruthy(intervalId.current)) {
         clearInterval(intervalId.current);
       }
     }
@@ -80,7 +82,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
     intervalId.current = setInterval(checkTime, TIME_IN_MILLIS.SECOND);
 
     return () => {
-      if (intervalId.current) {
+      if (isTruthy(intervalId.current)) {
         clearInterval(intervalId.current);
       }
     };

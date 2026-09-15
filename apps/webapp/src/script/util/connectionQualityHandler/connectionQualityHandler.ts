@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {getLogger} from 'Util/logger';
@@ -36,7 +37,7 @@ interface ConnectionQualityHandler {
 export const getConnectionQualityHander = (): ConnectionQualityHandler | null => {
   const navigatorConnection = window.navigator?.connection;
 
-  if (!navigatorConnection) {
+  if (isUndefined(navigatorConnection)) {
     logger.warn('Listening for connection quality is disabled, navigator.connection is not supported by the browser');
     return null;
   }

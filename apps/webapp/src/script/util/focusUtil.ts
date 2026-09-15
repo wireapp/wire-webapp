@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
+
 /**
  * Returns back a NodeList of focusable elements
  * that exist within the passed parent HTMLElement, or
@@ -36,7 +38,9 @@ export const getAllFocusableElements = (
   }
 
   const defaultSelectors = `button:not([disabled]), [role="button"], [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled]), details:not([disabled]), summary:not(:disabled)`;
-  const selectors = customSelector.length ? `${defaultSelectors}, ${[...customSelector]}` : `${defaultSelectors}`;
+  const selectors = isNonEmptyArray(customSelector)
+    ? `${defaultSelectors}, ${[...customSelector]}`
+    : `${defaultSelectors}`;
   return parent.querySelectorAll(selectors);
 };
 

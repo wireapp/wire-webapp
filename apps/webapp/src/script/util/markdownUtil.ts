@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 // Basic markdown patterns (used for both detection and sanitization)
 const HEADER_PATTERN = /^#{1,6}\s+/m;
 const BOLD_PATTERN_1 = /\*\*[^*]+\*\*/;
@@ -69,7 +71,7 @@ const MARKDOWN_PATTERNS = [
  * Checks if the given text string contains markdown.
  */
 export const isMarkdownText = (text: string): boolean => {
-  if (!text) {
+  if (!isNonEmptyString(text)) {
     return false;
   }
 
@@ -84,7 +86,7 @@ export const isMarkdownText = (text: string): boolean => {
  * Removes all markdown formatting from a given string.
  */
 export const sanitizeMarkdown = (text: string): string => {
-  if (!text) {
+  if (!isNonEmptyString(text)) {
     return '';
   }
 
@@ -180,7 +182,7 @@ const markdownSanitizers: MarkdownSanitizer[] = [
       }
       return line
         .split('|')
-        .filter(cell => cell.trim())
+        .filter(cell => isNonEmptyString(cell.trim()))
         .map(cell => cell.trim())
         .join(' ');
     },
