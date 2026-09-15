@@ -19,6 +19,7 @@
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import {isEmptyArray, isNonEmptyString, isTruthy} from '@sindresorhus/is';
 import {match} from 'path-to-regexp';
 
 import {isConversationListTab, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
@@ -42,10 +43,11 @@ let routes: Routes = {};
  * Matches the current URL path against configured routes and triggers the appropriate handler.
  */
 const parseRoute = () => {
-  const currentPath = window.location.hash.replace('#', '') || '/';
+  const pathFromHash = window.location.hash.replace('#', '');
+  const currentPath = isNonEmptyString(pathFromHash) ? pathFromHash : '/';
 
   const exactMatch = routes[currentPath];
-  if (exactMatch) {
+  if (isTruthy(exactMatch)) {
     return exactMatch();
   }
 
@@ -58,7 +60,7 @@ const parseRoute = () => {
       const matcher = match(pattern, {decode: decodeURIComponent});
       const result = matcher(currentPath);
 
-      if (!result || !handler) {
+      if (!isTruthy(result) || !isTruthy(handler)) {
         continue;
       }
 
@@ -68,14 +70,14 @@ const parseRoute = () => {
       // Handle wildcard parameter
       if (paramNames.some(name => name.startsWith('*'))) {
         const wildcardName = paramNames.find(name => name.startsWith('*'));
-        if (wildcardName) {
+        if (isNonEmptyString(wildcardName)) {
           const segments = params[wildcardName];
           return handler(...Object.values(params).filter(param => param !== segments), segments);
         }
       }
 
       // Handle optional parameters
-      if (paramNames.length === 0) {
+      if (isEmptyArray(paramNames)) {
         return handler(params);
       }
 

@@ -568,6 +568,16 @@ const productionConfigs = [
     },
   },
   {
+    files: [
+      'apps/webapp/src/script/browser/**/*.{ts,tsx}',
+      'apps/webapp/src/script/localization/**/*.{ts,tsx}',
+      'apps/webapp/src/script/router/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
     files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off',
