@@ -19,7 +19,7 @@
 
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
-import {isEmptyArray, isNonEmptyString, isTruthy} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {match} from 'path-to-regexp';
 
 import {isConversationListTab, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
@@ -47,7 +47,7 @@ const parseRoute = () => {
   const currentPath = isNonEmptyString(pathFromHash) ? pathFromHash : '/';
 
   const exactMatch = routes[currentPath];
-  if (isTruthy(exactMatch)) {
+  if (exactMatch !== null && exactMatch !== undefined) {
     return exactMatch();
   }
 
@@ -60,7 +60,7 @@ const parseRoute = () => {
       const matcher = match(pattern, {decode: decodeURIComponent});
       const result = matcher(currentPath);
 
-      if (!isTruthy(result) || !isTruthy(handler)) {
+      if (result === false || handler === null || handler === undefined) {
         continue;
       }
 

@@ -19,7 +19,7 @@
 
 import {Fragment, ReactNode} from 'react';
 
-import {isNonEmptyArray, isNull, isTruthy, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyArray, isNull, isUndefined} from '@sindresorhus/is';
 
 interface ComponentReplacement {
   start: string;
@@ -33,6 +33,16 @@ interface StringReplacement {
 }
 
 type Replacement = ComponentReplacement | StringReplacement;
+
+function hasNonEmptyReactNodeValue(node: ReactNode): boolean {
+  return (
+    node !== false &&
+    node !== null &&
+    node !== undefined &&
+    (typeof node !== 'string' || node.length > 0) &&
+    (typeof node !== 'number' || (node !== 0 && !Number.isNaN(node)))
+  );
+}
 
 export type ReactTranslationMarker = {
   readonly start: string;
@@ -187,7 +197,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
               }
               return componentsReplacementMatch.render(node);
             })
-            .filter(isTruthy)
+            .filter(hasNonEmptyReactNodeValue)
             .map((node, index) => <Fragment key={index}>{node}</Fragment>);
         }
 
@@ -202,6 +212,6 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
 
       return node;
     })
-    .filter(isTruthy)
+    .filter(hasNonEmptyReactNodeValue)
     .map((node, index) => <Fragment key={index}>{node}</Fragment>); // Make sure we have a different key for each node.
 }
