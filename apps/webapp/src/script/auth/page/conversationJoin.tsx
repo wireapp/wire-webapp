@@ -19,7 +19,7 @@
 
 import {useEffect, useState, useRef, FormEvent} from 'react';
 
-import {isNan, isNonEmptyString} from '@sindresorhus/is';
+import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
@@ -241,9 +241,7 @@ const ConversationJoinComponent = ({
   }
 
   const isFullConversation =
-    conversationError !== null &&
-    conversationError !== undefined &&
-    conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
+    !isNullOrUndefined(conversationError) && conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
 
   const submitJoinCodeWithPassword = async (password: string) => {
     await handleSubmit(undefined, password);
@@ -261,7 +259,7 @@ const ConversationJoinComponent = ({
             setIsJoinGuestLinkPasswordModalOpen(false);
             setIsTemporaryGuest(false);
           }}
-          error={conversationError !== null && conversationError !== undefined ? conversationError : generalError}
+          error={!isNullOrUndefined(conversationError) ? conversationError : generalError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
           onSubmitPassword={isTemporaryGuest === false ? getConversationInfoAndJoin : submitJoinCodeWithPassword}

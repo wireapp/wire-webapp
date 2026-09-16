@@ -19,7 +19,7 @@
 
 import {useEffect, CSSProperties} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 
@@ -81,7 +81,7 @@ const UserDetailsComponent = ({
         </p>
       )}
 
-      {classifiedDomains !== undefined && classifiedDomains !== null && (
+      {!isNullOrUndefined(classifiedDomains) && (
         <UserClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />
       )}
 

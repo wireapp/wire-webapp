@@ -19,7 +19,7 @@
 
 import {useState, useEffect} from 'react';
 
-import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -60,7 +60,7 @@ export const ServicesTab = ({
 
   const debouncedSearch = useDebouncedCallback(async () => {
     const results = await integrationRepository.searchForServices(searchQuery);
-    if (results !== undefined && results !== null) {
+    if (!isNullOrUndefined(results)) {
       setServices(results);
     }
   }, SEARCH_DEBOUNCE_MILLISECONDS);

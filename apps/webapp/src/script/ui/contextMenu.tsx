@@ -20,7 +20,7 @@
 import {ComponentType, CSSProperties, ReactNode, SVGProps, useEffect, useMemo, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
 
@@ -140,7 +140,7 @@ const ContextMenu = ({
     let leftPx = 0;
     let topPx = 0;
 
-    if (anchorEl !== undefined && anchorEl !== null) {
+    if (!isNullOrUndefined(anchorEl)) {
       const anchorRect = anchorEl.getBoundingClientRect();
       const position = getPositionFromPlacement(anchorRect, menuWidth, menuHeight, placement, offset);
       leftPx = position.left;

@@ -19,7 +19,7 @@
 
 import {useEffect, useRef, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -105,7 +105,7 @@ const StartUI = ({
   const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
 
   const openFirstConversation = async (): Promise<void> => {
-    if (peopleSearchResults.current !== undefined && peopleSearchResults.current !== null) {
+    if (!isNullOrUndefined(peopleSearchResults.current)) {
       const {contacts} = peopleSearchResults.current;
       if (contacts.length > 0) {
         return openContact(contacts[0]);

@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -100,7 +101,7 @@ export const DevicesPreferences = ({
     <PreferencesPage title={translate('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{translate('preferencesDevicesCurrent')}</legend>
-        {currentClient !== undefined && currentClient !== null && (
+        {!isNullOrUndefined(currentClient) && (
           <DetailedDevice
             isCurrentDevice
             device={currentClient}

@@ -22,6 +22,7 @@ import React, {HTMLProps, useEffect, useId, useRef, useState} from 'react';
 import createCache from '@emotion/cache';
 import {CacheProvider, CSSObject} from '@emotion/react';
 import weakMemoize from '@emotion/weak-memoize';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {createPortal} from 'react-dom';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -75,8 +76,9 @@ const ModalComponent = ({
 
   useEffect(() => {
     // Get the correct document based on the container
-    const targetDocument =
-      container !== undefined && container !== null ? ((container as HTMLElement).ownerDocument ?? document) : document;
+    const targetDocument = !isNullOrUndefined(container)
+      ? ((container as HTMLElement).ownerDocument ?? document)
+      : document;
 
     const trapFocus = (event: KeyboardEvent) => preventFocusOutside(event, trapId, targetDocument);
 
@@ -118,7 +120,7 @@ const ModalComponent = ({
     return null;
   }
 
-  const portalTarget = container !== undefined && container !== null ? container : document.body;
+  const portalTarget = !isNullOrUndefined(container) ? container : document.body;
   const targetDocument = (portalTarget as HTMLElement).ownerDocument ?? document;
   const isForeignDocument = targetDocument !== document;
 

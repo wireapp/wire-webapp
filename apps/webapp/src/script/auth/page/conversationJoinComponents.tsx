@@ -19,6 +19,8 @@
 
 import React, {useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {
   useMatchMedia,
   QUERY,
@@ -214,7 +216,7 @@ const GuestLoginColumn = ({
                     .
                   </span>
                 </Checkbox>
-                {error !== null && error !== undefined ? parseValidationErrors(error) : parseError(conversationError)}
+                {!isNullOrUndefined(error) ? parseValidationErrors(error) : parseError(conversationError)}
                 {isSubmitingName ? (
                   <Loading size={32} />
                 ) : (

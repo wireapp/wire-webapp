@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -173,7 +173,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         setNumberOfRecords(numberOfRecords);
         setNumberOfProcessedRecords(0);
 
-        if (clientState.currentClient !== null && clientState.currentClient !== undefined) {
+        if (!isNullOrUndefined(clientState.currentClient)) {
           const archiveBlob = await backupRepository.generateHistory(
             user,
             clientState.currentClient.id,

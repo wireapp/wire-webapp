@@ -20,6 +20,7 @@
 import {useEffect, useMemo, useState} from 'react';
 import type {ReactNode} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -175,7 +176,7 @@ export const DeviceDetails = ({
       ? conversationState.getSelfProteusConversation()
       : conversationState.activeConversation();
     setIsResettingSession(true);
-    if (conversation !== undefined && conversation !== null) {
+    if (!isNullOrUndefined(conversation)) {
       messageRepository
         .resetSession(user.qualifiedId, device.id, conversation)
         .then(_resetProgress)
@@ -184,14 +185,13 @@ export const DeviceDetails = ({
   };
 
   const activeConversation = conversationState.activeConversation();
-  const isConversationMLS =
-    activeConversation !== null && activeConversation !== undefined ? isMLSConversation(activeConversation) : false;
+  const isConversationMLS = !isNullOrUndefined(activeConversation) ? isMLSConversation(activeConversation) : false;
 
   const deviceIdentity = getDeviceIdentity?.(device.id);
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {deviceIdentity !== undefined && deviceIdentity !== null && (
+      {!isNullOrUndefined(deviceIdentity) && (
         <MLSDeviceDetails identity={deviceIdentity} isSelfUser={user.isMe} cipherSuite={device.getCipherSuite()} />
       )}
 

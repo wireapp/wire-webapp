@@ -20,7 +20,7 @@
 import React, {memo, ReactElement, ReactNode} from 'react';
 
 import {css} from '@emotion/react';
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {throttle} from 'underscore';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
@@ -95,13 +95,11 @@ const ListWrapper = memo(
   }: LeftListWrapperProps) => {
     const {translate} = useApplicationContext();
     const hasHeaderElement =
-      headerElement !== null &&
-      headerElement !== undefined &&
+      !isNullOrUndefined(headerElement) &&
       headerElement !== false &&
       headerElement !== '' &&
-      headerElement !== 0 &&
-      headerElement !== BigInt(0) &&
-      (typeof headerElement !== 'number' || !Number.isNaN(headerElement));
+      (typeof headerElement !== 'number' || (headerElement !== 0 && !isNan(headerElement))) &&
+      (typeof headerElement !== 'bigint' || headerElement !== BigInt(0));
     const defaultHeadingId =
       hasHeader === true && hasHeaderElement === false && isNonEmptyString(header)
         ? getListWrapperHeadingId(id)

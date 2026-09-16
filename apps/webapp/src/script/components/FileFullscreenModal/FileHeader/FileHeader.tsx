@@ -19,7 +19,7 @@
 
 import {useMemo} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {
@@ -161,7 +161,7 @@ export const FileHeader = ({
               {timeAgo}
             </MessageTime>
           </div>
-          {badges !== null && badges !== undefined && badges.length > 0 && <BadgesWithTooltip items={badges} />}
+          {!isNullOrUndefined(badges) && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
       {isEditable === true && !showViewOnlyLabel && (

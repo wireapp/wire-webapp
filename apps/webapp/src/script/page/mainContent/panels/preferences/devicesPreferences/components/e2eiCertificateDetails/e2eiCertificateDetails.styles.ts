@@ -18,6 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/serialize';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {MLSStatuses} from 'src/script/e2eIdentity';
 
@@ -60,7 +61,7 @@ export const styles: stylesProps = {
     },
   },
   e2eiStatus: (MLSStatus?: MLSStatuses) => ({
-    color: MLSStatus !== undefined && MLSStatus !== null ? MLSStatusColor[MLSStatus] : 'var(--green-500)',
+    color: !isNullOrUndefined(MLSStatus) ? MLSStatusColor[MLSStatus] : 'var(--green-500)',
     marginLeft: '4px',
   }),
   serialNumberWrapper: {

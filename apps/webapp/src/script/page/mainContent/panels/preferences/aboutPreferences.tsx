@@ -19,7 +19,7 @@
 
 import {useMemo} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
@@ -45,7 +45,7 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
   const desktopConfig = Config.getDesktopConfig();
 
   const termsOfUseUrl = useMemo(() => {
-    if (selfUser !== null && selfUser !== undefined) {
+    if (!isNullOrUndefined(selfUser)) {
       return externalUrl.termsOfUse;
     }
     return '';
@@ -111,7 +111,7 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
         </PreferencesSection>
       )}
       <PreferencesSection hasSeparator>
-        {desktopConfig !== null && desktopConfig !== undefined && (
+        {!isNullOrUndefined(desktopConfig) && (
           <p className="preferences-detail">
             {translate('preferencesAboutDesktopVersion', {version: desktopConfig.version})}
           </p>

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {create} from 'zustand';
 
@@ -77,7 +78,7 @@ const showWarning = (type: TYPE, info?: {name: string}) => {
     hideWarning(visibleWarning);
   }
 
-  if (info !== undefined && info !== null) {
+  if (!isNullOrUndefined(info)) {
     setName(info.name);
   }
 

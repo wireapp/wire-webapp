@@ -19,6 +19,8 @@
 
 import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo, useCallback} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 
@@ -186,7 +188,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
-    if (action === undefined || action === null) {
+    if (isNullOrUndefined(action)) {
       return;
     }
     const actions = {

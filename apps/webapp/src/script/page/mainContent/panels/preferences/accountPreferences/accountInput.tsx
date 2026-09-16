@@ -19,7 +19,7 @@
 
 import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 
-import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
+import {isEmptyString, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -115,7 +115,7 @@ const AccountInput: FC<AccountInputProps> = ({
     if (forceLowerCase) {
       value = value.toLowerCase();
     }
-    if (maxLength !== null && maxLength !== undefined && maxLength !== 0 && !Number.isNaN(maxLength)) {
+    if (!isNullOrUndefined(maxLength) && maxLength !== 0 && !Number.isNaN(maxLength)) {
       value = value.substring(0, maxLength);
     }
     setInput(value);

@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
@@ -57,8 +57,7 @@ interface Props {
 export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
   const userState = container.resolve(UserState);
   const {conversationId} = useCallAlertState();
-  const call =
-    conversationId !== undefined && conversationId !== null ? callingRepository.findCall(conversationId) : undefined;
+  const call = !isNullOrUndefined(conversationId) ? callingRepository.findCall(conversationId) : undefined;
   const [isChecked, setIsChecked] = useState(false);
   const {setQualityFeedbackModalShown, qualityFeedbackModalShown, setConversationId} = useCallAlertState();
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
@@ -71,7 +70,7 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
     return null;
   }
 
-  if (call === undefined || call === null) {
+  if (isNullOrUndefined(call)) {
     logger.warn('Call not found for conversationId', conversationId);
     setQualityFeedbackModalShown(false);
     return null;

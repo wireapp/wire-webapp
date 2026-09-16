@@ -19,7 +19,7 @@
 
 import {useEffect, useMemo, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
 import {useUserIdentity} from 'Hooks/useDeviceIdentities';
@@ -122,7 +122,7 @@ export const UserDevices = ({
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
 
-      {current.state === UserDevicesState.DEVICE_DETAILS && selectedClient !== undefined && selectedClient !== null && (
+      {current.state === UserDevicesState.DEVICE_DETAILS && !isNullOrUndefined(selectedClient) && (
         <DeviceDetails
           {...{
             getDeviceIdentity,
