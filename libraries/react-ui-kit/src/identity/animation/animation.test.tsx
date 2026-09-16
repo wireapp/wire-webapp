@@ -17,24 +17,27 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 
 import {Opacity} from './animation';
 
 describe('animation', () => {
-  it('transitions a DOM child without relying on findDOMNode', function (): void {
+  it('applies transition classes to its owned DOM node under React 19', async function (): Promise<void> {
     const {rerender} = render(
       <Opacity in={false}>
-        <div>Animated content</div>
+        <span>Animated content</span>
       </Opacity>,
     );
+    const transitionNode = screen.getByText('Animated content').parentElement;
+
+    expect(transitionNode).not.toBeNull();
 
     rerender(
-      <Opacity in>
-        <div>Animated content</div>
+      <Opacity in timeout={0}>
+        <span>Animated content</span>
       </Opacity>,
     );
 
-    expect(screen.getByText('Animated content')).not.toBeNull();
+    await waitFor(() => expect(transitionNode?.className).toMatch(/-enter-done/));
   });
 });

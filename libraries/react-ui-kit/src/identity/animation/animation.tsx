@@ -17,19 +17,40 @@
  *
  */
 
-import {ReactNode, ComponentType, HTMLProps, createElement, useRef} from 'react';
+import {HTMLAttributes, HTMLProps, ReactNode, useRef} from 'react';
 
 import {ClassNames} from '@emotion/react';
-import {isNullOrUndefined} from '@sindresorhus/is';
+import type {CSSObject} from '@emotion/react';
+import type {CSSTransitionProps} from 'react-transition-group/CSSTransition';
 
 import {DURATION, EASE} from '../motions/motions';
 
 const {CSSTransition, TransitionGroup} = require('react-transition-group');
 
-type TransitionProps = Partial<any> & {
-  children: ReactNode;
-  component?: string | ComponentType<any>;
-};
+type TransitionOptions = Partial<
+  Pick<
+    CSSTransitionProps<HTMLDivElement>,
+    | 'appear'
+    | 'enter'
+    | 'exit'
+    | 'in'
+    | 'mountOnEnter'
+    | 'onEnter'
+    | 'onEntered'
+    | 'onEntering'
+    | 'onExit'
+    | 'onExited'
+    | 'onExiting'
+    | 'timeout'
+    | 'unmountOnExit'
+  >
+>;
+
+type TransitionProps = TransitionOptions &
+  Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+    animationStyle?: CSSObject;
+    children: ReactNode;
+  };
 
 type OpacityProps = TransitionProps & {
   endValue?: number;
@@ -50,14 +71,14 @@ type TransitionContainerProps = HTMLProps<any> & {
 
 export const TransitionContainer = (props: TransitionContainerProps) => <TransitionGroup {...props} />;
 
-export const Transition = ({animationStyle, timeout, component = 'div', children, ...props}: TransitionProps) => {
-  const nodeRef = useRef<HTMLElement>(null);
+export const Transition = ({animationStyle, timeout, children, ...props}: TransitionProps) => {
+  const nodeRef = useRef<HTMLDivElement>(null);
 
   return (
     <ClassNames>
       {({css}) => (
-        <CSSTransition nodeRef={nodeRef} timeout={timeout} classNames={css(animationStyle)} {...props}>
-          {!isNullOrUndefined(component) ? createElement(component, {ref: nodeRef}, children) : children}
+        <CSSTransition {...props} timeout={timeout} nodeRef={nodeRef} classNames={css(animationStyle)}>
+          <div ref={nodeRef}>{children}</div>
         </CSSTransition>
       )}
     </ClassNames>
@@ -66,6 +87,7 @@ export const Transition = ({animationStyle, timeout, component = 'div', children
 
 export const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...props}: OpacityProps) => (
   <Transition
+    {...props}
     animationStyle={{
       '&-enter': {opacity: startValue},
       '&-enter-active': {
@@ -81,7 +103,6 @@ export const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAUL
       '&-exit-done': {opacity: startValue},
     }}
     timeout={timeout}
-    {...props}
   />
 );
 
@@ -92,6 +113,7 @@ export const YAxisMovement = ({
   ...props
 }: MovementProps) => (
   <Transition
+    {...props}
     animationStyle={{
       '&-enter': {transform: `translateY(${startValue})`},
       '&-enter-active': {
@@ -107,7 +129,6 @@ export const YAxisMovement = ({
       '&-exit-done': {transform: `translateY(${startValue})`},
     }}
     timeout={timeout}
-    {...props}
   />
 );
 
@@ -118,6 +139,7 @@ export const XAxisMovement = ({
   ...props
 }: MovementProps) => (
   <Transition
+    {...props}
     animationStyle={{
       '&-enter': {transform: `translateX(${startValue})`},
       '&-enter-active': {
@@ -133,12 +155,12 @@ export const XAxisMovement = ({
       '&-exit-done': {transform: `translateX(${startValue})`},
     }}
     timeout={timeout}
-    {...props}
   />
 );
 
 export const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION.DEFAULT, ...props}: MovementProps) => (
   <Transition
+    {...props}
     animationStyle={{
       '&-enter': {marginTop: startValue},
       '&-enter-active': {
@@ -154,7 +176,6 @@ export const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION
       '&-exit-done': {marginTop: startValue},
     }}
     timeout={timeout}
-    {...props}
   />
 );
 
