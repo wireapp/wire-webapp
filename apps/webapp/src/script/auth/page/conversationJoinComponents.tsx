@@ -76,10 +76,10 @@ const Separator = () => {
       style={{
         display: 'flex',
         alignItems: 'center',
-        maxWidth: `${!isMobile ? '4rem' : '100%'}`,
+        maxWidth: `${isMobile === false ? '4rem' : '100%'}`,
         justifyContent: 'center',
-        transform: `rotate(${!isMobile ? '90' : '0'}deg)`,
-        marginLeft: `${!isMobile ? '' : '16px'}`,
+        transform: `rotate(${isMobile === false ? '90' : '0'}deg)`,
+        marginLeft: `${isMobile === false ? '' : '16px'}`,
       }}
     >
       <Line />
@@ -221,7 +221,12 @@ const GuestLoginColumn = ({
                   <Button
                     block
                     type="submit"
-                    disabled={!enteredName || !isValidName || isSubmitingName || !isTermOfUseAccepted}
+                    disabled={
+                      enteredName.length === 0 ||
+                      isValidName === false ||
+                      isSubmitingName ||
+                      isTermOfUseAccepted === false
+                    }
                     formNoValidate
                     onClick={checkNameValidity}
                     aria-label={translate('conversationJoin.joinButton')}

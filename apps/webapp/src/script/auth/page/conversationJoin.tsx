@@ -19,7 +19,7 @@
 
 import {useEffect, useState, useRef, FormEvent} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
@@ -99,7 +99,8 @@ const ConversationJoinComponent = ({
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const localConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
-    const localExpiresIn = parseInt(UrlUtil.getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
+    const parsedExpiresIn = parseInt(UrlUtil.getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10);
+    const localExpiresIn = parsedExpiresIn !== 0 && !isNan(parsedExpiresIn) ? parsedExpiresIn : undefined;
 
     setConversationCode(localConversationCode);
     setConversationKey(localConversationKey);
@@ -108,7 +109,7 @@ const ConversationJoinComponent = ({
     void doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
       .catch(noop)
       .then(async () => {
-        if (localConversationCode && localConversationKey) {
+        if (isNonEmptyString(localConversationCode) && isNonEmptyString(localConversationKey)) {
           await doCheckConversationCode(localConversationKey, localConversationCode);
           await doGetConversationInfoByCode(localConversationKey, localConversationCode);
         }
@@ -144,7 +145,7 @@ const ConversationJoinComponent = ({
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
        * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
        */
-      await setLastEventDate(conversationEvent?.time ? new Date(conversationEvent.time) : new Date());
+      await setLastEventDate(isNonEmptyString(conversationEvent?.time) ? new Date(conversationEvent.time) : new Date());
 
       routeToApp(conversationEvent?.conversation, conversationEvent?.qualified_conversation?.domain ?? '');
     } catch (error: unknown) {
@@ -190,7 +191,7 @@ const ConversationJoinComponent = ({
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
               error.label.endsWith(errorType),
             );
-            if (!isValidationError) {
+            if (isValidationError === false) {
               void doLogout();
               console.warn('Unable to create wireless account', error);
               setShowEntropyForm(false);
@@ -203,7 +204,7 @@ const ConversationJoinComponent = ({
         setShowEntropyForm(false);
       }
     }
-    if (nameInput.current) {
+    if (nameInput.current !== null) {
       nameInput.current.focus();
     }
   };
@@ -211,7 +212,7 @@ const ConversationJoinComponent = ({
   const checkNameValidity = async (event: FormEvent) => {
     setIsTemporaryGuest(true);
     event.preventDefault();
-    if (!nameInput.current) {
+    if (nameInput.current === null) {
       return;
     }
     nameInput.current.value = nameInput.current.value.trim();
@@ -235,7 +236,7 @@ const ConversationJoinComponent = ({
     setEnteredName(event.target.value);
   };
 
-  if (!isValidLink) {
+  if (isValidLink === false) {
     return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
 
@@ -248,22 +249,22 @@ const ConversationJoinComponent = ({
     await handleSubmit(undefined, password);
   };
 
-  if (isFullConversation) {
+  if (isFullConversation === true) {
     return <ConversationJoinFull />;
   }
 
   return (
     <>
-      {isJoinGuestLinkPasswordModalOpen && (
+      {isJoinGuestLinkPasswordModalOpen === true && (
         <JoinGuestLinkPasswordModal
           onClose={() => {
             setIsJoinGuestLinkPasswordModalOpen(false);
             setIsTemporaryGuest(false);
           }}
-          error={conversationError || generalError}
+          error={conversationError !== null && conversationError !== undefined ? conversationError : generalError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
-          onSubmitPassword={!isTemporaryGuest ? getConversationInfoAndJoin : submitJoinCodeWithPassword}
+          onSubmitPassword={isTemporaryGuest === false ? getConversationInfoAndJoin : submitJoinCodeWithPassword}
         />
       )}
       <WirelessContainer
@@ -275,7 +276,7 @@ const ConversationJoinComponent = ({
           <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
             {translate('conversationJoin.mainHeadline')}
           </H1>
-          {!isWirePublicInstance && (
+          {isWirePublicInstance === false && (
             <Muted data-uie-name="status-join-subhead">
               {translate('conversationJoin.headline', {domain: window.location.hostname})}
             </Muted>
