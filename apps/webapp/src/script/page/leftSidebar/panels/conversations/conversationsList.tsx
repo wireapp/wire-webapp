@@ -24,6 +24,7 @@ import React, {
   useState,
   useCallback,
   useRef,
+  RefObject,
 } from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
@@ -64,6 +65,7 @@ import {ContentState} from '../../../useAppState';
 
 const CONVERSATION_ROW_HEIGHT = 56;
 const CONVERSATION_CLICK_DEBOUNCE_DIVISOR = 2;
+type FocusConversation = (conversationId: string) => boolean;
 
 interface ConversationsListProps {
   callState: CallState;
@@ -81,6 +83,7 @@ interface ConversationsListProps {
   groupParticipantsConversations: Conversation[];
   isGroupParticipantsVisible: boolean;
   isEmpty: boolean;
+  focusConversationRef?: RefObject<FocusConversation | null>;
 }
 
 export const ConversationsList = ({
@@ -98,6 +101,7 @@ export const ConversationsList = ({
   groupParticipantsConversations,
   isGroupParticipantsVisible,
   isEmpty,
+  focusConversationRef,
 }: ConversationsListProps) => {
   const {translate} = useApplicationContext();
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -179,6 +183,89 @@ export const ConversationsList = ({
     estimateSize: () => CONVERSATION_ROW_HEIGHT,
     getItemKey,
   });
+  const virtualItems = rowVirtualizer.getVirtualItems();
+
+  const [pendingFocusConversationId, setPendingFocusConversationId] = useState<string | null>(null);
+  const cancelPendingFocus = useCallback(() => {
+    setPendingFocusConversationId(null);
+  }, []);
+  const handleConversationListFocusOut = useCallback(
+    (event: React.FocusEvent<HTMLUListElement>) => {
+      const relatedTarget = event.relatedTarget;
+
+      if (relatedTarget instanceof Node && !event.currentTarget.contains(relatedTarget)) {
+        cancelPendingFocus();
+      }
+    },
+    [cancelPendingFocus],
+  );
+  const focusConversation = useCallback(
+    (conversationId: string) => {
+      const conversationElement = document.querySelector<HTMLElement>(
+        `[data-uie-uid="${conversationId}"] [data-uie-name="go-open-conversation"]`,
+      );
+
+      if (conversationElement) {
+        conversationElement.focus();
+        return document.activeElement === conversationElement;
+      }
+
+      const conversationIndex = conversationsToDisplay.findIndex(
+        item => isConversationEntity(item) && item.id === conversationId,
+      );
+
+      if (conversationIndex === -1) {
+        return false;
+      }
+
+      rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
+      setPendingFocusConversationId(conversationId);
+      return true;
+    },
+    [conversationsToDisplay, rowVirtualizer],
+  );
+
+  useEffect(() => {
+    if (!focusConversationRef) {
+      return;
+    }
+
+    focusConversationRef.current = focusConversation;
+
+    return () => {
+      if (focusConversationRef.current === focusConversation) {
+        focusConversationRef.current = () => false;
+      }
+    };
+  }, [focusConversation, focusConversationRef]);
+
+  useEffect(() => {
+    if (!pendingFocusConversationId) {
+      return;
+    }
+
+    const isPendingConversationAvailable =
+      conversationsToDisplay.some(item => isConversationEntity(item) && item.id === pendingFocusConversationId) &&
+      conversationFocusCandidates.some(conversation => conversation.id === pendingFocusConversationId);
+
+    if (!isPendingConversationAvailable) {
+      setPendingFocusConversationId(null);
+      return;
+    }
+
+    const conversationElement = document.querySelector<HTMLElement>(
+      `[data-uie-uid="${pendingFocusConversationId}"] [data-uie-name="go-open-conversation"]`,
+    );
+
+    if (!conversationElement) {
+      return;
+    }
+
+    conversationElement.focus();
+    if (document.activeElement === conversationElement) {
+      setPendingFocusConversationId(null);
+    }
+  }, [conversationFocusCandidates, conversationsToDisplay, pendingFocusConversationId, virtualItems]);
 
   const debouncedOnConversationClick = useDebouncedCallback(
     (
@@ -290,13 +377,14 @@ export const ConversationsList = ({
           overflow: 'auto',
           position: 'relative',
         }}
+        onBlur={handleConversationListFocusOut}
       >
         <li
           aria-hidden="true"
           css={virtualizationSpacerStyles}
           style={{height: `${rowVirtualizer.getTotalSize()}px`}}
         />
-        {rowVirtualizer.getVirtualItems().map(virtualItem => {
+        {virtualItems.map(virtualItem => {
           const conversation = conversationsToDisplay[virtualItem.index];
 
           // Have to use some hacky way to display properly heading while filtering conversations, can be improved

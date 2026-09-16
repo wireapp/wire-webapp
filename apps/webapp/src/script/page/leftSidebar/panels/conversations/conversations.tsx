@@ -85,18 +85,7 @@ import {StartUI} from '../startUi';
 export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean =>
   ![SidebarTabs.PREFERENCES, SidebarTabs.MEETINGS].includes(tab);
 
-const focusConversation = (conversationId: string): boolean => {
-  const conversationElement = document.querySelector<HTMLElement>(
-    `[data-uie-uid="${conversationId}"] [data-uie-name="go-open-conversation"]`,
-  );
-
-  if (!conversationElement) {
-    return false;
-  }
-
-  conversationElement.focus();
-  return document.activeElement === conversationElement;
-};
+type FocusConversation = (conversationId: string) => boolean;
 
 type ConversationsProps = {
   callState?: CallState;
@@ -134,6 +123,8 @@ export const Conversations = ({
   const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const focusConversationRef = useRef<FocusConversation>(() => false);
+  const focusConversation = useCallback((conversationId: string) => focusConversationRef.current(conversationId), []);
 
   const {
     currentTab,
@@ -511,7 +502,7 @@ export const Conversations = ({
       event.preventDefault();
       setCurrentFocus(firstResult.id);
     },
-    [conversationsFilter, conversationsForFocus, setCurrentFocus],
+    [conversationsFilter, conversationsForFocus, focusConversation, setCurrentFocus],
   );
 
   const onSearch = useCallback(
@@ -578,6 +569,7 @@ export const Conversations = ({
             isEmpty={hasEmptyConversationsList}
             groupParticipantsConversations={groupParticipantsConversations}
             isGroupParticipantsVisible={isGroupParticipantsVisible}
+            focusConversationRef={focusConversationRef}
           />
         )}
       </>

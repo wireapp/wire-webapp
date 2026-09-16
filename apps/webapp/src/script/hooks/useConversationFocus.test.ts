@@ -73,7 +73,11 @@ describe('useConversationFocus', () => {
       conversations.map(conversation => [conversation.id, document.createElement('button')]),
     );
     document.body.append(searchInput, ...focusableElements.values());
-    const focusConversation = (conversationId: string) => focusableElements.get(conversationId)?.focus();
+    const focusConversation = (conversationId: string) => {
+      const element = focusableElements.get(conversationId);
+      element?.focus();
+      return document.activeElement === element;
+    };
     const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
 
     searchInput.focus();
@@ -110,6 +114,19 @@ describe('useConversationFocus', () => {
 
     expect(preventDefault).not.toHaveBeenCalled();
     expect(focusConversation).not.toHaveBeenCalled();
+    expect(result.current.currentFocus).toBe('first');
+  });
+
+  it('does not trap focus when the next conversation is not mounted', () => {
+    const conversations = [createConversation('first'), createConversation('second')];
+    const focusConversation = jest.fn(() => false);
+    const preventDefault = jest.fn();
+    const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
+
+    act(() => result.current.handleKeyDown(0)({key: 'ArrowDown', preventDefault} as unknown as KeyboardEvent));
+
+    expect(focusConversation).toHaveBeenCalledWith('second');
+    expect(preventDefault).not.toHaveBeenCalled();
     expect(result.current.currentFocus).toBe('first');
   });
 

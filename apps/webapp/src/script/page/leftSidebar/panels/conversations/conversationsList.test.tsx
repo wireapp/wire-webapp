@@ -29,7 +29,7 @@ jest.mock('@tanstack/react-virtual', () => ({
 import {createRef} from 'react';
 
 import userEvent from '@testing-library/user-event';
-import {fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
@@ -195,6 +195,140 @@ describe('ConversationsList', () => {
     expect(results).toHaveLength(2);
     fireEvent.keyDown(results[1], {key: 'ArrowUp'});
     expect(handleArrowKeyDown).toHaveBeenCalledWith(1);
+  });
+
+  it('clears pending focus when the filtered conversation disappears', () => {
+    const conversation = create1to1Conversation('Alice');
+    const focusConversationRef = createRef<(conversationId: string) => boolean>();
+    const {container, rerender} = render(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[conversation]}
+        conversationsFilter="Alice"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={conversation.id}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+        focusConversationRef={focusConversationRef}
+      />,
+      {wrapper: rootProviderWrapper},
+    );
+
+    container.querySelector<HTMLElement>(`[data-uie-uid="${conversation.id}"]`)?.remove();
+    act(() => {
+      expect(focusConversationRef.current?.(conversation.id)).toBe(true);
+    });
+
+    const replacementContainer = document.createElement('div');
+    replacementContainer.dataset.uieUid = conversation.id;
+    const replacementButton = document.createElement('button');
+    replacementButton.dataset.uieName = 'go-open-conversation';
+    replacementContainer.append(replacementButton);
+    document.body.append(replacementContainer);
+
+    rerender(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[create1to1Conversation('Bob')]}
+        conversationsFilter="Bob"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={conversation.id}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+        focusConversationRef={focusConversationRef}
+      />,
+    );
+
+    expect(replacementButton).not.toHaveFocus();
+    replacementContainer.remove();
+  });
+
+  it('does not steal focus after focus leaves the list while focus is pending', () => {
+    const conversation = create1to1Conversation('Alice');
+    const focusConversationRef = createRef<(conversationId: string) => boolean>();
+    const {container, rerender} = render(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[conversation]}
+        conversationsFilter="Alice"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={conversation.id}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+        focusConversationRef={focusConversationRef}
+      />,
+      {wrapper: rootProviderWrapper},
+    );
+
+    container.querySelector<HTMLElement>(`[data-uie-uid="${conversation.id}"]`)?.remove();
+    const conversationList = container.querySelector<HTMLElement>('[data-uie-name="conversation-view"]');
+    const focusOrigin = document.createElement('button');
+    conversationList?.append(focusOrigin);
+    focusOrigin.focus();
+
+    act(() => {
+      expect(focusConversationRef.current?.(conversation.id)).toBe(true);
+    });
+
+    const replacementContainer = document.createElement('div');
+    replacementContainer.dataset.uieUid = conversation.id;
+    const replacementButton = document.createElement('button');
+    replacementButton.dataset.uieName = 'go-open-conversation';
+    replacementContainer.append(replacementButton);
+    document.body.append(replacementContainer);
+
+    const outsideFocusTarget = document.createElement('button');
+    document.body.append(outsideFocusTarget);
+    fireEvent.blur(focusOrigin, {relatedTarget: outsideFocusTarget});
+
+    rerender(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[create1to1Conversation('Bob')]}
+        conversationsFilter="Bob"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={conversation.id}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+        focusConversationRef={focusConversationRef}
+      />,
+    );
+
+    expect(replacementButton).not.toHaveFocus();
+    replacementContainer.remove();
+    outsideFocusTarget.remove();
   });
 
   it('keeps the search input focused while filtered results are updated', () => {
