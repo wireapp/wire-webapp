@@ -129,6 +129,17 @@ describe('handleSharedDriveDroppedFiles', () => {
     );
   });
 
+  it('rejects the whole batch when any dropped file is invalid', () => {
+    const validFile = new File(['one'], 'one.txt');
+    const invalidFile = new File(['two'], 'two.exe');
+    const dependencies = createDependencies({isAcceptedFile: file => file !== invalidFile});
+
+    handleSharedDriveDroppedFiles([validFile, invalidFile], dependencies);
+
+    expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'notAccepted', invalidFiles: [invalidFile]});
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
   it('keeps the recycle bin from becoming a drop target for an editor', () => {
     const file = new File(['content'], 'document.txt', {type: 'text/plain'});
     const dependencies = createDependencies({isInRecycleBin: true, isUploadFilesEnabled: true});
@@ -173,10 +184,10 @@ describe('getSharedDriveDropRejectionFeedback', () => {
     const file = new File(['content'], 'document.txt');
 
     expect(
-      getSharedDriveDropRejectionFeedback({reason: 'multipleFiles', invalidFiles: [file]}, translate, maxFileSize),
+      getSharedDriveDropRejectionFeedback({reason: 'notAccepted', invalidFiles: [file]}, translate, maxFileSize),
     ).toEqual({
-      title: 'conversationFileUploadFailedTooManyFilesHeading',
-      message: 'conversationFileUploadFailedTooManyFilesMessage:{"maxFiles":1}',
+      title: 'conversationFileUploadFailedHeading',
+      message: 'sharedDriveDropUnsupportedFileMessage',
       invalidFiles: [file],
     });
   });

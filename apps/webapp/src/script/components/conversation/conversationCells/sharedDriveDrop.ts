@@ -90,14 +90,6 @@ export const getSharedDriveDropRejectionFeedback = (
   translate: Translate,
   maxFileSize: number,
 ): SharedDriveDropFeedback => {
-  if (reason === 'multipleFiles') {
-    return {
-      title: translate('conversationFileUploadFailedTooManyFilesHeading'),
-      message: translate('conversationFileUploadFailedTooManyFilesMessage', {maxFiles: 1}),
-      invalidFiles: [...invalidFiles],
-    };
-  }
-
   if (reason === 'tooLarge') {
     return {
       title: translate('conversationFileUploadFailedTooLargeFilesHeading'),
