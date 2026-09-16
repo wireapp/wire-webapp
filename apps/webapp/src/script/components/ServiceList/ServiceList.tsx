@@ -60,7 +60,7 @@ export const ServiceList = ({
         ))}
       </ul>
 
-      {isSearching && !services.length && (
+      {isSearching === true && services.length === 0 && (
         <div className="no-results" data-uie-name="service-list-no-results">
           {translate('searchListNoMatches')}
         </div>

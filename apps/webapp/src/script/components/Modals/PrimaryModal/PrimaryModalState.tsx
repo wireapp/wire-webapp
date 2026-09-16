@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {isValid} from 'date-fns';
 import {escape} from 'underscore';
 import {create} from 'zustand';
@@ -280,14 +281,14 @@ const updateCurrentModalContent = (
       break;
     }
   }
-  if (content.secondaryAction) {
+  if (content.secondaryAction !== undefined && content.secondaryAction !== null) {
     const updatedSecondaryAction = Array.isArray(content.secondaryAction)
       ? content.secondaryAction
       : [content.secondaryAction];
     // force it into array format
     const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
     content.secondaryAction = updatedSecondaryAction.map((action, index) => {
-      const uieName = uieNames[index] || 'do-remaining';
+      const uieName = isNonEmptyString(uieNames[index]) ? uieNames[index] : 'do-remaining';
       return {...action, uieName};
     });
   }

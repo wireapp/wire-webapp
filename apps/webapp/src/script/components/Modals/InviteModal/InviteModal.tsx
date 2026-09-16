@@ -19,6 +19,8 @@
 
 import React, {useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/icon';
@@ -40,7 +42,7 @@ const {BRAND_NAME: brandName} = Config.getConfig();
 const InviteModal = ({translate, selfUser, onClose}: InviteModalProps) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
-  const inviteMessage = userName
+  const inviteMessage = isNonEmptyString(userName)
     ? translate('inviteMessage', {brandName: brandName, username: `@${userName}`})
     : translate('inviteMessageNoEmail', {brandName});
 

@@ -118,7 +118,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
   };
 
   const isPasswordOptional = () => {
-    const skipValidation = passwordOptional && !passwordInput.trim().length;
+    const skipValidation = passwordOptional === true && passwordInput.trim().length === 0;
     if (skipValidation) {
       return true;
     }
@@ -136,18 +136,18 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
   );
   const actionEnabled = isPasswordRequired ? isPasswordOptional() : true;
-  const inputActionEnabled = !isInput || !!inputValue.trim().length;
+  const inputActionEnabled = isInput === false || inputValue.trim().length > 0;
 
   const areGuestLinkPasswordsValid = checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
 
   const passwordGuestLinkActionEnabled =
-    (!isGuestLinkPassword || !!passwordValue.trim().length) && areGuestLinkPasswordsValid;
+    (isGuestLinkPassword === false || passwordValue.trim().length > 0) && areGuestLinkPasswordsValid;
 
   const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
     if (disabled === true) {
       return true;
     }
-    if (isConfirm) {
+    if (isConfirm === true) {
       return false;
     }
     if (isInput) {
@@ -161,17 +161,17 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
 
-      if (!skipValidation && !inputActionEnabled) {
+      if (skipValidation === false && inputActionEnabled === false) {
         return;
       }
 
-      if (hasPasswordWithRules && !isBackupPasswordValid) {
+      if (hasPasswordWithRules === true && isBackupPasswordValid === false) {
         setIsFormSubmitted(true);
         return;
       }
 
       // prevent from submit when validation not passed
-      if (!skipValidation && isGuestLinkPassword && !areGuestLinkPasswordsValid) {
+      if (skipValidation === false && isGuestLinkPassword === true && areGuestLinkPasswordsValid === false) {
         setIsFormSubmitted(true);
         return;
       }
@@ -186,7 +186,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
-    if (!action) {
+    if (action === undefined || action === null) {
       return;
     }
     const actions = {
@@ -207,7 +207,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
   const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
     updateOptionChecked(event.target.checked);
-    if (primaryActionButtonRef.current) {
+    if (primaryActionButtonRef.current !== null) {
       primaryActionButtonRef.current.focus();
     }
   };
@@ -217,7 +217,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
   }, [secondaryAction]);
 
   const closeAction = useCallback(() => {
-    if (hasPasswordWithRules) {
+    if (hasPasswordWithRules === true) {
       const [closeActionItem] = secondaryActions;
       closeActionItem?.action?.();
     }
@@ -235,9 +235,9 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
       const targetElement = primaryBtnFirst ? primaryActionButtonRef.current : closeButtonRef.current;
       const fallbackElement = primaryBtnFirst ? closeButtonRef.current : primaryActionButtonRef.current;
 
-      if (targetElement) {
+      if (targetElement !== null) {
         targetElement.focus();
-      } else if (fallbackElement) {
+      } else if (fallbackElement !== null) {
         fallbackElement.focus();
       }
     }, 0);
@@ -252,7 +252,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         closeAction();
       }
 
-      if (isEnterKey(event) && primaryAction?.runActionOnEnterClick) {
+      if (isEnterKey(event) && primaryAction?.runActionOnEnterClick === true) {
         event.preventDefault();
         primaryAction?.action?.();
         removeCurrentModal();

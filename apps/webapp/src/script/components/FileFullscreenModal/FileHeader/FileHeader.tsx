@@ -19,6 +19,7 @@
 
 import {useMemo} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {
@@ -160,7 +161,7 @@ export const FileHeader = ({
               {timeAgo}
             </MessageTime>
           </div>
-          {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
+          {badges !== null && badges !== undefined && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
       {isEditable === true && !showViewOnlyLabel && (
@@ -251,7 +252,7 @@ const FallbackConversationLabel = ({fallbackName}: {fallbackName: string}) => (
 const ConversationEntityLabel = ({conversation, fallbackName}: {conversation: Conversation; fallbackName: string}) => {
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const {isChannel, display_name: displayName} = useKoSubscribableChildren(conversation, ['isChannel', 'display_name']);
-  const name = displayName || fallbackName;
+  const name = isNonEmptyString(displayName) ? displayName : fallbackName;
   const iconType = getConversationIconType({isChannel, isChannelsEnabled});
 
   return (
