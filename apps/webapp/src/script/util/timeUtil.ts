@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNan, isUndefined} from '@sindresorhus/is';
 import {
   differenceInDays,
   differenceInHours,
@@ -269,7 +269,7 @@ export const formatDuration = (duration: number, translate: Translate): Duration
   const mappedUnits = mapUnits(duration, true, translate);
   const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
 
-  if (!firstNonZeroUnit) {
+  if (isUndefined(firstNonZeroUnit)) {
     const seconds = durationUnits(translate).pop();
 
     return {
@@ -324,7 +324,7 @@ export const formatDurationCaption = (duration: number, translate: Translate): s
  * @returns Formatted string
  */
 export const formatSeconds = (duration: number): string => {
-  duration = Math.round(duration || 0);
+  duration = Math.round(duration !== 0 && !isNan(duration) ? duration : 0);
 
   const hours = Math.floor(duration / (60 * 60));
 

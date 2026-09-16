@@ -17,6 +17,8 @@
  *
  */
 
+import {isNull} from '@sindresorhus/is';
+
 import {prependProtocol} from './urlUtil';
 import {isValidEmail} from './validationUtil';
 
@@ -52,7 +54,7 @@ export const safeMailOpen = (email: string): void => {
   }
 
   const newWindow = window.open(`mailto:${pureEmail}`);
-  if (newWindow) {
+  if (!isNull(newWindow)) {
     window.setTimeout(() => newWindow.close(), 10);
   }
 };

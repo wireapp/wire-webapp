@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {isNull} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 
 import {getConnectionQualityHander} from 'Util/connectionQualityHandler';
@@ -29,7 +30,7 @@ export const useConnectionQuality = () => {
   useEffect(() => {
     const connectionQualityHandler = getConnectionQualityHander();
 
-    if (!connectionQualityHandler) {
+    if (isNull(connectionQualityHandler)) {
       return noop;
     }
 

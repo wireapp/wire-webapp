@@ -19,6 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
+import {isEmptyString, isNull} from '@sindresorhus/is';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
@@ -57,7 +58,7 @@ const SetEmailComponent = ({
     let validationError: ValidationError | null = null;
 
     const currentInputNode = emailInput.current;
-    if (currentInputNode === null) {
+    if (isNull(currentInputNode)) {
       return;
     }
 
@@ -68,7 +69,7 @@ const SetEmailComponent = ({
     }
     setIsValidEmail(currentInputNode.validity.valid);
     try {
-      if (validationError) {
+      if (!isNull(validationError)) {
         throw validationError;
       }
       await doSetEmail(currentInputNode.value);
@@ -95,7 +96,7 @@ const SetEmailComponent = ({
             placeholder={translate('setEmail.emailPlaceholder')}
             type="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              if (emailInput.current !== null) {
+              if (!isNull(emailInput.current)) {
                 emailInput.current.setCustomValidity('');
               }
 
@@ -111,11 +112,11 @@ const SetEmailComponent = ({
             required
             data-uie-name="enter-email"
           />
-          {!error ? <>&nbsp;</> : <Exception errors={[error]} />}
+          {isNull(error) ? <>&nbsp;</> : <Exception errors={[error]} />}
           <Button
             block
             showLoading={isFetching}
-            disabled={isFetching || !email}
+            disabled={isFetching || isEmptyString(email)}
             formNoValidate
             type="submit"
             data-uie-name="do-verify-email"

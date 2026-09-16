@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
+
 import {UrlUtil} from '@wireapp/commons';
 
 import {QUERY_KEY} from './route';
@@ -25,11 +27,13 @@ import {Locales, SupportedLocale} from './supportedLocales';
 const DEFAULT_LANGUAGE: SupportedLocale = 'en-US';
 
 function getLocale(): SupportedLocale {
-  return mapLanguage(navigator.languages?.length ? navigator.languages[0] : navigator.language);
+  const browserLanguages = navigator.languages;
+  return mapLanguage(isNonEmptyArray(browserLanguages) ? browserLanguages[0] : navigator.language);
 }
 
 export function currentLanguage(): SupportedLocale {
-  return mapLanguage(UrlUtil.getURLParameter(QUERY_KEY.LANGUAGE) || getLocale());
+  const queryLanguage = UrlUtil.getURLParameter(QUERY_KEY.LANGUAGE);
+  return mapLanguage(isNonEmptyString(queryLanguage) ? queryLanguage : getLocale());
 }
 
 export function normalizeLanguage(language: string = DEFAULT_LANGUAGE): string {
@@ -43,5 +47,5 @@ export function findLanguage(language: string = DEFAULT_LANGUAGE): SupportedLoca
 }
 
 export function mapLanguage(language: string = DEFAULT_LANGUAGE): SupportedLocale {
-  return findLanguage(language) || DEFAULT_LANGUAGE;
+  return findLanguage(language);
 }

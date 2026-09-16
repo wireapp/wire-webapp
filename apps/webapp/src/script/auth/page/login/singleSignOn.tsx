@@ -19,7 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
-import {isObject, isString} from '@sindresorhus/is';
+import {isNull, isObject, isString, isUndefined} from '@sindresorhus/is';
 import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
@@ -86,10 +86,10 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 
       const onChildWindowClose = () => {
         clearInterval(timerId);
-        if (onReceiveChildWindowMessage) {
+        if (!isUndefined(onReceiveChildWindowMessage)) {
           window.removeEventListener('message', onReceiveChildWindowMessage);
         }
-        if (onParentWindowClose) {
+        if (!isUndefined(onParentWindowClose)) {
           window.removeEventListener('unload', onParentWindowClose);
         }
         setIsOverlayOpen(false);
@@ -172,9 +172,9 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         reject(new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR));
       });
 
-      if (ssoWindowRef.current) {
+      if (!isNull(ssoWindowRef.current)) {
         timerId = window.setInterval(() => {
-          if (ssoWindowRef.current && ssoWindowRef.current.closed) {
+          if (!isNull(ssoWindowRef.current) && ssoWindowRef.current.closed) {
             onChildWindowClose();
             reject(
               new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR),

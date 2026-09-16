@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
 import {createRoot, Root} from 'react-dom/client';
 
 import {getLogger} from './logger';
@@ -37,7 +38,7 @@ const roots = new Map<
 
 const cleanUpElement = (elementId: string) => {
   const root = roots.get(elementId);
-  if (root && root.elementContainer) {
+  if (!isUndefined(root) && !isUndefined(root.elementContainer)) {
     root.reactRoot.unmount();
     document.getElementById(elementId)?.removeChild(root.elementContainer);
     root.elementContainer = undefined;
@@ -49,7 +50,7 @@ const generateStyleString = (style: Partial<CSSStyleDeclaration>) => {
   let styleString = '';
 
   Object.entries(style).forEach(([key, value]) => {
-    styleString = styleString ? `${styleString} ${key}: ${value};` : `${key}: ${value};`;
+    styleString = isNonEmptyString(styleString) ? `${styleString} ${key}: ${value};` : `${key}: ${value};`;
   });
 
   return styleString;
@@ -70,7 +71,7 @@ const renderElement =
 
     const parentElement = document.getElementById(parentElementId);
 
-    if (!parentElement) {
+    if (isNull(parentElement)) {
       logger.warn(`Unable to find element with id: ${parentElementId}`);
 
       return;
@@ -78,7 +79,7 @@ const renderElement =
 
     const elementContainer = document.createElement('div');
 
-    if (style) {
+    if (!isUndefined(style)) {
       elementContainer.setAttribute('style', generateStyleString(style));
     }
 

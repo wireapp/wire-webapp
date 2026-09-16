@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
@@ -60,7 +60,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   useEffect(() => {
-    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON);
     if (isNonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
@@ -69,8 +69,11 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
   const immediateLogin = useCallback(async () => {
     await doInit({isImmediateLogin: true, shouldValidateLocalClient: true});
     // Check if the user is already logged in
-    if (!hasOtherInstance && core.getLocalClient()) {
-      navigate(ROUTE.HISTORY_INFO);
+    if (hasOtherInstance === false) {
+      const localClient = core.getLocalClient();
+      if (!isNullOrUndefined(localClient)) {
+        navigate(ROUTE.HISTORY_INFO);
+      }
     }
   }, [core, doInit, navigate, hasOtherInstance]);
 

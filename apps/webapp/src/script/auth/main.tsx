@@ -17,6 +17,7 @@
  *
  */
 
+import {isNull, isUndefined} from '@sindresorhus/is';
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
 import 'core-js/full/reflect';
@@ -77,7 +78,7 @@ const store = configureStore({
 
 const render = (Component: FC<{translate: Translate}>): void => {
   const container = document.getElementById(mainId);
-  if (!container) {
+  if (isNull(container)) {
     throw new Error(`No container '${mainId}' found to render application`);
   }
   createRoot(container).render(
@@ -102,7 +103,7 @@ async function runApp() {
 
   render(Root);
   setAppLocale();
-  if (hotReloadCapableModule.hot !== undefined) {
+  if (!isUndefined(hotReloadCapableModule.hot)) {
     hotReloadCapableModule.hot.accept('./page/Root', () => {
       render(require('./page/root').Root);
     });

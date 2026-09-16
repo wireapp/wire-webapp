@@ -19,7 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -105,7 +105,7 @@ const AccountFormComponent = ({
     const newValidInputs: Record<string, boolean> = {};
     Object.entries(inputs).forEach(([inputKey, currentInput]) => {
       const currentInputNode = currentInput.current;
-      if (currentInputNode) {
+      if (!isNull(currentInputNode)) {
         if (!['password', 'terms', 'confirmPassword'].includes(inputKey)) {
           currentInputNode.value = currentInputNode.value.trim();
         }
@@ -116,7 +116,7 @@ const AccountFormComponent = ({
             currentInputNode.validity,
           );
 
-          if (validationError) {
+          if (!isNull(validationError)) {
             errors.push(validationError);
             if (inputKey === 'password') {
               setHasMultiplePasswordEntries(true);
@@ -130,11 +130,11 @@ const AccountFormComponent = ({
     setValidationErrors(errors);
 
     try {
-      if (errors.length > 0) {
+      if (isNonEmptyArray(errors)) {
         throw errors[0];
       }
 
-      if (beforeSubmit !== undefined) {
+      if (!isUndefined(beforeSubmit)) {
         await beforeSubmit();
       }
       await pushAccountRegistrationData({...registrationData});
@@ -255,7 +255,7 @@ const AccountFormComponent = ({
           showTogglePasswordLabel={translate('showTogglePasswordLabel')}
           hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
         />
-        <Text muted css={styles.passwordInfo(!!validationErrors.length)} data-uie-name="element-password-help">
+        <Text muted css={styles.passwordInfo(isNonEmptyArray(validationErrors))} data-uie-name="element-password-help">
           {translate('accountForm.passwordHelp', {
             minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
           })}

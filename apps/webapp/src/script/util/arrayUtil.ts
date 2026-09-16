@@ -17,6 +17,8 @@
  *
  */
 
+import {isFiniteNumber, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
+
 export function chunk<T>(array: T[], size: number): T[][];
 export function chunk(array: Float32Array, size: number): Float32Array[];
 export function chunk<T>(array: T[] | Float32Array, size: number) {
@@ -36,7 +38,7 @@ export function chunk<T>(array: T[] | Float32Array, size: number) {
  * @returns the array containing values in array2 that are not in array1
  */
 export const getDifference = <T>(array1: T[] = [], array2: T[] = [], matcher?: (t1: T, t2: T) => boolean): T[] => {
-  if (matcher) {
+  if (!isUndefined(matcher)) {
     return array2.filter(el1 => !array1.some(el2 => matcher(el1, el2)));
   }
   return array2.filter(element => !array1.includes(element));
@@ -88,7 +90,7 @@ export const interpolate = (array: number[], length: number) => {
 export const isLastItem = <T>(array: T[], item: T) => array.indexOf(item) === array.length - 1;
 
 export const iterateIndex = <T>(array: T, currentIndex: number, reverse = false): number | undefined => {
-  if (Array.isArray(array) && array.length && Number.isFinite(currentIndex)) {
+  if (isNonEmptyArray(array) && isFiniteNumber(currentIndex)) {
     if (reverse) {
       const isZeroIndex = currentIndex === 0;
       return isZeroIndex ? array.length - 1 : (currentIndex - 1) % array.length;
@@ -100,7 +102,7 @@ export const iterateIndex = <T>(array: T, currentIndex: number, reverse = false)
 };
 
 export const iterateItem = <T>(array: T[], currentItem: T, reverse = false): T | undefined => {
-  if (Array.isArray(array) && array.length) {
+  if (isNonEmptyArray(array)) {
     const currentIndex = array.indexOf(currentItem);
 
     // If item could not be found
