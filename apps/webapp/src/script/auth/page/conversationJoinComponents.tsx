@@ -54,7 +54,7 @@ interface GuestLoginColumnProps {
   checkNameValidity: (event: React.FormEvent) => Promise<void>;
   isValidName: boolean;
   isSubmitingName: boolean;
-  nameInput: React.RefObject<HTMLInputElement | null>;
+  nameInput: React.RefObject<HTMLInputElement>;
   conversationError: (Error & {label?: string | undefined}) | null;
   error: any;
 }

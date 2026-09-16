@@ -72,7 +72,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`}, undefined);
+    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`}, {});
   });
 
   it('shows the welcome text with default backend name', () => {
@@ -219,7 +219,7 @@ describe('when visiting the index page', () => {
     it('navigates directly to email login', async () => {
       mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
-      expect(Navigate).toHaveBeenCalledWith({to: ROUTE.LOGIN}, undefined);
+      expect(Navigate).toHaveBeenCalledWith({to: ROUTE.LOGIN}, {});
     });
   });
 });
