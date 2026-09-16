@@ -88,6 +88,8 @@ type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };
 
+const logger = getLogger('Login');
+
 const LoginComponent = ({
   authError,
   resetAuthError,
@@ -116,7 +118,6 @@ const LoginComponent = ({
   const secondsPerMinute = 60;
   const twoFactorExpiryMinutes = 10;
   const twoFactorExpiryMilliseconds = millisecondsPerSecond * secondsPerMinute * twoFactorExpiryMinutes;
-  const logger = getLogger('Login');
   const navigate = useNavigate();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
 
@@ -205,7 +206,7 @@ const LoginComponent = ({
         logger.warn('Failed to fetch conversation info', error);
       });
     }
-  }, [doCheckConversationCode, doGetConversationInfoByCode, logger]);
+  }, [doCheckConversationCode, doGetConversationInfoByCode]);
 
   const immediateLogin = useCallback(async () => {
     try {
@@ -222,20 +223,23 @@ const LoginComponent = ({
       logger.error('Unable to login immediately', error);
       setShowEntropyForm(false);
     }
-  }, [doInit, doInitializeClient, getEntropy, isOauth, logger, navigate]);
+  }, [doInit, doInitializeClient, getEntropy, isOauth, navigate]);
 
   useEffect(() => {
     void resetAuthError();
+    return () => {
+      void resetAuthError();
+    };
+  }, [resetAuthError]);
+
+  useEffect(() => {
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
 
     if ((isImmediateLogin === true && is2FAEntropy !== true) || isOauth === true) {
       void immediateLogin();
     }
-    return () => {
-      void resetAuthError();
-    };
-  }, [immediateLogin, isEntropyRequired, isOauth, resetAuthError]);
+  }, [immediateLogin, isEntropyRequired, isOauth]);
 
   const handleSubmit = async (
     formLoginData: Partial<LoginData>,
