@@ -1121,6 +1121,140 @@ describe('CallingRepository ISO', () => {
       });
       await callingRepo.onCallEvent(event, '');
     });
+
+    const setupIncomingCallContext = async () => {
+      let currentTimestamp = 1_700_000_000_000;
+      const selfUser = new User(createUuid(), '', translateForTest);
+      selfUser.isMe = true;
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const incomingCallCallback = jest.fn();
+      const {repository: callingRepo} = createCallingRepositoryForTest({
+        conversationState: {
+          findConversation: jest.fn().mockImplementation(() => conversation),
+          participating_user_ets: jest.fn(),
+        } as unknown as ConversationState,
+        serverTimeHandler: {
+          toServerTimestamp: jest.fn().mockImplementation(() => currentTimestamp),
+        },
+      });
+
+      const avs = await callingRepo.initAvs(selfUser, createUuid());
+      avsUser = avs.wUser;
+      avsCall = avs.wCall;
+      const rejectSpy = jest.spyOn(avsCall, 'reject').mockClear();
+      callingRepo.setReady();
+      callingRepo.onIncomingCall(incomingCallCallback);
+
+      return {
+        callingRepo,
+        conversation,
+        incomingCallCallback,
+        rejectSpy,
+        sendIncomingSetup: async (setupReceivedAt: number) => {
+          await callingRepo.onCallEvent(
+            {
+              content: {resp: false, type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
+              conversation: conversation.id,
+              from: createUuid(),
+              sender: createUuid(),
+              time: new Date(setupReceivedAt).toISOString(),
+              type: CALL.E_CALL,
+            },
+            EventRepository.SOURCE.WEB_SOCKET,
+          );
+        },
+        setCurrentTimestamp: (timestamp: number) => {
+          currentTimestamp = timestamp;
+        },
+        triggerIncomingh: (shouldRing: 0 | 1) => {
+          callingRepo['incomingCall'](
+            conversation.id,
+            Math.floor(currentTimestamp / 1000),
+            selfUser.id,
+            createUuid(),
+            0,
+            shouldRing,
+            CONV_TYPE.ONEONONE,
+          );
+        },
+      };
+    };
+
+    it('does not ring when AVS asks after an incoming SETUP that is older than the call event lifetime', async () => {
+      const setupReceivedAt = 1_700_000_000_000;
+      const {
+        callingRepo,
+        conversation,
+        incomingCallCallback,
+        rejectSpy,
+        sendIncomingSetup,
+        setCurrentTimestamp,
+        triggerIncomingh,
+      } = await setupIncomingCallContext();
+
+      await sendIncomingSetup(setupReceivedAt);
+      setCurrentTimestamp(setupReceivedAt + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME + 1);
+      triggerIncomingh(1);
+
+      expect(incomingCallCallback).not.toHaveBeenCalled();
+      expect(callingRepo['callState'].calls()).toHaveLength(0);
+      expect(rejectSpy).toHaveBeenCalledWith(avsUser, conversation.id);
+    });
+
+    it('rings when the incoming SETUP is still within the call event lifetime', async () => {
+      const setupReceivedAt = 1_700_000_000_000;
+      const {callingRepo, incomingCallCallback, rejectSpy, sendIncomingSetup, setCurrentTimestamp, triggerIncomingh} =
+        await setupIncomingCallContext();
+
+      await sendIncomingSetup(setupReceivedAt);
+      setCurrentTimestamp(setupReceivedAt + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME);
+      triggerIncomingh(1);
+
+      expect(incomingCallCallback).toHaveBeenCalledTimes(1);
+      expect(callingRepo['callState'].calls()).toHaveLength(1);
+      expect(rejectSpy).not.toHaveBeenCalled();
+    });
+
+    it('rings when AVS asks to ring and no incoming SETUP was recorded', async () => {
+      const {callingRepo, incomingCallCallback, rejectSpy, triggerIncomingh} = await setupIncomingCallContext();
+
+      triggerIncomingh(1);
+
+      expect(incomingCallCallback).toHaveBeenCalledTimes(1);
+      expect(callingRepo['callState'].calls()).toHaveLength(1);
+      expect(rejectSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not reject a non-ringing incoming call after a stale SETUP', async () => {
+      const setupReceivedAt = 1_700_000_000_000;
+      const {callingRepo, incomingCallCallback, rejectSpy, sendIncomingSetup, setCurrentTimestamp, triggerIncomingh} =
+        await setupIncomingCallContext();
+
+      await sendIncomingSetup(setupReceivedAt);
+      setCurrentTimestamp(setupReceivedAt + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME + 1);
+      triggerIncomingh(0);
+
+      expect(incomingCallCallback).toHaveBeenCalledTimes(1);
+      expect(callingRepo['callState'].calls()).toHaveLength(1);
+      expect(callingRepo['callState'].calls()[0].reason()).toBe(REASON.STILL_ONGOING);
+      expect(rejectSpy).not.toHaveBeenCalled();
+    });
+
+    it('rings after a newer SETUP replaces an expired invite', async () => {
+      const firstSetupReceivedAt = 1_700_000_000_000;
+      const secondSetupReceivedAt = firstSetupReceivedAt + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME + 1;
+      const {callingRepo, incomingCallCallback, rejectSpy, sendIncomingSetup, setCurrentTimestamp, triggerIncomingh} =
+        await setupIncomingCallContext();
+
+      await sendIncomingSetup(firstSetupReceivedAt);
+      setCurrentTimestamp(secondSetupReceivedAt);
+      await sendIncomingSetup(secondSetupReceivedAt);
+      triggerIncomingh(1);
+
+      expect(incomingCallCallback).toHaveBeenCalledTimes(1);
+      expect(callingRepo['callState'].calls()).toHaveLength(1);
+      expect(rejectSpy).not.toHaveBeenCalled();
+    });
   });
 });
 
