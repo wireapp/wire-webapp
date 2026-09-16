@@ -175,7 +175,7 @@ export const DeviceDetails = ({
       ? conversationState.getSelfProteusConversation()
       : conversationState.activeConversation();
     setIsResettingSession(true);
-    if (conversation) {
+    if (conversation !== undefined && conversation !== null) {
       messageRepository
         .resetSession(user.qualifiedId, device.id, conversation)
         .then(_resetProgress)
@@ -184,13 +184,14 @@ export const DeviceDetails = ({
   };
 
   const activeConversation = conversationState.activeConversation();
-  const isConversationMLS = activeConversation != null ? isMLSConversation(activeConversation) : false;
+  const isConversationMLS =
+    activeConversation !== null && activeConversation !== undefined ? isMLSConversation(activeConversation) : false;
 
   const deviceIdentity = getDeviceIdentity?.(device.id);
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {deviceIdentity && (
+      {deviceIdentity !== undefined && deviceIdentity !== null && (
         <MLSDeviceDetails identity={deviceIdentity} isSelfUser={user.isMe} cipherSuite={device.getCipherSuite()} />
       )}
 

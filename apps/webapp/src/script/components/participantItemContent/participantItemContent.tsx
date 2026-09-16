@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
 
 import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
@@ -87,13 +88,13 @@ export const ParticipantItemContent = ({
               <div css={[userName, ellipsis]} data-uie-name="status-name">
                 {name}
 
-                {selfString && <span css={selfIndicator}>{selfString}</span>}
+                {isNonEmptyString(selfString) && <span css={selfIndicator}>{selfString}</span>}
               </div>
             </>
           )}
         </div>
 
-        {shortDescription && (
+        {isNonEmptyString(shortDescription) && (
           <div css={contentInfoWrapper}>
             <span
               css={[contentInfoText(hasUsernameInfo), ellipsis]}

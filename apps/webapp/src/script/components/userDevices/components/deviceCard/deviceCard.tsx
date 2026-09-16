@@ -42,17 +42,17 @@ interface DeviceCardProps {
 
 const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = false}: DeviceCardProps) => {
   const {translate} = useApplicationContext();
-  const messageFocusedTabIndex = useMessageFocusedTabIndex(!!click);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(click !== undefined);
   const {class: deviceClass = '?', id = '', label = '?'} = clientEntity;
   const name = clientEntity.getName();
-  const clickable = !!click;
+  const clickable = click !== undefined;
 
   const deviceIdentity = getDeviceIdentity?.(clientEntity.id);
 
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
 
   const clickOnDevice = () => {
-    if (clickable) {
+    if (clickable === true) {
       click(clientEntity);
     }
   };
