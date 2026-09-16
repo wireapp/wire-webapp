@@ -139,7 +139,6 @@ describe('handleSharedDriveDroppedFiles', () => {
     expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'notAccepted', invalidFiles: [invalidFile]});
     expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
-  });
 
   it('keeps the recycle bin from becoming a drop target for an editor', () => {
     const file = new File(['content'], 'document.txt', {type: 'text/plain'});
