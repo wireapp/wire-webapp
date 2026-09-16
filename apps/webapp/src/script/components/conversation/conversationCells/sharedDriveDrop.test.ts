@@ -20,11 +20,8 @@
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {
-  getSharedDriveDropRejectionFeedback,
-  handleSharedDriveDroppedFiles,
-  validateSharedDriveDroppedFiles,
-} from './sharedDriveDrop';
+import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';
+import {validateSharedDriveUploadFiles} from './sharedDriveUploadValidation';
 
 const rootUploadPath = 'conversation-id@example.com';
 const nestedUploadPath = 'conversation-id@example.com/Marketing/Briefs';
@@ -113,18 +110,23 @@ describe('handleSharedDriveDroppedFiles', () => {
     expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
 
-  it('rejects multiple files with clear feedback until multiple upload is supported', () => {
+  it('starts direct upload for multiple accepted files', async () => {
     const firstFile = new File(['one'], 'one.txt');
     const secondFile = new File(['two'], 'two.txt');
     const dependencies = createDependencies();
 
     handleSharedDriveDroppedFiles([firstFile, secondFile], dependencies);
 
-    expect(dependencies.onReject).toHaveBeenCalledWith({
-      reason: 'multipleFiles',
-      invalidFiles: [firstFile, secondFile],
-    });
-    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    await uploadAction();
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [firstFile, secondFile],
+      rootUploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
   });
 
   it('keeps the recycle bin from becoming a drop target for an editor', () => {
@@ -148,12 +150,12 @@ describe('handleSharedDriveDroppedFiles', () => {
   });
 });
 
-describe('validateSharedDriveDroppedFiles', () => {
-  it('accepts exactly one valid file', () => {
+describe('validateSharedDriveUploadFiles', () => {
+  it('accepts valid files', () => {
     const file = new File(['content'], 'document.txt', {type: 'text/plain'});
 
     expect(
-      validateSharedDriveDroppedFiles([file], {
+      validateSharedDriveUploadFiles([file], {
         isUploadFilesEnabled: true,
         isInRecycleBin: false,
         maxFileSize,

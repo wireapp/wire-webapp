@@ -17,21 +17,19 @@
  *
  */
 
-import {Result} from 'true-myth';
-
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {Translate} from 'Util/localizerUtil';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
+import {
+  type SharedDriveUploadRejection,
+  type SharedDriveUploadRejectionReason,
+  validateSharedDriveUploadFiles,
+} from './sharedDriveUploadValidation';
 
-export type SharedDriveDropRejectionReason =
-  'empty' | 'multipleFiles' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
-
-export interface SharedDriveDropRejection {
-  readonly reason: SharedDriveDropRejectionReason;
-  readonly invalidFiles: readonly File[];
-}
+export type SharedDriveDropRejectionReason = SharedDriveUploadRejectionReason;
+export type SharedDriveDropRejection = SharedDriveUploadRejection;
 
 export interface SharedDriveDropFeedback {
   readonly title: string;
@@ -55,44 +53,6 @@ interface SharedDriveDropDependencies {
 // eslint-disable-next-line no-magic-numbers
 const BYTES_IN_MEGABYTE = 1024 * 1024;
 
-export const validateSharedDriveDroppedFiles = (
-  files: readonly File[],
-  {
-    isUploadFilesEnabled,
-    isInRecycleBin,
-    maxFileSize,
-    isAcceptedFile,
-  }: Pick<SharedDriveDropDependencies, 'isUploadFilesEnabled' | 'isInRecycleBin' | 'maxFileSize' | 'isAcceptedFile'>,
-): Result<void, SharedDriveDropRejection> => {
-  if (!isUploadFilesEnabled) {
-    return Result.err({reason: 'notAllowed', invalidFiles: files});
-  }
-
-  if (isInRecycleBin) {
-    return Result.err({reason: 'recycleBin', invalidFiles: files});
-  }
-
-  if (files.length === 0) {
-    return Result.err({reason: 'empty', invalidFiles: []});
-  }
-
-  if (files.length > 1) {
-    return Result.err({reason: 'multipleFiles', invalidFiles: files});
-  }
-
-  const file = files[0];
-
-  if (!isAcceptedFile(file)) {
-    return Result.err({reason: 'notAccepted', invalidFiles: [file]});
-  }
-
-  if (file.size > maxFileSize) {
-    return Result.err({reason: 'tooLarge', invalidFiles: [file]});
-  }
-
-  return Result.ok(undefined);
-};
-
 export const handleSharedDriveDroppedFiles = (
   files: readonly File[],
   {
@@ -108,7 +68,7 @@ export const handleSharedDriveDroppedFiles = (
     isAcceptedFile,
   }: SharedDriveDropDependencies,
 ): void => {
-  const validation = validateSharedDriveDroppedFiles(files, {
+  const validation = validateSharedDriveUploadFiles(files, {
     isUploadFilesEnabled,
     isInRecycleBin,
     maxFileSize,
