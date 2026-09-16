@@ -100,6 +100,7 @@ const ListWrapper = memo(
       headerElement !== false &&
       headerElement !== '' &&
       headerElement !== 0 &&
+      headerElement !== BigInt(0) &&
       (typeof headerElement !== 'number' || !Number.isNaN(headerElement));
     const defaultHeadingId =
       hasHeader === true && hasHeaderElement === false && isNonEmptyString(header)
