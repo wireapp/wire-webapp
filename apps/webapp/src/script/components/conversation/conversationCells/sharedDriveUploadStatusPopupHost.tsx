@@ -60,7 +60,7 @@ export const SharedDriveUploadStatusPopupHost = ({
   const [uploadSnapshot, setUploadSnapshot] = useState(() => ({conversationQualifiedId, uploads: readStatuses()}));
   const [isExpanded, setIsExpanded] = useState(false);
   const [cancellingUploadIds, setCancellingUploadIds] = useState<ReadonlySet<string>>(() => new Set());
-  const [retryingUploadId, setRetryingUploadId] = useState<Maybe<string>>(Maybe.nothing());
+  const [retryingUploadIds, setRetryingUploadIds] = useState<ReadonlySet<string>>(() => new Set());
   const [dismissedRowIds, setDismissedRowIds] = useState<ReadonlySet<string>>(() => new Set());
   const [localDismissedUpload, setLocalDismissedUpload] = useState<Maybe<DismissedUpload>>(Maybe.nothing());
   const dismissedUpload = isProvided ? contextDismissedUpload : localDismissedUpload;
@@ -125,22 +125,24 @@ export const SharedDriveUploadStatusPopupHost = ({
 
   const retryUpload = useCallback(
     (uploadId: string): void => {
-      if (maybe.isJust(retryingUploadId)) {
+      if (retryingUploadIds.has(uploadId)) {
         return;
       }
 
-      setRetryingUploadId(Maybe.just(uploadId));
+      setRetryingUploadIds(current => new Set([...current, uploadId]));
       const finishRetry = () =>
-        setRetryingUploadId(current =>
-          maybe.isJust(current) && current.value === uploadId ? Maybe.nothing() : current,
-        );
+        setRetryingUploadIds(current => {
+          const next = new Set(current);
+          next.delete(uploadId);
+          return next;
+        });
       const snapshot = controller
         .snapshots(conversationQualifiedId)
         .find(state => state.identity.uploadId === uploadId);
       const retry = snapshot?.kind === 'publishFailed' ? controller.retryPublish : controller.retryUpload;
       void retry(uploadId).then(finishRetry, finishRetry);
     },
-    [controller, conversationQualifiedId, retryingUploadId],
+    [controller, conversationQualifiedId, retryingUploadIds],
   );
 
   useEffect(() => {
@@ -205,7 +207,7 @@ export const SharedDriveUploadStatusPopupHost = ({
       canDismiss={canDismissUploadStatus}
       retryLabel={translate('conversationFilePreviewErrorRetry')}
       isCancelling={isCancelling}
-      isRetrying={(uploadId: string) => maybe.isJust(retryingUploadId) && retryingUploadId.value === uploadId}
+      isRetrying={(uploadId: string) => retryingUploadIds.has(uploadId)}
       onToggle={() => setIsExpanded(expanded => !expanded)}
       onCancelAll={cancelAllUploads}
       onCancelUpload={cancelUpload}

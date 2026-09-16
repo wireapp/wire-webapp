@@ -308,7 +308,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(view.queryByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).not.toBeInTheDocument();
   });
 
-  it('calls retry for a failed upload and prevents concurrent retries', async () => {
+  it('calls retry for a failed upload and prevents duplicate retries for the same row', async () => {
     const user = userEvent.setup();
     const controller = createController(failedState);
     controller.retryUpload.mockReturnValue(new Promise<void>(noop));
@@ -322,6 +322,43 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(controller.retryUpload).toHaveBeenCalledTimes(1);
     expect(controller.retryUpload).toHaveBeenCalledWith('upload-1');
     expect(retry).toBeDisabled();
+  });
+
+  it('tracks retry state independently for failed rows', async () => {
+    const user = userEvent.setup();
+    const secondFailedState = {
+      ...failedState,
+      identity: {uploadId: 'upload-2'},
+      source: {...failedState.source, name: 'second-report.pdf'},
+    };
+    const controller = createController([failedState, secondFailedState]);
+    const retrySettlements = new Map<string, {resolve: () => void; reject: (reason?: unknown) => void}>();
+    controller.retryUpload.mockImplementation(
+      uploadId =>
+        new Promise<void>((resolve, reject) => {
+          retrySettlements.set(uploadId, {resolve, reject});
+        }),
+    );
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    const retryButtons = view
+      .getAllByTestId('shared-drive-upload-status-row')
+      .map(row => within(row).getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
+    await user.click(retryButtons[0]);
+    await user.click(retryButtons[1]);
+
+    expect(controller.retryUpload).toHaveBeenNthCalledWith(1, 'upload-1');
+    expect(controller.retryUpload).toHaveBeenNthCalledWith(2, 'upload-2');
+    expect(retryButtons[0]).toBeDisabled();
+    expect(retryButtons[1]).toBeDisabled();
+
+    retrySettlements.get('upload-1')?.resolve();
+    await waitFor(() => expect(retryButtons[0]).not.toBeDisabled());
+    expect(retryButtons[1]).toBeDisabled();
+
+    retrySettlements.get('upload-2')?.reject(new Error('retry failed'));
+    await waitFor(() => expect(retryButtons[1]).not.toBeDisabled());
   });
 
   it('keeps retry available when a retry fails', async () => {
