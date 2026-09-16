@@ -24,6 +24,18 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install JS dependencies
+        run: ./bin/yarn --immutable
+
       - name: Download translations and create PR
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
         env:
@@ -46,3 +58,6 @@ jobs:
           source: '/apps/webapp/src/i18n/en-US.json'
           translation: '/apps/webapp/src/i18n/%locale%.json'
           base_path: '.'
+
+      - name: Validate downloaded translation markers
+        run: ./bin/yarn nx run webapp:validate-translations

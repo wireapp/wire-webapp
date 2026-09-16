@@ -457,6 +457,17 @@ const productionConfigs = [
     },
   },
   {
+    files: ['tools/i18n/**/*.{ts,mts}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './tsconfig.tools.json',
+        projectService: false,
+      },
+      globals: runtimeGlobals,
+    },
+  },
+  {
     files: [
       'apps/server/**/*.{ts,tsx}',
       'libraries/api-client/**/*.{ts,tsx}',
