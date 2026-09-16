@@ -24424,10 +24424,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"p-map@npm:7.0.7":
-  version: 7.0.7
-  resolution: "p-map@npm:7.0.7"
-  checksum: 10/116cfb9db01391849798fc491cc17ae78f88e63b5e4090ddf38304469b6713923ac12bd1b609dc4c67ddc0f55de469b0c77f618a4356cf6253fa7f575222393e
+"p-map@npm:7.0.8":
+  version: 7.0.8
+  resolution: "p-map@npm:7.0.8"
+  checksum: 10/a2357da8135da159852e0eac00f4cca447beef2a8034d3cae7d5667c226a9fb0fd22ac539ab5ff8c5eae0e4b59274a46d0e8bc34d2512187bfa0c40def3ba2e9
   languageName: node
   linkType: hard
 
@@ -32626,7 +32626,7 @@ __metadata:
     long: "npm:5.3.2"
     nock: "npm:14.0.17"
     nx: "npm:22.7.12"
-    p-map: "npm:7.0.7"
+    p-map: "npm:7.0.8"
     playwright: "npm:1.63.0"
     prettier: "npm:3.9.6"
     rimraf: "npm:6.1.3"
