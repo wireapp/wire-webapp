@@ -17,21 +17,24 @@
  *
  */
 
-import {fireEvent, waitFor} from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {Runtime, TypeUtil} from '@wireapp/commons';
 import {StatusCodes} from 'http-status-codes';
-
-import {TypeUtil} from '@wireapp/commons';
+import {Provider} from 'react-redux';
+import {HashRouter as Router} from 'react-router';
 
 import {Login} from './login';
 
 import {Config, Configuration} from '../../../Config';
+import {configureStore} from '../../configureStore';
 import {actionRoot} from '../../module/action';
-import {initialRootState} from '../../module/reducer';
+import {AuthActionCreator} from '../../module/action/creator';
+import {initialRootState, ThunkDispatch} from '../../module/reducer';
 import {ROUTE} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {mountComponent} from '../../util/test/testUtil';
+import {mountComponent, withIntl, withTheme} from '../../util/test/testUtil';
 
 describe('Login', () => {
   it('successfully logs in with email', async () => {
@@ -118,6 +121,46 @@ describe('Login', () => {
     });
 
     expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
+  });
+
+  it('keeps invalid credentials visible after a failed Electron login rerender', async () => {
+    const invalidCredentialsError = new BackendError(
+      'Authentication failed',
+      BackendErrorLabel.INVALID_CREDENTIALS,
+      StatusCodes.FORBIDDEN,
+    );
+    const authErrorTransitions: Array<Error | null> = [];
+
+    spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
+    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(async (dispatch: ThunkDispatch): Promise<void> => {
+      dispatch(AuthActionCreator.startLogin());
+      dispatch(AuthActionCreator.failedLogin(invalidCredentialsError));
+      throw invalidCredentialsError;
+    });
+
+    const store = configureStore();
+    store.subscribe(() => {
+      authErrorTransitions.push(store.getState().authState.error);
+    });
+
+    const {getByTestId} = render(
+      <Router>{withTheme(<Provider store={store}>{withIntl(<Login />)}</Provider>)}</Router>,
+    );
+
+    fireEvent.change(getByTestId('enter-email'), {target: {value: 'email@mail.com'}});
+    fireEvent.change(getByTestId('enter-password'), {target: {value: 'wrong-password'}});
+    fireEvent.click(getByTestId('do-sign-in'));
+
+    await waitFor(() => {
+      expect(getByTestId('error-message')).toBeVisible();
+    });
+
+    const errorMessage = getByTestId('error-message');
+    const finalAuthErrorTransition = authErrorTransitions[authErrorTransitions.length - 1];
+    expect(errorMessage).toHaveAttribute('data-uie-value', BackendErrorLabel.INVALID_CREDENTIALS);
+    expect(getByTestId('do-sign-in')).toBeVisible();
+    expect(store.getState().authState.error).toBe(invalidCredentialsError);
+    expect(finalAuthErrorTransition).toBe(invalidCredentialsError);
   });
 
   it('has disabled submit button as long as one input is empty', () => {
