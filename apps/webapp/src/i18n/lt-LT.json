@@ -1576,7 +1576,7 @@
   "modalConversationMessageTooLongHeadline": "Žinutė pernelyg ilga",
   "modalConversationMessageTooLongMessage": "Jūs galite siųsti žinutes iki {number} simbolių ilgio.",
   "modalConversationNewDeviceAction": "Vis tiek siųsti",
-  "modalConversationNewDeviceHeadlineMany": "{user}s pradėjo naudoti naujus įrenginius",
+  "modalConversationNewDeviceHeadlineMany": "{users}s pradėjo naudoti naujus įrenginius",
   "modalConversationNewDeviceHeadlineOne": "{user} pradėjo naudoti naują įrenginį",
   "modalConversationNewDeviceHeadlineYou": "{user} pradėjo naudoti naują įrenginį",
   "modalConversationNewDeviceIncomingCallAction": "Priimti skambutį",

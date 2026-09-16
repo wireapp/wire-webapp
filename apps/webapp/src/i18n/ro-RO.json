@@ -1576,7 +1576,7 @@
   "modalConversationMessageTooLongHeadline": "Mesajul este prea lung",
   "modalConversationMessageTooLongMessage": "Nu poți trimite mesaje mai lungi de {number} caractere.",
   "modalConversationNewDeviceAction": "Send anyway",
-  "modalConversationNewDeviceHeadlineMany": "{user}s au început să folosească dispozitive noi",
+  "modalConversationNewDeviceHeadlineMany": "{users}s au început să folosească dispozitive noi",
   "modalConversationNewDeviceHeadlineOne": "{user} a început să folosească un nou dispozitiv",
   "modalConversationNewDeviceHeadlineYou": "{user} a început să folosească un nou dispozitiv",
   "modalConversationNewDeviceIncomingCallAction": "Acceptă apelul",

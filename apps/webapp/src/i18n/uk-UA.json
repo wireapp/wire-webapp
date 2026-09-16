@@ -1576,7 +1576,7 @@
   "modalConversationMessageTooLongHeadline": "Повідомлення занадто довге",
   "modalConversationMessageTooLongMessage": "Можна надсилати повідомлення довжиною до {number} символів.",
   "modalConversationNewDeviceAction": "Все одно надіслати",
-  "modalConversationNewDeviceHeadlineMany": "{user}s почали використовувати нові пристрої",
+  "modalConversationNewDeviceHeadlineMany": "{users}s почали використовувати нові пристрої",
   "modalConversationNewDeviceHeadlineOne": "{user} почав(-ла) використовувати новий пристрій",
   "modalConversationNewDeviceHeadlineYou": "{user} почав(-ла) використовувати новий пристрій",
   "modalConversationNewDeviceIncomingCallAction": "Прийняти виклик",

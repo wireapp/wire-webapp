@@ -1576,7 +1576,7 @@
   "modalConversationMessageTooLongHeadline": "El mensaje es demasiado largo",
   "modalConversationMessageTooLongMessage": "Puede enviar mensajes de hasta {number} caracter",
   "modalConversationNewDeviceAction": "Enviar de todos modos",
-  "modalConversationNewDeviceHeadlineMany": "{user}s comenzaron a utilizar dispositivos nuevos",
+  "modalConversationNewDeviceHeadlineMany": "{users}s comenzaron a utilizar dispositivos nuevos",
   "modalConversationNewDeviceHeadlineOne": "{user} comenzó a utilizar un dispositivo nuevo",
   "modalConversationNewDeviceHeadlineYou": "{user} comenzó a utilizar un dispositivo nuevo",
   "modalConversationNewDeviceIncomingCallAction": "¿Acepta la llamada?",

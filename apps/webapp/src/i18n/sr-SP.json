@@ -1660,7 +1660,7 @@
   "modalPreferencesAccountEmailTakenMessage": "Email address is already taken.",
   "modalRemoveDeviceCloseBtn": "Close window 'Remove device {name}'",
   "modalSessionResetHeadline": "Сесија је ресетована",
-  "modalSessionResetMessage": "Ако проблем није решен, Ако проблем није решен, [линк] контактирајт е[/link] нас. ",
+  "modalSessionResetMessage": "Ако проблем није решен, Ако проблем није решен, [link] контактирајт е[/link] нас. ",
   "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Покушај поново",
   "modalUploadContactsMessage": "Нисмо примили податке од вас. Покушајте поново да увезете контакте.",

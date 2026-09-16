@@ -661,7 +661,7 @@
   "conversation.E2EIVerificationDegraded": "Беседа больше не является верифицированной",
   "conversationAccessDisclaimer": "Приватный канал нельзя изменить на публичный.",
   "conversationAccessTitle": "Доступ",
-  "conversationAdminlessDeleteReminder": "Эта группа будет автоматически удалена [bold]{дата},[/bold], поскольку в ней нет подходящих администраторов. [link]Подробнее[/link]",
+  "conversationAdminlessDeleteReminder": "Эта группа будет автоматически удалена [bold]{date},[/bold], поскольку в ней нет подходящих администраторов. [link]Подробнее[/link]",
   "conversationAllWelcomeMessage": "Приветствуем вас в Wire 👋",
   "conversationAppsWarning": "Приложения имеют доступ к контенту этой беседы",
   "conversationAssetDownloading": "Загрузка…",

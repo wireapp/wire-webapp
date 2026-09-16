@@ -1576,7 +1576,7 @@
   "modalConversationMessageTooLongHeadline": "Besked for lang",
   "modalConversationMessageTooLongMessage": "Du kan sende beskeder på op til {number} tegn.",
   "modalConversationNewDeviceAction": "Send alligevel",
-  "modalConversationNewDeviceHeadlineMany": "{user}s er begyndt at bruge nye enheder",
+  "modalConversationNewDeviceHeadlineMany": "{users}s er begyndt at bruge nye enheder",
   "modalConversationNewDeviceHeadlineOne": "{user} er begyndt at bruge en ny enhed",
   "modalConversationNewDeviceHeadlineYou": "{user} er begyndt at bruge en ny enhed",
   "modalConversationNewDeviceIncomingCallAction": "Besvar opkald",

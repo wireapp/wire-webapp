@@ -1576,7 +1576,7 @@
   "modalConversationMessageTooLongHeadline": "Sporočilo je predolgo",
   "modalConversationMessageTooLongMessage": "Lahko pošljete sporočila do {number} znakov.",
   "modalConversationNewDeviceAction": "Send anyway",
-  "modalConversationNewDeviceHeadlineMany": "{user}s so začeli z uporabo novih naprav",
+  "modalConversationNewDeviceHeadlineMany": "{users}s so začeli z uporabo novih naprav",
   "modalConversationNewDeviceHeadlineOne": "{user} je začel(-a) z uporabo nove naprave",
   "modalConversationNewDeviceHeadlineYou": "{user} je začel(-a) z uporabo nove naprave",
   "modalConversationNewDeviceIncomingCallAction": "Sprejmi klic",
