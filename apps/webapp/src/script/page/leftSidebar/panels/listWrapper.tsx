@@ -20,6 +20,7 @@
 import React, {memo, ReactElement, ReactNode} from 'react';
 
 import {css} from '@emotion/react';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {throttle} from 'underscore';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
@@ -93,7 +94,17 @@ const ListWrapper = memo(
     notificationHost,
   }: LeftListWrapperProps) => {
     const {translate} = useApplicationContext();
-    const defaultHeadingId = hasHeader && !headerElement && header ? getListWrapperHeadingId(id) : undefined;
+    const hasHeaderElement =
+      headerElement !== null &&
+      headerElement !== undefined &&
+      headerElement !== false &&
+      headerElement !== '' &&
+      headerElement !== 0 &&
+      (typeof headerElement !== 'number' || !Number.isNaN(headerElement));
+    const defaultHeadingId =
+      hasHeader === true && hasHeaderElement === false && isNonEmptyString(header)
+        ? getListWrapperHeadingId(id)
+        : undefined;
     const sectionAriaLabelledBy = ariaLabelledBy ?? defaultHeadingId;
     const calculateBorders = throttle((element: HTMLElement) => {
       window.requestAnimationFrame(() => {
@@ -108,7 +119,7 @@ const ListWrapper = memo(
     }, BORDER_RECALCULATION_THROTTLE_MILLISECONDS);
 
     function initBorderedScroll(element: HTMLElement | null) {
-      if (!element) {
+      if (element === null) {
         return;
       }
 
@@ -131,7 +142,7 @@ const ListWrapper = memo(
             className={`left-list-${id} ${id}`}
             css={style}
             aria-labelledby={sectionAriaLabelledBy}
-            aria-label={sectionAriaLabelledBy ? undefined : ariaLabel}
+            aria-label={isNonEmptyString(sectionAriaLabelledBy) ? undefined : ariaLabel}
             {...panelAttributes}
           >
             {panelOverlay}
@@ -145,13 +156,15 @@ const ListWrapper = memo(
                   </p>
                 )}
                 <div className="left-list-header-title-wrapper">
-                  {headerElement || (
+                  {hasHeaderElement ? (
+                    headerElement
+                  ) : (
                     <>
                       <h2 id={defaultHeadingId} className="left-list-header-text" data-uie-name={headerUieName}>
                         {header}
                       </h2>
 
-                      {onClose && (
+                      {onClose !== undefined && (
                         <button
                           type="button"
                           className="left-list-header-close-button button-icon-large"

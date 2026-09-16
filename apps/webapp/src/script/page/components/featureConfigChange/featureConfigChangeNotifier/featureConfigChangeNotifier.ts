@@ -93,7 +93,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.FILE_SHARING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === undefined) {
         return undefined;
       }
       let translationKey: TranslationKey;
@@ -116,7 +116,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.VIDEO_CALLING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === undefined) {
         return undefined;
       }
       let translationKey: TranslationKey;
@@ -140,7 +140,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.APPLOCK],
     ) => {
       const shouldWarn = oldConfig?.config.enforceAppLock === true && newConfig?.config.enforceAppLock === false;
-      if (!shouldWarn) {
+      if (shouldWarn !== true) {
         return undefined;
       }
       return {
@@ -157,7 +157,7 @@ const createFeatureNotifications = (
       const handleDlPathChange: (
         status: FEATURE_STATUS | undefined,
       ) => FeatureNotificationMessage | undefined = status => {
-        if (newConfig && 'config' in newConfig) {
+        if (newConfig !== undefined && 'config' in newConfig) {
           localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation ?? '');
           amplify.publish(
             WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
@@ -195,14 +195,14 @@ const createFeatureNotifications = (
         };
       };
 
-      if (!oldConfig && newConfig?.status === FEATURE_STATUS.ENABLED && 'config' in newConfig) {
+      if (oldConfig === undefined && newConfig?.status === FEATURE_STATUS.ENABLED && 'config' in newConfig) {
         return handleDlPathChange(FEATURE_STATUS.ENABLED);
       }
 
       if (
-        newConfig &&
+        newConfig !== undefined &&
         'config' in newConfig &&
-        oldConfig &&
+        oldConfig !== undefined &&
         'config' in oldConfig &&
         Runtime.isDesktopApp() &&
         Runtime.isWindows()
@@ -212,7 +212,7 @@ const createFeatureNotifications = (
           newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation;
 
         // separate call for type narrowing
-        if (!status) {
+        if (status === undefined) {
           return undefined;
         }
         if (configStatus === undefined) {
@@ -228,7 +228,7 @@ const createFeatureNotifications = (
       oldConfig: FeatureList[FEATURE_KEY.SELF_DELETING_MESSAGES],
       newConfig: FeatureList[FEATURE_KEY.SELF_DELETING_MESSAGES],
     ) => {
-      if (!oldConfig || !('config' in oldConfig) || !newConfig || !('config' in newConfig)) {
+      if (oldConfig === undefined || !('config' in oldConfig) || newConfig === undefined || !('config' in newConfig)) {
         return undefined;
       }
       const previousTimeout = oldConfig?.config?.enforcedTimeoutSeconds * millisecondsInSecond;
@@ -242,14 +242,14 @@ const createFeatureNotifications = (
       const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
       const isFeatureEnabled = newStatus === FEATURE_STATUS.ENABLED;
 
-      if (!hasFeatureChanged) {
+      if (hasFeatureChanged !== true) {
         return undefined;
       }
 
       let htmlMessage: string;
       let translatedMessage: PrimaryModalTranslatedTranslation;
-      if (isFeatureEnabled) {
-        if (isEnforced) {
+      if (isFeatureEnabled === true) {
+        if (isEnforced === true) {
           const timeoutText = formatDuration(newTimeout, translate).text;
           htmlMessage = translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
             timeout: timeoutText,
@@ -287,7 +287,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.CONFERENCE_CALLING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status || status === FEATURE_STATUS.DISABLED) {
+      if (status === undefined || status === FEATURE_STATUS.DISABLED) {
         return undefined;
       }
       const replaceEnterprise = replaceLink(
@@ -333,7 +333,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.CONVERSATION_GUEST_LINKS],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === undefined) {
         return undefined;
       }
       let translationKey: TranslationKey;
@@ -358,7 +358,7 @@ function wasTurnedOnOrOff(
   oldConfig?: FeatureWithoutConfig,
   newConfig?: FeatureWithoutConfig,
 ): FEATURE_STATUS | undefined {
-  if (oldConfig?.status && newConfig?.status && oldConfig.status !== newConfig.status) {
+  if (oldConfig?.status !== undefined && newConfig?.status !== undefined && oldConfig.status !== newConfig.status) {
     return newConfig.status === FEATURE_STATUS.ENABLED ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED;
   }
   return undefined;
@@ -379,15 +379,15 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
 
   useEffect(() => {
     const previous = previousConfig.current;
-    if (config) {
+    if (config !== undefined) {
       previousConfig.current = config;
       saveFeatureConfig(selfUserId, config);
     }
 
-    if (!previous) {
+    if (previous === undefined) {
       return;
     }
-    if (!config) {
+    if (config === undefined) {
       return;
     }
 
@@ -396,7 +396,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
       const message = getMessage(previous[featureKey], config[featureKey]);
       const isEnforceDownloadPath = featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH;
 
-      if (!message) {
+      if (message === undefined) {
         continue;
       }
 
@@ -420,7 +420,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
           preventClose: isEnforceDownloadPath,
           close: isEnforceDownloadPath
             ? () => {
-                if (Runtime.isDesktopApp() && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
+                if (Runtime.isDesktopApp() === true && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
                   amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
                 }
               }

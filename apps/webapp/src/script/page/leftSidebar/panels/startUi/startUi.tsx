@@ -19,6 +19,7 @@
 
 import {useEffect, useRef, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -104,7 +105,7 @@ const StartUI = ({
   const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
 
   const openFirstConversation = async (): Promise<void> => {
-    if (peopleSearchResults.current) {
+    if (peopleSearchResults.current !== undefined && peopleSearchResults.current !== null) {
       const {contacts} = peopleSearchResults.current;
       if (contacts.length > 0) {
         return openContact(contacts[0]);
@@ -113,7 +114,8 @@ const StartUI = ({
   };
 
   const openContact = async (user: User) => {
-    const isSameTeam = user.teamId && selfUser.teamId && user.teamId === selfUser.teamId;
+    const isSameTeam =
+      isNonEmptyString(user.teamId) && isNonEmptyString(selfUser.teamId) && user.teamId === selfUser.teamId;
     const has1to1Conversation = conversationState.has1to1ConversationWithUser(user.qualifiedId);
 
     if (isSameTeam && !has1to1Conversation) {

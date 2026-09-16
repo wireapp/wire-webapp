@@ -77,7 +77,7 @@ const showWarning = (type: TYPE, info?: {name: string}) => {
     hideWarning(visibleWarning);
   }
 
-  if (info) {
+  if (info !== undefined && info !== null) {
     setName(info.name);
   }
 

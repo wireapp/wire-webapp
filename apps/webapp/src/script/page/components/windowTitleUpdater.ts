@@ -64,7 +64,7 @@ const useWindowTitle = (translate: Translate) => {
     (unreadCount: number) => {
       setUnreadMessagesCount(unreadCount);
 
-      const iconBadge = unreadCount ? '-badge' : '';
+      const iconBadge = unreadCount !== 0 && !Number.isNaN(unreadCount) ? '-badge' : '';
       const existingIconLink = document.querySelector<HTMLLinkElement>("link[rel*='shortcut icon']");
       const link: HTMLLinkElement = isNullOrUndefined(existingIconLink)
         ? document.createElement('link')

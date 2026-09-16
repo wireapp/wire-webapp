@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
@@ -144,11 +145,12 @@ export const PeopleTab = ({
     } else {
       const teamUsers = teamState.teamUsers();
 
-      contacts = unfiltered
-        ? teamUsers
-        : teamUsers.filter(
-            user => conversationState.hasConversationWith(user) || teamRepository.isSelfConnectedTo(user.id),
-          );
+      contacts =
+        unfiltered === true
+          ? teamUsers
+          : teamUsers.filter(
+              user => conversationState.hasConversationWith(user) || teamRepository.isSelfConnectedTo(user.id),
+            );
     }
 
     return contacts.filter(user => user.isAvailable());
@@ -199,7 +201,7 @@ export const PeopleTab = ({
   const debouncedSearch = useDebouncedCallback(async () => {
     setHasFederationError(false);
     const {query} = searchRepository.normalizeQuery(searchQuery);
-    if (!query) {
+    if (query.length === 0) {
       setResults({contacts: getLocalUsers(), others: []});
       onSearchResults(undefined);
       return;
@@ -280,7 +282,7 @@ export const PeopleTab = ({
       {searchQuery.length === 0 && (
         <>
           <ul className="start-ui-list left-list-items">
-            {teamSize === 1 && canInviteTeamMembers && !!manageTeamUrl && (
+            {teamSize === 1 && canInviteTeamMembers === true && isNonEmptyString(manageTeamUrl) && (
               <li className="left-list-item">
                 <button
                   className="left-list-item-button"
@@ -363,7 +365,7 @@ export const PeopleTab = ({
         {results.others.length > 0 && (
           <div className="others">
             <h3 className="start-ui-list-header">
-              {searchOnFederatedDomain()
+              {isNonEmptyString(searchOnFederatedDomain())
                 ? translate('searchOthersFederation', {domainName: searchOnFederatedDomain()})
                 : translate('searchOthers')}
             </h3>
