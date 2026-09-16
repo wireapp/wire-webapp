@@ -17,12 +17,24 @@
  *
  */
 
-import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import assert from 'node:assert';
+
+import {isNonEmptyString} from '@sindresorhus/is';
+import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {createElement} from 'react';
+
+import {render} from '@testing-library/react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {MessageContent} from 'Components/Modals/PrimaryModal/Content/MessageContent';
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/User';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
+import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -144,5 +156,100 @@ describe('showMeetingPartialAddFailureModal', () => {
       undefined,
       translate,
     );
+  });
+
+  it('includes a React translation for every plural failure detail', () => {
+    const qualifiedIds = generateQualifiedIds(8, 'backend.example');
+    const users = [
+      createUser(qualifiedIds[0], 'R&D <Test>'),
+      createUser(qualifiedIds[1], '[link]Admin[/link]'),
+      createUser(qualifiedIds[2], 'Carol'),
+      createUser(qualifiedIds[3], 'Dave'),
+      createUser(qualifiedIds[4], 'Eve'),
+      createUser(qualifiedIds[5], 'Frank'),
+      createUser(qualifiedIds[6], 'Grace'),
+      createUser(qualifiedIds[7], 'Heidi'),
+    ];
+    const failedToAdd: AddUsersFailure[] = [
+      {
+        users: [qualifiedIds[0], qualifiedIds[1]],
+        backends: ['backend.<example>'],
+        reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
+      },
+      {
+        users: [qualifiedIds[2], qualifiedIds[3]],
+        backends: ['backend.<example>'],
+        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+      },
+      {
+        users: [qualifiedIds[4], qualifiedIds[5]],
+        reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG,
+      },
+      {
+        users: [qualifiedIds[6], qualifiedIds[7]],
+        reason: AddUsersFailureReasons.NOT_MLS_CAPABLE,
+      },
+    ];
+
+    showMeetingPartialAddFailureModal({failedToAdd, users, translate});
+    jest.runAllTimers();
+
+    const translatedMessage = showModalSpy.mock.calls[0][1].text?.translatedMessage;
+    expect(translatedMessage).toMatchObject({kind: 'sequence'});
+
+    assert(translatedMessage?.kind === 'sequence');
+
+    expect(
+      translatedMessage.messages.map(message => {
+        return message.translationKey;
+      }),
+    ).toEqual([
+      'failedToAddParticipantsPlural',
+      'failedToAddParticipantsPluralDetailsNonFederatingBackends',
+      'failedToAddParticipantsPluralDetailsOfflineBackend',
+      'failedToAddParticipantsPluralDetailsOfflineForTooLong',
+      'failedToAddParticipantsPluralDetailsNotMlsCapable',
+    ]);
+    expect(translatedMessage.messages[0].values[0].runtimeText).toBe('8');
+    expect(translatedMessage.messages[1].values).toEqual([
+      expect.objectContaining({placeholder: 'name', runtimeText: 'R&D <Test>'}),
+      expect.objectContaining({placeholder: 'names', runtimeText: '[link]Admin[/link]'}),
+    ]);
+    expect(translatedMessage.messages[2].values).toEqual([
+      expect.objectContaining({placeholder: 'name', runtimeText: 'Carol'}),
+      expect.objectContaining({placeholder: 'names', runtimeText: 'Dave'}),
+      expect.objectContaining({placeholder: 'domain', runtimeText: 'backend.<example>'}),
+    ]);
+
+    const messageHtml = showModalSpy.mock.calls[0][1].text?.htmlMessage;
+    assert(isNonEmptyString(messageHtml));
+
+    const {container} = render(
+      createElement(MessageContent, {
+        message: null,
+        messageHtml,
+        translatedMessage,
+        translate,
+      }),
+      {
+        wrapper: createRootProviderWrapperForTest(
+          createRootContextValueForTest({
+            isFeatureToggleEnabled(featureName) {
+              return featureName === reactTranslationRenderingFeatureToggleName;
+            },
+            translate,
+          }),
+        ),
+      },
+    );
+
+    expect(container.querySelectorAll('strong')).toHaveLength(10);
+    expect(container.querySelectorAll('br')).toHaveLength(4);
+    expect(container).toHaveTextContent('R&D <Test>');
+    expect(container).toHaveTextContent('[link]Admin[/link]');
+    expect(container).toHaveTextContent('backend.<example>');
+    expect(container.querySelector('a')).toBeNull();
+    expect(container.querySelector('test')).toBeNull();
+    expect(container.querySelector('example')).toBeNull();
   });
 });

@@ -245,6 +245,31 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         },
         text: {
           htmlMessage: this.translate('mlsWasEnabledDescription', undefined, replaceLinkMls),
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [
+              {
+                kind: 'line-break',
+                legacyTokens: ['<br/>'],
+                markerName: 'br',
+              },
+              {
+                className: '',
+                dataUieName: 'learn-more-mls',
+                href: Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE,
+                kind: 'link',
+                legacyClosingTokens: [],
+                legacyOpeningTokens: [],
+                markerName: 'link',
+                rel: 'nofollow noopener noreferrer',
+                target: '_blank',
+              },
+            ],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'mlsWasEnabledDescription',
+            values: [],
+          },
           title: this.translate('mlsWasEnabledTitle'),
         },
       },

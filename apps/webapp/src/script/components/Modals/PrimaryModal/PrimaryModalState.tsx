@@ -172,6 +172,7 @@ const updateCurrentModalContent = (
     inputPlaceholder: text.input ?? '',
     messageHtml: text.htmlMessage,
     message: text.message,
+    translatedMessage: text.translatedMessage,
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
     primaryAction: primaryAction ?? null,
@@ -256,6 +257,26 @@ const updateCurrentModalContent = (
         undefined,
         replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT),
       );
+      content.translatedMessage = {
+        compatibilityReplacements: [],
+        components: [
+          {
+            className: '',
+            dataUieName: '',
+            href: Config.getConfig().URL.SUPPORT.BUG_REPORT,
+            kind: 'link',
+            legacyClosingTokens: ['/link]'],
+            legacyOpeningTokens: ['[линк]'],
+            markerName: 'link',
+            rel: 'nofollow noopener noreferrer',
+            target: '_blank',
+          },
+        ],
+        kind: 'translation',
+        layout: 'default',
+        translationKey: 'modalSessionResetMessage',
+        values: [],
+      };
       break;
     }
   }

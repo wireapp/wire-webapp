@@ -168,6 +168,27 @@ export class PropertiesRepository {
             undefined,
             replaceLink(Config.getConfig().URL.PRIVACY_POLICY),
           ),
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [
+              {
+                className: '',
+                dataUieName: '',
+                href: Config.getConfig().URL.PRIVACY_POLICY,
+                kind: 'link',
+                legacyClosingTokens: [],
+                legacyOpeningTokens: [],
+                markerName: 'link',
+                rel: 'nofollow noopener noreferrer',
+                target: '_blank',
+              },
+              {kind: 'line-break', legacyTokens: ['<br />'], markerName: 'br'},
+            ],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'dataSharingModalDescription',
+            values: [],
+          },
           closeBtnLabel: this.translate('dataSharingModalCloseBtnTitle'),
         },
         primaryAction: {

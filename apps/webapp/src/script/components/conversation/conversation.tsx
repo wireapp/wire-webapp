@@ -455,6 +455,20 @@ function ConversationContent({
         },
         text: {
           htmlMessage: translate('modalOpenLinkMessage', {link: href}, {}, true),
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'modalOpenLinkMessage',
+            values: [
+              {
+                alternatePlaceholders: [],
+                placeholder: 'link',
+                runtimeText: href,
+              },
+            ],
+          },
           title: translate('modalOpenLinkTitle'),
         },
       },
