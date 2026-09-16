@@ -17,7 +17,7 @@
  *
  */
 
-import {cloneElement, FC, isValidElement, ReactNode, useCallback, useEffect, useState} from 'react';
+import {cloneElement, FC, isValidElement, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
@@ -67,11 +67,17 @@ interface AnimatedProps {
   timeout?: number;
 }
 
-const Animated: FC<AnimatedProps> = ({children, ...rest}) => (
-  <CSSTransition classNames="right-to-left" timeout={rightPanelAnimationTimeout} {...rest}>
-    {children}
-  </CSSTransition>
-);
+const Animated: FC<AnimatedProps> = ({children, ...rest}) => {
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <CSSTransition classNames="right-to-left" nodeRef={nodeRef} timeout={rightPanelAnimationTimeout} {...rest}>
+      <div ref={nodeRef} style={{height: '100%', width: '100%'}}>
+        {children}
+      </div>
+    </CSSTransition>
+  );
+};
 
 export enum PanelState {
   ADD_PARTICIPANTS = 'ADD_PARTICIPANTS',

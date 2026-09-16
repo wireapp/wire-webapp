@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, ComponentType, HTMLProps, createElement} from 'react';
+import {ReactNode, ComponentType, HTMLProps, createElement, useRef} from 'react';
 
 import {ClassNames} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -50,15 +50,19 @@ type TransitionContainerProps = HTMLProps<any> & {
 
 export const TransitionContainer = (props: TransitionContainerProps) => <TransitionGroup {...props} />;
 
-export const Transition = ({animationStyle, timeout, component = 'div', children, ...props}: TransitionProps) => (
-  <ClassNames>
-    {({css}) => (
-      <CSSTransition timeout={timeout} classNames={css(animationStyle)} {...props}>
-        {!isNullOrUndefined(component) ? createElement(component, {}, children) : children}
-      </CSSTransition>
-    )}
-  </ClassNames>
-);
+export const Transition = ({animationStyle, timeout, component = 'div', children, ...props}: TransitionProps) => {
+  const nodeRef = useRef<HTMLElement>(null);
+
+  return (
+    <ClassNames>
+      {({css}) => (
+        <CSSTransition nodeRef={nodeRef} timeout={timeout} classNames={css(animationStyle)} {...props}>
+          {!isNullOrUndefined(component) ? createElement(component, {ref: nodeRef}, children) : children}
+        </CSSTransition>
+      )}
+    </ClassNames>
+  );
+};
 
 export const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...props}: OpacityProps) => (
   <Transition
