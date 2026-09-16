@@ -188,7 +188,7 @@ const Preferences = ({
         className="left-list-items no-scroll preferences-list-items"
       >
         {preferencesItems
-          .filter(item => !item.hidden)
+          .filter(item => item.hidden !== true)
           .map(item => (
             <PreferenceItem
               key={item.id}

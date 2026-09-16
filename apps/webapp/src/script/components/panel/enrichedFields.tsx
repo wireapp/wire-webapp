@@ -19,6 +19,7 @@
 
 import {useEffect, useId, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {RichInfoField} from '@wireapp/api-client/lib/user/richInfo';
 import {container} from 'tsyringe';
 
@@ -51,9 +52,9 @@ export const useEnrichedFields = (
   useEffect(() => {
     let cancel = false;
     const returnFields: RichInfoField[] =
-      addEmail && email != null && email !== '' ? [{type: translate('userProfileEmail'), value: email}] : [];
+      addEmail === true && isNonEmptyString(email) ? [{type: translate('userProfileEmail'), value: email}] : [];
 
-    if (addDomain && user.domain) {
+    if (addDomain === true && isNonEmptyString(user.domain)) {
       returnFields.push({
         type: translate('userProfileDomain'),
         value: user.domain,

@@ -82,7 +82,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
 
   useEffect(
     () => () => {
-      if (stream && !hasActiveCall) {
+      if (stream !== null && hasActiveCall !== true) {
         streamHandler.releaseTracksFromStream(stream);
       }
     },
@@ -91,7 +91,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
 
   return (
     <PreferencesSection title={translate('preferencesAVMicrophone')}>
-      {!stream && !isRequesting && (
+      {stream === null && isRequesting !== true && (
         <div className="preferences-av-detail">
           <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
             {translate('preferencesAVPermissionDetail')}
@@ -114,7 +114,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
           <div className="icon-spinner spin accent-text"></div>
         </div>
       ) : (
-        <InputLevel className="preferences-av-meter accent-text" disabled={!stream} mediaStream={stream} />
+        <InputLevel className="preferences-av-meter accent-text" disabled={stream === null} mediaStream={stream} />
       )}
     </PreferencesSection>
   );

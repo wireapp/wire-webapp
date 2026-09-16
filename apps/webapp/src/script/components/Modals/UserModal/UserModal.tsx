@@ -292,7 +292,7 @@ const UserModal = ({
   }, [userId, userRepository]);
 
   let modalDataUieName = '';
-  if (user) {
+  if (user !== null) {
     modalDataUieName = 'modal-user-profile';
   } else if (userNotFound) {
     modalDataUieName = 'modal-cannot-open-profile';
@@ -331,9 +331,11 @@ const UserModal = ({
       </div>
 
       <FadingScrollbar
-        className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}
+        className={cx('modal__body user-modal__wrapper', {
+          'user-modal__wrapper--max': user === null && userNotFound === false,
+        })}
       >
-        {user && (
+        {user !== null && (
           <>
             <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
@@ -356,7 +358,7 @@ const UserModal = ({
             />
           </>
         )}
-        {isShown && !user && !userNotFound && (
+        {isShown === true && user === null && userNotFound === false && (
           <div className="loading-wrapper">
             <Icon.LoadingIcon aria-hidden="true" />
           </div>

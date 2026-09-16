@@ -53,7 +53,7 @@ export const AppLoader: FC<AppLoaderProps> = ({init, children}) => {
     }).then(user => setSelfUser(user));
   }, []);
 
-  if (selfUser) {
+  if (selfUser !== undefined) {
     return children(selfUser);
   }
 

@@ -19,6 +19,7 @@
 
 import {FC, useCallback, useEffect, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
@@ -112,7 +113,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   const onGridClick = async () => getGifs(currentQuery);
 
   const onBackClick = () => {
-    if (currentGif) {
+    if (currentGif !== null) {
       setGifs([currentGif]);
       setSelectedGif(currentGif);
       setGiphyState(GiphyState.RESULT);
@@ -155,7 +156,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   };
 
   const onSend = () => {
-    if (selectedGif) {
+    if (selectedGif !== null) {
       amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, currentQuery);
       setSelectedGif(null);
 
@@ -176,7 +177,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   };
 
   useEffect(() => {
-    if (inputValue) {
+    if (isNonEmptyString(inputValue)) {
       requestAnimationFrame(() => setPlayAnimation(true));
       void showGiphy(inputValue);
     }
@@ -229,7 +230,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
               </div>
             )}
 
-            {isSingleGif && currentGif && (
+            {isSingleGif === true && currentGif !== null && (
               <div className="gif-container">
                 <div className="button-reset-default gif-container-item">
                   <GifImage src={currentGif.animated} />
@@ -278,8 +279,8 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
 
             <Button
               type="button"
-              aria-disabled={!selectedGif}
-              disabled={!selectedGif}
+              aria-disabled={selectedGif === null}
+              disabled={selectedGif === null}
               onClick={onSend}
               data-uie-name="do-send-gif"
               aria-label={translate('accessibility.giphyModal.sendGif')}

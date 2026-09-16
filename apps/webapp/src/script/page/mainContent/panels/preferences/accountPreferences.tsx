@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
@@ -196,7 +197,7 @@ export const AccountPreferences = ({
               domain={showDomain ? domain : undefined}
             />
 
-            {email && !selfUser.isNoPasswordSSO && (
+            {isNonEmptyString(email) && selfUser.isNoPasswordSSO !== true && (
               <EmailInput canEditProfile={canEditProfile} email={email} userRepository={userRepository} />
             )}
 

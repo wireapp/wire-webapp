@@ -19,6 +19,8 @@
 
 import {MouseEvent, KeyboardEvent} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DeviceVerificationBadges} from 'Components/badge';
@@ -87,7 +89,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
           <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />
         </div>
 
-        {deviceIdentity?.thumbprint && (
+        {isNonEmptyString(deviceIdentity?.thumbprint) && (
           <p className="preferences-devices-id">
             <span>{translate('preferencesMLSThumbprint')}</span>
 

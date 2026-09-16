@@ -19,6 +19,7 @@
 
 import {useEffect, CSSProperties} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 
@@ -74,13 +75,15 @@ const UserDetailsComponent = ({
         </UserInfo>
       </div>
 
-      {participant.handle && (
+      {isNonEmptyString(participant.handle) && (
         <p className="panel-participant__user-name" data-uie-name="status-username" title={participant.handle}>
           {participant.handle}
         </p>
       )}
 
-      {classifiedDomains && <UserClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
+      {!isNullOrUndefined(classifiedDomains) && (
+        <UserClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />
+      )}
 
       <Avatar
         className="panel-participant__avatar"

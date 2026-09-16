@@ -20,6 +20,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/serialize';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
@@ -79,7 +80,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
     void (async () => {
       try {
         const url = await assetRepository.getObjectUrl(pictureResource);
-        if (!cancelled && url) {
+        if (cancelled === false && isNonEmptyString(url)) {
           setAvatarImage(url);
         }
       } catch (error: unknown) {
@@ -99,7 +100,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
   return (
     <InViewport onVisible={() => setIsVisible(true)}>
-      <Transition in={!!avatarImage} nodeRef={imageRef} timeout={showTransition ? 700 : 0}>
+      <Transition in={isNonEmptyString(avatarImage)} nodeRef={imageRef} timeout={showTransition ? 700 : 0}>
         {(state: string) => {
           return (
             <img

@@ -61,10 +61,10 @@ interface UserStatusBadgesProps {
 export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
   const {translate} = useApplicationContext();
   const badgeToComponentMap = createBadgeToComponentMap(translate);
-  const badges = Object.entries(config).filter(([_badge, shouldShow]) => shouldShow);
+  const badges = Object.entries(config).filter(([_badge, shouldShow]) => shouldShow === true);
   const badgesCount = badges.length;
 
-  if (!badgesCount) {
+  if (badgesCount === 0) {
     return null;
   }
 

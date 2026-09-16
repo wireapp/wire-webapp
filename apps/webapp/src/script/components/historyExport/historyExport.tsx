@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -140,7 +141,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
     dismissExport();
 
-    if (archiveBlob) {
+    if (archiveBlob !== null) {
       downloadBlob(archiveBlob, filename, 'application/octet-stream');
     }
   };
@@ -172,7 +173,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         setNumberOfRecords(numberOfRecords);
         setNumberOfProcessedRecords(0);
 
-        if (clientState.currentClient) {
+        if (!isNullOrUndefined(clientState.currentClient)) {
           const archiveBlob = await backupRepository.generateHistory(
             user,
             clientState.currentClient.id,
@@ -184,7 +185,9 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
             [Segmentation.BACKUP_CREATION.CREATION_DURATION]: Math.ceil(
               (Date.now() - startTime) / MILLISECONDS_PER_SECOND,
             ),
-            [Segmentation.BACKUP_CREATION.PASSWORD]: password ? Segmentation.GENERAL.YES : Segmentation.GENERAL.NO,
+            [Segmentation.BACKUP_CREATION.PASSWORD]: isNonEmptyString(password)
+              ? Segmentation.GENERAL.YES
+              : Segmentation.GENERAL.NO,
             [Segmentation.BACKUP_CREATION.PASSWORD_MULTIPLE_ATTEMPTS]: hasMultipleAttempts
               ? Segmentation.GENERAL.YES
               : Segmentation.GENERAL.NO,

@@ -19,6 +19,7 @@
 
 import {ReactNode, useId} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {ViewerAccessIcon} from '@wireapp/react-ui-kit';
@@ -56,7 +57,7 @@ const InfoToggle = ({
             {name}
           </label>
           <p className="info-toggle__details">{info}</p>
-          {adminHintForShareDrive && (
+          {isNonEmptyString(adminHintForShareDrive) && (
             <p className="info-toggle__admin-hint">
               <span className="info-toggle__admin-hint-icon">
                 <ViewerAccessIcon width={14} height={14} aria-hidden="true" />

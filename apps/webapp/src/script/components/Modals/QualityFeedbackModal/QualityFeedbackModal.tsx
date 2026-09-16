@@ -19,6 +19,7 @@
 
 import React, {useState} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
@@ -56,7 +57,7 @@ interface Props {
 export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
   const userState = container.resolve(UserState);
   const {conversationId} = useCallAlertState();
-  const call = conversationId && callingRepository.findCall(conversationId);
+  const call = !isNullOrUndefined(conversationId) ? callingRepository.findCall(conversationId) : undefined;
   const [isChecked, setIsChecked] = useState(false);
   const {setQualityFeedbackModalShown, qualityFeedbackModalShown, setConversationId} = useCallAlertState();
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
@@ -65,11 +66,11 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
     message: translate('qualityFeedback.notificationSubmitted'),
   });
 
-  if (!qualityFeedbackModalShown) {
+  if (qualityFeedbackModalShown !== true) {
     return null;
   }
 
-  if (!call) {
+  if (isNullOrUndefined(call)) {
     logger.warn('Call not found for conversationId', conversationId);
     setQualityFeedbackModalShown(false);
     return null;
@@ -86,7 +87,7 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
       currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal.getTime();
       localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
 
-      if (!skipNotification) {
+      if (skipNotification === false) {
         submittedNotification.show();
       }
     } catch (error: unknown) {
@@ -118,7 +119,7 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
         <ul css={ratingList}>
           {ratingListItems.map(ratingItem => (
             <li key={ratingItem.value}>
-              {ratingItem?.headingTranslationKey && (
+              {isNonEmptyString(ratingItem?.headingTranslationKey) && (
                 // headingTranslationKey has to broad type to specify it
                 // TODO: narrow down the type
                 <div css={ratingItemHeading}>{translate(ratingItem.headingTranslationKey)}</div>

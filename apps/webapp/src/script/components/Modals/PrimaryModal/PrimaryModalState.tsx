@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {isValid} from 'date-fns';
 import {escape} from 'underscore';
 import {create} from 'zustand';
@@ -120,7 +121,7 @@ const addNewModalToQueue = (
 
 const showNextModalInQueue = (): void => {
   const {queue, currentModalId, removeFirstItemInQueue} = usePrimaryModalState.getState();
-  if (currentModalId !== null && currentModalId !== undefined && currentModalId !== '') {
+  if (!isNullOrUndefined(currentModalId) && currentModalId !== '') {
     // we already have a modal open which is awaiting a manual user action
     return;
   }
@@ -215,10 +216,9 @@ const updateCurrentModalContent = (
     }
     case PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
       content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
-      content.titleText =
-        data !== undefined && data !== null
-          ? translate('modalAccountReadReceiptsChangedOnHeadline')
-          : translate('modalAccountReadReceiptsChangedOffHeadline');
+      content.titleText = !isNullOrUndefined(data)
+        ? translate('modalAccountReadReceiptsChangedOnHeadline')
+        : translate('modalAccountReadReceiptsChangedOffHeadline');
       content.message = translate('modalAccountReadReceiptsChangedMessage');
       break;
     }
@@ -280,14 +280,14 @@ const updateCurrentModalContent = (
       break;
     }
   }
-  if (content.secondaryAction) {
+  if (!isNullOrUndefined(content.secondaryAction)) {
     const updatedSecondaryAction = Array.isArray(content.secondaryAction)
       ? content.secondaryAction
       : [content.secondaryAction];
     // force it into array format
     const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
     content.secondaryAction = updatedSecondaryAction.map((action, index) => {
-      const uieName = uieNames[index] || 'do-remaining';
+      const uieName = isNonEmptyString(uieNames[index]) ? uieNames[index] : 'do-remaining';
       return {...action, uieName};
     });
   }

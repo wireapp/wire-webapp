@@ -19,6 +19,7 @@
 
 import {FC, useEffect, useRef} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -67,11 +68,15 @@ const PanelHeader: FC<PanelHeaderProps> = ({
 }: PanelHeaderProps) => {
   const {translate} = useApplicationContext();
   const panelHeaderRef = useRef<HTMLHeadingElement>(null);
-  const effectiveGoBackTitle = goBackTitle || translate('accessibility.rightPanel.GoBack');
-  const effectiveCloseButtonTitle = closeBtnTitle || translate('accessibility.rightPanel.close');
+  const effectiveGoBackTitle = isNonEmptyString(goBackTitle)
+    ? goBackTitle
+    : translate('accessibility.rightPanel.GoBack');
+  const effectiveCloseButtonTitle = isNonEmptyString(closeBtnTitle)
+    ? closeBtnTitle
+    : translate('accessibility.rightPanel.close');
 
   useEffect(() => {
-    if (!!panelHeaderRef.current && shouldFocusFirstButton) {
+    if (panelHeaderRef.current !== null && shouldFocusFirstButton === true) {
       const nextElementToFocus = panelHeaderRef.current.querySelector('button');
       // TO-DO Remove setTimeout after replacing transition group animation libray
       // triggering focus method without setTimeout is not working due to right side bar animation
@@ -91,7 +96,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
         </DraggableClickWrapper>
       )}
 
-      {title && (
+      {isNonEmptyString(title) && (
         <h2 className="panel__header__title" tabIndex={TabIndex.FOCUSABLE} data-uie-name={titleDataUieName}>
           {title}
         </h2>
