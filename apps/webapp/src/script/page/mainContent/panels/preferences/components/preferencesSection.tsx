@@ -19,6 +19,8 @@
 
 import {ReactNode} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 interface PreferencesSectionProps {
   className?: string;
   hasSeparator?: boolean;
@@ -29,9 +31,9 @@ interface PreferencesSectionProps {
 
 const PreferencesSection = ({title, className = '', uieName, hasSeparator, children}: PreferencesSectionProps) => (
   <>
-    {hasSeparator && <hr className="preferences-separator" />}
+    {hasSeparator === true && <hr className="preferences-separator" />}
     <fieldset className={`preferences-section ${className}`} data-uie-name={uieName}>
-      {title && <legend className="preferences-header">{title}</legend>}
+      {isNonEmptyString(title) && <legend className="preferences-header">{title}</legend>}
       {children}
     </fieldset>
   </>

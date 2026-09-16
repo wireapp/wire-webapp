@@ -19,6 +19,8 @@
 
 import {useEffect, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
@@ -95,7 +97,11 @@ export const DeviceDetailsPreferences = ({
             />
           </legend>
 
-          <DetailedDevice getDeviceIdentity={getDeviceIdentity} device={device} fingerprint={fingerprint || ''} />
+          <DetailedDevice
+            getDeviceIdentity={getDeviceIdentity}
+            device={device}
+            fingerprint={isNonEmptyString(fingerprint) ? fingerprint : ''}
+          />
 
           <h3 className="label preferences-label preferences-devices-fingerprint-label">
             {translate('preferencesDeviceDetailsVerificationStatus')}

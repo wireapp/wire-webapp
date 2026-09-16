@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -76,7 +77,7 @@ const AccountSecuritySection = ({
 
   return (
     <PreferencesSection hasSeparator className="preferences-section-account-security">
-      {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
+      {isNonEmptyString(manageTeamUrl) && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
         <Link
           tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
@@ -89,7 +90,7 @@ const AccountSecuritySection = ({
         </Link>
       )}
 
-      {createTeamUrl && !isMacOsWrapper && (
+      {isNonEmptyString(createTeamUrl) && isMacOsWrapper !== true && (
         <Link variant={LinkVariant.PRIMARY} targetBlank href={createTeamUrl} data-uie-name="do-create-team">
           {translate('preferencesAccountCreateTeam')}
         </Link>

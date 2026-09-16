@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {VerificationBadges} from 'Components/badge';
@@ -65,7 +67,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
       </div>
 
       <div css={styles.buttonsGroup}>
-        {isActivated && certificate && (
+        {isActivated && isNonEmptyString(certificate) && (
           <Button
             variant={ButtonVariant.TERTIARY}
             onClick={showModal}
@@ -77,7 +79,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
           </Button>
         )}
 
-        {isCurrentDevice && (
+        {isCurrentDevice === true && (
           <>
             {!isActivated && (
               <Button

@@ -19,6 +19,7 @@
 
 import {ComponentType} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {Select} from '@wireapp/react-ui-kit';
@@ -47,7 +48,7 @@ const DeviceSelect = ({
   title,
 }: DeviceSelectProps) => {
   const devicesList = devices.map(({deviceId, label}) => ({
-    label: label || defaultDeviceName,
+    label: isNonEmptyString(label) ? label : defaultDeviceName,
     value: deviceId,
   }));
   const currentValue = devicesList.find(device => device.value === value);
@@ -71,7 +72,7 @@ const DeviceSelect = ({
           onChange={option => {
             const currentOption = option?.value.toString();
 
-            if (currentOption) {
+            if (isNonEmptyString(currentOption)) {
               onChange(currentOption);
             }
           }}

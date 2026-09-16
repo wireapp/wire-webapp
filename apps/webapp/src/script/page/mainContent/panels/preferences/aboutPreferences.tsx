@@ -19,6 +19,8 @@
 
 import {useMemo} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {User} from 'Repositories/entity/User';
@@ -43,14 +45,15 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
   const desktopConfig = Config.getDesktopConfig();
 
   const termsOfUseUrl = useMemo(() => {
-    if (selfUser) {
+    if (selfUser !== null && selfUser !== undefined) {
       return externalUrl.termsOfUse;
     }
     return '';
   }, [selfUser]);
 
-  const showWireSection = !!(termsOfUseUrl || websiteUrl || privacyPolicyUrl);
-  const showSupportSection = !!(config.URL.SUPPORT.INDEX || config.URL.SUPPORT.CONTACT);
+  const showWireSection =
+    isNonEmptyString(termsOfUseUrl) || isNonEmptyString(websiteUrl) || isNonEmptyString(privacyPolicyUrl);
+  const showSupportSection = isNonEmptyString(config.URL.SUPPORT.INDEX) || isNonEmptyString(config.URL.SUPPORT.CONTACT);
 
   return (
     <PreferencesPage title={translate('preferencesAbout')}>
@@ -83,21 +86,21 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
       {showWireSection && (
         <PreferencesSection title={config.BRAND_NAME}>
           <ul className="preferences-about-list">
-            {termsOfUseUrl && (
+            {isNonEmptyString(termsOfUseUrl) && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={termsOfUseUrl} data-uie-name="go-legal">
                   {translate('preferencesAboutTermsOfUse')}
                 </Link>
               </li>
             )}
-            {privacyPolicyUrl && (
+            {isNonEmptyString(privacyPolicyUrl) && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={privacyPolicyUrl} data-uie-name="go-privacy">
                   {translate('preferencesAboutPrivacyPolicy')}
                 </Link>
               </li>
             )}
-            {websiteUrl && (
+            {isNonEmptyString(websiteUrl) && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={websiteUrl} data-uie-name="go-wire-dot-com">
                   {translate('preferencesAboutWebsite', {brandName: config.BRAND_NAME})}
@@ -108,7 +111,7 @@ const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
         </PreferencesSection>
       )}
       <PreferencesSection hasSeparator>
-        {desktopConfig && (
+        {desktopConfig !== null && desktopConfig !== undefined && (
           <p className="preferences-detail">
             {translate('preferencesAboutDesktopVersion', {version: desktopConfig.version})}
           </p>

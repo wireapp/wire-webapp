@@ -19,6 +19,8 @@
 
 import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 
+import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
+
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -92,7 +94,7 @@ const AccountInput: FC<AccountInputProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
-      if (inputWrapperRef.current && !inputWrapperRef.current.contains(event.target)) {
+      if (inputWrapperRef.current !== null && !inputWrapperRef.current.contains(event.target)) {
         setInput(value);
         setIsEditingExternal?.(false);
         setIsEditing(false);
@@ -107,13 +109,13 @@ const AccountInput: FC<AccountInputProps> = ({
   }, []);
 
   const updateInput = (value: string) => {
-    if (allowedChars) {
+    if (isNonEmptyString(allowedChars)) {
       value = value.replace(new RegExp(`[^${allowedChars}]`, 'g'), '');
     }
     if (forceLowerCase) {
       value = value.toLowerCase();
     }
-    if (maxLength) {
+    if (maxLength !== null && maxLength !== undefined && maxLength !== 0 && !Number.isNaN(maxLength)) {
       value = value.substring(0, maxLength);
     }
     setInput(value);
@@ -147,7 +149,7 @@ const AccountInput: FC<AccountInputProps> = ({
           >
             {label}
 
-            {!readOnly && (
+            {readOnly !== true && (
               <IconButton
                 variant={IconButtonVariant.SECONDARY}
                 css={{
@@ -185,7 +187,7 @@ const AccountInput: FC<AccountInputProps> = ({
           autoFocus
           uieName={`enter-${fieldName}-input`}
           label={label}
-          name={valueUie ? valueUie : fieldName}
+          name={isNonEmptyString(valueUie) ? valueUie : fieldName}
           value={input}
           ref={inputWrapperRef}
           onChange={({target}) => updateInput(target.value)}
@@ -200,7 +202,7 @@ const AccountInput: FC<AccountInputProps> = ({
               (event.target as HTMLInputElement).blur();
               // on enter save changes and close the editable field
               setIsEditing(false);
-            } else if (isTabKey(event) && !!!input) {
+            } else if (isTabKey(event) && isEmptyString(input)) {
               // after clearing the input i.e field value is empty when user press tab,
               // revert to the last saved value, close the editable field and focus on the next field
               setInput(value);
