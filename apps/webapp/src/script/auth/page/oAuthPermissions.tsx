@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -128,7 +128,7 @@ const OAuthPermissionsComponent = ({
           setTeamImage(`${Config.getConfig().APP_BASE}/image/logo/wire-logo-120.png`);
         } else {
           const teamImageBlob = await assetRepository.load(teamIcon);
-          setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
+          setTeamImage(!isNullOrUndefined(teamImageBlob) ? await loadDataUrl(teamImageBlob) : teamImageBlob);
         }
       }
       if (isNonEmptyString(oauthParams.client_id)) {
@@ -161,7 +161,7 @@ const OAuthPermissionsComponent = ({
   return (
     <Page>
       <ContainerXS centerText verticalCenter css={containerCSS}>
-        {!oAuthApp ? (
+        {isNull(oAuthApp) ? (
           <Icon.LoadingIcon width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>

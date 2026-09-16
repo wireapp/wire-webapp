@@ -19,6 +19,8 @@
 
 import {useEffect, RefObject} from 'react';
 
+import {isNull} from '@sindresorhus/is';
+
 interface UseAutoFocusProps {
   elementRef: RefObject<HTMLElement | null>;
   preventScroll?: boolean;
@@ -42,7 +44,7 @@ export const useAutoFocus = ({
       const element = elementRef.current;
 
       // Check if element exists at animation frame time
-      if (!element) {
+      if (isNull(element)) {
         return;
       }
 

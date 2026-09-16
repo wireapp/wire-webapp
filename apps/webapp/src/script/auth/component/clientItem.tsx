@@ -30,7 +30,7 @@ import {
   KeyboardEvent,
 } from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 
 import {
@@ -132,7 +132,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   }, [executeAnimateIn, executeAnimateOut, isSelected, selected]);
 
   const formatDate = (dateString: string): string =>
-    dateString
+    isNonEmptyString(dateString)
       ? new Date(dateString).toLocaleString('en-US', {
           day: 'numeric',
           hour: 'numeric',
@@ -191,7 +191,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     event.preventDefault();
     let localValidationError = null;
 
-    if (passwordInput.current) {
+    if (!isNull(passwordInput.current)) {
       if (!passwordInput.current.checkValidity()) {
         localValidationError = ValidationError.handleValidationState(
           passwordInput.current.name,
@@ -204,7 +204,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     setValidationError(localValidationError);
     return Promise.resolve(localValidationError)
       .then(error => {
-        if (error !== null) {
+        if (!isNull(error)) {
           throw error;
         }
       })
@@ -237,12 +237,12 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const smoothMarginTop = animationPosition * cardHorizontalSpacingPixels;
 
   const renderErrorMessage = (): ReactElement | null => {
-    if (validationError && selected) {
+    if (!isNull(validationError) && selected === true) {
       return (
         <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
       );
     }
-    if (clientError && selected) {
+    if (!isUndefined(clientError) && selected === true) {
       return (
         <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}} data-uie-name="error-message">
           {parseError(clientError)}
@@ -289,7 +289,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <DeviceIcon color="#323639" />
             </div>
             <div style={{flexGrow: 1, marginTop: isOpen ? smoothMarginTop : 0}}>
-              {client.model !== undefined && client.model.length > 0 && (
+              {isNonEmptyString(client.model) && (
                 <Text bold block color="#323639" data-uie-name="device-header-model">
                   {formatName(client.model, client.class)}
                 </Text>
