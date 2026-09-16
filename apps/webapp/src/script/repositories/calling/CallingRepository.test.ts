@@ -56,7 +56,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {Call} from './Call';
-import {CallingRepository, setupDetachedWindowExternalLinksClick} from './CallingRepository';
+import {CallingRepository, MediaStreamQuery, setupDetachedWindowExternalLinksClick} from './CallingRepository';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {type NetworkQuality, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
@@ -1585,6 +1585,178 @@ describe('setupDetachedWindowExternalLinksClick', () => {
     link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
 
     expect(openerWindow.open).not.toHaveBeenCalled();
+  });
+});
+
+describe('Media access flow', () => {
+  type CallingRepositoryTestApi = {
+    acquireCallMedia(call: Call, query: MediaStreamQuery): Promise<MediaStream>;
+  };
+
+  let activeCall: Call;
+  let callState: CallState;
+  let mediaStreamHandler: MediaStreamHandler;
+  let backgroundEffectsHandler: BackgroundEffectsHandler;
+  let callingRepository: CallingRepository;
+  let selfParticipant: Participant;
+
+  beforeEach(() => {
+    mediaStreamHandler = Object.assign(Object.create(MediaStreamHandler.prototype) as MediaStreamHandler, {
+      requestMediaStream: jest.fn(),
+    });
+
+    backgroundEffectsHandler = Object.assign(
+      Object.create(BackgroundEffectsHandler.prototype) as BackgroundEffectsHandler,
+      {
+        isBackgroundEffectEnabled: jest.fn(() => true),
+        applyBackgroundEffect: jest.fn(),
+        setPreferredBackgroundEffect: jest.fn(),
+      },
+    );
+
+    selfParticipant = Object.assign(Object.create(Participant.prototype) as Participant, {
+      hasActiveVideo: jest.fn(() => true),
+      sharesScreen: jest.fn(() => false),
+      audioStream: jest.fn(() => undefined),
+      videoStream: jest.fn(() => undefined),
+      processedVideoStream: jest.fn(() => undefined),
+      releaseProcessedVideoStream: jest.fn(),
+      getMediaStream: jest.fn(),
+      updateMediaStream: jest.fn(),
+      videoState: jest.fn(() => VIDEO_STATE.STARTED),
+      releaseVideoStream: jest.fn(),
+    });
+
+    activeCall = Object.assign(Object.create(Call.prototype) as Call, {
+      participants: ko.observableArray<Participant>([]),
+      getSelfParticipant: jest.fn(() => selfParticipant),
+      isGroupOrConference: false,
+      state: ko.observable(CALL_STATE.MEDIA_ESTAB),
+    });
+
+    callState = new CallState();
+
+    callingRepository = new CallingRepository(
+      {} as any,
+      {} as any,
+      {} as any,
+      mediaStreamHandler,
+      {} as any,
+      {} as any,
+      backgroundEffectsHandler,
+      {} as any,
+      {} as any,
+      {} as any,
+      callState,
+    );
+
+    callingRepository['changeMediaSource'] = jest.fn();
+    callingRepository['stopMediaSource'] = jest.fn();
+    callingRepository['parseQualifiedId'] = jest.fn((): QualifiedId => ({domain: '', id: 'parsed-conv-id'}));
+
+    jest.spyOn(callingRepository, 'findCall').mockReturnValue(activeCall);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('acquires audio media and updates the self participant', async () => {
+    const repositoryTestApi = callingRepository as unknown as CallingRepositoryTestApi;
+    const source = new window.RTCAudioSource();
+    const audioTrack = source.createTrack();
+    const stream = new MediaStream([audioTrack]);
+    jest.spyOn(mediaStreamHandler, 'requestMediaStream').mockResolvedValue(stream);
+
+    const result = await repositoryTestApi.acquireCallMedia(activeCall, {
+      audio: true,
+    });
+
+    expect(mediaStreamHandler.requestMediaStream).toHaveBeenCalledWith(
+      true,
+      false,
+      false,
+      activeCall.isGroupOrConference,
+    );
+
+    expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(
+      stream,
+      true,
+    );
+
+    expect(result).toBe(selfParticipant.getMediaStream());
+  });
+
+  it('applies the current background effect when camera media is requested', async () => {
+    const repositoryTestApi = callingRepository as unknown as CallingRepositoryTestApi;
+    const source = new window.RTCVideoSource();
+    const videoTrack = source.createTrack();
+    const stream = new MediaStream([videoTrack]);
+    jest.spyOn(mediaStreamHandler, 'requestMediaStream').mockResolvedValue(stream);
+
+    const applyBackgroundEffectSpy = jest
+      .spyOn(
+        repositoryTestApi as unknown as {
+          applyCurrentBackgroundEffectOnSelfParticipant(
+            stream: MediaStream,
+          ): Promise<MediaStream | void>;
+        },
+        'applyCurrentBackgroundEffectOnSelfParticipant',
+      ).mockResolvedValue(stream);
+
+    await repositoryTestApi.acquireCallMedia(activeCall, {
+      camera: true,
+    });
+
+    expect(applyBackgroundEffectSpy).toHaveBeenCalledWith(stream);
+  });
+
+  it('does not apply background effects for audio-only media', async () => {
+    const repositoryTestApi = callingRepository as unknown as CallingRepositoryTestApi;
+    const source = new window.RTCAudioSource();
+    const audioTrack = source.createTrack();
+    const stream = new MediaStream([audioTrack]);
+    jest.spyOn(mediaStreamHandler, 'requestMediaStream').mockResolvedValue(stream);
+
+    const applyBackgroundEffectSpy = jest.spyOn(
+      repositoryTestApi as any,
+      'applyCurrentBackgroundEffectOnSelfParticipant',
+    );
+
+    await repositoryTestApi.acquireCallMedia(activeCall, {
+      audio: true,
+    });
+
+    expect(applyBackgroundEffectSpy).not.toHaveBeenCalled();
+
+    expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(
+      stream,
+      true,
+    );
+  });
+
+  it('stops acquired tracks when the call ended while acquiring media', async () => {
+    const repositoryTestApi = callingRepository as unknown as CallingRepositoryTestApi;
+    const track = {
+      stop: jest.fn(),
+    } as unknown as MediaStreamTrack;
+
+    const stream = {
+      getTracks: () => [track],
+      getVideoTracks: () => [],
+      getAudioTracks: () => [],
+    } as unknown as MediaStream;
+
+    jest.spyOn(mediaStreamHandler, 'requestMediaStream').mockResolvedValue(stream);
+
+    activeCall.state(CALL_STATE.NONE);
+
+    await repositoryTestApi.acquireCallMedia(activeCall, {
+      audio: true,
+    });
+
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(selfParticipant.updateMediaStream).not.toHaveBeenCalled();
   });
 });
 

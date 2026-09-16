@@ -125,7 +125,7 @@ import {Warnings} from '../../view_model/WarningsContainer';
 const avsLogger = getLogger('avs');
 const AVS_BROWSER_SLEEP_MODE_DETECTION_TIME = 3000;
 
-interface MediaStreamQuery {
+export interface MediaStreamQuery {
   audio?: boolean;
   camera?: boolean;
   screen?: boolean;
@@ -808,26 +808,37 @@ export class CallingRepository {
     }
   }
 
+  // Zentral methode to query media
+  private async acquireCallMedia(call: Call, query: MediaStreamQuery): Promise<MediaStream> {
+    const selfParticipant = call.getSelfParticipant();
+
+    const mediaStream = await this.getMediaStream(query, call.isGroupOrConference);
+
+    // The call might have ended while waiting for media permissions.
+    if (call.state() === CALL_STATE.NONE) {
+      mediaStream.getTracks().forEach(track => track.stop());
+      return selfParticipant.getMediaStream();
+    }
+
+    if (query.camera && mediaStream.getVideoTracks().length > 0) {
+      await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
+    } else {
+      selfParticipant.updateMediaStream(mediaStream, true);
+    }
+
+    return selfParticipant.getMediaStream();
+  }
+
   private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
     try {
-      const selfParticipant = call.getSelfParticipant();
       camera = this.teamState.isVideoCallingEnabled() ? camera : false;
+
       backgroundEffectsStore.getState().setIsInitializing(true);
-      const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
 
-      if (call.state() === CALL_STATE.NONE) {
-        mediaStream.getTracks().forEach(track => track.stop());
-        return true;
-      }
+      await this.acquireCallMedia(call, {audio, camera});
 
-      if (camera && mediaStream.getVideoTracks().length > 0) {
-        await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
-      } else {
-        selfParticipant.updateMediaStream(mediaStream, true);
-      }
-
-      if (camera) {
-        selfParticipant.videoState(VIDEO_STATE.STARTED);
+      if (camera && call.state() !== CALL_STATE.NONE) {
+        call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
       }
 
       return true;
@@ -2861,15 +2872,7 @@ export class CallingRepository {
 
         backgroundEffectsStore.getState().setIsInitializing(true);
 
-        const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
-
-        if (missingStreams.camera && mediaStream.getVideoTracks().length > 0) {
-          await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
-        } else {
-          selfParticipant.updateMediaStream(mediaStream, true);
-        }
-
-        return selfParticipant.getMediaStream();
+        return await this.acquireCallMedia(call, missingStreams);
       } catch (error: unknown) {
         this.logger.warn('Could not get mediaStream for call', error);
         this.handleMediaStreamError(call, missingStreams, error);
