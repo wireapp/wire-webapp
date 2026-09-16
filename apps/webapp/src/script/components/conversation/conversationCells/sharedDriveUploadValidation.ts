@@ -19,8 +19,7 @@
 
 import {Result} from 'true-myth';
 
-export type SharedDriveUploadRejectionReason =
-  'empty' | 'multipleFiles' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
+export type SharedDriveUploadRejectionReason = 'empty' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
 
 export interface SharedDriveUploadRejection {
   readonly reason: SharedDriveUploadRejectionReason;
