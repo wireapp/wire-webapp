@@ -767,8 +767,10 @@ describe('FailedToAddUsersMessage', () => {
       const messageDetail = getByTestId('multi-user-not-added-details');
       expect(messageDetail).toHaveTextContent('Second, Third und First konnten der Gruppe nicht hinzugefügt werden.');
       expect(messageDetail).not.toHaveTextContent('__wire_react_translation_');
-      expect(messageDetail.querySelectorAll('strong')).toHaveLength(1);
-      expect(messageDetail.querySelector('strong')).toHaveTextContent('First');
+      const strongElements = messageDetail.querySelectorAll('strong');
+      expect(strongElements).toHaveLength(2);
+      expect(strongElements[0]).toHaveTextContent('Second, Third');
+      expect(strongElements[1]).toHaveTextContent('First');
     }),
   );
 });
