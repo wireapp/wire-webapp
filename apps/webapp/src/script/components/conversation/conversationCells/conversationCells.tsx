@@ -207,6 +207,10 @@ export const ConversationCells = memo(
 
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+
+    useEffect(() => {
+      sharedDriveUploadController.updateRefresh(sharedDriveConversationQualifiedId, handleRefresh);
+    }, [handleRefresh, sharedDriveConversationQualifiedId, sharedDriveUploadController]);
     const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
     const maxSharedDriveUploadFileSize = Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_CELLS;
     const handleSharedDriveUploadRejection = useCallback(

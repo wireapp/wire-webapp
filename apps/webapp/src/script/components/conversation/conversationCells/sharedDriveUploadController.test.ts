@@ -161,6 +161,113 @@ describe('createSharedDriveUploadController', () => {
     ]);
   });
 
+  it('refreshes the latest view after a view change during an in-flight upload', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    let resolveUpload: ((result: {uuid: string; versionId: string}) => void) | undefined;
+    cellsRepository.uploadNode.mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          resolveUpload = resolve;
+        }),
+    );
+    const {controller} = createDirectUploadControllerHelper(cellsRepository);
+    const refreshedSorts: string[] = [];
+    const initialRefresh = jest.fn(() => refreshedSorts.push('name'));
+    const latestRefresh = jest.fn(() => refreshedSorts.push('mtime'));
+
+    const uploadPromise = controller.upload(
+      [new File(['one'], 'one.txt')],
+      uploadPath,
+      initialRefresh,
+      conversationQualifiedId,
+    );
+    controller.updateRefresh(conversationQualifiedId, latestRefresh);
+
+    resolveUpload?.({uuid: 'remote-id', versionId: 'version-id'});
+    await uploadPromise;
+
+    expect(initialRefresh).not.toHaveBeenCalled();
+    expect(latestRefresh).toHaveBeenCalledTimes(1);
+    expect(refreshedSorts).toEqual(['mtime']);
+  });
+
+  it('refreshes the latest view after retrying an in-flight upload', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    let resolveRetry: ((result: {uuid: string; versionId: string}) => void) | undefined;
+    cellsRepository.uploadNode.mockRejectedValueOnce(new Error('upload failed')).mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          resolveRetry = resolve;
+        }),
+    );
+    const {controller} = createDirectUploadControllerHelper(cellsRepository);
+    const initialRefresh = jest.fn();
+    const latestRefresh = jest.fn();
+    const file = new File(['one'], 'one.txt');
+
+    await controller.upload([file], uploadPath, initialRefresh, conversationQualifiedId);
+    controller.updateRefresh(conversationQualifiedId, latestRefresh);
+
+    const retryPromise = controller.retryUpload('upload-1');
+    controller.updateRefresh(conversationQualifiedId, latestRefresh);
+    resolveRetry?.({uuid: 'remote-id', versionId: 'version-id'});
+    await retryPromise;
+
+    expect(initialRefresh).not.toHaveBeenCalled();
+    expect(latestRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('limits concurrent batches to three active uploads and preserves global queue order', async () => {
+    const cellsRepository = createCellsRepositoryMock();
+    const pendingUploads: Array<{resolve: () => void}> = [];
+    let activeUploads = 0;
+    let maximumActiveUploads = 0;
+    cellsRepository.uploadNode.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          activeUploads += 1;
+          maximumActiveUploads = Math.max(maximumActiveUploads, activeUploads);
+          pendingUploads.push({
+            resolve: () => {
+              activeUploads -= 1;
+              resolve({uuid: 'remote-id', versionId: 'version-id'});
+            },
+          });
+        }),
+    );
+    const createUploadId = jest
+      .fn()
+      .mockReturnValueOnce('upload-1')
+      .mockReturnValueOnce('upload-2')
+      .mockReturnValueOnce('upload-3')
+      .mockReturnValueOnce('upload-4');
+    const {controller} = createDirectUploadControllerHelper(cellsRepository, createUploadId);
+    const files = Array.from({length: 4}, (_, index) => new File([`${index}`], `file-${index}.txt`));
+
+    const firstBatch = controller.upload(files.slice(0, 2), uploadPath, jest.fn(), conversationQualifiedId);
+    const secondBatch = controller.upload(files.slice(2), uploadPath, jest.fn(), conversationQualifiedId);
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(3);
+    expect(controller.snapshots(conversationQualifiedId).slice(0, 3)).toEqual(
+      expect.arrayContaining([expect.objectContaining({kind: 'uploading'})]),
+    );
+    expect(controller.snapshots(conversationQualifiedId).slice(3)).toEqual([
+      expect.objectContaining({identity: {uploadId: 'upload-4'}, kind: 'queued'}),
+    ]);
+
+    pendingUploads[0].resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
+    expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(4, expect.objectContaining({file: files[3]}));
+
+    pendingUploads.slice(1).forEach(upload => upload.resolve());
+    await Promise.all([firstBatch, secondBatch]);
+
+    expect(maximumActiveUploads).toBe(3);
+  });
+
   it('limits a single batch to three active uploads and preserves queue order', async () => {
     const cellsRepository = createCellsRepositoryMock();
     const pendingUploads: Array<{resolve: () => void}> = [];
