@@ -808,19 +808,34 @@ export class CallingRepository {
     }
   }
 
-  // Zentral methode to query media
+  // Zentral methode to query, handle and setup medias
   private async acquireCallMedia(call: Call, query: MediaStreamQuery): Promise<MediaStream> {
     const selfParticipant = call.getSelfParticipant();
 
-    const mediaStream = await this.getMediaStream(query, call.isGroupOrConference);
+    const cache = {
+      audio: selfParticipant.audioStream(),
+      camera: selfParticipant.videoStream(),
+      screen: selfParticipant.videoStream(),
+    };
 
-    // The call might have ended while waiting for media permissions.
+    const missingStreams = Object.fromEntries(
+      Object.entries(query).filter(([type, requested]) => requested && !cache[type as keyof typeof cache]),
+    ) as MediaStreamQuery;
+
+    // Everything requested is already available.
+    if (Object.keys(missingStreams).length === 0) {
+      return selfParticipant.getMediaStream();
+    }
+
+    const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
+
+    // The call might have ended while waiting for media.
     if (call.state() === CALL_STATE.NONE) {
       mediaStream.getTracks().forEach(track => track.stop());
       return selfParticipant.getMediaStream();
     }
 
-    if (query.camera && mediaStream.getVideoTracks().length > 0) {
+    if (missingStreams.camera && mediaStream.getVideoTracks().length > 0) {
       await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
     } else {
       selfParticipant.updateMediaStream(mediaStream, true);
@@ -2832,50 +2847,21 @@ export class CallingRepository {
       return Promise.reject();
     }
     const selfParticipant = call.getSelfParticipant();
-    const query: Required<MediaStreamQuery> = {audio, camera, screen};
-    const cache = {
-      audio: selfParticipant.audioStream(),
-      camera: selfParticipant.videoStream(),
-      screen: selfParticipant.videoStream(),
-    };
+    const query = {audio, camera, screen};
 
-    const missingStreams = Object.entries(cache).reduce((accumulator: MediaStreamQuery, currentValue) => {
-      const [type, isCached] = currentValue;
-      if (!isCached && !!query[type as keyof MediaStreamQuery]) {
-        accumulator[type as keyof MediaStreamQuery] = true;
-      }
-      return accumulator;
-    }, {});
-
-    const queryLog = Object.entries(query)
-      .filter(([_type, needed]) => needed)
-      .map(([type]) => (missingStreams[type as keyof MediaStreamQuery] ? type : `${type} (from cache)`))
-      .join(', ');
-    this.logger.debug(`mediaStream requested: ${queryLog}`);
-
-    if (Object.keys(missingStreams).length === 0) {
-      // we have everything in cache, just return the participant's stream
-      return new Promise(resolve => {
-        /*
-         * There is a bug in Chrome (from version 73, the version where it's fixed is unknown).
-         * This bug crashes the browser if the mediaStream is returned right away (probably some race condition in Chrome internal code)
-         * The timeout(0) fixes this issue.
-         */
-        window.setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
-      });
-    }
     this.mediaStreamQuery = (async () => {
       try {
-        if (missingStreams.screen && selfParticipant.sharesScreen()) {
+        if (screen && selfParticipant.sharesScreen()) {
           return selfParticipant.getMediaStream();
         }
 
         backgroundEffectsStore.getState().setIsInitializing(true);
 
-        return await this.acquireCallMedia(call, missingStreams);
+        return await this.acquireCallMedia(call, query);
       } catch (error: unknown) {
-        this.logger.warn('Could not get mediaStream for call', error);
-        this.handleMediaStreamError(call, missingStreams, error);
+        this.logger.warn('Failed to get call media stream', error);
+
+        this.handleMediaStreamError(call, query, error);
 
         return selfParticipant.getMediaStream();
       } finally {
@@ -2887,11 +2873,14 @@ export class CallingRepository {
     this.mediaStreamQuery
       .then(() => {
         const selfParticipant = call.getSelfParticipant();
+
         if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
           selfParticipant.releaseVideoStream(true);
         }
       })
-      .catch(this.logger.warn);
+      .catch(error => {
+         this.logger.warn('Failed to handle media stream query', error);
+       });
     return this.mediaStreamQuery;
   };
 
