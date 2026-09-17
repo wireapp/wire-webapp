@@ -480,8 +480,11 @@ describe('MLSService', () => {
       expect(mlsService.config).toEqual({...config, nbKeyPackages: 100});
     });
 
-    it('uploads public key only if it was not yet defined on client entity', async () => {
-      const [mlsService, {apiClient, transactionContext, coreCrypto}] = await createMLSService();
+    it('uploads initial key packages after registering the public key without requiring conversation recovery', async () => {
+      const [mlsService, {apiClient, transactionContext, coreCrypto, coreDatabase}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      const onRecoveryRequired = jest.fn();
+      mlsService.on(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED, onRecoveryRequired);
 
       const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
       const mockClientId = 'client-1';
@@ -489,8 +492,14 @@ describe('MLSService', () => {
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
-      jest.spyOn(apiClient.api.client, 'putClient').mockResolvedValueOnce(undefined);
-      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
+      let publicKeyRegistered = false;
+      jest.spyOn(apiClient.api.client, 'putClient').mockImplementationOnce(async () => {
+        publicKeyRegistered = true;
+      });
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array([1, 2, 3])]);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockImplementationOnce(async () => {
+        expect(publicKeyRegistered).toBe(true);
+      });
       jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.FRESH);
       jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
 
@@ -498,6 +507,28 @@ describe('MLSService', () => {
 
       expect(transactionContext.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.putClient).toHaveBeenCalledWith(mockClientId, expect.anything());
+      expect(transactionContext.clientKeypackages).toHaveBeenCalledWith(
+        defaultMLSInitConfig.defaultCiphersuite,
+        expect.anything(),
+        mlsService.config.nbKeyPackages,
+      );
+      expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalledWith(mockClientId, ['AQID']);
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      expect(onRecoveryRequired).not.toHaveBeenCalled();
+    });
+
+    it('defers fresh client registration and key package upload when E2EI enrollment is required', async () => {
+      const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
+      const mockClient = {mls_public_keys: {}, id: 'client-1'} as RegisteredClient;
+      jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.FRESH);
+      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
+      const putClient = jest.spyOn(apiClient.api.client, 'putClient');
+      const uploadKeyPackages = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
+
+      await mlsService.initClient(createUserId(), mockClient, {...defaultMLSInitConfig, skipInitIdentity: true});
+
+      expect(putClient).not.toHaveBeenCalled();
+      expect(uploadKeyPackages).not.toHaveBeenCalled();
     });
 
     it('uploads key packages if there are not enough keys on backend', async () => {

@@ -235,6 +235,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         case MLSDeviceStatus.FRESH:
           if (skipInitIdentity !== true) {
             await this.uploadMLSPublicKeys(client);
+            // Initial registration needs packages immediately, without triggering exhaustion recovery.
+            const keyPackages = await this.clientKeypackages(this.config.nbKeyPackages);
+            await this.uploadMLSKeyPackages(client.id, keyPackages);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
           }
