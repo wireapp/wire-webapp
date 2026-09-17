@@ -99,6 +99,36 @@ describe('handleSharedDriveUploadInput', () => {
     );
   });
 
+  it('ignores macOS metadata files before uploading selected files', async () => {
+    const file = new File(['content'], 'document.txt');
+    const metadataFile = new File(['metadata'], '.DS_Store');
+    const dependencies = createDependencies();
+
+    handleSharedDriveUploadInput(createEvent([metadataFile, file]), {...dependencies, uploadPath});
+
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
+    await uploadAction();
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [file],
+      uploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it('does not dispatch when only macOS metadata files are selected', () => {
+    const dependencies = createDependencies();
+    const event = createEvent([new File(['metadata'], '.DS_Store')]);
+
+    handleSharedDriveUploadInput(event, {...dependencies, uploadPath});
+
+    expect(event.target.value).toBe('');
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
   it('rejects invalid selected files before dispatching upload', () => {
     const validFile = new File(['valid'], 'valid.txt');
     const invalidFile = new File(['invalid'], 'invalid.exe');

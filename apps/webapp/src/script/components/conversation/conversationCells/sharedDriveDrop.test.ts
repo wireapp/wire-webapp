@@ -129,6 +129,35 @@ describe('handleSharedDriveDroppedFiles', () => {
     );
   });
 
+  it('ignores macOS metadata files before uploading dropped files', async () => {
+    const file = new File(['one'], 'one.txt');
+    const metadataFile = new File(['metadata'], '.DS_Store');
+    const dependencies = createDependencies();
+
+    handleSharedDriveDroppedFiles([metadataFile, file], dependencies);
+
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    await uploadAction();
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [file],
+      rootUploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it('does not upload when only macOS metadata files are dropped', () => {
+    const metadataFile = new File(['metadata'], '.DS_Store');
+    const dependencies = createDependencies();
+
+    handleSharedDriveDroppedFiles([metadataFile], dependencies);
+
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
   it('rejects the whole batch when any dropped file is invalid', () => {
     const validFile = new File(['one'], 'one.txt');
     const invalidFile = new File(['two'], 'two.exe');

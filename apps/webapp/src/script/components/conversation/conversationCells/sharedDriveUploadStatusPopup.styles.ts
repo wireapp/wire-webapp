@@ -32,6 +32,7 @@ export const sharedDriveUploadStatusPopupStyles: CSSObject = {
   zIndex: 'var(--z-index-panel)',
   display: 'flex',
   width: 'min(412px, calc(100% - 24px))',
+  maxHeight: 'calc(100vh - 24px)',
   minHeight: 52,
   boxSizing: 'border-box',
   flexDirection: 'column',
@@ -45,6 +46,7 @@ export const sharedDriveUploadStatusPopupStyles: CSSObject = {
 
 export const sharedDriveUploadStatusPopupContentStyles: CSSObject = {
   display: 'flex',
+  flex: '0 0 auto',
   minWidth: 0,
   minHeight: 36,
   alignItems: 'center',
@@ -126,9 +128,15 @@ export const sharedDriveUploadStatusPopupToggleIconStyles: CSSObject = {
 
 export const sharedDriveUploadStatusPopupRowsStyles: CSSObject = {
   display: 'flex',
+  flex: '1 1 auto',
   minWidth: 0,
+  minHeight: 0,
   flexDirection: 'column',
   gap: 8,
+  overflowY: 'auto',
+  overscrollBehavior: 'contain',
+  paddingRight: 8,
+  scrollbarGutter: 'stable',
   '&[hidden]': {
     display: 'none',
   },
@@ -229,7 +237,7 @@ export const sharedDriveUploadStatusPopupRowStatusStyles = (kind: SharedDriveUpl
   color: {
     queued: 'var(--accent-color, #0667c8)',
     uploading: 'var(--accent-color, #0667c8)',
-    uploaded: 'var(--success-color, #1d7833)',
+    uploaded: 'var(--accent-color, #0667c8)',
     failed: 'var(--danger-color, #c20013)',
   }[kind],
   fontSize: 12,

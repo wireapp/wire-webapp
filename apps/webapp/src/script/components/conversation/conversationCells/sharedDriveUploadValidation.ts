@@ -26,6 +26,11 @@ export interface SharedDriveUploadRejection {
   readonly invalidFiles: readonly File[];
 }
 
+export const isSharedDriveUploadMetadataFile = (file: File): boolean => file.name === '.DS_Store';
+
+export const filterSharedDriveUploadFiles = (files: readonly File[]): File[] =>
+  files.filter(file => !isSharedDriveUploadMetadataFile(file));
+
 interface SharedDriveUploadValidationOptions {
   readonly isUploadFilesEnabled: boolean;
   readonly isInRecycleBin: boolean;
