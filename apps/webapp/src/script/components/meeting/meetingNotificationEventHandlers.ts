@@ -38,6 +38,7 @@ export const staleMeetingNotificationKinds = [
   MeetingNotificationKind.UPDATE,
   MeetingNotificationKind.INVITE,
   MeetingNotificationKind.ONGOING,
+  MeetingNotificationKind.REMINDER,
 ] as const;
 
 export type MeetingNotificationEventHandlersDependencies = {

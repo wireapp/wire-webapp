@@ -157,8 +157,25 @@ describe('useMeetingNotificationStore', () => {
       qualifiedCreator,
       meetingStartTime,
     });
+    store.addNotification({
+      kind: MeetingNotificationKind.REMINDER,
+      qualifiedId,
+      meetingTitle: 'Reminder meeting',
+      qualifiedConversationId,
+      qualifiedCreator,
+      meetingStartTime,
+    });
 
     expect(useMeetingNotificationStore.getState().notifications).toEqual([
+      {
+        id: 'meeting-notification-4',
+        kind: MeetingNotificationKind.REMINDER,
+        qualifiedId,
+        meetingTitle: 'Reminder meeting',
+        qualifiedConversationId,
+        qualifiedCreator,
+        meetingStartTime,
+      },
       {
         id: 'meeting-notification-3',
         kind: MeetingNotificationKind.ONGOING,
@@ -283,6 +300,7 @@ describe('useMeetingNotificationStore', () => {
       MeetingNotificationKind.UPDATE,
       MeetingNotificationKind.INVITE,
       MeetingNotificationKind.ONGOING,
+      MeetingNotificationKind.REMINDER,
     ]);
 
     expect(useMeetingNotificationStore.getState().notifications.map(({kind, qualifiedId: id}) => ({kind, id}))).toEqual(

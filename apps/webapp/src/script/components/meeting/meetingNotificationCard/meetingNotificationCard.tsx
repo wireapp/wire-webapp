@@ -94,6 +94,7 @@ const notificationLabels = {
   [MeetingNotificationKind.UPDATE]: 'meetings.notifications.update',
   [MeetingNotificationKind.CANCELLED]: 'meetings.notifications.canceled',
   [MeetingNotificationKind.ONGOING]: 'meetings.notifications.ongoing',
+  [MeetingNotificationKind.REMINDER]: 'meetings.notifications.reminder',
 } as const satisfies Record<MeetingNotificationKind, TranslationKey>;
 
 const getOrganizer = (qualifiedCreator: QualifiedId) =>
@@ -162,6 +163,17 @@ const MeetingNotificationMetadata = ({
           <span css={meetingNotificationCardOngoingTimeStyles}>
             {translate('meetings.meetingStatus.startedAt', {time: meetingTime})}
           </span>
+        </>
+      );
+    })
+    .with({kind: MeetingNotificationKind.REMINDER}, ({qualifiedCreator}) => {
+      const organizer = getOrganizer(qualifiedCreator);
+
+      return (
+        <>
+          {translate('meetings.notifications.by', {organizer}, undefined, true)}
+          {organizer && <span aria-hidden="true"> • </span>}
+          {translate('meetings.notifications.startsIn10Minutes')}
         </>
       );
     })

@@ -321,7 +321,12 @@ describe('createMeetingNotificationEventHandlers', () => {
     expect(dismissedMeetings).toEqual([
       {
         meetingId,
-        kinds: [MeetingNotificationKind.UPDATE, MeetingNotificationKind.INVITE, MeetingNotificationKind.ONGOING],
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+          MeetingNotificationKind.REMINDER,
+        ],
       },
       {
         meetingId,
@@ -351,7 +356,12 @@ describe('createMeetingNotificationEventHandlers', () => {
     expect(dismissedMeetings).toEqual([
       {
         meetingId,
-        kinds: [MeetingNotificationKind.UPDATE, MeetingNotificationKind.INVITE, MeetingNotificationKind.ONGOING],
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+          MeetingNotificationKind.REMINDER,
+        ],
       },
       {
         meetingId,
@@ -386,7 +396,12 @@ describe('createMeetingNotificationEventHandlers', () => {
     expect(dismissedMeetings).toEqual([
       {
         meetingId,
-        kinds: [MeetingNotificationKind.UPDATE, MeetingNotificationKind.INVITE, MeetingNotificationKind.ONGOING],
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+          MeetingNotificationKind.REMINDER,
+        ],
       },
       {
         meetingId,
@@ -410,7 +425,12 @@ describe('createMeetingNotificationEventHandlers', () => {
     expect(dismissedMeetings).toEqual([
       {
         meetingId,
-        kinds: [MeetingNotificationKind.UPDATE, MeetingNotificationKind.INVITE, MeetingNotificationKind.ONGOING],
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+          MeetingNotificationKind.REMINDER,
+        ],
       },
       {
         meetingId,
@@ -425,7 +445,12 @@ describe('createMeetingNotificationEventHandlers', () => {
     expect(dismissedMeetings).toEqual([
       {
         meetingId,
-        kinds: [MeetingNotificationKind.UPDATE, MeetingNotificationKind.INVITE, MeetingNotificationKind.ONGOING],
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+          MeetingNotificationKind.REMINDER,
+        ],
       },
       {
         meetingId,
@@ -433,7 +458,12 @@ describe('createMeetingNotificationEventHandlers', () => {
       },
       {
         meetingId,
-        kinds: [MeetingNotificationKind.UPDATE, MeetingNotificationKind.INVITE, MeetingNotificationKind.ONGOING],
+        kinds: [
+          MeetingNotificationKind.UPDATE,
+          MeetingNotificationKind.INVITE,
+          MeetingNotificationKind.ONGOING,
+          MeetingNotificationKind.REMINDER,
+        ],
       },
       {
         meetingId,
