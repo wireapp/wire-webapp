@@ -19,6 +19,7 @@
 
 import {type FormEvent, useMemo, useRef} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CallIcon, CloseIcon} from '@wireapp/react-ui-kit';
@@ -48,16 +49,31 @@ import {useMeetNowSubmit} from './useMeetNowSubmit';
 
 export const MeetNowModal = () => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
-  const {isOpen, formState, errors, close, reset, setTitle, setSelectedUsers, setParticipantsFilter, validate} =
-    useMeetNowModal();
+  const {
+    isOpen,
+    formState,
+    errors,
+    close,
+    reset,
+    setTitle,
+    setSelectedUsers,
+    setParticipantsFilter,
+    setPassword,
+    setPasswordConfirmation,
+    validate,
+  } = useMeetNowModal();
   const conversationState = container.resolve(ConversationState);
   const {isSubmitting, submit} = useMeetNowSubmit(conversationState);
   const selfUser = container.resolve(UserState).self();
   const submitGenerationRef = useRef(0);
 
   const titleError = useMemo(
-    () => (errors.title !== undefined ? translate(errors.title) : undefined),
+    () => (isUndefined(errors.title) ? undefined : translate(errors.title)),
     [errors.title, translate],
+  );
+  const passwordError = useMemo(
+    () => (isUndefined(errors.password) ? undefined : translate(errors.password)),
+    [errors.password, translate],
   );
 
   const dismissModal = () => {
@@ -125,9 +141,12 @@ export const MeetNowModal = () => {
             isOpen={isOpen}
             formState={formState}
             titleError={titleError}
+            passwordError={passwordError}
             onTitleChange={setTitle}
             onSelectedUsersChange={setSelectedUsers}
             onParticipantsFilterChange={setParticipantsFilter}
+            onPasswordChange={setPassword}
+            onPasswordConfirmationChange={setPasswordConfirmation}
             onSubmit={handleSubmit}
             selfUser={selfUser}
           />

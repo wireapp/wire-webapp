@@ -139,7 +139,7 @@ describe('ScheduleMeetingModal', () => {
   it('focuses the title and closes when Escape is pressed after opening', () => {
     renderModal();
 
-    const title = screen.getByLabelText('meetings.scheduleModal.titleLabel');
+    const title = screen.getByTestId('schedule-meeting-title');
     expect(title).toHaveFocus();
 
     fireEvent.keyDown(title, {key: KEY.ESC});
@@ -184,7 +184,7 @@ describe('ScheduleMeetingModal', () => {
     await waitFor(() => {
       expect(submitButton).toBeDisabled();
     });
-    fireEvent.keyDown(screen.getByLabelText('meetings.scheduleModal.titleLabel'), {key: KEY.ESC});
+    fireEvent.keyDown(screen.getByTestId('schedule-meeting-title'), {key: KEY.ESC});
 
     expect(useScheduleMeetingModal.getState().isOpen).toBe(true);
 

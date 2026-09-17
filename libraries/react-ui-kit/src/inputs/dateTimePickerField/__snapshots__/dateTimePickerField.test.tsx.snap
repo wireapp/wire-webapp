@@ -15,7 +15,7 @@ exports[`"DateTimePickerField" renders 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   width: 100%;
 }
 
@@ -725,7 +725,7 @@ exports[`"DateTimePickerField" renders as disabled 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   width: 100%;
 }
 
@@ -1430,7 +1430,7 @@ exports[`"DateTimePickerField" renders as invalid 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   width: 100%;
 }
 
@@ -2145,7 +2145,7 @@ exports[`"DateTimePickerField" renders with label 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   width: 100%;
 }
 

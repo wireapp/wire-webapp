@@ -45,6 +45,7 @@ import {
   type ScheduleMeetingFormState,
   type ScheduleMeetingMode,
   type ScheduleMeetingSubmitResult,
+  scheduleMeetingModes,
   scheduleMeetingSubmitResults,
 } from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
@@ -78,7 +79,7 @@ const submitMeeting = ({
   scheduleMeeting,
   updateMeeting,
 }: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
-  if (mode === 'create') {
+  if (mode === scheduleMeetingModes.create) {
     const commandResult = mapScheduleFormToMeetingCommand(formState, wallClock);
 
     if (commandResult.isErr) {

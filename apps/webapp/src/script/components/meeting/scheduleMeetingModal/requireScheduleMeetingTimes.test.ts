@@ -40,6 +40,8 @@ const baseFormState = (): ScheduleMeetingFormState => ({
   recurrence: 'weekly',
   selectedUsers: [],
   participantsFilter: '',
+  password: '',
+  passwordConfirmation: '',
 });
 
 describe('requireScheduleMeetingTimes', () => {

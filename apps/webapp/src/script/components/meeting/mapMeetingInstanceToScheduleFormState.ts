@@ -47,5 +47,7 @@ export const mapMeetingInstanceToScheduleFormState = (
     recurrence: meetingSeries.recurrence,
     selectedUsers,
     participantsFilter: '',
+    password: '',
+    passwordConfirmation: '',
   };
 };

@@ -59,6 +59,16 @@ describe('useMeetNowModal', () => {
     expect(hasMeetNowFormErrors(errors)).toBe(true);
   });
 
+  it('accepts a valid title without a guest-link password', () => {
+    const errors = getMeetNowFormErrors({
+      ...getDefaultMeetNowFormState(),
+      title: 'Standup',
+    });
+
+    expect(errors).toEqual({title: undefined, password: undefined});
+    expect(hasMeetNowFormErrors(errors)).toBe(false);
+  });
+
   it('shows a titleTooLong error on the input while typing past the maximum length', () => {
     useMeetNowModal.getState().open();
     useMeetNowModal.getState().setTitle('a'.repeat(MEETING_TITLE_MAX_LENGTH + 1));

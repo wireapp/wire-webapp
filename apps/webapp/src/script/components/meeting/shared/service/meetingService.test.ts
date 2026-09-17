@@ -134,17 +134,20 @@ describe('scheduleMeeting', () => {
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    requestMeetingConversationCode = jest.fn().mockReturnValue(task.resolve(undefined)),
   }: {
     createMeetingMock?: jest.Mock;
     saveMeetingConversationFromBackend?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
+    requestMeetingConversationCode?: jest.Mock;
   } = {}): {
     deps: MeetingServiceDeps;
     createMeetingMock: jest.Mock;
     establishMeetingConversation: jest.Mock;
     saveMeetingConversationFromBackend: jest.Mock;
+    requestMeetingConversationCode: jest.Mock;
   } => {
     const meetingsRepository = {
       createMeeting: createMeetingMock,
@@ -156,6 +159,7 @@ describe('scheduleMeeting', () => {
       safeGetConversationById,
       establishMeetingConversation,
       safeAddUsers,
+      requestMeetingConversationCode,
     } as unknown as ConversationRepository;
 
     return {
@@ -169,6 +173,7 @@ describe('scheduleMeeting', () => {
       createMeetingMock,
       establishMeetingConversation,
       saveMeetingConversationFromBackend,
+      requestMeetingConversationCode,
     };
   };
 
@@ -249,6 +254,26 @@ describe('scheduleMeeting', () => {
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.createFailed);
   });
+
+  it('requests a password-protected conversation code after creating a meeting', async () => {
+    const {deps, requestMeetingConversationCode} = createDeps();
+
+    const result = await scheduleMeeting({...scheduleCommand, password: 'ValidPassword1!'}, deps);
+
+    expect(result.isOk).toBe(true);
+    expect(requestMeetingConversationCode).toHaveBeenCalledWith(qualifiedConversation, 'ValidPassword1!');
+  });
+
+  it('returns conversationSetupFailed when requesting the conversation code fails', async () => {
+    const {deps} = createDeps({
+      requestMeetingConversationCode: jest.fn().mockReturnValue(task.reject(new Error('code request failed'))),
+    });
+
+    const result = await scheduleMeeting(scheduleCommand, deps);
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toBe(meetingSubmitErrors.conversationSetupFailed);
+  });
 });
 
 describe('meetNowMeeting', () => {
@@ -264,12 +289,14 @@ describe('meetNowMeeting', () => {
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+    requestMeetingConversationCode = jest.fn().mockReturnValue(task.resolve(undefined)),
   }: {
     createMeetingMock?: jest.Mock;
     saveMeetingConversationFromBackend?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
+    requestMeetingConversationCode?: jest.Mock;
   } = {}) => {
     const meetingsRepository = {
       createMeeting: createMeetingMock,
@@ -281,6 +308,7 @@ describe('meetNowMeeting', () => {
       safeGetConversationById,
       establishMeetingConversation,
       safeAddUsers,
+      requestMeetingConversationCode,
     } as unknown as ConversationRepository;
 
     return {
@@ -293,6 +321,7 @@ describe('meetNowMeeting', () => {
       },
       createMeetingMock,
       establishMeetingConversation,
+      requestMeetingConversationCode,
     };
   };
 
@@ -319,6 +348,22 @@ describe('meetNowMeeting', () => {
       end_time: new Date(fixedNow.getTime() + 60 * 60 * 1000).toISOString(),
       tzid: 'Europe/Berlin',
     });
+  });
+
+  it('requests a password-protected conversation code for an instant meeting', async () => {
+    const {deps, requestMeetingConversationCode} = createDeps();
+
+    const result = await meetNowMeeting(
+      {
+        title: 'Standup',
+        selectedUsers: [],
+        password: 'ValidPassword1!',
+      },
+      deps,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(requestMeetingConversationCode).toHaveBeenCalledWith(qualifiedConversation, 'ValidPassword1!');
   });
 });
 

@@ -24,6 +24,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {CircleCloseIcon, ErrorMessage, getOverlayPortalContainer, Input} from '@wireapp/react-ui-kit';
 
 import {MeetingParticipantsPicker} from 'Components/meeting/meetingParticipantsPicker';
+import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
 import {useMeetingParticipants} from 'Components/meeting/shared/participants/useMeetingParticipants';
 import {
   scheduleMeetingParticipantsSectionCss,
@@ -43,9 +44,12 @@ export interface MeetNowFormProps {
   isOpen: boolean;
   formState: MeetNowFormState;
   titleError?: string;
+  passwordError?: string;
   onTitleChange: (title: string) => void;
   onSelectedUsersChange: (users: User[]) => void;
   onParticipantsFilterChange: (filter: string) => void;
+  onPasswordChange?: (password: string) => void;
+  onPasswordConfirmationChange?: (password: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   selfUser: User;
 }
@@ -54,13 +58,17 @@ export const MeetNowForm = ({
   isOpen,
   formState,
   titleError,
+  passwordError,
   onTitleChange,
   onSelectedUsersChange,
   onParticipantsFilterChange,
+  onPasswordChange,
+  onPasswordConfirmationChange,
   onSubmit,
   selfUser,
 }: MeetNowFormProps) => {
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
   const {mainViewModel, translate} = useApplicationContext();
   const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
@@ -81,6 +89,7 @@ export const MeetNowForm = ({
       <Input
         id="meet-now-title"
         data-uie-name="meet-now-title"
+        required
         ref={titleInputRef}
         autoComplete="off"
         label={translate('meetings.scheduleModal.titleLabel')}
@@ -123,6 +132,21 @@ export const MeetNowForm = ({
           popoverPortalContainer={portalContainer}
         />
       </div>
+      <MeetingLinkForm
+        translate={translate}
+        onGeneratePassword={password => {
+          onPasswordChange?.(password);
+          onPasswordConfirmationChange?.(password);
+        }}
+        passwordValue={formState.password}
+        passwordValueRef={passwordInputRef}
+        onPasswordValueChange={password => onPasswordChange?.(password)}
+        isPasswordInputMarkInvalid={isNonEmptyString(passwordError)}
+        passwordConfirmationValue={formState.passwordConfirmation}
+        onPasswordConfirmationChange={password => onPasswordConfirmationChange?.(password)}
+        isPasswordConfirmationMarkInvalid={isNonEmptyString(passwordError)}
+        copyDisabled={!isNonEmptyString(formState.password) || isNonEmptyString(passwordError)}
+      />
     </form>
   );
 };

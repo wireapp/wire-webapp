@@ -24,6 +24,7 @@ import {
   MEETING_TITLE_MAX_LENGTH,
   meetingTitleErrorKeys,
 } from 'Components/meeting/shared/validation/meetingTitleValidation';
+import {meetingPasswordErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 
 import {getScheduleMeetingFormErrors, hasScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 
@@ -128,6 +129,20 @@ describe('scheduleMeetingValidation', () => {
     });
 
     expect(hasScheduleMeetingFormErrors(errors)).toBe(false);
+  });
+
+  it('returns a password error when only the confirmation is filled', () => {
+    const errors = getScheduleMeetingFormErrors({
+      title: 'Weekly sync',
+      start: futureStart,
+      end: futureEnd,
+      passwordConfirmation: 'ValidConfirmation1!',
+      wallClock,
+      ...createMode,
+    });
+
+    expect(errors.password).toBe(meetingPasswordErrorKey);
+    expect(hasScheduleMeetingFormErrors(errors)).toBe(true);
   });
 
   it('allows past start and end times in edit mode when end is after start', () => {

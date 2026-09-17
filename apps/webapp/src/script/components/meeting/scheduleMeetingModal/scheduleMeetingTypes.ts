@@ -19,9 +19,15 @@
 
 import type {Maybe} from 'true-myth';
 
+import type {MeetingPasswordErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import type {User} from 'Repositories/entity/User';
 
-export type ScheduleMeetingMode = 'create' | 'edit';
+export const scheduleMeetingModes = {
+  create: 'create',
+  edit: 'edit',
+} as const;
+
+export type ScheduleMeetingMode = (typeof scheduleMeetingModes)[keyof typeof scheduleMeetingModes];
 
 export type ScheduleMeetingRecurrenceOption = 'doesNotRepeat' | 'daily' | 'weekly' | 'everyTwoWeeks' | 'everyFourWeeks';
 
@@ -32,6 +38,8 @@ export interface ScheduleMeetingFormState {
   recurrence: ScheduleMeetingRecurrenceOption;
   selectedUsers: User[];
   participantsFilter: string;
+  password: string;
+  passwordConfirmation: string;
 }
 
 export type ScheduleMeetingFormErrorKey =
@@ -48,6 +56,7 @@ export interface ScheduleMeetingFormErrors {
   startInPast: ScheduleMeetingFormErrorKey | undefined;
   endInPast: ScheduleMeetingFormErrorKey | undefined;
   endBeforeStart: ScheduleMeetingFormErrorKey | undefined;
+  password: MeetingPasswordErrorKey | undefined;
 }
 
 export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => ({
@@ -56,6 +65,7 @@ export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => (
   startInPast: undefined,
   endInPast: undefined,
   endBeforeStart: undefined,
+  password: undefined,
 });
 
 export interface ScheduleMeetingFormDisplayErrors {
@@ -64,6 +74,7 @@ export interface ScheduleMeetingFormDisplayErrors {
   startInPast: string | undefined;
   endInPast: string | undefined;
   endBeforeStart: string | undefined;
+  password: string | undefined;
 }
 
 export const scheduleMeetingSubmitResults = {

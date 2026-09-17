@@ -45,6 +45,8 @@ const baseFormState = (): ScheduleMeetingFormState => ({
   recurrence: 'weekly',
   selectedUsers: [],
   participantsFilter: 'alice',
+  password: '',
+  passwordConfirmation: '',
 });
 
 describe('mapScheduleFormToMeetingCommand', () => {
@@ -66,6 +68,27 @@ describe('mapScheduleFormToMeetingCommand', () => {
       end: futureEndDate,
       recurrence: 'weekly',
       selectedUsers: [alice, bob],
+    });
+  });
+
+  it('maps a valid guest-link password to the meeting command', () => {
+    const result = mapScheduleFormToMeetingCommand(
+      {
+        ...baseFormState(),
+        password: 'ValidPassword1!',
+        passwordConfirmation: 'ValidPassword1!',
+      },
+      wallClock,
+    );
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result)).toEqual({
+      title: 'Weekly sync',
+      start: futureStartDate,
+      end: futureEndDate,
+      recurrence: 'weekly',
+      selectedUsers: [],
+      password: 'ValidPassword1!',
     });
   });
 
