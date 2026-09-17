@@ -37,7 +37,7 @@ import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {toError} from 'Util/toError';
@@ -210,20 +210,10 @@ export class ConnectionRepository {
       if (isBackendError(error)) {
         switch (error.label) {
           case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
-            const replaceLinkLegalHold = replaceLink(
-              Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-              '',
-              'read-more-legal-hold',
-            );
             PrimaryModal.show(
               PrimaryModal.type.ACKNOWLEDGE,
               {
                 text: {
-                  htmlMessage: this.translate(
-                    'modalUserCannotSendConnectionLegalHoldMessage',
-                    undefined,
-                    replaceLinkLegalHold,
-                  ),
                   translatedMessage: {
                     compatibilityReplacements: [],
                     components: [
@@ -258,9 +248,6 @@ export class ConnectionRepository {
               PrimaryModal.type.ACKNOWLEDGE,
               {
                 text: {
-                  htmlMessage: this.translate('modalUserCannotSendConnectionNotFederatingMessage', {
-                    username: userEntity.name(),
-                  }),
                   translatedMessage: {
                     compatibilityReplacements: [],
                     components: [],
@@ -290,7 +277,6 @@ export class ConnectionRepository {
               PrimaryModal.type.ACKNOWLEDGE,
               {
                 text: {
-                  htmlMessage: this.translate('modalUserCannotSendConnectionMessage'),
                   translatedMessage: {
                     compatibilityReplacements: [],
                     components: [],
@@ -425,7 +411,6 @@ export class ConnectionRepository {
             PrimaryModal.type.ACKNOWLEDGE,
             {
               text: {
-                htmlMessage: this.translate('modalUserCannotAcceptConnectionMessage'),
                 translatedMessage: {
                   compatibilityReplacements: [],
                   components: [],
@@ -447,7 +432,6 @@ export class ConnectionRepository {
             PrimaryModal.type.ACKNOWLEDGE,
             {
               text: {
-                htmlMessage: this.translate('modalUserCannotCancelConnectionMessage'),
                 translatedMessage: {
                   compatibilityReplacements: [],
                   components: [],
@@ -469,7 +453,6 @@ export class ConnectionRepository {
             PrimaryModal.type.ACKNOWLEDGE,
             {
               text: {
-                htmlMessage: this.translate('modalUserCannotIgnoreConnectionMessage'),
                 translatedMessage: {
                   compatibilityReplacements: [],
                   components: [],

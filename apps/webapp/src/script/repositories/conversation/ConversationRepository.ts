@@ -99,7 +99,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
@@ -3508,24 +3508,12 @@ export class ConversationRepository {
   }
 
   private showLegalHoldConsentError() {
-    const replaceLinkLegalHold = replaceLink(
-      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-      '',
-      'read-more-legal-hold',
-    );
-
-    const messageText = this.translate(
-      'modalLegalHoldConversationMissingConsentMessage',
-      undefined,
-      replaceLinkLegalHold,
-    );
     const titleText = this.translate('modalUserCannotBeAddedHeadline');
 
     PrimaryModal.show(
       PrimaryModal.type.ACKNOWLEDGE,
       {
         text: {
-          htmlMessage: messageText,
           translatedMessage: {
             compatibilityReplacements: [],
             components: [

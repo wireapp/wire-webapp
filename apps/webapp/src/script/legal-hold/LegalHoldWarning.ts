@@ -75,7 +75,6 @@ export const showLegalHoldWarningModal = (
         },
         secondaryAction,
         text: {
-          htmlMessage: translate('legalHoldWarningMessage', undefined, {br: '<br>'}),
           translatedMessage: createLegalHoldWarningMessage(),
           title: translate('legalHoldWarningTitle'),
         },

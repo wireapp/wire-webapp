@@ -19,7 +19,6 @@
 
 import assert from 'node:assert';
 
-import {isNonEmptyString} from '@sindresorhus/is';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {createElement} from 'react';
 
@@ -30,7 +29,6 @@ import {MessageContent} from 'Components/Modals/PrimaryModal/Content/MessageCont
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/User';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -38,10 +36,7 @@ import {
 import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {
-  formatMeetingPartialAddFailureMessage,
-  showMeetingPartialAddFailureModal,
-} from './showMeetingPartialAddFailureModal';
+import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureModal';
 
 setStrings({en});
 
@@ -50,60 +45,6 @@ const createUser = (qualifiedId: {id: string; domain: string}, name: string) => 
   user.name(name);
   return user;
 };
-
-describe('formatMeetingPartialAddFailureMessage', () => {
-  it('returns an empty string when there are no failed users', () => {
-    expect(
-      formatMeetingPartialAddFailureMessage(
-        [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}],
-        [],
-        translate,
-      ),
-    ).toBe('');
-  });
-
-  it('formats a singular offline backend failure', () => {
-    const [qualifiedId] = generateQualifiedIds(1, 'offline.example');
-    const user = createUser(qualifiedId, 'Felix');
-
-    const message = formatMeetingPartialAddFailureMessage(
-      [
-        {
-          users: [qualifiedId],
-          backends: ['offline.example'],
-          reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-        },
-      ],
-      [user],
-      translate,
-    );
-
-    expect(message).toContain('Felix');
-    expect(message).toContain('offline.example');
-    expect(message).toContain('could not be added to the group');
-  });
-
-  it('formats a plural failure with details', () => {
-    const [qualifiedId1, qualifiedId2] = generateQualifiedIds(2, 'test.domain');
-    const users = [createUser(qualifiedId1, 'Alice'), createUser(qualifiedId2, 'Bob')];
-
-    const message = formatMeetingPartialAddFailureMessage(
-      [
-        {
-          users: [qualifiedId1, qualifiedId2],
-          reason: AddUsersFailureReasons.NOT_MLS_CAPABLE,
-        },
-      ],
-      users,
-      translate,
-    );
-
-    expect(message).toContain('2 participants');
-    expect(message).toContain('Alice');
-    expect(message).toContain('Bob');
-    expect(message).toContain('devices that are MLS-capable');
-  });
-});
 
 describe('showMeetingPartialAddFailureModal', () => {
   const showModalSpy = jest.spyOn(PrimaryModal, 'show');
@@ -150,7 +91,6 @@ describe('showMeetingPartialAddFailureModal', () => {
       expect.objectContaining({
         text: expect.objectContaining({
           title: translate('meetings.scheduleModal.error.addParticipantsFailed'),
-          htmlMessage: expect.stringContaining('Felix'),
         }),
       }),
       undefined,
@@ -221,25 +161,14 @@ describe('showMeetingPartialAddFailureModal', () => {
       expect.objectContaining({placeholder: 'domain', runtimeText: 'backend.<example>'}),
     ]);
 
-    const messageHtml = showModalSpy.mock.calls[0][1].text?.htmlMessage;
-    assert(isNonEmptyString(messageHtml));
-
     const {container} = render(
       createElement(MessageContent, {
         message: null,
-        messageHtml,
         translatedMessage,
         translate,
       }),
       {
-        wrapper: createRootProviderWrapperForTest(
-          createRootContextValueForTest({
-            isFeatureToggleEnabled(featureName) {
-              return featureName === reactTranslationRenderingFeatureToggleName;
-            },
-            translate,
-          }),
-        ),
+        wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate})),
       },
     );
 

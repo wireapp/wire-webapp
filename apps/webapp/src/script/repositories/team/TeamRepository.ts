@@ -50,7 +50,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {Environment} from 'Util/environment';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {loadDataUrl} from 'Util/util';
@@ -235,7 +235,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   };
 
   private showReloadAppModal = () => {
-    const replaceLinkMls = replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE, '', 'learn-more-mls');
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
@@ -244,7 +243,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
           text: this.translate('mlsWasEnabledReload'),
         },
         text: {
-          htmlMessage: this.translate('mlsWasEnabledDescription', undefined, replaceLinkMls),
           translatedMessage: {
             compatibilityReplacements: [],
             components: [

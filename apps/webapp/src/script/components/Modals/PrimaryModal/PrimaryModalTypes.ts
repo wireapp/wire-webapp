@@ -42,7 +42,6 @@ export interface ButtonAction {
 }
 
 export interface Text {
-  htmlMessage?: string;
   input?: string;
   message?: React.ReactNode;
   option?: string;
@@ -107,8 +106,6 @@ export interface ModalContent {
   currentType: string | PrimaryModalType;
   inputPlaceholder: string;
   message: React.ReactNode;
-  /** @deprecated please use `message` instead */
-  messageHtml?: string;
   translatedMessage?: PrimaryModalTranslatedMessage;
   modalUie: string;
   onBgClick: () => void;

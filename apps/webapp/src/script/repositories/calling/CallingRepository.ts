@@ -3104,17 +3104,6 @@ export class CallingRepository {
     const modalOptions = {
       text: {
         closeBtnLabel: this.translate('modalNoCameraCloseBtn'),
-        htmlMessage: this.translate(
-          'modalNoCameraMessage',
-          {brandName: Config.getConfig().BRAND_NAME},
-          {
-            '/faqLink': '</a>',
-            br: '<br>',
-            faqLink: `<a href="${
-              Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-            }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
-          },
-        ),
         translatedMessage: {
           compatibilityReplacements: [],
           components: [

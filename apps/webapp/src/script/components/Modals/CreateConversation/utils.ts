@@ -34,7 +34,6 @@ export type NonFederatingParticipantsModalCopy = {
   readonly editParticipantsButtonText: string;
   readonly leaveButtonText: string;
   readonly titleText: string;
-  readonly getMessageHtml: (backendString: string, replaceBackends: Record<string, string>) => string;
   readonly getTranslatedMessage: (backendString: string) => PrimaryModalTranslatedMessage;
 };
 
@@ -155,9 +154,6 @@ export const getNonFederatingParticipantsModalCopy = (translate: Translate): Non
     editParticipantsButtonText: translate('groupCreationPreferencesNonFederatingEditList'),
     leaveButtonText: translate('groupCreationPreferencesNonFederatingLeave'),
     titleText: translate('groupCreationPreferencesNonFederatingHeadline'),
-    getMessageHtml: (backendString: string, replaceBackends: Record<string, string>) => {
-      return translate('groupCreationPreferencesNonFederatingMessage', {backends: backendString}, replaceBackends);
-    },
     getTranslatedMessage: (backendString: string): PrimaryModalTranslatedMessage => {
       return {
         compatibilityReplacements: [],
