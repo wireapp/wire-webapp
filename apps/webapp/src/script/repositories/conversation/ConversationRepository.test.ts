@@ -91,8 +91,7 @@ import {
   generateConversation as _generateConversation,
   generateAPIConversation,
 } from 'test/helper/ConversationGenerator';
-import {createDeleteEvent} from 'test/helper/EventGenerator';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {createDeleteEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {escapeRegex} from 'Util/sanitizationUtil';
@@ -954,7 +953,7 @@ describe('ConversationRepository', () => {
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
 
-    it('replaces proteus 1:1 with mls 1:1', async () => {
+    it('replaces proteus 1:1 with mls 1:1 and preserves unread messages', async () => {
       const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const userRepository = requireValueForTest(testFactory.user_repository);
 
@@ -988,6 +987,25 @@ describe('ConversationRepository', () => {
         mls1to1ConversationResponse,
         proteus1to1ConversationResponse,
       ]);
+
+      const lastReadTimestamp = 1_700_000_000_000;
+      proteus1to1Conversation.last_read_timestamp(lastReadTimestamp);
+      proteus1to1Conversation.last_event_timestamp(lastReadTimestamp + 1000);
+      const storedMessages = await Promise.all(
+        [lastReadTimestamp, lastReadTimestamp + 1000].map(timestamp =>
+          conversationRepository['eventService'].saveEvent(
+            createMessageAddEvent({
+              text: 'Message before migration',
+              overrides: {
+                conversation: proteus1to1Conversation.id,
+                qualified_conversation: proteus1to1Conversation.qualifiedId,
+                from: otherUser.id,
+                time: new Date(timestamp).toISOString(),
+              },
+            }),
+          ),
+        ),
+      );
 
       const connection = new ConnectionEntity();
       connection.conversationId = mls1to1Conversation.qualifiedId;
@@ -1045,6 +1063,8 @@ describe('ConversationRepository', () => {
       //Local properties were migrated from proteus to mls conversation
       expect(conversationEntity?.serialize().archived_state).toEqual(proteus1to1Conversation.archivedState());
       expect(conversationEntity?.serialize().muted_state).toEqual(proteus1to1Conversation.mutedState());
+      expect(conversationEntity?.last_read_timestamp()).toBe(lastReadTimestamp);
+      expect(conversationEntity?.unreadState().allMessages.map(message => message.id)).toEqual([storedMessages[1].id]);
 
       //proteus conversation was deleted from the local store
       expect(conversationRepository['conversationService'].deleteConversationFromDb).toHaveBeenCalledWith(
