@@ -28,7 +28,6 @@ jest.mock('@tanstack/react-virtual', () => ({
 
 import {createRef} from 'react';
 
-import userEvent from '@testing-library/user-event';
 import {act, fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -92,6 +91,7 @@ describe('ConversationsList', () => {
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={conversations}
+        conversationFocusCandidates={conversations}
         conversationsFilter={searchFilter}
         listViewModel={listViewModel}
         connectRequests={connectRequests}
@@ -153,50 +153,6 @@ describe('ConversationsList', () => {
     expect(container.querySelectorAll('[data-uie-name="go-open-conversation"]')).toHaveLength(0);
   });
 
-  it('focuses the first filtered conversation when tabbing from the search input', async () => {
-    const firstConversation = create1to1Conversation('Alice');
-    const filteredConversation = create1to1Conversation('Bob');
-    const searchInputRef = createRef<HTMLInputElement>();
-
-    const {container} = render(
-      <>
-        <input ref={searchInputRef} aria-label="Search conversations" />
-        <ConversationsList
-          conversationLabelRepository={conversationLabelRepository}
-          conversations={[filteredConversation]}
-          conversationsFilter="Bob"
-          listViewModel={listViewModel}
-          connectRequests={connectRequests}
-          conversationState={conversationState}
-          callState={callState}
-          currentFocus={filteredConversation.id}
-          currentFolder={currentFolder}
-          resetConversationFocus={resetConversationFocus}
-          handleArrowKeyDown={handleArrowKeyDown}
-          clearSearchFilter={clearSearchFilter}
-          groupParticipantsConversations={[firstConversation]}
-          isGroupParticipantsVisible={true}
-          isEmpty={false}
-        />
-      </>,
-      {wrapper: rootProviderWrapper},
-    );
-
-    const firstResult = container.querySelector('[data-uie-name="go-open-conversation"]');
-    expect(firstResult).toHaveAttribute('tabindex', '0');
-
-    const user = userEvent.setup();
-    searchInputRef.current?.focus();
-    await user.tab();
-
-    expect(firstResult).toHaveFocus();
-
-    const results = container.querySelectorAll('[data-uie-name="go-open-conversation"]');
-    expect(results).toHaveLength(2);
-    fireEvent.keyDown(results[1], {key: 'ArrowUp'});
-    expect(handleArrowKeyDown).toHaveBeenCalledWith(firstConversation.id);
-  });
-
   it('clears pending focus when the filtered conversation disappears', () => {
     const conversation = create1to1Conversation('Alice');
     const focusConversationRef = createRef<(conversationId: string) => boolean>();
@@ -204,6 +160,7 @@ describe('ConversationsList', () => {
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={[conversation]}
+        conversationFocusCandidates={[conversation]}
         conversationsFilter="Alice"
         listViewModel={listViewModel}
         connectRequests={connectRequests}
@@ -238,6 +195,7 @@ describe('ConversationsList', () => {
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={[create1to1Conversation('Bob')]}
+        conversationFocusCandidates={[]}
         conversationsFilter="Bob"
         listViewModel={listViewModel}
         connectRequests={connectRequests}
@@ -266,6 +224,7 @@ describe('ConversationsList', () => {
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={[conversation]}
+        conversationFocusCandidates={[conversation]}
         conversationsFilter="Alice"
         listViewModel={listViewModel}
         connectRequests={connectRequests}
@@ -310,6 +269,7 @@ describe('ConversationsList', () => {
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={[create1to1Conversation('Bob')]}
+        conversationFocusCandidates={[]}
         conversationsFilter="Bob"
         listViewModel={listViewModel}
         connectRequests={connectRequests}
@@ -342,6 +302,7 @@ describe('ConversationsList', () => {
         <ConversationsList
           conversationLabelRepository={conversationLabelRepository}
           conversations={[conversation]}
+          conversationFocusCandidates={[conversation]}
           conversationsFilter="Alice"
           listViewModel={listViewModel}
           connectRequests={connectRequests}
@@ -368,6 +329,7 @@ describe('ConversationsList', () => {
         <ConversationsList
           conversationLabelRepository={conversationLabelRepository}
           conversations={[updatedConversation]}
+          conversationFocusCandidates={[updatedConversation]}
           conversationsFilter="Bob"
           listViewModel={listViewModel}
           connectRequests={connectRequests}
@@ -396,6 +358,7 @@ describe('ConversationsList', () => {
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={[conversationNameResult]}
+        conversationFocusCandidates={[conversationNameResult, participantNameResult]}
         conversationsFilter="a"
         listViewModel={listViewModel}
         connectRequests={connectRequests}

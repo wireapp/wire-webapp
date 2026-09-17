@@ -566,6 +566,7 @@ export const Conversations = ({
             handleArrowKeyDown={handleKeyDown}
             conversationState={conversationState}
             conversations={currentTabConversations}
+            conversationFocusCandidates={conversationsForFocus}
             resetConversationFocus={resetConversationFocus}
             clearSearchFilter={clearConversationFilter}
             isEmpty={hasEmptyConversationsList}

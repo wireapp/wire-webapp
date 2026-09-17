@@ -160,6 +160,141 @@ describe('Conversations', () => {
     navigate.mockRestore();
   });
 
+  it('keeps search focus when the query changes to another value with the same result', async () => {
+    const conversationState = new ConversationState();
+    const conversation = create1to1Conversation('Alice');
+    conversationState.conversations([conversation]);
+    const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
+    window.HTMLElement.prototype.scrollTo = jest.fn();
+    const {container, getByRole} = render(
+      withTheme(
+        <Conversations
+          {...defaultParams}
+          callState={callState}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+      ),
+    );
+    const user = userEvent.setup();
+    const searchInput = getByRole('textbox');
+    await user.type(searchInput, 'Alice');
+
+    const result = await waitFor(() => {
+      const result = container.querySelector<HTMLElement>(
+        `[data-uie-uid="${conversation.id}"] [data-uie-name="go-open-conversation"]`,
+      );
+      expect(result).toBeInTheDocument();
+      return result;
+    });
+
+    await user.tab();
+    expect(result).toHaveFocus();
+    await user.tab({shift: true});
+    expect(searchInput).toHaveFocus();
+
+    await user.clear(searchInput);
+    await user.type(searchInput, 'Alic');
+    expect(searchInput).toHaveFocus();
+  });
+
+  it('cancels delayed focus when the conversation list unmounts', async () => {
+    const conversationState = new ConversationState();
+    const firstConversation = create1to1Conversation('Alice');
+    const secondConversation = create1to1Conversation('Alina');
+    conversationState.conversations([firstConversation, secondConversation]);
+    const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
+    window.HTMLElement.prototype.scrollTo = jest.fn();
+    const {container, getByRole, unmount} = render(
+      withTheme(
+        <Conversations
+          {...defaultParams}
+          callState={callState}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+      ),
+    );
+    const user = userEvent.setup();
+    const searchInput = getByRole('textbox');
+    await user.type(searchInput, 'Ali');
+
+    const firstResult = await waitFor(() => {
+      const result = container.querySelector<HTMLElement>(
+        `[data-uie-uid="${firstConversation.id}"] [data-uie-name="go-open-conversation"]`,
+      );
+      expect(result).toBeInTheDocument();
+      return result;
+    });
+    const secondResult = container.querySelector<HTMLElement>(
+      `[data-uie-uid="${secondConversation.id}"] [data-uie-name="go-open-conversation"]`,
+    );
+    expect(secondResult).toBeInTheDocument();
+
+    await user.tab();
+    expect(firstResult).toHaveFocus();
+    secondResult?.remove();
+    await user.keyboard('{ArrowDown}');
+
+    const outsideTarget = document.createElement('button');
+    document.body.append(outsideTarget);
+    act(() => outsideTarget.focus());
+    unmount();
+
+    const replacementTarget = document.createElement('button');
+    document.body.append(replacementTarget);
+    expect(outsideTarget).toHaveFocus();
+    expect(replacementTarget).not.toHaveFocus();
+    replacementTarget.remove();
+    outsideTarget.remove();
+  });
+
+  it('cancels delayed focus when switching conversation tabs', async () => {
+    const conversationState = new ConversationState();
+    const firstConversation = create1to1Conversation('Alice');
+    const secondConversation = create1to1Conversation('Alina');
+    conversationState.conversations([firstConversation, secondConversation]);
+    const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
+    window.HTMLElement.prototype.scrollTo = jest.fn();
+    const {container, getByRole, getByTitle} = render(
+      withTheme(
+        <Conversations
+          {...defaultParams}
+          callState={callState}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+      ),
+    );
+    const user = userEvent.setup();
+    const searchInput = getByRole('textbox');
+    await user.type(searchInput, 'Ali');
+
+    const firstResult = await waitFor(() => {
+      const result = container.querySelector<HTMLElement>(
+        `[data-uie-uid="${firstConversation.id}"] [data-uie-name="go-open-conversation"]`,
+      );
+      expect(result).toBeInTheDocument();
+      return result;
+    });
+    const secondResult = container.querySelector<HTMLElement>(
+      `[data-uie-uid="${secondConversation.id}"] [data-uie-name="go-open-conversation"]`,
+    );
+    expect(secondResult).toBeInTheDocument();
+
+    await user.tab();
+    expect(firstResult).toHaveFocus();
+    secondResult?.remove();
+    await user.keyboard('{ArrowDown}');
+
+    act(() => getByTitle('conversationLabelFavorites').click());
+
+    expect(searchInput).not.toHaveFocus();
+  });
+
   it('preserves native search Tab when no result is mounted', async () => {
     const conversationState = new ConversationState();
     conversationState.conversations([create1to1Conversation('Alice')]);

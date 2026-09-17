@@ -21,6 +21,7 @@ import React, {
   MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyBoardEvent,
   useEffect,
+  useLayoutEffect,
   useState,
   useCallback,
   useRef,
@@ -56,7 +57,7 @@ import {
   virtualizationSpacerStyles,
   virtualizationStyles,
 } from './conversationsList.styles';
-import {getConversationFocusCandidates, getConversationsToDisplay} from './helpers';
+import {getConversationsToDisplay} from './helpers';
 
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
@@ -77,6 +78,7 @@ interface ConversationsListProps {
   conversationLabelRepository: ConversationLabelRepository;
   currentFocus: string;
   conversationsFilter: string;
+  conversationFocusCandidates: Conversation[];
   currentFolder?: ConversationLabel;
   resetConversationFocus: () => void;
   handleArrowKeyDown: (conversationId: string) => (e: React.KeyboardEvent) => void;
@@ -93,6 +95,7 @@ interface ConversationsListProps {
 export const ConversationsList = ({
   conversations,
   conversationsFilter,
+  conversationFocusCandidates,
   listViewModel,
   connectRequests,
   conversationState,
@@ -155,14 +158,6 @@ export const ConversationsList = ({
     conversationsFilter,
     currentFolder,
     currentTab,
-  });
-  const conversationFocusCandidates = getConversationFocusCandidates({
-    conversations,
-    conversationsFilter,
-    currentFolder,
-    currentTab,
-    groupParticipantsConversations,
-    isGroupParticipantsVisible,
   });
   const focusContextKey = `${currentTab}\u0000${conversationsFilter}\u0000${conversationFocusCandidates
     .map(conversation => conversation.id)
@@ -264,7 +259,7 @@ export const ConversationsList = ({
     };
   }, [focusConversation, focusConversationRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!pendingFocusRequest) {
       return;
     }
