@@ -70,6 +70,7 @@ const createController = (state: UploadState | null = null) => {
       return jest.fn();
     }),
     upload: jest.fn(),
+    updateRefresh: jest.fn(),
     cancel: jest.fn(),
     retryUpload: jest.fn(),
     retryPublish: jest.fn(),

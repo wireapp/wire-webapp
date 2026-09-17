@@ -30,6 +30,7 @@ export type SharedDriveUploadController = {
     onRefresh: () => void,
     conversationQualifiedId: string,
   ) => Promise<void>;
+  readonly updateRefresh: (conversationQualifiedId: string, onRefresh: () => void) => void;
   readonly snapshots: (conversationQualifiedId: string) => readonly UploadState[];
   readonly subscribe: (listener: () => void) => () => void;
   readonly cancel: (uploadId: string) => Promise<void>;
@@ -238,7 +239,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const ids: string[] = [];
   const conversationByUploadId = new Map<string, string>();
   const requestsByUploadId = new Map<string, SharedDriveUploadRequest>();
-  const refreshByUploadId = new Map<string, () => void>();
+  const refreshByConversationId = new Map<string, () => void>();
   const listeners = new Set<() => void>();
   const workByUploadId = new Map<string, UploadWork>();
   const queuedWork: UploadWork[] = [];
@@ -318,9 +319,15 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     ids.push(uploadId);
     conversationByUploadId.set(uploadId, conversationQualifiedId);
     requestsByUploadId.set(uploadId, request);
-    refreshByUploadId.set(uploadId, onRefresh);
+    if (!refreshByConversationId.has(conversationQualifiedId)) {
+      refreshByConversationId.set(conversationQualifiedId, onRefresh);
+    }
     uploadStrategy.attach(uploadId, notify);
     return Result.ok(uploadId);
+  };
+
+  const updateRefresh = (conversationQualifiedId: string, onRefresh: () => void): void => {
+    refreshByConversationId.set(conversationQualifiedId, onRefresh);
   };
 
   const enqueueWork = (work: UploadWork): void => {
@@ -359,7 +366,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
 
     const results = await Promise.all(works.map(work => work.promise));
     if (results.some(Boolean)) {
-      onRefresh();
+      refreshByConversationId.get(conversationQualifiedId)?.();
     }
     notify();
   };
@@ -389,7 +396,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     if (!requestsByUploadId.has(id)) {
       const succeeded = await uploadStrategy.retryUpload(id);
       if (succeeded) {
-        refreshByUploadId.get(id)?.();
+        refreshByConversationId.get(conversationByUploadId.get(id) ?? '')?.();
       }
       notify();
       return;
@@ -401,7 +408,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     pumpQueue();
     const succeeded = await work.promise;
     if (succeeded) {
-      refreshByUploadId.get(id)?.();
+      refreshByConversationId.get(conversationByUploadId.get(id) ?? '')?.();
     }
     notify();
   };
@@ -418,6 +425,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
 
   return {
     upload,
+    updateRefresh,
     snapshots,
     subscribe: (listener: () => void) => {
       listeners.add(listener);

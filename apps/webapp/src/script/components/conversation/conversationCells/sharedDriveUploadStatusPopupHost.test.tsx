@@ -69,6 +69,7 @@ const createController = (state: UploadState | readonly UploadState[] = uploadSt
   snapshots: jest.fn(scope => (scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [])),
   subscribe: jest.fn((_listener: () => void) => jest.fn()),
   upload: jest.fn(),
+  updateRefresh: jest.fn(),
   cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
   retryUpload: jest.fn(),
   retryPublish: jest.fn(),
