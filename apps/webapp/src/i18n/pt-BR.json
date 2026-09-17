@@ -80,7 +80,7 @@
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Você foi desconectado pois sua conta foi excluída.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Você foi desconectado pois seu dispositivo foi excluído.",
   "LOGOUT_REASON.NO_APP_CONFIG": "Você foi desconectado porque a configuração inicial não pôde ser carregada.",
-  "LOGOUT_REASON.SESSION_EXPIRED": "Você foi desconectado porque sua sessão expirou. {newline}Por favor, inicie sessão novamente.",
+  "LOGOUT_REASON.SESSION_EXPIRED": "Você foi desconectado porque sua sessão expirou. {Newline}Por favor, inicie sessão novamente.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Espaço em disco insuficiente",
   "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire can’t access your system's safe storage. {supportKeychainLink}",
   "LabeledError.howToLogIn": "Find out how to log in",
