@@ -178,7 +178,7 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
   };
 
   return (
-    <div ref={wrapper}>
+    <div ref={wrapper} tabIndex={-1}>
       <ConversationProtocolDetails
         protocol={current.protocol}
         cipherSuite={current.cipherSuite}
