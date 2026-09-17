@@ -38,6 +38,7 @@ export enum SystemMessageType {
   MEMBER_LEAVE = 'leave',
   MEMBER_ROLE_UPDATE = 'member-role-update',
   NORMAL = 'normal',
+  MLS_RESET = 'mls-reset',
   MLS_CONVERSATION_RECOVERED = 'mls-conversation-recovered',
   ONE2ONE_MIGRATED_TO_MLS = 'one2one-migrated-to-mls',
   E2EI_VERIFIED = 'e2ei-verified',

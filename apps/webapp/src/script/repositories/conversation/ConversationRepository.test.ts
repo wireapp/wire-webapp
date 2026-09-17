@@ -17,6 +17,7 @@
  *
  */
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {faker} from '@faker-js/faker';
 import {waitFor} from '@testing-library/react';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
@@ -4205,9 +4206,10 @@ describe('onMLSResetMessage', () => {
 
     conversationState.conversations([conversation]);
 
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
     const mlsResetEvent: ConversationMLSResetEvent = {
       type: CONVERSATION_EVENT.MLS_RESET,
-      time: new Date().toISOString(),
+      time: wallClock.currentDate.toISOString(),
       from: 'user-id',
       conversation: conversation.id,
       qualified_conversation: conversation.qualifiedId,
@@ -4220,6 +4222,7 @@ describe('onMLSResetMessage', () => {
     const coreConversationService = getConversationServiceFromCoreForTest(core);
     spyOn(coreConversationService, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
     spyOn(coreConversationService, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(false));
+    const addEventSpy = jest.spyOn(conversationRepository as any, 'addEventToConversation').mockResolvedValue({});
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
     const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
 
@@ -4230,6 +4233,7 @@ describe('onMLSResetMessage', () => {
       epoch: 0,
     });
     expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
+    expect(addEventSpy).toHaveBeenCalledWith(conversation, mlsResetEvent);
   });
 
   it('Should get epoch from core crypto if new groupId already exists locally', async () => {
@@ -4241,9 +4245,10 @@ describe('onMLSResetMessage', () => {
 
     conversationState.conversations([conversation]);
 
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
     const mlsResetEvent: ConversationMLSResetEvent = {
       type: CONVERSATION_EVENT.MLS_RESET,
-      time: new Date().toISOString(),
+      time: wallClock.currentDate.toISOString(),
       from: 'user-id',
       conversation: conversation.id,
       qualified_conversation: conversation.qualifiedId,
@@ -4258,6 +4263,7 @@ describe('onMLSResetMessage', () => {
     spyOn(coreConversationService, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
     spyOn(getMlsServiceForTest(core), 'getEpoch').and.returnValue(Promise.resolve(5));
 
+    const addEventSpy = jest.spyOn(conversationRepository as any, 'addEventToConversation').mockResolvedValue({});
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
     const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
 
@@ -4268,6 +4274,7 @@ describe('onMLSResetMessage', () => {
       epoch: 5,
     });
     expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
+    expect(addEventSpy).toHaveBeenCalledWith(conversation, mlsResetEvent);
     expect(conversation.epoch).toBe(5);
   });
 });

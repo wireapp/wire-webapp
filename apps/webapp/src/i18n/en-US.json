@@ -1429,6 +1429,8 @@
   "messageFailedToSendWillNotReceiveSingular": "won't get your message.",
   "messageFailedToSendWillReceivePlural": "will get your message later.",
   "messageFailedToSendWillReceiveSingular": "will get your message later.",
+  "mlsResetSelf": "Session successfully reset",
+  "mlsReset": " was unable to decrypt some of your messages but has solved the issue. This affected all conversations you share together.",
   "mlsConversationRecovered": "You haven't used this device for a while, or an issue has occurred. Some older messages may not appear here.",
   "mlsSignature": "MLS with {signature} Signature",
   "mlsThumbprint": "MLS Thumbprint",
