@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {render, screen} from '@testing-library/react';
+import {act, render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
@@ -156,12 +156,13 @@ describe('CellsFilePreviewModal', () => {
   });
 
   it('keeps fullscreen modification actions available for editors', async () => {
-    renderModal({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR});
+    const {fireAndForgetInvoker} = renderModal({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR});
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Editing'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'More options'})).toBeInTheDocument();
-    expect(await screen.findByTitle('Collabora editor')).toBeInTheDocument();
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    expect(screen.getByTitle('Collabora editor')).toBeInTheDocument();
   });
 });

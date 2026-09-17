@@ -34,6 +34,7 @@ import {useDebouncedCallback} from 'use-debounce';
 import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {ConversationListCell} from 'Components/conversationListCell';
+import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
 import {Call} from 'Repositories/calling/Call';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
@@ -78,12 +79,15 @@ interface ConversationsListProps {
   conversationsFilter: string;
   currentFolder?: ConversationLabel;
   resetConversationFocus: () => void;
-  handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
+  handleArrowKeyDown: (conversationId: string) => (e: React.KeyboardEvent) => void;
+  registerConversationElement?: RegisterConversationElement;
+  focusMountedConversation?: FocusConversation;
   clearSearchFilter: () => void;
   groupParticipantsConversations: Conversation[];
   isGroupParticipantsVisible: boolean;
   isEmpty: boolean;
   focusConversationRef?: RefObject<FocusConversation | null>;
+  cancelPendingFocusRef?: RefObject<(() => void) | null>;
 }
 
 export const ConversationsList = ({
@@ -102,6 +106,9 @@ export const ConversationsList = ({
   isGroupParticipantsVisible,
   isEmpty,
   focusConversationRef,
+  cancelPendingFocusRef,
+  registerConversationElement,
+  focusMountedConversation,
 }: ConversationsListProps) => {
   const {translate} = useApplicationContext();
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -157,6 +164,9 @@ export const ConversationsList = ({
     groupParticipantsConversations,
     isGroupParticipantsVisible,
   });
+  const focusContextKey = `${currentTab}\u0000${conversationsFilter}\u0000${conversationFocusCandidates
+    .map(conversation => conversation.id)
+    .join('\u0000')}`;
 
   const parentRef = useRef(null);
 
@@ -185,44 +195,59 @@ export const ConversationsList = ({
   });
   const virtualItems = rowVirtualizer.getVirtualItems();
 
-  const [pendingFocusConversationId, setPendingFocusConversationId] = useState<string | null>(null);
+  const [pendingFocusRequest, setPendingFocusRequest] = useState<{
+    conversationId: string;
+    contextKey: string;
+  } | null>(null);
   const cancelPendingFocus = useCallback(() => {
-    setPendingFocusConversationId(null);
+    setPendingFocusRequest(null);
   }, []);
+
+  useEffect(() => {
+    if (!cancelPendingFocusRef) {
+      return;
+    }
+
+    cancelPendingFocusRef.current = cancelPendingFocus;
+    return () => {
+      if (cancelPendingFocusRef.current === cancelPendingFocus) {
+        cancelPendingFocusRef.current = null;
+      }
+    };
+  }, [cancelPendingFocus, cancelPendingFocusRef]);
   const handleConversationListFocusOut = useCallback(
     (event: React.FocusEvent<HTMLUListElement>) => {
       const relatedTarget = event.relatedTarget;
 
-      if (relatedTarget instanceof Node && !event.currentTarget.contains(relatedTarget)) {
+      if (!(relatedTarget instanceof Node) || !event.currentTarget.contains(relatedTarget)) {
         cancelPendingFocus();
+        resetConversationFocus();
       }
     },
-    [cancelPendingFocus],
+    [cancelPendingFocus, resetConversationFocus],
   );
   const focusConversation = useCallback(
     (conversationId: string) => {
-      const conversationElement = document.querySelector<HTMLElement>(
-        `[data-uie-uid="${conversationId}"] [data-uie-name="go-open-conversation"]`,
-      );
-
-      if (conversationElement) {
-        conversationElement.focus();
-        return document.activeElement === conversationElement;
+      if (focusMountedConversation?.(conversationId)) {
+        return true;
       }
 
       const conversationIndex = conversationsToDisplay.findIndex(
         item => isConversationEntity(item) && item.id === conversationId,
       );
 
-      if (conversationIndex === -1) {
+      if (
+        conversationIndex === -1 ||
+        !conversationFocusCandidates.some(conversation => conversation.id === conversationId)
+      ) {
         return false;
       }
 
       rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
-      setPendingFocusConversationId(conversationId);
+      setPendingFocusRequest({conversationId, contextKey: focusContextKey});
       return true;
     },
-    [conversationsToDisplay, rowVirtualizer],
+    [conversationFocusCandidates, conversationsToDisplay, focusContextKey, focusMountedConversation, rowVirtualizer],
   );
 
   useEffect(() => {
@@ -240,32 +265,40 @@ export const ConversationsList = ({
   }, [focusConversation, focusConversationRef]);
 
   useEffect(() => {
-    if (!pendingFocusConversationId) {
+    if (!pendingFocusRequest) {
+      return;
+    }
+
+    if (pendingFocusRequest.contextKey !== focusContextKey) {
+      setPendingFocusRequest(null);
       return;
     }
 
     const isPendingConversationAvailable =
-      conversationsToDisplay.some(item => isConversationEntity(item) && item.id === pendingFocusConversationId) &&
-      conversationFocusCandidates.some(conversation => conversation.id === pendingFocusConversationId);
+      conversationsToDisplay.some(
+        item => isConversationEntity(item) && item.id === pendingFocusRequest.conversationId,
+      ) && conversationFocusCandidates.some(conversation => conversation.id === pendingFocusRequest.conversationId);
 
     if (!isPendingConversationAvailable) {
-      setPendingFocusConversationId(null);
+      setPendingFocusRequest(null);
       return;
     }
 
-    const conversationElement = document.querySelector<HTMLElement>(
-      `[data-uie-uid="${pendingFocusConversationId}"] [data-uie-name="go-open-conversation"]`,
-    );
-
-    if (!conversationElement) {
-      return;
+    if (focusMountedConversation?.(pendingFocusRequest.conversationId)) {
+      setPendingFocusRequest(null);
     }
+  }, [
+    conversationFocusCandidates,
+    conversationsToDisplay,
+    focusContextKey,
+    focusMountedConversation,
+    pendingFocusRequest,
+    virtualItems,
+  ]);
 
-    conversationElement.focus();
-    if (document.activeElement === conversationElement) {
-      setPendingFocusConversationId(null);
-    }
-  }, [conversationFocusCandidates, conversationsToDisplay, pendingFocusConversationId, virtualItems]);
+  useEffect(() => cancelPendingFocus, [cancelPendingFocus, focusContextKey]);
+
+  useEffect(() => () => cancelPendingFocus(), [cancelPendingFocus]);
 
   const debouncedOnConversationClick = useDebouncedCallback(
     (
@@ -302,11 +335,10 @@ export const ConversationsList = ({
   );
 
   const getCommonConversationCellProps = (conversation: Conversation) => {
-    const focusIndex = conversationFocusCandidates.findIndex(candidate => candidate.id === conversation.id);
-
     return {
       isFocused: currentFocus === conversation.id,
-      handleArrowKeyDown: handleArrowKeyDown(focusIndex),
+      handleArrowKeyDown: handleArrowKeyDown(conversation.id),
+      registerConversationElement,
       resetConversationFocus,
       dataUieName: 'item-conversation',
       conversation,

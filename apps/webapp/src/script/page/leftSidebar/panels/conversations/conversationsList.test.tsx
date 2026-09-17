@@ -194,7 +194,7 @@ describe('ConversationsList', () => {
     const results = container.querySelectorAll('[data-uie-name="go-open-conversation"]');
     expect(results).toHaveLength(2);
     fireEvent.keyDown(results[1], {key: 'ArrowUp'});
-    expect(handleArrowKeyDown).toHaveBeenCalledWith(1);
+    expect(handleArrowKeyDown).toHaveBeenCalledWith(firstConversation.id);
   });
 
   it('clears pending focus when the filtered conversation disappears', () => {
@@ -304,6 +304,7 @@ describe('ConversationsList', () => {
     const outsideFocusTarget = document.createElement('button');
     document.body.append(outsideFocusTarget);
     fireEvent.blur(focusOrigin, {relatedTarget: outsideFocusTarget});
+    expect(resetConversationFocus).toHaveBeenCalled();
 
     rerender(
       <ConversationsList

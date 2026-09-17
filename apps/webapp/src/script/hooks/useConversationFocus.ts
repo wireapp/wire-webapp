@@ -24,46 +24,85 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
 
 type FocusConversation = (conversationId: string) => boolean;
+type RegisterConversationElement = (conversationId: string, element: HTMLElement) => () => void;
 
-function useConversationFocus(conversations: Conversation[], focusKey = '', focusConversation?: FocusConversation) {
+function useConversationFocus(
+  conversations: Conversation[],
+  focusKey = '',
+  focusConversation: FocusConversation = () => false,
+) {
   const [currentFocus, setCurrentFocus] = useState(conversations[0]?.id || '');
   const conversationIds = conversations.map(conversation => conversation.id).join('\u0000');
   const focusStateKey = `${focusKey}\u0000${conversationIds}`;
   const previousFocusStateKey = useRef(focusStateKey);
+  const registeredElements = useRef(new Map<string, Set<HTMLElement>>());
+
+  const registerConversationElement: RegisterConversationElement = useCallback((conversationId, element) => {
+    const elements = registeredElements.current.get(conversationId) ?? new Set<HTMLElement>();
+    elements.add(element);
+    registeredElements.current.set(conversationId, elements);
+
+    return () => {
+      elements.delete(element);
+      if (elements.size === 0) {
+        registeredElements.current.delete(conversationId);
+      }
+    };
+  }, []);
+
+  const focusMountedConversation = useCallback((conversationId: string) => {
+    const elements = registeredElements.current.get(conversationId);
+    const element = elements && [...elements].find(candidate => candidate.isConnected);
+
+    if (!element) {
+      if (elements) {
+        elements.clear();
+        registeredElements.current.delete(conversationId);
+      }
+      return false;
+    }
+
+    element.focus();
+    return document.activeElement === element;
+  }, []);
+
+  const focusConversationById = useCallback(
+    (conversationId: string) => focusMountedConversation(conversationId) || focusConversation(conversationId),
+    [focusConversation, focusMountedConversation],
+  );
 
   const handleKeyDown = useCallback(
-    (index: number) => (event: ReactKeyboardEvent | KeyboardEvent) => {
+    (conversationId: string) => (event: ReactKeyboardEvent | KeyboardEvent) => {
       if (conversations.length === 0) {
         return;
       }
 
+      const currentIndex = conversations.findIndex(conversation => conversation.id === conversationId);
+      const effectiveIndex = currentIndex === -1 ? 0 : currentIndex;
+
       if (isKey(event, KEY.ARROW_DOWN)) {
-        const nextConversation = conversations[index + 1] || conversations[0];
+        const nextConversation = conversations[effectiveIndex + 1] || conversations[0];
 
-        const didFocusConversation = focusConversation?.(nextConversation.id) ?? true;
-
-        if (!didFocusConversation) {
+        if (!focusConversationById(nextConversation.id)) {
           return;
         }
 
         event.preventDefault();
         setCurrentFocus(nextConversation.id);
       } else if (isKey(event, KEY.ARROW_UP)) {
-        const prevConversation = conversations[index - 1] || conversations[conversations.length - 1];
+        const prevConversation = conversations[effectiveIndex - 1] || conversations[conversations.length - 1];
 
-        const didFocusConversation = focusConversation?.(prevConversation.id) ?? true;
-
-        if (!didFocusConversation) {
+        if (!focusConversationById(prevConversation.id)) {
           return;
         }
 
         event.preventDefault();
         setCurrentFocus(prevConversation.id);
-      } else if (isTabKey(event) || (event.shiftKey && isTabKey(event))) {
+      } else if (isTabKey(event)) {
         setCurrentFocus(conversations[0].id);
       }
     },
-    [conversations, focusConversation],
+    [conversations, focusConversationById],
   );
 
   const resetConversationFocus = useCallback(() => setCurrentFocus(conversations[0]?.id || ''), [conversations]);
@@ -92,7 +131,21 @@ function useConversationFocus(conversations: Conversation[], focusKey = '', focu
     };
   }, [currentFocus, resetConversationFocus, conversations]);
 
-  return {currentFocus, handleKeyDown, setCurrentFocus, resetConversationFocus};
+  const focusFirstMountedConversation = useCallback(() => {
+    const firstConversation = conversations[0];
+    return firstConversation ? focusMountedConversation(firstConversation.id) : false;
+  }, [conversations, focusMountedConversation]);
+
+  return {
+    currentFocus,
+    focusFirstMountedConversation,
+    focusMountedConversation,
+    handleKeyDown,
+    registerConversationElement,
+    setCurrentFocus,
+    resetConversationFocus,
+  };
 }
 
+export type {RegisterConversationElement};
 export {useConversationFocus};

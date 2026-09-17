@@ -124,6 +124,7 @@ export const Conversations = ({
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const focusConversationRef = useRef<FocusConversation>(() => false);
+  const cancelPendingFocusRef = useRef<(() => void) | null>(null);
   const focusConversation = useCallback((conversationId: string) => focusConversationRef.current(conversationId), []);
 
   const {
@@ -282,11 +283,15 @@ export const Conversations = ({
       isGroupParticipantsVisible,
     ],
   );
-  const {currentFocus, handleKeyDown, resetConversationFocus, setCurrentFocus} = useConversationFocus(
-    conversationsForFocus,
-    conversationsFilter,
-    focusConversation,
-  );
+  const {
+    currentFocus,
+    focusFirstMountedConversation,
+    focusMountedConversation,
+    handleKeyDown,
+    registerConversationElement,
+    resetConversationFocus,
+    setCurrentFocus,
+  } = useConversationFocus(conversationsForFocus, conversationsFilter, focusConversation);
 
   const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
   const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionRequests;
@@ -489,20 +494,17 @@ export const Conversations = ({
 
   const handleSearchTab = useCallback(
     (event: ReactKeyBoardEvent<HTMLInputElement>) => {
-      const firstResult = conversationsFilter ? conversationsForFocus[0] : undefined;
+      cancelPendingFocusRef.current?.();
+      const firstResult = conversationsForFocus[0];
 
-      if (!firstResult) {
-        return;
-      }
-
-      if (!focusConversation(firstResult.id)) {
+      if (!conversationsFilter || !firstResult || !focusFirstMountedConversation()) {
         return;
       }
 
       event.preventDefault();
       setCurrentFocus(firstResult.id);
     },
-    [conversationsFilter, conversationsForFocus, focusConversation, setCurrentFocus],
+    [conversationsFilter, conversationsForFocus, focusFirstMountedConversation, setCurrentFocus],
   );
 
   const onSearch = useCallback(
@@ -570,6 +572,9 @@ export const Conversations = ({
             groupParticipantsConversations={groupParticipantsConversations}
             isGroupParticipantsVisible={isGroupParticipantsVisible}
             focusConversationRef={focusConversationRef}
+            cancelPendingFocusRef={cancelPendingFocusRef}
+            registerConversationElement={registerConversationElement}
+            focusMountedConversation={focusMountedConversation}
           />
         )}
       </>
