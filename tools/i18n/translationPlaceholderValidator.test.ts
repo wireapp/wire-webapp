@@ -35,6 +35,17 @@ describe('validateTranslationPlaceholders', () => {
     expect(actualMismatches).toStrictEqual([]);
   });
 
+  it('accepts a canonical key that is absent from the translated locale', () => {
+    const actualMismatches = validateTranslationPlaceholders({
+      locale: 'de-DE',
+      filePath: 'apps/webapp/src/i18n/de-DE.json',
+      canonicalTranslations: {message: 'Queued {name}'},
+      translatedTranslations: {},
+    });
+
+    expect(actualMismatches).toStrictEqual([]);
+  });
+
   it('accepts placeholders reordered in translated text', () => {
     const actualMismatches = validateTranslationPlaceholders({
       locale: 'de-DE',

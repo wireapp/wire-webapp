@@ -75,10 +75,12 @@ export function validateTranslationPlaceholders(
   return Object.keys(options.canonicalTranslations)
     .toSorted()
     .flatMap((translationKey): TranslationPlaceholderMismatch[] => {
+      if (!Object.hasOwn(options.translatedTranslations, translationKey)) {
+        return [];
+      }
+
       const canonicalValue = options.canonicalTranslations[translationKey];
-      const translatedValue = Object.hasOwn(options.translatedTranslations, translationKey)
-        ? options.translatedTranslations[translationKey]
-        : '';
+      const translatedValue = options.translatedTranslations[translationKey];
       const canonicalMarkerCounts = countMarkers(extractTranslationMarkers(canonicalValue));
       const translatedMarkerCounts = countMarkers(extractTranslationMarkers(translatedValue));
       const missingMarkers = findMarkerCountDifference({
