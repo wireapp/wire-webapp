@@ -23,7 +23,6 @@ import type {FunctionComponent, ReactNode} from 'react';
 import * as Icon from 'Components/icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
 import {Config} from 'src/script/Config';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -47,7 +46,6 @@ type TranslateDecryptErrorCaptionOptions = {
 
 type RenderDecryptErrorCaptionOptions = {
   readonly isIdentityChanged: boolean;
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translate: Translate;
   readonly userName: string;
 };
@@ -72,38 +70,27 @@ function translateDecryptErrorCaption(options: TranslateDecryptErrorCaptionOptio
 }
 
 function renderDecryptErrorCaption(options: RenderDecryptErrorCaptionOptions): ReactNode {
-  const {isIdentityChanged, isReactTranslationRenderingEnabled, translate, userName} = options;
-
-  if (isReactTranslationRenderingEnabled) {
-    const translatedText = translateDecryptErrorCaption({
-      isIdentityChanged,
-      translate,
-      userSubstitution: decryptErrorUserMarker.substitution,
-    });
-
-    return renderReactTranslation({
-      translatedText,
-      componentReplacements: [
-        {
-          start: '<span class="label-bold-xs">',
-          end: '</span>',
-          render(children) {
-            return <span className="label-bold-xs">{children}</span>;
-          },
-        },
-      ],
-      nodeReplacements: [],
-      valueReplacements: [{marker: decryptErrorUserMarker, runtimeText: userName}],
-    });
-  }
-
-  const legacyCaption = translateDecryptErrorCaption({
+  const {isIdentityChanged, translate, userName} = options;
+  const translatedText = translateDecryptErrorCaption({
     isIdentityChanged,
     translate,
-    userSubstitution: userName,
+    userSubstitution: decryptErrorUserMarker.substitution,
   });
 
-  return <span dangerouslySetInnerHTML={{__html: legacyCaption}} />;
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [
+      {
+        start: '<span class="label-bold-xs">',
+        end: '</span>',
+        render(children) {
+          return <span className="label-bold-xs">{children}</span>;
+        },
+      },
+    ],
+    nodeReplacements: [],
+    valueReplacements: [{marker: decryptErrorUserMarker, runtimeText: userName}],
+  });
 }
 
 const DecryptErrorMessage: FunctionComponent<DecryptErrorMessageProps> = function DecryptErrorMessage({
@@ -111,13 +98,11 @@ const DecryptErrorMessage: FunctionComponent<DecryptErrorMessageProps> = functio
   onClickResetSession,
 }): ReactNode {
   const [isResettingSession, setIsResettingSession] = useState(false);
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
 
   const link = Config.getConfig().URL.SUPPORT.DECRYPT_ERROR;
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
   const decryptErrorCaption = renderDecryptErrorCaption({
     isIdentityChanged: message.isIdentityChanged,
-    isReactTranslationRenderingEnabled,
     translate,
     userName: message.user().name(),
   });

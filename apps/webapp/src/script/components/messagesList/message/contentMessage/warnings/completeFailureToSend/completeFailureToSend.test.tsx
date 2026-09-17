@@ -22,7 +22,6 @@ import {isNull} from '@sindresorhus/is';
 
 import en from 'I18n/en-US.json';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -31,15 +30,7 @@ import {setStrings, translate} from 'Util/localizerUtil';
 
 import {CompleteFailureToSendWarning} from './completeFailureToSend';
 
-const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureToggleName) {
-      return featureToggleName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -71,31 +62,7 @@ function getWarningTextContainer(container: HTMLElement): HTMLElement {
 
 describe('CompleteFailureToSendWarning', () => {
   it(
-    'preserves legacy rendering when React translation rendering is disabled',
-    withTranslationStrings(en, () => {
-      const {container, getByTestId, getByText} = render(
-        withThemeAndRootContext(
-          <CompleteFailureToSendWarning
-            isMessageFocused={false}
-            onRetry={jest.fn()}
-            unreachableDomain="example.test"
-          />,
-          legacyRootProviderWrapper,
-        ),
-      );
-      const warningTextContainer = getWarningTextContainer(container);
-
-      expect(warningTextContainer).toHaveTextContent(
-        'Message could not be sent as the back-end of example.test could not be reached.',
-      );
-      expect(warningTextContainer.querySelectorAll('strong')).toHaveLength(1);
-      expect(getByTestId('go-offline-backend')).not.toBeNull();
-      expect(getByText('Retry')).not.toBeNull();
-    }),
-  );
-
-  it(
-    'renders the translated warning with React formatting when enabled',
+    'renders the translated warning with React formatting',
     withTranslationStrings(en, () => {
       const {container, getByTestId} = render(
         withThemeAndRootContext(
@@ -104,7 +71,7 @@ describe('CompleteFailureToSendWarning', () => {
             onRetry={jest.fn()}
             unreachableDomain="example.test"
           />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const warningTextContainer = getWarningTextContainer(container);
@@ -123,7 +90,7 @@ describe('CompleteFailureToSendWarning', () => {
       const {container} = render(
         withThemeAndRootContext(
           <CompleteFailureToSendWarning isMessageFocused={false} onRetry={jest.fn()} unreachableDomain="R&D <Test>" />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const warningTextContainer = getWarningTextContainer(container);
@@ -146,7 +113,7 @@ describe('CompleteFailureToSendWarning', () => {
             onRetry={jest.fn()}
             unreachableDomain="[bold]example[/bold]"
           />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const warningTextContainer = getWarningTextContainer(container);
@@ -173,7 +140,7 @@ describe('CompleteFailureToSendWarning', () => {
               onRetry={jest.fn()}
               unreachableDomain="example.test"
             />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
         const warningTextContainer = getWarningTextContainer(container);
@@ -200,7 +167,7 @@ describe('CompleteFailureToSendWarning', () => {
               onRetry={jest.fn()}
               unreachableDomain="example.test"
             />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
         const warningTextContainer = getWarningTextContainer(container);
@@ -220,7 +187,7 @@ describe('CompleteFailureToSendWarning', () => {
       const {container, queryByTestId} = render(
         withThemeAndRootContext(
           <CompleteFailureToSendWarning isMessageFocused={false} onRetry={jest.fn()} />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
 

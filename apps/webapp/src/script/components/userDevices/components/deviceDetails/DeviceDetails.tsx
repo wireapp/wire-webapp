@@ -33,7 +33,6 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/e2eIdentity';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -61,17 +60,12 @@ interface DeviceDetailsProps {
 }
 
 type RenderDeviceDetailsHeadlineOptions = {
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translate: Translate;
   readonly userName: string;
 };
 
 const deviceDetailsBoldMarker = createReactTranslationMarker('device-details-bold');
 const deviceDetailsUserMarker = createReactTranslationMarker('device-details-user');
-
-function translateDeviceDetailsHeadline(translate: Translate, userName: string): string {
-  return translate('participantDevicesDetailHeadline', {user: userName});
-}
 
 function translateDeviceDetailsHeadlineWithReactMarkers(translate: Translate): string {
   return translate(
@@ -104,34 +98,29 @@ function normalizeDeviceDetailsHeadlineFormatting(translatedText: string): strin
 }
 
 function renderDeviceDetailsHeadline(options: RenderDeviceDetailsHeadlineOptions): ReactNode {
-  const {isReactTranslationRenderingEnabled, translate, userName} = options;
+  const {translate, userName} = options;
+  const translatedText = normalizeDeviceDetailsHeadlineFormatting(
+    translateDeviceDetailsHeadlineWithReactMarkers(translate),
+  );
 
-  if (isReactTranslationRenderingEnabled) {
-    const translatedText = normalizeDeviceDetailsHeadlineFormatting(
-      translateDeviceDetailsHeadlineWithReactMarkers(translate),
-    );
-
-    return (
-      <span>
-        {renderReactTranslation({
-          translatedText,
-          componentReplacements: [
-            {
-              start: deviceDetailsBoldMarker.start,
-              end: deviceDetailsBoldMarker.end,
-              render(children): ReactNode {
-                return <strong>{children}</strong>;
-              },
+  return (
+    <span>
+      {renderReactTranslation({
+        translatedText,
+        componentReplacements: [
+          {
+            start: deviceDetailsBoldMarker.start,
+            end: deviceDetailsBoldMarker.end,
+            render(children): ReactNode {
+              return <strong>{children}</strong>;
             },
-          ],
-          nodeReplacements: [],
-          valueReplacements: [{marker: deviceDetailsUserMarker, runtimeText: userName}],
-        })}
-      </span>
-    );
-  }
-
-  return <span dangerouslySetInnerHTML={{__html: translateDeviceDetailsHeadline(translate, userName)}} />;
+          },
+        ],
+        nodeReplacements: [],
+        valueReplacements: [{marker: deviceDetailsUserMarker, runtimeText: userName}],
+      })}
+    </span>
+  );
 }
 
 export const DeviceDetails = ({
@@ -146,7 +135,7 @@ export const DeviceDetails = ({
   logger,
   conversationState = container.resolve(ConversationState),
 }: DeviceDetailsProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const [fingerprintRemote, setFingerprintRemote] = useState<string>();
   const [isResettingSession, setIsResettingSession] = useState(false);
 
@@ -154,7 +143,6 @@ export const DeviceDetails = ({
 
   const {isVerified} = useKoSubscribableChildren(clientMeta, ['isVerified']);
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   useEffect(() => {
     setFingerprintRemote(undefined);
@@ -201,7 +189,7 @@ export const DeviceDetails = ({
         </h3>
 
         <p className="panel__info-text">
-          {renderDeviceDetailsHeadline({isReactTranslationRenderingEnabled, translate, userName})}
+          {renderDeviceDetailsHeadline({translate, userName})}
 
           <a
             className="participant-devices__link accent-text"

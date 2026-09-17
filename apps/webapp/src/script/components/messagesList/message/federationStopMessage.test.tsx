@@ -23,7 +23,6 @@ import {isNull} from '@sindresorhus/is';
 import en from 'I18n/en-US.json';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/federationStopMessage';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -32,15 +31,7 @@ import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FederationStopMessage} from './federationStopMessage';
 
-const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureToggleName) {
-      return featureToggleName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -74,12 +65,12 @@ function getTranslationTextContainer(container: HTMLElement): HTMLElement {
 
 describe('FederationStopMessage', () => {
   it(
-    'preserves legacy rendering when React translation rendering is disabled',
+    'renders the one-domain translation with React formatting',
     withTranslationStrings(en, () => {
       const {container} = render(
         withThemeAndRootContext(
           <FederationStopMessage message={createFederationStopMessage(['example.test'])} isMessageFocused={false} />,
-          legacyRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const translationTextContainer = getTranslationTextContainer(container);
@@ -90,23 +81,7 @@ describe('FederationStopMessage', () => {
   );
 
   it(
-    'renders the one-domain translation with React formatting when enabled',
-    withTranslationStrings(en, () => {
-      const {container} = render(
-        withThemeAndRootContext(
-          <FederationStopMessage message={createFederationStopMessage(['example.test'])} isMessageFocused={false} />,
-          reactTranslationRenderingRootProviderWrapper,
-        ),
-      );
-      const translationTextContainer = getTranslationTextContainer(container);
-
-      expect(translationTextContainer).toHaveTextContent('Your backend stopped federating with example.test.');
-      expect(translationTextContainer.querySelectorAll('strong')).toHaveLength(2);
-    }),
-  );
-
-  it(
-    'renders the two-domain translation with React formatting when enabled',
+    'renders the two-domain translation with React formatting',
     withTranslationStrings(en, () => {
       const {container} = render(
         withThemeAndRootContext(
@@ -114,7 +89,7 @@ describe('FederationStopMessage', () => {
             message={createFederationStopMessage(['example-one.test', 'example-two.test'])}
             isMessageFocused={false}
           />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const translationTextContainer = getTranslationTextContainer(container);
@@ -132,7 +107,7 @@ describe('FederationStopMessage', () => {
       const {container} = render(
         withThemeAndRootContext(
           <FederationStopMessage message={createFederationStopMessage(['R&D <Test>'])} isMessageFocused={false} />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const translationTextContainer = getTranslationTextContainer(container);
@@ -152,7 +127,7 @@ describe('FederationStopMessage', () => {
             message={createFederationStopMessage(['[bold]example[/bold]'])}
             isMessageFocused={false}
           />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const translationTextContainer = getTranslationTextContainer(container);
@@ -173,7 +148,7 @@ describe('FederationStopMessage', () => {
         const {container} = render(
           withThemeAndRootContext(
             <FederationStopMessage message={createFederationStopMessage(['example.test'])} isMessageFocused={false} />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
         const translationTextContainer = getTranslationTextContainer(container);
@@ -197,7 +172,7 @@ describe('FederationStopMessage', () => {
         const {container} = render(
           withThemeAndRootContext(
             <FederationStopMessage message={createFederationStopMessage(['example.test'])} isMessageFocused={false} />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
         const translationTextContainer = getTranslationTextContainer(container);

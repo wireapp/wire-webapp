@@ -20,7 +20,6 @@
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 
 import en from 'I18n/en-US.json';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
@@ -36,17 +35,7 @@ import {Warnings} from '.';
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
-const legacyTranslationRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate}),
-);
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -167,25 +156,10 @@ describe('WarningsContainer', () => {
   });
 
   it(
-    'keeps legacy permission request rendering when React translation rendering is disabled',
+    'renders the camera permission request icon',
     withTranslationStrings(en, () => {
       const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
-        wrapper: legacyTranslationRootProviderWrapper,
-      });
-      act(() => {
-        Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);
-      });
-
-      expect(container.querySelector('.warning-bar-message')).toHaveTextContent('Allow access to camera');
-      expect(container.querySelector('.icon-camera')).toBeTruthy();
-    }),
-  );
-
-  it(
-    'renders the camera permission request icon as a React node',
-    withTranslationStrings(en, () => {
-      const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       act(() => {
         Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);
@@ -200,7 +174,7 @@ describe('WarningsContainer', () => {
     'renders exactly one microphone permission request icon as a React node',
     withTranslationStrings(en, () => {
       const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       act(() => {
         Warnings.showWarning(Warnings.TYPE.REQUEST_MICROPHONE);
@@ -215,7 +189,7 @@ describe('WarningsContainer', () => {
     'renders the screen and notification permission request icons as React nodes',
     withTranslationStrings(en, () => {
       const {container: screenContainer} = render(<WarningsContainer onRefresh={jest.fn()} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       act(() => {
         Warnings.showWarning(Warnings.TYPE.REQUEST_SCREEN);
@@ -230,7 +204,7 @@ describe('WarningsContainer', () => {
       });
 
       const {container: notificationContainer} = render(<WarningsContainer onRefresh={jest.fn()} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       act(() => {
         Warnings.showWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
@@ -250,7 +224,7 @@ describe('WarningsContainer', () => {
       },
       () => {
         const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         act(() => {
           Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);
@@ -272,7 +246,7 @@ describe('WarningsContainer', () => {
       },
       () => {
         const {container} = render(<WarningsContainer onRefresh={jest.fn()} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         act(() => {
           Warnings.showWarning(Warnings.TYPE.REQUEST_CAMERA);

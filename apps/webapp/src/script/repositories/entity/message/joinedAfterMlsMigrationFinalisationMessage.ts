@@ -17,9 +17,8 @@
  *
  */
 
-import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './systemMessage';
 
@@ -27,10 +26,6 @@ export class JoinedAfterMLSMigrationFinalisationMessage extends SystemMessage {
   constructor(translate: Translate) {
     super(translate);
     this.system_message_type = SystemMessageType.JOINED_AFTER_MLS_MIGRATION;
-    this.caption = this.translate(
-      'conversationJoinedAfterMLSMigrationFinalisation',
-      undefined,
-      replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
-    );
+    this.caption = this.translate('conversationJoinedAfterMLSMigrationFinalisation');
   }
 }

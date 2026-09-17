@@ -25,22 +25,11 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
 
-const legacyTranslationRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate}),
-);
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -84,7 +73,7 @@ function getFileTypeRestrictedMessageText(container: HTMLElement): HTMLElement {
 
 describe('FileTypeRestrictedMessage', () => {
   it(
-    'preserves incoming legacy rendering and its UIE value',
+    'renders incoming bold formatting and an opaque runtime name',
     withTranslationStrings(en, () => {
       const message = createFileTypeRestrictedMessage({
         isIncoming: true,
@@ -92,46 +81,7 @@ describe('FileTypeRestrictedMessage', () => {
       });
 
       const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-        wrapper: legacyTranslationRootProviderWrapper,
-      });
-      const messageText = getFileTypeRestrictedMessageText(container);
-
-      expect(messageText.getAttribute('data-uie-value')).toEqual('incoming');
-      expect(messageText.textContent).toBe('File from\u00A0Alice\u00A0can’t be opened');
-      expect(messageText.querySelector('strong')).toHaveTextContent('Alice');
-    }),
-  );
-
-  it(
-    'preserves outgoing legacy rendering and its UIE value',
-    withTranslationStrings(en, () => {
-      const message = createFileTypeRestrictedMessage({
-        fileExt: 'txt',
-        isIncoming: false,
-      });
-
-      const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-        wrapper: legacyTranslationRootProviderWrapper,
-      });
-      const messageText = getFileTypeRestrictedMessageText(container);
-
-      expect(messageText.getAttribute('data-uie-value')).toEqual('outgoing');
-      expect(messageText.textContent).toBe(
-        'Sharing files with the txt extension is not permitted by your organization',
-      );
-    }),
-  );
-
-  it(
-    'renders incoming bold formatting and an opaque runtime name when enabled',
-    withTranslationStrings(en, () => {
-      const message = createFileTypeRestrictedMessage({
-        isIncoming: true,
-        name: 'Alice',
-      });
-
-      const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       const messageText = getFileTypeRestrictedMessageText(container);
       const strong = messageText.querySelector('strong');
@@ -156,7 +106,7 @@ describe('FileTypeRestrictedMessage', () => {
         });
 
         const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const messageText = getFileTypeRestrictedMessageText(container);
         const strong = messageText.querySelector('strong');
@@ -182,7 +132,7 @@ describe('FileTypeRestrictedMessage', () => {
         });
 
         const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const messageText = getFileTypeRestrictedMessageText(container);
         const strong = messageText.querySelector('strong');
@@ -202,7 +152,7 @@ describe('FileTypeRestrictedMessage', () => {
       });
 
       const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       const messageText = getFileTypeRestrictedMessageText(container);
 
@@ -220,7 +170,7 @@ describe('FileTypeRestrictedMessage', () => {
       });
 
       const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       const messageText = getFileTypeRestrictedMessageText(container);
 
@@ -245,7 +195,7 @@ describe('FileTypeRestrictedMessage', () => {
         });
 
         const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const messageText = getFileTypeRestrictedMessageText(container);
 
@@ -269,7 +219,7 @@ describe('FileTypeRestrictedMessage', () => {
         });
 
         const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const messageText = getFileTypeRestrictedMessageText(container);
         const strong = messageText.querySelector('strong');
@@ -294,7 +244,7 @@ describe('FileTypeRestrictedMessage', () => {
         });
 
         const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const messageText = getFileTypeRestrictedMessageText(container);
 
@@ -318,7 +268,7 @@ describe('FileTypeRestrictedMessage', () => {
         });
 
         const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const messageText = getFileTypeRestrictedMessageText(container);
 
@@ -342,7 +292,7 @@ describe('FileTypeRestrictedMessage', () => {
         });
 
         const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const messageText = getFileTypeRestrictedMessageText(container);
 
@@ -366,7 +316,7 @@ describe('FileTypeRestrictedMessage', () => {
         });
 
         const {container} = render(<FileTypeRestrictedMessage message={message} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const messageText = getFileTypeRestrictedMessageText(container);
 

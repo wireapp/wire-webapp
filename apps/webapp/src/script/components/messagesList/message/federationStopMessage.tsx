@@ -26,7 +26,6 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/federationStopMessage';
 import {Config} from 'src/script/Config';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -43,7 +42,6 @@ interface FederationStopMessageProps {
 
 type RenderFederationStopMessageOptions = {
   readonly domains: string[];
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translate: Translate;
 };
 
@@ -53,74 +51,55 @@ const backendUrlOneMarker = createReactTranslationMarker('federation-stop-backen
 const backendUrlTwoMarker = createReactTranslationMarker('federation-stop-backend-url-two');
 
 function renderFederationStopMessage(options: RenderFederationStopMessageOptions): ReactNode {
-  const {domains, isReactTranslationRenderingEnabled, translate} = options;
+  const {domains, translate} = options;
 
-  if (isReactTranslationRenderingEnabled) {
-    if (isNonEmptyArray(domains) === false) {
-      return <span />;
-    }
-
-    let translatedText: string;
-    let valueReplacements: ReactTranslationValueReplacement[];
-    if (domains.length === 1) {
-      translatedText = translate('federationDelete', {backendUrl: backendUrlMarker.substitution});
-      valueReplacements = [{marker: backendUrlMarker, runtimeText: domains[0]}];
-    } else {
-      translatedText = translate('federationConnectionRemove', {
-        backendUrlOne: backendUrlOneMarker.substitution,
-        backendUrlTwo: backendUrlTwoMarker.substitution,
-      });
-      valueReplacements = [
-        {marker: backendUrlOneMarker, runtimeText: domains[0]},
-        {marker: backendUrlTwoMarker, runtimeText: domains[1]},
-      ];
-    }
-
-    return (
-      <span>
-        {renderReactTranslation({
-          translatedText,
-          componentReplacements: [
-            {
-              start: '<strong>',
-              end: '</strong>',
-              render(children) {
-                return <strong>{children}</strong>;
-              },
-            },
-          ],
-          nodeReplacements: [],
-          valueReplacements,
-        })}
-      </span>
-    );
+  if (isNonEmptyArray(domains) === false) {
+    return <span />;
   }
 
-  let legacyTranslation: string;
+  let translatedText: string;
+  let valueReplacements: ReactTranslationValueReplacement[];
   if (domains.length === 1) {
-    legacyTranslation = translate('federationDelete', {backendUrl: domains[0]});
+    translatedText = translate('federationDelete', {backendUrl: backendUrlMarker.substitution});
+    valueReplacements = [{marker: backendUrlMarker, runtimeText: domains[0]}];
   } else {
-    legacyTranslation = translate('federationConnectionRemove', {backendUrlOne: domains[0], backendUrlTwo: domains[1]});
+    translatedText = translate('federationConnectionRemove', {
+      backendUrlOne: backendUrlOneMarker.substitution,
+      backendUrlTwo: backendUrlTwoMarker.substitution,
+    });
+    valueReplacements = [
+      {marker: backendUrlOneMarker, runtimeText: domains[0]},
+      {marker: backendUrlTwoMarker, runtimeText: domains[1]},
+    ];
   }
 
   return (
-    <span
-      dangerouslySetInnerHTML={{
-        __html: legacyTranslation,
-      }}
-    />
+    <span>
+      {renderReactTranslation({
+        translatedText,
+        componentReplacements: [
+          {
+            start: '<strong>',
+            end: '</strong>',
+            render(children) {
+              return <strong>{children}</strong>;
+            },
+          },
+        ],
+        nodeReplacements: [],
+        valueReplacements,
+      })}
+    </span>
   );
 }
 
 const FederationStopMessage: FunctionComponent<FederationStopMessageProps> = ({message, isMessageFocused}) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
   const {id, domains} = message;
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
   const federationStopMessage = renderFederationStopMessage({
     domains,
-    isReactTranslationRenderingEnabled,
     translate,
   });
 

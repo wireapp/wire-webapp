@@ -21,7 +21,6 @@ import {render} from '@testing-library/react';
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/User';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -33,15 +32,7 @@ import {createUuid} from 'Util/uuid';
 
 import {OptionPreferences} from './optionPreferences';
 
-const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -102,7 +93,7 @@ function createSelfUserForTest(): User {
 
 describe('OptionPreferences', () => {
   it(
-    'keeps the legacy emoji detail rendering when React translation rendering is disabled',
+    'renders the emoji detail icon as a React node',
     withTranslationStrings(en, () => {
       const {container} = render(
         withThemeAndRootContext(
@@ -110,24 +101,7 @@ describe('OptionPreferences', () => {
             propertiesRepository={createPropertiesRepositoryForTest()}
             selfUser={createSelfUserForTest()}
           />,
-          legacyRootProviderWrapper,
-        ),
-      );
-
-      expect(container.querySelector('.icon-emoji')).toBeTruthy();
-    }),
-  );
-
-  it(
-    'renders the emoji detail icon as a React node when React translation rendering is enabled',
-    withTranslationStrings(en, () => {
-      const {container} = render(
-        withThemeAndRootContext(
-          <OptionPreferences
-            propertiesRepository={createPropertiesRepositoryForTest()}
-            selfUser={createSelfUserForTest()}
-          />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
 
@@ -149,7 +123,7 @@ describe('OptionPreferences', () => {
               propertiesRepository={createPropertiesRepositoryForTest()}
               selfUser={createSelfUserForTest()}
             />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
 
@@ -173,7 +147,7 @@ describe('OptionPreferences', () => {
               propertiesRepository={createPropertiesRepositoryForTest()}
               selfUser={createSelfUserForTest()}
             />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
 
