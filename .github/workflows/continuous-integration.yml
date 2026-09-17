@@ -110,6 +110,9 @@ jobs:
             exit 1
           fi
 
+      - name: Validate translation markers
+        run: ./bin/yarn nx run webapp:validate-translations
+
   build-libraries:
     runs-on: ubuntu-24.04
     name: build libraries

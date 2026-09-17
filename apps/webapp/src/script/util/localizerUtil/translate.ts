@@ -17,9 +17,10 @@
  *
  */
 
-import {isString} from '@sindresorhus/is';
+import {isNumber, isString} from '@sindresorhus/is';
 import {escape} from 'underscore';
 
+import {dangerousTranslationSubstitutionPattern, translationSubstitutionPattern} from './translationMarkers';
 import type {Substitutions, TranslationKey} from './translationTypes';
 
 type TranslationSubstitutions = Substitutions;
@@ -29,8 +30,8 @@ export const DEFAULT_LOCALE = 'en';
 let locale = DEFAULT_LOCALE;
 let strings: Record<string, Record<string, string>> = {};
 
-function isStringOrNumber(toTest: any): toTest is string | number {
-  return typeof toTest === 'string' || typeof toTest === 'number';
+function isStringOrNumber(toTest: unknown): toTest is string | number {
+  return isString(toTest) || isNumber(toTest);
 }
 
 function replaceSubstituteEscaped(
@@ -41,10 +42,12 @@ function replaceSubstituteEscaped(
   if (isStringOrNumber(substitutes)) {
     return string.replace(regex, escape(substitutes.toString()));
   }
+
   return string.replace(regex, (found: string, content: string): string => {
     if (substitutes !== undefined && Object.hasOwn(substitutes, content)) {
       return escape(substitutes[content] as string);
     }
+
     return found;
   });
 }
@@ -57,10 +60,12 @@ function replaceSubstitute(
   if (isStringOrNumber(substitutes)) {
     return string.replace(regex, substitutes.toString());
   }
+
   return string.replace(regex, (found: string, content: string) => {
     if (substitutes !== undefined && Object.hasOwn(substitutes, content)) {
       return substitutes[content] as string;
     }
+
     return found;
   });
 }
@@ -88,10 +93,10 @@ export function translate<Id extends TranslationKey>(
 
   const substitutedEscaped =
     skipEscape === true
-      ? replaceSubstitute(value, /{(.+?)}/g, substitutions)
-      : replaceSubstituteEscaped(value, /{(.+?)}/g, substitutions);
+      ? replaceSubstitute(value, translationSubstitutionPattern, substitutions)
+      : replaceSubstituteEscaped(value, translationSubstitutionPattern, substitutions);
 
-  return replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
+  return replaceSubstitute(substitutedEscaped, dangerousTranslationSubstitutionPattern, replaceDangerously);
 }
 
 export function setLocale(newLocale: string): void {
