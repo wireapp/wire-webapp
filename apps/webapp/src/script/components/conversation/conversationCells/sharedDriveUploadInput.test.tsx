@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event';
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {SharedDriveUploadFileInput} from './sharedDriveUploadFileInput';
+import {SharedDriveUploadInput} from './sharedDriveUploadInput';
 
 const uploadPath = 'conversation-id@example.com/files';
 const conversationQualifiedId = 'conversation-id@example.com';
@@ -56,16 +56,43 @@ function getUploadAction(fireAndForgetInvoker: FireAndForgetInvoker) {
   return jest.mocked(fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
 }
 
-describe('SharedDriveUploadFileInput', () => {
+describe('SharedDriveUploadInput', () => {
   it('uploads all files selected from the file picker as one batch', async () => {
     const user = userEvent.setup();
     const firstFile = new File(['first'], 'first.txt', {type: 'text/plain'});
     const secondFile = new File(['second'], 'second.txt', {type: 'text/plain'});
     const dependencies = createDependencies();
-    const {container} = render(<SharedDriveUploadFileInput {...dependencies} />);
+    const {container} = render(<SharedDriveUploadInput {...dependencies} selectionMode="files" />);
 
     const input = container.querySelector('input[type="file"]');
     expect(input).toBeInstanceOf(HTMLInputElement);
+
+    await user.upload(input as HTMLInputElement, [firstFile, secondFile]);
+
+    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
+    await uploadAction();
+
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [firstFile, secondFile],
+      uploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it('uploads files selected from a folder with their relative paths', async () => {
+    const user = userEvent.setup();
+    const firstFile = new File(['first'], 'first.txt', {type: 'text/plain'});
+    const secondFile = new File(['second'], 'second.txt', {type: 'text/plain'});
+    Object.defineProperty(firstFile, 'webkitRelativePath', {value: 'Reports/first.txt'});
+    Object.defineProperty(secondFile, 'webkitRelativePath', {value: 'Reports/Archive/second.txt'});
+    const dependencies = createDependencies();
+    const {container} = render(<SharedDriveUploadInput {...dependencies} selectionMode="folder" />);
+
+    const input = container.querySelector('input[type="file"]');
+    expect(input).toBeInstanceOf(HTMLInputElement);
+    expect(input).toHaveAttribute('directory', '');
+    expect(input).toHaveAttribute('webkitdirectory', '');
 
     await user.upload(input as HTMLInputElement, [firstFile, secondFile]);
 

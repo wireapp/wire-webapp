@@ -22,7 +22,7 @@ import type {ChangeEvent} from 'react';
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {handleSharedDriveUploadInput} from './sharedDriveUploadInput';
+import {handleSharedDriveUploadInput} from './sharedDriveUploadInputHandler';
 
 const uploadPath = 'conversation-id@example.com/files';
 const conversationQualifiedId = 'conversation-id@example.com';
