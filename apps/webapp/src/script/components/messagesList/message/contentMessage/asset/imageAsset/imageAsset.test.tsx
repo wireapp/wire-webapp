@@ -22,7 +22,7 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import type {KeyboardEventHandler, MouseEventHandler, ReactElement, ReactNode} from 'react';
 
 import type {AssetUrl} from 'Components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
-import type {GetAssetUrl} from 'Components/image';
+import type {GetAssetUrl, ImageLogger} from 'Components/image';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
@@ -35,6 +35,12 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {ImageAsset, ImageAssetProps} from './imageAsset';
+
+type ImageLoggerMock = jest.Mocked<ImageLogger>;
+
+function buildImageLoggerMock(): ImageLoggerMock {
+  return {error: jest.fn()};
+}
 
 jest.mock('Components/inViewport', () => {
   interface MockInViewportProps {
@@ -97,6 +103,7 @@ describe('image-asset', () => {
   const fakeImageUrl = 'https://test.com/image.png';
   const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
   const getAssetUrlMock = jest.fn<ReturnType<GetAssetUrl>, Parameters<GetAssetUrl>>();
+  const imageLoggerMock = buildImageLoggerMock();
 
   const createDefaultMessage = () => {
     const message = new ContentMessage(undefined, translateForTest);
@@ -108,6 +115,7 @@ describe('image-asset', () => {
   const defaultProps: ImageAssetProps = {
     asset: new MediumImage('image'),
     getAssetUrl: getAssetUrlMock,
+    logger: imageLoggerMock,
     message: createDefaultMessage(),
     onClick: jest.fn(),
   };
@@ -181,6 +189,7 @@ describe('image-asset', () => {
     });
 
     expect(imageContainer).not.toHaveClass('loading-dots');
+    expect(imageLoggerMock.error).toHaveBeenCalledWith('Failed to load image asset', expect.any(Error));
   });
 
   it('keeps the image non-interactive while loading', async () => {

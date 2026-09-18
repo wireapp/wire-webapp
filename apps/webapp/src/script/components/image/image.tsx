@@ -28,6 +28,7 @@ import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {getLogger, Logger} from 'Util/logger';
 
 import {getImageStyle, getWrapperStyles} from './image.styles';
 import {RestrictedImage} from './restrictedImage';
@@ -38,6 +39,10 @@ import {
   useAssetTransfer,
 } from '../messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
 
+const defaultLogger = getLogger('Image');
+
+export type ImageLogger = Pick<Logger, 'error'>;
+
 interface BaseImageProps {
   alt?: string;
   'aria-label'?: string;
@@ -46,6 +51,7 @@ interface BaseImageProps {
   'data-uie-visible'?: boolean;
   css?: CSSObject;
   getAssetUrl?: GetAssetUrl;
+  logger?: ImageLogger;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   isQuote?: boolean;
@@ -78,6 +84,7 @@ export const AssetImage = ({
   image,
   imageStyles,
   isQuote,
+  logger,
   onClick,
   onKeyDown,
   role,
@@ -99,6 +106,7 @@ export const AssetImage = ({
       imageSizes={image}
       imageStyles={imageStyles}
       isQuote={isQuote}
+      logger={logger}
       onClick={onClick}
       onKeyDown={onKeyDown}
       role={role}
@@ -119,6 +127,7 @@ export const Image = ({
   'data-uie-visible': dataUieVisible,
   getAssetUrl: getAssetUrlOverride,
   isQuote = false,
+  logger = defaultLogger,
   teamState = container.resolve(TeamState),
   alt,
   imageStyles,
@@ -168,13 +177,13 @@ export const Image = ({
         if (isMounted.current === false) {
           return;
         }
-        console.error(error);
+        logger.error('Failed to load image asset', error);
         setImageLoadState('failed');
       }
     }
 
     void loadImageAsset();
-  }, [imageLoadState, isInViewport, image, isFileSharingReceivingEnabled, getAssetUrl]);
+  }, [imageLoadState, isInViewport, image, isFileSharingReceivingEnabled, getAssetUrl, logger]);
 
   useEffect(() => {
     return () => {
