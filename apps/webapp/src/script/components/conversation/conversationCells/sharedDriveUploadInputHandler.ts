@@ -23,7 +23,7 @@ import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {SharedDriveDropRejection} from './sharedDriveDrop';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {validateSharedDriveUploadFiles} from './sharedDriveUploadValidation';
+import {filterSharedDriveUploadFiles, validateSharedDriveUploadFiles} from './sharedDriveUploadValidation';
 
 export type SharedDriveUploadInputDependencies = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
@@ -53,7 +53,7 @@ export const handleSharedDriveUploadInput = (
     isAcceptedFile,
   }: SharedDriveUploadInputDependencies,
 ): void => {
-  const files = Array.from(event.target.files ?? []);
+  const files = filterSharedDriveUploadFiles(Array.from(event.target.files ?? []));
   event.target.value = '';
   if (files.length === 0) {
     return;

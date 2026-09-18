@@ -670,23 +670,16 @@ function ConversationContent({
     }
   }, [isFileTabActive, isSharedDriveSearchViewOpen]);
 
-  const {
-    getRootProps,
-    getInputProps,
-    openAllFilesView,
-    openFolderView,
-    openImageFilesView,
-    handlePastedFile,
-    isDragAccept,
-  } = useFilesUploadDropzone({
-    isTeam: inTeam,
-    cellsRepository: repositories.cells,
-    conversation: activeConversation,
-    isCellsEnabled: isCellsEnabled,
-    isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
-    isFileDropAllowed,
-    translate,
-  });
+  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept} =
+    useFilesUploadDropzone({
+      isTeam: inTeam,
+      cellsRepository: repositories.cells,
+      conversation: activeConversation,
+      isCellsEnabled: isCellsEnabled,
+      isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
+      isFileDropAllowed,
+      translate,
+    });
 
   const currentFolderName = getCurrentFolderName(getCellsFilesPath());
   const selfUserDriveRole = getSelfUserDriveRole({
@@ -765,7 +758,6 @@ function ConversationContent({
                         isSearchViewOpen={isSharedDriveSearchViewOpen}
                         onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
                         onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
-                        onUploadFolder={openFolderView}
                         isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
                         showViewerPermission={showViewerPermission}
                       />

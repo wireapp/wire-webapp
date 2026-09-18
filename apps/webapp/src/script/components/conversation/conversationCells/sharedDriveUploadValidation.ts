@@ -26,6 +26,13 @@ export interface SharedDriveUploadRejection {
   readonly invalidFiles: readonly File[];
 }
 
+const UPLOAD_METADATA_FILE_NAMES = new Set(['.DS_Store', 'Thumbs.db', 'desktop.ini']);
+
+export const isUploadMetadataFile = (file: File): boolean => UPLOAD_METADATA_FILE_NAMES.has(file.name);
+
+export const filterSharedDriveUploadFiles = (files: readonly File[]): File[] =>
+  files.filter(file => !isUploadMetadataFile(file));
+
 interface SharedDriveUploadValidationOptions {
   readonly isUploadFilesEnabled: boolean;
   readonly isInRecycleBin: boolean;

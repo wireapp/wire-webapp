@@ -156,19 +156,19 @@ export const SharedDriveUploadStatusPopupHost = ({
   }
 
   const titleKey = {
-    queued: 'cells.uploadStatus.uploading',
+    queued: 'cells.uploadStatus.queued',
     uploading: 'cells.uploadStatus.uploading',
     uploaded: 'cells.uploadStatus.uploaded',
     failed: 'cells.uploadStatus.failed',
   } as const;
   const aggregateTitleKey = {
-    queued: 'cells.uploadStatus.uploadingItems',
+    queued: 'cells.uploadStatus.queuedItems',
     uploading: 'cells.uploadStatus.uploadingItems',
     uploaded: 'cells.uploadStatus.uploadedItems',
     failed: 'cells.uploadStatus.failedItems',
   } as const;
   const statusLabelKey = {
-    queued: 'cells.uploadStatus.uploadingSize',
+    queued: 'cells.uploadStatus.queuedSize',
     uploading: 'cells.uploadStatus.uploadingSize',
     uploaded: 'cells.uploadStatus.uploadedSize',
     failed: 'cells.uploadStatus.failedLabel',

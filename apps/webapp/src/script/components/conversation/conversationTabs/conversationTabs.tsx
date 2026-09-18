@@ -49,7 +49,7 @@ interface ConversationTabsProps {
 
 const FILE_PATH = 'files';
 const sharedDriveUploadTabStatusLabelKey = {
-  queued: 'cells.uploadStatus.uploading',
+  queued: 'cells.uploadStatus.queued',
   uploading: 'cells.uploadStatus.uploading',
   uploaded: 'cells.uploadStatus.uploaded',
   failed: 'cells.uploadStatus.failed',
@@ -203,6 +203,7 @@ const SharedDriveTabUploadStatusIcon = ({kind}: {kind: SharedDriveUploadStatus['
     return (
       <SharedDriveUploadSpinnerIcon
         className="conversation-tabs__upload-status-icon conversation-tabs__upload-status-icon--uploading"
+        color="var(--accent-color)"
         width={16}
         height={16}
         data-uie-name="shared-drive-tab-upload-uploading"
@@ -215,6 +216,7 @@ const SharedDriveTabUploadStatusIcon = ({kind}: {kind: SharedDriveUploadStatus['
   return (
     <SharedDriveUploadCompletedIcon
       className="conversation-tabs__upload-status-icon"
+      color="var(--accent-color)"
       width={16}
       height={16}
       data-uie-name="shared-drive-tab-upload-completed"
