@@ -38,9 +38,9 @@ describe('FileAssetComponent', () => {
     createRootContextValueForTest({translate: translateForTest}),
   );
 
-  function mockContentMessage(): ContentMessage {
+  function mockContentMessage(fileName: string | undefined = 'test-file.log'): ContentMessage {
     const asset = new FileAsset();
-    asset.file_name = 'test-file.log';
+    asset.file_name = fileName;
     asset.file_size = 10485760;
 
     const message = new ContentMessage(undefined, translateForTest);
@@ -54,12 +54,20 @@ describe('FileAssetComponent', () => {
   } as TeamState;
 
   it('renders file uploads', () => {
-    const props = {
-      message: mockContentMessage(),
-      teamState,
-    };
+    const {queryByTestId} = render(<FileAssetComponent message={mockContentMessage()} teamState={teamState} />, {
+      wrapper: rootProviderWrapper,
+    });
 
-    const {queryByTestId} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
+    expect(queryByTestId('file')).not.toBeNull();
+  });
+
+  it('renders file uploads without a file name', () => {
+    const {queryByTestId} = render(
+      <FileAssetComponent message={mockContentMessage(undefined)} teamState={teamState} />,
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
 
     expect(queryByTestId('file')).not.toBeNull();
   });
@@ -69,22 +77,16 @@ describe('FileAssetComponent', () => {
     message.ephemeral_expires(true);
     message.status(StatusType.SENT);
 
-    const props = {
-      message,
-      teamState,
-    };
-
-    const {queryByTestId} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
+    const {queryByTestId} = render(<FileAssetComponent message={message} teamState={teamState} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(queryByTestId('file')).toBeNull();
   });
 
   it('shows the file size in MB', () => {
-    const props = {
-      message: mockContentMessage(),
-      teamState,
-    };
-
-    const {queryByText} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
+    const {queryByText} = render(<FileAssetComponent message={mockContentMessage()} teamState={teamState} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(queryByText('10 MB')).not.toBeNull();
   });
 });
