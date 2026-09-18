@@ -59,7 +59,7 @@ export const MeetingLinkForm = ({
       </div>
     </div>
     <div css={passwordFieldsStyles}>
-      <PasswordFields translate={translate} {...passwordFieldsProps} />
+      <PasswordFields translate={translate} required={false} {...passwordFieldsProps} />
     </div>
   </div>
 );

@@ -27,6 +27,9 @@ import {errorMessageStyles} from './PasswordFields.styles';
 
 export interface PasswordFieldsProps {
   readonly translate: Translate;
+  required?: boolean;
+  passwordError?: React.ReactNode;
+  passwordConfirmationError?: React.ReactNode;
   passwordValue: string;
   passwordValueRef: React.RefObject<HTMLInputElement | null>;
   onPasswordValueChange: (value: string) => void;
@@ -38,6 +41,9 @@ export interface PasswordFieldsProps {
 
 export const PasswordFields = ({
   translate,
+  required = true,
+  passwordError,
+  passwordConfirmationError,
   passwordValue,
   passwordValueRef,
   onPasswordValueChange,
@@ -50,7 +56,7 @@ export const PasswordFields = ({
     <Input
       name="guest-link-password"
       data-uie-name="guest-link-password"
-      required
+      required={required}
       placeholder={translate('modalGuestLinkJoinPlaceholder')}
       label={translate('modalGuestLinkJoinLabel')}
       helperText={translate('modalGuestLinkJoinHelperText', {
@@ -67,12 +73,16 @@ export const PasswordFields = ({
       onChange={event => onPasswordValueChange(event.currentTarget.value)}
       pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
       markInvalid={isPasswordInputMarkInvalid}
-      error={isPasswordInputMarkInvalid ? <PasswordFieldsErrorMessage translate={translate} /> : undefined}
+      error={
+        isPasswordInputMarkInvalid ? (
+          <PasswordFieldsErrorMessage translate={translate} message={passwordError} />
+        ) : undefined
+      }
     />
     <Input
       name="guest-link-password-confirm"
       data-uie-name="guest-link-password-confirm"
-      required
+      required={required}
       placeholder={translate('modalGuestLinkJoinConfirmPlaceholder')}
       label={translate('modalGuestLinkJoinConfirmLabel')}
       className="modal__input"
@@ -84,14 +94,23 @@ export const PasswordFields = ({
       value={passwordConfirmationValue}
       onChange={event => onPasswordConfirmationChange(event.currentTarget.value)}
       markInvalid={isPasswordConfirmationMarkInvalid}
+      error={
+        isPasswordConfirmationMarkInvalid ? (
+          <PasswordFieldsErrorMessage translate={translate} message={passwordConfirmationError} />
+        ) : undefined
+      }
     />
   </>
 );
 
-const PasswordFieldsErrorMessage = ({translate}: Pick<PasswordFieldsProps, 'translate'>) => (
+const PasswordFieldsErrorMessage = ({
+  translate,
+  message,
+}: {translate: PasswordFieldsProps['translate']; message?: React.ReactNode}) => (
   <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
-    {translate('modalGuestLinkJoinHelperText', {
-      minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-    })}
+    {message ??
+      translate('modalGuestLinkJoinHelperText', {
+        minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
+      })}
   </ErrorMessage>
 );

@@ -59,6 +59,27 @@ describe('PasswordFields', () => {
     expect(onPasswordConfirmationChange).toHaveBeenCalledWith('ValidPassword1!');
   });
 
+  it('can render optional password inputs', () => {
+    render(
+      withTheme(
+        <PasswordFields
+          translate={translateForTest}
+          required={false}
+          passwordValue=""
+          passwordValueRef={{current: null}}
+          onPasswordValueChange={jest.fn()}
+          isPasswordInputMarkInvalid={false}
+          passwordConfirmationValue=""
+          onPasswordConfirmationChange={jest.fn()}
+          isPasswordConfirmationMarkInvalid={false}
+        />,
+      ),
+    );
+
+    expect(screen.getByTestId('guest-link-password')).not.toBeRequired();
+    expect(screen.getByTestId('guest-link-password-confirm')).not.toBeRequired();
+  });
+
   it('shows the password error when the password input is marked invalid', () => {
     render(
       withTheme(
