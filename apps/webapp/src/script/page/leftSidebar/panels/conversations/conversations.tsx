@@ -85,7 +85,7 @@ import {StartUI} from '../startUi';
 export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean =>
   ![SidebarTabs.PREFERENCES, SidebarTabs.MEETINGS].includes(tab);
 
-type FocusConversation = (conversationId: string) => boolean;
+type FocusConversation = (conversationId: string) => boolean | 'pending';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -285,7 +285,6 @@ export const Conversations = ({
   );
   const {
     currentFocus,
-    focusFirstMountedConversation,
     focusMountedConversation,
     handleKeyDown,
     registerConversationElement,
@@ -481,7 +480,7 @@ export const Conversations = ({
 
   const handleEnterSearchClick = useCallback(
     (event: ReactKeyBoardEvent<HTMLDivElement>) => {
-      const firstFoundConversation = currentTabConversations?.[0];
+      const firstFoundConversation = conversationsForFocus?.[0];
 
       if (firstFoundConversation) {
         createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
@@ -489,7 +488,7 @@ export const Conversations = ({
         scrollToConversation(firstFoundConversation.id);
       }
     },
-    [currentTabConversations],
+    [conversationsForFocus],
   );
 
   const handleSearchTab = useCallback(
@@ -497,14 +496,23 @@ export const Conversations = ({
       cancelPendingFocusRef.current?.();
       const firstResult = conversationsForFocus[0];
 
-      if (!conversationsFilter || !firstResult || !focusFirstMountedConversation()) {
+      if (!conversationsFilter || !firstResult) {
+        return;
+      }
+
+      const wasMounted = focusMountedConversation(firstResult.id);
+      const wasFocused = wasMounted || focusConversation(firstResult.id);
+
+      if (!wasFocused) {
         return;
       }
 
       event.preventDefault();
-      setCurrentFocus(firstResult.id);
+      if (wasMounted) {
+        setCurrentFocus(firstResult.id);
+      }
     },
-    [conversationsFilter, conversationsForFocus, focusFirstMountedConversation, setCurrentFocus],
+    [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
   );
 
   const onSearch = useCallback(
@@ -576,6 +584,7 @@ export const Conversations = ({
             cancelPendingFocusRef={cancelPendingFocusRef}
             registerConversationElement={registerConversationElement}
             focusMountedConversation={focusMountedConversation}
+            onConversationFocused={setCurrentFocus}
           />
         )}
       </>

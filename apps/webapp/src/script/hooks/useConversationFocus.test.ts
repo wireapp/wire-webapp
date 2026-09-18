@@ -155,6 +155,19 @@ describe('useConversationFocus', () => {
     expect(result.current.currentFocus).toBe('first');
   });
 
+  it('keeps the current tab stop while focus is queued for a virtualized conversation', () => {
+    const conversations = [createConversation('first'), createConversation('second')];
+    const focusConversation = jest.fn(() => 'pending' as const);
+    const preventDefault = jest.fn();
+    const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
+
+    act(() => result.current.handleKeyDown('first')({key: 'ArrowDown', preventDefault} as unknown as KeyboardEvent));
+
+    expect(focusConversation).toHaveBeenCalledWith('second');
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+    expect(result.current.currentFocus).toBe('first');
+  });
+
   it('does not throw when keyboard events are received with no conversations', () => {
     const {result} = renderHook(() => useConversationFocus([]));
 

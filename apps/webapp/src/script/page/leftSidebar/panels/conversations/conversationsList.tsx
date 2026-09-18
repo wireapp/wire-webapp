@@ -67,7 +67,7 @@ import {ContentState} from '../../../useAppState';
 
 const CONVERSATION_ROW_HEIGHT = 56;
 const CONVERSATION_CLICK_DEBOUNCE_DIVISOR = 2;
-type FocusConversation = (conversationId: string) => boolean;
+type FocusConversation = (conversationId: string) => boolean | 'pending';
 
 interface ConversationsListProps {
   callState: CallState;
@@ -84,6 +84,7 @@ interface ConversationsListProps {
   handleArrowKeyDown: (conversationId: string) => (e: React.KeyboardEvent) => void;
   registerConversationElement?: RegisterConversationElement;
   focusMountedConversation?: FocusConversation;
+  onConversationFocused?: (conversationId: string) => void;
   clearSearchFilter: () => void;
   groupParticipantsConversations: Conversation[];
   isGroupParticipantsVisible: boolean;
@@ -112,6 +113,7 @@ export const ConversationsList = ({
   cancelPendingFocusRef,
   registerConversationElement,
   focusMountedConversation,
+  onConversationFocused,
 }: ConversationsListProps) => {
   const {translate} = useApplicationContext();
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -240,7 +242,7 @@ export const ConversationsList = ({
 
       rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
       setPendingFocusRequest({conversationId, contextKey: focusContextKey});
-      return true;
+      return 'pending';
     },
     [conversationFocusCandidates, conversationsToDisplay, focusContextKey, focusMountedConversation, rowVirtualizer],
   );
@@ -280,6 +282,7 @@ export const ConversationsList = ({
     }
 
     if (focusMountedConversation?.(pendingFocusRequest.conversationId)) {
+      onConversationFocused?.(pendingFocusRequest.conversationId);
       setPendingFocusRequest(null);
     }
   }, [
@@ -287,6 +290,7 @@ export const ConversationsList = ({
     conversationsToDisplay,
     focusContextKey,
     focusMountedConversation,
+    onConversationFocused,
     pendingFocusRequest,
     virtualItems,
   ]);

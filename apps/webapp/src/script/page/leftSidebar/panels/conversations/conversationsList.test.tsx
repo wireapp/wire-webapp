@@ -155,7 +155,7 @@ describe('ConversationsList', () => {
 
   it('clears pending focus when the filtered conversation disappears', () => {
     const conversation = create1to1Conversation('Alice');
-    const focusConversationRef = createRef<(conversationId: string) => boolean>();
+    const focusConversationRef = createRef<(conversationId: string) => boolean | 'pending'>();
     const {container, rerender} = render(
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
@@ -181,7 +181,7 @@ describe('ConversationsList', () => {
 
     container.querySelector<HTMLElement>(`[data-uie-uid="${conversation.id}"]`)?.remove();
     act(() => {
-      expect(focusConversationRef.current?.(conversation.id)).toBe(true);
+      expect(focusConversationRef.current?.(conversation.id)).toBe('pending');
     });
 
     const replacementContainer = document.createElement('div');
@@ -219,7 +219,7 @@ describe('ConversationsList', () => {
 
   it('does not steal focus after focus leaves the list while focus is pending', () => {
     const conversation = create1to1Conversation('Alice');
-    const focusConversationRef = createRef<(conversationId: string) => boolean>();
+    const focusConversationRef = createRef<(conversationId: string) => boolean | 'pending'>();
     const {container, rerender} = render(
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
@@ -250,7 +250,7 @@ describe('ConversationsList', () => {
     focusOrigin.focus();
 
     act(() => {
-      expect(focusConversationRef.current?.(conversation.id)).toBe(true);
+      expect(focusConversationRef.current?.(conversation.id)).toBe('pending');
     });
 
     const replacementContainer = document.createElement('div');

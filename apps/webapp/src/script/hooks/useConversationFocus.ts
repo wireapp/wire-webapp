@@ -23,7 +23,7 @@ import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
 
-type FocusConversation = (conversationId: string) => boolean;
+type FocusConversation = (conversationId: string) => boolean | 'pending';
 type RegisterConversationElement = (conversationId: string, element: HTMLElement) => () => void;
 
 function useConversationFocus(
@@ -66,11 +66,6 @@ function useConversationFocus(
     return document.activeElement === element;
   }, []);
 
-  const focusConversationById = useCallback(
-    (conversationId: string) => focusMountedConversation(conversationId) || focusConversation(conversationId),
-    [focusConversation, focusMountedConversation],
-  );
-
   const handleKeyDown = useCallback(
     (conversationId: string) => (event: ReactKeyboardEvent | KeyboardEvent) => {
       if (conversations.length === 0) {
@@ -83,26 +78,44 @@ function useConversationFocus(
       if (isKey(event, KEY.ARROW_DOWN)) {
         const nextConversation = conversations[effectiveIndex + 1] || conversations[0];
 
-        if (!focusConversationById(nextConversation.id)) {
+        if (focusMountedConversation(nextConversation.id)) {
+          event.preventDefault();
+          setCurrentFocus(nextConversation.id);
+          return;
+        }
+
+        const focusResult = focusConversation(nextConversation.id);
+        if (!focusResult) {
           return;
         }
 
         event.preventDefault();
-        setCurrentFocus(nextConversation.id);
+        if (focusResult === true) {
+          setCurrentFocus(nextConversation.id);
+        }
       } else if (isKey(event, KEY.ARROW_UP)) {
         const prevConversation = conversations[effectiveIndex - 1] || conversations[conversations.length - 1];
 
-        if (!focusConversationById(prevConversation.id)) {
+        if (focusMountedConversation(prevConversation.id)) {
+          event.preventDefault();
+          setCurrentFocus(prevConversation.id);
+          return;
+        }
+
+        const focusResult = focusConversation(prevConversation.id);
+        if (!focusResult) {
           return;
         }
 
         event.preventDefault();
-        setCurrentFocus(prevConversation.id);
+        if (focusResult === true) {
+          setCurrentFocus(prevConversation.id);
+        }
       } else if (isTabKey(event)) {
         setCurrentFocus(conversations[0].id);
       }
     },
-    [conversations, focusConversationById],
+    [conversations, focusConversation, focusMountedConversation],
   );
 
   const resetConversationFocus = useCallback(() => setCurrentFocus(conversations[0]?.id || ''), [conversations]);
