@@ -66,26 +66,26 @@ let getConfigSpy: jasmine.Spy;
 let searchRepository: SearchRepository;
 let storageRepository: StorageRepository;
 
-beforeAll(async () => {
-  await testFactory.exposeEventActors().then(factory => {
-    eventRepository = factory;
-    return eventRepository;
-  });
-
-  await testFactory.exposeSearchActors().then(factory => {
-    searchRepository = factory;
-    return searchRepository;
-  });
-
-  await testFactory.exposeStorageActors().then(factory => {
-    storageRepository = factory;
-    return storageRepository;
-  });
-
-  getConfigSpy = spyOn(Config, 'getConfig').and.returnValue(defaultConfig);
-});
-
 describe('InputBar', () => {
+  beforeAll(async () => {
+    await testFactory.exposeEventActors().then(factory => {
+      eventRepository = factory;
+      return eventRepository;
+    });
+
+    await testFactory.exposeSearchActors().then(factory => {
+      searchRepository = factory;
+      return searchRepository;
+    });
+
+    await testFactory.exposeStorageActors().then(factory => {
+      storageRepository = factory;
+      return storageRepository;
+    });
+
+    getConfigSpy = spyOn(Config, 'getConfig').and.returnValue(defaultConfig);
+  });
+
   let propertiesRepository: PropertiesRepository;
   const createRootProviderWrapper = (isViewerPermissionFeatureEnabled = false) =>
     createRootProviderWrapperForTest(
