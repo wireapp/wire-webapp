@@ -74,24 +74,25 @@ type ImageLoadState = 'waiting' | 'loading' | 'loaded' | 'failed';
 
 export type GetAssetUrl = (resource: AssetRemoteData, acceptedMimeTypes?: string[]) => Promise<AssetUrl>;
 
-export const AssetImage = ({
-  'aria-label': ariaLabel,
-  alt,
-  className,
-  css,
-  'data-uie-name': dataUieName,
-  'data-uie-visible': dataUieVisible,
-  getAssetUrl,
-  image,
-  imageStyles,
-  isQuote,
-  logger,
-  onClick,
-  onKeyDown,
-  role,
-  tabIndex,
-  teamState,
-}: AssetImageProps) => {
+export function AssetImage(properties: AssetImageProps): React.ReactElement {
+  const {
+    'aria-label': ariaLabel,
+    alt,
+    className,
+    css,
+    'data-uie-name': dataUieName,
+    'data-uie-visible': dataUieVisible,
+    getAssetUrl,
+    image,
+    imageStyles,
+    isQuote,
+    logger,
+    onClick,
+    onKeyDown,
+    role,
+    tabIndex,
+    teamState,
+  } = properties;
   const {resource} = useKoSubscribableChildren(image, ['resource']);
 
   return (
@@ -115,27 +116,28 @@ export const AssetImage = ({
       teamState={teamState}
     />
   );
-};
+}
 
-export const Image = ({
-  'aria-label': ariaLabel,
-  image,
-  imageSizes,
-  onClick,
-  className,
-  css,
-  'data-uie-name': dataUieName,
-  'data-uie-visible': dataUieVisible,
-  getAssetUrl: getAssetUrlOverride,
-  isQuote = false,
-  logger = defaultLogger,
-  teamState = container.resolve(TeamState),
-  alt,
-  imageStyles,
-  onKeyDown,
-  role,
-  tabIndex,
-}: RemoteDataImageProps) => {
+export function Image(properties: RemoteDataImageProps): React.ReactElement {
+  const {
+    'aria-label': ariaLabel,
+    image,
+    imageSizes,
+    onClick,
+    className,
+    css,
+    'data-uie-name': dataUieName,
+    'data-uie-visible': dataUieVisible,
+    getAssetUrl: getAssetUrlOverride,
+    isQuote = false,
+    logger = defaultLogger,
+    teamState = container.resolve(TeamState),
+    alt,
+    imageStyles,
+    onKeyDown,
+    role,
+    tabIndex,
+  } = properties;
   const [isInViewport, setIsInViewport] = useState(false);
   const [imageLoadState, setImageLoadState] = useState<ImageLoadState>('waiting');
   const isMounted = useRef(false);
@@ -231,4 +233,4 @@ export const Image = ({
       />
     </InViewport>
   );
-};
+}

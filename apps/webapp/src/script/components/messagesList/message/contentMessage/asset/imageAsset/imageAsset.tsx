@@ -41,7 +41,8 @@ export interface ImageAssetProps {
   isFocusable?: boolean;
 }
 
-export const ImageAsset = ({asset, getAssetUrl, logger, message, onClick}: ImageAssetProps) => {
+export function ImageAsset(properties: ImageAssetProps): React.ReactElement {
+  const {asset, getAssetUrl, logger, message, onClick} = properties;
   const {translate} = useApplicationContext();
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isUploading, uploadProgress, cancelUpload} = useAssetTransfer(message);
@@ -91,4 +92,4 @@ export const ImageAsset = ({asset, getAssetUrl, logger, message, onClick}: Image
       )}
     </div>
   );
-};
+}

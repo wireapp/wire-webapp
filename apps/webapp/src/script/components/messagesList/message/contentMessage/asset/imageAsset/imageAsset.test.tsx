@@ -59,19 +59,20 @@ jest.mock('Components/inViewport', () => {
     tabIndex?: number;
   }
 
-  function MockInViewport({
-    'aria-label': ariaLabel,
-    children,
-    className,
-    'data-uie-name': dataUieName,
-    'data-uie-status': dataUieStatus,
-    'data-uie-visible': dataUieVisible,
-    onClick,
-    onKeyDown,
-    onVisible,
-    role,
-    tabIndex,
-  }: MockInViewportProps): ReactElement {
+  function MockInViewport(properties: MockInViewportProps): ReactElement {
+    const {
+      'aria-label': ariaLabel,
+      children,
+      className,
+      'data-uie-name': dataUieName,
+      'data-uie-status': dataUieStatus,
+      'data-uie-visible': dataUieVisible,
+      onClick,
+      onKeyDown,
+      onVisible,
+      role,
+      tabIndex,
+    } = properties;
     setTimeout(onVisible);
 
     return (
