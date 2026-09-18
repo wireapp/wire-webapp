@@ -20,7 +20,7 @@
 import {sanitizeUrl, validateUrl, URL_REGEX} from './url';
 
 describe('sanitizeUrl', () => {
-  test('should return the same URL if it has a supported protocol', () => {
+  it('should return the same URL if it has a supported protocol', () => {
     expect(sanitizeUrl('https://example.com')).toBe('https://example.com');
     expect(sanitizeUrl('http://example.com')).toBe('http://example.com');
     expect(sanitizeUrl('mailto:user@example.com')).toBe('mailto:user@example.com');
@@ -28,12 +28,12 @@ describe('sanitizeUrl', () => {
     expect(sanitizeUrl('tel:+123456789')).toBe('tel:+123456789');
   });
 
-  test('should add https:// if missing', () => {
+  it('should add https:// if missing', () => {
     expect(sanitizeUrl('example.com')).toBe('https://example.com');
     expect(sanitizeUrl('www.example.com')).toBe('https://www.example.com');
   });
 
-  test('should return an empty string for unsupported protocols', () => {
+  it('should return an empty string for unsupported protocols', () => {
     expect(sanitizeUrl('ftp://example.com')).toBe('');
     expect(sanitizeUrl('javascript:alert(1)')).toBe('');
     expect(sanitizeUrl('data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==')).toBe('');
@@ -41,25 +41,25 @@ describe('sanitizeUrl', () => {
 });
 
 describe('validateUrl', () => {
-  test('should return true for valid URLs', () => {
+  it('should return true for valid URLs', () => {
     expect(validateUrl('https://example.com')).toBe(true);
     expect(validateUrl('http://example.com')).toBe(true);
     expect(validateUrl('https://sub.domain.co.uk/path?query=1#hash')).toBe(true);
   });
 
-  test('should return false for invalid URLs', () => {
+  it('should return false for invalid URLs', () => {
     expect(validateUrl('ftp://example.com')).toBe(false);
     expect(validateUrl('javascript:alert(1)')).toBe(false);
     expect(validateUrl('')).toBe(false);
     expect(validateUrl('example.com')).toBe(false);
   });
 
-  test('should allow only "https://" as a valid empty URL', () => {
+  it('should allow only "https://" as a valid empty URL', () => {
     expect(validateUrl('https://')).toBe(true);
     expect(validateUrl('http://')).toBe(false);
   });
 
-  test('should match valid URLs with URL_REGEX', () => {
+  it('should match valid URLs with URL_REGEX', () => {
     expect(URL_REGEX.test('https://valid.com')).toBe(true);
     expect(URL_REGEX.test('http://valid.com')).toBe(true);
     expect(URL_REGEX.test('https://sub.domain/path?query=1')).toBe(true);
@@ -68,7 +68,7 @@ describe('validateUrl', () => {
     expect(URL_REGEX.test('https://example.com/app;jsessionid=abc123?foo=bar')).toBe(true);
   });
 
-  test('should reject invalid URLs with URL_REGEX', () => {
+  it('should reject invalid URLs with URL_REGEX', () => {
     expect(URL_REGEX.test('ftp://invalid.com')).toBe(false);
     expect(URL_REGEX.test('javascript:alert(1)')).toBe(false);
     expect(URL_REGEX.test('data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==')).toBe(false);

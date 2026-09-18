@@ -58,7 +58,7 @@ describe('MessageReactionsList', () => {
     jest.clearAllMocks();
   });
 
-  test('renders a button for each reaction and user count', () => {
+  it('renders a button for each reaction and user count', () => {
     const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
 
     const winkButton = getAllByTitle('wink');
@@ -84,7 +84,7 @@ describe('MessageReactionsList', () => {
     expect(smileyFace2Count).toBeDefined();
   });
 
-  test('counts reactions from users who are no longer conversation members', () => {
+  it('counts reactions from users who are no longer conversation members', () => {
     const departedUserId = generateQualifiedId();
     const reactionsWithDepartedUser: ReactionMap = [
       ['❤️', [user1.qualifiedId, user2.qualifiedId, user3.qualifiedId, departedUserId]],
@@ -97,7 +97,7 @@ describe('MessageReactionsList', () => {
     expect(within(getByTitle('heart')).getByText('4')).toBeDefined();
   });
 
-  test('loads missing reactor names from the local database when the tooltip is opened', async () => {
+  it('loads missing reactor names from the local database when the tooltip is opened', async () => {
     const departedUser = new User('departed-user', 'test.wire.link', translateForTest);
     departedUser.name('Former Member');
     const loadUsersByIdsFromDb = jest.fn().mockResolvedValue([departedUser]);
@@ -131,7 +131,7 @@ describe('MessageReactionsList', () => {
     await waitFor(() => expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member'));
   });
 
-  test('loads only the first two missing reactor names in stored reaction order', async () => {
+  it('loads only the first two missing reactor names in stored reaction order', async () => {
     const firstDepartedUser = new User('first-departed-user', 'test.wire.link', translateForTest);
     const secondDepartedUser = new User('second-departed-user', 'test.wire.link', translateForTest);
     const thirdDepartedUser = new User('third-departed-user', 'test.wire.link', translateForTest);
@@ -177,7 +177,7 @@ describe('MessageReactionsList', () => {
     });
   });
 
-  test('does not repeat a local lookup after successfully resolving tooltip names', async () => {
+  it('does not repeat a local lookup after successfully resolving tooltip names', async () => {
     const departedUser = new User('departed-user', 'test.wire.link', translateForTest);
     departedUser.name('Former Member');
     const loadUsersByIdsFromDb = jest.fn().mockResolvedValue([departedUser]);
@@ -201,7 +201,7 @@ describe('MessageReactionsList', () => {
     await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(1));
   });
 
-  test('allows a later tooltip interaction to retry a failed local lookup', async () => {
+  it('allows a later tooltip interaction to retry a failed local lookup', async () => {
     const departedUser = new User('departed-user', 'test.wire.link', translateForTest);
     departedUser.name('Former Member');
     let rejectFirstLookup: ((error: Error) => void) | undefined;
@@ -254,7 +254,7 @@ describe('MessageReactionsList', () => {
     await waitFor(() => expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member'));
   });
 
-  test('handles click on reaction button', () => {
+  it('handles click on reaction button', () => {
     const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
 
     fireEvent.click(getByTitle('+1'));

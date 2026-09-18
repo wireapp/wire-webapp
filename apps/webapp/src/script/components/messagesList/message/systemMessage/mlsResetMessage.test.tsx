@@ -28,7 +28,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {SystemMessage} from './systemMessage';
 
 describe('SystemMessage MLS reset messages', () => {
-  test('shows the resetting user and the recovery explanation as a system message', () => {
+  it('shows the resetting user and the recovery explanation as a system message', () => {
     const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
     const message = createMLSResetMessage(key => enUS[key]);
     message.timestamp(wallClock.currentTimestampInMilliseconds);
@@ -43,7 +43,7 @@ describe('SystemMessage MLS reset messages', () => {
     );
   });
 
-  test('shows the success caption without a sender name once the resetting user resolves to self', () => {
+  it('shows the success caption without a sender name once the resetting user resolves to self', () => {
     const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
     const message = createMLSResetMessage(key => enUS[key]);
     message.timestamp(wallClock.currentTimestampInMilliseconds);
