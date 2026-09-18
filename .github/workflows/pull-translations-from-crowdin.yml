@@ -22,7 +22,7 @@ jobs:
         with:
           persist-credentials: false
           ref: main
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
