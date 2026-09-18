@@ -22,7 +22,7 @@ import React from 'react';
 import {CSSObject} from '@emotion/react';
 
 import * as Icon from 'Components/icon';
-import {AssetImage} from 'Components/image';
+import {AssetImage, GetAssetUrl} from 'Components/image';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -34,12 +34,13 @@ import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 export interface ImageAssetProps {
   asset: MediumImage;
+  getAssetUrl?: GetAssetUrl;
   message: ContentMessage;
   onClick: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
   isFocusable?: boolean;
 }
 
-export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
+export const ImageAsset = ({asset, getAssetUrl, message, onClick}: ImageAssetProps) => {
   const {translate} = useApplicationContext();
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isUploading, uploadProgress, cancelUpload} = useAssetTransfer(message);
@@ -77,6 +78,7 @@ export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
           data-uie-name="go-image-detail"
           data-uie-visible={visible && !isObfuscated}
           onClick={event => onClick(message, event)}
+          getAssetUrl={getAssetUrl}
           onKeyDown={event =>
             handleKeyDown({event, callback: onClick.bind(null, message, event), keys: [KEY.ENTER, KEY.SPACE]})
           }

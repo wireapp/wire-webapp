@@ -17,11 +17,13 @@
  *
  */
 
+import type {CSSObject} from '@emotion/react';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {container} from 'tsyringe';
+import type {KeyboardEventHandler, MouseEventHandler, ReactElement, ReactNode} from 'react';
 
+import type {AssetUrl} from 'Components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
+import type {GetAssetUrl} from 'Components/image';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {User} from 'Repositories/entity/User';
@@ -35,12 +37,55 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {ImageAsset, ImageAssetProps} from './imageAsset';
 
 jest.mock('Components/inViewport', () => {
-  return {
-    InViewport: ({onVisible, children, ...props}: {onVisible: () => void; children: any; [key: string]: any}) => {
-      setTimeout(onVisible);
+  interface MockInViewportProps {
+    'aria-label'?: string;
+    children: ReactNode;
+    className?: string;
+    css?: CSSObject;
+    'data-uie-name'?: string;
+    'data-uie-status'?: string;
+    'data-uie-visible'?: boolean;
+    onClick?: MouseEventHandler<HTMLDivElement>;
+    onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
+    onVisible: () => void;
+    role?: string;
+    tabIndex?: number;
+  }
 
-      return <div {...props}>{children}</div>;
-    },
+  function MockInViewport({
+    'aria-label': ariaLabel,
+    children,
+    className,
+    'data-uie-name': dataUieName,
+    'data-uie-status': dataUieStatus,
+    'data-uie-visible': dataUieVisible,
+    onClick,
+    onKeyDown,
+    onVisible,
+    role,
+    tabIndex,
+  }: MockInViewportProps): ReactElement {
+    setTimeout(onVisible);
+
+    return (
+      <div
+        aria-label={ariaLabel}
+        className={className}
+        data-uie-name={dataUieName}
+        data-uie-status={dataUieStatus}
+        data-uie-visible={dataUieVisible}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        role={role}
+        tabIndex={tabIndex}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  return {
+    InViewport: MockInViewport,
     __esModule: true,
   };
 });
@@ -51,6 +96,7 @@ describe('image-asset', () => {
   );
   const fakeImageUrl = 'https://test.com/image.png';
   const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
+  const getAssetUrlMock = jest.fn<ReturnType<GetAssetUrl>, Parameters<GetAssetUrl>>();
 
   const createDefaultMessage = () => {
     const message = new ContentMessage(undefined, translateForTest);
@@ -61,17 +107,15 @@ describe('image-asset', () => {
 
   const defaultProps: ImageAssetProps = {
     asset: new MediumImage('image'),
+    getAssetUrl: getAssetUrlMock,
     message: createDefaultMessage(),
     onClick: jest.fn(),
   };
 
-  beforeAll(() => {
-    jest.spyOn(window.URL, 'createObjectURL').mockReturnValue(fakeImageUrl);
-    jest.spyOn(window.URL, 'revokeObjectURL').mockReturnValue();
-  });
-
   beforeEach(() => {
     jest.clearAllMocks();
+    getAssetUrlMock.mockReset();
+    getAssetUrlMock.mockResolvedValue({url: fakeImageUrl, dispose: jest.fn()});
   });
 
   it('displays loading dots when resource is not loaded', () => {
@@ -88,11 +132,6 @@ describe('image-asset', () => {
   });
 
   it('displays the dummy image url when resource is loaded', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({
@@ -108,7 +147,7 @@ describe('image-asset', () => {
     render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
-      expect(window.URL.createObjectURL).toHaveBeenCalled();
+      expect(getAssetUrlMock).toHaveBeenCalled();
       const imageElement = screen.getByTestId('image-asset-img');
       const imgSrc = imageElement.getAttribute('src');
       expect(imgSrc).toBe(fakeImageUrl);
@@ -120,11 +159,7 @@ describe('image-asset', () => {
   });
 
   it('shows an error status and removes loading dots when image loading fails', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest.spyOn(assetRepository, 'load').mockReset().mockRejectedValue(new Error('Asset could not be loaded'));
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((): void => {
-      return undefined;
-    });
+    getAssetUrlMock.mockRejectedValue(new Error('Asset could not be loaded'));
 
     const image = new MediumImage('image');
     image.resource(
@@ -146,18 +181,16 @@ describe('image-asset', () => {
     });
 
     expect(imageContainer).not.toHaveClass('loading-dots');
-    consoleErrorSpy.mockRestore();
   });
 
   it('keeps the image non-interactive while loading', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    let resolvePendingLoad: (blob: Blob) => void = (): void => {
+    let resolvePendingLoad: (assetUrl: AssetUrl) => void = (): void => {
       return undefined;
     };
-    const pendingLoad = new Promise<Blob>((resolve): void => {
+    const pendingLoad = new Promise<AssetUrl>((resolve): void => {
       resolvePendingLoad = resolve;
     });
-    jest.spyOn(assetRepository, 'load').mockReset().mockReturnValue(pendingLoad);
+    getAssetUrlMock.mockReturnValue(pendingLoad);
 
     const image = new MediumImage('image');
     image.resource(
@@ -177,14 +210,14 @@ describe('image-asset', () => {
     expect(imageContainer).toHaveAttribute('data-uie-status', 'waiting');
 
     await waitFor(() => {
-      expect(assetRepository.load).toHaveBeenCalled();
+      expect(getAssetUrlMock).toHaveBeenCalled();
     });
 
     expect(imageContainer).toHaveAttribute('data-uie-status', 'loading');
     fireEvent.click(imageContainer);
     expect(onClickMock).not.toHaveBeenCalled();
 
-    resolvePendingLoad(new Blob([new Uint8Array()], {type: 'application/octet-stream'}));
+    resolvePendingLoad({url: fakeImageUrl, dispose: jest.fn()});
     await waitFor(() => {
       expect(screen.getByTestId('image-asset-img')).toBeDefined();
     });
@@ -205,11 +238,6 @@ describe('image-asset', () => {
   });
 
   it('calls onClick when image is clicked', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({
@@ -237,11 +265,6 @@ describe('image-asset', () => {
   });
 
   it('calls onClick when Enter key is pressed', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({
@@ -270,11 +293,6 @@ describe('image-asset', () => {
   });
 
   it('calls onClick when Space key is pressed', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({
@@ -303,11 +321,6 @@ describe('image-asset', () => {
   });
 
   it('sets correct accessibility attributes', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({

@@ -38,9 +38,19 @@ import {
   useAssetTransfer,
 } from '../messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
 
-interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
+interface BaseImageProps {
   alt?: string;
+  'aria-label'?: string;
+  className?: string;
+  'data-uie-name'?: string;
+  'data-uie-visible'?: boolean;
+  css?: CSSObject;
+  getAssetUrl?: GetAssetUrl;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   isQuote?: boolean;
+  role?: string;
+  tabIndex?: number;
   teamState?: TeamState;
   imageStyles?: CSSObject;
 }
@@ -55,22 +65,66 @@ interface AssetImageProps extends BaseImageProps {
 
 type ImageLoadState = 'waiting' | 'loading' | 'loaded' | 'failed';
 
-export const AssetImage = ({image, alt, ...props}: AssetImageProps) => {
+export type GetAssetUrl = (resource: AssetRemoteData, acceptedMimeTypes?: string[]) => Promise<AssetUrl>;
+
+export const AssetImage = ({
+  'aria-label': ariaLabel,
+  alt,
+  className,
+  css,
+  'data-uie-name': dataUieName,
+  'data-uie-visible': dataUieVisible,
+  getAssetUrl,
+  image,
+  imageStyles,
+  isQuote,
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
+  teamState,
+}: AssetImageProps) => {
   const {resource} = useKoSubscribableChildren(image, ['resource']);
 
-  return <Image image={resource} imageSizes={image} alt={alt} {...props} />;
+  return (
+    <Image
+      aria-label={ariaLabel}
+      alt={alt}
+      className={className}
+      css={css}
+      data-uie-name={dataUieName}
+      data-uie-visible={dataUieVisible}
+      getAssetUrl={getAssetUrl}
+      image={resource}
+      imageSizes={image}
+      imageStyles={imageStyles}
+      isQuote={isQuote}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      role={role}
+      tabIndex={tabIndex}
+      teamState={teamState}
+    />
+  );
 };
 
 export const Image = ({
+  'aria-label': ariaLabel,
   image,
   imageSizes,
   onClick,
   className,
+  css,
+  'data-uie-name': dataUieName,
+  'data-uie-visible': dataUieVisible,
+  getAssetUrl: getAssetUrlOverride,
   isQuote = false,
   teamState = container.resolve(TeamState),
   alt,
   imageStyles,
-  ...props
+  onKeyDown,
+  role,
+  tabIndex,
 }: RemoteDataImageProps) => {
   const [isInViewport, setIsInViewport] = useState(false);
   const [imageLoadState, setImageLoadState] = useState<ImageLoadState>('waiting');
@@ -78,7 +132,8 @@ export const Image = ({
 
   const [imageUrl, setImageUrl] = useState<AssetUrl>();
 
-  const {getAssetUrl} = useAssetTransfer();
+  const {getAssetUrl: getAssetUrlFromAssetTransfer} = useAssetTransfer();
+  const getAssetUrl = getAssetUrlOverride ?? getAssetUrlFromAssetTransfer;
 
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
@@ -143,15 +198,20 @@ export const Image = ({
 
         return undefined;
       }}
-      css={getWrapperStyles(onClick !== undefined)}
       className={cx(className, {'loading-dots image-asset--no-image': isLoading})}
       onClick={event => {
         if (isLoaded) {
           onClick?.(event);
         }
       }}
+      onKeyDown={onKeyDown}
+      role={role}
+      tabIndex={tabIndex}
+      aria-label={ariaLabel}
+      data-uie-name={dataUieName}
+      data-uie-visible={dataUieVisible}
       data-uie-status={imageLoadState === 'failed' ? 'error' : imageLoadState}
-      {...props}
+      css={css ?? getWrapperStyles(onClick !== undefined)}
     >
       <img
         css={{...getImageStyle(imageSizes), ...imageStyles}}
