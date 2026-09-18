@@ -24,7 +24,7 @@ import {
   MEETING_TITLE_MAX_LENGTH,
   meetingTitleErrorKeys,
 } from 'Components/meeting/shared/validation/meetingTitleValidation';
-import {meetingPasswordErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
+import {meetingPasswordConfirmationErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 
 import {getScheduleMeetingFormErrors, hasScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 
@@ -141,7 +141,7 @@ describe('scheduleMeetingValidation', () => {
       ...createMode,
     });
 
-    expect(errors.password).toBe(meetingPasswordErrorKey);
+    expect(errors.passwordConfirmation).toBe(meetingPasswordConfirmationErrorKey);
     expect(hasScheduleMeetingFormErrors(errors)).toBe(true);
   });
 

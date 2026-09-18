@@ -22,7 +22,7 @@ import {isUndefined} from '@sindresorhus/is';
 import type {Maybe, Result} from 'true-myth';
 import {result} from 'true-myth';
 
-import {getMeetingPasswordError} from 'Components/meeting/shared/validation/meetingPasswordValidation';
+import {getMeetingPasswordErrors} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import {getMeetingTitleError} from 'Components/meeting/shared/validation/meetingTitleValidation';
 
 import {type ScheduleMeetingFormErrors, ScheduleMeetingMode, scheduleMeetingModes} from './scheduleMeetingTypes';
@@ -56,7 +56,7 @@ export const getScheduleMeetingFormErrors = ({
 
   return {
     title: getMeetingTitleError(title),
-    password: getMeetingPasswordError(password, passwordConfirmation),
+    ...getMeetingPasswordErrors(password, passwordConfirmation),
     missingTimes,
     startInPast:
       !allowPastTimes &&
@@ -83,7 +83,8 @@ export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors):
   !isUndefined(errors.startInPast) ||
   !isUndefined(errors.endInPast) ||
   !isUndefined(errors.endBeforeStart) ||
-  !isUndefined(errors.password);
+  !isUndefined(errors.password) ||
+  !isUndefined(errors.passwordConfirmation);
 
 export const validateScheduleMeetingForm = (
   input: ScheduleMeetingValidationInput,

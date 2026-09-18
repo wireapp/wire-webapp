@@ -21,7 +21,7 @@ import {isUndefined} from '@sindresorhus/is';
 import {result, type Result} from 'true-myth';
 import {create} from 'zustand';
 
-import {getMeetingPasswordError} from 'Components/meeting/shared/validation/meetingPasswordValidation';
+import {getMeetingPasswordErrors} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import {
   getMeetingTitleError,
   getMeetingTitleInputError,
@@ -64,11 +64,11 @@ const initialState = {
 
 export const getMeetNowFormErrors = ({title, password, passwordConfirmation}: MeetNowFormState): MeetNowFormErrors => ({
   title: getMeetingTitleError(title),
-  password: getMeetingPasswordError(password, passwordConfirmation),
+  ...getMeetingPasswordErrors(password, passwordConfirmation),
 });
 
 export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean =>
-  !isUndefined(errors.title) || !isUndefined(errors.password);
+  !isUndefined(errors.title) || !isUndefined(errors.password) || !isUndefined(errors.passwordConfirmation);
 
 export const validateMeetNowForm = (formState: MeetNowFormState): Result<MeetNowFormState, MeetNowFormErrors> => {
   const errors = getMeetNowFormErrors(formState);
@@ -107,9 +107,16 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => ({
     set(state => ({
       formState: {...state.formState, participantsFilter},
     })),
-  setPassword: password => set(state => ({formState: {...state.formState, password}})),
+  setPassword: password =>
+    set(state => ({
+      formState: {...state.formState, password},
+      errors: {...state.errors, ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation)},
+    })),
   setPasswordConfirmation: passwordConfirmation =>
-    set(state => ({formState: {...state.formState, passwordConfirmation}})),
+    set(state => ({
+      formState: {...state.formState, passwordConfirmation},
+      errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
+    })),
   validate: () => {
     const errors = getMeetNowFormErrors(get().formState);
     set({errors});

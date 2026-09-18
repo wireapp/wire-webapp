@@ -32,11 +32,13 @@ export type MeetNowFormState = {
 export type MeetNowFormErrors = {
   title: TranslationKey | undefined;
   password: MeetingPasswordErrorKey | undefined;
+  passwordConfirmation: MeetingPasswordErrorKey | undefined;
 };
 
 export const emptyMeetNowFormErrors = (): MeetNowFormErrors => ({
   title: undefined,
   password: undefined,
+  passwordConfirmation: undefined,
 });
 
 export const meetNowSubmitResults = {

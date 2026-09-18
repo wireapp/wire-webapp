@@ -75,6 +75,10 @@ export const MeetNowModal = () => {
     () => (isUndefined(errors.password) ? undefined : translate(errors.password)),
     [errors.password, translate],
   );
+  const passwordConfirmationError = useMemo(
+    () => (isUndefined(errors.passwordConfirmation) ? undefined : translate(errors.passwordConfirmation)),
+    [errors.passwordConfirmation, translate],
+  );
 
   const dismissModal = () => {
     close();
@@ -142,6 +146,7 @@ export const MeetNowModal = () => {
             formState={formState}
             titleError={titleError}
             passwordError={passwordError}
+            passwordConfirmationError={passwordConfirmationError}
             onTitleChange={setTitle}
             onSelectedUsersChange={setSelectedUsers}
             onParticipantsFilterChange={setParticipantsFilter}

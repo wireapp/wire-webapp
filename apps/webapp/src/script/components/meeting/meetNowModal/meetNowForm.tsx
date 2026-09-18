@@ -45,6 +45,7 @@ export interface MeetNowFormProps {
   formState: MeetNowFormState;
   titleError?: string;
   passwordError?: string;
+  passwordConfirmationError?: string;
   onTitleChange: (title: string) => void;
   onSelectedUsersChange: (users: User[]) => void;
   onParticipantsFilterChange: (filter: string) => void;
@@ -59,6 +60,7 @@ export const MeetNowForm = ({
   formState,
   titleError,
   passwordError,
+  passwordConfirmationError,
   onTitleChange,
   onSelectedUsersChange,
   onParticipantsFilterChange,
@@ -140,11 +142,13 @@ export const MeetNowForm = ({
         }}
         passwordValue={formState.password}
         passwordValueRef={passwordInputRef}
+        passwordError={passwordError}
+        passwordConfirmationError={passwordConfirmationError}
         onPasswordValueChange={password => onPasswordChange?.(password)}
         isPasswordInputMarkInvalid={isNonEmptyString(passwordError)}
         passwordConfirmationValue={formState.passwordConfirmation}
         onPasswordConfirmationChange={password => onPasswordConfirmationChange?.(password)}
-        isPasswordConfirmationMarkInvalid={isNonEmptyString(passwordError)}
+        isPasswordConfirmationMarkInvalid={isNonEmptyString(passwordConfirmationError)}
         copyDisabled={!isNonEmptyString(formState.password) || isNonEmptyString(passwordError)}
       />
     </form>

@@ -76,6 +76,9 @@ export const ScheduleMeetingModal = () => {
       endInPast: isUndefined(errors.endInPast) ? undefined : translate(errors.endInPast),
       endBeforeStart: isUndefined(errors.endBeforeStart) ? undefined : translate(errors.endBeforeStart),
       password: isUndefined(errors.password) ? undefined : translate(errors.password),
+      passwordConfirmation: isUndefined(errors.passwordConfirmation)
+        ? undefined
+        : translate(errors.passwordConfirmation),
     }),
     [errors, translate],
   );

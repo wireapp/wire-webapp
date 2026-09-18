@@ -21,19 +21,28 @@ import {ValidationError} from 'src/script/auth/module/action/validationError';
 import type {TranslationKey} from 'Util/localizerUtil';
 import {isValidPassword} from 'Util/stringUtil';
 
-export const meetingPasswordErrorKey = ValidationError.FIELD.CONFIRM_PASSWORD.PATTERN_MISMATCH as TranslationKey;
+export const meetingPasswordErrorKey = ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH as TranslationKey;
+export const meetingPasswordConfirmationErrorKey = ValidationError.FIELD.CONFIRM_PASSWORD.PATTERN_MISMATCH as TranslationKey;
 
-export type MeetingPasswordErrorKey = typeof meetingPasswordErrorKey;
+export type MeetingPasswordErrorKey = typeof meetingPasswordErrorKey | typeof meetingPasswordConfirmationErrorKey;
 
-export const getMeetingPasswordError = (
+export type MeetingPasswordErrors = {
+  password: typeof meetingPasswordErrorKey | undefined;
+  passwordConfirmation: typeof meetingPasswordConfirmationErrorKey | undefined;
+};
+
+export const getMeetingPasswordErrors = (
   password?: string,
   passwordConfirmation?: string,
-): MeetingPasswordErrorKey | undefined => {
+): MeetingPasswordErrors => {
   const hasPassword = Boolean(password?.trim());
   const hasPasswordConfirmation = Boolean(passwordConfirmation?.trim());
 
-  return (hasPassword || hasPasswordConfirmation) &&
-    (!hasPassword || !isValidPassword(password ?? '') || password !== passwordConfirmation)
-    ? meetingPasswordErrorKey
-    : undefined;
+  return {
+    password: hasPassword && !isValidPassword(password ?? '') ? meetingPasswordErrorKey : undefined,
+    passwordConfirmation:
+      hasPasswordConfirmation && (!hasPassword || password !== passwordConfirmation)
+        ? meetingPasswordConfirmationErrorKey
+        : undefined,
+  };
 };

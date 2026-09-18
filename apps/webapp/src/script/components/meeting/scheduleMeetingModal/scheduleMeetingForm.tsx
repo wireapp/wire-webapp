@@ -261,11 +261,13 @@ export const ScheduleMeetingForm = ({
             }}
             passwordValue={formState.password}
             passwordValueRef={passwordInputRef}
+            passwordError={errors.password}
+            passwordConfirmationError={errors.passwordConfirmation}
             onPasswordValueChange={password => onPasswordChange?.(password)}
             isPasswordInputMarkInvalid={isNonEmptyString(errors.password)}
             passwordConfirmationValue={formState.passwordConfirmation}
             onPasswordConfirmationChange={password => onPasswordConfirmationChange?.(password)}
-            isPasswordConfirmationMarkInvalid={isNonEmptyString(errors.password)}
+            isPasswordConfirmationMarkInvalid={isNonEmptyString(errors.passwordConfirmation)}
             copyDisabled={!isNonEmptyString(formState.password) || isNonEmptyString(errors.password)}
           />
         )}

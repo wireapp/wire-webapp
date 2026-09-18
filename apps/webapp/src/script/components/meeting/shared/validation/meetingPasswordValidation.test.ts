@@ -16,22 +16,42 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {getMeetingPasswordError, meetingPasswordErrorKey} from './meetingPasswordValidation';
+import {
+  getMeetingPasswordErrors,
+  meetingPasswordConfirmationErrorKey,
+  meetingPasswordErrorKey,
+} from './meetingPasswordValidation';
 
 describe('getMeetingPasswordError', () => {
   it('allows both optional password fields to be empty', () => {
-    expect(getMeetingPasswordError('', '')).toBeUndefined();
+    expect(getMeetingPasswordErrors('', '')).toEqual({password: undefined, passwordConfirmation: undefined});
   });
 
   it('rejects a confirmation when the password is empty', () => {
-    expect(getMeetingPasswordError('', 'ValidConfirmation1!')).toBe(meetingPasswordErrorKey);
+    expect(getMeetingPasswordErrors('', 'ValidConfirmation1!')).toEqual({
+      password: undefined,
+      passwordConfirmation: meetingPasswordConfirmationErrorKey,
+    });
   });
 
   it('allows a valid matching password and confirmation', () => {
-    expect(getMeetingPasswordError('ValidPassword1!', 'ValidPassword1!')).toBeUndefined();
+    expect(getMeetingPasswordErrors('ValidPassword1!', 'ValidPassword1!')).toEqual({
+      password: undefined,
+      passwordConfirmation: undefined,
+    });
   });
 
   it('rejects a mismatched confirmation', () => {
-    expect(getMeetingPasswordError('ValidPassword1!', 'DifferentPassword1!')).toBe(meetingPasswordErrorKey);
+    expect(getMeetingPasswordErrors('ValidPassword1!', 'DifferentPassword1!')).toEqual({
+      password: undefined,
+      passwordConfirmation: meetingPasswordConfirmationErrorKey,
+    });
+  });
+
+  it('reports an invalid password separately from the confirmation', () => {
+    expect(getMeetingPasswordErrors('invalid', 'invalid')).toEqual({
+      password: meetingPasswordErrorKey,
+      passwordConfirmation: undefined,
+    });
   });
 });

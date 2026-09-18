@@ -57,6 +57,7 @@ export interface ScheduleMeetingFormErrors {
   endInPast: ScheduleMeetingFormErrorKey | undefined;
   endBeforeStart: ScheduleMeetingFormErrorKey | undefined;
   password: MeetingPasswordErrorKey | undefined;
+  passwordConfirmation: MeetingPasswordErrorKey | undefined;
 }
 
 export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => ({
@@ -66,10 +67,12 @@ export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => (
   endInPast: undefined,
   endBeforeStart: undefined,
   password: undefined,
+  passwordConfirmation: undefined,
 });
 
 export interface ScheduleMeetingFormDisplayErrors {
   title: string | undefined;
+  passwordConfirmation: string | undefined;
   missingTimes: string | undefined;
   startInPast: string | undefined;
   endInPast: string | undefined;

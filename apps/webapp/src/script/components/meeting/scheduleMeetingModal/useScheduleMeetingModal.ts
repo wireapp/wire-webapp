@@ -29,6 +29,7 @@ import {
   resolveStartChange,
 } from 'Components/meeting/shared/defaults/meetingDateTimeDefaults';
 import {getMeetingTitleInputError} from 'Components/meeting/shared/validation/meetingTitleValidation';
+import {getMeetingPasswordErrors} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 
@@ -238,9 +239,16 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
   setRecurrence: recurrence => set(state => ({formState: {...state.formState, recurrence}})),
   setSelectedUsers: selectedUsers => set(state => ({formState: {...state.formState, selectedUsers}})),
   setParticipantsFilter: participantsFilter => set(state => ({formState: {...state.formState, participantsFilter}})),
-  setPassword: password => set(state => ({formState: {...state.formState, password}})),
+  setPassword: password =>
+    set(state => ({
+      formState: {...state.formState, password},
+      errors: {...state.errors, ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation)},
+    })),
   setPasswordConfirmation: passwordConfirmation =>
-    set(state => ({formState: {...state.formState, passwordConfirmation}})),
+    set(state => ({
+      formState: {...state.formState, passwordConfirmation},
+      errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
+    })),
   validate: wallClock => {
     const {formState, mode} = get();
     const {title, start, end, password, passwordConfirmation} = formState;
