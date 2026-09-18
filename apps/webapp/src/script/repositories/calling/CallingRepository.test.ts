@@ -79,6 +79,7 @@ import {Translate} from 'Util/localizerUtil';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {NoAudioInputError} from "../../error/noAudioInputError";
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -486,6 +487,70 @@ describe('CallingRepository', () => {
       await callingRepository.answerCall(incomingCall);
 
       expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
+    });
+
+    it('does not answer an incoming call when microphone acquisition fails', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const userId = {domain: '', id: ''};
+
+      const incomingCall = new Call(
+        userId,
+        conversation,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        buildMediaDevicesHandler(),
+      );
+
+      incomingCall.state(CALL_STATE.INCOMING);
+
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
+
+      jest
+        .spyOn(callingRepository as any, 'acquireCallMedia')
+        .mockRejectedValue(new NoAudioInputError(new Error('Microphone unavailable')));
+
+      const answerSpy = jest.spyOn(wCall, 'answer');
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      callingRepository['callState'].calls([incomingCall]);
+
+      await callingRepository.answerCall(incomingCall);
+
+      expect(answerSpy).not.toHaveBeenCalled();
+    });
+
+    it('answers an incoming video call when camera acquisition fails', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const userId = {domain: '', id: ''};
+
+      const incomingCall = new Call(
+        userId,
+        conversation,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.VIDEO,
+        buildMediaDevicesHandler(),
+      );
+
+      incomingCall.state(CALL_STATE.INCOMING);
+
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
+
+      jest
+        .spyOn(callingRepository as any, 'acquireCallMedia')
+        .mockRejectedValue(new Error('Camera unavailable'));
+
+      const answerSpy = jest.spyOn(wCall, 'answer');
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      callingRepository['callState'].calls([incomingCall]);
+
+      await callingRepository.answerCall(incomingCall);
+
+      expect(answerSpy).toHaveBeenCalled();
     });
   });
 
@@ -2187,6 +2252,20 @@ describe('central acquire call media flow', () => {
 
     expect(result).toBe(acquiredStream);
   });
+
+  it('preserves NoAudioInputError when acquiring audio and camera fails because of audio', async () => {
+    const audioError = new NoAudioInputError(new Error('Microphone unavailable'));
+
+    jest.spyOn(callingRepository as any, 'getMediaStream').mockRejectedValue(audioError);
+
+    await expect(
+      callingRepository['acquireCallMedia'](activeCall, {
+        audio: true,
+        camera: true,
+      }),
+    ).rejects.toBeInstanceOf(NoAudioInputError);
+  });
+
 });
 
 describe('set background effect', () => {

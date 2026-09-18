@@ -84,7 +84,7 @@ describe('MediaStreamHandler', () => {
       ).rejects.toBeInstanceOf(NoAudioInputError);
     });
 
-    it('rejects when requesting audio and video fails', async () => {
+    it('identifies an audio error when requesting audio and video', async () => {
       const error = new Error('Permission denied');
       error.name = MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR;
 
@@ -92,7 +92,7 @@ describe('MediaStreamHandler', () => {
 
       await expect(
         streamHandler.requestMediaStream(true, true, false, true),
-      ).rejects.toBeDefined();
+      ).rejects.toBeInstanceOf(NoAudioInputError);
     });
   });
 });
