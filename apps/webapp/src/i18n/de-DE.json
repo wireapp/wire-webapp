@@ -1430,6 +1430,8 @@
   "messageFailedToSendWillReceivePlural": "werden Ihre Nachricht später erhalten.",
   "messageFailedToSendWillReceiveSingular": "wird Ihre Nachricht später erhalten.",
   "mlsConversationRecovered": "Sie haben das Gerät eine Weile nicht benutzt oder es ist ein Problem aufgetreten. Einige ältere Nachrichten werden hier eventuell nicht angezeigt.",
+  "mlsReset": " was unable to decrypt some of your messages but has solved the issue. This affected all conversations you share together.",
+  "mlsResetSelf": "Session successfully reset",
   "mlsSignature": "MLS mit {signature} Signatur",
   "mlsThumbprint": "MLS-Daumenabdruck",
   "mlsToggleInfo": "Wenn dies aktiviert ist, wird für die Unterhaltung das neue Messaging-Layer-Security-Protokoll (MLS) verwendet.",
