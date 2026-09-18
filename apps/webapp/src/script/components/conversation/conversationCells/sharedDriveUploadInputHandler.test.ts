@@ -99,34 +99,57 @@ describe('handleSharedDriveUploadInput', () => {
     );
   });
 
-  it('ignores macOS metadata files before uploading selected files', async () => {
-    const file = new File(['content'], 'document.txt');
-    const metadataFile = new File(['metadata'], '.DS_Store');
+  it.each(['.DS_Store', 'Thumbs.db', 'desktop.ini'])(
+    'filters filesystem metadata files before uploading selected files',
+    async metadataFileName => {
+      const file = new File(['content'], 'document.txt');
+      const metadataFile = new File(['metadata'], metadataFileName);
+      const dependencies = createDependencies();
+
+      handleSharedDriveUploadInput(createEvent([metadataFile, file]), {...dependencies, uploadPath});
+
+      expect(dependencies.onReject).not.toHaveBeenCalled();
+      expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+      const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
+      await uploadAction();
+      expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+        [file],
+        uploadPath,
+        dependencies.onRefresh,
+        conversationQualifiedId,
+      );
+    },
+  );
+
+  it('does not dispatch when only filesystem metadata files are selected', () => {
     const dependencies = createDependencies();
-
-    handleSharedDriveUploadInput(createEvent([metadataFile, file]), {...dependencies, uploadPath});
-
-    expect(dependencies.onReject).not.toHaveBeenCalled();
-    expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
-    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
-    await uploadAction();
-    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
-      [file],
-      uploadPath,
-      dependencies.onRefresh,
-      conversationQualifiedId,
-    );
-  });
-
-  it('does not dispatch when only macOS metadata files are selected', () => {
-    const dependencies = createDependencies();
-    const event = createEvent([new File(['metadata'], '.DS_Store')]);
+    const event = createEvent([
+      new File(['metadata'], '.DS_Store'),
+      new File(['metadata'], 'Thumbs.db'),
+      new File(['metadata'], 'desktop.ini'),
+    ]);
 
     handleSharedDriveUploadInput(event, {...dependencies, uploadPath});
 
     expect(event.target.value).toBe('');
     expect(dependencies.onReject).not.toHaveBeenCalled();
     expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
+  it('preserves intentional dotfiles when selected', async () => {
+    const dotFile = new File(['content'], '.env');
+    const dependencies = createDependencies();
+
+    handleSharedDriveUploadInput(createEvent([dotFile]), {...dependencies, uploadPath});
+
+    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
+    await uploadAction();
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [dotFile],
+      uploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
   });
 
   it('rejects invalid selected files before dispatching upload', () => {
