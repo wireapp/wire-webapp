@@ -34,13 +34,16 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {ImageAsset, ImageAssetProps} from './imageAsset';
 
-jest.mock('Components/inViewport', () => ({
-  InViewport: ({onVisible, children, ...props}: {onVisible: () => void; children: any; [key: string]: any}) => {
-    setTimeout(onVisible);
-    return <div {...props}>{children}</div>;
-  },
-  __esModule: true,
-}));
+jest.mock('Components/inViewport', () => {
+  return {
+    InViewport: ({onVisible, children, ...props}: {onVisible: () => void; children: any; [key: string]: any}) => {
+      setTimeout(onVisible);
+
+      return <div {...props}>{children}</div>;
+    },
+    __esModule: true,
+  };
+});
 
 describe('image-asset', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -109,6 +112,81 @@ describe('image-asset', () => {
       const imageElement = screen.getByTestId('image-asset-img');
       const imgSrc = imageElement.getAttribute('src');
       expect(imgSrc).toBe(fakeImageUrl);
+
+      const imageContainer = requireValueForTest(imageElement.parentElement);
+      expect(imageContainer).toHaveAttribute('data-uie-status', 'loaded');
+      expect(imageContainer).not.toHaveClass('loading-dots');
+    });
+  });
+
+  it('shows an error status and removes loading dots when image loading fails', async () => {
+    const assetRepository = container.resolve(AssetRepository);
+    jest.spyOn(assetRepository, 'load').mockReset().mockRejectedValue(new Error('Asset could not be loaded'));
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((): void => {
+      return undefined;
+    });
+
+    const image = new MediumImage('image');
+    image.resource(
+      new AssetRemoteData({
+        assetKey: 'remote',
+        assetDomain: 'test-domain.wire.com',
+        assetToken: '',
+        forceCaching: false,
+      }),
+    );
+
+    render(<ImageAsset {...defaultProps} asset={image} />, {wrapper: rootProviderWrapper});
+
+    const imageElement = screen.getByTestId('image-loader');
+    const imageContainer = requireValueForTest(imageElement.parentElement);
+
+    await waitFor(() => {
+      expect(imageContainer).toHaveAttribute('data-uie-status', 'error');
+    });
+
+    expect(imageContainer).not.toHaveClass('loading-dots');
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('keeps the image non-interactive while loading', async () => {
+    const assetRepository = container.resolve(AssetRepository);
+    let resolvePendingLoad: (blob: Blob) => void = (): void => {
+      return undefined;
+    };
+    const pendingLoad = new Promise<Blob>((resolve): void => {
+      resolvePendingLoad = resolve;
+    });
+    jest.spyOn(assetRepository, 'load').mockReset().mockReturnValue(pendingLoad);
+
+    const image = new MediumImage('image');
+    image.resource(
+      new AssetRemoteData({
+        assetKey: 'remote',
+        assetDomain: 'test-domain.wire.com',
+        assetToken: '',
+        forceCaching: false,
+      }),
+    );
+
+    const onClickMock = jest.fn();
+    render(<ImageAsset {...defaultProps} asset={image} onClick={onClickMock} />, {wrapper: rootProviderWrapper});
+
+    const imageElement = screen.getByTestId('image-loader');
+    const imageContainer = requireValueForTest(imageElement.parentElement);
+    expect(imageContainer).toHaveAttribute('data-uie-status', 'waiting');
+
+    await waitFor(() => {
+      expect(assetRepository.load).toHaveBeenCalled();
+    });
+
+    expect(imageContainer).toHaveAttribute('data-uie-status', 'loading');
+    fireEvent.click(imageContainer);
+    expect(onClickMock).not.toHaveBeenCalled();
+
+    resolvePendingLoad(new Blob([new Uint8Array()], {type: 'application/octet-stream'}));
+    await waitFor(() => {
+      expect(screen.getByTestId('image-asset-img')).toBeDefined();
     });
   });
 

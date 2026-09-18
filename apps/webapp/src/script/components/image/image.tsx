@@ -53,6 +53,8 @@ interface AssetImageProps extends BaseImageProps {
   image: MediumImage;
 }
 
+type ImageLoadState = 'waiting' | 'loading' | 'loaded' | 'failed';
+
 export const AssetImage = ({image, alt, ...props}: AssetImageProps) => {
   const {resource} = useKoSubscribableChildren(image, ['resource']);
 
@@ -71,8 +73,8 @@ export const Image = ({
   ...props
 }: RemoteDataImageProps) => {
   const [isInViewport, setIsInViewport] = useState(false);
-  /** keeps track of whether the component is mounted or not to avoid setting the image url in case it's not */
-  const isUnmouted = useRef(false);
+  const [imageLoadState, setImageLoadState] = useState<ImageLoadState>('waiting');
+  const isMounted = useRef(false);
 
   const [imageUrl, setImageUrl] = useState<AssetUrl>();
 
@@ -81,29 +83,46 @@ export const Image = ({
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
   useEffect(() => {
-    if (imageUrl === undefined && isInViewport && isFileSharingReceivingEnabled) {
-      void (async () => {
-        try {
-          const allowedImageTypes = [
-            'application/octet-stream', // Octet-stream is required to paste images from clipboard
-            ...Config.getConfig().ALLOWED_IMAGE_TYPES,
-          ];
-          const url = await getAssetUrl(image, allowedImageTypes);
-          if (isUnmouted.current) {
-            // Avoid re-rendering a component that is umounted
-            return;
-          }
-          setImageUrl(url);
-        } catch (error: unknown) {
-          console.error(error);
-        }
-      })();
+    isMounted.current = true;
+
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (imageLoadState !== 'waiting' || isInViewport === false || isFileSharingReceivingEnabled === false) {
+      return;
     }
-  }, [imageUrl, isInViewport, image, isFileSharingReceivingEnabled, getAssetUrl]);
+
+    setImageLoadState('loading');
+    async function loadImageAsset(): Promise<void> {
+      try {
+        const allowedImageTypes = [
+          'application/octet-stream', // Octet-stream is required to paste images from clipboard
+          ...Config.getConfig().ALLOWED_IMAGE_TYPES,
+        ];
+        const url = await getAssetUrl(image, allowedImageTypes);
+
+        if (isMounted.current === false) {
+          return;
+        }
+        setImageUrl(url);
+        setImageLoadState('loaded');
+      } catch (error: unknown) {
+        if (isMounted.current === false) {
+          return;
+        }
+        console.error(error);
+        setImageLoadState('failed');
+      }
+    }
+
+    void loadImageAsset();
+  }, [imageLoadState, isInViewport, image, isFileSharingReceivingEnabled, getAssetUrl]);
 
   useEffect(() => {
     return () => {
-      isUnmouted.current = true;
       imageUrl?.dispose();
     };
   }, [imageUrl]);
@@ -114,19 +133,24 @@ export const Image = ({
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${imageSizes?.width}' height='${imageSizes?.height}'></svg>`;
   const assetUrl = imageUrl?.url ?? dummyImageUrl;
-  const isLoading = imageUrl === undefined;
+  const isLoading = imageLoadState === 'waiting' || imageLoadState === 'loading';
+  const isLoaded = imageLoadState === 'loaded';
 
   return (
     <InViewport
-      onVisible={() => setIsInViewport(true)}
+      onVisible={() => {
+        setIsInViewport(true);
+
+        return undefined;
+      }}
       css={getWrapperStyles(onClick !== undefined)}
       className={cx(className, {'loading-dots image-asset--no-image': isLoading})}
       onClick={event => {
-        if (isLoading === false) {
+        if (isLoaded) {
           onClick?.(event);
         }
       }}
-      data-uie-status={isLoading ? 'loading' : 'loaded'}
+      data-uie-status={imageLoadState === 'failed' ? 'error' : imageLoadState}
       {...props}
     >
       <img
@@ -134,7 +158,7 @@ export const Image = ({
         src={assetUrl}
         role="presentation"
         alt={alt}
-        data-uie-name={isLoading ? 'image-loader' : 'image-asset-img'}
+        data-uie-name={isLoaded ? 'image-asset-img' : 'image-loader'}
       />
     </InViewport>
   );
