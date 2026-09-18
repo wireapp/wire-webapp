@@ -226,7 +226,7 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<Command
 }
 
 describe('executePreviewNextBetaCommand', () => {
-  test('delegates history planning with the exact target commit', async () => {
+  it('delegates history planning with the exact target commit', async () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
@@ -240,7 +240,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(githubClientFixture.state.listedCommits).toEqual([firstMainCommit, secondMainCommit, thirdMainCommit]);
   });
 
-  test('does not discover pull requests when history is unavailable', async () => {
+  it('does not discover pull requests when history is unavailable', async () => {
     const githubClientFixture = createFakeGitHubClient();
     const unavailableHistory: NextBetaPreviewHistoryPlan = {
       kind: 'unavailable',
@@ -261,7 +261,7 @@ describe('executePreviewNextBetaCommand', () => {
     );
   });
 
-  test('does not discover pull requests when history planning fails', async () => {
+  it('does not discover pull requests when history planning fails', async () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
@@ -277,7 +277,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary).toContain('[REDACTED]');
   });
 
-  test('discovers merged main pull requests, ignores release branches, deduplicates, and records gaps', async () => {
+  it('discovers merged main pull requests, ignores release branches, deduplicates, and records gaps', async () => {
     const githubClientFixture = createFakeGitHubClient({
       pullRequestsByCommit: new Map([
         [
@@ -316,7 +316,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.writerState.informationMessages[0]).not.toContain('Add next Beta change preview');
   });
 
-  test('sorts multiple merged main pull requests numerically', async () => {
+  it('sorts multiple merged main pull requests numerically', async () => {
     const githubClientFixture = createFakeGitHubClient({
       pullRequestsByCommit: new Map([
         [
@@ -345,7 +345,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary.indexOf('#22052')).toBeLessThan(commandRun.result.summary.indexOf('#22056'));
   });
 
-  test('normalizes and escapes hostile pull request titles into one safe list item', async () => {
+  it('normalizes and escapes hostile pull request titles into one safe list item', async () => {
     const githubClientFixture = createFakeGitHubClient({
       pullRequestsByCommit: new Map([
         [
@@ -375,7 +375,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary).not.toContain('\n# forged heading');
   });
 
-  test('continues after a discovery failure, returns non-zero, and sanitizes the failure', async () => {
+  it('continues after a discovery failure, returns non-zero, and sanitizes the failure', async () => {
     const failedCommit = firstMainCommit;
     const githubClientFixture = createFakeGitHubClient({
       failureMessageByCommit: new Map([[failedCommit, `GitHub token ${githubToken} leaked`]]),
@@ -400,7 +400,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary).toContain('#22050');
   });
 
-  test('continues after a rejected GitHub discovery request', async () => {
+  it('continues after a rejected GitHub discovery request', async () => {
     const failedCommit = firstMainCommit;
     const githubClientFixture = createFakeGitHubClient({
       rejectedMessageByCommit: new Map([[failedCommit, `token ${githubToken} rejected`]]),
@@ -424,7 +424,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary).toContain('#22050');
   });
 
-  test('returns success with a clear no-change result without GitHub requests', async () => {
+  it('returns success with a clear no-change result without GitHub requests', async () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
@@ -441,7 +441,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.writerState.informationMessages[0]).toContain('Commits not present in Beta: 0');
   });
 
-  test('reports sanitized informational-output failure without repeating processing', async () => {
+  it('reports sanitized informational-output failure without repeating processing', async () => {
     const githubClientFixture = createFakeGitHubClient({
       pullRequestsByCommit: new Map([[firstMainCommit, [createPullRequest({number: 22050})]]]),
     });
@@ -464,7 +464,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary).toContain('#22050');
   });
 
-  test('reports sanitized summary-output failure without repeating processing', async () => {
+  it('reports sanitized summary-output failure without repeating processing', async () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
@@ -485,7 +485,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary).toContain('Unable to write GitHub Actions summary');
   });
 
-  test('reports both writer failures once and keeps secrets redacted', async () => {
+  it('reports both writer failures once and keeps secrets redacted', async () => {
     const githubClientFixture = createFakeGitHubClient();
 
     const commandRun = await runCommand({
@@ -506,7 +506,7 @@ describe('executePreviewNextBetaCommand', () => {
     expect(commandRun.result.summary).not.toContain(githubToken);
   });
 
-  test('returns non-zero when the history planner fails', async () => {
+  it('returns non-zero when the history planner fails', async () => {
     const githubClientFixture = createFakeGitHubClient();
     const commandRun = await runCommand({
       targetMainCommit,

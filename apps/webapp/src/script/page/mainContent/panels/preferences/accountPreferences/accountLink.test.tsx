@@ -35,7 +35,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 describe('AccountLink', () => {
-  test('copies correct text', async () => {
+  it('copies correct text', async () => {
     const mockCopy: any = jest.spyOn(utils, 'copyText');
     mockCopy.mockImplementation((text: string) => text);
 
@@ -48,7 +48,7 @@ describe('AccountLink', () => {
     expect(mockCopy).toHaveReturnedWith('test-value');
   });
 
-  test('renders elements correctly', () => {
+  it('renders elements correctly', () => {
     render(withTheme(<AccountLink label="test" value="test-value" />), {wrapper: rootProviderWrapper});
     const label = screen.getByTestId('label-profile-link');
     const value = screen.getByTestId('profile-link');

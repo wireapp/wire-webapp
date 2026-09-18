@@ -25,7 +25,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {InviteModal} from './InviteModal';
 
 describe('InviteModal', () => {
-  test('proper render invite modal text', async () => {
+  it('proper render invite modal text', async () => {
     const userName = 'janek';
     const user = new User('', '', translateForTest);
 
