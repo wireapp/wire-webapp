@@ -812,7 +812,6 @@ export class CallingRepository {
   private async acquireCallMedia(call: Call, query: MediaStreamQuery): Promise<MediaStream> {
     const selfParticipant = call.getSelfParticipant();
 
-    // Wait for an ongoing acquisition before checking which streams are still missing.
     if (this.mediaStreamQuery) {
       await this.mediaStreamQuery;
     }
@@ -834,6 +833,33 @@ export class CallingRepository {
     }
 
     const mediaStreamQuery = (async () => {
+      if (missingStreams.audio && missingStreams.camera) {
+        // Acquire audio first because microphone access is required for calls.
+        const audioStream = await this.getMediaStream({audio: true}, call.isGroupOrConference);
+
+        if (call.state() === CALL_STATE.NONE) {
+          audioStream.getTracks().forEach(track => track.stop());
+          return audioStream;
+        }
+
+        selfParticipant.updateMediaStream(audioStream, true);
+
+        // Acquire the camera separately so that audio and camera errors
+        // can be distinguished reliably.
+        const cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
+
+        if (call.state() === CALL_STATE.NONE) {
+          cameraStream.getTracks().forEach(track => track.stop());
+          return selfParticipant.getMediaStream();
+        }
+
+        if (cameraStream.getVideoTracks().length > 0) {
+          await this.applyCurrentBackgroundEffectOnSelfParticipant(cameraStream);
+        }
+
+        return selfParticipant.getMediaStream();
+      }
+
       const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
 
       if (call.state() === CALL_STATE.NONE) {
@@ -875,6 +901,10 @@ export class CallingRepository {
 
       return true;
     } catch (error: unknown) {
+      if (error instanceof NoAudioInputError) {
+        throw error;
+      }
+
       this.logger.warn('Failed to warm up media streams', error);
       return false;
     } finally {
@@ -1741,11 +1771,16 @@ export class CallingRepository {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
     } catch (error: unknown) {
-      if (error) {
+      if (error instanceof NoAudioInputError) {
+        this.logger.warn('Failed answering call because microphone is unavailable', error);
+        this.showNoAudioInputModal();
+      } else if (error) {
         this.logger.error('Failed answering call', error);
       }
+
       this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.CALL_SETUP_ERROR);
       call.reason(REASON.ERROR);
+
       if (!!conversation && this.isMLSConference(conversation)) {
         await this.leaveMLSConferenceBecauseError(conversation);
       }
