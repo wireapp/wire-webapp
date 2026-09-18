@@ -1430,6 +1430,8 @@
   "messageFailedToSendWillReceivePlural": "ඔබගේ පණිවිඩය පසුව ලැබෙනු ඇත.",
   "messageFailedToSendWillReceiveSingular": "ඔබගේ පණිවිඩය පසුව ලැබෙනු ඇත.",
   "mlsConversationRecovered": "ඔබ යම් කාලයක් මෙම උපාංගය භාවිතා කර නැත හෝ යම් දෝෂයක් සිදු වී ඇත. ඇතැම් පරණ පණිවිඩ මෙහි නොපෙන්වයි.",
+  "mlsReset": " was unable to decrypt some of your messages but has solved the issue. This affected all conversations you share together.",
+  "mlsResetSelf": "Session successfully reset",
   "mlsSignature": "{signature} අත්සන සමඟ MLS",
   "mlsThumbprint": "MLS ඇඟිලි සටහන",
   "mlsToggleInfo": "මෙය සක්‍රිය විට, සංවාදය සඳහා නව පණිවිඩකරණ ස්තර ආරක්‍ෂණ (MLS) කෙටුම්පත භාවිතා කරයි.",
