@@ -22,10 +22,7 @@ import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-w
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {
-  createMeetingReminderScheduler,
-  MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS,
-} from './createMeetingReminderScheduler';
+import {createMeetingReminderScheduler, MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS} from './createMeetingReminderScheduler';
 
 const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
   series_start_date: '2026-06-01T10:00:00.000Z',
@@ -59,9 +56,7 @@ describe('createMeetingReminderScheduler', () => {
     expect(reminders).toEqual([]);
 
     wallClock.advanceByMilliseconds(1);
-    expect(reminders).toEqual([
-      {meetingTitle: 'Weekly sync', meetingStartTime: '2026-06-01T10:00:00.000Z'},
-    ]);
+    expect(reminders).toEqual([{meetingTitle: 'Weekly sync', meetingStartTime: '2026-06-01T10:00:00.000Z'}]);
 
     wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
     expect(reminders).toHaveLength(1);
@@ -232,9 +227,7 @@ describe('createMeetingReminderScheduler', () => {
     wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 21);
     expect(reminders).toEqual([]);
 
-    wallClock.advanceByMilliseconds(
-      Date.parse('2026-06-08T09:50:00.000Z') - Date.parse('2026-06-01T10:10:00.000Z'),
-    );
+    wallClock.advanceByMilliseconds(Date.parse('2026-06-08T09:50:00.000Z') - Date.parse('2026-06-01T10:10:00.000Z'));
     expect(reminders).toEqual(['2026-06-08T10:00:00.000Z']);
     scheduler.stop();
   });
