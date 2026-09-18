@@ -157,7 +157,7 @@ describe('PrimaryModal', () => {
     });
 
     it('should fire validation on submit click', async () => {
-      const {getErrorMessage, getPrimaryActionButton} = renderPrimaryModal({
+      const {getErrorMessages, getPrimaryActionButton} = renderPrimaryModal({
         hideCloseButton: false,
         primaryAction: action,
         secondaryAction: jest.fn(),
@@ -168,7 +168,7 @@ describe('PrimaryModal', () => {
 
       fireEvent.click(getPrimaryActionButton());
 
-      expect(getErrorMessage()).toBeTruthy();
+      expect(getErrorMessages()).toHaveLength(2);
     });
 
     it('should fill password fields when generate password button clicked', async () => {
@@ -246,7 +246,7 @@ const renderPrimaryModal = ({
   translate,
   type,
 }: RenderPrimaryModalParameters) => {
-  const {getByTestId, queryByTestId, getByLabelText} = render(
+  const {getByTestId, getAllByTestId, queryByTestId, getByLabelText} = render(
     withTheme(<PrimaryModalComponent translate={translateForTest} />),
     {
       wrapper: rootProviderWrapper,
@@ -288,7 +288,7 @@ const renderPrimaryModal = ({
     getPrimaryActionButton: () => getByTestId('do-action'),
     getSecondaryActionButton: () => getByTestId('do-secondary'),
     getCloseButton: () => queryByTestId('do-close'),
-    getErrorMessage: () => getByTestId('primary-modals-error-message'),
+    getErrorMessages: () => getAllByTestId('primary-modals-error-message'),
     getPasswordInput: () => getByTestId('guest-link-password'),
     getInput: () => getByLabelText('test-input'),
     getGeneratePasswordButton: () => getByTestId('do-generate-password'),

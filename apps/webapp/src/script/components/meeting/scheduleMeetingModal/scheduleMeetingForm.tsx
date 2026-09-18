@@ -34,6 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {MeetingParticipantsPicker} from 'Components/meeting/meetingParticipantsPicker';
+import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
 import {useMeetingParticipants} from 'Components/meeting/shared/participants/useMeetingParticipants';
 import {
   scheduleMeetingFormColumnCss,
@@ -56,11 +57,12 @@ import {
   SCHEDULE_MEETING_RECURRENCE_OPTIONS,
   SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
 } from './scheduleMeetingRecurrence';
-import type {
-  ScheduleMeetingFormDisplayErrors,
-  ScheduleMeetingFormState,
-  ScheduleMeetingMode,
-  ScheduleMeetingRecurrenceOption,
+import {
+  type ScheduleMeetingFormDisplayErrors,
+  type ScheduleMeetingFormState,
+  type ScheduleMeetingMode,
+  scheduleMeetingModes,
+  type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
 
 const toDateTimePickerValue = (value: Maybe<Date>): Date | null => value.unwrapOr(null);
@@ -82,6 +84,8 @@ export interface ScheduleMeetingFormProps {
   onRecurrenceChange: (recurrence: ScheduleMeetingRecurrenceOption) => void;
   onSelectedUsersChange: (users: User[]) => void;
   onParticipantsFilterChange: (filter: string) => void;
+  onPasswordChange?: (password: string) => void;
+  onPasswordConfirmationChange?: (password: string) => void;
   selfUser: User;
 }
 
@@ -96,9 +100,12 @@ export const ScheduleMeetingForm = ({
   onRecurrenceChange,
   onSelectedUsersChange,
   onParticipantsFilterChange,
+  onPasswordChange,
+  onPasswordConfirmationChange,
   selfUser,
 }: ScheduleMeetingFormProps) => {
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
   const {mainViewModel, translate, wallClock} = useApplicationContext();
   const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
@@ -158,12 +165,12 @@ export const ScheduleMeetingForm = ({
   );
 
   const startMinTime = useMemo(
-    () => (mode === 'edit' ? null : getMinTimeForDate(toDateTimePickerValue(formState.start))),
+    () => (mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(toDateTimePickerValue(formState.start))),
     [formState.start, getMinTimeForDate, mode],
   );
 
   const endMinTime = useMemo(
-    () => (mode === 'edit' ? null : getMinTimeForDate(toDateTimePickerValue(formState.end))),
+    () => (mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(toDateTimePickerValue(formState.end))),
     [formState.end, getMinTimeForDate, mode],
   );
 
@@ -197,6 +204,7 @@ export const ScheduleMeetingForm = ({
       <div css={scheduleMeetingFormLeftColumnCss}>
         <Input
           id="schedule-meeting-title"
+          required
           ref={titleInputRef}
           autoComplete="off"
           data-uie-name="schedule-meeting-title"
@@ -244,6 +252,25 @@ export const ScheduleMeetingForm = ({
             popoverPortalContainer={portalContainer}
           />
         </div>
+        {mode === scheduleMeetingModes.create && (
+          <MeetingLinkForm
+            translate={translate}
+            onGeneratePassword={password => {
+              onPasswordChange?.(password);
+              onPasswordConfirmationChange?.(password);
+            }}
+            passwordValue={formState.password}
+            passwordValueRef={passwordInputRef}
+            passwordError={errors.password}
+            passwordConfirmationError={errors.passwordConfirmation}
+            onPasswordValueChange={password => onPasswordChange?.(password)}
+            isPasswordInputMarkInvalid={isNonEmptyString(errors.password)}
+            passwordConfirmationValue={formState.passwordConfirmation}
+            onPasswordConfirmationChange={password => onPasswordConfirmationChange?.(password)}
+            isPasswordConfirmationMarkInvalid={isNonEmptyString(errors.passwordConfirmation)}
+            copyDisabled={!isNonEmptyString(formState.password) || isNonEmptyString(errors.password)}
+          />
+        )}
       </div>
 
       <div css={scheduleMeetingFormDividerCss} aria-hidden="true" />

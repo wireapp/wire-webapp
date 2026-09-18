@@ -57,6 +57,7 @@ export const CopyToClipboardButton = ({
 
   return (
     <Button
+      type="button"
       disabled={disabled}
       onClick={copyToClipboard}
       variant={ButtonVariant.TERTIARY}
