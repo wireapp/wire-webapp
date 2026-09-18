@@ -53,7 +53,7 @@ describe('MessageReactions', () => {
     jest.clearAllMocks();
   });
 
-  test('outside click should close the emoji picker', async () => {
+  it('outside click should close the emoji picker', async () => {
     let currentMsgActionName = defaultProps.currentMsgActionName; // preserve initial value
 
     const MessageReactionsComponent = (props: MessageReactionsProps) => {
@@ -88,7 +88,7 @@ describe('MessageReactions', () => {
     expect(queryByTestId(emojiPickerDialogId)).toBeNull();
   });
 
-  test('should call handleReactionClick on reaction click', () => {
+  it('should call handleReactionClick on reaction click', () => {
     const {getByLabelText} = render(<MessageReactions {...defaultProps} />, {wrapper: rootProviderWrapper});
 
     const thumbsUpButton = getByLabelText(translateForTest('accessibility.messageActionsMenuThumbsUp'));

@@ -34,14 +34,14 @@ describe('BackUpHeader', () => {
     backUpHeader = new BackUpHeader('userId', 'password');
   });
 
-  test('encodeHeader returns the expected header data', async () => {
+  it('encodeHeader returns the expected header data', async () => {
     const headerData = await backUpHeader.encodeHeader();
 
     // Assert the expected properties of the headerData
     expect(headerData).toHaveLength(63);
   });
 
-  test('decodeHeader returns the expected decoded header', async () => {
+  it('decodeHeader returns the expected decoded header', async () => {
     // Create encoded header data
     const encodedHeaderData = await backUpHeader.encodeHeader();
 

@@ -54,7 +54,7 @@ describe('runtime build metadata verification', () => {
     expect(validateMatchingRuntimeResponses(mainBuildMetadata, matchingRuntimeConfiguration)).toEqual([]);
   });
 
-  test.each([
+  it.each([
     ['version', {...mainBuildMetadata, version: 'main-other-version'}],
     ['assetVersion', {...mainBuildMetadata, assetVersion: 'main-other-assets'}],
     ['commit', {...mainBuildMetadata, commit: 'other-commit'}],

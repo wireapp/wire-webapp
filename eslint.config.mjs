@@ -45,6 +45,8 @@ const ignores = [
   'apps/webapp/bin/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
+  '!**/*.config.test.*',
+  '!**/*.config.spec.*',
   'apps/webapp/src/sw.js',
   'apps/server/bin/',
   'apps/server/coverage/',
@@ -1038,6 +1040,13 @@ const config = [
     },
     rules: {
       'jest/require-top-level-describe': 'error',
+      'jest/consistent-test-it': [
+        'error',
+        {
+          fn: 'it',
+          withinDescribe: 'it',
+        },
+      ],
     },
   },
   {

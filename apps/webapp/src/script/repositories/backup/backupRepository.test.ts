@@ -262,7 +262,7 @@ describe('BackupRepository', () => {
   });
 
   describe('Backup encrytion', () => {
-    test('compressHistoryFiles calls the encryption function if password is provided', async () => {
+    it('compressHistoryFiles calls the encryption function if password is provided', async () => {
       // Mocked values
       const password = 'Password';
       const clientId = 'ClientId';
