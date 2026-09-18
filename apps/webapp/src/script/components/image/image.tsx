@@ -27,6 +27,7 @@ import {InViewport} from 'Components/inViewport';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger, Logger} from 'Util/logger';
 
@@ -141,6 +142,7 @@ export const Image = ({
 
   const [imageUrl, setImageUrl] = useState<AssetUrl>();
 
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {getAssetUrl: getAssetUrlFromAssetTransfer} = useAssetTransfer();
   const getAssetUrl = getAssetUrlOverride ?? getAssetUrlFromAssetTransfer;
 
@@ -182,8 +184,8 @@ export const Image = ({
       }
     }
 
-    void loadImageAsset();
-  }, [imageLoadState, isInViewport, image, isFileSharingReceivingEnabled, getAssetUrl, logger]);
+    fireAndForgetInvoker.fireAndForget(loadImageAsset);
+  }, [imageLoadState, isInViewport, image, isFileSharingReceivingEnabled, getAssetUrl, fireAndForgetInvoker, logger]);
 
   useEffect(() => {
     return () => {
@@ -204,8 +206,6 @@ export const Image = ({
     <InViewport
       onVisible={() => {
         setIsInViewport(true);
-
-        return undefined;
       }}
       className={cx(className, {'loading-dots image-asset--no-image': isLoading})}
       onClick={event => {

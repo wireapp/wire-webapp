@@ -28,6 +28,7 @@ import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {User} from 'Repositories/entity/User';
 import {
+  createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
@@ -97,8 +98,9 @@ jest.mock('Components/inViewport', () => {
 });
 
 describe('image-asset', () => {
+  const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
   const rootProviderWrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({translate: translateForTest}),
+    createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest}),
   );
   const fakeImageUrl = 'https://test.com/image.png';
   const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
