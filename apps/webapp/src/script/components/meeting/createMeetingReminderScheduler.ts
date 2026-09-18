@@ -168,7 +168,11 @@ export const createMeetingReminderScheduler = ({
 
     scheduled.delete(meetingKey);
     firedOccurrenceKeys.add(toFiredOccurrenceKey(meetingKey, scheduledReminder.occurrenceStartMs));
-    onReminder(toReminderPayload(scheduledReminder.meeting, scheduledReminder.occurrenceStartMs));
+
+    if (wallClock.currentTimestampInMilliseconds < scheduledReminder.occurrenceStartMs) {
+      onReminder(toReminderPayload(scheduledReminder.meeting, scheduledReminder.occurrenceStartMs));
+    }
+
     scheduleMeeting(scheduledReminder.meeting);
   };
 

@@ -182,6 +182,63 @@ describe('createMeetingReminderScheduler', () => {
     scheduler.stop();
   });
 
+  it('does not fire a reminder when the timeout runs after the meeting has started', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    });
+    const onReminder = jest.fn();
+    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+
+    scheduler.sync([createMeetingSeries()]);
+    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 21);
+
+    expect(onReminder).not.toHaveBeenCalled();
+    scheduler.stop();
+  });
+
+  it('still fires a reminder when the timeout is late but the meeting has not started', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    });
+    const onReminder = jest.fn();
+    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+
+    scheduler.sync([createMeetingSeries()]);
+    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 6);
+
+    expect(onReminder).toHaveBeenCalledTimes(1);
+    scheduler.stop();
+  });
+
+  it('still reminds for the next recurring occurrence after skipping a stale fire', () => {
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    });
+    const reminders: string[] = [];
+    const scheduler = createMeetingReminderScheduler({
+      wallClock,
+      onReminder: reminder => {
+        reminders.push(reminder.meetingStartTime);
+      },
+    });
+
+    scheduler.sync([
+      createMeetingSeries({
+        recurrence: 'weekly',
+        series_start_date: '2026-06-01T10:00:00.000Z',
+        series_end_date: '2026-06-01T11:00:00.000Z',
+      }),
+    ]);
+    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 21);
+    expect(reminders).toEqual([]);
+
+    wallClock.advanceByMilliseconds(
+      Date.parse('2026-06-08T09:50:00.000Z') - Date.parse('2026-06-01T10:10:00.000Z'),
+    );
+    expect(reminders).toEqual(['2026-06-08T10:00:00.000Z']);
+    scheduler.stop();
+  });
+
   it('does not fire a far-future reminder on the first timeout chunk', () => {
     const wallClock = createDeterministicWallClock({
       initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T10:00:00.000Z'),
