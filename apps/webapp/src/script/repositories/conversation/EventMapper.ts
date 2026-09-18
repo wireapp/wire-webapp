@@ -51,6 +51,7 @@ import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTime
 import {MissedMessage} from 'Repositories/entity/message/missedMessage';
 import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsConversationRecoveredMessage';
 import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
+import {createMLSResetMessage} from 'Repositories/entity/message/mlsResetMessage';
 import {Multipart} from 'Repositories/entity/message/multipart';
 import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/oneToOneMigratedToMlsMessage';
 import {PingMessage} from 'Repositories/entity/message/pingMessage';
@@ -295,6 +296,11 @@ export class EventMapper {
 
       case CONVERSATION_EVENT.RENAME: {
         messageEntity = this._mapEventRename(event);
+        break;
+      }
+
+      case CONVERSATION_EVENT.MLS_RESET: {
+        messageEntity = createMLSResetMessage(this.translate);
         break;
       }
 
