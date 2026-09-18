@@ -808,40 +808,57 @@ export class CallingRepository {
     }
   }
 
-  // Zentral methode to query, handle and setup medias
+  // Zentral methode to query, caching and setup medias
   private async acquireCallMedia(call: Call, query: MediaStreamQuery): Promise<MediaStream> {
     const selfParticipant = call.getSelfParticipant();
 
-    const cache = {
+    // Wait for an ongoing acquisition before checking which streams are still missing.
+    if (this.mediaStreamQuery) {
+      await this.mediaStreamQuery;
+    }
+
+    const currentStreams = {
       audio: selfParticipant.audioStream(),
       camera: selfParticipant.videoStream(),
       screen: selfParticipant.videoStream(),
     };
 
     const missingStreams = Object.fromEntries(
-      Object.entries(query).filter(([type, requested]) => requested && !cache[type as keyof typeof cache]),
+      Object.entries(query).filter(
+        ([type, requested]) => requested && !currentStreams[type as keyof typeof currentStreams],
+      ),
     ) as MediaStreamQuery;
 
-    // Everything requested is already available.
     if (Object.keys(missingStreams).length === 0) {
       return selfParticipant.getMediaStream();
     }
 
-    const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
+    const mediaStreamQuery = (async () => {
+      const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
 
-    // The call might have ended while waiting for media.
-    if (call.state() === CALL_STATE.NONE) {
-      mediaStream.getTracks().forEach(track => track.stop());
+      if (call.state() === CALL_STATE.NONE) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        return mediaStream;
+      }
+
+      if (missingStreams.camera && mediaStream.getVideoTracks().length > 0) {
+        await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
+      } else {
+        selfParticipant.updateMediaStream(mediaStream, true);
+      }
+
       return selfParticipant.getMediaStream();
-    }
+    })();
 
-    if (missingStreams.camera && mediaStream.getVideoTracks().length > 0) {
-      await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
-    } else {
-      selfParticipant.updateMediaStream(mediaStream, true);
-    }
+    this.mediaStreamQuery = mediaStreamQuery;
 
-    return selfParticipant.getMediaStream();
+    try {
+      return await mediaStreamQuery;
+    } finally {
+      if (this.mediaStreamQuery === mediaStreamQuery) {
+        this.mediaStreamQuery = undefined;
+      }
+    }
   }
 
   private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
@@ -2838,50 +2855,37 @@ export class CallingRepository {
     camera: boolean,
     screen: boolean,
   ): Promise<MediaStream> => {
-    if (this.mediaStreamQuery) {
-      // if a query is already occurring, we will return the result of this query
-      return this.mediaStreamQuery;
-    }
     const call = this.findCall(this.parseQualifiedId(convId));
     if (!call) {
       return Promise.reject();
     }
+
     const selfParticipant = call.getSelfParticipant();
     const query = {audio, camera, screen};
 
-    this.mediaStreamQuery = (async () => {
-      try {
-        if (screen && selfParticipant.sharesScreen()) {
-          return selfParticipant.getMediaStream();
-        }
-
-        backgroundEffectsStore.getState().setIsInitializing(true);
-
-        return await this.acquireCallMedia(call, query);
-      } catch (error: unknown) {
-        this.logger.warn('Failed to get call media stream', error);
-
-        this.handleMediaStreamError(call, query, error);
-
+    try {
+      if (screen && selfParticipant.sharesScreen()) {
         return selfParticipant.getMediaStream();
-      } finally {
-        this.mediaStreamQuery = undefined;
-        backgroundEffectsStore.getState().setIsInitializing(false);
       }
-    })();
 
-    this.mediaStreamQuery
-      .then(() => {
-        const selfParticipant = call.getSelfParticipant();
+      backgroundEffectsStore.getState().setIsInitializing(true);
 
-        if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
-          selfParticipant.releaseVideoStream(true);
-        }
-      })
-      .catch(error => {
-         this.logger.warn('Failed to handle media stream query', error);
-       });
-    return this.mediaStreamQuery;
+      const mediaStream = await this.acquireCallMedia(call, query);
+
+      if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
+        selfParticipant.releaseVideoStream(true);
+      }
+
+      return mediaStream;
+    } catch (error: unknown) {
+      this.logger.warn('Failed to get call media stream', error);
+
+      this.handleMediaStreamError(call, query, error);
+
+      return selfParticipant.getMediaStream();
+    } finally {
+      backgroundEffectsStore.getState().setIsInitializing(false);
+    }
   };
 
   private readonly updateActiveSpeakers = (wuser: number, convId: string, rawJson: string) => {

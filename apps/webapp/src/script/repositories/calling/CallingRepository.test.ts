@@ -1685,7 +1685,7 @@ describe('setupDetachedWindowExternalLinksClick', () => {
   });
 });
 
-describe('Central media access flow', () => {
+describe('central acquire call media flow', () => {
   type CallingRepositoryTestApi = {
     acquireCallMedia(call: Call, query: MediaStreamQuery): Promise<MediaStream>;
   };
@@ -1693,6 +1693,7 @@ describe('Central media access flow', () => {
   let activeCall: Call;
   let callState: CallState;
   let mediaStreamHandler: MediaStreamHandler;
+  let mediaDeviceandler: MediaDevicesHandler;
   let backgroundEffectsHandler: BackgroundEffectsHandler;
   let callingRepository: CallingRepository;
   let selfParticipant: Participant;
@@ -1700,6 +1701,10 @@ describe('Central media access flow', () => {
   beforeEach(() => {
     mediaStreamHandler = Object.assign(Object.create(MediaStreamHandler.prototype) as MediaStreamHandler, {
       requestMediaStream: jest.fn(),
+    });
+
+    mediaDeviceandler = Object.assign(Object.create(MediaDevicesHandler.prototype) as MediaDevicesHandler, {
+      initializeMediaDevices: jest.fn(),
     });
 
     backgroundEffectsHandler = Object.assign(
@@ -1714,7 +1719,7 @@ describe('Central media access flow', () => {
     selfParticipant = Object.assign(Object.create(Participant.prototype) as Participant, {
       hasActiveVideo: jest.fn(() => true),
       sharesScreen: jest.fn(() => false),
-      audioStream: jest.fn(() => undefined),
+      audioStream: ko.observable(undefined),
       videoStream: jest.fn(() => undefined),
       processedVideoStream: jest.fn(() => undefined),
       releaseProcessedVideoStream: jest.fn(),
@@ -1738,7 +1743,7 @@ describe('Central media access flow', () => {
       {} as any,
       {} as any,
       mediaStreamHandler,
-      {} as any,
+      mediaDeviceandler,
       {} as any,
       backgroundEffectsHandler,
       {} as any,
@@ -1900,6 +1905,71 @@ describe('Central media access flow', () => {
 
     expect(stopSpy).toHaveBeenCalledTimes(1);
     expect(updateMediaStreamSpy).not.toHaveBeenCalled();
+  });
+
+  it('shares media acquisition between concurrent requests', async () => {
+    activeCall.state(CALL_STATE.INCOMING);
+
+    const source = new window.RTCAudioSource();
+    const audioTrack = source.createTrack();
+    const mediaStream = new MediaStream([audioTrack]);
+
+    selfParticipant.updateMediaStream = jest.fn((stream: MediaStream) => {
+      if (stream.getAudioTracks().length > 0) {
+        selfParticipant.audioStream(new MediaStream(stream.getAudioTracks()));
+      }
+
+      return selfParticipant.getMediaStream();
+    });
+
+    selfParticipant.getMediaStream = jest.fn(() => {
+      const audioTracks = selfParticipant.audioStream()?.getAudioTracks() ?? [];
+      return new MediaStream(audioTracks);
+    });
+
+    let resolveMediaStream: (stream: MediaStream) => void = () => null;
+
+    const requestMediaStreamSpy = jest
+      .spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream')
+      .mockImplementation(
+        () =>
+          new Promise<MediaStream>(resolve => {
+            resolveMediaStream = resolve;
+          }),
+      );
+
+    jest
+      .spyOn(callingRepository['mediaDevicesHandler'], 'initializeMediaDevices')
+      .mockResolvedValue(undefined);
+
+    // Start two acquisitions before the first one has finished.
+    const firstRequest = callingRepository['acquireCallMedia'](activeCall, {
+      audio: true,
+    });
+
+    const secondRequest = callingRepository['acquireCallMedia'](activeCall, {
+      audio: true,
+    });
+
+    // Only the first request should actually acquire media.
+    expect(requestMediaStreamSpy).toHaveBeenCalledTimes(1);
+
+    resolveMediaStream(mediaStream);
+
+    const [firstStream, secondStream] = await Promise.all([
+      firstRequest,
+      secondRequest,
+    ]);
+
+    // The second request must reuse the media acquired by the first request.
+    expect(requestMediaStreamSpy).toHaveBeenCalledTimes(1);
+    expect(selfParticipant.updateMediaStream).toHaveBeenCalledTimes(1);
+
+    expect(selfParticipant.audioStream()?.getAudioTracks()[0]).toBe(audioTrack);
+    expect(firstStream.getAudioTracks()[0]).toBe(audioTrack);
+    expect(secondStream.getAudioTracks()[0]).toBe(audioTrack);
+
+    audioTrack.stop();
   });
 });
 
