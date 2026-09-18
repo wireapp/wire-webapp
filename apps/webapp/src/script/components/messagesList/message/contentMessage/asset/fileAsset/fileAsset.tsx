@@ -17,7 +17,6 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -60,10 +59,7 @@ const FileAsset = ({
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
-  const assetFileName = asset.file_name;
-  if (isUndefined(assetFileName)) {
-    throw new Error('File asset has no file name');
-  }
+  const assetFileName = asset.file_name ?? '';
   const fileName = trimFileExtension(assetFileName);
   const fileExtension = getFileExtension(assetFileName);
   const formattedFileSize = formatBytes(asset.file_size);
