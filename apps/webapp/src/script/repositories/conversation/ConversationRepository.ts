@@ -4818,6 +4818,7 @@ export class ConversationRepository {
       });
 
       await this.saveConversationStateInDb(updatedConversation);
+      await this.addEventToConversation(updatedConversation, eventJson);
 
       this.logger.info(
         `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,

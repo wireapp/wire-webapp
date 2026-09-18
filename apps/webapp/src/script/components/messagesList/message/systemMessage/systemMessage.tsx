@@ -32,6 +32,8 @@ import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateM
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
 import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {SystemMessageBase} from './systemMessageBase';
 import {renderMlsSystemMessageCaption} from './systemMessageCaption';
@@ -45,6 +47,11 @@ interface SystemMessageProps {
 }
 
 export const SystemMessage = ({message}: SystemMessageProps) => {
+  const {user} = useKoSubscribableChildren(message, ['user']);
+  if (message.system_message_type === SystemMessageType.MLS_RESET) {
+    return <SystemMessageBase message={message} isSenderNameVisible={!user.isMe} icon={<Icon.InfoIcon />} />;
+  }
+
   if (message instanceof RenameMessage) {
     return (
       <>
