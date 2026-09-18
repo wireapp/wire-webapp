@@ -25,7 +25,6 @@ import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {Config} from 'src/script/Config';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -40,7 +39,6 @@ type Props = {
 };
 
 type RenderCompleteFailureToSendWarningOptions = {
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly messageFocusedTabIndex: number;
   readonly translate: Translate;
   readonly unreachableDomain?: string;
@@ -50,49 +48,36 @@ const config = Config.getConfig();
 const unreachableDomainMarker = createReactTranslationMarker('complete-failure-to-send-domain');
 
 function renderCompleteFailureToSendWarning(options: RenderCompleteFailureToSendWarningOptions): ReactNode {
-  const {isReactTranslationRenderingEnabled, messageFocusedTabIndex, translate, unreachableDomain} = options;
+  const {messageFocusedTabIndex, translate, unreachableDomain} = options;
 
   if (isNonEmptyString(unreachableDomain) === false) {
     return <p css={warning}>{translate('messageCouldNotBeSentConnectivityIssues')}</p>;
   }
 
-  let warningContent: ReactNode;
-  if (isReactTranslationRenderingEnabled) {
-    const translatedText = translate('messageCouldNotBeSentBackEndOffline', {
-      domain: unreachableDomainMarker.substitution,
-    });
-    const valueReplacements: ReactTranslationValueReplacement[] = [
-      {marker: unreachableDomainMarker, runtimeText: unreachableDomain},
-    ];
-
-    warningContent = (
-      <span css={warning}>
-        {renderReactTranslation({
-          translatedText,
-          componentReplacements: [
-            {
-              start: '<strong>',
-              end: '</strong>',
-              render(children) {
-                return <strong>{children}</strong>;
-              },
+  const translatedText = translate('messageCouldNotBeSentBackEndOffline', {
+    domain: unreachableDomainMarker.substitution,
+  });
+  const valueReplacements: ReactTranslationValueReplacement[] = [
+    {marker: unreachableDomainMarker, runtimeText: unreachableDomain},
+  ];
+  const warningContent = (
+    <span css={warning}>
+      {renderReactTranslation({
+        translatedText,
+        componentReplacements: [
+          {
+            start: '<strong>',
+            end: '</strong>',
+            render(children) {
+              return <strong>{children}</strong>;
             },
-          ],
-          nodeReplacements: [],
-          valueReplacements,
-        })}
-      </span>
-    );
-  } else {
-    warningContent = (
-      <span
-        css={warning}
-        dangerouslySetInnerHTML={{
-          __html: translate('messageCouldNotBeSentBackEndOffline', {domain: unreachableDomain}),
-        }}
-      />
-    );
-  }
+          },
+        ],
+        nodeReplacements: [],
+        valueReplacements,
+      })}
+    </span>
+  );
 
   return (
     <p>
@@ -116,14 +101,12 @@ export const CompleteFailureToSendWarning: FunctionComponent<Props> = ({
   onRetry,
   unreachableDomain,
 }) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   return (
     <div css={wrapper}>
       {renderCompleteFailureToSendWarning({
-        isReactTranslationRenderingEnabled,
         messageFocusedTabIndex,
         translate,
         unreachableDomain,

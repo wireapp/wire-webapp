@@ -182,6 +182,8 @@ export type MultipartMessageAddEvent = ConversationEvent<
 > &
   MessageAddMetadata;
 
+export type SessionResetEvent = BaseEvent & {id: string; type: CONVERSATION.SESSION_RESET};
+
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
@@ -301,6 +303,7 @@ export type ClientConversationEvent =
   | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
   | MissedEvent
+  | SessionResetEvent
   | JoinedAfterMLSMigrationFinalisationEvent
   | MLSMigrationFinalisationOngoingCallEvent
   | MLSConversationRecoveredEvent

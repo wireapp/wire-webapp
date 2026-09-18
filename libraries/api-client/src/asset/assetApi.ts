@@ -72,6 +72,13 @@ function getHeaderStringOrUndefined(headerValue: AxiosHeaderValue | undefined): 
   return undefined;
 }
 
+const assetDownloadRetryConfig = {
+  // Asset previews must eventually settle so the UI can handle download failures.
+  'axios-retry': {
+    retries: 3,
+  },
+} as const;
+
 export class AssetAPI {
   private readonly logger: logdown.Logger;
 
@@ -98,6 +105,7 @@ export class AssetAPI {
       params: {},
       responseType: 'arraybuffer',
       url: assetUrl,
+      ...assetDownloadRetryConfig,
     };
 
     if (token !== null && token !== undefined && token.length > 0) {

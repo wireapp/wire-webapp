@@ -22,7 +22,6 @@ import type {ReactNode} from 'react';
 import {ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {CheckIcon} from 'Components/icon';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {
@@ -65,7 +64,6 @@ type ConversationFeatureDescriptor = {
 type RenderConversationFeatureItemOptions = {
   readonly descriptor: ConversationFeatureDescriptor;
   readonly isLastFeature: boolean;
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translate: Translate;
 };
 
@@ -152,16 +150,6 @@ function getConversationFeatureMarkerSubstitutions(
   );
 }
 
-function getConversationFeatureRuntimeSubstitutions(
-  values: readonly ConversationFeatureTranslationValue[],
-): Record<string, string> {
-  return Object.fromEntries(
-    values.map(value => {
-      return [value.placeholder, value.runtimeText];
-    }),
-  );
-}
-
 function renderConversationFeatureReactTranslation(
   descriptor: ConversationFeatureDescriptor,
   translate: Translate,
@@ -195,36 +183,20 @@ function renderConversationFeatureIcon(isLastFeature: boolean): ReactNode {
 }
 
 function renderConversationFeatureItem(options: RenderConversationFeatureItemOptions): ReactNode {
-  const {descriptor, isLastFeature, isReactTranslationRenderingEnabled, translate} = options;
-
-  if (isReactTranslationRenderingEnabled) {
-    return (
-      <div css={conversationFeatureCss} key={descriptor.translationKey}>
-        {renderConversationFeatureIcon(isLastFeature)}
-        <span className="subline" data-uie-name="team-creation-intro-list-item">
-          {renderConversationFeatureReactTranslation(descriptor, translate)}
-        </span>
-      </div>
-    );
-  }
+  const {descriptor, isLastFeature, translate} = options;
 
   return (
     <div css={conversationFeatureCss} key={descriptor.translationKey}>
       {renderConversationFeatureIcon(isLastFeature)}
-      <span
-        dangerouslySetInnerHTML={{
-          __html: translate(descriptor.translationKey, getConversationFeatureRuntimeSubstitutions(descriptor.values)),
-        }}
-        className="subline"
-        data-uie-name="team-creation-intro-list-item"
-      />
+      <span className="subline" data-uie-name="team-creation-intro-list-item">
+        {renderConversationFeatureReactTranslation(descriptor, translate)}
+      </span>
     </div>
   );
 }
 
 export function ConversationFeature({conversationType}: ConversationFeatureProps): ReactNode {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
+  const {translate} = useApplicationContext();
   const featureDescriptors = getConversationFeatureDescriptors(conversationType);
 
   return (
@@ -233,7 +205,6 @@ export function ConversationFeature({conversationType}: ConversationFeatureProps
         return renderConversationFeatureItem({
           descriptor,
           isLastFeature: featureIndex === featureDescriptors.length - 1,
-          isReactTranslationRenderingEnabled,
           translate,
         });
       })}

@@ -69,6 +69,7 @@ export enum BackendErrorLabel {
   MLS_GROUP_OUT_OF_SYNC = 'mls-group-out-of-sync',
   MLS_INVALID_LEAF_NODE_SIGNATURE = 'mls-invalid-leaf-node-signature',
   MLS_INVALID_LEAF_NODE_INDEX = 'mls-invalid-leaf-node-index',
+  MLS_MIGRATION_CRITERIA_NOT_SATISFIED = 'mls-migration-criteria-not-satisfied',
 
   // Handle errors
   HANDLE_EXISTS = 'handle-exists',

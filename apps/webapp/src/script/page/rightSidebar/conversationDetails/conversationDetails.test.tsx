@@ -90,11 +90,6 @@ const viewerPermissionRootProviderWrapper = createRootProviderWrapperForTest(
   }),
 );
 
-beforeAll(async () => {
-  conversationRepository = await testFactory.exposeConversationActors();
-  searchRepository = await testFactory.exposeSearchActors();
-});
-
 const getDefaultParams = () => {
   const conversationRoleRepository: Partial<ConversationRoleRepository> = {
     canAddParticipants: () => true,
@@ -144,6 +139,11 @@ const getDefaultParams = () => {
 };
 
 describe('ConversationDetails', () => {
+  beforeAll(async () => {
+    conversationRepository = await testFactory.exposeConversationActors();
+    searchRepository = await testFactory.exposeSearchActors();
+  });
+
   it.each([
     {selfUserTeamId: 'conversation-team', expectedStatus: 'cells.sharedDriveAccess.editorAccess'},
     {selfUserTeamId: 'other-team', expectedStatus: 'cells.sharedDriveAccess.viewerAccess'},

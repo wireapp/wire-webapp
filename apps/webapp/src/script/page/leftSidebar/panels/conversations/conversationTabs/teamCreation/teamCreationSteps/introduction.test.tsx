@@ -21,7 +21,6 @@ import {render} from '@testing-library/react';
 
 import en from 'I18n/en-US.json';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -30,15 +29,7 @@ import {setStrings, translate} from 'Util/localizerUtil';
 
 import {Introduction} from './introduction';
 
-const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -82,21 +73,9 @@ function renderIntroduction(options: RenderIntroductionOptions): ReturnType<type
 
 describe('Introduction', () => {
   it(
-    'keeps the legacy list-item rendering when React translation rendering is disabled',
+    'renders translated bold formatting as React elements',
     withTranslationStrings(en, () => {
-      const {container} = renderIntroduction({rootProviderWrapper: legacyRootProviderWrapper});
-      const listItems = container.querySelectorAll('[data-uie-name="team-creation-intro-list-item"]');
-
-      expect(listItems).toHaveLength(5);
-      expect(listItems[0]).toHaveTextContent('Admin Console: Invite team members and manage settings.');
-      expect(listItems[0].querySelector('strong')).toHaveTextContent('Admin Console:');
-    }),
-  );
-
-  it(
-    'renders translated bold formatting as React elements when enabled',
-    withTranslationStrings(en, () => {
-      const {container} = renderIntroduction({rootProviderWrapper: reactTranslationRenderingRootProviderWrapper});
+      const {container} = renderIntroduction({rootProviderWrapper: translationRootProviderWrapper});
       const listItems = container.querySelectorAll('[data-uie-name="team-creation-intro-list-item"]');
 
       expect(listItems).toHaveLength(5);
@@ -107,14 +86,14 @@ describe('Introduction', () => {
   );
 
   it(
-    'keeps unsupported translation markup as text when enabled',
+    'keeps unsupported translation markup as text',
     withTranslationStrings(
       {
         ...en,
         teamCreationIntroListItem1: '<img src="example">[bold]Admin Console:[/bold] Invite team members.',
       },
       () => {
-        const {container} = renderIntroduction({rootProviderWrapper: reactTranslationRenderingRootProviderWrapper});
+        const {container} = renderIntroduction({rootProviderWrapper: translationRootProviderWrapper});
         const listItems = container.querySelectorAll('[data-uie-name="team-creation-intro-list-item"]');
 
         expect(listItems[0]).toHaveTextContent('<img src="example">Admin Console: Invite team members.');

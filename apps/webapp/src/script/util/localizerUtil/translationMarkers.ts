@@ -17,21 +17,18 @@
  *
  */
 
-import {forwardRef} from 'react';
+export const translationSubstitutionPattern = /{(.+?)}/g;
+export const dangerousTranslationSubstitutionPattern = /\[(.+?)\]/g;
 
-import type {SharedDriveUploadInputDependencies} from './sharedDriveUploadInput';
-import {handleSharedDriveUploadInput} from './sharedDriveUploadInput';
+function extractMarkersWithPattern(translationValue: string, markerPattern: RegExp): string[] {
+  return Array.from(translationValue.matchAll(markerPattern), (match): string => {
+    return match[0];
+  });
+}
 
-export const SharedDriveUploadFileInput = forwardRef<HTMLInputElement, SharedDriveUploadInputDependencies>(
-  (dependencies, ref) => (
-    <input
-      ref={ref}
-      type="file"
-      hidden
-      multiple
-      onChange={event => handleSharedDriveUploadInput(event, dependencies)}
-    />
-  ),
-);
-
-SharedDriveUploadFileInput.displayName = 'SharedDriveUploadFileInput';
+export function extractTranslationMarkers(translationValue: string): string[] {
+  return [
+    ...extractMarkersWithPattern(translationValue, translationSubstitutionPattern),
+    ...extractMarkersWithPattern(translationValue, dangerousTranslationSubstitutionPattern),
+  ];
+}

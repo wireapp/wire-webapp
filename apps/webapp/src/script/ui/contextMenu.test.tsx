@@ -25,11 +25,6 @@ import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSu
 
 import * as ActiveWindowMod from '../hooks/useActiveWindow';
 
-beforeAll(() => {
-  jest.spyOn(ActiveWindowMod, 'useActiveWindowState').mockImplementation(() => ({activeWindow: window}));
-  (ActiveWindowMod.useActiveWindowState as any).getState = () => ({activeWindow: window});
-});
-
 const px = (n: number) => `${n}px`;
 const queryMenu = () => document.querySelector('ul.ctx-menu') as HTMLUListElement | null;
 
@@ -66,6 +61,11 @@ const closeMenu = async () => {
 };
 
 describe('ContextMenu positioning', () => {
+  beforeAll(() => {
+    jest.spyOn(ActiveWindowMod, 'useActiveWindowState').mockImplementation(() => ({activeWindow: window}));
+    (ActiveWindowMod.useActiveWindowState as any).getState = () => ({activeWindow: window});
+  });
+
   beforeEach(() => {
     Object.defineProperty(window, 'innerWidth', {configurable: true, value: 1024});
     Object.defineProperty(window, 'innerHeight', {configurable: true, value: 768});

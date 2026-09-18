@@ -21,7 +21,6 @@ import {render} from '@testing-library/react';
 
 import {Config} from 'src/script/Config';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -34,15 +33,7 @@ import en from 'I18n/en-US.json';
 
 import {CameraPreferences} from './cameraPreferences';
 
-const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName): boolean {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 const cameraAccessDeniedUrl = 'https://support.example/camera-access-denied';
 
 type TranslationTestFunction = () => void | Promise<void>;
@@ -118,31 +109,11 @@ function renderCameraPreferences(
 
 describe('CameraPreferences', () => {
   it(
-    'keeps the legacy no-camera translation rendering when React translation rendering is disabled',
+    'renders the FAQ link and line break as React nodes',
     withCameraConfiguration(
       {},
       withTranslationStrings(en, () => {
-        const {container} = renderCameraPreferences(legacyRootProviderWrapper);
-        const noCameraMessage = container.querySelector('.preferences-av-video-disabled__info');
-        const faqLink = noCameraMessage?.querySelector('a');
-
-        expect(noCameraMessage).toHaveTextContent('doesn’t have access to the camera.');
-        expect(noCameraMessage?.querySelectorAll('br')).toHaveLength(1);
-        expect(faqLink).toHaveTextContent('Read this support article');
-        expect(faqLink).toHaveAttribute('href', cameraAccessDeniedUrl);
-        expect(faqLink).toHaveAttribute('target', '_blank');
-        expect(faqLink).toHaveAttribute('rel', 'noopener noreferrer');
-        expect(faqLink).toHaveAttribute('data-uie-name', 'go-no-camera-faq');
-      }),
-    ),
-  );
-
-  it(
-    'renders the FAQ link and line break as React nodes when enabled',
-    withCameraConfiguration(
-      {},
-      withTranslationStrings(en, () => {
-        const {container} = renderCameraPreferences(reactTranslationRenderingRootProviderWrapper);
+        const {container} = renderCameraPreferences(translationRootProviderWrapper);
         const noCameraMessage = container.querySelector('.preferences-av-video-disabled__info');
         const faqLink = noCameraMessage?.querySelector('a');
 
@@ -167,7 +138,7 @@ describe('CameraPreferences', () => {
           preferencesAVNoCamera: 'Need help? [faqLink]Camera troubleshooting[/faqLink][br]{brandName}',
         },
         () => {
-          const {container} = renderCameraPreferences(reactTranslationRenderingRootProviderWrapper);
+          const {container} = renderCameraPreferences(translationRootProviderWrapper);
           const noCameraMessage = container.querySelector('.preferences-av-video-disabled__info');
           const faqLink = noCameraMessage?.querySelector('a');
 
@@ -190,7 +161,7 @@ describe('CameraPreferences', () => {
           preferencesAVNoCamera: '{brandName}[br][faqLink]Read this support article[/faqLink]',
         },
         () => {
-          const {container} = renderCameraPreferences(reactTranslationRenderingRootProviderWrapper);
+          const {container} = renderCameraPreferences(translationRootProviderWrapper);
           const noCameraMessage = container.querySelector('.preferences-av-video-disabled__info');
 
           expect(noCameraMessage?.textContent).toBe('[faqLink]Wire[/faqLink]Read this support article');
@@ -202,7 +173,7 @@ describe('CameraPreferences', () => {
   );
 
   it(
-    'keeps unsupported translation markup as text when enabled',
+    'keeps unsupported translation markup as text',
     withCameraConfiguration(
       {},
       withTranslationStrings(
@@ -211,7 +182,7 @@ describe('CameraPreferences', () => {
           preferencesAVNoCamera: '<img src="example">[br][faqLink]Read this support article[/faqLink]',
         },
         () => {
-          const {container} = renderCameraPreferences(reactTranslationRenderingRootProviderWrapper);
+          const {container} = renderCameraPreferences(translationRootProviderWrapper);
           const noCameraMessage = container.querySelector('.preferences-av-video-disabled__info');
 
           expect(noCameraMessage).toHaveTextContent('<img src="example">Read this support article');

@@ -24,7 +24,6 @@ import ko from 'knockout';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
 import {User} from 'Repositories/entity/User';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -46,15 +45,7 @@ const conversationRepository = {
     labels: ko.observableArray([]),
   } as unknown as ConversationLabelRepository,
 } as unknown as ConversationRepository;
-const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName): boolean {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -126,25 +117,10 @@ function renderConversationTabs(
 
 describe('ConversationTabs', () => {
   it(
-    'keeps the legacy environment disclaimer rendering when React translation rendering is disabled',
-    withInternalEnvironment(
-      withTranslationStrings(en, () => {
-        const {container, getByRole} = renderConversationTabs(legacyRootProviderWrapper);
-        const disclaimerLink = container.querySelector(`a[href="${internalEnvironmentUrl}"]`);
-
-        expect(disclaimerLink).toHaveTextContent(internalEnvironmentUrl);
-        expect(disclaimerLink).toHaveAttribute('target', '_blank');
-        expect(disclaimerLink).toHaveAttribute('rel', 'nofollow noopener noreferrer');
-        expect(getByRole('presentation')).toBeInTheDocument();
-      }),
-    ),
-  );
-
-  it(
-    'renders the environment disclaimer link as React content in the tooltip and footer',
+    'renders the environment disclaimer link in the tooltip and footer',
     withInternalEnvironment(
       withTranslationStrings(en, async () => {
-        const {container, getByRole} = renderConversationTabs(reactTranslationRenderingRootProviderWrapper);
+        const {container, getByRole} = renderConversationTabs(translationRootProviderWrapper);
         const disclaimerLink = container.querySelector(`a[href="${internalEnvironmentUrl}"]`);
         const user = userEvent.setup();
 
@@ -172,7 +148,7 @@ describe('ConversationTabs', () => {
           conversationInternalEnvironmentDisclaimer: 'Open [link]{url}[/link] instead.',
         },
         async () => {
-          const {container, getByRole} = renderConversationTabs(reactTranslationRenderingRootProviderWrapper);
+          const {container, getByRole} = renderConversationTabs(translationRootProviderWrapper);
           const disclaimerLink = container.querySelector(`a[href="${internalEnvironmentUrl}"]`);
           const user = userEvent.setup();
 
@@ -190,7 +166,7 @@ describe('ConversationTabs', () => {
   );
 
   it(
-    'keeps unsupported translated markup as text when React translation rendering is enabled',
+    'keeps unsupported translated markup as text',
     withInternalEnvironment(
       withTranslationStrings(
         {
@@ -198,7 +174,7 @@ describe('ConversationTabs', () => {
           conversationInternalEnvironmentDisclaimer: '<img src="example"> [link]{url}[/link]',
         },
         async () => {
-          const {container} = renderConversationTabs(reactTranslationRenderingRootProviderWrapper);
+          const {container} = renderConversationTabs(translationRootProviderWrapper);
 
           expect(container).toHaveTextContent(`<img src="example"> ${internalEnvironmentUrl}`);
           expect(container.querySelector('img')).toBeNull();

@@ -70,6 +70,7 @@ describe('AssetAPI', () => {
           url: `/assets/${validDomain}/${validAssetId}`,
           params: expect.objectContaining({asset_token: validToken}),
           responseType: 'arraybuffer',
+          'axios-retry': {retries: 3},
         }),
       );
     });
@@ -171,6 +172,7 @@ describe('AssetAPI', () => {
           method: 'get',
           url: `/bot/assets/${validAssetId}`,
           params: expect.objectContaining({asset_token: validToken}),
+          'axios-retry': {retries: 3},
         }),
       );
     });

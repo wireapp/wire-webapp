@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactNode} from 'react';
+
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
@@ -26,8 +28,8 @@ import {ClientEvent} from 'Repositories/event/Client';
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
-import {Declension, joinNames, replaceLink} from 'Util/localizerUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {Declension, joinNames} from 'Util/localizerUtil';
+import {createReactTranslationMarker, replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export const CONFIG = {
@@ -50,7 +52,13 @@ function getVisibleUsers(users: User[]) {
   return users.slice(0, CONFIG.REDUCED_USERS_COUNT);
 }
 
-function ShowMoreButton({children, onClick}: {children: React.ReactNode; onClick: () => void}) {
+const legalHoldLinkMarker = createReactTranslationMarker('member_message_legal_hold_link');
+const legalHoldLinkDangerousSubstitutions = {
+  '/link': legalHoldLinkMarker.end,
+  link: legalHoldLinkMarker.start,
+};
+
+function ShowMoreButton({children, onClick}: {children: ReactNode; onClick: () => void}): ReactNode {
   return (
     <button
       className="message-header-show-more button-reset-default accent-text"
@@ -65,7 +73,7 @@ function ShowMoreButton({children, onClick}: {children: React.ReactNode; onClick
   );
 }
 
-function getContent(message: MemberMessageEntity, translate: RootContextValue['translate']) {
+function getContent(message: MemberMessageEntity, translate: RootContextValue['translate']): string {
   if (!message.hasUsers()) {
     return '';
   }
@@ -101,28 +109,23 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
         }
 
         return exceedsMaxVisibleUsers
-          ? translate('conversationCreateWithMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
-          : translate('conversationCreateWith', {users: dativeUsers}, {}, true);
+          ? translate('conversationCreateWithMore', {count: hiddenUsersCount.toString(), users: dativeUsers})
+          : translate('conversationCreateWith', {users: dativeUsers});
       }
 
       if (actor.isMe) {
         return exceedsMaxVisibleUsers
-          ? translate('conversationCreatedYouMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
-          : translate('conversationCreatedYou', {users: dativeUsers}, {}, true);
+          ? translate('conversationCreatedYouMore', {count: hiddenUsersCount.toString(), users: dativeUsers})
+          : translate('conversationCreatedYou', {users: dativeUsers});
       }
 
       return exceedsMaxVisibleUsers
-        ? translate('conversationCreatedMore', {count: hiddenUsersCount.toString(), name, users: dativeUsers}, {}, true)
-        : translate('conversationCreated', {name, users: dativeUsers}, {}, true);
+        ? translate('conversationCreatedMore', {count: hiddenUsersCount.toString(), name, users: dativeUsers})
+        : translate('conversationCreated', {name, users: dativeUsers});
     }
 
     case SystemMessageType.CONVERSATION_RESUME: {
-      return translate(
-        'conversationResume',
-        {users: generateNames(targetedUsers, translate, Declension.DATIVE)},
-        {},
-        true,
-      );
+      return translate('conversationResume', {users: generateNames(targetedUsers, translate, Declension.DATIVE)});
     }
 
     default:
@@ -135,43 +138,36 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
       if (senderJoined) {
         return message.user().isMe
           ? translate('conversationMemberJoinedSelfYou')
-          : translate('conversationMemberJoinedSelf', {name: message.senderName()}, {}, true);
+          : translate('conversationMemberJoinedSelf', {name: message.senderName()});
       }
 
       if (message.user().isMe) {
         return exceedsMaxVisibleUsers
-          ? translate(
-              'conversationMemberJoinedYouMore',
-              {count: hiddenUsersCount.toString(), users: accusativeUsers},
-              {},
-              true,
-            )
-          : translate('conversationMemberJoinedYou', {users: accusativeUsers}, {}, true);
+          ? translate('conversationMemberJoinedYouMore', {count: hiddenUsersCount.toString(), users: accusativeUsers})
+          : translate('conversationMemberJoinedYou', {users: accusativeUsers});
       }
       return exceedsMaxVisibleUsers
-        ? translate(
-            'conversationMemberJoinedMore',
-            {count: hiddenUsersCount.toString(), name, users: accusativeUsers},
-            {},
-            true,
-          )
-        : translate('conversationMemberJoined', {name, users: accusativeUsers}, {}, true);
+        ? translate('conversationMemberJoinedMore', {count: hiddenUsersCount.toString(), name, users: accusativeUsers})
+        : translate('conversationMemberJoined', {name, users: accusativeUsers});
     }
 
     case CONVERSATION_EVENT.MEMBER_LEAVE: {
       if (message.reason === MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT) {
-        const replaceLinkLegalHold = replaceLink(
-          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-          '',
-          'read-more-legal-hold',
-        );
         if (message.userEntities().some(user => user.isMe)) {
-          return translate('conversationYouRemovedMissingLegalHoldConsent', undefined, replaceLinkLegalHold);
+          return translate(
+            'conversationYouRemovedMissingLegalHoldConsent',
+            undefined,
+            legalHoldLinkDangerousSubstitutions,
+          );
         }
         const users = generateNames(targetedUsers, translate);
 
         if (message.userEntities().length === 1) {
-          return translate('conversationMemberRemovedMissingLegalHoldConsent', {user: users}, replaceLinkLegalHold);
+          return translate(
+            'conversationMemberRemovedMissingLegalHoldConsent',
+            {user: users},
+            legalHoldLinkDangerousSubstitutions,
+          );
         }
         if (exceedsMaxVisibleUsers) {
           return translate(
@@ -180,11 +176,14 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
               count: hiddenUsersCount.toString(),
               users,
             },
-            replaceLinkLegalHold,
-            true,
+            legalHoldLinkDangerousSubstitutions,
           );
         }
-        return translate('conversationMultipleMembersRemovedMissingLegalHoldConsent', {users}, replaceLinkLegalHold);
+        return translate(
+          'conversationMultipleMembersRemovedMissingLegalHoldConsent',
+          {users},
+          legalHoldLinkDangerousSubstitutions,
+        );
       }
       const temporaryGuestRemoval = message.otherUser().isMe && message.otherUser().isTemporaryGuest();
       if (temporaryGuestRemoval) {
@@ -195,20 +194,20 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
       if (senderLeft) {
         return message.user().isMe
           ? translate('conversationMemberLeftYou')
-          : translate('conversationMemberLeft', {name}, {}, true);
+          : translate('conversationMemberLeft', {name});
       }
 
       const allUsers = generateNames(targetedUsers, translate);
       if (!actor.id) {
-        return translate('conversationMemberWereRemoved', {users: allUsers}, {}, true);
+        return translate('conversationMemberWereRemoved', {users: allUsers});
       }
       return actor.isMe
-        ? translate('conversationMemberRemovedYou', {users: allUsers}, {}, true)
-        : translate('conversationMemberRemoved', {name, users: allUsers}, {}, true);
+        ? translate('conversationMemberRemovedYou', {users: allUsers})
+        : translate('conversationMemberRemoved', {name, users: allUsers});
     }
 
     case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
-      return translate('conversationTeamLeft', {name}, {}, true);
+      return translate('conversationTeamLeft', {name});
     }
 
     default:
@@ -227,6 +226,22 @@ export function MessageContent({
   const {translate} = useApplicationContext();
   const htmlCaption = getContent(message, translate);
   const content = replaceReactComponents(htmlCaption, [
+    {
+      start: legalHoldLinkMarker.start,
+      end: legalHoldLinkMarker.end,
+      render(text): ReactNode {
+        return (
+          <a
+            href={Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK}
+            data-uie-name="read-more-legal-hold"
+            rel="nofollow noopener noreferrer"
+            target="_blank"
+          >
+            {text}
+          </a>
+        );
+      },
+    },
     {start: '<strong>', end: '</strong>', render: text => <strong key={text}>{text}</strong>},
     {
       start: '[showmore]',

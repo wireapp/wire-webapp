@@ -39,7 +39,6 @@ import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {RightSidebarParams} from 'src/script/page/appMain';
 import {PanelState} from 'src/script/page/rightSidebar';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -407,7 +406,6 @@ export const TitleBar = ({
 
       {renderWarningBadge({
         badgeTranslationKey,
-        isReactTranslationRenderingEnabled: isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName),
         translate,
       })}
     </ul>
@@ -435,7 +433,6 @@ type NonEmptyWarningBadgeKey = Exclude<WarningBadgeKey, ''>;
 
 type RenderWarningBadgeOptions = {
   readonly badgeTranslationKey: WarningBadgeKey;
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translate: Translate;
 };
 
@@ -472,7 +469,7 @@ function renderWarningBadgeTranslation(translationKey: NonEmptyWarningBadgeKey, 
 }
 
 function renderWarningBadge(options: RenderWarningBadgeOptions): ReactNode {
-  const {badgeTranslationKey, isReactTranslationRenderingEnabled, translate} = options;
+  const {badgeTranslationKey, translate} = options;
 
   if (isNonEmptyString(badgeTranslationKey) === false) {
     return null;
@@ -480,20 +477,10 @@ function renderWarningBadge(options: RenderWarningBadgeOptions): ReactNode {
 
   const nonEmptyBadgeTranslationKey = badgeTranslationKey as NonEmptyWarningBadgeKey;
 
-  if (isReactTranslationRenderingEnabled) {
-    return (
-      <li className="conversation-title-bar-indication-badge" data-uie-name="status-indication-badge">
-        {renderWarningBadgeTranslation(nonEmptyBadgeTranslationKey, translate)}
-      </li>
-    );
-  }
-
   return (
-    <li
-      className="conversation-title-bar-indication-badge"
-      data-uie-name="status-indication-badge"
-      dangerouslySetInnerHTML={{__html: translate(nonEmptyBadgeTranslationKey)}}
-    />
+    <li className="conversation-title-bar-indication-badge" data-uie-name="status-indication-badge">
+      {renderWarningBadgeTranslation(nonEmptyBadgeTranslationKey, translate)}
+    </li>
   );
 }
 

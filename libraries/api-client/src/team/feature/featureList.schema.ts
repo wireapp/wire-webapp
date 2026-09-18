@@ -113,6 +113,7 @@ const mlsE2EIdConfigSchema = z.object({
 });
 
 const mlsMigrationConfigSchema = z.object({
+  allowManualMigration: z.boolean().optional(),
   startTime: z.string().optional(),
   finaliseRegardlessAfter: z.string().optional(),
 });

@@ -64,6 +64,7 @@ import {PingMessage} from 'Repositories/entity/message/pingMessage';
 import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import {createSessionResetMessage} from 'Repositories/entity/message/sessionResetMessage';
 import type {Text as TextAsset} from 'Repositories/entity/message/text';
 import {Text} from 'Repositories/entity/message/text';
 import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
@@ -302,6 +303,11 @@ export class EventMapper {
 
       case CONVERSATION_EVENT.RENAME: {
         messageEntity = this._mapEventRename(event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.SESSION_RESET: {
+        messageEntity = createSessionResetMessage(this.translate);
         break;
       }
 

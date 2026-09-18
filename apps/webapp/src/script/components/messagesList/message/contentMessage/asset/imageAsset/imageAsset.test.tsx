@@ -17,15 +17,19 @@
  *
  */
 
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {container} from 'tsyringe';
+import type {CSSObject} from '@emotion/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import React, {KeyboardEventHandler, MouseEventHandler, ReactNode} from 'react';
+import type {FunctionComponent} from 'react';
 
+import type {AssetUrl} from 'Components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
+import type {GetAssetUrl, ImageLogger} from 'Components/image';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {User} from 'Repositories/entity/User';
 import {
+  createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
@@ -34,20 +38,76 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {ImageAsset, ImageAssetProps} from './imageAsset';
 
-jest.mock('Components/inViewport', () => ({
-  InViewport: ({onVisible, children, ...props}: {onVisible: () => void; children: any; [key: string]: any}) => {
+type ImageLoggerMock = jest.Mocked<ImageLogger>;
+
+function buildImageLoggerMock(): ImageLoggerMock {
+  return {error: jest.fn()};
+}
+
+jest.mock('Components/inViewport', () => {
+  interface MockInViewportProps {
+    'aria-label'?: string;
+    children: ReactNode;
+    className?: string;
+    css?: CSSObject;
+    'data-uie-name'?: string;
+    'data-uie-status'?: string;
+    'data-uie-visible'?: boolean;
+    onClick?: MouseEventHandler<HTMLDivElement>;
+    onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
+    onVisible: () => void;
+    role?: string;
+    tabIndex?: number;
+  }
+
+  const MockInViewport: FunctionComponent<MockInViewportProps> = (properties: MockInViewportProps) => {
+    const {
+      'aria-label': ariaLabel,
+      children,
+      className,
+      'data-uie-name': dataUieName,
+      'data-uie-status': dataUieStatus,
+      'data-uie-visible': dataUieVisible,
+      onClick,
+      onKeyDown,
+      onVisible,
+      role,
+      tabIndex,
+    } = properties;
     setTimeout(onVisible);
-    return <div {...props}>{children}</div>;
-  },
-  __esModule: true,
-}));
+
+    return (
+      <div
+        aria-label={ariaLabel}
+        className={className}
+        data-uie-name={dataUieName}
+        data-uie-status={dataUieStatus}
+        data-uie-visible={dataUieVisible}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        role={role}
+        tabIndex={tabIndex}
+      >
+        {children}
+      </div>
+    );
+  };
+
+  return {
+    InViewport: MockInViewport,
+    __esModule: true,
+  };
+});
 
 describe('image-asset', () => {
+  const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
   const rootProviderWrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({translate: translateForTest}),
+    createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest}),
   );
   const fakeImageUrl = 'https://test.com/image.png';
   const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
+  const getAssetUrlMock = jest.fn<ReturnType<GetAssetUrl>, Parameters<GetAssetUrl>>();
+  const imageLoggerMock = buildImageLoggerMock();
 
   const createDefaultMessage = () => {
     const message = new ContentMessage(undefined, translateForTest);
@@ -58,20 +118,19 @@ describe('image-asset', () => {
 
   const defaultProps: ImageAssetProps = {
     asset: new MediumImage('image'),
+    getAssetUrl: getAssetUrlMock,
+    logger: imageLoggerMock,
     message: createDefaultMessage(),
     onClick: jest.fn(),
   };
 
-  beforeAll(() => {
-    jest.spyOn(window.URL, 'createObjectURL').mockReturnValue(fakeImageUrl);
-    jest.spyOn(window.URL, 'revokeObjectURL').mockReturnValue();
-  });
-
   beforeEach(() => {
     jest.clearAllMocks();
+    getAssetUrlMock.mockReset();
+    getAssetUrlMock.mockResolvedValue({url: fakeImageUrl, dispose: jest.fn()});
   });
 
-  it('displays loading dots when resource is not loaded', () => {
+  it('waits for the resource before loading the image', async () => {
     const image = new MediumImage('image');
     image.height = '10';
     image.width = '100';
@@ -82,14 +141,26 @@ describe('image-asset', () => {
 
     const imageElement = screen.getByTestId('image-loader');
     expect(imageElement).toBeDefined();
+    expect(getAssetUrlMock).not.toHaveBeenCalled();
+
+    act(() => {
+      image.resource(
+        new AssetRemoteData({
+          assetKey: 'remote',
+          assetDomain: 'test-domain.wire.com',
+          assetToken: '',
+          forceCaching: false,
+        }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalled();
+      expect(screen.getByTestId('image-asset-img')).toBeDefined();
+    });
   });
 
   it('displays the dummy image url when resource is loaded', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({
@@ -105,10 +176,121 @@ describe('image-asset', () => {
     render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
-      expect(window.URL.createObjectURL).toHaveBeenCalled();
+      expect(getAssetUrlMock).toHaveBeenCalled();
       const imageElement = screen.getByTestId('image-asset-img');
       const imgSrc = imageElement.getAttribute('src');
       expect(imgSrc).toBe(fakeImageUrl);
+
+      const imageContainer = requireValueForTest(imageElement.parentElement);
+      expect(imageContainer).toHaveAttribute('data-uie-status', 'loaded');
+      expect(imageContainer).not.toHaveClass('loading-dots');
+    });
+  });
+
+  it('shows an error status and removes loading dots when image loading fails', async () => {
+    getAssetUrlMock.mockRejectedValue(new Error('Asset could not be loaded'));
+
+    const image = new MediumImage('image');
+    image.resource(
+      new AssetRemoteData({
+        assetKey: 'remote',
+        assetDomain: 'test-domain.wire.com',
+        assetToken: '',
+        forceCaching: false,
+      }),
+    );
+
+    const onClickMock = jest.fn();
+    render(<ImageAsset {...defaultProps} asset={image} onClick={onClickMock} />, {wrapper: rootProviderWrapper});
+
+    const imageElement = screen.getByTestId('image-loader');
+    const imageContainer = requireValueForTest(imageElement.parentElement);
+
+    await waitFor(() => {
+      expect(imageContainer).toHaveAttribute('data-uie-status', 'error');
+    });
+
+    expect(imageContainer).not.toHaveClass('loading-dots');
+    expect(imageLoggerMock.error).toHaveBeenCalledWith('Failed to load image asset', expect.any(Error));
+
+    fireEvent.keyDown(imageContainer, {key: 'Enter', code: 'Enter'});
+    fireEvent.keyDown(imageContainer, {key: ' ', code: 'Space'});
+    expect(onClickMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the image non-interactive while loading', async () => {
+    let resolvePendingLoad: (assetUrl: AssetUrl) => void = (): void => {
+      return undefined;
+    };
+    const pendingLoad = new Promise<AssetUrl>((resolve): void => {
+      resolvePendingLoad = resolve;
+    });
+    getAssetUrlMock.mockReturnValue(pendingLoad);
+
+    const image = new MediumImage('image');
+    image.resource(
+      new AssetRemoteData({
+        assetKey: 'remote',
+        assetDomain: 'test-domain.wire.com',
+        assetToken: '',
+        forceCaching: false,
+      }),
+    );
+
+    const onClickMock = jest.fn();
+    render(<ImageAsset {...defaultProps} asset={image} onClick={onClickMock} />, {wrapper: rootProviderWrapper});
+
+    const imageElement = screen.getByTestId('image-loader');
+    const imageContainer = requireValueForTest(imageElement.parentElement);
+    expect(imageContainer).toHaveAttribute('data-uie-status', 'waiting');
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalled();
+    });
+
+    expect(imageContainer).toHaveAttribute('data-uie-status', 'loading');
+    fireEvent.click(imageContainer);
+    fireEvent.keyDown(imageContainer, {key: 'Enter', code: 'Enter'});
+    fireEvent.keyDown(imageContainer, {key: ' ', code: 'Space'});
+    expect(onClickMock).not.toHaveBeenCalled();
+
+    resolvePendingLoad({url: fakeImageUrl, dispose: jest.fn()});
+    await waitFor(() => {
+      expect(screen.getByTestId('image-asset-img')).toBeDefined();
+    });
+  });
+
+  it('disposes the asset url when loading finishes after unmount', async () => {
+    let resolvePendingLoad: (assetUrl: AssetUrl) => void = (): void => {
+      return undefined;
+    };
+    const pendingLoad = new Promise<AssetUrl>((resolve): void => {
+      resolvePendingLoad = resolve;
+    });
+    getAssetUrlMock.mockReturnValue(pendingLoad);
+
+    const image = new MediumImage('image');
+    image.resource(
+      new AssetRemoteData({
+        assetKey: 'remote',
+        assetDomain: 'test-domain.wire.com',
+        assetToken: '',
+        forceCaching: false,
+      }),
+    );
+
+    const {unmount} = render(<ImageAsset {...defaultProps} asset={image} />, {wrapper: rootProviderWrapper});
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalled();
+    });
+
+    const disposeAssetUrlMock = jest.fn();
+    unmount();
+    resolvePendingLoad({url: fakeImageUrl, dispose: disposeAssetUrlMock});
+
+    await waitFor(() => {
+      expect(disposeAssetUrlMock).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -127,11 +309,6 @@ describe('image-asset', () => {
   });
 
   it('calls onClick when image is clicked', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({
@@ -159,11 +336,6 @@ describe('image-asset', () => {
   });
 
   it('calls onClick when Enter key is pressed', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({
@@ -192,11 +364,6 @@ describe('image-asset', () => {
   });
 
   it('calls onClick when Space key is pressed', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({
@@ -225,11 +392,6 @@ describe('image-asset', () => {
   });
 
   it('sets correct accessibility attributes', async () => {
-    const assetRepository = container.resolve(AssetRepository);
-    jest
-      .spyOn(assetRepository, 'load')
-      .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
     const image = new MediumImage('image');
     image.resource(
       new AssetRemoteData({

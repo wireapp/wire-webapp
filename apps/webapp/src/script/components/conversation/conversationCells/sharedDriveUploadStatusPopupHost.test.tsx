@@ -40,6 +40,11 @@ const uploadState: UploadState = {
   source: uploadSource,
   progress: 0,
 };
+const queuedState: UploadState = {
+  kind: 'queued',
+  identity: {uploadId: 'upload-1'},
+  source: uploadSource,
+};
 const uploadedState: UploadState = {
   kind: 'published',
   identity: {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
@@ -69,6 +74,7 @@ const createController = (state: UploadState | readonly UploadState[] = uploadSt
   snapshots: jest.fn(scope => (scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [])),
   subscribe: jest.fn((_listener: () => void) => jest.fn()),
   upload: jest.fn(),
+  updateRefresh: jest.fn(),
   cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
   retryUpload: jest.fn(),
   retryPublish: jest.fn(),
@@ -453,6 +459,29 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
     expect(view.getByText('cells.uploadStatus.uploadingSize 4 B')).toBeInTheDocument();
+  });
+
+  it('uses queued copy for queued uploads', async () => {
+    const user = userEvent.setup();
+    const controller = createController(queuedState);
+    const translate = (key: string, substitutions?: Record<string, string | number>) => {
+      if (substitutions?.name) {
+        return `${key} ${substitutions.name}`;
+      }
+      if (substitutions?.size) {
+        return `${key} ${substitutions.size}`;
+      }
+      return key;
+    };
+
+    const view = renderHost(controller, conversationQualifiedId, true, true, translate);
+
+    expect(view.getByText('cells.uploadStatus.queued report.pdf')).toBeInTheDocument();
+
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    expect(view.getByText('cells.uploadStatus.queuedSize 4 B')).toBeInTheDocument();
+    expect(view.queryByText('cells.uploadStatus.uploadingSize 4 B')).not.toBeInTheDocument();
   });
 
   it('keeps the collapsed state when the upload lifecycle changes', () => {

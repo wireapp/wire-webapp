@@ -35,7 +35,7 @@ const releaseBuildMetadata: BuildMetadata = {
 };
 
 describe('artifact metadata GitHub outputs', () => {
-  test.each([
+  it.each([
     ['main metadata', mainBuildMetadata],
     ['release metadata', releaseBuildMetadata],
   ])('formats all validated artifact metadata outputs for %s', (_description, metadata) => {

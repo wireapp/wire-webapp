@@ -23,7 +23,6 @@ import {escape} from 'underscore';
 import {create} from 'zustand';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
-import {replaceLink} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatLocale} from 'Util/timeUtil';
 import {noop} from 'Util/util';
@@ -63,7 +62,6 @@ const defaultContent: ModalContent = {
   currentType: '',
   inputPlaceholder: '',
   message: '',
-  messageHtml: '',
   modalUie: '',
   onBgClick: noop,
   primaryAction: {} as ButtonAction,
@@ -171,7 +169,6 @@ const updateCurrentModalContent = (
     copyPassword,
     currentType: type,
     inputPlaceholder: text.input ?? '',
-    messageHtml: text.htmlMessage,
     message: text.message,
     translatedMessage: text.translatedMessage,
     modalUie: type,
@@ -225,12 +222,12 @@ const updateCurrentModalContent = (
     case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: translate('modalAcknowledgeAction'), ...primaryAction};
       content.titleText = text.title ?? translate('modalAcknowledgeHeadline');
-      content.message = text.htmlMessage === undefined || text.htmlMessage === '' ? (text.message ?? '') : '';
+      content.message = text.message ?? '';
       break;
     }
     case PrimaryModalType.WITHOUT_TITLE: {
       content.primaryAction = {...primaryAction};
-      content.message = text.htmlMessage === undefined || text.htmlMessage === '' ? (text.message ?? '') : '';
+      content.message = text.message ?? '';
       break;
     }
     case PrimaryModalType.CONFIRM: {
@@ -252,11 +249,6 @@ const updateCurrentModalContent = (
     case PrimaryModalType.SESSION_RESET: {
       content.titleText = translate('modalSessionResetHeadline');
       content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
-      content.messageHtml = translate(
-        'modalSessionResetMessage',
-        undefined,
-        replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT),
-      );
       content.translatedMessage = {
         compatibilityReplacements: [],
         components: [
@@ -265,8 +257,8 @@ const updateCurrentModalContent = (
             dataUieName: '',
             href: Config.getConfig().URL.SUPPORT.BUG_REPORT,
             kind: 'link',
-            legacyClosingTokens: ['/link]'],
-            legacyOpeningTokens: ['[линк]'],
+            legacyClosingTokens: ['[/link]', '/link]'],
+            legacyOpeningTokens: ['[link]', '[линк]'],
             markerName: 'link',
             rel: 'nofollow noopener noreferrer',
             target: '_blank',

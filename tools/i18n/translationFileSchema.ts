@@ -17,9 +17,8 @@
  *
  */
 
-export function replaceLink(href: string, className: string = '', uieName: string = '') {
-  return {
-    '/link': '</a>',
-    link: `<a href="${href}" data-uie-name="${uieName}" class="${className}" rel="nofollow noopener noreferrer" target="_blank">`,
-  };
-}
+import {z} from 'zod';
+
+export const translationFileSchema = z.record(z.string());
+
+export type TranslationStringMap = z.infer<typeof translationFileSchema>;

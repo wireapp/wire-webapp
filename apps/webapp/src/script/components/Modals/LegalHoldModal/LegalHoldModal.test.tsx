@@ -35,7 +35,6 @@ import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {translateForTest} from 'Util/test/translateForTest';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
@@ -55,17 +54,7 @@ let callRepository: CallingRepository;
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
-const legacyTranslationRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate}),
-);
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -108,13 +97,6 @@ function createOthersDescriptionProps(): LegalHoldModalProps {
   return props;
 }
 
-beforeAll(() => {
-  testFactory.exposeCallingActors().then(injectedCallingRepository => {
-    callRepository = injectedCallingRepository;
-    return callRepository;
-  });
-});
-
 const defaultProps = () => ({
   clientRepository: {} as ClientRepository,
   conversationRepository: {
@@ -134,6 +116,10 @@ const defaultProps = () => ({
 });
 
 describe('LegalHoldModal', () => {
+  beforeAll(async () => {
+    callRepository = await testFactory.exposeCallingActors();
+  });
+
   it('is showRequestModal', (): void => {
     try {
       render(<LegalHoldModal {...defaultProps()} />, {wrapper: rootProviderWrapper});
@@ -168,36 +154,7 @@ describe('LegalHoldModal', () => {
   });
 
   it(
-    'preserves request rendering when React translation rendering is disabled',
-    withTranslationStrings({...en, legalHoldModalText: 'Before[br][fingerprint]After'}, async (): Promise<void> => {
-      const fingerprint = 'A1B2';
-      const expectedFingerprintRepresentation = splitFingerprint(fingerprint)
-        .map(fingerprintPart => {
-          return `${fingerprintPart} `;
-        })
-        .join('');
-      const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
-        wrapper: legacyTranslationRootProviderWrapper,
-      });
-
-      act((): void => {
-        useLegalHoldModalState.getState().showRequestModal(false, false, fingerprint);
-      });
-
-      const statusText = await waitFor((): HTMLElement => {
-        return getByTestId('status-modal-text');
-      });
-
-      expect(statusText.querySelectorAll('br')).toHaveLength(1);
-      expect(statusText.querySelectorAll('.legal-hold-modal__fingerprint')).toHaveLength(1);
-      expect(statusText.querySelector('.legal-hold-modal__fingerprint')?.textContent).toBe(
-        expectedFingerprintRepresentation,
-      );
-    }),
-  );
-
-  it(
-    'renders request markers as React nodes when enabled',
+    'renders request markers as React nodes',
     withTranslationStrings(en, async (): Promise<void> => {
       const fingerprint = 'A1B2C3D4';
       const expectedFingerprintParts = splitFingerprint(fingerprint);
@@ -207,7 +164,7 @@ describe('LegalHoldModal', () => {
         })
         .join('');
       const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
 
       act((): void => {
@@ -234,7 +191,7 @@ describe('LegalHoldModal', () => {
   );
 
   it(
-    'preserves fingerprint presentation between legacy and React rendering',
+    'renders the fingerprint with the expected presentation',
     withTranslationStrings({...en, legalHoldModalText: 'Before[br][fingerprint]After'}, async (): Promise<void> => {
       const fingerprint = 'A1B2C3D4E5F6G7H8';
       const expectedFingerprintRepresentation = splitFingerprint(fingerprint)
@@ -243,41 +200,19 @@ describe('LegalHoldModal', () => {
         })
         .join('');
 
-      const legacyRender = render(<LegalHoldModal {...defaultProps()} />, {
-        wrapper: legacyTranslationRootProviderWrapper,
+      const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
+        wrapper: translationRootProviderWrapper,
       });
       act((): void => {
         useLegalHoldModalState.getState().showRequestModal(false, false, fingerprint);
       });
-      const legacyStatusText = await waitFor((): HTMLElement => {
-        return legacyRender.getByTestId('status-modal-text');
+      const statusText = await waitFor((): HTMLElement => {
+        return getByTestId('status-modal-text');
       });
-      const legacyFingerprintRepresentation = legacyStatusText.querySelector(
-        '.legal-hold-modal__fingerprint',
-      )?.textContent;
+      const fingerprintElement = statusText.querySelector('.legal-hold-modal__fingerprint');
 
-      legacyRender.unmount();
-      act((): void => {
-        useLegalHoldModalState.getState().closeModal();
-      });
-
-      const reactRender = render(<LegalHoldModal {...defaultProps()} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
-      });
-      act((): void => {
-        useLegalHoldModalState.getState().showRequestModal(false, false, fingerprint);
-      });
-      const reactStatusText = await waitFor((): HTMLElement => {
-        return reactRender.getByTestId('status-modal-text');
-      });
-      const reactFingerprintElement = reactStatusText.querySelector('.legal-hold-modal__fingerprint');
-      const reactFingerprintRepresentation = reactFingerprintElement?.textContent;
-
-      expect(legacyFingerprintRepresentation).toBe(expectedFingerprintRepresentation);
-      expect(reactFingerprintRepresentation).toBe(legacyFingerprintRepresentation);
-      expect(reactFingerprintElement?.querySelectorAll('span')).toHaveLength(splitFingerprint(fingerprint).length);
-
-      reactRender.unmount();
+      expect(fingerprintElement?.textContent).toBe(expectedFingerprintRepresentation);
+      expect(fingerprintElement?.querySelectorAll('span')).toHaveLength(splitFingerprint(fingerprint).length);
     }),
   );
 
@@ -291,7 +226,7 @@ describe('LegalHoldModal', () => {
         })
         .join('');
       const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
 
       act((): void => {
@@ -319,7 +254,7 @@ describe('LegalHoldModal', () => {
         })
         .join('');
       const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
 
       act((): void => {
@@ -348,7 +283,7 @@ describe('LegalHoldModal', () => {
           })
           .join('');
         const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
 
         act((): void => {
@@ -375,7 +310,7 @@ describe('LegalHoldModal', () => {
       {...en, legalHoldModalText: 'Before<img src="example">[br]After'},
       async (): Promise<void> => {
         const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
 
         act((): void => {
@@ -398,7 +333,7 @@ describe('LegalHoldModal', () => {
   });
 
   it(
-    'preserves both Legal Hold descriptions in the legacy HTML path',
+    'renders both Legal Hold descriptions with exact line-break compatibility',
     withTranslationStrings(
       {
         ...en,
@@ -407,7 +342,7 @@ describe('LegalHoldModal', () => {
       },
       async (): Promise<void> => {
         const selfRender = render(<LegalHoldModal {...defaultProps()} />, {
-          wrapper: legacyTranslationRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         act((): void => {
           useLegalHoldModalState.getState().showUsers(false);
@@ -424,51 +359,7 @@ describe('LegalHoldModal', () => {
         });
 
         const othersRender = render(<LegalHoldModal {...createOthersDescriptionProps()} />, {
-          wrapper: legacyTranslationRootProviderWrapper,
-        });
-        act((): void => {
-          useLegalHoldModalState
-            .getState()
-            .showUsers(false, new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
-        });
-        const othersDescription = await waitFor((): HTMLElement => {
-          return othersRender.getByTestId('status-modal-text');
-        });
-
-        expect(othersDescription).toHaveTextContent('Others beforeOthers after');
-        expect(othersDescription.querySelectorAll('br')).toHaveLength(1);
-      },
-    ),
-  );
-
-  it(
-    'renders both Legal Hold descriptions with exact React line-break compatibility',
-    withTranslationStrings(
-      {
-        ...en,
-        legalHoldDescriptionSelf: 'Self before<br />Self after',
-        legalHoldDescriptionOthers: 'Others before<br />Others after',
-      },
-      async (): Promise<void> => {
-        const selfRender = render(<LegalHoldModal {...defaultProps()} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
-        });
-        act((): void => {
-          useLegalHoldModalState.getState().showUsers(false);
-        });
-        const selfDescription = await waitFor((): HTMLElement => {
-          return selfRender.getByTestId('status-modal-text');
-        });
-
-        expect(selfDescription).toHaveTextContent('Self beforeSelf after');
-        expect(selfDescription.querySelectorAll('br')).toHaveLength(1);
-        selfRender.unmount();
-        act((): void => {
-          useLegalHoldModalState.getState().closeModal();
-        });
-
-        const othersRender = render(<LegalHoldModal {...createOthersDescriptionProps()} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         act((): void => {
           useLegalHoldModalState
@@ -494,7 +385,7 @@ describe('LegalHoldModal', () => {
       },
       async (): Promise<void> => {
         const {getByTestId} = render(<LegalHoldModal {...defaultProps()} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         act((): void => {
           useLegalHoldModalState.getState().showUsers(false);

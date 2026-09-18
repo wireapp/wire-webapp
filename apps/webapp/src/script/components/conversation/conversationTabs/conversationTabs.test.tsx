@@ -43,6 +43,11 @@ const uploadingState: UploadState = {
   source: uploadSource,
   progress: 0,
 };
+const queuedState: UploadState = {
+  kind: 'queued',
+  identity: {uploadId: 'upload-1'},
+  source: uploadSource,
+};
 const uploadedState: UploadState = {
   kind: 'published',
   identity: {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
@@ -70,6 +75,7 @@ const createController = (state: UploadState | null = null) => {
       return jest.fn();
     }),
     upload: jest.fn(),
+    updateRefresh: jest.fn(),
     cancel: jest.fn(),
     retryUpload: jest.fn(),
     retryPublish: jest.fn(),
@@ -127,6 +133,16 @@ describe('ConversationTabs', () => {
     expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
   });
 
+  it('announces queued uploads without saying they are uploading', () => {
+    const {controller} = createController(queuedState);
+    const view = renderTabs(controller);
+
+    expect(view.getByTestId('shared-drive-tab-upload-uploading')).toHaveClass(
+      'conversation-tabs__upload-status-icon--uploading',
+    );
+    expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.queued');
+  });
+
   it('updates the shared drive tab icon as the upload status changes', () => {
     const {controller, setState} = createController(uploadingState);
     const view = renderTabs(controller);
@@ -136,7 +152,8 @@ describe('ConversationTabs', () => {
     act(() => setState(uploadedState));
 
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
-    expect(view.getByTestId('shared-drive-tab-upload-completed')).toBeInTheDocument();
+    const completedIcon = view.getByTestId('shared-drive-tab-upload-completed');
+    expect(completedIcon).toBeInTheDocument();
     expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.uploaded');
   });
 

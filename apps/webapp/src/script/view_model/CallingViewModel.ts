@@ -51,7 +51,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {ROLE} from 'Repositories/user/userPermission';
-import {replaceLink, type Translate} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
@@ -248,9 +248,6 @@ export class CallingViewModel {
             text: this.translate('modalConfirmSecondary'),
           },
           text: {
-            htmlMessage: `<div class="modal-description">
-            ${this.translate('groupCallConfirmationModalTitle', {memberCount})}
-          </div>`,
             translatedMessage: {
               compatibilityReplacements: [],
               components: [],
@@ -450,11 +447,6 @@ export class CallingViewModel {
   private showRestrictedConferenceCallingModal() {
     if (this.teamState.isInTeam(this.selfUser())) {
       if (this.selfUser().teamRole() === ROLE.OWNER) {
-        const replaceEnterprise = replaceLink(
-          Config.getConfig().URL.PRICING,
-          'modal__text__read-more',
-          'read-more-pricing',
-        );
         PrimaryModal.show(
           PrimaryModal.type.CONFIRM,
           {
@@ -465,11 +457,6 @@ export class CallingViewModel {
               text: this.translate('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
             },
             text: {
-              htmlMessage: this.translate(
-                'callingRestrictedConferenceCallOwnerModalDescription',
-                {brandName: Config.getConfig().BRAND_NAME},
-                replaceEnterprise,
-              ),
               translatedMessage: {
                 compatibilityReplacements: [],
                 components: [
@@ -520,9 +507,6 @@ export class CallingViewModel {
         PrimaryModal.type.ACKNOWLEDGE,
         {
           text: {
-            htmlMessage: this.translate('callingRestrictedConferenceCallPersonalModalDescription', {
-              brandName: Config.getConfig().BRAND_NAME,
-            }),
             translatedMessage: {
               compatibilityReplacements: [],
               components: [],

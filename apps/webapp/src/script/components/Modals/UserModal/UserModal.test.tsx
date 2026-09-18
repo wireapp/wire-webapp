@@ -27,7 +27,6 @@ import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {Config} from 'src/script/Config';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {setStrings, translate} from 'Util/localizerUtil';
@@ -44,17 +43,7 @@ describe('UserModal', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
-  const legacyTranslationRootProviderWrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({translate}),
-  );
-  const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({
-      isFeatureToggleEnabled(featureName): boolean {
-        return featureName === reactTranslationRenderingFeatureToggleName;
-      },
-      translate,
-    }),
-  );
+  const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
   type TranslationTestFunction = () => void | Promise<void>;
   type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -183,46 +172,14 @@ describe('UserModal', () => {
   });
 
   it(
-    'preserves the blocked Legal Hold message in the legacy HTML path',
-    withLegalHoldConfiguration(
-      withTranslationStrings(
-        {...en, modalUserBlockedForLegalHold: 'Blocked: [link]Learn more[/link]'},
-        async (): Promise<void> => {
-          const user = createUser(true);
-          const {getByTestId} = render(
-            withThemeAndRootContext(
-              <UserModal {...createUserModalProps(user)} />,
-              legacyTranslationRootProviderWrapper,
-            ),
-          );
-          showTestUserModal(user);
-
-          const blockedMessage = await waitFor((): HTMLElement => {
-            return getByTestId('status-blocked-legal-hold');
-          });
-
-          expect(blockedMessage).toHaveTextContent('Blocked: Learn more');
-          expect(blockedMessage.querySelector('a')).toHaveAttribute(
-            'href',
-            Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-          );
-        },
-      ),
-    ),
-  );
-
-  it(
-    'renders the blocked Legal Hold message as a React link when enabled',
+    'renders the blocked Legal Hold message as a React link',
     withLegalHoldConfiguration(
       withTranslationStrings(
         {...en, modalUserBlockedForLegalHold: 'Blocked: [link]Read about Legal Hold[/link]'},
         async (): Promise<void> => {
           const user = createUser(true);
           const {getByTestId} = render(
-            withThemeAndRootContext(
-              <UserModal {...createUserModalProps(user)} />,
-              reactTranslationRenderingRootProviderWrapper,
-            ),
+            withThemeAndRootContext(<UserModal {...createUserModalProps(user)} />, translationRootProviderWrapper),
           );
           showTestUserModal(user);
 
@@ -250,10 +207,7 @@ describe('UserModal', () => {
         async (): Promise<void> => {
           const user = createUser(true);
           const {getByTestId} = render(
-            withThemeAndRootContext(
-              <UserModal {...createUserModalProps(user)} />,
-              reactTranslationRenderingRootProviderWrapper,
-            ),
+            withThemeAndRootContext(<UserModal {...createUserModalProps(user)} />, translationRootProviderWrapper),
           );
           showTestUserModal(user);
 
@@ -276,10 +230,7 @@ describe('UserModal', () => {
         async (): Promise<void> => {
           const user = createUser(true);
           const {getByTestId} = render(
-            withThemeAndRootContext(
-              <UserModal {...createUserModalProps(user)} />,
-              reactTranslationRenderingRootProviderWrapper,
-            ),
+            withThemeAndRootContext(<UserModal {...createUserModalProps(user)} />, translationRootProviderWrapper),
           );
           showTestUserModal(user);
 

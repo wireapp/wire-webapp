@@ -29,7 +29,6 @@ import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Reposito
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -40,15 +39,7 @@ import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
 import {translateForTest} from 'Util/test/translateForTest';
 
 setStrings({en});
-const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName): boolean {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -69,15 +60,7 @@ function withTranslationStrings(
 }
 
 function withTheme(component: React.ReactNode): React.ReactElement {
-  return <StyledApp themeId={THEME_ID.DEFAULT}>{legacyRootProviderWrapper({children: component})}</StyledApp>;
-}
-
-function withReactTranslationTheme(component: React.ReactNode): React.ReactElement {
-  return (
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      {reactTranslationRenderingRootProviderWrapper({children: component})}
-    </StyledApp>
-  );
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{translationRootProviderWrapper({children: component})}</StyledApp>;
 }
 
 const createFailedToAddUsersMessages = (
@@ -381,7 +364,7 @@ describe('FailedToAddUsersMessage', () => {
   });
 
   it(
-    'renders a single-user unreachable-backend summary with opaque runtime text when enabled',
+    'renders a single-user unreachable-backend summary with opaque runtime text',
     withTranslationStrings(en, () => {
       const userState = new UserState();
       const [qualifiedId] = generateQualifiedIds(1, 'backend.<example>');
@@ -397,7 +380,7 @@ describe('FailedToAddUsersMessage', () => {
       ]);
 
       const {getByTestId} = render(
-        withReactTranslationTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+        withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
       );
       const messageDetails = getByTestId('1-user-not-added-details');
       const strongElements = messageDetails.querySelectorAll('strong');
@@ -418,7 +401,7 @@ describe('FailedToAddUsersMessage', () => {
   );
 
   it(
-    'keeps translation-looking and internal-marker-looking names literal when enabled',
+    'keeps translation-looking and internal-marker-looking names literal',
     withTranslationStrings(en, () => {
       const runtimeNames = [
         '[bold]Admin[/bold]',
@@ -440,9 +423,7 @@ describe('FailedToAddUsersMessage', () => {
         ]);
 
         const {getByTestId, unmount} = render(
-          withReactTranslationTheme(
-            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
-          ),
+          withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
         );
         const messageDetails = getByTestId('1-user-not-added-details');
         const nameStrongElement = messageDetails.querySelector('strong');
@@ -479,9 +460,7 @@ describe('FailedToAddUsersMessage', () => {
         ]);
 
         const {getByTestId} = render(
-          withReactTranslationTheme(
-            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
-          ),
+          withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
         );
         const messageDetails = getByTestId('1-user-not-added-details');
 
@@ -516,9 +495,7 @@ describe('FailedToAddUsersMessage', () => {
         ]);
 
         const {getByTestId} = render(
-          withReactTranslationTheme(
-            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
-          ),
+          withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
         );
         const messageSummary = getByTestId('element-message-failed-to-add-users');
 
@@ -573,7 +550,7 @@ describe('FailedToAddUsersMessage', () => {
       ]);
 
       const {getByTestId, getAllByTestId} = render(
-        withReactTranslationTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+        withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
       );
 
       act(() => {
@@ -631,7 +608,7 @@ describe('FailedToAddUsersMessage', () => {
       const message = createFailedToAddUsersMessages([createFailureForReason(qualifiedIds, reason)]);
 
       const {getByTestId, getAllByTestId} = render(
-        withReactTranslationTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+        withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
       );
 
       act(() => {
@@ -671,9 +648,7 @@ describe('FailedToAddUsersMessage', () => {
         ]);
 
         const {getByTestId} = render(
-          withReactTranslationTheme(
-            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
-          ),
+          withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
         );
 
         act(() => {
@@ -717,9 +692,7 @@ describe('FailedToAddUsersMessage', () => {
         ]);
 
         const {getByTestId, getAllByTestId} = render(
-          withReactTranslationTheme(
-            <FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />,
-          ),
+          withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
         );
 
         act(() => {
@@ -757,7 +730,7 @@ describe('FailedToAddUsersMessage', () => {
       ]);
 
       const {getByTestId} = render(
-        withReactTranslationTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+        withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
       );
 
       act(() => {
@@ -767,8 +740,10 @@ describe('FailedToAddUsersMessage', () => {
       const messageDetail = getByTestId('multi-user-not-added-details');
       expect(messageDetail).toHaveTextContent('Second, Third und First konnten der Gruppe nicht hinzugefügt werden.');
       expect(messageDetail).not.toHaveTextContent('__wire_react_translation_');
-      expect(messageDetail.querySelectorAll('strong')).toHaveLength(1);
-      expect(messageDetail.querySelector('strong')).toHaveTextContent('First');
+      const strongElements = messageDetail.querySelectorAll('strong');
+      expect(strongElements).toHaveLength(2);
+      expect(strongElements[0]).toHaveTextContent('Second, Third');
+      expect(strongElements[1]).toHaveTextContent('First');
     }),
   );
 });

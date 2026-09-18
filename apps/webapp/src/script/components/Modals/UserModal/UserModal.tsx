@@ -33,11 +33,9 @@ import {UserDetails} from 'Components/panel/userDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {replaceLink} from 'Util/localizerUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 
@@ -108,7 +106,6 @@ interface UserModalUserActionsSectionProps {
   onAction: () => void;
   isSelfActivated: boolean;
   selfUser: User;
-  isReactTranslationRenderingEnabled: boolean;
   legalHoldBlockUrl: string;
   translate: Translate;
 }
@@ -118,7 +115,6 @@ const UserModalUserActionsSection = ({
   onAction,
   isSelfActivated,
   selfUser,
-  isReactTranslationRenderingEnabled,
   legalHoldBlockUrl,
   translate,
 }: UserModalUserActionsSectionProps) => {
@@ -126,26 +122,10 @@ const UserModalUserActionsSection = ({
   const {mainViewModel} = useApplicationContext();
 
   if (isBlockedLegalHold) {
-    if (isReactTranslationRenderingEnabled) {
-      return (
-        <div className="modal__message" data-uie-name="status-blocked-legal-hold">
-          {renderBlockedForLegalHoldMessage({legalHoldBlockUrl, translate})}
-        </div>
-      );
-    }
-
     return (
-      <div
-        className="modal__message"
-        data-uie-name="status-blocked-legal-hold"
-        dangerouslySetInnerHTML={{
-          __html: translate(
-            'modalUserBlockedForLegalHold',
-            undefined,
-            replaceLink(legalHoldBlockUrl, '', 'read-more-legal-hold'),
-          ),
-        }}
-      />
+      <div className="modal__message" data-uie-name="status-blocked-legal-hold">
+        {renderBlockedForLegalHoldMessage({legalHoldBlockUrl, translate})}
+      </div>
     );
   }
 
@@ -236,8 +216,7 @@ const UserModal = ({
   core = container.resolve(Core),
   teamState = container.resolve(TeamState),
 }: UserModalProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
+  const {translate} = useApplicationContext();
   const legalHoldBlockUrl = Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK;
   const onClose = useUserModalState(state => state.onClose);
   const userId = useUserModalState(state => state.userId);
@@ -352,7 +331,6 @@ const UserModal = ({
               onAction={hide}
               isSelfActivated={isActivatedAccount}
               selfUser={selfUser}
-              isReactTranslationRenderingEnabled={isReactTranslationRenderingEnabled}
               legalHoldBlockUrl={legalHoldBlockUrl}
               translate={translate}
             />

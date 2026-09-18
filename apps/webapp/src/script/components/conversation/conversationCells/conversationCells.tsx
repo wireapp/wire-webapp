@@ -57,7 +57,7 @@ import {
 import {type SharedDriveDropRejection, getSharedDriveDropRejectionFeedback} from './sharedDriveDrop';
 import {SharedDriveDropzone} from './sharedDriveDropzone';
 import {useSharedDriveUploadController} from './sharedDriveUploadContext';
-import {SharedDriveUploadFileInput} from './sharedDriveUploadFileInput';
+import {SharedDriveUploadInput} from './sharedDriveUploadInput';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
@@ -75,7 +75,6 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
-  onUploadFolder: () => void;
   isUploadFilesEnabled: boolean;
   showViewerPermission: boolean;
 }
@@ -89,16 +88,17 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
-    onUploadFolder,
     isUploadFilesEnabled,
     showViewerPermission,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
     const sharedDriveUploadController = useSharedDriveUploadController();
     const uploadInput = useRef<HTMLInputElement>(null);
+    const folderUploadInput = useRef<HTMLInputElement>(null);
     const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const onUploadFiles = () => uploadInput.current?.click();
+    const onUploadFolder = () => folderUploadInput.current?.click();
     const {
       cellsState: initialCellState,
       name,
@@ -207,6 +207,10 @@ export const ConversationCells = memo(
 
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+
+    useEffect(() => {
+      sharedDriveUploadController.updateRefresh(sharedDriveConversationQualifiedId, handleRefresh);
+    }, [handleRefresh, sharedDriveConversationQualifiedId, sharedDriveUploadController]);
     const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
     const maxSharedDriveUploadFileSize = Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_CELLS;
     const handleSharedDriveUploadRejection = useCallback(
@@ -227,7 +231,7 @@ export const ConversationCells = memo(
       translate,
       uploadPath: sharedDriveUploadPath,
     });
-    const sharedDriveUploadFileInputDependencies = {
+    const sharedDriveUploadInputDependencies = {
       fireAndForgetInvoker,
       onRefresh: handleRefresh,
       onReject: handleSharedDriveUploadRejection,
@@ -313,7 +317,12 @@ export const ConversationCells = memo(
           onDropFiles={handleDroppedFiles}
         >
           <div css={wrapperStyles}>
-            <SharedDriveUploadFileInput ref={uploadInput} {...sharedDriveUploadFileInputDependencies} />
+            <SharedDriveUploadInput ref={uploadInput} {...sharedDriveUploadInputDependencies} selectionMode="files" />
+            <SharedDriveUploadInput
+              ref={folderUploadInput}
+              {...sharedDriveUploadInputDependencies}
+              selectionMode="folder"
+            />
             <CellsHeader
               onRefresh={handleRefresh}
               conversationName={name}

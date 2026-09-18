@@ -129,6 +129,58 @@ describe('handleSharedDriveDroppedFiles', () => {
     );
   });
 
+  it.each(['.DS_Store', 'Thumbs.db', 'desktop.ini'])(
+    'filters filesystem metadata files before uploading dropped files',
+    async metadataFileName => {
+      const file = new File(['one'], 'one.txt');
+      const metadataFile = new File(['metadata'], metadataFileName);
+      const dependencies = createDependencies();
+
+      handleSharedDriveDroppedFiles([metadataFile, file], dependencies);
+
+      expect(dependencies.onReject).not.toHaveBeenCalled();
+      expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+      const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+      await uploadAction();
+      expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+        [file],
+        rootUploadPath,
+        dependencies.onRefresh,
+        conversationQualifiedId,
+      );
+    },
+  );
+
+  it('does not start an upload when only filesystem metadata files are dropped', () => {
+    const metadataFiles = [
+      new File(['metadata'], '.DS_Store'),
+      new File(['metadata'], 'Thumbs.db'),
+      new File(['metadata'], 'desktop.ini'),
+    ];
+    const dependencies = createDependencies();
+
+    handleSharedDriveDroppedFiles(metadataFiles, dependencies);
+
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
+  it('preserves intentional dotfiles when uploading dropped files', async () => {
+    const dotFile = new File(['one'], '.env');
+    const dependencies = createDependencies();
+
+    handleSharedDriveDroppedFiles([dotFile], dependencies);
+
+    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    await uploadAction();
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [dotFile],
+      rootUploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
   it('rejects the whole batch when any dropped file is invalid', () => {
     const validFile = new File(['one'], 'one.txt');
     const invalidFile = new File(['two'], 'two.exe');

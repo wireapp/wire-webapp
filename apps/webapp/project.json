@@ -139,6 +139,13 @@
         "cwd": "{projectRoot}"
       }
     },
+    "validate-translations": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/i18n/validateTranslationPlaceholders.mts",
+        "cwd": "{workspaceRoot}"
+      }
+    },
     "configure": {
       "executor": "nx:run-commands",
       "dependsOn": ["copy-config-lib:build"],

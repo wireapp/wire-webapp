@@ -17,7 +17,7 @@
  *
  */
 
-import {isEmptyArray, isEmptyString, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isEmptyArray, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 
@@ -91,57 +91,6 @@ function createMeetingTranslatedTranslation(
     values,
   };
 }
-
-const formatFailureDetails = (failure: AddUsersFailure, users: User[], translate: Translate): string => {
-  const failureUsers = failure.users
-    .map(userId => {
-      return findUser(users, userId);
-    })
-    .filter((user): user is User => {
-      return !isUndefined(user);
-    });
-
-  if (isEmptyArray(failureUsers)) {
-    return '';
-  }
-
-  const domainStr = getDomainStr(failure);
-
-  if (failureUsers.length === 1) {
-    const translationKey = singularDetailsTranslationKeyByReason[failure.reason];
-
-    if (failure.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS) {
-      return translate(translationKey, {
-        name: getUserNameWithTranslate(failureUsers[0], translate),
-        domain: domainStr ?? failureUsers[0].domain,
-      });
-    }
-
-    return translate(translationKey, {
-      name: getUserNameWithTranslate(failureUsers[0], translate),
-    });
-  }
-
-  const translationKey = pluralDetailsTranslationKeyByReason[failure.reason];
-  const replacements = {
-    name: getUserNameWithTranslate(failureUsers[0], translate),
-    names: failureUsers
-      .slice(1)
-      .map(user => {
-        return getUserNameWithTranslate(user, translate);
-      })
-      .join(', '),
-  };
-
-  if (failure.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS) {
-    return translate(translationKey, {
-      ...replacements,
-      domain: domainStr ?? '',
-    });
-  }
-
-  return translate(translationKey, replacements);
-};
 
 function createFailureDetailsTranslation(
   failure: AddUsersFailure,
@@ -256,48 +205,6 @@ function createMeetingPartialAddFailureTranslation(
   };
 }
 
-export const formatMeetingPartialAddFailureMessage = (
-  failedToAdd: AddUsersFailure[],
-  users: User[],
-  translate: Translate,
-): string => {
-  const allUserIds = failedToAdd.flatMap(failure => failure.users);
-
-  if (allUserIds.length === 0) {
-    return '';
-  }
-
-  if (allUserIds.length === 1) {
-    const qualifiedId = allUserIds[0];
-    const failure = failedToAdd.find(currentFailure =>
-      currentFailure.users.some(userId => matchQualifiedIds(userId, qualifiedId)),
-    );
-
-    if (isUndefined(failure)) {
-      return '';
-    }
-
-    const translationKey = singularTranslationKeyByReason[failure.reason];
-    const name = getDisplayName(users, qualifiedId, translate);
-    const domainStr = getDomainStr(failure) ?? findUser(users, qualifiedId)?.domain ?? qualifiedId.domain;
-
-    if (failure.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS) {
-      return translate(translationKey, {name, domain: domainStr});
-    }
-
-    return translate(translationKey, {name});
-  }
-
-  const summary = translate('failedToAddParticipantsPlural', {total: allUserIds.length.toString()});
-  const details = failedToAdd
-    .map(failure => {
-      return formatFailureDetails(failure, users, translate);
-    })
-    .filter(isNonEmptyString);
-
-  return [summary, ...details].join('<br/>');
-};
-
 type ShowMeetingPartialAddFailureModalParams = {
   failedToAdd: AddUsersFailure[];
   users: User[];
@@ -313,10 +220,9 @@ export const showMeetingPartialAddFailureModal = ({
     return;
   }
 
-  const htmlMessage = formatMeetingPartialAddFailureMessage(failedToAdd, users, translate);
   const translatedMessage = createMeetingPartialAddFailureTranslation(failedToAdd, users, translate);
 
-  if (isEmptyString(htmlMessage) || isUndefined(translatedMessage)) {
+  if (isUndefined(translatedMessage)) {
     return;
   }
 
@@ -326,7 +232,6 @@ export const showMeetingPartialAddFailureModal = ({
       {
         text: {
           title: translate('meetings.scheduleModal.error.addParticipantsFailed'),
-          htmlMessage,
           translatedMessage,
         },
       },

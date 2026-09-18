@@ -33,6 +33,7 @@ import {
   ButtonActionConfirmation,
   Calling,
   Cleared,
+  ClientAction,
   Composite,
   Confirmation,
   DataTransfer,
@@ -182,6 +183,14 @@ export class CryptographyMapper {
 
       case GenericMessageType.CALLING: {
         specificContent = this._mapCalling(genericMessage.calling as Calling, event);
+        break;
+      }
+
+      case GenericMessageType.CLIENT_ACTION: {
+        if (genericMessage.clientAction !== ClientAction.RESET_SESSION) {
+          return;
+        }
+        specificContent = {type: ClientEvent.CONVERSATION.SESSION_RESET};
         break;
       }
 

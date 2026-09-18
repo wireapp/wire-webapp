@@ -40,10 +40,6 @@ let conversationRepository: ConversationRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(async () => {
-  conversationRepository = await testFactory.exposeConversationActors();
-});
-
 const getDefaultParams = () => {
   return {
     onClose: jest.fn(),
@@ -53,6 +49,10 @@ const getDefaultParams = () => {
 };
 
 describe('Notifications', () => {
+  beforeAll(async () => {
+    conversationRepository = await testFactory.exposeConversationActors();
+  });
+
   it('has the correct input checked', () => {
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     Object.defineProperty(conversation, 'notificationState', {

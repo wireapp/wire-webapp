@@ -32,8 +32,11 @@ import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateM
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
 import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {SystemMessageBase} from './systemMessageBase';
+import {renderMlsSystemMessageCaption} from './systemMessageCaption';
 
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageComponent} from '../adminlessDeleteReminderMessage';
 import {messageBodyWrapper} from '../contentMessage/contentMessage.styles';
@@ -44,6 +47,11 @@ interface SystemMessageProps {
 }
 
 export const SystemMessage = ({message}: SystemMessageProps) => {
+  const {user} = useKoSubscribableChildren(message, ['user']);
+  if (message.system_message_type === SystemMessageType.SESSION_RESET) {
+    return <SystemMessageBase message={message} isSenderNameVisible={!user.isMe} icon={<Icon.InfoIcon />} />;
+  }
+
   if (message instanceof RenameMessage) {
     return (
       <>
@@ -80,11 +88,23 @@ export const SystemMessage = ({message}: SystemMessageProps) => {
   }
 
   if (message instanceof JoinedAfterMLSMigrationFinalisationMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
+    return (
+      <SystemMessageBase
+        message={message}
+        icon={<Icon.InfoIcon />}
+        captionContent={renderMlsSystemMessageCaption(message.caption ?? '')}
+      />
+    );
   }
 
   if (message instanceof OneToOneMigratedToMlsMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
+    return (
+      <SystemMessageBase
+        message={message}
+        icon={<Icon.InfoIcon />}
+        captionContent={renderMlsSystemMessageCaption(message.caption ?? '')}
+      />
+    );
   }
 
   if (message instanceof MLSMigrationFinalisationOngoingCallMessage) {

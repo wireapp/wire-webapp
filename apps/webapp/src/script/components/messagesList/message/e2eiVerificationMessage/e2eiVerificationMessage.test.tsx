@@ -28,7 +28,6 @@ import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories
 import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
 import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -40,15 +39,7 @@ import {E2EIVerificationMessage} from './e2eiVerificationMessage';
 import {withTheme, withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const legacyRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -167,7 +158,7 @@ describe('E2EIVerificationMessage', () => {
     });
 
     it(
-      'preserves the legacy HTML translation when rendering is disabled',
+      'renders the learn-more link as a React element',
       withE2EIConfiguration(
         withTranslationStrings(en, () => {
           const message = createVerificationMessage({
@@ -177,27 +168,7 @@ describe('E2EIVerificationMessage', () => {
           const {container} = render(
             withThemeAndRootContext(
               <E2EIVerificationMessage message={message} conversation={createConversation()} />,
-              legacyRootProviderWrapper,
-            ),
-          );
-
-          expect(getLearnMoreLink(container)).toHaveTextContent('Learn more');
-        }),
-      ),
-    );
-
-    it(
-      'renders the learn-more link as React when rendering is enabled',
-      withE2EIConfiguration(
-        withTranslationStrings(en, () => {
-          const message = createVerificationMessage({
-            messageType: E2EIVerificationMessageType.VERIFIED,
-          });
-
-          const {container} = render(
-            withThemeAndRootContext(
-              <E2EIVerificationMessage message={message} conversation={createConversation()} />,
-              reactTranslationRenderingRootProviderWrapper,
+              translationRootProviderWrapper,
             ),
           );
 
@@ -290,7 +261,7 @@ describe('E2EIVerificationMessage', () => {
       E2EIVerificationMessageType.EXPIRED,
       E2EIVerificationMessageType.NEW_DEVICE,
       E2EIVerificationMessageType.NEW_MEMBER,
-    ])('renders the remote %s user name as React text when enabled', messageType => {
+    ])('renders the remote %s user name as React text', messageType => {
       return withE2EIConfiguration(
         withTranslationStrings(en, () => {
           const remoteUser = createUser('R&D <Test>');
@@ -305,7 +276,7 @@ describe('E2EIVerificationMessage', () => {
                 message={message}
                 conversation={createConversation({participatingUser: remoteUser})}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              translationRootProviderWrapper,
             ),
           );
 
@@ -333,7 +304,7 @@ describe('E2EIVerificationMessage', () => {
                 message={message}
                 conversation={createConversation({participatingUser: remoteUser})}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              translationRootProviderWrapper,
             ),
           );
 
@@ -360,7 +331,7 @@ describe('E2EIVerificationMessage', () => {
           const {container} = render(
             withThemeAndRootContext(
               <E2EIVerificationMessage message={message} conversation={createConversation({selfUser})} />,
-              reactTranslationRenderingRootProviderWrapper,
+              translationRootProviderWrapper,
             ),
           );
 
@@ -380,7 +351,7 @@ describe('E2EIVerificationMessage', () => {
           const {container} = render(
             withThemeAndRootContext(
               <E2EIVerificationMessage message={message} conversation={createConversation()} />,
-              reactTranslationRenderingRootProviderWrapper,
+              translationRootProviderWrapper,
             ),
           );
 
@@ -404,7 +375,7 @@ describe('E2EIVerificationMessage', () => {
               message={message}
               conversation={createConversation({participatingUser: remoteUser})}
             />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
 
@@ -435,7 +406,7 @@ describe('E2EIVerificationMessage', () => {
                 message={message}
                 conversation={createConversation({participatingUser: remoteUser})}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              translationRootProviderWrapper,
             ),
           );
 
@@ -466,7 +437,7 @@ describe('E2EIVerificationMessage', () => {
                 message={message}
                 conversation={createConversation({participatingUser: remoteUser})}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              translationRootProviderWrapper,
             ),
           );
 

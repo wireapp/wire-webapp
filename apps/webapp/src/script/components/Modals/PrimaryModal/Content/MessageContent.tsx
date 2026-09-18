@@ -17,10 +17,8 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 
 import {TranslatedMessageContent} from './TranslatedMessageContent';
@@ -28,30 +26,22 @@ import {TranslatedMessageContent} from './TranslatedMessageContent';
 import type {PrimaryModalTranslatedMessage} from '../PrimaryModalTranslatedMessage';
 
 interface MessageContentProps {
-  messageHtml?: string;
   message?: React.ReactNode;
   translatedMessage?: PrimaryModalTranslatedMessage;
   translate: Translate;
 }
 
-export const MessageContent = ({message, messageHtml, translatedMessage, translate}: MessageContentProps) => {
-  const {isFeatureToggleEnabled} = useApplicationContext();
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
+export const MessageContent = ({message, translatedMessage, translate}: MessageContentProps) => {
   const hasMessage = !isNullOrUndefined(message);
-  const hasMessageHtml = isNonEmptyString(messageHtml);
   const hasTranslatedMessage = !isUndefined(translatedMessage);
 
-  if (!hasMessage && !hasMessageHtml && !hasTranslatedMessage) {
+  if (!hasMessage && !hasTranslatedMessage) {
     return null;
   }
 
   function renderRichMessageContent(): React.ReactNode {
-    if (isReactTranslationRenderingEnabled && hasTranslatedMessage) {
+    if (hasTranslatedMessage) {
       return <TranslatedMessageContent message={translatedMessage} translate={translate} />;
-    }
-
-    if (isNonEmptyString(messageHtml)) {
-      return <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />;
     }
 
     return null;
