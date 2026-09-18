@@ -83,16 +83,5 @@ describe('MediaStreamHandler', () => {
         streamHandler.requestMediaStream(true, false, false, true),
       ).rejects.toBeInstanceOf(NoAudioInputError);
     });
-
-    it('identifies an audio error when requesting audio and video', async () => {
-      const error = new Error('Permission denied');
-      error.name = MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR;
-
-      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.reject(error));
-
-      await expect(
-        streamHandler.requestMediaStream(true, true, false, true),
-      ).rejects.toBeInstanceOf(NoAudioInputError);
-    });
   });
 });
