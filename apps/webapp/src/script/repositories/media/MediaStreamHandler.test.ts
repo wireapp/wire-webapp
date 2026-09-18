@@ -21,6 +21,8 @@ import {UserState} from 'Repositories/user/userState';
 
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';
+import {NoAudioInputError} from "../../error/noAudioInputError";
+import {MEDIA_STREAM_ERROR} from "Repositories/media/MediaStreamError";
 
 describe('MediaStreamHandler', () => {
   let streamHandler: MediaStreamHandler;
@@ -69,6 +71,28 @@ describe('MediaStreamHandler', () => {
       expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
         jasmine.objectContaining({audio: enhancedAudioConstraints, video: jasmine.any(Object)}),
       );
+    });
+
+    it('throws NoAudioInputError when requesting audio fails with NotAllowedError', async () => {
+      const error = new Error('Permission denied');
+      error.name = MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR;
+
+      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.reject(error));
+
+      await expect(
+        streamHandler.requestMediaStream(true, false, false, true),
+      ).rejects.toBeInstanceOf(NoAudioInputError);
+    });
+
+    it('rejects when requesting audio and video fails', async () => {
+      const error = new Error('Permission denied');
+      error.name = MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR;
+
+      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.reject(error));
+
+      await expect(
+        streamHandler.requestMediaStream(true, true, false, true),
+      ).rejects.toBeDefined();
     });
   });
 });
