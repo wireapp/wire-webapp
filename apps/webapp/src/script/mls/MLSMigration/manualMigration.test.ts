@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {Maybe, task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
@@ -36,6 +36,7 @@ const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
   const conversation = new Conversation('conversation', 'example.com', protocol, translateForTest);
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.teamId = 'team';
+  conversation.roles({self: DefaultConversationRoleName.WIRE_ADMIN});
   if (protocol !== CONVERSATION_PROTOCOL.PROTEUS) {
     conversation.groupId = 'group';
   }
@@ -62,18 +63,47 @@ const arrange = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
 
 describe('manual MLS migration', () => {
   it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED])(
-    'allows a same-team regular member on %s before the start date',
+    'allows a same-team conversation admin on %s before the start date',
     protocol => {
       expect(canManuallyMigrateConversation(createConversation(protocol), selfUser, Maybe.just(feature))).toBe(true);
     },
   );
 
+  it.each([DefaultConversationRoleName.WIRE_MEMBER, ''])(
+    'rejects a non-admin role (%s) before making requests',
+    async role => {
+      const {deps, repository} = arrange();
+      deps.conversation.roles({self: role});
+      expect(canManuallyMigrateConversation(deps.conversation, selfUser, Maybe.just(feature))).toBe(false);
+      const outcome = await manuallyMigrateConversation(deps);
+      expect(outcome.isErr && outcome.error.reason).toBe('notAllowed');
+      expect(repository.updateConversationProtocol).not.toHaveBeenCalled();
+      expect(repository.tryEstablishingMLSGroup).not.toHaveBeenCalled();
+    },
+  );
+
+  it('does not finalise when the admin role is revoked during establishment', async () => {
+    const {deps, repository} = arrange(CONVERSATION_PROTOCOL.MIXED);
+    repository.tryEstablishingMLSGroup.mockImplementation(async () => {
+      deps.conversation.roles({self: DefaultConversationRoleName.WIRE_MEMBER});
+    });
+    const outcome = await manuallyMigrateConversation(deps);
+    expect(outcome.isErr && outcome.error.reason).toBe('notAllowed');
+    expect(repository.updateConversationProtocol).not.toHaveBeenCalled();
+  });
+
   it('excludes other teams and missing team IDs, even when both are missing', () => {
     const conversation = createConversation();
-    expect(canManuallyMigrateConversation(conversation, {teamId: 'other'}, Maybe.just(feature))).toBe(false);
-    expect(canManuallyMigrateConversation(conversation, {}, Maybe.just(feature))).toBe(false);
+    expect(canManuallyMigrateConversation(conversation, {...selfUser, teamId: 'other'}, Maybe.just(feature))).toBe(
+      false,
+    );
+    expect(canManuallyMigrateConversation(conversation, {qualifiedId: selfUser.qualifiedId}, Maybe.just(feature))).toBe(
+      false,
+    );
     conversation.teamId = '';
-    expect(canManuallyMigrateConversation(conversation, {}, Maybe.just(feature))).toBe(false);
+    expect(canManuallyMigrateConversation(conversation, {qualifiedId: selfUser.qualifiedId}, Maybe.just(feature))).toBe(
+      false,
+    );
   });
 
   it('requires both backend flags and a group using Proteus or Mixed', () => {

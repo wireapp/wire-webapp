@@ -18,7 +18,7 @@
  */
 
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 import {task} from 'true-myth';
@@ -41,6 +41,7 @@ const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
   const conversation = new Conversation('conversation', 'example.com', protocol, translateForTest);
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.teamId = 'team';
+  conversation.roles({self: DefaultConversationRoleName.WIRE_ADMIN});
   conversation.groupId = protocol === CONVERSATION_PROTOCOL.PROTEUS ? '' : 'group';
   return conversation;
 };
@@ -76,6 +77,24 @@ const activate = (count = 5) => {
 };
 
 describe('manual migration protocol details', () => {
+  it('only enables the gesture for conversation admins and closes confirmation on demotion', () => {
+    const {props, repository} = arrange();
+    props.conversation.roles({self: DefaultConversationRoleName.WIRE_MEMBER});
+    render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
+    expect(screen.queryByRole('button', {name: 'modalCreateGroupProtocolHeading PROTEUS'})).not.toBeInTheDocument();
+    for (let index = 0; index < 5; index += 1) {
+      fireEvent.click(screen.getByText('PROTEUS'));
+    }
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    act(() => props.conversation.roles({self: DefaultConversationRoleName.WIRE_ADMIN}));
+    activate();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    act(() => props.conversation.roles({self: DefaultConversationRoleName.WIRE_MEMBER}));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'modalCreateGroupProtocolHeading PROTEUS'})).not.toBeInTheDocument();
+    expect(repository.updateConversationProtocol).not.toHaveBeenCalled();
+  });
+
   it('refreshes the protocol and closes confirmation after a remote protocol update', () => {
     const {props, repository} = arrange();
     render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});

@@ -30,11 +30,12 @@ import {useManualMigrationStore} from './useManualMigrationStore';
 
 export const canManuallyMigrateConversation = (
   conversation: Conversation,
-  selfUser: Pick<User, 'teamId'>,
+  selfUser: Pick<User, 'teamId' | 'qualifiedId'>,
   feature: Maybe<NonNullable<FeatureMLSMigration>>,
 ): boolean =>
   conversation.isGroupOrChannel() &&
   !conversation.isSelfUserRemoved() &&
+  conversation.isAdmin(selfUser.qualifiedId) &&
   !!conversation.teamId &&
   conversation.teamId === selfUser.teamId &&
   [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED].includes(conversation.protocol) &&

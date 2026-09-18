@@ -85,7 +85,12 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
   const cancelButton = useRef<HTMLButtonElement>(null);
   const wrapper = useRef<HTMLDivElement>(null);
   const {teamFeatures} = useKoSubscribableChildren(teamState, ['teamFeatures']);
-  useKoSubscribableChildren(currentConversation, ['isSelfUserRemoved', 'isGroupOrChannel', 'messages_unordered']);
+  useKoSubscribableChildren(currentConversation, [
+    'isSelfUserRemoved',
+    'isGroupOrChannel',
+    'messages_unordered',
+    'roles',
+  ]);
   const eligible = canManuallyMigrateConversation(currentConversation, selfUser, Maybe.of(teamFeatures?.mlsMigration));
 
   useEffect(() => {
