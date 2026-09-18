@@ -39,6 +39,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {errorHandlerStrings} from 'Util/errorUtil';
 import type {TranslationKey} from 'Util/localizerUtil';
 import {isAxiosError, isBackendError} from 'Util/typePredicateUtil';
+import {useIsMounted} from 'Util/useIsMounted';
 
 import {ConversationProtocolDetails} from './conversationProtocolDetails';
 import {
@@ -49,6 +50,7 @@ import {
   modalDescriptionStyles,
   modalActionsStyles,
 } from './manualMigrationProtocolDetails.styles';
+import {useOnMultipleClicks} from './useOnMultipleClicks';
 
 const REQUIRED_PROTOCOL_ACTIVATIONS = 5;
 
@@ -74,92 +76,78 @@ interface Props {
 
 export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamState, repository}: Props) => {
   const {translate} = useApplicationContext();
-  const [current, setCurrent] = useState(conversation);
-  const [dialog, setDialog] = useState<MigrationDialogState>({phase: 'closed'});
+  const [currentConversation, setCurrentConversation] = useState(conversation);
+  const [dialogState, setDialogState] = useState<MigrationDialogState>({phase: 'closed'});
   const isPending = useManualMigrationStore(state => state.pendingConversationIds.has(conversation.qualifiedId.id));
-  const isBusy = isPending || dialog.phase === 'running';
-  const taps = useRef(0);
-  const mounted = useRef(true);
+  const isBusy = isPending || dialogState.phase === 'running';
+  const isMounted = useIsMounted();
   const titleId = useId();
   const cancelButton = useRef<HTMLButtonElement>(null);
   const wrapper = useRef<HTMLDivElement>(null);
   const {teamFeatures} = useKoSubscribableChildren(teamState, ['teamFeatures']);
-  useKoSubscribableChildren(current, ['isSelfUserRemoved', 'isGroupOrChannel']);
-  const eligible = canManuallyMigrateConversation(current, selfUser, Maybe.of(teamFeatures?.mlsMigration));
+  useKoSubscribableChildren(currentConversation, ['isSelfUserRemoved', 'isGroupOrChannel', 'messages_unordered']);
+  const eligible = canManuallyMigrateConversation(currentConversation, selfUser, Maybe.of(teamFeatures?.mlsMigration));
 
   useEffect(() => {
-    setCurrent(conversation);
+    setCurrentConversation(conversation);
   }, [conversation]);
 
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
+  const {activate, reset} = useOnMultipleClicks({
+    count: REQUIRED_PROTOCOL_ACTIVATIONS,
+    elementRef: wrapper,
+    elementSelector: '[data-uie-name="manual-migration-protocol"]',
+    enabled: eligible && !isBusy && dialogState.phase === 'closed',
+    onActivate: () => setDialogState({phase: 'confirmation'}),
+  });
 
   useEffect(() => {
     if (!eligible) {
-      taps.current = 0;
-      if (!isPending && dialog.phase === 'confirmation') {
-        setDialog({phase: 'closed'});
+      reset();
+      if (!isPending && dialogState.phase === 'confirmation') {
+        setDialogState({phase: 'closed'});
       }
     }
-  }, [eligible, isPending, dialog.phase]);
+  }, [eligible, isPending, dialogState.phase, reset]);
 
+  const previousPhaseRef = useRef(dialogState.phase);
   useEffect(() => {
-    const resetOnOtherClick = (event: MouseEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element) || !target.closest('[data-uie-name="manual-migration-protocol"]')) {
-        taps.current = 0;
-      }
-    };
-    document.addEventListener('click', resetOnOtherClick, true);
-    return () => document.removeEventListener('click', resetOnOtherClick, true);
-  }, []);
+    if (dialogState.phase === 'closed' && previousPhaseRef.current !== 'closed') {
+      const trigger = wrapper.current?.querySelector<HTMLButtonElement>('[data-uie-name="manual-migration-protocol"]');
+      (trigger ?? wrapper.current)?.focus();
+    }
+    previousPhaseRef.current = dialogState.phase;
+  }, [dialogState.phase]);
 
   const dismiss = () => {
     if (!isBusy) {
-      taps.current = 0;
-      setDialog({phase: 'closed'});
-      wrapper.current?.focus();
-    }
-  };
-
-  const activate = () => {
-    if (!eligible || isBusy || dialog.phase !== 'closed') {
-      return;
-    }
-    taps.current += 1;
-    if (taps.current === REQUIRED_PROTOCOL_ACTIVATIONS) {
-      taps.current = 0;
-      setDialog({phase: 'confirmation'});
+      reset();
+      setDialogState({phase: 'closed'});
     }
   };
 
   const confirm = async () => {
-    if (useManualMigrationStore.getState().pendingConversationIds.has(current.qualifiedId.id)) {
+    if (useManualMigrationStore.getState().pendingConversationIds.has(currentConversation.qualifiedId.id)) {
       return;
     }
 
-    setDialog({phase: 'running'});
+    setDialogState({phase: 'running'});
     const outcome = await manuallyMigrateConversation({
-      conversation: current,
+      conversation: currentConversation,
       selfUser,
       repository,
       getFeature: () => Maybe.of(teamState.teamFeatures()?.mlsMigration),
       onConversationUpdated: updated => {
-        if (mounted.current) {
-          setCurrent(updated);
+        if (isMounted()) {
+          setCurrentConversation(updated);
         }
       },
     });
 
-    if (!mounted.current) {
+    if (!isMounted()) {
       return;
     }
 
-    setDialog({
+    setDialogState({
       phase: 'feedback',
       message: outcome.match({
         Ok: () => translate('manualMlsMigrationSuccess'),
@@ -180,15 +168,16 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
   return (
     <div ref={wrapper} tabIndex={-1}>
       <ConversationProtocolDetails
-        protocol={current.protocol}
-        cipherSuite={current.cipherSuite}
+        protocol={currentConversation.protocol}
+        cipherSuite={currentConversation.cipherSuite}
         onProtocolActivated={eligible ? activate : undefined}
       />
-      {dialog.phase !== 'closed' && (
+      {dialogState.phase !== 'closed' && (
         <ModalComponent
           isShown
           onOpened={() => cancelButton.current?.focus()}
           aria-labelledby={titleId}
+          aria-busy={dialogState.phase === 'running'}
           wrapperCSS={modalWrapperStyles}
           onKeyDown={event => {
             if (event.key === 'Escape') {
@@ -202,11 +191,15 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
               {translate('manualMlsMigrationTitle')}
             </h2>
             <p role="status" css={modalDescriptionStyles}>
-              {dialog.phase === 'feedback' ? dialog.message : translate('manualMlsMigrationDescription')}
+              {dialogState.phase === 'feedback'
+                ? dialogState.message
+                : translate(
+                    dialogState.phase === 'running' ? 'manualMlsMigrationProgress' : 'manualMlsMigrationDescription',
+                  )}
             </p>
           </div>
           <div css={modalActionsStyles}>
-            {dialog.phase === 'feedback' ? (
+            {dialogState.phase === 'feedback' ? (
               <Button
                 ref={element => {
                   element?.focus();

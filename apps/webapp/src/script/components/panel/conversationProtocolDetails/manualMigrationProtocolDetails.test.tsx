@@ -32,6 +32,8 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
+import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+
 import {ManualMigrationProtocolDetails} from './manualMigrationProtocolDetails';
 
 const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
@@ -74,6 +76,20 @@ const activate = (count = 5) => {
 };
 
 describe('manual migration protocol details', () => {
+  it('refreshes the protocol and closes confirmation after a remote protocol update', () => {
+    const {props, repository} = arrange();
+    render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
+    activate();
+    act(() => {
+      ConversationMapper.updateProperties(props.conversation, {protocol: CONVERSATION_PROTOCOL.MLS});
+      // Protocol updates append a system message after refreshing the entity in place.
+      props.conversation.messages_unordered.valueHasMutated();
+    });
+    expect(screen.getByText('MLS')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(repository.updateConversationProtocol).not.toHaveBeenCalled();
+  });
+
   it('opens only on the fifth activation and cancellation sends no request', () => {
     const {props, repository} = arrange();
     render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
@@ -84,6 +100,7 @@ describe('manual migration protocol details', () => {
     fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(repository.updateConversationProtocol).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', {name: 'modalCreateGroupProtocolHeading PROTEUS'})).toHaveFocus();
     activate(4);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
@@ -114,6 +131,8 @@ describe('manual migration protocol details', () => {
     fireEvent.click(confirm);
     fireEvent.click(confirm);
     expect(confirm).toBeDisabled();
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationProgress');
     expect(screen.getByRole('button', {name: 'modalConfirmSecondary'})).toBeDisabled();
     fireEvent.keyDown(screen.getByRole('heading', {name: 'manualMlsMigrationTitle'}), {key: 'Escape'});
     fireEvent.click(screen.getByRole('dialog'));
@@ -125,6 +144,7 @@ describe('manual migration protocol details', () => {
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess'));
     expect(screen.getByText('MLS')).toBeInTheDocument();
     const resultDialog = screen.getByRole('dialog');
+    expect(resultDialog).toHaveAttribute('aria-busy', 'false');
     expect(within(resultDialog).getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess');
     expect(within(resultDialog).getAllByRole('button')).toHaveLength(1);
     const ok = within(resultDialog).getByRole('button', {name: 'modalAcknowledgeAction'});
@@ -173,6 +193,7 @@ describe('manual migration protocol details', () => {
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationFailure'));
     expect(screen.getByText('PROTEUS')).toBeInTheDocument();
     const resultDialog = screen.getByRole('dialog');
+    expect(resultDialog).toHaveAttribute('aria-busy', 'false');
     expect(within(resultDialog).getAllByRole('button')).toHaveLength(1);
     fireEvent.click(within(resultDialog).getByRole('button', {name: 'modalAcknowledgeAction'}));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

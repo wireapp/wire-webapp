@@ -45,7 +45,7 @@ export const canManuallyMigrateConversation = (
 export type ManualMigrationFailure = {
   stage: 'eligibility' | 'busy' | 'initialise' | 'establish' | 'finalise';
   reason: 'requestFailed' | 'notAllowed' | 'alreadyRunning' | 'missingGroup' | 'protocolUnchanged';
-  cause: Maybe<NonNullable<unknown>>;
+  cause: Maybe<{}>;
 };
 
 type MigrationRepository = Pick<

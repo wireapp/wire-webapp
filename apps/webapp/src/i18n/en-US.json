@@ -1308,6 +1308,7 @@
   "manualMlsMigrationFailure": "Conversation migration to MLS failed.",
   "manualMlsMigrationMissingGroup": "Migration could not continue because the Mixed conversation has no MLS group.",
   "manualMlsMigrationNotAllowed": "Manual migration is no longer allowed for this conversation.",
+  "manualMlsMigrationProgress": "Changing the conversation protocol to MLS…",
   "manualMlsMigrationProtocolUnchanged": "The conversation protocol did not change to MLS. Please try again.",
   "manualMlsMigrationSuccess": "Conversation migrated to MLS successfully.",
   "manualMlsMigrationTitle": "Change protocol to MLS?",
