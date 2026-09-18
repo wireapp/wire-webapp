@@ -21,6 +21,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -64,7 +65,7 @@ interface BaseImageProps {
 }
 
 interface RemoteDataImageProps extends BaseImageProps {
-  image: AssetRemoteData;
+  image: AssetRemoteData | undefined;
   imageSizes?: {width: string; height: string; ratio: number};
 }
 interface AssetImageProps extends BaseImageProps {
@@ -74,6 +75,24 @@ interface AssetImageProps extends BaseImageProps {
 type ImageLoadState = 'waiting' | 'loading' | 'loaded' | 'failed';
 
 export type GetAssetUrl = (resource: AssetRemoteData, acceptedMimeTypes?: string[]) => Promise<AssetUrl>;
+
+type ImageLoadingOptions = {
+  image: AssetRemoteData | undefined;
+  imageLoadState: ImageLoadState;
+  isInViewport: boolean;
+  isFileSharingReceivingEnabled: boolean;
+};
+
+function isImageReadyToLoad(options: ImageLoadingOptions): options is ImageLoadingOptions & {image: AssetRemoteData} {
+  const {image, imageLoadState, isInViewport, isFileSharingReceivingEnabled} = options;
+
+  return (
+    isUndefined(image) === false &&
+    imageLoadState === 'waiting' &&
+    isInViewport === true &&
+    isFileSharingReceivingEnabled === true
+  );
+}
 
 export const AssetImage: FunctionComponent<AssetImageProps> = (properties: AssetImageProps) => {
   const {
@@ -160,9 +179,18 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   }, []);
 
   useEffect(() => {
-    if (imageLoadState !== 'waiting' || isInViewport === false || isFileSharingReceivingEnabled === false) {
+    const imageLoadingOptions = {
+      image,
+      imageLoadState,
+      isInViewport,
+      isFileSharingReceivingEnabled,
+    };
+
+    if (isImageReadyToLoad(imageLoadingOptions) === false) {
       return;
     }
+
+    const {image: availableImage} = imageLoadingOptions;
 
     setImageLoadState('loading');
     async function loadImageAsset(): Promise<void> {
@@ -171,7 +199,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
           'application/octet-stream', // Octet-stream is required to paste images from clipboard
           ...Config.getConfig().ALLOWED_IMAGE_TYPES,
         ];
-        const url = await getAssetUrl(image, allowedImageTypes);
+        const url = await getAssetUrl(availableImage, allowedImageTypes);
 
         if (isMounted.current === false) {
           return;

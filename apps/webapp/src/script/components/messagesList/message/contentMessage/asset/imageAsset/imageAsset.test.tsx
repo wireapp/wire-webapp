@@ -18,7 +18,7 @@
  */
 
 import type {CSSObject} from '@emotion/react';
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import React, {KeyboardEventHandler, MouseEventHandler, ReactNode} from 'react';
 import type {FunctionComponent} from 'react';
 
@@ -130,7 +130,7 @@ describe('image-asset', () => {
     getAssetUrlMock.mockResolvedValue({url: fakeImageUrl, dispose: jest.fn()});
   });
 
-  it('displays loading dots when resource is not loaded', () => {
+  it('waits for the resource before loading the image', async () => {
     const image = new MediumImage('image');
     image.height = '10';
     image.width = '100';
@@ -141,6 +141,23 @@ describe('image-asset', () => {
 
     const imageElement = screen.getByTestId('image-loader');
     expect(imageElement).toBeDefined();
+    expect(getAssetUrlMock).not.toHaveBeenCalled();
+
+    act(() => {
+      image.resource(
+        new AssetRemoteData({
+          assetKey: 'remote',
+          assetDomain: 'test-domain.wire.com',
+          assetToken: '',
+          forceCaching: false,
+        }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalled();
+      expect(screen.getByTestId('image-asset-img')).toBeDefined();
+    });
   });
 
   it('displays the dummy image url when resource is loaded', async () => {
