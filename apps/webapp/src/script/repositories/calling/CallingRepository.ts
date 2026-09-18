@@ -125,7 +125,7 @@ import {Warnings} from '../../view_model/WarningsContainer';
 const avsLogger = getLogger('avs');
 const AVS_BROWSER_SLEEP_MODE_DETECTION_TIME = 3000;
 
-interface MediaStreamQuery {
+export interface MediaStreamQuery {
   audio?: boolean;
   camera?: boolean;
   screen?: boolean;
@@ -808,30 +808,103 @@ export class CallingRepository {
     }
   }
 
-  private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
-    try {
-      const selfParticipant = call.getSelfParticipant();
-      camera = this.teamState.isVideoCallingEnabled() ? camera : false;
-      backgroundEffectsStore.getState().setIsInitializing(true);
-      const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
+  // Zentral methode to query, caching and setup medias
+  private async acquireCallMedia(call: Call, query: MediaStreamQuery): Promise<MediaStream> {
+    const selfParticipant = call.getSelfParticipant();
+
+    if (this.mediaStreamQuery) {
+      await this.mediaStreamQuery;
+    }
+
+    const currentStreams = {
+      audio: selfParticipant.audioStream(),
+      camera: selfParticipant.videoStream(),
+      screen: selfParticipant.videoStream(),
+    };
+
+    const missingStreams = Object.fromEntries(
+      Object.entries(query).filter(
+        ([type, requested]) => requested && !currentStreams[type as keyof typeof currentStreams],
+      ),
+    ) as MediaStreamQuery;
+
+    if (Object.keys(missingStreams).length === 0) {
+      return selfParticipant.getMediaStream();
+    }
+
+    const mediaStreamQuery = (async () => {
+      if (missingStreams.audio && missingStreams.camera) {
+        // Acquire audio first because microphone access is required for calls.
+        const audioStream = await this.getMediaStream({audio: true}, call.isGroupOrConference);
+
+        if (call.state() === CALL_STATE.NONE) {
+          audioStream.getTracks().forEach(track => track.stop());
+          return audioStream;
+        }
+
+        selfParticipant.updateMediaStream(audioStream, true);
+
+        // Acquire the camera separately so that audio and camera errors
+        // can be distinguished reliably.
+        const cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
+
+        if (call.state() === CALL_STATE.NONE) {
+          cameraStream.getTracks().forEach(track => track.stop());
+          return selfParticipant.getMediaStream();
+        }
+
+        if (cameraStream.getVideoTracks().length > 0) {
+          await this.applyCurrentBackgroundEffectOnSelfParticipant(cameraStream);
+        }
+
+        return selfParticipant.getMediaStream();
+      }
+
+      const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
 
       if (call.state() === CALL_STATE.NONE) {
         mediaStream.getTracks().forEach(track => track.stop());
-        return true;
+        return mediaStream;
       }
 
-      if (camera && mediaStream.getVideoTracks().length > 0) {
+      if (missingStreams.camera && mediaStream.getVideoTracks().length > 0) {
         await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
       } else {
         selfParticipant.updateMediaStream(mediaStream, true);
       }
 
-      if (camera) {
-        selfParticipant.videoState(VIDEO_STATE.STARTED);
+      return selfParticipant.getMediaStream();
+    })();
+
+    this.mediaStreamQuery = mediaStreamQuery;
+
+    try {
+      return await mediaStreamQuery;
+    } finally {
+      if (this.mediaStreamQuery === mediaStreamQuery) {
+        this.mediaStreamQuery = undefined;
+      }
+    }
+  }
+
+  private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
+    try {
+      camera = this.teamState.isVideoCallingEnabled() ? camera : false;
+
+      backgroundEffectsStore.getState().setIsInitializing(true);
+
+      await this.acquireCallMedia(call, {audio, camera});
+
+      if (camera && call.state() !== CALL_STATE.NONE) {
+        call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
       }
 
       return true;
     } catch (error: unknown) {
+      if (error instanceof NoAudioInputError) {
+        throw error;
+      }
+
       this.logger.warn('Failed to warm up media streams', error);
       return false;
     } finally {
@@ -1698,11 +1771,16 @@ export class CallingRepository {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
     } catch (error: unknown) {
-      if (error) {
+      if (error instanceof NoAudioInputError) {
+        this.logger.warn('Failed answering call because microphone is unavailable', error);
+        this.showNoAudioInputModal();
+      } else if (error) {
         this.logger.error('Failed answering call', error);
       }
+
       this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.CALL_SETUP_ERROR);
       call.reason(REASON.ERROR);
+
       if (!!conversation && this.isMLSConference(conversation)) {
         await this.leaveMLSConferenceBecauseError(conversation);
       }
@@ -2812,84 +2890,37 @@ export class CallingRepository {
     camera: boolean,
     screen: boolean,
   ): Promise<MediaStream> => {
-    if (this.mediaStreamQuery) {
-      // if a query is already occurring, we will return the result of this query
-      return this.mediaStreamQuery;
-    }
     const call = this.findCall(this.parseQualifiedId(convId));
     if (!call) {
       return Promise.reject();
     }
+
     const selfParticipant = call.getSelfParticipant();
-    const query: Required<MediaStreamQuery> = {audio, camera, screen};
-    const cache = {
-      audio: selfParticipant.audioStream(),
-      camera: selfParticipant.videoStream(),
-      screen: selfParticipant.videoStream(),
-    };
+    const query = {audio, camera, screen};
 
-    const missingStreams = Object.entries(cache).reduce((accumulator: MediaStreamQuery, currentValue) => {
-      const [type, isCached] = currentValue;
-      if (!isCached && !!query[type as keyof MediaStreamQuery]) {
-        accumulator[type as keyof MediaStreamQuery] = true;
+    try {
+      if (screen && selfParticipant.sharesScreen()) {
+        return selfParticipant.getMediaStream();
       }
-      return accumulator;
-    }, {});
 
-    const queryLog = Object.entries(query)
-      .filter(([_type, needed]) => needed)
-      .map(([type]) => (missingStreams[type as keyof MediaStreamQuery] ? type : `${type} (from cache)`))
-      .join(', ');
-    this.logger.debug(`mediaStream requested: ${queryLog}`);
+      backgroundEffectsStore.getState().setIsInitializing(true);
 
-    if (Object.keys(missingStreams).length === 0) {
-      // we have everything in cache, just return the participant's stream
-      return new Promise(resolve => {
-        /*
-         * There is a bug in Chrome (from version 73, the version where it's fixed is unknown).
-         * This bug crashes the browser if the mediaStream is returned right away (probably some race condition in Chrome internal code)
-         * The timeout(0) fixes this issue.
-         */
-        window.setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
-      });
+      const mediaStream = await this.acquireCallMedia(call, query);
+
+      if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
+        selfParticipant.releaseVideoStream(true);
+      }
+
+      return mediaStream;
+    } catch (error: unknown) {
+      this.logger.warn('Failed to get call media stream', error);
+
+      this.handleMediaStreamError(call, query, error);
+
+      return selfParticipant.getMediaStream();
+    } finally {
+      backgroundEffectsStore.getState().setIsInitializing(false);
     }
-    this.mediaStreamQuery = (async () => {
-      try {
-        if (missingStreams.screen && selfParticipant.sharesScreen()) {
-          return selfParticipant.getMediaStream();
-        }
-
-        backgroundEffectsStore.getState().setIsInitializing(true);
-
-        const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
-
-        if (missingStreams.camera && mediaStream.getVideoTracks().length > 0) {
-          await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
-        } else {
-          selfParticipant.updateMediaStream(mediaStream, true);
-        }
-
-        return selfParticipant.getMediaStream();
-      } catch (error: unknown) {
-        this.logger.warn('Could not get mediaStream for call', error);
-        this.handleMediaStreamError(call, missingStreams, error);
-
-        return selfParticipant.getMediaStream();
-      } finally {
-        this.mediaStreamQuery = undefined;
-        backgroundEffectsStore.getState().setIsInitializing(false);
-      }
-    })();
-
-    this.mediaStreamQuery
-      .then(() => {
-        const selfParticipant = call.getSelfParticipant();
-        if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
-          selfParticipant.releaseVideoStream(true);
-        }
-      })
-      .catch(this.logger.warn);
-    return this.mediaStreamQuery;
   };
 
   private readonly updateActiveSpeakers = (wuser: number, convId: string, rawJson: string) => {

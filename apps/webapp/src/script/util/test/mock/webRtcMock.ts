@@ -19,12 +19,13 @@
 
 import {nonstandard, RTCRtpSender, MediaStream} from '@roamhq/wrtc';
 
-const {RTCAudioSource} = nonstandard;
+const {RTCAudioSource, RTCVideoSource} = nonstandard;
 
 declare global {
   interface Window {
     MediaStream: typeof MediaStream;
     RTCAudioSource: typeof RTCAudioSource;
+    RTCVideoSource: typeof RTCVideoSource;
     RTCRtpSender: typeof RTCRtpSender;
   }
 }
@@ -39,6 +40,11 @@ Object.defineProperty(window, 'MediaStream', {
 
 Object.defineProperty(window, 'RTCAudioSource', {
   value: RTCAudioSource,
+  writable: true,
+});
+
+Object.defineProperty(window, 'RTCVideoSource', {
+  value: RTCVideoSource,
   writable: true,
 });
 
