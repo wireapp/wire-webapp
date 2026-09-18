@@ -71,13 +71,6 @@ jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
 const testFactory = new TestFactory();
 let callingRepository: CallingRepository;
 
-beforeAll(() => {
-  return testFactory.exposeCallingActors().then(injectedCallingRepository => {
-    callingRepository = injectedCallingRepository;
-    return callingRepository;
-  });
-});
-
 const callActions = {
   answer: jest.fn(),
   changePage: jest.fn(),
@@ -136,6 +129,10 @@ function getWarningBadge(container: HTMLElement): HTMLElement {
 }
 
 describe('TitleBar', () => {
+  beforeAll(async () => {
+    callingRepository = await testFactory.exposeCallingActors();
+  });
+
   it('subscribes to shortcut PEOPLE and add ADD_PEOPLE events on mount', async () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);

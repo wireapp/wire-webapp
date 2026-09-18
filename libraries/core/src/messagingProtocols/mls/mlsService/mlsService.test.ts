@@ -121,11 +121,11 @@ const createMLSService = async () => {
   ] as const;
 };
 
-afterAll(() => {
-  jest.clearAllTimers();
-});
-
 describe('MLSService', () => {
+  afterAll(() => {
+    jest.clearAllTimers();
+  });
+
   afterAll(() => {
     apiClients.forEach(client => client.disconnect());
   });

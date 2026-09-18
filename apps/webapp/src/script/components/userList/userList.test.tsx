@@ -42,11 +42,11 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-beforeAll(async () => {
-  conversationRepository = await testFactory.exposeConversationActors();
-});
-
 describe('UserList', () => {
+  beforeAll(async () => {
+    conversationRepository = await testFactory.exposeConversationActors();
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
