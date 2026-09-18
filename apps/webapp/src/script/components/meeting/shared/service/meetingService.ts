@@ -92,13 +92,10 @@ const createMeetingAndSyncParticipants = (
         meetingSubmitErrors.conversationSetupFailed,
       )
         .andThen(() =>
-          (deps.conversationRepository.requestMeetingConversationCode
-            ? deps.conversationRepository.requestMeetingConversationCode(
-                createdMeeting.qualified_conversation,
-                password,
-              )
-            : task.resolve(undefined)
-          ).mapRejected(() => meetingSubmitErrors.conversationSetupFailed),
+          deps.conversationRepository.requestMeetingConversationCode(
+            createdMeeting.qualified_conversation,
+            password,
+          ).orElse(() => task.resolve(undefined)),
         )
         .andThen(() =>
           syncMeetingConversationParticipants(deps.conversationRepository, {

@@ -178,7 +178,13 @@ describe('scheduleMeeting', () => {
   };
 
   it('creates a meeting and establishes the MLS conversation without participants', async () => {
-    const {deps, createMeetingMock, establishMeetingConversation, saveMeetingConversationFromBackend} = createDeps();
+    const {
+      deps,
+      createMeetingMock,
+      establishMeetingConversation,
+      saveMeetingConversationFromBackend,
+      requestMeetingConversationCode,
+    } = createDeps();
 
     const result = await scheduleMeeting(scheduleCommand, deps);
 
@@ -199,6 +205,7 @@ describe('scheduleMeeting', () => {
       userIdsToAdd: [],
       conversationQualifiedId: qualifiedConversation,
     });
+    expect(requestMeetingConversationCode).toHaveBeenCalledWith(qualifiedConversation, undefined);
   });
 
   it('establishes the meeting conversation with selected users on create', async () => {
@@ -264,15 +271,17 @@ describe('scheduleMeeting', () => {
     expect(requestMeetingConversationCode).toHaveBeenCalledWith(qualifiedConversation, 'ValidPassword1!');
   });
 
-  it('returns conversationSetupFailed when requesting the conversation code fails', async () => {
+  it('continues meeting setup when requesting the conversation code fails', async () => {
+    const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const {deps} = createDeps({
+      establishMeetingConversation,
       requestMeetingConversationCode: jest.fn().mockReturnValue(task.reject(new Error('code request failed'))),
     });
 
     const result = await scheduleMeeting(scheduleCommand, deps);
 
-    expect(result.isErr).toBe(true);
-    expect(unwrapErr(result)).toBe(meetingSubmitErrors.conversationSetupFailed);
+    expect(result.isOk).toBe(true);
+    expect(establishMeetingConversation).toHaveBeenCalled();
   });
 });
 
