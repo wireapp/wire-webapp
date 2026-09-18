@@ -80,7 +80,7 @@ describe('SharedDriveUploadInput', () => {
     );
   });
 
-  it('uploads files selected from a folder with their relative paths', async () => {
+  it('forwards files selected from a folder with their relative paths', async () => {
     const user = userEvent.setup();
     const firstFile = new File(['first'], 'first.txt', {type: 'text/plain'});
     const secondFile = new File(['second'], 'second.txt', {type: 'text/plain'});

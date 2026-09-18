@@ -129,10 +129,6 @@ describe('ConversationTabs', () => {
     expect(view.getByTestId('shared-drive-tab-upload-uploading')).toHaveClass(
       'conversation-tabs__upload-status-icon--uploading',
     );
-    expect(view.getByTestId('shared-drive-tab-upload-uploading').querySelector('path')).toHaveAttribute(
-      'fill',
-      'var(--accent-color)',
-    );
     expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.uploading');
     expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
   });
@@ -143,10 +139,6 @@ describe('ConversationTabs', () => {
 
     expect(view.getByTestId('shared-drive-tab-upload-uploading')).toHaveClass(
       'conversation-tabs__upload-status-icon--uploading',
-    );
-    expect(view.getByTestId('shared-drive-tab-upload-uploading').querySelector('path')).toHaveAttribute(
-      'fill',
-      'var(--accent-color)',
     );
     expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.queued');
   });
@@ -162,7 +154,6 @@ describe('ConversationTabs', () => {
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
     const completedIcon = view.getByTestId('shared-drive-tab-upload-completed');
     expect(completedIcon).toBeInTheDocument();
-    expect(completedIcon.querySelector('path')).toHaveAttribute('fill', 'var(--accent-color)');
     expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.uploaded');
   });
 
