@@ -27,33 +27,37 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {SystemMessage} from './systemMessage';
 
-it('shows the resetting user and the recovery explanation as a system message', () => {
-  const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
-  const message = createSessionResetMessage(key => enUS[key]);
-  message.timestamp(wallClock.currentTimestampInMilliseconds);
-  const user = new User('resetting-user-id', 'staging.zinfra.io', translateForTest);
-  user.name('User X');
-  render(<SystemMessage message={message} />);
+describe('SystemMessage MLS reset messages', () => {
+  test('shows the resetting user and the recovery explanation as a system message', () => {
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
+    const message = createSessionResetMessage(key => enUS[key]);
+    message.timestamp(wallClock.currentTimestampInMilliseconds);
+    const user = new User('resetting-user-id', 'staging.zinfra.io', translateForTest);
+    user.name('User X');
+    render(<SystemMessage message={message} />);
 
-  act(() => message.user(user));
+    act(() => message.user(user));
 
-  expect(screen.getByTestId('element-message-system')).toHaveTextContent(
-    'User X was unable to decrypt some of your messages but has solved the issue. This affected all conversations you share together.',
-  );
-});
+    expect(screen.getByTestId('element-message-system')).toHaveTextContent(
+      'User X was unable to decrypt some of your messages but has solved the issue. This affected all conversations you share together.',
+    );
+  });
 
-it('shows the recovery caption without a sender name once the resetting user resolves to self', () => {
-  const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
-  const message = createSessionResetMessage(key => enUS[key]);
-  message.timestamp(wallClock.currentTimestampInMilliseconds);
-  render(<SystemMessage message={message} />);
+  test('shows the recovery caption without a sender name once the resetting user resolves to self', () => {
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
+    const message = createSessionResetMessage(key => enUS[key]);
+    message.timestamp(wallClock.currentTimestampInMilliseconds);
+    render(<SystemMessage message={message} />);
 
-  const user = new User('self-user-id', 'staging.zinfra.io', translateForTest);
-  user.name('My Name');
-  user.isMe = true;
-  act(() => message.user(user));
+    const user = new User('self-user-id', 'staging.zinfra.io', translateForTest);
+    user.name('My Name');
+    user.isMe = true;
+    act(() => message.user(user));
 
-  expect(screen.getByText('You were unable to decrypt some of your messages but have solved the issue.')).toBeVisible();
-  expect(screen.queryByText('My Name')).not.toBeInTheDocument();
-  expect(screen.queryByText(/was unable to decrypt/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText('You were unable to decrypt some of your messages but have solved the issue.'),
+    ).toBeVisible();
+    expect(screen.queryByText('My Name')).not.toBeInTheDocument();
+    expect(screen.queryByText(/was unable to decrypt/)).not.toBeInTheDocument();
+  });
 });

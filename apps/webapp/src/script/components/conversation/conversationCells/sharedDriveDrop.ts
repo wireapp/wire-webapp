@@ -23,6 +23,7 @@ import type {Translate} from 'Util/localizerUtil';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {
+  filterSharedDriveUploadFiles,
   type SharedDriveUploadRejection,
   type SharedDriveUploadRejectionReason,
   validateSharedDriveUploadFiles,
@@ -68,7 +69,12 @@ export const handleSharedDriveDroppedFiles = (
     isAcceptedFile,
   }: SharedDriveDropDependencies,
 ): void => {
-  const validation = validateSharedDriveUploadFiles(files, {
+  const uploadFiles = filterSharedDriveUploadFiles(files);
+  if (uploadFiles.length === 0) {
+    return;
+  }
+
+  const validation = validateSharedDriveUploadFiles(uploadFiles, {
     isUploadFilesEnabled,
     isInRecycleBin,
     maxFileSize,
@@ -81,7 +87,7 @@ export const handleSharedDriveDroppedFiles = (
   }
 
   fireAndForgetInvoker.fireAndForget(() =>
-    sharedDriveUploadController.upload(files, uploadPath, onRefresh, conversationQualifiedId),
+    sharedDriveUploadController.upload(uploadFiles, uploadPath, onRefresh, conversationQualifiedId),
   );
 };
 

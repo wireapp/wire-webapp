@@ -100,6 +100,8 @@ describe('CellsRepository upload cancellation', () => {
 });
 
 describe('CellsRepository upload paths', () => {
+  const uploadPath = 'conversation-id@example.com/direct-upload';
+
   const createApiClient = () => ({
     api: {
       cells: {
@@ -120,6 +122,28 @@ describe('CellsRepository upload paths', () => {
       expect.objectContaining({
         path: 'conversation-id@example.com/direct-upload/document.txt',
       }),
+    );
+  });
+
+  it('preserves relative paths for folder uploads', async () => {
+    const apiClient = createApiClient();
+    const repository = new CellsRepository(apiClient as never);
+    const firstFile = new File(['first'], 'first.txt');
+    const secondFile = new File(['second'], 'second.txt');
+
+    Object.defineProperty(firstFile, 'webkitRelativePath', {value: 'Reports/first.txt'});
+    Object.defineProperty(secondFile, 'webkitRelativePath', {value: 'Reports/Archive/second.txt'});
+
+    await repository.uploadNode({uuid: 'upload-uuid', file: firstFile, path: uploadPath});
+    await repository.uploadNode({uuid: 'upload-uuid-2', file: secondFile, path: uploadPath});
+
+    expect(apiClient.api.cells.uploadNode).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({path: `${uploadPath}/Reports/first.txt`}),
+    );
+    expect(apiClient.api.cells.uploadNode).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({path: `${uploadPath}/Reports/Archive/second.txt`}),
     );
   });
 

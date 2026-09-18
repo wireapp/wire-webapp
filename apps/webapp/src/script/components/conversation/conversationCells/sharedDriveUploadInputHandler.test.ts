@@ -22,7 +22,7 @@ import type {ChangeEvent} from 'react';
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {handleSharedDriveUploadInput} from './sharedDriveUploadInput';
+import {handleSharedDriveUploadInput} from './sharedDriveUploadInputHandler';
 
 const uploadPath = 'conversation-id@example.com/files';
 const conversationQualifiedId = 'conversation-id@example.com';
@@ -93,6 +93,59 @@ describe('handleSharedDriveUploadInput', () => {
 
     expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
       [firstFile, secondFile],
+      uploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it.each(['.DS_Store', 'Thumbs.db', 'desktop.ini'])(
+    'filters filesystem metadata files before uploading selected files',
+    async metadataFileName => {
+      const file = new File(['content'], 'document.txt');
+      const metadataFile = new File(['metadata'], metadataFileName);
+      const dependencies = createDependencies();
+
+      handleSharedDriveUploadInput(createEvent([metadataFile, file]), {...dependencies, uploadPath});
+
+      expect(dependencies.onReject).not.toHaveBeenCalled();
+      expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+      const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
+      await uploadAction();
+      expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+        [file],
+        uploadPath,
+        dependencies.onRefresh,
+        conversationQualifiedId,
+      );
+    },
+  );
+
+  it('does not dispatch when only filesystem metadata files are selected', () => {
+    const dependencies = createDependencies();
+    const event = createEvent([
+      new File(['metadata'], '.DS_Store'),
+      new File(['metadata'], 'Thumbs.db'),
+      new File(['metadata'], 'desktop.ini'),
+    ]);
+
+    handleSharedDriveUploadInput(event, {...dependencies, uploadPath});
+
+    expect(event.target.value).toBe('');
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
+  it('preserves intentional dotfiles when selected', async () => {
+    const dotFile = new File(['content'], '.env');
+    const dependencies = createDependencies();
+
+    handleSharedDriveUploadInput(createEvent([dotFile]), {...dependencies, uploadPath});
+
+    const uploadAction = getUploadAction(dependencies.fireAndForgetInvoker);
+    await uploadAction();
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [dotFile],
       uploadPath,
       dependencies.onRefresh,
       conversationQualifiedId,

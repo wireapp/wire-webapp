@@ -941,6 +941,15 @@ const testJavaScriptFilePatterns = [
 
 const testJsxFilePatterns = testJavaScriptFilePatterns.map(filePattern => filePattern.replaceAll('.js', '.jsx'));
 
+const jestTestFilePatterns = [
+  ...testTypeScriptFilePatterns,
+  ...testTsxFilePatterns,
+  ...testJavaScriptFilePatterns,
+  ...testJsxFilePatterns,
+].filter(filePattern => {
+  return filePattern.includes('.test') || filePattern.includes('.spec');
+});
+
 const repositoryLinterOptions = {
   reportUnusedDisableDirectives: 'error',
 };
@@ -1019,6 +1028,16 @@ const config = [
     ],
     rules: {
       'no-restricted-syntax': testRestrictedSyntaxRule,
+    },
+  },
+  {
+    files: jestTestFilePatterns,
+    ignores: ['apps/webapp/test/e2e_tests/**'],
+    plugins: {
+      jest: jestPlugin,
+    },
+    rules: {
+      'jest/require-top-level-describe': 'error',
     },
   },
   {

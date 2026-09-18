@@ -42,10 +42,6 @@ let conversationRepository: ConversationRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(async () => {
-  conversationRepository = await testFactory.exposeConversationActors();
-});
-
 const getDefaultParams = (isGuest: boolean = true) => {
   return {
     conversationRepository,
@@ -64,6 +60,10 @@ const getDefaultParams = (isGuest: boolean = true) => {
 };
 
 describe('GuestServicesOptions', () => {
+  beforeAll(async () => {
+    conversationRepository = await testFactory.exposeConversationActors();
+  });
+
   it('shows Shared Drive guest restrictions for a Cells conversation', async () => {
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);

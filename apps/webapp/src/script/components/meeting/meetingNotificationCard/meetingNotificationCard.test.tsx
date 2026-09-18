@@ -117,6 +117,15 @@ describe('MeetingNotificationCard', () => {
       qualifiedCreator,
       meetingStartTime: ongoingMeetingStartTime,
     },
+    {
+      id: 'notification-reminder',
+      kind: MeetingNotificationKind.REMINDER,
+      meetingTitle: 'meeting Title',
+      qualifiedId,
+      qualifiedConversationId,
+      qualifiedCreator,
+      meetingStartTime,
+    },
   ] satisfies readonly MeetingNotification[];
 
   it.each(notifications)('renders the $kind variant', notification => {
@@ -130,6 +139,7 @@ describe('MeetingNotificationCard', () => {
         [MeetingNotificationKind.UPDATE]: 'meetings.notifications.update',
         [MeetingNotificationKind.CANCELLED]: 'meetings.notifications.canceled',
         [MeetingNotificationKind.ONGOING]: 'meetings.notifications.ongoing',
+        [MeetingNotificationKind.REMINDER]: 'meetings.notifications.reminder',
       }[notification.kind],
     );
     expect(screen.getByRole('button', {name: 'meetings.notifications.dismiss'})).toBeInTheDocument();
@@ -152,6 +162,11 @@ describe('MeetingNotificationCard', () => {
       expect(screen.getByText(`Started at ${formatLocale(ongoingMeetingStartTime, 'p')}`)).toHaveStyle({
         color: 'var(--accent-color)',
       });
+    }
+
+    if (notification.kind === MeetingNotificationKind.REMINDER) {
+      expect(card).toHaveTextContent('By creator-id');
+      expect(card).toHaveTextContent('meetings.notifications.startsIn10Minutes');
     }
 
     if (notification.kind === MeetingNotificationKind.CANCELLED) {

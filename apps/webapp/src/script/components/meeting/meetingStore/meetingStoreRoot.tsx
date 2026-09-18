@@ -21,9 +21,13 @@ import {type ReactNode, useEffect, useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
+import {createMeetingReminderScheduler} from 'Components/meeting/createMeetingReminderScheduler';
 import {createBrowserDeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {createMeetingNotificationEventHandlers} from 'Components/meeting/meetingNotificationEventHandlers';
-import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
+import {
+  MeetingNotificationKind,
+  useMeetingNotificationStore,
+} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/meeting/shared/service/deleteMeeting';
@@ -100,6 +104,15 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
       logger,
     });
+    const reminderScheduler = createMeetingReminderScheduler({
+      wallClock,
+      onReminder: payload => {
+        notificationStore.addNotification({
+          ...payload,
+          kind: MeetingNotificationKind.REMINDER,
+        });
+      },
+    });
 
     const getSelfUserQualifiedId = () => container.resolve(UserState).self().qualifiedId;
 
@@ -118,17 +131,20 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const unsubscribeFromMeetingStore = store.subscribe((state, previousState) => {
       if (state.meetingSeries !== previousState.meetingSeries) {
         notificationHandlers.retryPendingNotifications();
+        reminderScheduler.sync(state.meetingSeries);
       }
     });
 
+    reminderScheduler.sync(store.getState().meetingSeries);
     dispatcher.enqueueInitialLoad();
 
     return () => {
       unsubscribeFromMeetingLifecycleEvents();
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
+      reminderScheduler.stop();
     };
-  }, [isMeetingsEnabled, store]);
+  }, [isMeetingsEnabled, store, wallClock]);
 
   return <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>;
 };

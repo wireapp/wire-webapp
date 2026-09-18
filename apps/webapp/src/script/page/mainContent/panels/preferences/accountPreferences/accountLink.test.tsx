@@ -34,26 +34,28 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-test('copies correct text', async () => {
-  const mockCopy: any = jest.spyOn(utils, 'copyText');
-  mockCopy.mockImplementation((text: string) => text);
+describe('AccountLink', () => {
+  test('copies correct text', async () => {
+    const mockCopy: any = jest.spyOn(utils, 'copyText');
+    mockCopy.mockImplementation((text: string) => text);
 
-  render(withTheme(<AccountLink label="test" value="test-value" />), {wrapper: rootProviderWrapper});
+    render(withTheme(<AccountLink label="test" value="test-value" />), {wrapper: rootProviderWrapper});
 
-  const button = await screen.findByRole('button');
-  fireEvent.click(button);
+    const button = await screen.findByRole('button');
+    fireEvent.click(button);
 
-  expect(mockCopy).toHaveBeenCalledTimes(1);
-  expect(mockCopy).toHaveReturnedWith('test-value');
-});
+    expect(mockCopy).toHaveBeenCalledTimes(1);
+    expect(mockCopy).toHaveReturnedWith('test-value');
+  });
 
-test('renders elements correctly', () => {
-  render(withTheme(<AccountLink label="test" value="test-value" />), {wrapper: rootProviderWrapper});
-  const label = screen.getByTestId('label-profile-link');
-  const value = screen.getByTestId('profile-link');
-  const button = screen.getByTestId('do-copy-profile-link');
+  test('renders elements correctly', () => {
+    render(withTheme(<AccountLink label="test" value="test-value" />), {wrapper: rootProviderWrapper});
+    const label = screen.getByTestId('label-profile-link');
+    const value = screen.getByTestId('profile-link');
+    const button = screen.getByTestId('do-copy-profile-link');
 
-  expect(label).toBeTruthy();
-  expect(value).toBeTruthy();
-  expect(button).toBeTruthy();
+    expect(label).toBeTruthy();
+    expect(value).toBeTruthy();
+    expect(button).toBeTruthy();
+  });
 });

@@ -97,13 +97,6 @@ function createOthersDescriptionProps(): LegalHoldModalProps {
   return props;
 }
 
-beforeAll(() => {
-  testFactory.exposeCallingActors().then(injectedCallingRepository => {
-    callRepository = injectedCallingRepository;
-    return callRepository;
-  });
-});
-
 const defaultProps = () => ({
   clientRepository: {} as ClientRepository,
   conversationRepository: {
@@ -123,6 +116,10 @@ const defaultProps = () => ({
 });
 
 describe('LegalHoldModal', () => {
+  beforeAll(async () => {
+    callRepository = await testFactory.exposeCallingActors();
+  });
+
   it('is showRequestModal', (): void => {
     try {
       render(<LegalHoldModal {...defaultProps()} />, {wrapper: rootProviderWrapper});
