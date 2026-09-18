@@ -4009,6 +4009,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.FEDERATION_STOP:
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
+      case ClientEvent.CONVERSATION.SESSION_RESET:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION:
       case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL:
@@ -4818,7 +4819,6 @@ export class ConversationRepository {
       });
 
       await this.saveConversationStateInDb(updatedConversation);
-      await this.addEventToConversation(updatedConversation, eventJson);
 
       this.logger.info(
         `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,

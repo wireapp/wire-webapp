@@ -48,7 +48,7 @@ interface SystemMessageProps {
 
 export const SystemMessage = ({message}: SystemMessageProps) => {
   const {user} = useKoSubscribableChildren(message, ['user']);
-  if (message.system_message_type === SystemMessageType.MLS_RESET) {
+  if (message.system_message_type === SystemMessageType.SESSION_RESET) {
     return <SystemMessageBase message={message} isSenderNameVisible={!user.isMe} icon={<Icon.InfoIcon />} />;
   }
 

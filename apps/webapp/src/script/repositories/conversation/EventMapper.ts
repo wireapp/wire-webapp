@@ -58,13 +58,13 @@ import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTime
 import {MissedMessage} from 'Repositories/entity/message/missedMessage';
 import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsConversationRecoveredMessage';
 import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
-import {createMLSResetMessage} from 'Repositories/entity/message/mlsResetMessage';
 import {Multipart} from 'Repositories/entity/message/multipart';
 import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/oneToOneMigratedToMlsMessage';
 import {PingMessage} from 'Repositories/entity/message/pingMessage';
 import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import {createSessionResetMessage} from 'Repositories/entity/message/sessionResetMessage';
 import type {Text as TextAsset} from 'Repositories/entity/message/text';
 import {Text} from 'Repositories/entity/message/text';
 import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
@@ -306,8 +306,8 @@ export class EventMapper {
         break;
       }
 
-      case CONVERSATION_EVENT.MLS_RESET: {
-        messageEntity = createMLSResetMessage(this.translate);
+      case ClientEvent.CONVERSATION.SESSION_RESET: {
+        messageEntity = createSessionResetMessage(this.translate);
         break;
       }
 

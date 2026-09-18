@@ -49,6 +49,7 @@ export enum CONVERSATION {
   MLS_CONVERSATION_RECOVERED = 'conversation.mls-conversation-recovered',
   ONE2ONE_CREATION = 'conversation.one2one-creation',
   REACTION = 'conversation.reaction',
+  SESSION_RESET = 'conversation.session-reset',
   TEAM_MEMBER_LEAVE = 'conversation.team-member-leave',
   UNABLE_TO_DECRYPT = 'conversation.unable-to-decrypt',
   VERIFICATION = 'conversation.verification',

@@ -28,6 +28,7 @@ import {
   ButtonAction,
   Calling,
   Cleared,
+  ClientAction,
   External,
   GenericMessage,
   Knock,
@@ -74,6 +75,39 @@ describe('CryptographyMapper', () => {
   });
 
   describe('"mapGenericMessage"', () => {
+    it('maps a decoded Proteus session reset with its original metadata', async () => {
+      const reset = GenericMessage.decode(
+        GenericMessage.encode(
+          GenericMessage.create({messageId: 'reset-id', clientAction: ClientAction.RESET_SESSION}),
+        ).finish(),
+      );
+      const resetEvent = {
+        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD as const,
+        conversation: 'conversation-id',
+        qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+        from: 'resetting-user',
+        qualified_from: {id: 'resetting-user', domain: 'example.com'},
+        time: '2026-09-18T09:00:00.000Z',
+        data: {sender: 'ios-client', recipient: 'web-client', text: ''},
+      };
+
+      await expect(mapper.mapGenericMessage(reset, resetEvent)).resolves.toMatchObject({
+        type: ClientEvent.CONVERSATION.SESSION_RESET,
+        id: 'reset-id',
+        from: resetEvent.from,
+        from_client_id: 'ios-client',
+        qualified_from: resetEvent.qualified_from,
+        conversation: resetEvent.conversation,
+        qualified_conversation: resetEvent.qualified_conversation,
+        time: resetEvent.time,
+      });
+    });
+
+    it('ignores unsupported client actions', async () => {
+      const message = GenericMessage.create({messageId: 'unknown-action', clientAction: 999 as ClientAction});
+      await expect(mapper.mapGenericMessage(message, event)).resolves.toBeUndefined();
+    });
+
     it('resolves with a mapped original asset message', () => {
       const original = {
         mime_type: 'jpg',
