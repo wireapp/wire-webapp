@@ -18,6 +18,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react';
+import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
@@ -74,7 +75,7 @@ type ImageLoadState = 'waiting' | 'loading' | 'loaded' | 'failed';
 
 export type GetAssetUrl = (resource: AssetRemoteData, acceptedMimeTypes?: string[]) => Promise<AssetUrl>;
 
-export function AssetImage(properties: AssetImageProps): React.ReactElement {
+export const AssetImage: FunctionComponent<AssetImageProps> = (properties: AssetImageProps) => {
   const {
     'aria-label': ariaLabel,
     alt,
@@ -116,9 +117,9 @@ export function AssetImage(properties: AssetImageProps): React.ReactElement {
       teamState={teamState}
     />
   );
-}
+};
 
-export function Image(properties: RemoteDataImageProps): React.ReactElement {
+export const Image: FunctionComponent<RemoteDataImageProps> = (properties: RemoteDataImageProps) => {
   const {
     'aria-label': ariaLabel,
     image,
@@ -233,4 +234,4 @@ export function Image(properties: RemoteDataImageProps): React.ReactElement {
       />
     </InViewport>
   );
-}
+};

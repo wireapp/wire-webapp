@@ -19,7 +19,8 @@
 
 import type {CSSObject} from '@emotion/react';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import type {KeyboardEventHandler, MouseEventHandler, ReactElement, ReactNode} from 'react';
+import React, {KeyboardEventHandler, MouseEventHandler, ReactNode} from 'react';
+import type {FunctionComponent} from 'react';
 
 import type {AssetUrl} from 'Components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
 import type {GetAssetUrl, ImageLogger} from 'Components/image';
@@ -59,7 +60,7 @@ jest.mock('Components/inViewport', () => {
     tabIndex?: number;
   }
 
-  function MockInViewport(properties: MockInViewportProps): ReactElement {
+  const MockInViewport: FunctionComponent<MockInViewportProps> = (properties: MockInViewportProps) => {
     const {
       'aria-label': ariaLabel,
       children,
@@ -90,7 +91,7 @@ jest.mock('Components/inViewport', () => {
         {children}
       </div>
     );
-  }
+  };
 
   return {
     InViewport: MockInViewport,

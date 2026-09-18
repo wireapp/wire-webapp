@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -41,7 +42,7 @@ export interface ImageAssetProps {
   isFocusable?: boolean;
 }
 
-export function ImageAsset(properties: ImageAssetProps): React.ReactElement {
+export const ImageAsset: FunctionComponent<ImageAssetProps> = (properties: ImageAssetProps) => {
   const {asset, getAssetUrl, logger, message, onClick} = properties;
   const {translate} = useApplicationContext();
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
@@ -92,4 +93,4 @@ export function ImageAsset(properties: ImageAssetProps): React.ReactElement {
       )}
     </div>
   );
-}
+};
