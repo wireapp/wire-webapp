@@ -47,8 +47,8 @@ const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
 };
 const arrange = () => {
   const repository = {
-    updateConversationProtocol: jest.fn(async (_conversation: Conversation, protocol: CONVERSATION_PROTOCOL) =>
-      createConversation(protocol),
+    updateConversationProtocol: jest.fn(async (conversation: Conversation, protocol: CONVERSATION_PROTOCOL) =>
+      ConversationMapper.updateProperties(conversation, {protocol, groupId: 'group'}),
     ),
     tryEstablishingMLSGroup: jest.fn(asyncNoop),
     safeEnsureConversationExists: jest.fn(() => task.resolve().map(noop)),
@@ -105,6 +105,7 @@ describe('manual migration protocol details', () => {
       props.conversation.messages_unordered.valueHasMutated();
     });
     expect(screen.getByText('MLS')).toBeInTheDocument();
+    expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MLS);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(repository.updateConversationProtocol).not.toHaveBeenCalled();
   });
@@ -158,10 +159,16 @@ describe('manual migration protocol details', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(repository.updateConversationProtocol).toHaveBeenCalledTimes(1);
     await act(async () => {
-      deferred.resolve(createConversation(CONVERSATION_PROTOCOL.MIXED));
+      deferred.resolve(
+        ConversationMapper.updateProperties(props.conversation, {
+          protocol: CONVERSATION_PROTOCOL.MIXED,
+          groupId: 'group',
+        }),
+      );
     });
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess'));
     expect(screen.getByText('MLS')).toBeInTheDocument();
+    expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MLS);
     const resultDialog = screen.getByRole('dialog');
     expect(resultDialog).toHaveAttribute('aria-busy', 'false');
     expect(within(resultDialog).getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess');
@@ -195,12 +202,59 @@ describe('manual migration protocol details', () => {
 
   it('shows the translated reason when finalisation does not change the protocol', async () => {
     const {props, repository} = arrange();
-    repository.updateConversationProtocol.mockResolvedValue(createConversation(CONVERSATION_PROTOCOL.MIXED));
+    repository.updateConversationProtocol.mockImplementation(async conversation =>
+      ConversationMapper.updateProperties(conversation, {protocol: CONVERSATION_PROTOCOL.MIXED, groupId: 'group'}),
+    );
     render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
     activate();
     fireEvent.click(screen.getByRole('button', {name: 'manualMlsMigrationConfirm'}));
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationProtocolUnchanged'));
     expect(within(screen.getByRole('dialog')).getAllByRole('button')).toHaveLength(1);
+  });
+
+  it('keeps the shared Mixed state visible after establishment fails and retries from Mixed', async () => {
+    const {props, repository} = arrange();
+    repository.tryEstablishingMLSGroup.mockRejectedValueOnce('offline');
+    render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
+    activate();
+    fireEvent.click(screen.getByRole('button', {name: 'manualMlsMigrationConfirm'}));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationFailure'));
+    expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MIXED);
+    expect(screen.getByText('MIXED')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: 'modalAcknowledgeAction'}));
+    for (let index = 0; index < 5; index += 1) {
+      fireEvent.click(screen.getByRole('button', {name: 'modalCreateGroupProtocolHeading MIXED'}));
+    }
+    fireEvent.click(screen.getByRole('button', {name: 'manualMlsMigrationConfirm'}));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess'));
+    expect(repository.updateConversationProtocol.mock.calls.map(([, protocol]) => protocol)).toEqual([
+      CONVERSATION_PROTOCOL.MIXED,
+      CONVERSATION_PROTOCOL.MLS,
+    ]);
+    expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MLS);
+  });
+
+  it('refreshes a remounted panel when the shared conversation finishes migrating', async () => {
+    const {props, repository} = arrange();
+    const deferred = Promise.withResolvers<Conversation>();
+    repository.updateConversationProtocol.mockReturnValueOnce(deferred.promise);
+    const panel = render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
+    activate();
+    fireEvent.click(screen.getByRole('button', {name: 'manualMlsMigrationConfirm'}));
+    panel.unmount();
+    render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
+    await act(async () => {
+      deferred.resolve(
+        ConversationMapper.updateProperties(props.conversation, {
+          protocol: CONVERSATION_PROTOCOL.MIXED,
+          groupId: 'group',
+        }),
+      );
+    });
+    await waitFor(() => expect(screen.getByText('MLS')).toBeInTheDocument());
+    expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MLS);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'modalCreateGroupProtocolHeading MLS'})).not.toBeInTheDocument();
   });
 
   it('shows failure in the modal until acknowledged and allows a fresh confirmation', async () => {

@@ -59,13 +59,11 @@ export const manuallyMigrateConversation = ({
   selfUser,
   repository,
   getFeature,
-  onConversationUpdated,
 }: {
   conversation: Conversation;
   selfUser: Pick<User, 'teamId' | 'qualifiedId'>;
   repository: MigrationRepository;
   getFeature: () => Maybe<NonNullable<FeatureMLSMigration>>;
-  onConversationUpdated: (conversation: Conversation) => void;
 }): Task<Conversation, ManualMigrationFailure> => {
   if (!canManuallyMigrateConversation(conversation, selfUser, getFeature())) {
     return task.reject({stage: 'eligibility', reason: 'notAllowed', cause: Maybe.nothing()});
@@ -84,15 +82,10 @@ export const manuallyMigrateConversation = ({
     cause: Maybe.of(cause),
   });
   const update = (current: Conversation, protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS) =>
-    task
-      .tryOrElse(
-        cause => failure(protocol === CONVERSATION_PROTOCOL.MIXED ? 'initialise' : 'finalise', cause),
-        () => repository.updateConversationProtocol(current, protocol),
-      )
-      .map(updated => {
-        onConversationUpdated(updated);
-        return updated;
-      });
+    task.tryOrElse(
+      cause => failure(protocol === CONVERSATION_PROTOCOL.MIXED ? 'initialise' : 'finalise', cause),
+      () => repository.updateConversationProtocol(current, protocol),
+    );
 
   const initialized =
     conversation.protocol === CONVERSATION_PROTOCOL.PROTEUS

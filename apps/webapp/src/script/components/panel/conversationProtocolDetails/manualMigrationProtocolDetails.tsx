@@ -76,7 +76,6 @@ interface Props {
 
 export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamState, repository}: Props) => {
   const {translate} = useApplicationContext();
-  const [currentConversation, setCurrentConversation] = useState(conversation);
   const [dialogState, setDialogState] = useState<MigrationDialogState>({phase: 'closed'});
   const isPending = useManualMigrationStore(state => state.pendingConversationIds.has(conversation.qualifiedId.id));
   const isBusy = isPending || dialogState.phase === 'running';
@@ -85,17 +84,8 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
   const cancelButton = useRef<HTMLButtonElement>(null);
   const wrapper = useRef<HTMLDivElement>(null);
   const {teamFeatures} = useKoSubscribableChildren(teamState, ['teamFeatures']);
-  useKoSubscribableChildren(currentConversation, [
-    'isSelfUserRemoved',
-    'isGroupOrChannel',
-    'messages_unordered',
-    'roles',
-  ]);
-  const eligible = canManuallyMigrateConversation(currentConversation, selfUser, Maybe.of(teamFeatures?.mlsMigration));
-
-  useEffect(() => {
-    setCurrentConversation(conversation);
-  }, [conversation]);
+  useKoSubscribableChildren(conversation, ['isSelfUserRemoved', 'isGroupOrChannel', 'messages_unordered', 'roles']);
+  const eligible = canManuallyMigrateConversation(conversation, selfUser, Maybe.of(teamFeatures?.mlsMigration));
 
   const {activate, reset} = useOnMultipleClicks({
     count: REQUIRED_PROTOCOL_ACTIVATIONS,
@@ -131,21 +121,16 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
   };
 
   const confirm = async () => {
-    if (useManualMigrationStore.getState().pendingConversationIds.has(currentConversation.qualifiedId.id)) {
+    if (useManualMigrationStore.getState().pendingConversationIds.has(conversation.qualifiedId.id)) {
       return;
     }
 
     setDialogState({phase: 'running'});
     const outcome = await manuallyMigrateConversation({
-      conversation: currentConversation,
+      conversation,
       selfUser,
       repository,
       getFeature: () => Maybe.of(teamState.teamFeatures()?.mlsMigration),
-      onConversationUpdated: updated => {
-        if (isMounted()) {
-          setCurrentConversation(updated);
-        }
-      },
     });
 
     if (!isMounted()) {
@@ -173,8 +158,8 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
   return (
     <div ref={wrapper} tabIndex={-1}>
       <ConversationProtocolDetails
-        protocol={currentConversation.protocol}
-        cipherSuite={currentConversation.cipherSuite}
+        protocol={conversation.protocol}
+        cipherSuite={conversation.cipherSuite}
         onProtocolActivated={eligible ? activate : undefined}
       />
       {dialogState.phase !== 'closed' && (

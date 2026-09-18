@@ -22,6 +22,7 @@ import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/tea
 import {Maybe, task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
+import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -37,16 +38,14 @@ const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.teamId = 'team';
   conversation.roles({self: DefaultConversationRoleName.WIRE_ADMIN});
-  if (protocol !== CONVERSATION_PROTOCOL.PROTEUS) {
-    conversation.groupId = 'group';
-  }
+  conversation.groupId = protocol === CONVERSATION_PROTOCOL.PROTEUS ? '' : 'group';
   return conversation;
 };
 const arrange = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
   const conversation = createConversation(protocol);
   const repository = {
-    updateConversationProtocol: jest.fn(async (_current: Conversation, next: CONVERSATION_PROTOCOL) =>
-      createConversation(next),
+    updateConversationProtocol: jest.fn(async (current: Conversation, next: CONVERSATION_PROTOCOL) =>
+      ConversationMapper.updateProperties(current, {protocol: next, groupId: 'group'}),
     ),
     tryEstablishingMLSGroup: jest.fn(asyncNoop),
     safeEnsureConversationExists: jest.fn(() => task.resolve().map(noop)),
@@ -56,7 +55,6 @@ const arrange = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
     selfUser,
     repository,
     getFeature: () => Maybe.just(feature),
-    onConversationUpdated: jest.fn(),
   };
   return {deps, repository};
 };
@@ -123,12 +121,12 @@ describe('manual MLS migration', () => {
     expect(canManuallyMigrateConversation(conversation, selfUser, Maybe.just(feature))).toBe(false);
   });
 
-  it('establishes the group between Mixed and MLS updates and reports both updated entities', async () => {
+  it('establishes the group between Mixed and MLS updates on the shared conversation', async () => {
     const {deps, repository} = arrange();
     const order: string[] = [];
-    repository.updateConversationProtocol.mockImplementation(async (_current, protocol) => {
+    repository.updateConversationProtocol.mockImplementation(async (current, protocol) => {
       order.push(protocol);
-      return createConversation(protocol);
+      return ConversationMapper.updateProperties(current, {protocol, groupId: 'group'});
     });
     repository.tryEstablishingMLSGroup.mockImplementation(async () => {
       order.push('establish');
@@ -136,7 +134,8 @@ describe('manual MLS migration', () => {
     const outcome = await manuallyMigrateConversation(deps);
     expect(outcome.isOk).toBe(true);
     expect(order).toEqual([CONVERSATION_PROTOCOL.MIXED, 'establish', CONVERSATION_PROTOCOL.MLS]);
-    expect(deps.onConversationUpdated).toHaveBeenCalledTimes(2);
+    expect(outcome.isOk && outcome.value).toBe(deps.conversation);
+    expect(deps.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MLS);
   });
 
   it('joins an established Mixed group before finalisation', async () => {
@@ -202,7 +201,9 @@ describe('manual MLS migration', () => {
 
   it('handles another client completing migration during initialisation', async () => {
     const {deps, repository} = arrange();
-    repository.updateConversationProtocol.mockResolvedValueOnce(createConversation(CONVERSATION_PROTOCOL.MLS));
+    repository.updateConversationProtocol.mockImplementationOnce(async current =>
+      ConversationMapper.updateProperties(current, {protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'group'}),
+    );
     expect((await manuallyMigrateConversation(deps)).isOk).toBe(true);
     expect(repository.updateConversationProtocol).toHaveBeenCalledTimes(1);
     expect(repository.tryEstablishingMLSGroup).not.toHaveBeenCalled();
