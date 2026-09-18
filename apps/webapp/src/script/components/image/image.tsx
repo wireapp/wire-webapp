@@ -233,6 +233,12 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   const isLoading = imageLoadState === 'waiting' || imageLoadState === 'loading';
   const isLoaded = imageLoadState === 'loaded';
 
+  function handleImageKeyDown(event: React.KeyboardEvent<HTMLDivElement>): void {
+    if (isLoaded) {
+      onKeyDown?.(event);
+    }
+  }
+
   return (
     <InViewport
       onVisible={() => {
@@ -244,7 +250,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
           onClick?.(event);
         }
       }}
-      onKeyDown={onKeyDown}
+      onKeyDown={handleImageKeyDown}
       role={role}
       tabIndex={tabIndex}
       aria-label={ariaLabel}

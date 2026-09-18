@@ -200,7 +200,8 @@ describe('image-asset', () => {
       }),
     );
 
-    render(<ImageAsset {...defaultProps} asset={image} />, {wrapper: rootProviderWrapper});
+    const onClickMock = jest.fn();
+    render(<ImageAsset {...defaultProps} asset={image} onClick={onClickMock} />, {wrapper: rootProviderWrapper});
 
     const imageElement = screen.getByTestId('image-loader');
     const imageContainer = requireValueForTest(imageElement.parentElement);
@@ -211,6 +212,10 @@ describe('image-asset', () => {
 
     expect(imageContainer).not.toHaveClass('loading-dots');
     expect(imageLoggerMock.error).toHaveBeenCalledWith('Failed to load image asset', expect.any(Error));
+
+    fireEvent.keyDown(imageContainer, {key: 'Enter', code: 'Enter'});
+    fireEvent.keyDown(imageContainer, {key: ' ', code: 'Space'});
+    expect(onClickMock).not.toHaveBeenCalled();
   });
 
   it('keeps the image non-interactive while loading', async () => {
@@ -245,6 +250,8 @@ describe('image-asset', () => {
 
     expect(imageContainer).toHaveAttribute('data-uie-status', 'loading');
     fireEvent.click(imageContainer);
+    fireEvent.keyDown(imageContainer, {key: 'Enter', code: 'Enter'});
+    fireEvent.keyDown(imageContainer, {key: ' ', code: 'Space'});
     expect(onClickMock).not.toHaveBeenCalled();
 
     resolvePendingLoad({url: fakeImageUrl, dispose: jest.fn()});
