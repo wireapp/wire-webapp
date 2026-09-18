@@ -20,7 +20,6 @@
 import type {ReactNode} from 'react';
 
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/fileTypeRestrictedMessage';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
@@ -40,7 +39,6 @@ type FileTypeRestrictedTranslation =
     };
 
 type RenderFileTypeRestrictedMessageOptions = {
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translate: Translate;
   readonly translation: FileTypeRestrictedTranslation;
 };
@@ -51,14 +49,6 @@ const fileTypeRestrictedFileExtMarker = createReactTranslationMarker('file-type-
 const fileTypeRestrictedNonBreakingSpaceMarker = createReactTranslationMarker(
   'file-type-restricted-non-breaking-space',
 );
-
-function translateFileTypeRestrictedMessage(translate: Translate, translation: FileTypeRestrictedTranslation): string {
-  if (translation.kind === 'incoming') {
-    return translate('fileTypeRestrictedIncoming', {name: translation.name});
-  }
-
-  return translate('fileTypeRestrictedOutgoing', {fileExt: translation.fileExt});
-}
 
 function translateFileTypeRestrictedMessageWithReactMarkers(
   translate: Translate,
@@ -118,34 +108,18 @@ function renderFileTypeRestrictedTranslation(
 }
 
 function renderFileTypeRestrictedMessage(options: RenderFileTypeRestrictedMessageOptions): ReactNode {
-  const {isReactTranslationRenderingEnabled, translate, translation} = options;
+  const {translate, translation} = options;
   const dataUieValue = translation.kind === 'incoming' ? 'incoming' : 'outgoing';
 
-  if (isReactTranslationRenderingEnabled) {
-    return (
-      <p
-        className="message-header-label"
-        data-uie-name="filetype-restricted-message-text"
-        data-uie-value={dataUieValue}
-      >
-        {renderFileTypeRestrictedTranslation(translate, translation)}
-      </p>
-    );
-  }
-
   return (
-    <p
-      className="message-header-label"
-      dangerouslySetInnerHTML={{__html: translateFileTypeRestrictedMessage(translate, translation)}}
-      data-uie-name="filetype-restricted-message-text"
-      data-uie-value={dataUieValue}
-    />
+    <p className="message-header-label" data-uie-name="filetype-restricted-message-text" data-uie-value={dataUieValue}>
+      {renderFileTypeRestrictedTranslation(translate, translation)}
+    </p>
   );
 }
 
 const FileTypeRestrictedMessage = ({message}: FileTypeRestrictedMessageProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
+  const {translate} = useApplicationContext();
   const translation = message.isIncoming
     ? {kind: 'incoming' as const, name: message.name}
     : {kind: 'outgoing' as const, fileExt: message.fileExt};
@@ -155,7 +129,7 @@ const FileTypeRestrictedMessage = ({message}: FileTypeRestrictedMessageProps) =>
       <div className="message-header-icon">
         <span className="icon-sysmsg-error text-red" />
       </div>
-      {renderFileTypeRestrictedMessage({isReactTranslationRenderingEnabled, translate, translation})}
+      {renderFileTypeRestrictedMessage({translate, translation})}
     </div>
   );
 };

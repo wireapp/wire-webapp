@@ -55,7 +55,6 @@ import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBi
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
-import {replaceLink} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
@@ -280,11 +279,6 @@ const GroupCreationModal = ({
           setIsShown(false);
 
           const backendString = error.backends.join(', and ');
-          const replaceBackends = replaceLink(
-            Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
-            'modal__text__read-more',
-            'read-more-backends',
-          );
           return PrimaryModal.show(
             PrimaryModal.type.MULTI_ACTIONS,
             {
@@ -305,11 +299,6 @@ const GroupCreationModal = ({
                 },
               },
               text: {
-                htmlMessage: translate(
-                  'groupCreationPreferencesNonFederatingMessage',
-                  {backends: backendString},
-                  replaceBackends,
-                ),
                 translatedMessage: {
                   compatibilityReplacements: [],
                   components: [

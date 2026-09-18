@@ -27,10 +27,8 @@ import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceLink} from 'Util/localizerUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {TranslationKey} from 'Util/localizerUtil/translationTypes';
@@ -70,8 +68,6 @@ interface E2EIVerificationMessageProps {
 }
 
 type RenderE2EITranslationOptions = {
-  readonly isReactTranslationRenderingEnabled: boolean;
-  readonly legacyDangerousSubstitutions: Maybe<Record<string, string>>;
   readonly translationKey: TranslationKey;
   readonly translate: Translate;
   readonly userName: Maybe<string>;
@@ -81,7 +77,7 @@ const e2eiUserMarker = createReactTranslationMarker('e2ei-user');
 const e2eiBoldMarker = createReactTranslationMarker('e2ei-bold');
 const e2eiLearnMoreLinkMarker = createReactTranslationMarker('e2ei-learn-more-link');
 
-const e2eiReactDangerousSubstitutions = {
+const e2eiTranslationSubstitutions = {
   '/bold': e2eiBoldMarker.end,
   '/link': e2eiLearnMoreLinkMarker.end,
   bold: e2eiBoldMarker.start,
@@ -89,7 +85,6 @@ const e2eiReactDangerousSubstitutions = {
 };
 
 const noE2EIUserName = Maybe.nothing<string>();
-const noE2EILegacyDangerousSubstitutions = Maybe.nothing<Record<string, string>>();
 
 function getSingleMessageUserId(userIds: readonly QualifiedId[]): Maybe<QualifiedId> {
   if (userIds.length === 1) {
@@ -100,76 +95,57 @@ function getSingleMessageUserId(userIds: readonly QualifiedId[]): Maybe<Qualifie
 }
 
 function renderE2EITranslation(options: RenderE2EITranslationOptions): ReactNode {
-  const {isReactTranslationRenderingEnabled, legacyDangerousSubstitutions, translationKey, translate, userName} =
-    options;
+  const {translationKey, translate, userName} = options;
+  let translatedText: string;
+  let valueReplacements: ReactTranslationValueReplacement[];
 
-  if (isReactTranslationRenderingEnabled) {
-    let translatedText: string;
-    let valueReplacements: ReactTranslationValueReplacement[];
-
-    if (userName.isNothing) {
-      translatedText = translate(translationKey, {}, e2eiReactDangerousSubstitutions);
-      valueReplacements = [];
-    } else {
-      translatedText = translate(translationKey, {user: e2eiUserMarker.substitution}, e2eiReactDangerousSubstitutions);
-      valueReplacements = [{marker: e2eiUserMarker, runtimeText: userName.value}];
-    }
-
-    return (
-      <span>
-        {renderReactTranslation({
-          translatedText,
-          componentReplacements: [
-            {
-              start: e2eiBoldMarker.start,
-              end: e2eiBoldMarker.end,
-              render(children): ReactNode {
-                return <strong>{children}</strong>;
-              },
-            },
-            {
-              start: e2eiLearnMoreLinkMarker.start,
-              end: e2eiLearnMoreLinkMarker.end,
-              render(children): ReactNode {
-                return (
-                  <a
-                    href={Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION}
-                    className=""
-                    data-uie-name=""
-                    rel="nofollow noopener noreferrer"
-                    target="_blank"
-                  >
-                    {children}
-                  </a>
-                );
-              },
-            },
-          ],
-          nodeReplacements: [],
-          valueReplacements,
-        })}
-      </span>
-    );
-  }
-
-  let legacyTranslation: string;
-  if (userName.isJust) {
-    if (legacyDangerousSubstitutions.isNothing) {
-      legacyTranslation = translate(translationKey, {user: userName.value});
-    } else {
-      legacyTranslation = translate(translationKey, {user: userName.value}, legacyDangerousSubstitutions.value);
-    }
-  } else if (legacyDangerousSubstitutions.isNothing) {
-    legacyTranslation = translate(translationKey);
+  if (userName.isNothing) {
+    translatedText = translate(translationKey, {}, e2eiTranslationSubstitutions);
+    valueReplacements = [];
   } else {
-    legacyTranslation = translate(translationKey, {}, legacyDangerousSubstitutions.value);
+    translatedText = translate(translationKey, {user: e2eiUserMarker.substitution}, e2eiTranslationSubstitutions);
+    valueReplacements = [{marker: e2eiUserMarker, runtimeText: userName.value}];
   }
 
-  return <span dangerouslySetInnerHTML={{__html: legacyTranslation}} />;
+  return (
+    <span>
+      {renderReactTranslation({
+        translatedText,
+        componentReplacements: [
+          {
+            start: e2eiBoldMarker.start,
+            end: e2eiBoldMarker.end,
+            render(children): ReactNode {
+              return <strong>{children}</strong>;
+            },
+          },
+          {
+            start: e2eiLearnMoreLinkMarker.start,
+            end: e2eiLearnMoreLinkMarker.end,
+            render(children): ReactNode {
+              return (
+                <a
+                  href={Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION}
+                  className=""
+                  data-uie-name=""
+                  rel="nofollow noopener noreferrer"
+                  target="_blank"
+                >
+                  {children}
+                </a>
+              );
+            },
+          },
+        ],
+        nodeReplacements: [],
+        valueReplacements,
+      })}
+    </span>
+  );
 }
 
 export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificationMessageProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const {messageType, userIds = []} = message;
 
   const {participating_user_ets: participatingUserEts, selfUser} = useKoSubscribableChildren(conversation, [
@@ -199,9 +175,6 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
   const isRevoked = messageType === E2EIVerificationMessageType.REVOKED;
   const isNoLongerVerified = messageType === E2EIVerificationMessageType.NO_LONGER_VERIFIED;
 
-  const learnMoreReplacement = Maybe.just(replaceLink(Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION));
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
-
   const getCertificate = async () => {
     try {
       await E2EIHandler.getInstance().enroll({resetTimers: true});
@@ -227,8 +200,6 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
       >
         {isVerified &&
           renderE2EITranslation({
-            isReactTranslationRenderingEnabled,
-            legacyDangerousSubstitutions: learnMoreReplacement,
             translationKey: 'conversation.AllE2EIDevicesVerified',
             translate,
             userName: noE2EIUserName,
@@ -237,8 +208,6 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isExpired &&
           (isSelfUser === false ? (
             renderE2EITranslation({
-              isReactTranslationRenderingEnabled,
-              legacyDangerousSubstitutions: noE2EILegacyDangerousSubstitutions,
               translationKey: 'conversation.E2EICertificateExpired',
               translate,
               userName: Maybe.of(usersName),
@@ -258,8 +227,6 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isNewDevice &&
           (isSelfUser === false ? (
             renderE2EITranslation({
-              isReactTranslationRenderingEnabled,
-              legacyDangerousSubstitutions: noE2EILegacyDangerousSubstitutions,
               translationKey: 'conversation.E2EINewDeviceAdded',
               translate,
               userName: Maybe.of(usersName),
@@ -279,8 +246,6 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isNewMember &&
           (isSelfUser === false ? (
             renderE2EITranslation({
-              isReactTranslationRenderingEnabled,
-              legacyDangerousSubstitutions: noE2EILegacyDangerousSubstitutions,
               translationKey: 'conversation.E2EINewUserAdded',
               translate,
               userName: Maybe.of(usersName),
@@ -300,15 +265,11 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isRevoked &&
           (isSelfUser === false
             ? renderE2EITranslation({
-                isReactTranslationRenderingEnabled,
-                legacyDangerousSubstitutions: learnMoreReplacement,
                 translationKey: 'conversation.E2EICertificateRevoked',
                 translate,
                 userName: Maybe.of(usersName),
               })
             : renderE2EITranslation({
-                isReactTranslationRenderingEnabled,
-                legacyDangerousSubstitutions: learnMoreReplacement,
                 translationKey: 'conversation.E2EISelfUserCertificateRevoked',
                 translate,
                 userName: noE2EIUserName,
@@ -316,8 +277,6 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
 
         {isNoLongerVerified &&
           renderE2EITranslation({
-            isReactTranslationRenderingEnabled,
-            legacyDangerousSubstitutions: learnMoreReplacement,
             translationKey: 'conversation.E2EICertificateNoLongerVerifiedGeneric',
             translate,
             userName: noE2EIUserName,

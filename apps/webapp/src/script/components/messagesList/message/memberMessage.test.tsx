@@ -28,7 +28,6 @@ import en from 'I18n/en-US.json';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
 import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {
   createRootContextValueForTest,
@@ -49,14 +48,6 @@ jest.mock('Components/avatar', () => ({
 setStrings({en});
 
 const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureToggleName) {
-      return featureToggleName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -329,35 +320,8 @@ describe('MemberMessage', () => {
       expect(container.textContent).toContain('You started a conversation with');
     });
 
-    it('renders the named group creation header with the legacy renderer when the feature toggle is disabled', () => {
-      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
-      message.user().isMe = true;
-
-      const {container} = render(
-        withTheme(
-          <MemberMessage
-            hasReadReceiptsTurnedOn={baseProps.hasReadReceiptsTurnedOn}
-            isSelfDeletingMessagesOff={baseProps.isSelfDeletingMessagesOff}
-            isSelfTemporaryGuest={baseProps.isSelfTemporaryGuest}
-            message={message}
-            onClickCancelRequest={baseProps.onClickCancelRequest}
-            onClickInvitePeople={baseProps.onClickInvitePeople}
-            onClickParticipants={baseProps.onClickParticipants}
-            shouldShowInvitePeople={baseProps.shouldShowInvitePeople}
-            conversationName={baseProps.conversationName}
-            isCellsConversation={baseProps.isCellsConversation}
-            isSelfGuest={baseProps.isSelfGuest}
-          />,
-        ),
-        {wrapper: rootProviderWrapper},
-      );
-
-      expect(container.querySelector('.message-group-creation-header-text strong')).toBeInTheDocument();
-      expect(container.textContent).toContain('You started the conversation');
-    });
-
     it(
-      'renders supported bold translation markup as a React element when the feature toggle is enabled',
+      'renders supported bold translation markup as a React element',
       withTranslationStrings(
         {
           ...en,
@@ -382,7 +346,7 @@ describe('MemberMessage', () => {
                 isCellsConversation={baseProps.isCellsConversation}
                 isSelfGuest={baseProps.isSelfGuest}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              rootProviderWrapper,
             ),
           );
           const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
@@ -395,7 +359,7 @@ describe('MemberMessage', () => {
       ),
     );
 
-    it('renders another sender name as React text when the feature toggle is enabled', () => {
+    it('renders another sender name as React text', () => {
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
       message.user().isMe = false;
       message.user().name('R&D <Test>');
@@ -415,7 +379,7 @@ describe('MemberMessage', () => {
             isCellsConversation={baseProps.isCellsConversation}
             isSelfGuest={baseProps.isSelfGuest}
           />,
-          reactTranslationRenderingRootProviderWrapper,
+          rootProviderWrapper,
         ),
       );
       const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
@@ -425,7 +389,7 @@ describe('MemberMessage', () => {
       expect(container.querySelector('test')).toBeNull();
     });
 
-    it('keeps markup-like sender names as literal React text when the feature toggle is enabled', () => {
+    it('keeps markup-like sender names as literal React text', () => {
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
       message.user().isMe = false;
       message.user().name('[bold]Admin[/bold]');
@@ -445,7 +409,7 @@ describe('MemberMessage', () => {
             isCellsConversation={baseProps.isCellsConversation}
             isSelfGuest={baseProps.isSelfGuest}
           />,
-          reactTranslationRenderingRootProviderWrapper,
+          rootProviderWrapper,
         ),
       );
       const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
@@ -483,7 +447,7 @@ describe('MemberMessage', () => {
                 isCellsConversation={baseProps.isCellsConversation}
                 isSelfGuest={baseProps.isSelfGuest}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              rootProviderWrapper,
             ),
           );
           const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
@@ -521,7 +485,7 @@ describe('MemberMessage', () => {
                 isCellsConversation={baseProps.isCellsConversation}
                 isSelfGuest={baseProps.isSelfGuest}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              rootProviderWrapper,
             ),
           );
           const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
@@ -560,7 +524,7 @@ describe('MemberMessage', () => {
                 isCellsConversation={baseProps.isCellsConversation}
                 isSelfGuest={baseProps.isSelfGuest}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              rootProviderWrapper,
             ),
           );
           const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
@@ -572,7 +536,7 @@ describe('MemberMessage', () => {
     );
 
     it(
-      'renders arbitrary image markup as text when the feature toggle is enabled',
+      'renders arbitrary image markup as text',
       withTranslationStrings(
         {
           ...en,
@@ -597,7 +561,7 @@ describe('MemberMessage', () => {
                 isCellsConversation={baseProps.isCellsConversation}
                 isSelfGuest={baseProps.isSelfGuest}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              rootProviderWrapper,
             ),
           );
           const groupCreationHeader = container.querySelector('.message-group-creation-header-text');
@@ -610,7 +574,7 @@ describe('MemberMessage', () => {
     );
 
     it(
-      'renders arbitrary meta markup as text when the feature toggle is enabled',
+      'renders arbitrary meta markup as text',
       withTranslationStrings(
         {
           ...en,
@@ -635,7 +599,7 @@ describe('MemberMessage', () => {
                 isCellsConversation={baseProps.isCellsConversation}
                 isSelfGuest={baseProps.isSelfGuest}
               />,
-              reactTranslationRenderingRootProviderWrapper,
+              rootProviderWrapper,
             ),
           );
           const groupCreationHeader = container.querySelector('.message-group-creation-header-text');

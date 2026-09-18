@@ -36,7 +36,6 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {ContentState} from 'src/script/page/useAppState';
@@ -65,14 +64,7 @@ jest.mock('Components/calling/useCallAlertState', () => ({
 
 const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName): boolean {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
 
@@ -349,7 +341,7 @@ describe('TitleBar', () => {
         const {container} = render(
           withThemeAndRootContext(
             <TitleBar {...getDefaultProps(callingRepository, conversation)} />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
 
@@ -378,7 +370,7 @@ describe('TitleBar', () => {
         const {container} = render(
           withThemeAndRootContext(
             <TitleBar {...getDefaultProps(callingRepository, conversation)} />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
 
@@ -403,7 +395,7 @@ describe('TitleBar', () => {
       const {container} = render(
         withThemeAndRootContext(
           <TitleBar {...getDefaultProps(callingRepository, conversation)} />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
 
@@ -428,7 +420,7 @@ describe('TitleBar', () => {
     const {container} = render(
       withThemeAndRootContext(
         <TitleBar {...getDefaultProps(callingRepository, conversation)} />,
-        reactTranslationRenderingRootProviderWrapper,
+        translationRootProviderWrapper,
       ),
     );
 

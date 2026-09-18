@@ -22,11 +22,6 @@ import assert from 'node:assert';
 import {render} from '@testing-library/react';
 import {isUndefined} from '@sindresorhus/is';
 
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
 import type {Translate} from 'Util/localizerUtil';
 
 import {MessageContent} from './MessageContent';
@@ -88,65 +83,14 @@ function createTranslatedMessage(): PrimaryModalTranslatedMessage {
   };
 }
 
-function createRootProviderWrapper(
-  isReactTranslationRenderingEnabled: boolean,
-): ReturnType<typeof createRootProviderWrapperForTest> {
-  return createRootProviderWrapperForTest(
-    createRootContextValueForTest({
-      isFeatureToggleEnabled(featureName) {
-        return isReactTranslationRenderingEnabled && featureName === reactTranslationRenderingFeatureToggleName;
-      },
-      translate: createTranslateForTest(''),
-    }),
-  );
-}
-
 describe('MessageContent', () => {
-  it('keeps legacy htmlMessage rendering when React translation rendering is disabled', () => {
-    const {container} = render(
-      <MessageContent
-        message={null}
-        messageHtml={'<strong>Legacy</strong>'}
-        translate={createTranslateForTest('')}
-        translatedMessage={createTranslatedMessage()}
-      />,
-      {wrapper: createRootProviderWrapper(false)},
-    );
-
-    expect(container.querySelector('strong')).toHaveTextContent('Legacy');
-    expect(container).not.toHaveTextContent('ignored');
-  });
-
-  it('renders legacy rich content and normal message independently when disabled', () => {
+  it('renders translated rich content and normal message independently', () => {
     const {container} = render(
       <MessageContent
         message="Normal message"
-        messageHtml={'<strong>Legacy HTML</strong>'}
-        translate={createTranslateForTest('ignored')}
-        translatedMessage={createTranslatedMessage()}
-      />,
-      {wrapper: createRootProviderWrapper(false)},
-    );
-    const legacyHtmlSlot = container.querySelector('#modal-description-html');
-    const normalMessageSlot = container.querySelector('#modal-description-text');
-
-    assert(legacyHtmlSlot !== null);
-    assert(normalMessageSlot !== null);
-    expect(legacyHtmlSlot.querySelector('strong')).toHaveTextContent('Legacy HTML');
-    expect(normalMessageSlot).toHaveTextContent('Normal message');
-    expect(normalMessageSlot.querySelector('strong')).toBeNull();
-    expect(container).not.toHaveTextContent('ignored');
-  });
-
-  it('renders translated rich content and normal message independently when enabled', () => {
-    const {container} = render(
-      <MessageContent
-        message="Normal message"
-        messageHtml={'<strong>Legacy HTML</strong>'}
         translate={createTranslateForTest('[bold]Translated {name}[/bold]')}
         translatedMessage={createTranslatedMessage()}
       />,
-      {wrapper: createRootProviderWrapper(true)},
     );
     const translatedMessageSlot = container.querySelector('#modal-description-html');
     const normalMessageSlot = container.querySelector('#modal-description-text');
@@ -159,16 +103,14 @@ describe('MessageContent', () => {
     expect(normalMessageSlot.querySelector('strong')).toBeNull();
   });
 
-  it('renders translated messages as React nodes when enabled', () => {
+  it('renders translated messages as React nodes', () => {
     const translatedMessage = createTranslatedMessage();
     const {container} = render(
       <MessageContent
         message={null}
-        messageHtml={'<img src="example">Legacy'}
         translate={createTranslateForTest('[bold]Before {name}[/bold][br][link]Open[/link]')}
         translatedMessage={translatedMessage}
       />,
-      {wrapper: createRootProviderWrapper(true)},
     );
 
     expect(container.querySelectorAll('strong')).toHaveLength(1);
@@ -189,11 +131,28 @@ describe('MessageContent', () => {
         translate={createTranslateForTest('<img src="example">System update')}
         translatedMessage={createTranslatedMessage()}
       />,
-      {wrapper: createRootProviderWrapper(true)},
     );
 
     expect(container.querySelector('img')).toBeNull();
     expect(container).toHaveTextContent('<img src="example">System update');
+  });
+
+  it('keeps unsupported translated document markup as text', () => {
+    const unsupportedMarkup =
+      '<script>alert(1)</script><meta name="example"><div>Nested content</div><iframe>Frame content</iframe>';
+    const {container} = render(
+      <MessageContent
+        message={null}
+        translate={createTranslateForTest(unsupportedMarkup)}
+        translatedMessage={createTranslatedMessage()}
+      />,
+    );
+
+    expect(container.querySelector('script')).toBeNull();
+    expect(container.querySelector('meta')).toBeNull();
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(container.querySelector('p')?.childElementCount).toBe(0);
+    expect(container).toHaveTextContent(unsupportedMarkup);
   });
 
   it('renders repeated runtime values as opaque text', () => {
@@ -203,7 +162,6 @@ describe('MessageContent', () => {
         translate={createTranslateForTest('[bold]{name}[/bold] and [bold]{name}[/bold]')}
         translatedMessage={createTranslatedMessage()}
       />,
-      {wrapper: createRootProviderWrapper(true)},
     );
 
     expect(container.querySelectorAll('strong')).toHaveLength(2);
@@ -235,7 +193,6 @@ describe('MessageContent', () => {
         translate={createTranslateForTest('{name}<br/>{name}')}
         translatedMessage={translatedMessage}
       />,
-      {wrapper: createRootProviderWrapper(true)},
     );
 
     expect(container.querySelectorAll('br')).toHaveLength(1);
@@ -244,10 +201,7 @@ describe('MessageContent', () => {
   });
 
   it('keeps empty messages absent', () => {
-    const {container} = render(
-      <MessageContent message={null} messageHtml="" translate={createTranslateForTest('')} />,
-      {wrapper: createRootProviderWrapper(true)},
-    );
+    const {container} = render(<MessageContent message={null} translate={createTranslateForTest('')} />);
 
     expect(container.firstChild).toBeNull();
   });

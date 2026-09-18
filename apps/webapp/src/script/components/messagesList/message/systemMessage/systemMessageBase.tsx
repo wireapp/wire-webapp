@@ -28,9 +28,10 @@ interface SystemMessageProps {
   message: SystemMessage;
   isSenderNameVisible?: boolean;
   icon?: ReactNode;
+  captionContent?: ReactNode;
 }
 
-export const SystemMessageBase = ({message, isSenderNameVisible = false, icon}: SystemMessageProps) => {
+export const SystemMessageBase = ({message, isSenderNameVisible = false, icon, captionContent}: SystemMessageProps) => {
   const {unsafeSenderName, timestamp} = useKoSubscribableChildren(message, ['unsafeSenderName', 'timestamp']);
 
   return (
@@ -44,7 +45,7 @@ export const SystemMessageBase = ({message, isSenderNameVisible = false, icon}: 
         <span className="message-header-label__multiline">
           {isSenderNameVisible && <span className="message-header-sender-name">{unsafeSenderName}</span>}
           {message.caption !== undefined && message.caption !== '' && (
-            <span className="system-message-caption ellipsis" dangerouslySetInnerHTML={{__html: message.caption}} />
+            <span className="system-message-caption ellipsis">{captionContent ?? message.caption}</span>
           )}
         </span>
       </p>

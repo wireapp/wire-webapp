@@ -72,8 +72,7 @@ export class MemberMessage extends SystemMessage {
   public readonly name: ko.Observable<string>;
   public readonly otherUser: ko.PureComputed<User>;
   public readonly showNamedCreation: ko.PureComputed<boolean>;
-  public readonly htmlGroupCreationHeader: ko.PureComputed<string>;
-  public readonly reactGroupCreationHeader: ko.PureComputed<string>;
+  public readonly groupCreationHeader: ko.PureComputed<string>;
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public showServicesWarning: boolean;
   public memberMessageType: SystemMessageType;
@@ -128,16 +127,7 @@ export class MemberMessage extends SystemMessage {
       return this.hasUsers() ? this.userEntities()[0] : new User('', '', this.translate);
     });
 
-    this.htmlGroupCreationHeader = ko.pureComputed(() => {
-      return translateGroupCreationHeader({
-        isNamedCreation: this.showNamedCreation(),
-        isTemporaryGuest: this.user().isTemporaryGuest(),
-        isCurrentUser: this.user().isMe,
-        senderName: this.senderName(),
-        translate: this.translate,
-      });
-    });
-    this.reactGroupCreationHeader = ko.pureComputed(() => {
+    this.groupCreationHeader = ko.pureComputed(() => {
       return translateGroupCreationHeader({
         isNamedCreation: this.showNamedCreation(),
         isTemporaryGuest: this.user().isTemporaryGuest(),

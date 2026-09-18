@@ -17,9 +17,28 @@
  *
  */
 
-export function replaceLink(href: string, className: string = '', uieName: string = '') {
-  return {
-    '/link': '</a>',
-    link: `<a href="${href}" data-uie-name="${uieName}" class="${className}" rel="nofollow noopener noreferrer" target="_blank">`,
-  };
+import {ReactNode} from 'react';
+
+import {Config} from 'src/script/Config';
+import {renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+
+export function renderMlsSystemMessageCaption(caption: string): ReactNode[] {
+  return renderReactTranslation({
+    translatedText: caption,
+    componentReplacements: [
+      {
+        start: '[link]',
+        end: '[/link]',
+        render(children) {
+          return (
+            <a href={Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE} rel="nofollow noopener noreferrer" target="_blank">
+              {children}
+            </a>
+          );
+        },
+      },
+    ],
+    nodeReplacements: [],
+    valueReplacements: [],
+  });
 }

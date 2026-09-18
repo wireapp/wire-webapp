@@ -41,7 +41,6 @@ import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {ConversationFolderTab} from 'src/script/page/leftSidebar/panels/conversations/conversationTab/conversationFolderTab';
 import {
   isTabVisible,
@@ -53,7 +52,6 @@ import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';
-import {replaceLink} from 'Util/localizerUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
@@ -82,97 +80,53 @@ const environmentDisclaimerUrlMarker = createReactTranslationMarker('environment
 const environmentDisclaimerLinkMarker = createReactTranslationMarker('environment-disclaimer-link');
 
 type RenderEnvironmentDisclaimerOptions = {
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translate: Translate;
 };
 
-type RenderedEnvironmentDisclaimer =
-  | {
-      readonly kind: 'react';
-      readonly content: ReactNode[];
-    }
-  | {
-      readonly kind: 'legacy';
-      readonly html: string;
-    };
+type RenderedEnvironmentDisclaimer = readonly ReactNode[];
 
 function renderEnvironmentDisclaimer(options: RenderEnvironmentDisclaimerOptions): RenderedEnvironmentDisclaimer {
-  const {isReactTranslationRenderingEnabled, translate} = options;
+  const {translate} = options;
+  const translatedText = translate(
+    'conversationInternalEnvironmentDisclaimer',
+    {url: environmentDisclaimerUrlMarker.substitution},
+    {
+      '/link': environmentDisclaimerLinkMarker.end,
+      link: environmentDisclaimerLinkMarker.start,
+    },
+  );
 
-  if (isReactTranslationRenderingEnabled) {
-    const translatedText = translate(
-      'conversationInternalEnvironmentDisclaimer',
-      {url: environmentDisclaimerUrlMarker.substitution},
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [
       {
-        '/link': environmentDisclaimerLinkMarker.end,
-        link: environmentDisclaimerLinkMarker.start,
+        start: environmentDisclaimerLinkMarker.start,
+        end: environmentDisclaimerLinkMarker.end,
+        render(children): ReactNode {
+          return (
+            <a href={wireCloudUrl} data-uie-name="" className="" rel="nofollow noopener noreferrer" target="_blank">
+              {children}
+            </a>
+          );
+        },
       },
-    );
-
-    return {
-      kind: 'react',
-      content: renderReactTranslation({
-        translatedText,
-        componentReplacements: [
-          {
-            start: environmentDisclaimerLinkMarker.start,
-            end: environmentDisclaimerLinkMarker.end,
-            render(children): ReactNode {
-              return (
-                <a href={wireCloudUrl} data-uie-name="" className="" rel="nofollow noopener noreferrer" target="_blank">
-                  {children}
-                </a>
-              );
-            },
-          },
-        ],
-        nodeReplacements: [],
-        valueReplacements: [
-          {
-            marker: environmentDisclaimerUrlMarker,
-            runtimeText: wireCloudUrl,
-          },
-        ],
-      }),
-    };
-  }
-
-  const replaceWireLink = replaceLink(wireCloudUrl, '', '');
-  const translatedText = translate('conversationInternalEnvironmentDisclaimer', {url: wireCloudUrl}, replaceWireLink);
-
-  return {
-    kind: 'legacy',
-    html: translatedText,
-  };
+    ],
+    nodeReplacements: [],
+    valueReplacements: [
+      {
+        marker: environmentDisclaimerUrlMarker,
+        runtimeText: wireCloudUrl,
+      },
+    ],
+  });
 }
 
 function renderEnvironmentDisclaimerTooltipBody(environmentDisclaimer: RenderedEnvironmentDisclaimer): ReactNode {
-  if (environmentDisclaimer.kind === 'react') {
-    return <div>{environmentDisclaimer.content}</div>;
-  }
-
-  return (
-    <div
-      dangerouslySetInnerHTML={{
-        __html: environmentDisclaimer.html,
-      }}
-    />
-  );
+  return <div>{environmentDisclaimer}</div>;
 }
 
 function renderEnvironmentDisclaimerFooterContent(environmentDisclaimer: RenderedEnvironmentDisclaimer): ReactNode {
-  if (environmentDisclaimer.kind === 'react') {
-    return <div css={footerDisclaimerEllipsis}>{environmentDisclaimer.content}</div>;
-  }
-
-  return (
-    <div
-      css={footerDisclaimerEllipsis}
-      dangerouslySetInnerHTML={{
-        __html: environmentDisclaimer.html,
-      }}
-    />
-  );
+  return <div css={footerDisclaimerEllipsis}>{environmentDisclaimer}</div>;
 }
 
 function renderEnvironmentDisclaimerSection(options: RenderEnvironmentDisclaimerOptions): ReactNode {
@@ -193,7 +147,7 @@ function renderEnvironmentDisclaimerSection(options: RenderEnvironmentDisclaimer
 }
 
 function renderEnvironmentDisclaimerIfNeeded(options: RenderEnvironmentDisclaimerOptions): ReactNode {
-  const {isReactTranslationRenderingEnabled, translate} = options;
+  const {translate} = options;
   const webEnvironment = getWebEnvironment();
 
   if (webEnvironment.isProduction) {
@@ -204,7 +158,7 @@ function renderEnvironmentDisclaimerIfNeeded(options: RenderEnvironmentDisclaime
     return null;
   }
 
-  return renderEnvironmentDisclaimerSection({isReactTranslationRenderingEnabled, translate});
+  return renderEnvironmentDisclaimerSection({translate});
 }
 
 interface ConversationTabsProps {
@@ -238,7 +192,7 @@ export const ConversationTabs = ({
   selfUser,
   channelConversations,
 }: ConversationTabsProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const {visibleTabs} = useSidebarStore();
   const {isChannelsEnabled, shouldShowChannelTab} = useChannelsFeatureFlag();
   const core = container.resolve(Core);
@@ -379,8 +333,6 @@ export const ConversationTabs = ({
   const visibleConversationTabs = conversationTabs.filter(tab => isTabVisible(tab.type, visibleTabs));
 
   const manageTeamUrl = getManageTeamUrl();
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
-
   const showCellsTab = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
   const connectTabIndex = visibleConversationTabs.length + 1;
   const cellsTabIndex = connectTabIndex + 1;
@@ -488,7 +440,7 @@ export const ConversationTabs = ({
       >
         {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
 
-        {renderEnvironmentDisclaimerIfNeeded({isReactTranslationRenderingEnabled, translate})}
+        {renderEnvironmentDisclaimerIfNeeded({translate})}
 
         <SettingsTab
           settingsLabel={translate('preferencesHeadline')}

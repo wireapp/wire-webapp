@@ -27,7 +27,6 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import {User} from 'Repositories/entity/User';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -41,17 +40,7 @@ import {Config} from '../../../../Config';
 
 import {DeviceDetails} from './DeviceDetails';
 
-const legacyTranslationRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate}),
-);
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -111,23 +100,7 @@ function getDeviceDetailsHeadline(container: HTMLElement): HTMLElement {
 
 describe('DeviceDetails', () => {
   it(
-    'preserves the legacy headline rendering when React translation rendering is disabled',
-    withTranslationStrings(en, () => {
-      const {container} = render(
-        withThemeAndRootContext(
-          <DeviceDetails {...createDeviceDetailsPropertiesForTest('Alice')} />,
-          legacyTranslationRootProviderWrapper,
-        ),
-      );
-      const headline = getDeviceDetailsHeadline(container);
-
-      expect(headline).toHaveTextContent('Verify that this matches the fingerprint shown on Alice’s device.');
-      expect(headline.querySelector('strong')).toHaveTextContent('Alice’s device');
-    }),
-  );
-
-  it(
-    'renders the headline with translation-controlled strong content when enabled',
+    'renders the headline with translation-controlled strong content',
     withTranslationStrings(
       {
         ...en,
@@ -137,7 +110,7 @@ describe('DeviceDetails', () => {
         const {container} = render(
           withThemeAndRootContext(
             <DeviceDetails {...createDeviceDetailsPropertiesForTest('Alice')} />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
         const headline = getDeviceDetailsHeadline(container);
@@ -160,7 +133,7 @@ describe('DeviceDetails', () => {
         const {container} = render(
           withThemeAndRootContext(
             <DeviceDetails {...createDeviceDetailsPropertiesForTest('Alice')} />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
         const headline = getDeviceDetailsHeadline(container);
@@ -178,7 +151,7 @@ describe('DeviceDetails', () => {
       const {container} = render(
         withThemeAndRootContext(
           <DeviceDetails {...createDeviceDetailsPropertiesForTest('R&D <Test>')} />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const headline = getDeviceDetailsHeadline(container);
@@ -194,7 +167,7 @@ describe('DeviceDetails', () => {
       const {container} = render(
         withThemeAndRootContext(
           <DeviceDetails {...createDeviceDetailsPropertiesForTest('[bold]Admin[/bold]')} />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const headline = getDeviceDetailsHeadline(container);
@@ -219,7 +192,7 @@ describe('DeviceDetails', () => {
         const {container} = render(
           withThemeAndRootContext(
             <DeviceDetails {...createDeviceDetailsPropertiesForTest('Alice')} />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
         const headline = getDeviceDetailsHeadline(container);
@@ -241,7 +214,7 @@ describe('DeviceDetails', () => {
         const {container} = render(
           withThemeAndRootContext(
             <DeviceDetails {...createDeviceDetailsPropertiesForTest('Alice')} />,
-            reactTranslationRenderingRootProviderWrapper,
+            translationRootProviderWrapper,
           ),
         );
         const headline = getDeviceDetailsHeadline(container);
@@ -260,7 +233,7 @@ describe('DeviceDetails', () => {
       const {getByText} = render(
         withThemeAndRootContext(
           <DeviceDetails {...createDeviceDetailsPropertiesForTest('Alice')} />,
-          reactTranslationRenderingRootProviderWrapper,
+          translationRootProviderWrapper,
         ),
       );
       const howToLink = getByText('How do I do that?');

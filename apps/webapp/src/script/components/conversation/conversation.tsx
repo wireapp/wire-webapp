@@ -454,7 +454,6 @@ function ConversationContent({
           text: translate('modalOpenLinkAction'),
         },
         text: {
-          htmlMessage: translate('modalOpenLinkMessage', {link: href}, {}, true),
           translatedMessage: {
             compatibilityReplacements: [],
             components: [],

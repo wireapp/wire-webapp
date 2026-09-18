@@ -31,7 +31,6 @@ import {
 } from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from 'src/script/Config';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
-import {replaceLink} from 'Util/localizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};
 const hideCloseBtn = {hideCloseBtn: true, preventClose: true};
@@ -167,34 +166,7 @@ export const getModalOptions = (
   }
   let options: ModalOptions = {};
   let modalType: PrimaryModalType = PrimaryModal.type.CONFIRM;
-  const replaceLearnMore = replaceLink('learnMore');
-  const svgHtml = `
-  <div style="margin-bottom: 24px;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M60 32V7.48786L32 0L4 8V32C4 48 16.0287 60.3908 32 64C48.1374 60.3908 60 48 60 32ZM52 21.3829L27.4086 48L12 31.3842L16.9238 26.0013L27.4086 37.2342L47.0762 16L52 21.3829Z" fill="#1D7833"/>
-      </svg>
-  </div>
-  `;
-
   const supportUrl = Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION_CERTIFICATE;
-
-  const gracePeriodOverParagraph = translate(
-    'acme.settingsChanged.gracePeriodOver.paragraph',
-    {url: supportUrl},
-    {
-      br: '<br>',
-      ...replaceLearnMore,
-    },
-  );
-
-  const settingsChangedParagraph = translate(
-    'acme.settingsChanged.paragraph',
-    {url: supportUrl},
-    {
-      br: '<br>',
-      ...replaceLearnMore,
-    },
-  );
 
   const gracePeriodOverTranslation = createE2EITranslation(
     'acme.settingsChanged.gracePeriodOver.paragraph',
@@ -223,7 +195,6 @@ export const getModalOptions = (
       options = {
         text: {
           closeBtnLabel: translate('acme.settingsChanged.button.close'),
-          htmlMessage: extraParams?.isGracePeriodOver === true ? gracePeriodOverParagraph : settingsChangedParagraph,
           translatedMessage: selectedSettingsChangedTranslation,
           title: translate('acme.settingsChanged.headline.alt'),
         },
@@ -247,10 +218,6 @@ export const getModalOptions = (
       options = {
         text: {
           closeBtnLabel: translate('acme.renewCertificate.button.close'),
-          htmlMessage:
-            extraParams?.isGracePeriodOver === true
-              ? translate('acme.renewCertificate.gracePeriodOver.paragraph', {url: supportUrl})
-              : translate('acme.renewCertificate.paragraph', {url: supportUrl}),
           translatedMessage: createE2EICertificateRenewalTranslation(extraParams?.isGracePeriodOver, supportUrl),
           title: translate('acme.renewCertificate.headline.alt'),
         },
@@ -273,7 +240,6 @@ export const getModalOptions = (
     case ModalType.SELF_CERTIFICATE_REVOKED:
       options = {
         text: {
-          htmlMessage: translate('acme.selfCertificateRevoked.text'),
           translatedMessage: createE2EITranslation(
             'acme.selfCertificateRevoked.text',
             [],
@@ -296,10 +262,6 @@ export const getModalOptions = (
       options = {
         text: {
           closeBtnLabel: translate('acme.settingsChanged.button.close'),
-          htmlMessage: translate('acme.remindLater.paragraph', {
-            delayTime: extraParams?.delayTime ?? 0,
-            url: supportUrl,
-          }),
           translatedMessage: createE2EITranslation(
             'acme.remindLater.paragraph',
             [
@@ -330,10 +292,6 @@ export const getModalOptions = (
       options = {
         text: {
           closeBtnLabel: translate('acme.error.button.close'),
-          htmlMessage:
-            extraParams?.isGracePeriodOver === true
-              ? translate('acme.error.gracePeriod.paragraph', undefined, {br: '<br>'})
-              : translate('acme.error.paragraph', undefined, {br: '<br>'}),
           translatedMessage: createE2EIErrorTranslation(extraParams?.isGracePeriodOver),
           title: translate('acme.error.headline'),
         },
@@ -370,11 +328,6 @@ export const getModalOptions = (
       options = {
         text: {
           closeBtnLabel: translate('acme.done.button.close'),
-          htmlMessage: `<div style="text-align: center">${svgHtml}${
-            extraParams?.isRenewal === true
-              ? translate('acme.renewal.done.paragraph', {url: supportUrl})
-              : translate('acme.done.paragraph', {url: supportUrl})
-          }</div>`,
           translatedMessage: createE2EITranslation(
             successTranslationKey,
             [createE2EIUrlValue(supportUrl)],
@@ -402,7 +355,6 @@ export const getModalOptions = (
         hideCloseBtn: true,
         preventClose: true,
         text: {
-          htmlMessage: translate('featureConfigChangeModalDownloadPathEnabled'),
           translatedMessage: createE2EITranslation('featureConfigChangeModalDownloadPathEnabled', [], []),
 
           title: translate('featureConfigChangeModalDownloadPathHeadline', {

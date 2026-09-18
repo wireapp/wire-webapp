@@ -22,7 +22,6 @@ import type {ReactNode} from 'react';
 import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 
@@ -38,48 +37,34 @@ import {
 import {buttonCss} from '../teamCreation.styles';
 
 type RenderIntroductionListItemOptions = {
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translatedText: string;
 };
 
 function renderIntroductionListItem(options: RenderIntroductionListItemOptions): ReactNode {
-  const {isReactTranslationRenderingEnabled, translatedText} = options;
-
-  if (isReactTranslationRenderingEnabled) {
-    return (
-      <span className="text" data-uie-name="team-creation-intro-list-item">
-        {renderReactTranslation({
-          translatedText,
-          componentReplacements: [
-            {
-              start: '<strong>',
-              end: '</strong>',
-              render(children): ReactNode {
-                return <strong>{children}</strong>;
-              },
-            },
-          ],
-          nodeReplacements: [],
-          valueReplacements: [],
-        })}
-      </span>
-    );
-  }
+  const {translatedText} = options;
 
   return (
-    <span
-      dangerouslySetInnerHTML={{
-        __html: translatedText,
-      }}
-      className="text"
-      data-uie-name="team-creation-intro-list-item"
-    />
+    <span className="text" data-uie-name="team-creation-intro-list-item">
+      {renderReactTranslation({
+        translatedText,
+        componentReplacements: [
+          {
+            start: '<strong>',
+            end: '</strong>',
+            render(children): ReactNode {
+              return <strong>{children}</strong>;
+            },
+          },
+        ],
+        nodeReplacements: [],
+        valueReplacements: [],
+      })}
+    </span>
   );
 }
 
 export const Introduction = ({onNextStep}: StepProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
+  const {translate} = useApplicationContext();
   const featuresList = [
     translate('teamCreationIntroListItem1'),
     translate('teamCreationIntroListItem2'),
@@ -102,7 +87,6 @@ export const Introduction = ({onNextStep}: StepProps) => {
             <CheckRoundIcon css={checkIconCss} />
 
             {renderIntroductionListItem({
-              isReactTranslationRenderingEnabled,
               translatedText: listItem,
             })}
           </div>

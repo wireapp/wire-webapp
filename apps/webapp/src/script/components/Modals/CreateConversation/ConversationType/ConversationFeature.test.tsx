@@ -20,7 +20,6 @@ import {render} from '@testing-library/react';
 import {isNull, isUndefined} from '@sindresorhus/is';
 
 import en from 'I18n/en-US.json';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -32,17 +31,7 @@ import {ConversationFeature} from './ConversationFeature';
 
 import {ConversationType} from '../types';
 
-const legacyTranslationRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate}),
-);
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName): boolean {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -117,9 +106,9 @@ function expectLastFeatureHasShieldIcon(featureItems: readonly HTMLElement[]): v
 
 describe('ConversationFeature', () => {
   it(
-    'renders the group features through the legacy HTML path',
+    'renders the group features with React elements',
     withTranslationStrings({}, () => {
-      const {container} = renderConversationFeature(ConversationType.Group, legacyTranslationRootProviderWrapper);
+      const {container} = renderConversationFeature(ConversationType.Group, translationRootProviderWrapper);
       const featureItems = getFeatureItems(container);
 
       expect(featureItems).toHaveLength(3);
@@ -135,9 +124,9 @@ describe('ConversationFeature', () => {
   );
 
   it(
-    'renders the channel features through the legacy HTML path',
+    'renders the channel features with React elements',
     withTranslationStrings({}, () => {
-      const {container} = renderConversationFeature(ConversationType.Channel, legacyTranslationRootProviderWrapper);
+      const {container} = renderConversationFeature(ConversationType.Channel, translationRootProviderWrapper);
       const featureItems = getFeatureItems(container);
 
       expect(featureItems).toHaveLength(5);
@@ -162,10 +151,7 @@ describe('ConversationFeature', () => {
         conversationCommonFeature3: 'Messages and calls are always end-to-end encrypted',
       },
       () => {
-        const {container} = renderConversationFeature(
-          ConversationType.Group,
-          reactTranslationRenderingRootProviderWrapper,
-        );
+        const {container} = renderConversationFeature(ConversationType.Group, translationRootProviderWrapper);
         const featureItems = getFeatureItems(container);
         const firstFeatureItem = getFeatureItem(featureItems, 0);
 
@@ -197,10 +183,7 @@ describe('ConversationFeature', () => {
         conversationCommonFeature3: 'Messages and calls are always end-to-end encrypted',
       },
       () => {
-        const {container} = renderConversationFeature(
-          ConversationType.Channel,
-          reactTranslationRenderingRootProviderWrapper,
-        );
+        const {container} = renderConversationFeature(ConversationType.Channel, translationRootProviderWrapper);
         const featureItems = getFeatureItems(container);
 
         expect(featureItems).toHaveLength(5);

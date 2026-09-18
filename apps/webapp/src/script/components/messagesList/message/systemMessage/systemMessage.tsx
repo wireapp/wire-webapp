@@ -34,6 +34,7 @@ import {RenameMessage} from 'Repositories/entity/message/renameMessage';
 import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
 
 import {SystemMessageBase} from './systemMessageBase';
+import {renderMlsSystemMessageCaption} from './systemMessageCaption';
 
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageComponent} from '../adminlessDeleteReminderMessage';
 import {messageBodyWrapper} from '../contentMessage/contentMessage.styles';
@@ -80,11 +81,23 @@ export const SystemMessage = ({message}: SystemMessageProps) => {
   }
 
   if (message instanceof JoinedAfterMLSMigrationFinalisationMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
+    return (
+      <SystemMessageBase
+        message={message}
+        icon={<Icon.InfoIcon />}
+        captionContent={renderMlsSystemMessageCaption(message.caption ?? '')}
+      />
+    );
   }
 
   if (message instanceof OneToOneMigratedToMlsMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
+    return (
+      <SystemMessageBase
+        message={message}
+        icon={<Icon.InfoIcon />}
+        captionContent={renderMlsSystemMessageCaption(message.caption ?? '')}
+      />
+    );
   }
 
   if (message instanceof MLSMigrationFinalisationOngoingCallMessage) {

@@ -23,14 +23,20 @@ import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpd
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
+import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {SystemMessage} from './systemMessage';
+import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 jest.mock('Components/icon', () => ({
   EditIcon: () => {
     return <span data-uie-name="editicon" className="editicon"></span>;
+  },
+  InfoIcon: () => {
+    return <span data-uie-name="infoicon" className="infoicon"></span>;
   },
   ReadIcon: () => {
     return <span data-uie-name="readicon" className="readicon"></span>;
@@ -75,5 +81,40 @@ describe('SystemMessage', () => {
 
     expect(screen.queryByTestId('element-message-system')).not.toBeNull();
     expect(screen.queryByTestId('readicon')).not.toBeNull();
+  });
+
+  it('renders the MLS caption link with an application-controlled destination', () => {
+    const mlsSupportUrl = 'https://support.example/mls';
+    const originalConfig = Config.getConfig();
+    const configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
+      ...originalConfig,
+      URL: {
+        ...originalConfig.URL,
+        SUPPORT: {
+          ...originalConfig.URL.SUPPORT,
+          MLS_LEARN_MORE: mlsSupportUrl,
+        },
+      },
+    });
+    const translate: Translate = identifier => {
+      if (identifier === 'conversationJoinedAfterMLSMigrationFinalisation') {
+        return 'Before [link]Learn more[/link] after';
+      }
+
+      return identifier;
+    };
+    const message = new JoinedAfterMLSMigrationFinalisationMessage(translate);
+
+    try {
+      render(<SystemMessage message={message} />);
+
+      const link = screen.getByRole('link', {name: 'Learn more'});
+      expect(link).toHaveAttribute('href', mlsSupportUrl);
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'nofollow noopener noreferrer');
+      expect(screen.getByTestId('element-message-system')).toHaveTextContent('Before Learn more after');
+    } finally {
+      configSpy.mockRestore();
+    }
   });
 });

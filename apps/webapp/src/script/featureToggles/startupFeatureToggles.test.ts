@@ -26,7 +26,6 @@ import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
-  reactTranslationRenderingFeatureToggleName,
   meetingsM2FeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
@@ -39,7 +38,6 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   viewerPermissionFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
-  reactTranslationRenderingFeatureToggleName,
   meetingsM2FeatureToggleName,
 ] as const;
 
@@ -48,7 +46,6 @@ describe('startupFeatureToggles', function () {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
-    expect(startupFeatureToggles.isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
   });
 
@@ -134,14 +131,6 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName)).toBe(true);
   });
 
-  it('enables the React translation rendering feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${reactTranslationRenderingFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName)).toBe(true);
-  });
-
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -185,7 +174,6 @@ describe('startupFeatureToggles', function () {
       viewerPermissionFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       sharedDriveDirectUploadFeatureToggleName,
-      reactTranslationRenderingFeatureToggleName,
       meetingsM2FeatureToggleName,
     ]);
   });
