@@ -1,0 +1,78 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {type RefObject, useCallback, useEffect, useRef} from 'react';
+
+import {isNullOrUndefined} from '@sindresorhus/is';
+
+export const useOnMultipleClicks = ({
+  count,
+  elementRef,
+  elementSelector,
+  enabled,
+  onActivate,
+}: {
+  count: number;
+  elementSelector: string;
+  elementRef: RefObject<HTMLElement | null>;
+  enabled: boolean;
+  onActivate: () => void;
+}) => {
+  const tapsCountRef = useRef(0);
+  const reset = useCallback(() => {
+    tapsCountRef.current = 0;
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) {
+      reset();
+    }
+  }, [enabled, reset]);
+
+  useEffect(() => {
+    const resetOnOtherClick = (event: MouseEvent) => {
+      const target = event.target;
+      const element = elementRef.current;
+      if (
+        target instanceof Element === false ||
+        isNullOrUndefined(element) ||
+        element.contains(target) === false ||
+        isNullOrUndefined(target.closest(elementSelector))
+      ) {
+        reset();
+      }
+    };
+    document.addEventListener('click', resetOnOtherClick, true);
+    return () => document.removeEventListener('click', resetOnOtherClick, true);
+  }, [elementRef, elementSelector, reset]);
+
+  const activate = () => {
+    if (!enabled || isNullOrUndefined(elementRef.current)) {
+      reset();
+      return;
+    }
+    tapsCountRef.current += 1;
+    if (tapsCountRef.current === count) {
+      reset();
+      onActivate();
+    }
+  };
+
+  return {activate, reset};
+};
