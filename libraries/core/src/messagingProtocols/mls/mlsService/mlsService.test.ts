@@ -897,6 +897,34 @@ describe('MLSService', () => {
 
       expect(transactionContext.updateKeyingMaterial).toHaveBeenCalledWith(expect.any(ConversationId));
     });
+
+    it('retries key material update in a fresh core crypto transaction', async () => {
+      const [mlsService, {coreCrypto}] = await createMLSService();
+      jest.useFakeTimers();
+      try {
+        const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+        const firstTransactionContext = {
+          updateKeyingMaterial: jest.fn().mockRejectedValueOnce({message: 'stale message'}),
+        } as unknown as jest.Mocked<CoreCryptoContext>;
+        const retryTransactionContext = {
+          updateKeyingMaterial: jest.fn().mockResolvedValueOnce(undefined),
+        } as unknown as jest.Mocked<CoreCryptoContext>;
+
+        jest
+          .spyOn(coreCrypto, 'transaction')
+          .mockImplementationOnce(fn => fn(firstTransactionContext))
+          .mockImplementationOnce(fn => fn(retryTransactionContext));
+
+        await mlsService.updateKeyingMaterialForConversation(groupId);
+        await jest.advanceTimersByTimeAsync(TimeInMillis.SECOND * 10);
+
+        expect(coreCrypto.transaction).toHaveBeenCalledTimes(2);
+        expect(firstTransactionContext.updateKeyingMaterial).toHaveBeenCalledTimes(1);
+        expect(retryTransactionContext.updateKeyingMaterial).toHaveBeenCalledTimes(1);
+      } finally {
+        jest.useRealTimers();
+      }
+    });
   });
 
   describe('handleMLSWelcomeMessageEvent', () => {
