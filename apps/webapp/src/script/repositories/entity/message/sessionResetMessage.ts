@@ -23,12 +23,12 @@ import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
 
-export const createMLSResetMessage = (translate: Translate): SystemMessage => {
+export const createSessionResetMessage = (translate: Translate): SystemMessage => {
   const message = new SystemMessage(translate);
-  message.system_message_type = SystemMessageType.MLS_RESET;
+  message.system_message_type = SystemMessageType.SESSION_RESET;
   // The sender is resolved after mapping the event, so determine the caption when it is read.
   Object.defineProperty(message, 'caption', {
-    get: () => translate(message.user().isMe ? 'mlsResetSelf' : 'mlsReset'),
+    get: () => translate(message.user().isMe ? 'sessionResetSelf' : 'sessionReset'),
     enumerable: true,
     configurable: true,
   });

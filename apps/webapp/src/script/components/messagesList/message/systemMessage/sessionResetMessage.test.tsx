@@ -21,7 +21,7 @@ import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-w
 import {act, render, screen} from '@testing-library/react';
 
 import enUS from 'src/i18n/en-US.json';
-import {createMLSResetMessage} from 'Repositories/entity/message/mlsResetMessage';
+import {createSessionResetMessage} from 'Repositories/entity/message/sessionResetMessage';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -29,22 +29,22 @@ import {SystemMessage} from './systemMessage';
 
 it('shows the resetting user and the recovery explanation as a system message', () => {
   const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
-  const message = createMLSResetMessage(key => enUS[key]);
+  const message = createSessionResetMessage(key => enUS[key]);
   message.timestamp(wallClock.currentTimestampInMilliseconds);
   const user = new User('resetting-user-id', 'staging.zinfra.io', translateForTest);
   user.name('User X');
-  message.user(user);
-
   render(<SystemMessage message={message} />);
+
+  act(() => message.user(user));
 
   expect(screen.getByTestId('element-message-system')).toHaveTextContent(
     'User X was unable to decrypt some of your messages but has solved the issue. This affected all conversations you share together.',
   );
 });
 
-it('shows the success caption without a sender name once the resetting user resolves to self', () => {
+it('shows the recovery caption without a sender name once the resetting user resolves to self', () => {
   const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
-  const message = createMLSResetMessage(key => enUS[key]);
+  const message = createSessionResetMessage(key => enUS[key]);
   message.timestamp(wallClock.currentTimestampInMilliseconds);
   render(<SystemMessage message={message} />);
 
@@ -53,7 +53,7 @@ it('shows the success caption without a sender name once the resetting user reso
   user.isMe = true;
   act(() => message.user(user));
 
-  expect(screen.getByText('Session successfully reset')).toBeVisible();
+  expect(screen.getByText('You were unable to decrypt some of your messages but have solved the issue.')).toBeVisible();
   expect(screen.queryByText('My Name')).not.toBeInTheDocument();
   expect(screen.queryByText(/was unable to decrypt/)).not.toBeInTheDocument();
 });
