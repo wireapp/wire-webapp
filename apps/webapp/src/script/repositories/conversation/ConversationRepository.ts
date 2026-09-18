@@ -1912,6 +1912,10 @@ export class ConversationRepository {
       });
     }
 
+    // Migration can happen after startup has loaded unread events. Populate the new entity as well,
+    // since unread counts are derived from messages in memory, not just the persisted read timestamp.
+    await this.getUnreadEvents(mlsConversation);
+
     const wasProteus1to1ActiveConversation = proteusConversations.some(conversation =>
       this.conversationState.isActiveConversation(conversation),
     );

@@ -1,5 +1,5 @@
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Encryption', () => {
@@ -50,7 +50,8 @@ test.describe('Encryption', () => {
 
       await test.step('User A still sees the correct unread count after migration', async () => {
         const mlsConversation = userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'});
-        await expect(mlsConversation).toBeVisible();
+        // The modal reloads both clients before they advertise MLS support and migrate the conversation.
+        await expect(mlsConversation).toBeVisible({timeout: LOGIN_TIMEOUT});
         await expect(mlsConversation.unreadIndicator).toBeVisible();
         await expect(mlsConversation.unreadIndicator).toContainText('1'); // There should be one unread message
       });
