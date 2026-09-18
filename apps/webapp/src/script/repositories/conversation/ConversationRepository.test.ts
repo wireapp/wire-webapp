@@ -61,6 +61,7 @@ import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
+import {EventSource} from 'Repositories/event/EventSource';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
@@ -3553,6 +3554,25 @@ describe('deleteConversation', () => {
   });
 });
 
+describe('Proteus session reset', () => {
+  it('routes incoming session resets to the conversation timeline', async () => {
+    const [repository] = buildConversationRepository(translateForTest);
+    const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.PROTEUS});
+    const event = {
+      type: CONVERSATION.SESSION_RESET as const,
+      id: 'reset-id',
+      conversation: conversation.id,
+      from: 'resetting-user',
+      time: '2026-09-18T09:00:00.000Z',
+    };
+    const addEvent = jest.spyOn(repository as any, 'addEventToConversation').mockResolvedValue({});
+
+    await repository['reactToConversationEvent'](conversation, event, EventSource.WEBSOCKET);
+
+    expect(addEvent).toHaveBeenCalledWith(conversation, event);
+  });
+});
+
 describe('onMLSResetMessage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -3592,7 +3612,7 @@ describe('onMLSResetMessage', () => {
       epoch: 0,
     });
     expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
-    expect(addEventSpy).toHaveBeenCalledWith(conversation, mlsResetEvent);
+    expect(addEventSpy).not.toHaveBeenCalled();
   });
 
   it('Should get epoch from core crypto if new groupId already exists locally', async () => {
@@ -3632,7 +3652,7 @@ describe('onMLSResetMessage', () => {
       epoch: 5,
     });
     expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
-    expect(addEventSpy).toHaveBeenCalledWith(conversation, mlsResetEvent);
+    expect(addEventSpy).not.toHaveBeenCalled();
     expect(conversation.epoch).toBe(5);
   });
 });

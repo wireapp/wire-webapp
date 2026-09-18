@@ -18,7 +18,7 @@
  */
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
@@ -50,16 +50,15 @@ describe('Event Mapper', () => {
   });
 
   describe('mapJsonEvent', () => {
-    it('maps a stored MLS reset event to a system message with its sender', () => {
+    it('maps a stored Proteus session reset event to a system message with its sender', () => {
       const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
       const event = {
         id: 'reset-event-id',
-        type: CONVERSATION_EVENT.MLS_RESET as const,
+        type: CONVERSATION.SESSION_RESET as const,
         conversation: conversation.id,
         qualified_conversation: conversation.qualifiedId,
         from: 'resetting-user-id',
         time: wallClock.currentDate.toISOString(),
-        data: {group_id: 'old-group-id', new_group_id: 'new-group-id'},
       };
       const mapper = new EventMapper(undefined, translateForTest);
 
@@ -67,11 +66,11 @@ describe('Event Mapper', () => {
 
       expect(eventShouldBeStored(event)).toBe(true);
       expect(message.isSystem()).toBe(true);
-      expect(message.system_message_type).toBe(SystemMessageType.MLS_RESET);
-      expect(message.caption).toBe('mlsReset');
+      expect(message.system_message_type).toBe(SystemMessageType.SESSION_RESET);
+      expect(message.caption).toBe('sessionReset');
       expect(message.from).toBe(event.from);
       expect(message.id).toBe(event.id);
-      expect(message.type).toBe(CONVERSATION_EVENT.MLS_RESET);
+      expect(message.type).toBe(ClientEvent.CONVERSATION.SESSION_RESET);
       expect(message.timestamp()).toBe(wallClock.currentTimestampInMilliseconds);
     });
 

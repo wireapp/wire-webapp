@@ -1087,7 +1087,7 @@ export class MessageRepository {
    * Sending a message to the remote end of a session reset.
    *
    * @note When we reset a session then we must inform the remote client about this action. It sends a ProtocolBuffer message
-   *  (which will not be rendered in the view) to the remote client. This message only needs to be sent to the affected
+   *  to the remote client, which renders a session-reset system message. This message only needs to be sent to the affected
    *  remote client, therefore we force the message sending.
    *
    * @param userId User ID

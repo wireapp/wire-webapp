@@ -17,6 +17,12 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
+import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
+import {EventMapper} from 'Repositories/conversation/EventMapper';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
+
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
@@ -60,6 +66,68 @@ function buildEventStorageMiddleware() {
 
 describe('EventStorageMiddleware', () => {
   describe('processEvent', () => {
+    it('persists a decoded session reset that can be mapped again after reload', async () => {
+      const [middleware, {eventService}] = buildEventStorageMiddleware();
+      const incomingEvent = {
+        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD as const,
+        conversation: 'conversation-id',
+        from: 'resetting-user-id',
+        time: '2026-09-18T09:00:00.000Z',
+        data: {sender: 'ios-client', recipient: 'web-client', text: ''},
+      };
+      const decodedMessage = GenericMessage.decode(
+        GenericMessage.encode(
+          GenericMessage.create({messageId: 'reset-id', clientAction: ClientAction.RESET_SESSION}),
+        ).finish(),
+      );
+      const mappedEvent = await new CryptographyMapper().mapGenericMessage(decodedMessage, incomingEvent);
+      const storedEvent = await middleware.processEvent(mappedEvent, EventSource.WEBSOCKET);
+
+      expect(eventService.saveEvent).toHaveBeenCalledWith(mappedEvent);
+      const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const message = new EventMapper(undefined, translateForTest).mapJsonEvent(
+        JSON.parse(JSON.stringify(storedEvent)),
+        conversation,
+      );
+      expect(message).toMatchObject({
+        id: 'reset-id',
+        from: 'resetting-user-id',
+        system_message_type: SystemMessageType.SESSION_RESET,
+      });
+    });
+
+    it('does not store a second session-reset message on duplicate delivery', async () => {
+      const [middleware, {eventService}] = buildEventStorageMiddleware();
+      const event = {
+        type: ClientEvent.CONVERSATION.SESSION_RESET,
+        id: 'reset-id',
+        conversation: 'conversation-id',
+        from: 'resetting-user-id',
+        time: '2026-09-18T09:00:00.000Z',
+      } as const;
+      const savedEvent = {...event, primary_key: 'stored-reset', category: 0};
+      eventService.loadEvent.mockResolvedValue(savedEvent);
+
+      await expect(middleware.processEvent(event, EventSource.WEBSOCKET)).resolves.toEqual(savedEvent);
+
+      expect(eventService.saveEvent).not.toHaveBeenCalled();
+    });
+
+    it('does not persist MLS group resets as timeline messages', async () => {
+      const [middleware, {eventService}] = buildEventStorageMiddleware();
+      const event = {
+        type: CONVERSATION_EVENT.MLS_RESET as const,
+        conversation: 'conversation-id',
+        from: 'resetting-user-id',
+        time: '2026-09-18T09:00:00.000Z',
+        data: {group_id: 'old-group', new_group_id: 'new-group'},
+      };
+
+      await middleware.processEvent(event, EventSource.WEBSOCKET);
+
+      expect(eventService.saveEvent).not.toHaveBeenCalled();
+    });
+
     it('ignores unhandled event', async () => {
       const event = {type: 'other'} as any;
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
