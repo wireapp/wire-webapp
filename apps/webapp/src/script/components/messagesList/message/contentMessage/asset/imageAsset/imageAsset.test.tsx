@@ -260,6 +260,40 @@ describe('image-asset', () => {
     });
   });
 
+  it('disposes the asset url when loading finishes after unmount', async () => {
+    let resolvePendingLoad: (assetUrl: AssetUrl) => void = (): void => {
+      return undefined;
+    };
+    const pendingLoad = new Promise<AssetUrl>((resolve): void => {
+      resolvePendingLoad = resolve;
+    });
+    getAssetUrlMock.mockReturnValue(pendingLoad);
+
+    const image = new MediumImage('image');
+    image.resource(
+      new AssetRemoteData({
+        assetKey: 'remote',
+        assetDomain: 'test-domain.wire.com',
+        assetToken: '',
+        forceCaching: false,
+      }),
+    );
+
+    const {unmount} = render(<ImageAsset {...defaultProps} asset={image} />, {wrapper: rootProviderWrapper});
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalled();
+    });
+
+    const disposeAssetUrlMock = jest.fn();
+    unmount();
+    resolvePendingLoad({url: fakeImageUrl, dispose: disposeAssetUrlMock});
+
+    await waitFor(() => {
+      expect(disposeAssetUrlMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
   it('renders image container with correct structure', () => {
     const image = new MediumImage('image');
     image.height = '10';

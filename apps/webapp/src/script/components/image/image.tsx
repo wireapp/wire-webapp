@@ -202,6 +202,8 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
         const url = await getAssetUrl(availableImage, allowedImageTypes);
 
         if (isMounted.current === false) {
+          url.dispose();
+
           return;
         }
         setImageUrl(url);
