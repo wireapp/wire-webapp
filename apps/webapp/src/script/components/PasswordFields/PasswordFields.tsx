@@ -106,7 +106,10 @@ export const PasswordFields = ({
 const PasswordFieldsErrorMessage = ({
   translate,
   message,
-}: {translate: PasswordFieldsProps['translate']; message?: React.ReactNode}) => (
+}: {
+  translate: PasswordFieldsProps['translate'];
+  message?: React.ReactNode;
+}) => (
   <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
     {message ??
       translate('modalGuestLinkJoinHelperText', {

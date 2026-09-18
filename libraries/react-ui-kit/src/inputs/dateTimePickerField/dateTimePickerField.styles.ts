@@ -24,7 +24,7 @@ import {Theme} from '../../identity/theme';
 export const dateTimePickerContentStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 0,
+  gap: '8px',
   width: '100%',
 };
 

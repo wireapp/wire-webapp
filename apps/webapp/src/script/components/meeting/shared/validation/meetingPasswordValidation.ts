@@ -22,7 +22,8 @@ import type {TranslationKey} from 'Util/localizerUtil';
 import {isValidPassword} from 'Util/stringUtil';
 
 export const meetingPasswordErrorKey = ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH as TranslationKey;
-export const meetingPasswordConfirmationErrorKey = ValidationError.FIELD.CONFIRM_PASSWORD.PATTERN_MISMATCH as TranslationKey;
+export const meetingPasswordConfirmationErrorKey = ValidationError.FIELD.CONFIRM_PASSWORD
+  .PATTERN_MISMATCH as TranslationKey;
 
 export type MeetingPasswordErrorKey = typeof meetingPasswordErrorKey | typeof meetingPasswordConfirmationErrorKey;
 
@@ -31,10 +32,7 @@ export type MeetingPasswordErrors = {
   passwordConfirmation: typeof meetingPasswordConfirmationErrorKey | undefined;
 };
 
-export const getMeetingPasswordErrors = (
-  password?: string,
-  passwordConfirmation?: string,
-): MeetingPasswordErrors => {
+export const getMeetingPasswordErrors = (password?: string, passwordConfirmation?: string): MeetingPasswordErrors => {
   const hasPassword = Boolean(password?.trim());
   const hasPasswordConfirmation = Boolean(passwordConfirmation?.trim());
 

@@ -92,10 +92,9 @@ const createMeetingAndSyncParticipants = (
         meetingSubmitErrors.conversationSetupFailed,
       )
         .andThen(() =>
-          deps.conversationRepository.requestMeetingConversationCode(
-            createdMeeting.qualified_conversation,
-            password,
-          ).orElse(() => task.resolve(undefined)),
+          deps.conversationRepository
+            .requestMeetingConversationCode(createdMeeting.qualified_conversation, password)
+            .orElse(() => task.resolve(undefined)),
         )
         .andThen(() =>
           syncMeetingConversationParticipants(deps.conversationRepository, {
