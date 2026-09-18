@@ -615,7 +615,9 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       setTimeout(async () => {
         try {
-          await this.updateKeyingMaterial(groupId, context, false);
+          await this.coreCryptoClient.transaction(retryContext =>
+            this.updateKeyingMaterial(groupId, retryContext, false),
+          );
         } catch (error: unknown) {
           this.logger.error(`Failed to update keying material for group on retry`, {
             error,
