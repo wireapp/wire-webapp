@@ -129,11 +129,8 @@ function getWarningBadge(container: HTMLElement): HTMLElement {
 }
 
 describe('TitleBar', () => {
-  beforeAll(() => {
-    return testFactory.exposeCallingActors().then(injectedCallingRepository => {
-      callingRepository = injectedCallingRepository;
-      return callingRepository;
-    });
+  beforeAll(async () => {
+    callingRepository = await testFactory.exposeCallingActors();
   });
 
   it('subscribes to shortcut PEOPLE and add ADD_PEOPLE events on mount', async () => {

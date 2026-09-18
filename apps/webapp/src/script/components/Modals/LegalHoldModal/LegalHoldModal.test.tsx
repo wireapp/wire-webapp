@@ -116,11 +116,8 @@ const defaultProps = () => ({
 });
 
 describe('LegalHoldModal', () => {
-  beforeAll(() => {
-    testFactory.exposeCallingActors().then(injectedCallingRepository => {
-      callRepository = injectedCallingRepository;
-      return callRepository;
-    });
+  beforeAll(async () => {
+    callRepository = await testFactory.exposeCallingActors();
   });
 
   it('is showRequestModal', (): void => {

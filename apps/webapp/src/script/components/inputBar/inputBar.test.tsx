@@ -68,20 +68,11 @@ let storageRepository: StorageRepository;
 
 describe('InputBar', () => {
   beforeAll(async () => {
-    await testFactory.exposeEventActors().then(factory => {
-      eventRepository = factory;
-      return eventRepository;
-    });
+    eventRepository = await testFactory.exposeEventActors();
 
-    await testFactory.exposeSearchActors().then(factory => {
-      searchRepository = factory;
-      return searchRepository;
-    });
+    searchRepository = await testFactory.exposeSearchActors();
 
-    await testFactory.exposeStorageActors().then(factory => {
-      storageRepository = factory;
-      return storageRepository;
-    });
+    storageRepository = await testFactory.exposeStorageActors();
 
     getConfigSpy = spyOn(Config, 'getConfig').and.returnValue(defaultConfig);
   });
