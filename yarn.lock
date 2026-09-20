@@ -134,9 +134,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:3.1132.0":
-  version: 3.1132.0
-  resolution: "@aws-sdk/client-s3@npm:3.1132.0"
+"@aws-sdk/client-s3@npm:3.1135.0":
+  version: 3.1135.0
+  resolution: "@aws-sdk/client-s3@npm:3.1135.0"
   dependencies:
     "@aws-sdk/checksums": "npm:^3.1001.0"
     "@aws-sdk/core": "npm:^3.978.0"
@@ -149,7 +149,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.11.3"
     "@smithy/types": "npm:^4.17.2"
     tslib: "npm:^2.6.2"
-  checksum: 10/4e494c2ea8d0cb514894f960b31200c362df1c3622b98e9f63453a362a6756babe8eb4abf1071190d287dd12e486961b09a4a3664fd5ebe0c517651004b9e8f2
+  checksum: 10/093bfa7e059356d8150ecae0cfc348cf3acbd66353ef416546f1f297d15b59bab9d162facb285042295c9bb1892a0a814667e7186995e78a91592633e1cef3c3
   languageName: node
   linkType: hard
 
@@ -293,9 +293,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.1132.0":
-  version: 3.1132.0
-  resolution: "@aws-sdk/lib-storage@npm:3.1132.0"
+"@aws-sdk/lib-storage@npm:3.1135.0":
+  version: 3.1135.0
+  resolution: "@aws-sdk/lib-storage@npm:3.1135.0"
   dependencies:
     "@smithy/core": "npm:^3.33.3"
     "@smithy/types": "npm:^4.17.2"
@@ -304,8 +304,8 @@ __metadata:
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.1132.0
-  checksum: 10/72123e5f34302560e2ac57453f81e72df043763308ce4eb33a7355ab5c75a536be86185ef07f7b177c91dc60ca7c255b9cbdbd816ee9d867cbfbd0000fb6167f
+    "@aws-sdk/client-s3": ^3.1135.0
+  checksum: 10/cf9fee4736984d4e61d1e8b846b6ebc05707788c1d7e400b5e5b6a9e1f242deb95dcc8f6979b20a386b71744dd66d85dd79205d64506369289cc6fb4e37795e7
   languageName: node
   linkType: hard
 
@@ -375,16 +375,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/xhr-http-handler@npm:3.1132.0":
-  version: 3.1132.0
-  resolution: "@aws-sdk/xhr-http-handler@npm:3.1132.0"
+"@aws-sdk/xhr-http-handler@npm:3.1135.0":
+  version: 3.1135.0
+  resolution: "@aws-sdk/xhr-http-handler@npm:3.1135.0"
   dependencies:
     "@aws-sdk/types": "npm:^3.974.5"
     "@smithy/core": "npm:^3.33.3"
     "@smithy/types": "npm:^4.17.2"
     events: "npm:3.3.0"
     tslib: "npm:^2.6.2"
-  checksum: 10/00b425d058883c2f540224b8d3956ff594d3213f9354c923231622fabf5777802a6434bd3a7a4994d1ec67e2d6b41267cfdc7ba1a120bf9cb16117fbe8d958e7
+  checksum: 10/ed851eec9741dbd1d45d91b303185d941153c19422ebf6a3aa6b96ad5b5ea69b92f1ebacd28245d8b19f7628b242dcdd0613c0c2749ae05e48aba6c0c59bd666
   languageName: node
   linkType: hard
 
@@ -11629,9 +11629,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
-    "@aws-sdk/client-s3": "npm:3.1132.0"
-    "@aws-sdk/lib-storage": "npm:3.1132.0"
-    "@aws-sdk/xhr-http-handler": "npm:3.1132.0"
+    "@aws-sdk/client-s3": "npm:3.1135.0"
+    "@aws-sdk/lib-storage": "npm:3.1135.0"
+    "@aws-sdk/xhr-http-handler": "npm:3.1135.0"
     "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:1.16.2"
     "@swc/jest": "npm:0.2.39"
