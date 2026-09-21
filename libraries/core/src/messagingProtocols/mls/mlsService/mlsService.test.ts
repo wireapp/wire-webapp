@@ -210,6 +210,26 @@ describe('MLSService', () => {
       expect(mlsService.addUsersToExistingConversation).not.toHaveBeenCalled();
     });
 
+    it('fails to establish an empty group when the keying material commit is rejected', async () => {
+      const [mlsService, {apiClient, transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const staleCommit = new Error('mls-stale-message');
+
+      jest
+        .spyOn(apiClient.api.client, 'getPublicKeys')
+        .mockResolvedValue({removal: {ed25519: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='}});
+      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages: [], failures: []});
+      const scheduleRenewalSpy = jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockResolvedValue(undefined);
+
+      // Losing the race against another client rejects our commit at the now stale epoch
+      jest.spyOn(transactionContext, 'updateKeyingMaterial').mockRejectedValue(staleCommit);
+
+      await expect(mlsService.registerConversation(groupId, [])).rejects.toThrow(staleCommit);
+
+      // Reporting success here is what left the client behind the group's epoch with no way back
+      expect(scheduleRenewalSpy).not.toHaveBeenCalled();
+    });
+
     it('adds users to a group with one single transaction', async () => {
       const [mlsService, {apiClient, coreCrypto, transactionContext}] = await createMLSService();
       const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFd=';
@@ -896,6 +916,57 @@ describe('MLSService', () => {
       await mlsService.updateKeyingMaterialForConversation(groupId);
 
       expect(transactionContext.updateKeyingMaterial).toHaveBeenCalledWith(expect.any(ConversationId));
+    });
+
+    it('propagates the failure to the caller instead of retrying internally', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const error = new Error('commit rejected');
+
+      jest.spyOn(transactionContext, 'updateKeyingMaterial').mockRejectedValue(error);
+
+      // Fake timers are installed only once the service is built, as building it awaits the db
+      jest.useFakeTimers();
+      try {
+        await expect(mlsService.updateKeyingMaterialForConversation(groupId)).rejects.toThrow(error);
+
+        // A stale commit cannot succeed on a second attempt, so nothing must be scheduled for later
+        jest.runAllTimers();
+        expect(transactionContext.updateKeyingMaterial).toHaveBeenCalledTimes(1);
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+
+    it('does not emit a key material update failure event, so the error is handled by the caller', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const onFailure = jest.fn();
+
+      mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, onFailure);
+      jest.spyOn(transactionContext, 'updateKeyingMaterial').mockRejectedValue(new Error('commit rejected'));
+
+      await expect(mlsService.updateKeyingMaterialForConversation(groupId)).rejects.toThrow('commit rejected');
+
+      expect(onFailure).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('renewKeyMaterial', () => {
+    it('emits a key material update failure event when the renewal fails', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const error = new Error('commit rejected');
+      const onFailure = jest.fn();
+
+      mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, onFailure);
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
+      jest.spyOn(transactionContext, 'updateKeyingMaterial').mockRejectedValue(error);
+
+      // The renewal runs from a scheduled task, so it must not reject
+      await expect(mlsService.renewKeyMaterial(groupId)).resolves.toBeUndefined();
+
+      expect(onFailure).toHaveBeenCalledWith({error, groupId});
     });
   });
 

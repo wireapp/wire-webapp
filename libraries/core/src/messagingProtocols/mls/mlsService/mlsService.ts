@@ -597,32 +597,22 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this.coreCryptoClient.transaction(cx => cx.encryptMessage(conversationId, message));
   }
 
-  private async updateKeyingMaterial(groupId: string, context: CoreCryptoContext, retry = true) {
+  /**
+   * Updates the keying material of a group within the given core-crypto transaction.
+   *
+   * Failures are propagated to the caller on purpose. When the commit is rejected (for instance
+   * with a stale epoch, after another client committed to the group first) core-crypto rolls the
+   * commit back, so the local epoch stays behind the backend and rebuilding the same commit is
+   * rejected identically. Recovering requires re-syncing the epoch first, which only the call site
+   * can do through the MLS recovery orchestrator.
+   */
+  private async updateKeyingMaterial(groupId: string, context: CoreCryptoContext) {
     try {
       const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
       await context.updateKeyingMaterial(new ConversationId(groupIdBytes));
     } catch (error: unknown) {
-      if (!retry) {
-        this.logger.error(`Failed to update keying material for group retrying did not fix the issue`, {
-          error,
-          groupId,
-        });
-        throw error;
-      }
-
       this.logger.warn(`Failed to update keying material for group`, {error, groupId});
-      this.emit(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, {error, groupId});
-
-      setTimeout(async () => {
-        try {
-          await this.updateKeyingMaterial(groupId, context, false);
-        } catch (error: unknown) {
-          this.logger.error(`Failed to update keying material for group on retry`, {
-            error,
-            groupId,
-          });
-        }
-      }, TimeUtil.TimeInMillis.SECOND * 10); // retry after 10 seconds
+      throw error;
     }
   }
 
@@ -886,6 +876,9 @@ export class MLSService extends TypedEventEmitter<Events> {
       });
     } catch (error: unknown) {
       this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
+      // Renewal runs from the recurring task scheduler, so there is no call site that could handle
+      // this. Hand the failure to the consumer, which owns the MLS recovery orchestrator.
+      this.emit(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, {error, groupId});
     }
   }
 
