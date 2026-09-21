@@ -28,7 +28,7 @@ jest.mock('@tanstack/react-virtual', () => ({
 
 import {createRef} from 'react';
 
-import {render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
@@ -44,11 +44,12 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
+import {SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {ConversationsList} from './conversationsList';
 
 const create1to1Conversation = (userName: string) => {
-  const conversation = new Conversation('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation(userName, 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const user = new User('id', 'domain', translateForTest);
   user.name(userName);
   conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -80,15 +81,17 @@ describe('ConversationsList', () => {
     currentFocus = '';
     currentFolder = {} as ConversationLabel;
     resetConversationFocus = jest.fn();
-    handleArrowKeyDown = jest.fn();
+    handleArrowKeyDown = jest.fn(() => jest.fn());
     clearSearchFilter = jest.fn();
+    useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
   });
 
-  const renderComponent = (conversations: Conversation[], searchFilter: string = '') =>
+  const renderComponent = (conversations: Conversation[], searchFilter: string = '', isEmpty = false) =>
     render(
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={conversations}
+        conversationFocusCandidates={conversations}
         conversationsFilter={searchFilter}
         listViewModel={listViewModel}
         connectRequests={connectRequests}
@@ -101,8 +104,7 @@ describe('ConversationsList', () => {
         clearSearchFilter={clearSearchFilter}
         groupParticipantsConversations={[]}
         isGroupParticipantsVisible={false}
-        isEmpty={false}
-        searchInputRef={createRef()}
+        isEmpty={isEmpty}
       />,
       {wrapper: rootProviderWrapper},
     );
@@ -118,6 +120,236 @@ describe('ConversationsList', () => {
     await Promise.all(userNames.map(async userName => expect(await findByText(userName)).toBeDefined()));
   });
 
+  it.each(['', 'Alice'])(
+    'keeps pending requests before conversation results in the DOM order (filter: %s)',
+    searchFilter => {
+      const conversation = create1to1Conversation('Alice');
+      const pendingRequest = new User('pending', 'domain', translateForTest);
+      connectRequests = [pendingRequest];
+      currentFocus = conversation.id;
+
+      const {container} = renderComponent([conversation], searchFilter);
+      const requestButton = container.querySelector('[data-uie-name="connection-request"] [role="button"]');
+      const conversationButton = container.querySelector('[data-uie-name="go-open-conversation"]');
+
+      if (!requestButton || !conversationButton) {
+        throw new Error('Expected pending request and conversation controls to be rendered');
+      }
+
+      expect(requestButton).toHaveAttribute('tabindex', '0');
+      expect(conversationButton).toHaveAttribute('tabindex', '0');
+      expect(requestButton.compareDocumentPosition(conversationButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    },
+  );
+
+  it('keeps pending requests focusable when filtering has no conversation results', () => {
+    const pendingRequest = new User('pending', 'domain', translateForTest);
+    connectRequests = [pendingRequest];
+
+    const {container} = renderComponent([], 'no match', true);
+    const requestButton = container.querySelector('[data-uie-name="connection-request"] [role="button"]');
+
+    expect(requestButton).toHaveAttribute('tabindex', '0');
+    expect(container.querySelectorAll('[data-uie-name="go-open-conversation"]')).toHaveLength(0);
+  });
+
+  it('clears pending focus when the filtered conversation disappears', () => {
+    const conversation = create1to1Conversation('Alice');
+    const focusConversationRef = createRef<(conversationId: string) => boolean | 'pending'>();
+    const {container, rerender} = render(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[conversation]}
+        conversationFocusCandidates={[conversation]}
+        conversationsFilter="Alice"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={conversation.id}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+        focusConversationRef={focusConversationRef}
+      />,
+      {wrapper: rootProviderWrapper},
+    );
+
+    container.querySelector<HTMLElement>(`[data-uie-uid="${conversation.id}"]`)?.remove();
+    act(() => {
+      expect(focusConversationRef.current?.(conversation.id)).toBe('pending');
+    });
+
+    const replacementContainer = document.createElement('div');
+    replacementContainer.dataset.uieUid = conversation.id;
+    const replacementButton = document.createElement('button');
+    replacementButton.dataset.uieName = 'go-open-conversation';
+    replacementContainer.append(replacementButton);
+    document.body.append(replacementContainer);
+
+    rerender(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[create1to1Conversation('Bob')]}
+        conversationFocusCandidates={[]}
+        conversationsFilter="Bob"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={conversation.id}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+        focusConversationRef={focusConversationRef}
+      />,
+    );
+
+    expect(replacementButton).not.toHaveFocus();
+    replacementContainer.remove();
+  });
+
+  it('does not steal focus after focus leaves the list while focus is pending', () => {
+    const conversation = create1to1Conversation('Alice');
+    const focusConversationRef = createRef<(conversationId: string) => boolean | 'pending'>();
+    const {container, rerender} = render(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[conversation]}
+        conversationFocusCandidates={[conversation]}
+        conversationsFilter="Alice"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={conversation.id}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+        focusConversationRef={focusConversationRef}
+      />,
+      {wrapper: rootProviderWrapper},
+    );
+
+    container.querySelector<HTMLElement>(`[data-uie-uid="${conversation.id}"]`)?.remove();
+    const conversationList = container.querySelector<HTMLElement>('[data-uie-name="conversation-view"]');
+    const focusOrigin = document.createElement('button');
+    conversationList?.append(focusOrigin);
+    focusOrigin.focus();
+
+    act(() => {
+      expect(focusConversationRef.current?.(conversation.id)).toBe('pending');
+    });
+
+    const replacementContainer = document.createElement('div');
+    replacementContainer.dataset.uieUid = conversation.id;
+    const replacementButton = document.createElement('button');
+    replacementButton.dataset.uieName = 'go-open-conversation';
+    replacementContainer.append(replacementButton);
+    document.body.append(replacementContainer);
+
+    const outsideFocusTarget = document.createElement('button');
+    document.body.append(outsideFocusTarget);
+    fireEvent.blur(focusOrigin, {relatedTarget: outsideFocusTarget});
+    expect(resetConversationFocus).toHaveBeenCalled();
+
+    rerender(
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={[create1to1Conversation('Bob')]}
+        conversationFocusCandidates={[]}
+        conversationsFilter="Bob"
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={conversation.id}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+        focusConversationRef={focusConversationRef}
+      />,
+    );
+
+    expect(replacementButton).not.toHaveFocus();
+    replacementContainer.remove();
+    outsideFocusTarget.remove();
+  });
+
+  it('keeps the search input focused while filtered results are updated', () => {
+    const searchInputRef = createRef<HTMLInputElement>();
+    const conversation = create1to1Conversation('Alice');
+
+    const {rerender} = render(
+      <>
+        <input ref={searchInputRef} aria-label="Search conversations" />
+        <ConversationsList
+          conversationLabelRepository={conversationLabelRepository}
+          conversations={[conversation]}
+          conversationFocusCandidates={[conversation]}
+          conversationsFilter="Alice"
+          listViewModel={listViewModel}
+          connectRequests={connectRequests}
+          conversationState={conversationState}
+          callState={callState}
+          currentFocus={conversation.id}
+          currentFolder={currentFolder}
+          resetConversationFocus={resetConversationFocus}
+          handleArrowKeyDown={handleArrowKeyDown}
+          clearSearchFilter={clearSearchFilter}
+          groupParticipantsConversations={[]}
+          isGroupParticipantsVisible={false}
+          isEmpty={false}
+        />
+      </>,
+      {wrapper: rootProviderWrapper},
+    );
+
+    searchInputRef.current?.focus();
+    const updatedConversation = create1to1Conversation('Bob');
+    rerender(
+      <>
+        <input ref={searchInputRef} aria-label="Search conversations" />
+        <ConversationsList
+          conversationLabelRepository={conversationLabelRepository}
+          conversations={[updatedConversation]}
+          conversationFocusCandidates={[updatedConversation]}
+          conversationsFilter="Bob"
+          listViewModel={listViewModel}
+          connectRequests={connectRequests}
+          conversationState={conversationState}
+          callState={callState}
+          currentFocus={updatedConversation.id}
+          currentFolder={currentFolder}
+          resetConversationFocus={resetConversationFocus}
+          handleArrowKeyDown={handleArrowKeyDown}
+          clearSearchFilter={clearSearchFilter}
+          groupParticipantsConversations={[]}
+          isGroupParticipantsVisible={false}
+          isEmpty={false}
+        />
+      </>,
+    );
+
+    expect(searchInputRef.current).toHaveFocus();
+  });
+
   it('keeps group participant results inside the conversation results scroll container', async () => {
     const conversationNameResult = create1to1Conversation('Conversation name match');
     const participantNameResult = create1to1Conversation('Participant name match');
@@ -126,6 +358,7 @@ describe('ConversationsList', () => {
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={[conversationNameResult]}
+        conversationFocusCandidates={[conversationNameResult, participantNameResult]}
         conversationsFilter="a"
         listViewModel={listViewModel}
         connectRequests={connectRequests}
@@ -139,7 +372,6 @@ describe('ConversationsList', () => {
         groupParticipantsConversations={[participantNameResult]}
         isGroupParticipantsVisible={true}
         isEmpty={false}
-        searchInputRef={createRef()}
       />,
       {wrapper: rootProviderWrapper},
     );

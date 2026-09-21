@@ -23,6 +23,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {
   conversationFilters,
   conversationSearchFilter,
+  getConversationFocusCandidates,
   getConversationsWithHeadings,
   getTabConversations,
   scrollToConversation,
@@ -199,6 +200,50 @@ describe('getConversationsWithHeadings', () => {
     const result = getConversationsWithHeadings([conversation], '', SidebarTabs.RECENT);
 
     expect(result).toEqual([conversation]);
+  });
+
+  it('keeps focus candidates in rendered order across conversation and participant results', () => {
+    const conversationNameResult = generateConversation({name: 'Conversation'});
+    const participantNameResult = generateConversation({name: 'Participant'});
+
+    const result = getConversationFocusCandidates({
+      conversations: [conversationNameResult],
+      conversationsFilter: 'name',
+      currentTab: SidebarTabs.RECENT,
+      groupParticipantsConversations: [participantNameResult],
+      isGroupParticipantsVisible: true,
+    });
+
+    expect(result).toEqual([conversationNameResult, participantNameResult]);
+
+    const resultWithDuplicateParticipant = getConversationFocusCandidates({
+      conversations: [conversationNameResult],
+      conversationsFilter: 'name',
+      currentTab: SidebarTabs.RECENT,
+      groupParticipantsConversations: [participantNameResult, participantNameResult],
+      isGroupParticipantsVisible: true,
+    });
+
+    expect(resultWithDuplicateParticipant).toEqual([conversationNameResult, participantNameResult]);
+  });
+
+  it('uses the folder-filtered list as focus candidates', () => {
+    const folderMatch = generateConversation({name: 'Match'});
+    const folderNonMatch = generateConversation({name: 'Other'});
+    const currentFolder = {
+      conversations: () => [folderMatch, folderNonMatch],
+    } as any;
+
+    const result = getConversationFocusCandidates({
+      conversations: [folderNonMatch],
+      conversationsFilter: 'match',
+      currentTab: SidebarTabs.FOLDER,
+      currentFolder,
+      groupParticipantsConversations: [],
+      isGroupParticipantsVisible: false,
+    });
+
+    expect(result).toEqual([folderMatch]);
   });
 });
 
