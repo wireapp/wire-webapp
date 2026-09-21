@@ -83,5 +83,15 @@ describe('MediaStreamHandler', () => {
         NoAudioInputError,
       );
     });
+
+    it('throws NoAudioInputError when microphone permission is denied with DOMException', async () => {
+      const error = new DOMException('Permission denied', MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR);
+
+      spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.reject(error));
+
+      await expect(streamHandler.requestMediaStream(true, false, false, true)).rejects.toBeInstanceOf(
+        NoAudioInputError,
+      );
+    });
   });
 });

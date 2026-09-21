@@ -833,6 +833,12 @@ export class CallingRepository {
     }
 
     const mediaStreamQuery = (async () => {
+      this.logger.info('Acquiring missing call media', {
+        query,
+        missingStreams,
+        hasAudio: !!selfParticipant.audioStream(),
+        hasCamera: !!selfParticipant.videoStream(),
+      });
       if (missingStreams.audio && missingStreams.camera) {
         // Acquire audio first because microphone access is required for calls.
         const audioStream = await this.getMediaStream({audio: true}, call.isGroupOrConference);
@@ -901,6 +907,13 @@ export class CallingRepository {
 
       return true;
     } catch (error: unknown) {
+      this.logger.warn('warmupMediaStreams failed', {
+        error,
+        name: error instanceof Error ? error.name : undefined,
+        constructor: error?.constructor?.name,
+        isNoAudioInputError: error instanceof NoAudioInputError,
+      });
+
       if (error instanceof NoAudioInputError) {
         throw error;
       }
