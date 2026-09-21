@@ -40,7 +40,12 @@ export const PasswordGeneratorButton = ({
   };
 
   return (
-    <Button variant={ButtonVariant.TERTIARY} onClick={generatePassword} data-uie-name="do-generate-password">
+    <Button
+      type="button"
+      variant={ButtonVariant.TERTIARY}
+      onClick={generatePassword}
+      data-uie-name="do-generate-password"
+    >
       <Icon.ShieldIcon data-uie-name="generate-password-icon" width="16" height="16" css={{marginRight: '10px'}} />
       {translate('generatePassword')}
     </Button>

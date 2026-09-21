@@ -29,4 +29,5 @@ export const mapMeetNowFormToMeetingCommand = (
   validateMeetNowForm(formState).map(validatedFormState => ({
     title: validatedFormState.title.trim(),
     selectedUsers: validatedFormState.selectedUsers,
+    ...(validatedFormState.password?.trim() ? {password: validatedFormState.password} : {}),
   }));

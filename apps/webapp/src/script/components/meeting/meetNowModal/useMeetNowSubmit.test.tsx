@@ -46,6 +46,8 @@ const formState = {
   title: 'Standup',
   selectedUsers: [],
   participantsFilter: '',
+  password: '',
+  passwordConfirmation: '',
 };
 
 const meetNowCommand = {

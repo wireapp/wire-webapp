@@ -26,7 +26,7 @@ export const scheduleMeetingSelectMenuPortalStyles: CSSObject = {
   zIndex: overlayPortalZIndex,
 };
 
-/** Matches DateTimePickerField label-to-input spacing (`gap: 8px` + InputLabel margin). */
+/** Provides consistent label-to-input spacing for standard labeled fields. */
 export const scheduleMeetingLabeledFieldWrapperStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
@@ -34,9 +34,15 @@ export const scheduleMeetingLabeledFieldWrapperStyles: CSSObject = {
   marginBottom: 0,
 };
 
-export const scheduleMeetingRecurrenceSelectWrapperStyles = scheduleMeetingLabeledFieldWrapperStyles;
+export const scheduleMeetingRecurrenceSelectWrapperStyles: CSSObject = {
+  ...scheduleMeetingLabeledFieldWrapperStyles,
+  gap: 0,
+};
 
-export const scheduleMeetingTitleInputWrapperStyles = scheduleMeetingLabeledFieldWrapperStyles;
+export const scheduleMeetingTitleInputWrapperStyles: CSSObject = {
+  ...scheduleMeetingLabeledFieldWrapperStyles,
+  gap: 0,
+};
 
 export const scheduleMeetingTitleInputStyles: CSSObject = {
   paddingRight: '38px',

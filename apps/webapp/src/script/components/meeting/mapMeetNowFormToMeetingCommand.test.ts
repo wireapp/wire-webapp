@@ -31,6 +31,8 @@ describe('mapMeetNowFormToMeetingCommand', () => {
       title: '  Standup  ',
       selectedUsers: [],
       participantsFilter: 'alice',
+      password: '',
+      passwordConfirmation: '',
     });
 
     expect(result.isOk).toBe(true);
@@ -40,11 +42,30 @@ describe('mapMeetNowFormToMeetingCommand', () => {
     });
   });
 
+  it('maps a valid guest-link password to the meeting command', () => {
+    const result = mapMeetNowFormToMeetingCommand({
+      title: 'Standup',
+      selectedUsers: [],
+      participantsFilter: '',
+      password: 'ValidPassword1!',
+      passwordConfirmation: 'ValidPassword1!',
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result)).toEqual({
+      title: 'Standup',
+      selectedUsers: [],
+      password: 'ValidPassword1!',
+    });
+  });
+
   it('returns title errors for an empty title', () => {
     const result = mapMeetNowFormToMeetingCommand({
       title: '   ',
       selectedUsers: [],
       participantsFilter: '',
+      password: '',
+      passwordConfirmation: '',
     });
 
     expect(result.isErr).toBe(true);
@@ -58,6 +79,8 @@ describe('mapMeetNowFormToMeetingCommand', () => {
       title: 'a'.repeat(MEETING_TITLE_MAX_LENGTH + 1),
       selectedUsers: [],
       participantsFilter: '',
+      password: '',
+      passwordConfirmation: '',
     });
 
     expect(result.isErr).toBe(true);

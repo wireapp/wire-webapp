@@ -19,6 +19,7 @@
 
 import {useMemo} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CalendarIcon, CloseIcon} from '@wireapp/react-ui-kit';
@@ -40,7 +41,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
 import {ScheduleMeetingForm} from './scheduleMeetingForm';
-import {wasScheduleMeetingPersisted} from './scheduleMeetingTypes';
+import {scheduleMeetingModes, wasScheduleMeetingPersisted} from './scheduleMeetingTypes';
 import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
@@ -59,6 +60,8 @@ export const ScheduleMeetingModal = () => {
     setRecurrence,
     setSelectedUsers,
     setParticipantsFilter,
+    setPassword,
+    setPasswordConfirmation,
     validate,
   } = useScheduleMeetingModal();
 
@@ -67,11 +70,15 @@ export const ScheduleMeetingModal = () => {
 
   const displayErrors = useMemo(
     () => ({
-      title: errors.title !== undefined ? translate(errors.title) : undefined,
-      missingTimes: errors.missingTimes !== undefined ? translate(errors.missingTimes) : undefined,
-      startInPast: errors.startInPast !== undefined ? translate(errors.startInPast) : undefined,
-      endInPast: errors.endInPast !== undefined ? translate(errors.endInPast) : undefined,
-      endBeforeStart: errors.endBeforeStart !== undefined ? translate(errors.endBeforeStart) : undefined,
+      title: isUndefined(errors.title) ? undefined : translate(errors.title),
+      missingTimes: isUndefined(errors.missingTimes) ? undefined : translate(errors.missingTimes),
+      startInPast: isUndefined(errors.startInPast) ? undefined : translate(errors.startInPast),
+      endInPast: isUndefined(errors.endInPast) ? undefined : translate(errors.endInPast),
+      endBeforeStart: isUndefined(errors.endBeforeStart) ? undefined : translate(errors.endBeforeStart),
+      password: isUndefined(errors.password) ? undefined : translate(errors.password),
+      passwordConfirmation: isUndefined(errors.passwordConfirmation)
+        ? undefined
+        : translate(errors.passwordConfirmation),
     }),
     [errors, translate],
   );
@@ -100,10 +107,14 @@ export const ScheduleMeetingModal = () => {
   };
 
   const modalTitle =
-    mode === 'edit' ? translate('meetings.scheduleModal.editTitle') : translate('meetings.scheduleModal.scheduleTitle');
+    mode === scheduleMeetingModes.edit
+      ? translate('meetings.scheduleModal.editTitle')
+      : translate('meetings.scheduleModal.scheduleTitle');
 
   const submitLabel =
-    mode === 'edit' ? translate('meetings.scheduleModal.confirmChanges') : translate('meetings.action.scheduleMeeting');
+    mode === scheduleMeetingModes.edit
+      ? translate('meetings.scheduleModal.confirmChanges')
+      : translate('meetings.action.scheduleMeeting');
 
   return (
     <ModalComponent
@@ -143,6 +154,8 @@ export const ScheduleMeetingModal = () => {
             onRecurrenceChange={setRecurrence}
             onSelectedUsersChange={setSelectedUsers}
             onParticipantsFilterChange={setParticipantsFilter}
+            onPasswordChange={setPassword}
+            onPasswordConfirmationChange={setPasswordConfirmation}
             selfUser={selfUser}
           />
         </div>

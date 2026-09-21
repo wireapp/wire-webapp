@@ -18,7 +18,10 @@
  */
 
 import type {MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {ScheduleMeetingMode} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
+import {
+  type ScheduleMeetingMode,
+  scheduleMeetingModes,
+} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 import type {TranslationKey} from 'Util/localizerUtil';
 
 export type MeetingSubmitErrorTranslationKeys = {
@@ -72,7 +75,8 @@ export const getScheduleMeetingSubmitErrorTranslationKeys = (
 ): MeetingSubmitErrorTranslationMap => {
   const createFailureTitleKey = 'meetings.scheduleModal.error.createFailedTitle';
   const updateFailureTitleKey = 'meetings.scheduleModal.error.updateFailedTitle';
-  const setupFailureTitleKey = mode === 'create' ? 'meetings.error.setupFailedTitle' : updateFailureTitleKey;
+  const setupFailureTitleKey =
+    mode === scheduleMeetingModes.create ? 'meetings.error.setupFailedTitle' : updateFailureTitleKey;
 
   return {
     missingTimes: {

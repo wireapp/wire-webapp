@@ -26,6 +26,7 @@ import type {User} from 'Repositories/entity/User';
 export type MeetNowMeetingCommand = {
   title: string;
   selectedUsers: User[];
+  password?: string;
 };
 
 export type ScheduleMeetingCommand = {
@@ -34,6 +35,7 @@ export type ScheduleMeetingCommand = {
   end: Date;
   recurrence: ScheduleMeetingRecurrenceOption;
   selectedUsers: User[];
+  password?: string;
 };
 
 export type UpdateMeetingCommand = {
