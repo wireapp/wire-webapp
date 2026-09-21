@@ -50,7 +50,7 @@ const unreachableDomainMarker = createReactTranslationMarker('complete-failure-t
 function renderCompleteFailureToSendWarning(options: RenderCompleteFailureToSendWarningOptions): ReactNode {
   const {messageFocusedTabIndex, translate, unreachableDomain} = options;
 
-  if (isNonEmptyString(unreachableDomain) === false) {
+  if (!isNonEmptyString(unreachableDomain)) {
     return <p css={warning}>{translate('messageCouldNotBeSentConnectivityIssues')}</p>;
   }
 

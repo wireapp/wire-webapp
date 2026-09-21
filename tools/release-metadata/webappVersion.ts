@@ -71,7 +71,7 @@ function validateWebAppPackageDocument(
   packageDocument: unknown,
   packagePath: string,
 ): Result<WebAppPackageDocument, Error> {
-  if (isPlainObject(packageDocument) === false) {
+  if (!isPlainObject(packageDocument)) {
     return Result.err(new Error(`WebApp package document is not an object: ${packagePath}`));
   }
 
@@ -190,11 +190,11 @@ function createWebAppVersionSynchronizationMarkerValue(
 }
 
 export function validateWebAppVersion(version: unknown): Result<WebAppVersion, Error> {
-  if (isString(version) === false) {
+  if (!isString(version)) {
     return Result.err(new Error('WebApp version must be a string'));
   }
 
-  if (strictWebAppVersionPattern.test(version) === false) {
+  if (!strictWebAppVersionPattern.test(version)) {
     return Result.err(new Error(`Invalid WebApp version: ${version}`));
   }
 
@@ -284,13 +284,13 @@ export function createWebAppVersionSynchronizationMarker(
 export function parseWebAppVersionSynchronizationMarker(
   value: unknown,
 ): Result<WebAppVersionSynchronizationMarker, Error> {
-  if (isString(value) === false) {
+  if (!isString(value)) {
     return Result.err(new Error('WebApp version synchronization marker must be a string'));
   }
 
   const markerMatches = value.match(synchronizationMarkerSearchPattern);
 
-  if (isNonEmptyArray(markerMatches) === false) {
+  if (!isNonEmptyArray(markerMatches)) {
     return Result.err(new Error('Malformed WebApp version synchronization marker'));
   }
 
@@ -300,7 +300,7 @@ export function parseWebAppVersionSynchronizationMarker(
 
   const firstMarker = markerMatches.at(0);
 
-  if (isString(firstMarker) === false) {
+  if (!isString(firstMarker)) {
     return Result.err(new Error('Malformed WebApp version synchronization marker'));
   }
 
@@ -314,11 +314,7 @@ export function parseWebAppVersionSynchronizationMarker(
   const productionTagName = markerMatch[2];
   const webAppVersion = markerMatch[3];
 
-  if (
-    isString(releaseIdentifier) === false ||
-    isString(productionTagName) === false ||
-    isString(webAppVersion) === false
-  ) {
+  if (!isString(releaseIdentifier) || !isString(productionTagName) || !isString(webAppVersion)) {
     return Result.err(new Error('Malformed WebApp version synchronization marker'));
   }
 

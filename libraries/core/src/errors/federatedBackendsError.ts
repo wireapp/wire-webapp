@@ -30,7 +30,7 @@ export class NonFederatingBackendsError extends Error {
 }
 
 export function isNonFederatingBackendsError(error: unknown): error is NonFederatingBackendsError {
-  if (typeof error !== 'object' || error === null || 'name' in error === false) {
+  if (typeof error !== 'object' || error === null || !('name' in error)) {
     return false;
   }
 

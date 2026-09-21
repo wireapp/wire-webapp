@@ -199,7 +199,7 @@ export class CellsAPI {
 
     const firstCreateCheckResult = result.data.Results?.[0];
 
-    if (autoRename === true && firstCreateCheckResult?.Exists === true) {
+    if (autoRename && firstCreateCheckResult?.Exists === true) {
       filePath = firstCreateCheckResult.NextPath ?? filePath;
     }
 
@@ -247,7 +247,7 @@ export class CellsAPI {
 
     const firstCreateCheckResult = result.data.Results?.[0];
 
-    if (autoRename === true && firstCreateCheckResult?.Exists === true) {
+    if (autoRename && firstCreateCheckResult?.Exists === true) {
       filePath = firstCreateCheckResult.NextPath ?? filePath;
     }
 
@@ -469,7 +469,7 @@ export class CellsAPI {
       Filters: {
         Type: type ?? 'UNKNOWN',
         Status: {
-          Deleted: deleted === true ? 'Only' : 'Not',
+          Deleted: deleted ? 'Only' : 'Not',
         },
       },
       SortField: sortBy,

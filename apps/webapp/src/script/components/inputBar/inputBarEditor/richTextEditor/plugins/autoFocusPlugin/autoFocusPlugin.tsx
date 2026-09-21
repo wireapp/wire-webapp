@@ -66,7 +66,7 @@ const useTextAreaFocus = (callback: () => void) => {
   useEffect(() => {
     window.addEventListener('keydown', handleFocusTextarea);
 
-    if (hasInputAlreadyFocused() === false) {
+    if (!hasInputAlreadyFocused()) {
       // Focus on the first render if no other input is focused
       setTimeout(callback);
     }

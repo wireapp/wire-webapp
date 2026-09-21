@@ -191,7 +191,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
 
       mentions.forEach(mention => {
         const {isValid, username} = validateMention(mention, availableUsers);
-        if (username == null || username === '' || isValid === false) {
+        if (username == null || username === '' || !isValid) {
           return;
         }
 

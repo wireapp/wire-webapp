@@ -327,10 +327,7 @@ export class CallingViewModel {
           typeof conferenceCallingEnabledState === 'function'
             ? conferenceCallingEnabledState()
             : conferenceCallingEnabledState;
-        if (
-          (conversationEntity.isGroupOrChannel() || conversationEntity.isMeeting()) &&
-          isConferenceCallingEnabled === false
-        ) {
+        if ((conversationEntity.isGroupOrChannel() || conversationEntity.isMeeting()) && !isConferenceCallingEnabled) {
           this.showRestrictedConferenceCallingModal();
         } else {
           await handleCallAction(conversationEntity);

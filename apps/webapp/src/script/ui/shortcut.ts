@@ -171,8 +171,8 @@ const _registerEvent = (platformSpecificShortcut: string, event: string): void =
     keyboardJS.releaseKey(inputEvent.keyCode);
 
     // Hotfix WEBAPP-1916
-    const ignoreEvent = includesString(platformSpecificShortcut, 'command') && inputEvent.metaKey === false;
-    if (ignoreEvent === false) {
+    const ignoreEvent = includesString(platformSpecificShortcut, 'command') && !inputEvent.metaKey;
+    if (!ignoreEvent) {
       inputEvent.preventDefault();
       amplify.publish(event);
     }

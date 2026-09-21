@@ -82,7 +82,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
 
   useEffect(
     () => () => {
-      if (stream !== null && hasActiveCall !== true) {
+      if (stream !== null && !hasActiveCall) {
         streamHandler.releaseTracksFromStream(stream);
       }
     },
@@ -91,7 +91,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
 
   return (
     <PreferencesSection title={translate('preferencesAVMicrophone')}>
-      {stream === null && isRequesting !== true && (
+      {stream === null && !isRequesting && (
         <div className="preferences-av-detail">
           <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
             {translate('preferencesAVPermissionDetail')}

@@ -89,7 +89,7 @@ export const useGetMultipartAsset = ({
 
   const fetchData = useCallback(
     async (forceRefetch = false): Promise<void> => {
-      if (!forceRefetch && (isMounted.current === false || status === 'success')) {
+      if (!forceRefetch && (!isMounted.current || status === 'success')) {
         return;
       }
 
@@ -161,7 +161,7 @@ export const useGetMultipartAsset = ({
   }, []);
 
   useEffect(() => {
-    if (!isEnabled || status === 'success' || hasStartedFetchRef.current === true) {
+    if (!isEnabled || status === 'success' || hasStartedFetchRef.current) {
       return;
     }
 

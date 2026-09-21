@@ -207,7 +207,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
       const policy = this.getPolicyFor(normalizedError, context);
       this.logger.info(`Resolved recovery policy: action=${policy.action}`, {policy});
 
-      if (policy.action === 'Unknown' || retry === false) {
+      if (policy.action === 'Unknown' || !retry) {
         this.logger.info('No recovery action configured or retry disabled, re-throwing original error');
         throw rawError;
       }

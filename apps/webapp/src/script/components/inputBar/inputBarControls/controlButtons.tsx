@@ -91,18 +91,18 @@ const ControlButtons = ({
   if (isEditing === true) {
     return (
       <>
-        {showFormatButton === true && (
+        {showFormatButton && (
           <li>
             <FormatTextButton isActive={isFormatActive} isEditing onClick={onFormatClick} />
           </li>
         )}
 
-        {showEmojiButton === true && (
+        {showEmojiButton && (
           <li>
             <EmojiButton isActive={isEmojiActive} isEditing onClick={onEmojiClick} />
           </li>
         )}
-        {(showFormatButton === true || showEmojiButton === true) && (
+        {(showFormatButton || showEmojiButton) && (
           <li aria-hidden="true">
             <FormatSeparator isEditing />
           </li>
@@ -173,12 +173,12 @@ const ControlButtons = ({
     <>
       {showGiphyButton === true && isFilesharingEnabled && (
         <>
-          {showFormatButton === true && (
+          {showFormatButton && (
             <li>
               <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
             </li>
           )}
-          {showEmojiButton === true && (
+          {showEmojiButton && (
             <li>
               <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
             </li>

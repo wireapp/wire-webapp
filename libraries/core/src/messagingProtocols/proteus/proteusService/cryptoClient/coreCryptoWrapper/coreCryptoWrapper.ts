@@ -99,7 +99,7 @@ const migrateOnceAndGetKey = async (
    * - If `keyNew` is freshly generated and `keyOld` is not freshly generated:
    *     - Migrate data from `keyOld` to `keyNew`
    */
-  if (keyNew.freshlyGenerated === true && keyOld.freshlyGenerated === false) {
+  if (keyNew.freshlyGenerated && !keyOld.freshlyGenerated) {
     const databaseKey = new DatabaseKey(keyNew.key);
     await migrateDatabaseKeyTypeToBytes(coreCryptoDbName, Encoder.toBase64(keyOld.key).asString, databaseKey);
   }

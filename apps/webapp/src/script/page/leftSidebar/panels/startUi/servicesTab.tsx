@@ -73,7 +73,7 @@ export const ServicesTab = ({
     <>
       {services.length > 0 && (
         <>
-          {canManageServices === true && isNonEmptyString(manageServicesUrl) && (
+          {canManageServices && isNonEmptyString(manageServicesUrl) && (
             <ul className="start-ui-manage-services left-list-items">
               <li className="left-list-item">
                 <button
@@ -100,7 +100,7 @@ export const ServicesTab = ({
             <Icon.ServiceIcon />
           </span>
 
-          {canManageServices === true && isNonEmptyString(manageServicesUrl) ? (
+          {canManageServices && isNonEmptyString(manageServicesUrl) ? (
             <>
               <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
                 {translate('searchNoAppsManager')}

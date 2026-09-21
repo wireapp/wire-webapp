@@ -291,7 +291,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     ...(variant === ButtonVariant.CANCEL && buttonCancelStyles(props)),
     ...(variant === ButtonVariant.SEND && buttonSendStyles(props)),
 
-    ...(group === true
+    ...(group
       ? {
           borderRadius: '0',
 

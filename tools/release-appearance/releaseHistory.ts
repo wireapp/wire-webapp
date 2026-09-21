@@ -209,7 +209,7 @@ function splitGitLines(commandOutput: string): readonly string[] {
       return line.trim();
     })
     .filter(line => {
-      return isEmptyString(line) === false;
+      return !isEmptyString(line);
     });
 }
 

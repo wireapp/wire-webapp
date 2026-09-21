@@ -128,7 +128,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
       <div className="panel__footer">
         {showActions && (
           <>
-            {canChatWithServices?.() === true && (
+            {canChatWithServices() && (
               <div
                 role="button"
                 tabIndex={TabIndex.FOCUSABLE}
@@ -158,17 +158,13 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
                 className="panel__action-item"
                 data-uie-name="do-remove"
                 onClick={() => {
-                  if (serviceUser !== undefined) {
-                    onRemove(serviceUser);
-                  }
+                  onRemove(serviceUser);
                 }}
                 onKeyDown={event =>
                   handleKeyDown({
                     event,
                     callback: () => {
-                      if (serviceUser !== undefined) {
-                        onRemove(serviceUser);
-                      }
+                      onRemove(serviceUser);
                     },
                     keys: [KEY.ENTER, KEY.SPACE],
                   })

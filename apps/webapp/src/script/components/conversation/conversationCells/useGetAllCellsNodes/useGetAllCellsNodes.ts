@@ -150,7 +150,7 @@ export const useGetAllCellsNodes = ({
   }, [domain, id, isCurrentFetchRequest, offset, pageSize, sort, setError, setNodes, setPagination, setStatus]);
 
   const handleHashChange = useCallback((): void => {
-    if (enabled !== true) {
+    if (!enabled) {
       return;
     }
     clearAll({conversationId: id});
@@ -159,7 +159,7 @@ export const useGetAllCellsNodes = ({
   }, [clearAll, enabled, fetchNodes, fireAndForgetInvoker, id]);
 
   useEffect(() => {
-    if (enabled !== true) {
+    if (!enabled) {
       requestVersionGate.current.invalidate();
       return;
     }

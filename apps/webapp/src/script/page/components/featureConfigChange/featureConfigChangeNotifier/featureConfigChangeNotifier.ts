@@ -131,7 +131,7 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.APPLOCK],
     ) => {
       const shouldWarn = oldConfig?.config.enforceAppLock === true && newConfig?.config.enforceAppLock === false;
-      if (shouldWarn !== true) {
+      if (!shouldWarn) {
         return undefined;
       }
       return {
@@ -227,13 +227,13 @@ const createFeatureNotifications = (
       const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
       const isFeatureEnabled = newStatus === FEATURE_STATUS.ENABLED;
 
-      if (hasFeatureChanged !== true) {
+      if (!hasFeatureChanged) {
         return undefined;
       }
 
       let translatedMessage: PrimaryModalTranslatedTranslation;
-      if (isFeatureEnabled === true) {
-        if (isEnforced === true) {
+      if (isFeatureEnabled) {
+        if (isEnforced) {
           const timeoutText = formatDuration(newTimeout, translate).text;
           translatedMessage = createFeatureTranslatedMessage(
             'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced',
@@ -382,7 +382,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
           preventClose: isEnforceDownloadPath,
           close: isEnforceDownloadPath
             ? () => {
-                if (Runtime.isDesktopApp() === true && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
+                if (Runtime.isDesktopApp() && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
                   amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
                 }
               }

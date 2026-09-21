@@ -80,7 +80,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
     void (async () => {
       try {
         const url = await assetRepository.getObjectUrl(pictureResource);
-        if (cancelled === false && isNonEmptyString(url)) {
+        if (!cancelled && isNonEmptyString(url)) {
           setAvatarImage(url);
         }
       } catch (error: unknown) {

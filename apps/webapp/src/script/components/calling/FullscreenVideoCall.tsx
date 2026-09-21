@@ -205,7 +205,7 @@ const FullscreenVideoCall = ({
   const backgroundSidebarHandler = (newValue: boolean): void => {
     setIsBackgroundSidebarOpen(newValue);
 
-    if (isBackgroundSidebarOpen && newValue === false) {
+    if (isBackgroundSidebarOpen && !newValue) {
       wrapperRef.current?.focus();
     }
   };

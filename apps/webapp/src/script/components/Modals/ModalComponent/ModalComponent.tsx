@@ -116,7 +116,7 @@ const ModalComponent = ({
     };
   }, [isShown]);
 
-  if (displayNone === true) {
+  if (displayNone) {
     return null;
   }
 

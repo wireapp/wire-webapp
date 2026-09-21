@@ -92,16 +92,16 @@ export const useConversationSearchFiles = ({
   const {id, domain} = conversationQualifiedId;
 
   const isValidSearchRequest = useCallback((requestVersion: number): boolean => {
-    return enabledRef.current === true && requestVersionGate.current.isStale(requestVersion) === false;
+    return enabledRef.current && !requestVersionGate.current.isStale(requestVersion);
   }, []);
 
   const shouldRefreshSearchResultsAfterClearingInput = useCallback(
     ({preserveFilters}: ClearSearchRefreshOptions): boolean => {
-      if (preserveFilters === false) {
+      if (!preserveFilters) {
         return false;
       }
 
-      return enabledRef.current === true;
+      return enabledRef.current;
     },
     [],
   );
@@ -266,7 +266,7 @@ export const useConversationSearchFiles = ({
       preserveFilters,
     });
 
-    if (shouldRefreshSearchResults === true) {
+    if (shouldRefreshSearchResults) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await searchNodes({query: '', filters});
       });
@@ -322,8 +322,8 @@ export const useConversationSearchFiles = ({
   useEffect(() => {
     const hasNoSearchInput = normalizeSearchQuery(searchValue).length === 0;
 
-    if (hadActiveSearchParamsRef.current === true && hasActiveParams === false && hasNoSearchInput === true) {
-      if (enabledRef.current === true) {
+    if (hadActiveSearchParamsRef.current && !hasActiveParams && hasNoSearchInput) {
+      if (enabledRef.current) {
         fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
           await searchNodes({query: '', filters});
         });

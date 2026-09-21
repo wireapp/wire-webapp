@@ -53,8 +53,8 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
   const modalId = `multipart-preview-${firstAsset?.uuid ?? 'unknown'}`;
 
   const extension = firstAsset?.initialName != null ? getFileExtension(firstAsset.initialName) : '';
-  const isImage = firstAsset?.contentType?.startsWith('image') === true;
-  const isVideo = firstAsset?.contentType?.startsWith('video') === true;
+  const isImage = firstAsset?.contentType?.startsWith('image');
+  const isVideo = firstAsset?.contentType?.startsWith('video');
 
   const {src, imagePreviewUrl, isLoading} = useGetMultipartAsset({
     uuid: firstAsset?.uuid ?? '',
@@ -108,7 +108,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
         {previewUrl !== undefined ? (
           <>
             <img src={previewUrl} alt="" />
-            {isVideo === true && (
+            {isVideo && (
               <div className="message-quote__preview-overlay" aria-hidden="true">
                 <PlayIcon width={16} height={16} />
               </div>
@@ -139,7 +139,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
     <>
       <div className="message-quote__attachments" data-uie-name="media-attachments-quote">
         {attachmentIcon}
-        {showText === true && <span>{displayText}</span>}
+        {showText && <span>{displayText}</span>}
       </div>
 
       {shouldDisplayImagePreview && (

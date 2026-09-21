@@ -53,7 +53,7 @@ const backendUrlTwoMarker = createReactTranslationMarker('federation-stop-backen
 function renderFederationStopMessage(options: RenderFederationStopMessageOptions): ReactNode {
   const {domains, translate} = options;
 
-  if (isNonEmptyArray(domains) === false) {
+  if (!isNonEmptyArray(domains)) {
     return <span />;
   }
 

@@ -78,7 +78,7 @@ export function buildCallingViewModel(translate: Translate) {
     translate,
     {} as any,
     callState,
-    {} as any,
+    {isConferenceCallingEnabled: ko.pureComputed(() => true)} as any,
   );
 
   return [callingViewModel, {core: mockCore}] as const;

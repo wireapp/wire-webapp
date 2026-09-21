@@ -426,7 +426,7 @@ const _getStateUserName: ConversationCellStateDefinition = {
       lastMessageEntity !== undefined &&
       lastMessageEntity.isMember() &&
       (lastMessageEntity as MemberMessage).isMemberJoin();
-    const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin === true;
+    const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin;
 
     return conversationEntity.isRequest() || isEmpty1to1Conversation;
   },

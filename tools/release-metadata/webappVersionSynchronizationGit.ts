@@ -165,7 +165,7 @@ export function redactWebAppVersionSynchronizationGitFailureMessage(
   redactedSecretValues: readonly string[],
 ): string {
   return redactedSecretValues.reduce((redactedMessage, secretValue) => {
-    if (isNonEmptyString(secretValue) === false) {
+    if (!isNonEmptyString(secretValue)) {
       return redactedMessage;
     }
 
@@ -216,14 +216,14 @@ export function parseWebAppVersionSynchronizationPackageDocument(
   packageContents: string,
   packagePath: string,
 ): Result<WebAppPackageDocument, Error> {
-  if (isNonEmptyString(packageContents) === false) {
+  if (!isNonEmptyString(packageContents)) {
     return Result.err(new Error(`Empty package document: ${packagePath}`));
   }
 
   try {
     const packageDocumentResult = webAppPackageDocumentSchema.safeParse(JSON.parse(packageContents));
 
-    if (packageDocumentResult.success === false) {
+    if (!packageDocumentResult.success) {
       return Result.err(new Error(`Invalid package document: ${packagePath}: ${packageDocumentResult.error.message}`));
     }
 
@@ -243,13 +243,13 @@ function parseRemoteBranchNames(remoteBranchesOutput: string, branchPrefix: stri
       const remoteBranchFields = remoteBranchLine.split('\t');
       const remoteReference = remoteBranchFields.at(1);
 
-      if (isString(remoteReference) === false || remoteReference.startsWith('refs/heads/') === false) {
+      if (!isString(remoteReference) || !remoteReference.startsWith('refs/heads/')) {
         return [];
       }
 
       const branchName = remoteReference.slice('refs/heads/'.length);
 
-      if (branchName.startsWith(branchPrefix) === false) {
+      if (!branchName.startsWith(branchPrefix)) {
         return [];
       }
 
@@ -261,7 +261,7 @@ function parseRemoteBranchNames(remoteBranchesOutput: string, branchPrefix: stri
 function parseCommitSha(commitOutput: string, description: string): Result<string, Error> {
   const commitSha = commitOutput.trim();
 
-  if (commitShaPattern.test(commitSha) === false) {
+  if (!commitShaPattern.test(commitSha)) {
     return Result.err(new Error(`Malformed Git commit returned for ${description}`));
   }
 
@@ -293,20 +293,20 @@ function validatePackageDocumentVersionChange(
 ): Result<Unit, Error> {
   const basePackageDocumentResult = webAppPackageDocumentSchema.safeParse(options.basePackageDocument);
 
-  if (basePackageDocumentResult.success === false) {
+  if (!basePackageDocumentResult.success) {
     return Result.err(new Error(`Synchronization branch base has an invalid ${options.packagePath}`));
   }
 
   const branchPackageDocumentResult = webAppPackageDocumentSchema.safeParse(options.branchPackageDocument);
 
-  if (branchPackageDocumentResult.success === false) {
+  if (!branchPackageDocumentResult.success) {
     return Result.err(new Error(`Synchronization branch tip has an invalid ${options.packagePath}`));
   }
 
   const basePackageDocumentWithoutVersion = removePackageDocumentVersion(basePackageDocumentResult.data);
   const branchPackageDocumentWithoutVersion = removePackageDocumentVersion(branchPackageDocumentResult.data);
 
-  if (isDeepStrictEqual(basePackageDocumentWithoutVersion, branchPackageDocumentWithoutVersion) === false) {
+  if (!isDeepStrictEqual(basePackageDocumentWithoutVersion, branchPackageDocumentWithoutVersion)) {
     return Result.err(new Error(`Synchronization branch changes ${options.packagePath} beyond its version field`));
   }
 
@@ -413,11 +413,11 @@ export function validateWebAppVersionSynchronizationBranch(
     return Result.err(new Error('Synchronization branch tip is not ahead of its base commit'));
   }
 
-  if (branchInspection.commitParentCount !== 1 || branchInspection.isNormalCommit === false) {
+  if (branchInspection.commitParentCount !== 1 || !branchInspection.isNormalCommit) {
     return Result.err(new Error('Synchronization branch must contain exactly one normal commit'));
   }
 
-  if (branchInspection.isBasedOnMainHistory === false) {
+  if (!branchInspection.isBasedOnMainHistory) {
     return Result.err(new Error('Synchronization branch base is not part of main history'));
   }
 
@@ -707,7 +707,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
         },
       })
         .andThen(status => {
-          if (status.isClean() === false) {
+          if (!status.isClean()) {
             return Result.err(new Error('Git working tree must be clean before WebApp version synchronization'));
           }
 

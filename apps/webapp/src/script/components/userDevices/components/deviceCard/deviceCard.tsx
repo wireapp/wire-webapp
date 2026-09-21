@@ -52,7 +52,7 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
 
   const clickOnDevice = () => {
-    if (clickable === true) {
+    if (clickable) {
       click(clientEntity);
     }
   };

@@ -54,7 +54,7 @@ const StyledLabel = ({
           position: 'absolute',
           top: '50%',
           transform: 'translateY(-50%)',
-          ...(labelBeforeCheckbox === true
+          ...(labelBeforeCheckbox
             ? {
                 right: '11px',
               }
@@ -89,14 +89,14 @@ const StyledLabel = ({
           margin: '0 8px 0 0px',
           color: theme.general.color,
         },
-        ...(labelBeforeCheckbox === true && {
+        ...(labelBeforeCheckbox && {
           flexDirection: 'row-reverse',
           justifyContent: 'space-between',
         }),
         alignItems: 'center',
         position: 'relative',
         margin: '0 0 0 -16px',
-        width: aligncenter === true ? 'auto' : '100%',
+        width: aligncenter ? 'auto' : '100%',
         lineHeight: '1.4rem',
         display: 'flex',
         opacity: disabled === true ? 0.56 : 1,

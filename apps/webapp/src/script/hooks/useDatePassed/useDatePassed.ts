@@ -35,7 +35,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
   const targetTime = useRef<number | null>(null);
 
   const checkTime = useCallback(() => {
-    if (isNull(target) || enabled === false) {
+    if (isNull(target) || !enabled) {
       return;
     }
 
@@ -51,7 +51,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
 
   useEffect(() => {
     // Clear interval if disabled or no target
-    if (enabled === false || isNull(target)) {
+    if (!enabled || isNull(target)) {
       hasPassed.current = false;
       targetTime.current = null;
       if (!isUndefined(intervalId.current)) {

@@ -66,7 +66,7 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
     message: translate('qualityFeedback.notificationSubmitted'),
   });
 
-  if (qualityFeedbackModalShown !== true) {
+  if (!qualityFeedbackModalShown) {
     return null;
   }
 
@@ -87,7 +87,7 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
       currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal.getTime();
       localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
 
-      if (skipNotification === false) {
+      if (!skipNotification) {
         submittedNotification.show();
       }
     } catch (error: unknown) {

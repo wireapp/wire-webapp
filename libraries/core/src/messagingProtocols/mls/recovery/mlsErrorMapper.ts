@@ -142,7 +142,7 @@ const WrongEpochHandler: ErrorHandler = {
 
 /** Local MLS state indicates the conversation is broken/not established. */
 const BrokenConversationHandler: ErrorHandler = {
-  canHandle: err => isBrokenMLSConversationError?.(err) === true,
+  canHandle: err => isBrokenMLSConversationError?.(err),
   map: (err, context) => ({
     type: 'GroupNotEstablished',
     message: 'Broken MLS conversation',
@@ -153,7 +153,7 @@ const BrokenConversationHandler: ErrorHandler = {
 
 /** Backend/MLS reports missing users; group is out-of-sync. */
 const GroupOutOfSyncHandler: ErrorHandler = {
-  canHandle: err => isMLSGroupOutOfSyncError?.(err) === true || err instanceof MLSGroupOutOfSyncError,
+  canHandle: err => isMLSGroupOutOfSyncError?.(err) || err instanceof MLSGroupOutOfSyncError,
   map: (err, context) => {
     let missingUsers: QualifiedId[] = [];
     if (isMLSGroupOutOfSyncError?.(err)) {
@@ -177,7 +177,7 @@ const GroupOutOfSyncHandler: ErrorHandler = {
 
 /** core-crypto indicates a local group already exists for the welcome's group id. */
 const ConversationAlreadyExistsHandler: ErrorHandler = {
-  canHandle: error => isMlsConversationAlreadyExistsError?.(error) === true,
+  canHandle: error => isMlsConversationAlreadyExistsError?.(error),
   map: (error, context) => {
     if (!isMlsConversationAlreadyExistsError(error)) {
       throw new Error('Error is not a ConversationAlreadyExists error');
@@ -194,7 +194,7 @@ const ConversationAlreadyExistsHandler: ErrorHandler = {
 
 /** Orphan welcome (no matching state); caller should try to join. */
 const OrphanWelcomeHandler: ErrorHandler = {
-  canHandle: err => isMlsOrphanWelcomeError?.(err) === true,
+  canHandle: err => isMlsOrphanWelcomeError?.(err),
   map: (err, context) => ({
     type: MlsErrorType.OrphanWelcome,
     message: 'Orphan welcome message',

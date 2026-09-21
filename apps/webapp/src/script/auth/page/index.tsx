@@ -69,7 +69,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
   const immediateLogin = useCallback(async () => {
     await doInit({isImmediateLogin: true, shouldValidateLocalClient: true});
     // Check if the user is already logged in
-    if (hasOtherInstance === false) {
+    if (!hasOtherInstance) {
       const localClient = core.getLocalClient();
       if (!isNullOrUndefined(localClient)) {
         navigate(ROUTE.HISTORY_INFO);

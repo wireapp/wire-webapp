@@ -226,7 +226,7 @@ export class AssetRepository {
     const skipCompression = image.type === 'image/gif';
     const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;
-    if (skipCompression === true) {
+    if (skipCompression) {
       compressedBytes = buffer;
     } else {
       const worker = new WebWorker(() => new Worker(new URL('./imageWorker', import.meta.url)));

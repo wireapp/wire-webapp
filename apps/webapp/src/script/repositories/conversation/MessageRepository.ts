@@ -577,7 +577,7 @@ export class MessageRepository {
     // check if the user actually wants to send link previews
     if (
       !this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) ||
-      Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS === false
+      !Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS
     ) {
       return;
     }
@@ -1097,7 +1097,7 @@ export class MessageRepository {
         };
 
     const shouldProceedSending = await injectOptimisticEvent();
-    if (shouldProceedSending === false) {
+    if (!shouldProceedSending) {
       this.logger.log('User has canceled sending a message to a degraded conversation.');
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
     }
@@ -1499,7 +1499,7 @@ export class MessageRepository {
       // For the moment, we do not want to send status in federated env
       // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
       .filter(user => {
-        return user.isFederated === false;
+        return !user.isFederated;
       })
       .toSorted(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => this.teamState.isInTeam(user));
