@@ -24,6 +24,7 @@ import {Maybe} from 'true-myth';
 import {match} from 'ts-pattern';
 import {z} from 'zod';
 
+import {createGitHubMutationPacer, githubMutationMinimumIntervalMilliseconds} from './githubMutationPacer.ts';
 import {calculateGitHubRateLimitRetryDecision, maximumGitHubRateLimitRetries} from './githubRateLimitPolicy.ts';
 import type {GitHubRateLimitResponseMetadata} from './githubRateLimitPolicy.ts';
 
@@ -84,6 +85,12 @@ type ParsedGitHubFailureResponse = {
 type CreateHttpRequestFailureOptions = {
   readonly error: unknown;
   readonly request: HttpRequest;
+};
+
+type CreateKyRequestOperationOptions = {
+  readonly kyInstance: KyInstance;
+  readonly request: HttpRequest;
+  readonly requestOptions: Options;
 };
 
 const millisecondsPerSecond = 1_000;
@@ -313,8 +320,27 @@ function formatRateLimitRetryMessage(options: FormatRateLimitRetryMessageOptions
   ].join(' · ');
 }
 
+function createKyRequestOperation(
+  createKyRequestOperationOptions: CreateKyRequestOperationOptions,
+): () => Promise<unknown> {
+  const {kyInstance, request, requestOptions} = createKyRequestOperationOptions;
+
+  return async function executeKyRequest(): Promise<unknown> {
+    return await kyInstance(request.url, requestOptions).json<unknown>();
+  };
+}
+
+function isGitHubMutationMethod(method: HttpMethod): boolean {
+  return method === 'post' || method === 'patch';
+}
+
 export function createKyHttpClient(createKyHttpClientOptions: CreateKyHttpClientOptions): HttpClient {
   const {currentTimeMilliseconds, kyInstance, reportRateLimitWait, sleep} = createKyHttpClientOptions;
+  const mutationPacer = createGitHubMutationPacer({
+    currentTimeMilliseconds,
+    minimumIntervalMilliseconds: githubMutationMinimumIntervalMilliseconds,
+    sleep,
+  });
 
   return {
     async requestJson(request): Promise<unknown> {
@@ -335,7 +361,12 @@ export function createKyHttpClient(createKyHttpClientOptions: CreateKyHttpClient
 
       for (let retryAttempt = 1; ; retryAttempt += 1) {
         try {
-          return await kyInstance(request.url, requestOptions).json<unknown>();
+          const requestOperation = createKyRequestOperation({kyInstance, request, requestOptions});
+          if (isGitHubMutationMethod(request.method)) {
+            return await mutationPacer.run(requestOperation);
+          }
+
+          return await requestOperation();
         } catch (error: unknown) {
           const failure = createHttpRequestFailure({error, request});
           if (failure.kind === 'http-response-failure') {

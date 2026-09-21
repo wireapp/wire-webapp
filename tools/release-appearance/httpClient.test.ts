@@ -24,7 +24,7 @@ import type {KyInstance} from 'ky';
 import {Maybe} from 'true-myth';
 
 import {createKyHttpClient, formatHttpRequestFailure, isHttpRequestFailure} from './httpClient.ts';
-import type {HttpClient, HttpRequest, HttpRequestFailure} from './httpClient.ts';
+import type {HttpClient, HttpMethod, HttpRequest, HttpRequestFailure} from './httpClient.ts';
 
 function createCommentRequest(): HttpRequest {
   return {
@@ -35,6 +35,23 @@ function createCommentRequest(): HttpRequest {
     },
     json: Maybe.just({body: 'release comment'}),
   };
+}
+
+function createTestRequest(method: HttpMethod, path: string): HttpRequest {
+  return {
+    method,
+    url: new URL(`https://api.github.example${path}`),
+    headers: {},
+    json: Maybe.nothing<NonNullable<unknown>>(),
+  };
+}
+
+function resolveAtNextEventLoopTurn(resolve: (value?: void | PromiseLike<void>) => void): void {
+  setImmediate(resolve);
+}
+
+function waitForNextEventLoopTurn(): Promise<void> {
+  return new Promise<void>(resolveAtNextEventLoopTurn);
 }
 
 function createTestHttpClient(kyInstance: KyInstance): HttpClient {
@@ -129,13 +146,15 @@ describe('Ky HTTP client', () => {
     });
     const sleepDelays: number[] = [];
     const rateLimitMessages: string[] = [];
+    let currentTimeMilliseconds = 1_800_000_000_000;
     const httpClient = createKyHttpClient({
       kyInstance,
       currentTimeMilliseconds() {
-        return 1_800_000_000_000;
+        return currentTimeMilliseconds;
       },
       async sleep(delayMilliseconds) {
         sleepDelays.push(delayMilliseconds);
+        currentTimeMilliseconds += delayMilliseconds;
       },
       reportRateLimitWait(message) {
         rateLimitMessages.push(message);
@@ -180,6 +199,67 @@ describe('Ky HTTP client', () => {
     expect(failure.response.statusCode).toBe(429);
     expect(failure.response.githubMessage.isNothing).toBe(true);
     expect(formatHttpRequestFailure(failure)).not.toContain('release comment');
+  });
+
+  it('paces POST and PATCH mutation starts together while keeping GET requests concurrent', async () => {
+    let currentTimeMilliseconds = 0;
+    let activeReadRequests = 0;
+    let maximumActiveReadRequests = 0;
+    const mutationStartTimes: {readonly method: string; readonly timeMilliseconds: number}[] = [];
+    const sleepDelays: number[] = [];
+    const readResponse = Promise.withResolvers<void>();
+    const kyInstance = ky.create({
+      async fetch(input, init) {
+        const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toLowerCase();
+        if (method === 'get') {
+          activeReadRequests += 1;
+          maximumActiveReadRequests = Math.max(maximumActiveReadRequests, activeReadRequests);
+          try {
+            await readResponse.promise;
+            return new Response('{}');
+          } finally {
+            activeReadRequests -= 1;
+          }
+        }
+
+        mutationStartTimes.push({method, timeMilliseconds: currentTimeMilliseconds});
+        return new Response('{}');
+      },
+    });
+    const httpClient = createKyHttpClient({
+      kyInstance,
+      currentTimeMilliseconds() {
+        return currentTimeMilliseconds;
+      },
+      async sleep(delayMilliseconds) {
+        sleepDelays.push(delayMilliseconds);
+        currentTimeMilliseconds += delayMilliseconds;
+      },
+      reportRateLimitWait() {
+        return;
+      },
+    });
+
+    const readRequests = [
+      httpClient.requestJson(createTestRequest('get', '/issues/1/comments')),
+      httpClient.requestJson(createTestRequest('get', '/issues/2/comments')),
+    ];
+    await waitForNextEventLoopTurn();
+    expect(maximumActiveReadRequests).toBe(2);
+
+    const mutationRequests = await Promise.all([
+      httpClient.requestJson(createTestRequest('post', '/issues/1/comments')),
+      httpClient.requestJson(createTestRequest('patch', '/issues/comments/2')),
+    ]);
+    readResponse.resolve();
+    await Promise.all(readRequests);
+
+    expect(mutationRequests).toEqual([{}, {}]);
+    expect(mutationStartTimes).toEqual([
+      {method: 'post', timeMilliseconds: 0},
+      {method: 'patch', timeMilliseconds: 1_000},
+    ]);
+    expect(sleepDelays).toEqual([1_000]);
   });
 
   it('retains valid fields while discarding malformed GitHub fields and unrelated response data', async () => {
