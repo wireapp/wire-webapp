@@ -820,6 +820,7 @@
   "conversationHistoryText": "Выберите период. Когда участники присоединяются к этому каналу, они могут просматривать историю за этот период времени.",
   "conversationHistoryTitle": "История беседы",
   "conversationImageAssetRestricted": "Получение изображений запрещено",
+  "conversationImageAssetRetry": "Retry",
   "conversationInternalEnvironmentDisclaimer": "Это НЕ WIRE, а внутренняя среда тестирования. Разрешено использовать только сотрудникам Wire. Любое публичное использование ЗАПРЕЩЕНО. Данные пользователей этой тестовой среды тщательно записываются и анализируются. Чтобы воспользоваться защищенным мессенджером Wire, перейдите по ссылке [link]{url}[/link].",
   "conversationJoin.existentAccountJoinInBrowser": "Войти в браузере",
   "conversationJoin.existentAccountJoinWithoutLink": "Присоединиться к беседе",

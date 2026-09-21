@@ -820,6 +820,7 @@
   "conversationHistoryText": "Wählen Sie einen Zeitraum. Wenn Teilnehmer diesem Channel beitreten, können sie den Verlauf für diese Zeitspanne verfolgen.",
   "conversationHistoryTitle": "Gesprächsverlauf",
   "conversationImageAssetRestricted": "Empfang von Bildern ist verboten",
+  "conversationImageAssetRetry": "Wiederholen",
   "conversationInternalEnvironmentDisclaimer": "Dies ist NICHT WIRE, sondern eine interne Testumgebung und ist nur für die Verwendung durch Mitarbeiter von Wire autorisiert. Jede öffentliche Nutzung ist UNTERSAGT. Die Daten der Benutzer dieser Testumgebung werden umfassend erfasst und analysiert. Um den sicheren Messenger Wire zu verwenden, besuchen Sie bitte [link]{url}[/link]",
   "conversationJoin.existentAccountJoinInBrowser": "Im Browser beitreten",
   "conversationJoin.existentAccountJoinWithoutLink": "an der Unterhaltung teilnehmen",
