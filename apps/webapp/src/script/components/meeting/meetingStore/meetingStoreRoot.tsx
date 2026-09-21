@@ -21,6 +21,10 @@ import {type ReactNode, useEffect, useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
+import {
+  createBrowserMeetingReminderNotificationApi,
+  createMeetingReminderOsNotifier,
+} from 'Components/meeting/createMeetingReminderOsNotifier';
 import {createMeetingReminderScheduler} from 'Components/meeting/createMeetingReminderScheduler';
 import {createBrowserDeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {createMeetingNotificationEventHandlers} from 'Components/meeting/meetingNotificationEventHandlers';
@@ -52,7 +56,7 @@ type MeetingStoreRootProps = {
  * meeting lifecycle events, independently of whether the meetings view is currently rendered.
  */
 export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
-  const {mainViewModel, wallClock} = useApplicationContext();
+  const {mainViewModel, wallClock, translate} = useApplicationContext();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {
     meetings: meetingsRepository,
@@ -104,6 +108,13 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
       logger,
     });
+    const reminderOsNotifier = createMeetingReminderOsNotifier({
+      notificationApi: createBrowserMeetingReminderNotificationApi(),
+      openMeetingsList: () => mainViewModel.list.openMeetingsList(),
+      translate,
+      logger,
+    });
+    // One scheduler, two sinks: the in-app card always fires, the OS toast is additive.
     const reminderScheduler = createMeetingReminderScheduler({
       wallClock,
       onReminder: payload => {
@@ -111,6 +122,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
           ...payload,
           kind: MeetingNotificationKind.REMINDER,
         });
+        reminderOsNotifier.notify(payload);
       },
     });
 
@@ -143,8 +155,9 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
       reminderScheduler.stop();
+      reminderOsNotifier.stop();
     };
-  }, [isMeetingsEnabled, store, wallClock]);
+  }, [isMeetingsEnabled, store, wallClock, mainViewModel, translate]);
 
   return <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>;
 };
