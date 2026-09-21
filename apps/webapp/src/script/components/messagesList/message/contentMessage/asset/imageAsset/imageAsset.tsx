@@ -52,6 +52,7 @@ export const ImageAsset: FunctionComponent<ImageAssetProps> = (properties: Image
     messageDate: `${message.displayTimestampShort()}`,
     username: `${message.user().name()}`,
   });
+  const retryLabel = translate('conversationImageAssetRetry');
 
   const imageContainerStyle: CSSObject = {
     maxWidth: 'var(--conversation-message-asset-width)',
@@ -83,6 +84,7 @@ export const ImageAsset: FunctionComponent<ImageAssetProps> = (properties: Image
           onClick={event => onClick(message, event)}
           getAssetUrl={getAssetUrl}
           logger={logger}
+          retryLabel={retryLabel}
           onKeyDown={event =>
             handleKeyDown({event, callback: onClick.bind(null, message, event), keys: [KEY.ENTER, KEY.SPACE]})
           }

@@ -19,8 +19,11 @@
 
 import type {CSSObject} from '@emotion/react';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React, {KeyboardEventHandler, MouseEventHandler, ReactNode} from 'react';
 import type {FunctionComponent} from 'react';
+
+import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import type {AssetUrl} from 'Components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
 import type {GetAssetUrl, ImageLogger} from 'Components/image';
@@ -39,6 +42,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {ImageAsset, ImageAssetProps} from './imageAsset';
 
 type ImageLoggerMock = jest.Mocked<ImageLogger>;
+type ImageAssetTestWrapperProperties = {children: ReactNode};
 
 function buildImageLoggerMock(): ImageLoggerMock {
   return {error: jest.fn()};
@@ -101,13 +105,34 @@ jest.mock('Components/inViewport', () => {
 
 describe('image-asset', () => {
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-  const rootProviderWrapper = createRootProviderWrapperForTest(
+  const rootContextWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest}),
   );
   const fakeImageUrl = 'https://test.com/image.png';
+  const retryLabel = translateForTest('conversationImageAssetRetry');
   const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
   const getAssetUrlMock = jest.fn<ReturnType<GetAssetUrl>, Parameters<GetAssetUrl>>();
   const imageLoggerMock = buildImageLoggerMock();
+
+  function rootProviderWrapper(properties: ImageAssetTestWrapperProperties): ReactNode {
+    const {children} = properties;
+
+    return <ThemeProvider>{rootContextWrapper({children})}</ThemeProvider>;
+  }
+
+  function createImageWithResource(): MediumImage {
+    const image = new MediumImage('image');
+    image.resource(
+      new AssetRemoteData({
+        assetKey: 'remote',
+        assetDomain: 'test-domain.wire.com',
+        assetToken: '',
+        forceCaching: false,
+      }),
+    );
+
+    return image;
+  }
 
   const createDefaultMessage = () => {
     const message = new ContentMessage(undefined, translateForTest);
@@ -212,10 +237,98 @@ describe('image-asset', () => {
 
     expect(imageContainer).not.toHaveClass('loading-dots');
     expect(imageLoggerMock.error).toHaveBeenCalledWith('Failed to load image asset', expect.any(Error));
+    expect(screen.getByRole('button', {name: retryLabel})).toBeDefined();
+    expect(imageContainer).not.toHaveAttribute('role', 'button');
 
     fireEvent.keyDown(imageContainer, {key: 'Enter', code: 'Enter'});
     fireEvent.keyDown(imageContainer, {key: ' ', code: 'Space'});
     expect(onClickMock).not.toHaveBeenCalled();
+  });
+
+  it('retries failed image loading and hides the retry action after success', async () => {
+    getAssetUrlMock.mockRejectedValueOnce(new Error('Initial image load failed'));
+
+    const image = createImageWithResource();
+    const onClickMock = jest.fn();
+    render(<ImageAsset {...defaultProps} asset={image} onClick={onClickMock} />, {wrapper: rootProviderWrapper});
+
+    const retryButton = await screen.findByRole('button', {name: retryLabel});
+    fireEvent.click(retryButton);
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalledTimes(2);
+      expect(screen.getByTestId('image-asset-img')).toBeDefined();
+    });
+
+    expect(screen.queryByRole('button', {name: retryLabel})).toBeNull();
+    expect(onClickMock).not.toHaveBeenCalled();
+  });
+
+  it('returns to the failed state when retrying image loading fails', async () => {
+    getAssetUrlMock
+      .mockRejectedValueOnce(new Error('Initial image load failed'))
+      .mockRejectedValueOnce(new Error('Retry image load failed'));
+
+    const image = createImageWithResource();
+    render(<ImageAsset {...defaultProps} asset={image} />, {wrapper: rootProviderWrapper});
+
+    const retryButton = await screen.findByRole('button', {name: retryLabel});
+    const imageContainer = requireValueForTest(retryButton.parentElement);
+    fireEvent.click(retryButton);
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalledTimes(2);
+      expect(imageContainer).toHaveAttribute('data-uie-status', 'error');
+    });
+
+    expect(screen.getByRole('button', {name: retryLabel})).toBeDefined();
+  });
+
+  it('retries image loading with the keyboard without opening image details', async () => {
+    getAssetUrlMock.mockRejectedValueOnce(new Error('Initial image load failed'));
+
+    const image = createImageWithResource();
+    const onClickMock = jest.fn();
+    render(<ImageAsset {...defaultProps} asset={image} onClick={onClickMock} />, {wrapper: rootProviderWrapper});
+
+    const retryButton = await screen.findByRole('button', {name: retryLabel});
+    const user = userEvent.setup();
+    retryButton.focus();
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalledTimes(2);
+      expect(screen.getByTestId('image-asset-img')).toBeDefined();
+    });
+
+    expect(onClickMock).not.toHaveBeenCalled();
+  });
+
+  it('does not start parallel asset requests when retry is activated repeatedly', async () => {
+    let resolveRetryLoad: (assetUrl: AssetUrl) => void = (): void => {
+      return undefined;
+    };
+    const pendingRetryLoad = new Promise<AssetUrl>((resolve): void => {
+      resolveRetryLoad = resolve;
+    });
+    getAssetUrlMock.mockRejectedValueOnce(new Error('Initial image load failed')).mockReturnValueOnce(pendingRetryLoad);
+
+    const image = createImageWithResource();
+    render(<ImageAsset {...defaultProps} asset={image} />, {wrapper: rootProviderWrapper});
+
+    const retryButton = await screen.findByRole('button', {name: retryLabel});
+    fireEvent.click(retryButton);
+    fireEvent.click(retryButton);
+
+    await waitFor(() => {
+      expect(getAssetUrlMock).toHaveBeenCalledTimes(2);
+      expect(screen.getByTestId('image-loader')).toBeDefined();
+    });
+
+    resolveRetryLoad({url: fakeImageUrl, dispose: jest.fn()});
+    await waitFor(() => {
+      expect(screen.getByTestId('image-asset-img')).toBeDefined();
+    });
   });
 
   it('keeps the image non-interactive while loading', async () => {
