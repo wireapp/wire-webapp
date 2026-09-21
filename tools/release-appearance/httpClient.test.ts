@@ -20,10 +20,11 @@
 import assert from 'node:assert';
 
 import ky from 'ky';
+import type {KyInstance} from 'ky';
 import {Maybe} from 'true-myth';
 
 import {createKyHttpClient, formatHttpRequestFailure, isHttpRequestFailure} from './httpClient.ts';
-import type {HttpRequest, HttpRequestFailure} from './httpClient.ts';
+import type {HttpClient, HttpRequest, HttpRequestFailure} from './httpClient.ts';
 
 function createCommentRequest(): HttpRequest {
   return {
@@ -36,12 +37,27 @@ function createCommentRequest(): HttpRequest {
   };
 }
 
+function createTestHttpClient(kyInstance: KyInstance): HttpClient {
+  return createKyHttpClient({
+    kyInstance,
+    currentTimeMilliseconds() {
+      return 1_800_000_000_000;
+    },
+    async sleep() {
+      return;
+    },
+    reportRateLimitWait() {
+      return;
+    },
+  });
+}
+
 async function readHttpRequestFailure(requestPromise: Promise<unknown>): Promise<HttpRequestFailure> {
   try {
     await requestPromise;
     assert.fail('Expected the HTTP request to fail');
   } catch (error: unknown) {
-    if (isHttpRequestFailure(error) === false) {
+    if (!isHttpRequestFailure(error)) {
       assert.fail('Expected an application-owned HTTP request failure');
     }
 
@@ -53,7 +69,7 @@ describe('Ky HTTP client', () => {
   it('retains safe diagnostics from a normal forbidden response without retrying', async () => {
     let fetchCallCount = 0;
     const kyInstance = ky.create({
-      fetch: async (): Promise<Response> => {
+      async fetch() {
         fetchCallCount += 1;
         return new Response(
           JSON.stringify({
@@ -73,7 +89,7 @@ describe('Ky HTTP client', () => {
         );
       },
     });
-    const httpClient = createKyHttpClient({kyInstance});
+    const httpClient = createTestHttpClient(kyInstance);
 
     const failure = await readHttpRequestFailure(httpClient.requestJson(createCommentRequest()));
 
@@ -91,10 +107,10 @@ describe('Ky HTTP client', () => {
     expect(failure.response.retryAfter.isNothing).toBe(true);
   });
 
-  it('retries a secondary-rate-limit response using retry-after and fails boundedly', async () => {
+  it('retries a secondary-rate-limit response with bounded fallback backoff', async () => {
     let fetchCallCount = 0;
     const kyInstance = ky.create({
-      fetch: async (): Promise<Response> => {
+      async fetch() {
         fetchCallCount += 1;
         return new Response(
           JSON.stringify({
@@ -104,15 +120,27 @@ describe('Ky HTTP client', () => {
             status: 403,
             headers: {
               'content-type': 'application/json',
-              'retry-after': '0',
-              'x-ratelimit-remaining': '0',
+              'x-ratelimit-remaining': '4999',
               'x-ratelimit-reset': '1785800000',
             },
           },
         );
       },
     });
-    const httpClient = createKyHttpClient({kyInstance});
+    const sleepDelays: number[] = [];
+    const rateLimitMessages: string[] = [];
+    const httpClient = createKyHttpClient({
+      kyInstance,
+      currentTimeMilliseconds() {
+        return 1_800_000_000_000;
+      },
+      async sleep(delayMilliseconds) {
+        sleepDelays.push(delayMilliseconds);
+      },
+      reportRateLimitWait(message) {
+        rateLimitMessages.push(message);
+      },
+    });
 
     const failure = await readHttpRequestFailure(httpClient.requestJson(createCommentRequest()));
 
@@ -121,13 +149,18 @@ describe('Ky HTTP client', () => {
     expect(failure.response.statusCode).toBe(403);
     assert(failure.response.githubMessage.isJust);
     expect(failure.response.githubMessage.value).toMatch(/secondary rate limit/);
-    expect(failure.response.retryAfter).toEqual(Maybe.just('0'));
+    expect(failure.response.retryAfter).toEqual(Maybe.nothing<string>());
+    expect(sleepDelays).toEqual([60_000, 120_000]);
+    expect(rateLimitMessages).toEqual([
+      'GitHub secondary rate limit reached; retrying in 60s · (attempt 1/2) · POST /repos/wireapp/wire-webapp/issues/7/comments',
+      'GitHub secondary rate limit reached; retrying in 120s · (attempt 2/2) · POST /repos/wireapp/wire-webapp/issues/7/comments',
+    ]);
   });
 
   it('retries an HTTP 429 response even when the response body has no GitHub message', async () => {
     let fetchCallCount = 0;
     const kyInstance = ky.create({
-      fetch: async (): Promise<Response> => {
+      async fetch() {
         fetchCallCount += 1;
         return new Response(JSON.stringify({details: 'release comment'}), {
           status: 429,
@@ -138,7 +171,7 @@ describe('Ky HTTP client', () => {
         });
       },
     });
-    const httpClient = createKyHttpClient({kyInstance});
+    const httpClient = createTestHttpClient(kyInstance);
 
     const failure = await readHttpRequestFailure(httpClient.requestJson(createCommentRequest()));
 
@@ -151,7 +184,7 @@ describe('Ky HTTP client', () => {
 
   it('retains valid fields while discarding malformed GitHub fields and unrelated response data', async () => {
     const kyInstance = ky.create({
-      fetch: async (): Promise<Response> => {
+      async fetch() {
         return new Response(
           JSON.stringify({
             message: 403,
@@ -170,7 +203,7 @@ describe('Ky HTTP client', () => {
         );
       },
     });
-    const httpClient = createKyHttpClient({kyInstance});
+    const httpClient = createTestHttpClient(kyInstance);
 
     const failure = await readHttpRequestFailure(httpClient.requestJson(createCommentRequest()));
 

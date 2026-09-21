@@ -159,7 +159,7 @@ async function executeRuntimeCommand(productionTagName: string): Promise<void> {
 
   const runtimeEnvironment = runtimeEnvironmentResult.value;
   const githubReleaseClient = createGitHubReleaseClient({
-    httpClient: createRuntimeKyHttpClient(),
+    httpClient: createRuntimeKyHttpClient({reportRateLimitWait: writeRuntimeOutput}),
     githubApiUrl: runtimeEnvironment.githubApiUrl,
     githubRepository: runtimeEnvironment.githubRepository,
     githubToken: runtimeEnvironment.githubToken,

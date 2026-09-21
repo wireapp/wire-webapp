@@ -17,12 +17,15 @@
  *
  */
 
-import {isNull, isObject, isString, isUndefined} from '@sindresorhus/is';
+import {isObject, isString} from '@sindresorhus/is';
 import ky, {isHTTPError} from 'ky';
-import type {KyInstance, Options, RetryOptions} from 'ky';
+import type {KyInstance, Options} from 'ky';
 import {Maybe} from 'true-myth';
 import {match} from 'ts-pattern';
 import {z} from 'zod';
+
+import {calculateGitHubRateLimitRetryDecision, maximumGitHubRateLimitRetries} from './githubRateLimitPolicy.ts';
+import type {GitHubRateLimitResponseMetadata} from './githubRateLimitPolicy.ts';
 
 export type HttpMethod = 'get' | 'post' | 'patch';
 
@@ -64,6 +67,13 @@ export type HttpRequestFailure =
 
 export type CreateKyHttpClientOptions = {
   readonly kyInstance: KyInstance;
+  readonly currentTimeMilliseconds: () => number;
+  readonly sleep: (delayMilliseconds: number) => Promise<void>;
+  readonly reportRateLimitWait: (message: string) => void;
+};
+
+export type CreateRuntimeKyHttpClientOptions = {
+  readonly reportRateLimitWait: (message: string) => void;
 };
 
 type ParsedGitHubFailureResponse = {
@@ -76,25 +86,10 @@ type CreateHttpRequestFailureOptions = {
   readonly request: HttpRequest;
 };
 
-const maximumRateLimitRetries = 2;
-const forbiddenHttpStatusCode = 403;
-const tooManyRequestsHttpStatusCode = 429;
-const internalServerErrorHttpStatusCode = 500;
-const badGatewayHttpStatusCode = 502;
-const serviceUnavailableHttpStatusCode = 503;
-const gatewayTimeoutHttpStatusCode = 504;
-const rateLimitRetryStatusCodes = [
-  forbiddenHttpStatusCode,
-  tooManyRequestsHttpStatusCode,
-  internalServerErrorHttpStatusCode,
-  badGatewayHttpStatusCode,
-  serviceUnavailableHttpStatusCode,
-  gatewayTimeoutHttpStatusCode,
-];
-const githubRateLimitMessagePattern = /\b(?:api|primary|secondary) rate limit\b|\brate limit exceeded\b/i;
+const millisecondsPerSecond = 1_000;
 
 function createMaybeString(value: string | undefined): Maybe<string> {
-  return isUndefined(value) ? Maybe.nothing<string>() : Maybe.just(value);
+  return Maybe.of(value);
 }
 
 const githubFailureResponseSchema = z
@@ -111,29 +106,50 @@ const githubFailureResponseSchema = z
 
 function readResponseHeader(response: Response, headerName: string): Maybe<string> {
   const headerValue = response.headers.get(headerName);
-  return isNull(headerValue) ? Maybe.nothing<string>() : Maybe.just(headerValue);
+  return Maybe.of(headerValue);
 }
 
 function readBearerToken(headers: Readonly<Record<string, string>>): Maybe<string> {
   const authorizationHeader = headers.Authorization;
-  if (isUndefined(authorizationHeader) || authorizationHeader.startsWith('Bearer ') === false) {
-    return Maybe.nothing<string>();
-  }
+  return Maybe.of(authorizationHeader).match({
+    Just(headerValue) {
+      if (!headerValue.startsWith('Bearer ')) {
+        return Maybe.nothing<string>();
+      }
 
-  return Maybe.just(authorizationHeader.slice('Bearer '.length));
+      return Maybe.just(headerValue.slice('Bearer '.length));
+    },
+    Nothing() {
+      return Maybe.nothing<string>();
+    },
+  });
 }
 
 function redactSecret(value: Maybe<string>, secret: Maybe<string>): Maybe<string> {
-  if (value.isNothing || secret.isNothing || secret.value.length === 0) {
-    return value;
-  }
+  return value.match({
+    Just(valueToRedact) {
+      return secret.match({
+        Just(secretValue) {
+          if (secretValue.length === 0) {
+            return Maybe.just(valueToRedact);
+          }
 
-  return Maybe.just(value.value.replaceAll(secret.value, '[REDACTED]'));
+          return Maybe.just(valueToRedact.replaceAll(secretValue, '[REDACTED]'));
+        },
+        Nothing() {
+          return Maybe.just(valueToRedact);
+        },
+      });
+    },
+    Nothing() {
+      return Maybe.nothing<string>();
+    },
+  });
 }
 
 function parseGitHubFailureResponse(responseBody: unknown, githubToken: Maybe<string>): ParsedGitHubFailureResponse {
   const validationResult = githubFailureResponseSchema.safeParse(responseBody);
-  if (validationResult.success === false) {
+  if (!validationResult.success) {
     return {
       githubMessage: Maybe.nothing<string>(),
       documentationUrl: Maybe.nothing<string>(),
@@ -180,7 +196,7 @@ function createHttpRequestFailure(
 }
 
 export function isHttpRequestFailure(error: unknown): error is HttpRequestFailure {
-  if (isObject(error) === false || 'kind' in error === false || isString(error.kind) === false) {
+  if (!isObject(error) || !('kind' in error) || !isString(error.kind)) {
     return false;
   }
 
@@ -201,67 +217,104 @@ export function formatHttpRequestFailure(failure: HttpRequestFailure): string {
         'GitHub API request failed',
         `HTTP status: ${responseFailure.response.statusCode}`,
         `Request: ${responseFailure.method.toUpperCase()} ${responseFailure.url.toString()}`,
+        ...responseFailure.response.githubMessage.match({
+          Just(githubMessage) {
+            return [`GitHub message: ${githubMessage}`];
+          },
+          Nothing() {
+            return [];
+          },
+        }),
+        ...responseFailure.response.documentationUrl.match({
+          Just(documentationUrl) {
+            return [`Documentation URL: ${documentationUrl}`];
+          },
+          Nothing() {
+            return [];
+          },
+        }),
+        ...responseFailure.response.githubRequestId.match({
+          Just(githubRequestId) {
+            return [`GitHub request ID: ${githubRequestId}`];
+          },
+          Nothing() {
+            return [];
+          },
+        }),
+        ...responseFailure.response.acceptedGithubPermissions.match({
+          Just(acceptedGithubPermissions) {
+            return [`Accepted GitHub permissions: ${acceptedGithubPermissions}`];
+          },
+          Nothing() {
+            return [];
+          },
+        }),
+        ...responseFailure.response.retryAfter.match({
+          Just(retryAfter) {
+            return [`Retry-After: ${retryAfter}`];
+          },
+          Nothing() {
+            return [];
+          },
+        }),
+        ...responseFailure.response.rateLimitRemaining.match({
+          Just(rateLimitRemaining) {
+            return [`Rate-limit remaining: ${rateLimitRemaining}`];
+          },
+          Nothing() {
+            return [];
+          },
+        }),
+        ...responseFailure.response.rateLimitReset.match({
+          Just(rateLimitReset) {
+            return [`Rate-limit reset: ${rateLimitReset}`];
+          },
+          Nothing() {
+            return [];
+          },
+        }),
       ];
-      if (responseFailure.response.githubMessage.isJust) {
-        diagnosticParts.push(`GitHub message: ${responseFailure.response.githubMessage.value}`);
-      }
-      if (responseFailure.response.documentationUrl.isJust) {
-        diagnosticParts.push(`Documentation URL: ${responseFailure.response.documentationUrl.value}`);
-      }
-      if (responseFailure.response.githubRequestId.isJust) {
-        diagnosticParts.push(`GitHub request ID: ${responseFailure.response.githubRequestId.value}`);
-      }
-      if (responseFailure.response.acceptedGithubPermissions.isJust) {
-        diagnosticParts.push(
-          `Accepted GitHub permissions: ${responseFailure.response.acceptedGithubPermissions.value}`,
-        );
-      }
-      if (responseFailure.response.retryAfter.isJust) {
-        diagnosticParts.push(`Retry-After: ${responseFailure.response.retryAfter.value}`);
-      }
-      if (responseFailure.response.rateLimitRemaining.isJust) {
-        diagnosticParts.push(`Rate-limit remaining: ${responseFailure.response.rateLimitRemaining.value}`);
-      }
-      if (responseFailure.response.rateLimitReset.isJust) {
-        diagnosticParts.push(`Rate-limit reset: ${responseFailure.response.rateLimitReset.value}`);
-      }
 
       return diagnosticParts.join('; ');
     })
     .exhaustive();
 }
 
-function isRateLimitFailure(failure: HttpRequestFailure): boolean {
-  if (failure.kind === 'http-transport-failure') {
-    return false;
-  }
-
-  if (failure.response.statusCode === tooManyRequestsHttpStatusCode || failure.response.retryAfter.isJust) {
-    return true;
-  }
-
-  return (
-    failure.response.githubMessage.isJust && githubRateLimitMessagePattern.test(failure.response.githubMessage.value)
-  );
-}
-
-function createRateLimitRetryOptions(request: HttpRequest): RetryOptions {
+function createGitHubRateLimitResponseMetadata(
+  response: GitHubResponseFailureDetails,
+): GitHubRateLimitResponseMetadata {
   return {
-    limit: maximumRateLimitRetries,
-    methods: [request.method],
-    statusCodes: rateLimitRetryStatusCodes,
-    afterStatusCodes: rateLimitRetryStatusCodes,
-    shouldRetry(retryState) {
-      const {error} = retryState;
-      const failure = createHttpRequestFailure({error, request});
-
-      return isRateLimitFailure(failure) ? undefined : false;
-    },
+    statusCode: response.statusCode,
+    githubMessage: response.githubMessage,
+    retryAfter: response.retryAfter,
+    rateLimitRemaining: response.rateLimitRemaining,
+    rateLimitReset: response.rateLimitReset,
   };
 }
 
+type FormatRateLimitRetryMessageOptions = {
+  readonly request: HttpRequest;
+  readonly retryAttempt: number;
+  readonly delayMilliseconds: number;
+  readonly rateLimitKind: 'primary' | 'secondary';
+};
+
+function formatRateLimitRetryDelay(delayMilliseconds: number): string {
+  const delaySeconds = delayMilliseconds / millisecondsPerSecond;
+
+  return Number.isInteger(delaySeconds) ? `${delaySeconds}s` : `${delaySeconds.toFixed(1)}s`;
+}
+
+function formatRateLimitRetryMessage(options: FormatRateLimitRetryMessageOptions): string {
+  return [
+    `GitHub ${options.rateLimitKind} rate limit reached; retrying in ${formatRateLimitRetryDelay(options.delayMilliseconds)}`,
+    `(attempt ${options.retryAttempt}/${maximumGitHubRateLimitRetries})`,
+    `${options.request.method.toUpperCase()} ${options.request.url.pathname}`,
+  ].join(' · ');
+}
+
 export function createKyHttpClient(createKyHttpClientOptions: CreateKyHttpClientOptions): HttpClient {
-  const {kyInstance} = createKyHttpClientOptions;
+  const {currentTimeMilliseconds, kyInstance, reportRateLimitWait, sleep} = createKyHttpClientOptions;
 
   return {
     async requestJson(request): Promise<unknown> {
@@ -271,24 +324,60 @@ export function createKyHttpClient(createKyHttpClientOptions: CreateKyHttpClient
             method: request.method,
             headers: request.headers,
             json,
-            retry: createRateLimitRetryOptions(request),
+            retry: 0,
           };
         })
         .unwrapOr({
           method: request.method,
           headers: request.headers,
-          retry: createRateLimitRetryOptions(request),
+          retry: 0,
         });
 
-      try {
-        return await kyInstance(request.url, requestOptions).json<unknown>();
-      } catch (error: unknown) {
-        throw createHttpRequestFailure({error, request});
+      for (let retryAttempt = 1; ; retryAttempt += 1) {
+        try {
+          return await kyInstance(request.url, requestOptions).json<unknown>();
+        } catch (error: unknown) {
+          const failure = createHttpRequestFailure({error, request});
+          if (failure.kind === 'http-response-failure') {
+            const retryDecision = calculateGitHubRateLimitRetryDecision({
+              response: createGitHubRateLimitResponseMetadata(failure.response),
+              retryAttempt,
+              currentTimeMilliseconds: currentTimeMilliseconds(),
+            });
+            if (retryDecision.kind === 'retry') {
+              reportRateLimitWait(
+                formatRateLimitRetryMessage({
+                  request,
+                  retryAttempt,
+                  delayMilliseconds: retryDecision.delayMilliseconds,
+                  rateLimitKind: retryDecision.rateLimitKind,
+                }),
+              );
+              await sleep(retryDecision.delayMilliseconds);
+              continue;
+            }
+          }
+
+          throw failure;
+        }
       }
     },
   };
 }
 
-export function createRuntimeKyHttpClient(): HttpClient {
-  return createKyHttpClient({kyInstance: ky});
+function sleepForRateLimitRetry(delayMilliseconds: number): Promise<void> {
+  return new Promise<void>(resolvePromise => {
+    setTimeout(resolvePromise, delayMilliseconds);
+  });
+}
+
+export function createRuntimeKyHttpClient(
+  createRuntimeKyHttpClientOptions: CreateRuntimeKyHttpClientOptions,
+): HttpClient {
+  return createKyHttpClient({
+    kyInstance: ky,
+    currentTimeMilliseconds: Date.now,
+    sleep: sleepForRateLimitRetry,
+    reportRateLimitWait: createRuntimeKyHttpClientOptions.reportRateLimitWait,
+  });
 }

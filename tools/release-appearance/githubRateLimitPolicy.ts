@@ -224,11 +224,11 @@ export function calculateGitHubRateLimitRetryDecision(
     response,
     currentTimeMilliseconds,
   );
-  const rateLimitKind = primaryRateLimitDelayMilliseconds.match({
-    Just(): 'primary' {
+  const rateLimitKind: 'primary' | 'secondary' = primaryRateLimitDelayMilliseconds.match({
+    Just() {
       return 'primary';
     },
-    Nothing(): 'secondary' {
+    Nothing() {
       return 'secondary';
     },
   });
