@@ -21,8 +21,8 @@ import {UserState} from 'Repositories/user/userState';
 
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';
-import {NoAudioInputError} from "../../error/noAudioInputError";
-import {MEDIA_STREAM_ERROR} from "Repositories/media/MediaStreamError";
+import {NoAudioInputError} from '../../error/noAudioInputError';
+import {MEDIA_STREAM_ERROR} from 'Repositories/media/MediaStreamError';
 
 describe('MediaStreamHandler', () => {
   let streamHandler: MediaStreamHandler;
@@ -79,9 +79,9 @@ describe('MediaStreamHandler', () => {
 
       spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.reject(error));
 
-      await expect(
-        streamHandler.requestMediaStream(true, false, false, true),
-      ).rejects.toBeInstanceOf(NoAudioInputError);
+      await expect(streamHandler.requestMediaStream(true, false, false, true)).rejects.toBeInstanceOf(
+        NoAudioInputError,
+      );
     });
   });
 });

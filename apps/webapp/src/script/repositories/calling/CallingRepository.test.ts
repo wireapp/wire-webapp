@@ -79,7 +79,7 @@ import {Translate} from 'Util/localizerUtil';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {NoAudioInputError} from "../../error/noAudioInputError";
+import {NoAudioInputError} from '../../error/noAudioInputError';
 
 type AudioFlowStat = {
   bytesReceived?: number;
@@ -539,9 +539,7 @@ describe('CallingRepository', () => {
 
       jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
 
-      jest
-        .spyOn(callingRepository as any, 'acquireCallMedia')
-        .mockRejectedValue(new Error('Camera unavailable'));
+      jest.spyOn(callingRepository as any, 'acquireCallMedia').mockRejectedValue(new Error('Camera unavailable'));
 
       const answerSpy = jest.spyOn(wCall, 'answer');
 
@@ -575,13 +573,9 @@ describe('CallingRepository', () => {
         .spyOn(callingRepository as any, 'acquireCallMedia')
         .mockRejectedValue(new NoAudioInputError(new Error('Microphone unavailable')));
 
-      const audioModalSpy = jest
-        .spyOn(callingRepository as any, 'showNoAudioInputModal')
-        .mockImplementation();
+      const audioModalSpy = jest.spyOn(callingRepository as any, 'showNoAudioInputModal').mockImplementation();
 
-      const cameraModalSpy = jest
-        .spyOn(callingRepository as any, 'showNoCameraModal')
-        .mockImplementation();
+      const cameraModalSpy = jest.spyOn(callingRepository as any, 'showNoCameraModal').mockImplementation();
 
       callingRepository['conversationState'].conversations.push(conversation);
       callingRepository['callState'].calls([incomingCall]);
@@ -735,9 +729,7 @@ describe('CallingRepository', () => {
 
       jest.spyOn(callingRepository, 'findCall').mockReturnValue(call);
 
-      const queries = [1, 2, 3, 4].map(() =>
-        callingRepository['getCallMediaStream']('', true, false, false),
-      );
+      const queries = [1, 2, 3, 4].map(() => callingRepository['getCallMediaStream']('', true, false, false));
 
       const mediaStreams = await Promise.all(queries);
 
@@ -798,20 +790,13 @@ describe('CallingRepository', () => {
       const audioTrack = audioSource.createTrack();
       const requestedStream = new MediaStream([audioTrack]);
 
-      jest
-        .spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream')
-        .mockResolvedValue(requestedStream);
+      jest.spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').mockResolvedValue(requestedStream);
 
       jest.spyOn(callingRepository, 'findCall').mockReturnValue(call);
 
       const mediaStream = await callingRepository['getCallMediaStream']('', true, true, false);
 
-      expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(
-        true,
-        false,
-        false,
-        true,
-      );
+      expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(true, false, false, true);
 
       expect(mediaStream.getAudioTracks()[0]).toBe(audioTrack);
       expect(mediaStream.getVideoTracks()[0]).toBe(videoTrack);
@@ -839,9 +824,7 @@ describe('CallingRepository', () => {
       const videoTrack = videoSource.createTrack();
       const requestedStream = new MediaStream([videoTrack]);
 
-      jest
-        .spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream')
-        .mockResolvedValue(requestedStream);
+      jest.spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').mockResolvedValue(requestedStream);
 
       jest.spyOn(callingRepository, 'findCall').mockReturnValue(call);
 
@@ -855,12 +838,7 @@ describe('CallingRepository', () => {
 
       const mediaStream = await callingRepository['getCallMediaStream']('', true, true, false);
 
-      expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(
-        false,
-        true,
-        false,
-        true,
-      );
+      expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledWith(false, true, false, true);
 
       expect(mediaStream.getAudioTracks()[0]).toBe(audioTrack);
       expect(mediaStream.getVideoTracks()[0]).toBe(videoTrack);
@@ -1887,10 +1865,7 @@ describe('central acquire call media flow', () => {
       activeCall.isGroupOrConference,
     );
 
-    expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(
-      stream,
-      true,
-    );
+    expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(stream, true);
 
     expect(result).toBe(selfParticipant.getMediaStream());
     audioTrack.stop();
@@ -1906,12 +1881,11 @@ describe('central acquire call media flow', () => {
     const applyBackgroundEffectSpy = jest
       .spyOn(
         repositoryTestApi as unknown as {
-          applyCurrentBackgroundEffectOnSelfParticipant(
-            stream: MediaStream,
-          ): Promise<MediaStream | void>;
+          applyCurrentBackgroundEffectOnSelfParticipant(stream: MediaStream): Promise<MediaStream | void>;
         },
         'applyCurrentBackgroundEffectOnSelfParticipant',
-      ).mockResolvedValue(stream);
+      )
+      .mockResolvedValue(stream);
 
     await repositoryTestApi.acquireCallMedia(activeCall, {
       camera: true,
@@ -1939,10 +1913,7 @@ describe('central acquire call media flow', () => {
 
     expect(applyBackgroundEffectSpy).not.toHaveBeenCalled();
 
-    expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(
-      stream,
-      true,
-    );
+    expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(stream, true);
     audioTrack.stop();
   });
 
@@ -1987,13 +1958,11 @@ describe('central acquire call media flow', () => {
 
     let resolveMediaStream: (stream: MediaStream) => void = () => null;
 
-    jest
-      .spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream')
-      .mockReturnValue(
-        new Promise(resolve => {
-          resolveMediaStream = resolve;
-        }),
-      );
+    jest.spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').mockReturnValue(
+      new Promise(resolve => {
+        resolveMediaStream = resolve;
+      }),
+    );
 
     const stopSpy = jest.spyOn(audioTrack, 'stop');
     const updateMediaStreamSpy = jest.spyOn(selfParticipant, 'updateMediaStream');
@@ -2044,9 +2013,7 @@ describe('central acquire call media flow', () => {
           }),
       );
 
-    jest
-      .spyOn(callingRepository['mediaDevicesHandler'], 'initializeMediaDevices')
-      .mockResolvedValue(undefined);
+    jest.spyOn(callingRepository['mediaDevicesHandler'], 'initializeMediaDevices').mockResolvedValue(undefined);
 
     // Start two acquisitions before the first one has finished.
     const firstRequest = callingRepository['acquireCallMedia'](activeCall, {
@@ -2062,10 +2029,7 @@ describe('central acquire call media flow', () => {
 
     resolveMediaStream(mediaStream);
 
-    const [firstStream, secondStream] = await Promise.all([
-      firstRequest,
-      secondRequest,
-    ]);
+    const [firstStream, secondStream] = await Promise.all([firstRequest, secondRequest]);
 
     // The second request must reuse the media acquired by the first request.
     expect(requestMediaStreamSpy).toHaveBeenCalledTimes(1);
@@ -2111,9 +2075,7 @@ describe('central acquire call media flow', () => {
       .spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream')
       .mockResolvedValue(new MediaStream([videoTrack]));
 
-    jest
-      .spyOn(callingRepository['mediaDevicesHandler'], 'initializeMediaDevices')
-      .mockResolvedValue(undefined);
+    jest.spyOn(callingRepository['mediaDevicesHandler'], 'initializeMediaDevices').mockResolvedValue(undefined);
 
     await callingRepository['acquireCallMedia'](activeCall, {
       audio: true,
@@ -2141,9 +2103,7 @@ describe('central acquire call media flow', () => {
     const audioTrack = audioSource.createTrack();
     const acquiredStream = new MediaStream([audioTrack]);
 
-    const getMediaStreamSpy = jest
-      .spyOn(callingRepository as any, 'getMediaStream')
-      .mockResolvedValue(acquiredStream);
+    const getMediaStreamSpy = jest.spyOn(callingRepository as any, 'getMediaStream').mockResolvedValue(acquiredStream);
 
     selfParticipant.updateMediaStream = jest.fn((stream: MediaStream) => {
       if (stream.getAudioTracks().length > 0) {
@@ -2216,9 +2176,7 @@ describe('central acquire call media flow', () => {
       )
       .mockResolvedValueOnce(new MediaStream([videoTrack]));
 
-    jest
-      .spyOn(callingRepository['mediaDevicesHandler'], 'initializeMediaDevices')
-      .mockResolvedValue(undefined);
+    jest.spyOn(callingRepository['mediaDevicesHandler'], 'initializeMediaDevices').mockResolvedValue(undefined);
 
     const audioRequest = callingRepository['acquireCallMedia'](activeCall, {
       audio: true,
@@ -2265,14 +2223,12 @@ describe('central acquire call media flow', () => {
 
     let resolveMediaStream: (stream: MediaStream) => void = () => null;
 
-    jest
-      .spyOn(callingRepository as any, 'getMediaStream')
-      .mockImplementation(
-        () =>
-          new Promise<MediaStream>(resolve => {
-            resolveMediaStream = resolve;
-          }),
-      );
+    jest.spyOn(callingRepository as any, 'getMediaStream').mockImplementation(
+      () =>
+        new Promise<MediaStream>(resolve => {
+          resolveMediaStream = resolve;
+        }),
+    );
 
     const request = callingRepository['acquireCallMedia'](activeCall, {
       audio: true,
@@ -2314,9 +2270,7 @@ describe('central acquire call media flow', () => {
       .mockResolvedValueOnce(audioStream)
       .mockResolvedValueOnce(cameraStream);
 
-    jest
-      .spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant')
-      .mockResolvedValue(undefined);
+    jest.spyOn(callingRepository as any, 'applyCurrentBackgroundEffectOnSelfParticipant').mockResolvedValue(undefined);
 
     selfParticipant.audioStream(undefined);
     selfParticipant.videoStream(undefined);
@@ -2328,17 +2282,9 @@ describe('central acquire call media flow', () => {
 
     expect(getMediaStreamSpy).toHaveBeenCalledTimes(2);
 
-    expect(getMediaStreamSpy).toHaveBeenNthCalledWith(
-      1,
-      {audio: true},
-      activeCall.isGroupOrConference,
-    );
+    expect(getMediaStreamSpy).toHaveBeenNthCalledWith(1, {audio: true}, activeCall.isGroupOrConference);
 
-    expect(getMediaStreamSpy).toHaveBeenNthCalledWith(
-      2,
-      {camera: true},
-      activeCall.isGroupOrConference,
-    );
+    expect(getMediaStreamSpy).toHaveBeenNthCalledWith(2, {camera: true}, activeCall.isGroupOrConference);
   });
 
   it('keeps acquired audio when camera acquisition fails', async () => {
@@ -2360,22 +2306,11 @@ describe('central acquire call media flow', () => {
       }),
     ).rejects.toBe(cameraError);
 
-    expect(getMediaStreamSpy).toHaveBeenNthCalledWith(
-      1,
-      {audio: true},
-      activeCall.isGroupOrConference,
-    );
+    expect(getMediaStreamSpy).toHaveBeenNthCalledWith(1, {audio: true}, activeCall.isGroupOrConference);
 
-    expect(getMediaStreamSpy).toHaveBeenNthCalledWith(
-      2,
-      {camera: true},
-      activeCall.isGroupOrConference,
-    );
+    expect(getMediaStreamSpy).toHaveBeenNthCalledWith(2, {camera: true}, activeCall.isGroupOrConference);
 
-    expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(
-      audioStream,
-      true,
-    );
+    expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(audioStream, true);
   });
 });
 
