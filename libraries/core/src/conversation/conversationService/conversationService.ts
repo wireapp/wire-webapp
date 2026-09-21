@@ -684,11 +684,11 @@ export class ConversationService extends TypedEventEmitter<Events> {
           qualifiedConversationId: conversation.qualified_id,
           groupId,
         },
-        callBack: async () => {
-          // Surface the ORIGINAL error to the orchestrator for mapping & policy resolution
-          // Deliberately throwing the raw value so mapper can recognize core-crypto/API error shapes
-          throw error;
-        },
+        // The failure arrives out of band, so hand the raw error to the orchestrator for mapping and
+        // policy resolution. The callback is the real operation, so it can be re-run once the
+        // recovery action has re-synced the epoch.
+        seedError: error,
+        callBack: () => this.mlsService.updateKeyingMaterialForConversation(groupId),
       });
     } catch (error: unknown) {
       this.logger.error('Failed to react to key material update failure', {error, groupId});
