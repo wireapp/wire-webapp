@@ -820,6 +820,7 @@
   "conversationHistoryText": "Select a period. When participants join this channel, they can follow the history for this time frame.",
   "conversationHistoryTitle": "Conversation history",
   "conversationImageAssetRestricted": "Receiving images is prohibited",
+  "conversationImageAssetRetry": "Retry",
   "conversationInternalEnvironmentDisclaimer": "This is NOT WIRE but an internal testing environment. Authorized for use by Wire employees only. Any public USE is PROHIBITED. The data of the users of this test environment is extensively recorded and analysed. To use the secure messenger Wire, please visit [link]{url}[/link]",
   "conversationJoin.existentAccountJoinInBrowser": "Join in the browser",
   "conversationJoin.existentAccountJoinWithoutLink": "Prisijungti prie susirašinėjimo",

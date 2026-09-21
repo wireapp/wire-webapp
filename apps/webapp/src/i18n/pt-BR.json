@@ -820,6 +820,7 @@
   "conversationHistoryText": "Selecione um período. Quando os participantes entram neste canal, eles podem seguir o histórico a partir deste período de tempo.",
   "conversationHistoryTitle": "Histórico de conversas",
   "conversationImageAssetRestricted": "Receber imagens é proibido",
+  "conversationImageAssetRetry": "Retry",
   "conversationInternalEnvironmentDisclaimer": "This is NOT WIRE but an internal testing environment. Authorized for use by Wire employees only. Any public USE is PROHIBITED. The data of the users of this test environment is extensively recorded and analysed. To use the secure messenger Wire, please visit [link]{url}[/link]",
   "conversationJoin.existentAccountJoinInBrowser": "Join in the browser",
   "conversationJoin.existentAccountJoinWithoutLink": "Entrar na conversa",
