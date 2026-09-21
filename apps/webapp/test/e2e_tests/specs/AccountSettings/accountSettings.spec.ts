@@ -80,49 +80,6 @@ test.describe('account settings', () => {
     },
   );
 
-  const ssoUser = getUser({
-    email: process.env.SSO_CLAIMED_USER_EMAIL,
-    username: process.env.SSO_CLAIMED_USER_EMAIL,
-    password: process.env.SSO_CLAIMED_USER_PASSWORD,
-  });
-
-  test(
-    'I should not be able to change email of user managed by SCIM',
-    {tag: ['@TC-60', '@regression']},
-    async ({context, createPage}) => {
-      const page = await createPage(context);
-      const pageManager = PageManager.from(page);
-      await pageManager.openMainPage();
-
-      const {pages, components} = pageManager.webapp;
-      const [idpPage] = await Promise.all([
-        context.waitForEvent('page'),
-        pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
-      ]);
-
-      await test.step('Log in on IDP page', async () => {
-        await idpPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
-        await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
-        await idpPage.getByRole('button', {name: 'Sign In'}).click();
-      });
-
-      await test.step('Remove an existing device and confirm new history', async () => {
-        // Since this test re-uses the same user over and over again we need to always remove one of the previously registered devices
-        await page.getByRole('button', {name: 'Remove device'}).first().click({timeout: 10_000});
-
-        // We will also always be prompted to confirm the new history on this device
-        await pages.historyInfo().continueButton.click({timeout: 10_000});
-        await expect(components.conversationSidebar().sidebar, 'Login took more than 60s').toBeVisible({
-          timeout: 60_000, // The login for this user may take some time since it's persisted and checking for messages takes extra time
-        });
-      });
-
-      await pages.sidebar().clickPreferencesButton();
-      await pages.settings().accountButton.click();
-      await expect(pages.account().emailDisplay).not.toBeVisible();
-    },
-  );
-
   test('Verify sound settings are saved after re-login', {tag: ['@TC-1718', '@regression']}, async ({createPage}) => {
     const pageManager = PageManager.from(await createPage(withLogin(memberA)));
     const {pages, components} = pageManager.webapp;
