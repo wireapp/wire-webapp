@@ -39,6 +39,7 @@ import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/meeting
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
+import {formatTimeShort} from 'Util/timeUtil';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
@@ -111,6 +112,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const reminderOsNotifier = createMeetingReminderOsNotifier({
       notificationApi: createBrowserMeetingReminderNotificationApi(),
       openMeetingsList: () => mainViewModel.list.openMeetingsList(),
+      formatMeetingTime: formatTimeShort,
       translate,
       logger,
     });

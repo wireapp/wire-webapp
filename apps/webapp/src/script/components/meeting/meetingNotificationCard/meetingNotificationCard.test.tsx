@@ -56,7 +56,9 @@ const translateForNotificationTest: Translate = (key, substitutions) =>
       ? `By ${substitutions?.organizer}`
       : key === 'meetings.meetingStatus.startedAt'
         ? `Started at ${substitutions?.time}`
-        : key;
+        : key === 'meetings.notifications.startsAt'
+          ? `Starts at ${substitutions?.time}`
+          : key;
 const mainViewModel = {
   content: {repositories: {conversation: {}, calling: {}}},
   calling: {callActions: {answer: jest.fn(), startAudio: jest.fn()}},
@@ -166,7 +168,7 @@ describe('MeetingNotificationCard', () => {
 
     if (notification.kind === MeetingNotificationKind.REMINDER) {
       expect(card).toHaveTextContent('By creator-id');
-      expect(card).toHaveTextContent('meetings.notifications.startsIn10Minutes');
+      expect(card).toHaveTextContent(`Starts at ${formatLocale(meetingStartTime, 'p')}`);
     }
 
     if (notification.kind === MeetingNotificationKind.CANCELLED) {

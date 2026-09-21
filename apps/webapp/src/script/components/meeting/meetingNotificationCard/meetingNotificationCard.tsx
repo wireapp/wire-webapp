@@ -30,7 +30,7 @@ import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
-import {formatLocale} from 'Util/timeUtil';
+import {formatLocale, formatTimeShort} from 'Util/timeUtil';
 
 import {
   meetingNotificationCardActionsStyles,
@@ -105,7 +105,6 @@ const getOrganizer = (qualifiedCreator: QualifiedId) =>
     ?.name() ?? qualifiedCreator.id;
 
 const getMeetingTime = (meetingStartTime: string) => formatLocale(meetingStartTime, 'PP, p');
-const getMeetingTimeOnly = (meetingStartTime: string) => formatLocale(meetingStartTime, 'p');
 
 const MeetingNotificationOrganizerAndTimeMetadata = ({
   qualifiedCreator,
@@ -154,7 +153,7 @@ const MeetingNotificationMetadata = ({
     )
     .with({kind: MeetingNotificationKind.ONGOING}, ({qualifiedCreator, meetingStartTime}) => {
       const organizer = getOrganizer(qualifiedCreator);
-      const meetingTime = getMeetingTimeOnly(meetingStartTime);
+      const meetingTime = formatTimeShort(meetingStartTime);
 
       return (
         <>
@@ -166,14 +165,15 @@ const MeetingNotificationMetadata = ({
         </>
       );
     })
-    .with({kind: MeetingNotificationKind.REMINDER}, ({qualifiedCreator}) => {
+    .with({kind: MeetingNotificationKind.REMINDER}, ({qualifiedCreator, meetingStartTime}) => {
       const organizer = getOrganizer(qualifiedCreator);
+      const meetingTime = formatTimeShort(meetingStartTime);
 
       return (
         <>
           {translate('meetings.notifications.by', {organizer}, undefined, true)}
           {organizer && <span aria-hidden="true"> • </span>}
-          {translate('meetings.notifications.startsIn10Minutes')}
+          {translate('meetings.notifications.startsAt', {time: meetingTime})}
         </>
       );
     })

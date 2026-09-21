@@ -39,8 +39,13 @@ const createPayload = (overrides: Partial<MeetingReminderFirePayload> = {}): Mee
   ...overrides,
 });
 
-const translate = ((identifier: string) =>
-  identifier === 'meetings.notifications.startsIn10Minutes' ? 'Starts in 10 minutes' : identifier) as Translate;
+const translate = ((identifier: string, substitutions?: Record<string, string>) =>
+  identifier === 'meetings.notifications.startsAt'
+    ? `Starts at ${substitutions?.time}`
+    : identifier) as Translate;
+
+const formatMeetingTime = (meetingStartTime: string): string =>
+  meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
 
 const createHarness = (apiOverrides: Partial<MeetingReminderNotificationApi> = {}) => {
   const requests: MeetingReminderNotificationRequest[] = [];
@@ -65,6 +70,7 @@ const createHarness = (apiOverrides: Partial<MeetingReminderNotificationApi> = {
       ...apiOverrides,
     },
     openMeetingsList,
+    formatMeetingTime,
     translate,
     logger,
   });
@@ -73,14 +79,14 @@ const createHarness = (apiOverrides: Partial<MeetingReminderNotificationApi> = {
 };
 
 describe('createMeetingReminderOsNotifier', () => {
-  it('presents a notification naming the meeting and stating it starts in 10 minutes', () => {
+  it('presents a notification naming the meeting and its start time', () => {
     const {requests, notifier} = createHarness();
 
     notifier.notify(createPayload());
 
     expect(requests).toHaveLength(1);
     expect(requests[0].title).toBe('Weekly sync');
-    expect(requests[0].body).toBe('Starts in 10 minutes');
+    expect(requests[0].body).toBe('Starts at 12:00 PM');
   });
 
   it('attaches neither action buttons nor a Wire sound file', () => {

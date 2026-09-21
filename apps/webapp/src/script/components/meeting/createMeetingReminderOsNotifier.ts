@@ -69,6 +69,7 @@ export type MeetingReminderNotificationApi = {
 export type CreateMeetingReminderOsNotifierDependencies = {
   notificationApi: MeetingReminderNotificationApi;
   openMeetingsList: () => void;
+  formatMeetingTime: (meetingStartTime: string) => string;
   translate: Translate;
   logger: MeetingReminderOsNotifierLogger;
 };
@@ -94,6 +95,7 @@ export const toMeetingReminderNotificationTag = (payload: MeetingReminderFirePay
 export const createMeetingReminderOsNotifier = ({
   notificationApi,
   openMeetingsList,
+  formatMeetingTime,
   translate,
   logger,
 }: CreateMeetingReminderOsNotifierDependencies): MeetingReminderOsNotifier => {
@@ -126,7 +128,7 @@ export const createMeetingReminderOsNotifier = ({
       const tag = toMeetingReminderNotificationTag(payload);
       const shownNotification = notificationApi.show({
         title: payload.meetingTitle,
-        body: translate('meetings.notifications.startsIn10Minutes'),
+        body: translate('meetings.notifications.startsAt', {time: formatMeetingTime(payload.meetingStartTime)}),
         tag,
         onClick: () => {
           // WPB-28121 will additionally open the meeting prep modal from here. Until it ships,
