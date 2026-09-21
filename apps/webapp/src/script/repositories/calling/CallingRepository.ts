@@ -1352,6 +1352,22 @@ export class CallingRepository {
       // Temporary feature to toggle Rust SFT
       this.setSetupSftConfig(call);
 
+      // Microphone access is required to start a call.
+      try {
+        await this.acquireCallMedia(call, {audio: true});
+      } catch (error: unknown) {
+        if (error instanceof NoAudioInputError) {
+          this.showNoAudioInputModal();
+
+          call.state(CALL_STATE.NONE);
+          this.removeCall(call);
+
+          return;
+        }
+
+        throw error;
+      }
+
       if (this.isMLSConference(conversation)) {
         call.epochCache.enable();
         await this.joinMlsConferenceSubconversation(conversation);

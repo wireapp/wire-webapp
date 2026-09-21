@@ -318,9 +318,13 @@ describe('CallingRepository', () => {
   });
 
   describe('startCall', () => {
+    let acquireCallMediaSpy: jest.SpyInstance<Promise<MediaStream>>;
     beforeEach(() => {
       const subscribeToEpochUpdates = jest.mocked(getSubconversationServiceForTest().subscribeToEpochUpdates);
       subscribeToEpochUpdates?.mockClear();
+      acquireCallMediaSpy = jest
+        .spyOn(callingRepository as any, 'acquireCallMedia')
+        .mockResolvedValue(new MediaStream());
     });
 
     it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS])(
@@ -415,6 +419,34 @@ describe('CallingRepository', () => {
       await callingRepository.startCall(mlsConversation);
 
       expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
+    });
+
+    it('does not start a call when microphone acquisition fails', async () => {
+      const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.PROTEUS);
+
+      acquireCallMediaSpy.mockRejectedValueOnce(new NoAudioInputError(new Error('Microphone unavailable')));
+
+      const startSpy = jest.spyOn(wCall, 'start');
+
+      await callingRepository.startCall(conversation);
+
+      expect(startSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not start a call and shows microphone error when microphone acquisition fails', async () => {
+      const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.PROTEUS);
+
+      acquireCallMediaSpy.mockRejectedValueOnce(new NoAudioInputError(new Error('Microphone unavailable')));
+
+      const startSpy = jest.spyOn(wCall, 'start');
+      const audioModalSpy = jest.spyOn(callingRepository as any, 'showNoAudioInputModal').mockImplementation();
+      const cameraModalSpy = jest.spyOn(callingRepository as any, 'showNoCameraModal').mockImplementation();
+
+      await callingRepository.startCall(conversation);
+
+      expect(startSpy).not.toHaveBeenCalled();
+      expect(audioModalSpy).toHaveBeenCalled();
+      expect(cameraModalSpy).not.toHaveBeenCalled();
     });
   });
 
