@@ -21,7 +21,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -35,7 +35,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger, Logger} from 'Util/logger';
 
-import {getImageStyle, getWrapperStyles} from './image.styles';
+import {failedWrapperStyles, getImageStyle, getWrapperStyles} from './image.styles';
 import {RestrictedImage} from './restrictedImage';
 
 import {Config} from '../../Config';
@@ -246,6 +246,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   let imageTabIndex: number | undefined;
   let imageStatus: ImageLoadState | 'error' = imageLoadState;
   let imageUieName = 'image-loader';
+  let imageWrapperStyles: CSSObject = getWrapperStyles(isImageDetailInteractive);
 
   if (isFailed === false) {
     imageRole = role;
@@ -258,6 +259,14 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
 
   if (isLoaded === true) {
     imageUieName = 'image-asset-img';
+  }
+
+  if (isUndefined(css) === false) {
+    imageWrapperStyles = css;
+  }
+
+  if (isFailed === true) {
+    imageWrapperStyles = {...imageWrapperStyles, ...failedWrapperStyles};
   }
 
   function handleImageVisible(): void {
@@ -297,7 +306,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   }
 
   function renderImageContent(): React.ReactNode {
-    if (isFailed === true && isUndefined(retryLabel) === false) {
+    if (isFailed === true && isNonEmptyString(retryLabel)) {
       return (
         <Button
           aria-label={retryLabel}
@@ -337,7 +346,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
       data-uie-name={dataUieName}
       data-uie-visible={dataUieVisible}
       data-uie-status={imageStatus}
-      css={css ?? getWrapperStyles(isImageDetailInteractive)}
+      css={imageWrapperStyles}
     >
       {renderImageContent()}
     </InViewport>

@@ -26,6 +26,14 @@ export function getWrapperStyles(interactive: boolean) {
   };
 }
 
+export const failedWrapperStyles: CSSObject = {
+  alignItems: 'center',
+  display: 'flex',
+  height: '100%',
+  justifyContent: 'center',
+  width: '100%',
+};
+
 export function getImageStyle(sizes: {ratio: number; width: string} | undefined): CSSObject {
   return {
     aspectRatio: `${sizes?.ratio}`,
