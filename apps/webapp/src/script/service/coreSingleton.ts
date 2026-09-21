@@ -50,6 +50,8 @@ export class Core extends Account {
         this.key = key;
         return createStorageEngine(storeName, DatabaseTypes.PERMANENT, {
           key: ENABLE_ENCRYPTION_AT_REST ? key : undefined,
+          // Ask the browser to treat the local database as persistent so that it is not evicted under storage pressure.
+          requestPersistentStorage: true,
         });
       },
 
