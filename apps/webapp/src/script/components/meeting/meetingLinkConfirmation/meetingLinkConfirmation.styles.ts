@@ -17,12 +17,16 @@
  *
  */
 
-import type {TranslationKey} from 'Util/localizerUtil';
+export const meetingLinkConfirmationStyles = {
+  display: 'flex',
+  gap: '8px',
+  marginTop: '32px',
+  // There is no way to remove padding from modal_text,
+  // so we need this negative padding to align the buttons with the modal footer,
+  marginBottom: '-50px',
+  justifyContent: 'flex-end',
+};
 
-export const MEETING_ACTION_TRANSLATION_KEYS = {
-  joinNow: 'meetings.action.joinNow',
-  deleteMeetingForAll: 'meetings.action.deleteMeetingForAll',
-  deleteMeetingForMe: 'meetings.action.deleteMeetingForMe',
-  editMeeting: 'meetings.action.editMeeting',
-  meetingLink: 'meetings.action.meetingLink',
-} as const satisfies Record<string, TranslationKey>;
+export const meetingLinkActionsButtonsStyles = {
+  marginBottom: '16px',
+};

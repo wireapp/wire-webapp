@@ -27,6 +27,7 @@ import {maybe, task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
+import * as MeetingLinkConfirmation from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -169,6 +170,33 @@ describe('useScheduleMeetingSubmit', () => {
     expect(submitResult).toBe(scheduleMeetingSubmitResults.succeeded);
     expect(scheduleMeeting).toHaveBeenCalledWith(scheduleCommand);
     expect(loadMeetings).not.toHaveBeenCalled();
+  });
+
+  it('shows the unavailable host message when meeting-link generation fails', async () => {
+    const showMeetingLinkConfirmation = jest.spyOn(MeetingLinkConfirmation, 'showMeetingLinkConfirmation');
+    const scheduleMeeting = jest.fn().mockReturnValue(
+      task.resolve({
+        failedToAdd: [],
+        qualifiedConversation: {id: 'conversation-id', domain: 'example.com'},
+        meetingLinkGenerationFailed: true,
+      }),
+    );
+    const store = createMeetingStore({scheduleMeeting});
+
+    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+
+    await act(async () => {
+      await result.current.submit(formState);
+    });
+
+    expect(showMeetingLinkConfirmation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meetingLinkUnavailable: true,
+        meetingLinkUnavailableForHost: true,
+        retryMeetingLink: expect.any(Function),
+        translate: translateForTest,
+      }),
+    );
   });
 
   it('returns setupFailed and refreshes meetings after a partial create failure', async () => {

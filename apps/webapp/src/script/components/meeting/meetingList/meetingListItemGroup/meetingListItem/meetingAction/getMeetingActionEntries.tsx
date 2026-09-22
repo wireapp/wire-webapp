@@ -17,7 +17,7 @@
  *
  */
 
-import {CallIcon, EditIcon, TrashIcon} from '@wireapp/react-ui-kit';
+import {CallIcon, EditIcon, LinkIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
 import {
   contextMenuDangerItemIconStyles,
@@ -42,6 +42,7 @@ type GetMeetingActionEntriesParams = {
   onEdit: () => void;
   onDeleteForAll: () => void;
   onDeleteForMe: () => void;
+  onMeetingLink?: () => void;
 };
 
 export const getMeetingActionEntries = ({
@@ -54,6 +55,7 @@ export const getMeetingActionEntries = ({
   onEdit,
   onDeleteForAll,
   onDeleteForMe,
+  onMeetingLink,
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
   const joinEntry: ContextMenuEntry = {
     icon: () => <CallIcon css={isJoinDisabled ? contextMenuDisabledItemIconStyles : undefined} />,
@@ -82,11 +84,18 @@ export const getMeetingActionEntries = ({
     click: onDeleteForAll,
   };
 
+  const meetingLinkEntry: ContextMenuEntry = {
+    icon: () => <LinkIcon />,
+    label: translate(MEETING_ACTION_TRANSLATION_KEYS.meetingLink),
+    click: onMeetingLink,
+  };
+
   const showDeleteForAll = canDeleteMeetingForAll(meetingInstance, selfUser);
   const showDeleteForMe = canDeleteMeetingForMe(meetingInstance, selfUser);
 
   return [
     joinEntry,
+    meetingLinkEntry,
     ...(canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
     ...(showDeleteForAll ? [deleteForAllEntry] : []),
     ...(showDeleteForMe ? [deleteForMeEntry] : []),

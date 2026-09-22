@@ -37,6 +37,7 @@ import {
 } from 'Components/meeting/shared/styles/meetingModalShell.styles';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {UserState} from 'Repositories/user/userState';
+import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
@@ -75,10 +76,14 @@ export const ScheduleMeetingModal = () => {
       startInPast: isUndefined(errors.startInPast) ? undefined : translate(errors.startInPast),
       endInPast: isUndefined(errors.endInPast) ? undefined : translate(errors.endInPast),
       endBeforeStart: isUndefined(errors.endBeforeStart) ? undefined : translate(errors.endBeforeStart),
-      password: isUndefined(errors.password) ? undefined : translate(errors.password),
+      password: isUndefined(errors.password)
+        ? undefined
+        : translate(errors.password, {minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString()}),
       passwordConfirmation: isUndefined(errors.passwordConfirmation)
         ? undefined
-        : translate(errors.passwordConfirmation),
+        : translate(errors.passwordConfirmation, {
+            minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
+          }),
     }),
     [errors, translate],
   );

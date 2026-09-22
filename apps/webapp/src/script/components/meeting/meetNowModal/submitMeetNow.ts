@@ -23,7 +23,7 @@ import {task, type Task} from 'true-myth';
 import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
 import {mapMeetNowFormToMeetingCommand} from 'Components/meeting/mapMeetNowFormToMeetingCommand';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
+import type {CreateMeetingSuccess, MeetingLink} from 'Components/meeting/shared/service/meetingService';
 import {MEET_NOW_ERROR_TRANSLATION_KEYS} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
 import {
   isMeetingPersistedDespiteSubmitError,
@@ -102,6 +102,11 @@ export type SubmitMeetNowParams = {
   guardCall: (startCall: () => void) => void;
   translate: Translate;
   callNotEstablishedCopy: NoInternetCallGuardCopy;
+  onMeetingCreated?: (params: {
+    meetingLink?: MeetingLink;
+    meetingLinkGenerationFailed?: boolean;
+    qualifiedConversation: QualifiedId;
+  }) => void;
 };
 
 export const submitMeetNow = async ({
@@ -112,6 +117,7 @@ export const submitMeetNow = async ({
   guardCall,
   translate,
   callNotEstablishedCopy,
+  onMeetingCreated,
 }: SubmitMeetNowParams): Promise<MeetNowSubmitResult> => {
   const commandResult = mapMeetNowFormToMeetingCommand(formState);
 
@@ -138,6 +144,14 @@ export const submitMeetNow = async ({
       failedToAdd: submitResult.value.failedToAdd,
       users: formState.selectedUsers,
       translate,
+    });
+  }
+
+  if (submitResult.value.meetingLink || submitResult.value.meetingLinkGenerationFailed) {
+    onMeetingCreated?.({
+      meetingLink: submitResult.value.meetingLink,
+      meetingLinkGenerationFailed: submitResult.value.meetingLinkGenerationFailed,
+      qualifiedConversation: submitResult.value.qualifiedConversation,
     });
   }
 

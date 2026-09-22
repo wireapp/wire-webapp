@@ -43,6 +43,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import type {Translate} from 'Util/localizerUtil';
 import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
 import {KEY} from 'Util/keyboardUtil';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -160,15 +161,16 @@ const setupContainerMocks = () => {
 
 type RenderMeetNowModalOptions = {
   meetNowMeeting?: MeetingStoreState['meetNowMeeting'];
+  translate?: Translate;
 };
 
-const renderMeetNowModal = ({meetNowMeeting}: RenderMeetNowModalOptions = {}) => {
+const renderMeetNowModal = ({meetNowMeeting, translate = translateForTest}: RenderMeetNowModalOptions = {}) => {
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
   const deferredMeetNowMeeting = createDeferredMeetNowMeeting();
   const store = createMeetingStore(meetNowMeeting ?? deferredMeetNowMeeting.meetNowMeeting);
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      translate: translateForTest,
+      translate,
       mainViewModel: createMainViewModel(),
       fireAndForgetInvoker,
     }),
@@ -355,6 +357,21 @@ describe('MeetNowModal', () => {
 
     expect(meetNowMeeting).not.toHaveBeenCalled();
     expect(useMeetNowModal.getState().isOpen).toBe(true);
+  });
+
+  it('passes the minimum password length when translating a password error', () => {
+    const translate = jest.fn(translateForTest);
+    renderMeetNowModal({translate});
+
+    act(() => {
+      useMeetNowModal.getState().open();
+      useMeetNowModal.getState().setPassword('invalid');
+    });
+
+    expect(translate).toHaveBeenCalledWith(
+      'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH',
+      expect.objectContaining({minPasswordLength: expect.any(String)}),
+    );
   });
 
   it('closes the modal after a successful submit when it was not dismissed in the meantime', async () => {

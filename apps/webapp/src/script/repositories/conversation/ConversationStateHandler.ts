@@ -130,7 +130,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
   async requestAccessCode(conversationEntity: Conversation, password?: string): Promise<void> {
     try {
       const response = await this.conversationService.postConversationCode(conversationEntity.id, password ?? '');
-      const accessCode = response?.data;
+      const accessCode = response;
       if (accessCode !== undefined) {
         ConversationMapper.mapAccessCode(conversationEntity, accessCode);
       }

@@ -24,6 +24,7 @@ import {task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
+import * as MeetingLinkConfirmation from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -171,6 +172,32 @@ describe('useMeetNowSubmit', () => {
     expect(findConversation).toHaveBeenCalledWith(qualifiedConversation);
     expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);
     expect(startAudio).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the unavailable host message when meeting-link generation fails', async () => {
+    const showMeetingLinkConfirmation = jest.spyOn(MeetingLinkConfirmation, 'showMeetingLinkConfirmation');
+    const meetNowMeeting = jest
+      .fn()
+      .mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation, meetingLinkGenerationFailed: true}));
+    const store = createMeetingStore({meetNowMeeting});
+    const {conversationState, mainViewModel} = createJoinTestMocks();
+
+    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
+      wrapper: createWrapper(store, mainViewModel),
+    });
+
+    await act(async () => {
+      await result.current.submit(formState);
+    });
+
+    expect(showMeetingLinkConfirmation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meetingLinkUnavailable: true,
+        meetingLinkUnavailableForHost: true,
+        retryMeetingLink: expect.any(Function),
+        translate: translateForTest,
+      }),
+    );
   });
 
   it('returns creationFailed when meeting creation fails', async () => {

@@ -27,7 +27,11 @@ import {mapMeetingInstanceToScheduleFormState} from 'Components/meeting/mapMeeti
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 import type {DeleteMeetingCommand} from 'Components/meeting/shared/service/deleteMeeting';
-import {type CreateMeetingSuccess, type MeetingSubmitSuccess} from 'Components/meeting/shared/service/meetingService';
+import {
+  type CreateMeetingSuccess,
+  type MeetingSubmitSuccess,
+  type ScheduleMeetingSuccess,
+} from 'Components/meeting/shared/service/meetingService';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,
@@ -80,7 +84,7 @@ export type MeetingStoreState = {
   isLoading: boolean;
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
-  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<ScheduleMeetingSuccess, MeetingSubmitErrors>;
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
@@ -132,8 +136,22 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
       deps.serviceTasks.scheduleMeeting(command).andThen(result =>
         get()
           .syncMeetingByQualifiedId(result.qualifiedMeetingId)
-          .map(() => ({failedToAdd: result.failedToAdd}))
-          .orElse(() => task.resolve({failedToAdd: result.failedToAdd})),
+          .map(() => ({
+            qualifiedConversation: result.qualifiedConversation,
+            qualifiedMeetingId: result.qualifiedMeetingId,
+            failedToAdd: result.failedToAdd,
+            ...(result.meetingLink ? {meetingLink: result.meetingLink} : {}),
+            ...(result.meetingLinkGenerationFailed ? {meetingLinkGenerationFailed: true} : {}),
+          }))
+          .orElse(() =>
+            task.resolve({
+              qualifiedConversation: result.qualifiedConversation,
+              qualifiedMeetingId: result.qualifiedMeetingId,
+              failedToAdd: result.failedToAdd,
+              ...(result.meetingLink ? {meetingLink: result.meetingLink} : {}),
+              ...(result.meetingLinkGenerationFailed ? {meetingLinkGenerationFailed: true} : {}),
+            }),
+          ),
       ),
     meetNowMeeting: command =>
       deps.serviceTasks.meetNowMeeting(command).andThen(result =>

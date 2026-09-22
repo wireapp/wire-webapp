@@ -38,6 +38,7 @@ import {
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserState} from 'Repositories/user/userState';
+import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
@@ -72,11 +73,19 @@ export const MeetNowModal = () => {
     [errors.title, translate],
   );
   const passwordError = useMemo(
-    () => (isUndefined(errors.password) ? undefined : translate(errors.password)),
+    () =>
+      isUndefined(errors.password)
+        ? undefined
+        : translate(errors.password, {minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString()}),
     [errors.password, translate],
   );
   const passwordConfirmationError = useMemo(
-    () => (isUndefined(errors.passwordConfirmation) ? undefined : translate(errors.passwordConfirmation)),
+    () =>
+      isUndefined(errors.passwordConfirmation)
+        ? undefined
+        : translate(errors.passwordConfirmation, {
+            minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
+          }),
     [errors.passwordConfirmation, translate],
   );
 

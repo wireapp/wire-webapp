@@ -31,10 +31,11 @@ import {Conversation} from '../entity/Conversation';
 
 function buildHandler() {
   const conversationService: jest.Mocked<
-    Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess'>
+    Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess' | 'postConversationCode'>
   > = {
     deleteConversationCode: jest.fn(),
     putConversationAccess: jest.fn(),
+    postConversationCode: jest.fn(),
   };
   const translate = jest.fn((key: Parameters<Translate>[0]) => `translated:${key}`) as Translate;
   const handler = new ConversationStateHandler(conversationService as unknown as ConversationService, translate);
@@ -166,5 +167,21 @@ describe('ConversationStateHandler', () => {
         translate,
       );
     });
+  });
+
+  it('maps the raw conversation code returned by requestAccessCode', async () => {
+    const {conversationService, handler} = buildHandler();
+    const conversation = buildConversation(true);
+    conversation.teamId = 'team-id';
+    conversationService.postConversationCode.mockResolvedValue({
+      code: 'generated-code',
+      key: 'conversation-key',
+      uri: 'https://wire.example/conversation-join',
+    });
+
+    await handler.requestAccessCode(conversation);
+
+    expect(conversation.accessCode()).toContain('key=conversation-key&code=generated-code');
+    expect(conversationService.postConversationCode).toHaveBeenCalledWith('conversation-id', '');
   });
 });

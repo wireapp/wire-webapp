@@ -19,8 +19,11 @@
 
 import {MouseEvent} from 'react';
 
+import {container} from 'tsyringe';
+
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
+import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
 import {
   iconContainerStyle,
@@ -30,9 +33,10 @@ import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {useDeleteMeeting} from 'Components/meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/meeting/useEditMeeting';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
-import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
+import {canEditMeeting, isMeetingHost} from 'Components/meeting/utils/canEditMeeting';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../../../../ui/contextMenu';
 
@@ -45,6 +49,7 @@ interface MeetingActionProps {
 
 export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDisabled}: MeetingActionProps) => {
   const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
+  const {content} = useMainViewModel();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
 
@@ -78,6 +83,51 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
           if (canDeleteMeetingForMe(meetingInstance, selfUser)) {
             openDeleteMeetingModal(meetingInstance, 'forMe', selfUser);
           }
+        },
+        onMeetingLink: () => {
+          const isHost = isMeetingHost(meetingInstance.meetingSeries, selfUser);
+          const conversation = container
+            .resolve(ConversationState)
+            .findConversation(meetingInstance.meetingSeries.qualified_conversation);
+          const cachedAccessCode = conversation?.accessCode();
+          const requestMeetingLinkTask = isHost
+            ? () =>
+                content.repositories.conversation.requestMeetingConversationCode(
+                  meetingInstance.meetingSeries.qualified_conversation,
+                )
+            : undefined;
+          const getMeetingLinkTask = () =>
+            content.repositories.conversation.getMeetingConversationCode(
+              meetingInstance.meetingSeries.qualified_conversation,
+            );
+
+          if (cachedAccessCode) {
+            showMeetingLinkConfirmation({
+              meetingLink: {
+                meetingLink: cachedAccessCode,
+                hasPassword: conversation?.accessCodeHasPassword() === true,
+              },
+              retryMeetingLink: requestMeetingLinkTask,
+              translate,
+            });
+            return;
+          }
+
+          const openMeetingLink = async (): Promise<void> => {
+            const result = await getMeetingLinkTask().toPromise();
+            result.match({
+              Ok: meetingLink =>
+                showMeetingLinkConfirmation({meetingLink, retryMeetingLink: requestMeetingLinkTask, translate}),
+              Err: () =>
+                showMeetingLinkConfirmation({
+                  meetingLinkUnavailable: true,
+                  meetingLinkUnavailableForHost: isHost,
+                  retryMeetingLink: requestMeetingLinkTask,
+                  translate,
+                }),
+            });
+          };
+          fireAndForgetInvoker.fireAndForget(openMeetingLink);
         },
       }),
       identifier: 'message-options-menu',

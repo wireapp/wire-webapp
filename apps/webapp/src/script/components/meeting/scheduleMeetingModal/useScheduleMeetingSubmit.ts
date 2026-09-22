@@ -25,6 +25,7 @@ import {type Maybe, task, type Task} from 'true-myth';
 
 import {mapScheduleFormToMeetingCommand} from 'Components/meeting/mapScheduleFormToMeetingCommand';
 import {mapScheduleFormToUpdateMeetingCommand} from 'Components/meeting/mapScheduleFormToUpdateMeetingCommand';
+import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {MeetingSubmitSuccess} from 'Components/meeting/shared/service/meetingService';
@@ -65,6 +66,8 @@ type SubmitMeetingParams = {
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 
+type ScheduleSubmitSuccess = MeetingSubmitSuccess & {qualifiedConversation?: QualifiedId};
+
 const submitMeeting = ({
   formState,
   mode,
@@ -78,7 +81,7 @@ const submitMeeting = ({
   wallClock,
   scheduleMeeting,
   updateMeeting,
-}: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+}: SubmitMeetingParams): Task<ScheduleSubmitSuccess, MeetingSubmitErrors> => {
   if (mode === scheduleMeetingModes.create) {
     const commandResult = mapScheduleFormToMeetingCommand(formState, wallClock);
 
@@ -180,6 +183,21 @@ export const useScheduleMeetingSubmit = () => {
         showMeetingPartialAddFailureModal({
           failedToAdd: submitResult.value.failedToAdd,
           users: formState.selectedUsers,
+          translate,
+        });
+      }
+
+      const createdConversation = submitResult.value.qualifiedConversation;
+      if (
+        mode === scheduleMeetingModes.create &&
+        (submitResult.value.meetingLink || submitResult.value.meetingLinkGenerationFailed) &&
+        createdConversation
+      ) {
+        showMeetingLinkConfirmation({
+          meetingLink: submitResult.value.meetingLink,
+          meetingLinkUnavailable: submitResult.value.meetingLinkGenerationFailed,
+          meetingLinkUnavailableForHost: submitResult.value.meetingLinkGenerationFailed,
+          retryMeetingLink: () => conversationRepository.requestMeetingConversationCode(createdConversation),
           translate,
         });
       }
