@@ -42,7 +42,11 @@ const createNotificationConstructorFake = ({
   permission = 'granted',
   throwOnConstruction = false,
   throwOnClose = false,
-}: {permission?: NotificationPermission; throwOnConstruction?: boolean; throwOnClose?: boolean} = {}): NotificationConstructorFake => {
+}: {
+  permission?: NotificationPermission;
+  throwOnConstruction?: boolean;
+  throwOnClose?: boolean;
+} = {}): NotificationConstructorFake => {
   const createdNotifications: CreatedNotification[] = [];
 
   const notificationConstructor = function (title: string, options?: NotificationOptions) {

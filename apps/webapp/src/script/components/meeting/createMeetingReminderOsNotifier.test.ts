@@ -61,9 +61,7 @@ const meetingReminderFirePayloadFactory = createFactory<MeetingReminderFirePaylo
 });
 
 const translate = ((identifier: string, substitutions?: Record<string, string>) =>
-  identifier === 'meetings.notifications.startsAt'
-    ? `Starts at ${substitutions?.time}`
-    : identifier) as Translate;
+  identifier === 'meetings.notifications.startsAt' ? `Starts at ${substitutions?.time}` : identifier) as Translate;
 
 const formatMeetingTime = (meetingStartTime: string): string =>
   meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
@@ -135,7 +133,9 @@ describe('createMeetingReminderOsNotifier', () => {
     expect(toMeetingReminderNotificationTag(firstOccurrence)).not.toBe(
       toMeetingReminderNotificationTag(secondOccurrence),
     );
-    expect(toMeetingReminderNotificationTag(firstOccurrence)).toBe(toMeetingReminderNotificationTag(meetingReminderFirePayloadFactory.build()));
+    expect(toMeetingReminderNotificationTag(firstOccurrence)).toBe(
+      toMeetingReminderNotificationTag(meetingReminderFirePayloadFactory.build()),
+    );
   });
 
   it.each(['denied', 'default'] as const)('presents nothing when permission is %s', permission => {
@@ -220,7 +220,9 @@ describe('createMeetingReminderOsNotifier', () => {
 
     expect(closedTags).toEqual([
       toMeetingReminderNotificationTag(meetingReminderFirePayloadFactory.build()),
-      toMeetingReminderNotificationTag(meetingReminderFirePayloadFactory.build({meetingStartTime: '2026-06-08T10:00:00.000Z'})),
+      toMeetingReminderNotificationTag(
+        meetingReminderFirePayloadFactory.build({meetingStartTime: '2026-06-08T10:00:00.000Z'}),
+      ),
     ]);
   });
 
