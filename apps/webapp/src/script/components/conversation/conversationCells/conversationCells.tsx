@@ -221,6 +221,8 @@ export const ConversationCells = memo(
       },
       [maxSharedDriveUploadFileSize, translate],
     );
+    const handleSharedDriveDropReadError = (): void =>
+      handleSharedDriveUploadRejection({reason: 'readFailed', invalidFiles: []});
     const handleDroppedFiles = useSharedDriveFileDrop({
       conversationQualifiedId: sharedDriveConversationQualifiedId,
       fireAndForgetInvoker,
@@ -315,6 +317,7 @@ export const ConversationCells = memo(
           isOverlaySuppressed={activeFolderDropTargetName !== null}
           onDragStateReset={resetSharedDriveDropState}
           onDropFiles={handleDroppedFiles}
+          onDropReadError={handleSharedDriveDropReadError}
         >
           <div css={wrapperStyles}>
             <SharedDriveUploadInput ref={uploadInput} {...sharedDriveUploadInputDependencies} selectionMode="files" />
@@ -357,6 +360,7 @@ export const ConversationCells = memo(
                 onToggleSort={toggleSort}
                 onFolderDropTargetChange={setActiveFolderDropTargetName}
                 onDropFilesToFolder={!isInRecycleBin && canUploadToSharedDrive ? handleDropFilesToFolder : undefined}
+                onDropReadError={handleSharedDriveDropReadError}
               />
             )}
             {isCellsStatePending && !isRefreshing && (
