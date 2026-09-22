@@ -76,14 +76,16 @@ const createNotificationConstructorFake = ({
 const createApi = (fakeOptions: Parameters<typeof createNotificationConstructorFake>[0] = {}) => {
   const {notificationConstructor, createdNotifications} = createNotificationConstructorFake(fakeOptions);
   const focusWindow = jest.fn();
+  const publishNotificationClick = jest.fn();
 
   const api = createSystemNotificationApiFromBrowserNotification({
     notificationConstructor,
     isSupported: () => true,
     focusWindow,
+    publishNotificationClick,
   });
 
-  return {api, createdNotifications, focusWindow};
+  return {api, createdNotifications, focusWindow, publishNotificationClick};
 };
 
 const request = {title: 'Weekly sync', body: 'Starts at 12:00 PM', tag: 'meeting-reminder:tag', onClick: jest.fn()};
@@ -95,6 +97,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
       notificationConstructor,
       isSupported: () => false,
       focusWindow: jest.fn(),
+      publishNotificationClick: jest.fn(),
     });
 
     expect(api.isSupported()).toBe(false);
@@ -125,6 +128,15 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     expect(focusWindow).toHaveBeenCalledTimes(1);
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('announces the click so the desktop app restores its window and switches account', () => {
+    const {api, createdNotifications, publishNotificationClick} = createApi();
+
+    api.show({...request, onClick: jest.fn()});
+    createdNotifications.at(0)?.onclick?.();
+
+    expect(publishNotificationClick).toHaveBeenCalledTimes(1);
   });
 
   it('closes the underlying notification through the returned handle', () => {

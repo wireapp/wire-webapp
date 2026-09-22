@@ -17,9 +17,11 @@
  *
  */
 
+import {amplify} from 'amplify';
 import {result} from 'true-myth';
 
 import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {systemNotificationErrors, type SystemNotificationApi} from 'src/script/notification/systemNotificationTypes';
 
@@ -27,6 +29,7 @@ export type BrowserNotificationDependencies = {
   notificationConstructor: typeof Notification;
   isSupported: () => boolean;
   focusWindow: () => void;
+  publishNotificationClick: () => void;
 };
 
 /**
@@ -41,6 +44,7 @@ export const createSystemNotificationApiFromBrowserNotification = ({
   notificationConstructor,
   isSupported,
   focusWindow,
+  publishNotificationClick,
 }: BrowserNotificationDependencies): SystemNotificationApi => ({
   isSupported,
   getPermission: () => notificationConstructor.permission,
@@ -51,6 +55,9 @@ export const createSystemNotificationApiFromBrowserNotification = ({
         const notification = new notificationConstructor(title, {body, tag});
 
         notification.onclick = () => {
+          // wire-desktop listens for this to restore the window and switch to the account that
+          // raised the notification. window.focus() alone does neither from inside a webview.
+          publishNotificationClick();
           focusWindow();
           onClick();
         };
@@ -76,4 +83,5 @@ export const createBrowserSystemNotificationApi = (): SystemNotificationApi =>
     notificationConstructor: window.Notification,
     isSupported: () => Runtime.isSupportingNotifications(),
     focusWindow: () => window.focus(),
+    publishNotificationClick: () => amplify.publish(WebAppEvents.NOTIFICATION.CLICK),
   });
