@@ -1392,7 +1392,7 @@
   "meetings.scheduleModal.editTitle": "Edit Meeting",
   "meetings.scheduleModal.endsLabel": "Ends",
   "meetings.scheduleModal.error.addParticipantsFailed": "The meeting was saved, but some participants could not be added. Please try again.",
-  "meetings.scheduleModal.error.conversationRenameFailed": "The meeting title was updated, but the name shown in the call could not be updated. Please try again.",
+  "meetings.scheduleModal.error.conversationRenameFailed": "The meeting title was updated, but the call may still show the previous title. Please try again.",
   "meetings.scheduleModal.error.conversationRenameFailedRetry": "Try again",
   "meetings.scheduleModal.error.conversationRenameFailedTitle": "Could not update meeting title",
   "meetings.scheduleModal.error.createFailed": "Something went wrong while scheduling the meeting. Please try again.",
