@@ -24,9 +24,15 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {systemNotificationErrors, type SystemNotificationApi} from 'src/script/notification/systemNotificationTypes';
+import {getLogger} from 'Util/logger';
+
+type SystemNotificationLogger = {
+  warn: (message: string, context?: unknown) => void;
+};
 
 export type BrowserNotificationDependencies = {
   notificationConstructor: typeof Notification;
+  logger: SystemNotificationLogger;
   isSupported: () => boolean;
   focusWindow: () => void;
   publishNotificationClick: () => void;
@@ -42,6 +48,7 @@ export type BrowserNotificationDependencies = {
  */
 export const createSystemNotificationApiFromBrowserNotification = ({
   notificationConstructor,
+  logger,
   isSupported,
   focusWindow,
   publishNotificationClick,
@@ -53,6 +60,13 @@ export const createSystemNotificationApiFromBrowserNotification = ({
       () => systemNotificationErrors.presentationFailed,
       () => {
         const notification = new notificationConstructor(title, {body, tag});
+        const closeNotification = () =>
+          result.tryOrElse(
+            () => systemNotificationErrors.closeFailed,
+            () => {
+              notification.close();
+            },
+          );
 
         notification.onclick = () => {
           // wire-desktop listens for this to restore the window and switch to the account that
@@ -66,15 +80,15 @@ export const createSystemNotificationApiFromBrowserNotification = ({
           onClose();
         };
 
-        return {
-          close: () =>
-            result.tryOrElse(
-              () => systemNotificationErrors.closeFailed,
-              () => {
-                notification.close();
-              },
-            ),
+        // A notification can fail after the constructor returned, so `show` reporting `Ok` is not
+        // the last word on whether it reached the user.
+        notification.onerror = () => {
+          logger.warn('system notification failed after being shown', {tag});
+          onClose();
+          closeNotification();
         };
+
+        return {close: closeNotification};
       },
     ),
 });
@@ -85,6 +99,7 @@ export const createSystemNotificationApiFromBrowserNotification = ({
 export const createBrowserSystemNotificationApi = (): SystemNotificationApi =>
   createSystemNotificationApiFromBrowserNotification({
     notificationConstructor: window.Notification,
+    logger: getLogger('SystemNotification'),
     isSupported: () => Runtime.isSupportingNotifications(),
     focusWindow: () => window.focus(),
     publishNotificationClick: () => amplify.publish(WebAppEvents.NOTIFICATION.CLICK),

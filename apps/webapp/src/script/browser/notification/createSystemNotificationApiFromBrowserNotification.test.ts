@@ -29,6 +29,7 @@ type CreatedNotification = {
   closeCallCount: number;
   onclick: (() => void) | null;
   onclose: (() => void) | null;
+  onerror: (() => void) | null;
   close: () => void;
 };
 
@@ -55,6 +56,7 @@ const createNotificationConstructorFake = ({
       closeCallCount: 0,
       onclick: null,
       onclose: null,
+      onerror: null,
       close: () => {
         if (throwOnClose) {
           throw new Error('notification could not be closed');
@@ -79,15 +81,17 @@ const createApi = (fakeOptions: Parameters<typeof createNotificationConstructorF
   const {notificationConstructor, createdNotifications} = createNotificationConstructorFake(fakeOptions);
   const focusWindow = jest.fn();
   const publishNotificationClick = jest.fn();
+  const logger = {warn: jest.fn()};
 
   const api = createSystemNotificationApiFromBrowserNotification({
     notificationConstructor,
     isSupported: () => true,
     focusWindow,
     publishNotificationClick,
+    logger,
   });
 
-  return {api, createdNotifications, focusWindow, publishNotificationClick};
+  return {api, createdNotifications, focusWindow, publishNotificationClick, logger};
 };
 
 const request = {
@@ -106,6 +110,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
       isSupported: () => false,
       focusWindow: jest.fn(),
       publishNotificationClick: jest.fn(),
+      logger: {warn: jest.fn()},
     });
 
     expect(api.isSupported()).toBe(false);
@@ -167,6 +172,20 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     createdNotifications.at(0)?.onclose?.();
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('logs, closes and calls back when the notification errors after being shown', () => {
+    const {api, createdNotifications, logger} = createApi();
+    const onClose = jest.fn();
+
+    api.show({...request, onClose});
+    createdNotifications.at(0)?.onerror?.();
+
+    expect(logger.warn).toHaveBeenCalledWith('system notification failed after being shown', {
+      tag: 'meeting-reminder:tag',
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(createdNotifications.at(0)?.closeCallCount).toBe(1);
   });
 
   it('reports a construction failure instead of throwing', () => {
