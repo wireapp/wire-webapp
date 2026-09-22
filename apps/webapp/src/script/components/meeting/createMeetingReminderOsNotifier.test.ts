@@ -94,7 +94,7 @@ describe('createMeetingReminderOsNotifier', () => {
 
     notifier.notify(createPayload());
 
-    expect(Object.keys(requests[0]).sort()).toEqual(['body', 'onClick', 'tag', 'title']);
+    expect(Object.keys(requests[0]).sort()).toEqual(['body', 'onClick', 'onClose', 'tag', 'title']);
   });
 
   it('focuses the meetings list and closes the toast when clicked', () => {
@@ -167,6 +167,16 @@ describe('createMeetingReminderOsNotifier', () => {
       error: systemNotificationErrors.closeFailed,
       tag: requests[0].tag,
     });
+  });
+
+  it('forgets a toast the platform closed on its own, so teardown does not close it again', () => {
+    const {requests, closedTags, notifier} = createHarness();
+
+    notifier.notify(createPayload());
+    requests[0].onClose();
+    notifier.stop();
+
+    expect(closedTags).toEqual([]);
   });
 
   it('closes outstanding toasts on teardown, once', () => {

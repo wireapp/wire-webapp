@@ -48,7 +48,7 @@ export const createSystemNotificationApiFromBrowserNotification = ({
 }: BrowserNotificationDependencies): SystemNotificationApi => ({
   isSupported,
   getPermission: () => notificationConstructor.permission,
-  show: ({title, body, tag, onClick}) =>
+  show: ({title, body, tag, onClick, onClose}) =>
     result.tryOrElse(
       () => systemNotificationErrors.presentationFailed,
       () => {
@@ -60,6 +60,10 @@ export const createSystemNotificationApiFromBrowserNotification = ({
           publishNotificationClick();
           focusWindow();
           onClick();
+        };
+
+        notification.onclose = () => {
+          onClose();
         };
 
         return {

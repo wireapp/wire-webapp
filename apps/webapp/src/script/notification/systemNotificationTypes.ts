@@ -31,6 +31,8 @@ export type SystemNotificationRequest = {
   body: string;
   tag: string;
   onClick: () => void;
+  /** Called when the platform closed the notification on its own: user dismissal, OS lifecycle or an error. */
+  onClose: () => void;
 };
 
 export type SystemNotificationHandle = {

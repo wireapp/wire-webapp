@@ -65,9 +65,13 @@ export const createMeetingReminderOsNotifier = ({
 }: CreateMeetingReminderOsNotifierDependencies): MeetingReminderOsNotifier => {
   const openNotifications = new Map<string, SystemNotificationHandle>();
 
+  const forget = (tag: string): void => {
+    openNotifications.delete(tag);
+  };
+
   const closeAndForget = (tag: string): void => {
     Maybe.of(openNotifications.get(tag)).inspect(handle => {
-      openNotifications.delete(tag);
+      forget(tag);
 
       handle.close().inspectErr(error => {
         logger.warn('failed to close meeting reminder OS notification', {error, tag});
@@ -99,6 +103,11 @@ export const createMeetingReminderOsNotifier = ({
           // focusing Wire on the meetings list is the whole click behaviour.
           openMeetingsList();
           closeAndForget(tag);
+        },
+        onClose: () => {
+          // The platform can close a toast without us: user dismissal, OS lifecycle or an error.
+          // Without this the handle would sit in the map until teardown.
+          forget(tag);
         },
       });
 

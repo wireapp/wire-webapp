@@ -28,6 +28,7 @@ type CreatedNotification = {
   options: NotificationOptions | undefined;
   closeCallCount: number;
   onclick: (() => void) | null;
+  onclose: (() => void) | null;
   close: () => void;
 };
 
@@ -53,6 +54,7 @@ const createNotificationConstructorFake = ({
       options,
       closeCallCount: 0,
       onclick: null,
+      onclose: null,
       close: () => {
         if (throwOnClose) {
           throw new Error('notification could not be closed');
@@ -88,7 +90,13 @@ const createApi = (fakeOptions: Parameters<typeof createNotificationConstructorF
   return {api, createdNotifications, focusWindow, publishNotificationClick};
 };
 
-const request = {title: 'Weekly sync', body: 'Starts at 12:00 PM', tag: 'meeting-reminder:tag', onClick: jest.fn()};
+const request = {
+  title: 'Weekly sync',
+  body: 'Starts at 12:00 PM',
+  tag: 'meeting-reminder:tag',
+  onClick: jest.fn(),
+  onClose: jest.fn(),
+};
 
 describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('reports support from the injected predicate', () => {
@@ -112,7 +120,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('constructs a notification carrying the title, body and tag', () => {
     const {api, createdNotifications} = createApi();
 
-    api.show({...request, onClick: jest.fn()});
+    api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
 
     expect(createdNotifications).toHaveLength(1);
     expect(createdNotifications.at(0)?.title).toBe('Weekly sync');
@@ -123,7 +131,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {api, createdNotifications, focusWindow} = createApi();
     const onClick = jest.fn();
 
-    api.show({...request, onClick});
+    api.show({...request, onClick, onClose: jest.fn()});
     createdNotifications.at(0)?.onclick?.();
 
     expect(focusWindow).toHaveBeenCalledTimes(1);
@@ -133,7 +141,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('announces the click so the desktop app restores its window and switches account', () => {
     const {api, createdNotifications, publishNotificationClick} = createApi();
 
-    api.show({...request, onClick: jest.fn()});
+    api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
     createdNotifications.at(0)?.onclick?.();
 
     expect(publishNotificationClick).toHaveBeenCalledTimes(1);
@@ -142,7 +150,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('closes the underlying notification through the returned handle', () => {
     const {api, createdNotifications} = createApi();
 
-    const handle = api.show({...request, onClick: jest.fn()});
+    const handle = api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
 
     expect(result.isOk(handle)).toBe(true);
     if (result.isOk(handle)) {
@@ -151,10 +159,20 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     expect(createdNotifications.at(0)?.closeCallCount).toBe(1);
   });
 
+  it('calls back when the platform closes the notification without us', () => {
+    const {api, createdNotifications} = createApi();
+    const onClose = jest.fn();
+
+    api.show({...request, onClose});
+    createdNotifications.at(0)?.onclose?.();
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it('reports a construction failure instead of throwing', () => {
     const {api} = createApi({throwOnConstruction: true});
 
-    const handle = api.show({...request, onClick: jest.fn()});
+    const handle = api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
 
     expect(handle).toEqual(result.err(systemNotificationErrors.presentationFailed));
   });
@@ -162,7 +180,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('reports a close failure instead of throwing', () => {
     const {api} = createApi({throwOnClose: true});
 
-    const handle = api.show({...request, onClick: jest.fn()});
+    const handle = api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
 
     expect(result.isOk(handle)).toBe(true);
     if (result.isOk(handle)) {
