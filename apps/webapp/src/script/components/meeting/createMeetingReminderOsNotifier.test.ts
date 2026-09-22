@@ -17,6 +17,9 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {createFactory} from '@enormora/objectory';
 import {result} from 'true-myth';
 
 import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
@@ -30,13 +33,18 @@ import {
 
 import {createMeetingReminderOsNotifier, toMeetingReminderNotificationTag} from './createMeetingReminderOsNotifier';
 
-const createPayload = (overrides: Partial<MeetingReminderFirePayload> = {}): MeetingReminderFirePayload => ({
-  qualifiedId: {id: 'meeting-id', domain: 'example.com'},
-  qualifiedConversationId: {id: 'conversation-id', domain: 'example.com'},
-  meetingTitle: 'Weekly sync',
-  meetingStartTime: '2026-06-01T10:00:00.000Z',
-  qualifiedCreator: {id: 'creator-id', domain: 'example.com'},
-  ...overrides,
+const qualifiedIdFactory = createFactory<QualifiedId>(() => {
+  return {id: 'meeting-id', domain: 'example.com'};
+});
+
+const meetingReminderFirePayloadFactory = createFactory<MeetingReminderFirePayload>(() => {
+  return {
+    qualifiedId: qualifiedIdFactory,
+    qualifiedConversationId: qualifiedIdFactory.withOverrides({id: 'conversation-id'}),
+    meetingTitle: 'Weekly sync',
+    meetingStartTime: '2026-06-01T10:00:00.000Z',
+    qualifiedCreator: qualifiedIdFactory.withOverrides({id: 'creator-id'}),
+  };
 });
 
 const translate = ((identifier: string, substitutions?: Record<string, string>) =>
@@ -82,7 +90,7 @@ describe('createMeetingReminderOsNotifier', () => {
   it('presents a notification naming the meeting and its start time', () => {
     const {requests, notifier} = createHarness();
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
 
     expect(requests).toHaveLength(1);
     expect(requests[0].title).toBe('Weekly sync');
@@ -92,7 +100,7 @@ describe('createMeetingReminderOsNotifier', () => {
   it('attaches neither action buttons nor a Wire sound file', () => {
     const {requests, notifier} = createHarness();
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
 
     expect(Object.keys(requests[0]).sort()).toEqual(['body', 'onClick', 'onClose', 'tag', 'title']);
   });
@@ -100,7 +108,7 @@ describe('createMeetingReminderOsNotifier', () => {
   it('focuses the meetings list and closes the toast when clicked', () => {
     const {requests, closedTags, openMeetingsList, notifier} = createHarness();
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
     requests[0].onClick();
 
     expect(openMeetingsList).toHaveBeenCalledTimes(1);
@@ -108,19 +116,19 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('tags the toast per meeting occurrence so a recurring meeting does not stack toasts', () => {
-    const firstOccurrence = createPayload();
-    const secondOccurrence = createPayload({meetingStartTime: '2026-06-08T10:00:00.000Z'});
+    const firstOccurrence = meetingReminderFirePayloadFactory.build();
+    const secondOccurrence = meetingReminderFirePayloadFactory.build({meetingStartTime: '2026-06-08T10:00:00.000Z'});
 
     expect(toMeetingReminderNotificationTag(firstOccurrence)).not.toBe(
       toMeetingReminderNotificationTag(secondOccurrence),
     );
-    expect(toMeetingReminderNotificationTag(firstOccurrence)).toBe(toMeetingReminderNotificationTag(createPayload()));
+    expect(toMeetingReminderNotificationTag(firstOccurrence)).toBe(toMeetingReminderNotificationTag(meetingReminderFirePayloadFactory.build()));
   });
 
   it.each(['denied', 'default'] as const)('presents nothing when permission is %s', permission => {
     const {requests, logger, notifier} = createHarness({getPermission: () => permission});
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
 
     expect(requests).toEqual([]);
     expect(logger.warn).not.toHaveBeenCalled();
@@ -129,7 +137,7 @@ describe('createMeetingReminderOsNotifier', () => {
   it('presents nothing when notifications are unsupported', () => {
     const {requests, logger, notifier} = createHarness({isSupported: () => false});
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
 
     expect(requests).toEqual([]);
     expect(logger.warn).not.toHaveBeenCalled();
@@ -144,12 +152,12 @@ describe('createMeetingReminderOsNotifier', () => {
         }),
     });
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
 
     expect(logger.warn).toHaveBeenCalledWith('failed to present meeting reminder OS notification', {
       error: systemNotificationErrorKinds.presentationFailed,
       cause: new Error('notification could not be constructed'),
-      tag: toMeetingReminderNotificationTag(createPayload()),
+      tag: toMeetingReminderNotificationTag(meetingReminderFirePayloadFactory.build()),
     });
   });
 
@@ -169,7 +177,7 @@ describe('createMeetingReminderOsNotifier', () => {
       },
     });
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
     requests[0].onClick();
 
     expect(logger.warn).toHaveBeenCalledWith('failed to close meeting reminder OS notification', {
@@ -182,7 +190,7 @@ describe('createMeetingReminderOsNotifier', () => {
   it('forgets a toast the platform closed on its own, so teardown does not close it again', () => {
     const {requests, closedTags, notifier} = createHarness();
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
     requests[0].onClose();
     notifier.stop();
 
@@ -192,21 +200,21 @@ describe('createMeetingReminderOsNotifier', () => {
   it('closes outstanding toasts on teardown, once', () => {
     const {closedTags, notifier} = createHarness();
 
-    notifier.notify(createPayload());
-    notifier.notify(createPayload({meetingStartTime: '2026-06-08T10:00:00.000Z'}));
+    notifier.notify(meetingReminderFirePayloadFactory.build());
+    notifier.notify(meetingReminderFirePayloadFactory.build({meetingStartTime: '2026-06-08T10:00:00.000Z'}));
     notifier.stop();
     notifier.stop();
 
     expect(closedTags).toEqual([
-      toMeetingReminderNotificationTag(createPayload()),
-      toMeetingReminderNotificationTag(createPayload({meetingStartTime: '2026-06-08T10:00:00.000Z'})),
+      toMeetingReminderNotificationTag(meetingReminderFirePayloadFactory.build()),
+      toMeetingReminderNotificationTag(meetingReminderFirePayloadFactory.build({meetingStartTime: '2026-06-08T10:00:00.000Z'})),
     ]);
   });
 
   it('does not close a clicked toast again on teardown', () => {
     const {requests, closedTags, notifier} = createHarness();
 
-    notifier.notify(createPayload());
+    notifier.notify(meetingReminderFirePayloadFactory.build());
     requests[0].onClick();
     notifier.stop();
 
