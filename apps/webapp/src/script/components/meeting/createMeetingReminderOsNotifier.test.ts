@@ -19,6 +19,8 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {createFactory} from '@enormora/objectory';
 import {result} from 'true-myth';
 
@@ -32,6 +34,17 @@ import {
 } from 'src/script/notification/systemNotificationTypes';
 
 import {createMeetingReminderOsNotifier, toMeetingReminderNotificationTag} from './createMeetingReminderOsNotifier';
+
+/** Keeps the "a notification was requested" invariant visible instead of trusting an index. */
+const firstRequestOf = (requests: SystemNotificationRequest[]): SystemNotificationRequest => {
+  const firstRequest = requests.at(0);
+
+  if (isUndefined(firstRequest)) {
+    throw new Error('expected the notifier to have requested a notification');
+  }
+
+  return firstRequest;
+};
 
 const qualifiedIdFactory = createFactory<QualifiedId>(() => {
   return {id: 'meeting-id', domain: 'example.com'};
@@ -93,8 +106,8 @@ describe('createMeetingReminderOsNotifier', () => {
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
     expect(requests).toHaveLength(1);
-    expect(requests[0].title).toBe('Weekly sync');
-    expect(requests[0].body).toBe('Starts at 12:00 PM');
+    expect(firstRequestOf(requests).title).toBe('Weekly sync');
+    expect(firstRequestOf(requests).body).toBe('Starts at 12:00 PM');
   });
 
   it('attaches neither action buttons nor a Wire sound file', () => {
@@ -102,17 +115,17 @@ describe('createMeetingReminderOsNotifier', () => {
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
-    expect(Object.keys(requests[0]).sort()).toEqual(['body', 'onClick', 'onClose', 'tag', 'title']);
+    expect(Object.keys(firstRequestOf(requests)).sort()).toEqual(['body', 'onClick', 'onClose', 'tag', 'title']);
   });
 
   it('focuses the meetings list and closes the toast when clicked', () => {
     const {requests, closedTags, openMeetingsList, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
-    requests[0].onClick();
+    firstRequestOf(requests).onClick();
 
     expect(openMeetingsList).toHaveBeenCalledTimes(1);
-    expect(closedTags).toEqual([requests[0].tag]);
+    expect(closedTags).toEqual([firstRequestOf(requests).tag]);
   });
 
   it('tags the toast per meeting occurrence so a recurring meeting does not stack toasts', () => {
@@ -178,12 +191,12 @@ describe('createMeetingReminderOsNotifier', () => {
     });
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
-    requests[0].onClick();
+    firstRequestOf(requests).onClick();
 
     expect(logger.warn).toHaveBeenCalledWith('failed to close meeting reminder OS notification', {
       error: systemNotificationErrorKinds.closeFailed,
       cause: new Error('notification could not be closed'),
-      tag: requests[0].tag,
+      tag: firstRequestOf(requests).tag,
     });
   });
 
@@ -191,7 +204,7 @@ describe('createMeetingReminderOsNotifier', () => {
     const {requests, closedTags, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
-    requests[0].onClose();
+    firstRequestOf(requests).onClose();
     notifier.stop();
 
     expect(closedTags).toEqual([]);
@@ -215,7 +228,7 @@ describe('createMeetingReminderOsNotifier', () => {
     const {requests, closedTags, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
-    requests[0].onClick();
+    firstRequestOf(requests).onClick();
     notifier.stop();
 
     expect(closedTags).toHaveLength(1);
