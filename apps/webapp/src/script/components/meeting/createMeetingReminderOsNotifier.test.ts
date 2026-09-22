@@ -55,7 +55,7 @@ const translate = ((identifier: string, substitutions?: Record<string, string>) 
 const formatMeetingTime = (meetingStartTime: string): string =>
   meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
 
-const createHarness = (apiOverrides: Partial<SystemNotificationApi> = {}) => {
+const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotificationApi> = {}) => {
   const requests: SystemNotificationRequest[] = [];
   const closedTags: string[] = [];
   const logger = {info: jest.fn(), warn: jest.fn()};
@@ -88,7 +88,7 @@ const createHarness = (apiOverrides: Partial<SystemNotificationApi> = {}) => {
 
 describe('createMeetingReminderOsNotifier', () => {
   it('presents a notification naming the meeting and its start time', () => {
-    const {requests, notifier} = createHarness();
+    const {requests, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
@@ -98,7 +98,7 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('attaches neither action buttons nor a Wire sound file', () => {
-    const {requests, notifier} = createHarness();
+    const {requests, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
@@ -106,7 +106,7 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('focuses the meetings list and closes the toast when clicked', () => {
-    const {requests, closedTags, openMeetingsList, notifier} = createHarness();
+    const {requests, closedTags, openMeetingsList, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
     requests[0].onClick();
@@ -126,7 +126,7 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it.each(['denied', 'default'] as const)('presents nothing when permission is %s', permission => {
-    const {requests, logger, notifier} = createHarness({getPermission: () => permission});
+    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({getPermission: () => permission});
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
@@ -135,7 +135,7 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('presents nothing when notifications are unsupported', () => {
-    const {requests, logger, notifier} = createHarness({isSupported: () => false});
+    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({isSupported: () => false});
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
@@ -144,7 +144,7 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('logs and drops a failure to present the toast', () => {
-    const {logger, notifier} = createHarness({
+    const {logger, notifier} = createNotifierWithFakeNotificationApi({
       show: () =>
         result.err({
           kind: systemNotificationErrorKinds.presentationFailed,
@@ -163,7 +163,7 @@ describe('createMeetingReminderOsNotifier', () => {
 
   it('logs a failure to close the toast', () => {
     const requests: SystemNotificationRequest[] = [];
-    const {logger, notifier} = createHarness({
+    const {logger, notifier} = createNotifierWithFakeNotificationApi({
       show: request => {
         requests.push(request);
 
@@ -188,7 +188,7 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('forgets a toast the platform closed on its own, so teardown does not close it again', () => {
-    const {requests, closedTags, notifier} = createHarness();
+    const {requests, closedTags, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
     requests[0].onClose();
@@ -198,7 +198,7 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('closes outstanding toasts on teardown, once', () => {
-    const {closedTags, notifier} = createHarness();
+    const {closedTags, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
     notifier.notify(meetingReminderFirePayloadFactory.build({meetingStartTime: '2026-06-08T10:00:00.000Z'}));
@@ -212,7 +212,7 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('does not close a clicked toast again on teardown', () => {
-    const {requests, closedTags, notifier} = createHarness();
+    const {requests, closedTags, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
     requests[0].onClick();
