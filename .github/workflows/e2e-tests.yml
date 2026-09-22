@@ -7,17 +7,11 @@ on:
     inputs:
       webappUrl:
         type: choice
-        description: Define which stage to run the tests against
+        description: Webapp URL to run the tests against
         required: true
         options:
           - https://wire-webapp-dev.zinfra.io/
-          - https://wire-webapp-master.zinfra.io/
           - https://wire-webapp-qa.zinfra.io/
-      backendUrl:
-        type: choice
-        description: Define which backend should be used
-        options:
-          - https://staging-nginz-https.zinfra.io/
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -35,12 +29,17 @@ on:
       webappUrl:
         type: string
         required: true
-      backendUrl:
+      teamManagementUrl:
         type: string
-        required: true
+        required: false
+        description: Exact team management URL expected from the deployed WebApp artifact
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+      testinyRunName:
+        type: string
+        required: false
+        description: Define Testiny Run name to upload results to
       keep_traces:
         type: boolean
         description: 'Keep Playwright traces'
@@ -50,6 +49,8 @@ on:
         required: true
       WIRE_E2E_TEST_BOT_WEBHOOK_URL:
         required: false
+      TESTINY_API_KEY:
+        required: false
     outputs:
       reportArtifactId:
         description: ID of the playwright report artifact
@@ -58,6 +59,9 @@ on:
         description: URL to the playwright report artifact
         value: ${{ jobs.e2e-report.outputs.reportUrl }}
 
+env:
+  BACKEND_URL: https://staging-nginz-https.zinfra.io/
+
 jobs:
   bootstrap_smoke_test:
     name: Run bootstrap smoke test
@@ -65,7 +69,7 @@ jobs:
 
     services:
       testservice:
-        image: quay.io/wire/testservice:5ec1c95b75daa7241e38c97f2916a06a2e40ce1b
+        image: quay.io/wire/testservice:80a5c186821531c55ea3da3bdc67cac3c51f5f2c
         ports:
           - 8080:8080
 
@@ -88,14 +92,13 @@ jobs:
       - uses: 1password/install-cli-action@8d006a0d0a4fd505af7f7ce589e7f768385ff5e4
 
       - name: Generate env file
-        run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
+        run: op inject -i apps/webapp/test/e2e_tests/.env.tpl -o apps/webapp/test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
       - name: Run bootstrap smoke test
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
-          BACKEND_URL: ${{ inputs.backendUrl }}
           TEST_SERVICE_URL: http://localhost:8080
         run: ./bin/yarn playwright test -c apps/webapp/playwright.config.ts apps/webapp/test/e2e_tests/specs/CriticalFlow/startupHasNoConsoleErrors.spec.ts
 
@@ -138,7 +141,7 @@ jobs:
     timeout-minutes: 45
     needs: [bootstrap_smoke_test, compute_shards]
     container:
-      image: mcr.microsoft.com/playwright:v1.60.0-noble
+      image: quay.io/wire/mirror-images/playwright:v1.63.0-noble
       options: --ipc=host
 
     strategy:
@@ -150,7 +153,7 @@ jobs:
       # Run the kalium testservice as service container of the current job
       # (The tag specifies the commit in kalium to use for tests, see https://quay.io/repository/wire/testservice?tab=history for the latest version)
       testservice:
-        image: quay.io/wire/testservice:5ec1c95b75daa7241e38c97f2916a06a2e40ce1b
+        image: quay.io/wire/testservice:80a5c186821531c55ea3da3bdc67cac3c51f5f2c
         ports:
           - 8080:8080
 
@@ -179,14 +182,24 @@ jobs:
           op --version
 
       - name: Generate env file
-        run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
+        run: op inject -i apps/webapp/test/e2e_tests/.env.tpl -o apps/webapp/test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
-      - name: Run tests
+      - name: Run tests (with team management URL override)
+        if: ${{ inputs.teamManagementUrl != '' }}
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
-          BACKEND_URL: ${{ inputs.backendUrl }}
+          TEAM_MANAGEMENT_URL: ${{ inputs.teamManagementUrl }}
+          TEST_SERVICE_URL: http://testservice:8080
+          PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
+          GREP: ${{ inputs.grep }}
+        run: ./bin/yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
+
+      - name: Run tests
+        if: ${{ inputs.teamManagementUrl == '' }}
+        env:
+          WEBAPP_URL: ${{ inputs.webappUrl }}
           TEST_SERVICE_URL: http://testservice:8080
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
@@ -202,7 +215,7 @@ jobs:
 
   e2e-report:
     runs-on: ubuntu-24.04
-    if: ${{ !cancelled() }}
+    if: ${{ always() && needs.test.result != 'skipped' && needs.test.result != 'cancelled' }}
     needs: [test]
     timeout-minutes: 20
 
@@ -236,7 +249,31 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
 
+      - name: Check for blob reports
+        id: check_blob_reports
+        run: |
+          blobReportDirectory="${PLAYWRIGHT_REPORT_PATH}/blob-reports"
+          if [ -d "$blobReportDirectory" ] && [ -n "$(find "$blobReportDirectory" -type f -print -quit)" ]; then
+            echo "hasReports=true" >> "$GITHUB_OUTPUT"
+            echo "At least one Playwright blob report was downloaded."
+          else
+            echo "hasReports=false" >> "$GITHUB_OUTPUT"
+            echo "No Playwright blob reports were downloaded."
+          fi
+
+      - name: Summarize missing Playwright report
+        if: ${{ steps.check_blob_reports.outputs.hasReports != 'true' }}
+        run: |
+          {
+            echo "## Playwright report"
+            echo
+            echo "No Playwright blob reports were produced or downloaded."
+            echo "Report merging, upload, and Testiny publication were skipped."
+            echo "The upstream E2E job result was \`${{ needs.test.result }}\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Merge playwright reports
+        if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' }}
         working-directory: apps/webapp
         run: |
           ../../bin/yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
@@ -244,6 +281,7 @@ jobs:
 
       - name: Upload test report
         id: upload_playwright_report
+        if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report
@@ -251,16 +289,22 @@ jobs:
 
       - name: Generate outputs
         id: generate-outputs
+        if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' }}
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
 
       - name: Update Testiny Run with results
-        if: ${{ success() && inputs.testinyRunName }}
+        if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' && success() && inputs.testinyRunName }}
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
           TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}
         run: |
+          if [ -z "$TESTINY_API_KEY" ]; then
+            echo "::error::TESTINY_API_KEY secret is required when testinyRunName is provided."
+            exit 1
+          fi
+
           node apps/webapp/test/e2e_tests/scripts/send-playwright-results-to-testiny.ts \
             --report apps/webapp/playwright-report/report.json \
             --run-name "$TESTINY_RUN_NAME"

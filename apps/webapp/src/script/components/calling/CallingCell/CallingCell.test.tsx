@@ -17,8 +17,9 @@
  *
  */
 
-import {render, waitFor} from '@testing-library/react';
 import {act, ReactNode} from 'react';
+
+import {render, waitFor} from '@testing-library/react';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
@@ -32,27 +33,46 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 
-import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
+import {buildMediaDevicesHandler} from '../../../auth/util/test/testUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/InViewport', () => ({
+const mockCallAlertState = {
+  clearShowAlert: jest.fn(),
+  showAlert: false,
+};
+
+jest.mock('Components/calling/useCallAlertState', () => ({
+  useCallAlertState: jest.fn(() => mockCallAlertState),
+}));
+
+jest.mock('Components/inViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: ReactNode}) => {
-    setTimeout(onVisible);
+    require('react').useEffect(() => {
+      onVisible();
+    }, [onVisible]);
+
     return <div>{children}</div>;
   },
   __esModule: true,
 }));
 
-const createCall = (state: CALL_STATE, selfUser = new User(createUuid()), selfClientId = createUuid()) => {
+const createCall = (
+  state: CALL_STATE,
+  selfUser = new User(createUuid(), '', translateForTest),
+  selfClientId = createUuid(),
+) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call(
     {domain: '', id: ''},
-    new Conversation('', ''),
+    new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     0,
     selfParticipant,
     CALL_TYPE.NORMAL,
@@ -71,8 +91,8 @@ const createProps = async () => {
   const mockTeamState = new TeamState();
   jest.spyOn(mockTeamState, 'isExternal').mockReturnValue(false);
 
-  const conversation = new Conversation();
-  conversation.participating_user_ets([new User('id')]);
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  conversation.participating_user_ets([new User('id', '', translateForTest)]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,
@@ -88,8 +108,12 @@ const createProps = async () => {
 };
 
 describe('ConversationListCallingCell', () => {
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
+  beforeEach(() => {
+    mockCallAlertState.clearShowAlert.mockClear();
+  });
 
   it('displays an incoming ringing call', async () => {
     const props = await createProps();
@@ -141,12 +165,13 @@ describe('ConversationListCallingCell', () => {
     const callDuration = container.querySelector('[data-uie-name="call-duration"]');
 
     expect(callDuration).not.toBeNull();
-    expect(callDuration!.textContent).toBe('00:00');
+    const callDurationElement = requireValueForTest(callDuration);
+    expect(callDurationElement.textContent).toBe('00:00');
     act(() => {
       jest.advanceTimersByTime(10000);
     });
 
-    expect(callDuration!.textContent).toBe('00:10');
+    expect(callDurationElement.textContent).toBe('00:10');
     jest.useRealTimers();
   });
 });

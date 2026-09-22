@@ -203,8 +203,10 @@ export const createTeam = async (
     features?: {
       conferenceCalling?: boolean;
       channels?: boolean;
+      meetings?: boolean;
       mls?: boolean | Parameters<BrigRepositoryE2E['configureMLSFeature']>[1];
       cells?: boolean;
+      sso?: boolean;
     };
   },
 ) => {
@@ -232,9 +234,7 @@ export const createTeam = async (
   }
 
   if (options?.features && Object.values(options.features).some(Boolean)) {
-    // The team will be reset right after initialization, so we need to wait a short time for it to finish
-    // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await api.team.upgradeTeam(teamId, owner);
 
     if (options.features.conferenceCalling) {
       await api.enableConferenceCallingFeature(teamId);
@@ -263,10 +263,21 @@ export const createTeam = async (
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
     }
 
+    if (options.features.meetings) {
+      await api.brig.unlockMeetingsFeature(teamId);
+      await api.brig.enableMeetingsFeature(teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MEETINGS, teamId, owner.token);
+    }
+
     if (options.features.cells) {
       await api.brig.unlockCellsFeature(teamId);
       await api.brig.enableCells(teamId);
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, teamId, owner.token);
+    }
+
+    if (options.features.sso) {
+      await api.brig.enableSSOFeature(teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.SSO, teamId, owner.token);
     }
   }
 

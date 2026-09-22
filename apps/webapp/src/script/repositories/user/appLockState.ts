@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
 import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
 
 const defaultEnabled = true;
 const defaultEnforced = false;
@@ -63,6 +64,14 @@ export class AppLockState {
     this.isAppLockActivated = ko.pureComputed(() => this.isAppLockEnabled() && this.hasPassphrase());
     this.hasPassphrase = ko.observable(false);
     this.isActivatedInPreferences = ko.observable(false);
-    this.isAppLockEnabled = ko.pureComputed(() => this.isAppLockEnforced() || this.isActivatedInPreferences());
+    this.isAppLockEnabled = ko.pureComputed(() => {
+      const isMdmAppLockDisabled =
+        Config.getConfig().FEATURE.ENABLE_MDM_CONFIG &&
+        Config.getDesktopConfig()?.managedConfig?.applockOverride === true;
+      if (isMdmAppLockDisabled) {
+        return false;
+      }
+      return this.isAppLockEnforced() || this.isActivatedInPreferences();
+    });
   }
 }

@@ -118,6 +118,7 @@ export const WebAppEvents = {
       HIDE: 'wire.webapp.conversation.people.hide',
     },
     PERSIST_STATE: 'wire.webapp.conversation.persist_state',
+    SELF_REMOVED: 'wire.webapp.conversation.self_removed',
     SHOW: 'wire.webapp.conversation.show',
     VERIFICATION_STATE_CHANGED: 'wire.webapp.conversation.verification_state_changed',
   },
@@ -156,6 +157,12 @@ export const WebAppEvents = {
     SSO_WINDOW_FOCUS: 'wire.webapp.lifecycle.sso_window_focus',
     UNREAD_COUNT: 'wire.webapp.lifecycle.unread_count',
     UPDATE: 'wire.webapp.lifecycle.update',
+  },
+  MEETING: {
+    CREATED: 'wire.webapp.meeting.created',
+    DELETED: 'wire.webapp.meeting.deleted',
+    MEMBER_ADDED: 'wire.webapp.meeting.member_added',
+    UPDATED: 'wire.webapp.meeting.updated',
   },
   NOTIFICATION: {
     CLICK: 'wire.webapp.notification.click',
@@ -265,4 +272,12 @@ export const WebAppEvents = {
     MODAL: 'wire.webapp.warning.modal',
     SHOW: 'wire.webapp.warning.show',
   },
+};
+
+export type ConversationSelfRemovedPayload = {
+  qualifiedConversationId: {
+    domain: string;
+    id: string;
+  };
+  initiatedBySelf: boolean;
 };

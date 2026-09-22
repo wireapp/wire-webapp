@@ -28,6 +28,7 @@ import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
+import {createFireAndForgetInvoker} from '../../../taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {MLSService} from '../mlsService';
 
 async function buildE2EIService(dbName = 'core-test-db') {
@@ -54,13 +55,16 @@ async function buildE2EIService(dbName = 'core-test-db') {
     conversationExists: jest.fn(),
   } as unknown as MLSService;
 
-  const recurringTaskScheduler = new RecurringTaskScheduler({
-    delete: key => mockedDb.delete('recurringTasks', key),
-    get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
-    set: async (key, timestamp) => {
-      await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
+  const recurringTaskScheduler = new RecurringTaskScheduler(
+    {
+      delete: key => mockedDb.delete('recurringTasks', key),
+      get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
+      set: async (key, timestamp) => {
+        await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
+      },
     },
-  });
+    createFireAndForgetInvoker({logger: {error: jest.fn()}}),
+  );
 
   return [
     new E2EIServiceExternal(coreCrypto, mockedDb, recurringTaskScheduler, clientService, mockedMLSService),

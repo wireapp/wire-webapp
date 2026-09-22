@@ -273,6 +273,49 @@ describe('SubconversationService', () => {
       expect(mlsService.registerConversation).toHaveBeenCalledTimes(2);
     });
 
+    it('joins by external commit when another client won the race to establish the subconversation', async () => {
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
+
+      const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
+      const parentGroupId = 'parentGroupId';
+      const subconversationGroupId = 'subconversationGroupId';
+
+      // The subconversation is not established yet, so this client tries to create it...
+      const notEstablishedYet = getSubconversationResponse({
+        epoch: 0,
+        epochTimestamp: '',
+        parentConversationId,
+        groupId: subconversationGroupId,
+        subconversationId: SUBCONVERSATION_ID.CONFERENCE,
+      });
+
+      // ...but by the time it commits, somebody else already did, so the epoch has moved on
+      const establishedByOtherClient = getSubconversationResponse({
+        epoch: 1,
+        epochTimestamp: new Date().toISOString(),
+        parentConversationId,
+        groupId: subconversationGroupId,
+        subconversationId: SUBCONVERSATION_ID.CONFERENCE,
+      });
+
+      jest
+        .spyOn(apiClient.api.conversation, 'getSubconversation')
+        .mockResolvedValueOnce(notEstablishedYet)
+        .mockResolvedValueOnce(establishedByOtherClient);
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(false);
+
+      // The rejected commit has to surface here, otherwise the join is considered successful while
+      // this client stays behind the group's epoch and can never decrypt any media
+      jest
+        .spyOn(mlsService, 'registerConversation')
+        .mockRejectedValueOnce(new BackendError('', BackendErrorLabel.MLS_STALE_MESSAGE, StatusCode.CONFLICT));
+
+      await subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
+
+      expect(mlsService.registerConversation).toHaveBeenCalledTimes(1);
+      expect(mlsService.joinByExternalCommit).toHaveBeenCalled();
+    });
+
     it('returns fresh epoch number after joining the group', async () => {
       const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 

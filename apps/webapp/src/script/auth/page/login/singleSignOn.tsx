@@ -19,12 +19,12 @@
 
 import React, {useRef, useState} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNull, isObject, isString, isUndefined} from '@sindresorhus/is';
 import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
-import {useParams} from 'react-router-dom';
+import {useParams} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {
@@ -47,26 +47,27 @@ import {
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LogoFullIcon} from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
 import {Config} from '../../../Config';
-import {AppAlreadyOpen} from '../../component/AppAlreadyOpen';
-import {BackButton} from '../../component/BackButton';
+import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
+import {BackButton} from '../../component/backButton';
 import {RootState, bindActionCreators} from '../../module/reducer';
-import * as AuthSelector from '../../module/selector/AuthSelector';
-import {srOnlyStyle} from '../../util/a11y';
+import * as AuthSelector from '../../module/selector/authSelector';
+import {srOnlyStyle} from '../../util/a11Y';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
-import {Page} from '../Page';
+import {Page} from '../page';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 
 const logger = getLogger('SingleSignOn');
 
 const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const ssoWindowRef = useRef<Window | null>(null);
   const params = useParams<{code?: string}>();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
@@ -85,10 +86,10 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 
       const onChildWindowClose = () => {
         clearInterval(timerId);
-        if (onReceiveChildWindowMessage) {
+        if (!isUndefined(onReceiveChildWindowMessage)) {
           window.removeEventListener('message', onReceiveChildWindowMessage);
         }
-        if (onParentWindowClose) {
+        if (!isUndefined(onParentWindowClose)) {
           window.removeEventListener('unload', onParentWindowClose);
         }
         setIsOverlayOpen(false);
@@ -113,7 +114,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
           );
         }
 
-        const eventType = is.object(event.data) && 'type' in event.data ? event.data.type : undefined;
+        const eventType = isObject(event.data) && 'type' in event.data ? event.data.type : undefined;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
             onChildWindowClose();
@@ -127,7 +128,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
             return reject(
               new BackendError(
                 `Authentication error: "${JSON.stringify(event.data.payload)}"`,
-                is.object(event.data.payload) && 'label' in event.data.payload && is.string(event.data.payload.label)
+                isObject(event.data.payload) && 'label' in event.data.payload && isString(event.data.payload.label)
                   ? event.data.payload.label
                   : SyntheticErrorLabel.SSO_GENERIC_ERROR,
                 HTTP_STATUS.UNAUTHORIZED,
@@ -171,9 +172,9 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         reject(new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR));
       });
 
-      if (ssoWindowRef.current) {
+      if (!isNull(ssoWindowRef.current)) {
         timerId = window.setInterval(() => {
-          if (ssoWindowRef.current && ssoWindowRef.current.closed) {
+          if (!isNull(ssoWindowRef.current) && ssoWindowRef.current.closed) {
             onChildWindowClose();
             reject(
               new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR),
@@ -201,14 +202,14 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         <Overlay>
           <Container centerText style={{color: COLOR.WHITE, maxWidth: '330px'}}>
             <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginBottom: '30px'}}>
-              <Logo height={24} color={COLOR.WHITE} ariaLabel={t('accessibility.logo.wire')} />
+              <Logo height={24} color={COLOR.WHITE} ariaLabel={translate('accessibility.logo.wire')} />
             </div>
             <Text
               style={{fontSize: '0.875rem', fontWeight: 400, marginTop: '32px'}}
               color={COLOR.WHITE}
               data-uie-name="status-overlay-description"
             >
-              {t('ssoLogin.overlayDescription')}
+              {translate('ssoLogin.overlayDescription')}
             </Text>
             <Link
               block
@@ -224,7 +225,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               onClick={focusChildWindow}
               data-uie-name="do-focus-child-window"
             >
-              {t('ssoLogin.overlayFocusLink')}
+              {translate('ssoLogin.overlayFocusLink')}
             </Link>
           </Container>
         </Overlay>
@@ -276,36 +277,36 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
                       tabIndex={-1}
                     >
                       <span id="sso-login-heading-label" style={srOnlyStyle}>
-                        {t('authLoginTitle')}
+                        {translate('authLoginTitle')}
                       </span>
                       <span id="sso-login-heading-text">
-                        {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                        {translate('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
                       </span>
                     </div>
 
                     <Text block center data-uie-name="status-email-or-sso-code">
-                      {t('ssoLogin.subheadCodeOrEmail')}
+                      {translate('ssoLogin.subheadCodeOrEmail')}
                     </Text>
 
                     <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
                   </>
                 ) : (
                   <>
-                    <H1 center>{t('ssoLogin.headline')}</H1>
+                    <H1 center>{translate('ssoLogin.headline')}</H1>
                     {Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? (
                       <>
                         <Muted block center data-uie-name="status-email-or-sso-code">
-                          {t('ssoLogin.subheadCodeOrEmail')}
+                          {translate('ssoLogin.subheadCodeOrEmail')}
                         </Muted>
 
                         <Muted block center data-uie-name="status-email-environment-switch-warning">
-                          {t('ssoLogin.subheadEmailEnvironmentSwitchWarning', {
+                          {translate('ssoLogin.subheadEmailEnvironmentSwitchWarning', {
                             brandName: Config.getConfig().BRAND_NAME,
                           })}
                         </Muted>
                       </>
                     ) : (
-                      <Muted data-uie-name="status-sso-code">{t('ssoLogin.subheadCode')}</Muted>
+                      <Muted data-uie-name="status-sso-code">{translate('ssoLogin.subheadCode')}</Muted>
                     )}
                     <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
                   </>

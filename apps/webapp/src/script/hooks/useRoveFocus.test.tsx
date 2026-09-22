@@ -19,11 +19,12 @@
 
 import {renderHook} from '@testing-library/react';
 import {act} from 'react';
+import {noop} from 'noop-esm';
 
 import {useRoveFocus} from './useRoveFocus';
 
 function createEvent(key: string) {
-  return {key, preventDefault: () => {}} as KeyboardEvent;
+  return {key, preventDefault: noop} as KeyboardEvent;
 }
 
 describe('useRoveFocus', () => {

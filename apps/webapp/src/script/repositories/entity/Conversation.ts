@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
@@ -49,21 +50,21 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {truncate} from 'Util/stringUtil';
 
-import {CallMessage} from './message/CallMessage';
-import type {ContentMessage} from './message/ContentMessage';
-import type {Message} from './message/Message';
-import {PingMessage} from './message/PingMessage';
+import {CallMessage} from './message/callMessage';
+import type {ContentMessage} from './message/contentMessage';
+import type {Message} from './message/message';
+import {PingMessage} from './message/pingMessage';
 import type {User} from './User';
 
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
 
 export interface UnreadState {
@@ -117,6 +118,8 @@ export class Conversation {
   public cipherSuite: number = 1;
   // Initial protocol is a protocol that was known by a webapp before any protocol update happened. For newly created conversations it is the same as protocol.
   public initialProtocol: CONVERSATION_PROTOCOL;
+  /** Whether this group has no eligible admins and is scheduled for automatic deletion. */
+  public readonly isGhostGroup: ko.Observable<boolean>;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
@@ -144,6 +147,7 @@ export class Conversation {
   public readonly isCreatedBySelf: ko.PureComputed<boolean>;
   public readonly isGroup: ko.PureComputed<boolean>;
   public readonly isChannel: ko.PureComputed<boolean>;
+  public readonly isMeeting: ko.PureComputed<boolean>;
   public readonly isGroupOrChannel: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
@@ -179,6 +183,7 @@ export class Conversation {
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
+  public readonly protocol: CONVERSATION_PROTOCOL;
   public status: ko.Observable<ConversationStatus>;
   public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
@@ -200,15 +205,17 @@ export class Conversation {
   }
 
   constructor(
-    conversation_id: string = '',
-    domain: string = '',
-    public readonly protocol = CONVERSATION_PROTOCOL.PROTEUS,
+    conversation_id: string,
+    domain: string,
+    protocol: CONVERSATION_PROTOCOL,
+    private readonly translate: Translate,
     teamState = container.resolve(TeamState),
   ) {
     this.teamState = teamState;
     this.id = conversation_id;
 
     this.domain = domain;
+    this.protocol = protocol;
 
     this.logger = getLogger(`Conversation (${this.id})`);
     this.initialProtocol = this.protocol;
@@ -293,6 +300,10 @@ export class Conversation {
       return this.groupConversationType() === GROUP_CONVERSATION_TYPE.CHANNEL;
     });
 
+    this.isMeeting = ko.pureComputed(() => {
+      return this.groupConversationType() === GROUP_CONVERSATION_TYPE.MEETING;
+    });
+
     this.isGroupOrChannel = ko.pureComputed(() => {
       return this.isGroup() || this.isChannel();
     });
@@ -369,6 +380,7 @@ export class Conversation {
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
+    this.isGhostGroup = ko.observable(false);
 
     this.hasLegalHold = ko.computed(() => {
       const isInitialized = this.hasInitializedUsers();
@@ -587,11 +599,34 @@ export class Conversation {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || t('unavailableUser');
+        return userName || this.translate('unavailableUser');
       }
 
       if (this.isGroupOrChannel()) {
         if (this.name()) {
+          return this.name();
+        }
+
+        const hasUserEntities = isNonEmptyArray(this.participating_user_ets());
+        if (hasUserEntities) {
+          const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
+          const joinedNames = this.participating_user_ets()
+            .filter(userEntity => isJustServices || !userEntity.isService)
+            .map(userEntity => userEntity.name())
+            .join(', ');
+
+          const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          return truncate(joinedNames, maxLength, false);
+        }
+
+        const hasUserIds = !!this.participating_user_ids().length;
+        if (!hasUserIds) {
+          return this.translate('conversationsEmptyConversation');
+        }
+      }
+
+      if (this.isMeeting()) {
+        if (isNonEmptyString(this.name())) {
           return this.name();
         }
 
@@ -609,7 +644,7 @@ export class Conversation {
 
         const hasUserIds = !!this.participating_user_ids().length;
         if (!hasUserIds) {
-          return t('conversationsEmptyConversation');
+          return this.translate('conversationsEmptyConversation');
         }
       }
 
@@ -641,6 +676,7 @@ export class Conversation {
       this.cleared_timestamp,
       this.messageTimer,
       this.isGuest,
+      this.isGhostGroup,
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.last_server_timestamp,
@@ -969,7 +1005,7 @@ export class Conversation {
         if (message_et.timestamp_affects_order() || forceUpdate) {
           this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
-          const from_self = message_et.user()?.isMe;
+          const from_self = message_et.user()?.isMe && !message_et.isSystem();
           if (from_self) {
             this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_READ);
           }
@@ -1103,6 +1139,7 @@ export class Conversation {
       initial_protocol: this.initialProtocol,
       id: this.id,
       is_guest: this.isGuest(),
+      is_ghost_group: this.isGhostGroup(),
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

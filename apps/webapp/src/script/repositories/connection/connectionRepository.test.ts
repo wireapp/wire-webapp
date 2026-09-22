@@ -25,26 +25,31 @@ import {StatusCodes} from 'http-status-codes';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
+import type {Translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
 import {ConnectionRepository} from './connectionRepository';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildConnectionRepository() {
+function buildConnectionRepository(translate: Translate) {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
   const selfService = new SelfService();
   const teamService = new TeamService();
   const userRepository = {refreshUser: jest.fn()} as unknown as UserRepository;
   return [
-    new ConnectionRepository(connectionService, userRepository, selfService, teamService, connectionState),
+    new ConnectionRepository(connectionService, userRepository, selfService, teamService, translate, connectionState),
     {connectionState, userRepository, connectionService},
   ] as const;
 }
@@ -59,12 +64,19 @@ function createConnection() {
 }
 
 describe('ConnectionRepository', () => {
+  const originalPrimaryModalShow = PrimaryModal.show;
+
+  afterEach(() => {
+    PrimaryModal.show = originalPrimaryModalShow;
+    jest.clearAllMocks();
+  });
+
   describe('cancelRequest', () => {
-    const [connectionRepository, {connectionService, userRepository}] = buildConnectionRepository();
+    const [connectionRepository, {connectionService, userRepository}] = buildConnectionRepository(translateForTest);
 
     it('sets the connection status to cancelled', () => {
       const user = createConnection();
-      connectionRepository.addConnectionEntity(user.connection()!);
+      connectionRepository.addConnectionEntity(requireValueForTest(user.connection()));
       jest.spyOn(connectionService, 'putConnections').mockResolvedValue({} as any);
       return connectionRepository.cancelRequest(user).then(() => {
         expect(connectionService.putConnections).toHaveBeenCalled();
@@ -73,20 +85,22 @@ describe('ConnectionRepository', () => {
 
     it('switches the conversation if requested', () => {
       const user = createConnection();
-      connectionRepository.addConnectionEntity(user.connection()!);
+      connectionRepository.addConnectionEntity(requireValueForTest(user.connection()));
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
-      return connectionRepository.cancelRequest(user, true, new Conversation()).then(() => {
-        expect(connectionService.putConnections).toHaveBeenCalled();
-        expect(amplifySpy).toHaveBeenCalled();
-      });
+      return connectionRepository
+        .cancelRequest(user, true, new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest))
+        .then(() => {
+          expect(connectionService.putConnections).toHaveBeenCalled();
+          expect(amplifySpy).toHaveBeenCalled();
+        });
     });
 
     it('deletes connection request if the other user does not exist on backend anymore', async () => {
       const user = createConnection();
 
-      connectionRepository.addConnectionEntity(user.connection()!);
+      connectionRepository.addConnectionEntity(requireValueForTest(user.connection()));
 
       jest.spyOn(userRepository, 'refreshUser').mockImplementationOnce(async (uid: QualifiedId) => {
         user.isDeleted = true;
@@ -104,12 +118,14 @@ describe('ConnectionRepository', () => {
   });
 
   describe('getConnectionByConversationId', () => {
-    const [connectionRepository] = buildConnectionRepository();
+    const [connectionRepository] = buildConnectionRepository(translateForTest);
 
     it('should return the expected connection for the given conversation id', () => {
       const userA = createConnection();
-      connectionRepository.addConnectionEntity(userA.connection()!);
-      const connectionEntity = connectionRepository.getConnectionByConversationId(userA.connection()!.conversationId);
+      connectionRepository.addConnectionEntity(requireValueForTest(userA.connection()));
+      const connectionEntity = connectionRepository.getConnectionByConversationId(
+        requireValueForTest(userA.connection()).conversationId,
+      );
 
       expect(connectionEntity).toBe(userA.connection());
 
@@ -120,7 +136,7 @@ describe('ConnectionRepository', () => {
   });
 
   describe('getConnections', () => {
-    const [connectionRepository, {connectionService}] = buildConnectionRepository();
+    const [connectionRepository, {connectionService}] = buildConnectionRepository(translateForTest);
     it('de-duplicates connection requests', async () => {
       const connectionRequest = {
         conversation: '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
@@ -141,6 +157,42 @@ describe('ConnectionRepository', () => {
       });
 
       expect(storedConnection?.from).toEqual(connectionRequest.from);
+    });
+  });
+
+  describe('createConnection', () => {
+    it('uses the injected translate function for modal copy', async () => {
+      const translate = jest.fn(
+        (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
+      ) as Translate;
+      const [connectionRepository, {connectionService}] = buildConnectionRepository(translate);
+      const user = generateUser();
+      const primaryModalShow = jest.fn();
+
+      connectionService.postConnections = jest
+        .fn()
+        .mockRejectedValueOnce(
+          new BackendError('', BackendErrorLabel.FEDERATION_NOT_ALLOWED, StatusCodes.FORBIDDEN),
+        ) as any;
+      PrimaryModal.show = primaryModalShow;
+
+      await connectionRepository.createConnection(user);
+
+      expect(translate).toHaveBeenCalledWith('modalUserCannotConnectHeadline');
+      expect(primaryModalShow).toHaveBeenCalledWith(
+        PrimaryModal.type.ACKNOWLEDGE,
+        expect.objectContaining({
+          text: expect.objectContaining({
+            translatedMessage: expect.objectContaining({
+              translationKey: 'modalUserCannotSendConnectionNotFederatingMessage',
+              values: [expect.objectContaining({placeholder: 'username', runtimeText: user.name()})],
+            }),
+            title: 'translated:modalUserCannotConnectHeadline',
+          }),
+        }),
+        undefined,
+        translate,
+      );
     });
   });
 });

@@ -17,14 +17,16 @@
  *
  */
 
-import {useEffect} from 'react';
+import {ReactNode, useEffect} from 'react';
 
 import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {afterRender} from 'Util/util';
 
 import {closeWarning, useWarningsState} from './WarningsState';
@@ -33,10 +35,53 @@ import {CONFIG, TYPE} from './WarningsTypes';
 import {Config} from '../../Config';
 
 interface WarningProps {
-  onRefresh: () => void;
+  readonly onRefresh: () => void;
+}
+
+type PermissionRequestTranslationKey =
+  | 'warningPermissionRequestCamera'
+  | 'warningPermissionRequestMicrophone'
+  | 'warningPermissionRequestNotification'
+  | 'warningPermissionRequestScreen';
+
+type RenderPermissionRequestTranslationOptions = {
+  readonly icon: ReactNode;
+  readonly translate: Translate;
+  readonly translationKey: PermissionRequestTranslationKey;
+};
+
+const permissionRequestIconMarker = createReactTranslationMarker('permission-request-icon');
+
+function renderPermissionRequestTranslation(options: RenderPermissionRequestTranslationOptions): ReactNode[] {
+  const {icon, translate, translationKey} = options;
+  const iconSubstitution = permissionRequestIconMarker.substitution;
+  const translatedText = translate(translationKey, {icon: iconSubstitution}, {icon: iconSubstitution});
+
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [],
+    nodeReplacements: [
+      {
+        marker: permissionRequestIconMarker,
+        render() {
+          return icon;
+        },
+      },
+    ],
+    valueReplacements: [],
+  });
+}
+
+function renderPermissionRequestWarningMessage(options: RenderPermissionRequestTranslationOptions): ReactNode {
+  const {icon, translate, translationKey} = options;
+
+  return (
+    <div className="warning-bar-message">{renderPermissionRequestTranslation({icon, translate, translationKey})}</div>
+  );
 }
 
 const WarningsContainer = ({onRefresh}: WarningProps) => {
+  const {translate} = useApplicationContext();
   const name = useWarningsState(state => state.name);
   const warnings = useWarningsState(state => state.warnings);
   const type = TYPE;
@@ -44,17 +89,6 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
   const warningDimmed = warnings.some(warning => CONFIG.DIMMED_MODES.includes(warning));
 
   useEffect(() => {
-    const visibleWarning = warnings[warnings.length - 1];
-    const isConnectivityRecovery = visibleWarning === TYPE.CONNECTIVITY_RECOVERY;
-    const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
-    const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
-
-    const app = document.querySelector('#app');
-    if (app) {
-      app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
-      app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
-    }
-
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }, [warnings]);
 
@@ -66,7 +100,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       type="button"
       data-uie-name="do-close-warning"
       className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-      onClick={closeWarning}
+      onClick={() => closeWarning(translate)}
     />
   );
 
@@ -78,28 +112,25 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
     <div className={cx('warning', {'warning-dimmed': warningDimmed})}>
       {visibleWarning === type.REQUEST_CAMERA && (
         <div data-uie-name="request-camera" className="warning-bar warning-bar-feature">
-          <div
-            className="warning-bar-message"
-            dangerouslySetInnerHTML={{
-              __html: t('warningPermissionRequestCamera', undefined, {
-                icon: "<span class='warning-bar-icon icon-camera'></span>",
-              }),
-            }}
-          />
+          {renderPermissionRequestWarningMessage({
+            icon: <span className="warning-bar-icon icon-camera" />,
+            translate,
+            translationKey: 'warningPermissionRequestCamera',
+          })}
           {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_CAMERA && (
         <div data-uie-name="denied-camera" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
-            <span>{t('warningPermissionDeniedCamera')}</span>&nbsp;
+            <span>{translate('warningPermissionDeniedCamera')}</span>&nbsp;
             <a
               className="warning-bar-link"
               href={URL.SUPPORT.CAMERA_ACCESS_DENIED}
               rel="nofollow noopener noreferrer"
               target="_blank"
             >
-              {t('warningLearnMore')}
+              {translate('warningLearnMore')}
             </a>
           </div>
           {closeButton}
@@ -107,24 +138,25 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       )}
       {visibleWarning === type.REQUEST_MICROPHONE && (
         <div data-uie-name="request-microphone" className="warning-bar warning-bar-feature">
-          <div className="warning-bar-message">
-            <Icon.MicOnIcon className="warning-bar-icon" />
-            <span dangerouslySetInnerHTML={{__html: t('warningPermissionRequestMicrophone', undefined, {icon: ''})}} />
-          </div>
+          {renderPermissionRequestWarningMessage({
+            icon: <Icon.MicOnIcon className="warning-bar-icon" />,
+            translate,
+            translationKey: 'warningPermissionRequestMicrophone',
+          })}
           {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_MICROPHONE && (
         <div data-uie-name="denied-microphone" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
-            <span>{t('warningPermissionDeniedMicrophone')}</span>&nbsp;
+            <span>{translate('warningPermissionDeniedMicrophone')}</span>&nbsp;
             <a
               className="warning-bar-link"
               rel="nofollow noopener noreferrer"
               target="_blank"
               href={URL.SUPPORT.MICROPHONE_ACCESS_DENIED}
             >
-              {t('warningLearnMore')}
+              {translate('warningLearnMore')}
             </a>
           </div>
           {closeButton}
@@ -132,28 +164,25 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       )}
       {visibleWarning === type.REQUEST_SCREEN && (
         <div data-uie-name="request-screen" className="warning-bar warning-bar-feature">
-          <div
-            className="warning-bar-message"
-            dangerouslySetInnerHTML={{
-              __html: t('warningPermissionRequestScreen', undefined, {
-                icon: "<span class='warning-bar-icon icon-screensharing'></span>",
-              }),
-            }}
-          />
+          {renderPermissionRequestWarningMessage({
+            icon: <span className="warning-bar-icon icon-screensharing" />,
+            translate,
+            translationKey: 'warningPermissionRequestScreen',
+          })}
           {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_SCREEN && (
         <div data-uie-name="denied-screen" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
-            <span>{t('warningPermissionDeniedScreen')}</span>&nbsp;
+            <span>{translate('warningPermissionDeniedScreen')}</span>&nbsp;
             <a
               className="warning-bar-link"
               rel="nofollow noopener noreferrer"
               target="_blank"
               href={URL.SUPPORT.SCREEN_ACCESS_DENIED}
             >
-              {t('warningLearnMore')}
+              {translate('warningLearnMore')}
             </a>
           </div>
           {closeButton}
@@ -162,14 +191,14 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       {visibleWarning === type.NOT_FOUND_CAMERA && (
         <div data-uie-name="not-found-camera" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
-            <span>{t('warningNotFoundCamera')}</span>&nbsp;
+            <span>{translate('warningNotFoundCamera')}</span>&nbsp;
             <a
               className="warning-bar-link"
               rel="nofollow noopener noreferrer"
               target="_blank"
               href={URL.SUPPORT.DEVICE_NOT_FOUND}
             >
-              {t('warningLearnMore')}
+              {translate('warningLearnMore')}
             </a>
           </div>
           {closeButton}
@@ -178,14 +207,14 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       {visibleWarning === type.NOT_FOUND_MICROPHONE && (
         <div data-uie-name="not-found-microphone" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
-            <span>{t('warningNotFoundMicrophone')}</span>&nbsp;
+            <span>{translate('warningNotFoundMicrophone')}</span>&nbsp;
             <a
               className="warning-bar-link"
               rel="nofollow noopener noreferrer"
               target="_blank"
               href={URL.SUPPORT.DEVICE_NOT_FOUND}
             >
-              {t('warningLearnMore')}
+              {translate('warningLearnMore')}
             </a>
           </div>
           {closeButton}
@@ -193,14 +222,11 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       )}
       {visibleWarning === type.REQUEST_NOTIFICATION && (
         <div data-uie-name="request-notification" className="warning-bar warning-bar-feature">
-          <div
-            className="warning-bar-message"
-            dangerouslySetInnerHTML={{
-              __html: t('warningPermissionRequestNotification', undefined, {
-                icon: "<span class='warning-bar-icon icon-envelope'></span>",
-              }),
-            }}
-          />
+          {renderPermissionRequestWarningMessage({
+            icon: <span className="warning-bar-icon icon-envelope" />,
+            translate,
+            translationKey: 'warningPermissionRequestNotification',
+          })}
           {closeButton}
         </div>
       )}
@@ -208,32 +234,32 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
         <div data-uie-name="unsupported-incoming-call" className="warning-bar warning-bar-feature">
           {!Runtime.isChrome() && (
             <div className="warning-bar-message">
-              <span>{t('warningCallUnsupportedIncoming', {user: name})}</span>&nbsp;
+              <span>{translate('warningCallUnsupportedIncoming', {user: name})}</span>&nbsp;
               <a
                 className="warning-bar-link"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
                 href={URL.SUPPORT.CALLING}
               >
-                {t('warningLearnMore')}
+                {translate('warningLearnMore')}
               </a>
             </div>
           )}
           {Runtime.isChrome() && Runtime.isDesktopApp() ? (
             <div className="warning-bar-message">
-              <span>{t('warningCallIssues', {brandName})}</span>&nbsp;
+              <span>{translate('warningCallIssues', {brandName})}</span>&nbsp;
               <a
                 className="warning-bar-link"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
                 href={window.wire.env.APP_BASE}
               >
-                {t('wire_for_web', {brandName})}
+                {translate('wire_for_web', {brandName})}
               </a>
             </div>
           ) : (
             <div className="warning-bar-message">
-              <span>{t('warningCallUpgradeBrowser')}</span>
+              <span>{translate('warningCallUpgradeBrowser')}</span>
             </div>
           )}
           {closeButton}
@@ -243,32 +269,32 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
         <div data-uie-name="unsupported-outgoing-call" className="warning-bar warning-bar-feature">
           {!Runtime.isChrome() && (
             <div className="warning-bar-message">
-              <span>{t('warningCallUnsupportedOutgoing')}</span>&nbsp;
+              <span>{translate('warningCallUnsupportedOutgoing')}</span>&nbsp;
               <a
                 className="warning-bar-link"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
                 href={URL.SUPPORT.CALLING}
               >
-                {t('warningLearnMore')}
+                {translate('warningLearnMore')}
               </a>
             </div>
           )}
           {Runtime.isChrome() && Runtime.isDesktopApp() ? (
             <div className="warning-bar-message">
-              <span>{t('warningCallIssues', {brandName})}</span>&nbsp;
+              <span>{translate('warningCallIssues', {brandName})}</span>&nbsp;
               <a
                 className="warning-bar-link"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
                 href={window.wire.env.APP_BASE}
               >
-                {t('wire_for_web', {brandName})}
+                {translate('wire_for_web', {brandName})}
               </a>
             </div>
           ) : (
             <div className="warning-bar-message">
-              <span>{t('warningCallUpgradeBrowser')}</span>
+              <span>{translate('warningCallUpgradeBrowser')}</span>
             </div>
           )}
           {closeButton}
@@ -277,7 +303,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       {visibleWarning === type.CONNECTIVITY_RECONNECT && (
         <div data-uie-name="connectivity-reconnect" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
-            <span>{t('warningConnectivityConnectionLost', {brandName})}</span>
+            <span>{translate('warningConnectivityConnectionLost', {brandName})}</span>
             <Icon.LoadingIcon className="warning-bar-spinner" data-uie-name="status-loading" />
           </div>
         </div>
@@ -285,7 +311,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       {visibleWarning === type.CALL_QUALITY_POOR && (
         <div data-uie-name="call-quality-poor" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
-            <span>{t('warningCallQualityPoor')}</span>
+            <span>{translate('warningCallQualityPoor')}</span>
           </div>
         </div>
       )}
@@ -294,13 +320,13 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       )}
       {visibleWarning === type.NO_INTERNET && (
         <div data-uie-name="no-internet" className="warning-bar warning-bar-connection">
-          <div className="warning-bar-message">{t('warningConnectivityNoInternet')}</div>
+          <div className="warning-bar-message">{translate('warningConnectivityNoInternet')}</div>
         </div>
       )}
       {visibleWarning === type.LIFECYCLE_UPDATE && (
         <div data-uie-name="lifecycle-update" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
-            <span>{t('warningLifecycleUpdate', {brandName})}</span>&nbsp;
+            <span>{translate('warningLifecycleUpdate', {brandName})}</span>&nbsp;
             <a
               className="warning-bar-link"
               href={URL.WHATS_NEW}
@@ -308,7 +334,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
               target="_blank"
               data-uie-name="go-whats-new"
             >
-              {t('warningLifecycleUpdateNotes')}
+              {translate('warningLifecycleUpdateNotes')}
             </a>
             &nbsp;·&nbsp;
             <button
@@ -317,7 +343,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
               onClick={onRefresh}
               data-uie-name="do-update"
             >
-              {t('warningLifecycleUpdateLink')}
+              {translate('warningLifecycleUpdateLink')}
             </button>
           </div>
         </div>

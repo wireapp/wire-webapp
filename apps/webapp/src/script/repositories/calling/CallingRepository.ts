@@ -17,22 +17,25 @@
  *
  */
 
-import type { CallConfigData } from '@wireapp/api-client/lib/account/callConfigData';
-import { QualifiedUserClients } from '@wireapp/api-client/lib/conversation';
-import { FEATURE_KEY } from '@wireapp/api-client/lib/team';
-import type { QualifiedId } from '@wireapp/api-client/lib/user';
-import type { WebappProperties } from '@wireapp/api-client/lib/user/data';
-import { MessageSendingState } from '@wireapp/core/lib/conversation';
-import { flattenUserMap } from '@wireapp/core/lib/conversation/message/userClientsUtil';
-import { SubconversationEpochInfoMember } from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
-import { TaskScheduler } from '@wireapp/core/lib/util';
-import { constructFullyQualifiedClientId } from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
-import { amplify } from 'amplify';
+import {isFunction, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
+import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
+import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
+import {TaskScheduler} from '@wireapp/core/lib/util';
+import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
+import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
-import { container } from 'tsyringe';
+import {noop} from 'noop-esm';
+import {Maybe} from 'true-myth';
+import {container} from 'tsyringe';
 import 'webrtc-adapter';
-import { z } from 'zod';
+import {z} from 'zod';
 
 import {
   AUDIO_STATE,
@@ -52,65 +55,72 @@ import {
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
-import { AvsDebugger } from '@wireapp/avs-debugger';
-import { Runtime } from '@wireapp/commons';
-import { WebAppEvents } from '@wireapp/webapp-events';
+import {AvsDebugger} from '@wireapp/avs-debugger';
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
-import { useCallAlertState } from 'Components/calling/useCallAlertState';
-import { PrimaryModal } from 'Components/Modals/PrimaryModal';
-import { CALL_QUALITY_FEEDBACK_KEY } from 'Components/Modals/QualityFeedbackModal/constants';
-import { RatingListLabel } from 'Components/Modals/QualityFeedbackModal/typings';
-import { NetworkQualityInfo, NetworkQualityInfoSchema } from 'Repositories/calling/calling.schema';
-import { isMLSConversation, MLSConversation } from 'Repositories/conversation/ConversationSelectors';
-import { ConversationState } from 'Repositories/conversation/ConversationState';
-import { ConversationVerificationState } from 'Repositories/conversation/ConversationVerificationState';
-import { EventBuilder } from 'Repositories/conversation/EventBuilder';
-import { CONSENT_TYPE, MessageRepository, MessageSendingOptions } from 'Repositories/conversation/MessageRepository';
-import { Conversation } from 'Repositories/entity/Conversation';
-import type { User } from 'Repositories/entity/User';
-import { CallingEvent } from 'Repositories/event/CallingEvent';
-import { EventRepository } from 'Repositories/event/EventRepository';
-import { EventSource } from 'Repositories/event/EventSource';
-import { NOTIFICATION_HANDLING_STATE } from 'Repositories/event/NotificationHandlingState';
-import { BackgroundEffectsHandler } from 'Repositories/media/backgroundEffectsHandler';
-import type { MediaDevicesHandler } from 'Repositories/media/MediaDevicesHandler';
-import type { MediaStreamHandler } from 'Repositories/media/MediaStreamHandler';
-import { MediaType } from 'Repositories/media/MediaType';
-import { backgroundEffectsStore } from 'Repositories/media/useBackgroundEffectsStore';
-import type { BackgroundEffectSelection, BackgroundSource } from 'Repositories/media/VideoBackgroundEffects';
-import { TeamState } from 'Repositories/team/TeamState';
-import { EventName } from 'Repositories/tracking/eventName';
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
+import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {useActiveWindowState} from 'Hooks/useActiveWindow';
+import {
+  NetworkQualityInfo,
+  NetworkQualityInfoSchema,
+  UNKNOWN_NETWORK_QUALITY,
+} from 'Repositories/calling/calling.schema';
+import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {EventBuilder} from 'Repositories/conversation/EventBuilder';
+import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import {CallingEvent} from 'Repositories/event/CallingEvent';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventSource} from 'Repositories/event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
+import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaType} from 'Repositories/media/MediaType';
+import {backgroundEffectsStore, BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
+import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import {TeamState} from 'Repositories/team/TeamState';
+import {EventName} from 'Repositories/tracking/eventName';
 import * as trackingHelpers from 'Repositories/tracking/helpers';
-import { Segmentation } from 'Repositories/tracking/segmentation';
-import { isTelemetryEnabledAtCurrentEnvironment } from 'Repositories/tracking/telemetry.helpers';
-import type { UserRepository } from 'Repositories/user/userRepository';
-import { flatten } from 'Util/arrayUtil';
-import { calculateChildWindowPosition } from 'Util/DOM/caculateChildWindowPosition';
-import { isDetachedCallingFeatureEnabled } from 'Util/isDetachedCallingFeatureEnabled';
-import { t } from 'Util/localizerUtil';
-import { getLogger, Logger } from 'Util/logger';
-import { captureModalFocusContext } from 'Util/modalFocusUtil';
-import { roundLogarithmic } from 'Util/numberUtil';
-import { matchQualifiedIds } from 'Util/qualifiedId';
-import { copyStyles } from 'Util/renderElement';
-import { TIME_IN_MILLIS } from 'Util/timeUtil';
-import { toError } from 'Util/toError';
-import { createUuid } from 'Util/uuid';
+import {Segmentation} from 'Repositories/tracking/segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
+import type {UserRepository} from 'Repositories/user/userRepository';
+import {flatten} from 'Util/arrayUtil';
+import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
+import {type Translate} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {captureModalFocusContext} from 'Util/modalFocusUtil';
+import {roundLogarithmic} from 'Util/numberUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {copyStyles} from 'Util/renderElement';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {toError} from 'Util/toError';
+import {createUuid} from 'Util/uuid';
 
-import { Call, SerializedConversationId } from './Call';
-import { CallingEpochData } from './CallingEpochCache';
-import { callingSubscriptions } from './callingSubscriptionsHandler';
-import { CallingViewMode, CallState, MuteState } from './CallState';
-import { CALL_MESSAGE_TYPE } from './enum/CallMessageType';
-import { LEAVE_CALL_REASON } from './enum/LeaveCallReason';
-import { ClientId, Participant, UserId } from './Participant';
+import {Call, SerializedConversationId} from './Call';
+import {CallingEpochData} from './CallingEpochCache';
+import {callingSubscriptions} from './callingSubscriptionsHandler';
+import {CallingViewMode, CallState, MuteState} from './CallState';
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCallInvite';
+import {ClientId, Participant, UserId} from './Participant';
 
-import { Config } from '../../Config';
-import { NoAudioInputError } from '../../error/noAudioInputError';
-import { APIClient } from '../../service/apiClientSingleton';
-import { Core } from '../../service/coreSingleton';
-import type { ServerTimeHandler } from '../../time/serverTimeHandler';
-import { Warnings } from '../../view_model/WarningsContainer';
+import {Config} from '../../Config';
+import {NoAudioInputError} from '../../error/noAudioInputError';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {Warnings} from '../../view_model/WarningsContainer';
 
 const avsLogger = getLogger('avs');
 const AVS_BROWSER_SLEEP_MODE_DETECTION_TIME = 3000;
@@ -140,7 +150,7 @@ interface ActiveSpeakers {
   audio_levels: ActiveSpeaker[];
 }
 
-type Clients = { clientid: string; userid: string }[];
+type Clients = {clientid: string; userid: string}[];
 
 enum CALL_DIRECTION {
   INCOMING = 'incoming',
@@ -151,6 +161,23 @@ type SubconversationData = {
   epoch: number;
   secretKey: string;
   members: SubconversationEpochInfoMember[];
+};
+
+export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window) => {
+  if (!Runtime.isDesktopApp()) {
+    return noop;
+  }
+
+  const handleClick = (event: MouseEvent) => {
+    const anchor = (event.target as HTMLElement).closest('a');
+    if (anchor?.target === '_blank' && anchor.href) {
+      event.preventDefault();
+      openerWindow.open(anchor.href);
+    }
+  };
+
+  detachedWindow.document.addEventListener('click', handleClick, true);
+  return () => detachedWindow.document.removeEventListener('click', handleClick, true);
 };
 
 export class CallingRepository {
@@ -169,6 +196,7 @@ export class CallingRepository {
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
   private isOnAvsRustSft = false;
+  private readonly incomingSetupReceivedAtByConversation = new Map<SerializedConversationId, number>();
 
   static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
 
@@ -195,6 +223,7 @@ export class CallingRepository {
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly backgroundEffectsHandler: BackgroundEffectsHandler,
+    private readonly translate: Translate,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -202,7 +231,7 @@ export class CallingRepository {
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('CallingRepository');
-    this.incomingCallCallback = () => { };
+    this.incomingCallCallback = noop;
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -242,21 +271,26 @@ export class CallingRepository {
       if (isDegraded) {
         this.abortCall(activeConversation.qualifiedId, LEAVE_CALL_REASON.CONVERSATION_DEGRADED);
 
-        const { container, restoreFocusCallback } = this.getModalContainerAndRestoreFocusCallback();
+        const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
         const modalOptions = {
           primaryAction: {
-            text: t('conversation.E2EIOk'),
+            text: this.translate('conversation.E2EIOk'),
           },
           text: {
-            message: t('conversation.E2EIGroupCallDisconnected'),
-            title: t('conversation.E2EIConversationNoLongerVerified'),
+            message: this.translate('conversation.E2EIGroupCallDisconnected'),
+            title: this.translate('conversation.E2EIConversationNoLongerVerified'),
           },
           close: restoreFocusCallback(),
           container,
         };
 
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${activeConversation.id}`);
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          modalOptions,
+          `degraded-${activeConversation.id}`,
+          this.translate,
+        );
       }
     });
 
@@ -270,7 +304,7 @@ export class CallingRepository {
 
     this.subscribeToEvents();
 
-    this.onChooseScreen = (deviceId: string) => { };
+    this.onChooseScreen = noop;
 
     // Request the video streams whenever the mode changes to active speaker
     ko.computed(() => {
@@ -342,13 +376,25 @@ export class CallingRepository {
     effect: BackgroundEffectSelection,
     customBackground?: BackgroundSource,
   ): Promise<void> {
-    // persisted chosen background effect, don't care we have call or not
     this.backgroundEffectsHandler.setPreferredBackgroundEffect(effect, customBackground);
-    await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
+
+    const activeCall = this.callState.joinedCall();
+    if (!activeCall) {
+      return;
+    }
+
+    const selfParticipant = activeCall.getSelfParticipant();
+    const originalVideoStream = selfParticipant.videoStream();
+
+    if (!originalVideoStream || selfParticipant.sharesScreen()) {
+      return;
+    }
+
+    await this.applyCurrentBackgroundEffectOnSelfParticipant(originalVideoStream, true);
   }
 
-  public allowSuperhighQualityTier(enable: boolean) {
-    this.backgroundEffectsHandler.enableSuperhighQualityTier(enable);
+  public setBackgroundEffectsQualityTier(quality: BackgroundEffectsQuality) {
+    this.backgroundEffectsHandler.setQualityTier(quality);
   }
 
   public getBackgroundEffectsHandler(): BackgroundEffectsHandler {
@@ -356,74 +402,103 @@ export class CallingRepository {
   }
 
   private async applyCurrentBackgroundEffectOnSelfParticipant(
+    stream: MediaStream,
     changeAvsSendingMediaSource = false,
   ): Promise<MediaStream | void> {
     const activeCall = this.callState.joinedCall();
+
     if (!activeCall) {
-      // There is no call even there is no self-participant!
-      this.logger.warn('There is no call even there is no self-participant to apply background effects');
+      this.logger.warn('No active call exists to apply background effects');
       return;
     }
 
-    // Read self-Participant state to change
     const selfParticipant = activeCall.getSelfParticipant();
-    const hasActiveVideo = selfParticipant.hasActiveVideo();
-    const sharesScreen = selfParticipant.sharesScreen();
 
-    if (sharesScreen) {
-      this.logger.error('The application allows to apply background effects in case of screen shares');
+    if (selfParticipant.sharesScreen()) {
+      this.logger.warn('Background effects are not applied while screen sharing');
       return;
     }
 
-    // let's check if background should be disabled, then let's do it and go back to the original video
+    const hasVideo = stream.getVideoTracks().some(track => track.readyState === 'live');
+
+    if (!hasVideo) {
+      selfParticipant.updateMediaStream(stream, true);
+      return stream;
+    }
+
+    /*
+     * switchVideoBackgroundEffect passes the already assigned original stream.
+     * In that case we must not assign it again because updateMediaStream(..., true)
+     * could stop or release the same stream.
+     */
+    const originalStreamChanged = selfParticipant.videoStream() !== stream;
+
+    const previousProcessedStream = selfParticipant.processedVideoStream();
+
     if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
-      const originalVideoStream = selfParticipant.videoStream();
-      if (originalVideoStream === undefined) {
-        return undefined;
+      if (originalStreamChanged) {
+        selfParticipant.updateMediaStream(stream, true);
       }
-      selfParticipant.releaseProcessedVideoStream();
-      if (hasActiveVideo && changeAvsSendingMediaSource) {
-        // So let's switch back to the original video source
-        this.logger.info('Disable background effects.');
-        this.changeMediaSource(originalVideoStream, MediaType.VIDEO, false);
-      }
-      return originalVideoStream;
-    }
 
-    const videoStream = selfParticipant.videoStream();
-    if (hasActiveVideo === false || videoStream === undefined) {
-      // no Video nothing to change!!
-      this.logger.warn('No video exists to apply apply background effects');
-      return;
-    }
-
-    // Hold a reference to the old stream so we can release it AFTER the new one is assigned,
-    const previousStream = selfParticipant.processedVideoStream();
-
-    const { applied, media } = await this.backgroundEffectsHandler.applyBackgroundEffect(videoStream);
-
-    // The BackgroundEffectsHandler decide not to change the video stream, so we're going on with the original video.
-    if (!applied) {
-      previousStream?.release();
       selfParticipant.processedVideoStream(undefined);
+
       if (changeAvsSendingMediaSource) {
-        this.logger.info('Background effect could not applied! Switch back to original video stream!');
-        this.changeMediaSource(videoStream, MediaType.VIDEO, false);
+        this.changeMediaSource(stream, MediaType.VIDEO, false, activeCall);
       }
-      return videoStream;
+
+      previousProcessedStream?.release();
+
+      this.logger.info('Background effect disabled. Using original video stream.');
+
+      return stream;
     }
 
-    // Assign new stream first, then release old.
+    /*
+     * Prepare the processed stream before exposing the new original stream
+     * to the participant.
+     */
+    const {applied, media} = await this.backgroundEffectsHandler.applyBackgroundEffect(stream);
+
+    if (!applied) {
+      if (originalStreamChanged) {
+        selfParticipant.updateMediaStream(stream, true);
+      }
+
+      selfParticipant.processedVideoStream(undefined);
+
+      if (changeAvsSendingMediaSource) {
+        this.changeMediaSource(stream, MediaType.VIDEO, false, activeCall);
+      }
+
+      previousProcessedStream?.release();
+
+      this.logger.warn('Background effect could not be applied. Using original video stream.');
+
+      return stream;
+    }
+
+    /*
+     * Important:
+     * updateMediaStream must happen before processedVideoStream(media).
+     *
+     * updateMediaStream may clear or release the participant's processed stream.
+     */
+    if (originalStreamChanged) {
+      selfParticipant.updateMediaStream(stream, true);
+    }
+
     selfParticipant.processedVideoStream(media);
-    if (previousStream !== media) {
-      previousStream?.release();
+
+    if (changeAvsSendingMediaSource) {
+      this.changeMediaSource(media.stream, MediaType.VIDEO, false, activeCall);
     }
 
-    // in case we also want to instantly change AVS sending source we do it now,
-    if (changeAvsSendingMediaSource) {
-      this.changeMediaSource(media.stream, MediaType.VIDEO, false);
-      this.logger.info('Background effect applied!');
+    if (previousProcessedStream !== media) {
+      previousProcessedStream?.release();
     }
+
+    this.logger.info('Background effect applied to self participant.');
+
     return media.stream;
   }
 
@@ -435,7 +510,7 @@ export class CallingRepository {
     this.isSoftLock = value;
   }
 
-  async initAvs(selfUser: User, clientId: ClientId): Promise<{ wCall: Wcall; wUser: number }> {
+  async initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     const callingInstance = await getAvsInstance();
@@ -445,7 +520,7 @@ export class CallingRepository {
 
     this.mediaDevicesHandler.setOnMediaDevicesRefreshHandler(this.onMediaDevicesRefresh);
 
-    return { wCall: this.wCall, wUser: this.wUser };
+    return {wCall: this.wCall, wUser: this.wUser};
   }
 
   private onMediaDevicesRefresh = () => {
@@ -536,8 +611,8 @@ export class CallingRepository {
       this.sendSFTRequest, // `sfth`
       this.incomingCall, // `incomingh`,
       this.handleMissedCall, // `missedh`,
-      () => { }, // `answer
-      () => { }, // `estabh`,
+      noop, // `answer
+      noop, // `estabh`,
       this.callClosed, // `closeh`,
       this.metricsReceived, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
@@ -593,15 +668,19 @@ export class CallingRepository {
     if (!call) {
       return false;
     }
-    const { conversation } = call;
+    const {conversation} = call;
 
-    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversation.qualifiedId);
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+    const allClients = await coreServices.conversation.fetchAllParticipantsClients(conversation.qualifiedId);
 
     if (!this.isMLSConference(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
-        qualifiedClients.map(({ data, userId }) =>
+        qualifiedClients.map(({data, userId}) =>
           data.map(clientid => ({
             clientid,
             userid: this.serializeQualifiedId(userId),
@@ -612,7 +691,7 @@ export class CallingRepository {
       this.wCall?.setClientsForConv(
         this.wUser,
         this.serializeQualifiedId(conversation.qualifiedId),
-        JSON.stringify({ clients }),
+        JSON.stringify({clients}),
       );
     }
 
@@ -643,11 +722,16 @@ export class CallingRepository {
       return;
     }
 
+    const {quality} = qualityInfo;
+    if (quality === UNKNOWN_NETWORK_QUALITY) {
+      return;
+    }
+
     const call = this.findCall(this.parseQualifiedId(conversationId));
     if (!call) {
       return;
     }
-    const { quality } = qualityInfo;
+
     if (quality !== QUALITY.NORMAL) {
       // @note: This should be reverted back once avs is sending correct quality metrics
       // Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
@@ -725,25 +809,30 @@ export class CallingRepository {
   }
 
   private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
-    // if it's a video call we query the video user media in order to display the video preview
     try {
       const selfParticipant = call.getSelfParticipant();
       camera = this.teamState.isVideoCallingEnabled() ? camera : false;
       backgroundEffectsStore.getState().setIsInitializing(true);
-      const mediaStream = await this.getMediaStream({ audio, camera }, call.isGroupOrConference);
-      if (call.state() !== CALL_STATE.NONE) {
-        selfParticipant.updateMediaStream(mediaStream, true);
-        if (this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
-          await this.applyCurrentBackgroundEffectOnSelfParticipant();
-        }
-        if (camera) {
-          call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
-        }
-      } else {
+      const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
+
+      if (call.state() === CALL_STATE.NONE) {
         mediaStream.getTracks().forEach(track => track.stop());
+        return true;
       }
+
+      if (camera && mediaStream.getVideoTracks().length > 0) {
+        await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
+      } else {
+        selfParticipant.updateMediaStream(mediaStream, true);
+      }
+
+      if (camera) {
+        selfParticipant.videoState(VIDEO_STATE.STARTED);
+      }
+
       return true;
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
+      this.logger.warn('Failed to warm up media streams', error);
       return false;
     } finally {
       backgroundEffectsStore.getState().setIsInitializing(false);
@@ -782,7 +871,7 @@ export class CallingRepository {
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({ settings }: WebappProperties) => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
     });
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
@@ -798,32 +887,33 @@ export class CallingRepository {
       return;
     }
 
-    const { conversation } = activeCall;
+    const {conversation} = activeCall;
 
     const clients = this.userRepository?.findUserById(unverifiedUserId)?.devices() || [];
 
-    for (const { id: clientId } of clients) {
+    for (const {id: clientId} of clients) {
       const participant = activeCall.getParticipant(unverifiedUserId, clientId);
 
       if (participant) {
         this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.USER_TURNED_UNVERIFIED);
 
-        const { container, restoreFocusCallback } = this.getModalContainerAndRestoreFocusCallback();
+        const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
         PrimaryModal.show(
           PrimaryModal.type.ACKNOWLEDGE,
           {
             primaryAction: {
-              text: t('callDegradationAction'),
+              text: this.translate('callDegradationAction'),
             },
             text: {
-              message: t('callDegradationDescription', { username: participant.user.name() }),
-              title: t('callDegradationTitle'),
+              message: this.translate('callDegradationDescription', {username: participant.user.name()}),
+              title: this.translate('callDegradationTitle'),
             },
             close: restoreFocusCallback(),
             container,
           },
           `degraded-${conversation.qualifiedId}`,
+          this.translate,
         );
       }
     }
@@ -844,19 +934,20 @@ export class CallingRepository {
 
   private warnOutdatedClient(conversationId: QualifiedId) {
     const brandName = Config.getConfig().BRAND_NAME;
-    const { container, restoreFocusCallback } = this.getModalContainerAndRestoreFocusCallback();
+    const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
     PrimaryModal.show(
       PrimaryModal.type.ACKNOWLEDGE,
       {
         close: restoreFocusCallback(() => this.acceptVersionWarning(conversationId)),
         text: {
-          message: t('modalCallUpdateClientMessage', { brandName }),
-          title: t('modalCallUpdateClientHeadline', { brandName }),
+          message: this.translate('modalCallUpdateClientMessage', {brandName}),
+          title: this.translate('modalCallUpdateClientHeadline', {brandName}),
         },
         container,
       },
       'update-client-warning',
+      this.translate,
     );
   }
 
@@ -866,7 +957,7 @@ export class CallingRepository {
    * We need to find the correct conversation in order for AVS to know which call is concerned
    */
   private extractTargetedConversationId(event: CallingEvent): QualifiedId {
-    const { targetConversation, conversation, qualified_conversation } = event;
+    const {targetConversation, conversation, qualified_conversation} = event;
     const targetedConversationId = targetConversation || qualified_conversation;
     const conversationId = targetedConversationId ?? {
       domain: '',
@@ -884,9 +975,9 @@ export class CallingRepository {
       return;
     }
 
-    const { content, qualified_conversation, from, qualified_from, time } = event;
+    const {content, qualified_conversation, from, qualified_from, time} = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
-    const userId = isFederated ? qualified_from : { domain: '', id: from };
+    const userId = isFederated ? qualified_from : {domain: '', id: from};
     const conversationId = this.extractTargetedConversationId(event);
     const conversation = this.getConversationById(conversationId);
 
@@ -898,7 +989,11 @@ export class CallingRepository {
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversationId);
+          const coreServices = this.core.service;
+          if (isUndefined(coreServices)) {
+            throw new Error('Core services are not initialized');
+          }
+          const allClients = await coreServices.conversation.fetchAllParticipantsClients(conversationId);
 
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
@@ -948,7 +1043,7 @@ export class CallingRepository {
         window.dispatchEvent(
           new CustomEvent(WebAppEvents.CALL.REMOTE_MUTED, {
             detail: {
-              notificationMessage: t('muteStateRemoteMute'),
+              notificationMessage: this.translate('muteStateRemoteMute'),
             },
           }),
         );
@@ -981,7 +1076,7 @@ export class CallingRepository {
             id: `${Date.now()}-${id}`,
             emoji,
             left: Math.random() * 500,
-            from: isSelf ? t('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
+            from: isSelf ? this.translate('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
           };
         });
 
@@ -1018,7 +1113,7 @@ export class CallingRepository {
 
         const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
 
-        const { isHandUp } = content;
+        const {isHandUp} = content;
         const handRaisedAt = time ? new Date(time).getTime() : new Date().getTime();
         participant.handRaisedAt(isHandUp ? handRaisedAt : null);
 
@@ -1028,8 +1123,8 @@ export class CallingRepository {
 
         const name = participant.user.name();
         const handUpMessage = isSelf
-          ? t('videoCallParticipantRaisedSelfHandUp')
-          : t('videoCallParticipantRaisedTheirHandUp', { name });
+          ? this.translate('videoCallParticipantRaisedSelfHandUp')
+          : this.translate('videoCallParticipantRaisedTheirHandUp', {name});
 
         window.dispatchEvent(
           new CustomEvent(WebAppEvents.CALL.HAND_RAISED, {
@@ -1068,7 +1163,16 @@ export class CallingRepository {
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
 
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
-    const userId = isFederated ? qualified_from : { domain: '', id: from };
+    const userId = isFederated ? qualified_from : {domain: '', id: from};
+    const isFromSelf = !!this.selfUser && matchQualifiedIds(this.selfUser.qualifiedId, userId);
+    const incomingSetupReceivedAtMs = new Date(time).getTime();
+
+    if (isIncomingSetupOffer(content) && !isFromSelf && Number.isFinite(incomingSetupReceivedAtMs)) {
+      this.incomingSetupReceivedAtByConversation.set(
+        this.serializeQualifiedId(conversation.qualifiedId),
+        incomingSetupReceivedAtMs,
+      );
+    }
 
     let senderClientId = '';
     if (senderFullyQualifiedClientId) {
@@ -1085,7 +1189,7 @@ export class CallingRepository {
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
       conversation && this.getConversationType(conversation),
-      0, // if call a meeting 1
+      conversation ? this.getMeetingCallFlag(conversation) : 0,
     );
 
     if (res !== 0) {
@@ -1106,11 +1210,15 @@ export class CallingRepository {
   // Call actions
   //##############################################################################
 
+  private getMeetingCallFlag(conversation: Conversation): 0 | 1 {
+    return conversation.isMeeting() ? 1 : 0;
+  }
+
   private getConversationType(conversation: Conversation): CONV_TYPE {
     const useSFTForOneToOneCalls =
       this.teamState.teamFeatures()?.[FEATURE_KEY.CONFERENCE_CALLING]?.config?.useSFTForOneToOneCalls;
 
-    if (conversation.isGroupOrChannel() || useSFTForOneToOneCalls) {
+    if (conversation.isGroupOrChannel() || conversation.isMeeting() || useSFTForOneToOneCalls) {
       if (isMLSConversation(conversation)) {
         return CONV_TYPE.CONFERENCE_MLS;
       }
@@ -1169,7 +1277,14 @@ export class CallingRepository {
        * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
        */
       this.wCall?.setMute(this.wUser, 0);
-      this.wCall?.start(this.wUser, convId, CALL_TYPE.NORMAL, conversationType, this.callState.cbrEncoding(), 0); // if call a meeting 1
+      this.wCall?.start(
+        this.wUser,
+        convId,
+        CALL_TYPE.NORMAL,
+        conversationType,
+        this.callState.cbrEncoding(),
+        this.getMeetingCallFlag(conversation),
+      );
       if (!!conversation && this.isMLSConference(conversation)) {
         this.setCachedEpochInfos(call);
       }
@@ -1217,7 +1332,7 @@ export class CallingRepository {
 
   private parseQualifiedId(multiplexedId: string): QualifiedId {
     const [id, domain = ''] = multiplexedId.split('@');
-    return { domain, id };
+    return {domain, id};
   }
 
   /**
@@ -1271,7 +1386,7 @@ export class CallingRepository {
    * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
    */
   toggleOnlyScreenshare = async (call: Call): Promise<void> => {
-    const { conversation } = call;
+    const {conversation} = call;
 
     // The screen share was stopped by the user through the application. We clean up the state and stop the screen share
     // video track. Note that stopping a track does not trigger an "ended" event.
@@ -1282,7 +1397,7 @@ export class CallingRepository {
     }
 
     try {
-      const mediaStream = await this.getMediaStream({ audio: true, screen: true }, call.isGroupOrConference);
+      const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
       if ('contentHint' in mediaStream.getVideoTracks()[0]) {
         mediaStream.getVideoTracks()[0].contentHint = 'detail';
       }
@@ -1330,12 +1445,12 @@ export class CallingRepository {
         selfParticipant.releaseVideoStream(true);
       }
 
-      screenStream = await this.getMediaStream({ screen: true }, call.isGroupOrConference);
+      screenStream = await this.getMediaStream({screen: true}, call.isGroupOrConference);
       if (!screenStream) {
         throw new Error('Failed to get screen share stream');
       }
 
-      cameraStream = await this.getMediaStream({ camera: true }, call.isGroupOrConference);
+      cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
       if (!cameraStream) {
         throw new Error('Failed to get camera stream');
       }
@@ -1451,7 +1566,7 @@ export class CallingRepository {
   };
 
   async setViewModeDetached(
-    detachedViewModeOptions: { name: string; height: number; width: number } = {
+    detachedViewModeOptions: {name: string; height: number; width: number} = {
       name: 'WIRE_PICTURE_IN_PICTURE_CALL',
       width: 1026,
       height: 829,
@@ -1462,8 +1577,8 @@ export class CallingRepository {
       return;
     }
 
-    const { name, width, height } = detachedViewModeOptions;
-    const { top, left } = calculateChildWindowPosition(height, width);
+    const {name, width, height} = detachedViewModeOptions;
+    const {top, left} = calculateChildWindowPosition(height, width);
 
     const detachedWindow = window.open(
       '',
@@ -1492,11 +1607,15 @@ export class CallingRepository {
     // New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
     setTimeout(() => copyStyles(window.document, detachedWindow.document), 0);
 
-    detachedWindow.document.title = t('callingPopOutWindowTitle', { brandName: Config.getConfig().BRAND_NAME });
+    detachedWindow.document.title = this.translate('callingPopOutWindowTitle', {
+      brandName: Config.getConfig().BRAND_NAME,
+    });
 
     detachedWindow.addEventListener('beforeunload', this.closeDetachedWindow);
     detachedWindow.addEventListener('pagehide', this.closeDetachedWindow);
     window.addEventListener('pagehide', this.onPageHide);
+
+    setupDetachedWindowExternalLinksClick(detachedWindow, window);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
 
@@ -1509,7 +1628,7 @@ export class CallingRepository {
     // Temporary feature to toggle Rust SFT
     this.setSetupSftConfig(call);
 
-    const { conversation } = call;
+    const {conversation} = call;
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
 
@@ -1522,28 +1641,33 @@ export class CallingRepository {
       const isE2EIDegradedConversation = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
       let userConsentWithDegradation = true;
       if (isE2EIDegradedConversation) {
-        const { container, restoreFocusCallback } = this.getModalContainerAndRestoreFocusCallback();
+        const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
         userConsentWithDegradation = await new Promise(resolve =>
-          PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-            primaryAction: {
-              action: () => {
-                conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-                resolve(true);
+          PrimaryModal.show(
+            PrimaryModal.type.CONFIRM,
+            {
+              primaryAction: {
+                action: () => {
+                  conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+                  resolve(true);
+                },
+                text: this.translate('conversation.E2EIJoinAnyway'),
               },
-              text: t('conversation.E2EIJoinAnyway'),
+              secondaryAction: {
+                action: () => resolve(false),
+                text: this.translate('conversation.E2EICancel'),
+              },
+              text: {
+                message: this.translate('conversation.E2EIDegradedJoinCall'),
+                title: this.translate('conversation.E2EIConversationNoLongerVerified'),
+              },
+              close: restoreFocusCallback(),
+              container,
             },
-            secondaryAction: {
-              action: () => resolve(false),
-              text: t('conversation.E2EICancel'),
-            },
-            text: {
-              message: t('conversation.E2EIDegradedJoinCall'),
-              title: t('conversation.E2EIConversationNoLongerVerified'),
-            },
-            close: restoreFocusCallback(),
-            container,
-          }),
+            undefined,
+            this.translate,
+          ),
         );
       }
       const shouldContinueCall = userConsentWithDegradation && (await this.pushClients(call, true));
@@ -1624,7 +1748,7 @@ export class CallingRepository {
     callingSubscriptions.removeCall(conversationId);
   };
 
-  private readonly joinMlsConferenceSubconversation = async ({ qualifiedId, groupId }: MLSConversation) => {
+  private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
     const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
     const serializeConversationId = this.serializeQualifiedId(qualifiedId);
 
@@ -1682,7 +1806,7 @@ export class CallingRepository {
         continue;
       }
 
-      const { id: userId, domain } = member.userId;
+      const {id: userId, domain} = member.userId;
       const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
 
       const key = `mls-call-client-${conversation.id}-${clientQualifiedId}`;
@@ -1710,7 +1834,7 @@ export class CallingRepository {
             `Call Epoch Info: on client left remove from subconversation, user: ${serializeSelfUser}, conversation: ${conversationId}`,
           );
           return this.subconversationService.removeClientFromConferenceSubconversation(conversationId, {
-            user: { id: member.userId.id, domain: member.userId.domain },
+            user: {id: member.userId.id, domain: member.userId.domain},
             clientId: member.clientid,
           });
         },
@@ -1736,7 +1860,7 @@ export class CallingRepository {
   private readonly setEpochInfo = (conversationId: QualifiedId, subconversationData: SubconversationData) => {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
     const userId = this.selfUser ? this.serializeQualifiedId(this.selfUser.qualifiedId) : 'unknown';
-    const { epoch, secretKey, members } = subconversationData;
+    const {epoch, secretKey, members} = subconversationData;
     const clients = {
       convid: serializedConversationId,
       clients: members,
@@ -1750,7 +1874,7 @@ export class CallingRepository {
       this.logger.info(
         `Call Epoch Info: _cache_store, epoch: ${epoch}, user: ${userId}, conversation: ${serializedConversationId}`,
       );
-      return call.epochCache.store({ serializedConversationId, epoch, clients, secretKey });
+      return call.epochCache.store({serializedConversationId, epoch, clients, secretKey});
     }
 
     this.logger.info(
@@ -1815,7 +1939,7 @@ export class CallingRepository {
       return;
     }
 
-    const { setQualityFeedbackModalShown, setConversationId } = useCallAlertState.getState();
+    const {setQualityFeedbackModalShown, setConversationId} = useCallAlertState.getState();
 
     try {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
@@ -1895,51 +2019,93 @@ export class CallingRepository {
     this.avsVersion = version;
   };
 
-  private getMediaStream({ audio = false, camera = false, screen = false }: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler
-      .requestMediaStream(audio, camera, screen, isGroup)
-      .then(stream => {
-        if (!stream) {
-          throw new Error('Failed to get media stream');
+  private async getMediaStream(
+    {audio = false, camera = false, screen = false}: MediaStreamQuery,
+    isGroup: boolean,
+  ): Promise<MediaStream> {
+    try {
+      const stream = await this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
+      if (isNullOrUndefined(stream)) {
+        throw new Error('Failed to get media stream');
+      }
+
+      // For camera streams, verify we have video tracks
+      if (camera === true) {
+        const videoTracks = stream.getVideoTracks();
+        if (videoTracks.length === 0) {
+          throw new Error('No video tracks found in camera stream');
         }
 
-        // For camera streams, verify we have video tracks
-        if (camera) {
-          const videoTracks = stream.getVideoTracks();
-          if (!videoTracks.length) {
-            throw new Error('No video tracks found in camera stream');
-          }
-
-          const videoTrack = videoTracks[0];
-          if (videoTrack.readyState !== 'live') {
-            throw new Error(`Camera track not live. State: ${videoTrack.readyState}`);
-          }
-
-          // Log camera track details for debugging
-          this.logger.info('Camera track details:', {
-            enabled: videoTrack.enabled,
-            muted: videoTrack.muted,
-            readyState: videoTrack.readyState,
-            settings: videoTrack.getSettings(),
-            constraints: videoTrack.getConstraints(),
-            capabilities: videoTrack.getCapabilities(),
-          });
+        const videoTrack = videoTracks[0];
+        if (isUndefined(videoTrack)) {
+          throw new Error('No video tracks found in camera stream');
         }
 
-        return this.mediaDevicesHandler
-          .initializeMediaDevices(camera, false)
-          .then(() => {
-            return stream;
-          })
-          .catch((error: unknown) => {
-            this.logger.warn('Failed to initialize media devices:', error);
-            return stream;
+        if (videoTrack.readyState !== 'live') {
+          throw new Error(`Camera track not live. State: ${videoTrack.readyState}`);
+        }
+
+        // Log camera track details for debugging
+        this.logger.info('Camera track details:', {
+          enabled: videoTrack.enabled,
+          muted: videoTrack.muted,
+          readyState: videoTrack.readyState,
+          settings: this.getMediaTrackSettings(videoTrack).unwrapOr(undefined),
+          constraints: this.getMediaTrackConstraints(videoTrack).unwrapOr(undefined),
+          capabilities: this.getMediaTrackCapabilities(videoTrack).unwrapOr(undefined),
+        });
+      }
+
+      if (audio === true) {
+        const audioTrack = stream.getAudioTracks()[0];
+
+        if (isUndefined(audioTrack) === false) {
+          this.logger.info('Audio track details:', {
+            enabled: audioTrack.enabled,
+            muted: audioTrack.muted,
+            readyState: audioTrack.readyState,
+            settings: this.getMediaTrackSettings(audioTrack).unwrapOr(undefined),
+            constraints: this.getMediaTrackConstraints(audioTrack).unwrapOr(undefined),
+            capabilities: this.getMediaTrackCapabilities(audioTrack).unwrapOr(undefined),
           });
-      })
-      .catch((error: unknown) => {
-        this.logger.error('Failed to get media stream:', error);
-        throw error;
-      });
+        }
+      }
+
+      try {
+        await this.mediaDevicesHandler.initializeMediaDevices(camera === true, false);
+      } catch (error: unknown) {
+        this.logger.warn('Failed to initialize media devices:', error);
+      }
+
+      return stream;
+    } catch (error: unknown) {
+      this.logger.error('Failed to get media stream:', error);
+      throw error;
+    }
+  }
+
+  private getMediaTrackSettings(mediaTrack: MediaStreamTrack): Maybe<MediaTrackSettings> {
+    if (isFunction(mediaTrack.getSettings) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getSettings());
+  }
+
+  private getMediaTrackConstraints(mediaTrack: MediaStreamTrack): Maybe<MediaTrackConstraints> {
+    if (isFunction(mediaTrack.getConstraints) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getConstraints());
+  }
+
+  private getMediaTrackCapabilities(mediaTrack: MediaStreamTrack): Maybe<MediaTrackCapabilities> {
+    if (isFunction(mediaTrack.getCapabilities) === false) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(mediaTrack.getCapabilities());
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
@@ -1950,7 +2116,7 @@ export class CallingRepository {
     }
 
     const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
-    const { conversation } = call;
+    const {conversation} = call;
 
     if (call && !validStateWithoutCamera.includes(call.state())) {
       this.showNoCameraModal();
@@ -1971,17 +2137,21 @@ export class CallingRepository {
   }
 
   public async refreshVideoInput() {
-    const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
+    const activeCallBeforeRefresh = this.callState.joinedCall();
+    const isGroupOrConference = activeCallBeforeRefresh?.isGroupOrConference ?? false;
+    const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, isGroupOrConference);
     this.stopMediaSource(MediaType.VIDEO);
-    let clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
+
     const activeCall = this.callState.joinedCall();
+
     if (activeCall && this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
-      const processedStream = await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
+      const processedStream = await this.applyCurrentBackgroundEffectOnSelfParticipant(stream, true);
       if (processedStream) {
-        clonedMediaStream = processedStream;
+        return processedStream;
       }
     }
-    return clonedMediaStream;
+
+    return this.changeMediaSource(stream, MediaType.VIDEO);
   }
 
   public async refreshAudioInput() {
@@ -2037,7 +2207,7 @@ export class CallingRepository {
       return;
     }
     const selfParticipant = call.getSelfParticipant();
-    const { conversation } = call;
+    const {conversation} = call;
 
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks();
@@ -2071,8 +2241,8 @@ export class CallingRepository {
   }
 
   private mapTargets(targets: SendMessageTarget): QualifiedUserClients {
-    const recipients = targets.clients.reduce((acc, { userid, clientid }) => {
-      const { domain: parsedDomain, id } = this.parseQualifiedId(userid);
+    const recipients = targets.clients.reduce((acc, {userid, clientid}) => {
+      const {domain: parsedDomain, id} = this.parseQualifiedId(userid);
       const domain = parsedDomain || this.selfUser?.domain || '';
       const domainRecipients = (acc[domain] = acc[domain] ?? {});
       domainRecipients[id] = [...(domainRecipients[id] ?? []), clientid];
@@ -2194,14 +2364,14 @@ export class CallingRepository {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
     void this.sendCallingMessage(
       conversationId,
-      { type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: { targets: recipients } },
-      { nativePush: true, recipients },
+      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
+      {nativePush: true, recipients},
     );
   };
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    void this.sendCallingMessage(conversationId, { type: CALL_MESSAGE_TYPE.REMOTE_KICK }, { nativePush: true, recipients });
+    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (
@@ -2213,15 +2383,23 @@ export class CallingRepository {
   ): number => {
     const _sendSFTRequest = async () => {
       const response = await axios.post(url, data);
-      const { status, data: axiosData } = response;
+      const {status, data: axiosData} = response;
       const jsonData = JSON.stringify(axiosData);
-      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+      const user = this.wUser;
+      if (isUndefined(user)) {
+        return;
+      }
+      this.wCall?.sftResp(user, status, jsonData, jsonData.length, context);
     };
     const avsSftResponseFailedCode = 1000;
     _sendSFTRequest().catch((error: unknown) => {
       this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${toError(error).message}`, error);
       avsLogger.warn(`Request to sft server failed with error`, error);
-      this.wCall?.sftResp(this.wUser!, avsSftResponseFailedCode, '', 0, context);
+      const user = this.wUser;
+      if (isUndefined(user)) {
+        return;
+      }
+      this.wCall?.sftResp(user, avsSftResponseFailedCode, '', 0, context);
     });
 
     return 0;
@@ -2233,8 +2411,8 @@ export class CallingRepository {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
       const config = await this.fetchConfig(limit);
       if (useRustSft) {
-        (config as any).sft_servers = [{ urls: ['https://rust-sft.stars.wire.link'] }];
-        (config as any).sft_servers_all = [{ urls: ['https://rust-sft.stars.wire.link'] }];
+        (config as any).sft_servers = [{urls: ['https://rust-sft.stars.wire.link']}];
+        (config as any).sft_servers_all = [{urls: ['https://rust-sft.stars.wire.link']}];
       }
 
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
@@ -2288,7 +2466,7 @@ export class CallingRepository {
     }
 
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
-      const { conversation } = call;
+      const {conversation} = call;
       const callingEvent = EventBuilder.buildCallingTimeoutEvent(
         reason,
         conversation,
@@ -2411,6 +2589,26 @@ export class CallingRepository {
       );
       return;
     }
+
+    const nowMs = this.serverTimeHandler.toServerTimestamp();
+    if (
+      shouldRejectStaleIncomingRing({
+        shouldRing: !!shouldRing,
+        incomingSetupReceivedAtMs: Maybe.of(
+          this.incomingSetupReceivedAtByConversation.get(this.serializeQualifiedId(conversation.qualifiedId)),
+        ),
+        nowMs,
+        lifetimeMs: EventRepository.CONFIG.E_CALL_EVENT_LIFETIME,
+      })
+    ) {
+      this.logger.info(
+        `Skipping incoming ring, last incoming SETUP is older than ${EventRepository.CONFIG.E_CALL_EVENT_LIFETIME}ms`,
+        conversationId,
+      );
+      this.rejectCall(conversationId);
+      return;
+    }
+
     const storedCall = this.findCall(conversationId);
     if (storedCall) {
       // A call that has been picked up by another device can still be in storage.
@@ -2492,8 +2690,8 @@ export class CallingRepository {
 
   private updateParticipantList(call: Call, members: QualifiedWcallMember[]): void {
     const newMembers = members
-      .filter(({ userId, clientid }) => !call.getParticipant(userId, clientid))
-      .map(({ userId, clientid }) => {
+      .filter(({userId, clientid}) => !call.getParticipant(userId, clientid))
+      .map(({userId, clientid}) => {
         const user = this.userRepository.findUserById(userId);
         if (!user) {
           return null;
@@ -2504,7 +2702,7 @@ export class CallingRepository {
 
     const removedMembers = call
       .participants()
-      .filter(participant => !members.find(({ userId, clientid }) => participant.doesMatchIds(userId, clientid)));
+      .filter(participant => !members.find(({userId, clientid}) => participant.doesMatchIds(userId, clientid)));
 
     newMembers.forEach(participant => call.participants.unshift(participant));
     removedMembers.forEach(participant => call.participants.remove(participant));
@@ -2525,7 +2723,7 @@ export class CallingRepository {
       return;
     }
 
-    const { members: serializedMembers }: { members: WcallMember[] } = JSON.parse(membersJson);
+    const {members: serializedMembers}: {members: WcallMember[]} = JSON.parse(membersJson);
     const members: QualifiedWcallMember[] = serializedMembers.map(member => ({
       ...member,
       userId: this.parseQualifiedId(member.userid),
@@ -2569,7 +2767,7 @@ export class CallingRepository {
     }
 
     const isCurrentlyEstablished = currentOtherParticipant.isAudioEstablished();
-    const { aestab: newEstablishedStatus } = nextOtherParticipant;
+    const {aestab: newEstablishedStatus} = nextOtherParticipant;
 
     if (isCurrentlyEstablished && newEstablishedStatus === AUDIO_STATE.CONNECTING) {
       call.epochCache.clean();
@@ -2585,7 +2783,7 @@ export class CallingRepository {
       return;
     }
 
-    const { conversation } = call;
+    const {conversation} = call;
 
     if (conversation && this.isMLSConference(conversation)) {
       const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
@@ -2623,7 +2821,7 @@ export class CallingRepository {
       return Promise.reject();
     }
     const selfParticipant = call.getSelfParticipant();
-    const query: Required<MediaStreamQuery> = { audio, camera, screen };
+    const query: Required<MediaStreamQuery> = {audio, camera, screen};
     const cache = {
       audio: selfParticipant.audioStream(),
       camera: selfParticipant.videoStream(),
@@ -2660,22 +2858,25 @@ export class CallingRepository {
         if (missingStreams.screen && selfParticipant.sharesScreen()) {
           return selfParticipant.getMediaStream();
         }
-        backgroundEffectsStore.getState().setIsInitializing(true);
-        const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
-        this.mediaStreamQuery = undefined;
-        selfParticipant.updateMediaStream(mediaStream, true);
 
-        if (this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
-          await this.applyCurrentBackgroundEffectOnSelfParticipant();
+        backgroundEffectsStore.getState().setIsInitializing(true);
+
+        const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
+
+        if (missingStreams.camera && mediaStream.getVideoTracks().length > 0) {
+          await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
+        } else {
+          selfParticipant.updateMediaStream(mediaStream, true);
         }
 
         return selfParticipant.getMediaStream();
       } catch (error: unknown) {
-        this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
         this.handleMediaStreamError(call, missingStreams, error);
+
         return selfParticipant.getMediaStream();
       } finally {
+        this.mediaStreamQuery = undefined;
         backgroundEffectsStore.getState().setIsInitializing(false);
       }
     })();
@@ -2692,21 +2893,16 @@ export class CallingRepository {
   };
 
   private readonly updateActiveSpeakers = (wuser: number, convId: string, rawJson: string) => {
-    console.info('active speakers updated', new Date());
     const call = this.findCall(this.parseQualifiedId(convId));
     const activeSpeakers: ActiveSpeakers = JSON.parse(rawJson);
     if (call && activeSpeakers) {
-      const didUpdateGridPage = call.setActiveSpeakers(
-        activeSpeakers.audio_levels.map(({ userid, clientid, audio_level_now }) => ({
+      call.setActiveSpeakers(
+        activeSpeakers.audio_levels.map(({userid, clientid, audio_level_now}) => ({
           clientId: clientid,
           levelNow: audio_level_now,
           userId: this.parseQualifiedId(userid),
         })),
       );
-
-      if (didUpdateGridPage && !this.callState.isSpeakersViewActive() && !this.callState.isMaximisedViewActive()) {
-        this.changeCallPage(call, call.currentPage());
-      }
     }
   };
 
@@ -2840,7 +3036,7 @@ export class CallingRepository {
     call: Call,
     customSegmentations: Record<string, any> = {},
   ) => {
-    const { conversation } = call;
+    const {conversation} = call;
     const participants = conversation.participating_user_ets() || [];
     const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;
@@ -2881,63 +3077,83 @@ export class CallingRepository {
   }
 
   private showNoAudioInputModal(): void {
-    const { container, restoreFocusCallback } = this.getModalContainerAndRestoreFocusCallback();
+    const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
     const modalOptions = {
       primaryAction: {
-        text: t('modalAcknowledgeAction'),
+        text: this.translate('modalAcknowledgeAction'),
       },
       secondaryAction: {
         action: () => amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV),
-        text: t('modalNoAudioInputAction'),
+        text: this.translate('modalNoAudioInputAction'),
       },
       text: {
-        closeBtnLabel: t('modalNoAudioCloseBtn'),
-        message: t('modalNoAudioInputMessage'),
-        title: t('modalNoAudioInputTitle'),
+        closeBtnLabel: this.translate('modalNoAudioCloseBtn'),
+        message: this.translate('modalNoAudioInputMessage'),
+        title: this.translate('modalNoAudioInputTitle'),
       },
       close: restoreFocusCallback(),
       container,
     };
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions, undefined, this.translate);
   }
 
   private showNoCameraModal(): void {
-    const { container, restoreFocusCallback } = this.getModalContainerAndRestoreFocusCallback();
+    const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
     const modalOptions = {
       text: {
-        closeBtnLabel: t('modalNoCameraCloseBtn'),
-        htmlMessage: t(
-          'modalNoCameraMessage',
-          { brandName: Config.getConfig().BRAND_NAME },
-          {
-            '/faqLink': '</a>',
-            br: '<br>',
-            faqLink: `<a href="${Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-              }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
-          },
-        ),
-        title: t('modalNoCameraTitle'),
+        closeBtnLabel: this.translate('modalNoCameraCloseBtn'),
+        translatedMessage: {
+          compatibilityReplacements: [],
+          components: [
+            {kind: 'line-break', legacyTokens: [], markerName: 'br'},
+            {
+              className: '',
+              dataUieName: 'go-no-camera-faq',
+              href: Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED,
+              kind: 'link',
+              legacyClosingTokens: [],
+              legacyOpeningTokens: [],
+              markerName: 'faqLink',
+              rel: 'noopener noreferrer',
+              target: '_blank',
+            },
+          ],
+          kind: 'translation',
+          layout: 'default',
+          translationKey: 'modalNoCameraMessage',
+          values: [
+            {
+              alternatePlaceholders: [],
+              placeholder: 'brandName',
+              runtimeText: Config.getConfig().BRAND_NAME,
+            },
+          ],
+        } satisfies PrimaryModalTranslatedMessage,
+        title: this.translate('modalNoCameraTitle'),
       },
       close: restoreFocusCallback(),
       container,
     };
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
   }
 
   /**
    * Helper method to get modal container and restore focus callback
    * Call this method immediately before showing a modal to ensure the correct active element is captured.
+   * Prefer the currently focused window so detached calls still show modals in the window the user interacted with.
    * @returns Object containing container and focus restoration callback
    */
   private getModalContainerAndRestoreFocusCallback() {
     const detachedWindow = this.callState.detachedWindow();
     const isDetachedWindow = this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
+    const activeWindow = useActiveWindowState.getState().activeWindow;
+    const modalWindow = isDetachedWindow && detachedWindow && activeWindow === detachedWindow ? detachedWindow : window;
 
     const context = captureModalFocusContext({
-      targetDocument: isDetachedWindow && detachedWindow ? detachedWindow.document : undefined,
-      container: isDetachedWindow && detachedWindow ? detachedWindow.document.body : undefined,
+      targetDocument: modalWindow.document,
+      container: modalWindow === window ? undefined : modalWindow.document.body,
     });
 
     return {

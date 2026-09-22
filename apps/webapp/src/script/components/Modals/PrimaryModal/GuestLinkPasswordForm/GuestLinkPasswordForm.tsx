@@ -19,20 +19,19 @@
 
 import type {FormEvent} from 'react';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
+import {Form} from '@wireapp/react-ui-kit';
 
+import {PasswordFields} from 'Components/PasswordFields/PasswordFields';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
-
-import {errorMessageStyles} from './GuestLinkPasswordForm.styles';
+import type {Translate} from 'Util/localizerUtil';
 
 interface GuestLinkPasswordFormProps {
+  readonly translate: Translate;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onGeneratePassword: (password: string) => void;
   passwordValue: string;
-  passwordValueRef: React.RefObject<HTMLInputElement>;
+  passwordValueRef: React.RefObject<HTMLInputElement | null>;
   onPasswordValueChange: (value: string) => void;
   isPasswordInputMarkInvalid: boolean;
   passwordConfirmationValue: string;
@@ -41,6 +40,7 @@ interface GuestLinkPasswordFormProps {
 }
 
 export const GuestLinkPasswordForm = ({
+  translate,
   onSubmit,
   onGeneratePassword,
   passwordValue,
@@ -54,6 +54,7 @@ export const GuestLinkPasswordForm = ({
   return (
     <>
       <PasswordGeneratorButton
+        translate={translate}
         passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
         onGeneratePassword={onGeneratePassword}
       />
@@ -63,55 +64,17 @@ export const GuestLinkPasswordForm = ({
         onSubmit={onSubmit}
         autoComplete="off"
       >
-        <Input
-          name="guest-link-password"
-          data-uie-name="guest-link-password"
-          required
-          placeholder={t('modalGuestLinkJoinPlaceholder')}
-          label={t('modalGuestLinkJoinLabel')}
-          helperText={t('modalGuestLinkJoinHelperText', {
-            minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-          })}
-          id="modal_pswd"
-          className="modal__input"
-          type="password"
-          showTogglePasswordLabel={t('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
-          autoComplete="off"
-          value={passwordValue}
-          ref={passwordValueRef}
-          onChange={event => onPasswordValueChange(event.currentTarget.value)}
-          pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
-          markInvalid={isPasswordInputMarkInvalid}
-          error={isPasswordInputMarkInvalid ? <GuestLinkPasswordModalErrorMessage /> : undefined}
-        />
-        <Input
-          name="guest-link-password-confirm"
-          data-uie-name="guest-link-password-confirm"
-          required
-          placeholder={t('modalGuestLinkJoinConfirmPlaceholder')}
-          label={t('modalGuestLinkJoinConfirmLabel')}
-          className="modal__input"
-          type="password"
-          showTogglePasswordLabel={t('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
-          id="modal_pswd_confirmation"
-          autoComplete="off"
-          value={passwordConfirmationValue}
-          onChange={event => onPasswordConfirmationChange(event.currentTarget.value)}
-          markInvalid={isPasswordConfirmationMarkInvalid}
+        <PasswordFields
+          translate={translate}
+          passwordValue={passwordValue}
+          passwordValueRef={passwordValueRef}
+          onPasswordValueChange={onPasswordValueChange}
+          isPasswordInputMarkInvalid={isPasswordInputMarkInvalid}
+          passwordConfirmationValue={passwordConfirmationValue}
+          onPasswordConfirmationChange={onPasswordConfirmationChange}
+          isPasswordConfirmationMarkInvalid={isPasswordConfirmationMarkInvalid}
         />
       </Form>
     </>
-  );
-};
-
-const GuestLinkPasswordModalErrorMessage = () => {
-  return (
-    <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
-      {t('modalGuestLinkJoinHelperText', {
-        minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-      })}
-    </ErrorMessage>
   );
 };

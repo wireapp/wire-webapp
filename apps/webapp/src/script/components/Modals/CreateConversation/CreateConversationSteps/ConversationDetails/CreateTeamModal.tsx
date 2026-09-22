@@ -20,9 +20,9 @@
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {useTeamCreationModal} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/useTeamCreationModal';
+import {useTeamCreationModal} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/useTeamCreationModal';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {
   salesModalBodyButtonCss,
@@ -36,6 +36,7 @@ import {
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
 export const CreateTeamModal = () => {
+  const {translate} = useApplicationContext();
   const {
     isCreateTeamModalOpen,
     setIsCreateTeamModalOpen,
@@ -65,10 +66,10 @@ export const CreateTeamModal = () => {
       <div css={salesModalBodyCss}>
         <div css={salesModalBodyWrapperCss}>
           <p css={salesModalBodyHeaderCss} className="paragraph-body-3">
-            {t('createConversationTeamCreationModalHeader')}
+            {translate('createConversationTeamCreationModalHeader')}
           </p>
           <Text block css={salesModalBodyTextCss}>
-            {t('createConversationTeamCreationModalText')}
+            {translate('createConversationTeamCreationModalText')}
           </Text>
         </div>
         <Button
@@ -78,7 +79,7 @@ export const CreateTeamModal = () => {
           data-uie-name="do-create-team"
           onKeyDown={event => handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]})}
         >
-          {t('createConversationTeamCreationModalButton')}
+          {translate('createConversationTeamCreationModalButton')}
         </Button>
       </div>
     </ModalComponent>

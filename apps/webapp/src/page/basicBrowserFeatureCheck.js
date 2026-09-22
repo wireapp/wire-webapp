@@ -25,7 +25,7 @@
  * browsers (for instance, `globalThis`).
  *
  * The more advanced browser support check, that can be done after the oAuth exception (like IndexDB, RTC, cookies),
- * is done in `src/script/browser/CheckBrowser.ts`
+ * is done in `src/script/browser/checkBrowser.ts`
  *
  */
 

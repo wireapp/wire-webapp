@@ -1,0 +1,227 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState} from 'react';
+
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {maybe} from 'true-myth';
+
+import {SharedDriveUploadCompletedIcon, SharedDriveUploadSpinnerIcon} from '@wireapp/react-ui-kit';
+
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
+import {KEY} from 'Util/keyboardUtil';
+
+import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
+import {
+  getRepresentativeSharedDriveUploadStatus,
+  getSharedDriveUploadAggregateKind,
+  getSharedDriveUploadStatuses,
+  type SharedDriveUploadStatus,
+} from '../conversationCells/sharedDriveUploadStatus';
+import {useSharedDriveUploadStatus} from '../conversationCells/sharedDriveUploadStatusContext';
+
+interface ConversationTabsProps {
+  activeTabIndex: number;
+  onIndexChange: (index: number) => void;
+  conversationQualifiedId: QualifiedId;
+  sharedDriveUploadController: SharedDriveUploadController;
+  isUploadStatusIndicatorEnabled: boolean;
+}
+
+const FILE_PATH = 'files';
+const sharedDriveUploadTabStatusLabelKey = {
+  queued: 'cells.uploadStatus.queued',
+  uploading: 'cells.uploadStatus.uploading',
+  uploaded: 'cells.uploadStatus.uploaded',
+  failed: 'cells.uploadStatus.failed',
+} as const;
+
+export const ConversationTabs = ({
+  activeTabIndex,
+  onIndexChange,
+  conversationQualifiedId,
+  sharedDriveUploadController,
+  isUploadStatusIndicatorEnabled,
+}: ConversationTabsProps) => {
+  const {translate} = useApplicationContext();
+  const {dismissedUpload} = useSharedDriveUploadStatus();
+  const filesUrl = generateConversationUrl({...conversationQualifiedId, filePath: FILE_PATH});
+  const messagesUrl = generateConversationUrl(conversationQualifiedId);
+  const conversationQualifiedIdString = stringifyQualifiedId(conversationQualifiedId);
+  const readUploadStatus = useCallback((): SharedDriveUploadStatus | null => {
+    const statuses = getSharedDriveUploadStatuses(sharedDriveUploadController, conversationQualifiedIdString);
+    const aggregateKind = getSharedDriveUploadAggregateKind(statuses);
+    if (!aggregateKind) {
+      return null;
+    }
+
+    const representative = getRepresentativeSharedDriveUploadStatus(statuses, aggregateKind);
+    return representative ? {...representative, kind: aggregateKind} : null;
+  }, [sharedDriveUploadController, conversationQualifiedIdString]);
+  const [uploadStatus, setUploadStatus] = useState<SharedDriveUploadStatus | null>(readUploadStatus);
+  const isUploadDismissed =
+    maybe.isJust(dismissedUpload) &&
+    dismissedUpload.value.conversationQualifiedId === conversationQualifiedIdString &&
+    uploadStatus?.uploadId === dismissedUpload.value.uploadId;
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLButtonElement>) => {
+      const tabCount = 2;
+
+      switch (event.key) {
+        case KEY.ARROW_RIGHT:
+          event.preventDefault();
+          const nextTab = (activeTabIndex + 1) % tabCount;
+          onIndexChange(nextTab);
+          createNavigateKeyboard(nextTab === 0 ? messagesUrl : filesUrl, false, ['*'])(event);
+          break;
+        case KEY.ARROW_LEFT:
+          event.preventDefault();
+          const prevTab = (activeTabIndex - 1 + tabCount) % tabCount;
+          onIndexChange(prevTab);
+          createNavigateKeyboard(prevTab === 0 ? messagesUrl : filesUrl, false, ['*'])(event);
+          break;
+        default:
+          break;
+      }
+    },
+    [activeTabIndex, onIndexChange, messagesUrl, filesUrl],
+  );
+
+  const handleHashChange = useCallback(() => {
+    const currentPath = window.location.hash;
+
+    if (currentPath.includes(FILE_PATH)) {
+      onIndexChange(1);
+    } else {
+      onIndexChange(0);
+    }
+  }, [onIndexChange]);
+
+  useEffect(() => {
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [handleHashChange]);
+
+  useEffect(() => {
+    const updateUploadStatus = () => setUploadStatus(readUploadStatus());
+    updateUploadStatus();
+    return sharedDriveUploadController.subscribe(updateUploadStatus);
+  }, [readUploadStatus, sharedDriveUploadController]);
+
+  return (
+    <div className="conversation-tabs">
+      <div className="conversation-tabs__list" role="tablist" aria-label={translate('conversationTabs')}>
+        <ConversationTab
+          id="conversation"
+          label={translate('cells.tableRow.conversationName')}
+          isActive={activeTabIndex === 0}
+          onClick={event => {
+            createNavigate(messagesUrl)(event);
+            onIndexChange(0);
+          }}
+          onKeyDown={handleKeyDown}
+        />
+        <ConversationTab
+          id="files"
+          label={translate('conversationDetailsActionCellsTitle')}
+          isActive={activeTabIndex === 1}
+          uploadStatus={isUploadStatusIndicatorEnabled && !isUploadDismissed ? uploadStatus : null}
+          onClick={event => {
+            createNavigate(filesUrl)(event);
+            onIndexChange(1);
+          }}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
+    </div>
+  );
+};
+
+interface ConversationTabProps {
+  id: string;
+  label: string;
+  isActive: boolean;
+  uploadStatus?: SharedDriveUploadStatus | null;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
+}
+
+const ConversationTab = ({id, label, isActive, uploadStatus = null, onClick, onKeyDown}: ConversationTabProps) => {
+  const {translate} = useApplicationContext();
+  const uploadStatusLabel =
+    uploadStatus !== null
+      ? translate(sharedDriveUploadTabStatusLabelKey[uploadStatus.kind], {name: uploadStatus.fileName})
+      : null;
+
+  return (
+    <button
+      id={`conversation-tab-${id}`}
+      role="tab"
+      aria-selected={isActive}
+      aria-controls={`conversation-tabpanel-${id}`}
+      tabIndex={isActive ? 0 : -1}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      className="conversation-tabs__button"
+    >
+      <span className="conversation-tabs__button-content">
+        {label}
+        {uploadStatus && <SharedDriveTabUploadStatusIcon kind={uploadStatus.kind} />}
+        {uploadStatusLabel !== null && (
+          <span className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+            {uploadStatusLabel}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+};
+
+const SharedDriveTabUploadStatusIcon = ({kind}: {kind: SharedDriveUploadStatus['kind']}) => {
+  if (kind === 'uploading' || kind === 'queued') {
+    return (
+      <SharedDriveUploadSpinnerIcon
+        className="conversation-tabs__upload-status-icon conversation-tabs__upload-status-icon--uploading"
+        color="var(--accent-color)"
+        width={16}
+        height={16}
+        data-uie-name="shared-drive-tab-upload-uploading"
+        data-testid="shared-drive-tab-upload-uploading"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  return (
+    <SharedDriveUploadCompletedIcon
+      className="conversation-tabs__upload-status-icon"
+      color="var(--accent-color)"
+      width={16}
+      height={16}
+      data-uie-name="shared-drive-tab-upload-completed"
+      data-testid="shared-drive-tab-upload-completed"
+      aria-hidden="true"
+    />
+  );
+};

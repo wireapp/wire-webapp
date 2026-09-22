@@ -160,10 +160,7 @@ type AbortReasonOther = {
 };
 
 type AbortReasons =
-  | AbortReasonBrokenMLSConversation
-  | AbortReasonMLSStaleMessage
-  | AbortReasonMLSGroupOutOfSync
-  | AbortReasonOther;
+  AbortReasonBrokenMLSConversation | AbortReasonMLSStaleMessage | AbortReasonMLSGroupOutOfSync | AbortReasonOther;
 
 export function serializeAbortReason(reason: AbortReasons): string {
   return JSON.stringify(reason);

@@ -20,24 +20,20 @@
 import {render, screen, waitFor} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {InviteModal} from './InviteModal';
 
-import {Config} from '../../../Config';
+describe('InviteModal', () => {
+  it('proper render invite modal text', async () => {
+    const userName = 'janek';
+    const user = new User('', '', translateForTest);
 
-const {BRAND_NAME: brandName} = Config.getConfig();
+    user.username(userName);
 
-test('proper render invite modal text', async () => {
-  const userName = 'janek';
-  const user = new User();
+    render(<InviteModal translate={translateForTest} selfUser={user} />);
 
-  user.username(userName);
-
-  const inviteText = t('inviteMessage', {brandName: brandName, username: `@${userName}`});
-
-  render(<InviteModal selfUser={user} />);
-
-  const textarea = await screen.getByTestId('invite-modal-message');
-  await waitFor(() => expect((textarea as HTMLTextAreaElement).value).toBe(inviteText));
+    const textarea = await screen.getByTestId('invite-modal-message');
+    await waitFor(() => expect((textarea as HTMLTextAreaElement).value).toBe('inviteMessage'));
+  });
 });

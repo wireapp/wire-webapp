@@ -20,6 +20,7 @@
 import {AxiosHeaders} from 'axios';
 import {
   NodeServiceApi,
+  LookupFilterMetaFilter,
   RestLookupRequest,
   RestCreateCheckResponse,
   RestDeleteVersionResponse,
@@ -54,6 +55,24 @@ const DEFAULT_OFFSET = 0;
 const USER_META_TAGS_NAMESPACE = 'usermeta-tags';
 const USER_META_OWNER_UUID_NAMESPACE = 'usermeta-owner-uuid';
 const MIME_NAMESPACE = 'mime';
+
+const uploadNetworkRetryConfig = {
+  // Uploads have their own retry action, so keep automatic retries bounded while allowing transient recovery.
+  'axios-retry': {
+    retries: 3,
+  },
+} as const;
+
+// Each selected tag is sent as its own metadata filter with the `Should` operation so the
+// backend applies OR semantics across tags (a node matching any selected tag is returned).
+// Matches the iOS client shape in WireMessaging RestAPI.swift.
+function createTagMetadataFilters(tags: string[]): LookupFilterMetaFilter[] {
+  return tags.map(tag => ({
+    Namespace: USER_META_TAGS_NAMESPACE,
+    Term: tag,
+    Operation: 'Should',
+  }));
+}
 
 // TODO: remove the apiKey (from pydio and s3) once the Pydio backend has fully support for the auth with the Wire's access token
 // If it's passed we use it to authenticate, instead of the access token
@@ -101,14 +120,15 @@ export class CellsAPI {
     httpClient?: HttpClient;
     storageService?: CellsStorage;
   }) {
-    const http = httpClient || this.getHttpClient({cellsConfig});
+    const http = httpClient !== undefined ? httpClient : this.getHttpClient({cellsConfig});
 
     this.storageService =
-      storageService ||
-      new S3Service({
-        config: cellsConfig.s3,
-        accessTokenStore: this.accessTokenStore,
-      });
+      storageService !== undefined
+        ? storageService
+        : new S3Service({
+            config: cellsConfig.s3,
+            accessTokenStore: this.accessTokenStore,
+          });
     this.client = new NodeServiceApi(undefined, undefined, http.client);
   }
 
@@ -163,7 +183,7 @@ export class CellsAPI {
     progressCallback?: (progress: number) => void;
     abortController?: AbortController;
   }): Promise<RestCreateCheckResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -174,7 +194,7 @@ export class CellsAPI {
         Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
         FindAvailablePath: true,
       },
-      {signal: abortController?.signal},
+      {signal: abortController?.signal, ...uploadNetworkRetryConfig},
     );
 
     const firstCreateCheckResult = result.data.Results?.[0];
@@ -194,6 +214,48 @@ export class CellsAPI {
     return result.data;
   }
 
+  async uploadNode({
+    uuid,
+    versionId,
+    path,
+    file,
+    autoRename = true,
+    progressCallback,
+    abortController,
+  }: {
+    uuid: string;
+    versionId: string;
+    path: string;
+    file: File;
+    autoRename?: boolean;
+    progressCallback?: (progress: number) => void;
+    abortController?: AbortController;
+  }): Promise<RestCreateCheckResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    let filePath = `${path}`.normalize('NFC');
+
+    const result = await this.client.createCheck(
+      {
+        Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
+        FindAvailablePath: true,
+      },
+      {signal: abortController?.signal, ...uploadNetworkRetryConfig},
+    );
+
+    const firstCreateCheckResult = result.data.Results?.[0];
+
+    if (autoRename === true && firstCreateCheckResult?.Exists === true) {
+      filePath = firstCreateCheckResult.NextPath ?? filePath;
+    }
+
+    await this.storageService.putObject({path: filePath, file, progressCallback, abortController});
+
+    return result.data;
+  }
+
   async checkNodeCreation({
     path,
     uuid,
@@ -205,34 +267,37 @@ export class CellsAPI {
     versionId: string;
     type: RestIncomingNode['Type'];
   }): Promise<RestCreateCheckResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.createCheck({
-      Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
-      FindAvailablePath: false,
-    });
+    const result = await this.client.createCheck(
+      {
+        Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
+        FindAvailablePath: false,
+      },
+      uploadNetworkRetryConfig,
+    );
 
     return result.data;
   }
 
   async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestPromoteVersionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.promoteVersion(uuid, versionId, {Publish: true});
+    const result = await this.client.promoteVersion(uuid, versionId, {Publish: true}, uploadNetworkRetryConfig);
 
     return result.data;
   }
 
   async deleteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestDeleteVersionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.deleteVersion(uuid, versionId);
+    const result = await this.client.deleteVersion(uuid, versionId, uploadNetworkRetryConfig);
 
     return result.data;
   }
@@ -244,7 +309,7 @@ export class CellsAPI {
     uuid: string;
     permanently?: boolean;
   }): Promise<RestPerformActionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -263,7 +328,7 @@ export class CellsAPI {
     currentPath: RestNodeLocator['Path'];
     targetPath: RestActionOptionsCopyMove['TargetPath'];
   }): Promise<RestPerformActionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -278,7 +343,7 @@ export class CellsAPI {
   }
 
   async restoreNode({uuid}: {uuid: string}): Promise<RestPerformActionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -288,7 +353,7 @@ export class CellsAPI {
   }
 
   async renameNode({currentPath, newName}: {currentPath: string; newName: string}): Promise<RestPerformActionResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -306,7 +371,7 @@ export class CellsAPI {
   }
 
   async lookupNodeByPath({path}: {path: string}): Promise<RestNode | undefined> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -317,7 +382,7 @@ export class CellsAPI {
 
     const node = result.data.Nodes?.[0];
 
-    if (!node) {
+    if (!Boolean(node)) {
       throw new Error(`File not found: ${path}`);
     }
 
@@ -325,7 +390,7 @@ export class CellsAPI {
   }
 
   async lookupNodeByUuid({uuid}: {uuid: string}): Promise<RestNode | undefined> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -336,7 +401,7 @@ export class CellsAPI {
 
     const node = result.data.Nodes?.[0];
 
-    if (!node) {
+    if (!Boolean(node)) {
       throw new Error(`File not found: ${uuid}`);
     }
 
@@ -344,7 +409,7 @@ export class CellsAPI {
   }
 
   async getNodeVersions({uuid, flags}: {uuid: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<NodeVersions> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -356,11 +421,11 @@ export class CellsAPI {
       this.logger.warn('Get node versions response validation failed:', validation.error);
     }
 
-    return result.data.Versions || [];
+    return result.data.Versions !== undefined ? result.data.Versions : [];
   }
 
   async getNode({id, flags}: {id: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<Node> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -392,7 +457,7 @@ export class CellsAPI {
     type?: RestIncomingNode['Type'];
     deleted?: boolean;
   }): Promise<RestNodeCollection> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -408,7 +473,7 @@ export class CellsAPI {
         },
       },
       SortField: sortBy,
-      SortDirDesc: sortDirection ? sortDirection === 'desc' : undefined,
+      SortDirDesc: Boolean(sortDirection) ? sortDirection === 'desc' : undefined,
     };
 
     const result = await this.client.lookup(request);
@@ -418,7 +483,7 @@ export class CellsAPI {
 
   async searchNodes({
     phrase,
-    path = '/',
+    path = '',
     recursive,
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
@@ -445,10 +510,11 @@ export class CellsAPI {
     creatorIds?: string[];
     deleted?: boolean;
   }): Promise<RestNodeCollection> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
+    const tagMetadataFilters = createTagMetadataFilters(tags ?? []);
     const mimeOp: 'Should' | 'Must' = mimeTypes !== undefined && mimeTypes.length > 1 ? 'Should' : 'Must';
     const creatorOp: 'Should' | 'Must' = creatorIds !== undefined && creatorIds.length > 1 ? 'Should' : 'Must';
 
@@ -461,15 +527,13 @@ export class CellsAPI {
       Scope: {Root: {Path: path}, Recursive: isRecursive},
       Filters: {
         ...(hasPhrase ? {Text: {SearchIn: 'BaseName', Term: phrase}} : {}),
-        Type: type || 'UNKNOWN',
+        Type: Boolean(type) ? type : 'UNKNOWN',
         Status: {
           Deleted: deleted ? 'Only' : 'Not',
           ...(hasPublicLink !== undefined ? {HasPublicLink: hasPublicLink} : {}),
         },
         Metadata: [
-          ...(tags !== undefined && tags.length > 0
-            ? [{Namespace: USER_META_TAGS_NAMESPACE, Term: this.transformTagsToJson(tags)}]
-            : []),
+          ...tagMetadataFilters,
           ...(mimeTypes?.map(term => ({Namespace: MIME_NAMESPACE, Term: term, Operation: mimeOp})) ?? []),
           ...(creatorIds?.map(term => ({
             Namespace: USER_META_OWNER_UUID_NAMESPACE,
@@ -503,7 +567,7 @@ export class CellsAPI {
     versionId?: RestIncomingNode['VersionId'];
     templateUuid?: NonNullable<RestIncomingNode['TemplateUuid']>;
   }): Promise<RestNodeCollection> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -557,7 +621,7 @@ export class CellsAPI {
   }
 
   async deleteNodePublicLink({uuid}: {uuid: string}): Promise<RestPublicLinkDeleteSuccess> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -587,7 +651,7 @@ export class CellsAPI {
     createPassword?: string;
     passwordEnabled?: boolean;
   }): Promise<RestShareLink> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -614,7 +678,7 @@ export class CellsAPI {
   }
 
   async getNodePublicLink({uuid}: {uuid: string}): Promise<RestShareLink> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -646,7 +710,7 @@ export class CellsAPI {
     updatePassword?: string;
     passwordEnabled?: boolean;
   }): Promise<RestShareLink> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -678,7 +742,7 @@ export class CellsAPI {
   }
 
   async getAllTags(): Promise<RestNamespaceValuesResponse> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
@@ -688,7 +752,7 @@ export class CellsAPI {
   }
 
   async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}): Promise<RestNode> {
-    if (!this.client || !this.storageService) {
+    if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
 

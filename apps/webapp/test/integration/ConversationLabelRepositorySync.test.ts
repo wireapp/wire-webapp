@@ -17,10 +17,13 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
+import {asyncNoop} from 'noop-esm';
 import {ConversationLabelRepository, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 // Simple integration test to verify the synchronization fix
@@ -47,9 +50,7 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
       putPropertiesByKey: jest.fn(async <T extends Record<string, any>>(key: string, value: T): Promise<void> => {
         localStorage.setItem(`test_${key}`, JSON.stringify(value));
       }),
-      deleteProperties: jest.fn(async (): Promise<void> => {
-        // Not used in these tests
-      }),
+      deleteProperties: jest.fn(asyncNoop),
       deletePropertiesByKey: jest.fn(async (key: string): Promise<void> => {
         localStorage.removeItem(`test_${key}`);
       }),
@@ -64,6 +65,7 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
       allConversations,
       ko.pureComputed(() => conversations()),
       propertiesService,
+      translate,
     );
   });
 
@@ -112,7 +114,10 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
     // Verify that localStorage was updated with the newer data
     const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
     expect(storedData).toBeTruthy();
-    const parsedData = JSON.parse(storedData!);
+    if (isNullOrUndefined(storedData)) {
+      throw new Error('Expected localStorage data to be available');
+    }
+    const parsedData = JSON.parse(storedData);
     expect(parsedData.labels[0].name).toBe('Local Folder');
   });
 
@@ -161,7 +166,10 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
     // Verify that localStorage was updated with the newer data
     const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
     expect(storedData).toBeTruthy();
-    const parsedData = JSON.parse(storedData!);
+    if (isNullOrUndefined(storedData)) {
+      throw new Error('Expected localStorage data to be available');
+    }
+    const parsedData = JSON.parse(storedData);
     expect(parsedData.labels[0].name).toBe('Backend Folder');
   });
 
@@ -196,7 +204,10 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
     // Verify that localStorage was populated
     const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
     expect(storedData).toBeTruthy();
-    const parsedData = JSON.parse(storedData!);
+    if (isNullOrUndefined(storedData)) {
+      throw new Error('Expected localStorage data to be available');
+    }
+    const parsedData = JSON.parse(storedData);
     expect(parsedData.labels).toHaveLength(1);
   });
 

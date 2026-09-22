@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 
@@ -36,7 +37,7 @@ export function storeValue(key: string, value: any, secondsToExpire?: number): v
 }
 
 export function constructUserPrimaryKey({id, domain}: QualifiedId): string {
-  if (domain) {
+  if (isNonEmptyString(domain)) {
     return `${domain}@${id}`;
   }
   return id;

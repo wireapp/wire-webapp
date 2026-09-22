@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -60,10 +61,10 @@ import {ClientState} from 'Repositories/client/ClientState';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {Message} from 'Repositories/entity/message/Message';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
@@ -85,7 +86,7 @@ import {
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
 } from 'Util/linkPreviewSender';
-import {Declension, joinNames, t} from 'Util/localizerUtil';
+import {type Translate, Declension, joinNames} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isMarkdownText} from 'Util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -99,7 +100,7 @@ import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
-import {isMLSConversation} from './ConversationSelectors';
+import {isMLSConversation, supportsReadReceipts} from './ConversationSelectors';
 import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from './EventBuilder';
@@ -109,9 +110,9 @@ import {getLinkPreviewFromString} from './linkPreviews';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
-import {MentionEntity} from '../../message/MentionEntity';
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {StatusType} from '../../message/StatusType';
+import {MentionEntity} from '../../message/mentionEntity';
+import {QuoteEntity} from '../../message/quoteEntity';
+import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 
@@ -120,6 +121,11 @@ export interface MessageSendingOptions {
   nativePush?: boolean;
   recipients?: QualifiedId[] | QualifiedUserClients;
 }
+
+type AddedMessageWaiter = {
+  readonly messagePromise: Promise<Message>;
+  readonly dispose: () => void;
+};
 
 export enum CONSENT_TYPE {
   INCOMING_CALL = 'incoming_call',
@@ -172,6 +178,15 @@ export class MessageRepository {
   private isBlockingNotificationHandling: boolean;
   private onClientMismatch?: ClientMismatchHandlerFn;
 
+  private get coreServices() {
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+
+    return coreServices;
+  }
+
   constructor(
     private readonly conversationRepositoryProvider: () => ConversationRepository,
     private readonly cryptography_repository: CryptographyRepository,
@@ -181,6 +196,7 @@ export class MessageRepository {
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -190,7 +206,7 @@ export class MessageRepository {
     this.logger = getLogger('MessageRepository');
 
     this.eventService = eventRepository.eventService;
-    this.event_mapper = new EventMapper();
+    this.event_mapper = new EventMapper(undefined, this.translate);
 
     this.isBlockingNotificationHandling = true;
 
@@ -198,7 +214,7 @@ export class MessageRepository {
   }
 
   private get conversationService() {
-    return this.core.service!.conversation;
+    return this.coreServices.conversation;
   }
 
   private initSubscriptions(): void {
@@ -268,6 +284,7 @@ export class MessageRepository {
   private async sendText(
     {conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload,
     options?: {syncTimestamp?: boolean},
+    isNewTextMessage = false,
   ) {
     const textMessage = MessageBuilder.buildTextMessage(
       this.decorateTextMessage(
@@ -280,7 +297,79 @@ export class MessageRepository {
       messageId,
     );
 
-    return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
+    if (!isNewTextMessage || !isNonEmptyString(this.clientState.currentClient?.id)) {
+      return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
+    }
+
+    return this.sendTextWithReliableInMemoryStatus(textMessage, conversation, {
+      ...options,
+      enableEphemeral: true,
+    });
+  }
+
+  private createAddedMessageWaiter(conversation: Conversation, messageId: string): AddedMessageWaiter {
+    let resolveMessage: ((messageEntity: Message) => void) | undefined;
+    let isDisposed = false;
+
+    const messagePromise = new Promise<Message>((resolve): void => {
+      resolveMessage = resolve;
+    });
+
+    function dispose(): void {
+      if (!isDisposed) {
+        isDisposed = true;
+        amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, onMessageAdded);
+      }
+    }
+
+    function onMessageAdded(messageEntity: Message): void {
+      const isMatchingMessage = messageEntity.id === messageId && messageEntity.conversation_id === conversation.id;
+
+      if (isMatchingMessage && !isUndefined(resolveMessage)) {
+        dispose();
+        resolveMessage(messageEntity);
+      }
+    }
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, onMessageAdded);
+
+    return {dispose, messagePromise};
+  }
+
+  private async sendTextWithReliableInMemoryStatus(
+    textMessage: GenericMessage,
+    conversation: Conversation,
+    options: MessageSendingOptions & {enableEphemeral: true; syncTimestamp?: boolean},
+  ): Promise<SendAndInjectResult> {
+    const addedMessageWaiter = this.createAddedMessageWaiter(conversation, textMessage.messageId);
+
+    try {
+      const sendResult = await this.sendAndInjectMessage(textMessage, conversation, options);
+
+      if (sendResult.state === MessageSendingState.OUTGOING_SENT) {
+        const messageEntity = await addedMessageWaiter.messagePromise;
+        if (messageEntity.status() === StatusType.SENDING) {
+          const updatedStatus = messageEntity.readReceipts().length > 0 ? StatusType.SEEN : StatusType.SENT;
+          messageEntity.status(updatedStatus);
+
+          const shouldSynchronizeTimestamp = isUndefined(options.syncTimestamp) || options.syncTimestamp;
+          if (shouldSynchronizeTimestamp) {
+            const timestamp = new Date(sendResult.sentAt).getTime();
+            if (!isNaN(timestamp)) {
+              messageEntity.timestamp(timestamp);
+              conversation.updateTimestampServer(timestamp, true);
+              conversation.updateTimestamps(messageEntity);
+            }
+          }
+
+          this.conversationRepositoryProvider().checkMessageTimer(messageEntity as ContentMessage);
+        }
+      }
+
+      return sendResult;
+    } finally {
+      addedMessageWaiter.dispose();
+    }
   }
 
   /**
@@ -389,21 +478,21 @@ export class MessageRepository {
    * @param conversation Conversation that should receive the message
    * @param textMessage Plain text message
    * @param mentions Mentions part of the message
-   * @param quoteEntity Quoted message
+   * @param QuoteEntity Quoted message
    * @returns Resolves after sending the message
    */
   public async sendTextWithLinkPreview({
     conversation,
     textMessage,
     mentions,
-    quoteEntity,
+    QuoteEntity,
     messageId,
     attachments,
   }: {
     conversation: Conversation;
     textMessage: string;
     mentions: MentionEntity[];
-    quoteEntity?: OutgoingQuote;
+    QuoteEntity?: OutgoingQuote;
     messageId?: string;
     attachments?: MultiPartContent['attachments'];
   }): Promise<void> {
@@ -411,7 +500,7 @@ export class MessageRepository {
       conversation,
       mentions,
       message: textMessage,
-      quote: quoteEntity,
+      quote: QuoteEntity,
       // We set the id explicitely in order to be able to override the message if we generate a link preview
       // Similarly, we provide that same id when we retry to send a failed message in order to override the original
       messageId: messageId ?? createUuid(),
@@ -421,7 +510,7 @@ export class MessageRepository {
     if (attachments && attachments.length > 0) {
       state = (await this.sendMultipartText({...textPayload, attachments})).state;
     } else {
-      state = (await this.sendText(textPayload)).state;
+      state = (await this.sendText(textPayload, undefined, isUndefined(messageId))).state;
     }
 
     if (state !== MessageSendingState.CANCELED) {
@@ -508,7 +597,7 @@ export class MessageRepository {
         {
           ...textPayload,
           linkPreview: linkPreview.image
-            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(
+            ? await this.coreServices.linkPreview.uploadLinkPreviewImage(
                 linkPreview as LinkPreviewContent,
                 conversationId,
                 isAuditLogEnabled,
@@ -526,22 +615,22 @@ export class MessageRepository {
    * @param conversationEntity Conversation to send message in
    * @param url URL of giphy image
    * @param tag tag tag used for gif search
-   * @param quoteEntity Quote as part of the message
+   * @param QuoteEntity Quote as part of the message
    * @returns Resolves when the gif was posted
    */
   public async sendGif(
     conversationEntity: Conversation,
     url: string,
     tag: string | number | Record<string, string>,
-    quoteEntity?: OutgoingQuote,
+    QuoteEntity?: OutgoingQuote,
   ): Promise<void> {
     if (!tag) {
-      tag = t('extensionsGiphyRandom');
+      tag = this.translate('extensionsGiphyRandom');
     }
 
     const blob = await loadUrlBlob(url);
-    const textMessage = t('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
-    this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
+    const textMessage = this.translate('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
+    this.sendText({conversation: conversationEntity, message: textMessage, quote: QuoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
 
@@ -845,7 +934,7 @@ export class MessageRepository {
   ): Promise<boolean> {
     const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
     if (showLegalHoldWarning) {
-      return showLegalHoldWarningModal(conversation, conversationDegraded)
+      return showLegalHoldWarningModal(conversation, conversationDegraded, this.translate)
         .then(() => true)
         .catch(() => false);
     }
@@ -854,27 +943,30 @@ export class MessageRepository {
     }
 
     const users = conversation.getUsersWithUnverifiedClients();
-    const userNames = joinNames(users, Declension.NOMINATIVE);
+    const userNames = joinNames(users, this.translate, Declension.NOMINATIVE);
     const titleSubstitutions = capitalizeFirstChar(userNames);
 
     const [actionString, messageString] = {
       [CONSENT_TYPE.INCOMING_CALL]: [
-        t('modalConversationNewDeviceIncomingCallAction'),
-        t('modalConversationNewDeviceIncomingCallMessage'),
+        this.translate('modalConversationNewDeviceIncomingCallAction'),
+        this.translate('modalConversationNewDeviceIncomingCallMessage'),
       ],
       [CONSENT_TYPE.OUTGOING_CALL]: [
-        t('modalConversationNewDeviceOutgoingCallAction'),
-        t('modalConversationNewDeviceOutgoingCallMessage'),
+        this.translate('modalConversationNewDeviceOutgoingCallAction'),
+        this.translate('modalConversationNewDeviceOutgoingCallMessage'),
       ],
-      [CONSENT_TYPE.MESSAGE]: [t('modalConversationNewDeviceAction'), t('modalConversationNewDeviceMessage')],
+      [CONSENT_TYPE.MESSAGE]: [
+        this.translate('modalConversationNewDeviceAction'),
+        this.translate('modalConversationNewDeviceMessage'),
+      ],
     }[consentType];
 
     const baseTitle =
       users.length > 1
-        ? t('modalConversationNewDeviceHeadlineMany', {users: titleSubstitutions})
-        : t('modalConversationNewDeviceHeadlineOne', {user: titleSubstitutions});
+        ? this.translate('modalConversationNewDeviceHeadlineMany', {users: titleSubstitutions})
+        : this.translate('modalConversationNewDeviceHeadlineOne', {user: titleSubstitutions});
     const titleString = users[0].isMe
-      ? t('modalConversationNewDeviceHeadlineYou', {user: titleSubstitutions})
+      ? this.translate('modalConversationNewDeviceHeadlineYou', {user: titleSubstitutions})
       : baseTitle;
 
     return new Promise(resolve => {
@@ -893,7 +985,7 @@ export class MessageRepository {
         },
       };
 
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, options, `degraded-${conversation.id}`);
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, options, `degraded-${conversation.id}`, this.translate);
     });
   }
 
@@ -947,10 +1039,14 @@ export class MessageRepository {
         }
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+        const selfUser = this.userState.self();
+        if (isUndefined(selfUser)) {
+          throw new Error('No self user found, cannot send message optimistically');
+        }
         const optimisticEvent = EventBuilder.buildMessageAdd({
           conversationEntity: conversation,
           currentTimestamp,
-          senderId: this.userState.self()!.id,
+          senderId: selfUser.id,
           clientId,
         });
         this.trackContributed(conversation, payload);
@@ -1083,7 +1179,7 @@ export class MessageRepository {
    * Sending a message to the remote end of a session reset.
    *
    * @note When we reset a session then we must inform the remote client about this action. It sends a ProtocolBuffer message
-   *  (which will not be rendered in the view) to the remote client. This message only needs to be sent to the affected
+   *  to the remote client, which renders a session-reset system message. This message only needs to be sent to the affected
    *  remote client, therefore we force the message sending.
    *
    * @param userId User ID
@@ -1125,6 +1221,10 @@ export class MessageRepository {
     type: Confirmation.Type,
     moreMessageEntities: Message[] = [],
   ) {
+    if (type === Confirmation.Type.READ && !supportsReadReceipts(conversationEntity)) {
+      return;
+    }
+
     const typeToConfirm = (EventTypeHandling.CONFIRM as string[]).includes(messageEntity.type);
 
     if (messageEntity.user().isMe || !typeToConfirm) {
@@ -1190,6 +1290,10 @@ export class MessageRepository {
   }
 
   private expectReadReceipt(conversationEntity: Conversation): boolean {
+    if (!supportsReadReceipts(conversationEntity)) {
+      return false;
+    }
+
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
     }
@@ -1230,7 +1334,15 @@ export class MessageRepository {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = options.targetedUsers || conversation.allUserEntities().map(user => user!.qualifiedId);
+      const userIds =
+        options.targetedUsers ??
+        conversation.allUserEntities().map(user => {
+          if (isUndefined(user)) {
+            throw new Error('Conversation member list contains an empty user');
+          }
+
+          return user.qualifiedId;
+        });
       const payload = MessageBuilder.buildDeleteMessage({
         messageId: message.id,
       });
@@ -1330,7 +1442,7 @@ export class MessageRepository {
       .some(user => matchQualifiedIds(senderId, user.qualifiedId));
 
     if (!senderInConversation) {
-      message.setButtonError(buttonId, t('buttonActionError'));
+      message.setButtonError(buttonId, this.translate('buttonActionError'));
       message.waitingButtonId(undefined);
       return;
     }
@@ -1348,7 +1460,7 @@ export class MessageRepository {
       await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
     } catch (error: unknown) {
       message.waitingButtonId(undefined);
-      return message.setButtonError(buttonId, t('buttonActionError'));
+      return message.setButtonError(buttonId, this.translate('buttonActionError'));
     }
   }
 

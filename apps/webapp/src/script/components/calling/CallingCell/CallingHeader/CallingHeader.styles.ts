@@ -79,10 +79,14 @@ export const detachedWindowButton: CSSObject = {
   padding: '8px 12px',
 
   '& svg': {
-    fill: 'var(--text-color)',
+    fill: 'currentColor',
   },
 
   '& svg path': {
-    fill: 'var(--text-color)',
+    fill: 'currentColor',
+  },
+
+  '&:hover, &:focus-visible, &:active': {
+    color: 'var(--accent-color)',
   },
 };

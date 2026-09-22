@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
 import type {User} from 'Repositories/entity/User';
@@ -120,7 +121,7 @@ export const sortByPriority = (stringA: string = '', stringB: string = '', query
   stringB = stringB.toLowerCase();
   query = query.toLowerCase();
 
-  if (query) {
+  if (isNonEmptyString(query)) {
     if (stringA.startsWith(query) && !stringB.startsWith(query)) {
       return -1;
     } else if (stringB.startsWith(query) && !stringA.startsWith(query)) {

@@ -19,11 +19,13 @@
 
 import {CONVERSATION_EVENT} from './conversationEvent';
 import {FEDERATION_EVENT} from './federationEvent';
+import {MEETING_EVENT} from './meetingEvent';
 import {TEAM_EVENT} from './teamEvent';
 import {USER_EVENT} from './userEvent';
 import {USER_GROUP_EVENT, UserGroupEvent} from './userGroupEvent';
 
-import {ConversationEvent, TeamEvent, UserEvent, FederationEvent} from '.';
+import {ConversationEvent, MeetingEvent, TeamEvent, UserEvent, FederationEvent} from '.';
 
-export type BackendEvent = ConversationEvent | UserEvent | TeamEvent | FederationEvent | UserGroupEvent;
-export type BackendEventType = CONVERSATION_EVENT | USER_EVENT | TEAM_EVENT | FEDERATION_EVENT | USER_GROUP_EVENT;
+export type BackendEvent = ConversationEvent | MeetingEvent | UserEvent | TeamEvent | FederationEvent | UserGroupEvent;
+export type BackendEventType =
+  CONVERSATION_EVENT | MEETING_EVENT | USER_EVENT | TEAM_EVENT | FEDERATION_EVENT | USER_GROUP_EVENT;

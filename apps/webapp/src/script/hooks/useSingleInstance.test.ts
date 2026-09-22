@@ -18,59 +18,201 @@
  */
 
 import {renderHook} from '@testing-library/react';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import type {DeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {act} from 'react';
+import {Maybe, maybe} from 'true-myth';
 
-import {useSingleInstance} from './useSingleInstance';
+import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTypes';
 
-describe('useSingleInstance', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
+import {createUseSingleInstance} from './useSingleInstance';
+
+function createInMemoryStringKeyValueStorage(): StringKeyValueStorage {
+  const storedValues: Array<{key: string; value: string}> = [];
+
+  const storage: StringKeyValueStorage = {
+    getItem: key => {
+      return maybe
+        .find(item => {
+          return item.key === key;
+        }, storedValues)
+        .map(item => {
+          return item.value;
+        });
+    },
+    removeItem: key => {
+      const storedValueIndex = storedValues.findIndex(item => {
+        return item.key === key;
+      });
+
+      if (storedValueIndex >= 0) {
+        storedValues.splice(storedValueIndex, 1);
+      }
+    },
+    setItem: (key, value) => {
+      storage.removeItem(key);
+      storedValues.push({key, value});
+    },
+  };
+
+  return storage;
+}
+
+type UseSingleInstanceTestEnvironment = {
+  isDesktopApp: jest.Mock<boolean, []>;
+  singleInstanceStorage: StringKeyValueStorage;
+  useSingleInstance: ReturnType<typeof createUseSingleInstance>;
+  wallClock: DeterministicWallClock;
+};
+
+function createUseSingleInstanceTestEnvironment(): UseSingleInstanceTestEnvironment {
+  const createInstanceId = jest.fn(() => {
+    return 'first-instance-id';
   });
 
+  const isDesktopApp = jest.fn(() => {
+    return false;
+  });
+
+  const singleInstanceStorage = createInMemoryStringKeyValueStorage();
+  const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+  const useSingleInstance = createUseSingleInstance({createInstanceId, isDesktopApp, singleInstanceStorage, wallClock});
+
+  return {isDesktopApp, singleInstanceStorage, useSingleInstance, wallClock};
+}
+
+describe('useSingleInstance', () => {
   it('can create multiple new instance listeners', () => {
+    const {useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
     const {
-      result: {current: firstIntance},
-    } = renderHook(() => useSingleInstance());
-    expect(firstIntance.hasOtherInstance).toBeFalsy();
+      result: {current: firstInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+    expect(firstInstance.hasOtherInstance).toBeFalsy();
 
     const {
       result: {current: secondInstance},
-    } = renderHook(() => useSingleInstance());
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
     expect(secondInstance.hasOtherInstance).toBeFalsy();
   });
 
   it('only allows a single registered instance', () => {
-    const {
-      result: {current: firstIntance},
-    } = renderHook(() => useSingleInstance());
-    expect(firstIntance.hasOtherInstance).toBeFalsy();
+    const {singleInstanceStorage, useSingleInstance} = createUseSingleInstanceTestEnvironment();
 
-    firstIntance.registerInstance();
+    const {
+      result: {current: firstInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+    expect(firstInstance.hasOtherInstance).toBeFalsy();
+
+    firstInstance.registerInstance();
+
+    expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(
+      Maybe.just(JSON.stringify({appInstanceId: 'first-instance-id'})),
+    );
 
     const {
       result: {current: secondInstance},
-    } = renderHook(() => useSingleInstance());
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
     expect(secondInstance.hasOtherInstance).toBeTruthy();
 
-    firstIntance.killRunningInstance();
+    firstInstance.killRunningInstance();
   });
 
   it('detects a new instance that has started', () => {
-    const {
-      result: {current: firstIntance},
-    } = renderHook(() => useSingleInstance());
-    expect(firstIntance.hasOtherInstance).toBeFalsy();
+    const {useSingleInstance, wallClock} = createUseSingleInstanceTestEnvironment();
 
-    const {result: secondInstance} = renderHook(() => useSingleInstance());
+    const {
+      result: {current: firstInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+    expect(firstInstance.hasOtherInstance).toBeFalsy();
+
+    const {result: secondInstance} = renderHook(() => {
+      return useSingleInstance();
+    });
     expect(secondInstance.current.hasOtherInstance).toBeFalsy();
 
-    firstIntance.registerInstance();
+    firstInstance.registerInstance();
 
     act(() => {
-      jest.advanceTimersByTime(1001);
+      wallClock.advanceByMilliseconds(1001);
     });
     expect(secondInstance.current.hasOtherInstance).toBeTruthy();
 
-    firstIntance.killRunningInstance();
+    firstInstance.killRunningInstance();
+  });
+
+  it('allows desktop app instances regardless of stored instance data', () => {
+    const {isDesktopApp, singleInstanceStorage, useSingleInstance, wallClock} =
+      createUseSingleInstanceTestEnvironment();
+
+    isDesktopApp.mockReturnValue(true);
+    singleInstanceStorage.setItem('app_opened', JSON.stringify({appInstanceId: 'other-instance-id'}));
+
+    const {result: currentInstance} = renderHook(() => {
+      return useSingleInstance();
+    });
+
+    expect(currentInstance.current.hasOtherInstance).toBeFalsy();
+
+    act(() => {
+      wallClock.advanceByMilliseconds(1001);
+    });
+
+    expect(currentInstance.current.hasOtherInstance).toBeFalsy();
+  });
+
+  it('does not crash when stored instance data is malformed', () => {
+    const {singleInstanceStorage, useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
+    singleInstanceStorage.setItem('app_opened', 'not-json');
+
+    const {
+      result: {current: currentInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+
+    expect(currentInstance.hasOtherInstance).toBeFalsy();
+    expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(Maybe.nothing());
+  });
+
+  it('removes stored instance data with an invalid shape', () => {
+    const {singleInstanceStorage, useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
+    singleInstanceStorage.setItem('app_opened', JSON.stringify({appInstanceId: 42}));
+
+    const {
+      result: {current: currentInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+
+    expect(currentInstance.hasOtherInstance).toBeFalsy();
+    expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(Maybe.nothing());
+  });
+
+  it('removes stored instance data without an instance id', () => {
+    const {singleInstanceStorage, useSingleInstance} = createUseSingleInstanceTestEnvironment();
+
+    singleInstanceStorage.setItem('app_opened', JSON.stringify({}));
+
+    const {
+      result: {current: currentInstance},
+    } = renderHook(() => {
+      return useSingleInstance();
+    });
+
+    expect(currentInstance.hasOtherInstance).toBeFalsy();
+    expect(singleInstanceStorage.getItem('app_opened')).toStrictEqual(Maybe.nothing());
   });
 });

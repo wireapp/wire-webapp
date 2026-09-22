@@ -1,0 +1,91 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {
+  MEETING_TITLE_MAX_LENGTH,
+  meetingTitleErrorKeys,
+} from 'Components/meeting/shared/validation/meetingTitleValidation';
+import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+
+import {mapMeetNowFormToMeetingCommand} from './mapMeetNowFormToMeetingCommand';
+
+describe('mapMeetNowFormToMeetingCommand', () => {
+  it('maps validated form state to a meeting command', () => {
+    const result = mapMeetNowFormToMeetingCommand({
+      title: '  Standup  ',
+      selectedUsers: [],
+      participantsFilter: 'alice',
+      password: '',
+      passwordConfirmation: '',
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result)).toEqual({
+      title: 'Standup',
+      selectedUsers: [],
+    });
+  });
+
+  it('maps a valid guest-link password to the meeting command', () => {
+    const result = mapMeetNowFormToMeetingCommand({
+      title: 'Standup',
+      selectedUsers: [],
+      participantsFilter: '',
+      password: 'ValidPassword1!',
+      passwordConfirmation: 'ValidPassword1!',
+    });
+
+    expect(result.isOk).toBe(true);
+    expect(unwrap(result)).toEqual({
+      title: 'Standup',
+      selectedUsers: [],
+      password: 'ValidPassword1!',
+    });
+  });
+
+  it('returns title errors for an empty title', () => {
+    const result = mapMeetNowFormToMeetingCommand({
+      title: '   ',
+      selectedUsers: [],
+      participantsFilter: '',
+      password: '',
+      passwordConfirmation: '',
+    });
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toEqual({
+      title: meetingTitleErrorKeys.required,
+    });
+  });
+
+  it('returns title errors for a title that exceeds the maximum length', () => {
+    const result = mapMeetNowFormToMeetingCommand({
+      title: 'a'.repeat(MEETING_TITLE_MAX_LENGTH + 1),
+      selectedUsers: [],
+      participantsFilter: '',
+      password: '',
+      passwordConfirmation: '',
+    });
+
+    expect(result.isErr).toBe(true);
+    expect(unwrapErr(result)).toEqual({
+      title: meetingTitleErrorKeys.tooLong,
+    });
+  });
+});

@@ -86,6 +86,9 @@ const config = {
   /** min supported api version for Enterprise login v2 */
   MIN_ENTERPRISE_LOGIN_V2_AND_CHANNELS_SUPPORTED_API_VERSION: 8,
 
+  /** min supported api version for meetings (`tzid` is required from v17) */
+  MIN_MEETINGS_SUPPORTED_API_VERSION: 17,
+
   /** Image MIME types */
   ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
 

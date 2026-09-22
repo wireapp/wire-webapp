@@ -18,6 +18,7 @@
  */
 
 import {v4 as uuidv4} from 'uuid';
+import {noop} from 'noop-esm';
 
 import {APIClient} from '@wireapp/api-client';
 
@@ -43,7 +44,7 @@ describe('AssetService', () => {
       };
 
       jest.spyOn(apiClient.api.asset, 'postAsset').mockReturnValue({
-        cancel: () => {},
+        cancel: noop,
         response: Promise.resolve(assetServerData),
       });
 

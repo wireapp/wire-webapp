@@ -19,7 +19,6 @@
 
 import {useEffect, useState} from 'react';
 
-import {t} from 'Util/localizerUtil';
 import {
   TIME_IN_MILLIS,
   fromUnixTime,
@@ -35,10 +34,18 @@ import {
   isYoungerThanMinute,
 } from 'Util/timeUtil';
 
-const calculateTimestamp = (ts: number, isDay: boolean) => {
+export interface RelativeTimestampLabels {
+  justNow: string;
+  today: string;
+  yesterday: string;
+}
+
+export type RelativeTimestampFormatter = (timestamp: number, isDay: boolean) => string;
+
+function calculateTimestamp(ts: number, isDay: boolean, relativeTimestampLabels: RelativeTimestampLabels) {
   const date = fromUnixTime(ts / TIME_IN_MILLIS.SECOND);
   if (isYoungerThanMinute(date)) {
-    return t('conversationJustNow');
+    return relativeTimestampLabels.justNow;
   }
 
   if (isYoungerThan1Hour(date)) {
@@ -47,11 +54,11 @@ const calculateTimestamp = (ts: number, isDay: boolean) => {
 
   if (isToday(date)) {
     const time = formatTimeShort(date);
-    return isDay ? `${t('conversationToday')} ${time}` : time;
+    return isDay ? `${relativeTimestampLabels.today} ${time}` : time;
   }
 
   if (isYesterday(date)) {
-    return `${t('conversationYesterday')} ${formatTimeShort(date)}`;
+    return `${relativeTimestampLabels.yesterday} ${formatTimeShort(date)}`;
   }
 
   if (isYoungerThan7Days(date)) {
@@ -63,20 +70,33 @@ const calculateTimestamp = (ts: number, isDay: boolean) => {
   const year = isThisYear(date) ? '' : ` ${date.getFullYear()}`;
   const time = formatTimeShort(date);
   return isDay ? `${weekDay}, ${dayMonth}${year}, ${time}` : `${dayMonth}${year}, ${time}`;
+}
+
+export const createRelativeTimestampFormatter = (
+  relativeTimestampLabels: RelativeTimestampLabels,
+): RelativeTimestampFormatter => {
+  return (timestamp: number, isDay: boolean) => {
+    return calculateTimestamp(timestamp, isDay, relativeTimestampLabels);
+  };
 };
 
-export function useRelativeTimestamp(
+export const useRelativeTimestamp = (
   timestamp: number,
   asDay = false,
-  getMessagesGroupLabelCallBack = calculateTimestamp,
-) {
+  getMessagesGroupLabelCallBack: RelativeTimestampFormatter,
+) => {
   const [timeago, setTimeago] = useState<string>(getMessagesGroupLabelCallBack(timestamp, asDay));
 
   useEffect(() => {
+    setTimeago(getMessagesGroupLabelCallBack(timestamp, asDay));
+
     const interval = setInterval(() => {
       setTimeago(getMessagesGroupLabelCallBack(timestamp, asDay));
     }, TIME_IN_MILLIS.MINUTE);
-    return () => clearInterval(interval);
-  });
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [asDay, getMessagesGroupLabelCallBack, timestamp]);
   return timeago;
-}
+};

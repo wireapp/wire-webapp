@@ -17,26 +17,27 @@
  *
  */
 
-import {ReactNode, useContext, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 
-import is from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EnrichedFields} from 'Components/panel/EnrichedFields';
-import {UserActions} from 'Components/panel/UserActions';
-import {UserDetails} from 'Components/panel/UserDetails';
+import {EnrichedFields} from 'Components/panel/enrichedFields';
+import {UserActions} from 'Components/panel/userActions';
+import {UserDetails} from 'Components/panel/userDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {useUserModalState} from './UserModal.state';
 import {
@@ -51,7 +52,6 @@ import {
 } from './UserModal.styles';
 
 import {Config} from '../../../Config';
-import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/coreSingleton';
 
 export interface UserModalProps {
@@ -62,42 +62,77 @@ export interface UserModalProps {
 }
 
 const brandName = Config.getConfig().BRAND_NAME;
+const legalHoldLinkMarker = createReactTranslationMarker('legal-hold-link');
+
+type RenderBlockedForLegalHoldMessageOptions = {
+  readonly legalHoldBlockUrl: string;
+  readonly translate: Translate;
+};
+
+function renderBlockedForLegalHoldMessage(options: RenderBlockedForLegalHoldMessageOptions): ReactNode[] {
+  const {legalHoldBlockUrl, translate} = options;
+  const translatedText = translate('modalUserBlockedForLegalHold', undefined, {
+    link: legalHoldLinkMarker.start,
+    '/link': legalHoldLinkMarker.end,
+  });
+
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [
+      {
+        start: legalHoldLinkMarker.start,
+        end: legalHoldLinkMarker.end,
+        render(children): ReactNode {
+          return (
+            <a
+              data-uie-name="read-more-legal-hold"
+              href={legalHoldBlockUrl}
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              {children}
+            </a>
+          );
+        },
+      },
+    ],
+    nodeReplacements: [],
+    valueReplacements: [],
+  });
+}
 
 interface UserModalUserActionsSectionProps {
   user: User;
   onAction: () => void;
   isSelfActivated: boolean;
   selfUser: User;
+  legalHoldBlockUrl: string;
+  translate: Translate;
 }
 
-const UserModalUserActionsSection = ({user, onAction, isSelfActivated, selfUser}: UserModalUserActionsSectionProps) => {
+const UserModalUserActionsSection = ({
+  user,
+  onAction,
+  isSelfActivated,
+  selfUser,
+  legalHoldBlockUrl,
+  translate,
+}: UserModalUserActionsSectionProps) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
-  const rootContext = useContext(RootContext);
+  const {mainViewModel} = useApplicationContext();
 
   if (isBlockedLegalHold) {
-    const replaceLinkLegalHold = replaceLink(
-      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-      '',
-      'read-more-legal-hold',
-    );
-
     return (
-      <div
-        className="modal__message"
-        data-uie-name="status-blocked-legal-hold"
-        dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', undefined, replaceLinkLegalHold)}}
-      />
+      <div className="modal__message" data-uie-name="status-blocked-legal-hold">
+        {renderBlockedForLegalHoldMessage({legalHoldBlockUrl, translate})}
+      </div>
     );
-  }
-
-  if (is.null_(rootContext)) {
-    return null;
   }
 
   return (
     <UserActions
       user={user}
-      actionsViewModel={rootContext.mainViewModel.actions}
+      actionsViewModel={mainViewModel.actions}
       onAction={onAction}
       isSelfActivated={isSelfActivated}
       selfUser={selfUser}
@@ -141,15 +176,16 @@ const UserModalWarningMessage = ({
 };
 
 export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
+  const {translate} = useApplicationContext();
   const learnMoreHref = Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS;
 
   if (user !== undefined) {
     return (
       <div css={unverifiedUserWarningStyle}>
         <UserModalWarningMessage
-          content={t('userNotVerified', {user: user.name()})}
+          content={translate('userNotVerified', {user: user.name()})}
           href={learnMoreHref}
-          linkText={t('modalUserLearnMore')}
+          linkText={translate('modalUserLearnMore')}
           showIcon
         />
       </div>
@@ -159,15 +195,15 @@ export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
   return (
     <div css={unverifiedUserWarningStyle}>
       <UserModalWarningMessage
-        content={t('conversationConnectionVerificationWarning')}
+        content={translate('conversationConnectionVerificationWarning')}
         href={learnMoreHref}
-        linkText={t('modalUserLearnMore')}
+        linkText={translate('modalUserLearnMore')}
         textAlignCenter
       />
       <UserModalWarningMessage
-        content={t('conversationConnectionSupportWarning')}
+        content={translate('conversationConnectionSupportWarning')}
         href={learnMoreHref}
-        linkText={t('conversationConnectionReportMisuse')}
+        linkText={translate('conversationConnectionReportMisuse')}
         textAlignCenter
       />
     </div>
@@ -180,6 +216,8 @@ const UserModal = ({
   core = container.resolve(Core),
   teamState = container.resolve(TeamState),
 }: UserModalProps) => {
+  const {translate} = useApplicationContext();
+  const legalHoldBlockUrl = Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK;
   const onClose = useUserModalState(state => state.onClose);
   const userId = useUserModalState(state => state.userId);
   const resetState = useUserModalState(state => state.resetState);
@@ -232,6 +270,13 @@ const UserModal = ({
     };
   }, [userId, userRepository]);
 
+  let modalDataUieName = '';
+  if (user !== null) {
+    modalDataUieName = 'modal-user-profile';
+  } else if (userNotFound) {
+    modalDataUieName = 'modal-cannot-open-profile';
+  }
+
   return (
     <ModalComponent
       isShown={isShown}
@@ -239,13 +284,13 @@ const UserModal = ({
       onClosed={onModalClosed}
       className="user-modal"
       css={userModalStyle}
-      data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+      data-uie-name={modalDataUieName}
       wrapperCSS={userModalWrapperStyle}
     >
       <div className="modal__header">
         {userNotFound && (
           <h2 className="modal__header__title" data-uie-name="status-modal-title">
-            {t('userNotFoundTitle', {brandName})}
+            {translate('userNotFoundTitle', {brandName})}
           </h2>
         )}
 
@@ -265,9 +310,11 @@ const UserModal = ({
       </div>
 
       <FadingScrollbar
-        className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}
+        className={cx('modal__body user-modal__wrapper', {
+          'user-modal__wrapper--max': user === null && userNotFound === false,
+        })}
       >
-        {user && (
+        {user !== null && (
           <>
             <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
@@ -284,10 +331,12 @@ const UserModal = ({
               onAction={hide}
               isSelfActivated={isActivatedAccount}
               selfUser={selfUser}
+              legalHoldBlockUrl={legalHoldBlockUrl}
+              translate={translate}
             />
           </>
         )}
-        {isShown && !user && !userNotFound && (
+        {isShown === true && user === null && userNotFound === false && (
           <div className="loading-wrapper">
             <Icon.LoadingIcon aria-hidden="true" />
           </div>
@@ -296,12 +345,12 @@ const UserModal = ({
         {userNotFound && (
           <>
             <div className="modal__message" data-uie-name="status-modal-text">
-              {t('userNotFoundMessage', {brandName})}
+              {translate('userNotFoundMessage', {brandName})}
             </div>
 
             <div className="modal__buttons">
               <button className="modal__button modal__button--confirm" data-uie-name="do-ok" onClick={hide}>
-                {t('modalAcknowledgeAction')}
+                {translate('modalAcknowledgeAction')}
               </button>
             </div>
           </>

@@ -1,8 +1,7 @@
+---
 name: Pull translations from Crowdin
 
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -10,7 +9,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: crowdin-pull-master
+  group: crowdin-pull-main
   cancel-in-progress: true
 
 jobs:
@@ -22,8 +21,20 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          ref: master
-          fetch-depth: 0
+          ref: main
+          fetch-depth: 1
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install JS dependencies
+        run: ./bin/yarn --immutable
 
       - name: Download translations and create PR
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
@@ -38,12 +49,15 @@ jobs:
           push_translations: true
           create_pull_request: true
           localization_branch_name: 'translations'
-          pull_request_base_branch_name: 'master'
-          pull_request_title: 'chore: Update translations'
-          commit_message: 'chore: Update translations'
+          pull_request_base_branch_name: 'main'
+          pull_request_title: 'Update translations'
+          commit_message: 'Update translations'
           github_user_name: otto-the-bot
           github_user_email: webapp+otto@wire.com
           token: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
           source: '/apps/webapp/src/i18n/en-US.json'
           translation: '/apps/webapp/src/i18n/%locale%.json'
           base_path: '.'
+
+      - name: Validate downloaded translation markers
+        run: ./bin/yarn nx run webapp:validate-translations

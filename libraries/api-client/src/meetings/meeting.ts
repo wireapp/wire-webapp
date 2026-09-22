@@ -19,18 +19,22 @@
 
 import {MeetingRecurrence} from './meetingRecurrence';
 
+import type {ValidatedMeetingConversation} from '../conversation/conversationSchema';
 import {QualifiedId} from '../user/qualifiedId';
 
 export interface Meeting {
   created_at: string;
   end_time: string;
-  invited_emails: string[];
   qualified_conversation: QualifiedId;
   qualified_creator: QualifiedId;
   qualified_id: QualifiedId;
   recurrence?: MeetingRecurrence;
   start_time: string;
   title: string;
-  trial: boolean;
+  tzid: string;
   updated_at: string;
+}
+
+export interface MeetingWithConversation extends Meeting {
+  conversation: ValidatedMeetingConversation;
 }

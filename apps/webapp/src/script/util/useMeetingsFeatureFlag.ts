@@ -19,17 +19,22 @@
 
 import {container} from 'tsyringe';
 
-import {meetingsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {TeamState} from 'src/script/repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {canUseMeetings} from './canUseMeetings';
+
+import {Core} from '../service/coreSingleton';
+
 export const useMeetingsFeatureFlag = () => {
-  const {isFeatureToggleEnabled} = useApplicationContext();
   const teamState = container.resolve(TeamState);
-  const {isMeetingsEnabled: isMeetingsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isMeetingsEnabled']);
+  const core = container.resolve(Core);
+  const {isMeetingsEnabled: isTeamMeetingsFeatureEnabled} = useKoSubscribableChildren(teamState, ['isMeetingsEnabled']);
 
-  const isMeetingsEnabled = isMeetingsEnabledForTeam && isFeatureToggleEnabled(meetingsFeatureToggleName);
-
-  return {isMeetingsEnabled};
+  return {
+    isMeetingsEnabled: canUseMeetings({
+      isTeamMeetingsFeatureEnabled,
+      apiVersion: core.backendFeatures.version,
+    }),
+  };
 };

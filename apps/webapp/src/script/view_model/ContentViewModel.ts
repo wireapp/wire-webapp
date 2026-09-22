@@ -31,10 +31,10 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/message';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isConversationEntity} from 'Util/typePredicateUtil';
 
@@ -42,10 +42,14 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
-import '../page/LeftSidebar';
-import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
-import '../page/MainContent';
-import {PanelState} from '../page/RightSidebar';
+import '../page/leftSidebar';
+import {
+  getConversationListTab,
+  isConversationListTab,
+  useSidebarStore,
+} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+import '../page/mainContent';
+import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
@@ -82,6 +86,7 @@ export class ContentViewModel {
   constructor(
     mainViewModel: MainViewModel,
     public repositories: ViewModelRepositories,
+    private readonly translate: Translate,
   ) {
     this.userState = container.resolve(UserState);
     this.conversationState = container.resolve(ConversationState);
@@ -100,9 +105,11 @@ export class ContentViewModel {
 
     this.userState.connectRequests.subscribe(requests => {
       const {contentState} = useAppState.getState();
+      const {currentTab} = useSidebarStore.getState();
 
       const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
-      if (isStateRequests && !requests.length) {
+      const isOnConversationListTab = isConversationListTab(currentTab);
+      if (isStateRequests && isOnConversationListTab && !requests.length) {
         showMostRecentConversation();
       }
     });
@@ -211,11 +218,12 @@ export class ContentViewModel {
       PrimaryModal.type.ACKNOWLEDGE,
       {
         text: {
-          message: t('conversationNotFoundMessage'),
-          title: t('conversationNotFoundTitle', {brandName: Config.getConfig().BRAND_NAME}),
+          message: this.translate('conversationNotFoundMessage'),
+          title: this.translate('conversationNotFoundTitle', {brandName: Config.getConfig().BRAND_NAME}),
         },
       },
       undefined,
+      this.translate,
     );
   }
 
@@ -247,7 +255,6 @@ export class ContentViewModel {
    *
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
-   * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | QualifiedId | undefined,
@@ -314,8 +321,8 @@ export class ContentViewModel {
     } finally {
       const {currentTab, setCurrentTab} = useSidebarStore.getState();
 
-      if ([SidebarTabs.PREFERENCES, SidebarTabs.CONNECT].includes(currentTab)) {
-        setCurrentTab(SidebarTabs.RECENT);
+      if (isConversationListTab(currentTab)) {
+        setCurrentTab(getConversationListTab(currentTab));
       }
     }
   };
@@ -344,6 +351,7 @@ export class ContentViewModel {
         return;
       }
 
+      setHistoryParam('/');
       return this.switchContent(ContentState.WATERMARK);
     }
   };

@@ -19,13 +19,13 @@
 
 import React, {forwardRef, useEffect} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isTabKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
 
@@ -76,7 +76,8 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
     },
     textInputRef,
   ) => {
-    const isFilled = is.nonEmptyString(value);
+    const {translate} = useApplicationContext();
+    const isFilled = isNonEmptyString(value);
 
     useEffect(() => {
       if (isSuccess === true && onSuccessDismissed !== undefined) {
@@ -96,7 +97,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
 
     return (
       <div css={containerCSS} ref={inputWrapperRef}>
-        {isError === true && is.nonEmptyString(errorMessage) && (
+        {isError === true && isNonEmptyString(errorMessage) && (
           <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
             {errorMessage}
           </span>
@@ -129,11 +130,11 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
             css={cancelButtonCSS}
             onClick={() => {
               onCancel();
-              if (textInputRef && 'current' in textInputRef) {
+              if (textInputRef !== null && 'current' in textInputRef) {
                 textInputRef.current?.focus();
               }
             }}
-            aria-label={t('accessibility.userProfileDeleteEntry')}
+            aria-label={translate('accessibility.userProfileDeleteEntry')}
             onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>): void => {
               if (event.shiftKey && isTabKey(event)) {
                 // shift+tab from clear button should focus on the input field

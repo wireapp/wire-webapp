@@ -21,16 +21,18 @@ import {amplify} from 'amplify';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {ConversationError} from '../error/conversationError';
-import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
+import {OPEN_CONVERSATION_DETAILS} from '../page/rightSidebar/rightSidebar';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
   conversationDegraded: boolean,
+  translate: Translate,
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     const secondaryAction = [
@@ -39,41 +41,57 @@ export const showLegalHoldWarningModal = (
           const {showUsers} = useLegalHoldModalState.getState();
           showUsers(false, conversationEntity);
         },
-        text: t('legalHoldWarningSecondaryInformation'),
+        text: translate('legalHoldWarningSecondaryInformation'),
       },
     ];
 
     if (conversationDegraded) {
       secondaryAction.push({
         action: () => amplify.publish(OPEN_CONVERSATION_DETAILS),
-        text: t('legalHoldWarningSecondaryVerify'),
+        text: translate('legalHoldWarningSecondaryVerify'),
       });
     }
 
-    PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
-      close: () => {
-        reject(
-          new ConversationError(
-            ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-            ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-          ),
-        );
-      },
-      preventClose: true,
-      primaryAction: {
-        action: () => {
-          if (conversationDegraded) {
-            conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-          }
-          resolve();
+    PrimaryModal.show(
+      PrimaryModal.type.MULTI_ACTIONS,
+      {
+        close: () => {
+          reject(
+            new ConversationError(
+              ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+              ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+            ),
+          );
         },
-        text: t('legalHoldWarningPrimary'),
+        preventClose: true,
+        primaryAction: {
+          action: () => {
+            if (conversationDegraded) {
+              conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+            }
+            resolve();
+          },
+          text: translate('legalHoldWarningPrimary'),
+        },
+        secondaryAction,
+        text: {
+          translatedMessage: createLegalHoldWarningMessage(),
+          title: translate('legalHoldWarningTitle'),
+        },
       },
-      secondaryAction,
-      text: {
-        htmlMessage: t('legalHoldWarningMessage', undefined, {br: '<br>'}),
-        title: t('legalHoldWarningTitle'),
-      },
-    });
+      undefined,
+      translate,
+    );
   });
 };
+
+function createLegalHoldWarningMessage(): PrimaryModalTranslatedMessage {
+  return {
+    compatibilityReplacements: [],
+    components: [{kind: 'line-break', legacyTokens: [], markerName: 'br'}],
+    kind: 'translation',
+    layout: 'default',
+    translationKey: 'legalHoldWarningMessage',
+    values: [],
+  };
+}

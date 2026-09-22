@@ -20,8 +20,8 @@
 import {Button, ButtonVariant, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {
   confirmConversationTypeContainerCss,
@@ -39,6 +39,7 @@ interface ConfirmDiscardModalProps {
 }
 
 export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalProps) => {
+  const {translate} = useApplicationContext();
   const {isConfirmDiscardModalOpen} = useCreateConversationModal();
 
   return (
@@ -50,9 +51,9 @@ export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalPro
       onKeyDown={event => handleEscDown(event, onCancel)}
     >
       <p css={confirmConversationHeaderCss} className="heading-h2">
-        {t('createConversationConfirmDiscardModalHeader')}
+        {translate('createConversationConfirmDiscardModalHeader')}
       </p>
-      <Text css={confirmConversationTextCss}>{t('createConversationConfirmDiscardModalText')}</Text>
+      <Text css={confirmConversationTextCss}>{translate('createConversationConfirmDiscardModalText')}</Text>
       <FlexBox css={confirmConversationButtonContainerCss}>
         <Button
           css={confirmConversationButtonCss}
@@ -62,7 +63,7 @@ export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalPro
           data-uie-name="do-cancel"
           onKeyDown={event => handleEscDown(event, onCancel)}
         >
-          {t('createConversationConfirmDiscardModalCancel')}
+          {translate('createConversationConfirmDiscardModalCancel')}
         </Button>
         <Button
           css={confirmConversationButtonCss}
@@ -71,7 +72,7 @@ export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalPro
           data-uie-name="do-submit"
           onKeyDown={event => handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]})}
         >
-          {t('createConversationConfirmDiscardModalContinue')}
+          {translate('createConversationConfirmDiscardModalContinue')}
         </Button>
       </FlexBox>
     </ModalComponent>

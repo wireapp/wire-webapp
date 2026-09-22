@@ -1,55 +1,81 @@
-import {Router, type Response, type Request} from 'express';
-import {Result} from 'true-myth';
+import {Router, type Request, type Response} from 'express';
+
+import {createBuildMetadata, generateClientConfig, type BuildMetadata, type Env} from '@wireapp/config';
+
 import {createClientVersionCheckRoute} from './clientVersionCheckRoute';
 
-type ClientVersionCheckRouteDependencyFunctionOverrides = {
-  readonly get?: jest.Mock;
-  readonly parseClientVersion?: jest.Mock;
-  readonly deployedClientVersion?: string;
-  readonly isClientVersionEnforcementEnabled?: boolean;
-};
+const clientAssetVersionHeaderName = 'Wire-Client-Version';
 
-type FakeResponseOptions = {
-  readonly sendStatus?: jest.Mock;
-  readonly status?: jest.Mock;
+type ClientVersionCheckRouteOverrides = {
+  readonly deployedAssetVersion?: string;
+  readonly isClientVersionEnforcementEnabled?: boolean;
 };
 
 type FakeResponse = {
   readonly response: Response;
-  readonly set: jest.Mock;
   readonly sendStatus: jest.Mock;
+  readonly set: jest.Mock;
   readonly status: jest.Mock;
+  readonly json: jest.Mock;
 };
 
-function createClientVersionCheckRouteDependencies(overrides: ClientVersionCheckRouteDependencyFunctionOverrides = {}) {
-  const get = overrides.get ?? jest.fn();
-  const parseClientVersion = overrides.parseClientVersion ?? jest.fn().mockReturnValue(Result.ok(new Date()));
-  const deployedClientVersion = overrides.deployedClientVersion ?? '2026.02.12.17.51.00';
-  const isClientVersionEnforcementEnabled = overrides.isClientVersionEnforcementEnabled ?? false;
+type InvokedRoute = FakeResponse & {
+  readonly requestHeader: jest.Mock;
+};
+
+type InvokeRouteOptions = ClientVersionCheckRouteOverrides & {
+  readonly clientAssetVersion: string | undefined;
+};
+
+function createClientVersionCheckRouteDependencies(overrides: ClientVersionCheckRouteOverrides = {}) {
+  const get = jest.fn();
   const router = {get} as unknown as Router;
 
-  return {router, parseClientVersion, deployedClientVersion, isClientVersionEnforcementEnabled, get};
+  return {
+    get,
+    router,
+    deployedAssetVersion: overrides.deployedAssetVersion ?? 'main-deployed',
+    isClientVersionEnforcementEnabled: overrides.isClientVersionEnforcementEnabled ?? false,
+  };
 }
 
-function createFakeResponse(options: FakeResponseOptions = {}): FakeResponse {
-  const sendStatus = options.sendStatus ?? jest.fn();
-  const status = options.status ?? jest.fn();
-  const responseShape = {
-    sendStatus,
-    set: jest.fn(),
-    status,
-  };
-  responseShape.set.mockImplementation((_name: string, _value: string) => {
+function createFakeResponse(): FakeResponse {
+  const sendStatus = jest.fn();
+  const json = jest.fn();
+  const status = jest.fn().mockReturnValue({json});
+  const set = jest.fn().mockImplementation(() => {
     return responseShape;
   });
+  const responseShape = {sendStatus, set, status};
 
-  const response = responseShape as unknown as Response;
+  return {
+    response: responseShape as unknown as Response,
+    sendStatus,
+    set,
+    status,
+    json,
+  };
+}
 
-  return {response, set: responseShape.set, sendStatus, status};
+function invokeClientVersionCheckRoute(options: InvokeRouteOptions): InvokedRoute {
+  const fakeResponse = createFakeResponse();
+  const requestHeader = jest.fn().mockReturnValue(options.clientAssetVersion);
+  const fakeRequest = {
+    header: requestHeader,
+  } as unknown as Request;
+  const dependencies = createClientVersionCheckRouteDependencies(options);
+
+  dependencies.get.mockImplementation((_routePath, routeHandler) => {
+    routeHandler(fakeRequest, fakeResponse.response);
+  });
+
+  createClientVersionCheckRoute(dependencies);
+
+  return {...fakeResponse, requestHeader};
 }
 
 describe('/client-version-check', () => {
-  it('listens on /client-version-check path', async () => {
+  it('listens on /client-version-check path', () => {
     const dependencies = createClientVersionCheckRouteDependencies();
 
     createClientVersionCheckRoute(dependencies);
@@ -57,162 +83,97 @@ describe('/client-version-check', () => {
     expect(dependencies.get).toHaveBeenNthCalledWith(1, '/client-version-check', expect.any(Function));
   });
 
-  it('returns HTTP 200 when client version enforcement is disabled and parsed client version equals deployed version', async () => {
-    const {response, set, sendStatus} = createFakeResponse();
-    const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.51.00')} as unknown as Request;
-    const dependencies = createClientVersionCheckRouteDependencies({
-      deployedClientVersion: '2026.02.12.17.51.00',
-      isClientVersionEnforcementEnabled: false,
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, response);
-      }),
-    });
+  it.each([undefined, '', '   '])(
+    'returns HTTP 400 for a missing or blank client asset identity (%s)',
+    clientAssetVersion => {
+      const fakeResponse = invokeClientVersionCheckRoute({clientAssetVersion});
 
-    createClientVersionCheckRoute(dependencies);
-
-    expect(dependencies.parseClientVersion).toHaveBeenNthCalledWith(1, '2026.02.12.17.51.00');
-    expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
-    expect(set).toHaveBeenNthCalledWith(1, 'Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    expect(set).toHaveBeenNthCalledWith(2, 'Pragma', 'no-cache');
-    expect(set).toHaveBeenNthCalledWith(3, 'Expires', '0');
-    expect(set).toHaveBeenNthCalledWith(4, 'Surrogate-Control', 'no-store');
-  });
-
-  it.each<{headerValue: string | undefined; expectedHttpStatusCode: number}>([
-    {headerValue: '', expectedHttpStatusCode: 400},
-    {headerValue: '   ', expectedHttpStatusCode: 400},
-    {headerValue: undefined, expectedHttpStatusCode: 400},
-  ])(
-    'returns HTTP status code $expectedHttpStatusCode if header value is "$headerValue"',
-    async ({headerValue, expectedHttpStatusCode}) => {
-      const {response, sendStatus} = createFakeResponse();
-      const fakeHeader = jest.fn().mockReturnValue(headerValue);
-      const fakeRequest = {header: fakeHeader} as unknown as Request;
-      const dependencies = createClientVersionCheckRouteDependencies({
-        get: jest.fn((_routePath, routeHandler) => {
-          routeHandler(fakeRequest, response);
-        }),
-      });
-
-      createClientVersionCheckRoute(dependencies);
-
-      expect(fakeHeader).toHaveBeenNthCalledWith(1, 'Wire-Client-Version');
-      expect(dependencies.parseClientVersion).not.toHaveBeenCalled();
-      expect(sendStatus).toHaveBeenNthCalledWith(1, expectedHttpStatusCode);
+      expect(fakeResponse.sendStatus).toHaveBeenNthCalledWith(1, 400);
     },
   );
 
-  it('returns HTTP 400 if parseClientVersion() returns a Result Err', async () => {
-    const {response, sendStatus} = createFakeResponse();
-    const fakeRequest = {header: jest.fn().mockReturnValue('1.0.0')} as unknown as Request;
-    const dependencies = createClientVersionCheckRouteDependencies({
-      parseClientVersion: jest.fn().mockReturnValue(Result.err(new Error('invalid version'))),
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, response);
-      }),
-    });
+  it.each(['main-aaaaaaa', 'dev-aaaaaaa', '2026-08-03.1-aaaaaaa', '2026.07.20.06.18.03'])(
+    'returns HTTP 200 for non-empty identity %s when enforcement is disabled',
+    clientAssetVersion => {
+      const fakeResponse = invokeClientVersionCheckRoute({
+        clientAssetVersion,
+        deployedAssetVersion: 'main-bbbbbbb',
+        isClientVersionEnforcementEnabled: false,
+      });
 
-    createClientVersionCheckRoute(dependencies);
+      expect(fakeResponse.sendStatus).toHaveBeenNthCalledWith(1, 200);
+      expect(fakeResponse.status).not.toHaveBeenCalled();
+    },
+  );
 
-    expect(dependencies.parseClientVersion).toHaveBeenNthCalledWith(1, '1.0.0');
-    expect(sendStatus).toHaveBeenNthCalledWith(1, 400);
-  });
-
-  it('returns HTTP 200 when client version enforcement is disabled and parsed client version is lower than deployed version', async () => {
-    const {response, sendStatus} = createFakeResponse();
-    const clientVersionDate = new Date(2026, 1, 12, 17, 50, 59);
-    const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.50.59')} as unknown as Request;
-    const dependencies = createClientVersionCheckRouteDependencies({
-      parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
-      deployedClientVersion: '2026.02.12.17.51.00',
-      isClientVersionEnforcementEnabled: false,
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, response);
-      }),
-    });
-
-    createClientVersionCheckRoute(dependencies);
-
-    expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
-  });
-
-  it('returns HTTP 200 when client version enforcement is disabled and parsed client version is higher than deployed version', async () => {
-    const {response, sendStatus} = createFakeResponse();
-    const clientVersionDate = new Date(2026, 1, 12, 17, 51, 1);
-    const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.51.01')} as unknown as Request;
-    const dependencies = createClientVersionCheckRouteDependencies({
-      parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
-      deployedClientVersion: '2026.02.12.17.51.00',
-      isClientVersionEnforcementEnabled: false,
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, response);
-      }),
-    });
-
-    createClientVersionCheckRoute(dependencies);
-
-    expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
-  });
-
-  it('returns HTTP 200 when client version enforcement is enabled and parsed client version equals deployed version', async () => {
-    const {response, sendStatus} = createFakeResponse();
-    const deployedClientVersion = '2026.02.12.17.51.00';
-    const fakeRequest = {header: jest.fn().mockReturnValue(deployedClientVersion)} as unknown as Request;
-    const dependencies = createClientVersionCheckRouteDependencies({
-      parseClientVersion: jest.fn().mockReturnValue(Result.ok(new Date(2026, 1, 12, 17, 51, 0))),
-      deployedClientVersion,
+  it('returns HTTP 200 when enforcement is enabled and the asset identities match', () => {
+    const deployedAssetVersion = 'main-aaaaaaa';
+    const fakeResponse = invokeClientVersionCheckRoute({
+      clientAssetVersion: deployedAssetVersion,
+      deployedAssetVersion,
       isClientVersionEnforcementEnabled: true,
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, response);
-      }),
     });
 
-    createClientVersionCheckRoute(dependencies);
-
-    expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
+    expect(fakeResponse.sendStatus).toHaveBeenNthCalledWith(1, 200);
   });
 
-  it('returns HTTP 426 with reload action when client version enforcement is enabled and parsed client version is below deployed version', async () => {
-    const json = jest.fn();
-    const status = jest.fn().mockReturnValue({json});
-    const {response, sendStatus} = createFakeResponse({status});
-    const clientVersionDate = new Date(2026, 1, 12, 17, 50, 59);
-    const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.50.59')} as unknown as Request;
-    const dependencies = createClientVersionCheckRouteDependencies({
-      parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
-      deployedClientVersion: '2026.02.12.17.51.00',
+  it.each([
+    {
+      description: 'the main artifact differs',
+      clientAssetVersion: 'main-aaaaaaa',
+      deployedAssetVersion: 'main-bbbbbbb',
+    },
+    {
+      description: 'the Beta candidate differs within the same logical release',
+      clientAssetVersion: '2026-08-03.1-aaaaaaa',
+      deployedAssetVersion: '2026-08-03.1-bbbbbbb',
+    },
+    {
+      description: 'the deployment was rolled back to another artifact',
+      clientAssetVersion: '2026-08-03.1-bbbbbbb',
+      deployedAssetVersion: '2026-08-03.1-aaaaaaa',
+    },
+    {
+      description: 'the client has a legacy timestamp identity',
+      clientAssetVersion: '2026.07.20.06.18.03',
+      deployedAssetVersion: 'main-bbbbbbb',
+    },
+  ])('returns HTTP 426 with a reload action when $description', testCase => {
+    const fakeResponse = invokeClientVersionCheckRoute({
+      ...testCase,
       isClientVersionEnforcementEnabled: true,
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, response);
-      }),
     });
 
-    createClientVersionCheckRoute(dependencies);
-
-    expect(status).toHaveBeenNthCalledWith(1, 426);
-    expect(json).toHaveBeenNthCalledWith(1, {action: 'reload'});
-    expect(sendStatus).not.toHaveBeenCalled();
+    expect(fakeResponse.status).toHaveBeenNthCalledWith(1, 426);
+    expect(fakeResponse.json).toHaveBeenNthCalledWith(1, {action: 'reload'});
+    expect(fakeResponse.sendStatus).not.toHaveBeenCalled();
   });
 
-  it('returns HTTP 426 with reload action when client version enforcement is enabled and parsed client version is above deployed version', async () => {
-    const json = jest.fn();
-    const status = jest.fn().mockReturnValue({json});
-    const {response, sendStatus} = createFakeResponse({status});
-    const clientVersionDate = new Date(2026, 1, 12, 17, 51, 1);
-    const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.51.01')} as unknown as Request;
-    const dependencies = createClientVersionCheckRouteDependencies({
-      parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
-      deployedClientVersion: '2026.02.12.17.51.00',
+  it('accepts the asset identity produced by the shared build metadata and client configuration contract', () => {
+    const buildMetadata: BuildMetadata = createBuildMetadata({
+      version: '2026-08-03.1',
+      commit: 'bbbbbbb1234567890',
+      builtAt: '2026-08-03T10:00:00.000Z',
+    });
+    const clientConfiguration = generateClientConfig(
+      {
+        assetVersion: buildMetadata.assetVersion,
+        commit: buildMetadata.commit,
+        env: 'production',
+        urls: {},
+        version: buildMetadata.version,
+      },
+      {} as Env,
+    );
+
+    const fakeResponse = invokeClientVersionCheckRoute({
+      clientAssetVersion: clientConfiguration.ASSET_VERSION,
+      deployedAssetVersion: buildMetadata.assetVersion,
       isClientVersionEnforcementEnabled: true,
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, response);
-      }),
     });
 
-    createClientVersionCheckRoute(dependencies);
-
-    expect(status).toHaveBeenNthCalledWith(1, 426);
-    expect(json).toHaveBeenNthCalledWith(1, {action: 'reload'});
-    expect(sendStatus).not.toHaveBeenCalled();
+    expect(clientConfiguration.ASSET_VERSION).toBe(buildMetadata.assetVersion);
+    expect(fakeResponse.requestHeader).toHaveBeenCalledWith(clientAssetVersionHeaderName);
+    expect(fakeResponse.sendStatus).toHaveBeenNthCalledWith(1, 200);
   });
 });

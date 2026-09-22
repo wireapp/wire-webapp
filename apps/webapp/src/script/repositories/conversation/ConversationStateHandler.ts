@@ -24,7 +24,8 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
+import type {TranslationKey} from 'Util/localizerUtil/translationTypes';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
@@ -32,17 +33,34 @@ import {ACCESS_STATE} from './AccessState';
 import {
   ACCESS_MODES,
   featureFromStateChange,
-  isGettingAccessToFeature,
+  hasAccessToFeature,
   updateAccessRights,
 } from './ConversationAccessPermission';
 import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
 
+const ACCESS_FEATURE_TRANSLATION_KEYS: Record<
+  'Guest' | 'Service',
+  {allow: TranslationKey; disable: TranslationKey; toggle: TranslationKey}
+> = {
+  Guest: {
+    allow: 'modalConversationOptionsAllowGuestMessage',
+    disable: 'modalConversationOptionsDisableGuestMessage',
+    toggle: 'modalConversationOptionsToggleGuestMessage',
+  },
+  Service: {
+    allow: 'modalConversationOptionsAllowAppMessage',
+    disable: 'modalConversationOptionsDisableAppMessage',
+    toggle: 'modalConversationOptionsToggleAppMessage',
+  },
+};
+
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
+  private readonly translate: Translate;
 
-  constructor(conversationService: ConversationService) {
+  constructor(conversationService: ConversationService, translate: Translate) {
     super();
     const eventHandlingConfig: EventHandlingConfig = {
       [CONVERSATION_EVENT.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
@@ -51,6 +69,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     };
     this.setEventHandlingConfig(eventHandlingConfig);
     this.conversationService = conversationService;
+    this.translate = translate;
   }
 
   async changeAccessState(conversationEntity: Conversation, accessState: ACCESS_STATE): Promise<void> {
@@ -63,8 +82,10 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         const {accessModes, accessRole} = updateAccessRights(accessState);
         if (accessModes !== undefined && accessRole !== undefined) {
           try {
-            const isGettingAccessCode = isGettingAccessToFeature(ACCESS_MODES.CODE, prevAccessState, accessState);
-            if (isGettingAccessCode === false) {
+            const isLosingAccessCode =
+              hasAccessToFeature(ACCESS_MODES.CODE, prevAccessState) &&
+              !hasAccessToFeature(ACCESS_MODES.CODE, accessState);
+            if (isLosingAccessCode) {
               conversationEntity.accessCode('');
               await this.revokeAccessCode(conversationEntity);
             }
@@ -75,23 +96,23 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             await this.conversationService.putConversationAccess(conversationId, accessModes, accessRole);
 
             conversationEntity.accessState(accessState);
-          } catch (e: unknown) {
-            let messageString: string;
+          } catch {
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
-
-            if (featureInfo.isAvailable) {
-              messageString = t(`modalConversationOptionsAllow${featureName as 'Guest' | 'Service'}Message`);
-            } else {
-              messageString = t(`modalConversationOptionsDisable${featureName as 'Guest' | 'Service'}Message`);
+            if (featureName !== undefined) {
+              const messageKey = featureInfo.isAvailable
+                ? ACCESS_FEATURE_TRANSLATION_KEYS[featureName].allow
+                : ACCESS_FEATURE_TRANSLATION_KEYS[featureName].disable;
+              this._showModal(this.translate(messageKey));
             }
-            this._showModal(messageString);
           }
           return;
         }
       }
     }
     const {featureName} = featureFromStateChange(prevAccessState, accessState);
-    this._showModal(t(`modalConversationOptionsToggle${featureName as 'Service' | 'Guest'}Message`));
+    if (featureName !== undefined) {
+      this._showModal(this.translate(ACCESS_FEATURE_TRANSLATION_KEYS[featureName].toggle));
+    }
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {
@@ -101,7 +122,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     } catch (error: unknown) {
       const isNotFound = isErrorWithCode(error) && error.code === HTTP_STATUS.NOT_FOUND;
       if (!isNotFound) {
-        this._showModal(t('modalConversationGuestOptionsGetCodeMessage'));
+        this._showModal(this.translate('modalConversationGuestOptionsGetCodeMessage'));
       }
     }
   }
@@ -113,8 +134,8 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       if (accessCode !== undefined) {
         ConversationMapper.mapAccessCode(conversationEntity, accessCode);
       }
-    } catch (e: unknown) {
-      return this._showModal(t('modalConversationGuestOptionsRequestCodeMessage'));
+    } catch {
+      return this._showModal(this.translate('modalConversationGuestOptionsRequestCodeMessage'));
     }
   }
 
@@ -122,8 +143,8 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     try {
       await this.conversationService.deleteConversationCode(conversationEntity.id);
       conversationEntity.accessCode('');
-    } catch (e: unknown) {
-      return this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage'));
+    } catch {
+      return this._showModal(this.translate('modalConversationGuestOptionsRevokeCodeMessage'));
     }
   }
 
@@ -152,6 +173,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _showModal(message: string): void {
     const modalOptions = {text: {message}};
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
   }
 }

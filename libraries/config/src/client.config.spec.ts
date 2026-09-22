@@ -23,6 +23,7 @@ import {Env} from './env';
 
 describe('Client Config', () => {
   const mockParams: ConfigGeneratorParams = {
+    assetVersion: '1.0.0-abc123',
     commit: 'abc123',
     version: '1.0.0',
     env: 'production',
@@ -72,6 +73,7 @@ describe('Client Config', () => {
 
       expect(config).toBeDefined();
       expect(config.VERSION).toBe('1.0.0');
+      expect(config.ASSET_VERSION).toBe('1.0.0-abc123');
       expect(config.ENVIRONMENT).toBe('production');
       expect(config.APP_NAME).toBe('Wire');
       expect(config.BRAND_NAME).toBe('Wire');
@@ -151,7 +153,7 @@ describe('Client Config', () => {
       expect(config.MAX_GROUP_PARTICIPANTS).toBe(500);
       expect(config.MAX_VIDEO_PARTICIPANTS).toBe(4);
       expect(config.NEW_PASSWORD_MINIMUM_LENGTH).toBe(8);
-      expect(config.MAX_API_VERSION).toBe(13);
+      expect(config.MAX_API_VERSION).toBe(17);
     });
 
     it('should parse file upload extensions correctly', () => {

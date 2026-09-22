@@ -17,49 +17,51 @@
  *
  */
 
+const {execSync} = require('child_process');
 const path = require('path');
 
 const rootDir = path.join(__dirname, '..', '..');
 const pkg = require(path.join(rootDir, 'package.json'));
 const appConfigPkg = require('./app-config/package.json');
-const {execSync} = require('child_process');
+
+const {selectConfiguration} = require('./configuration-selection');
 require('dotenv').config({quiet: true});
 
 /**
- * Selects configuration based on current branch and tagged commits
- * @returns {string} the configuration name
+ * Reads the tag at HEAD for the compatibility fallback.
+ * @returns {string} the tag at HEAD, or an empty string when Git is unavailable
  */
-const selectConfiguration = () => {
-  const distribution = process.env.DISTRIBUTION !== 'wire' && process.env.DISTRIBUTION;
-  if (distribution) {
-    console.log(`Selecting configuration "${distribution}" (reason: custom distribution)`);
-    return distribution;
-  }
-  let currentTag = '';
+function readCurrentTag() {
   try {
-    currentTag = execSync('git tag -l --points-at HEAD').toString().trim();
-  } catch (error) {}
-
-  if (currentTag.includes('staging') || currentTag.includes('production')) {
-    console.log(`Selecting configuration "master" (reason: tag "${currentTag}")`);
-    return 'master';
+    return execSync('git tag -l --points-at HEAD').toString().trim();
+  } catch (error) {
+    return '';
   }
-
-  console.log('Selecting configuration "staging" (reason: default)');
-  return 'staging';
-};
-
-let repositoryUrl;
-const forcedConfigUrl = process.env.FORCED_CONFIG_URL;
-if (forcedConfigUrl) {
-  console.log(`Selecting configuration "${forcedConfigUrl}" (reason: forced config URL)`);
-  repositoryUrl = forcedConfigUrl;
-} else {
-  const configurationEntry = `wire-web-config-default-${selectConfiguration()}`;
-  repositoryUrl = appConfigPkg.dependencies[configurationEntry];
 }
 
-console.log('Repo URL', repositoryUrl);
+const forcedConfigUrl = process.env.FORCED_CONFIG_URL;
+const configurationSelection = selectConfiguration({
+  forcedConfigUrl,
+  distribution: process.env.DISTRIBUTION,
+  webappConfiguration: process.env.WIRE_WEBAPP_CONFIGURATION,
+  currentTag: readCurrentTag(),
+});
+const selectedLegacyDependencyKey =
+  configurationSelection.configurationDependencyKey === undefined
+    ? 'not applicable (forced URL)'
+    : configurationSelection.configurationDependencyKey;
+
+const configurationSelectionLog = `Configuration selection: semantic profile "${configurationSelection.semanticProfile}", selected legacy dependency key "${selectedLegacyDependencyKey}", selection reason: ${configurationSelection.selectionReason}`;
+console.info(configurationSelectionLog);
+
+const repositoryUrl =
+  configurationSelection.repositoryUrl === undefined
+    ? appConfigPkg.dependencies[configurationSelection.configurationDependencyKey]
+    : configurationSelection.repositoryUrl;
+const repositoryUrlForLog =
+  configurationSelection.repositoryUrl === undefined ? repositoryUrl : 'provided by FORCED_CONFIG_URL (redacted)';
+
+console.info(`Resolved repository URL: ${repositoryUrlForLog}`);
 
 module.exports = {
   files: {

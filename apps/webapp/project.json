@@ -6,20 +6,35 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/apps/server/dist/static"],
-      "defaultConfiguration": "production",
-      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/internal"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "yarn build:prod",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal yarn build:prod",
         "cwd": "{projectRoot}"
-      },
-      "configurations": {
-        "development": {
-          "command": "yarn build:dev"
-        },
-        "production": {
-          "command": "yarn build:prod"
-        }
+      }
+    },
+    "build-development": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/development"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
+      "options": {
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development yarn build:dev",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "build-production-public": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/public"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
+      "options": {
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public yarn build:prod:public",
+        "cwd": "{projectRoot}"
       }
     },
     "watch-deps": {
@@ -28,6 +43,22 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'Watching upstream library dependencies' && tail -f /dev/null",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "build-libs": {
+      "dependsOn": ["^build"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'All libraries built'",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "watch-deps-dynamic": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "[ -n \"$WATCH_LIBS\" ] && nx run-many -t watch --projects=$WATCH_LIBS || tail -f /dev/null",
         "cwd": "{projectRoot}"
       }
     },
@@ -64,7 +95,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=936 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.ts,.tsx {projectRoot}/src"
+        "command": "eslint --config eslint.config.mjs --max-warnings=847 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
       }
     },
     "lint:full": {
@@ -85,7 +116,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
       "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.build.json --noEmit"
+        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
       }
     },
     "check-circular": {
@@ -108,11 +139,11 @@
         "cwd": "{projectRoot}"
       }
     },
-    "translate-generate-types": {
+    "validate-translations": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ./bin/transalations_generate_types.js",
-        "cwd": "{projectRoot}"
+        "command": "node tools/i18n/validateTranslationPlaceholders.mts",
+        "cwd": "{workspaceRoot}"
       }
     },
     "configure": {

@@ -19,7 +19,7 @@
 
 import type {KeyboardEvent as ReactKeyboardEvent, SyntheticEvent as ReactEvent} from 'react';
 
-import is from '@sindresorhus/is';
+import {isString} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -78,7 +78,7 @@ export const isFunctionKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent)
 export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
   keyboardEvent.metaKey ||
   keyboardEvent.ctrlKey ||
-  (is.string(keyboardEvent.key) && keyboardEvent.key.toLowerCase() === 'control');
+  (isString(keyboardEvent.key) && keyboardEvent.key.toLowerCase() === 'control');
 
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);

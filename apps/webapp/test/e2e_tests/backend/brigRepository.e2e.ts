@@ -80,6 +80,16 @@ export class BrigRepositoryE2E {
     });
   }
 
+  public async enableMeetingsFeature(teamId: string) {
+    await this.axiosInstance.patch(`i/teams/${teamId}/features/meetings`, {
+      status: 'enabled',
+    });
+  }
+
+  public async unlockMeetingsFeature(teamId: string) {
+    await this.axiosInstance.put(`i/teams/${teamId}/features/meetings/unlocked`, {});
+  }
+
   public async configureMLSFeature(
     teamId: string,
     config: {
@@ -178,5 +188,11 @@ export class BrigRepositoryE2E {
 
   public async deleteDomainClaim(domain: string) {
     await this.axiosInstance.delete(`i/domain-registration/${domain}`);
+  }
+
+  public async enableSSOFeature(teamId: string) {
+    await this.axiosInstance.patch(`i/teams/${teamId}/features/sso`, {
+      status: 'enabled',
+    });
   }
 }

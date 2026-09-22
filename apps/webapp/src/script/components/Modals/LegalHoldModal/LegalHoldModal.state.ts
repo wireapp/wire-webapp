@@ -17,12 +17,12 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {create} from 'zustand';
 
 import {LegalHoldModalType} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {splitFingerprint} from 'Util/stringUtil';
 
 type LegalHoldModalState = {
   type: LegalHoldModalType | null;
@@ -80,17 +80,12 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
   isOpen: false,
   isSelfInfo: false,
   setFingerprint: fingerprint => {
-    const formattedFingerprint =
-      fingerprint !== undefined && fingerprint !== ''
-        ? splitFingerprint(fingerprint)
-            .map(part => `<span>${part} </span>`)
-            .join('')
-        : '';
+    const normalizedFingerprint = isUndefined(fingerprint) ? '' : fingerprint;
 
     return set(state => ({
       ...state,
-      fingerprint: formattedFingerprint,
-      isOpen: !!formattedFingerprint,
+      fingerprint: normalizedFingerprint,
+      isOpen: normalizedFingerprint !== '',
     }));
   },
   setIsLoading: isLoading =>
@@ -114,19 +109,14 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       users,
     })),
   showRequestModal: (initialize = false, showLoading = false, fingerprint) => {
-    const formattedFingerprint =
-      fingerprint !== undefined && fingerprint !== ''
-        ? splitFingerprint(fingerprint)
-            .map(part => `<span>${part} </span>`)
-            .join('')
-        : '';
+    const normalizedFingerprint = isUndefined(fingerprint) ? '' : fingerprint;
 
     return set(state => ({
       ...state,
-      fingerprint: formattedFingerprint,
+      fingerprint: normalizedFingerprint,
       isInitialized: initialize,
       isLoading: showLoading,
-      isOpen: showLoading || !!formattedFingerprint,
+      isOpen: showLoading || normalizedFingerprint !== '',
       type: LegalHoldModalType.REQUEST,
     }));
   },

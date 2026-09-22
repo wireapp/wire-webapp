@@ -21,7 +21,8 @@ import {MeetingRecurrence} from './meetingRecurrence';
 
 export interface UpdateMeeting {
   end_time?: string;
-  recurrence?: MeetingRecurrence;
+  /** Omit to leave unchanged; null clears recurrence. */
+  recurrence?: MeetingRecurrence | null;
   start_time?: string;
   title?: string;
 }

@@ -66,7 +66,7 @@ export class BackupRepository {
     this.backupService = backupService;
     this.conversationRepository = conversationRepository;
 
-    this.worker = new WebWorker(() => new Worker(new URL('./zipWorker.ts', import.meta.url)));
+    this.worker = new WebWorker(() => new Worker(new URL('./zipWorker', import.meta.url)));
   }
 
   public cancelAction(): void {

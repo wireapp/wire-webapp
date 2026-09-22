@@ -62,7 +62,7 @@ import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {chunk, partition} from 'Util/arrayUtil';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {fixWebsocketString} from 'Util/stringUtil';
@@ -75,7 +75,7 @@ import {UserMapper} from './userMapper';
 import type {UserService} from './userService';
 import {UserState} from './userState';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
@@ -129,13 +129,14 @@ export class UserRepository extends TypedEventEmitter<Events> {
     private readonly clientRepository: ClientRepository,
     serverTimeHandler: ServerTimeHandler,
     private readonly propertyRepository: PropertiesRepository,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
     super();
     this.logger = getLogger('UserRepository');
 
-    this.userMapper = new UserMapper(serverTimeHandler);
+    this.userMapper = new UserMapper(serverTimeHandler, this.translate);
 
     this.getTeamMembersFromUsers = async (_: User[]) => undefined;
 
@@ -499,7 +500,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     if (hasAvailabilityChanged) {
       await this.updateUser(selfUser.qualifiedId, {availability});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
-      showAvailabilityModal(availability);
+      showAvailabilityModal(availability, this.translate);
     }
   };
 
@@ -605,7 +606,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       };
     }
 
-    return {...user, name: t('deletedUser')};
+    return {...user, name: this.translate('deletedUser')};
   }
 
   private mapUserResponse(found: APIClientUser[], failed: QualifiedId[], dbUsers: UserRecord[]): User[] {
@@ -626,7 +627,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       }
 
       // Otherwise, we generate placeholder users locally with some default values.
-      return new User(userId.id, userId.domain);
+      return new User(userId.id, userId.domain, this.translate);
     });
 
     const mappedUsers = this.userMapper.mapUsersFromJson(found, selfDomain).concat(failedToLoad);
@@ -662,6 +663,29 @@ export class UserRepository extends TypedEventEmitter<Events> {
   findUsersByIds(userIds: QualifiedId[]): User[] {
     return this.userState.users().filter(user => userIds.find(userId => matchQualifiedIds(user.qualifiedId, userId)));
   }
+
+  /**
+   * Load users from the local database without making a backend request.
+   * Users that are no longer cached in IndexedDB are represented as deleted users.
+   */
+  readonly getUsersByIdsFromDb = async (userIds: QualifiedId[]): Promise<User[]> => {
+    const storedUsers = await Promise.all(userIds.map(userId => this.userService.loadUserFromDb(userId)));
+    const localDomain = this.userState.self().domain;
+
+    return storedUsers.map((storedUser, index) => {
+      if (!storedUser?.name) {
+        return this.createDeletedUser(userIds[index]);
+      }
+
+      return this.userMapper.mapUserFromJson(
+        {
+          ...storedUser,
+          qualified_id: storedUser.qualified_id ?? userIds[index],
+        },
+        localDomain,
+      );
+    });
+  };
 
   /**
    * Find a local user.
@@ -701,9 +725,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
       return user;
     }
     if (localOnly) {
-      const deletedUser = new User(userId.id, userId.domain);
+      const deletedUser = new User(userId.id, userId.domain, this.translate);
       deletedUser.isDeleted = true;
-      deletedUser.name(t('deletedUser'));
+      deletedUser.name(this.translate('deletedUser'));
       return deletedUser;
     }
     try {
@@ -919,9 +943,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   private createDeletedUser(userId: QualifiedId): User {
-    const userEntity = new User(userId.id, userId.domain);
+    const userEntity = new User(userId.id, userId.domain, this.translate);
     userEntity.isDeleted = true;
-    userEntity.name(t('nonexistentUser'));
+    userEntity.name(this.translate('nonexistentUser'));
     return userEntity;
   }
 

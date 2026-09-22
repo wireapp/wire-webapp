@@ -21,7 +21,7 @@ import {DeleteEvent, MessageAddEvent, MultipartMessageAddEvent} from 'Repositori
 import {StoredEvent} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 
-import {QuoteEntity} from '../../../message/QuoteEntity';
+import {QuoteEntity} from '../../../message/quoteEntity';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';

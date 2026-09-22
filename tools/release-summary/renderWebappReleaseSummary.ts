@@ -1,0 +1,1960 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {Maybe} from 'true-myth';
+import {match, P} from 'ts-pattern';
+
+export type WorkflowJobResult = 'cancelled' | 'failure' | 'skipped' | 'success';
+
+export type ReleaseBranchAction = 'created' | 'reused';
+
+export type ReleaseMetadata = {
+  readonly artifactChecksum: Maybe<string>;
+  readonly artifactAssetVersion: Maybe<string>;
+  readonly artifactBuiltAt: Maybe<string>;
+  readonly artifactName: Maybe<string>;
+  readonly artifactVersion: Maybe<string>;
+  readonly branch: Maybe<string>;
+  readonly commitSha: Maybe<string>;
+  readonly identifier: Maybe<string>;
+  readonly manualReason: Maybe<string>;
+};
+
+export type BetaSummaryInput = {
+  readonly deploymentResult: Maybe<WorkflowJobResult>;
+  readonly environmentName: Maybe<string>;
+  readonly runtimeBackendRest: Maybe<string>;
+  readonly runtimeBackendWebSocket: Maybe<string>;
+  readonly runtimeVerificationResult: Maybe<WorkflowJobResult>;
+  readonly tagCreationResult: Maybe<WorkflowJobResult>;
+  readonly tagName: Maybe<string>;
+  readonly webappUrl: Maybe<string>;
+};
+
+export type E2ESummaryInput = {
+  readonly environmentName: Maybe<string>;
+  readonly reportUrl: Maybe<string>;
+  readonly result: Maybe<WorkflowJobResult>;
+  readonly runtimeBackendRest: Maybe<string>;
+  readonly runtimeBackendWebSocket: Maybe<string>;
+  readonly testinyRunName: Maybe<string>;
+  readonly webappUrl: Maybe<string>;
+};
+
+export type ProductionPreflightResult = 'already_tagged' | 'failure' | 'ready' | 'skipped';
+
+export type ProductionSummaryInput = {
+  readonly approvalResult: Maybe<WorkflowJobResult>;
+  readonly currentBetaVerificationResult: Maybe<WorkflowJobResult>;
+  readonly deploymentResult: Maybe<WorkflowJobResult>;
+  readonly deploymentRequired: Maybe<boolean>;
+  readonly environmentName: Maybe<string>;
+  readonly preflightJobResult: Maybe<WorkflowJobResult>;
+  readonly preflightResult: Maybe<ProductionPreflightResult>;
+  readonly runtimeBackendRest: Maybe<string>;
+  readonly runtimeBackendWebSocket: Maybe<string>;
+  readonly runtimeVerificationResult: Maybe<WorkflowJobResult>;
+  readonly skippedReason: Maybe<string>;
+  readonly tagCreationResult: Maybe<WorkflowJobResult>;
+  readonly createdTagName: Maybe<string>;
+  readonly plannedTagName: Maybe<string>;
+  readonly webappUrl: Maybe<string>;
+};
+
+export type ProductionDistributionSummaryInput = {
+  readonly dockerImageTag: Maybe<string>;
+  readonly distributionJobResult: Maybe<WorkflowJobResult>;
+  readonly distributionResult: Maybe<WorkflowJobResult>;
+  readonly helmChartVersion: Maybe<string>;
+  readonly wireBuildsCommitSha: Maybe<string>;
+  readonly dockerRepository: Maybe<string>;
+  readonly chartRepositoryUrl: Maybe<string>;
+};
+
+export type GitHubReleaseAction = 'already_draft' | 'already_published' | 'created';
+
+export type GitHubReleaseState = 'draft' | 'published';
+
+export type GitHubReleaseSummaryInput = {
+  readonly action: Maybe<GitHubReleaseAction>;
+  readonly jobResult: Maybe<WorkflowJobResult>;
+  readonly state: Maybe<GitHubReleaseState>;
+  readonly tagName: Maybe<string>;
+  readonly url: Maybe<string>;
+};
+
+export type WebAppVersionSynchronizationPreflightState =
+  | 'available'
+  | 'matching-open'
+  | 'matching-merged'
+  | 'closed-without-merge'
+  | 'blocked-by-previous-unresolved'
+  | 'conflict';
+
+export type WebAppVersionSynchronizationAction = 'already-open' | 'already-merged' | 'created' | 'recovered';
+
+export type WebAppVersionSynchronizationSummaryInput = {
+  readonly initialPreflightJobResult: Maybe<WorkflowJobResult>;
+  readonly initialPreflightPullRequestNumber: Maybe<string>;
+  readonly initialPreflightPullRequestUrl: Maybe<string>;
+  readonly initialPreflightState: Maybe<WebAppVersionSynchronizationPreflightState>;
+  readonly productionPreflightJobResult: Maybe<WorkflowJobResult>;
+  readonly productionPreflightPullRequestNumber: Maybe<string>;
+  readonly productionPreflightPullRequestUrl: Maybe<string>;
+  readonly productionPreflightState: Maybe<WebAppVersionSynchronizationPreflightState>;
+  readonly synchronizationAction: Maybe<WebAppVersionSynchronizationAction>;
+  readonly synchronizationBranchName: Maybe<string>;
+  readonly synchronizationJobResult: Maybe<WorkflowJobResult>;
+  readonly synchronizationPullRequestNumber: Maybe<string>;
+  readonly synchronizationPullRequestUrl: Maybe<string>;
+  readonly webAppVersion: Maybe<string>;
+};
+
+export type GitHubLinkContext = {
+  readonly actor: Maybe<string>;
+  readonly repository: Maybe<string>;
+  readonly runId: Maybe<string>;
+  readonly serverUrl: Maybe<string>;
+  readonly wireBuildsRepository: Maybe<string>;
+};
+
+export type ReleasePreparationSummaryInput = {
+  readonly branchAction: Maybe<ReleaseBranchAction>;
+  readonly sourceCommitSha: Maybe<string>;
+  readonly sourceRef: Maybe<string>;
+};
+
+export type WebappReleaseSummaryInput = {
+  readonly beta: BetaSummaryInput;
+  readonly distribution: ProductionDistributionSummaryInput;
+  readonly e2e: E2ESummaryInput;
+  readonly github: GitHubLinkContext;
+  readonly githubRelease: GitHubReleaseSummaryInput;
+  readonly preparation: ReleasePreparationSummaryInput;
+  readonly production: ProductionSummaryInput;
+  readonly release: ReleaseMetadata;
+  readonly webAppVersionSynchronization: WebAppVersionSynchronizationSummaryInput;
+};
+
+type RenderReleaseIdentityParameters = {
+  readonly title: string;
+  readonly outcome: string;
+  readonly input: WebappReleaseSummaryInput;
+};
+
+function readOptionalEnvironmentValue(environment: NodeJS.ProcessEnv, variableName: string): Maybe<string> {
+  return Maybe.of(environment[variableName]).andThen(environmentValue => {
+    if (environmentValue === '') {
+      return Maybe.nothing<string>();
+    }
+
+    return Maybe.just(environmentValue);
+  });
+}
+
+function readOptionalBoolean(environment: NodeJS.ProcessEnv, variableName: string): Maybe<boolean> {
+  const environmentValue = readOptionalEnvironmentValue(environment, variableName);
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with('true', () => {
+        return Maybe.just(true);
+      })
+      .with('false', () => {
+        return Maybe.just(false);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<boolean>();
+      });
+  });
+}
+
+function readWorkflowJobResult(environment: NodeJS.ProcessEnv, variableName: string): Maybe<WorkflowJobResult> {
+  const environmentValue = readOptionalEnvironmentValue(environment, variableName);
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('cancelled', 'failure', 'skipped', 'success'), validResult => {
+        return Maybe.just(validResult);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<WorkflowJobResult>();
+      });
+  });
+}
+
+function readProductionPreflightResult(environment: NodeJS.ProcessEnv): Maybe<ProductionPreflightResult> {
+  const environmentValue = readOptionalEnvironmentValue(environment, 'PRODUCTION_PREFLIGHT_RESULT');
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('already_tagged', 'failure', 'ready', 'skipped'), validResult => {
+        return Maybe.just(validResult);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<ProductionPreflightResult>();
+      });
+  });
+}
+
+function readReleaseBranchAction(environment: NodeJS.ProcessEnv): Maybe<ReleaseBranchAction> {
+  const environmentValue = readOptionalEnvironmentValue(environment, 'RELEASE_BRANCH_ACTION');
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('created', 'reused'), validAction => {
+        return Maybe.just(validAction);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<ReleaseBranchAction>();
+      });
+  });
+}
+
+function readGitHubReleaseAction(environment: NodeJS.ProcessEnv): Maybe<GitHubReleaseAction> {
+  const environmentValue = readOptionalEnvironmentValue(environment, 'GITHUB_RELEASE_ACTION');
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('already_draft', 'already_published', 'created'), validAction => {
+        return Maybe.just(validAction);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<GitHubReleaseAction>();
+      });
+  });
+}
+
+function readGitHubReleaseState(environment: NodeJS.ProcessEnv): Maybe<GitHubReleaseState> {
+  const environmentValue = readOptionalEnvironmentValue(environment, 'GITHUB_RELEASE_STATE');
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('draft', 'published'), validState => {
+        return Maybe.just(validState);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<GitHubReleaseState>();
+      });
+  });
+}
+
+function readWebAppVersionSynchronizationPreflightState(
+  environment: NodeJS.ProcessEnv,
+  variableName: string,
+): Maybe<WebAppVersionSynchronizationPreflightState> {
+  const environmentValue = readOptionalEnvironmentValue(environment, variableName);
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(
+        P.union(
+          'available',
+          'matching-open',
+          'matching-merged',
+          'closed-without-merge',
+          'blocked-by-previous-unresolved',
+          'conflict',
+        ),
+        validState => {
+          return Maybe.just(validState);
+        },
+      )
+      .otherwise(() => {
+        return Maybe.nothing<WebAppVersionSynchronizationPreflightState>();
+      });
+  });
+}
+
+function readWebAppVersionSynchronizationAction(
+  environment: NodeJS.ProcessEnv,
+): Maybe<WebAppVersionSynchronizationAction> {
+  const environmentValue = readOptionalEnvironmentValue(environment, 'WEBAPP_VERSION_SYNC_ACTION');
+
+  return environmentValue.andThen(value => {
+    return match(value)
+      .with(P.union('already-open', 'already-merged', 'created', 'recovered'), validAction => {
+        return Maybe.just(validAction);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<WebAppVersionSynchronizationAction>();
+      });
+  });
+}
+
+export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): WebappReleaseSummaryInput {
+  return {
+    beta: {
+      deploymentResult: readWorkflowJobResult(environment, 'BETA_RESULT'),
+      environmentName: readOptionalEnvironmentValue(environment, 'BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME'),
+      runtimeBackendRest: readOptionalEnvironmentValue(environment, 'BETA_RUNTIME_BACKEND_REST'),
+      runtimeBackendWebSocket: readOptionalEnvironmentValue(environment, 'BETA_RUNTIME_BACKEND_WS'),
+      runtimeVerificationResult: readWorkflowJobResult(environment, 'BETA_RUNTIME_VERIFICATION_RESULT'),
+      tagCreationResult: readWorkflowJobResult(environment, 'BETA_TAG_CREATION_RESULT'),
+      tagName: readOptionalEnvironmentValue(environment, 'BETA_TAG_NAME'),
+      webappUrl: readOptionalEnvironmentValue(environment, 'BETA_WEBAPP_URL'),
+    },
+    distribution: {
+      chartRepositoryUrl: readOptionalEnvironmentValue(environment, 'CHART_REPOSITORY_URL'),
+      dockerImageTag: readOptionalEnvironmentValue(environment, 'PRODUCTION_DOCKER_IMAGE_TAG'),
+      dockerRepository: readOptionalEnvironmentValue(environment, 'DOCKER_REPOSITORY'),
+      distributionJobResult: readWorkflowJobResult(environment, 'PRODUCTION_DISTRIBUTION_JOB_RESULT'),
+      distributionResult: readWorkflowJobResult(environment, 'PRODUCTION_DISTRIBUTION_RESULT'),
+      helmChartVersion: readOptionalEnvironmentValue(environment, 'PRODUCTION_HELM_CHART_VERSION'),
+      wireBuildsCommitSha: readOptionalEnvironmentValue(environment, 'PRODUCTION_WIRE_BUILDS_COMMIT_SHA'),
+    },
+    e2e: {
+      environmentName: readOptionalEnvironmentValue(environment, 'E2E_ELASTIC_BEANSTALK_ENVIRONMENT_NAME'),
+      reportUrl: readOptionalEnvironmentValue(environment, 'E2E_REPORT_URL'),
+      result: readWorkflowJobResult(environment, 'E2E_RESULT'),
+      runtimeBackendRest: readOptionalEnvironmentValue(environment, 'E2E_RUNTIME_BACKEND_REST'),
+      runtimeBackendWebSocket: readOptionalEnvironmentValue(environment, 'E2E_RUNTIME_BACKEND_WS'),
+      testinyRunName: readOptionalEnvironmentValue(environment, 'TESTINY_RUN_NAME'),
+      webappUrl: readOptionalEnvironmentValue(environment, 'E2E_WEBAPP_URL'),
+    },
+    github: {
+      actor: readOptionalEnvironmentValue(environment, 'RELEASE_ACTOR'),
+      repository: readOptionalEnvironmentValue(environment, 'GITHUB_REPOSITORY'),
+      runId: readOptionalEnvironmentValue(environment, 'GITHUB_RUN_ID'),
+      serverUrl: readOptionalEnvironmentValue(environment, 'GITHUB_SERVER_URL'),
+      wireBuildsRepository: readOptionalEnvironmentValue(environment, 'WIRE_BUILDS_REPOSITORY'),
+    },
+    githubRelease: {
+      action: readGitHubReleaseAction(environment),
+      jobResult: readWorkflowJobResult(environment, 'GITHUB_RELEASE_JOB_RESULT'),
+      state: readGitHubReleaseState(environment),
+      tagName: readOptionalEnvironmentValue(environment, 'GITHUB_RELEASE_TAG_NAME'),
+      url: readOptionalEnvironmentValue(environment, 'GITHUB_RELEASE_URL'),
+    },
+    production: {
+      approvalResult: readWorkflowJobResult(environment, 'PRODUCTION_APPROVAL_RESULT'),
+      currentBetaVerificationResult: readWorkflowJobResult(environment, 'PRODUCTION_CURRENT_BETA_VERIFICATION_RESULT'),
+      createdTagName: readOptionalEnvironmentValue(environment, 'CREATED_PRODUCTION_TAG_NAME'),
+      deploymentResult: readWorkflowJobResult(environment, 'PRODUCTION_DEPLOYMENT_RESULT'),
+      deploymentRequired: readOptionalBoolean(environment, 'PRODUCTION_DEPLOYMENT_REQUIRED'),
+      environmentName: readOptionalEnvironmentValue(environment, 'PRODUCTION_ENVIRONMENT_NAME'),
+      plannedTagName: readOptionalEnvironmentValue(environment, 'PLANNED_PRODUCTION_TAG_NAME'),
+      preflightJobResult: readWorkflowJobResult(environment, 'PRODUCTION_PREFLIGHT_JOB_RESULT'),
+      preflightResult: readProductionPreflightResult(environment),
+      runtimeBackendRest: readOptionalEnvironmentValue(environment, 'PRODUCTION_RUNTIME_BACKEND_REST'),
+      runtimeBackendWebSocket: readOptionalEnvironmentValue(environment, 'PRODUCTION_RUNTIME_BACKEND_WS'),
+      runtimeVerificationResult: readWorkflowJobResult(environment, 'PRODUCTION_RUNTIME_VERIFICATION_RESULT'),
+      skippedReason: readOptionalEnvironmentValue(environment, 'PRODUCTION_SKIPPED_REASON'),
+      tagCreationResult: readWorkflowJobResult(environment, 'PRODUCTION_TAG_CREATION_RESULT'),
+      webappUrl: readOptionalEnvironmentValue(environment, 'PRODUCTION_WEBAPP_URL'),
+    },
+    preparation: {
+      branchAction: readReleaseBranchAction(environment),
+      sourceCommitSha: readOptionalEnvironmentValue(environment, 'SOURCE_COMMIT_SHA'),
+      sourceRef: readOptionalEnvironmentValue(environment, 'SOURCE_REF'),
+    },
+    release: {
+      artifactAssetVersion: readOptionalEnvironmentValue(environment, 'ARTIFACT_ASSET_VERSION'),
+      artifactBuiltAt: readOptionalEnvironmentValue(environment, 'ARTIFACT_BUILT_AT'),
+      artifactChecksum: readOptionalEnvironmentValue(environment, 'ARTIFACT_CHECKSUM'),
+      artifactName: readOptionalEnvironmentValue(environment, 'ARTIFACT_NAME'),
+      artifactVersion: readOptionalEnvironmentValue(environment, 'ARTIFACT_VERSION'),
+      branch: readOptionalEnvironmentValue(environment, 'RELEASE_BRANCH'),
+      commitSha: readOptionalEnvironmentValue(environment, 'RELEASE_COMMIT_SHA'),
+      identifier: readOptionalEnvironmentValue(environment, 'RELEASE_IDENTIFIER'),
+      manualReason: readOptionalEnvironmentValue(environment, 'RELEASE_REASON'),
+    },
+    webAppVersionSynchronization: {
+      initialPreflightJobResult: readWorkflowJobResult(environment, 'WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_JOB_RESULT'),
+      initialPreflightPullRequestNumber: readOptionalEnvironmentValue(
+        environment,
+        'WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_PR_NUMBER',
+      ),
+      initialPreflightPullRequestUrl: readOptionalEnvironmentValue(
+        environment,
+        'WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_PR_URL',
+      ),
+      initialPreflightState: readWebAppVersionSynchronizationPreflightState(
+        environment,
+        'WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_STATE',
+      ),
+      productionPreflightJobResult: readWorkflowJobResult(
+        environment,
+        'WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_JOB_RESULT',
+      ),
+      productionPreflightPullRequestNumber: readOptionalEnvironmentValue(
+        environment,
+        'WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_PR_NUMBER',
+      ),
+      productionPreflightPullRequestUrl: readOptionalEnvironmentValue(
+        environment,
+        'WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_PR_URL',
+      ),
+      productionPreflightState: readWebAppVersionSynchronizationPreflightState(
+        environment,
+        'WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_STATE',
+      ),
+      synchronizationAction: readWebAppVersionSynchronizationAction(environment),
+      synchronizationBranchName: readOptionalEnvironmentValue(environment, 'WEBAPP_VERSION_SYNC_BRANCH_NAME'),
+      synchronizationJobResult: readWorkflowJobResult(environment, 'WEBAPP_VERSION_SYNC_JOB_RESULT'),
+      synchronizationPullRequestNumber: readOptionalEnvironmentValue(environment, 'WEBAPP_VERSION_SYNC_PR_NUMBER'),
+      synchronizationPullRequestUrl: readOptionalEnvironmentValue(environment, 'WEBAPP_VERSION_SYNC_PR_URL'),
+      webAppVersion: readOptionalEnvironmentValue(environment, 'WEBAPP_VERSION'),
+    },
+  };
+}
+
+function formatValueOrFallback(value: Maybe<string>, fallback: string = 'not available'): string {
+  return value.unwrapOr(fallback);
+}
+
+function formatMarkdownLink(label: string, url: string): string {
+  return `[${label}](${url})`;
+}
+
+function formatOptionalFrontendUrl(url: Maybe<string>): string {
+  return url
+    .andThen(value => {
+      if (value.startsWith('http://') || value.startsWith('https://')) {
+        return Maybe.just(formatMarkdownLink(value, value));
+      }
+
+      return Maybe.nothing<string>();
+    })
+    .unwrapOr('not available');
+}
+
+function formatOptionalReportUrl(url: Maybe<string>): string {
+  return formatOptionalFrontendUrl(url);
+}
+
+function formatCommitLink(commitSha: Maybe<string>, github: GitHubLinkContext): string {
+  return commitSha
+    .andThen(commit => {
+      return github.serverUrl.andThen(serverUrl => {
+        return github.repository.map(repository => {
+          return formatMarkdownLink(commit, `${serverUrl}/${repository}/commit/${commit}`);
+        });
+      });
+    })
+    .unwrapOr('not available');
+}
+
+function formatWorkflowRunLink(github: GitHubLinkContext): string {
+  return github.serverUrl
+    .andThen(serverUrl => {
+      return github.repository.andThen(repository => {
+        return github.runId.map(runId => {
+          const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+
+          return formatMarkdownLink(workflowRunUrl, workflowRunUrl);
+        });
+      });
+    })
+    .unwrapOr('not available');
+}
+
+function formatReleaseBranchAction(branchAction: Maybe<ReleaseBranchAction>): string {
+  return branchAction.mapOr('not available', actualAction => {
+    return match(actualAction)
+      .with('created', () => {
+        return 'created';
+      })
+      .with('reused', () => {
+        return 'reused';
+      })
+      .exhaustive();
+  });
+}
+
+function formatReleaseBranchPreparationNote(branchAction: Maybe<ReleaseBranchAction>): string {
+  return branchAction.mapOr('not available', actualAction => {
+    return match(actualAction)
+      .with('created', () => {
+        return 'The release branch was created from the exact main commit selected when the workflow was started.';
+      })
+      .with('reused', () => {
+        return 'The existing release branch head was reused. The selected main commit was not merged, reset, or applied.';
+      })
+      .exhaustive();
+  });
+}
+
+function formatBranchCreationSource(input: WebappReleaseSummaryInput): string {
+  return input.preparation.branchAction.mapOrElse(
+    () => {
+      return formatValueOrFallback(input.preparation.sourceRef);
+    },
+    branchAction => {
+      return match(branchAction)
+        .with('created', () => {
+          return formatValueOrFallback(input.preparation.sourceRef);
+        })
+        .with('reused', () => {
+          return 'not applicable; existing release branch was reused';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function formatSourceCommit(input: WebappReleaseSummaryInput): string {
+  return input.preparation.branchAction.mapOrElse(
+    () => {
+      return formatCommitLink(input.preparation.sourceCommitSha, input.github);
+    },
+    branchAction => {
+      return match(branchAction)
+        .with('created', () => {
+          return formatCommitLink(input.preparation.sourceCommitSha, input.github);
+        })
+        .with('reused', () => {
+          return 'not applicable; existing release branch was reused';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function formatBetaResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOr('unknown result', actualResult => {
+    return match(actualResult)
+      .with('success', () => {
+        return 'deployed and verified successfully';
+      })
+      .with('failure', () => {
+        return 'failed';
+      })
+      .with('skipped', () => {
+        return 'did not run';
+      })
+      .with('cancelled', () => {
+        return 'cancelled';
+      })
+      .exhaustive();
+  });
+}
+
+function hasWorkflowJobResult(result: Maybe<WorkflowJobResult>, expectedResult: WorkflowJobResult): boolean {
+  return result.mapOr(false, actualResult => {
+    return actualResult === expectedResult;
+  });
+}
+
+function hasGitHubReleaseAction(input: WebappReleaseSummaryInput, expectedAction: GitHubReleaseAction): boolean {
+  return input.githubRelease.action.mapOr(false, actualAction => {
+    return actualAction === expectedAction;
+  });
+}
+
+function hasGitHubReleaseState(input: WebappReleaseSummaryInput, expectedState: GitHubReleaseState): boolean {
+  return input.githubRelease.state.mapOr(false, actualState => {
+    return actualState === expectedState;
+  });
+}
+
+function hasDraftGitHubReleaseHandoff(input: WebappReleaseSummaryInput): boolean {
+  if (hasGitHubReleaseState(input, 'draft') === false) {
+    return false;
+  }
+
+  if (hasGitHubReleaseAction(input, 'created')) {
+    return true;
+  }
+
+  return hasGitHubReleaseAction(input, 'already_draft');
+}
+
+function hasPublishedGitHubReleaseHandoff(input: WebappReleaseSummaryInput): boolean {
+  if (hasGitHubReleaseState(input, 'published') === false) {
+    return false;
+  }
+
+  return hasGitHubReleaseAction(input, 'already_published');
+}
+
+function hasSuccessfulGitHubReleaseHandoff(input: WebappReleaseSummaryInput): boolean {
+  if (hasWorkflowJobResult(input.githubRelease.jobResult, 'success') === false) {
+    return false;
+  }
+
+  if (hasDraftGitHubReleaseHandoff(input)) {
+    return true;
+  }
+
+  return hasPublishedGitHubReleaseHandoff(input);
+}
+
+function hasProductionPreflightResult(
+  result: Maybe<ProductionPreflightResult>,
+  expectedResult: ProductionPreflightResult,
+): boolean {
+  return result.mapOr(false, actualResult => {
+    return actualResult === expectedResult;
+  });
+}
+
+function formatRepositoryTreeLink(label: Maybe<string>, github: GitHubLinkContext): Maybe<string> {
+  return label.andThen(value => {
+    return github.serverUrl.andThen(serverUrl => {
+      return github.repository.map(repository => {
+        return formatMarkdownLink(value, `${serverUrl}/${repository}/tree/${value}`);
+      });
+    });
+  });
+}
+
+function formatBetaTag(input: BetaSummaryInput, github: GitHubLinkContext): string {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return formatRepositoryTreeLink(input.tagName, github).unwrapOr('not available');
+  }
+
+  if (
+    hasWorkflowJobResult(input.tagCreationResult, 'failure') ||
+    hasWorkflowJobResult(input.tagCreationResult, 'cancelled') ||
+    hasWorkflowJobResult(input.tagCreationResult, 'skipped')
+  ) {
+    return 'not created';
+  }
+
+  return 'not available';
+}
+
+function formatE2EResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOr('unknown result', actualResult => {
+    return match(actualResult)
+      .with('success', () => {
+        return 'passed successfully';
+      })
+      .with('failure', () => {
+        return 'failed';
+      })
+      .with('skipped', () => {
+        return 'did not run';
+      })
+      .with('cancelled', () => {
+        return 'cancelled';
+      })
+      .exhaustive();
+  });
+}
+
+function formatGitHubReleaseJobResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOr('unknown result', actualResult => {
+    return match(actualResult)
+      .with('success', () => {
+        return 'completed successfully';
+      })
+      .with('failure', () => {
+        return 'failed';
+      })
+      .with('skipped', () => {
+        return 'not run';
+      })
+      .with('cancelled', () => {
+        return 'cancelled';
+      })
+      .exhaustive();
+  });
+}
+
+function formatGitHubReleaseAction(action: Maybe<GitHubReleaseAction>): string {
+  return action.mapOr('not available', actualAction => {
+    return match(actualAction)
+      .with('created', () => {
+        return 'new draft created';
+      })
+      .with('already_draft', () => {
+        return 'existing draft verified';
+      })
+      .with('already_published', () => {
+        return 'existing published release verified';
+      })
+      .exhaustive();
+  });
+}
+
+function formatGitHubReleaseState(state: Maybe<GitHubReleaseState>): string {
+  return state.mapOr('not available', actualState => {
+    return match(actualState)
+      .with('draft', () => {
+        return 'draft';
+      })
+      .with('published', () => {
+        return 'published';
+      })
+      .exhaustive();
+  });
+}
+
+function formatGitHubReleaseTag(input: WebappReleaseSummaryInput): string {
+  return formatRepositoryTreeLink(input.githubRelease.tagName, input.github).unwrapOr('not available');
+}
+
+function formatGitHubReleaseUrl(input: WebappReleaseSummaryInput): string {
+  return formatOptionalExternalLink('GitHub Release', input.githubRelease.url).unwrapOr('not available');
+}
+
+function formatGitHubReleaseManualHandoff(state: Maybe<GitHubReleaseState>): string {
+  return state.mapOr('not available', actualState => {
+    return match(actualState)
+      .with('draft', () => {
+        return 'Review or edit the generated customer-facing changelog and publish the GitHub Release manually.';
+      })
+      .with('published', () => {
+        return 'The existing published GitHub Release was preserved; no automated publication was performed.';
+      })
+      .exhaustive();
+  });
+}
+
+function formatGitHubReleaseStageOverview(input: WebappReleaseSummaryInput): string {
+  return [
+    formatGitHubReleaseJobResult(input.githubRelease.jobResult),
+    `action: ${formatGitHubReleaseAction(input.githubRelease.action)}`,
+    `state: ${formatGitHubReleaseState(input.githubRelease.state)}`,
+    `URL: ${formatGitHubReleaseUrl(input)}`,
+  ].join('; ');
+}
+
+function formatWebAppVersionSynchronizationPreflightState(
+  state: Maybe<WebAppVersionSynchronizationPreflightState>,
+): string {
+  return state.mapOr('not available', actualState => {
+    return actualState;
+  });
+}
+
+function formatWebAppVersionSynchronizationAction(action: Maybe<WebAppVersionSynchronizationAction>): string {
+  return action.mapOr('not available', actualAction => {
+    return match(actualAction)
+      .with('created', () => {
+        return 'PR created';
+      })
+      .with('recovered', () => {
+        return 'interrupted branch recovered and PR created';
+      })
+      .with('already-open', () => {
+        return 'existing open PR reused';
+      })
+      .with('already-merged', () => {
+        return 'existing merged PR verified';
+      })
+      .exhaustive();
+  });
+}
+
+function formatWebAppVersionSynchronizationPullRequest(
+  pullRequestNumber: Maybe<string>,
+  pullRequestUrl: Maybe<string>,
+): string {
+  return pullRequestNumber
+    .andThen(number => {
+      return pullRequestUrl.map(url => {
+        return formatMarkdownLink(`#${number}`, url);
+      });
+    })
+    .unwrapOr('not available');
+}
+
+function formatWebAppVersionSynchronizationPreflight(
+  jobResult: Maybe<WorkflowJobResult>,
+  state: Maybe<WebAppVersionSynchronizationPreflightState>,
+  pullRequestNumber: Maybe<string>,
+  pullRequestUrl: Maybe<string>,
+): string {
+  return [
+    `job: ${formatWorkflowJobResult(jobResult)}`,
+    `state: ${formatWebAppVersionSynchronizationPreflightState(state)}`,
+    `PR: ${formatWebAppVersionSynchronizationPullRequest(pullRequestNumber, pullRequestUrl)}`,
+  ].join('; ');
+}
+
+function formatWebAppVersionSynchronizationStageOverview(input: WebappReleaseSummaryInput): string {
+  const synchronizationJobResult = input.webAppVersionSynchronization.synchronizationJobResult;
+  const bookkeepingIncomplete = isWebAppVersionSynchronizationBookkeepingIncomplete(input);
+
+  return synchronizationJobResult.mapOr('not available', actualSynchronizationJobResult => {
+    return match({actualSynchronizationJobResult, bookkeepingIncomplete})
+      .with({actualSynchronizationJobResult: 'failure', bookkeepingIncomplete: true}, () => {
+        return 'failed; release bookkeeping incomplete';
+      })
+      .with({actualSynchronizationJobResult: 'cancelled', bookkeepingIncomplete: true}, () => {
+        return 'cancelled; release bookkeeping incomplete';
+      })
+      .with({actualSynchronizationJobResult: 'skipped', bookkeepingIncomplete: true}, () => {
+        return 'not run; release bookkeeping incomplete';
+      })
+      .with({actualSynchronizationJobResult: 'failure'}, () => {
+        return 'failed';
+      })
+      .with({actualSynchronizationJobResult: 'cancelled'}, () => {
+        return 'cancelled';
+      })
+      .with({actualSynchronizationJobResult: 'skipped'}, () => {
+        return 'not run';
+      })
+      .with({actualSynchronizationJobResult: 'success'}, () => {
+        return [
+          'completed successfully',
+          `WebApp package version: ${formatCodeValue(input.webAppVersionSynchronization.webAppVersion)}`,
+          `Version synchronization action: ${formatWebAppVersionSynchronizationAction(input.webAppVersionSynchronization.synchronizationAction)}`,
+          `Version synchronization PR: ${formatWebAppVersionSynchronizationPullRequest(
+            input.webAppVersionSynchronization.synchronizationPullRequestNumber,
+            input.webAppVersionSynchronization.synchronizationPullRequestUrl,
+          )}`,
+        ].join('; ');
+      })
+      .exhaustive();
+  });
+}
+
+function formatRuntimeVerificationResult(result: WorkflowJobResult): string {
+  return match(result)
+    .with('success', () => {
+      return 'verified successfully';
+    })
+    .with('failure', () => {
+      return 'failed';
+    })
+    .with('skipped', () => {
+      return 'not run';
+    })
+    .with('cancelled', () => {
+      return 'cancelled';
+    })
+    .exhaustive();
+}
+
+function renderRuntimeVerificationLines(result: Maybe<WorkflowJobResult>): string[] {
+  return result.mapOr([], actualResult => {
+    return [`- Runtime verification result: ${formatRuntimeVerificationResult(actualResult)}`];
+  });
+}
+
+function formatProductionPreflightResult(input: ProductionSummaryInput): string {
+  return input.preflightResult.mapOrElse(
+    () => {
+      return input.preflightJobResult.mapOr('unknown result', preflightJobResult => {
+        return match(preflightJobResult)
+          .with('failure', () => {
+            return 'failed';
+          })
+          .with('cancelled', () => {
+            return 'cancelled';
+          })
+          .with('skipped', () => {
+            return 'not run';
+          })
+          .with('success', () => {
+            return 'unknown result';
+          })
+          .exhaustive();
+      });
+    },
+    preflightResult => {
+      return match(preflightResult)
+        .with('ready', () => {
+          return 'ready';
+        })
+        .with('already_tagged', () => {
+          return 'already tagged';
+        })
+        .with('skipped', () => {
+          return 'skipped';
+        })
+        .with('failure', () => {
+          return 'failed';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function formatProductionApprovalResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOr('approval result unavailable', actualResult => {
+    return match(actualResult)
+      .with('success', () => {
+        return 'approved';
+      })
+      .with('failure', () => {
+        return 'rejected or failed';
+      })
+      .with('cancelled', () => {
+        return 'cancelled';
+      })
+      .with('skipped', () => {
+        return 'not run';
+      })
+      .exhaustive();
+  });
+}
+
+function formatWorkflowJobResult(result: Maybe<WorkflowJobResult>): string {
+  return result.mapOr('unknown result', actualResult => {
+    return match(actualResult)
+      .with('success', () => {
+        return 'completed successfully';
+      })
+      .with('failure', () => {
+        return 'failed';
+      })
+      .with('cancelled', () => {
+        return 'cancelled';
+      })
+      .with('skipped', () => {
+        return 'not run';
+      })
+      .exhaustive();
+  });
+}
+
+function formatProductionDeploymentResult(input: ProductionSummaryInput): string {
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'failure')) {
+    return 'not run because current Beta verification failed';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'cancelled')) {
+    return 'not run because current Beta verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'skipped')) {
+    return 'not run because current Beta verification did not run';
+  }
+
+  return formatWorkflowJobResult(input.deploymentResult);
+}
+
+function formatProductionResult(input: ProductionSummaryInput): string {
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+    return 'already tagged; deployment not required';
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'failure')) {
+    return 'failed during preflight';
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'cancelled')) {
+    return 'cancelled during preflight';
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
+    return 'not run because Production preflight did not run';
+  }
+
+  if (hasProductionPreflightResult(input.preflightResult, 'skipped')) {
+    return 'not run because Production preflight did not run';
+  }
+
+  if (!hasProductionPreflightResult(input.preflightResult, 'ready')) {
+    return 'unknown result';
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'failure')) {
+    return 'approval rejected or failed; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'cancelled')) {
+    return 'approval was cancelled; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'skipped')) {
+    return 'approval did not run; deployment not started';
+  }
+
+  if (!hasWorkflowJobResult(input.approvalResult, 'success')) {
+    return 'approval result unavailable; deployment status unavailable';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'failure')) {
+    return 'current Beta verification failed; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'cancelled')) {
+    return 'current Beta verification was cancelled; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'skipped')) {
+    return 'current Beta verification did not run; deployment not started';
+  }
+
+  if (hasWorkflowJobResult(input.deploymentResult, 'failure')) {
+    return 'failed during deployment';
+  }
+
+  if (hasWorkflowJobResult(input.deploymentResult, 'cancelled')) {
+    return 'cancelled during deployment';
+  }
+
+  if (hasWorkflowJobResult(input.deploymentResult, 'skipped')) {
+    return 'not run';
+  }
+
+  if (!hasWorkflowJobResult(input.deploymentResult, 'success')) {
+    return 'unknown result';
+  }
+
+  if (hasWorkflowJobResult(input.runtimeVerificationResult, 'failure')) {
+    return 'deployed, but runtime verification failed';
+  }
+
+  if (hasWorkflowJobResult(input.runtimeVerificationResult, 'cancelled')) {
+    return 'deployed, but runtime verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.runtimeVerificationResult, 'skipped')) {
+    return 'deployed, but runtime verification did not run';
+  }
+
+  if (!hasWorkflowJobResult(input.runtimeVerificationResult, 'success')) {
+    return 'unknown result';
+  }
+
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return 'deployed, verified, and tagged successfully';
+  }
+
+  if (hasWorkflowJobResult(input.tagCreationResult, 'failure')) {
+    return 'deployed and verified, but tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.tagCreationResult, 'cancelled')) {
+    return 'deployed and verified, but tag creation was cancelled';
+  }
+
+  return 'unknown result';
+}
+
+function formatProductionSkipReason(input: ProductionSummaryInput): Maybe<string> {
+  if (input.skippedReason.isJust) {
+    return input.skippedReason;
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'skipped')) {
+    return Maybe.just('Production preflight did not run');
+  }
+
+  if (hasProductionPreflightResult(input.preflightResult, 'skipped')) {
+    return Maybe.just('Production preflight did not run');
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'cancelled')) {
+    return Maybe.just('Production preflight was cancelled');
+  }
+
+  if (hasWorkflowJobResult(input.preflightJobResult, 'failure')) {
+    return Maybe.just('Production preflight failed');
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'failure')) {
+    return Maybe.just('Production approval was rejected or failed');
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'cancelled')) {
+    return Maybe.just('Production approval was cancelled');
+  }
+
+  if (hasWorkflowJobResult(input.approvalResult, 'skipped')) {
+    return Maybe.just('Production approval did not run');
+  }
+
+  if (
+    hasProductionPreflightResult(input.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.approvalResult, 'success') === false
+  ) {
+    return Maybe.just('Production approval result was unavailable');
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'failure')) {
+    return Maybe.just('Current Beta verification failed; Production deployment did not run');
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'cancelled')) {
+    return Maybe.just('Current Beta verification was cancelled; Production deployment did not run');
+  }
+
+  if (hasWorkflowJobResult(input.currentBetaVerificationResult, 'skipped')) {
+    return Maybe.just('Current Beta verification did not run; Production deployment did not run');
+  }
+
+  if (hasWorkflowJobResult(input.deploymentResult, 'skipped')) {
+    return Maybe.just('Production deployment did not run');
+  }
+
+  return Maybe.nothing<string>();
+}
+
+function formatApprovalGate(input: ProductionSummaryInput): string {
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+    return 'not required; the release is already tagged as Production';
+  }
+
+  if (hasProductionPreflightResult(input.preflightResult, 'ready')) {
+    return `${formatValueOrFallback(input.environmentName)} GitHub Environment ${formatProductionApprovalResult(input.approvalResult)}`;
+  }
+
+  return 'not reached';
+}
+
+function formatProductionTag(input: ProductionSummaryInput, github: GitHubLinkContext): string {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return formatRepositoryTreeLink(input.createdTagName, github).unwrapOr('not available');
+  }
+
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+    return formatRepositoryTreeLink(input.plannedTagName, github).unwrapOr('not available');
+  }
+
+  if (
+    hasWorkflowJobResult(input.tagCreationResult, 'failure') ||
+    hasWorkflowJobResult(input.tagCreationResult, 'cancelled') ||
+    hasWorkflowJobResult(input.tagCreationResult, 'skipped') ||
+    hasWorkflowJobResult(input.deploymentResult, 'failure') ||
+    hasWorkflowJobResult(input.deploymentResult, 'cancelled') ||
+    hasWorkflowJobResult(input.deploymentResult, 'skipped') ||
+    hasWorkflowJobResult(input.runtimeVerificationResult, 'failure') ||
+    hasWorkflowJobResult(input.runtimeVerificationResult, 'cancelled') ||
+    hasWorkflowJobResult(input.runtimeVerificationResult, 'skipped') ||
+    hasWorkflowJobResult(input.preflightJobResult, 'failure') ||
+    hasWorkflowJobResult(input.preflightJobResult, 'cancelled') ||
+    hasWorkflowJobResult(input.preflightJobResult, 'skipped')
+  ) {
+    return 'not created';
+  }
+
+  return 'not available';
+}
+
+function formatProductionTagCreationResult(input: ProductionSummaryInput): string {
+  return input.tagCreationResult.mapOrElse(
+    () => {
+      if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+        return 'not required; tag already exists';
+      }
+
+      if (hasProductionPreflightResult(input.preflightResult, 'skipped')) {
+        return 'not run';
+      }
+
+      return 'unknown result';
+    },
+    tagCreationResult => {
+      return match(tagCreationResult)
+        .with('success', () => {
+          return 'created successfully';
+        })
+        .with('failure', () => {
+          return 'failed';
+        })
+        .with('cancelled', () => {
+          return 'cancelled';
+        })
+        .with('skipped', () => {
+          if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+            return 'not required; tag already exists';
+          }
+
+          return 'not run';
+        })
+        .exhaustive();
+    },
+  );
+}
+
+function formatDistributionResult(
+  input: ProductionSummaryInput,
+  distribution: ProductionDistributionSummaryInput,
+): string {
+  if (
+    hasWorkflowJobResult(distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(distribution.distributionResult, 'success')
+  ) {
+    return 'published successfully';
+  }
+
+  if (hasWorkflowJobResult(distribution.distributionJobResult, 'failure')) {
+    return 'failed';
+  }
+
+  if (hasWorkflowJobResult(distribution.distributionJobResult, 'cancelled')) {
+    return 'cancelled';
+  }
+
+  if (
+    hasWorkflowJobResult(distribution.distributionJobResult, 'skipped') &&
+    hasProductionPreflightResult(input.preflightResult, 'already_tagged')
+  ) {
+    return 'not run; Production tag already exists';
+  }
+
+  if (hasWorkflowJobResult(distribution.distributionJobResult, 'skipped')) {
+    return 'not run';
+  }
+
+  return 'unknown result';
+}
+
+function formatDockerImage(distribution: ProductionDistributionSummaryInput): string {
+  return distribution.dockerRepository
+    .andThen(repository => {
+      return distribution.dockerImageTag.map(imageTag => {
+        return `${repository}:${imageTag}`;
+      });
+    })
+    .unwrapOr('not published');
+}
+
+function formatWireBuildsCommit(distribution: ProductionDistributionSummaryInput, github: GitHubLinkContext): string {
+  return distribution.wireBuildsCommitSha
+    .andThen(commitSha => {
+      return github.serverUrl.andThen(serverUrl => {
+        return github.wireBuildsRepository.map(repository => {
+          return formatMarkdownLink(commitSha, `${serverUrl}/${repository}/commit/${commitSha}`);
+        });
+      });
+    })
+    .unwrapOr('not updated');
+}
+
+function formatOptionalExternalLink(label: string, url: Maybe<string>): Maybe<string> {
+  return url.andThen(value => {
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return Maybe.just(formatMarkdownLink(label, value));
+    }
+
+    return Maybe.nothing<string>();
+  });
+}
+
+function formatVerifiedBetaTagLink(input: BetaSummaryInput, github: GitHubLinkContext): Maybe<string> {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return formatRepositoryTreeLink(input.tagName, github);
+  }
+
+  return Maybe.nothing<string>();
+}
+
+function formatVerifiedProductionTagLink(input: ProductionSummaryInput, github: GitHubLinkContext): Maybe<string> {
+  if (hasWorkflowJobResult(input.tagCreationResult, 'success')) {
+    return formatRepositoryTreeLink(input.createdTagName, github);
+  }
+
+  if (hasProductionPreflightResult(input.preflightResult, 'already_tagged')) {
+    return formatRepositoryTreeLink(input.plannedTagName, github);
+  }
+
+  return Maybe.nothing<string>();
+}
+
+function formatCodeValue(value: Maybe<string>): string {
+  return `\`${formatValueOrFallback(value)}\``;
+}
+
+function formatBetaStageOverview(input: WebappReleaseSummaryInput): string {
+  const betaTagLink = formatVerifiedBetaTagLink(input.beta, input.github);
+  const betaResult = formatBetaResult(input.beta.deploymentResult);
+
+  return betaTagLink.mapOr(betaResult, tagLink => {
+    return `${betaResult} - tag ${tagLink}`;
+  });
+}
+
+function formatE2EStageOverview(input: WebappReleaseSummaryInput): string {
+  const reportLink = formatOptionalExternalLink('Playwright report', input.e2e.reportUrl);
+  const e2EResult = formatE2EResult(input.e2e.result);
+
+  return reportLink.mapOr(e2EResult, link => {
+    return `${e2EResult} - ${link}`;
+  });
+}
+
+function hasProductionPreflightFailure(input: ProductionSummaryInput): boolean {
+  return (
+    hasWorkflowJobResult(input.preflightJobResult, 'failure') ||
+    hasProductionPreflightResult(input.preflightResult, 'failure')
+  );
+}
+
+function hasProductionPreflightCancellation(input: ProductionSummaryInput): boolean {
+  return hasWorkflowJobResult(input.preflightJobResult, 'cancelled');
+}
+
+function hasProductionApprovalFailure(input: ProductionSummaryInput): boolean {
+  return hasWorkflowJobResult(input.approvalResult, 'failure');
+}
+
+function hasProductionApprovalCancellation(input: ProductionSummaryInput): boolean {
+  return hasWorkflowJobResult(input.approvalResult, 'cancelled');
+}
+
+function hasProductionApprovalSkipped(input: ProductionSummaryInput): boolean {
+  return hasWorkflowJobResult(input.approvalResult, 'skipped');
+}
+
+function hasHostedProductionCompleted(input: ProductionSummaryInput): boolean {
+  return (
+    hasProductionPreflightResult(input.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.preflightJobResult, 'success') &&
+    hasWorkflowJobResult(input.deploymentResult, 'success') &&
+    hasWorkflowJobResult(input.runtimeVerificationResult, 'success') &&
+    hasWorkflowJobResult(input.tagCreationResult, 'success')
+  );
+}
+
+function hasSuccessfulReleaseDistribution(input: WebappReleaseSummaryInput): boolean {
+  return (
+    hasWorkflowJobResult(input.distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(input.distribution.distributionResult, 'success')
+  );
+}
+
+function hasSuccessfulProductionReleaseLifecycle(input: WebappReleaseSummaryInput): boolean {
+  return (
+    hasHostedProductionCompleted(input.production) &&
+    hasSuccessfulReleaseDistribution(input) &&
+    hasSuccessfulGitHubReleaseHandoff(input)
+  );
+}
+
+function isWebAppVersionSynchronizationBookkeepingIncomplete(input: WebappReleaseSummaryInput): boolean {
+  return (
+    hasSuccessfulProductionReleaseLifecycle(input) &&
+    input.webAppVersionSynchronization.synchronizationJobResult.mapOr(false, synchronizationJobResult => {
+      return match(synchronizationJobResult)
+        .with('success', () => {
+          return false;
+        })
+        .with(P.union('failure', 'cancelled', 'skipped'), () => {
+          return true;
+        })
+        .exhaustive();
+    })
+  );
+}
+
+function formatAlreadyTaggedReleaseOutcome(input: WebappReleaseSummaryInput): string {
+  const alreadyTaggedProductionOutcome = 'Release already has the matching Production tag; deployment was not repeated';
+
+  if (hasWorkflowJobResult(input.githubRelease.jobResult, 'failure')) {
+    return `${alreadyTaggedProductionOutcome}, but GitHub Release handoff failed`;
+  }
+
+  if (hasWorkflowJobResult(input.githubRelease.jobResult, 'cancelled')) {
+    return `${alreadyTaggedProductionOutcome}, but GitHub Release handoff was cancelled`;
+  }
+
+  if (hasWorkflowJobResult(input.githubRelease.jobResult, 'skipped')) {
+    return `${alreadyTaggedProductionOutcome}; automated release lifecycle is incomplete because GitHub Release handoff did not run`;
+  }
+
+  if (hasSuccessfulGitHubReleaseHandoff(input)) {
+    if (hasDraftGitHubReleaseHandoff(input)) {
+      return `${alreadyTaggedProductionOutcome} and the GitHub Release draft was verified`;
+    }
+
+    return `${alreadyTaggedProductionOutcome} and the existing published GitHub Release was preserved`;
+  }
+
+  return `${alreadyTaggedProductionOutcome}; GitHub Release handoff result is unavailable`;
+}
+
+function formatBetaReleaseOutcome(input: WebappReleaseSummaryInput): string {
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
+    return 'Beta release stopped because Hosted Beta deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
+    return 'Beta release stopped because Hosted Beta deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
+    return 'Beta release incomplete because Hosted Beta deployment did not run';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
+    return 'Beta release stopped because Beta tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
+    return 'Beta release stopped because Beta tag creation was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'skipped')) {
+    return 'Beta release incomplete because Beta tag creation did not run';
+  }
+
+  if (
+    hasWorkflowJobResult(input.beta.deploymentResult, 'success') &&
+    hasWorkflowJobResult(input.beta.tagCreationResult, 'success')
+  ) {
+    return 'Beta release completed successfully';
+  }
+
+  return 'Beta release status is unavailable or unexpected';
+}
+
+function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
+    return 'Release stopped because Hosted Beta deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
+    return 'Release stopped because Hosted Beta deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
+    return 'Release incomplete because Hosted Beta deployment did not run';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
+    return 'Release stopped because Beta tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
+    return 'Release stopped because Beta tag creation was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'skipped')) {
+    return 'Release incomplete because Beta tag creation did not run';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
+    return 'Release stopped because the E2E system gate failed';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'cancelled')) {
+    return 'Release stopped because the E2E system gate was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'skipped')) {
+    return 'Release incomplete because the E2E system gate did not run';
+  }
+
+  if (hasProductionPreflightResult(input.production.preflightResult, 'already_tagged')) {
+    return formatAlreadyTaggedReleaseOutcome(input);
+  }
+
+  if (hasProductionPreflightFailure(input.production)) {
+    return 'Release stopped because Production preflight failed';
+  }
+
+  if (hasProductionPreflightCancellation(input.production)) {
+    return 'Release stopped because Production preflight was cancelled';
+  }
+
+  if (
+    hasWorkflowJobResult(input.production.preflightJobResult, 'skipped') ||
+    hasProductionPreflightResult(input.production.preflightResult, 'skipped')
+  ) {
+    return 'Release incomplete because Production preflight did not run';
+  }
+
+  if (hasProductionApprovalFailure(input.production)) {
+    return 'Release stopped because Production approval was rejected or failed';
+  }
+
+  if (hasProductionApprovalCancellation(input.production)) {
+    return 'Release stopped because Production approval was cancelled';
+  }
+
+  if (hasProductionApprovalSkipped(input.production)) {
+    return 'Release incomplete because Production approval did not run';
+  }
+
+  if (
+    hasProductionPreflightResult(input.production.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.production.approvalResult, 'success') === false
+  ) {
+    return 'Release status is unavailable because Production approval result is missing';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'failure')) {
+    return 'Release stopped because current Beta verification failed before Production deployment';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'cancelled')) {
+    return 'Release stopped because current Beta verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'skipped')) {
+    return 'Release incomplete because current Beta verification did not run';
+  }
+
+  if (hasWorkflowJobResult(input.production.deploymentResult, 'failure')) {
+    return 'Release stopped because Hosted Production deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.production.deploymentResult, 'cancelled')) {
+    return 'Release stopped because Hosted Production deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.runtimeVerificationResult, 'failure')) {
+    return 'Hosted Production was deployed, but runtime verification failed';
+  }
+
+  if (hasWorkflowJobResult(input.production.runtimeVerificationResult, 'cancelled')) {
+    return 'Hosted Production was deployed, but runtime verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.tagCreationResult, 'failure')) {
+    return 'Hosted Production was deployed and verified, but Production tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.production.tagCreationResult, 'cancelled')) {
+    return 'Hosted Production was deployed and verified, but Production tag creation was cancelled';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    (hasWorkflowJobResult(input.distribution.distributionJobResult, 'failure') ||
+      hasWorkflowJobResult(input.distribution.distributionResult, 'failure'))
+  ) {
+    return 'Hosted Production completed, but release distribution failed';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    (hasWorkflowJobResult(input.distribution.distributionJobResult, 'cancelled') ||
+      hasWorkflowJobResult(input.distribution.distributionResult, 'cancelled'))
+  ) {
+    return 'Hosted Production completed, but release distribution was cancelled';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    hasWorkflowJobResult(input.distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(input.distribution.distributionResult, 'success') &&
+    hasWorkflowJobResult(input.githubRelease.jobResult, 'failure')
+  ) {
+    return 'Hosted Production and release distribution completed, but GitHub Release handoff failed';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    hasWorkflowJobResult(input.distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(input.distribution.distributionResult, 'success') &&
+    hasWorkflowJobResult(input.githubRelease.jobResult, 'cancelled')
+  ) {
+    return 'Hosted Production and release distribution completed, but GitHub Release handoff was cancelled';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    hasWorkflowJobResult(input.distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(input.distribution.distributionResult, 'success') &&
+    hasWorkflowJobResult(input.githubRelease.jobResult, 'skipped')
+  ) {
+    return 'Hosted Production and release distribution completed, but GitHub Release handoff did not run';
+  }
+
+  if (isWebAppVersionSynchronizationBookkeepingIncomplete(input)) {
+    return 'Production release completed successfully, but WebApp version synchronization bookkeeping is incomplete';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    hasWorkflowJobResult(input.distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(input.distribution.distributionResult, 'success') &&
+    hasSuccessfulGitHubReleaseHandoff(input)
+  ) {
+    if (hasDraftGitHubReleaseHandoff(input)) {
+      return 'Automated release completed successfully; GitHub Release draft is ready for changelog completion';
+    }
+
+    return 'Automated release completed successfully; existing GitHub Release is already published';
+  }
+
+  if (
+    hasHostedProductionCompleted(input.production) &&
+    hasWorkflowJobResult(input.distribution.distributionJobResult, 'success') &&
+    hasWorkflowJobResult(input.distribution.distributionResult, 'success') &&
+    hasWorkflowJobResult(input.githubRelease.jobResult, 'success')
+  ) {
+    return 'Hosted Production and release distribution completed, but GitHub Release handoff result is unavailable';
+  }
+
+  return 'Release status is unavailable or unexpected';
+}
+
+function formatFinalProductionOverview(input: WebappReleaseSummaryInput): string {
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'failure')) {
+    return 'blocked because Hosted Beta deployment failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'cancelled')) {
+    return 'unavailable because Hosted Beta deployment was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.deploymentResult, 'skipped')) {
+    return 'unavailable because Hosted Beta deployment did not run';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'failure')) {
+    return 'blocked because Beta tag creation failed';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'cancelled')) {
+    return 'unavailable because Beta tag creation was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.beta.tagCreationResult, 'skipped')) {
+    return 'unavailable because Beta tag creation did not run';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'failure')) {
+    return 'blocked because the E2E system gate failed';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'cancelled')) {
+    return 'unavailable because the E2E system gate was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.e2e.result, 'skipped')) {
+    return 'unavailable because the E2E system gate did not run';
+  }
+
+  if (hasProductionApprovalFailure(input.production)) {
+    return 'blocked because Production approval was rejected or failed';
+  }
+
+  if (hasProductionApprovalCancellation(input.production)) {
+    return 'unavailable because Production approval was cancelled';
+  }
+
+  if (hasProductionApprovalSkipped(input.production)) {
+    return 'unavailable because Production approval did not run';
+  }
+
+  if (
+    hasProductionPreflightResult(input.production.preflightResult, 'ready') &&
+    hasWorkflowJobResult(input.production.approvalResult, 'success') === false
+  ) {
+    return 'unavailable because Production approval result is missing';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'failure')) {
+    return 'blocked because current Beta verification failed before Production deployment';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'cancelled')) {
+    return 'unavailable because current Beta verification was cancelled';
+  }
+
+  if (hasWorkflowJobResult(input.production.currentBetaVerificationResult, 'skipped')) {
+    return 'unavailable because current Beta verification did not run';
+  }
+
+  return formatProductionResult(input.production);
+}
+
+function formatDistributionPublicationEvidence(
+  distribution: ProductionDistributionSummaryInput,
+  github: GitHubLinkContext,
+): string {
+  const evidence: string[] = [];
+
+  const dockerImage = formatDockerImage(distribution);
+  if (dockerImage !== 'not published') {
+    evidence.push(`Docker \`${dockerImage}\``);
+  }
+
+  distribution.helmChartVersion.map(version => {
+    evidence.push(`Helm \`${version}\``);
+
+    return version;
+  });
+
+  const wireBuildsCommitLink = distribution.wireBuildsCommitSha.andThen(commitSha => {
+    return github.serverUrl.andThen(serverUrl => {
+      return github.wireBuildsRepository.map(repository => {
+        return formatMarkdownLink(commitSha, `${serverUrl}/${repository}/commit/${commitSha}`);
+      });
+    });
+  });
+  wireBuildsCommitLink.map(commitLink => {
+    evidence.push(`wire-builds ${commitLink}`);
+
+    return commitLink;
+  });
+
+  return evidence.join(', ');
+}
+
+function renderReleaseIdentity({title, outcome, input}: RenderReleaseIdentityParameters): string {
+  const identityLines = [
+    title,
+    '',
+    `- Outcome: ${outcome}`,
+    `- Release: ${formatCodeValue(input.release.identifier)}`,
+    `- Release branch: ${formatCodeValue(input.release.branch)}`,
+    `- Commit: ${formatCommitLink(input.release.commitSha, input.github)}`,
+    `- Webapp version: ${formatCodeValue(input.release.artifactVersion)}`,
+  ];
+
+  identityLines.push(`- Workflow run: ${formatWorkflowRunLink(input.github)}`);
+
+  return identityLines.join('\n');
+}
+
+function renderBetaSection(input: WebappReleaseSummaryInput): string {
+  return [
+    '### Hosted Beta validation',
+    '',
+    `- Result: ${formatBetaResult(input.beta.deploymentResult)}`,
+    '- GitHub Environment: wire-webapp-beta',
+    `- Target environment: ${formatValueOrFallback(input.beta.environmentName)}`,
+    `- Frontend URL: ${formatOptionalFrontendUrl(input.beta.webappUrl)}`,
+    `- REST backend URL: ${formatValueOrFallback(input.beta.runtimeBackendRest)}`,
+    `- WebSocket backend URL: ${formatValueOrFallback(input.beta.runtimeBackendWebSocket)}`,
+    ...renderRuntimeVerificationLines(input.beta.runtimeVerificationResult),
+    ...(hasWorkflowJobResult(input.beta.deploymentResult, 'success')
+      ? ['- Runtime verification: /version and /config.js']
+      : []),
+    `- Beta tag: ${formatBetaTag(input.beta, input.github)}`,
+  ].join('\n');
+}
+
+function renderE2ESection(input: WebappReleaseSummaryInput): string {
+  const testinyRunName =
+    input.release.identifier.isJust && input.beta.tagName.isJust
+      ? formatValueOrFallback(input.e2e.testinyRunName)
+      : 'not run';
+
+  return [
+    '### E2E system gate',
+    '',
+    `- Result: ${formatE2EResult(input.e2e.result)}`,
+    `- Target environment: ${formatValueOrFallback(input.e2e.environmentName)}`,
+    `- Frontend URL: ${formatOptionalFrontendUrl(input.e2e.webappUrl)}`,
+    `- REST backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendRest)}`,
+    `- WebSocket backend URL: ${formatValueOrFallback(input.e2e.runtimeBackendWebSocket)}`,
+    ...(hasWorkflowJobResult(input.e2e.result, 'success') ? ['- Runtime verification: /version and /config.js'] : []),
+    `- Playwright report URL: ${formatOptionalReportUrl(input.e2e.reportUrl)}`,
+    `- Testiny run name: ${testinyRunName}`,
+  ].join('\n');
+}
+
+function renderProductionSection(input: WebappReleaseSummaryInput): string {
+  const productionSkipReason = formatProductionSkipReason(input.production);
+  const productionSkipReasonLines = productionSkipReason
+    .map(reason => {
+      return [`- Skip reason: ${reason}`];
+    })
+    .unwrapOr([]);
+
+  return [
+    '### Hosted Production promotion',
+    '',
+    `- Result: ${formatProductionResult(input.production)}`,
+    `- Production preflight result: ${formatProductionPreflightResult(input.production)}`,
+    `- Production approval result: ${formatProductionApprovalResult(input.production.approvalResult)}`,
+    `- Current Beta verification result: ${formatWorkflowJobResult(input.production.currentBetaVerificationResult)}`,
+    `- Production deployment result: ${formatProductionDeploymentResult(input.production)}`,
+    ...productionSkipReasonLines,
+    `- Target environment: ${formatValueOrFallback(input.production.environmentName)}`,
+    `- Frontend URL: ${formatOptionalFrontendUrl(input.production.webappUrl)}`,
+    `- REST backend URL: ${formatValueOrFallback(input.production.runtimeBackendRest)}`,
+    `- WebSocket backend URL: ${formatValueOrFallback(input.production.runtimeBackendWebSocket)}`,
+    ...renderRuntimeVerificationLines(input.production.runtimeVerificationResult),
+    ...(hasWorkflowJobResult(input.production.runtimeVerificationResult, 'success')
+      ? ['- Runtime verification: /version and /config.js']
+      : []),
+    `- Production tag: ${formatProductionTag(input.production, input.github)}`,
+    `- Production tag creation result: ${formatProductionTagCreationResult(input.production)}`,
+    `- Approval gate: ${formatApprovalGate(input.production)}`,
+  ].join('\n');
+}
+
+function renderProductionDistributionSection(input: WebappReleaseSummaryInput): string {
+  return [
+    '### Release distribution',
+    '',
+    `- Result: ${formatDistributionResult(input.production, input.distribution)}`,
+    `- Docker image: ${formatDockerImage(input.distribution)}`,
+    `- Helm chart repository: ${formatValueOrFallback(input.distribution.chartRepositoryUrl)}`,
+    `- Helm chart version: ${formatValueOrFallback(input.distribution.helmChartVersion, 'not published')}`,
+    `- wire-builds/main commit: ${formatWireBuildsCommit(input.distribution, input.github)}`,
+  ].join('\n');
+}
+
+function renderGitHubReleaseSection(input: WebappReleaseSummaryInput): string {
+  return [
+    '### GitHub Release handoff',
+    '',
+    `- Job result: ${formatGitHubReleaseJobResult(input.githubRelease.jobResult)}`,
+    `- Action: ${formatGitHubReleaseAction(input.githubRelease.action)}`,
+    `- State: ${formatGitHubReleaseState(input.githubRelease.state)}`,
+    `- Production tag: ${formatGitHubReleaseTag(input)}`,
+    `- Release URL: ${formatGitHubReleaseUrl(input)}`,
+    `- Manual follow-up: ${formatGitHubReleaseManualHandoff(input.githubRelease.state)}`,
+  ].join('\n');
+}
+
+function renderWebAppVersionSynchronizationSection(input: WebappReleaseSummaryInput): string {
+  const synchronization = input.webAppVersionSynchronization;
+
+  return [
+    '### WebApp version synchronization',
+    '',
+    `- Initial preflight: ${formatWebAppVersionSynchronizationPreflight(
+      synchronization.initialPreflightJobResult,
+      synchronization.initialPreflightState,
+      synchronization.initialPreflightPullRequestNumber,
+      synchronization.initialPreflightPullRequestUrl,
+    )}`,
+    `- Production preflight: ${formatWebAppVersionSynchronizationPreflight(
+      synchronization.productionPreflightJobResult,
+      synchronization.productionPreflightState,
+      synchronization.productionPreflightPullRequestNumber,
+      synchronization.productionPreflightPullRequestUrl,
+    )}`,
+    `- Synchronization job: ${formatWorkflowJobResult(synchronization.synchronizationJobResult)}`,
+    `- WebApp package version: ${formatCodeValue(synchronization.webAppVersion)}`,
+    `- Synchronization action: ${formatWebAppVersionSynchronizationAction(synchronization.synchronizationAction)}`,
+    `- Synchronization branch: ${formatValueOrFallback(synchronization.synchronizationBranchName)}`,
+    `- Synchronization pull request: ${formatWebAppVersionSynchronizationPullRequest(
+      synchronization.synchronizationPullRequestNumber,
+      synchronization.synchronizationPullRequestUrl,
+    )}`,
+  ].join('\n');
+}
+
+function renderReleasePreparationSection(input: WebappReleaseSummaryInput): string {
+  const commitLink = formatCommitLink(input.release.commitSha, input.github);
+  const sourceCommitLink = formatSourceCommit(input);
+  const workflowRunLink = formatWorkflowRunLink(input.github);
+
+  return [
+    '### Release preparation',
+    '',
+    `- Release identifier: ${formatValueOrFallback(input.release.identifier)}`,
+    `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
+    `- Branch action: ${formatReleaseBranchAction(input.preparation.branchAction)}`,
+    `- Branch creation source: ${formatBranchCreationSource(input)}`,
+    `- Commit used to create the release branch: ${sourceCommitLink}`,
+    `- Authoritative release commit: ${commitLink}`,
+    `- Branch preparation: ${formatReleaseBranchPreparationNote(input.preparation.branchAction)}`,
+    `- Actor: ${formatValueOrFallback(input.github.actor)}`,
+    `- Webapp version: ${formatValueOrFallback(input.release.artifactVersion)}`,
+    `- Asset version: ${formatValueOrFallback(input.release.artifactAssetVersion)}`,
+    `- Built at (UTC): ${formatValueOrFallback(input.release.artifactBuiltAt)}`,
+    `- Artifact name: ${formatValueOrFallback(input.release.artifactName)}`,
+    `- Artifact checksum: ${formatValueOrFallback(input.release.artifactChecksum)}`,
+    `- Workflow run URL: ${workflowRunLink}`,
+    ...input.release.manualReason
+      .map(reason => {
+        return [`- Manual reason: ${reason}`];
+      })
+      .unwrapOr([]),
+  ].join('\n');
+}
+
+type WebappReleaseSummaryPhase = 'beta' | 'final';
+
+function renderTechnicalReleaseEvidence(input: WebappReleaseSummaryInput, phase: WebappReleaseSummaryPhase): string {
+  const technicalSections = [renderReleasePreparationSection(input), renderBetaSection(input)];
+
+  if (phase === 'final') {
+    technicalSections.push(renderE2ESection(input), renderProductionSection(input));
+    technicalSections.push(
+      renderProductionDistributionSection(input),
+      renderGitHubReleaseSection(input),
+      renderWebAppVersionSynchronizationSection(input),
+    );
+  }
+
+  return [
+    '<details>',
+    '<summary>Technical release evidence</summary>',
+    '',
+    technicalSections.join('\n\n'),
+    '',
+    '</details>',
+  ].join('\n');
+}
+
+export function renderWebappBetaReleaseSummary(input: WebappReleaseSummaryInput): string {
+  const visibleSummary = [
+    renderReleaseIdentity({
+      title: '## WebApp Beta release',
+      outcome: formatBetaReleaseOutcome(input),
+      input,
+    }),
+    ['### Release stages', '', `- Hosted Beta: ${formatBetaStageOverview(input)}`].join('\n'),
+  ].join('\n\n');
+
+  return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, 'beta')}\n`;
+}
+
+export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): string {
+  const distributionResult = formatDistributionResult(input.production, input.distribution);
+  const distributionEvidence =
+    distributionResult === 'published successfully'
+      ? formatDistributionPublicationEvidence(input.distribution, input.github)
+      : '';
+  const distributionOverview =
+    distributionEvidence === '' ? distributionResult : `${distributionResult} - ${distributionEvidence}`;
+  const productionTagLink = formatVerifiedProductionTagLink(input.production, input.github);
+  const formattedProductionOverview = formatFinalProductionOverview(input);
+  const productionOverview = productionTagLink.mapOr(formattedProductionOverview, tagLink => {
+    return `${formattedProductionOverview} - tag ${tagLink}`;
+  });
+  const visibleSummary = [
+    renderReleaseIdentity({
+      title: '## WebApp release',
+      outcome: formatFinalReleaseOutcome(input),
+      input,
+    }),
+    [
+      '### Release stages',
+      '',
+      `- Hosted Beta: ${formatBetaStageOverview(input)}`,
+      `- E2E system gate: ${formatE2EStageOverview(input)}`,
+      `- Hosted Production: ${productionOverview}`,
+      `- Release distribution: ${distributionOverview}`,
+      `- GitHub Release handoff: ${formatGitHubReleaseStageOverview(input)}`,
+      `- WebApp version synchronization: ${formatWebAppVersionSynchronizationStageOverview(input)}`,
+    ].join('\n'),
+  ].join('\n\n');
+
+  return `${visibleSummary}\n\n${renderTechnicalReleaseEvidence(input, 'final')}\n`;
+}
+
+const commandLineArgumentStartIndex = 2;
+
+function readWebappReleaseSummaryPhase(commandLineArguments: readonly string[]): WebappReleaseSummaryPhase {
+  if (commandLineArguments.includes('--beta-release')) {
+    return 'beta';
+  }
+
+  return 'final';
+}
+
+function main(): void {
+  try {
+    const input = readWebappReleaseSummaryInput(process.env);
+    const summaryPhase = readWebappReleaseSummaryPhase(process.argv.slice(commandLineArgumentStartIndex));
+    const summary = summaryPhase === 'beta' ? renderWebappBetaReleaseSummary(input) : renderWebappReleaseSummary(input);
+
+    process.stdout.write(summary);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(message);
+    process.exitCode = 1;
+  }
+}
+
+if (process.argv[1]?.endsWith('renderWebappReleaseSummary.ts') === true) {
+  main();
+}

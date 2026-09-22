@@ -19,6 +19,9 @@
 
 import {useEffect, useState} from 'react';
 
+import {isNull} from '@sindresorhus/is';
+import {noop} from 'noop-esm';
+
 import {getConnectionQualityHander} from 'Util/connectionQualityHandler';
 
 export const useConnectionQuality = () => {
@@ -27,8 +30,8 @@ export const useConnectionQuality = () => {
   useEffect(() => {
     const connectionQualityHandler = getConnectionQualityHander();
 
-    if (!connectionQualityHandler) {
-      return () => {};
+    if (isNull(connectionQualityHandler)) {
+      return noop;
     }
 
     const unsubscribe = connectionQualityHandler.subscribe(setIsSlow);

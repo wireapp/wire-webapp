@@ -17,26 +17,63 @@
  *
  */
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
+
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {AssetType} from 'Repositories/assets/assetType';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {MentionEntity} from 'src/script/message/MentionEntity';
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
+
+import {AssetType} from 'Repositories/assets/assetType';
+import {EventBuilder} from 'Repositories/conversation/EventBuilder';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {MentionEntity} from 'src/script/message/mentionEntity';
+import {translate} from 'Util/localizerUtil';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
+import {SystemMessage} from 'Repositories/entity/message/systemMessage';
+import {eventShouldBeStored} from 'Repositories/event/EventTypeHandling';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
+
 import {EventMapper} from './EventMapper';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('Event Mapper', () => {
   let conversation: Conversation;
-  const eventMapper = new EventMapper();
+  const eventMapper = new EventMapper(undefined, translate);
 
   beforeEach(() => {
-    conversation = new Conversation(createUuid());
+    conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   });
 
   describe('mapJsonEvent', () => {
+    it('maps a stored Proteus session reset event to a system message with its sender', () => {
+      const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
+      const event = {
+        id: 'reset-event-id',
+        type: CONVERSATION.SESSION_RESET as const,
+        conversation: conversation.id,
+        qualified_conversation: conversation.qualifiedId,
+        from: 'resetting-user-id',
+        time: wallClock.currentDate.toISOString(),
+      };
+      const mapper = new EventMapper(undefined, translateForTest);
+
+      const message = mapper.mapJsonEvent(event, conversation) as SystemMessage;
+
+      expect(eventShouldBeStored(event)).toBe(true);
+      expect(message.isSystem()).toBe(true);
+      expect(message.system_message_type).toBe(SystemMessageType.SESSION_RESET);
+      expect(message.caption).toBe('sessionReset');
+      expect(message.from).toBe(event.from);
+      expect(message.id).toBe(event.id);
+      expect(message.type).toBe(ClientEvent.CONVERSATION.SESSION_RESET);
+      expect(message.timestamp()).toBe(wallClock.currentTimestampInMilliseconds);
+    });
+
     it('maps text messages without link previews', () => {
       const event = createMessageAddEvent();
 
@@ -162,7 +199,7 @@ describe('Event Mapper', () => {
       const validMention = new MentionEntity(text.indexOf('@'), mandy.length, createUuid());
       const outOfRangeMention = new MentionEntity(text.length, randy.length, createUuid());
 
-      const conversationEntity = new Conversation(createUuid());
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       const mentionArrays = [
         arrayToBase64(Mention.encode(validMention.toProto()).finish()),
@@ -197,7 +234,7 @@ describe('Event Mapper', () => {
       const overlappingStart = mandyStart + mandy.length - 1;
       const overlappingMention = new MentionEntity(overlappingStart, randy.length, createUuid());
 
-      const conversationEntity = new Conversation(createUuid());
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       const mentionArrays = [
         arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
@@ -218,6 +255,19 @@ describe('Event Mapper', () => {
 
       expect(mentions.length).toBe(2);
     });
+
+    it('uses the injected translate function for team member leave fallback names', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const teamMember = new User(createUuid(), '', translateForTest);
+      const mapperWithTranslate = new EventMapper(undefined, translate);
+      const event = EventBuilder.buildTeamMemberLeave(conversation, teamMember, Date.now());
+      event.data.name = '';
+
+      const messageEntity = mapperWithTranslate.mapJsonEvent(event, conversation) as any;
+
+      expect(messageEntity.name()).toBe('translated:conversationSomeone');
+      expect(translate).toHaveBeenCalledWith('conversationSomeone');
+    });
   });
 
   describe('_mapEventUnableToDecrypt', () => {
@@ -226,7 +276,7 @@ describe('Event Mapper', () => {
         category: 0,
         conversation: 'fb1c051a-3ce3-46c5-bbc2-0153b6076af0',
         error:
-          "We received a message with session tag 'a8859a310a0c374a3da67e3a0f871145', but we don't have a session for this tag. (c0a70d96aaeb87b6)",
+          "We received a message with session tag 'a8859a310a0c374a3da67e3a0f871145', but we don'translate have a session for this tag. (c0a70d96aaeb87b6)",
         error_code: '205 (c0a70d96aaeb87b6)',
         from: '2bde49aa-bdb5-458f-98cf-7d3552b10916',
         id: 'cb4972e0-9586-42a2-90cc-1798ec0cb648',

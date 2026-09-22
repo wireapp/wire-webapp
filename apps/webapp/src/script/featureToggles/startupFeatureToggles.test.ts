@@ -24,15 +24,21 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
-  meetingsFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
+  conversationListCollapseFeatureToggleName,
+  disableMessagePreprocessingFeatureToggleName,
+  meetingsM2FeatureToggleName,
+  sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
+  viewerPermissionFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
-  meetingsFeatureToggleName,
+  conversationListCollapseFeatureToggleName,
+  viewerPermissionFeatureToggleName,
+  disableMessagePreprocessingFeatureToggleName,
+  sharedDriveDirectUploadFeatureToggleName,
+  meetingsM2FeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -68,6 +74,14 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
   });
 
+  it('enables the meetings M2 feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${meetingsM2FeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsM2FeatureToggleName)).toBe(true);
+  });
+
   it('keeps only whitelisted feature toggles when known and unknown values are mixed', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=unknown-feature,${applockRefactoredFeatureToggleName}`,
@@ -85,20 +99,36 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
   });
 
-  it('enables the shared drive search and filters feature toggle when present in the query parameter', () => {
+  it('enables the conversation list collapse feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${sharedDriveSearchAndFiltersFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${conversationListCollapseFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(conversationListCollapseFeatureToggleName)).toBe(true);
   });
 
-  it('enables the meetings feature toggle when present in the query parameter', () => {
+  it('enables the viewer permission feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(viewerPermissionFeatureToggleName)).toBe(true);
+  });
+
+  it('enables the disable message preprocessing feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${disableMessagePreprocessingFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName)).toBe(true);
+  });
+
+  it('enables the shared drive direct upload feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${sharedDriveDirectUploadFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName)).toBe(true);
   });
 
   it('trims whitespace around feature toggle names', () => {
@@ -140,8 +170,11 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
-      sharedDriveSearchAndFiltersFeatureToggleName,
-      meetingsFeatureToggleName,
+      conversationListCollapseFeatureToggleName,
+      viewerPermissionFeatureToggleName,
+      disableMessagePreprocessingFeatureToggleName,
+      sharedDriveDirectUploadFeatureToggleName,
+      meetingsM2FeatureToggleName,
     ]);
   });
 

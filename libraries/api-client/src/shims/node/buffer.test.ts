@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
-
 import {base64MD5FromBuffer, bufferToString} from './buffer';
 
 describe('"base64MD5FromBuffer"', () => {

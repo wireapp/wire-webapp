@@ -1,6 +1,7 @@
 body {
   .message[data-uie-uid] .debug-info,
-  .conversation-list-cell[data-uie-uid] .debug-info {
+  .conversation-list-cell[data-uie-uid] .debug-info,
+  #message-list[data-uie-uid] > .debug-info {
     position: absolute;
     top: auto;
     right: auto;
@@ -39,5 +40,14 @@ body {
       content: 'conversation: ';
     }
     background-color: rgba(128, 0, 0);
+  }
+
+  #message-list[data-uie-uid] > .debug-info {
+    &::before {
+      content: 'Epoch: ';
+    }
+    top: 0;
+    height: max-content;
+    background-color: rgb(128, 128, 0);
   }
 }

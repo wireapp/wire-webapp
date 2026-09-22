@@ -45,7 +45,7 @@ export const handleOtrMessageAdd = async ({
       qualified_from,
       data: {sender: clientId, text: encodedCiphertext},
     } = event;
-    const userId = qualified_from || {id: from, domain: ''};
+    const userId = qualified_from ?? {id: from, domain: ''};
     const messageBytes = Decoder.fromBase64(encodedCiphertext).asBytes;
     const now = Date.now();
     logger.info('Decrypting OTR message', {userId, clientId});

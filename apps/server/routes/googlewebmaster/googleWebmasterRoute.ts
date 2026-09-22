@@ -22,7 +22,7 @@ import {Router} from 'express';
 import type {ServerConfig} from '@wireapp/config';
 
 export const GoogleWebmasterRoute = (config: ServerConfig) => {
-  if (config.GOOGLE_WEBMASTER_ID) {
+  if (Boolean(config.GOOGLE_WEBMASTER_ID)) {
     return Router().get(`/google${config.GOOGLE_WEBMASTER_ID}.html`, (_req, res) => {
       const responseBody = `google-site-verification: google${config.GOOGLE_WEBMASTER_ID}.html`;
       res.type('text/html; charset=utf-8').send(responseBody);

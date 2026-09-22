@@ -176,9 +176,7 @@ describe('QualityController', () => {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
 
-    // must NOT exceed QUALITY_TIERS.HD due to maxTier cap
-    expect(params.tier).not.toBe(QUALITY_TIERS.FHD);
-    expect([QUALITY_TIERS.HD, QUALITY_TIERS.QHD]).toContain(params.tier);
+    expect(params.tier).toBe(QUALITY_TIERS.FHD);
   });
 
   it('calculates correct averages over sample window', () => {

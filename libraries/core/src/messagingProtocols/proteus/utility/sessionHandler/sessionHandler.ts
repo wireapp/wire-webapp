@@ -17,7 +17,14 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {
+  isEmptyString,
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNullOrUndefined,
+  isObject,
+  isUndefined,
+} from '@sindresorhus/is';
 import {PreKey} from '@wireapp/api-client/lib/auth';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
@@ -49,16 +56,16 @@ type InitSessionsResult = {
 const constructSessionId = ({userId, clientId}: ConstructSessionIdParams): string => {
   const {id, domain} = userId;
   const baseId = `${id}@${clientId}`;
-  return is.nonEmptyString(domain) ? `${domain}@${baseId}` : baseId;
+  return isNonEmptyString(domain) ? `${domain}@${baseId}` : baseId;
 };
 
 const isSessionId = (value: unknown): value is SessionId => {
-  if (!is.object(value)) {
+  if (!isObject(value)) {
     return false;
   }
 
   const sessionIdCandidate = value as {userId?: unknown; clientId?: unknown};
-  return is.nonEmptyString(sessionIdCandidate.userId) && is.nonEmptyString(sessionIdCandidate.clientId);
+  return isNonEmptyString(sessionIdCandidate.userId) && isNonEmptyString(sessionIdCandidate.clientId);
 };
 
 /**
@@ -68,7 +75,7 @@ const parseSessionId = (sessionId: string): SessionId => {
   // see https://regex101.com/r/c8FtCw/1
   const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
   const match = regex.exec(sessionId);
-  if (!match || !isSessionId(match.groups)) {
+  if (match === null || !isSessionId(match.groups)) {
     throw new Error(`given session id "${sessionId}" has wrong format`);
   }
   return match.groups;
@@ -92,7 +99,7 @@ const initSession = async (
   {userId, clientId, initialPrekey}: {userId: QualifiedId; clientId: string; initialPrekey?: PreKey},
   {cryptoClient, apiClient}: {apiClient: APIClient; cryptoClient: CryptoClient},
 ): Promise<string> => {
-  const recipients = initialPrekey
+  const recipients = !isUndefined(initialPrekey)
     ? {[userId.domain]: {[userId.id]: {[clientId]: initialPrekey}}}
     : {[userId.domain]: {[userId.id]: [clientId]}};
   const {sessions} = await initSessions({
@@ -102,7 +109,7 @@ const initSession = async (
   });
   const sessionId = sessions[0];
 
-  if (sessionId === undefined) {
+  if (isUndefined(sessionId)) {
     throw new Error('Expected a session to be initialized.');
   }
 
@@ -124,7 +131,7 @@ const createSessions = async ({recipients, apiClient, cryptoClient}: CreateSessi
 
   return {
     ...result,
-    failed: failed !== undefined && failed.length > 0 ? failed : undefined,
+    failed: isNonEmptyArray(failed) ? failed : undefined,
   };
 };
 
@@ -163,7 +170,7 @@ const initSessions = async ({
         const userPrekeys = domainMissingWithPrekey[userId.id] ?? {};
         const prekey = data[clientId];
 
-        if (prekey === undefined) {
+        if (isNullOrUndefined(prekey)) {
           continue;
         }
 
@@ -181,19 +188,20 @@ const initSessions = async ({
     }
   }
 
-  const {sessions: prekeyCreated, unknowns: prekeyUnknows} =
-    Object.keys(missingClientsWithPrekeys).length > 0
-      ? await createSessionsFromPreKeys({
-          recipients: missingClientsWithPrekeys,
-          cryptoClient,
-        })
-      : {sessions: [], unknowns: {}};
+  const hasMissingClientsWithPrekeys = isNonEmptyArray(Object.keys(missingClientsWithPrekeys));
+  const {sessions: prekeyCreated, unknowns: prekeyUnknows} = hasMissingClientsWithPrekeys
+    ? await createSessionsFromPreKeys({
+        recipients: missingClientsWithPrekeys,
+        cryptoClient,
+      })
+    : {sessions: [], unknowns: {}};
 
+  const hasMissingClients = isNonEmptyArray(Object.keys(missingClients));
   const {
     sessions: created,
     failed,
     unknowns,
-  } = Object.keys(missingClients).length > 0
+  } = hasMissingClients
     ? await createSessions({
         recipients: missingClients,
         apiClient,
@@ -206,7 +214,7 @@ const initSessions = async ({
   return {
     sessions: [...existingSessions, ...prekeyCreated, ...created],
     failed,
-    unknowns: Object.keys(allUnknowns).length > 0 ? allUnknowns : undefined,
+    unknowns: isNonEmptyArray(Object.keys(allUnknowns)) ? allUnknowns : undefined,
   };
 };
 
@@ -241,7 +249,7 @@ const createSessionsFromPreKeys = async ({
         const sessionId = constructSessionId({userId: {id: userId, domain}, clientId});
         const prekey = userClients[clientId];
 
-        if (!prekey) {
+        if (isNullOrUndefined(prekey)) {
           const domainUnknowns = unknowns[domain] ?? {};
           domainUnknowns[userId] = domainUnknowns[userId] ?? [];
           domainUnknowns[userId].push(clientId);
@@ -269,7 +277,7 @@ type EncryptedPayloads<T> = Record<string, Record<string, Record<string, T>>>;
 const buildEncryptedPayloads = <T>(payloads: Map<string, T>): EncryptedPayloads<T> => {
   return [...payloads].reduce((acc, [sessionId, payload]) => {
     const {userId, domain, clientId} = parseSessionId(sessionId);
-    if (domain === undefined || domain.length === 0) {
+    if (isUndefined(domain) || isEmptyString(domain)) {
       throw new Error('Invalid session ID');
     }
     const domainPayloads = acc[domain] ?? {};

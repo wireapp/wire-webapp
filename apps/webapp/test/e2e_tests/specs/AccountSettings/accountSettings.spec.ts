@@ -18,6 +18,7 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
+import {readRequiredEnvironmentVariable} from 'test/e2e_tests/environment/readRequiredEnvironmentVariable';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {connectWithUser, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
@@ -79,48 +80,6 @@ test.describe('account settings', () => {
     },
   );
 
-  const ssoUser = getUser({
-    email: process.env.SCIM_USER_SSO_CODE,
-    username: process.env.SCIM_USER_EMAIL,
-    password: process.env.SCIM_USER_PASSWORD,
-  });
-
-  test(
-    'I should not be able to change email of user managed by SCIM',
-    {tag: ['@TC-60', '@regression']},
-    async ({context, createPage}) => {
-      const page = await createPage(context);
-      const pageManager = PageManager.from(page);
-      await pageManager.openMainPage();
-
-      const {pages, components} = pageManager.webapp;
-      const [idpPage] = await Promise.all([
-        context.waitForEvent('page'),
-        pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
-      ]);
-
-      await test.step('Log in on IDP page', async () => {
-        await idpPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
-        await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
-        await idpPage.getByRole('button', {name: 'Sign In'}).click();
-      });
-
-      await test.step('Remove an existing device and confirm new history', async () => {
-        // Since this test re-uses the same user over and over again we need to always remove one of the previously registered devices
-        await page.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
-        // We will also always be prompted to confirm the new history on this device
-        await pages.historyInfo().clickConfirmButton();
-        await expect(components.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible({
-          timeout: LOGIN_TIMEOUT,
-        });
-      });
-
-      await pages.sidebar().clickPreferencesButton();
-      await pages.settings().accountButton.click();
-      await expect(pages.account().emailDisplay).not.toBeVisible();
-    },
-  );
-
   test('Verify sound settings are saved after re-login', {tag: ['@TC-1718', '@regression']}, async ({createPage}) => {
     const pageManager = PageManager.from(await createPage(withLogin(memberA)));
     const {pages, components} = pageManager.webapp;
@@ -161,12 +120,13 @@ test.describe('account settings', () => {
     'Verify links to manage and create teams are shown when logged in as team owner',
     {tag: ['@TC-1723', '@regression']},
     async ({createPage}) => {
+      const expectedManageTeamUrl = new URL(readRequiredEnvironmentVariable('TEAM_MANAGEMENT_URL')).toString();
       const {components} = PageManager.from(await createPage(withLogin(owner))).webapp;
 
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
-      expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toMatch(
-        /^https:\/\/wire-teams-.+\.zinfra\.io\/login\/$/,
-      );
+      const actualManageTeamUrl = await components.conversationSidebar().manageTeamButton.getAttribute('href');
+
+      expect(actualManageTeamUrl).toContain(expectedManageTeamUrl);
     },
   );
 

@@ -23,6 +23,7 @@ import {VIDEO_STATE} from '@wireapp/avs';
 
 import {Participant} from 'Repositories/calling/Participant';
 import {User} from 'Repositories/entity/User';
+import {translate} from 'Util/localizerUtil';
 
 const STORAGE_KEY = 'wire-debug-dummy-participants';
 const CHANGE_EVENT = 'wire-debug-dummy-participants-changed';
@@ -57,7 +58,7 @@ function createDummyStream(name: string, hue: number): MediaStream {
 
 function makeDummyParticipant(index: number): Participant {
   const name = DUMMY_NAMES[index % DUMMY_NAMES.length];
-  const user = new User(`wire-dummy-${index}`, 'dummy.local');
+  const user = new User(`wire-dummy-${index}`, 'dummy.local', translate);
   user.name(name);
   const participant = new Participant(user, `dummy-client-${index}`);
   const stream = createDummyStream(name, (index * 30) % 360);

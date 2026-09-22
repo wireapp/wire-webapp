@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -33,8 +33,8 @@ import type {UserRepository} from 'Repositories/user/userRepository';
 
 import {LifeCycleRepository, doSimpleRedirect, type LifeCycleDependencies} from './LifeCycleRepository';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {URLParameter} from '../../auth/URLParameter';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {URLParameter} from '../../auth/urlParameter';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';

@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
-
 import * as ArrayUtil from './ArrayUtil';
 
 /**
@@ -94,7 +92,7 @@ describe('ArrayUtil', () => {
     it('breaks if being used with non-array types.', () => {
       const array = [1, 3, 3, 7];
       const notAnArray = 1447;
-      expect(() => ArrayUtil.getIntersection(array, notAnArray)).toThrow();
+      expect(() => ArrayUtil.getIntersection(array, notAnArray as unknown as number[])).toThrow();
     });
   });
 
@@ -119,7 +117,7 @@ describe('ArrayUtil', () => {
 
     it('works with strings.', () => {
       const string = 'Houdini';
-      expect(ArrayUtil.removeDuplicates(string)).toEqual(['H', 'o', 'u', 'd', 'i', 'n']);
+      expect(ArrayUtil.removeDuplicates(string as unknown as string[])).toEqual(['H', 'o', 'u', 'd', 'i', 'n']);
     });
 
     it('is case sensitive.', () => {

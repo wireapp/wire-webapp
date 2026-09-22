@@ -140,7 +140,7 @@ test.describe('Conversations', () => {
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
-      await expect(adminPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+      await expect(adminPages.conversationList().getConversation(guestUser.fullName, {protocol: 'mls'})).toBeAttached();
 
       await createGroup(adminPages, groupName, [userB, guestUser]);
 
@@ -169,7 +169,7 @@ test.describe('Conversations', () => {
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
-      await expect(adminPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+      await expect(adminPages.conversationList().getConversation(guestUser.fullName, {protocol: 'mls'})).toBeAttached();
 
       await createGroup(adminPages, groupName, [userB, guestUser]);
 
@@ -466,6 +466,23 @@ test.describe('Conversations', () => {
 
     await userAPages.conversation().sendMessageButton.click();
     await expect(userAPages.conversation().getMessage({content: '🙂'})).toBeVisible();
+  });
+
+  test('Verify emoji picker selection replaces an emoji alias', {tag: ['@regression']}, async ({createPage}) => {
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    await userAPages.conversationList().getConversation(userB.fullName).open();
+
+    await userAPages.conversation().messageInput.pressSequentially(':smile', {delay: 100});
+
+    const smileOption = userAPage.locator('#emoji-typeahead-menu').getByRole('button', {name: 'smile', exact: true});
+    await expect(smileOption).toBeVisible();
+    await smileOption.click();
+
+    await expect(userAPages.conversation().messageInput).toContainText('😄');
+    await expect(userAPages.conversation().messageInput).not.toContainText(':smile');
   });
 
   test(

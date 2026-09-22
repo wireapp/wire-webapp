@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable no-magic-numbers, dot-notation */
-
 import {AccentColor} from '@wireapp/commons/lib';
 import nock from 'nock';
 
@@ -27,13 +25,10 @@ import {AuthAPI} from './auth/authApi';
 import {ClientType} from './client';
 import {Config, MINIMUM_API_VERSION} from './config';
 import {BackendErrorLabel, StatusCode} from './http';
-import {cellsConfigMock} from './mocks/cells';
 import {Self, SelfAPI} from './self';
-import {UserAPI} from './user/userApi';
+import {UserAPI, UserType} from './user';
 
-const testConfig = {
-  cells: cellsConfigMock,
-} as Config;
+const testConfig: Config = {urls: APIClient.BACKEND.PRODUCTION};
 
 const apiClients: APIClient[] = [];
 
@@ -67,6 +62,7 @@ describe('APIClient', () => {
     name: 'Example User',
     id: '024174ec-c098-4104-9424-3849804acb78',
     assets: [],
+    type: UserType.REGULAR,
   };
 
   beforeEach(() => {
@@ -82,7 +78,7 @@ describe('APIClient', () => {
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
-      const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION, cells: testConfig.cells});
+      const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
       apiClients.push(client);
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
@@ -115,7 +111,7 @@ describe('APIClient', () => {
       try {
         await client.useVersion(MINIMUM_API_VERSION + 2, MINIMUM_API_VERSION + 3);
       } catch (error: unknown) {
-        errorMessage = error.message;
+        errorMessage = error instanceof Error ? error.message : String(error);
       } finally {
         expect(errorMessage).toContain('No compatible API version in range');
       }
@@ -129,7 +125,7 @@ describe('APIClient', () => {
       try {
         await client.useVersion(0, 3);
       } catch (error: unknown) {
-        errorMessage = error.message;
+        errorMessage = error instanceof Error ? error.message : String(error);
       } finally {
         expect(errorMessage).toContain(`Minimum supported API version is ${MINIMUM_API_VERSION}. Received: 0`);
       }
@@ -290,7 +286,6 @@ describe('APIClient', () => {
       expect(client['accessTokenStore'].accessTokenData?.access_token).toBe(accessTokenData.access_token);
     });
 
-    // eslint-disable-next-line jest/expect-expect
     it('can login after a logout', async () => {
       const client = new APIClient(testConfig);
       apiClients.push(client);
@@ -328,7 +323,6 @@ describe('APIClient', () => {
       nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(StatusCode.OK);
     });
 
-    // eslint-disable-next-line jest/expect-expect
     it('can logout a user', async () => {
       const client = new APIClient(testConfig);
       apiClients.push(client);
@@ -346,7 +340,7 @@ describe('APIClient', () => {
       jest.spyOn(client.api.auth, 'postLogout').mockReturnValue(Promise.reject(testError));
       const disconnectSpy = jest.spyOn(client, 'disconnect').mockReturnValue();
       jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
-      jest.spyOn(client['logger'], 'warn').mockImplementation(() => {});
+      jest.spyOn(client['logger'], 'warn').mockReturnValue(undefined);
 
       await client.logout();
       expect(client['logger'].warn).toHaveBeenCalledWith(testError);
@@ -362,7 +356,7 @@ describe('APIClient', () => {
       jest.spyOn(client.api.auth, 'postLogout');
       const disconnectSpy = jest.spyOn(client, 'disconnect').mockReturnValue();
       jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
-      jest.spyOn(client['logger'], 'warn').mockImplementation(() => {});
+      jest.spyOn(client['logger'], 'warn').mockReturnValue(undefined);
 
       await client.logout({skipLogoutRequest: true});
       expect(client['logger'].warn).not.toHaveBeenCalled();

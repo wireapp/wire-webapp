@@ -23,6 +23,10 @@ import {createStore} from 'zustand/vanilla';
 
 import {Metrics, QualityTier} from 'Repositories/media/backgroundEffects';
 import {
+  SELFIE_MULTICLASS_MODEL_PATH,
+  SELFIE_SEGMENTER_MODEL_PATH,
+} from 'Repositories/media/backgroundEffects/pipe/options';
+import {
   BackgroundEffectSelection,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
@@ -37,40 +41,38 @@ export interface RenderMetrics extends Metrics {
   tier: QualityTier;
 }
 
+export type BackgroundEffectsQuality = 'privacy' | 'balanced' | 'performance';
+
 export type BackgroundEffectsState = {
-  isFeatureEnabled: boolean;
   isPerformancePanelEnabled: boolean;
   preferredEffect: BackgroundEffectSelection;
   metrics: RenderMetrics | undefined;
   model: string;
   lastVirtualBackgroundId: string;
-  isHighQualityBlurEnabled: boolean;
+  qualityTier: BackgroundEffectsQuality;
+  effectiveQualityTier: BackgroundEffectsQuality;
   isInitializing: boolean;
 
-  setIsFeatureEnabled(value: boolean): void;
   setIsPerformancePanelEnabled(value: boolean): void;
   setPreferredEffect(effect: BackgroundEffectSelection): void;
   setLastVirtualBackgroundId(backgroundId: string): void;
   setMetrics(metrics: RenderMetrics | undefined): void;
   setModel(model: string | undefined): void;
-  setIsHighQualityBlurEnabled(value: boolean): void;
+  setQualityTier(tier: BackgroundEffectsQuality): void;
+  setEffectiveQualityTier(tier: BackgroundEffectsQuality): void;
   setIsInitializing(value: boolean): void;
 };
 
 export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
   immer<BackgroundEffectsState>(set => ({
-    isFeatureEnabled: false,
     isPerformancePanelEnabled: false,
     preferredEffect: DEFAULT_BACKGROUND_EFFECT,
     metrics: undefined,
     model: 'unknown',
     lastVirtualBackgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
-    isHighQualityBlurEnabled: true,
+    qualityTier: 'privacy',
+    effectiveQualityTier: 'privacy',
 
-    setIsFeatureEnabled: value =>
-      set(state => {
-        state.isFeatureEnabled = value;
-      }),
     setIsPerformancePanelEnabled: value =>
       set(state => {
         state.isPerformancePanelEnabled = value;
@@ -92,12 +94,26 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
 
     setModel: model =>
       set(state => {
-        state.model = model ?? 'unknown';
+        switch (model) {
+          case SELFIE_SEGMENTER_MODEL_PATH:
+            state.model = 'selfie-segmenter';
+            break;
+          case SELFIE_MULTICLASS_MODEL_PATH:
+            state.model = 'selfie-multiclass';
+            break;
+          default:
+            state.model = 'unknown';
+        }
       }),
 
-    setIsHighQualityBlurEnabled: value =>
+    setQualityTier: tier =>
       set(state => {
-        state.isHighQualityBlurEnabled = value;
+        state.qualityTier = tier;
+      }),
+
+    setEffectiveQualityTier: tier =>
+      set(state => {
+        state.effectiveQualityTier = tier;
       }),
 
     isInitializing: false,

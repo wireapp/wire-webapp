@@ -24,7 +24,7 @@ import {resetStoreValue} from 'Util/storageUtil';
 
 export class CacheRepository {
   public static CACHE_KEY = {
-    // Redefine name from "sw.js"
+    // Redefine name from "sw"
     ASSETS: `asset-cache-v3`,
   };
 

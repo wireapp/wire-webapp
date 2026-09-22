@@ -24,17 +24,17 @@ import {NotificationRepository} from 'Repositories/notification/NotificationRepo
 
 import {useAppSoftLock} from './useAppSoftLock';
 
-import {E2EIHandler} from '../E2EIdentity';
-import {isFreshMLSSelfClient} from '../E2EIdentity/E2EIdentityVerification';
+import {E2EIHandler} from '../e2eIdentity';
+import {isFreshMLSSelfClient} from '../e2eIdentity/e2eIdentityVerification';
 
 const isFreshMLSSelfClientMock = isFreshMLSSelfClient as jest.MockedFn<typeof isFreshMLSSelfClient>;
 const E2EIHandlerMock = E2EIHandler as jest.Mocked<typeof E2EIHandler>;
 
-jest.mock('../E2EIdentity/E2EIdentityVerification', () => ({
+jest.mock('../e2eIdentity/e2eIdentityVerification', () => ({
   isFreshMLSSelfClient: jest.fn(),
 }));
 
-jest.mock('../E2EIdentity', () => ({
+jest.mock('../e2eIdentity', () => ({
   E2EIHandler: {
     getInstance: jest.fn(),
   },

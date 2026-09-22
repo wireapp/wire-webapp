@@ -21,7 +21,13 @@ import {renderHook, act} from '@testing-library/react';
 
 import {formatLocale, formatTimeShort} from 'Util/timeUtil';
 
-import {useRelativeTimestamp} from './useRelativeTimestamp';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from './useRelativeTimestamp';
+
+const relativeTimestampFormatter = createRelativeTimestampFormatter({
+  justNow: 'conversationJustNow',
+  today: 'conversationToday',
+  yesterday: 'conversationYesterday',
+});
 
 describe('useRelativeTimestamp', () => {
   beforeEach(() => {
@@ -30,7 +36,7 @@ describe('useRelativeTimestamp', () => {
   it('updates the timestamp as time passes on', async () => {
     jest.setSystemTime(0);
     const timestamp = Date.now();
-    const {result} = renderHook(() => useRelativeTimestamp(timestamp));
+    const {result} = renderHook(() => useRelativeTimestamp(timestamp, false, relativeTimestampFormatter));
     expect(result.current).toBe('conversationJustNow');
 
     act(() => {
@@ -51,7 +57,7 @@ describe('useRelativeTimestamp', () => {
     [366 * 24 * 60 * 60 * 1001, 'Thursday, Jan 1 1970, 12:00 AM'],
   ])('computes the right time according to the given timestamp', async (currentTime, expected) => {
     jest.setSystemTime(currentTime);
-    const {result} = renderHook(() => useRelativeTimestamp(0, true));
+    const {result} = renderHook(() => useRelativeTimestamp(0, true, relativeTimestampFormatter));
     expect(result.current).toEqual(expected);
   });
 });

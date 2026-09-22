@@ -19,14 +19,14 @@
 
 import React from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyObject} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {handleEscDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {AdminSearchInput} from './AdminSearchInput';
 import {
@@ -40,7 +40,11 @@ import {
 } from './styles';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
 
-export const LeaveGroupAdminModal = () => {
+interface LeaveGroupAdminModalProps {
+  readonly translate: Translate;
+}
+
+export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => {
   const {isOpen, params, selectedUser, clearContent, isLoading, hide, setSelectedUser, setClearContent, setIsLoading} =
     useLeaveGroupAdminModalStore();
 
@@ -58,7 +62,7 @@ export const LeaveGroupAdminModal = () => {
   const handleLeave = async () => {
     setIsLoading(true);
     try {
-      if (is.nonEmptyObject(selectedUser)) {
+      if (isNonEmptyObject(selectedUser)) {
         await onLeave(clearContent, selectedUser);
         hide();
       }
@@ -87,14 +91,14 @@ export const LeaveGroupAdminModal = () => {
     >
       <div style={modalHeaderStyles}>
         <h2 style={modalTitleStyles} data-uie-name="leave-group-admin-modal-title">
-          {t('leaveGroupAdminModalTitle', {name: conversationName})}
+          {translate('leaveGroupAdminModalTitle', {name: conversationName})}
         </h2>
         <button
           type="button"
           onClick={handleClose}
           style={modalCloseButtonStyles}
           data-uie-name="do-close"
-          aria-label={t('leaveGroupAdminModalClose', {name: conversationName})}
+          aria-label={translate('leaveGroupAdminModalClose', {name: conversationName})}
         >
           <Icon.CloseIcon aria-hidden="true" />
         </button>
@@ -104,18 +108,20 @@ export const LeaveGroupAdminModal = () => {
         <p style={messageStyles} data-uie-name="leave-group-admin-modal-message">
           {hasEligibleUsers ? (
             <>
-              {t('leaveGroupAdminModalMessageWithEligibleFirstPart')} <br />
-              {t('leaveGroupAdminModalMessageWithEligibleSecondPart')}
+              {translate('leaveGroupAdminModalMessageWithEligibleFirstPart')} <br />
+              {translate('leaveGroupAdminModalMessageWithEligibleSecondPart')}
             </>
           ) : (
             <>
-              {t('leaveGroupAdminModalMessageNoEligibleFirstPart')} <br />
-              {t('leaveGroupAdminModalMessageNoEligibleSecondPart')}
+              {translate('leaveGroupAdminModalMessageNoEligibleFirstPart')} <br />
+              {translate('leaveGroupAdminModalMessageNoEligibleSecondPart')} <br />
+              {translate('leaveGroupAdminModalMessageNoEligibleThirdPart')}
             </>
           )}
         </p>
         {hasEligibleUsers && (
           <AdminSearchInput
+            translate={translate}
             eligibleUsers={eligibleUsers}
             selectedUser={selectedUser}
             clearContent={clearContent}
@@ -133,7 +139,7 @@ export const LeaveGroupAdminModal = () => {
               style={buttonStyles}
               data-uie-name="do-leave-group-and-promote-admin"
             >
-              {canLeave ? t('leaveGroupAdminModalLeaveAction') : t('leaveGroupAdminModalPromoteAction')}
+              {canLeave ? translate('leaveGroupAdminModalLeaveAction') : translate('leaveGroupAdminModalPromoteAction')}
             </Button>
           )}
 
@@ -143,7 +149,7 @@ export const LeaveGroupAdminModal = () => {
             style={buttonStyles}
             data-uie-name="do-delete-group-from-leave-modal"
           >
-            {t('leaveGroupAdminModalDeleteAction')}
+            {translate('leaveGroupAdminModalDeleteAction')}
           </Button>
 
           <Button
@@ -153,7 +159,7 @@ export const LeaveGroupAdminModal = () => {
             style={buttonStyles}
             data-uie-name="do-cancel-leave-group-admin"
           >
-            {t('leaveGroupAdminModalCancelAction')}
+            {translate('leaveGroupAdminModalCancelAction')}
           </Button>
         </div>
       </div>

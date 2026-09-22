@@ -19,6 +19,8 @@
 
 import {container} from 'tsyringe';
 
+import type {FireAndForgetInvoker} from '@wireapp/core';
+
 import type {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import type {BackupRepository} from 'Repositories/backup/backupRepository';
@@ -35,6 +37,7 @@ import type {IntegrationRepository} from 'Repositories/integration/IntegrationRe
 import type {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
@@ -46,6 +49,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import type {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {type Translate} from 'Util/localizerUtil';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
@@ -70,6 +74,7 @@ export interface ViewModelRepositories {
   giphy: GiphyRepository;
   integration: IntegrationRepository;
   lifeCycle: LifeCycleRepository;
+  meetings: MeetingsRepository;
   message: MessageRepository;
   notification: NotificationRepository;
   preferenceNotification: PreferenceNotificationRepository;
@@ -88,6 +93,7 @@ export class MainViewModel {
   content: ContentViewModel;
   list: ListViewModel;
   private readonly core = container.resolve(Core);
+  readonly translate: Translate;
 
   static get CONFIG() {
     return {
@@ -102,7 +108,8 @@ export class MainViewModel {
     return this.core.backendFeatures.isFederated;
   }
 
-  constructor(repositories: ViewModelRepositories) {
+  constructor(repositories: ViewModelRepositories, translate: Translate, fireAndForgetInvoker: FireAndForgetInvoker) {
+    this.translate = translate;
     const userState = container.resolve(UserState);
     const teamState = container.resolve(TeamState);
     const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
@@ -118,6 +125,7 @@ export class MainViewModel {
       userState,
       teamState,
       this,
+      this.translate,
     );
 
     this.calling = new CallingViewModel(
@@ -128,8 +136,9 @@ export class MainViewModel {
       repositories.team,
       repositories.properties,
       userState.self,
+      this.translate,
     );
-    this.content = new ContentViewModel(this, repositories);
-    this.list = new ListViewModel(this, repositories);
+    this.content = new ContentViewModel(this, repositories, this.translate);
+    this.list = new ListViewModel(this, repositories, this.translate, fireAndForgetInvoker);
   }
 }

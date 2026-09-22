@@ -1,0 +1,337 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import assert from 'node:assert';
+
+import ky from 'ky';
+import type {KyInstance} from 'ky';
+import {Maybe} from 'true-myth';
+
+import {createKyHttpClient, formatHttpRequestFailure, isHttpRequestFailure} from './httpClient.ts';
+import type {HttpClient, HttpMethod, HttpRequest, HttpRequestFailure} from './httpClient.ts';
+
+function createCommentRequest(): HttpRequest {
+  return {
+    method: 'post',
+    url: new URL('https://api.github.example/repos/wireapp/wire-webapp/issues/7/comments'),
+    headers: {
+      Authorization: 'Bearer github-token',
+    },
+    json: Maybe.just({body: 'release comment'}),
+  };
+}
+
+function createTestRequest(method: HttpMethod, path: string): HttpRequest {
+  return {
+    method,
+    url: new URL(`https://api.github.example${path}`),
+    headers: {},
+    json: Maybe.nothing<NonNullable<unknown>>(),
+  };
+}
+
+function resolveAtNextEventLoopTurn(resolve: (value?: void | PromiseLike<void>) => void): void {
+  setImmediate(resolve);
+}
+
+function waitForNextEventLoopTurn(): Promise<void> {
+  return new Promise<void>(resolveAtNextEventLoopTurn);
+}
+
+function createTestHttpClient(kyInstance: KyInstance): HttpClient {
+  return createKyHttpClient({
+    kyInstance,
+    currentTimeMilliseconds() {
+      return 1_800_000_000_000;
+    },
+    async sleep() {
+      return;
+    },
+    reportRateLimitWait() {
+      return;
+    },
+  });
+}
+
+async function readHttpRequestFailure(requestPromise: Promise<unknown>): Promise<HttpRequestFailure> {
+  try {
+    await requestPromise;
+    assert.fail('Expected the HTTP request to fail');
+  } catch (error: unknown) {
+    if (!isHttpRequestFailure(error)) {
+      assert.fail('Expected an application-owned HTTP request failure');
+    }
+
+    return error;
+  }
+}
+
+describe('Ky HTTP client', () => {
+  it('retains safe diagnostics from a normal forbidden response without retrying', async () => {
+    let fetchCallCount = 0;
+    const kyInstance = ky.create({
+      async fetch() {
+        fetchCallCount += 1;
+        return new Response(
+          JSON.stringify({
+            message: 'Resource not accessible by integration',
+            documentation_url: 'https://docs.github.com/rest/issues/comments#create-an-issue-comment',
+          }),
+          {
+            status: 403,
+            headers: {
+              'content-type': 'application/json',
+              'x-github-request-id': 'REQUEST-403',
+              'x-accepted-github-permissions': 'issues=write, pull_requests=write',
+              'x-ratelimit-remaining': '4999',
+              'x-ratelimit-reset': '1785800000',
+            },
+          },
+        );
+      },
+    });
+    const httpClient = createTestHttpClient(kyInstance);
+
+    const failure = await readHttpRequestFailure(httpClient.requestJson(createCommentRequest()));
+
+    expect(fetchCallCount).toBe(1);
+    assert(failure.kind === 'http-response-failure');
+    expect(failure.response.statusCode).toBe(403);
+    expect(failure.response.githubMessage).toEqual(Maybe.just('Resource not accessible by integration'));
+    expect(failure.response.documentationUrl).toEqual(
+      Maybe.just('https://docs.github.com/rest/issues/comments#create-an-issue-comment'),
+    );
+    expect(failure.response.githubRequestId).toEqual(Maybe.just('REQUEST-403'));
+    expect(failure.response.acceptedGithubPermissions).toEqual(Maybe.just('issues=write, pull_requests=write'));
+    expect(failure.response.rateLimitRemaining).toEqual(Maybe.just('4999'));
+    expect(failure.response.rateLimitReset).toEqual(Maybe.just('1785800000'));
+    expect(failure.response.retryAfter.isNothing).toBe(true);
+  });
+
+  it('retries a secondary-rate-limit response with bounded fallback backoff', async () => {
+    let fetchCallCount = 0;
+    const kyInstance = ky.create({
+      async fetch() {
+        fetchCallCount += 1;
+        return new Response(
+          JSON.stringify({
+            message: 'You have exceeded a secondary rate limit. Please wait a few minutes before you try again.',
+          }),
+          {
+            status: 403,
+            headers: {
+              'content-type': 'application/json',
+              'x-ratelimit-remaining': '4999',
+              'x-ratelimit-reset': '1785800000',
+            },
+          },
+        );
+      },
+    });
+    const sleepDelays: number[] = [];
+    const rateLimitMessages: string[] = [];
+    let currentTimeMilliseconds = 1_800_000_000_000;
+    const httpClient = createKyHttpClient({
+      kyInstance,
+      currentTimeMilliseconds() {
+        return currentTimeMilliseconds;
+      },
+      async sleep(delayMilliseconds) {
+        sleepDelays.push(delayMilliseconds);
+        currentTimeMilliseconds += delayMilliseconds;
+      },
+      reportRateLimitWait(message) {
+        rateLimitMessages.push(message);
+      },
+    });
+
+    const failure = await readHttpRequestFailure(httpClient.requestJson(createCommentRequest()));
+
+    expect(fetchCallCount).toBe(3);
+    assert(failure.kind === 'http-response-failure');
+    expect(failure.response.statusCode).toBe(403);
+    assert(failure.response.githubMessage.isJust);
+    expect(failure.response.githubMessage.value).toMatch(/secondary rate limit/);
+    expect(failure.response.retryAfter).toEqual(Maybe.nothing<string>());
+    expect(sleepDelays).toEqual([60_000, 120_000]);
+    expect(rateLimitMessages).toEqual([
+      'GitHub secondary rate limit reached; retrying in 60s · (attempt 1/2) · POST /repos/wireapp/wire-webapp/issues/7/comments',
+      'GitHub secondary rate limit reached; retrying in 120s · (attempt 2/2) · POST /repos/wireapp/wire-webapp/issues/7/comments',
+    ]);
+  });
+
+  it('retries an HTTP 429 response even when the response body has no GitHub message', async () => {
+    let fetchCallCount = 0;
+    const kyInstance = ky.create({
+      async fetch() {
+        fetchCallCount += 1;
+        return new Response(JSON.stringify({details: 'release comment'}), {
+          status: 429,
+          headers: {
+            'content-type': 'application/json',
+            'retry-after': '0',
+          },
+        });
+      },
+    });
+    const httpClient = createTestHttpClient(kyInstance);
+
+    const failure = await readHttpRequestFailure(httpClient.requestJson(createCommentRequest()));
+
+    expect(fetchCallCount).toBe(3);
+    assert(failure.kind === 'http-response-failure');
+    expect(failure.response.statusCode).toBe(429);
+    expect(failure.response.githubMessage.isNothing).toBe(true);
+    expect(formatHttpRequestFailure(failure)).not.toContain('release comment');
+  });
+
+  it('paces POST and PATCH mutation starts together while keeping GET requests concurrent', async () => {
+    let currentTimeMilliseconds = 0;
+    let activeReadRequests = 0;
+    let maximumActiveReadRequests = 0;
+    const mutationStartTimes: {readonly method: string; readonly timeMilliseconds: number}[] = [];
+    const sleepDelays: number[] = [];
+    const readResponse = Promise.withResolvers<void>();
+    const kyInstance = ky.create({
+      async fetch(input, init) {
+        const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toLowerCase();
+        if (method === 'get') {
+          activeReadRequests += 1;
+          maximumActiveReadRequests = Math.max(maximumActiveReadRequests, activeReadRequests);
+          try {
+            await readResponse.promise;
+            return new Response('{}');
+          } finally {
+            activeReadRequests -= 1;
+          }
+        }
+
+        mutationStartTimes.push({method, timeMilliseconds: currentTimeMilliseconds});
+        return new Response('{}');
+      },
+    });
+    const httpClient = createKyHttpClient({
+      kyInstance,
+      currentTimeMilliseconds() {
+        return currentTimeMilliseconds;
+      },
+      async sleep(delayMilliseconds) {
+        sleepDelays.push(delayMilliseconds);
+        currentTimeMilliseconds += delayMilliseconds;
+      },
+      reportRateLimitWait() {
+        return;
+      },
+    });
+
+    const readRequests = [
+      httpClient.requestJson(createTestRequest('get', '/issues/1/comments')),
+      httpClient.requestJson(createTestRequest('get', '/issues/2/comments')),
+    ];
+    await waitForNextEventLoopTurn();
+    expect(maximumActiveReadRequests).toBe(2);
+
+    const mutationRequests = await Promise.all([
+      httpClient.requestJson(createTestRequest('post', '/issues/1/comments')),
+      httpClient.requestJson(createTestRequest('patch', '/issues/comments/2')),
+    ]);
+    readResponse.resolve();
+    await Promise.all(readRequests);
+
+    expect(mutationRequests).toEqual([{}, {}]);
+    expect(mutationStartTimes).toEqual([
+      {method: 'post', timeMilliseconds: 0},
+      {method: 'patch', timeMilliseconds: 1_000},
+    ]);
+    expect(sleepDelays).toEqual([1_000]);
+  });
+
+  it('retains valid fields while discarding malformed GitHub fields and unrelated response data', async () => {
+    const kyInstance = ky.create({
+      async fetch() {
+        return new Response(
+          JSON.stringify({
+            message: 403,
+            documentation_url: 'not a URL',
+            body: 'release comment',
+            unrelated: 'do not expose this',
+          }),
+          {
+            status: 403,
+            headers: {
+              'content-type': 'application/json',
+              'x-github-request-id': 'REQUEST-MALFORMED',
+              'x-unrelated-header': 'do not expose this either',
+            },
+          },
+        );
+      },
+    });
+    const httpClient = createTestHttpClient(kyInstance);
+
+    const failure = await readHttpRequestFailure(httpClient.requestJson(createCommentRequest()));
+
+    assert(failure.kind === 'http-response-failure');
+    expect(failure.response.statusCode).toBe(403);
+    expect(failure.response.githubMessage.isNothing).toBe(true);
+    expect(failure.response.documentationUrl.isNothing).toBe(true);
+    expect(failure.response.githubRequestId).toEqual(Maybe.just('REQUEST-MALFORMED'));
+    const actualDiagnostic = formatHttpRequestFailure(failure);
+    expect(actualDiagnostic).not.toContain('release comment');
+    expect(actualDiagnostic).not.toContain('do not expose this');
+    expect(actualDiagnostic).toContain('GitHub request ID: REQUEST-MALFORMED');
+  });
+
+  it('formats only safe actionable diagnostics and never includes the request body or headers', () => {
+    const failure: HttpRequestFailure = {
+      kind: 'http-response-failure',
+      method: 'post',
+      url: new URL('https://api.github.example/repos/wireapp/wire-webapp/issues/7/comments'),
+      response: {
+        statusCode: 403,
+        githubMessage: Maybe.just('Resource not accessible by integration'),
+        documentationUrl: Maybe.just('https://docs.github.com/rest/issues/comments#create-an-issue-comment'),
+        githubRequestId: Maybe.just('REQUEST-403'),
+        acceptedGithubPermissions: Maybe.just('issues=write, pull_requests=write'),
+        retryAfter: Maybe.just('3'),
+        rateLimitRemaining: Maybe.just('0'),
+        rateLimitReset: Maybe.just('1785800000'),
+      },
+    };
+
+    const actualDiagnostic = formatHttpRequestFailure(failure);
+    const expectedDiagnostic = [
+      'GitHub API request failed',
+      'HTTP status: 403',
+      'Request: POST https://api.github.example/repos/wireapp/wire-webapp/issues/7/comments',
+      'GitHub message: Resource not accessible by integration',
+      'Documentation URL: https://docs.github.com/rest/issues/comments#create-an-issue-comment',
+      'GitHub request ID: REQUEST-403',
+      'Accepted GitHub permissions: issues=write, pull_requests=write',
+      'Retry-After: 3',
+      'Rate-limit remaining: 0',
+      'Rate-limit reset: 1785800000',
+    ].join('; ');
+
+    expect(actualDiagnostic).toBe(expectedDiagnostic);
+    expect(actualDiagnostic).not.toContain('release comment');
+    expect(actualDiagnostic).not.toContain('Authorization');
+    expect(actualDiagnostic).not.toContain('Bearer');
+  });
+});

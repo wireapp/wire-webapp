@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 const observedElements = new Map<
   Element,
   {
@@ -49,7 +51,7 @@ const onIntersect: IntersectionObserverCallback = entries => {
 
     const isVisible = isIntersecting && (requireFullyInView !== true || isFullyInView || isBiggerThanRoot());
 
-    if (onVisibilityChange) {
+    if (!isUndefined(onVisibilityChange)) {
       onVisibilityChange(!!isVisible, isIntersecting);
     } else if (isVisible) {
       removeElement(element);

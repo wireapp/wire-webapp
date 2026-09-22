@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {toBufferSource} from '../../../../util/bufferUtils';
 import {AcmeService} from '../connection';
 import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../e2eiService.types';
@@ -56,12 +58,15 @@ export const getAuthorizationChallenges = async ({
   const {challenge: oidcChallenge} = challenges.find(challenge => challenge.type.includes('oidc')) ?? {};
   const {challenge: dpopChallenge} = challenges.find(challenge => challenge.type.includes('dpop')) ?? {};
 
-  if (!dpopChallenge || !oidcChallenge) {
+  if (dpopChallenge === undefined || oidcChallenge === undefined) {
     throw new Error('missing dpop or oidc challenge');
+  }
+  if (isUndefined(oidcChallenge.keyauth)) {
+    throw new Error('missing oidc key authorization');
   }
   // manual copy of the wasm data because of a problem while cloning it
   const authorization = {
-    keyauth: oidcChallenge.keyauth!,
+    keyauth: oidcChallenge.keyauth,
     dpopChallenge: {
       delegate: toBufferSource(dpopChallenge.challenge.delegate),
       target: dpopChallenge.challenge.target,

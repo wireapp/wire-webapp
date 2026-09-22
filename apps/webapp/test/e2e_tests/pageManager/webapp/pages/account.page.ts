@@ -57,8 +57,8 @@ export class AccountPage {
     this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
     this.logoutButton = page.getByTestId('do-logout');
     this.editEmailButton = page.getByTestId('go-edit-email');
-    this.editDisplayNameButton = page.getByTestId('go-edit-email');
-    this.editUserNameButton = page.getByRole('button', {name: 'Username'});
+    this.editDisplayNameButton = page.getByTestId('go-edit-displayname');
+    this.editUserNameButton = page.getByTestId('go-edit-username');
     this.emailInput = page.getByTestId('enter-email-input');
     this.displayNameInput = page.getByTestId('enter-displayname-input');
     this.userNameInput = page.getByLabel('Username');

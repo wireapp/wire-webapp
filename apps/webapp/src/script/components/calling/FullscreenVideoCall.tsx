@@ -19,6 +19,7 @@
 
 import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -36,10 +37,10 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
+import {useAppNotification} from 'Components/appNotification/appNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {VideoBackgroundPerformancePanel} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
-import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import type {Call} from 'Repositories/calling/Call';
@@ -49,18 +50,18 @@ import {Participant} from 'Repositories/calling/Participant';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {detectCapabilities} from 'Repositories/media/backgroundEffects';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {BackgroundEffectsQuality, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
@@ -121,7 +122,6 @@ const FullscreenVideoCall = ({
   isChoosingScreen,
   sendEmoji,
   isMuted,
-  muteState,
   mediaDevicesHandler,
   propertiesRepository,
   callingRepository,
@@ -143,6 +143,7 @@ const FullscreenVideoCall = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
+  const {translate} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const [isPresenterMode, setIsPresenterMode] = useState(false);
   const handlePresenterModeRequested = useCallback(() => setIsPresenterMode(true), []);
@@ -207,9 +208,11 @@ const FullscreenVideoCall = ({
     }
   };
 
-  const callNotification = useAppNotification({
-    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
-  });
+  const activeWindow = viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow : window;
+  if (isNullOrUndefined(activeWindow)) {
+    throw new Error('The detached calling window is not available');
+  }
+  const callNotification = useAppNotification({activeWindow});
 
   useEffect(() => {
     const handRaisedHandler = (event: Event) => {
@@ -283,14 +286,14 @@ const FullscreenVideoCall = ({
 
   const totalPages = callPages.length;
 
-  const callGroupStartedAlert = t(isGroupCall ? 'startedVideoGroupCallingAlert' : 'startedVideoCallingAlert', {
+  const callGroupStartedAlert = translate(isGroupCall ? 'startedVideoGroupCallingAlert' : 'startedVideoCallingAlert', {
     conversationName,
-    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+    cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
-  const onGoingGroupCallAlert = t(isGroupCall ? 'ongoingGroupVideoCall' : 'ongoingVideoCall', {
+  const onGoingGroupCallAlert = translate(isGroupCall ? 'ongoingGroupVideoCall' : 'ongoingVideoCall', {
     conversationName,
-    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+    cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
@@ -301,7 +304,7 @@ const FullscreenVideoCall = ({
   const isWebGLAvailable = detectCapabilities().webgl2;
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
-  const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
+  const backgroundEffectsQuality = useBackgroundEffectsStore(state => state.effectiveQualityTier);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -309,8 +312,8 @@ const FullscreenVideoCall = ({
     });
   };
 
-  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
-    callingRepository.allowSuperhighQualityTier(event.target.checked);
+  const handleBackgroundEffectsQualityChange = (quality: BackgroundEffectsQuality) => {
+    callingRepository.setBackgroundEffectsQualityTier(quality);
   };
 
   return (
@@ -369,7 +372,7 @@ const FullscreenVideoCall = ({
                 }
                 type="button"
                 data-uie-name="do-call-controls-video-minimize"
-                title={t('videoCallOverlayCloseFullScreen')}
+                title={translate('videoCallOverlayCloseFullScreen')}
               >
                 {viewMode === CallingViewMode.DETACHED_WINDOW ? <CloseDetachedWindowIcon /> : <Icon.MessageIcon />}
               </IconButton>
@@ -389,7 +392,7 @@ const FullscreenVideoCall = ({
                 }
                 type="button"
                 data-uie-name="do-call-controls-video-maximize"
-                title={t('videoCallOverlayOpenPopupWindow')}
+                title={translate('videoCallOverlayOpenPopupWindow')}
               >
                 <OpenDetachedWindowIcon />
               </IconButton>
@@ -431,9 +434,9 @@ const FullscreenVideoCall = ({
               selectedEffect={selectedBackgroundEffect}
               backgrounds={BUILTIN_BACKGROUNDS}
               onSelectEffect={handleBackgroundSidebarSelect}
-              onEnableHighQualityBlur={handleEnableHighQualityBlur}
+              backgroundEffectsQuality={backgroundEffectsQuality}
+              onBackgroundEffectsQualityChange={handleBackgroundEffectsQualityChange}
               onClose={() => backgroundSidebarHandler(false)}
-              highQualityBlurAllowed={isHighQualityBlurEnabled}
               isWebGLAvailable={isWebGLAvailable}
             />
           )}
@@ -457,7 +460,7 @@ const FullscreenVideoCall = ({
                 key={id}
                 role="img"
                 className="emoji"
-                aria-label={t('callReactionsAriaLabel', {from, emoji})}
+                aria-label={translate('callReactionsAriaLabel', {from, emoji})}
                 style={{left}}
                 data-uie-from={from}
                 data-uie-value={emoji}
@@ -517,9 +520,9 @@ const FullscreenVideoCall = ({
           selectedEffect={selectedBackgroundEffect}
           backgrounds={BUILTIN_BACKGROUNDS}
           onSelectEffect={handleBackgroundSidebarSelect}
-          onEnableHighQualityBlur={handleEnableHighQualityBlur}
+          backgroundEffectsQuality={backgroundEffectsQuality}
+          onBackgroundEffectsQualityChange={handleBackgroundEffectsQualityChange}
           onClose={() => backgroundSidebarHandler(false)}
-          highQualityBlurAllowed={isHighQualityBlurEnabled}
           isWebGLAvailable={isWebGLAvailable}
         />
       )}
@@ -537,12 +540,12 @@ const FullscreenVideoCall = ({
           <>
             <div className="modal__header" data-uie-name="status-modal-title">
               <h2 className="text-medium" id="modal-title">
-                {t('videoCallScreenShareEndConfirm')}
+                {translate('videoCallScreenShareEndConfirm')}
               </h2>
             </div>
 
             <div className="modal__body">
-              <div id="modal-description-text">{t('videoCallScreenShareEndConfirmDescription')}</div>
+              <div id="modal-description-text">{translate('videoCallScreenShareEndConfirmDescription')}</div>
               <Checkbox
                 wrapperCSS={{marginTop: 16}}
                 data-uie-name="do-not-ask-again-checkbox"
@@ -555,7 +558,7 @@ const FullscreenVideoCall = ({
                 }
               >
                 <CheckboxLabel className="label-xs" htmlFor="do-not-ask-again-checkbox">
-                  {t('qualityFeedback.doNotAskAgain')}
+                  {translate('qualityFeedback.doNotAskAgain')}
                 </CheckboxLabel>
               </Checkbox>
               <div className="modal__buttons">
@@ -566,7 +569,7 @@ const FullscreenVideoCall = ({
                   data-uie-name="do-close"
                   className="modal__button modal__button--secondary"
                 >
-                  {t('modalConfirmSecondary')}
+                  {translate('modalConfirmSecondary')}
                 </button>
                 <button
                   type="button"
@@ -575,7 +578,7 @@ const FullscreenVideoCall = ({
                   data-uie-name="do-action"
                   key="modal-primary-button"
                 >
-                  {t('modalAcknowledgeAction')}
+                  {translate('modalAcknowledgeAction')}
                 </button>
               </div>
             </div>

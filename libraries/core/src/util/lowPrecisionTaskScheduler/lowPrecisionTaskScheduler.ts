@@ -39,11 +39,11 @@ const intervals: Record<number, {timeoutId: NodeJS.Timeout; tasks: Record<string
 
 const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTaskParams) => {
   const existingIntervalId = intervals[intervalDelay]?.timeoutId;
-  if (existingIntervalId) {
+  if (existingIntervalId !== undefined) {
     clearInterval(existingIntervalId);
   }
 
-  const tasks = intervals[intervalDelay]?.tasks || {};
+  const tasks = intervals[intervalDelay]?.tasks ?? {};
 
   tasks[key] = {firingDate, task};
 

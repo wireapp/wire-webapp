@@ -27,7 +27,7 @@ import {
   assetRetentionPolicy,
   isValidAsset,
   ValidationUtilError,
-} from 'Util/ValidationUtil';
+} from 'Util/validationUtil';
 
 describe('ValidationUtil', () => {
   describe('"asset.legacy"', () => {

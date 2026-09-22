@@ -1,0 +1,394 @@
+/*
+ * Wire
+ * Copyright (C) 2023 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {
+  ModalOptions,
+  PrimaryModalTranslatedComponent,
+  PrimaryModalTranslatedTranslation,
+  PrimaryModalTranslatedValue,
+  PrimaryModalType,
+} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Config} from 'src/script/Config';
+import type {Translate, TranslationKey} from 'Util/localizerUtil';
+
+const hideSecondaryBtn = {hideSecondary: true};
+const hideCloseBtn = {hideCloseBtn: true, preventClose: true};
+
+function createE2EIUrlValue(runtimeText: string): PrimaryModalTranslatedValue {
+  return {
+    alternatePlaceholders: [],
+    placeholder: 'url',
+    runtimeText,
+  };
+}
+
+const e2eiLiteralLineBreakComponent: PrimaryModalTranslatedComponent = {
+  kind: 'line-break',
+  legacyTokens: ['<br/>'],
+  markerName: 'br',
+};
+
+const e2eiMarkerLineBreakComponent: PrimaryModalTranslatedComponent = {
+  kind: 'line-break',
+  legacyTokens: [],
+  markerName: 'br',
+};
+
+const e2eiBoldComponent: PrimaryModalTranslatedComponent = {
+  kind: 'bold',
+  markerName: 'bold',
+};
+
+function createE2EILinkComponent(href: string): PrimaryModalTranslatedComponent {
+  return {
+    className: '',
+    dataUieName: '',
+    href,
+    kind: 'link',
+    legacyClosingTokens: ['</a>'],
+    legacyOpeningTokens: [
+      '<a href="{url}" target="_blank"><a href="{url}" target="_blank">',
+      '<a href="{url}" target="_blank">',
+    ],
+    markerName: 'link',
+    rel: 'nofollow noopener noreferrer',
+    target: '_blank',
+  };
+}
+
+function createE2EITranslation(
+  translationKey: TranslationKey,
+  values: readonly PrimaryModalTranslatedValue[],
+  components: readonly PrimaryModalTranslatedComponent[],
+  layout: 'default' | 'e2ei-success' = 'default',
+): PrimaryModalTranslatedTranslation {
+  return {
+    compatibilityReplacements: [],
+    components,
+    kind: 'translation',
+    layout,
+    translationKey,
+    values,
+  };
+}
+
+function createE2EICertificateRenewalTranslation(
+  isGracePeriodOver: boolean | undefined,
+  supportUrl: string,
+): PrimaryModalTranslatedTranslation {
+  if (isGracePeriodOver) {
+    return createE2EITranslation(
+      'acme.renewCertificate.gracePeriodOver.paragraph',
+      [createE2EIUrlValue(supportUrl)],
+      [e2eiLiteralLineBreakComponent, createE2EILinkComponent(supportUrl)],
+    );
+  }
+
+  return createE2EITranslation(
+    'acme.renewCertificate.paragraph',
+    [createE2EIUrlValue(supportUrl)],
+    [e2eiLiteralLineBreakComponent, createE2EILinkComponent(supportUrl)],
+  );
+}
+
+function createE2EIErrorTranslation(isGracePeriodOver: boolean | undefined): PrimaryModalTranslatedTranslation {
+  if (isGracePeriodOver) {
+    return createE2EITranslation('acme.error.gracePeriod.paragraph', [], [e2eiMarkerLineBreakComponent]);
+  }
+
+  return createE2EITranslation('acme.error.paragraph', [], [e2eiMarkerLineBreakComponent]);
+}
+
+export enum ModalType {
+  ENROLL = 'enroll',
+  ERROR = 'error',
+  SUCCESS = 'success',
+  LOADING = 'loading',
+  CERTIFICATE_RENEWAL = 'certificate_renewal',
+  SELF_CERTIFICATE_REVOKED = 'self_certificate_revoked',
+  SNOOZE_REMINDER = 'snooze_reminder',
+  DOWNLOAD_PATH_CHANGED = 'download_path_changed',
+}
+
+interface GetModalOptions {
+  type: ModalType;
+  primaryActionFn?: () => void;
+  secondaryActionFn?: () => void;
+  hideSecondary?: boolean;
+  hidePrimary?: boolean;
+  hideClose?: boolean;
+  extraParams?: {
+    /** time left to remind the user again (only for enroll and renewal modal types). */
+    delayTime?: string;
+
+    /** Flag indicating if this is a renewal action */
+    isRenewal?: boolean;
+
+    /** Flag indicating if the grace period is over (only for enroll, renew or error modals) */
+    isGracePeriodOver?: boolean;
+  };
+}
+export const getModalOptions = (
+  {
+    type,
+    primaryActionFn,
+    secondaryActionFn,
+    hidePrimary = false,
+    hideSecondary = false,
+    hideClose = true,
+    extraParams,
+  }: GetModalOptions,
+  translate: Translate,
+) => {
+  if (!secondaryActionFn) {
+    hideSecondary = true;
+  }
+  let options: ModalOptions = {};
+  let modalType: PrimaryModalType = PrimaryModal.type.CONFIRM;
+  const supportUrl = Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION_CERTIFICATE;
+
+  const gracePeriodOverTranslation = createE2EITranslation(
+    'acme.settingsChanged.gracePeriodOver.paragraph',
+    [createE2EIUrlValue(supportUrl)],
+    [e2eiLiteralLineBreakComponent, createE2EILinkComponent(supportUrl)],
+  );
+
+  const settingsChangedTranslation = createE2EITranslation(
+    'acme.settingsChanged.paragraph',
+    [createE2EIUrlValue(supportUrl)],
+    [e2eiLiteralLineBreakComponent, createE2EILinkComponent(supportUrl)],
+  );
+
+  let successTranslationKey: TranslationKey = 'acme.done.paragraph';
+  if (extraParams?.isRenewal) {
+    successTranslationKey = 'acme.renewal.done.paragraph';
+  }
+
+  let selectedSettingsChangedTranslation = settingsChangedTranslation;
+  if (extraParams?.isGracePeriodOver) {
+    selectedSettingsChangedTranslation = gracePeriodOverTranslation;
+  }
+
+  switch (type) {
+    case ModalType.ENROLL:
+      options = {
+        text: {
+          closeBtnLabel: translate('acme.settingsChanged.button.close'),
+          translatedMessage: selectedSettingsChangedTranslation,
+          title: translate('acme.settingsChanged.headline.alt'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: translate('acme.settingsChanged.button.primary'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: translate('acme.settingsChanged.button.secondary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType =
+        hideSecondary === true || secondaryActionFn === undefined
+          ? PrimaryModal.type.ACKNOWLEDGE
+          : PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.CERTIFICATE_RENEWAL:
+      options = {
+        text: {
+          closeBtnLabel: translate('acme.renewCertificate.button.close'),
+          translatedMessage: createE2EICertificateRenewalTranslation(extraParams?.isGracePeriodOver, supportUrl),
+          title: translate('acme.renewCertificate.headline.alt'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: translate('acme.renewCertificate.button.primary'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: translate('acme.renewCertificate.button.secondary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType =
+        hideSecondary === true || secondaryActionFn === undefined
+          ? PrimaryModal.type.ACKNOWLEDGE
+          : PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.SELF_CERTIFICATE_REVOKED:
+      options = {
+        text: {
+          translatedMessage: createE2EITranslation(
+            'acme.selfCertificateRevoked.text',
+            [],
+            [e2eiLiteralLineBreakComponent],
+          ),
+          title: translate('acme.selfCertificateRevoked.title'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: translate('acme.selfCertificateRevoked.button.primary'),
+        },
+        confirmCancelBtnLabel: translate('acme.selfCertificateRevoked.button.cancel'),
+        allButtonsFullWidth: true,
+        primaryBtnFirst: true,
+      };
+      modalType = PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.SNOOZE_REMINDER:
+      options = {
+        text: {
+          closeBtnLabel: translate('acme.settingsChanged.button.close'),
+          translatedMessage: createE2EITranslation(
+            'acme.remindLater.paragraph',
+            [
+              {
+                alternatePlaceholders: [],
+                placeholder: 'delayTime',
+                runtimeText: extraParams?.delayTime ?? '0',
+              },
+              createE2EIUrlValue(supportUrl),
+            ],
+            [e2eiBoldComponent, e2eiLiteralLineBreakComponent, createE2EILinkComponent(supportUrl)],
+          ),
+          title: translate('acme.settingsChanged.headline.alt'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: translate('acme.remindLater.button.primary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType =
+        hideSecondary === true || secondaryActionFn === undefined
+          ? PrimaryModal.type.ACKNOWLEDGE
+          : PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.ERROR:
+      options = {
+        text: {
+          closeBtnLabel: translate('acme.error.button.close'),
+          translatedMessage: createE2EIErrorTranslation(extraParams?.isGracePeriodOver),
+          title: translate('acme.error.headline'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: translate('acme.error.button.primary'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: translate('acme.error.button.secondary'),
+        },
+      };
+      modalType =
+        hideSecondary === true || secondaryActionFn === undefined
+          ? PrimaryModal.type.ACKNOWLEDGE
+          : PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.LOADING:
+      options = {
+        text: {
+          title:
+            extraParams?.isRenewal === true
+              ? translate('acme.renewal.inProgress.headline')
+              : translate('acme.inProgress.headline'),
+        },
+        ...hideCloseBtn,
+      };
+      // Needs to be changed to Loading spinner Modal
+      modalType = PrimaryModalType.LOADING;
+      break;
+
+    case ModalType.SUCCESS:
+      options = {
+        text: {
+          closeBtnLabel: translate('acme.done.button.close'),
+          translatedMessage: createE2EITranslation(
+            successTranslationKey,
+            [createE2EIUrlValue(supportUrl)],
+            [e2eiBoldComponent, e2eiLiteralLineBreakComponent, createE2EILinkComponent(supportUrl)],
+            'e2ei-success',
+          ),
+          title:
+            extraParams?.isRenewal === true ? translate('acme.renewal.done.headline') : translate('acme.done.headline'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: translate('acme.done.button'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: translate('acme.done.button.secondary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType = PrimaryModal.type.ACKNOWLEDGE;
+      break;
+
+    case ModalType.DOWNLOAD_PATH_CHANGED:
+      options = {
+        hideCloseBtn: true,
+        preventClose: true,
+        text: {
+          translatedMessage: createE2EITranslation('featureConfigChangeModalDownloadPathEnabled', [], []),
+
+          title: translate('featureConfigChangeModalDownloadPathHeadline', {
+            brandName: Config.getConfig().BRAND_NAME,
+          }),
+        },
+        primaryAction: {
+          action: () => {
+            amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+          },
+        },
+      };
+      modalType = PrimaryModal.type.ACKNOWLEDGE;
+      break;
+  }
+
+  if (hideClose) {
+    options = {
+      ...options,
+      ...hideCloseBtn,
+    };
+  }
+
+  if (hideSecondary === true || secondaryActionFn === undefined) {
+    delete options.secondaryAction;
+    options = {
+      ...options,
+      ...hideSecondaryBtn,
+    };
+  }
+
+  if (hidePrimary === true) {
+    delete options.primaryAction;
+  }
+
+  return {modalOptions: options, modalType};
+};

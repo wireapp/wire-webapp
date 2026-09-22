@@ -17,7 +17,9 @@
  *
  */
 
+import {CollaboratorPermission, TeamCollaborator} from '@wireapp/api-client/lib/team';
 import {FeatureList, FEATURE_STATUS, CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team/feature/';
+import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 
 import {randomUUID} from 'crypto';
 
@@ -32,11 +34,12 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamRepository} from './TeamRepository';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function buildConnectionRepository() {
   const team = new TeamEntity(randomUUID());
   const userState = new UserState();
-  const selfUser = new User('self-id', 'self-domain');
+  const selfUser = new User('self-id', 'self-domain', translateForTest);
   selfUser.teamId = team.id;
   selfUser.isMe = true;
   selfUser.teamRole(ROLE.NONE);
@@ -48,9 +51,10 @@ function buildConnectionRepository() {
   const assetRepository = {} as AssetRepository;
   const teamService = new TeamService({} as any);
   const onMemberDeleted = jest.fn();
+  const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
   return [
-    new TeamRepository(userRepository, assetRepository, onMemberDeleted, teamService, userState, teamState),
-    {userState, teamState, userRepository, assetRepository, teamService},
+    new TeamRepository(userRepository, assetRepository, onMemberDeleted, teamService, translate, userState, teamState),
+    {userState, teamState, userRepository, assetRepository, teamService, translate},
   ] as const;
 }
 
@@ -209,6 +213,77 @@ describe('TeamRepository', () => {
       const protocols = teamRepo.getTeamSupportedProtocols();
 
       expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
+    });
+  });
+
+  describe('getRoleBadge', () => {
+    it('uses the injected translate function', () => {
+      const [teamRepo, {teamState, translate}] = buildConnectionRepository();
+
+      teamState.memberRoles({'external-user': ROLE.PARTNER});
+      teamState.memberInviters({});
+
+      expect(teamRepo.getRoleBadge('external-user')).toBe('translated:rolePartner');
+      expect(translate).toHaveBeenCalledWith('rolePartner');
+    });
+  });
+
+  describe('loadTeamAppsAndCollaborators', () => {
+    function createResolvedUser(id: string, domain: string, type: UserType = UserType.REGULAR): User {
+      const user = new User(id, domain, translateForTest);
+      user.type = type;
+      return user;
+    }
+
+    it('merges team-owned apps with app-type collaborators, and puts human collaborators in teamCollaborators', async () => {
+      const [teamRepo, {teamState, teamService, userRepository}] = buildConnectionRepository();
+      const teamId = teamState.team().id as string;
+      const domain = teamState.teamDomain();
+
+      const ownedApp = createResolvedUser('owned-app-id', domain, UserType.APP);
+      const newAppCollaborator = createResolvedUser('collab-app-id', domain, UserType.APP);
+      const humanCollaborator = createResolvedUser('collab-human-id', domain, UserType.REGULAR);
+
+      const rawAppsFromBackend = [{id: 'owned-app-id'}] as any[];
+      const collaboratorsFromBackend: TeamCollaborator[] = [
+        {user: 'collab-app-id', team: teamId, permissions: [CollaboratorPermission.CREATE_TEAM_CONVERSATION]},
+        {user: 'collab-human-id', team: teamId, permissions: [CollaboratorPermission.IMPLICIT_CONNECTION]},
+      ];
+
+      jest.spyOn(teamService, 'getApps').mockResolvedValue(rawAppsFromBackend as any);
+      jest.spyOn(teamService, 'getCollaborators').mockResolvedValue(collaboratorsFromBackend);
+
+      (userRepository as any).userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([ownedApp])};
+      const getUsersByIdMock = jest.fn().mockResolvedValue([newAppCollaborator, humanCollaborator]);
+      userRepository.getUsersById = getUsersByIdMock;
+
+      await teamRepo.loadTeamAppsAndCollaborators(teamId);
+
+      const requestedIds = getUsersByIdMock.mock.calls[0][0] as QualifiedId[];
+      expect(requestedIds).toEqual([
+        {domain, id: 'collab-app-id'},
+        {domain, id: 'collab-human-id'},
+      ]);
+
+      const teamApps = teamState.teamApps();
+      expect(teamApps).toEqual([ownedApp, newAppCollaborator]);
+
+      expect(teamState.teamCollaborators()).toEqual([humanCollaborator]);
+    });
+
+    it('resolves nothing when the team has no apps or collaborators', async () => {
+      const [teamRepo, {teamState, teamService, userRepository}] = buildConnectionRepository();
+      const teamId = teamState.team().id as string;
+
+      jest.spyOn(teamService, 'getApps').mockResolvedValue([]);
+      jest.spyOn(teamService, 'getCollaborators').mockResolvedValue([]);
+      (userRepository as any).userMapper = {mapUsersFromJson: jest.fn().mockReturnValue([])};
+      userRepository.getUsersById = jest.fn().mockResolvedValue([]);
+
+      await teamRepo.loadTeamAppsAndCollaborators(teamId);
+
+      expect(teamState.teamApps()).toEqual([]);
+      expect(teamState.teamCollaborators()).toEqual([]);
     });
   });
 });

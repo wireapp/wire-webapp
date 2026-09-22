@@ -17,10 +17,14 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {Logger, getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
+
+import type {MonotonicClock} from '../../time/monotonicClock';
 
 type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
 
@@ -28,6 +32,8 @@ export class AppInitTimings {
   private readonly timings: AppTimings;
   private readonly init: number;
   private readonly logger: Logger;
+  private readonly monotonicClock: MonotonicClock;
+  private lastRecordedStep: Maybe<AppInitTimingsStep> = Maybe.nothing();
 
   static get CONFIG() {
     return {
@@ -37,14 +43,19 @@ export class AppInitTimings {
     };
   }
 
-  constructor() {
+  constructor(monotonicClock: MonotonicClock, startedAtMilliseconds: number) {
     this.logger = getLogger('AppInitTimings');
-    this.init = window.performance.now();
+    this.init = startedAtMilliseconds;
+    this.monotonicClock = monotonicClock;
     this.timings = {};
   }
 
   get(): AppTimings {
     return {...this.timings};
+  }
+
+  get lastStep(): Maybe<AppInitTimingsStep> {
+    return this.lastRecordedStep;
   }
 
   getAppLoad(): number {
@@ -59,8 +70,13 @@ export class AppInitTimings {
   }
 
   timeStep(step: AppInitTimingsStep): void {
-    if (!this.timings[step]) {
-      this.timings[step] = window.performance.now() - this.init;
+    this.timeStepAt(step, this.monotonicClock.nowMilliseconds);
+  }
+
+  timeStepAt(step: AppInitTimingsStep, occurredAtMilliseconds: number): void {
+    if (this.timings[step] === undefined) {
+      this.timings[step] = occurredAtMilliseconds - this.init;
+      this.lastRecordedStep = Maybe.just(step);
     }
   }
 }

@@ -19,6 +19,7 @@
 
 import {RestVersion} from 'cells-sdk-ts';
 
+import type {Translate} from 'Util/localizerUtil';
 import {calculateDaysDifference, formatDateKey, formatTime, getDayPrefix, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes} from 'Util/util';
 
@@ -49,6 +50,7 @@ export const transformRestVersionToFileVersion = (
  */
 export const groupVersionsByDate = (
   versions: RestVersionWithOptionalFields[],
+  translate: Translate,
   resolveOwnerName?: ResolveOwnerName,
 ): Record<string, FileVersion[]> => {
   const now = new Date();
@@ -70,7 +72,7 @@ export const groupVersionsByDate = (
       const versionDate = new Date(timestamp);
 
       const daysDiff = calculateDaysDifference(today, versionDate);
-      const dayPrefix = getDayPrefix(daysDiff, timestamp);
+      const dayPrefix = getDayPrefix(daysDiff, timestamp, translate);
       const dateKey = formatDateKey(timestamp, dayPrefix);
 
       if (acc[dateKey] === undefined) {

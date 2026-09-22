@@ -99,9 +99,7 @@ export interface ConsumableNotificationEvent {
  * ]);
  */
 export type ConsumableNotification =
-  | ConsumableNotificationMissed
-  | ConsumableNotificationEvent
-  | ConsumableNotificationSynchronization;
+  ConsumableNotificationMissed | ConsumableNotificationEvent | ConsumableNotificationSynchronization;
 
 const BackendEventSchema = z.object({
   id: z.string(),

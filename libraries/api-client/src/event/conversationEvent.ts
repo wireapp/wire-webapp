@@ -35,6 +35,7 @@ import {
   ConversationMLSMessageAddData,
 } from '../conversation/data/';
 import {ConversationAddPermissionUpdateData} from '../conversation/data/conversationAddPermissionUpdateData';
+import {ConversationAdminlessDeleteReminderData} from '../conversation/data/conversationAdminlessDeleteReminderData';
 import {ConversationMLSResetData} from '../conversation/data/conversationMlsResetData';
 import {ConversationProtocolUpdateData} from '../conversation/data/conversationProtocolUpdateData';
 import {QualifiedId} from '../user';
@@ -46,10 +47,16 @@ export enum CONVERSATION_EVENT {
   CODE_UPDATE = 'conversation.code-update',
   CONNECT_REQUEST = 'conversation.connect-request',
   CREATE = 'conversation.create',
+  CREATE_MEETING = 'conversation.create-meeting',
   DELETE = 'conversation.delete',
+  DELETE_MEETING = 'conversation.delete-meeting',
+  SYSTEM_DELETE = 'conversation.system.delete',
+  ADMINLESS_DELETE_REMINDER = 'conversation.adminless-reminder',
+  SYSTEM_ADMINLESS_DELETE_REMINDER = 'conversation.system.adminless-reminder',
   MEMBER_JOIN = 'conversation.member-join',
   MEMBER_LEAVE = 'conversation.member-leave',
   MEMBER_UPDATE = 'conversation.member-update',
+  SYSTEM_MEMBER_UPDATE = 'conversation.system.member-update',
   MESSAGE_TIMER_UPDATE = 'conversation.message-timer-update',
   OTR_MESSAGE_ADD = 'conversation.otr-message-add',
   MLS_MESSAGE_ADD = 'conversation.mls-message-add',
@@ -79,6 +86,7 @@ export type ConversationEventData =
   | ConversationRenameData
   | ConversationTypingData
   | ConversationAddPermissionUpdateData
+  | ConversationAdminlessDeleteReminderData
   | null;
 
 export type ConversationEvent =
@@ -87,7 +95,10 @@ export type ConversationEvent =
   | ConversationCodeDeleteEvent
   | ConversationConnectRequestEvent
   | ConversationCreateEvent
+  | ConversationCreateMeetingEvent
   | ConversationDeleteEvent
+  | ConversationDeleteMeetingEvent
+  | ConversationAdminlessDeleteReminderEvent
   | ConversationMemberJoinEvent
   | ConversationMemberLeaveEvent
   | ConversationMemberUpdateEvent
@@ -142,9 +153,30 @@ export interface ConversationCreateEvent extends BaseConversationEvent {
   type: CONVERSATION_EVENT.CREATE;
 }
 
-export interface ConversationDeleteEvent extends BaseConversationEvent {
+export interface ConversationCreateMeetingEvent extends BaseConversationEvent {
+  data: ConversationCreateData;
+  type: CONVERSATION_EVENT.CREATE_MEETING;
+}
+
+export interface ConversationDeleteEvent extends Omit<BaseConversationEvent, 'from'> {
   data: null;
-  type: CONVERSATION_EVENT.DELETE;
+  /** Not present for backend/system-initiated deletions, e.g. `conversation.system.delete`. */
+  from?: string;
+  type: CONVERSATION_EVENT.DELETE | CONVERSATION_EVENT.SYSTEM_DELETE;
+}
+
+export interface ConversationDeleteMeetingEvent extends Omit<BaseConversationEvent, 'from'> {
+  data: null;
+  /** Not present for backend/system-initiated deletions. */
+  from?: string;
+  type: CONVERSATION_EVENT.DELETE_MEETING;
+}
+
+export interface ConversationAdminlessDeleteReminderEvent extends Omit<BaseConversationEvent, 'from'> {
+  data: ConversationAdminlessDeleteReminderData;
+  /** Not present for backend/system-initiated reminders, e.g. `conversation.system.adminless-reminder`. */
+  from?: string;
+  type: CONVERSATION_EVENT.ADMINLESS_DELETE_REMINDER | CONVERSATION_EVENT.SYSTEM_ADMINLESS_DELETE_REMINDER;
 }
 
 export interface ConversationMemberJoinEvent extends BaseConversationEvent {
@@ -157,9 +189,11 @@ export interface ConversationMemberLeaveEvent extends BaseConversationEvent {
   type: CONVERSATION_EVENT.MEMBER_LEAVE;
 }
 
-export interface ConversationMemberUpdateEvent extends BaseConversationEvent {
+export interface ConversationMemberUpdateEvent extends Omit<BaseConversationEvent, 'from'> {
   data: ConversationMemberUpdateData;
-  type: CONVERSATION_EVENT.MEMBER_UPDATE;
+  /** Not present for backend/system-initiated updates, e.g. `conversation.system.member-update`. */
+  from?: string;
+  type: CONVERSATION_EVENT.MEMBER_UPDATE | CONVERSATION_EVENT.SYSTEM_MEMBER_UPDATE;
 }
 
 export interface ConversationMessageTimerUpdateEvent extends BaseConversationEvent {

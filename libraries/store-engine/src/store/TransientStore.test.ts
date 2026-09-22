@@ -123,7 +123,6 @@ describe('store.TransientStore', () => {
 
     afterEach(() => jest.useRealTimers());
 
-    // eslint-disable-next-line jest/no-done-callback
     it('publishes an event when an entity expires.', async () => {
       expect.assertions(2);
       store.on(TransientStore.TOPIC.EXPIRED, expiredBundle => {
@@ -145,11 +144,10 @@ describe('store.TransientStore', () => {
 
     it('keeps the same timer when being called multiple times.', async () => {
       const bundle = await store.set(primaryKey, entity, minuteInMillis);
-      const timeoutID = bundle.timeoutID as number;
       const cacheKey = store['constructCacheKey'](primaryKey);
 
       const newBundle = await store['startTimer'](cacheKey);
-      expect(newBundle.timeoutID).toBe(timeoutID);
+      expect(newBundle.timeoutID).toBe(bundle.timeoutID);
     });
   });
 });

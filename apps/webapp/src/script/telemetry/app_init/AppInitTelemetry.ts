@@ -17,44 +17,60 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
 import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import {AppInitTimings} from './AppInitTimings';
 import type {AppInitTimingsStep} from './AppInitTimingsStep';
 
-export class AppInitTelemetry {
-  private readonly timings: AppInitTimings;
-  private readonly statistics: AppInitStatistics;
+import type {MonotonicClock} from '../../time/monotonicClock';
 
-  constructor() {
-    this.timings = new AppInitTimings();
-    this.statistics = new AppInitStatistics();
+export class AppInitTelemetry {
+  private readonly appInitTimings: AppInitTimings;
+  private readonly appInitStatistics: AppInitStatistics;
+
+  constructor(monotonicClock: MonotonicClock, startedAtMilliseconds: number) {
+    this.appInitTimings = new AppInitTimings(monotonicClock, startedAtMilliseconds);
+    this.appInitStatistics = new AppInitStatistics();
   }
 
   addStatistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
-    this.statistics.add(statistic, value, bucket_size);
+    this.appInitStatistics.add(statistic, value, bucket_size);
   }
 
   getStatistics(): AppStatistics {
-    return this.statistics.get();
+    return this.appInitStatistics.get();
+  }
+
+  get timings(): Partial<Record<AppInitTimingsStep, number>> {
+    return this.appInitTimings.get();
+  }
+
+  get lastStep(): Maybe<AppInitTimingsStep> {
+    return this.appInitTimings.lastStep;
   }
 
   logStatistics(): void {
-    this.statistics.log();
+    this.appInitStatistics.log();
   }
 
   logTimings(): void {
-    this.timings.log();
+    this.appInitTimings.log();
   }
 
   report(): number {
     this.logStatistics();
     this.logTimings();
 
-    return this.timings.getAppLoad();
+    return this.appInitTimings.getAppLoad();
   }
 
   timeStep(step: AppInitTimingsStep): void {
-    return this.timings.timeStep(step);
+    return this.appInitTimings.timeStep(step);
+  }
+
+  timeStepAt(step: AppInitTimingsStep, occurredAtMilliseconds: number): void {
+    return this.appInitTimings.timeStepAt(step, occurredAtMilliseconds);
   }
 }

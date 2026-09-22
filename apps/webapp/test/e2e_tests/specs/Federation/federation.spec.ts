@@ -1,4 +1,5 @@
 import {Page} from 'playwright/test';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
@@ -7,20 +8,34 @@ import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} f
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {createAndSaveBackup, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
-test.describe('Federation', () => {
-  const federationBaseUrl = process.env.FEDERATION_WEBAPP_URL!;
-  const federationApiManager = new ApiManagerE2E({
-    backendUrl: process.env.FEDERATION_BACKEND_URL!,
-    basicAuth: process.env.FEDERATION_BASIC_AUTH!,
-  });
+function getRequiredEnvironmentVariable(variableName: string): string {
+  const variableValue = process.env[variableName];
+  if (!isNonEmptyString(variableValue)) {
+    throw new Error(`Missing required environment variable: ${variableName}`);
+  }
 
+  return variableValue;
+}
+
+test.describe('Federation', () => {
+  let federationBaseUrl: string;
+  let federationApiManager: ApiManagerE2E;
   let normalUser: User;
   let federatedUser: User;
   const groupName = 'Federated group';
 
+  test.beforeAll(() => {
+    federationBaseUrl = getRequiredEnvironmentVariable('FEDERATION_WEBAPP_URL');
+    federationApiManager = new ApiManagerE2E({
+      backendUrl: getRequiredEnvironmentVariable('FEDERATION_BACKEND_URL'),
+      basicAuth: getRequiredEnvironmentVariable('FEDERATION_BASIC_AUTH'),
+    });
+  });
+
   test.beforeEach(async ({api}) => {
     normalUser = (await createTeam(api, 'Normal Team', {features: {conferenceCalling: true, mls: true}})).owner;
-    federatedUser = (await createTeam(federationApiManager, 'Federated Team', {features: {mls: true}})).owner;
+    // The federation environment has mls enabled and set as default protocol by default, no need to manually unlock it or attempt to upgrade the team
+    federatedUser = (await createTeam(federationApiManager, 'Federated Team')).owner;
   });
 
   test.afterEach(async ({api}) => {
@@ -43,7 +58,7 @@ test.describe('Federation', () => {
         const messageWithImage = federatedUserPages
           .conversation()
           .getMessage({sender: normalUser})
-          .filter({has: federatedUserPage.getByRole('img')});
+          .filter({has: federatedUserPage.getByTestId('image-asset')});
         await expect(messageWithImage).toBeVisible();
       },
     },
@@ -86,7 +101,7 @@ test.describe('Federation', () => {
         const messageWithAudio = federatedUserPages
           .conversation()
           .getMessage({sender: normalUser})
-          .filter({has: federatedUserPage.locator('[data-uie-name="audio-asset"]')});
+          .filter({has: federatedUserPage.getByTestId('audio-asset')});
         await expect(messageWithAudio).toBeVisible();
       },
     },
@@ -104,7 +119,7 @@ test.describe('Federation', () => {
         const messageWithVideo = federatedUserPages
           .conversation()
           .getMessage({sender: normalUser})
-          .filter({has: federatedUserPage.locator('[data-uie-name="video-asset"]')});
+          .filter({has: federatedUserPage.getByTestId('video-asset')});
         await expect(messageWithVideo).toBeVisible();
       },
     },
@@ -122,7 +137,7 @@ test.describe('Federation', () => {
         const messageWithFile = federatedUserPages
           .conversation()
           .getMessage({sender: normalUser})
-          .filter({has: federatedUserPage.locator('[data-uie-name="file-asset"]')});
+          .filter({has: federatedUserPage.getByTestId('file-asset')});
         await expect(messageWithFile).toBeVisible();
       },
     },
@@ -207,6 +222,8 @@ test.describe('Federation', () => {
     'I want to share all possible assets in a federated group',
     {tag: ['@TC-8758', '@regression']},
     async ({createPage}) => {
+      test.setTimeout(150_000);
+
       const [normalUserPage, federatedUserPage] = await Promise.all([
         createPage(withLogin(normalUser)),
         createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
@@ -296,6 +313,8 @@ test.describe('Federation', () => {
     'I want to import my backup of conversations with users from different BE and see the conversation contents',
     {tag: ['@TC-3128', '@regression']},
     async ({createPage}, testInfo) => {
+      test.setTimeout(150_000);
+
       const [normalUserPage, federatedUserPage] = await Promise.all([
         createPage(withLogin(normalUser)),
         createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
@@ -316,20 +335,26 @@ test.describe('Federation', () => {
       });
 
       await test.step('Exchange direct messages and verify receipt', async () => {
-        await normalUserPages.conversationList().getConversation(federatedUser.fullName, {protocol: 'mls'}).open();
         await federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}).open();
+        const oneOnOneConversation = await normalUserPages
+          .conversationList()
+          .getConversation(federatedUser.fullName, {protocol: 'mls'})
+          .open();
 
         await normalUserPages.conversation().sendMessage('Message from normal user');
         await federatedUserPages.conversation().sendMessage('Message from federated user');
 
         await expect(normalUserPages.conversation().getMessage({sender: federatedUser})).toBeVisible();
         await expect(federatedUserPages.conversation().getMessage({sender: normalUser})).toBeVisible();
+
+        // Wait for messages to be read before exporting backup
+        await expect(oneOnOneConversation.unreadIndicator).not.toBeVisible();
       });
 
       await test.step('Create a group chat and exchange text and image messages', async () => {
         await createGroup(normalUserPages, groupName, [federatedUser]);
         await federatedUserPages.conversationList().getConversation(groupName).open();
-        await normalUserPages.conversationList().getConversation(groupName).open();
+        const groupConversation = await normalUserPages.conversationList().getConversation(groupName).open();
 
         await federatedUserPages.conversation().sendMessage('Group message from federated user');
         await shareAssetHelper(
@@ -345,8 +370,11 @@ test.describe('Federation', () => {
         const messageWithImage = normalUserPages
           .conversation()
           .getMessage({sender: federatedUser})
-          .filter({has: normalUserPage.getByRole('img')});
+          .filter({has: normalUserPage.getByTestId('image-asset')});
         await expect(messageWithImage).toBeVisible();
+
+        // Wait for messages to be read before exporting backup
+        await expect(groupConversation.unreadIndicator).not.toBeVisible();
       });
 
       const backupName = await test.step('Create and save backup for the normal user', async () => {
@@ -378,17 +406,23 @@ test.describe('Federation', () => {
           .conversationList()
           .getConversation(federatedUser.fullName, {protocol: 'mls'})
           .open();
+        await expect(normalUserDevice2Pages.conversation().getMessage({sender: normalUser})).toBeVisible();
         await expect(normalUserDevice2Pages.conversation().getMessage({sender: federatedUser})).toBeVisible();
       });
 
       await test.step('Verify group messages and media are restored on the new device', async () => {
         await normalUserDevice2Pages.conversationList().getConversation(groupName).open();
-        await expect(normalUserDevice2Pages.conversation().getMessage({sender: federatedUser})).toBeVisible();
+
+        await expect(
+          normalUserDevice2Pages
+            .conversation()
+            .getMessage({sender: federatedUser, content: 'Group message from federated user'}),
+        ).toBeVisible();
 
         const messageWithImage2Device = normalUserDevice2Pages
           .conversation()
-          .getMessage({sender: normalUser})
-          .filter({has: normalUserDevice2.getByRole('img')});
+          .getMessage({sender: federatedUser})
+          .filter({has: normalUserDevice2.getByTestId('image-asset')});
         await expect(messageWithImage2Device).toBeVisible();
       });
     },
@@ -493,6 +527,7 @@ test.describe('Federation', () => {
 
   testData.forEach(({title, tags, type}) => {
     test(title, {tag: tags}, async ({createPage}) => {
+      test.setTimeout(120_000);
       const [normalUserPage, federatedUserPage] = await Promise.all([
         createPage(withLogin(normalUser)),
         createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),

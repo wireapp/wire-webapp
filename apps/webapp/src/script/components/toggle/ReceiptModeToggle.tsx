@@ -22,7 +22,7 @@ import {useRef} from 'react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import cx from 'classnames';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import * as Icon from '../icon';
 
@@ -33,6 +33,7 @@ interface ReceiptModeToggleProps {
 }
 
 const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}: ReceiptModeToggleProps) => {
+  const {translate} = useApplicationContext();
   const updateValue = () => {
     if (!disabled) {
       const newReceiptMode = receiptMode !== RECEIPT_MODE.ON ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
@@ -61,7 +62,7 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}
           </span>
 
           <span className="panel__action-item__summary">
-            <span className="panel__action-item__text">{t('receiptToggleLabel')}</span>
+            <span className="panel__action-item__text">{translate('receiptToggleLabel')}</span>
           </span>
         </label>
 
@@ -85,7 +86,7 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}
           disabled={disabled}
         >
           <span className="button-label__switch" />
-          <span className="visually-hidden">{t('receiptToggleLabel')}</span>
+          <span className="visually-hidden">{translate('receiptToggleLabel')}</span>
         </button>
       </div>
 
@@ -93,7 +94,7 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}
         className="panel__info-text panel__info-text--margin panel__action-item__status"
         data-uie-name="status-info-toggle-receipt-mode"
       >
-        {t('receiptToggleInfo')}
+        {translate('receiptToggleInfo')}
       </p>
     </>
   );

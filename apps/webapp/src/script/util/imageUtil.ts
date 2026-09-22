@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 export const stripImageExifData = async (image: Blob): Promise<Blob> => {
@@ -52,7 +52,7 @@ const drawImageOnCanvas = (img: HTMLImageElement): HTMLCanvasElement => {
   canvas.height = img.height;
 
   const ctx = canvas.getContext('2d');
-  if (!ctx) {
+  if (isNull(ctx)) {
     throw new Error('Failed to get 2D context from canvas');
   }
 
@@ -61,10 +61,10 @@ const drawImageOnCanvas = (img: HTMLImageElement): HTMLCanvasElement => {
 };
 
 const canvasToBlob = (canvas: HTMLCanvasElement, type: string): Promise<Blob> => {
-  const validType = is.nonEmptyString(type) ? type : 'image/png';
+  const validType = isNonEmptyString(type) ? type : 'image/png';
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => {
-      if (blob) {
+      if (!isNull(blob)) {
         resolve(blob);
       } else {
         reject(new Error('Failed to convert canvas to Blob'));
@@ -174,13 +174,13 @@ export const isPreviewableImage = ({
   extension?: string;
 }): boolean => {
   const normalizedMimeType = mimeType?.toLowerCase();
-  if (is.nonEmptyString(normalizedMimeType) && PREVIEWABLE_IMAGE_MIME_TYPES.has(normalizedMimeType)) {
+  if (isNonEmptyString(normalizedMimeType) && PREVIEWABLE_IMAGE_MIME_TYPES.has(normalizedMimeType)) {
     return true;
   }
 
   const normalizedExtension = extension?.toLowerCase() ?? fileName?.split('.').pop()?.toLowerCase();
 
-  return is.nonEmptyString(normalizedExtension) && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
+  return isNonEmptyString(normalizedExtension) && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
 };
 
 type GetBestPreviewSourceOptions = {

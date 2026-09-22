@@ -19,6 +19,7 @@
 
 export type ConfigGeneratorParams = {
   commit: string;
+  assetVersion: string;
   version: string;
   env: string;
   urls: {

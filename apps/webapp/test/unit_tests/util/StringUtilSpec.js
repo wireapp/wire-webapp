@@ -31,7 +31,7 @@ import {
   obfuscate,
   replaceAccents,
   generateRandomPassword,
-} from 'Util/StringUtil';
+} from 'Util/stringUtil';
 
 import {lorem_ipsum} from '../../api/payloads';
 

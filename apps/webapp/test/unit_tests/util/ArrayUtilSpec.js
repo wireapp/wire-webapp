@@ -17,7 +17,7 @@
  *
  */
 
-import {chunk, getNextItem, interpolate, isLastItem, iterateIndex, uniquify, flatten, partition} from 'Util/ArrayUtil';
+import {chunk, getNextItem, interpolate, isLastItem, iterateIndex, uniquify, flatten, partition} from 'Util/arrayUtil';
 
 describe('ArrayUtil', () => {
   describe('chunk', () => {

@@ -5,43 +5,7 @@
     "docker": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ./bin/push_docker.js"
-      }
-    },
-    "changelog-production": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "ts-node --project ./tsconfig.bin.json ./bin/changelog.ts production 2>&1 | grep -v '\\[dotenv@'"
-      }
-    },
-    "changelog-staging": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "ts-node --project ./tsconfig.bin.json ./bin/changelog.ts staging 2>&1 | grep -v '\\[dotenv@'"
-      }
-    },
-    "changelog-rc": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "ts-node --project ./tsconfig.bin.json ./bin/changelog.ts production master 2>&1 | grep -v '\\[dotenv@'"
-      }
-    },
-    "release-staging": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "git checkout master && git pull origin master && ts-node --project ./tsconfig.bin.json ./bin/release_tag.ts staging"
-      }
-    },
-    "release-production": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "git checkout master && git pull origin master && ts-node --project ./tsconfig.bin.json ./bin/release_tag.ts production"
-      }
-    },
-    "release-custom": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx ts-node --project ./tsconfig.bin.json ./bin/release_tag.ts"
+        "command": "node ./tools/docker-publication/push_docker.js"
       }
     },
     "clean-jest": {
@@ -54,7 +18,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "echo \"workspace-tools has no tests\""
+        "command": "jest --config ./tools/jest.config.js"
       }
     },
     "build": {
@@ -67,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "echo \"workspace-tools has no lint\""
+        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/i18n tools/release-appearance 'tools/release-metadata/web*Version*.ts' tools/release-cli/webappVersionSynchronization.mts 'tools/**/*.test.ts'"
       }
     },
     "e2e": {
@@ -79,7 +43,7 @@
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --project ./tsconfig.bin.json --noEmit"
+        "command": "tsc --project ./tsconfig.tools.json --noEmit && tsc --project ./tools/release-appearance/tsconfig.json --noEmit && tsc --project ./tsconfig.release-cli.json --noEmit"
       }
     }
   },

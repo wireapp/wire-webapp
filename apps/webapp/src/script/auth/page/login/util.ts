@@ -17,18 +17,20 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isString} from '@sindresorhus/is';
 import {DomainRedirect} from '@wireapp/api-client/lib/account/domainRedirect';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {noop} from 'noop-esm';
 import {Dispatch, UnknownAction} from 'redux';
 import {match, P} from 'ts-pattern';
 
+import {Config} from 'src/script/Config';
 import {APIClient} from 'src/script/service/apiClientSingleton';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
-import {ValidationError} from '../../module/action/ValidationError';
+import {ValidationError} from '../../module/action/validationError';
 import {ConversationState} from '../../module/reducer/conversationReducer';
 import {QUERY_KEY, ROUTE} from '../../route';
 
@@ -39,7 +41,7 @@ export const requiresPasswordModal = (
 ): boolean =>
   !isOpen &&
   (hasPassword ||
-    (!is.nullOrUndefined(conversationError) &&
+    (!isNullOrUndefined(conversationError) &&
       conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD));
 
 export const buildDomainRedirectUrl = (welcomeUrl: string, existingQuery: string, clientType: ClientType): string => {
@@ -76,12 +78,12 @@ export const handleSSOBackendError = (
         SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR,
         BackendErrorLabel.NOT_FOUND,
       ),
-      () => {},
+      noop,
     )
     .otherwise(() => {
       setSsoError(error);
       const isValidationError = Object.values(ValidationError.ERROR).some(
-        errorType => is.nonEmptyString(error.label) && error.label.endsWith(errorType),
+        errorType => isNonEmptyString(error.label) && error.label.endsWith(errorType),
       );
       if (!isValidationError) {
         console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
@@ -106,7 +108,7 @@ export const handleEnterpriseLogin = async ({
 }) => {
   const ssoCodeResponse = await apiClient.api.account.getSSOCodeByEmail(email);
 
-  if (is.string(ssoCodeResponse.sso_code)) {
+  if (isString(ssoCodeResponse.sso_code)) {
     return await loginWithSSO(ssoCodeResponse.sso_code, password);
   }
 
@@ -122,7 +124,9 @@ export const handleEnterpriseLogin = async ({
       res => {
         dispatch(
           ROOT_ACTIONS.authAction.pushAccountRegistrationData({
-            accountCreationEnabled: res.domain_redirect !== DomainRedirect.NO_REGISTRATION,
+            accountCreationEnabled:
+              res.domain_redirect !== DomainRedirect.NO_REGISTRATION &&
+              Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION,
             shouldDisplayWarning: res.domain_redirect === DomainRedirect.NO_REGISTRATION && res.due_to_existing_account,
           }) as unknown as UnknownAction,
         );

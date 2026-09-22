@@ -1,0 +1,26 @@
+---
+name: Notify Deployoholics
+description: Send a message to the Deployoholics Wire channel.
+
+inputs:
+  webhook-url:
+    description: Deployoholics Wire webhook URL.
+    required: true
+  text:
+    description: Wire message text.
+    required: true
+  status:
+    description: Wire notification status.
+    required: false
+    default: failure
+
+runs:
+  using: composite
+  steps:
+    - name: Send Wire notification
+      uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.webhook-url }}
+      with:
+        status: ${{ inputs.status }}
+        text: ${{ inputs.text }}

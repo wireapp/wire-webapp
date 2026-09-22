@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {replaceReactComponents} from './reactLocalizerUtil';
+import {createReactTranslationMarker, renderReactTranslation, replaceReactComponents} from './reactLocalizerUtil';
 
 describe('replaceReactComponents', () => {
   it('return the string untouched if no replacements are given', () => {
@@ -160,5 +160,177 @@ describe('replaceReactComponents', () => {
 
     expect(result).toHaveLength(7);
     expect(getByTestId('parent').textContent).toEqual('Hello Jake, Paul and Marco!');
+  });
+
+  it('renders runtime values as text inside and outside translated components', () => {
+    const senderNameMarker = createReactTranslationMarker('sender-name');
+    const senderName = 'R&D <Test>';
+    const translatedText = `<strong>${senderNameMarker.substitution}</strong> started the conversation with ${senderNameMarker.substitution}`;
+    const result = renderReactTranslation({
+      translatedText,
+      componentReplacements: [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(children) {
+            return <strong>{children}</strong>;
+          },
+        },
+      ],
+      nodeReplacements: [],
+      valueReplacements: [{marker: senderNameMarker, runtimeText: senderName}],
+    });
+
+    const {container} = render(<p>{result}</p>);
+    const actualText = container.querySelector('p')?.textContent;
+    const expectedText = 'R&D <Test> started the conversation with R&D <Test>';
+
+    expect(actualText).toBe(expectedText);
+    expect(container.querySelectorAll('strong')).toHaveLength(1);
+    expect(container.querySelector('test')).toBeNull();
+  });
+
+  it('renders a trusted React node outside translated components', () => {
+    const iconMarker = createReactTranslationMarker('permission-icon');
+    const result = renderReactTranslation({
+      translatedText: `Allow ${iconMarker.substitution} access`,
+      componentReplacements: [],
+      nodeReplacements: [
+        {
+          marker: iconMarker,
+          render() {
+            return <span data-uie-name="permission-icon" />;
+          },
+        },
+      ],
+      valueReplacements: [],
+    });
+
+    const {getByTestId} = render(<p>{result}</p>);
+
+    expect(getByTestId('permission-icon')).toBeInTheDocument();
+  });
+
+  it('renders a trusted React node inside a translated component', () => {
+    const lineBreakMarker = createReactTranslationMarker('line-break');
+    const result = renderReactTranslation({
+      translatedText: `<strong>First${lineBreakMarker.substitution}Second</strong>`,
+      componentReplacements: [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(children) {
+            return <strong>{children}</strong>;
+          },
+        },
+      ],
+      nodeReplacements: [
+        {
+          marker: lineBreakMarker,
+          render() {
+            return <br data-uie-name="line-break" />;
+          },
+        },
+      ],
+      valueReplacements: [],
+    });
+
+    const {container, getByTestId} = render(<p>{result}</p>);
+    const strongElement = container.querySelector('strong');
+
+    expect(getByTestId('line-break')).toBeInTheDocument();
+    expect(strongElement).toHaveTextContent('FirstSecond');
+  });
+
+  it('renders multiple occurrences of the same trusted React node marker', () => {
+    const iconMarker = createReactTranslationMarker('permission-icon');
+    const result = renderReactTranslation({
+      translatedText: `${iconMarker.substitution} Camera ${iconMarker.substitution} Microphone`,
+      componentReplacements: [],
+      nodeReplacements: [
+        {
+          marker: iconMarker,
+          render() {
+            return <span data-uie-name="permission-icon" />;
+          },
+        },
+      ],
+      valueReplacements: [],
+    });
+
+    const {getAllByTestId} = render(<p>{result}</p>);
+
+    expect(getAllByTestId('permission-icon')).toHaveLength(2);
+  });
+
+  it('renders runtime text and trusted React nodes in translator-controlled order', () => {
+    const userNameMarker = createReactTranslationMarker('user-name');
+    const iconMarker = createReactTranslationMarker('permission-icon');
+    const result = renderReactTranslation({
+      translatedText: `${userNameMarker.substitution} ${iconMarker.substitution} was granted`,
+      componentReplacements: [],
+      nodeReplacements: [
+        {
+          marker: iconMarker,
+          render() {
+            return <span data-uie-name="permission-icon" />;
+          },
+        },
+      ],
+      valueReplacements: [{marker: userNameMarker, runtimeText: 'R&D <Test>'}],
+    });
+
+    const {container, getByTestId} = render(<p>{result}</p>);
+
+    expect(container.querySelector('test')).toBeNull();
+    expect(container.querySelector('p')).toHaveTextContent('R&D <Test> was granted');
+    expect(getByTestId('permission-icon')).toBeInTheDocument();
+  });
+
+  it('keeps translation-looking runtime values literal', () => {
+    const senderNameMarker = createReactTranslationMarker('sender-name');
+    const senderName = '[bold]Admin[/bold]';
+    const result = renderReactTranslation({
+      translatedText: `<strong>${senderNameMarker.substitution}</strong> started the conversation`,
+      componentReplacements: [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(children) {
+            return <strong>{children}</strong>;
+          },
+        },
+      ],
+      nodeReplacements: [],
+      valueReplacements: [{marker: senderNameMarker, runtimeText: senderName}],
+    });
+
+    const {container} = render(<p>{result}</p>);
+
+    expect(container.querySelector('p')?.textContent).toBe('[bold]Admin[/bold] started the conversation');
+    expect(container.querySelectorAll('strong')).toHaveLength(1);
+  });
+
+  it('keeps unsupported translation markup as text', () => {
+    const result = renderReactTranslation({
+      translatedText: '<img src="example"><strong>Started</strong>',
+      componentReplacements: [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(children) {
+            return <strong>{children}</strong>;
+          },
+        },
+      ],
+      nodeReplacements: [],
+      valueReplacements: [],
+    });
+
+    const {container} = render(<p>{result}</p>);
+
+    expect(container.querySelector('p')?.textContent).toBe('<img src="example">Started');
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.querySelector('strong')).toHaveTextContent('Started');
   });
 });

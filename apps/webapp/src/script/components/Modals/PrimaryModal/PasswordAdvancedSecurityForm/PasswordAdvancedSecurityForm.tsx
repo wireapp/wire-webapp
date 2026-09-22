@@ -21,9 +21,10 @@ import type {ReactElement, ChangeEvent, FormEvent} from 'react';
 
 import {Input} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 interface PasswordAdvancedSecurityFormProps {
+  readonly translate: Translate;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
   inputPlaceholder: string;
@@ -34,6 +35,7 @@ interface PasswordAdvancedSecurityFormProps {
 }
 
 export const PasswordAdvancedSecurityForm = ({
+  translate,
   onSubmit,
   inputValue,
   inputPlaceholder,
@@ -47,8 +49,8 @@ export const PasswordAdvancedSecurityForm = ({
       <Input
         id="modal_pswd_with_rules"
         type="password"
-        showTogglePasswordLabel={t('showTogglePasswordLabel')}
-        hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+        showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+        hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
         value={inputValue}
         placeholder={inputPlaceholder}
         required

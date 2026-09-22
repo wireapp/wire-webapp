@@ -17,7 +17,10 @@
  *
  */
 
-import {applockRefactoredFeatureToggleName, meetingsFeatureToggleName} from './startupFeatureToggleNames';
+import {
+  applockRefactoredFeatureToggleName,
+  conversationListCollapseFeatureToggleName,
+} from './startupFeatureToggleNames';
 import {startupFeatureToggleQueryParameterName} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
 
@@ -36,12 +39,26 @@ describe('updateLocationSearchForStartupFeatureToggle', () => {
 
   it('removes a feature toggle and preserves other enabled toggles', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${meetingsFeatureToggleName}`,
+      locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${conversationListCollapseFeatureToggleName}`,
       featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: false,
     });
 
-    expect(updatedLocationSearch).toBe(`?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`);
+    expect(updatedLocationSearch).toBe(
+      `?${startupFeatureToggleQueryParameterName}=${conversationListCollapseFeatureToggleName}`,
+    );
+  });
+
+  it('adds a startup feature toggle while preserving other enabled toggles', () => {
+    const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
+      locationSearch: `?${startupFeatureToggleQueryParameterName}=${conversationListCollapseFeatureToggleName}`,
+      featureToggleName: applockRefactoredFeatureToggleName,
+      shouldEnableFeatureToggle: true,
+    });
+
+    expect(updatedLocationSearch).toBe(
+      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}%2C${conversationListCollapseFeatureToggleName}`,
+    );
   });
 
   it('removes only the startup feature parameter when the last feature toggle is disabled', () => {

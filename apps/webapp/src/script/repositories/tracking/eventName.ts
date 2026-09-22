@@ -40,6 +40,8 @@ export const EventName = {
     CALLING_UI_SIZE: 'ui.calling_ui_size',
     SIDEBAR_COLLAPSE: 'ui.sidebar_collapse',
     SIDEBAR_UNCOLLAPSE: 'ui.sidebar_uncollapse',
+    CONVERSATION_LIST_COLLAPSE: 'ui.conversation_list_collapse',
+    CONVERSATION_LIST_UNCOLLAPSE: 'ui.conversation_list_uncollapse',
     CLICKED: {
       SETTINGS_MIGRATION: 'ui.clicked_settings_migration',
       PERSONAL_MIGRATION_CTA: 'ui.clicked_personal_migration_cta',

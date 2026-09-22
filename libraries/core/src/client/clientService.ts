@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {
   ClientCapability,
@@ -35,6 +36,7 @@ import {CRUDEngine} from '@wireapp/store-engine';
 
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
+import {wipeCoreCryptoDb} from '../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 
@@ -129,6 +131,9 @@ export class ClientService {
       if (notFoundOnBackend && this.storeEngine !== undefined) {
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
         await this.proteusService.wipe();
+        // The MLS/CoreCrypto keystore is scoped to the user (not the client id), so it survives
+        // a plain proteus wipe and would otherwise let a re-registered client inherit stale MLS key material.
+        await wipeCoreCryptoDb(this.storeEngine);
         if (shouldDeleteWholeDatabase) {
           await this.storeEngine.clearTables();
         }
@@ -154,10 +159,12 @@ export class ClientService {
   public async synchronizeClients(currentClient: string): Promise<MetaClient[]> {
     const registeredClients = await this.backend.getClients();
     const filteredClients = registeredClients.filter(client => client.id !== currentClient);
-    return this.database.createClientList(
-      {id: this.apiClient.context!.userId, domain: this.apiClient.context!.domain ?? ''},
-      filteredClients,
-    );
+    const context = this.apiClient.context;
+    if (isUndefined(context)) {
+      throw new Error('Context is not set.');
+    }
+
+    return this.database.createClientList({id: context.userId, domain: context.domain ?? ''}, filteredClients);
   }
 
   // TODO: Split functionality into "create" and "register" client
@@ -167,7 +174,7 @@ export class ClientService {
     {prekeys, lastPrekey}: InitialPrekeys,
     useLegacyNotificationStream: boolean = true,
   ): Promise<RegisteredClient> {
-    if (!this.apiClient.context) {
+    if (this.apiClient.context === undefined) {
       throw new Error('Context is not set.');
     }
 

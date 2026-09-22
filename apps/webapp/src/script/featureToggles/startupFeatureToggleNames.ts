@@ -18,13 +18,19 @@
  */
 
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
-export const meetingsFeatureToggleName = 'meetings';
+export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
+export const viewerPermissionFeatureToggleName = 'viewer-permission';
+export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
+export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upload';
+export const meetingsM2FeatureToggleName = 'meetings-m2';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
-  meetingsFeatureToggleName,
+  conversationListCollapseFeatureToggleName,
+  viewerPermissionFeatureToggleName,
+  disableMessagePreprocessingFeatureToggleName,
+  sharedDriveDirectUploadFeatureToggleName,
+  meetingsM2FeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

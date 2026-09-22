@@ -50,9 +50,7 @@ export type HandledEventPayload = {
  * - handled: The event was handled and its payload will be emitted
  */
 export type HandledEventResult =
-  | {status: 'unhandled'}
-  | {status: 'ignored'}
-  | {status: 'handled'; payload: HandledEventPayload | null};
+  {status: 'unhandled'} | {status: 'ignored'} | {status: 'handled'; payload: HandledEventPayload | null};
 
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
@@ -105,7 +103,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
 
   public async hasHistory(): Promise<boolean> {
     const notificationEvents = await this.getNotificationEventList();
-    return !!notificationEvents.length;
+    return notificationEvents.length > 0;
   }
 
   public getNotificationEventList(): Promise<BackendEvent[]> {

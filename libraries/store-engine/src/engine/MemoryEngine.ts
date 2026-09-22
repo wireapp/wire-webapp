@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 import {CRUDEngine} from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
@@ -30,11 +30,21 @@ export class MemoryEngine implements CRUDEngine {
   private autoIncrementedPrimaryKey: number = 1;
 
   private get store(): Record<string, Record<string, any>> {
-    return this.stores[this.storeName]!;
+    const store = this.stores[this.storeName];
+    if (isUndefined(store)) {
+      throw new Error(`Store ${this.storeName} is not initialized`);
+    }
+
+    return store;
   }
 
   private getTable(tableName: string): Record<PropertyKey, any> {
-    return this.store[tableName]! as Record<PropertyKey, any>;
+    const table = this.store[tableName];
+    if (isUndefined(table)) {
+      throw new Error(`Table ${tableName} is not initialized`);
+    }
+
+    return table;
   }
 
   create<EntityType, PrimaryKey = string>(
@@ -42,7 +52,7 @@ export class MemoryEngine implements CRUDEngine {
     primaryKey: PrimaryKey,
     entity: EntityType,
   ): Promise<PrimaryKey> {
-    if (!is.nullOrUndefined(entity)) {
+    if (!isNullOrUndefined(entity)) {
       this.prepareTable(tableName);
 
       if (primaryKey === undefined) {
@@ -53,7 +63,7 @@ export class MemoryEngine implements CRUDEngine {
       const table = this.getTable(tableName);
       const record = table[primaryKey as PropertyKey];
 
-      if (!is.nullOrUndefined(record)) {
+      if (!isNullOrUndefined(record)) {
         const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
         const error = new RecordAlreadyExistsError(message);
         return Promise.reject(error);
@@ -94,7 +104,9 @@ export class MemoryEngine implements CRUDEngine {
 
   private assignDb<ObjectType = Object>(storeName: string, object: ObjectType): MemoryStore {
     this.storeName = storeName;
-    this.stores[this.storeName] = (this.stores[this.storeName] || object) as Record<string, Record<string, any>>;
+    this.stores[this.storeName] = (
+      Boolean(this.stores[this.storeName]) ? this.stores[this.storeName] : object
+    ) as Record<string, Record<string, any>>;
     return this.stores;
   }
 
@@ -166,10 +178,10 @@ export class MemoryEngine implements CRUDEngine {
   }
 
   private prepareTable(tableName: string): void {
-    if (!this.stores[this.storeName]) {
+    if (!Boolean(this.stores[this.storeName])) {
       this.stores[this.storeName] = {};
     }
-    if (!this.store[tableName]) {
+    if (!Boolean(this.store[tableName])) {
       this.store[tableName] = {};
     }
   }

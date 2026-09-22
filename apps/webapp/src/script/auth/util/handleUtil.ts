@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
 import {randomArrayElement, randomInt} from './randomUtil';
@@ -87,7 +88,7 @@ export function createSuggestions(name: string): string[] {
   const randomName = getRandomWordCombination();
   let suggestions: string[] = [];
 
-  if (normalizedName) {
+  if (isNonEmptyString(normalizedName)) {
     suggestions.push(normalizedName);
     const normalizedNameVariations = generateHandleVariations(normalizedName);
     suggestions = suggestions.concat(normalizedNameVariations);

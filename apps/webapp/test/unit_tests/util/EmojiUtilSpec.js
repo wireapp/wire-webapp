@@ -17,7 +17,7 @@
  *
  */
 
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {includesOnlyEmojis} from 'Util/emojiUtil';
 
 describe('EmojiUtil', () => {
   describe('includesOnlyEmojis', () => {

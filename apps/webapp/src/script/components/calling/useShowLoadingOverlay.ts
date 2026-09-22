@@ -42,11 +42,7 @@ const useShowLoadingOverlay = (
     setIsVideoReady(true);
   }, []);
 
-  const hasProcessedVideoStream = processedVideoStream !== undefined;
-
-  const showLoadingOverlay =
-    isSelfParticipant &&
-    (isBackgroundEffectInitializing || (hasActiveVideo && !isVideoReady && hasProcessedVideoStream));
+  const showLoadingOverlay = isSelfParticipant && (isBackgroundEffectInitializing || (hasActiveVideo && !isVideoReady));
 
   return {
     onVideoCanPlay,

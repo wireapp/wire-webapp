@@ -17,11 +17,13 @@
  *
  */
 
+import {noop} from 'noop-esm';
+
 function getLocalStorage() {
   try {
     return window.localStorage;
   } catch {
-    return {setItem: () => {}, getItem: () => {}, removeItem: () => {}};
+    return {setItem: noop, getItem: noop, removeItem: noop};
   }
 }
 

@@ -21,7 +21,7 @@ import {ConfigGeneratorParams} from './config.types';
 import {Env} from './env';
 
 export function generateConfig(params: ConfigGeneratorParams, env: Env) {
-  const {urls, version, env: nodeEnv} = params;
+  const {assetVersion, urls, version, env: nodeEnv} = params;
   return {
     APP_BASE: urls.base ?? '',
     ANALYTICS_API_KEY: env.ANALYTICS_API_KEY,
@@ -44,7 +44,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
     DATADOG_APPLICATION_ID: env.DATADOG_APPLICATION_ID,
     DATADOG_CLIENT_TOKEN: env.DATADOG_CLIENT_TOKEN,
     ENABLE_DEV_BACKEND_API: env.ENABLE_DEV_BACKEND_API == 'true',
-    MAX_API_VERSION: Number(env.MAX_API_VERSION) || 13,
+    MAX_API_VERSION: Number(env.MAX_API_VERSION) || 17,
     ENVIRONMENT: nodeEnv,
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')
@@ -54,6 +54,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       APPLOCK_SCHEDULED_TIMEOUT: env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
         ? Number(env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)
         : null,
+      ENABLE_MDM_CONFIG: env.FEATURE_ENABLE_MDM_CONFIG == 'true',
       ENABLE_CELLS: env.FEATURE_ENABLE_CELLS == 'true',
       CELLS_INIT_WITH_ZAUTH_TOKEN: env.FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN == 'true',
       CHECK_CONSENT: env.FEATURE_CHECK_CONSENT != 'false',
@@ -126,9 +127,11 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
         HISTORY: env.URL_SUPPORT_HISTORY,
         INDEX: env.URL_SUPPORT_INDEX,
         FOLDERS: env.URL_SUPPORT_FOLDERS,
+        SHARED_DRIVE: env.URL_SUPPORT_SHARED_DRIVE,
         FAVORITES: env.URL_SUPPORT_FAVORITES,
         LEARN_MORE_ABOUT_GUEST_LINKS: env.URL_LEARN_MORE_ABOUT_GUEST_LINKS,
         LEGAL_HOLD_BLOCK: env.URL_SUPPORT_LEGAL_HOLD_BLOCK,
+        ADMINLESS_GROUP_DELETE: env.URL_SUPPORT_ADMINLESS_GROUP_DELETE,
         MICROPHONE_ACCESS_DENIED: env.URL_SUPPORT_MICROPHONE_ACCESS_DENIED,
         MLS_LEARN_MORE: env.URL_SUPPORT_MLS_LEARN_MORE,
         MLS_MIGRATION_FROM_PROTEUS: env.URL_SUPPORT_MLS_MIGRATION_FROM_PROTEUS,
@@ -154,6 +157,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       WEBSITE_BASE: env.URL_WEBSITE_BASE,
       WHATS_NEW: env.URL_WHATS_NEW,
     },
+    ASSET_VERSION: assetVersion,
     VERSION: version,
     WEBSITE_LABEL: env.WEBSITE_LABEL,
   } as const;

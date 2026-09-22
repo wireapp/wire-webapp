@@ -169,6 +169,9 @@ export type Env = {
   /** Time in seconds after the last unlock which forces the app to lock */
   FEATURE_APPLOCK_SCHEDULED_TIMEOUT: string;
 
+  /** Feature toggle to enable MDM config support for app lock */
+  FEATURE_ENABLE_MDM_CONFIG: string;
+
   /** Feature toggle to automatically mute when accepting incoming conference calls */
   FEATURE_CONFERENCE_AUTO_MUTE: string;
 
@@ -297,6 +300,8 @@ export type Env = {
 
   URL_SUPPORT_FOLDERS: string;
 
+  URL_SUPPORT_SHARED_DRIVE: string;
+
   URL_SUPPORT_BUG_REPORT: string;
 
   URL_SUPPORT_CALLING: string;
@@ -314,6 +319,8 @@ export type Env = {
   URL_SUPPORT_HISTORY: string;
 
   URL_SUPPORT_LEGAL_HOLD_BLOCK: string;
+
+  URL_SUPPORT_ADMINLESS_GROUP_DELETE: string;
 
   URL_SUPPORT_MLS_LEARN_MORE: string;
 

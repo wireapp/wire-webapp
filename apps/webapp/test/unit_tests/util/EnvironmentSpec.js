@@ -17,7 +17,7 @@
  *
  */
 
-import {Environment} from 'src/script/util/Environment';
+import {Environment} from 'src/script/util/environment';
 
 describe('EnvironmentSpec', () => {
   describe('Environment.electronVersion', () => {

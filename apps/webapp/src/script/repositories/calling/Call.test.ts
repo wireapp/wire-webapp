@@ -31,15 +31,16 @@ import {CallingRepository} from './CallingRepository';
 import {Participant} from './Participant';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const createSelfParticipant = () => {
-  const selfUser = new User();
+  const selfUser = new User('', '', translateForTest);
   selfUser.isMe = true;
   return new Participant(selfUser, 'client1');
 };
 
 const createParticipant = (name: string) => {
-  const user = new User();
+  const user = new User('', '', translateForTest);
   user.name(name);
   return new Participant(user, `client-${name}`);
 };
@@ -79,8 +80,8 @@ describe('Call', () => {
   let fourthParticipant: Participant;
   let fifthParticipant: Participant;
   let conv: Conversation;
-  let wCall: Wcall;
-  let wUser: number;
+  let wCall: Wcall | undefined;
+  let wUser: number | undefined;
 
   beforeAll(() => {
     return testFactory.exposeCallingActors().then(injectedCallingRepository => {
@@ -127,7 +128,9 @@ describe('Call', () => {
   });
 
   afterAll(() => {
-    return wCall && wCall.destroy(wUser);
+    if (wCall !== undefined && wUser !== undefined) {
+      wCall.destroy(wUser);
+    }
   });
 
   describe('update pages', () => {

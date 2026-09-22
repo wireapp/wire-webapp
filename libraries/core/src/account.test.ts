@@ -18,6 +18,7 @@
  */
 
 import {AuthAPI} from '@wireapp/api-client/lib/auth';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {
   ClientAPI,
   ClientCapability,
@@ -32,6 +33,7 @@ import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {NotificationAPI} from '@wireapp/api-client/lib/notification';
 import {ConsumableEvent} from '@wireapp/api-client/lib/notification/consumableNotification';
 import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
+import {UserType} from '@wireapp/api-client/lib/user';
 import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
@@ -61,6 +63,14 @@ import {Account} from './account';
 import {ConnectionState} from './connectionState/connectionState';
 import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
+
+function getAccountServiceForTest(account: Account): NonNullable<Account['service']> {
+  if (isNullOrUndefined(account.service)) {
+    throw new Error('Expected account services to be initialized');
+  }
+
+  return account.service;
+}
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -102,8 +112,6 @@ const waitFor = (assertion: () => void) => {
   });
 };
 
-/* eslint-disable jest/no-conditional-expect */
-
 describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
 
@@ -112,7 +120,7 @@ describe('Account', () => {
   });
 
   // Fix for node 16, crypto.subtle.decrypt has a type problem
-  jest.spyOn(global.crypto.subtle, 'decrypt').mockResolvedValue(new Uint8Array(32));
+  jest.spyOn(global.crypto.subtle, 'decrypt').mockResolvedValue(new Uint8Array(32).buffer);
   const accessTokenData = {
     access_token:
       'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
@@ -147,6 +155,8 @@ describe('Account', () => {
 
     nock(MOCK_BACKEND.rest).post(AuthAPI.URL.ACCESS).reply(HTTP_STATUS.OK, accessTokenData);
 
+    nock(MOCK_BACKEND.rest).get(AuthAPI.URL.COOKIES).reply(HTTP_STATUS.OK, undefined);
+
     nock(MOCK_BACKEND.rest).post(ClientAPI.URL.CLIENTS).reply(HTTP_STATUS.OK, {id: CLIENT_ID});
 
     nock(MOCK_BACKEND.rest)
@@ -172,6 +182,8 @@ describe('Account', () => {
         development: [MINIMUM_API_VERSION + 1],
         domain: 'zinfra.io',
       });
+
+    nock(MOCK_BACKEND.rest).get(`/v${MINIMUM_API_VERSION}${AuthAPI.URL.COOKIES}`).reply(HTTP_STATUS.OK, {}).persist();
 
     nock(MOCK_BACKEND.rest)
       .get(NotificationAPI.URL.NOTIFICATION)
@@ -210,6 +222,7 @@ describe('Account', () => {
         name: 'Example User',
         id: '024174ec-c098-4104-9424-3849804acb78',
         assets: [],
+        type: UserType.REGULAR,
       } as Self);
   });
 
@@ -235,7 +248,7 @@ describe('Account', () => {
 
       await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
 
-      expect(account.service!.conversation).toBeDefined();
+      expect(getAccountServiceForTest(account).conversation).toBeDefined();
 
       const message = GenericMessage.create({
         messageId: '2d7cb6d8-118f-11e8-b642-0ed5f89f718b',
@@ -331,10 +344,10 @@ describe('Account', () => {
       });
       account['currentClient'] = currentClient;
       jest
-        .spyOn(dependencies.account.service!.notification, 'handleNotification')
+        .spyOn(getAccountServiceForTest(dependencies.account).notification, 'handleNotification')
         .mockImplementation(notif => notif.payload as any);
       jest
-        .spyOn(dependencies.account.service!.notification['database'], 'getLastNotificationId')
+        .spyOn(getAccountServiceForTest(dependencies.account).notification['database'], 'getLastNotificationId')
         .mockResolvedValue('0');
 
       await account.useAPIVersion(MINIMUM_API_VERSION, MINIMUM_API_VERSION);
@@ -342,6 +355,7 @@ describe('Account', () => {
       jest
         .spyOn(dependencies.apiClient.transport.ws, 'buildWebSocketUrl')
         .mockResolvedValue(websocketServerAddress as never);
+      jest.spyOn(dependencies.apiClient.transport.http, 'sendRequest').mockResolvedValue({} as never);
       jest.spyOn(dependencies.account, 'getNotificationEventTime').mockReturnValue('2025-10-01T00:00:00Z');
     });
 
@@ -359,7 +373,7 @@ describe('Account', () => {
         return new Promise<void>(async resolve => {
           const nbNotifications = 10;
           const onNotificationStreamProgress = jest.fn();
-          const onEvent = jest.fn().mockImplementation(() => {});
+          const onEvent = jest.fn();
           mockNotifications(nbNotifications);
           await dependencies.account.listen({
             useLegacy: false,
@@ -371,7 +385,7 @@ describe('Account', () => {
               onEvent.mockReset();
               await server.connected;
               jest
-                .spyOn(dependencies.account.service!.notification as any, 'handleNotification')
+                .spyOn(getAccountServiceForTest(dependencies.account).notification as any, 'handleNotification')
                 .mockReturnValue([{event: {testData: 1}}]);
               server.send(
                 JSON.stringify({
@@ -406,7 +420,11 @@ describe('Account', () => {
                 // Expect all states to have been called in order
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(1, ConnectionState.PROCESSING_NOTIFICATIONS);
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(2, ConnectionState.CONNECTING);
-                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.LIVE);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(
+                  3,
+                  ConnectionState.LIVE,
+                  expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+                );
                 resolve();
                 break;
             }
@@ -417,7 +435,12 @@ describe('Account', () => {
             onConnectionStateChanged,
           });
 
-          await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+          await waitFor(() =>
+            expect(onConnectionStateChanged).toHaveBeenCalledWith(
+              ConnectionState.LIVE,
+              expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+            ),
+          );
 
           disconnect();
         });
@@ -483,7 +506,7 @@ describe('Account', () => {
 
         const onEvent = jest
           .fn()
-          .mockImplementationOnce(() => {})
+          .mockReturnValueOnce(undefined)
           .mockImplementationOnce(() => {
             // abort websocket connection after the second notification is processeed
             server.close({reason: 'Aborted by test', code: 2000, wasClean: true});
@@ -515,7 +538,9 @@ describe('Account', () => {
                     {domain: 'zinfra.io', type: 'federation.delete'},
                     NotificationSource.WEBSOCKET,
                   );
-                  expect(dependencies.account.service!.notification.handleNotification).toHaveBeenCalledTimes(2);
+                  expect(
+                    getAccountServiceForTest(dependencies.account).notification.handleNotification,
+                  ).toHaveBeenCalledTimes(2);
                   resolve();
               }
             },
@@ -523,6 +548,38 @@ describe('Account', () => {
             onNotificationStreamProgress: onNotificationStreamProgress,
           });
         });
+      });
+
+      it('emits CLOSED without unlocking websocket when legacy notification catch-up fails after websocket open', async () => {
+        const catchUpError = new Error('Legacy catch-up failed');
+        jest
+          .spyOn(getAccountServiceForTest(dependencies.account).notification, 'legacyProcessNotificationStream')
+          .mockRejectedValue(catchUpError);
+        const unlock = jest.spyOn(dependencies.apiClient.transport.ws, 'unlock');
+        const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
+
+        const disconnect = await dependencies.account.listen({
+          useLegacy: true,
+          onConnectionStateChanged,
+        });
+
+        await waitFor(() =>
+          expect(onConnectionStateChanged).toHaveBeenCalledWith(
+            ConnectionState.CLOSED,
+            expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+          ),
+        );
+
+        expect(onConnectionStateChanged).toHaveBeenCalledWith(
+          ConnectionState.PROCESSING_NOTIFICATIONS,
+          expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
+        );
+        expect(
+          onConnectionStateChanged.mock.calls.some(([connectionState]) => connectionState === ConnectionState.LIVE),
+        ).toBe(false);
+        expect(unlock).not.toHaveBeenCalled();
+
+        disconnect();
       });
     });
   });
@@ -565,7 +622,7 @@ describe('Account', () => {
       // The legacy processor pushes its "transition to LIVE" task onto a queue that the
       // production code resumes from `connect()`. Since we invoke the factory directly
       // here, we need to resume that queue so the pushed task actually runs.
-      account['notificationProcessingQueue'].resume();
+      account['notificationProcessingQueue'].queue.start();
 
       return {account};
     };

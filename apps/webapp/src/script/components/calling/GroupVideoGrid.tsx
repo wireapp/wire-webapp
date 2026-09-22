@@ -17,24 +17,26 @@
  *
  */
 
-import {ReactNode, CSSProperties, useEffect, useState} from 'react';
+import {CSSProperties, ReactNode, useEffect, useState} from 'react';
 
-import {css, CSSObject} from '@emotion/react';
+import {css} from '@emotion/react';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {QUERY} from '@wireapp/react-ui-kit';
+import {Loading, QUERY} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {groupVideoBackgroundInitializingOverlay} from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {Call} from 'Repositories/calling/Call';
 import type {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
-import {useDummyParticipants} from './useDummyParticipants';
+import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
 const PARTICIPANTS_LIMITS = {
@@ -65,6 +67,113 @@ const COLUMNS = {
 };
 
 const PARTICIPANTS_DESKTOP_EDGE_CASE = 3;
+const MIN_PARTICIPANTS_FOR_MAXIMIZED_VIEW = 2;
+
+interface GroupVideoThumbnailProps {
+  readonly thumbnail: Participant;
+  readonly minimized: boolean;
+  readonly maximizedParticipant: Participant | null;
+  readonly selfParticipant: Participant;
+}
+
+function GroupVideoThumbnail({
+  thumbnail: thumbnailParticipant,
+  minimized,
+  maximizedParticipant,
+  selfParticipant,
+}: GroupVideoThumbnailProps): ReactNode {
+  const thumbnail = useKoSubscribableChildren(thumbnailParticipant, [
+    'hasActiveVideo',
+    'sharesScreen',
+    'videoStream',
+    'processedVideoStream',
+  ]);
+  const {showLoadingOverlay, onVideoCanPlay} = useShowLoadingOverlay(
+    true,
+    thumbnail.hasActiveVideo,
+    thumbnail.processedVideoStream,
+  );
+  const {isMuted: selfIsMuted, handRaisedAt: selfHandRaisedAt} = useKoSubscribableChildren(selfParticipant, [
+    'isMuted',
+    'handRaisedAt',
+  ]);
+
+  return (
+    <>
+      {!isNullOrUndefined(thumbnail.videoStream) && maximizedParticipant === null && (
+        <GroupVideoThumbnailWrapper minimized={minimized}>
+          <Video
+            className="group-video__thumbnail-video"
+            autoPlay
+            playsInline
+            /* This is needed to keep playing the video when detached to a new window,
+               only muted video can be played automatically without user interacting with the window first,
+               see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
+            */
+            muted
+            data-uie-name="self-video-thumbnail"
+            onCanPlay={onVideoCanPlay}
+            css={{
+              transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
+            }}
+            srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
+          />
+          {showLoadingOverlay && (
+            <div
+              aria-busy={showLoadingOverlay}
+              css={groupVideoBackgroundInitializingOverlay}
+              data-uie-name="background-effect-initializing"
+            >
+              <Loading size={32} />
+            </div>
+          )}
+          {selfIsMuted && !minimized && (
+            <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+              <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+            </span>
+          )}
+          {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
+            <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
+              ✋
+            </span>
+          )}
+        </GroupVideoThumbnailWrapper>
+      )}
+      {!thumbnail.hasActiveVideo && (
+        <GroupVideoThumbnailWrapper minimized={minimized}>
+          <div
+            css={{
+              alignItems: 'center',
+              display: 'flex',
+              height: '100%',
+              justifyContent: 'center',
+              width: '100%',
+            }}
+          >
+            {selfIsMuted && !minimized && (
+              <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+                <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+              </span>
+            )}
+            {!isNullOrUndefined(selfHandRaisedAt) && !minimized && (
+              <span
+                className="group-video-grid__element__label__hand_icon small"
+                data-uie-name="status-call-audio-muted"
+              >
+                ✋
+              </span>
+            )}
+            <Avatar
+              avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
+              participant={selfParticipant.user}
+              hideAvailabilityStatus
+            />
+          </div>
+        </GroupVideoThumbnailWrapper>
+      )}
+    </>
+  );
+}
 
 interface CalculateRowsAndColumsParams {
   totalCount: number;
@@ -126,38 +235,6 @@ const HEIGHT_QUERIES = {
   TALL: 'min-height: 830px',
 };
 
-const presenterWrapper: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  height: '100%',
-  gap: '4px',
-  backgroundColor: 'var(--group-video-bg)',
-};
-
-const presenterMainArea: CSSObject = {
-  flex: '2 0 0',
-  position: 'relative',
-  minHeight: 0,
-};
-
-const presenterBottomStrip: CSSObject = {
-  flex: '1 0 0',
-  display: 'flex',
-  flexDirection: 'row',
-  gap: '4px',
-  overflowX: 'auto',
-  overflowY: 'hidden',
-  minHeight: 0,
-};
-
-const presenterStripTile: CSSObject = {
-  height: '100%',
-  aspectRatio: '16/9',
-  flexShrink: 0,
-  position: 'relative',
-};
-
 const GroupVideoGrid = ({
   minimized = false,
   grid,
@@ -166,19 +243,13 @@ const GroupVideoGrid = ({
   call,
   setMaximizedParticipant,
 }: GroupVideoGripProps) => {
+  const {translate} = useApplicationContext();
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
   const isTablet = useActiveWindowMatchMedia(QUERY.tablet);
   const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);
   const isShort = useActiveWindowMatchMedia(HEIGHT_QUERIES.SHORT);
   const isMedium = useActiveWindowMatchMedia(HEIGHT_QUERIES.MEDIUM);
   const isTall = useActiveWindowMatchMedia(HEIGHT_QUERIES.TALL);
-
-  const thumbnail = useKoSubscribableChildren(grid.thumbnail!, [
-    'hasActiveVideo',
-    'sharesScreen',
-    'videoStream',
-    'processedVideoStream',
-  ]);
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
     calculateRowsAndColumns({
@@ -189,39 +260,23 @@ const GroupVideoGrid = ({
     }),
   );
 
-  const dummyParticipants = useDummyParticipants();
-  const allGridParticipants = [...grid.grid, ...dummyParticipants];
-
   const doubleClickedOnVideo = (userId: QualifiedId, clientId: string) => {
     if (typeof setMaximizedParticipant !== 'function') {
       return;
     }
     if (maximizedParticipant !== null) {
-      if (maximizedParticipant.doesMatchIds(userId, clientId)) {
-        setMaximizedParticipant(null);
-      } else {
-        const next = allGridParticipants.find(p => p?.doesMatchIds(userId, clientId)) ?? null;
-        if (next) {
-          setMaximizedParticipant(next);
-        }
-      }
+      setMaximizedParticipant(null);
       return;
     }
-    if (allGridParticipants.length < 2) {
+    if (grid.grid.length < MIN_PARTICIPANTS_FOR_MAXIMIZED_VIEW) {
       return;
     }
 
-    const participant = allGridParticipants.find(p => p?.doesMatchIds(userId, clientId)) || null;
+    const participant = grid.grid.find(participant => participant?.doesMatchIds(userId, clientId)) || null;
     setMaximizedParticipant(participant);
   };
 
-  const participants = (maximizedParticipant ? [maximizedParticipant] : allGridParticipants).filter(Boolean);
-
-  const otherParticipants = maximizedParticipant
-    ? allGridParticipants.filter(
-        p => p && !p.doesMatchIds(maximizedParticipant.user.qualifiedId, maximizedParticipant.clientId),
-      )
-    : [];
+  const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(Boolean);
 
   useEffect(() => {
     setRowsAndColumns(
@@ -269,157 +324,60 @@ const GroupVideoGrid = ({
     }
   }, [call, grid.thumbnail, isTablet, isDesktop, isMobile, isShort, isMedium, isTall]);
 
-  const {isMuted: selfIsMuted, handRaisedAt: selfHandRaisedAt} = useKoSubscribableChildren(selfParticipant, [
-    'isMuted',
-    'handRaisedAt',
-  ]);
-
   return (
     <div className="group-video">
-      {maximizedParticipant ? (
-        <div css={presenterWrapper} data-uie-name="grids-wrapper">
-          <div
-            className="group-video-grid"
-            css={presenterMainArea}
-            style={{'--columns': 1, '--rows': 1} as CSSProperties}
-          >
-            <GroupVideoGridTile
-              minimized={false}
-              participant={maximizedParticipant}
-              selfParticipant={selfParticipant}
-              participantCount={grid.grid.length}
-              isMaximized={true}
-              onTileDoubleClick={doubleClickedOnVideo}
-            />
-          </div>
-          {otherParticipants.length > 0 && (
-            <div css={presenterBottomStrip}>
-              {otherParticipants.map(participant => (
-                <div
-                  key={participant.clientId}
-                  css={presenterStripTile}
-                  style={{'--columns': 1, '--rows': 1} as CSSProperties}
-                >
-                  <GroupVideoGridTile
-                    minimized={false}
-                    participant={participant}
-                    selfParticipant={selfParticipant}
-                    participantCount={grid.grid.length}
-                    isMaximized={false}
-                    onTileDoubleClick={doubleClickedOnVideo}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div
-          className="group-video-grid"
-          css={{backgroundColor: 'var(--group-video-bg)'}}
-          style={rowsAndColumns}
-          data-uie-name="grids-wrapper"
-        >
-          {grid.grid.length === 0 && (
-            <div
-              css={{
-                alignItems: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon.LoadingIcon
-                css={{
-                  '> path': {
-                    fill: 'var(--main-color)',
-                  },
-                  height: 32,
-                  marginBottom: 32,
-                  width: 32,
-                }}
-              />
-              <div
-                data-uie-name="no-active-speakers"
-                css={{color: 'var(--main-color)', fontSize: 'var(--font-size-xsmall)', fontWeight: 500}}
-              >
-                {t('noActiveSpeakers')}
-              </div>
-            </div>
-          )}
-          {participants.map(participant => (
-            <GroupVideoGridTile
-              minimized={minimized}
-              participant={participant}
-              key={participant.clientId}
-              selfParticipant={selfParticipant}
-              participantCount={participants.length}
-              isMaximized={false}
-              onTileDoubleClick={doubleClickedOnVideo}
-            />
-          ))}
-        </div>
-      )}
-      {thumbnail.videoStream != null && maximizedParticipant === null && (
-        <GroupVideoThumbnailWrapper minimized={minimized}>
-          <Video
-            className="group-video__thumbnail-video"
-            autoPlay
-            playsInline
-            /* This is needed to keep playing the video when detached to a new window,
-               only muted video can be played automatically without user interacting with the window first,
-               see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
-            */
-            muted
-            data-uie-name="self-video-thumbnail"
-            css={{
-              transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
-            }}
-            srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
-          />
-          {selfIsMuted && !minimized && (
-            <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
-              <Icon.MicOffIcon data-uie-name="mic-icon-off" />
-            </span>
-          )}
-          {selfHandRaisedAt != null && !minimized && (
-            <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
-              ✋
-            </span>
-          )}
-        </GroupVideoThumbnailWrapper>
-      )}
-      {grid.thumbnail && !thumbnail.hasActiveVideo && (
-        <GroupVideoThumbnailWrapper minimized={minimized}>
+      <div
+        className="group-video-grid"
+        css={{backgroundColor: 'var(--group-video-bg)'}}
+        style={rowsAndColumns}
+        data-uie-name="grids-wrapper"
+      >
+        {grid.grid.length === 0 && (
           <div
             css={{
               alignItems: 'center',
               display: 'flex',
-              height: '100%',
+              flexDirection: 'column',
               justifyContent: 'center',
-              width: '100%',
             }}
           >
-            {selfIsMuted && !minimized && (
-              <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
-                <Icon.MicOffIcon data-uie-name="mic-icon-off" />
-              </span>
-            )}
-            {selfHandRaisedAt != null && !minimized && (
-              <span
-                className="group-video-grid__element__label__hand_icon small"
-                data-uie-name="status-call-audio-muted"
-              >
-                ✋
-              </span>
-            )}
-            <Avatar
-              avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
-              participant={selfParticipant.user}
-              hideAvailabilityStatus
+            <Icon.LoadingIcon
+              css={{
+                '> path': {
+                  fill: 'var(--main-color)',
+                },
+                height: 32,
+                marginBottom: 32,
+                width: 32,
+              }}
             />
+            <div
+              data-uie-name="no-active-speakers"
+              css={{color: 'var(--main-color)', fontSize: 'var(--font-size-xsmall)', fontWeight: 500}}
+            >
+              {translate('noActiveSpeakers')}
+            </div>
           </div>
-        </GroupVideoThumbnailWrapper>
+        )}
+        {participants.map(participant => (
+          <GroupVideoGridTile
+            minimized={minimized}
+            participant={participant}
+            key={participant.clientId}
+            selfParticipant={selfParticipant}
+            participantCount={participants.length}
+            isMaximized={!!maximizedParticipant}
+            onTileDoubleClick={doubleClickedOnVideo}
+          />
+        ))}
+      </div>
+      {!isNullOrUndefined(grid.thumbnail) && (
+        <GroupVideoThumbnail
+          thumbnail={grid.thumbnail}
+          minimized={minimized}
+          maximizedParticipant={maximizedParticipant}
+          selfParticipant={selfParticipant}
+        />
       )}
     </div>
   );

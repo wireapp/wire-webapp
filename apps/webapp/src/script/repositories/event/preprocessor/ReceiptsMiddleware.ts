@@ -20,12 +20,13 @@
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {supportsReadReceipts} from 'Repositories/conversation/ConversationSelectors';
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
 import type {EventRecord} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 
-import {StatusType} from '../../../message/StatusType';
+import {StatusType} from '../../../message/statusType';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';
@@ -54,7 +55,8 @@ export class ReceiptsMiddleware implements EventMiddleware {
         const conversation = await this.conversationRepository.getConversationById(qualifiedConversation);
         if (conversation?.isGroupOrChannel()) {
           // We only override the value of expects_read_confirmation for group conversations (one to one conversation use the value set by the sender)
-          event.data.expects_read_confirmation = conversation.receiptMode() === RECEIPT_MODE.ON;
+          event.data.expects_read_confirmation =
+            supportsReadReceipts(conversation) && conversation.receiptMode() === RECEIPT_MODE.ON;
         }
         return event;
       }
@@ -98,7 +100,11 @@ export class ReceiptsMiddleware implements EventMiddleware {
     const commonUpdates = {status};
     const readReceiptUpdate =
       status === StatusType.SEEN
-        ? {read_receipts: currentReceipts.concat([{time: confirmationEvent.time, userId: confirmationEvent.from}])}
+        ? {
+            read_receipts: currentReceipts.concat([
+              {time: confirmationEvent.time, userId: confirmationEvent.from ?? ''},
+            ]),
+          }
         : {};
 
     const updatedEvent = {...originalEvent, ...commonUpdates, ...readReceiptUpdate};

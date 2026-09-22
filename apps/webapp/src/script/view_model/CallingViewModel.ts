@@ -17,42 +17,45 @@
  *
  */
 
-import { QualifiedId } from '@wireapp/api-client/lib/user';
-import { amplify } from 'amplify';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
 import ko from 'knockout';
-import { container } from 'tsyringe';
+import {noop} from 'noop-esm';
+import {container} from 'tsyringe';
 
-import { REASON as CALL_REASON, STATE as CALL_STATE } from '@wireapp/avs';
-import { Availability } from '@wireapp/protocol-messaging';
-import { WebAppEvents } from '@wireapp/webapp-events';
+import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import 'Components/calling/ChooseScreen';
-import { PrimaryModal } from 'Components/Modals/PrimaryModal';
-import type { AudioRepository } from 'Repositories/audio/audioRepository';
-import { AudioType } from 'Repositories/audio/audioType';
-import type { Call } from 'Repositories/calling/Call';
-import { CallingRepository } from 'Repositories/calling/CallingRepository';
-import { CallState, DesktopScreenShareMenu } from 'Repositories/calling/CallState';
-import { LEAVE_CALL_REASON } from 'Repositories/calling/enum/LeaveCallReason';
-import { ConversationState } from 'Repositories/conversation/ConversationState';
-import { ConversationVerificationState } from 'Repositories/conversation/ConversationVerificationState';
-import type { Conversation } from 'Repositories/entity/Conversation';
-import type { User } from 'Repositories/entity/User';
-import type { ElectronDesktopCapturerSource, MediaDevicesHandler } from 'Repositories/media/MediaDevicesHandler';
-import type { MediaStreamHandler } from 'Repositories/media/MediaStreamHandler';
-import { mediaDevicesStore } from 'Repositories/media/useMediaDevicesStore';
-import { isPermissionGranted } from 'Repositories/permission/permissionHandlers';
-import { PermissionType } from 'Repositories/permission/PermissionType';
-import { PropertiesRepository } from 'Repositories/properties/propertiesRepository';
-import { PROPERTIES_TYPE } from 'Repositories/properties/propertiesType';
-import type { TeamRepository } from 'Repositories/team/TeamRepository';
-import { TeamState } from 'Repositories/team/TeamState';
-import { ROLE } from 'Repositories/user/userPermission';
-import { replaceLink, t } from 'Util/localizerUtil';
-import { matchQualifiedIds } from 'Util/qualifiedId';
-import { safeWindowOpen } from 'Util/sanitizationUtil';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import type {AudioRepository} from 'Repositories/audio/audioRepository';
+import {AudioType} from 'Repositories/audio/audioType';
+import type {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {isMeetingConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {isPermissionGranted} from 'Repositories/permission/permissionHandlers';
+import {PermissionType} from 'Repositories/permission/PermissionType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {ROLE} from 'Repositories/user/userPermission';
+import {type Translate} from 'Util/localizerUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 
-import { Config } from '../Config';
+import {Config} from '../Config';
 
 export interface CallActions {
   answer: (call: Call) => Promise<void>;
@@ -92,15 +95,16 @@ export class CallingViewModel {
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
+    private readonly translate: Translate,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    const { setVideoInputDeviceId, setScreenInputDeviceId } = mediaDevicesStore.getState();
+    const {setVideoInputDeviceId, setScreenInputDeviceId} = mediaDevicesStore.getState();
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
-        const { conversation } = call;
+        const {conversation} = call;
         if (conversation.isSelfUserRemoved()) {
           return false;
         }
@@ -126,6 +130,10 @@ export class CallingViewModel {
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, toggleState); // This event needs to be kept, it is sent by the wrapper
 
     const ring = (call: Call): void => {
+      if (isMeetingConversation(call.conversation)) {
+        return;
+      }
+
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
         [CALL_STATE.INCOMING]: AudioType.INCOMING_CALL,
         [CALL_STATE.OUTGOING]: AudioType.OUTGOING_CALL,
@@ -150,9 +158,9 @@ export class CallingViewModel {
 
     const startCall = async (conversation: Conversation): Promise<void> => {
       const canStart = await this.canInitiateCall(conversation.qualifiedId, {
-        action: t('modalCallSecondOutgoingAction'),
-        message: t('modalCallSecondOutgoingMessage'),
-        title: t('modalCallSecondOutgoingHeadline'),
+        action: this.translate('modalCallSecondOutgoingAction'),
+        message: this.translate('modalCallSecondOutgoingMessage'),
+        title: this.translate('modalCallSecondOutgoingHeadline'),
       });
 
       if (!canStart) {
@@ -169,9 +177,9 @@ export class CallingViewModel {
 
     const answerCall = async (call: Call) => {
       const canAnswer = await this.canInitiateCall(call.conversation.qualifiedId, {
-        action: t('modalCallSecondIncomingAction'),
-        message: t('modalCallSecondIncomingMessage'),
-        title: t('modalCallSecondIncomingHeadline'),
+        action: this.translate('modalCallSecondIncomingAction'),
+        message: this.translate('modalCallSecondIncomingMessage'),
+        title: this.translate('modalCallSecondIncomingHeadline'),
       });
       if (!canAnswer) {
         return;
@@ -196,60 +204,82 @@ export class CallingViewModel {
     });
 
     const showE2EICallModal = (conversationEntity: Conversation) => {
-      const memberCount = conversationEntity.participating_user_ets().length;
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: async () => {
+              conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
 
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: async () => {
-            conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-
-            if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
-              showMaxUsersToCallModalWithoutConfirm(conversationEntity);
-            } else {
-              await startCall(conversationEntity);
-            }
+              if (shouldShowMaxUsersToCallModal(conversationEntity)) {
+                showMaxUsersToCallModalWithoutConfirm(conversationEntity);
+              } else {
+                await startCall(conversationEntity);
+              }
+            },
+            text: this.translate('conversation.E2EICallAnyway'),
           },
-          text: t('conversation.E2EICallAnyway'),
+          secondaryAction: {
+            action: noop,
+            text: this.translate('conversation.E2EICancel'),
+          },
+          text: {
+            message: this.translate('conversation.E2EIDegradedInitiateCall'),
+            title: this.translate('conversation.E2EIConversationNoLongerVerified'),
+          },
         },
-        secondaryAction: {
-          action: () => { },
-          text: t('conversation.E2EICancel'),
-        },
-        text: {
-          message: t('conversation.E2EIDegradedInitiateCall'),
-          title: t('conversation.E2EIConversationNoLongerVerified'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     };
 
     const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation) => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
-      PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
-        preventClose: true,
-        primaryAction: {
-          action: async () => await startCall(conversationEntity),
-          text: t('groupCallModalPrimaryBtnName'),
+      PrimaryModal.show(
+        PrimaryModal.type.WITHOUT_TITLE,
+        {
+          preventClose: true,
+          primaryAction: {
+            action: async () => await startCall(conversationEntity),
+            text: this.translate('groupCallModalPrimaryBtnName'),
+          },
+          secondaryAction: {
+            text: this.translate('modalConfirmSecondary'),
+          },
+          text: {
+            translatedMessage: {
+              compatibilityReplacements: [],
+              components: [],
+              kind: 'translation',
+              layout: 'group-call-description',
+              translationKey: 'groupCallConfirmationModalTitle',
+              values: [
+                {
+                  alternatePlaceholders: [],
+                  placeholder: 'memberCount',
+                  runtimeText: memberCount.toString(),
+                },
+              ],
+            } satisfies PrimaryModalTranslatedMessage,
+            closeBtnLabel: this.translate('groupCallModalCloseBtnLabel'),
+          },
         },
-        secondaryAction: {
-          text: t('modalConfirmSecondary'),
-        },
-        text: {
-          htmlMessage: `<div class="modal-description">
-            ${t('groupCallConfirmationModalTitle', { memberCount })}
-          </div>`,
-          closeBtnLabel: t('groupCallModalCloseBtnLabel'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     };
 
+    const shouldShowMaxUsersToCallModal = (conversationEntity: Conversation): boolean =>
+      !conversationEntity.isMeeting() &&
+      conversationEntity.participating_user_ets().length > MAX_USERS_TO_CALL_WITHOUT_CONFIRM;
+
     const handleCallAction = async (conversationEntity: Conversation): Promise<void> => {
-      const memberCount = conversationEntity.participating_user_ets().length;
       const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
       if (isE2EIDegraded) {
         showE2EICallModal(conversationEntity);
-      } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+      } else if (shouldShowMaxUsersToCallModal(conversationEntity)) {
         showMaxUsersToCallModalWithoutConfirm(conversationEntity);
       } else {
         await startCall(conversationEntity);
@@ -259,19 +289,24 @@ export class CallingViewModel {
     this.callActions = {
       answer: async (call: Call) => {
         if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            primaryAction: {
-              action: () => {
-                this.callingRepository.rejectCall(call.conversation.qualifiedId);
+          PrimaryModal.show(
+            PrimaryModal.type.ACKNOWLEDGE,
+            {
+              primaryAction: {
+                action: () => {
+                  this.callingRepository.rejectCall(call.conversation.qualifiedId);
+                },
+              },
+              text: {
+                message: `${this.translate('modalConferenceCallNotSupportedMessage')} ${this.translate(
+                  'modalConferenceCallNotSupportedJoinMessage',
+                )}`,
+                title: this.translate('modalConferenceCallNotSupportedHeadline'),
               },
             },
-            text: {
-              message: `${t('modalConferenceCallNotSupportedMessage')} ${t(
-                'modalConferenceCallNotSupportedJoinMessage',
-              )}`,
-              title: t('modalConferenceCallNotSupportedHeadline'),
-            },
-          });
+            undefined,
+            this.translate,
+          );
         } else {
           return answerCall(call);
         }
@@ -279,11 +314,11 @@ export class CallingViewModel {
       changePage: (newPage, call) => {
         this.callingRepository.changeCallPage(call, newPage);
       },
-      leave: ({ conversation }: Call) => {
+      leave: ({conversation}: Call) => {
         this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         callState.activeCallViewTab(CallViewTab.ALL);
       },
-      reject: ({ conversation }: Call) => {
+      reject: ({conversation}: Call) => {
         this.callingRepository.rejectCall(conversation.qualifiedId);
       },
       startAudio: async (conversationEntity: Conversation) => {
@@ -292,7 +327,10 @@ export class CallingViewModel {
           typeof conferenceCallingEnabledState === 'function'
             ? conferenceCallingEnabledState()
             : conferenceCallingEnabledState;
-        if (conversationEntity.isGroupOrChannel() && isConferenceCallingEnabled === false && false) {
+        if (
+          (conversationEntity.isGroupOrChannel() || conversationEntity.isMeeting()) &&
+          isConferenceCallingEnabled === false
+        ) {
           this.showRestrictedConferenceCallingModal();
         } else {
           await handleCallAction(conversationEntity);
@@ -348,7 +386,7 @@ export class CallingViewModel {
    * @param activeCall - the call to gracefully tear down
    */
   private async gracefullyTeardownCall(activeCall: Call): Promise<void> {
-    const { conversation } = activeCall;
+    const {conversation} = activeCall;
     if (activeCall.state() === CALL_STATE.INCOMING) {
       this.callingRepository.rejectCall(conversation.qualifiedId);
     } else {
@@ -368,7 +406,7 @@ export class CallingViewModel {
    */
   private canInitiateCall(
     conversationId: QualifiedId,
-    warningStrings: { action: string; message: string; title: string },
+    warningStrings: {action: string; message: string; title: string},
   ): Promise<boolean> {
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
     const otherActiveCall = this.callState
@@ -382,66 +420,113 @@ export class CallingViewModel {
     }
 
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: async () => {
-            await this.gracefullyTeardownCall(otherActiveCall);
-            resolve(true);
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: async () => {
+              await this.gracefullyTeardownCall(otherActiveCall);
+              resolve(true);
+            },
+            text: warningStrings.action,
           },
-          text: warningStrings.action,
+          secondaryAction: {
+            action: () => resolve(false),
+          },
+          text: {
+            message: warningStrings.message,
+            title: warningStrings.title,
+          },
         },
-        secondaryAction: {
-          action: () => resolve(false),
-        },
-        text: {
-          message: warningStrings.message,
-          title: warningStrings.title,
-        },
-      });
+        undefined,
+        this.translate,
+      );
     });
   }
 
   private showRestrictedConferenceCallingModal() {
     if (this.teamState.isInTeam(this.selfUser())) {
       if (this.selfUser().teamRole() === ROLE.OWNER) {
-        const replaceEnterprise = replaceLink(
-          Config.getConfig().URL.PRICING,
-          'modal__text__read-more',
-          'read-more-pricing',
-        );
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: () => {
-              safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
+        PrimaryModal.show(
+          PrimaryModal.type.CONFIRM,
+          {
+            primaryAction: {
+              action: () => {
+                safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
+              },
+              text: this.translate('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
             },
-            text: t('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
+            text: {
+              translatedMessage: {
+                compatibilityReplacements: [],
+                components: [
+                  {
+                    className: 'modal__text__read-more',
+                    dataUieName: 'read-more-pricing',
+                    href: Config.getConfig().URL.PRICING,
+                    kind: 'link',
+                    legacyClosingTokens: [],
+                    legacyOpeningTokens: [],
+                    markerName: 'link',
+                    rel: 'nofollow noopener noreferrer',
+                    target: '_blank',
+                  },
+                ],
+                kind: 'translation',
+                layout: 'default',
+                translationKey: 'callingRestrictedConferenceCallOwnerModalDescription',
+                values: [
+                  {
+                    alternatePlaceholders: [],
+                    placeholder: 'brandName',
+                    runtimeText: Config.getConfig().BRAND_NAME,
+                  },
+                ],
+              },
+              title: this.translate('callingRestrictedConferenceCallOwnerModalTitle'),
+            },
           },
-          text: {
-            htmlMessage: t(
-              'callingRestrictedConferenceCallOwnerModalDescription',
-              { brandName: Config.getConfig().BRAND_NAME },
-              replaceEnterprise,
-            ),
-            title: t('callingRestrictedConferenceCallOwnerModalTitle'),
-          },
-        });
+          undefined,
+          this.translate,
+        );
       } else {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            message: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
-            title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            text: {
+              message: this.translate('callingRestrictedConferenceCallTeamMemberModalDescription'),
+              title: this.translate('callingRestrictedConferenceCallTeamMemberModalTitle'),
+            },
           },
-        });
+          undefined,
+          this.translate,
+        );
       }
     } else {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
-            brandName: Config.getConfig().BRAND_NAME,
-          }),
-          title: t('callingRestrictedConferenceCallPersonalModalTitle'),
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            translatedMessage: {
+              compatibilityReplacements: [],
+              components: [],
+              kind: 'translation',
+              layout: 'default',
+              translationKey: 'callingRestrictedConferenceCallPersonalModalDescription',
+              values: [
+                {
+                  alternatePlaceholders: [],
+                  placeholder: 'brandName',
+                  runtimeText: Config.getConfig().BRAND_NAME,
+                },
+              ],
+            },
+            title: this.translate('callingRestrictedConferenceCallPersonalModalTitle'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
     }
   }
 

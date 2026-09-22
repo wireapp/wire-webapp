@@ -1,0 +1,364 @@
+/*
+ * Wire
+ * Copyright (C) 2019 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {act, fireEvent, render} from '@testing-library/react';
+import {type ReactElement} from 'react';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {UserType} from '@wireapp/api-client/lib/user';
+
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
+import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {SearchRepository} from 'Repositories/search/searchRepository';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {TeamEntity} from 'Repositories/team/TeamEntity';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/userState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import 'src/script/util/test/mock/localStorageMock';
+import {translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {createUuid} from 'Util/uuid';
+
+import {ConversationDetails} from './conversationDetails';
+
+import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {MainViewModel} from '../../../view_model/MainViewModel';
+import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {PanelState} from '../rightSidebar';
+
+jest.mock('Components/panel/enrichedFields', () => ({
+  useEnrichedFields: (): never[] => [],
+  EnrichedFields: function EnrichedFields({
+    showAvailability = false,
+  }: {
+    showAvailability?: boolean;
+  }): ReactElement | null {
+    if (!showAvailability) {
+      return null;
+    }
+
+    return <div data-uie-name="item-enriched-value" />;
+  },
+  __esModule: true,
+}));
+jest.mock('Components/panel/userDetails', () => ({
+  UserDetails: () => <div />,
+  __esModule: true,
+}));
+
+const testFactory = new TestFactory();
+let conversationRepository: ConversationRepository;
+let searchRepository: SearchRepository;
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+const viewerPermissionRootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({
+    isFeatureToggleEnabled: () => true,
+    translate: translateForTest,
+  }),
+);
+
+const getDefaultParams = () => {
+  const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+    canAddParticipants: () => true,
+    canDeleteGroup: () => true,
+    canLeaveGroup: () => true,
+    canRenameGroup: () => true,
+    canToggleTimeout: () => true,
+    canToggleGuests: () => true,
+    canToggleReadReceipts: () => true,
+    isUserGroupAdmin: () => true,
+  };
+
+  const selfUserMock = new User(createUuid(), '', translateForTest);
+
+  return {
+    actionsViewModel: new ActionsViewModel(
+      {} as SelfRepository,
+      {} as CellsRepository,
+      {} as ConnectionRepository,
+      conversationRepository,
+      {} as IntegrationRepository,
+      {} as MessageRepository,
+      {} as UserState,
+      {} as TeamState,
+      {} as MainViewModel,
+      translate,
+    ),
+    conversationRepository: {
+      expectReadReceipt: () => true,
+      getNextConversation: () =>
+        Promise.resolve(new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest)),
+      refreshUnavailableParticipants: () => Promise.resolve(),
+      conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
+    } as unknown as ConversationRepository,
+    integrationRepository: {getServiceFromUser: (): null => null} as unknown as IntegrationRepository,
+    isFederated: false,
+    isVisible: true,
+    searchRepository,
+    teamRepository: {
+      getRoleBadge: (userId: string) => '',
+      updateTeamMembersByIds: (teamEntity: TeamEntity, memberIds?: string[], append?: boolean) => Promise.resolve(),
+      isSelfConnectedTo: () => true,
+    } as unknown as TeamRepository,
+    teamState: new TeamState(),
+    selfUser: selfUserMock,
+  };
+};
+
+describe('ConversationDetails', () => {
+  beforeAll(async () => {
+    conversationRepository = await testFactory.exposeConversationActors();
+    searchRepository = await testFactory.exposeSearchActors();
+  });
+
+  it.each([
+    {selfUserTeamId: 'conversation-team', expectedStatus: 'cells.sharedDriveAccess.editorAccess'},
+    {selfUserTeamId: 'other-team', expectedStatus: 'cells.sharedDriveAccess.viewerAccess'},
+  ])('opens Shared Drive settings with $expectedStatus', ({selfUserTeamId, expectedStatus}) => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    conversation.teamId = 'conversation-team';
+
+    const defaultProps = getDefaultParams();
+    defaultProps.selfUser.teamId = selfUserTeamId;
+    const togglePanel = jest.fn();
+    const {getByTestId} = render(
+      withThemeAndRootContext(
+        <ConversationDetails
+          {...defaultProps}
+          activeConversation={conversation}
+          selfUser={defaultProps.selfUser}
+          togglePanel={togglePanel}
+        />,
+        viewerPermissionRootProviderWrapper,
+      ),
+    );
+
+    expect(getByTestId('status-cells-info')).toHaveTextContent(expectedStatus);
+    fireEvent.click(getByTestId('go-shared-drive'));
+
+    expect(togglePanel).toHaveBeenCalledWith(PanelState.SHARED_DRIVE, conversation);
+  });
+
+  it('keeps Shared Drive settings disabled when viewer permissions are disabled', () => {
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+
+    const defaultProps = getDefaultParams();
+    const {getByTestId, getByText} = render(
+      withTheme(<ConversationDetails {...defaultProps} activeConversation={conversation} />),
+    );
+
+    expect(getByText('conversationDetailsActionCellsOption')).toBeInTheDocument();
+    expect(getByTestId('cells-info')).toBeDisabled();
+  });
+
+  it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
+    'shows legacy bots and apps in %s groups',
+    protocol => {
+      const conversation = new Conversation(createUuid(), '', protocol, translateForTest);
+      const regularUser = new User('regular-user', '', translateForTest);
+      const legacyBot = new User('legacy-bot', '', translateForTest);
+      const app = new User('app', '', translateForTest);
+
+      regularUser.name('Regular user');
+      legacyBot.name('Legacy bot');
+      legacyBot.isService = true;
+      legacyBot.type = UserType.BOT;
+      app.name('App');
+      app.type = UserType.APP;
+      conversation.participating_user_ets([regularUser, legacyBot, app]);
+
+      const defaultProps = getDefaultParams();
+      const integrationRepository = {
+        ...defaultProps.integrationRepository,
+        mapServiceFromUser: (user: User) =>
+          new ServiceEntity({
+            id: user.id,
+            name: user.name(),
+            qualifiedId: user.qualifiedId,
+            type: 'App',
+          }),
+      } as IntegrationRepository;
+
+      const {getByTestId} = render(
+        <ConversationDetails
+          {...defaultProps}
+          activeConversation={conversation}
+          integrationRepository={integrationRepository}
+        />,
+        {wrapper: rootProviderWrapper},
+      );
+
+      expect(getByTestId(`service-list-service-${legacyBot.id}`)).not.toBeNull();
+      expect(getByTestId(`service-list-service-${app.id}`)).not.toBeNull();
+    },
+  );
+
+  it('keeps legacy bots visible while a Proteus group migrates through Mixed to MLS', () => {
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const legacyBot = new User('legacy-bot', '', translateForTest);
+
+    legacyBot.name('Legacy bot');
+    legacyBot.isService = true;
+    legacyBot.type = UserType.BOT;
+    conversation.participating_user_ets([legacyBot]);
+
+    const defaultProps = getDefaultParams();
+    const {getByTestId, rerender} = render(
+      <ConversationDetails {...defaultProps} activeConversation={conversation} />,
+      {wrapper: rootProviderWrapper},
+    );
+    const legacyBotTestId = `service-list-service-${legacyBot.id}`;
+
+    expect(getByTestId(legacyBotTestId)).not.toBeNull();
+
+    ConversationMapper.updateProperties(conversation, {protocol: CONVERSATION_PROTOCOL.MIXED});
+    rerender(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+
+    expect(getByTestId(legacyBotTestId)).not.toBeNull();
+
+    ConversationMapper.updateProperties(conversation, {protocol: CONVERSATION_PROTOCOL.MLS});
+    rerender(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+
+    expect(getByTestId(legacyBotTestId)).not.toBeNull();
+  });
+
+  it("returns the right actions depending on the conversation's type for non group creators", () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const otherUser = new User('other-user', '', translateForTest);
+    jest.spyOn(otherUser as any, 'isConnected').mockReturnValue(true);
+    jest.spyOn(conversation as any, 'isClearable').mockReturnValue(true);
+    conversation.participating_user_ets([otherUser]);
+
+    const defaultProps = getDefaultParams();
+
+    const {rerender, getByTestId} = render(
+      <ConversationDetails {...defaultProps} activeConversation={conversation} />,
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
+
+    const tests = [
+      {
+        conversationType: CONVERSATION_TYPE.ONE_TO_ONE,
+        expected: ['go-create-group', 'do-archive', 'do-clear', 'do-block'],
+        permission: {canCreateGroupConversation: () => true},
+      },
+      {
+        conversationType: CONVERSATION_TYPE.ONE_TO_ONE,
+        expected: ['do-archive', 'do-clear', 'do-block'],
+        permission: {canCreateGroupConversation: () => false},
+      },
+      {
+        conversationType: CONVERSATION_TYPE.REGULAR,
+        expected: ['do-archive', 'do-clear', 'do-leave'],
+        permission: {canCreateGroupConversation: () => true},
+      },
+      {
+        conversationType: CONVERSATION_TYPE.CONNECT,
+        expected: ['do-archive', 'do-cancel-request', 'do-block'],
+        permission: {canCreateGroupConversation: () => true},
+      },
+    ];
+
+    return tests.forEach(({expected, permission, conversationType}) => {
+      act(() => {
+        conversation.type(conversationType);
+      });
+
+      rerender(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+
+      expected.forEach(action => {
+        const actionItem = getByTestId(action);
+        expect(actionItem).not.toBeNull();
+      });
+    });
+  });
+
+  it('updates the block action when the participant blocking state changes', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+
+    const participant = new User('other-user', '', translateForTest);
+    const connection = new ConnectionEntity();
+    connection.status(ConnectionStatus.ACCEPTED);
+    participant.connection(connection);
+    conversation.participating_user_ets([participant]);
+
+    const defaultProps = getDefaultParams();
+    const {queryByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByTestId('do-block')).not.toBeNull();
+    expect(queryByTestId('do-unblock')).toBeNull();
+
+    act(() => {
+      connection.status(ConnectionStatus.BLOCKED);
+    });
+
+    expect(queryByTestId('do-block')).toBeNull();
+    expect(queryByTestId('do-unblock')).not.toBeNull();
+  });
+
+  it('updates participant availability when the participant becomes a temporary guest', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+
+    const participant = new User('other-user', '', translateForTest);
+    participant.teamId = 'team-id';
+    conversation.participating_user_ets([participant]);
+
+    const defaultProps = getDefaultParams();
+    const team = new TeamEntity();
+    team.id = 'team-id';
+    defaultProps.teamState.team(team);
+
+    const {queryByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByTestId('item-enriched-value')).not.toBeNull();
+
+    act(() => {
+      participant.isTemporaryGuest(true);
+    });
+
+    expect(queryByTestId('item-enriched-value')).toBeNull();
+  });
+});

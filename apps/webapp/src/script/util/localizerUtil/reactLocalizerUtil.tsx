@@ -19,6 +19,16 @@
 
 import {Fragment, ReactNode} from 'react';
 
+import {
+  isNan,
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNull,
+  isNullOrUndefined,
+  isString,
+  isUndefined,
+} from '@sindresorhus/is';
+
 interface ComponentReplacement {
   start: string;
   end: string;
@@ -32,8 +42,108 @@ interface StringReplacement {
 
 type Replacement = ComponentReplacement | StringReplacement;
 
+function hasNonEmptyReactNodeValue(node: ReactNode): boolean {
+  if (node === false || isNullOrUndefined(node)) {
+    return false;
+  }
+  if (isString(node)) {
+    return isNonEmptyString(node);
+  }
+  if (typeof node === 'number') {
+    return node !== 0 && !isNan(node);
+  }
+  return true;
+}
+
+export type ReactTranslationMarker = {
+  readonly start: string;
+  readonly end: string;
+  readonly substitution: string;
+};
+
+export type ReactTranslationComponentReplacement = {
+  readonly start: string;
+  readonly end: string;
+  render(children: React.ReactNode[]): React.ReactNode;
+};
+
+export type ReactTranslationValueReplacement = {
+  readonly marker: ReactTranslationMarker;
+  readonly runtimeText: string;
+};
+
+export type ReactTranslationNodeReplacement = {
+  readonly marker: ReactTranslationMarker;
+  render(): ReactNode;
+};
+
+type RenderReactTranslationOptions = {
+  readonly translatedText: string;
+  readonly componentReplacements: readonly ReactTranslationComponentReplacement[];
+  readonly nodeReplacements: readonly ReactTranslationNodeReplacement[];
+  readonly valueReplacements: readonly ReactTranslationValueReplacement[];
+};
+
 function sanitizeRegexp(text: string) {
   return text.replaceAll('[', '\\[').replaceAll(']', '\\]');
+}
+
+export function createReactTranslationMarker(markerName: string): ReactTranslationMarker {
+  const markerIdentifier = markerName.replaceAll(/[^a-zA-Z0-9]/g, '_');
+  const markerStart = `__wire_react_translation_${markerIdentifier}_start__`;
+  const markerEnd = `__wire_react_translation_${markerIdentifier}_end__`;
+
+  return {
+    start: markerStart,
+    end: markerEnd,
+    substitution: `${markerStart}value${markerEnd}`,
+  };
+}
+
+export function renderReactTranslation(options: RenderReactTranslationOptions): React.ReactNode[] {
+  const {translatedText, componentReplacements, nodeReplacements, valueReplacements} = options;
+
+  const renderedValueReplacements = valueReplacements.map(valueReplacement => {
+    return {
+      start: valueReplacement.marker.start,
+      end: valueReplacement.marker.end,
+      render() {
+        return valueReplacement.runtimeText;
+      },
+    };
+  });
+
+  const renderedNodeReplacements = nodeReplacements.map(nodeReplacement => {
+    return {
+      start: nodeReplacement.marker.start,
+      end: nodeReplacement.marker.end,
+      render() {
+        return nodeReplacement.render();
+      },
+    };
+  });
+
+  const renderedNestedReplacements = [...renderedValueReplacements, ...renderedNodeReplacements];
+
+  function renderNestedReplacements(text: string): React.ReactNode[] {
+    return replaceReactComponents(text, renderedNestedReplacements);
+  }
+
+  const renderedComponentReplacements = componentReplacements.map(componentReplacement => {
+    return {
+      start: componentReplacement.start,
+      end: componentReplacement.end,
+      render(text: string) {
+        return componentReplacement.render(renderNestedReplacements(text));
+      },
+    };
+  });
+
+  return replaceReactComponents(translatedText, [
+    ...renderedComponentReplacements,
+    ...renderedValueReplacements,
+    ...renderedNodeReplacements,
+  ]);
 }
 
 /**
@@ -56,17 +166,17 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
     return [html];
   }
 
-  const componentsSplitRegexpStr = componentReplacements.length
+  const componentsSplitRegexpStr = isNonEmptyArray(componentReplacements)
     ? `(${componentReplacements
         .map(replacement => `${sanitizeRegexp(replacement.start)}.+?${sanitizeRegexp(replacement.end)}`)
         .join('|')})`
     : null;
 
-  const stringSplitRegexpStr = stringReplacements.length
+  const stringSplitRegexpStr = isNonEmptyArray(stringReplacements)
     ? `(${stringReplacements.map(replacement => sanitizeRegexp(replacement.exactMatch)).join('|')})`
     : null;
 
-  const regexpStr = [componentsSplitRegexpStr, stringSplitRegexpStr].filter(Boolean).join('|');
+  const regexpStr = [componentsSplitRegexpStr, stringSplitRegexpStr].filter(value => !isNull(value)).join('|');
 
   const splitRegexp = new RegExp(regexpStr, 'g');
 
@@ -80,7 +190,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
         replacement => node.startsWith(replacement.start) && node.endsWith(replacement.end),
       );
 
-      if (componentsReplacementMatch) {
+      if (!isUndefined(componentsReplacementMatch)) {
         const text = node.substring(
           componentsReplacementMatch.start.length,
           node.length - componentsReplacementMatch.end.length,
@@ -93,12 +203,12 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
           return split
             .map(node => {
               const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.exactMatch);
-              if (stringReplacementMatch) {
+              if (!isUndefined(stringReplacementMatch)) {
                 return stringReplacementMatch.render();
               }
               return componentsReplacementMatch.render(node);
             })
-            .filter(Boolean)
+            .filter(hasNonEmptyReactNodeValue)
             .map((node, index) => <Fragment key={index}>{node}</Fragment>);
         }
 
@@ -107,12 +217,12 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
 
       const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.exactMatch);
 
-      if (stringReplacementMatch) {
+      if (!isUndefined(stringReplacementMatch)) {
         return stringReplacementMatch.render();
       }
 
       return node;
     })
-    .filter(Boolean)
+    .filter(hasNonEmptyReactNodeValue)
     .map((node, index) => <Fragment key={index}>{node}</Fragment>); // Make sure we have a different key for each node.
 }

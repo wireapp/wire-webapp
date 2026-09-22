@@ -18,8 +18,9 @@
  */
 
 import {CSSObject} from '@emotion/react';
+import {noop} from 'noop-esm';
 
-export const noop = () => {};
+export {noop};
 
 export const inlineSVG = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 

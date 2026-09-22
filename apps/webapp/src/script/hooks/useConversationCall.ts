@@ -19,6 +19,7 @@
 
 import {useEffect, useMemo, useState} from 'react';
 
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
@@ -55,7 +56,7 @@ export const useConversationCall = (conversation: Conversation): ConversationCal
   useEffect(() => {
     if (!call) {
       setCurrentCallState(null);
-      return () => {};
+      return noop;
     }
 
     setCurrentCallState(call.state());

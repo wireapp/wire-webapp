@@ -24,7 +24,7 @@ import {Muted, Option, Select} from '@wireapp/react-ui-kit';
 
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {channelSettingsTextCss} from './ConversationDetails.styles';
@@ -35,6 +35,7 @@ import {ChatHistory, ConversationAccess} from '../../types';
 import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';
 
 export const ChannelSettings = () => {
+  const {translate} = useApplicationContext();
   const teamState = container.resolve(TeamState);
   const {
     access,
@@ -50,7 +51,13 @@ export const ChannelSettings = () => {
   } = useCreateConversationModal();
   const isPremiumUser = teamState.isConferenceCallingEnabled();
   const {isPublicChannelsEnabled, isChannelsHistorySharingEnabled} = useChannelsFeatureFlag();
-  const chatHistoryOptions = getChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit, true);
+  const chatHistoryOptions = getChatHistoryOptions(
+    translate,
+    chatHistory,
+    historySharingQuantity,
+    historySharingUnit,
+    true,
+  );
   const onChatHistoryChange = (option?: Option | null) => {
     if (option?.value === ChatHistory.Custom) {
       if (!isPremiumUser) {
@@ -68,20 +75,20 @@ export const ChannelSettings = () => {
     <>
       <p className="heading-h3">Access</p>
       <p css={channelSettingsTextCss} className="subline">
-        {t('createConversationAccessText')}
+        {translate('createConversationAccessText')}
       </p>
 
       <RadioGroup<ConversationAccess>
         onChange={setAccess}
         horizontal
         selectedValue={access}
-        options={getConversationAccessOptions(isPublicChannelsEnabled)}
+        options={getConversationAccessOptions(translate, isPublicChannelsEnabled)}
         ariaLabelledBy="conversation-access"
         name="conversation-access"
       />
 
       <Muted block muted={access === ConversationAccess.Public} css={channelSettingsTextCss}>
-        {t('createConversationManagerText')}
+        {translate('createConversationManagerText')}
       </Muted>
 
       <RadioGroup<ADD_PERMISSION>
@@ -89,7 +96,7 @@ export const ChannelSettings = () => {
         onChange={setModerator}
         horizontal
         selectedValue={moderator}
-        options={getConversationManagerOptions()}
+        options={getConversationManagerOptions(translate)}
         ariaLabelledBy="conversation-manager"
         name="conversation-manager"
       />
@@ -97,7 +104,7 @@ export const ChannelSettings = () => {
         <>
           <p className="heading-h3">Conversation history</p>
           <p className="subline" css={channelSettingsTextCss}>
-            {t('conversationHistoryText')}
+            {translate('conversationHistoryText')}
           </p>
 
           <Select

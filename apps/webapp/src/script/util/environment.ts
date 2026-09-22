@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isNull} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -41,7 +41,8 @@ const DEV_ENVIRONMENT_IDENTIFIERS = {
 
 const getElectronVersion = (userAgent: string): string => {
   // [match, version]
-  const [, electronVersion] = /Wire(?:Internal)?\/(\S+)/i.exec(userAgent) || [];
+  const electronMatch = /Wire(?:Internal)?\/(\S+)/i.exec(userAgent);
+  const [, electronVersion] = isNull(electronMatch) ? [] : electronMatch;
   return electronVersion;
 };
 
@@ -115,7 +116,7 @@ export const Environment: Environment = {
     }
 
     const electronVersion = getElectronVersion(Runtime.getUserAgent());
-    const showElectronVersion = is.nonEmptyString(electronVersion) && showWrapperVersion;
+    const showElectronVersion = isNonEmptyString(electronVersion) && showWrapperVersion;
     return showElectronVersion ? electronVersion : Config.getConfig().VERSION;
   },
   avsVersion: (): string => Config.getConfig().AVS_VERSION,

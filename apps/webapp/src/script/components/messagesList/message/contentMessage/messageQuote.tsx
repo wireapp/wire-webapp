@@ -1,0 +1,307 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {FC, Fragment, MouseEvent as ReactMouseEvent, useEffect, useState} from 'react';
+
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
+import cx from 'classnames';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import * as Icon from 'Components/icon';
+import {AssetImage} from 'Components/image';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Multipart} from 'Repositories/entity/message/multipart';
+import {Text} from 'Repositories/entity/message/text';
+import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {includesOnlyEmojis} from 'Util/emojiUtil';
+import {type Translate} from 'Util/localizerUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
+import {isErrorWithType} from 'Util/typePredicateUtil';
+
+import {AudioAsset} from './asset/audioAsset/audioAsset';
+import {FileAsset} from './asset/fileAsset/fileAsset';
+import {LocationAsset} from './asset/locationAsset';
+import {MultipartAssetPreview} from './asset/multipartAssetPreview';
+import {TextMessageRenderer} from './asset/textMessageRenderer';
+import {VideoAsset} from './asset/videoAsset/videoAsset';
+
+import {MessageActions} from '..';
+import {ConversationError} from '../../../../error/conversationError';
+import {QuoteEntity} from '../../../../message/quoteEntity';
+import {useMessageFocusedTabIndex} from '../util';
+
+function createPlaceholderMessage(translate: Translate) {
+  const message = new ContentMessage(undefined, translate);
+  const user = new User('', '', translate);
+  user.name(' ');
+  message.user(user);
+  const textAsset = new Text('fake-text', ' ');
+  message.assets.push(textAsset);
+  return message;
+}
+
+interface QuoteProps {
+  conversation: Conversation;
+  findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
+  focusMessage: (id: string) => void;
+  handleClickOnMessage: MessageActions['onClickMessage'];
+  quote: QuoteEntity;
+  selfId: QualifiedId;
+  showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
+  showUserDetails: (user: User) => void;
+  isMessageFocused: boolean;
+}
+
+export const Quote: FC<QuoteProps> = ({
+  conversation,
+  findMessage,
+  focusMessage,
+  handleClickOnMessage,
+  quote,
+  selfId,
+  showDetail,
+  showUserDetails,
+  isMessageFocused,
+}) => {
+  const [quotedMessage, setQuotedMessage] = useState<ContentMessage>();
+  const [error, setError] = useState<Error | string | undefined>(quote.error);
+  const {translate} = useApplicationContext();
+
+  useEffect(() => {
+    const handleQuoteDeleted = (messageId: string) => {
+      if (quotedMessage?.id === messageId) {
+        setError(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+        setQuotedMessage(undefined);
+      }
+    };
+
+    const handleQuoteUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
+      if (quotedMessage?.id === originalMessageId) {
+        setQuotedMessage(messageEntity);
+      }
+    };
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
+    };
+  }, [quotedMessage]);
+
+  useEffect(() => {
+    if (error === undefined && quote.messageId !== '') {
+      findMessage(conversation, quote.messageId)
+        .then(message => {
+          setQuotedMessage(message as ContentMessage);
+        })
+        .catch((error: unknown) => {
+          if (isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+            return setError(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+          }
+          throw error;
+        });
+    }
+  }, [conversation, error, findMessage, quote]);
+
+  return (
+    <div className="message-quote" data-uie-name="quote-item">
+      {error !== undefined ? (
+        <div className="message-quote__error" data-uie-name="label-error-quote">
+          {translate('replyQuoteError')}
+        </div>
+      ) : (
+        <QuotedMessage
+          quotedMessage={quotedMessage ?? createPlaceholderMessage(translate)}
+          selfId={selfId}
+          focusMessage={focusMessage}
+          handleClickOnMessage={handleClickOnMessage}
+          showDetail={showDetail}
+          showUserDetails={showUserDetails}
+          isMessageFocused={isMessageFocused}
+        />
+      )}
+    </div>
+  );
+};
+
+interface QuotedMessageProps {
+  focusMessage: (id: string) => void;
+  handleClickOnMessage: MessageActions['onClickMessage'];
+  quotedMessage: ContentMessage;
+  selfId: QualifiedId;
+  showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
+  showUserDetails: (user: User) => void;
+  isMessageFocused: boolean;
+}
+
+const QuotedMessage: FC<QuotedMessageProps> = ({
+  quotedMessage,
+  focusMessage,
+  selfId,
+  handleClickOnMessage,
+  showDetail,
+  showUserDetails,
+  isMessageFocused,
+}) => {
+  const {user, assets, senderName, was_edited, timestamp} = useKoSubscribableChildren(quotedMessage, [
+    'user',
+    'assets',
+    'senderName',
+    'was_edited',
+    'timestamp',
+  ]);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
+  const {translate} = useApplicationContext();
+
+  return (
+    <>
+      <div className="message-quote__sender">
+        <button
+          type="button"
+          className="button-reset-default text-left"
+          onClick={() => showUserDetails(user)}
+          data-uie-name="label-name-quote"
+          tabIndex={messageFocusedTabIndex}
+        >
+          {senderName}
+        </button>
+        {was_edited && (
+          <span data-uie-name="message-edited-quote" title={quotedMessage.displayEditedTimestamp()}>
+            <Icon.EditIcon />
+          </span>
+        )}
+      </div>
+      {assets.map((asset, index) => (
+        <Fragment key={index}>
+          {asset.isMultipart() &&
+            (() => {
+              const multipartAsset = asset as Multipart;
+              const shouldRenderText = multipartAsset.should_render_text();
+              const cellAssets = multipartAsset.getCellAssets();
+              const attachmentsCount = cellAssets.length;
+              const attachmentsCountCopy =
+                attachmentsCount === 1
+                  ? translate('replyBarSingleAttachment')
+                  : translate('replyBarMultipleAttachments', {count: attachmentsCount});
+
+              return (
+                <>
+                  {shouldRenderText && (
+                    <TextMessageRenderer
+                      onMessageClick={handleClickOnMessage}
+                      text={multipartAsset.render(selfId)}
+                      className={cx('message-quote__text', {
+                        'message-quote__text--large': includesOnlyEmojis(multipartAsset.text),
+                      })}
+                      isFocusable={isMessageFocused}
+                      data-uie-name="media-text-quote"
+                      collapse
+                    />
+                  )}
+                  {attachmentsCount > 0 && (
+                    <MultipartAssetPreview
+                      cellAssets={cellAssets}
+                      conversationId={quotedMessage.conversation_id}
+                      attachmentsCountCopy={attachmentsCountCopy}
+                      senderName={senderName}
+                      timestamp={timestamp}
+                    />
+                  )}
+                </>
+              );
+            })()}
+
+          {asset.isImage() && (
+            <div data-uie-name="media-picture-quote">
+              <AssetImage
+                className="message-quote__image"
+                imageStyles={{objectFit: 'cover'}}
+                image={asset}
+                onClick={event => showDetail(quotedMessage, event)}
+              />
+            </div>
+          )}
+
+          {asset.isText() && (
+            <TextMessageRenderer
+              onMessageClick={handleClickOnMessage}
+              text={asset.render(selfId)}
+              className={cx('message-quote__text', {
+                'message-quote__text--large': includesOnlyEmojis(asset.text),
+              })}
+              isFocusable={isMessageFocused}
+              data-uie-name="media-text-quote"
+              collapse
+            />
+          )}
+
+          {asset.isVideo() && (
+            <VideoAsset
+              isQuote
+              message={quotedMessage}
+              // className="message-quote__video"
+              data-uie-name="media-video-quote"
+              isFocusable={isMessageFocused}
+            />
+          )}
+
+          {asset.isAudio() && (
+            <AudioAsset
+              message={quotedMessage}
+              className="message-quote__audio"
+              data-uie-name="media-audio-quote"
+              isFocusable={isMessageFocused}
+            />
+          )}
+
+          {asset.isFile() && (
+            <FileAsset
+              message={quotedMessage}
+              // className="message-quote__file"
+              data-uie-name="media-file-quote"
+              isFocusable={isMessageFocused}
+            />
+          )}
+
+          {asset.isLocation() && <LocationAsset asset={asset} data-uie-name="media-location-quote" />}
+        </Fragment>
+      ))}
+      <button
+        type="button"
+        className="button-reset-default message-quote__timestamp"
+        onClick={() => {
+          focusMessage(quotedMessage.id);
+        }}
+        data-uie-name="label-timestamp-quote"
+        tabIndex={messageFocusedTabIndex}
+      >
+        {isBeforeToday(timestamp)
+          ? translate('replyQuoteTimeStampDate', {date: formatDateNumeral(timestamp)})
+          : translate('replyQuoteTimeStampTime', {time: formatTimeShort(timestamp)})}
+      </button>
+    </>
+  );
+};

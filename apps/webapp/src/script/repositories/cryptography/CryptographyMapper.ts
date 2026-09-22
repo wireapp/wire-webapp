@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
@@ -32,6 +33,7 @@ import {
   ButtonActionConfirmation,
   Calling,
   Cleared,
+  ClientAction,
   Composite,
   Confirmation,
   DataTransfer,
@@ -66,7 +68,7 @@ import {base64ToArray, arrayToBase64} from 'Util/util';
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
 import {CryptographyError} from '../../error/cryptographyError';
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 
 export interface MappedText {
@@ -181,6 +183,14 @@ export class CryptographyMapper {
 
       case GenericMessageType.CALLING: {
         specificContent = this._mapCalling(genericMessage.calling as Calling, event);
+        break;
+      }
+
+      case GenericMessageType.CLIENT_ACTION: {
+        if (genericMessage.clientAction !== ClientAction.RESET_SESSION) {
+          return;
+        }
+        specificContent = {type: ClientEvent.CONVERSATION.SESSION_RESET};
         break;
       }
 
@@ -368,11 +378,9 @@ export class CryptographyMapper {
 
   private _mapAsset(asset: Asset) {
     const {original, preview, uploaded, notUploaded} = asset;
-    let data: AssetData = {
-      content_length: 0,
-      content_type: '',
-      info: {},
-    };
+
+    // Initializing this with empty values breaks rendering of images of services
+    let data = {} as AssetData;
 
     if (original !== null && original !== undefined) {
       data = {
@@ -569,7 +577,11 @@ export class CryptographyMapper {
       }
       const cipherTextArray = base64ToArray(eventData.data);
       const cipherText = cipherTextArray;
-      const externalMessageBuffer = await this.core.service!.asset.decryptAsset({
+      const coreServices = this.core.service;
+      if (isUndefined(coreServices)) {
+        throw new Error('Core services are not initialized');
+      }
+      const externalMessageBuffer = await coreServices.asset.decryptAsset({
         cipherText,
         keyBytes: otrKey,
         sha256,

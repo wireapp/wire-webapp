@@ -17,6 +17,7 @@
  *
  */
 
+import {asyncNoop} from 'noop-esm';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from '../../test.fixtures';
 import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
@@ -77,7 +78,7 @@ test('Group Video call', {tag: ['@TC-8637', '@crit-flow-web']}, async ({createTe
     await guestPages.calling().clickAcceptCallButton();
   });
 
-  await test.step('Owner switches audio on and sends audio', async () => {});
+  await test.step('Owner switches audio on and sends audio', asyncNoop);
 
   await test.step(`Team member is able to "hear" owner's audio`, async () => {
     await api.callingService.verifyAudioIsBeingReceived(callingServiceInstanceId);

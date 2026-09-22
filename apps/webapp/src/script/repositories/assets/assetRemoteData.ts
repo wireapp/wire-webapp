@@ -18,6 +18,7 @@
  */
 
 import {AssetUrlData} from '@wireapp/core/lib/conversation/assetService/assetService';
+import {noop} from 'noop-esm';
 
 /**
  * Callback function that receives download progress updates.
@@ -38,7 +39,7 @@ export type AssetRemoteDataParams = {
  * Represents remote asset data with encryption and download tracking capabilities.
  */
 export class AssetRemoteData {
-  public cancelDownload: () => void = () => {};
+  public cancelDownload: () => void = noop;
   private progress: number = 0;
   private progressCallback?: ProgressCallback;
   public readonly forceCaching: boolean;

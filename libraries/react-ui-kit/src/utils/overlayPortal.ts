@@ -34,7 +34,7 @@ export const getOverlayPortalContainer = (): HTMLElement | undefined => {
 
   let root = document.getElementById(OVERLAY_PORTAL_ROOT_ID);
 
-  if (!root) {
+  if (root === null) {
     root = document.createElement('div');
     root.id = OVERLAY_PORTAL_ROOT_ID;
     root.setAttribute('data-wire-overlay-root', '');

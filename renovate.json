@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommits"],
+  "extends": ["config:recommended", ":semanticCommitsDisabled"],
   "labels": ["renovate"],
   "timezone": "Europe/Berlin",
   "dependencyDashboard": true,
@@ -9,18 +9,8 @@
   "configMigration": true,
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": false
   },
-  "customManagers": [
-    {
-      "customType": "regex",
-      "managerFilePatterns": ["/^\\.github/workflows/e2e-tests\\.yml$/"],
-      "matchStrings": ["image:\\s+mcr\\.microsoft\\.com/playwright:(?<currentValue>v\\d+\\.\\d+\\.\\d+-noble)"],
-      "depNameTemplate": "mcr.microsoft.com/playwright",
-      "datasourceTemplate": "docker",
-      "extractVersionTemplate": "^v(?<version>\\d+\\.\\d+\\.\\d+)-noble$"
-    }
-  ],
   "packageRules": [
     {
       "matchUpdateTypes": ["major"],
@@ -39,8 +29,13 @@
       "groupName": "docker images"
     },
     {
-      "matchPackageNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
-      "groupName": "playwright"
+      "matchPackageNames": ["quay.io/wire/mirror-images/playwright"],
+      "minimumReleaseAge": null
+    },
+    {
+      "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
+      "groupName": "playwright",
+      "addLabels": ["run-e2e"]
     },
     {
       "matchPackageNames": ["nx", "@nx/**"],
@@ -53,10 +48,8 @@
     {
       "matchPackageNames": [
         "eslint",
-        "@types/eslint",
         "@stylistic/**",
         "@tony.ganchev/eslint-plugin-header",
-        "@wireapp/eslint-config",
         "eslint-import-resolver-typescript",
         "eslint-plugin-header",
         "eslint-plugin-import",
@@ -141,6 +134,11 @@
     {
       "matchPackageNames": ["geolite2"],
       "allowedVersions": "<2"
+    },
+    {
+      "description": "Keep emoji-picker-react on 4.16.1 because later versions change emoji data and runtime aliases used by Wire",
+      "matchPackageNames": ["emoji-picker-react"],
+      "allowedVersions": "4.16.1"
     }
   ]
 }

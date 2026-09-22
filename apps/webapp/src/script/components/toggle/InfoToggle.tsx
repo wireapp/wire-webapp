@@ -19,7 +19,10 @@
 
 import {ReactNode, useId} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
+
+import {ViewerAccessIcon} from '@wireapp/react-ui-kit';
 
 interface InfoToggleProps {
   dataUieName: string;
@@ -30,6 +33,7 @@ interface InfoToggleProps {
   className?: string;
   setIsChecked: (checked: boolean) => void;
   footer?: ReactNode;
+  adminHintForShareDrive?: string;
 }
 
 const InfoToggle = ({
@@ -41,17 +45,26 @@ const InfoToggle = ({
   name,
   setIsChecked,
   footer,
+  adminHintForShareDrive,
 }: InfoToggleProps) => {
   const inputId = useId();
 
   return (
     <div data-uie-name={dataUieName} className={cx('info-toggle', className)}>
       <div className="info-toggle__row">
-        <div>
+        <div className="info-toggle__content">
           <label htmlFor={inputId} className="heading-h3">
             {name}
           </label>
           <p className="info-toggle__details">{info}</p>
+          {isNonEmptyString(adminHintForShareDrive) && (
+            <p className="info-toggle__admin-hint">
+              <span className="info-toggle__admin-hint-icon">
+                <ViewerAccessIcon width={14} height={14} aria-hidden="true" />
+              </span>
+              <span>{adminHintForShareDrive}</span>
+            </p>
+          )}
         </div>
         <div className={cx('slider', {disabled: isDisabled})}>
           <input

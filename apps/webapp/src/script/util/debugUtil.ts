@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isObject, isUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
@@ -35,6 +35,7 @@ import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseR
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
@@ -60,6 +61,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {disableForcedErrorReporting} from 'Repositories/tracking/telemetry.helpers';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {translate} from 'Util/localizerUtil';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
@@ -67,11 +69,12 @@ import {TIME_IN_MILLIS} from './timeUtil';
 import {downloadBlob} from './util';
 import {createUuid} from './uuid';
 
-import {E2EIHandler} from '../E2EIdentity';
-import {checkVersion} from '../lifecycle/newVersionHandler';
+import {E2EIHandler} from '../e2eIdentity';
+import {checkForNewVersion, createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export enum CoreCryptoLogLevel {
   Off = 1,
@@ -163,7 +166,11 @@ export class DebugUtil {
       const startTime = performance.now();
 
       for (const notification of notificationResponse.notifications) {
-        const events = this.core.service!.notification.handleNotification(
+        const coreServices = this.core.service;
+        if (isUndefined(coreServices)) {
+          throw new Error('Core services are not initialized');
+        }
+        const events = coreServices.notification.handleNotification(
           notification,
           NotificationSource.NOTIFICATION_STREAM,
         );
@@ -198,7 +205,9 @@ export class DebugUtil {
       return;
     }
 
-    const participants = new Array(number).fill(0).map((_, i) => new Participant(new User(), `some-client-id-${i}`));
+    const participants = new Array(number)
+      .fill(0)
+      .map((_, i) => new Participant(new User('', '', translate), `some-client-id-${i}`));
     participants.forEach(participant => call.addParticipant(participant));
   }
 
@@ -244,7 +253,7 @@ export class DebugUtil {
         const debugInfo = document.createElement('div');
         debugInfo.classList.add('debug-info');
         const value = el.dataset.uieUid;
-        if (is.nonEmptyString(value)) {
+        if (isNonEmptyString(value)) {
           debugInfo.textContent = value;
           el.appendChild(debugInfo);
         }
@@ -264,7 +273,7 @@ export class DebugUtil {
       removeDebugInfo(debugInfos);
     } else {
       const debugElements = document.querySelectorAll<HTMLElement>(
-        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name]',
+        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name], #message-list[data-uie-uid]',
       );
       addDebugInfo(debugElements);
     }
@@ -291,7 +300,7 @@ export class DebugUtil {
     const useAsyncNotificationStream =
       teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
     const useLegacyNotificationStream = !useAsyncNotificationStream;
-    return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
+    return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, noop, dryRun);
   }
 
   async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
@@ -300,7 +309,7 @@ export class DebugUtil {
 
   async updateActiveConversationKeyPackages() {
     const groupId = this.conversationState.activeConversation()?.groupId;
-    if (is.nonEmptyString(groupId)) {
+    if (isNonEmptyString(groupId)) {
       return this.core.service?.mls?.renewKeyMaterial(groupId);
     }
   }
@@ -323,12 +332,12 @@ export class DebugUtil {
     );
   }
 
-  isVideoBackgroundEffectsFeatureEnabled(): boolean {
-    return this.callingRepository.getBackgroundEffectsHandler().readFeatureEnabledStateFromStore();
+  isPerformancePanelEnabled(): boolean {
+    return this.callingRepository.getBackgroundEffectsHandler().readPerformancePanelEnabledFromStore();
   }
 
-  enableVideoBackgroundEffectsFeature(flag: boolean) {
-    return this.callingRepository.getBackgroundEffectsHandler().saveFeatureEnabledStateInStore(flag);
+  enablePerformancePanel(flag: boolean) {
+    return this.callingRepository.getBackgroundEffectsHandler().savePerformancePanelEnabledStateInStore(flag);
   }
 
   setupAvsDebugger() {
@@ -393,7 +402,11 @@ export class DebugUtil {
 
   /** Used by QA test automation. */
   async breakSession(userId: QualifiedId, clientId: string): Promise<void> {
-    const proteusService = this.core.service!.proteus;
+    const coreServices = this.core.service;
+    if (isUndefined(coreServices)) {
+      throw new Error('Core services are not initialized');
+    }
+    const proteusService = coreServices.proteus;
     const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
@@ -403,7 +416,7 @@ export class DebugUtil {
     defaultProtocol?: CONVERSATION_PROTOCOL,
   ) {
     const {teamId} = await this.userRepository.getSelf();
-    if (!is.nonEmptyString(teamId)) {
+    if (!isNonEmptyString(teamId)) {
       throw new Error('teamId of self user is undefined');
     }
 
@@ -431,7 +444,7 @@ export class DebugUtil {
   ) {
     const {teamId} = await this.userRepository.getSelf();
 
-    if (!is.nonEmptyString(teamId)) {
+    if (!isNonEmptyString(teamId)) {
       throw new Error('teamId of self user is undefined');
     }
 
@@ -444,8 +457,21 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  triggerVersionCheck(baseVersion: string): Promise<string | void> {
-    return checkVersion(baseVersion);
+  triggerVersionCheck(baseAssetVersion: string): Promise<string | void> {
+    const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
+      fetchBuildMetadata: globalThis.fetch.bind(globalThis),
+    });
+
+    return checkForNewVersion({
+      localAssetVersion: baseAssetVersion,
+      isOnline() {
+        return globalThis.navigator.onLine === true;
+      },
+      fetchLatestBuildMetadata,
+      onNewVersionAvailable() {
+        Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
+      },
+    });
   }
 
   /**
@@ -459,7 +485,10 @@ export class DebugUtil {
       .__lexicalEditor as LexicalEditor;
 
     lexicalEditor.update(() => {
-      const root = $getRoot().getLastChild()!;
+      const root = $getRoot().getLastChild();
+      if (isUndefined(root)) {
+        throw new Error('The editor has no root child');
+      }
       const textNode = $createTextNode(text);
       // the "as any" can be removed when this issue is fixed https://github.com/facebook/lexical/issues/5502
       (root as any).append(textNode);
@@ -542,7 +571,7 @@ export class DebugUtil {
   }
 
   private hasEventTime(event: BackendEvent): event is BackendEvent & {time: string} {
-    return 'time' in event && is.nonEmptyString(event.time);
+    return 'time' in event && isNonEmptyString(event.time);
   }
 
   private isEventInTimeRange(event: BackendEvent, from: Date, to: Date): boolean {
@@ -556,7 +585,7 @@ export class DebugUtil {
 
   private async getCurrentClientId(): Promise<string | undefined> {
     const currentClientId = this.clientState.currentClient?.id;
-    if (is.nonEmptyString(currentClientId)) {
+    if (isNonEmptyString(currentClientId)) {
       return currentClientId;
     }
 
@@ -583,7 +612,7 @@ export class DebugUtil {
       }
 
       sinceNotificationId = page.notifications.at(-1)?.id;
-      if (!is.nonEmptyString(sinceNotificationId)) {
+      if (!isNonEmptyString(sinceNotificationId)) {
         break;
       }
     }
@@ -706,10 +735,13 @@ export class DebugUtil {
 
   async getEventInfo(
     event: ConversationEvent,
-  ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
+  ): Promise<{conversation: Conversation; event: ConversationEvent; user?: User}> {
     const conversationId = event.qualified_conversation ?? {domain: '', id: event.conversation};
     const conversation = await this.conversationRepository.getConversationById(conversationId);
-    const user = await this.userRepository.getUserById(event.qualified_from ?? {domain: '', id: event.from});
+
+    // Some events (e.g. system-initiated conversation deletions/reminders) have no sender.
+    const senderId = event.qualified_from ?? (event.from ? {domain: '', id: event.from} : undefined);
+    const user = senderId ? await this.userRepository.getUserById(senderId) : undefined;
 
     const debugInformation = {
       conversation,
@@ -720,7 +752,7 @@ export class DebugUtil {
     const logMessage = `Hey ${this.userState.self().name()}, this is for you:`;
     this.logger.warn(logMessage, debugInformation);
     this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
-    this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
+    this.logger.warn(`From: ${debugInformation.user ? debugInformation.user.name() : 'system'}`, debugInformation.user);
 
     return debugInformation;
   }
@@ -752,10 +784,10 @@ export class DebugUtil {
     navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
 
     navigator.mediaDevices.getUserMedia = (constraints: MediaStreamConstraints) => {
-      const audioSet = is.object(constraints.audio) ? (constraints.audio as MediaTrackConstraintSet) : undefined;
+      const audioSet = isObject(constraints.audio) ? (constraints.audio as MediaTrackConstraintSet) : undefined;
       const audio = audioSet === undefined ? [] : generateAudioTrack(audioSet);
 
-      const videoSet = is.object(constraints.video) ? (constraints.video as MediaTrackConstraintSet) : undefined;
+      const videoSet = isObject(constraints.video) ? (constraints.video as MediaTrackConstraintSet) : undefined;
       const video = videoSet === undefined ? [] : generateVideoTrack(videoSet);
 
       return Promise.resolve(new MediaStream(audio.concat(video)));

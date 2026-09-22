@@ -34,8 +34,6 @@ import {error as StoreEngineError} from '@wireapp/store-engine';
 
 import {FileEngine} from './index';
 
-/* eslint-disable jest/expect-expect, jest/valid-title */
-
 describe('FileEngine', () => {
   const BASE_DIRECTORY = path.join(process.cwd(), '.tmp');
   const STORE_NAME = 'the-simpsons';

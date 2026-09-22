@@ -17,6 +17,8 @@
  *
  */
 
+import {isNull} from '@sindresorhus/is';
+
 export const onHitTopOrBottom = (
   scrollingElement: HTMLElement | null,
   onHitTop: () => void,
@@ -54,7 +56,7 @@ export const onHitTopOrBottom = (
     return onHitBottom();
   };
 
-  if (scrollingElement) {
+  if (!isNull(scrollingElement)) {
     scrollingElement.addEventListener('scroll', onScroll);
     scrollingElement.addEventListener('wheel', onMouseWheel);
   }

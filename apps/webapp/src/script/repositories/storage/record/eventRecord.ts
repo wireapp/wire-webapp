@@ -24,7 +24,7 @@ import type {ReactionType} from '@wireapp/core/lib/conversation/';
 
 import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
 
-import {StatusType} from '../../../message/StatusType';
+import {StatusType} from '../../../message/statusType';
 
 export interface ReadReceipt {
   domain?: string;
@@ -109,3 +109,10 @@ export type LegacyEventRecord<T = any> = {
   waiting_button_id?: string;
   senderClientId?: string;
 } & Partial<StoredEvent<{}>>;
+
+/**
+ * Narrows `from` to a required `string`. Some conversation events (e.g. system-initiated deletions
+ * and adminless-delete reminders) have no sender, but content-message flows that reuse
+ * `EventRecord`/`ClientConversationEvent` generically always have one.
+ */
+export type WithSender<T extends {from?: string}> = Omit<T, 'from'> & {from: string};

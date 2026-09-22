@@ -30,11 +30,14 @@ import {
   CONVERSATION_EVENT,
   ConversationMLSMessageAddEvent,
   ConversationMLSWelcomeEvent,
+  MEETING_EVENT,
+  MeetingCreateEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {noop} from 'noop-esm';
 import {Result, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
@@ -104,7 +107,7 @@ describe('ConversationService', () => {
     apiClients.forEach(client => client.disconnect());
   });
 
-  async function buildConversationService() {
+  async function buildConversationService(coreDatabase?: CoreDatabase) {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
     apiClients.push(client);
     jest.spyOn(client.api.conversation, 'postMlsMessage').mockReturnValue(
@@ -140,7 +143,7 @@ describe('ConversationService', () => {
 
     const mockedMLSService = {
       on: jest.fn(),
-      encryptMessage: () => {},
+      encryptMessage: noop,
       commitPendingProposals: () => Promise.resolve(),
       getEpoch: () => Promise.resolve(),
       getSafeEpoch: jest.fn(),
@@ -161,7 +164,7 @@ describe('ConversationService', () => {
       handleMLSWelcomeMessageEvent: jest.fn(),
     } as unknown as MLSService;
 
-    const mockedDb = await openDB('core-test-db');
+    const mockedDb = coreDatabase ?? (await openDB('core-test-db'));
 
     const groupIdFromConversationId = jest.fn(async () => 'groupId');
 
@@ -761,6 +764,22 @@ describe('ConversationService', () => {
   });
 
   describe('handleEvent', () => {
+    it('passes through meeting events without a conversation id', async () => {
+      const getFromDatabase = jest.fn();
+      const coreDatabase = {get: getFromDatabase} as unknown as CoreDatabase;
+      const [conversationService] = await buildConversationService(coreDatabase);
+      const meetingEvent: MeetingCreateEvent = {
+        type: MEETING_EVENT.CREATE,
+        time: '2026-07-27T12:00:00.000Z',
+        qualified_id: {id: 'meeting-id', domain: 'example.com'},
+      };
+
+      const result = await conversationService.handleEvent(meetingEvent);
+
+      expect(result).toEqual({status: 'unhandled'});
+      expect(getFromDatabase).not.toHaveBeenCalled();
+    });
+
     it('rejoins a MLS conversation if epoch mismatch detected when decrypting mls message', async () => {
       const [conversationService, {apiClient, mlsService}] = await buildConversationService();
       const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};

@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {Page} from '@playwright/test';
 
 import {MarketingConsentModal} from './webapp/modals/marketingConsent.modal';
@@ -54,6 +55,7 @@ import {HistoryExportPage} from './webapp/pages/historyExport.page';
 import {HistoryImportPage} from './webapp/pages/historyImport.page';
 import {HistoryInfoPage} from './webapp/pages/infoHistory.page';
 import {LoginPage} from './webapp/pages/login.page';
+import {MeetingsPage} from './webapp/pages/meetings.page';
 import {MessageDetailsPage} from './webapp/pages/messageDetails.page';
 import {OptionsPage} from './webapp/pages/options.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
@@ -118,7 +120,7 @@ export class PageManager {
   };
 
   openSSOPage = async (baseUrl: string = webAppPath) => {
-    await this.page.goto(new URL(`/auth/#/sso`, baseUrl).toString());
+    await this.page.goto(new URL(`/auth/#/sso`, baseUrl).toString(), {waitUntil: 'commit', timeout: 120_000});
   };
 
   openUrl = (url: string) => {
@@ -147,7 +149,12 @@ export class PageManager {
     if (!this.cache.has(key)) {
       this.cache.set(key, factory());
     }
-    return this.cache.get(key)!;
+    const cachedPage = this.cache.get(key);
+    if (isUndefined(cachedPage)) {
+      throw new Error(`Page manager cache did not contain ${key}`);
+    }
+
+    return cachedPage;
   }
 
   // ───────────── WEBAPP ─────────────
@@ -190,6 +197,7 @@ export class PageManager {
       historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
       historyExport: () => this.getOrCreate('webapp.pages.historyExport', () => new HistoryExportPage(this.page)),
       historyImport: () => this.getOrCreate('webapp.pages.historyImport', () => new HistoryImportPage(this.page)),
+      meetings: () => this.getOrCreate('webapp.pages.meetings', () => new MeetingsPage(this.page)),
       messageDetails: () => this.getOrCreate('webapp.pages.messageDetails', () => new MessageDetailsPage(this.page)),
       participantDetails: () =>
         this.getOrCreate('webapp.pages.participantsDetails', () => new ParticipantDetails(this.page)),

@@ -17,6 +17,8 @@
  *
  */
 
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
+
 import {containsOnlyLink, getFirstLinkWithOffset} from './helpers';
 
 describe('containsOnlyLink', () => {
@@ -89,6 +91,7 @@ describe('getFirstLinkWithOffset', () => {
 
   it('should return the correct link and offset for a single link without text', () => {
     const link = getFirstLinkWithOffset('wire.com');
+    assertNotNullOrUndefined(link);
 
     expect(link.offset).toEqual(0);
     expect(link.url).toEqual('wire.com');
@@ -96,6 +99,7 @@ describe('getFirstLinkWithOffset', () => {
 
   it('should return the correct link and offset for a single link with text in front', () => {
     const link = getFirstLinkWithOffset('Hey check wire.com');
+    assertNotNullOrUndefined(link);
 
     expect(link.offset).toEqual(10);
     expect(link.url).toEqual('wire.com');
@@ -103,6 +107,7 @@ describe('getFirstLinkWithOffset', () => {
 
   it('should return the correct link and offset for a single link surrounded by text', () => {
     const Link = getFirstLinkWithOffset('Hey check wire.com PLEASE!');
+    assertNotNullOrUndefined(Link);
 
     expect(Link.offset).toEqual(10);
     expect(Link.url).toEqual('wire.com');
@@ -110,6 +115,7 @@ describe('getFirstLinkWithOffset', () => {
 
   it('should return the correct link and offset for a single link preceded by a code block', () => {
     const Link = getFirstLinkWithOffset('```\ntrap.com `extra trap!`\n```\nwire.com');
+    assertNotNullOrUndefined(Link);
 
     expect(Link.offset).toEqual(1);
     expect(Link.url).toEqual('wire.com');
@@ -117,6 +123,7 @@ describe('getFirstLinkWithOffset', () => {
 
   it('should return the correct link and offset for a single link followed by a code block', () => {
     const Link = getFirstLinkWithOffset('wire.com\n```\ntrap.com `extra trap!`\n```');
+    assertNotNullOrUndefined(Link);
 
     expect(Link.offset).toEqual(0);
     expect(Link.url).toEqual('wire.com');
@@ -124,6 +131,7 @@ describe('getFirstLinkWithOffset', () => {
 
   it('should return the correct link and offset for multiple links', () => {
     const link_preview = getFirstLinkWithOffset('wire.com wire.com wire.com wire.com wire.com');
+    assertNotNullOrUndefined(link_preview);
 
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');
@@ -131,6 +139,7 @@ describe('getFirstLinkWithOffset', () => {
 
   it('ignores mailto link', () => {
     const Link = getFirstLinkWithOffset('mailto:person@wire.com wire.com');
+    assertNotNullOrUndefined(Link);
 
     expect(Link.offset).toEqual(23);
     expect(Link.url).toEqual('wire.com');

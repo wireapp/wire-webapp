@@ -17,6 +17,7 @@
  *
  */
 
+import {isNull, isUndefined} from '@sindresorhus/is';
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
 import 'core-js/full/reflect';
@@ -31,15 +32,19 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {initializeDataDog} from 'Util/dataDog';
+import {translate} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {enableLogging} from 'Util/loggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import './configureEnvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
-import {Root} from './page/Root';
+import {Root} from './page/root';
 
-import {createWallClock} from '../clock/wallClock';
+// eslint-disable-next-line import/order
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+
 import {Config} from '../Config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
@@ -71,14 +76,14 @@ const store = configureStore({
   localStorage,
 });
 
-const render = (Component: FC): void => {
+const render = (Component: FC<{translate: Translate}>): void => {
   const container = document.getElementById(mainId);
-  if (!container) {
+  if (isNull(container)) {
     throw new Error(`No container '${mainId}' found to render application`);
   }
   createRoot(container).render(
     <Provider store={store}>
-      <Component />
+      <Component translate={translate} />
     </Provider>,
   );
 };
@@ -98,9 +103,9 @@ async function runApp() {
 
   render(Root);
   setAppLocale();
-  if (hotReloadCapableModule.hot !== undefined) {
+  if (!isUndefined(hotReloadCapableModule.hot)) {
     hotReloadCapableModule.hot.accept('./page/Root', () => {
-      render(require('./page/Root').Root);
+      render(require('./page/root').Root);
     });
   }
 }

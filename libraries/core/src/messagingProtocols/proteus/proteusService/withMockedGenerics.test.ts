@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable import/order */
 import * as GenericMessageParams from '../utility/getGenericMessageParams';
 
 import {APIClient} from '@wireapp/api-client';
@@ -62,12 +61,6 @@ const prepareProteusService = async () => {
   return proteusService;
 };
 
-afterAll(() => {
-  jest.clearAllTimers();
-  apiClients.forEach(client => client.disconnect());
-  cleanupProteusServiceMocks();
-});
-
 describe('sendGenericMessage', () => {
   describe('targetted messages', () => {
     it(`indicates when sending was canceled`, async () => {
@@ -93,6 +86,12 @@ describe('sendGenericMessage', () => {
 });
 
 describe('createConversation', () => {
+  afterAll(() => {
+    jest.clearAllTimers();
+    apiClients.forEach(client => client.disconnect());
+    cleanupProteusServiceMocks();
+  });
+
   describe('calls the api with valid conversation data', () => {
     const createConversationResult = {
       name: 'test',

@@ -64,6 +64,18 @@ describe('useShowLoadingOverlay', () => {
     expect(result.current.showLoadingOverlay).toBe(true);
   });
 
+  it('should show loading overlay while raw video is loading when background effects are disabled', () => {
+    const {result} = renderHook(() => useShowLoadingOverlay(true, true, undefined));
+
+    expect(result.current.showLoadingOverlay).toBe(true);
+
+    act(() => {
+      result.current.onVideoCanPlay();
+    });
+
+    expect(result.current.showLoadingOverlay).toBe(false);
+  });
+
   it('should hide loading overlay when video is ready', () => {
     const processedVideoStream = createProcessedVideoStream(createMediaStream());
 

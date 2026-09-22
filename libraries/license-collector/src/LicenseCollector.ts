@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import * as fs from 'fs-extra';
 import logdown from 'logdown';
 import pkginfo from 'npm-registry-package-info';
@@ -87,7 +88,7 @@ export class LicenseCollector {
     });
     this.logger.state.isEnabled = true;
 
-    if (!this.options.repositories.length) {
+    if (!Boolean(this.options.repositories.length)) {
       throw new Error('No repositories specified');
     }
 
@@ -99,7 +100,7 @@ export class LicenseCollector {
   private async checkPrerequisites(): Promise<void> {
     const {stderr: stderrVersion} = await execAsync('git --version');
 
-    if (stderrVersion) {
+    if (Boolean(stderrVersion)) {
       throw new Error(`No git installation found: ${stderrVersion}`);
     }
   }
@@ -111,12 +112,16 @@ export class LicenseCollector {
       const {url} = repository;
       const id = crypto.randomBytes(CLONE_DIR_ID_BYTE_LENGTH).toString('hex');
       const cloneDir = path.join(this.TMP_DIR, id);
-      const name = gitUrlRegex.exec(url) || ['', url];
-      repository.name = name[1]!;
+      const name = gitUrlRegex.exec(url) ?? ['', url];
+      const repositoryName = name[1];
+      if (isUndefined(repositoryName)) {
+        throw new Error(`Unable to determine repository name from ${url}`);
+      }
+      repository.name = repositoryName;
 
       repository.dir = cloneDir;
 
-      this.logger.info(`${name[1]}: Cloning "${url}" into "${cloneDir}" ...`);
+      this.logger.info(`${repositoryName}: Cloning "${url}" into "${cloneDir}" ...`);
 
       const {stderr: stderrClone} = await execAsync(`git clone --depth 1 "${url}" "${cloneDir}"`);
 
@@ -172,12 +177,16 @@ export class LicenseCollector {
           // skip invalid package.json files
         }
 
-        if (!packageJson) {
+        if (packageJson === undefined) {
           continue;
         }
 
-        const dependencies = Object.keys(packageJson.dependencies || []).filter(Boolean);
-        const devDependencies = Object.keys(packageJson.devDependencies || []).filter(Boolean);
+        const dependencies = Object.keys(packageJson.dependencies !== undefined ? packageJson.dependencies : {}).filter(
+          Boolean,
+        );
+        const devDependencies = Object.keys(
+          packageJson.devDependencies !== undefined ? packageJson.devDependencies : {},
+        ).filter(Boolean);
 
         const plural = (length: number) => (length === 1 ? 'y' : 'ies');
         const packageFileName = packageFile.replace(new RegExp(cloneDir, 'gm'), '');
@@ -212,7 +221,10 @@ export class LicenseCollector {
     this.logger.info(`Extracted ${packages.length} licenses.`);
 
     for (const packageName of packages) {
-      const currentPackage = result.data[packageName]!;
+      const currentPackage = result.data[packageName];
+      if (isUndefined(currentPackage)) {
+        throw new Error(`Missing package data for ${packageName}`);
+      }
 
       const link = currentPackage.homepage ?? currentPackage.repository?.url ?? 'none';
 
@@ -240,7 +252,7 @@ export class LicenseCollector {
 
     return new Promise((resolve, reject) => {
       return pkginfo(opts, (error: Error | null, data: pkginfo.Data) => {
-        return error ? reject(error) : resolve(data);
+        return Boolean(error) ? reject(error) : resolve(data);
       });
     });
   }

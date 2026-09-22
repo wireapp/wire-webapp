@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
 import {EventEmitter} from 'events';
 
@@ -53,7 +53,7 @@ export class TransientStore extends EventEmitter {
 
   public deleteFromCache(cacheKey: string): string {
     const timeoutID = this.bundles[cacheKey]?.timeoutID;
-    if (!is.nullOrUndefined(timeoutID)) {
+    if (!isNullOrUndefined(timeoutID)) {
       clearTimeout(timeoutID);
     }
     delete this.bundles[cacheKey];
@@ -87,9 +87,11 @@ export class TransientStore extends EventEmitter {
 
     const bundles = await Promise.all(readBundles);
 
-    for (const index in bundles) {
-      const bundle = bundles[index]!;
-      const cacheKey = cacheKeys[index]!;
+    for (const [index, bundle] of bundles.entries()) {
+      const cacheKey = cacheKeys[index];
+      if (isUndefined(cacheKey)) {
+        throw new Error(`Missing cache key for bundle at index ${index}`);
+      }
       await this.startTimer(cacheKey);
       this.bundles[cacheKey] = bundle;
     }
@@ -108,7 +110,7 @@ export class TransientStore extends EventEmitter {
     const bundle: TransientBundle = this.createTransientBundle(record, ttl);
 
     const cachedBundle = await this.getFromCache(primaryKey);
-    if (cachedBundle) {
+    if (Boolean(cachedBundle)) {
       const message = `Record with primary key "${primaryKey}" already exists in table "${this.tableName}" of database "${this.engine.storeName}".`;
       throw new RecordAlreadyExistsError(message);
     } else {
@@ -144,9 +146,13 @@ export class TransientStore extends EventEmitter {
   }
 
   private async expireBundle(cacheKey: string): Promise<ExpiredBundle> {
+    const bundle = this.bundles[cacheKey];
+    if (isUndefined(bundle)) {
+      throw new Error(`Cannot expire missing transient bundle ${cacheKey}`);
+    }
     const expiredBundle: ExpiredBundle = {
       cacheKey: cacheKey,
-      payload: this.bundles[cacheKey]!.payload,
+      payload: bundle.payload,
       primaryKey: this.constructPrimaryKey(cacheKey),
     };
 
@@ -180,7 +186,7 @@ export class TransientStore extends EventEmitter {
   private async startTimer(cacheKey: string): Promise<TransientBundle> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
     let bundle = await this.get(primaryKey);
-    if (!bundle) {
+    if (bundle === undefined) {
       bundle = new TransientBundle();
       bundle.expires = 0;
       bundle.payload = undefined;
@@ -189,7 +195,7 @@ export class TransientStore extends EventEmitter {
     const timespan: number = expires - Date.now();
     if (expires <= 0) {
       await this.expireBundle(cacheKey);
-    } else if (is.nullOrUndefined(timeoutID)) {
+    } else if (isNullOrUndefined(timeoutID)) {
       bundle.timeoutID = setTimeout(async () => {
         const expiredBundle = await this.expireBundle(cacheKey);
         this.emit(TransientStore.TOPIC.EXPIRED, expiredBundle);

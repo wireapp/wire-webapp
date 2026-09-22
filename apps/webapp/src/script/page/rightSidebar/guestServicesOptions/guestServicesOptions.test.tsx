@@ -1,0 +1,111 @@
+/*
+ * Wire
+ * Copyright (C) 2019 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {render, waitFor} from '@testing-library/react';
+import ko from 'knockout';
+
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
+import {GuestServicesOptions} from './guestServicesOptions';
+
+import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
+const testFactory = new TestFactory();
+let conversationRepository: ConversationRepository;
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
+const getDefaultParams = (isGuest: boolean = true) => {
+  return {
+    conversationRepository,
+    isGuest,
+    onBack: jest.fn(),
+    onClose: jest.fn(),
+    teamRepository: {
+      conversationHasGuestLinkEnabled: async (conversationId: string) => true,
+    } as TeamRepository,
+    teamState: {
+      ...new TeamState(),
+      isGuestLinkEnabled: ko.pureComputed(() => true),
+      isInTeam: () => true,
+    } as unknown as TeamState,
+  };
+};
+
+describe('GuestServicesOptions', () => {
+  beforeAll(async () => {
+    conversationRepository = await testFactory.exposeConversationActors();
+  });
+
+  it('shows Shared Drive guest restrictions for a Cells conversation', async () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+    conversation.accessCode('accessCode');
+    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+
+    const newConv = {
+      ...conversation,
+      inTeam: ko.pureComputed(() => true),
+      isGuestRoom: ko.pureComputed(() => true),
+    } as Conversation;
+
+    const defaultProps = getDefaultParams();
+    const {getByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={newConv} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    await waitFor(() => {
+      getByText('guestOptionsCopyLink');
+    });
+
+    expect(getByText('guestRoomToggleInfoHead')).not.toBeNull();
+    expect(getByText('guestRoomToggleCellsInfo')).toBeInTheDocument();
+  });
+
+  it('does not show Shared Drive guest restrictions for a non-Cells conversation', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const defaultProps = getDefaultParams();
+    const {queryByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(queryByText('guestRoomToggleCellsInfo')).not.toBeInTheDocument();
+  });
+
+  it('renders services options', () => {
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const defaultProps = getDefaultParams(false);
+    const {getByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
+
+    expect(getByText('appsRoomToggleInfo')).not.toBeNull();
+  });
+});

@@ -17,9 +17,20 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import {isEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {match} from 'path-to-regexp';
 
+import {isConversationListTab, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+
 type Routes = Record<string, ((...args: any[]) => void | Promise<void>) | null>;
+
+let routerWallClock: WallClock = createWallClock();
+
+export const configureRouterWallClock = (wallClock: WallClock): void => {
+  routerWallClock = wallClock;
+};
 
 const defaultRoute: Routes = {
   // do nothing if url was not matched
@@ -32,10 +43,11 @@ let routes: Routes = {};
  * Matches the current URL path against configured routes and triggers the appropriate handler.
  */
 const parseRoute = () => {
-  const currentPath = window.location.hash.replace('#', '') || '/';
+  const pathFromHash = window.location.hash.replace('#', '');
+  const currentPath = isNonEmptyString(pathFromHash) ? pathFromHash : '/';
 
   const exactMatch = routes[currentPath];
-  if (exactMatch) {
+  if (!isNullOrUndefined(exactMatch)) {
     return exactMatch();
   }
 
@@ -48,7 +60,7 @@ const parseRoute = () => {
       const matcher = match(pattern, {decode: decodeURIComponent});
       const result = matcher(currentPath);
 
-      if (!result || !handler) {
+      if (result === false || isNullOrUndefined(handler)) {
         continue;
       }
 
@@ -58,14 +70,14 @@ const parseRoute = () => {
       // Handle wildcard parameter
       if (paramNames.some(name => name.startsWith('*'))) {
         const wildcardName = paramNames.find(name => name.startsWith('*'));
-        if (wildcardName) {
+        if (isNonEmptyString(wildcardName)) {
           const segments = params[wildcardName];
           return handler(...Object.values(params).filter(param => param !== segments), segments);
         }
       }
 
       // Handle optional parameters
-      if (paramNames.length === 0) {
+      if (isEmptyArray(paramNames)) {
         return handler(params);
       }
 
@@ -85,10 +97,31 @@ export const configureRoutes = (routeDefinitions: Routes): void => {
   parseRoute();
 };
 export const navigate = (path: string) => {
-  setHistoryParam(path);
-  parseRoute();
+  const isDeferred = setHistoryParam(path);
+  if (!isDeferred) {
+    parseRoute();
+  }
 };
 
-export const setHistoryParam = (path: string) => {
+export const setHistoryParam = (path: string): boolean => {
+  const hashUnchanged = window.location.hash === `#${path}`;
   window.location.hash = path;
+
+  const shouldDefer = hashUnchanged && path === '/' && isConversationListTab(useSidebarStore.getState().currentTab);
+
+  if (shouldDefer) {
+    // Setting the hash to its current value does not fire a native `hashchange` event, so route
+    // handlers that rely on it (e.g. re-showing the most recent conversation) would otherwise
+    // never run. Force route re-evaluation async, matching the timing of a real hashchange, so
+    // callers that synchronously update content state right after calling this still take effect
+    // first.
+    routerWallClock.setTimeout(() => {
+      if (!isConversationListTab(useSidebarStore.getState().currentTab)) {
+        return;
+      }
+      parseRoute();
+    }, 0);
+  }
+
+  return shouldDefer;
 };

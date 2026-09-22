@@ -20,6 +20,12 @@
 const CHECK_INTERVAL = 2000;
 const TOLERANCE = CHECK_INTERVAL * 2;
 
+export type BackFromSleepDetails = {
+  readonly expectedIntervalMilliseconds: number;
+  readonly observedIntervalMilliseconds: number;
+  readonly suspensionDurationMilliseconds: number;
+};
+
 /**
  * This function will call the callback when the system has very likely woken up from sleep.
  * It will ignore small delays and will only call the callback if the system was disconnected during sleep.
@@ -42,7 +48,7 @@ export const onBackFromSleep = ({
   callback,
   isDisconnected: isDisconnectedCallback,
 }: {
-  callback: () => void;
+  callback: (details: BackFromSleepDetails) => void;
   isDisconnected?: () => boolean;
 }) => {
   let lastTime = new Date().getTime();
@@ -50,20 +56,25 @@ export const onBackFromSleep = ({
 
   const tid = setInterval(() => {
     const currentTime = new Date().getTime();
+    const observedIntervalMilliseconds = currentTime - lastTime;
 
     // The interval did not run for a while, so we assume the system was sleeping
-    const wasAsleep = currentTime > lastTime + TOLERANCE;
+    const wasAsleep = observedIntervalMilliseconds > TOLERANCE;
 
     lastTime = currentTime;
 
-    if (isDisconnectedCallback && isDisconnectedCallback()) {
+    if (isDisconnectedCallback !== undefined && isDisconnectedCallback()) {
       wasDisconnected = true;
     }
 
     if (wasAsleep) {
-      if (!isDisconnectedCallback || wasDisconnected) {
+      if (!Boolean(isDisconnectedCallback) || wasDisconnected) {
         wasDisconnected = false;
-        callback();
+        callback({
+          expectedIntervalMilliseconds: CHECK_INTERVAL,
+          observedIntervalMilliseconds,
+          suspensionDurationMilliseconds: Math.max(0, observedIntervalMilliseconds - CHECK_INTERVAL),
+        });
       }
     }
   }, CHECK_INTERVAL);

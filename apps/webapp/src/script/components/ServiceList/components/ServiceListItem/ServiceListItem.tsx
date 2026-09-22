@@ -19,13 +19,13 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {ParticipantItemContent} from 'Components/ParticipantItemContent';
-import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {ParticipantItemContent} from 'Components/participantItemContent';
+import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 interface ServiceListItemProps {
   service: ServiceEntity;
@@ -33,8 +33,8 @@ interface ServiceListItemProps {
 }
 
 export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
+  const {translate} = useApplicationContext();
   const {name: serviceName} = useKoSubscribableChildren(service, ['name']);
-  const serviceShortDescription = service.isApp ? service.description : service.summary;
 
   const onServiceClick = () => onClick(service);
 
@@ -52,13 +52,13 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       }
       data-uie-name="item-service"
       data-uie-value={serviceName}
-      aria-label={t('accessibility.openConversation', {name: serviceName})}
+      aria-label={translate('accessibility.openConversation', {name: serviceName})}
       css={listWrapper({noUnderline: true})}
     >
       <div css={listItem()}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={service} aria-hidden="true" css={{margin: '0 16px'}} />
 
-        <ParticipantItemContent participant={service} shortDescription={serviceShortDescription} showArrow />
+        <ParticipantItemContent participant={service} showArrow />
       </div>
     </div>
   );

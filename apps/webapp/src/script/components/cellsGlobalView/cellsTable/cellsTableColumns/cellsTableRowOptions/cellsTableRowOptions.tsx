@@ -1,0 +1,94 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {ReactElement} from 'react';
+
+import {isNonEmptyString} from '@sindresorhus/is';
+
+import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
+
+import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
+import {useShouldRestrictGlobalDriveNodeActions} from 'Components/cellsGlobalView/common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {forcedDownloadFile} from 'Util/util';
+
+import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
+
+import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+import {showShareModal} from '../cellsShareModal/cellsShareModal';
+
+interface CellsTableRowOptionsProps {
+  node: CellNode;
+  cellsRepository: CellsRepository;
+}
+
+export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): ReactElement => {
+  const {node, cellsRepository} = properties;
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {handleOpenFile} = useCellsFilePreviewModal();
+
+  const url = node.url;
+  const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
+  const shouldDisableRestrictedActions = useShouldRestrictGlobalDriveNodeActions(node);
+  // DropdownMenu.Item disabled state is visual/ARIA only for native onClick handlers.
+  // Keep restricted actions without a handler so viewer access cannot activate them.
+  const restrictedActionClickHandler = <ClickHandler extends () => void>(clickHandler: ClickHandler) =>
+    shouldDisableRestrictedActions ? undefined : clickHandler;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <button css={buttonStyles} aria-label={translate('cells.options.label')}>
+          <MoreIcon css={iconStyles} />
+          <span css={textStyles}>{translate('cells.options.label')}</span>
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item
+          onClick={() => (node.type === CellNodeType.FOLDER ? openFolder({path: node.path}) : handleOpenFile(node))}
+        >
+          {translate('cells.options.open')}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          disabled={shouldDisableRestrictedActions}
+          onClick={restrictedActionClickHandler(() =>
+            showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate}),
+          )}
+        >
+          {translate('cells.options.share')}
+        </DropdownMenu.Item>
+        {isNonEmptyString(url) && (
+          <DropdownMenu.Item
+            disabled={shouldDisableRestrictedActions}
+            onClick={restrictedActionClickHandler(() =>
+              forcedDownloadFile({
+                url,
+                name,
+              }),
+            )}
+          >
+            {translate('cells.options.download')}
+          </DropdownMenu.Item>
+        )}
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  );
+};

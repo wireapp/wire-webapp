@@ -35,20 +35,20 @@ Trigger: **Manual** (`workflow_dispatch`) from the [Create Library Release PR](h
 
 What it does:
 
-1. Checks out `dev` and creates a release branch (`chore/library-release-<run_id>`).
+1. Checks out `main` and creates a release branch (`chore/library-release-<run_id>`).
 2. Installs dependencies (`./bin/yarn --immutable`).
 3. Lints, tests, and builds **all** libraries (`tag:type:lib`).
 4. Runs `nx release version` which:
    - Reads conventional commits since the last release tag.
    - Bumps versions in `package.json` for each `npm:public` library.
    - Creates a git commit and tag per version bump.
-5. Pushes the branch with tags and opens a PR to `dev` with the **`publish-to-npm`** label.
+5. Pushes the branch with tags and opens a PR to `main` with the **`publish-to-npm`** label.
 
 If no version changes are detected the workflow exits without creating a PR.
 
 ### Step 2 — Publish on Merge
 
-Trigger: **Automatic** when a PR with the `publish-to-npm` label is merged to `dev` (or via `workflow_dispatch` from the [Publish packages to npm](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries-on-merge.yml) action page).
+Trigger: **Automatic** when a PR with the `publish-to-npm` label is merged to `main` (or via `workflow_dispatch` from the [Publish packages to npm](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries-on-merge.yml) action page).
 
 What it does:
 
@@ -62,7 +62,7 @@ What it does:
 
 ### 1. Write Your Changes with Conventional Commits
 
-Merge your library changes to `dev` using conventional commit messages so that `nx release` can determine the correct version bump:
+Merge your library changes to `main` using conventional commit messages so that `nx release` can determine the correct version bump:
 
 ```bash
 git commit -m "feat(api-client): add new endpoint"   # → minor bump
@@ -73,7 +73,7 @@ git commit -m "feat(api-client)!: drop legacy auth"   # → major bump
 ### 2. Trigger the Release PR
 
 1. Open the [**Create Library Release PR**](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries.yml) workflow page.
-2. Click **Run workflow** (branch: `dev`).
+2. Click **Run workflow** (branch: `main`).
 3. Wait for the workflow to complete — it will open a PR automatically.
 
 ### 3. Review the PR
@@ -98,7 +98,7 @@ After merging, the [publish workflow](https://github.com/wireapp/wire-webapp/act
 | `feat:` | Minor (0.**X**.0) | `feat(api-client): add cells support` |
 | `fix:` | Patch (0.0.**X**) | `fix(api-client): resolve retry logic` |
 | `feat!:` / `BREAKING CHANGE:` | Major (**X**.0.0) | `feat(api-client)!: remove deprecated methods` |
-| `chore:`, `docs:`, `refactor:` | None | `chore: update dev dependencies` |
+| `chore:`, `docs:`, `refactor:` | None | `chore: update development dependencies` |
 
 Only commits scoped to a published library (or unscoped commits touching its files) trigger a version bump for that library.
 

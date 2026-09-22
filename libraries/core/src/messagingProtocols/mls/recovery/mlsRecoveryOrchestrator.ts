@@ -168,6 +168,14 @@ type executeParams<T> = {
   context: OperationContext;
   callBack: () => Promise<T>;
   retry?: boolean;
+  /**
+   * An already-caught error to map and recover from instead of invoking {@link callBack} first.
+   *
+   * Used when the failure was reported out of band (for instance through an event) and the raw
+   * error shape must stay authoritative for the mapper. The callback is still re-invoked after
+   * recovery when the resolved policy sets {@link RetryPolicy.reRunOriginalOperation}.
+   */
+  seedError?: unknown;
 };
 
 function isRecoveryPolicy(entry: RecoveryPolicy | PerOperationPolicies): entry is RecoveryPolicy {
@@ -192,9 +200,12 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
    */
   public async execute(params: executeParams<void>): Promise<void>;
   public async execute<T>(params: executeParams<T>): Promise<T>;
-  public async execute<T>({context, callBack, retry = true}: executeParams<T>): Promise<T | void> {
+  public async execute<T>({context, callBack, retry = true, seedError}: executeParams<T>): Promise<T | void> {
     try {
       this.logger.info('Executing MLS operation with recovery orchestration', {context});
+      if (seedError !== undefined) {
+        throw seedError;
+      }
       return await callBack();
     } catch (rawError: unknown) {
       this.logger.info('Operation failed, invoking MLS recovery orchestrator', {rawError});
@@ -226,7 +237,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   /** Resolve the effective policy for the mapped error and operation. Supports per-operation policies. */
   private getPolicyFor = (err: DomainMlsError, ctx: OperationContext): RecoveryPolicy => {
     const entry = this.policies[err.type];
-    if (!entry) {
+    if (entry === undefined) {
       return {action: RecoveryActionKind.Unknown, retryConfig: {maxAttempts: 0}};
     }
 
@@ -249,7 +260,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     recoveryKey: string,
   ) {
     const id = context.qualifiedConversationId;
-    if (!id) {
+    if (id === undefined) {
       const errorMessage = `Missing conversationId for recovery action ${policy.action}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
@@ -394,9 +405,11 @@ export const minimalDefaultPolicies: PolicyTable = {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
       retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
     },
+    // Once the epoch is re-synced, publishing keying material again in a fresh transaction can
+    // succeed, so the original operation is worth re-running.
     keyMaterialUpdate: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
-      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
     },
   },
   // Use per-operation semantics so typed operations re-run once post-recovery

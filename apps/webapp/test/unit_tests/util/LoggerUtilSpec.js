@@ -17,7 +17,7 @@
  *
  */
 
-import {enableLogging} from 'src/script/util/LoggerUtil';
+import {enableLogging} from 'src/script/util/loggerUtil';
 import {Config} from 'src/script/Config';
 
 describe('enableLogging', () => {

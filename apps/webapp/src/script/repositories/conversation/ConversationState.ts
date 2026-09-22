@@ -29,13 +29,14 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
 import {
-  MLSConversation,
-  ProteusConversation,
+  isMeetingConversation,
   isMLS1to1ConversationWithUser,
   isMLSConversation,
   isProteus1to1ConversationWithUser,
-  isSelfConversation,
   isReadableConversation,
+  isSelfConversation,
+  MLSConversation,
+  ProteusConversation,
 } from './ConversationSelectors';
 
 @singleton()
@@ -76,7 +77,11 @@ export class ConversationState {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.sortedConversations = ko.pureComputed(() => this.filteredConversations().toSorted(sortGroupsByLastEvent));
+    this.sortedConversations = ko.pureComputed(() =>
+      this.filteredConversations()
+        .filter(conversation => !isMeetingConversation(conversation))
+        .toSorted(sortGroupsByLastEvent),
+    );
     this.selfProteusConversation = ko.pureComputed(() =>
       this.conversations().find(conversation => !isMLSConversation(conversation) && isSelfConversation(conversation)),
     );

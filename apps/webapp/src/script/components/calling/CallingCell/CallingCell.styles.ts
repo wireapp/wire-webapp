@@ -19,11 +19,16 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const callingContainer: CSSObject = {
+import {meetingNotificationHostCollapsedOffset} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost.styles';
+
+const callingContainerBottomPadding = 20;
+
+export const callingContainer = (hasNotifications: boolean): CSSObject => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   flexShrink: '0',
-  padding: '10px 12px 20px',
+  padding: `10px 12px ${callingContainerBottomPadding + (hasNotifications ? meetingNotificationHostCollapsedOffset : 0)}px`,
+  transition: 'padding-bottom var(--animation-timing-fast) ease-in-out',
   animation: 'show-call-ui var(--animation-timing-fast) ease-in-out 0s 1',
-};
+});

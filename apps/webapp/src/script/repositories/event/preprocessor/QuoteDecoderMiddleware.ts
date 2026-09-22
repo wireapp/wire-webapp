@@ -24,7 +24,7 @@ import {StoredEvent} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 import {base64ToArray} from 'Util/util';
 
-import {QuoteEntity} from '../../../message/QuoteEntity';
+import {QuoteEntity} from '../../../message/quoteEntity';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';
@@ -155,7 +155,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
 
     const quoteData: ProcessedQuoteData = {
       message_id: messageId,
-      user_id: quotedMessage.from,
+      user_id: quotedMessage.from ?? '',
       hash: quote.quotedMessageSha256,
     };
 

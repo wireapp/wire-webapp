@@ -20,14 +20,18 @@
 import {fireEvent, render} from '@testing-library/react';
 
 import type {BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
-import {withTheme} from '../../../../auth/util/test/TestUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {withTheme} from '../../../../auth/util/test/testUtil';
 
 import {getBackgroundEffectLabel, VideoBackgroundSettings} from './VideoBackgroundSettings';
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string, _params?: unknown, replacement?: string) => `${key}${replacement ? ` ${replacement}` : ''}`,
-  replaceLink: jest.fn(() => '<a href="https://support.wire.com/background-effects">Learn more</a>'),
-}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('VideoBackgroundSettings', () => {
   const backgrounds = [
@@ -49,9 +53,9 @@ describe('VideoBackgroundSettings', () => {
     selectedEffect: {type: 'none'} as const,
     backgrounds,
     onSelectEffect: jest.fn(),
-    onEnableHighQualityBlur: jest.fn(),
+    backgroundEffectsQuality: 'balanced' as const,
+    onBackgroundEffectsQualityChange: jest.fn(),
     onClose: jest.fn(),
-    highQualityBlurAllowed: false,
     isWebGLAvailable: true,
   };
 
@@ -59,7 +63,9 @@ describe('VideoBackgroundSettings', () => {
     jest.clearAllMocks();
   });
 
-  const renderComponent = (props = {}) => render(withTheme(<VideoBackgroundSettings {...defaultProps} {...props} />));
+  const renderComponent = (props = {}) => {
+    return render(withTheme(<VideoBackgroundSettings {...defaultProps} {...props} />), {wrapper: rootProviderWrapper});
+  };
 
   it('renders video background settings wrapper', () => {
     const {getByTestId} = renderComponent();
@@ -67,27 +73,34 @@ describe('VideoBackgroundSettings', () => {
     expect(getByTestId('video-background-settings')).toBeInTheDocument();
   });
 
-  it('renders the high quality blur checkbox as unchecked', () => {
+  it('renders the selected background effects quality radio button', () => {
     const {getByTestId} = renderComponent();
 
-    const checkbox = getByTestId('enable-high-quality-blur') as HTMLInputElement;
-
-    expect(checkbox).not.toBeChecked();
-    expect(checkbox).not.toBeDisabled();
+    expect(getByTestId('background-effects-quality-balanced')).toBeChecked();
   });
 
-  it('renders the high quality blur checkbox as checked', () => {
-    const {getByTestId} = renderComponent({highQualityBlurAllowed: true});
+  it('renders the privacy background effects quality radio button as selected', () => {
+    const {getByTestId} = renderComponent({backgroundEffectsQuality: 'privacy'});
 
-    expect(getByTestId('enable-high-quality-blur')).toBeChecked();
+    expect(getByTestId('background-effects-quality-privacy')).toBeChecked();
+    expect(getByTestId('background-effects-quality-balanced')).not.toBeChecked();
+    expect(getByTestId('background-effects-quality-performance')).not.toBeChecked();
   });
 
-  it('calls onEnableHighQualityBlur when high quality blur checkbox changes', () => {
+  it('calls onBackgroundEffectsQualityChange when a background effects quality radio button changes', () => {
     const {getByTestId} = renderComponent();
 
-    fireEvent.click(getByTestId('enable-high-quality-blur'));
+    fireEvent.click(getByTestId('background-effects-quality-performance'));
 
-    expect(defaultProps.onEnableHighQualityBlur).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onBackgroundEffectsQualityChange).toHaveBeenCalledWith('performance');
+  });
+
+  it('calls onBackgroundEffectsQualityChange with privacy when privacy quality is selected', () => {
+    const {getByTestId} = renderComponent();
+
+    fireEvent.click(getByTestId('background-effects-quality-privacy'));
+
+    expect(defaultProps.onBackgroundEffectsQualityChange).toHaveBeenCalledWith('privacy');
   });
 
   it('calls onClose when close modal close button is clicked', () => {
@@ -228,7 +241,7 @@ describe('VideoBackgroundSettings', () => {
     expect(queryByText('videoCallBackgroundBlurSectionLabel')).not.toBeInTheDocument();
     expect(queryByText('videoCallBackgroundBlurLow')).not.toBeInTheDocument();
     expect(queryByText('videoCallBackgroundBlurHigh')).not.toBeInTheDocument();
-    expect(queryByTestId('enable-high-quality-blur')).not.toBeInTheDocument();
+    expect(queryByTestId('background-effects-quality-balanced')).not.toBeInTheDocument();
   });
 
   it('does not render virtual background tiles when WebGL is unavailable', () => {
@@ -258,31 +271,47 @@ describe('VideoBackgroundSettings', () => {
 
   describe('getBackgroundEffectLabel', () => {
     it('returns label for no effect', () => {
-      expect(getBackgroundEffectLabel({type: 'none'}, backgrounds)).toBe('videoCallBackgroundNoEffect');
+      expect(getBackgroundEffectLabel({type: 'none'}, backgrounds, translationKey => translationKey)).toBe(
+        'videoCallBackgroundNoEffect',
+      );
     });
 
     it('returns label for low blur', () => {
-      expect(getBackgroundEffectLabel({type: 'blur', level: 'low'}, backgrounds)).toBe('videoCallBackgroundBlurLow');
+      expect(
+        getBackgroundEffectLabel({type: 'blur', level: 'low'}, backgrounds, translationKey => translationKey),
+      ).toBe('videoCallBackgroundBlurLow');
     });
 
     it('returns label for high blur', () => {
-      expect(getBackgroundEffectLabel({type: 'blur', level: 'high'}, backgrounds)).toBe('videoCallBackgroundBlurHigh');
+      expect(
+        getBackgroundEffectLabel({type: 'blur', level: 'high'}, backgrounds, translationKey => translationKey),
+      ).toBe('videoCallBackgroundBlurHigh');
     });
 
     it('returns label for matching virtual background', () => {
-      expect(getBackgroundEffectLabel({type: 'virtual', backgroundId: 'office'}, backgrounds)).toBe(
-        'videoCallBackgroundOffice1',
-      );
+      expect(
+        getBackgroundEffectLabel(
+          {type: 'virtual', backgroundId: 'office'},
+          backgrounds,
+          translationKey => translationKey,
+        ),
+      ).toBe('videoCallBackgroundOffice1');
     });
 
     it('returns fallback label for unknown virtual background', () => {
-      expect(getBackgroundEffectLabel({type: 'virtual', backgroundId: 'missing'}, backgrounds)).toBe(
-        'videoCallBackgroundVirtual',
-      );
+      expect(
+        getBackgroundEffectLabel(
+          {type: 'virtual', backgroundId: 'missing'},
+          backgrounds,
+          translationKey => translationKey,
+        ),
+      ).toBe('videoCallBackgroundVirtual');
     });
 
     it('returns label for custom background', () => {
-      expect(getBackgroundEffectLabel({type: 'custom'}, backgrounds)).toBe('videoCallBackgroundCustom');
+      expect(getBackgroundEffectLabel({type: 'custom'}, backgrounds, translationKey => translationKey)).toBe(
+        'videoCallBackgroundCustom',
+      );
     });
   });
 });

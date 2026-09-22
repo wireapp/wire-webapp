@@ -17,7 +17,9 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {ReactElement} from 'react';
+
+import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage} from '@wireapp/react-ui-kit';
@@ -29,35 +31,35 @@ type LabelledErrorValue = {
   label: string;
 };
 
-type MessageInterpolationValue = string | number | boolean | Date | JSX.Element | null | undefined;
+type MessageInterpolationValue = string | number | boolean | Date | ReactElement | null | undefined;
 type MessageInterpolationValues = Record<string, MessageInterpolationValue>;
 
 const hasLabel = (value: unknown): value is LabelledErrorValue => {
-  return is.object(value) && 'label' in value && is.string((value as LabelledErrorValue).label);
+  return isObject(value) && 'label' in value && isString((value as LabelledErrorValue).label);
 };
 
 const toMessageInterpolationValues = (value: unknown): MessageInterpolationValues | undefined => {
-  if (!is.object(value)) {
+  if (!isObject(value)) {
     return undefined;
   }
 
   const entries = Object.entries(value).filter((entry): entry is [string, MessageInterpolationValue] => {
     const [entryKey, entryValue] = entry;
     return (
-      is.nonEmptyString(entryKey) &&
+      isNonEmptyString(entryKey) &&
       (entryValue === null ||
         entryValue === undefined ||
-        is.string(entryValue) ||
-        is.number(entryValue) ||
-        is.boolean(entryValue) ||
-        is.date(entryValue))
+        isString(entryValue) ||
+        isNumber(entryValue) ||
+        isBoolean(entryValue) ||
+        isDate(entryValue))
     );
   });
 
   return entries.length > 0 ? Object.fromEntries(entries) : undefined;
 };
 
-export function parseError(error: unknown): JSX.Element | null {
+export function parseError(error: unknown): ReactElement | null {
   if (error !== null && error !== undefined) {
     if (hasLabel(error) && Object.hasOwn(errorHandlerStrings, error.label)) {
       return (
@@ -75,7 +77,7 @@ export function parseError(error: unknown): JSX.Element | null {
   return null;
 }
 
-export function parseValidationErrors(errors: unknown | unknown[]): JSX.Element[] {
+export function parseValidationErrors(errors: unknown | unknown[]): ReactElement[] {
   const errorMessages: unknown[] = ([] as unknown[]).concat(errors ?? []);
   return errorMessages.map(error => (
     <ErrorMessage

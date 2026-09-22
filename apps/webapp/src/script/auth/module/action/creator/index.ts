@@ -19,14 +19,14 @@
 
 import type {Action} from 'redux';
 
-import type {AuthActions} from './AuthActionCreator';
-import type {ClientActions} from './ClientActionCreator';
-import type {ConversationActions} from './ConversationActionCreator';
-import type {InvitationActions} from './InvitationActionCreator';
-import type {LanguageActions} from './LanguageActionCreator';
-import type {LocalStorageActions} from './LocalStorageActionCreator';
-import type {SelfActions} from './SelfActionCreator';
-import type {UserActions} from './UserActionCreator';
+import type {AuthActions} from './authActionCreator';
+import type {ClientActions} from './clientActionCreator';
+import type {ConversationActions} from './conversationActionCreator';
+import type {InvitationActions} from './invitationActionCreator';
+import type {LanguageActions} from './languageActionCreator';
+import type {LocalStorageActions} from './localStorageActionCreator';
+import type {SelfActions} from './selfActionCreator';
+import type {UserActions} from './userActionCreator';
 
 export interface AppAction extends Action {
   type: string;
@@ -42,11 +42,11 @@ export type AppActions =
   | SelfActions
   | UserActions;
 
-export * from './AuthActionCreator';
-export * from './ClientActionCreator';
-export * from './ConversationActionCreator';
-export * from './InvitationActionCreator';
-export * from './LanguageActionCreator';
-export * from './LocalStorageActionCreator';
-export * from './SelfActionCreator';
-export * from './UserActionCreator';
+export * from './authActionCreator';
+export * from './clientActionCreator';
+export * from './conversationActionCreator';
+export * from './invitationActionCreator';
+export * from './languageActionCreator';
+export * from './localStorageActionCreator';
+export * from './selfActionCreator';
+export * from './userActionCreator';

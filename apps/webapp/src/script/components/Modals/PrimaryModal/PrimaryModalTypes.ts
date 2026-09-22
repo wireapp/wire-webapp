@@ -20,6 +20,18 @@
 import React from 'react';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
+import type {Translate as TranslationFunction} from 'Util/localizerUtil';
+
+import type {PrimaryModalTranslatedMessage} from './PrimaryModalTranslatedMessage';
+
+export type {
+  PrimaryModalTranslatedComponent,
+  PrimaryModalTranslatedCompatibilityReplacement,
+  PrimaryModalTranslatedLayout,
+  PrimaryModalTranslatedMessage,
+  PrimaryModalTranslatedTranslation,
+  PrimaryModalTranslatedValue,
+} from './PrimaryModalTranslatedMessage';
 
 export interface ButtonAction {
   action?: Function;
@@ -30,15 +42,16 @@ export interface ButtonAction {
 }
 
 export interface Text {
-  htmlMessage?: string;
   input?: string;
   message?: React.ReactNode;
   option?: string;
   title?: string;
   closeBtnLabel?: string;
+  translatedMessage?: PrimaryModalTranslatedMessage;
 }
 
 export type ModalSize = 'small' | 'medium' | 'large';
+export type Translate = TranslationFunction;
 
 export interface ModalOptions {
   close?: () => void;
@@ -93,8 +106,7 @@ export interface ModalContent {
   currentType: string | PrimaryModalType;
   inputPlaceholder: string;
   message: React.ReactNode;
-  /** @deprecated please use `message` instead */
-  messageHtml?: string;
+  translatedMessage?: PrimaryModalTranslatedMessage;
   modalUie: string;
   onBgClick: () => void;
   primaryAction: ButtonAction | null;
@@ -109,5 +121,6 @@ export interface ModalContent {
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};
+export type QueuedModalItem = {id: string; options: ModalOptions; type: PrimaryModalType; translate: Translate};
 
-export type ModalQueue = ModalItem[];
+export type ModalQueue = QueuedModalItem[];

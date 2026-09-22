@@ -39,6 +39,8 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 export interface ConversationRecord {
   access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   access: CONVERSATION_ACCESS[];
+  /** Whether the group has no eligible admins and is scheduled for automatic deletion. */
+  is_ghost_group?: boolean;
   archived_state: boolean;
   readonly_state: CONVERSATION_READONLY_STATE | null;
   archived_timestamp: number;

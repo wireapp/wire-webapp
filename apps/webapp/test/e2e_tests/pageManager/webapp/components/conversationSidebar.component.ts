@@ -20,7 +20,6 @@
 import {Page, Locator} from '@playwright/test';
 
 export class ConversationSidebar {
-  readonly pageLoadingTimeout = 60_000;
   private readonly page: Page;
   readonly navigation: Locator;
   readonly personalStatusLabel: Locator;
@@ -31,12 +30,15 @@ export class ConversationSidebar {
   readonly preferencesButton: Locator;
   readonly allConversationsButton: Locator;
   readonly connectButton: Locator;
+  readonly cellsButton: Locator;
+  readonly meetingsButton: Locator;
   readonly archiveButton: Locator;
   readonly manageTeamButton: Locator;
   readonly sidebar: Locator;
   readonly supportButton: Locator;
   readonly favoritesButton: Locator;
   readonly preferencesNotificationBadge: Locator;
+  readonly folderList: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -50,12 +52,15 @@ export class ConversationSidebar {
     this.preferencesButton = page.getByTestId('go-preferences');
     this.allConversationsButton = page.getByTestId('go-recent-view');
     this.connectButton = page.getByTestId('go-people');
+    this.cellsButton = page.getByTestId('go-cells');
+    this.meetingsButton = page.getByTestId('go-meetings');
     this.archiveButton = page.getByTestId('go-archive');
     this.manageTeamButton = page.getByTestId('go-team-management');
     this.sidebar = page.locator(`.conversations-sidebar-items`);
     this.supportButton = page.getByRole('link', {name: 'Support'});
     this.favoritesButton = page.getByRole('tab', {name: 'Favorites'});
     this.preferencesNotificationBadge = this.preferencesButton.getByTestId('notification-badge');
+    this.folderList = page.getByTestId('folder-list');
   }
 
   async clickPreferencesButton() {
@@ -70,12 +75,20 @@ export class ConversationSidebar {
     await this.connectButton.click();
   }
 
-  async isPageLoaded() {
-    await this.preferencesButton.waitFor({state: 'visible', timeout: this.pageLoadingTimeout});
+  async clickCellsButton() {
+    await this.cellsButton.click();
+  }
+
+  async clickMeetingsButton() {
+    await this.meetingsButton.click();
   }
 
   async clickArchive() {
     await this.archiveButton.click();
+  }
+
+  tab(testId: string) {
+    return this.page.getByTestId(testId);
   }
 
   async openStatusMenu(userFullName: string) {

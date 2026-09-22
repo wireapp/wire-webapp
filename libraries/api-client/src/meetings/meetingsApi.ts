@@ -20,12 +20,19 @@
 import {AxiosRequestConfig} from 'axios';
 
 import {CreateMeeting} from './createMeeting';
-import {Meeting} from './meeting';
-import {MeetingEmailsInvitation} from './meetingEmailsInvitation';
+import {Meeting, MeetingWithConversation} from './meeting';
+import {meetingSchema, meetingWithConversationSchema, meetingsListResponseSchema} from './meetingSchema';
 import {UpdateMeeting} from './updateMeeting';
 
 import {HttpClient} from '../http';
 import {QualifiedId} from '../user/qualifiedId';
+
+const disableInfiniteNetworkRetries = {
+  // Disable infinite retries so offline Meetings actions fail promptly into existing error UI.
+  'axios-retry': {
+    retries: 0,
+  },
+} as const;
 
 export class MeetingsAPI {
   constructor(private readonly client: HttpClient) {}
@@ -33,39 +40,52 @@ export class MeetingsAPI {
   public static readonly URL = {
     MEETINGS: '/meetings',
     LIST: '/meetings/list',
-    INVITATIONS: 'invitations',
-    INVITATIONS_DELETE: 'invitations/delete',
   } as const;
 
   private generateMeetingUrl(meetingId: QualifiedId): string {
     return `${MeetingsAPI.URL.MEETINGS}/${meetingId.domain}/${meetingId.id}`;
   }
 
+  private parseMeetingResponse(data: unknown): Meeting {
+    return meetingSchema.parse(data);
+  }
+
+  private parseMeetingWithConversationResponse(data: unknown): MeetingWithConversation {
+    return meetingWithConversationSchema.parse(data);
+  }
+
+  private parseMeetingsListResponse(data: unknown): Meeting[] {
+    return meetingsListResponseSchema.parse(data);
+  }
+
   /**
    * Create a new meeting.
    */
-  public async createMeeting(newMeeting: CreateMeeting): Promise<Meeting> {
+  public async createMeeting(newMeeting: CreateMeeting): Promise<MeetingWithConversation> {
     const config: AxiosRequestConfig = {
       data: newMeeting,
       method: 'post',
       url: MeetingsAPI.URL.MEETINGS,
+      ...disableInfiniteNetworkRetries,
     };
 
-    const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
+    const response = await this.client.sendJSON<MeetingWithConversation>(config);
+    return this.parseMeetingWithConversationResponse(response.data);
   }
 
   /**
    * List all meetings for the authenticated user.
+   * @see https://staging-nginz-https.zinfra.io/v17/api/swagger-ui/#/default/get_meetings_list
    */
   public async getMeetingsList(): Promise<Meeting[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: MeetingsAPI.URL.LIST,
+      ...disableInfiniteNetworkRetries,
     };
 
     const response = await this.client.sendJSON<Meeting[]>(config);
-    return response.data;
+    return this.parseMeetingsListResponse(response.data);
   }
 
   /**
@@ -75,6 +95,7 @@ export class MeetingsAPI {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: this.generateMeetingUrl(meetingId),
+      ...disableInfiniteNetworkRetries,
     };
 
     await this.client.sendJSON<void>(config);
@@ -87,49 +108,25 @@ export class MeetingsAPI {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: this.generateMeetingUrl(meetingId),
+      ...disableInfiniteNetworkRetries,
     };
 
     const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
+    return this.parseMeetingResponse(response.data);
   }
 
   /**
    * Update an existing meeting.
    */
-  public async updateMeeting(meetingId: QualifiedId, updateMeeting: UpdateMeeting): Promise<Meeting> {
+  public async updateMeeting(meetingId: QualifiedId, updateMeeting: UpdateMeeting): Promise<MeetingWithConversation> {
     const config: AxiosRequestConfig = {
       data: updateMeeting,
       method: 'put',
       url: this.generateMeetingUrl(meetingId),
+      ...disableInfiniteNetworkRetries,
     };
 
-    const response = await this.client.sendJSON<Meeting>(config);
-    return response.data;
-  }
-
-  /**
-   * Add emails to the invited emails of a meeting.
-   */
-  public async addMeetingInvitation(meetingId: QualifiedId, invitation: MeetingEmailsInvitation): Promise<void> {
-    const config: AxiosRequestConfig = {
-      data: invitation,
-      method: 'post',
-      url: `${this.generateMeetingUrl(meetingId)}/${MeetingsAPI.URL.INVITATIONS}`,
-    };
-
-    await this.client.sendJSON<void>(config);
-  }
-
-  /**
-   * Remove emails from the invited emails of a meeting.
-   */
-  public async removeMeetingInvitation(meetingId: QualifiedId, invitation: MeetingEmailsInvitation): Promise<void> {
-    const config: AxiosRequestConfig = {
-      data: invitation,
-      method: 'post',
-      url: `${this.generateMeetingUrl(meetingId)}/${MeetingsAPI.URL.INVITATIONS_DELETE}`,
-    };
-
-    await this.client.sendJSON<void>(config);
+    const response = await this.client.sendJSON<MeetingWithConversation>(config);
+    return this.parseMeetingWithConversationResponse(response.data);
   }
 }

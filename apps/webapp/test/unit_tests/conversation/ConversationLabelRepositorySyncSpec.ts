@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {
   ConversationLabelRepository,
   LabelType,
@@ -25,7 +26,8 @@ import {
 } from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 describe('ConversationLabelRepository Synchronization', () => {
@@ -53,6 +55,7 @@ describe('ConversationLabelRepository Synchronization', () => {
       mockAllConversations,
       ko.pureComputed(() => mockConversations()),
       mockPropertiesService,
+      translate,
     );
   });
 
@@ -213,6 +216,10 @@ describe('ConversationLabelRepository Synchronization', () => {
       // Assert
       const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
       expect(storedData).toBeTruthy();
+      if (storedData === null) {
+        throw new Error('Expected stored conversation labels');
+      }
+
       const parsedData = JSON.parse(storedData);
       expect(parsedData.labels).toHaveLength(1);
       expect(parsedData.lastSyncTimestamp).toBeTruthy();
@@ -278,7 +285,7 @@ describe('ConversationLabelRepository Synchronization', () => {
     });
 
     it('should remove folder and switch to RECENT when last conversation is removed', () => {
-      const conversation = new Conversation(createUuid());
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translate);
       mockAllConversations([conversation]);
       mockConversations([conversation]);
 
@@ -292,8 +299,8 @@ describe('ConversationLabelRepository Synchronization', () => {
     });
 
     it('should keep folder and stay on FOLDER tab when other conversations remain', () => {
-      const conversation1 = new Conversation(createUuid());
-      const conversation2 = new Conversation(createUuid());
+      const conversation1 = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translate);
+      const conversation2 = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translate);
       mockAllConversations([conversation1, conversation2]);
       mockConversations([conversation1, conversation2]);
 

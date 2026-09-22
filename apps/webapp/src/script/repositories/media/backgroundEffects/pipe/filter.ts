@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
 type QuadBuffers = {
@@ -393,8 +395,13 @@ export class VideoFilter {
 
       if (blur > 0) {
         // If blur was applied, currentTexture is this.texture2
-        inputForColorAdjust = this.texture2!;
-        outputFbo = this.fbo1!; // Write to texture1
+        const blurredTexture = this.texture2;
+        const colorAdjustFramebuffer = this.fbo1;
+        if (isNullOrUndefined(blurredTexture) || isNullOrUndefined(colorAdjustFramebuffer)) {
+          throw new Error('Blur output is not initialized for color adjustment');
+        }
+        inputForColorAdjust = blurredTexture;
+        outputFbo = colorAdjustFramebuffer; // Write to texture1
         finalPassOutputToTexture1 = true;
       } else {
         // No blur, currentTexture is the original sourceTexture
@@ -402,7 +409,11 @@ export class VideoFilter {
         // We need to draw to an FBO. If FBOs are available, use fbo1.
         // If sourceTexture is the only input and no blur, and we need color adjust,
         // this implies we are drawing from sourceTexture to fbo1/texture1.
-        outputFbo = this.fbo1!;
+        const colorAdjustFramebuffer = this.fbo1;
+        if (isNullOrUndefined(colorAdjustFramebuffer)) {
+          throw new Error('Color adjustment framebuffer is not initialized');
+        }
+        outputFbo = colorAdjustFramebuffer;
         finalPassOutputToTexture1 = true;
       }
 

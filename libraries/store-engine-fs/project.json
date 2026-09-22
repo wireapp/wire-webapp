@@ -61,13 +61,13 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --cache --cache-location node_modules/.cache/eslint/store-engine-fs --ext .js,.ts,.tsx {projectRoot}/src"
+        "command": "eslint --config eslint.config.mjs --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/store-engine-fs --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
       }
     },
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
+        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
       }
     }
   },

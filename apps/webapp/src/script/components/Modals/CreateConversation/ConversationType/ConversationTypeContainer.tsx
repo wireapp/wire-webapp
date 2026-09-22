@@ -19,10 +19,12 @@
 
 import {useEffect} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ConversationFeature} from './ConversationFeature';
@@ -34,6 +36,7 @@ import {ConversationCreationStep, ConversationType} from '../types';
 import {getConversationTypeOptions} from '../utils';
 
 export const ConversationTypeContainer = () => {
+  const {translate} = useApplicationContext();
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
   const {self} = useKoSubscribableChildren(userState, ['self']);
@@ -46,7 +49,11 @@ export const ConversationTypeContainer = () => {
     setIsConfirmDiscardModalOpen,
   } = useCreateConversationModal();
 
-  const isInTeam = teamState.isInTeam(self!);
+  if (isUndefined(self)) {
+    throw new Error('The self user must be initialized before rendering conversation type options');
+  }
+
+  const isInTeam = teamState.isInTeam(self);
 
   // Set default conversation type based on user's team membership
   useEffect(() => {
@@ -74,7 +81,7 @@ export const ConversationTypeContainer = () => {
 
   return (
     <div css={conversationTypeContainerCss}>
-      {getConversationTypeOptions().map(option => (
+      {getConversationTypeOptions(translate).map(option => (
         <>
           <ConversationOption
             key={option.conversationType}

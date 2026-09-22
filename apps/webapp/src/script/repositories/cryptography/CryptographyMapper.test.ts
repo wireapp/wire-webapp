@@ -20,6 +20,7 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {isObject} from 'underscore';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
 import {
   Asset,
@@ -27,6 +28,7 @@ import {
   ButtonAction,
   Calling,
   Cleared,
+  ClientAction,
   External,
   GenericMessage,
   Knock,
@@ -73,6 +75,39 @@ describe('CryptographyMapper', () => {
   });
 
   describe('"mapGenericMessage"', () => {
+    it('maps a decoded Proteus session reset with its original metadata', async () => {
+      const reset = GenericMessage.decode(
+        GenericMessage.encode(
+          GenericMessage.create({messageId: 'reset-id', clientAction: ClientAction.RESET_SESSION}),
+        ).finish(),
+      );
+      const resetEvent = {
+        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD as const,
+        conversation: 'conversation-id',
+        qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+        from: 'resetting-user',
+        qualified_from: {id: 'resetting-user', domain: 'example.com'},
+        time: '2026-09-18T09:00:00.000Z',
+        data: {sender: 'ios-client', recipient: 'web-client', text: ''},
+      };
+
+      await expect(mapper.mapGenericMessage(reset, resetEvent)).resolves.toMatchObject({
+        type: ClientEvent.CONVERSATION.SESSION_RESET,
+        id: 'reset-id',
+        from: resetEvent.from,
+        from_client_id: 'ios-client',
+        qualified_from: resetEvent.qualified_from,
+        conversation: resetEvent.conversation,
+        qualified_conversation: resetEvent.qualified_conversation,
+        time: resetEvent.time,
+      });
+    });
+
+    it('ignores unsupported client actions', async () => {
+      const message = GenericMessage.create({messageId: 'unknown-action', clientAction: 999 as ClientAction});
+      await expect(mapper.mapGenericMessage(message, event)).resolves.toBeUndefined();
+    });
+
     it('resolves with a mapped original asset message', () => {
       const original = {
         mime_type: 'jpg',
@@ -136,7 +171,9 @@ describe('CryptographyMapper', () => {
         expect(event_json.data.content_type).toEqual(original_asset.mimeType);
         expect(event_json.data.info.name).toEqual(original_asset.name);
         expect(event_json.data.meta.duration).toEqual(duration);
-        expect(event_json.data.meta.loudness).toEqual(new Uint8Array(original_asset.audio?.normalizedLoudness.buffer));
+        const normalizedLoudness = original_asset.audio?.normalizedLoudness;
+        assertNotNullOrUndefined(normalizedLoudness);
+        expect(event_json.data.meta.loudness).toEqual(new Uint8Array(normalizedLoudness.buffer));
       });
     });
 
@@ -492,7 +529,10 @@ describe('CryptographyMapper', () => {
         .mapGenericMessage(undefined as any, {id: 'ABC'} as any)
         .then(done.fail)
         .catch((error: unknown) => {
-          expect(error instanceof CryptographyError).toBeTruthy();
+          if (!(error instanceof CryptographyError)) {
+            throw error;
+          }
+
           expect(error.type).toBe(CryptographyError.TYPE.NO_GENERIC_MESSAGE);
           done();
         });
@@ -530,7 +570,6 @@ describe('CryptographyMapper', () => {
         }),
         messageId: createUuid(),
       });
-
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(isObject(event_json)).toBeTruthy();
         expect(event_json.type).toBe(ClientEvent.CONVERSATION.BUTTON_ACTION);
@@ -588,10 +627,10 @@ describe('CryptographyMapper', () => {
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.location.longitude).toBe(generic_message.location.longitude);
-        expect(event_json.data.location.latitude).toBe(generic_message.location.latitude);
-        expect(event_json.data.location.name).toBe(generic_message.location.name);
-        expect(event_json.data.location.zoom).toBe(generic_message.location.zoom);
+        expect(event_json.data.location.longitude).toBe(location.longitude);
+        expect(event_json.data.location.latitude).toBe(location.latitude);
+        expect(event_json.data.location.name).toBe(location.name);
+        expect(event_json.data.location.zoom).toBe(location.zoom);
       });
     });
 

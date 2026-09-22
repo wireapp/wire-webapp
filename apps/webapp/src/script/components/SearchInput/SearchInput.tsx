@@ -19,13 +19,13 @@
 
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
 import {MAX_HANDLE_LENGTH} from 'Repositories/user/userHandleGenerator';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import * as Icon from '../icon';
 
@@ -47,6 +47,7 @@ export const SearchInput = ({
   setInput,
   forceDark,
 }: SearchInputProps) => {
+  const {translate} = useApplicationContext();
   const innerElement = useRef<HTMLDivElement>(null);
   const inputElement = useRef<HTMLInputElement>(null);
 
@@ -54,7 +55,7 @@ export const SearchInput = ({
   const noSelectedUsers = selectedUsers.length === 0;
 
   useLayoutEffect(() => {
-    if (inputElement.current && innerElement.current) {
+    if (inputElement.current !== null && innerElement.current !== null) {
       inputElement.current.focus();
       innerElement.current.scrollTop = inputElement.current.scrollHeight;
     }
@@ -62,7 +63,7 @@ export const SearchInput = ({
 
   useEffect(() => {
     setInput('');
-  }, [selectedUsers.length]);
+  }, [selectedUsers.length, setInput]);
 
   const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 
@@ -77,7 +78,7 @@ export const SearchInput = ({
           <div className="search-icon icon-search" />
 
           <input
-            className={cx('search-input', {'search-input-padding': is.nonEmptyString(input)})}
+            className={cx('search-input', {'search-input-padding': isNonEmptyString(input)})}
             data-uie-name="enter-users"
             maxLength={MAX_HANDLE_LENGTH}
             onChange={event => setInput(event.target.value)}
@@ -97,11 +98,11 @@ export const SearchInput = ({
             aria-label={placeholder}
           />
 
-          {is.nonEmptyString(input) && (
+          {isNonEmptyString(input) && (
             <button
               className="search-input-cancel"
               onClick={() => setInput('')}
-              aria-label={t('accessibility.searchInput.cancel')}
+              aria-label={translate('accessibility.searchInput.cancel')}
             >
               <Icon.CloseIcon css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
             </button>

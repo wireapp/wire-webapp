@@ -13,7 +13,6 @@ CHANGELOG.md
 node_modules
 npm-debug.log
 yarn-error.log
-apps/webapp/src/types/i18n.d.ts
 charts/
 *.md
 tsconfig*.json

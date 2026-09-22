@@ -19,14 +19,16 @@
 
 import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo, useCallback} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {Config} from 'src/script/Config';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {isValidPassword} from 'Util/stringUtil';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
@@ -45,7 +47,11 @@ import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurren
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
 
-export const PrimaryModalComponent: FC = () => {
+interface PrimaryModalComponentProps {
+  readonly translate: Translate;
+}
+
+export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate}) => {
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, setPasswordValue] = useState<string>('');
   const [passwordInput, updatePasswordWithRules] = useState<string>('');
@@ -71,7 +77,7 @@ export const PrimaryModalComponent: FC = () => {
     currentType,
     inputPlaceholder,
     message,
-    messageHtml,
+    translatedMessage,
     modalUie,
     onBgClick,
     primaryAction,
@@ -113,7 +119,7 @@ export const PrimaryModalComponent: FC = () => {
   };
 
   const isPasswordOptional = () => {
-    const skipValidation = passwordOptional && !passwordInput.trim().length;
+    const skipValidation = passwordOptional === true && passwordInput.trim().length === 0;
     if (skipValidation) {
       return true;
     }
@@ -131,18 +137,18 @@ export const PrimaryModalComponent: FC = () => {
     ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
   );
   const actionEnabled = isPasswordRequired ? isPasswordOptional() : true;
-  const inputActionEnabled = !isInput || !!inputValue.trim().length;
+  const inputActionEnabled = isInput === false || inputValue.trim().length > 0;
 
   const areGuestLinkPasswordsValid = checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
 
   const passwordGuestLinkActionEnabled =
-    (!isGuestLinkPassword || !!passwordValue.trim().length) && areGuestLinkPasswordsValid;
+    (isGuestLinkPassword === false || passwordValue.trim().length > 0) && areGuestLinkPasswordsValid;
 
   const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
     if (disabled === true) {
       return true;
     }
-    if (isConfirm) {
+    if (isConfirm === true) {
       return false;
     }
     if (isInput) {
@@ -156,17 +162,17 @@ export const PrimaryModalComponent: FC = () => {
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
 
-      if (!skipValidation && !inputActionEnabled) {
+      if (skipValidation === false && inputActionEnabled === false) {
         return;
       }
 
-      if (hasPasswordWithRules && !isBackupPasswordValid) {
+      if (hasPasswordWithRules === true && isBackupPasswordValid === false) {
         setIsFormSubmitted(true);
         return;
       }
 
       // prevent from submit when validation not passed
-      if (!skipValidation && isGuestLinkPassword && !areGuestLinkPasswordsValid) {
+      if (skipValidation === false && isGuestLinkPassword === true && areGuestLinkPasswordsValid === false) {
         setIsFormSubmitted(true);
         return;
       }
@@ -181,7 +187,7 @@ export const PrimaryModalComponent: FC = () => {
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
-    if (!action) {
+    if (isNullOrUndefined(action)) {
       return;
     }
     const actions = {
@@ -202,15 +208,17 @@ export const PrimaryModalComponent: FC = () => {
 
   const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
     updateOptionChecked(event.target.checked);
-    if (primaryActionButtonRef.current) {
+    if (primaryActionButtonRef.current !== null) {
       primaryActionButtonRef.current.focus();
     }
   };
 
-  const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
+  const secondaryActions = useMemo(() => {
+    return Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
+  }, [secondaryAction]);
 
   const closeAction = useCallback(() => {
-    if (hasPasswordWithRules) {
+    if (hasPasswordWithRules === true) {
       const [closeActionItem] = secondaryActions;
       closeActionItem?.action?.();
     }
@@ -228,9 +236,9 @@ export const PrimaryModalComponent: FC = () => {
       const targetElement = primaryBtnFirst ? primaryActionButtonRef.current : closeButtonRef.current;
       const fallbackElement = primaryBtnFirst ? closeButtonRef.current : primaryActionButtonRef.current;
 
-      if (targetElement) {
+      if (targetElement !== null) {
         targetElement.focus();
-      } else if (fallbackElement) {
+      } else if (fallbackElement !== null) {
         fallbackElement.focus();
       }
     }, 0);
@@ -245,7 +253,7 @@ export const PrimaryModalComponent: FC = () => {
         closeAction();
       }
 
-      if (isEnterKey(event) && primaryAction?.runActionOnEnterClick) {
+      if (isEnterKey(event) && primaryAction?.runActionOnEnterClick === true) {
         event.preventDefault();
         primaryAction?.action?.();
         removeCurrentModal();
@@ -292,7 +300,7 @@ export const PrimaryModalComponent: FC = () => {
   const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
   const isPasswordFieldValid = isFormSubmitted && passwordValueRef.current?.validity.valid === false;
 
-  const backupPasswordHint = t('backupPasswordHint', {
+  const backupPasswordHint = translate('backupPasswordHint', {
     minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
   });
 
@@ -314,10 +322,11 @@ export const PrimaryModalComponent: FC = () => {
         closeAction={closeAction}
       />
       <FadingScrollbar className="modal__body">
-        <MessageContent message={message} messageHtml={messageHtml} />
+        <MessageContent message={message} translatedMessage={translatedMessage} translate={translate} />
 
         {isGuestLinkPassword && (
           <GuestLinkPasswordForm
+            translate={translate}
             onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             onGeneratePassword={password => {
               setPasswordValue(password);
@@ -338,8 +347,8 @@ export const PrimaryModalComponent: FC = () => {
           <CopyToClipboardButton
             disabled={!passwordGuestLinkActionEnabled}
             textToCopy={passwordValue}
-            displayText={t('guestOptionsPasswordCopyToClipboard')}
-            copySuccessText={t('guestOptionsPasswordCopyToClipboardSuccess')}
+            displayText={translate('guestOptionsPasswordCopyToClipboard')}
+            copySuccessText={translate('guestOptionsPasswordCopyToClipboardSuccess')}
             onCopySuccess={() => setDidCopyPassword(true)}
           />
         )}
@@ -355,6 +364,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isJoinGuestLinkPassword && (
           <JoinGuestLinkPasswordForm
+            translate={translate}
             onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             inputValue={passwordValue}
             onInputChange={setPasswordValue}
@@ -363,6 +373,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {hasPasswordWithRules && (
           <PasswordAdvancedSecurityForm
+            translate={translate}
             onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             inputValue={passwordInput}
             inputPlaceholder={inputPlaceholder}

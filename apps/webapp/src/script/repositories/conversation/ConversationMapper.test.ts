@@ -18,31 +18,40 @@
  */
 
 import {
+  ADD_PERMISSION,
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
   CONVERSATION_ACCESS,
+  CONVERSATION_CELLS_STATE,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  GROUP_CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
   DefaultConversationRoleName,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
+import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {BaseError} from 'src/script/error/baseError';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
+import {CONVERSATION_READONLY_STATE} from './ConversationRepository';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
@@ -52,7 +61,7 @@ describe('ConversationMapper', () => {
 
       expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallEmtpyArray = () => ConversationMapper.mapConversations([]);
+      const functionCallEmtpyArray = () => ConversationMapper.mapConversations([], 1, translate);
 
       expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
@@ -61,7 +70,8 @@ describe('ConversationMapper', () => {
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined]);
+      // @ts-expect-error intentionally exercises an invalid array item
+      const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined], 1, translate);
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
@@ -74,7 +84,7 @@ describe('ConversationMapper', () => {
     it('maps a single conversation', () => {
       const conversation = entities.conversation;
       const initialTimestamp = Date.now();
-      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp, translate);
 
       const expectedParticipantIds: QualifiedId[] = [
         conversation.members.others[0].id,
@@ -119,7 +129,7 @@ describe('ConversationMapper', () => {
       };
 
       const initialTimestamp = Date.now();
-      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp, translate);
 
       expect(conversationEntity.roles()).toEqual({
         [conversation.members.self.id]: DefaultConversationRoleName.WIRE_ADMIN,
@@ -130,7 +140,7 @@ describe('ConversationMapper', () => {
 
     it('maps multiple conversations', () => {
       const conversations = payload.conversations.get.conversations;
-      const conversationEntities = ConversationMapper.mapConversations(conversations);
+      const conversationEntities = ConversationMapper.mapConversations(conversations, 1, translate);
 
       expect(conversationEntities.length).toBe(conversations.length);
 
@@ -173,10 +183,95 @@ describe('ConversationMapper', () => {
         type: 0,
       };
 
-      const [conversationEntity] = ConversationMapper.mapConversations([payload] as ConversationDatabaseData[]);
+      const [conversationEntity] = ConversationMapper.mapConversations(
+        [payload] as ConversationDatabaseData[],
+        1,
+        translate,
+      );
 
       expect(conversationEntity.name()).toBe(payload.name);
       expect(conversationEntity.teamId).toBe(payload.team);
+    });
+  });
+
+  describe('getUpdatableProperties', () => {
+    it('returns backend-owned fields only', () => {
+      const conversationEntity = new Conversation(createUuid(), 'example.com', CONVERSATION_PROTOCOL.MLS, translate);
+      conversationEntity.name('Weekly sync');
+      conversationEntity.addMessage(new ContentMessage(createUuid(), translateForTest));
+      conversationEntity.archivedState(true);
+      conversationEntity.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
+      conversationEntity.last_read_timestamp(987654321);
+
+      const updatableProperties = ConversationMapper.getUpdatableProperties(conversationEntity);
+
+      expect(updatableProperties).toEqual(expect.objectContaining({name: 'Weekly sync', domain: 'example.com'}));
+      expect(updatableProperties).not.toHaveProperty('messages_unordered');
+      expect(updatableProperties).not.toHaveProperty('archivedState');
+      expect(updatableProperties).not.toHaveProperty('readOnlyState');
+      expect(updatableProperties).not.toHaveProperty('last_read_timestamp');
+      expect(updatableProperties).not.toHaveProperty('isGuest');
+    });
+  });
+
+  describe('getUpdatablePropertiesFromBackend', () => {
+    it('keeps omitted optional fields out of the update object', () => {
+      const conversationData = {
+        qualified_id: {id: createUuid(), domain: 'example.com'},
+        creator: createUuid(),
+        type: CONVERSATION_TYPE.REGULAR,
+        access: [],
+        access_role: CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+        group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        group_id: 'group-id',
+        epoch: 0,
+        members: {others: [], self: {id: createUuid(), status_ref: '0.0', status_time: '1970-01-01T00:00:00.000Z'}},
+      };
+
+      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(
+        conversationData as unknown as ConversationBackendData,
+      );
+
+      expect(updatableProperties).not.toHaveProperty('name');
+      expect(updatableProperties).not.toHaveProperty('conversationModerator');
+      expect(updatableProperties).toEqual(
+        expect.objectContaining({
+          groupConversationType: GROUP_CONVERSATION_TYPE.MEETING,
+          groupId: 'group-id',
+          epoch: 0,
+        }),
+      );
+    });
+
+    it('includes optional fields when present in the payload', () => {
+      const conversationData = {
+        qualified_id: {id: createUuid(), domain: 'example.com'},
+        creator: createUuid(),
+        type: CONVERSATION_TYPE.REGULAR,
+        access: [],
+        access_role: CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        cells_state: CONVERSATION_CELLS_STATE.DISABLED,
+        group_conv_type: GROUP_CONVERSATION_TYPE.MEETING,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        group_id: 'group-id',
+        epoch: 0,
+        name: 'Weekly sync',
+        add_permission: ADD_PERMISSION.EVERYONE,
+        members: {others: [], self: {id: createUuid(), status_ref: '0.0', status_time: '1970-01-01T00:00:00.000Z'}},
+      };
+
+      const updatableProperties = ConversationMapper.getUpdatablePropertiesFromBackend(
+        conversationData as unknown as ConversationBackendData,
+      );
+
+      expect(updatableProperties).toEqual(
+        expect.objectContaining({
+          name: 'Weekly sync',
+          conversationModerator: ADD_PERMISSION.EVERYONE,
+        }),
+      );
     });
   });
 
@@ -184,7 +279,7 @@ describe('ConversationMapper', () => {
     it('can update the properties of a conversation', () => {
       const creatorId = createUuid();
       const conversationsData = [payload.conversations.get.conversations[0]];
-      const [conversationEntity] = ConversationMapper.mapConversations(conversationsData);
+      const [conversationEntity] = ConversationMapper.mapConversations(conversationsData, 1, translate);
       const data: Partial<Record<keyof Conversation, string>> = {
         creator: creatorId,
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
@@ -199,7 +294,7 @@ describe('ConversationMapper', () => {
 
     it('only updates existing properties', () => {
       const updatedName = 'Christmas 2017';
-      const conversationEntity = new Conversation(createUuid());
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.name('Christmas 2016');
 
       expect(conversationEntity.name()).toBeDefined();
@@ -218,14 +313,15 @@ describe('ConversationMapper', () => {
   });
 
   describe('updateSelfStatus', () => {
-    let conversationEntity: Conversation = undefined;
+    let conversationEntity: Conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     beforeEach(() => {
       const conversationsData = [payload.conversations.get.conversations[0]];
-      [conversationEntity] = ConversationMapper.mapConversations(conversationsData);
+      [conversationEntity] = ConversationMapper.mapConversations(conversationsData, 1, translate);
     });
 
     it('returns without updating if conversation entity does not exist', () => {
+      // @ts-expect-error intentionally exercises an absent conversation entity
       conversationEntity = undefined;
       const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {muted_state: 1};
 
@@ -338,7 +434,7 @@ describe('ConversationMapper', () => {
 
   describe('mergeConversations', () => {
     function getDataWithReadReceiptMode(
-      localReceiptMode: RECEIPT_MODE,
+      localReceiptMode: RECEIPT_MODE | null,
       remoteReceiptMode: RECEIPT_MODE,
     ): Partial<ConversationDatabaseData>[] {
       const conversationCreatorId = createUuid();
@@ -347,7 +443,7 @@ describe('ConversationMapper', () => {
       const selfUserId = createUuid();
       const teamId = createUuid();
 
-      const localData: Partial<ConversationDatabaseData> = {
+      const localData = {
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,
@@ -368,9 +464,9 @@ describe('ConversationMapper', () => {
         team_id: teamId,
         type: 0,
         verification_state: ConversationVerificationState.UNVERIFIED,
-      };
+      } as unknown as Partial<ConversationDatabaseData>;
 
-      const remoteData: Partial<ConversationDatabaseData> = {
+      const remoteData = {
         access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
         access_role: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
         creator: conversationCreatorId,
@@ -401,12 +497,12 @@ describe('ConversationMapper', () => {
         receipt_mode: remoteReceiptMode,
         team: teamId,
         type: 0,
-      };
+      } as unknown as Partial<ConversationDatabaseData>;
 
       return [localData, remoteData];
     }
 
-    const remoteData: Partial<ConversationBackendData> = {
+    const remoteData = {
       access: [CONVERSATION_ACCESS.PRIVATE],
       creator: '532af01e-1e24-4366-aacf-33b67d4ee376',
       qualified_id: {domain: 'wire.com', id: 'de7466b0-985c-4dc3-ad57-17877db45b4c'},
@@ -428,7 +524,16 @@ describe('ConversationMapper', () => {
       name: 'Family Gathering',
       team: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
       type: 2,
-    };
+    } as unknown as ConversationBackendData;
+
+    function getRemoteSelf(): MemberBackendData {
+      const remoteSelf = remoteData.members?.self;
+      if (remoteSelf === undefined) {
+        throw new Error('Expected remote self member');
+      }
+
+      return remoteSelf;
+    }
 
     it('incorporates remote data from backend into local data', () => {
       const local_data: Partial<ConversationDatabaseData> = {
@@ -499,12 +604,14 @@ describe('ConversationMapper', () => {
       expect(merged_conversation.last_server_timestamp).toBe(localData.last_event_timestamp);
       expect(merged_conversation.verification_state).toBe(localData.verification_state);
 
-      const expectedArchivedTimestamp = new Date(remoteData.members.self.otr_archived_ref).getTime();
+      const remoteSelf = getRemoteSelf();
+      assertNotNullOrUndefined(remoteSelf.otr_archived_ref);
+      const expectedArchivedTimestamp = new Date(remoteSelf.otr_archived_ref).getTime();
 
       expect(merged_conversation.archived_timestamp).toBe(expectedArchivedTimestamp);
-      expect(merged_conversation.archived_state).toBe(remoteData.members.self.otr_archived);
+      expect(merged_conversation.archived_state).toBe(remoteSelf.otr_archived);
 
-      const expectedNotificationTimestamp = new Date(remoteData.members.self.otr_muted_ref).getTime();
+      const expectedNotificationTimestamp = new Date(remoteSelf.otr_muted_ref ?? 0).getTime();
 
       expect(merged_conversation.muted_state).toBe(NOTIFICATION_STATE.EVERYTHING);
       expect(merged_conversation.muted_timestamp).toBe(expectedNotificationTimestamp);
@@ -618,7 +725,8 @@ describe('ConversationMapper', () => {
         otr_muted_status: NOTIFICATION_STATE.NOTHING,
       };
 
-      remoteData.members.self = {...remoteData.members.self, ...selfUpdate};
+      const remoteSelf = getRemoteSelf();
+      remoteData.members = {...remoteData.members, self: {...remoteSelf, ...selfUpdate}};
 
       const [merged_conversation] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
@@ -640,12 +748,15 @@ describe('ConversationMapper', () => {
       expect(merged_conversation.verification_state).toBe(localData.verification_state);
 
       // remote one is newer
-      const expectedArchivedTimestamp = new Date(remoteData.members.self.otr_archived_ref).getTime();
+      const updatedRemoteSelf = getRemoteSelf();
+      assertNotNullOrUndefined(updatedRemoteSelf.otr_archived_ref);
+      const expectedArchivedTimestamp = new Date(updatedRemoteSelf.otr_archived_ref).getTime();
 
       expect(merged_conversation.archived_timestamp).toBe(expectedArchivedTimestamp);
-      expect(merged_conversation.archived_state).toBe(remoteData.members.self.otr_archived);
+      expect(merged_conversation.archived_state).toBe(updatedRemoteSelf.otr_archived);
 
-      const expectedNotificationTimestamp = new Date(remoteData.members.self.otr_muted_ref).getTime();
+      assertNotNullOrUndefined(updatedRemoteSelf.otr_muted_ref);
+      const expectedNotificationTimestamp = new Date(updatedRemoteSelf.otr_muted_ref).getTime();
 
       expect(merged_conversation.muted_state).toBe(NOTIFICATION_STATE.NOTHING);
       expect(merged_conversation.muted_timestamp).toBe(expectedNotificationTimestamp);
@@ -737,7 +848,12 @@ describe('ConversationMapper', () => {
         CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
       ];
 
-      const conversationEntity = new Conversation('conversation-id', 'domain');
+      const conversationEntity = new Conversation(
+        'conversation-id',
+        'domain',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
       conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
@@ -756,7 +872,7 @@ describe('ConversationMapper', () => {
 
       const accessRoleV2: undefined = undefined;
 
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
@@ -820,7 +936,7 @@ describe('ConversationMapper', () => {
       ];
 
       it.each(mockRightsLegacy)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
-        const conversationEntity = new Conversation();
+        const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
         conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
@@ -860,7 +976,7 @@ describe('ConversationMapper', () => {
       const mockAccessRights = Object.entries(mockRightsV3);
 
       it.each(mockAccessRights)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
-        const conversationEntity = new Conversation();
+        const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
         conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
@@ -869,7 +985,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for self conversation', () => {
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.type(CONVERSATION_TYPE.SELF);
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);
@@ -877,7 +993,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for personal group conversation', () => {
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => true));
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);
@@ -885,7 +1001,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for personal one2one conversation', () => {
-      const conversationEntity = new Conversation();
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => false));
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);

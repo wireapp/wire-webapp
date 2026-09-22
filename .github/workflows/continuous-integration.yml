@@ -1,0 +1,352 @@
+---
+name: Continuous integration
+
+on:
+  pull_request:
+    # we want to run the continuous integration on every pull request targetting those branches
+    branches: [main, release/*, maintenance/*]
+
+  merge_group:
+    branches: [main, release/*, maintenance/*]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+# Keep Nx task caching disabled in pull_request and merge_group runs because
+# repository-controlled code is untrusted and could poison task results (CVE-2025-36852, CREEP).
+env:
+  NX_SKIP_NX_CACHE: 'true'
+
+jobs:
+  workflow-security:
+    runs-on: ubuntu-24.04
+    name: Workflow security analysis
+    permissions:
+      actions: read # required by zizmor online audits in private repositories
+      contents: read # required for actions/checkout to read the workflow source
+      security-events: write # required by zizmor-action to upload SARIF to code scanning
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        id: zizmor
+        uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          inputs: .github/workflows/continuous-integration.yml
+          version: 1.25.2
+          persona: pedantic
+          min-severity: informational
+          min-confidence: low
+          config: .github/zizmor.yml
+
+      - name: Fail if zizmor reported findings
+        env:
+          sarifFilePath: ${{ steps.zizmor.outputs.output-file }}
+        run: |
+          findingsCount="$(jq '[.runs[].results[]] | length' "$sarifFilePath")"
+          echo "zizmor findings: $findingsCount"
+          test "$findingsCount" -eq 0
+
+  generated-artifacts:
+    runs-on: ubuntu-24.04
+    name: generated artifacts check
+    permissions:
+      contents: read
+
+    steps:
+      # Do not set ref to github.event.pull_request.head.sha. pull request continuous integration must use the default
+      # merge commit so the workflow and checked-out files stay aligned.
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Verify sparse runtime validation entry point
+        run: bash ./tools/runtime-verification/verifySparseRuntimeValidation.sh
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Verify deployment CLI from clean install
+        run: |
+          rm -rf libraries/config/lib
+          published_charts_path="$(mktemp)"
+          printf '%s\n' '[]' > "${published_charts_path}"
+
+          helm_action="$(
+            ./tools/production-distribution/run-production-distribution-cli.sh \
+              select-helm-chart \
+              --charts-path "${published_charts_path}" \
+              --image-tag "dev-test-image"
+          )"
+
+          test "${helm_action}" = 'publish'
+          test -f libraries/config/lib/index.js
+          test -f libraries/config/lib/index.d.ts
+
+      - name: Verify generated i18n artifacts are committed
+        run: |
+          ./bin/yarn nx run webapp:translate-merge
+
+          if ! test -z "$(git status --porcelain)"; then
+            echo "Repository is not clean after generation. Run generation locally and commit the changes."
+            git status
+            exit 1
+          fi
+
+      - name: Validate translation markers
+        run: ./bin/yarn nx run webapp:validate-translations
+
+  build-libraries:
+    runs-on: ubuntu-24.04
+    name: build libraries
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Build libraries
+        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+
+  type-check:
+    runs-on: ubuntu-24.04
+    name: type check
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Type check
+        run: ./bin/yarn type-check
+
+  lint-file-names:
+    runs-on: ubuntu-24.04
+    name: lint file names
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Lint file names
+        run: ./bin/yarn lint:fileNames
+
+  lint:
+    runs-on: ubuntu-24.04
+    name: lint
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          # Keep this shallow. Nx gets the base branch explicitly in the next step.
+
+      - name: Fetch base branch for Nx checks
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch --no-tags --depth=1 origin \
+            "${BASE_REF}:refs/remotes/origin/${BASE_REF}" \
+            "${BASE_REF}:${BASE_REF}"
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Build libraries for lint import resolution
+        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+
+      - name: Lint affected projects (ESLint)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: ./bin/yarn nx affected -t lint --base="origin/${BASE_REF}"
+
+      - name: Check formatting (Prettier)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: ./bin/yarn lint:format
+
+      - name: Stylelint
+        if: ${{ github.event_name == 'pull_request' }}
+        run: ./bin/yarn stylelint
+
+      - name: Lint all projects (ESLint)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: ./bin/yarn lint:projects
+
+      - name: Check formatting (Prettier)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: ./bin/yarn lint:format
+
+      - name: Stylelint
+        if: ${{ github.event_name != 'pull_request' }}
+        run: ./bin/yarn stylelint
+
+  unit-tests:
+    runs-on: ubuntu-24.04
+    name: unit tests
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Test
+        run: ./tools/ci/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-reports
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            apps/webapp/coverage
+            apps/server/coverage
+            coverage/libraries/core
+            coverage/libraries/api-client
+
+  public-production-package:
+    runs-on: ubuntu-24.04
+    name: Public production package verification
+    if: ${{ github.event_name == 'pull_request' }}
+    needs:
+      - generated-artifacts
+      - build-libraries
+      - type-check
+      - lint-file-names
+      - lint
+      - unit-tests
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (pull_request)
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Build and verify public production package
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
+          expected_version="dev-${short_commit_sha}"
+          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
+            ./bin/yarn build:prod:public
+
+          BUILD_ARTIFACT_PATH=apps/server/dist/s3/ebs.zip \
+          EXPECTED_COMMIT="${WIRE_WEBAPP_BUILD_COMMIT}" \
+          EXPECTED_VERSION="${expected_version}" \
+            node ./tools/build-artifact/validateBuildArtifact.mts

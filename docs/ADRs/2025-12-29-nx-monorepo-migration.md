@@ -39,7 +39,7 @@ Before:                    After:
    - [`apps/server/project.json`](../apps/server/project.json) - Server Nx targets (build, package, serve, etc.)
 
 3. **ESLint Migration**
-   - Replace `.eslintrc.js` with [`eslint.config.ts`](../eslint.config.ts) (ESLint 9+ flat config)
+   - Replace `.eslintrc.js` with [`eslint.config.mjs`](../eslint.config.mjs) (ESLint 9+ flat config)
    - Enable type-aware linting with TypeScript project service
    - Separate rule sets for TS/TSX, JS/JSX, and test files
 

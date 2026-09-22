@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {
   RegisterData,
   AUTH_COOKIE_KEY,
@@ -40,17 +40,18 @@ import {
   ConsumableNotificationSynchronization,
 } from '@wireapp/api-client/lib/notification/consumableNotification';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
-import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
+import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {once} from 'lodash';
 import logdown from 'logdown';
+import {asyncNoop, noop} from 'noop-esm';
+import {TimeoutError} from 'p-queue';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
-import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
+import {LogFactory, StringUtil, TypedEventEmitter} from '@wireapp/commons';
 import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
-import {PromiseQueue} from '@wireapp/promise-queue';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 
 import {AccountService} from './account/';
@@ -88,16 +89,26 @@ import {CryptoClientType} from './messagingProtocols/proteus/proteusService/cryp
 import {wipeCoreCryptoDb} from './messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import {deleteIdentity} from './messagingProtocols/proteus/proteusService/identityClearer';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
+import {createFlushableQueue, isQueueFlushedError} from './queue/flushableQueue';
+import {sequentialQueueOptions} from './queue/sequentialQueueOptions';
 import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
+import {createFireAndForgetInvoker} from './taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
 
 export type ProcessedEventPayload = HandledEventPayload;
+export type WebSocketConnectionContext = Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'>;
+
+function getWebSocketLifecycleContext(connectionContext: WebSocketConnectionContext | undefined): string {
+  return connectionContext === undefined
+    ? ''
+    : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
+}
 
 export type CreateStoreFn = (storeName: string, key: Uint8Array) => undefined | Promise<CRUDEngine | undefined>;
 
@@ -164,9 +175,9 @@ export class Account extends TypedEventEmitter<Events> {
    */
   private initialisePendingProposalsTasksOnce: () => Promise<void>;
 
-  private readonly notificationProcessingQueue = new PromiseQueue({
-    name: 'notification-processing-queue',
-    paused: true,
+  private readonly notificationProcessingQueue = createFlushableQueue({
+    autoStart: false,
+    ...sequentialQueueOptions,
   });
 
   public setMaxCoreCryptoLogLevel: (level: CoreCryptoLogLevel) => void = () => undefined;
@@ -206,21 +217,25 @@ export class Account extends TypedEventEmitter<Events> {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.recurringTaskScheduler = new RecurringTaskScheduler({
-      get: async key => {
-        const task = await this.db?.get('recurringTasks', key);
-        return task?.firingDate;
+    this.logger = LogFactory.getLogger('@wireapp/core/Account');
+    this.recurringTaskScheduler = new RecurringTaskScheduler(
+      {
+        get: async key => {
+          const task = await this.db?.get('recurringTasks', key);
+          return task?.firingDate;
+        },
+        set: async (key, timestamp) => {
+          await this.db?.put('recurringTasks', {key, firingDate: timestamp}, key);
+        },
+        delete: async key => {
+          await this.db?.delete('recurringTasks', key);
+        },
       },
-      set: async (key, timestamp) => {
-        await this.db?.put('recurringTasks', {key, firingDate: timestamp}, key);
-      },
-      delete: async key => {
-        await this.db?.delete('recurringTasks', key);
-      },
-    });
+      createFireAndForgetInvoker({logger: this.logger}),
+    );
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
-      if (cookie && this.storeEngine) {
+      if (cookie !== undefined && this.storeEngine !== undefined) {
         try {
           await this.persistCookie(this.storeEngine, cookie);
         } catch (error: unknown) {
@@ -229,7 +244,6 @@ export class Account extends TypedEventEmitter<Events> {
       }
     });
 
-    this.logger = LogFactory.getLogger('@wireapp/core/Account');
     this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
   }
 
@@ -293,7 +307,7 @@ export class Account extends TypedEventEmitter<Events> {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
 
-    if (!this.currentClient) {
+    if (this.currentClient === undefined) {
       throw new Error('Client has not been initialized - please login first');
     }
 
@@ -376,7 +390,7 @@ export class Account extends TypedEventEmitter<Events> {
     entropyData?: Uint8Array,
     clientInfo: ClientInfo = coreDefaultClient,
   ): Promise<RegisteredClient> => {
-    if (!this.service || !this.apiClient.context || !this.storeEngine) {
+    if (this.service === undefined || this.apiClient.context === undefined || this.storeEngine === undefined) {
       throw new Error('Services are not set or context not initialized.');
     }
 
@@ -414,7 +428,7 @@ export class Account extends TypedEventEmitter<Events> {
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
   public initClient = async (client: RegisteredClient, mlsConfig?: InitClientOptions) => {
-    if (!this.service || !this.apiClient.context || !this.storeEngine) {
+    if (this.service === undefined || this.apiClient.context === undefined || this.storeEngine === undefined) {
       throw new Error('Services are not set.');
     }
     this.apiClient.context.clientId = client.id;
@@ -424,7 +438,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     await this.service.proteus.initClient(this.apiClient.context);
 
-    if ((await this.isMLSActiveForClient()) && this.service.mls && mlsConfig) {
+    if ((await this.isMLSActiveForClient()) && this.service.mls !== undefined && mlsConfig !== undefined) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
 
@@ -449,7 +463,11 @@ export class Account extends TypedEventEmitter<Events> {
       onNewPrekeys: async (prekeys: PreKey[]) => {
         this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
 
-        await this.apiClient.api.client.putClient(context.clientId!, {prekeys});
+        const clientId = context.clientId;
+        if (isUndefined(clientId)) {
+          throw new Error('Client id is not set in the account context.');
+        }
+        await this.apiClient.api.client.putClient(clientId, {prekeys});
         this.logger.debug(`Successfully uploaded '${prekeys.length}' PreKeys.`);
       },
     };
@@ -486,9 +504,10 @@ export class Account extends TypedEventEmitter<Events> {
 
   private readonly initServices = async (context: Context): Promise<void> => {
     const encryptedStoreName = this.generateEncryptedDbName(context);
-    this.encryptedDb = this.options.systemCrypto
-      ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
-      : await createEncryptedStore(encryptedStoreName);
+    this.encryptedDb =
+      this.options.systemCrypto !== undefined
+        ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
+        : await createEncryptedStore(encryptedStoreName);
     this.db = await openDB(this.generateCoreDbName(context));
     this.storeEngine = await this.initEngine(context, this.encryptedDb);
 
@@ -601,7 +620,7 @@ export class Account extends TypedEventEmitter<Events> {
     }
 
     try {
-      if (this.storeEngine) {
+      if (this.storeEngine !== undefined) {
         await wipeCoreCryptoDb(this.storeEngine);
       }
     } catch (error: unknown) {
@@ -621,7 +640,7 @@ export class Account extends TypedEventEmitter<Events> {
    */
   private readonly wipeAllData = async (): Promise<void> => {
     try {
-      if (this.storeEngine) {
+      if (this.storeEngine !== undefined) {
         await deleteIdentity(this.storeEngine, false);
       }
     } catch (error: unknown) {
@@ -629,7 +648,7 @@ export class Account extends TypedEventEmitter<Events> {
     }
 
     try {
-      if (this.db) {
+      if (this.db !== undefined) {
         await deleteDB(this.db);
       }
     } catch (error: unknown) {
@@ -645,7 +664,7 @@ export class Account extends TypedEventEmitter<Events> {
    */
   private readonly wipeCryptoData = async (): Promise<void> => {
     try {
-      if (this.storeEngine) {
+      if (this.storeEngine !== undefined) {
         await deleteIdentity(this.storeEngine, true);
       }
     } catch (error: unknown) {
@@ -671,10 +690,10 @@ export class Account extends TypedEventEmitter<Events> {
    */
   public listen = async ({
     useLegacy,
-    onEvent = async () => {},
-    onConnectionStateChanged: onConnectionStateChangedCallBack = () => {},
-    onNotificationStreamProgress = () => {},
-    onMissedNotifications = () => {},
+    onEvent = asyncNoop,
+    onConnectionStateChanged: onConnectionStateChangedCallBack = noop,
+    onNotificationStreamProgress = noop,
+    onMissedNotifications = noop,
   }: {
     /**
      * Called when a new event arrives from backend
@@ -691,7 +710,7 @@ export class Account extends TypedEventEmitter<Events> {
     /**
      * called when the connection state with the backend has changed
      */
-    onConnectionStateChanged?: (state: ConnectionState) => void;
+    onConnectionStateChanged?: (state: ConnectionState, connectionContext?: WebSocketConnectionContext) => void;
 
     /**
      * called when we detect lost notification from backend.
@@ -713,7 +732,7 @@ export class Account extends TypedEventEmitter<Events> {
      */
     dryRun?: boolean;
   } = {}): Promise<() => void> => {
-    if (!this.currentClient) {
+    if (this.currentClient === undefined) {
       throw new Error('Client has not been initialized - please login first');
     }
 
@@ -721,15 +740,27 @@ export class Account extends TypedEventEmitter<Events> {
       throw new Error('use of legacy notifications must be explicitly set to true or false');
     }
 
-    const onConnectionStateChanged = this.createConnectionStateChangedHandler(onConnectionStateChangedCallBack);
+    let currentWebSocketConnectionContext: WebSocketConnectionContext | undefined;
+    const getCurrentWebSocketConnectionContext = (): WebSocketConnectionContext | undefined => {
+      return currentWebSocketConnectionContext;
+    };
+    const onConnectionStateChanged = this.createConnectionStateChangedHandler(
+      onConnectionStateChangedCallBack,
+      getCurrentWebSocketConnectionContext,
+    );
 
     const handleEvent = this.createEventHandler(onEvent);
 
-    const handleLegacyNotification = this.createLegacyNotificationHandler(handleEvent, onNotificationStreamProgress);
+    const handleLegacyNotification = this.createLegacyNotificationHandler(
+      handleEvent,
+      onNotificationStreamProgress,
+      getCurrentWebSocketConnectionContext,
+    );
     const handleNotification = this.createNotificationHandler(
       handleEvent,
       onNotificationStreamProgress,
       onConnectionStateChanged,
+      getCurrentWebSocketConnectionContext,
     );
 
     const handleMissedNotifications = this.createLegacyMissedNotificationsHandler(onMissedNotifications);
@@ -737,6 +768,7 @@ export class Account extends TypedEventEmitter<Events> {
       handleLegacyNotification,
       handleMissedNotifications,
       onConnectionStateChanged,
+      getCurrentWebSocketConnectionContext,
     });
 
     this.setupWebSocketListeners(onConnectionStateChanged, handleNotification, handleLegacyNotification, useLegacy);
@@ -785,9 +817,12 @@ export class Account extends TypedEventEmitter<Events> {
        */
       this.apiClient.transport.ws.lock();
     }
-    this.apiClient.connect(async abortController => {
+    this.apiClient.connect(async (abortController, reconnectContext) => {
+      currentWebSocketConnectionContext = reconnectContext;
       // this call back is called every single time the websocket connection is (re)established
-      this.logger.info('Connection established with websocket, starting notification stream processing');
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=websocket-open-processing-start useLegacy=${useLegacy} aborted=${abortController.signal.aborted}${getWebSocketLifecycleContext(reconnectContext)}`,
+      );
       /**
        * This is to avoid passing proposals too early to core crypto
        * @See WPB-18995
@@ -802,15 +837,37 @@ export class Account extends TypedEventEmitter<Events> {
        * send us the next batch of notifications, currently total size of notifications coming from web socket is limited to 500
        * so we need to acknowledge the notifications to let the backend know we are ready for the next batch
        */
-      this.notificationProcessingQueue.resume();
+      this.notificationProcessingQueue.queue.start();
 
       if (useLegacy) {
-        await legacyProcessNotificationStream(abortController);
+        this.logger.info(
+          `[WebSocketLifecycle] layer=account event=legacy-catchup-start aborted=${abortController.signal.aborted}${getWebSocketLifecycleContext(reconnectContext)}`,
+        );
+        try {
+          await legacyProcessNotificationStream(abortController);
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=legacy-catchup-success aborted=${abortController.signal.aborted} live=${this.isConnectionLive()}${getWebSocketLifecycleContext(reconnectContext)}`,
+          );
+        } catch (error: unknown) {
+          const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
+          this.logger.warn(
+            `[WebSocketLifecycle] layer=account event=legacy-catchup-failure aborted=${abortController.signal.aborted} live=${this.isConnectionLive()}${getWebSocketLifecycleContext(reconnectContext)} errorName=${errorName} errorMessage=${errorMessage}`,
+          );
+
+          if (abortController.signal.aborted) {
+            return;
+          }
+
+          this.pauseAndFlushNotificationQueue();
+          onConnectionStateChanged(ConnectionState.CLOSED);
+        }
       }
     });
 
     return () => {
-      this.logger.info('Disconnecting from backend as requested by consumer');
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=disconnect-requested${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
+      );
       flushProposalsQueue();
       this.pauseAndFlushNotificationQueue();
       this.apiClient.disconnect();
@@ -820,12 +877,22 @@ export class Account extends TypedEventEmitter<Events> {
   };
 
   private readonly createConnectionStateChangedHandler = (
-    onConnectionStateChanged: (state: ConnectionState) => void,
+    onConnectionStateChanged: (state: ConnectionState, connectionContext?: WebSocketConnectionContext) => void,
+    getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined,
   ): ((state: ConnectionState) => void) => {
+    let previousConnectionState = this.connectionState;
     return (state: ConnectionState): void => {
+      const connectionContext = getCurrentWebSocketConnectionContext();
       this.connectionState = state;
-      onConnectionStateChanged(state);
-      this.logger.info(`Connection state changed to: ${state}`);
+      if (connectionContext === undefined) {
+        onConnectionStateChanged(state);
+      } else {
+        onConnectionStateChanged(state, connectionContext);
+      }
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=connection-state-change previousState=${previousConnectionState.toUpperCase()} nextState=${state.toUpperCase()}${getWebSocketLifecycleContext(connectionContext)}`,
+      );
+      previousConnectionState = state;
     };
   };
 
@@ -846,7 +913,11 @@ export class Account extends TypedEventEmitter<Events> {
             conversation,
           } = event as Events.ConversationMessageTimerUpdateEvent;
           const expireAfterMillis = Number(message_timer);
-          this.service!.conversation.messageTimer.setConversationLevelTimer(conversation, expireAfterMillis);
+          const accountServices = this.service;
+          if (isUndefined(accountServices)) {
+            throw new Error('Services are not set.');
+          }
+          accountServices.conversation.messageTimer.setConversationLevelTimer(conversation, expireAfterMillis);
           break;
         }
       }
@@ -865,34 +936,38 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly createLegacyNotificationHandler = (
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
+    getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined,
   ) => {
     return async (notification: Notification, source: NotificationSource): Promise<void> => {
       void this.notificationProcessingQueue
-        .push(async () => {
+        .add(async () => {
           try {
             const start = Date.now();
             const firstNotificationPayload = notification.payload[0];
-            const notificationTime = firstNotificationPayload
-              ? this.getNotificationEventTime(firstNotificationPayload)
-              : null;
-            this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`);
-            this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
+            const notificationTime =
+              firstNotificationPayload !== undefined ? this.getNotificationEventTime(firstNotificationPayload) : null;
+            this.logger.info(`Processing legacy notification at ${notificationTime}`);
+            this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.queue.size}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
             if (notificationTime !== null && notificationTime.length > 0) {
               onNotificationStreamProgress(notificationTime);
             }
 
-            const messages = this.service!.notification.handleNotification(notification, source);
+            const accountServices = this.service;
+            if (isUndefined(accountServices)) {
+              throw new Error('Services are not set.');
+            }
+            const messages = accountServices.notification.handleNotification(notification, source);
 
             for await (const message of messages) {
               await handleEvent(message, source);
             }
 
-            this.logger.info(`Finished processing legacy notification "${notification.id}" in ${Date.now() - start}ms`);
+            this.logger.info(`Finished processing legacy notification in ${Date.now() - start}ms`);
           } catch (error: unknown) {
+            const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
             this.logger.error(
-              `Failed to handle legacy notification "${notification.id}": ${(error as any).message}`,
-              error,
+              `[WebSocketLifecycle] layer=account event=legacy-notification-failure${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())} errorName=${errorName} errorMessage=${errorMessage}`,
             );
           }
         })
@@ -904,6 +979,7 @@ export class Account extends TypedEventEmitter<Events> {
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     onConnectionStateChanged: (state: ConnectionState) => void,
+    getCurrentWebSocketConnectionContext: () => WebSocketConnectionContext | undefined,
   ) => {
     return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
       this.logger.info(`Received consumable notification of type "${notification.type}"`);
@@ -915,16 +991,33 @@ export class Account extends TypedEventEmitter<Events> {
 
         if (notification.type === ConsumableEvent.SYNCHRONIZATION) {
           this.notificationProcessingQueue
-            .push(() => this.handleSynchronizationNotification(notification, onConnectionStateChanged))
+            .add(() =>
+              this.handleSynchronizationNotification(
+                notification,
+                onConnectionStateChanged,
+                getCurrentWebSocketConnectionContext(),
+              ),
+            )
             .catch(this.handleNotificationQueueError);
           return;
         }
 
         this.notificationProcessingQueue
-          .push(() => this.decryptAckEmitNotification(notification, handleEvent, source, onNotificationStreamProgress))
+          .add(() =>
+            this.decryptAckEmitNotification(
+              notification,
+              handleEvent,
+              source,
+              onNotificationStreamProgress,
+              getCurrentWebSocketConnectionContext(),
+            ),
+          )
           .catch(this.handleNotificationQueueError);
       } catch (error: unknown) {
-        this.logger.error(`Failed to handle notification "${notification.type}": ${(error as any).message}`, error);
+        const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
+        this.logger.error(
+          `[WebSocketLifecycle] layer=account event=consumable-notification-handling-failure${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())} errorName=${errorName} errorMessage=${errorMessage}`,
+        );
       }
     };
   };
@@ -934,13 +1027,13 @@ export class Account extends TypedEventEmitter<Events> {
       throw error;
     }
 
-    switch (error.cause) {
-      case PromiseQueue.ERROR_CAUSES.TIMEOUT:
-        this.logger.warn('Notification decryption task timed out', error);
-        break;
-      case PromiseQueue.ERROR_CAUSES.FLUSHED:
-        this.logger.info('Notification processing queue was flushed, ignoring error', error);
-        break;
+    if (error instanceof TimeoutError) {
+      this.logger.warn('Notification decryption task timed out', error);
+      return;
+    }
+
+    if (isQueueFlushedError(error)) {
+      this.logger.info('Notification processing queue was flushed, ignoring error', error);
     }
   };
 
@@ -972,30 +1065,48 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly handleSynchronizationNotification = async (
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
+    connectionContext: WebSocketConnectionContext | undefined,
   ) => {
-    this.logger.info('acknowledging synchronization notification');
-    this.acknowledgeSynchronizationNotification(notification);
-
     const markerId = notification.data.marker_id;
     const currentMarkerId = this.apiClient.transport.http.accessTokenStore.markerToken;
-
+    const markerPresent = Boolean(markerId);
+    const markerMatched = markerId === currentMarkerId;
     this.logger.info(
-      `Handling synchronization notification with marker ID: ${markerId} current marker ID: ${currentMarkerId}`,
+      `[WebSocketLifecycle] layer=account event=async-sync-marker-received markerPresent=${markerPresent}${getWebSocketLifecycleContext(connectionContext)}`,
     );
+    this.acknowledgeSynchronizationNotification(notification);
     /**
      * There is a chance that there might be multiple synchronization notifications (markers)
      * in the queue in case websocket connection drops a few times
      * Hence we only want to resume message sending and set the connection state to LIVE
      * if the marker ID matches the current marker ID.
      */
-    if (markerId === currentMarkerId) {
+    if (markerMatched) {
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=async-sync-marker-matched markerMatched=true${getWebSocketLifecycleContext(connectionContext)}`,
+      );
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=live-transition-start${getWebSocketLifecycleContext(connectionContext)}`,
+      );
       await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
-      await this.service!.conversation.runDeferredEpochRecovery();
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      await accountServices.conversation.runDeferredEpochRecovery();
       resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.LIVE);
+      this.logger.info(
+        `[WebSocketLifecycle] layer=account event=live-transition-success${getWebSocketLifecycleContext(connectionContext)}`,
+      );
+      return;
     }
+
+    this.logger.info(
+      `[WebSocketLifecycle] layer=account event=async-sync-marker-ignored markerMatched=false${getWebSocketLifecycleContext(connectionContext)}`,
+    );
   };
 
   private readonly decryptAckEmitNotification = async (
@@ -1003,14 +1114,20 @@ export class Account extends TypedEventEmitter<Events> {
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     source: NotificationSource,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
+    connectionContext: WebSocketConnectionContext | undefined,
   ): Promise<void> => {
     try {
-      this.logger.info(`Sending consumable notification for decryption`, notification.data.event.id);
-      const payloads = this.service!.notification.handleNotification(notification.data.event, source);
+      this.logger.info('Sending consumable notification for decryption');
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      const payloads = accountServices.notification.handleNotification(notification.data.event, source);
 
       const firstEventPayload = notification.data.event.payload[0];
-      const notificationTime = firstEventPayload ? this.getNotificationEventTime(firstEventPayload) : null;
-      if (!this.isConnectionLive() && is.nonEmptyString(notificationTime)) {
+      const notificationTime =
+        firstEventPayload !== undefined ? this.getNotificationEventTime(firstEventPayload) : null;
+      if (!this.isConnectionLive() && isNonEmptyString(notificationTime)) {
         onNotificationStreamProgress(notificationTime);
       }
 
@@ -1018,10 +1135,13 @@ export class Account extends TypedEventEmitter<Events> {
         await handleEvent(payload, source);
       }
 
-      this.logger.info(`Acknowledging consumable notification on the backend "${notification.data.delivery_tag}"`);
+      this.logger.info('Acknowledging consumable notification on the backend');
       this.apiClient.transport.ws.acknowledgeNotification(notification);
-    } catch (err: unknown) {
-      this.logger.error(`Failed to process notification ${notification.data.delivery_tag}`, err);
+    } catch (error: unknown) {
+      const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
+      this.logger.error(
+        `[WebSocketLifecycle] layer=account event=consumable-notification-processing-failure${getWebSocketLifecycleContext(connectionContext)} errorName=${errorName} errorMessage=${errorMessage}`,
+      );
     }
   };
 
@@ -1047,9 +1167,14 @@ export class Account extends TypedEventEmitter<Events> {
   ) => {
     return async (notificationId: string) => {
       if (this.hasMLSDevice) {
-        void queueConversationRejoin('all-conversations', () =>
-          this.service!.conversation.handleConversationsEpochMismatch(),
-        );
+        void queueConversationRejoin('all-conversations', () => {
+          const accountServices = this.service;
+          if (isUndefined(accountServices)) {
+            throw new Error('Services are not set.');
+          }
+
+          return accountServices.conversation.handleConversationsEpochMismatch();
+        });
       }
 
       return onMissedNotifications(notificationId);
@@ -1071,10 +1196,12 @@ export class Account extends TypedEventEmitter<Events> {
     handleLegacyNotification,
     handleMissedNotifications,
     onConnectionStateChanged,
+    getCurrentWebSocketConnectionContext = () => undefined,
   }: {
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>;
     handleMissedNotifications: (notificationId: string) => Promise<void>;
     onConnectionStateChanged: (state: ConnectionState) => void;
+    getCurrentWebSocketConnectionContext?: () => WebSocketConnectionContext | undefined;
   }) => {
     return async (abortController?: AbortController) => {
       this.apiClient.transport.ws.lock();
@@ -1083,7 +1210,11 @@ export class Account extends TypedEventEmitter<Events> {
       pauseRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
 
-      const results = await this.service!.notification.legacyProcessNotificationStream(
+      const accountServices = this.service;
+      if (isUndefined(accountServices)) {
+        throw new Error('Services are not set.');
+      }
+      const results = await accountServices.notification.legacyProcessNotificationStream(
         async (notification, source) => {
           await handleLegacyNotification(notification, source);
         },
@@ -1099,14 +1230,21 @@ export class Account extends TypedEventEmitter<Events> {
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
       void this.notificationProcessingQueue
-        .push(async () => {
+        .add(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
+          const connectionContext = getCurrentWebSocketConnectionContext();
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=live-transition-start${getWebSocketLifecycleContext(connectionContext)}`,
+          );
           await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
           await this.service?.conversation.runDeferredEpochRecovery();
           resumeProposalProcessing();
           resumeMessageSending();
           resumeRejoiningMLSConversations();
           onConnectionStateChanged(ConnectionState.LIVE);
+          this.logger.info(
+            `[WebSocketLifecycle] layer=account event=live-transition-success${getWebSocketLifecycleContext(connectionContext)}`,
+          );
           this.apiClient.transport.ws.unlock();
         })
         .catch(this.handleNotificationQueueError);
@@ -1120,18 +1258,18 @@ export class Account extends TypedEventEmitter<Events> {
    * this is to avoid duplicate decryption of notifications
    */
   private readonly pauseAndFlushNotificationQueue = () => {
-    this.notificationProcessingQueue.pause();
+    this.notificationProcessingQueue.queue.pause();
     this.notificationProcessingQueue.flush();
     this.logger.info('Notification processing queue paused and flushed');
   };
 
   public readonly pauseNotificationQueue = () => {
-    this.notificationProcessingQueue.pause();
+    this.notificationProcessingQueue.queue.pause();
     this.logger.info('Notification processing queue paused');
   };
 
   public readonly resumeNotificationQueue = () => {
-    this.notificationProcessingQueue.resume();
+    this.notificationProcessingQueue.queue.start();
     this.logger.info('Notification processing queue resumed');
   };
 
@@ -1222,7 +1360,7 @@ export class Account extends TypedEventEmitter<Events> {
   };
 
   public getClientCapabilities = () => {
-    return this.currentClient?.capabilities || [];
+    return this.currentClient?.capabilities ?? [];
   };
 
   public static checkIsConsumable = (
@@ -1256,7 +1394,7 @@ export class Account extends TypedEventEmitter<Events> {
     const openDb = async () => {
       const dbKey = await generateSecretKey({keyId: 'db-key', keySize: 32, secretsDb: encryptedStore});
       const initializedDb = await this.options.createStore?.(dbName, dbKey.key);
-      if (initializedDb) {
+      if (initializedDb !== undefined) {
         this.logger.debug(`Initialized store with existing engine "${dbName}".`);
         return initializedDb;
       }
@@ -1267,7 +1405,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
     const storeEngine = await openDb();
     const cookie = CookieStore.getCookie();
-    if (cookie) {
+    if (cookie !== undefined) {
       await this.persistCookie(storeEngine, cookie);
     }
     return storeEngine;

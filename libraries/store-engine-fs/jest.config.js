@@ -25,6 +25,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
+  transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
   coverageDirectory: '../../coverage/libraries/store-engine-fs',
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',

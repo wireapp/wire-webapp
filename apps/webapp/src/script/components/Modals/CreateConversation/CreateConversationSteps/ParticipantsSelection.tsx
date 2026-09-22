@@ -17,36 +17,37 @@
  *
  */
 
-import {useContext, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {RootContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {participantsSelectionListCss, participantsSelectionSearchCss} from './CreateConversationSteps.styles';
 
 import {useCreateConversation} from '../hooks/useCreateConversation';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {getNonFederatingParticipantsModalCopy} from '../utils';
 
 export const ParticipantsSelection = () => {
-  const rootContext = useContext(RootContext);
+  const {mainViewModel, translate} = useApplicationContext();
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
   const [participantsInput, setParticipantsInput] = useState<string>('');
   const {isGuestsEnabled, selectedContacts, setSelectedContacts} = useCreateConversationModal();
-  const {onSubmit} = useCreateConversation();
+  const nonFederatingParticipantsModalCopy = getNonFederatingParticipantsModalCopy(translate);
+  const {onSubmit} = useCreateConversation(nonFederatingParticipantsModalCopy);
 
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
 
-  const mainViewModel = rootContext!.mainViewModel;
   const contentViewModel = mainViewModel.content;
   const conversationRepository = contentViewModel.repositories.conversation;
   const searchRepository = contentViewModel.repositories.search;
@@ -68,6 +69,10 @@ export const ParticipantsSelection = () => {
 
   const filteredContacts = contacts.filter(user => user.isAvailable());
 
+  if (isUndefined(selfUser)) {
+    return null;
+  }
+
   return (
     <>
       <div css={participantsSelectionSearchCss}>
@@ -75,14 +80,14 @@ export const ParticipantsSelection = () => {
           input={participantsInput}
           setInput={setParticipantsInput}
           selectedUsers={selectedContacts}
-          placeholder={t('groupCreationParticipantsPlaceholder')}
+          placeholder={translate('groupCreationParticipantsPlaceholder')}
           onEnter={onSubmit}
         />
       </div>
       <div className="modal__body" css={participantsSelectionListCss}>
         <FadingScrollbar>
           <UserSearchableList
-            selfUser={selfUser!}
+            selfUser={selfUser}
             users={filteredContacts}
             filter={participantsInput}
             selected={selectedContacts}

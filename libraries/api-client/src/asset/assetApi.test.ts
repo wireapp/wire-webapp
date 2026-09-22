@@ -70,6 +70,7 @@ describe('AssetAPI', () => {
           url: `/assets/${validDomain}/${validAssetId}`,
           params: expect.objectContaining({asset_token: validToken}),
           responseType: 'arraybuffer',
+          'axios-retry': {retries: 3},
         }),
       );
     });
@@ -171,6 +172,7 @@ describe('AssetAPI', () => {
           method: 'get',
           url: `/bot/assets/${validAssetId}`,
           params: expect.objectContaining({asset_token: validToken}),
+          'axios-retry': {retries: 3},
         }),
       );
     });
@@ -183,6 +185,7 @@ describe('AssetAPI', () => {
   describe('postAsset', () => {
     const mockAssetData = new Uint8Array([1, 2, 3, 4, 5]);
     const mockUploadResponse: AssetUploadData = {
+      domain: 'example.com',
       expires: '2025-12-31T23:59:59.000Z',
       key: 'asset-key-123',
       token: 'upload-token-456',
@@ -307,6 +310,7 @@ describe('AssetAPI', () => {
   describe('postServiceAsset', () => {
     const mockAssetData = new Uint8Array([10, 20, 30]);
     const mockUploadResponse: AssetUploadData = {
+      domain: 'example.com',
       expires: '2025-12-31T23:59:59.000Z',
       key: 'service-asset-key',
       token: 'service-token',

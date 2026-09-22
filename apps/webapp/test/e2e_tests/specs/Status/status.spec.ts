@@ -19,7 +19,7 @@
 
 import {Page} from 'playwright/test';
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
-import {User} from 'test/e2e_tests/data/user';
+import {getRequiredUserId, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
@@ -106,7 +106,7 @@ test.describe('Status', () => {
       sendAction: async ({api, conversation}) => {
         let conversationId;
         if (conversation === '1on1') {
-          conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+          conversationId = await api.conversation.getConversationWithUser(userA.token, getRequiredUserId(userB), {
             protocol: 'mls',
           });
         } else {

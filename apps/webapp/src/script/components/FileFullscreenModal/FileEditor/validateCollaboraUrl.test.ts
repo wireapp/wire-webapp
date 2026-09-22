@@ -18,7 +18,7 @@
  */
 
 import {Maybe} from 'true-myth';
-import {unwrap, unwrapErr} from 'true-myth/test-support';
+import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 
 import {validateCollaboraUrl} from './validateCollaboraUrl';
 
@@ -27,7 +27,7 @@ const TRUSTED_ORIGIN = 'https://cells.example.com';
 describe('validateCollaboraUrl', () => {
   describe('url is empty', () => {
     it('returns empty error when url is undefined', () => {
-      const result = validateCollaboraUrl(Maybe.of(undefined), TRUSTED_ORIGIN);
+      const result = validateCollaboraUrl(Maybe.nothing<string>(), TRUSTED_ORIGIN);
       expect(unwrapErr(result)).toEqual({reason: 'empty'});
     });
 

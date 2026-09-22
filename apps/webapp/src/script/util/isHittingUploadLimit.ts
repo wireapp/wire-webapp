@@ -19,23 +19,23 @@
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 const CONCURRENT_UPLOAD_LIMIT = 10;
 
-const isHittingUploadLimit = (files: File[], assetRepository: AssetRepository): boolean => {
+const isHittingUploadLimit = (files: File[], assetRepository: AssetRepository, translate: Translate): boolean => {
   const concurrentUploads = files.length + assetRepository.getNumberOfOngoingUploads();
   const isHittingUploadLimit = concurrentUploads > CONCURRENT_UPLOAD_LIMIT;
 
   if (isHittingUploadLimit) {
     const modalOptions = {
       text: {
-        message: t('modalAssetParallelUploadsMessage', {number: CONCURRENT_UPLOAD_LIMIT}),
-        title: t('modalAssetParallelUploadsHeadline'),
+        message: translate('modalAssetParallelUploadsMessage', {number: CONCURRENT_UPLOAD_LIMIT}),
+        title: translate('modalAssetParallelUploadsHeadline'),
       },
     };
 
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, translate);
   }
 
   return isHittingUploadLimit;

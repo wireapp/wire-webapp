@@ -19,7 +19,7 @@
 
 import {useMemo, useState} from 'react';
 
-import {UserDevicesHistoryEntry, UserDevicesState} from 'Components/UserDevices';
+import {UserDevicesHistoryEntry, UserDevicesState} from 'Components/userDevices';
 
 export const useUserDevicesHistory = () => {
   const [history, setHistory] = useState<UserDevicesHistoryEntry[]>([

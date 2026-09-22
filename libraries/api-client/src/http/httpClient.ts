@@ -222,7 +222,7 @@ export class HttpClient extends EventEmitter {
   }
 
   public async _sendRequest<T>({config, isFirstTry = true, abortController}: SendRequest): Promise<AxiosResponse<T>> {
-    if (this.accessTokenStore.accessTokenData) {
+    if (this.accessTokenStore.accessTokenData !== undefined) {
       // TODO: remove tokenAsParam
       const {token_type, access_token} = this.accessTokenStore.accessTokenData;
 

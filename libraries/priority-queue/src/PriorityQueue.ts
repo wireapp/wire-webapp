@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isObject, isUndefined} from '@sindresorhus/is';
 
 import {Config} from './Config';
 import {Item} from './Item';
@@ -83,11 +83,21 @@ export class PriorityQueue {
   }
 
   public get first(): Item {
-    return this.queue[0]!;
+    const firstItem = this.queue[0];
+    if (isUndefined(firstItem)) {
+      throw new Error('Cannot read the first item from an empty priority queue');
+    }
+
+    return firstItem;
   }
 
   public get last(): Item {
-    return this.queue[this.queue.length - 1]!;
+    const lastItem = this.queue[this.queue.length - 1];
+    if (isUndefined(lastItem)) {
+      throw new Error('Cannot read the last item from an empty priority queue');
+    }
+
+    return lastItem;
   }
 
   public get size(): number {
@@ -97,7 +107,7 @@ export class PriorityQueue {
   private async processList(): Promise<void> {
     const item = this.queue.shift();
 
-    if (!is.object(item)) {
+    if (!isObject(item)) {
       this.isRunning = false;
       return;
     }

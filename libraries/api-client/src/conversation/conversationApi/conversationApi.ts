@@ -128,7 +128,7 @@ export class ConversationAPI {
   ) {}
 
   private generateBaseConversationUrl(conversationId: QualifiedId, supportsQualifiedEndpoint: boolean = true): string {
-    return supportsQualifiedEndpoint && conversationId.domain
+    return supportsQualifiedEndpoint && Boolean(conversationId.domain)
       ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}`
       : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}`;
   }

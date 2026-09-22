@@ -156,7 +156,7 @@ test.describe('Sending Assets', () => {
 
       await test.step('User B send message and verify it in message', async () => {
         await pastedFileControls.press('Enter');
-        await expect(pages.conversation().getMessage({sender: userA}).getByRole('img')).toBeVisible();
+        await expect(pages.conversation().getMessage({sender: userA}).getByTestId('image-asset')).toBeVisible();
       });
     },
   );

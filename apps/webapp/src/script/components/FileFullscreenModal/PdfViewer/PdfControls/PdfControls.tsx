@@ -27,7 +27,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {ZoomInIcon, ZoomOutIcon} from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles, pageNumberStyles, wrapperStyles} from './PdfControls.styles';
 
@@ -57,20 +57,22 @@ export const PdfControls = ({
   currentPage,
   pagesCount,
 }: PdfControlsProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <nav css={wrapperStyles}>
       <IconButton
         onClick={onToggleSidebar}
-        aria-label={t(sidebarOpen ? 'pdfViewerCloseSidebar' : 'pdfViewerOpenSidebar')}
+        aria-label={translate(sidebarOpen ? 'pdfViewerCloseSidebar' : 'pdfViewerOpenSidebar')}
         css={buttonStyles}
       >
         {sidebarOpen ? <SidebarActiveIcon /> : <SidebarInactiveIcon />}
       </IconButton>
-      <span css={pageNumberStyles}>{t('pdfViewerPageNumber', {page: currentPage, total: pagesCount})}</span>
+      <span css={pageNumberStyles}>{translate('pdfViewerPageNumber', {page: currentPage, total: pagesCount})}</span>
       <ButtonsGroup>
         <ButtonsGroup.IconButton
           onClick={onPreviousPage}
-          aria-label={t('pdfViewerPreviousPage')}
+          aria-label={translate('pdfViewerPreviousPage')}
           disabled={currentPage === 1}
           css={buttonStyles}
         >
@@ -78,7 +80,7 @@ export const PdfControls = ({
         </ButtonsGroup.IconButton>
         <ButtonsGroup.IconButton
           onClick={onNextPage}
-          aria-label={t('pdfViewerNextPage')}
+          aria-label={translate('pdfViewerNextPage')}
           disabled={currentPage === pagesCount}
           css={buttonStyles}
         >
@@ -88,7 +90,7 @@ export const PdfControls = ({
       <ButtonsGroup>
         <ButtonsGroup.IconButton
           onClick={onZoomOut}
-          aria-label={t('pdfViewerZoomOut')}
+          aria-label={translate('pdfViewerZoomOut')}
           disabled={scale === MIN_ZOOM_SCALE}
           css={buttonStyles}
         >
@@ -96,7 +98,7 @@ export const PdfControls = ({
         </ButtonsGroup.IconButton>
         <ButtonsGroup.IconButton
           onClick={onZoomIn}
-          aria-label={t('pdfViewerZoomIn')}
+          aria-label={translate('pdfViewerZoomIn')}
           disabled={scale === MAX_ZOOM_SCALE}
           css={buttonStyles}
         >

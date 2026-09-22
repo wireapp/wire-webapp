@@ -19,7 +19,11 @@
 
 import {Button} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';
@@ -31,19 +35,28 @@ interface NoPreviewAvailableProps {
 }
 
 export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreviewAvailableProps) => {
+  const {translate} = useApplicationContext();
+  const canPerformCellsAction = useCellsActionPermissions();
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
+  const canDownload = canPerformCellsAction(CELLS_ACTION.DOWNLOAD);
 
   return (
     <FilePlaceholder
-      title={t('fileFullscreenModal.noPreviewAvailable.title')}
-      description={t('fileFullscreenModal.noPreviewAvailable.description')}
+      title={translate('fileFullscreenModal.noPreviewAvailable.title')}
+      description={translate(
+        canDownload
+          ? 'fileFullscreenModal.noPreviewAvailable.description'
+          : 'fileFullscreenModal.noPreviewAvailable.viewerDescription',
+      )}
       callToAction={
-        <Button
-          onClick={() => forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension})}
-          disabled={fileUrl === undefined || fileUrl.length === 0}
-        >
-          {t('fileFullscreenModal.noPreviewAvailable.callToAction')}
-        </Button>
+        canDownload && (
+          <Button
+            onClick={() => forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension})}
+            disabled={fileUrl === undefined || fileUrl.length === 0}
+          >
+            {translate('fileFullscreenModal.noPreviewAvailable.callToAction')}
+          </Button>
+        )
       }
     />
   );

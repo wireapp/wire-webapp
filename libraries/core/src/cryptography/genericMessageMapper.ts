@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 
 import {LogFactory} from '@wireapp/commons';
@@ -95,9 +96,13 @@ export class GenericMessageMapper {
         };
       }
       case GenericMessageType.BUTTON_ACTION: {
+        const buttonAction = genericMessage.buttonAction;
+        if (isUndefined(buttonAction)) {
+          throw new Error('Button action message has no button action content');
+        }
         return {
           ...baseMessage,
-          content: genericMessage.buttonAction!,
+          content: buttonAction,
           type: PayloadBundleType.BUTTON_ACTION,
         };
       }

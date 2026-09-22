@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {
   generateWireEmail,
   generateFirstName,
@@ -41,6 +43,14 @@ export interface User {
     id: string;
   };
   locale?: 'en-US' | 'de-DE';
+}
+
+export function getRequiredUserId(user: User): string {
+  if (!isNonEmptyString(user.id)) {
+    throw new Error(`User ${user.username} does not have an id`);
+  }
+
+  return user.id;
 }
 
 export const getUser = (user: Partial<User> = {}): User => {

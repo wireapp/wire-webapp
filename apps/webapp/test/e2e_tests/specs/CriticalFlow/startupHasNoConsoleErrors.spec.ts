@@ -18,7 +18,7 @@
  */
 
 import {expect, test, type ConsoleMessage, type Page} from '@playwright/test';
-import is from '@sindresorhus/is';
+import {isEmptyString} from '@sindresorhus/is';
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 
@@ -46,7 +46,7 @@ function isUncaughtRuntimeErrorMessage(message: string): boolean {
 function formatConsoleMessageLocation(consoleMessage: ConsoleMessage): string {
   const location = consoleMessage.location();
 
-  if (is.emptyString(location.url)) {
+  if (isEmptyString(location.url)) {
     return 'unknown location';
   }
 
@@ -102,7 +102,7 @@ test('Application startup does not emit uncaught runtime errors', {tag: ['@crit-
 
   await test.step('No uncaught runtime errors were emitted during startup', async () => {
     const formattedErrors = formatCollectedErrors(pageErrors, consoleErrors);
-    const expectationMessage = is.emptyString(formattedErrors)
+    const expectationMessage = isEmptyString(formattedErrors)
       ? 'Unexpected startup errors were emitted:\n\nNo errors were captured.'
       : `Unexpected startup errors were emitted:\n\n${formattedErrors}`;
 

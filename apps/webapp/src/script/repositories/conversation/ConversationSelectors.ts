@@ -18,7 +18,11 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_TYPE, Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation/';
+import {
+  Conversation as BackendConversation,
+  CONVERSATION_TYPE,
+  GROUP_CONVERSATION_TYPE,
+} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -48,6 +52,14 @@ export function isMLSCapableConversation(conversation: Conversation): conversati
 
 export function isGroupMLSConversation(conversation: Conversation): conversation is MLSConversation {
   return isMLSConversation(conversation) && conversation.isGroupOrChannel();
+}
+
+/** MLS groups cannot target read receipts to individual members yet. */
+export function supportsReadReceipts(conversation: Conversation): boolean {
+  return (
+    !conversation.isGroupOrChannel() ||
+    (conversation.protocol !== CONVERSATION_PROTOCOL.MIXED && conversation.protocol !== CONVERSATION_PROTOCOL.MLS)
+  );
 }
 
 export function isSelfConversation(conversation: Conversation): boolean {
@@ -138,6 +150,10 @@ export const isProteus1to1ConversationWithUser = (userId: QualifiedId) =>
 
 export const isMLS1to1ConversationWithUser = (userId: QualifiedId) =>
   is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.MLS);
+
+export const isMeetingConversation = (conversation: Conversation): boolean => {
+  return conversation.groupConversationType() === GROUP_CONVERSATION_TYPE.MEETING;
+};
 
 export const isReadableConversation = (conversation: Conversation): boolean => {
   const states_to_filter = [

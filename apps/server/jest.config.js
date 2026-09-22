@@ -42,10 +42,13 @@ module.exports = {
   },
   coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
   moduleDirectories: ['node_modules', __dirname],
+  moduleNameMapper: {
+    '^@enormora/objectory$': '<rootDir>/../../node_modules/@enormora/objectory/main.js',
+  },
   reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is|@enormora/objectory)/)'],
   transform: {
     '^.+\\.(ts|tsx)$': 'babel-jest',
     '^.+\\.(js|jsx)$': 'babel-jest',

@@ -17,7 +17,7 @@
  *
  */
 
-import is from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import ansiRegex from 'ansi-regex';
 import * as fs from 'fs-extra';
 import logdown from 'logdown';
@@ -67,7 +67,11 @@ export class LogFactory {
   }
 
   static addTimestamp(logTransport: logdown.TransportOptions): void {
-    const formattedDate = new Date().toISOString().split('.')[0]!.replace('T', ' ');
+    const formattedDatePart = new Date().toISOString().split('.')[0];
+    if (isUndefined(formattedDatePart)) {
+      throw new Error('The current date did not contain a time separator');
+    }
+    const formattedDate = formattedDatePart.replace('T', ' ');
     logTransport.args.unshift(`[${formattedDate}]`);
   }
 
@@ -75,7 +79,7 @@ export class LogFactory {
     const [time] = logTransport.args;
     const logMessage = `${time} ${logTransport.msg}`;
 
-    if (is.nonEmptyString(this.logFilePath)) {
+    if (isNonEmptyString(this.logFilePath)) {
       await LogFactory.writeMessage(logMessage, this.logFilePath);
     }
   }

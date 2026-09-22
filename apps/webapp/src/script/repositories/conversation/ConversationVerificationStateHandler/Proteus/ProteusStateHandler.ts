@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserState} from 'Repositories/user/userState';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 import {getLogger, Logger} from 'Util/logger';
 
 import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';
@@ -207,7 +207,7 @@ export class ProteusConversationVerificationStateHandler {
           conversationEntity,
           conversationVerificationState,
           userIds,
-          verificationMessageType: type,
+          VerificationMessageType: type,
         });
 
         return true;

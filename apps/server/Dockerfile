@@ -13,7 +13,8 @@ COPY apps/server/package.json ./apps/server/package.json
 COPY libraries/config/package.json ./libraries/config/package.json
 
 # Install only server production deps
-RUN ./bin/yarn workspaces focus @wireapp/server --production
+# Artifact downloads do not preserve executable file permissions.
+RUN chmod +x ./bin/yarn && ./bin/yarn workspaces focus @wireapp/server --production
 
 # Copy built config library artifacts
 COPY libraries/config/lib ./libraries/config/lib
@@ -21,6 +22,7 @@ COPY libraries/config/lib ./libraries/config/lib
 # Copy built server artifacts and runtime files
 COPY apps/server/dist /dist
 COPY run.sh .env.defaults ./
+COPY .env.defaults /dist/.env.defaults
 
 ENV NODE_PATH=/app/node_modules
 ENV PATH=/app/node_modules/.bin:$PATH

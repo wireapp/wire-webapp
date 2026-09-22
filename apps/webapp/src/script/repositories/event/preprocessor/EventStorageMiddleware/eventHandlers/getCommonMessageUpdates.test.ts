@@ -17,7 +17,7 @@
  *
  */
 
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
 import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';

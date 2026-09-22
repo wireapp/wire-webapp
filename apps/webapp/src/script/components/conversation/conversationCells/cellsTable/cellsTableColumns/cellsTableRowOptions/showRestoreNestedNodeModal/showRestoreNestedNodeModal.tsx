@@ -1,0 +1,74 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {RootContextValue} from 'src/script/page/rootProvider';
+import {CellNodeType, CellNode} from 'src/script/types/cellNode';
+import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+
+import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
+
+export const showRestoreNestedNodeModal = ({
+  node,
+  onRestoreNode,
+  parentNodeName,
+  translate,
+}: {
+  node: CellNode;
+  onRestoreNode: () => void;
+  parentNodeName: string;
+  translate: RootContextValue['translate'];
+}) => {
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      size: 'large',
+      primaryAction: {
+        action: onRestoreNode,
+        text: translate('cells.restoreNestedNodeModal.button'),
+      },
+      text: {
+        message: (
+          <div css={modalContentStyles}>
+            <p>{translate('cells.restoreNestedNodeModal.description1')}</p>
+            <p>
+              {replaceReactComponents(
+                translate('cells.restoreNestedNodeModal.description2', {
+                  name: '{name}',
+                }),
+                [
+                  {
+                    exactMatch: '{name}',
+                    render: () => <b>{parentNodeName}</b>,
+                  },
+                ],
+              )}
+            </p>
+          </div>
+        ),
+        title:
+          node.type === CellNodeType.FILE
+            ? translate('cells.restoreNestedNodeModal.file.headline')
+            : translate('cells.restoreNestedNodeModal.folder.headline'),
+      },
+    },
+    undefined,
+    translate,
+  );
+};

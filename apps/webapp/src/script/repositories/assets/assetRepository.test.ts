@@ -18,6 +18,7 @@
  */
 
 import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
+import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {container} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
@@ -50,7 +51,7 @@ describe('AssetRepository', () => {
   });
 
   it('keeps track of current uploads and removes it once finished', async () => {
-    spyOn(core.service!.asset, 'uploadAsset').and.callFake(() => {
+    spyOn(requireValueForTest(core.service).asset, 'uploadAsset').and.callFake(() => {
       expect(assetRepository.getNumberOfOngoingUploads()).toBe(1);
       return Promise.resolve({
         cancel: null,
@@ -66,7 +67,7 @@ describe('AssetRepository', () => {
   });
 
   it('removes cancelled uploads and cancels upload', () => {
-    spyOn(core.service!.asset, 'uploadAsset').and.callFake(() => {
+    spyOn(requireValueForTest(core.service).asset, 'uploadAsset').and.callFake(() => {
       expect(assetRepository.getNumberOfOngoingUploads()).toBe(1);
       return Promise.resolve({
         cancel: null,
@@ -85,7 +86,7 @@ describe('AssetRepository', () => {
   });
 
   it('updates the upload progress while the file is being uploaded', async () => {
-    spyOn(core.service!.asset, 'uploadAsset').and.callFake((_asset, _options, callback) => {
+    spyOn(requireValueForTest(core.service).asset, 'uploadAsset').and.callFake((_asset, _options, callback) => {
       const uploadProgress = assetRepository.getUploadProgress(messageId);
 
       callback(0.1);
@@ -115,7 +116,7 @@ describe('AssetRepository', () => {
       filetype: 'filetype',
     };
     options.auditData = assetAuditData;
-    const uploadAssetSpy = spyOn(core.service!.asset, 'uploadAsset').and.callFake(() => {
+    const uploadAssetSpy = spyOn(requireValueForTest(core.service).asset, 'uploadAsset').and.callFake(() => {
       return Promise.resolve({
         cancel: null,
         response: Promise.resolve({
@@ -138,7 +139,7 @@ describe('AssetRepository', () => {
     };
     options.auditData = assetAuditData;
 
-    const uploadAssetSpy = spyOn(core.service!.asset, 'uploadAsset').and.callFake(() => {
+    const uploadAssetSpy = spyOn(requireValueForTest(core.service).asset, 'uploadAsset').and.callFake(() => {
       return Promise.resolve({
         cancel: null,
         response: Promise.resolve({
@@ -166,14 +167,14 @@ describe('AssetRepository', () => {
       cancelDownload: null as (() => void) | null,
     };
 
-    spyOn(core.service!.asset, 'downloadAsset').and.returnValue({
+    spyOn(requireValueForTest(core.service).asset, 'downloadAsset').and.returnValue({
       cancel: jest.fn(),
       response: Promise.resolve({buffer: mockBuffer, mimeType: mockMimeType}),
     });
 
     const result = await assetRepository.load(mockAsset as any);
 
-    expect(core.service!.asset.downloadAsset).toHaveBeenCalledWith(
+    expect(requireValueForTest(core.service).asset.downloadAsset).toHaveBeenCalledWith(
       mockAsset.urlData,
       otrKey,
       sha256,
@@ -196,14 +197,17 @@ describe('AssetRepository', () => {
       cancelDownload: null as (() => void) | null,
     };
 
-    spyOn(core.service!.asset, 'downloadRawAsset').and.returnValue({
+    spyOn(requireValueForTest(core.service).asset, 'downloadRawAsset').and.returnValue({
       cancel: jest.fn(),
       response: Promise.resolve({buffer: mockBuffer, mimeType: mockMimeType}),
     });
 
     const result = await assetRepository.load(mockAsset as any);
 
-    expect(core.service!.asset.downloadRawAsset).toHaveBeenCalledWith(mockAsset.urlData, jasmine.any(Function));
+    expect(requireValueForTest(core.service).asset.downloadRawAsset).toHaveBeenCalledWith(
+      mockAsset.urlData,
+      jasmine.any(Function),
+    );
     expect(result).toBeInstanceOf(Blob);
     expect(result?.type).toBe(mockMimeType);
   });
@@ -218,7 +222,7 @@ describe('AssetRepository', () => {
       cancelDownload: null as (() => void) | null,
     };
 
-    spyOn(core.service!.asset, 'downloadAsset').and.returnValue({
+    spyOn(requireValueForTest(core.service).asset, 'downloadAsset').and.returnValue({
       cancel: jest.fn(),
       response: Promise.reject(new Error('Asset not found: 404')),
     });

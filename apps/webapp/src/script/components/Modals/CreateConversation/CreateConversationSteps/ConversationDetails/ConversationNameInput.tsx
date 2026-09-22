@@ -19,13 +19,14 @@
 
 import {TextInput} from 'Components/TextInput';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ConversationType} from '../../types';
 
 export const ConversationNameInput = () => {
+  const {translate} = useApplicationContext();
   const {conversationName, setConversationName, setError, error, gotoNextStep, conversationType} =
     useCreateConversationModal();
 
@@ -40,11 +41,11 @@ export const ConversationNameInput = () => {
 
     setConversationName(value);
     if (nameTooLong) {
-      return setError(t('groupCreationPreferencesErrorNameLong'));
+      return setError(translate('groupCreationPreferencesErrorNameLong'));
     }
 
     if (nameTooShort) {
-      return setError(t('groupCreationPreferencesErrorNameShort'));
+      return setError(translate('groupCreationPreferencesErrorNameShort'));
     }
     setError('');
   };
@@ -63,8 +64,8 @@ export const ConversationNameInput = () => {
 
   const label =
     conversationType === ConversationType.Group
-      ? t('groupCreationPreferencesPlaceholder')
-      : t('channelCreationPreferencesPlaceholder');
+      ? translate('groupCreationPreferencesPlaceholder')
+      : translate('channelCreationPreferencesPlaceholder');
 
   return (
     <TextInput

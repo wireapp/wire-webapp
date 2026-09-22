@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
+import {COLOR_V2, ellipsis} from '@wireapp/react-ui-kit';
 
 import {fileHeaderHeight} from '../common/fileHeaderHeight';
 
@@ -27,8 +27,11 @@ export const headerStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  gap: '16px',
   height: fileHeaderHeight,
   width: '100%',
+  boxSizing: 'border-box',
+  padding: '0 16px',
   lineHeight: 'var(--line-height-sm)',
   borderBottom: '1px solid var(--border-color)',
   backgroundColor: 'var(--app-bg)',
@@ -46,39 +49,80 @@ export const closeButtonStyles: CSSObject = {
   border: 'none',
   background: 'none',
   padding: 0,
-  marginRight: '40px',
+  marginRight: '24px',
+  flexShrink: 0,
 };
 
 export const leftColumnStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   flex: '1 1 auto',
+  minWidth: 0,
 };
 
 export const metadataStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  gap: '16px',
+  gap: '8px',
   fontSize: 'var(--font-size-small)',
   flex: '1 1 auto',
+  minWidth: 0,
+
+  svg: {
+    flexShrink: 0,
+  },
+};
+
+export const metadataTextStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '16px',
+  minWidth: 0,
+  whiteSpace: 'nowrap',
+};
+
+export const sourceConversationMetadataStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  flex: '0 1 auto',
+  minWidth: 0,
+  maxWidth: '220px',
+};
+
+export const sourceConversationIconStyles: CSSObject = {
+  flexShrink: 0,
+  width: '16px',
+  height: '16px',
 };
 
 export const nameStyles: CSSObject = {
+  ...ellipsis(),
   fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--font-weight-semibold)',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  flex: '1 1 auto',
+  margin: 0,
+  flex: '0 1 auto',
+  minWidth: 0,
+  maxWidth: '360px',
 };
 
 export const textStyles: CSSObject = {
+  ...ellipsis(),
   fontSize: 'var(--font-size-small)',
   color: 'var(--gray-70)',
+  flex: '0 1 auto',
+  minWidth: 0,
+  maxWidth: '180px',
 
   'body.theme-dark &': {
     color: 'var(--gray-40)',
   },
+};
+
+export const timeStyles: CSSObject = {
+  ...textStyles,
+  flexShrink: 0,
+  maxWidth: 'none',
 };
 
 export const actionButtonsStyles: CSSObject = {

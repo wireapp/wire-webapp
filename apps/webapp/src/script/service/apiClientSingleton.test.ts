@@ -18,7 +18,7 @@
  */
 
 import {Config} from '../Config';
-import {createDeterministicWallClock} from '../clock/deterministicWallClock';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {APIClient} from './apiClientSingleton';
 
 describe('APIClientSingleton', () => {

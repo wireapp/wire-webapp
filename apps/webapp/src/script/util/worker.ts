@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 export class WebWorker {
   #worker: Worker | undefined;
 
@@ -28,7 +30,7 @@ export class WebWorker {
   constructor(private workerCreator: () => Worker) {}
 
   private get worker(): Worker {
-    if (!this.#worker) {
+    if (isUndefined(this.#worker)) {
       this.#worker = this.workerCreator();
     }
     return this.#worker;

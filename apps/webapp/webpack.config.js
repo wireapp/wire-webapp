@@ -26,7 +26,11 @@ module.exports = {
   mode: 'production',
   optimization: {
     ...commonConfig.optimization,
-    minimize: true,
+    minimize: {
+      html: {
+        comments: /^! /,
+      },
+    },
   },
   plugins: [
     ...commonConfig.plugins,

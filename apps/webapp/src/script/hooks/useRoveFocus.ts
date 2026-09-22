@@ -31,7 +31,7 @@ export function useRoveFocus(elements: string[]) {
 
   const handleKeyDown = useCallback(
     (event: ReactKeyboardEvent | KeyboardEvent) => {
-      const currentIndex = focusedId ? elements.indexOf(focusedId) : -1;
+      const currentIndex = focusedId !== undefined && focusedId.length > 0 ? elements.indexOf(focusedId) : -1;
       if (isKey(event, KEY.ARROW_DOWN)) {
         event.preventDefault();
         if (currentIndex < lastIndex) {

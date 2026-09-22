@@ -29,10 +29,9 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 
-import type {ClientConfig, ServerConfig} from '@wireapp/config';
+import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {AppleAssociationRoute} from './routes/appleassociation/appleAssociationRoute';
-import {parseClientVersion} from './routes/clientVersionCheck/clientVersion';
 import {createClientVersionCheckRoute} from './routes/clientVersionCheck/clientVersionCheckRoute';
 import {ConfigRoute} from './routes/config/configRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/errorRoutes';
@@ -49,6 +48,7 @@ class Server {
   constructor(
     private readonly config: ServerConfig,
     private readonly clientConfig: ClientConfig,
+    private readonly buildMetadata: BuildMetadata,
   ) {
     if (this.config.DEVELOPMENT) {
       console.info(this.config);
@@ -81,8 +81,7 @@ class Server {
     this.app.use(
       createClientVersionCheckRoute({
         router: Router(),
-        parseClientVersion,
-        deployedClientVersion: this.config.VERSION,
+        deployedAssetVersion: this.buildMetadata.assetVersion,
         isClientVersionEnforcementEnabled: this.config.ENABLE_CLIENT_VERSION_ENFORCEMENT,
       }),
     );
@@ -177,7 +176,7 @@ class Server {
     // Scope clipboard delegation to self and the configured Collabora origin only.
     // Falls back to self-only when CELLS_PYDIO_URL is not configured.
     const collaboraOrigin = this.clientConfig.CELLS_PYDIO_URL;
-    const clipboardAllowlist = collaboraOrigin ? `(self "${collaboraOrigin}")` : '(self)';
+    const clipboardAllowlist = Boolean(collaboraOrigin) ? `(self "${collaboraOrigin}")` : '(self)';
     this.app.use((_req, res, next) => {
       res.setHeader(
         'Permissions-Policy',
@@ -188,7 +187,7 @@ class Server {
   }
 
   private initStaticRoutes() {
-    this.app.use(RedirectRoutes(this.config));
+    this.app.use(RedirectRoutes(this.config, this.buildMetadata));
 
     const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
 
@@ -237,7 +236,7 @@ class Server {
   }
 
   private initSiteMap(config: ServerConfig) {
-    if (config.APP_BASE) {
+    if (Boolean(config.APP_BASE)) {
       const pages = () => [
         {
           changeFreq: 'weekly',
@@ -254,9 +253,9 @@ class Server {
 
   start(): Promise<number> {
     return new Promise((resolve, reject) => {
-      if (this.server) {
+      if (this.server !== undefined) {
         reject('Server is already running.');
-      } else if (this.config.PORT_HTTP) {
+      } else if (Boolean(this.config.PORT_HTTP)) {
         if (this.config.DEVELOPMENT && this.config.DEVELOPMENT_ENABLE_TLS) {
           const options = {
             cert: fs.readFileSync(this.config.SSL_CERTIFICATE_PATH),
@@ -275,7 +274,7 @@ class Server {
   }
 
   async stop(): Promise<void> {
-    if (this.server) {
+    if (this.server !== undefined) {
       this.server.close();
       this.server = undefined;
     } else {

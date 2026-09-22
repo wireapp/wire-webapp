@@ -17,7 +17,9 @@
     "src"
   ],
   "dependencies": {
-    "fs-extra": "11.3.5",
-    "logdown": "3.3.1"
+    "@sindresorhus/is": "8.1.0",
+    "fs-extra": "11.4.0",
+    "logdown": "3.3.1",
+    "true-myth": "9.4.0"
   }
 }

@@ -19,7 +19,7 @@
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 
@@ -27,6 +27,8 @@ import {RepliesUpdaterMiddleware} from './RepliesUpdaterMiddleware';
 
 import {ClientEvent} from '../Client';
 import {EventService} from '../EventService';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildRepliesUpdaterMiddleware() {
   const eventService = {
@@ -40,8 +42,8 @@ function buildRepliesUpdaterMiddleware() {
 }
 
 describe('QuotedMessageMiddleware', () => {
-  const conversation = new Conversation(createUuid());
-  conversation.selfUser(new User());
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  conversation.selfUser(new User('', '', translateForTest));
 
   describe('processEvent', () => {
     it('updates quotes in DB when a message is edited', async () => {

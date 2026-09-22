@@ -20,8 +20,8 @@
 import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, HistorySharingUnit} from '../../types';
@@ -36,6 +36,7 @@ import {
 } from '../CreateConversationSteps.styles';
 
 export const CustomHistoryModal = () => {
+  const {translate} = useApplicationContext();
   const {
     setIsCustomHistoryModalOpen,
     historySharingUnit,
@@ -46,7 +47,7 @@ export const CustomHistoryModal = () => {
     isCustomHistoryModalOpen,
   } = useCreateConversationModal();
 
-  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(historySharingQuantity);
+  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
 
   const onCancel = () => {
     setHistorySharingQuantity(1);
@@ -67,7 +68,7 @@ export const CustomHistoryModal = () => {
       data-uie-name="custom-history-modal"
       onKeyDown={event => handleEscDown(event, onCancel)}
     >
-      <Text>{t('conversationHistoryModalText')}</Text>
+      <Text>{translate('conversationHistoryModalText')}</Text>
       <FlexBox css={customHistorySharingFormContainerCss}>
         <Input
           wrapperCSS={customHistorySharingInputCss}
@@ -96,7 +97,7 @@ export const CustomHistoryModal = () => {
           data-uie-name="do-cancel"
           onKeyDown={event => handleEscDown(event, onCancel)}
         >
-          {t('conversationHistoryModalCancel')}
+          {translate('conversationHistoryModalCancel')}
         </Button>
         <Button
           css={customHistorySharingButtonCss}
@@ -106,7 +107,7 @@ export const CustomHistoryModal = () => {
           data-uie-name="do-submit"
           onKeyDown={event => handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]})}
         >
-          {t('conversationHistoryModalApply')}
+          {translate('conversationHistoryModalApply')}
         </Button>
       </FlexBox>
     </ModalComponent>

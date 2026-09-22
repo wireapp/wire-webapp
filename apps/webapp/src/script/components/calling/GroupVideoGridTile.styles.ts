@@ -102,6 +102,6 @@ export const groupVideoBackgroundInitializingOverlay: CSSObject = {
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: 'inherit',
-  backgroundColor: 'var(--group-video-tile-bg)',
+  backgroundColor: 'var(--background-fade-16)',
   zIndex: 1,
 };

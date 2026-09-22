@@ -19,8 +19,8 @@
 
 import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {chevronLeftStyles, chevronRightStyles, iconButtonStyles} from './Pagination.styles';
 
@@ -32,7 +32,9 @@ interface PaginationArrowProps {
 }
 
 export const PaginationArrow = ({onClick, disabled, direction, 'data-uie-name': uieName}: PaginationArrowProps) => {
-  const ariaLabel = direction === 'left' ? t('paginationLeftArrowAriaLabel') : t('paginationRightArrowAriaLabel');
+  const {translate} = useApplicationContext();
+  const ariaLabel =
+    direction === 'left' ? translate('paginationLeftArrowAriaLabel') : translate('paginationRightArrowAriaLabel');
 
   return (
     <IconButton

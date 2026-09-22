@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [opened, edited, synchronize]
   merge_group:
-    branches: [dev]
+    branches: [main]
 jobs:
   add-jira-description:
     # On merge_group there is no pull request payload; keep the required check green there.
@@ -26,5 +26,5 @@ jobs:
           jira-token: ${{ secrets.JIRA_TOKEN }}
           jira-base-url: https://wearezeta.atlassian.net
           custom-issue-number-regexp: '(WPB-\d+)'
-          skip-branches: '^(dev|master|release\/*)$'
+          skip-branches: '^(main|release\/*)$'
           fail-when-jira-issue-not-found: true

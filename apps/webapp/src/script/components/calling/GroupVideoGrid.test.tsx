@@ -25,22 +25,35 @@ import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+  requireValueForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
-import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
+import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/Avatar', () => ({
+jest.mock('Components/avatar', () => ({
   AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},
   Avatar: () => <div data-testid="mock-avatar" />,
 }));
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createMockParticipant = (
   userId: string,
   clientId: string,
   {isMuted = false, isAudioEstablished = true}: {isMuted?: boolean; isAudioEstablished?: boolean},
 ) => {
-  const user = new User(userId);
+  const user = new User(userId, '', translateForTest);
 
   const participant = new Participant(user, clientId);
   participant.isMuted(isMuted);
@@ -52,15 +65,26 @@ const createMockParticipant = (
 const createMockCall = () => {
   return new Call(
     {domain: '', id: ''},
-    new Conversation('', ''),
+    new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     0,
-    new Participant(new User(''), ''),
+    new Participant(new User('', '', translateForTest), ''),
     CALL_TYPE.NORMAL,
     buildMediaDevicesHandler(),
   );
 };
 
+const createMediaStream = () =>
+  ({
+    getVideoTracks: jest.fn(() => []),
+  }) as unknown as MediaStream;
+
 describe('GroupVideoGrid', () => {
+  beforeEach(() => {
+    backgroundEffectsStore.setState({
+      isInitializing: false,
+    });
+  });
+
   it('renders video grids', async () => {
     const selfParticipant = createMockParticipant('selfUser', 'selfClient', {isMuted: true});
     selfParticipant.user.name('Anton Bertha');
@@ -80,7 +104,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {getByTestId} = render(<GroupVideoGrid {...props} />);
+    const {getByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
 
     const groupVideoGrid = getByTestId('grids-wrapper');
 
@@ -106,7 +130,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {getByTestId} = render(<GroupVideoGrid {...props} />);
+    const {getByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
 
     const groupVideoGrid = getByTestId('grids-wrapper');
 
@@ -135,7 +159,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {queryByTestId} = render(<GroupVideoGrid {...props} />);
+    const {queryByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('status-video-paused')).not.toBeNull();
   });
@@ -156,12 +180,40 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {getAllByTestId} = render(<GroupVideoGrid {...props} />);
+    const {getAllByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
     const thumbnailElements = getAllByTestId('self-video-thumbnail-wrapper');
     const thumbnailMutedIcons = getAllByTestId('status-call-audio-muted');
 
     expect(thumbnailElements).not.toHaveLength(0);
     expect(thumbnailMutedIcons).not.toHaveLength(0);
+  });
+
+  it('shows and hides the loading overlay while the raw thumbnail video is loading with background effects disabled', () => {
+    const participant = createMockParticipant('userId', 'clientId', {});
+    const videoStream = createMediaStream();
+    participant.videoState(VIDEO_STATE.STARTED);
+    participant.videoStream(videoStream);
+
+    const props: GroupVideoGripProps = {
+      grid: {
+        grid: [],
+        thumbnail: participant,
+      },
+      maximizedParticipant: null,
+      minimized: false,
+      selfParticipant: participant,
+      setMaximizedParticipant: jest.fn(),
+      call: createMockCall(),
+    };
+
+    const {container} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
+    const video = requireValueForTest(container.querySelector('[data-uie-name="self-video-thumbnail"]'));
+
+    expect(container.querySelector('[data-uie-name="background-effect-initializing"]')).toBeInTheDocument();
+
+    fireEvent.canPlay(video);
+
+    expect(container.querySelector('[data-uie-name="background-effect-initializing"]')).not.toBeInTheDocument();
   });
 
   it('does not render muted thumbnail when un-muted', async () => {
@@ -179,7 +231,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {queryByTestId} = render(<GroupVideoGrid {...props} />);
+    const {queryByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
     const thumbnailMutedIcon = queryByTestId('status-call-audio-muted');
     expect(thumbnailMutedIcon).toBeNull();
   });
@@ -201,7 +253,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {getAllByText} = render(<GroupVideoGrid {...props} />);
-    expect(getAllByText('videoCallParticipantConnecting')).toHaveLength(2);
+    const {getAllByText} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
+    expect(getAllByText(translate('videoCallParticipantConnecting'))).toHaveLength(2);
   });
 });
