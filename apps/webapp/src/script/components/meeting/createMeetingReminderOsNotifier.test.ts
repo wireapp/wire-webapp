@@ -23,7 +23,7 @@ import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingR
 import type {Translate} from 'Util/localizerUtil';
 
 import {
-  systemNotificationErrors,
+  systemNotificationErrorKinds,
   type SystemNotificationApi,
   type SystemNotificationRequest,
 } from 'src/script/notification/systemNotificationTypes';
@@ -137,13 +137,18 @@ describe('createMeetingReminderOsNotifier', () => {
 
   it('logs and drops a failure to present the toast', () => {
     const {logger, notifier} = createHarness({
-      show: () => result.err(systemNotificationErrors.presentationFailed),
+      show: () =>
+        result.err({
+          kind: systemNotificationErrorKinds.presentationFailed,
+          cause: new Error('notification could not be constructed'),
+        }),
     });
 
     notifier.notify(createPayload());
 
     expect(logger.warn).toHaveBeenCalledWith('failed to present meeting reminder OS notification', {
-      error: systemNotificationErrors.presentationFailed,
+      error: systemNotificationErrorKinds.presentationFailed,
+      cause: new Error('notification could not be constructed'),
       tag: toMeetingReminderNotificationTag(createPayload()),
     });
   });
@@ -155,7 +160,11 @@ describe('createMeetingReminderOsNotifier', () => {
         requests.push(request);
 
         return result.ok({
-          close: () => result.err(systemNotificationErrors.closeFailed),
+          close: () =>
+            result.err({
+              kind: systemNotificationErrorKinds.closeFailed,
+              cause: new Error('notification could not be closed'),
+            }),
         });
       },
     });
@@ -164,7 +173,8 @@ describe('createMeetingReminderOsNotifier', () => {
     requests[0].onClick();
 
     expect(logger.warn).toHaveBeenCalledWith('failed to close meeting reminder OS notification', {
-      error: systemNotificationErrors.closeFailed,
+      error: systemNotificationErrorKinds.closeFailed,
+      cause: new Error('notification could not be closed'),
       tag: requests[0].tag,
     });
   });

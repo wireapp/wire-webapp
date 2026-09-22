@@ -19,7 +19,7 @@
 
 import {result} from 'true-myth';
 
-import {systemNotificationErrors} from 'src/script/notification/systemNotificationTypes';
+import {systemNotificationErrorKinds} from 'src/script/notification/systemNotificationTypes';
 
 import {createSystemNotificationApiFromBrowserNotification} from './createSystemNotificationApiFromBrowserNotification';
 
@@ -193,7 +193,12 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     const handle = api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
 
-    expect(handle).toEqual(result.err(systemNotificationErrors.presentationFailed));
+    expect(handle).toEqual(
+      result.err({
+        kind: systemNotificationErrorKinds.presentationFailed,
+        cause: new Error('notification could not be constructed'),
+      }),
+    );
   });
 
   it('reports a close failure instead of throwing', () => {
@@ -203,7 +208,12 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     expect(result.isOk(handle)).toBe(true);
     if (result.isOk(handle)) {
-      expect(handle.value.close()).toEqual(result.err(systemNotificationErrors.closeFailed));
+      expect(handle.value.close()).toEqual(
+        result.err({
+          kind: systemNotificationErrorKinds.closeFailed,
+          cause: new Error('notification could not be closed'),
+        }),
+      );
     }
   });
 });

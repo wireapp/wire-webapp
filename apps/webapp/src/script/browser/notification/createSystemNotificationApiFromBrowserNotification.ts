@@ -23,7 +23,11 @@ import {result} from 'true-myth';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {systemNotificationErrors, type SystemNotificationApi} from 'src/script/notification/systemNotificationTypes';
+import {
+  systemNotificationErrorKinds,
+  toSystemNotificationError,
+  type SystemNotificationApi,
+} from 'src/script/notification/systemNotificationTypes';
 import {getLogger} from 'Util/logger';
 
 type SystemNotificationLogger = {
@@ -56,41 +60,35 @@ export const createSystemNotificationApiFromBrowserNotification = ({
   isSupported,
   getPermission: () => notificationConstructor.permission,
   show: ({title, body, tag, onClick, onClose}) =>
-    result.tryOrElse(
-      () => systemNotificationErrors.presentationFailed,
-      () => {
-        const notification = new notificationConstructor(title, {body, tag});
-        const closeNotification = () =>
-          result.tryOrElse(
-            () => systemNotificationErrors.closeFailed,
-            () => {
-              notification.close();
-            },
-          );
+    result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.presentationFailed), () => {
+      const notification = new notificationConstructor(title, {body, tag});
+      const closeNotification = () =>
+        result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.closeFailed), () => {
+          notification.close();
+        });
 
-        notification.onclick = () => {
-          // wire-desktop listens for this to restore the window and switch to the account that
-          // raised the notification. window.focus() alone does neither from inside a webview.
-          publishNotificationClick();
-          focusWindow();
-          onClick();
-        };
+      notification.onclick = () => {
+        // wire-desktop listens for this to restore the window and switch to the account that
+        // raised the notification. window.focus() alone does neither from inside a webview.
+        publishNotificationClick();
+        focusWindow();
+        onClick();
+      };
 
-        notification.onclose = () => {
-          onClose();
-        };
+      notification.onclose = () => {
+        onClose();
+      };
 
-        // A notification can fail after the constructor returned, so `show` reporting `Ok` is not
-        // the last word on whether it reached the user.
-        notification.onerror = () => {
-          logger.warn('system notification failed after being shown', {tag});
-          onClose();
-          closeNotification();
-        };
+      // A notification can fail after the constructor returned, so `show` reporting `Ok` is not
+      // the last word on whether it reached the user.
+      notification.onerror = () => {
+        logger.warn('system notification failed after being shown', {tag});
+        onClose();
+        closeNotification();
+      };
 
-        return {close: closeNotification};
-      },
-    ),
+      return {close: closeNotification};
+    }),
 });
 
 /**

@@ -19,12 +19,23 @@
 
 import {type Result} from 'true-myth';
 
-export const systemNotificationErrors = {
+export const systemNotificationErrorKinds = {
   presentationFailed: 'presentationFailed',
   closeFailed: 'closeFailed',
 } as const;
 
-export type SystemNotificationError = (typeof systemNotificationErrors)[keyof typeof systemNotificationErrors];
+export type SystemNotificationErrorKind =
+  (typeof systemNotificationErrorKinds)[keyof typeof systemNotificationErrorKinds];
+
+/** Carries the thrown value along, so a log line says more than which call site failed. */
+export type SystemNotificationError = {
+  kind: SystemNotificationErrorKind;
+  cause: unknown;
+};
+
+export const toSystemNotificationError =
+  (kind: SystemNotificationErrorKind) =>
+  (cause: unknown): SystemNotificationError => ({kind, cause});
 
 export type SystemNotificationRequest = {
   title: string;

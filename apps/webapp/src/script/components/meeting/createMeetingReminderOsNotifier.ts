@@ -74,7 +74,7 @@ export const createMeetingReminderOsNotifier = ({
       forget(tag);
 
       handle.close().inspectErr(error => {
-        logger.warn('failed to close meeting reminder OS notification', {error, tag});
+        logger.warn('failed to close meeting reminder OS notification', {error: error.kind, cause: error.cause, tag});
       });
     });
   };
@@ -112,7 +112,11 @@ export const createMeetingReminderOsNotifier = ({
       });
 
       if (result.isErr(shownNotification)) {
-        logger.warn('failed to present meeting reminder OS notification', {error: shownNotification.error, tag});
+        logger.warn('failed to present meeting reminder OS notification', {
+          error: shownNotification.error.kind,
+          cause: shownNotification.error.cause,
+          tag,
+        });
         return;
       }
 
