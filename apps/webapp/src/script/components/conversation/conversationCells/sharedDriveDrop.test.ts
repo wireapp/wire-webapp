@@ -247,12 +247,12 @@ describe('getSharedDriveDropRejectionFeedback', () => {
   it('maps folder read failures to specific user-facing feedback', () => {
     const translate = jest.fn((key: string) => key);
 
-    expect(getSharedDriveDropRejectionFeedback({reason: 'readFailed', invalidFiles: []}, translate, maxFileSize)).toEqual(
-      {
-        title: 'conversationFileUploadFailedHeading',
-        message: 'sharedDriveDropReadFailedMessage',
-        invalidFiles: [],
-      },
-    );
+    expect(
+      getSharedDriveDropRejectionFeedback({reason: 'readFailed', invalidFiles: []}, translate, maxFileSize),
+    ).toEqual({
+      title: 'conversationFileUploadFailedHeading',
+      message: 'sharedDriveDropReadFailedMessage',
+      invalidFiles: [],
+    });
   });
 });

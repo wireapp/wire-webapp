@@ -33,10 +33,7 @@ interface TestDirectoryEntry {
   readonly name: string;
   readonly fullPath: string;
   readonly createReader: () => {
-    readonly readEntries: (
-      success: (entries: TestEntry[]) => void,
-      failure?: (error?: DOMException) => void,
-    ) => void;
+    readonly readEntries: (success: (entries: TestEntry[]) => void, failure?: (error?: DOMException) => void) => void;
   };
 }
 
@@ -91,10 +88,7 @@ describe('getSharedDriveDroppedFiles', () => {
     const files = result.unwrapOr([]);
 
     expect(files).toHaveLength(2);
-    expect(files.map(file => file.webkitRelativePath)).toEqual([
-      'Marketing/brief.txt',
-      'Marketing/Assets/logo.png',
-    ]);
+    expect(files.map(file => file.webkitRelativePath)).toEqual(['Marketing/brief.txt', 'Marketing/Assets/logo.png']);
     expect(files.map(file => file.name)).toEqual(['brief.txt', 'logo.png']);
   });
 

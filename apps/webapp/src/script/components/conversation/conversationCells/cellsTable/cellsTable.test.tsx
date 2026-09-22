@@ -133,10 +133,7 @@ describe('CellsTable folder row drop target', () => {
     fireEvent.drop(folderRow, {dataTransfer});
 
     await waitFor(() =>
-      expect(onDropFilesToFolder).toHaveBeenCalledWith(
-        [droppedFile],
-        'conversation-id@example.com/Marketing/images',
-      ),
+      expect(onDropFilesToFolder).toHaveBeenCalledWith([droppedFile], 'conversation-id@example.com/Marketing/images'),
     );
     expect(onFolderDropTargetChange).toHaveBeenLastCalledWith(null);
   });
