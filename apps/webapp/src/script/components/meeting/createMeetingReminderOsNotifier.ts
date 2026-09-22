@@ -17,7 +17,7 @@
  *
  */
 
-import {Maybe, result} from 'true-myth';
+import {Maybe, maybe, result} from 'true-myth';
 
 import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
 import type {SystemNotificationApi, SystemNotificationHandle} from 'src/script/notification/systemNotificationTypes';
@@ -70,12 +70,16 @@ export const createMeetingReminderOsNotifier = ({
   };
 
   const closeAndForget = (tag: string): void => {
-    Maybe.of(openNotifications.get(tag)).inspect(handle => {
-      forget(tag);
+    const openNotification = Maybe.of(openNotifications.get(tag));
 
-      handle.close().inspectErr(error => {
-        logger.warn('failed to close meeting reminder OS notification', {error: error.kind, cause: error.cause, tag});
-      });
+    if (maybe.isNothing(openNotification)) {
+      return;
+    }
+
+    forget(tag);
+
+    openNotification.value.close().inspectErr(error => {
+      logger.warn('failed to close meeting reminder OS notification', {error: error.kind, cause: error.cause, tag});
     });
   };
 
