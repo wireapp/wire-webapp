@@ -17,7 +17,17 @@
  *
  */
 
-import {convertSvgMarkupToJsx} from './svgToJsx';
+import {convertSvgFileNameToReactComponentName, convertSvgMarkupToJsx} from './svgToJsx';
+
+describe('convertSvgFileNameToReactComponentName', () => {
+  it('converts a hyphenated SVG file name into a React component name', () => {
+    expect(convertSvgFileNameToReactComponentName('about-icon.svg')).toBe('AboutIcon');
+  });
+
+  it('converts an underscored SVG file name into a React component name', () => {
+    expect(convertSvgFileNameToReactComponentName('arrow_down.svg')).toBe('ArrowDown');
+  });
+});
 
 describe('convertSvgMarkupToJsx', () => {
   it('converts inline SVG styles into a React style object', () => {

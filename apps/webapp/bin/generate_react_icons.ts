@@ -21,26 +21,10 @@ import {JSDOM} from 'jsdom';
 
 import fs from 'fs';
 
-import {convertSvgMarkupToJsx} from './svgToJsx';
+import {convertSvgFileNameToReactComponentName, convertSvgMarkupToJsx} from './svgToJsx';
 
 const fileLocation = 'resource/image/icon';
 const fileList = fs.readdirSync(fileLocation).filter(file => file.endsWith('.svg'));
-
-function capitalize(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function camelize(str: string) {
-  return str
-    .replace(/(?:^\w|[A-Z]|[\b\-_]\w)/g, (word, index) => {
-      if (index === 0) {
-        return word.toLowerCase();
-      }
-
-      return word.toUpperCase().replace('-', '').replace('_', '');
-    })
-    .replace(/\s+/g, '');
-}
 
 const svgIcons = fileList.map(name => ({name, content: fs.readFileSync(`${fileLocation}/${name}`, 'utf8')}));
 const disclaimer = `
@@ -62,7 +46,7 @@ const reactComponents = svgIcons.map(({name, content}) => {
     viewBox: svgElement?.getAttribute('viewBox'),
   };
 
-  return `export const ${capitalize(camelize(name.replace(/\.svg$/, '')))} = (props: IconProps) => {
+  return `export const ${convertSvgFileNameToReactComponentName(name)} = (props: IconProps) => {
     return <svg width="${baseProps.width}" height="${baseProps.height}" viewBox="${baseProps.viewBox}" aria-hidden="true" {...props}>
       ${convertSvgMarkupToJsx(svgElement?.innerHTML ?? '')}
       </svg>;

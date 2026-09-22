@@ -149,7 +149,13 @@ function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-export function convertSvgMarkupToJsx(svgMarkup: string): string {
+function convertSvgFileNameToReactComponentName(svgFileName: string): string {
+  const svgFileNameWithoutExtension = svgFileName.replace(/\.svg$/, '');
+
+  return capitalize(camelize(svgFileNameWithoutExtension));
+}
+
+function convertSvgMarkupToJsx(svgMarkup: string): string {
   return svgMarkup.replace(/<(\w+)([^>]*)\/?>/g, (_match, tagName, attributes) => {
     const jsxAttributes = convertAttributesToJsx(attributes);
     const attributeSeparator = isNonEmptyString(jsxAttributes) ? ' ' : '';
@@ -157,3 +163,5 @@ export function convertSvgMarkupToJsx(svgMarkup: string): string {
     return `<${tagName}${attributeSeparator}${jsxAttributes}>`;
   });
 }
+
+export {convertSvgFileNameToReactComponentName, convertSvgMarkupToJsx};
