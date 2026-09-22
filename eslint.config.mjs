@@ -42,7 +42,6 @@ const ignores = [
   '**/build/**',
   '**/coverage/**',
   'apps/webapp/resource/',
-  'apps/webapp/bin/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
   '!**/*.config.test.*',
