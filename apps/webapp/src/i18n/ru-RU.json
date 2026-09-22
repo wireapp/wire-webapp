@@ -2083,6 +2083,7 @@
   "sharedDriveDropFolderOverlayDescription": "в",
   "sharedDriveDropOverlayDescription": "в общий диск",
   "sharedDriveDropOverlayTitle": "Загрузить файлы",
+  "sharedDriveDropReadFailedMessage": "Нам не удалось прочитать все файлы в этой папке. Файлы не были загружены. Пожалуйста, попробуйте перетащить папку еще раз.",
   "sharedDriveDropRecycleBinMessage": "Вы не можете загружать файлы в корзину.",
   "sharedDriveDropUnsupportedFileMessage": "Этот тип файла не может быть загружен в общий диск.",
   "showTogglePasswordLabel": "Показать пароль",
