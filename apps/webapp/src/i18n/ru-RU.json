@@ -1392,7 +1392,7 @@
   "meetings.scheduleModal.editTitle": "Изменить встречу",
   "meetings.scheduleModal.endsLabel": "Окончание",
   "meetings.scheduleModal.error.addParticipantsFailed": "Информация о встрече была сохранена, но некоторых участников добавить не удалось. Пожалуйста, попробуйте еще раз.",
-  "meetings.scheduleModal.error.conversationRenameFailed": "Название встречи было обновлено, но имя, указанное в вызове, обновить не удалось. Пожалуйста, попробуйте снова.",
+  "meetings.scheduleModal.error.conversationRenameFailed": "Название встречи было обновлено, но в приглашении может по-прежнему отображаться прежнее название. Пожалуйста, попробуйте еще раз.",
   "meetings.scheduleModal.error.conversationRenameFailedRetry": "Повторить",
   "meetings.scheduleModal.error.conversationRenameFailedTitle": "Не удалось обновить название встречи",
   "meetings.scheduleModal.error.createFailed": "Что-то пошло не так при планировании встречи. Попробуйте еще раз.",
