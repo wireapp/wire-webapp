@@ -125,18 +125,17 @@
         <div style="display: flex; flex-direction: column; min-height: 100vh; width: 100%;">
             <div class="content">
                 <header style="height: 40px; margin-left: 8px; margin-top: 20px;">
-                    <svg viewBox="0 0 78 25" width="71" height="23" aria-hidden="true" style="overflow: visible;">
-                        <g>
-                            <path xmlns="http://www.w3.org/2000/svg"
-                                  d="M14.73 19.79a7.25 7.25 0 0 1-1.74-4.7V3.43a1.73 1.73 0 0 1 3.47 0v11.64a7.2 7.2 0 0 1-1.73 4.7zm13-4.7A7.32 7.32 0 0 1 16 20.95a8.94 8.94 0 0 0 2.18-5.88V3.44a3.46 3.46 0 1 0-6.93 0v11.64c0 2.25.87 4.3 2.24 5.88a7.4 7.4 0 0 1-11.77-5.88V.88H0v14.2a9.1 9.1 0 0 0 14.78 7.08 9.05 9.05 0 0 0 14.67-7.08V.88h-1.73v14.2zm6.92 8.57h1.74V.84h-1.74v22.82zM51.55.44a9.99 9.99 0 0 0-8.23 4.33V.84h-1.74v22.82h1.74V10.34c0-4.5 3.7-8.18 8.23-8.18V.44zM54.8 18.8a10.1 10.1 0 0 1 .59-13.68 10.23 10.23 0 0 1 13.75-.58L54.8 18.8zM71.6 4.54a11.97 11.97 0 0 0-17.44-.63 11.8 11.8 0 0 0 0 16.74 11.97 11.97 0 0 0 16.85 0l-1.23-1.21a10.23 10.23 0 0 1-13.75.58l7.17-7.13 8.4-8.35zm2.72-3.07v-.34h-1.88v.34h.74v1.9h.4v-1.9h.74zm2.8 1.9V1.14h-.56l-.64 1.75-.65-1.75h-.58v2.25h.39V1.55l.66 1.83h.33l.67-1.84v1.84h.39z"></path>
-                        </g>
-                    </svg>
+                    <img
+                        src="/image/icon/logo-full-icon.svg?<%= ASSET_VERSION %>"
+                        alt="<%= BRAND_NAME %>"
+                        style="height: 23px; width: auto; overflow: visible;"
+                    />
                 </header>
                 <main style="flex: 1 1 0; padding-left: 8px; width: 100%;">
                     <div class="textContent">
-                        <h2 data-uie-name="element-unsupported-headline">Wire doesn't support this browser</h2>
+                        <h2 data-uie-name="element-unsupported-headline"><%= BRAND_NAME %> doesn't support this browser</h2>
                         <h3 data-uie-name="element-unsupported-general">
-                            To use Wire for web, download the latest version of <strong>Google Chrome, Mozilla Firefox</strong>,
+                            To use <%= BRAND_NAME %> for web, download the latest version of <strong>Google Chrome, Mozilla Firefox</strong>,
                             or <strong>Microsoft Edge</strong>.
                         </h3>
                         <h3 data-uie-name="element-unsupported-settings">
@@ -144,18 +143,18 @@
                         </h3>
                         <h3 data-uie-name="element-unsupported-support-link">
                             <a rel="noopener noreferrer" target="_blank" style="font-size: 1rem;"
-                               href="https://support.wire.com/hc/en-us/articles/202960551-What-do-I-need-to-use-Wire"
-                            >Learn more about Wire’s system requirements</a>
+                               href="<%= SUPPORT_INDEX %>"
+                            >Learn more about <%= BRAND_NAME %>'s system requirements</a>
                         </h3>
                     </div>
                 </main>
 
                 <footer>
                     <a style="text-transform: uppercase; text-decoration: none;" rel="noopener noreferrer"
-                       href="https://wire.com">
-                        wire.com
+                       href="<%= WEBSITE_BASE %>">
+                        <%= WEBSITE_LABEL %>
                     </a>
-                    <span> · © Wire Swiss GmbH</span>
+                    <span> · © <%= BRAND_NAME %></span>
                 </footer>
             </div>
         </div>

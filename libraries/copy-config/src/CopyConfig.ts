@@ -131,7 +131,7 @@ export class CopyConfig {
       return true;
     };
 
-    const isGlob = (path: string) => /\*$/.test(path);
+    const isGlob = (path: string) => /\*/.test(path);
 
     if (utils.isFile(destination) && !utils.isFile(source)) {
       throw new Error('Cannot copy a directory into a file.');

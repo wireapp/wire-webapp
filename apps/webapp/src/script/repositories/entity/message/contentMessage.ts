@@ -33,6 +33,7 @@ import type {MediumImage} from './mediumImage';
 import {Message} from './message';
 import {Text as TextAsset} from './text';
 
+import {Config} from '../../../Config';
 import type {QuoteEntity} from '../../../message/quoteEntity';
 import {SuperType} from '../../../message/superType';
 
@@ -133,7 +134,8 @@ export class ContentMessage extends Message {
 
     if (!file_name) {
       const date = this.timestamp();
-      file_name = `Wire ${formatLocale(date, 'yyyy-MM-dd')} at ${formatTimeShort(date)}`;
+      const {BRAND_NAME: brandName} = Config.getConfig();
+      file_name = `${brandName} ${formatLocale(date, 'yyyy-MM-dd')} at ${formatTimeShort(date)}`;
     }
 
     if (asset_et.file_type) {

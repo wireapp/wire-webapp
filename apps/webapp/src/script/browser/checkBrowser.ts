@@ -36,6 +36,10 @@ import Cookies from 'js-cookie';
 
 import {QUERY_KEY} from '../auth/route';
 
+// Inlined at build time by webpack (see webpack.config.common.js); this script
+// runs before the server-provided runtime config is available.
+const brandName = process.env.BRAND_NAME ?? 'Wire';
+
 const isOauth = (): boolean => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
 
 const cookieName = 'cookie_supported_test_wire_cookie_name';
@@ -108,7 +112,7 @@ const supportsIndexDB = (): Promise<boolean> =>
 
 const checkBrowser = (): void => {
   if (!supportsCookies()) {
-    redirectUnsupportedBrowser("This browser doesn't support cookies to run the Wire app!");
+    redirectUnsupportedBrowser(`This browser doesn't support cookies to run the ${brandName} app!`);
     return;
   }
   // Skip the mobile browser check for OAuth
@@ -117,19 +121,19 @@ const checkBrowser = (): void => {
   }
 
   if (isMobileBrowser() && !window.location.pathname.includes('/auth/')) {
-    redirectUnsupportedBrowser("This browser doesn't support the Wire app on mobile devices!");
+    redirectUnsupportedBrowser(`This browser doesn't support the ${brandName} app on mobile devices!`);
     return;
   }
 
   if (!('RTCPeerConnection' in window)) {
-    redirectUnsupportedBrowser("This browser doesn't support RTC to run the Wire app!");
+    redirectUnsupportedBrowser(`This browser doesn't support RTC to run the ${brandName} app!`);
     return;
   }
   void supportsIndexDB()
     .catch(() => false)
     .then(res => {
       if (!res) {
-        redirectUnsupportedBrowser("This browser doesn't support IndexDB to run the Wire app!");
+        redirectUnsupportedBrowser(`This browser doesn't support IndexDB to run the ${brandName} app!`);
       }
     });
 };

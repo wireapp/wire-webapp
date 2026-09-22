@@ -24,6 +24,7 @@ import da from 'I18n/da-DK.json';
 import de from 'I18n/de-DE.json';
 import el from 'I18n/el-GR.json';
 import en from 'I18n/en-US.json';
+import enOverride from 'I18n/en-US.override.json';
 import es from 'I18n/es-ES.json';
 import et from 'I18n/et-EE.json';
 import fi from 'I18n/fi-FI.json';
@@ -56,7 +57,13 @@ const strings = {
   da,
   de,
   el,
-  en,
+  en: {
+    ...en,
+    // Per-distribution overrides (see src/i18n/en-US.override.json). The
+    // committed default is an empty object, so standard builds are unaffected;
+    // a customization configuration replaces it at build time.
+    ...enOverride,
+  },
   es,
   et,
   fi,

@@ -29,6 +29,7 @@ import {toError} from 'Util/toError';
 
 import {ClientActionCreator} from './creator/';
 
+import {Config} from '../../../Config';
 import * as StringUtil from '../../util/stringUtil';
 import type {ThunkAction} from '../reducer';
 
@@ -108,12 +109,13 @@ export class ClientAction {
     }
 
     if (Runtime.isDesktopApp()) {
+      const {BRAND_NAME: brandName} = Config.getConfig();
       if (Runtime.isMacOS()) {
-        deviceModel = 'Wire macOS';
+        deviceModel = `${brandName} macOS`;
       } else if (Runtime.isWindows()) {
-        deviceModel = 'Wire Windows';
+        deviceModel = `${brandName} Windows`;
       } else {
-        deviceModel = 'Wire Linux';
+        deviceModel = `${brandName} Linux`;
       }
     } else if (clientType === ClientType.TEMPORARY) {
       deviceModel = `${deviceModel} (Temporary)`;

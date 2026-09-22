@@ -16,7 +16,7 @@
       "outputs": ["{projectRoot}/lib"],
       "dependsOn": ["clean"],
       "options": {
-        "command": "tsc",
+        "command": "tsc && chmod +x lib/cli.js",
         "cwd": "{projectRoot}"
       }
     },

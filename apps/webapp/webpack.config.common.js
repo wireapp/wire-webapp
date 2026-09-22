@@ -104,6 +104,9 @@ const templateParameters = {
   ASSET_VERSION: clientConfig.ASSET_VERSION,
   BRAND_NAME: clientConfig.BRAND_NAME,
   APP_BASE: clientConfig.APP_BASE,
+  WEBSITE_BASE: clientConfig.URL?.WEBSITE_BASE,
+  WEBSITE_LABEL: clientConfig.WEBSITE_LABEL,
+  SUPPORT_INDEX: clientConfig.URL?.SUPPORT?.INDEX,
   OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,
   OPEN_GRAPH_DESCRIPTION: serverConfig.OPEN_GRAPH.DESCRIPTION,
   OPEN_GRAPH_IMAGE_URL: serverConfig.OPEN_GRAPH.IMAGE_URL,
@@ -218,6 +221,11 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+    }),
+    // Inlined at build time for code that runs before the server-provided
+    // runtime config (./config.js) is available, e.g. checkBrowser.ts.
+    new webpack.DefinePlugin({
+      'process.env.BRAND_NAME': JSON.stringify(clientConfig.BRAND_NAME),
     }),
     new WorkboxPlugin.InjectManifest({
       maximumFileSizeToCacheInBytes: process.env.NODE_ENV !== 'production' ? 10 * 1024 * 1024 : undefined,

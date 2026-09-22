@@ -67,6 +67,11 @@ module.exports = {
   files: {
     [`${pkg.name}/content/**`]: 'resource/',
     [`${pkg.name}/.env.defaults`]: path.join(rootDir, '.env.defaults'),
+    // Optional per-distribution string overrides, merged over the base en-US
+    // locale at runtime (see src/script/localization/Localizer.ts). A glob that
+    // matches nothing (no override in the selected configuration) copies
+    // nothing and leaves the committed default in place.
+    [`${pkg.name}/i18n/*.override.json`]: path.join(__dirname, 'src', 'i18n'),
   },
   repositoryUrl,
 };
