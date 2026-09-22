@@ -17,9 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {type RefObject, useCallback, useEffect, useRef} from 'react';
-
-import {isNullOrUndefined} from '@sindresorhus/is';
 
 export const useOnMultipleClicks = ({
   count,
@@ -51,9 +50,9 @@ export const useOnMultipleClicks = ({
       const element = elementRef.current;
       if (
         target instanceof Element === false ||
-        isNullOrUndefined(element) ||
+        element === null ||
         element.contains(target) === false ||
-        isNullOrUndefined(target.closest(elementSelector))
+        is.nullOrUndefined(target.closest(elementSelector))
       ) {
         reset();
       }
@@ -63,7 +62,7 @@ export const useOnMultipleClicks = ({
   }, [elementRef, elementSelector, reset]);
 
   const activate = () => {
-    if (!enabled || isNullOrUndefined(elementRef.current)) {
+    if (!enabled || is.nullOrUndefined(elementRef.current)) {
       reset();
       return;
     }
