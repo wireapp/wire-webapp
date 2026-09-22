@@ -19,6 +19,7 @@
 
 import {useEffect, useMemo, useState} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
 import {useUserIdentity} from 'Hooks/useDeviceIdentities';
@@ -91,7 +92,10 @@ export const UserDevices = ({
           }
         }
       } catch (error: unknown) {
-        logger.error(`Unable to retrieve clients for user '${user.id}': ${(error as Error).message || error}`);
+        const errorMessage = (error as Error).message;
+        logger.error(
+          `Unable to retrieve clients for user '${user.id}': ${isNonEmptyString(errorMessage) ? errorMessage : error}`,
+        );
       }
     })();
   }, [clientRepository, logger, user]);
@@ -118,7 +122,7 @@ export const UserDevices = ({
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
 
-      {current.state === UserDevicesState.DEVICE_DETAILS && selectedClient && (
+      {current.state === UserDevicesState.DEVICE_DETAILS && !isNullOrUndefined(selectedClient) && (
         <DeviceDetails
           {...{
             getDeviceIdentity,

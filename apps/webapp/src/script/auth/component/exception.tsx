@@ -17,7 +17,7 @@
  *
  */
 
-import {Fragment} from 'react';
+import {Fragment, ReactElement} from 'react';
 
 import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
@@ -33,7 +33,7 @@ interface ExceptionProps {
   errors: unknown[];
 }
 
-type MessageInterpolationValue = string | number | boolean | Date | JSX.Element | null | undefined;
+type MessageInterpolationValue = string | number | boolean | Date | ReactElement | null | undefined;
 type MessageInterpolationValues = Record<string, MessageInterpolationValue>;
 
 const toMessageInterpolationValues = (value: unknown): MessageInterpolationValues | undefined => {

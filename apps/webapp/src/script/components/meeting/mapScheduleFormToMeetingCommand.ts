@@ -24,6 +24,7 @@ import {ScheduleFormErrors, scheduleFormErrors} from 'Components/meeting/schedul
 import {requireScheduleMeetingTimes} from 'Components/meeting/scheduleMeetingModal/requireScheduleMeetingTimes';
 import {
   emptyScheduleMeetingFormErrors,
+  scheduleMeetingModes,
   type ScheduleMeetingFormErrors,
   type ScheduleMeetingFormState,
 } from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
@@ -49,8 +50,10 @@ export const mapScheduleFormToMeetingCommand = (
     title: formState.title,
     start: formState.start,
     end: formState.end,
+    password: formState.password,
+    passwordConfirmation: formState.passwordConfirmation,
     wallClock,
-    mode: 'create',
+    mode: scheduleMeetingModes.create,
   });
 
   if (validationResult.isErr) {
@@ -71,5 +74,6 @@ export const mapScheduleFormToMeetingCommand = (
     end,
     recurrence: formState.recurrence,
     selectedUsers: formState.selectedUsers,
+    ...(formState.password?.trim() ? {password: formState.password} : {}),
   });
 };

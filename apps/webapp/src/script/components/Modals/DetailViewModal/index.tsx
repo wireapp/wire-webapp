@@ -19,6 +19,7 @@
 
 import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
@@ -116,7 +117,7 @@ export const DetailViewModal = ({
     setIsImageVisible(false);
 
     assetRepository.load((contentMessage.getFirstAsset() as MediumImage).resource()).then(blob => {
-      if (blob) {
+      if (!isNullOrUndefined(blob)) {
         setImageSrc(window.URL.createObjectURL(blob));
         setIsImageVisible(true);
       }
@@ -238,9 +239,9 @@ export const DetailViewModal = ({
 
   useEffect(() => {
     const conversationId = currentMessageEntity.conversation_id;
-    const isExpectedId = conversationEntity ? conversationId === conversationEntity.id : false;
+    const isExpectedId = !isNullOrUndefined(conversationEntity) ? conversationId === conversationEntity.id : false;
 
-    if (!isExpectedId) {
+    if (isExpectedId === false) {
       conversationRepository.getConversationById({domain: '', id: conversationId}).then(conversation => {
         setConversationEntity(conversation);
         getAllImages(conversation);
@@ -264,7 +265,7 @@ export const DetailViewModal = ({
 
   return (
     <div id={modalId} className={cx('modal detail-view modal-show', {'modal-fadein': isImageVisible})}>
-      {messageEntity && conversationEntity && (
+      {!isNullOrUndefined(messageEntity) && !isNullOrUndefined(conversationEntity) && (
         <div
           className={cx('detail-view-content modal-content-anim-close', {
             'modal-content-anim-open': isImageVisible,

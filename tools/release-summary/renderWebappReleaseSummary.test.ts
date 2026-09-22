@@ -108,6 +108,22 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     identifier: Maybe.just('2026-07-17.1'),
     manualReason: Maybe.nothing<string>(),
   },
+  webAppVersionSynchronization: {
+    initialPreflightJobResult: Maybe.nothing(),
+    initialPreflightPullRequestNumber: Maybe.nothing<string>(),
+    initialPreflightPullRequestUrl: Maybe.nothing<string>(),
+    initialPreflightState: Maybe.nothing(),
+    productionPreflightJobResult: Maybe.nothing(),
+    productionPreflightPullRequestNumber: Maybe.nothing<string>(),
+    productionPreflightPullRequestUrl: Maybe.nothing<string>(),
+    productionPreflightState: Maybe.nothing(),
+    synchronizationAction: Maybe.nothing(),
+    synchronizationBranchName: Maybe.nothing<string>(),
+    synchronizationJobResult: Maybe.nothing(),
+    synchronizationPullRequestNumber: Maybe.nothing<string>(),
+    synchronizationPullRequestUrl: Maybe.nothing<string>(),
+    webAppVersion: Maybe.nothing<string>(),
+  },
 };
 
 function visibleSummary(summary: string): string {
@@ -120,6 +136,56 @@ function technicalEvidence(summary: string): string {
 
 function countOccurrences(value: string, searchedValue: string): number {
   return value.split(searchedValue).length - 1;
+}
+
+type ReleaseSummaryOutcomeScenario = {
+  readonly expectedOutcome: string;
+  readonly input: WebappReleaseSummaryInput;
+  readonly name: string;
+};
+
+type CompletedProductionSynchronizationScenario = {
+  readonly expectedStage: string;
+  readonly name: string;
+  readonly synchronizationJobResult: 'failure' | 'cancelled' | 'skipped';
+};
+
+function createCompletedProductionReleaseInput(
+  synchronizationJobResult: 'failure' | 'cancelled' | 'skipped',
+): WebappReleaseSummaryInput {
+  return {
+    ...baselineWebappReleaseSummaryInput,
+    distribution: {
+      ...baselineWebappReleaseSummaryInput.distribution,
+      distributionJobResult: Maybe.just('success'),
+      distributionResult: Maybe.just('success'),
+    },
+    githubRelease: {
+      action: Maybe.just('created'),
+      jobResult: Maybe.just('success'),
+      state: Maybe.just('draft'),
+      tagName: Maybe.just(productionTagName),
+      url: Maybe.just(githubReleaseUrl),
+    },
+    production: {
+      ...baselineWebappReleaseSummaryInput.production,
+      createdTagName: Maybe.just(productionTagName),
+      deploymentResult: Maybe.just('success'),
+      deploymentRequired: Maybe.just(true),
+      preflightJobResult: Maybe.just('success'),
+      preflightResult: Maybe.just('ready'),
+      runtimeVerificationResult: Maybe.just('success'),
+      tagCreationResult: Maybe.just('success'),
+    },
+    webAppVersionSynchronization: {
+      ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+      initialPreflightJobResult: Maybe.just('success'),
+      initialPreflightState: Maybe.just('available'),
+      productionPreflightJobResult: Maybe.just('success'),
+      productionPreflightState: Maybe.just('available'),
+      synchronizationJobResult: Maybe.just(synchronizationJobResult),
+    },
+  };
 }
 
 function assertMarkdownContract(summary: string, includesDistribution: boolean): void {
@@ -311,6 +377,22 @@ describe('WebApp release summary renderer', () => {
         tagName: Maybe.just(productionTagName),
         url: Maybe.just(githubReleaseUrl),
       },
+      webAppVersionSynchronization: {
+        initialPreflightJobResult: Maybe.just('success'),
+        initialPreflightPullRequestNumber: Maybe.nothing<string>(),
+        initialPreflightPullRequestUrl: Maybe.nothing<string>(),
+        initialPreflightState: Maybe.just('available'),
+        productionPreflightJobResult: Maybe.just('success'),
+        productionPreflightPullRequestNumber: Maybe.nothing<string>(),
+        productionPreflightPullRequestUrl: Maybe.nothing<string>(),
+        productionPreflightState: Maybe.just('available'),
+        synchronizationAction: Maybe.just('created'),
+        synchronizationBranchName: Maybe.just('webapp-version-2026-07-17.1-1.0.0'),
+        synchronizationJobResult: Maybe.just('success'),
+        synchronizationPullRequestNumber: Maybe.just('123'),
+        synchronizationPullRequestUrl: Maybe.just('https://github.com/wireapp/wire-webapp/pull/123'),
+        webAppVersion: Maybe.just('1.0.0'),
+      },
     };
     const summary = renderWebappReleaseSummary(input);
     const visibleContent = visibleSummary(summary);
@@ -334,6 +416,15 @@ describe('WebApp release summary renderer', () => {
     expect(detailsContent).toContain('- Helm chart repository: https://charts.example.com/webapp');
     expect(visibleContent).toContain(
       `- GitHub Release handoff: completed successfully; action: new draft created; state: draft; URL: [GitHub Release](${githubReleaseUrl})`,
+    );
+    expect(visibleContent).toContain(
+      '- WebApp version synchronization: completed successfully; WebApp package version: `1.0.0`; Version synchronization action: PR created; Version synchronization PR: [#123](https://github.com/wireapp/wire-webapp/pull/123)',
+    );
+    expect(detailsContent).toContain(
+      '- Initial preflight: job: completed successfully; state: available; PR: not available',
+    );
+    expect(detailsContent).toContain(
+      '- Synchronization pull request: [#123](https://github.com/wireapp/wire-webapp/pull/123)',
     );
     expect(detailsContent).toContain('- Action: new draft created');
     expect(detailsContent).toContain(`- Release URL: [GitHub Release](${githubReleaseUrl})`);
@@ -382,6 +473,177 @@ describe('WebApp release summary renderer', () => {
       '- Manual follow-up: Review or edit the generated customer-facing changelog and publish the GitHub Release manually.',
     );
   });
+
+  it('distinguishes a successful Production release from incomplete version synchronization bookkeeping', () => {
+    const input: WebappReleaseSummaryInput = {
+      ...baselineWebappReleaseSummaryInput,
+      distribution: {
+        ...baselineWebappReleaseSummaryInput.distribution,
+        distributionJobResult: Maybe.just('success'),
+        distributionResult: Maybe.just('success'),
+      },
+      githubRelease: {
+        action: Maybe.just('created'),
+        jobResult: Maybe.just('success'),
+        state: Maybe.just('draft'),
+        tagName: Maybe.just(productionTagName),
+        url: Maybe.just(githubReleaseUrl),
+      },
+      production: {
+        ...baselineWebappReleaseSummaryInput.production,
+        createdTagName: Maybe.just(productionTagName),
+        deploymentResult: Maybe.just('success'),
+        deploymentRequired: Maybe.just(true),
+        preflightJobResult: Maybe.just('success'),
+        preflightResult: Maybe.just('ready'),
+        runtimeVerificationResult: Maybe.just('success'),
+        tagCreationResult: Maybe.just('success'),
+      },
+      webAppVersionSynchronization: {
+        ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+        initialPreflightJobResult: Maybe.just('success'),
+        initialPreflightState: Maybe.just('available'),
+        productionPreflightJobResult: Maybe.just('success'),
+        productionPreflightState: Maybe.just('available'),
+        synchronizationJobResult: Maybe.just('failure'),
+        webAppVersion: Maybe.just('1.0.0'),
+      },
+    };
+    const summary = renderWebappReleaseSummary(input);
+    const visibleContent = visibleSummary(summary);
+    const detailsContent = technicalEvidence(summary);
+
+    expect(visibleContent).toContain(
+      '- Outcome: Production release completed successfully, but WebApp version synchronization bookkeeping is incomplete',
+    );
+    expect(visibleContent).toContain('- Hosted Production: deployed, verified, and tagged successfully');
+    expect(visibleContent).toContain('- WebApp version synchronization: failed; release bookkeeping incomplete');
+    expect(detailsContent).toContain('- Synchronization job: failed');
+    expect(detailsContent).toContain('- WebApp package version: `1.0.0`');
+  });
+
+  const skippedSynchronizationAfterFailedReleaseScenarios: readonly ReleaseSummaryOutcomeScenario[] = [
+    {
+      name: 'E2E failure',
+      input: {
+        ...baselineWebappReleaseSummaryInput,
+        e2e: {...baselineWebappReleaseSummaryInput.e2e, result: Maybe.just('failure')},
+        webAppVersionSynchronization: {
+          ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+          synchronizationJobResult: Maybe.just('skipped'),
+        },
+      },
+      expectedOutcome: 'Release stopped because the E2E system gate failed',
+    },
+    {
+      name: 'Production deployment failure',
+      input: {
+        ...baselineWebappReleaseSummaryInput,
+        production: {
+          ...baselineWebappReleaseSummaryInput.production,
+          preflightJobResult: Maybe.just('success'),
+          preflightResult: Maybe.just('ready'),
+          approvalResult: Maybe.just('success'),
+          deploymentResult: Maybe.just('failure'),
+          runtimeVerificationResult: Maybe.just('skipped'),
+          tagCreationResult: Maybe.just('skipped'),
+        },
+        webAppVersionSynchronization: {
+          ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+          synchronizationJobResult: Maybe.just('skipped'),
+        },
+      },
+      expectedOutcome: 'Release stopped because Hosted Production deployment failed',
+    },
+    {
+      name: 'Production runtime verification failure',
+      input: {
+        ...baselineWebappReleaseSummaryInput,
+        production: {
+          ...baselineWebappReleaseSummaryInput.production,
+          preflightJobResult: Maybe.just('success'),
+          preflightResult: Maybe.just('ready'),
+          approvalResult: Maybe.just('success'),
+          deploymentResult: Maybe.just('success'),
+          runtimeVerificationResult: Maybe.just('failure'),
+          tagCreationResult: Maybe.just('skipped'),
+        },
+        webAppVersionSynchronization: {
+          ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
+          synchronizationJobResult: Maybe.just('skipped'),
+        },
+      },
+      expectedOutcome: 'Hosted Production was deployed, but runtime verification failed',
+    },
+    {
+      name: 'Production distribution failure',
+      input: {
+        ...createCompletedProductionReleaseInput('skipped'),
+        distribution: {
+          ...baselineWebappReleaseSummaryInput.distribution,
+          distributionJobResult: Maybe.just('failure'),
+          distributionResult: Maybe.just('failure'),
+        },
+      },
+      expectedOutcome: 'Hosted Production completed, but release distribution failed',
+    },
+    {
+      name: 'GitHub Release handoff failure',
+      input: {
+        ...createCompletedProductionReleaseInput('skipped'),
+        githubRelease: {
+          ...baselineWebappReleaseSummaryInput.githubRelease,
+          jobResult: Maybe.just('failure'),
+        },
+      },
+      expectedOutcome: 'Hosted Production and release distribution completed, but GitHub Release handoff failed',
+    },
+  ];
+
+  it.each(skippedSynchronizationAfterFailedReleaseScenarios)(
+    'does not report skipped synchronization as incomplete bookkeeping after $name',
+    ({input, expectedOutcome}) => {
+      const summary = renderWebappReleaseSummary(input);
+      const visibleContent = visibleSummary(summary);
+
+      expect(visibleContent).toContain(`- Outcome: ${expectedOutcome}`);
+      expect(visibleContent).toContain('- WebApp version synchronization: not run');
+      expect(visibleContent).not.toContain('bookkeeping incomplete');
+    },
+  );
+
+  const completedProductionSynchronizationScenarios: readonly CompletedProductionSynchronizationScenario[] = [
+    {
+      name: 'failure',
+      synchronizationJobResult: 'failure',
+      expectedStage: 'failed; release bookkeeping incomplete',
+    },
+    {
+      name: 'cancellation',
+      synchronizationJobResult: 'cancelled',
+      expectedStage: 'cancelled; release bookkeeping incomplete',
+    },
+    {
+      name: 'unexpected skip',
+      synchronizationJobResult: 'skipped',
+      expectedStage: 'not run; release bookkeeping incomplete',
+    },
+  ];
+
+  it.each(completedProductionSynchronizationScenarios)(
+    'reports completed Production with synchronization $name as incomplete bookkeeping',
+    scenario => {
+      const summary = renderWebappReleaseSummary(
+        createCompletedProductionReleaseInput(scenario.synchronizationJobResult),
+      );
+      const visibleContent = visibleSummary(summary);
+
+      expect(visibleContent).toContain(
+        '- Outcome: Production release completed successfully, but WebApp version synchronization bookkeeping is incomplete',
+      );
+      expect(visibleContent).toContain(`- WebApp version synchronization: ${scenario.expectedStage}`);
+    },
+  );
 
   it('renders an existing published GitHub Release as a successful handoff', () => {
     const input: WebappReleaseSummaryInput = {
@@ -1025,6 +1287,16 @@ describe('WebApp release summary renderer', () => {
       RELEASE_BRANCH_ACTION: 'created',
       SOURCE_COMMIT_SHA: sourceCommitSha,
       SOURCE_REF: 'main',
+      WEBAPP_VERSION: '1.0.0',
+      WEBAPP_VERSION_SYNC_ACTION: 'created',
+      WEBAPP_VERSION_SYNC_BRANCH_NAME: 'webapp-version-2026-07-17.1-1.0.0',
+      WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_JOB_RESULT: 'success',
+      WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_STATE: 'available',
+      WEBAPP_VERSION_SYNC_JOB_RESULT: 'success',
+      WEBAPP_VERSION_SYNC_PR_NUMBER: '123',
+      WEBAPP_VERSION_SYNC_PR_URL: 'https://github.com/wireapp/wire-webapp/pull/123',
+      WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_JOB_RESULT: 'success',
+      WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_STATE: 'available',
     });
 
     expect(input.release.artifactAssetVersion.unwrapOr('not available')).toBe('2026-07-17.1-1234567');
@@ -1041,6 +1313,18 @@ describe('WebApp release summary renderer', () => {
     expect(input.githubRelease.state.unwrapOr('published')).toBe('draft');
     expect(input.githubRelease.tagName.unwrapOr('not available')).toBe(productionTagName);
     expect(input.githubRelease.url.unwrapOr('not available')).toBe(githubReleaseUrl);
+    expect(input.webAppVersionSynchronization.webAppVersion.unwrapOr('not available')).toBe('1.0.0');
+    expect(input.webAppVersionSynchronization.synchronizationAction.unwrapOr('already-merged')).toBe('created');
+    expect(input.webAppVersionSynchronization.synchronizationBranchName.unwrapOr('not available')).toBe(
+      'webapp-version-2026-07-17.1-1.0.0',
+    );
+    expect(input.webAppVersionSynchronization.synchronizationJobResult.unwrapOr('failure')).toBe('success');
+    expect(input.webAppVersionSynchronization.synchronizationPullRequestNumber.unwrapOr('not available')).toBe('123');
+    expect(input.webAppVersionSynchronization.synchronizationPullRequestUrl.unwrapOr('not available')).toBe(
+      'https://github.com/wireapp/wire-webapp/pull/123',
+    );
+    expect(input.webAppVersionSynchronization.initialPreflightState.unwrapOr('conflict')).toBe('available');
+    expect(input.webAppVersionSynchronization.productionPreflightState.unwrapOr('conflict')).toBe('available');
   });
 
   it('does not create a link for an invalid E2E report URL', () => {

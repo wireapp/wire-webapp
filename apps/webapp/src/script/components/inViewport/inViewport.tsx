@@ -46,7 +46,7 @@ export const InViewport = ({
 
   useEffect(() => {
     const element = domNode.current;
-    if (!element) {
+    if (element === null) {
       return undefined;
     }
 
@@ -71,7 +71,7 @@ export const InViewport = ({
           onVisibilityLostTriggered = false;
         }
 
-        if (!onVisibilityLost) {
+        if (onVisibilityLost === undefined) {
           releaseTrackers();
         }
       }

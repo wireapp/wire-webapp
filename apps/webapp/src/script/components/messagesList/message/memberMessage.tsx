@@ -29,7 +29,6 @@ import {
 } from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -42,10 +41,8 @@ import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
 
 type RenderGroupCreationHeaderOptions = {
-  readonly htmlGroupCreationHeader: string;
-  readonly reactGroupCreationHeader: string;
+  readonly groupCreationHeader: string;
   readonly senderName: string;
-  readonly isReactTranslationRenderingEnabled: boolean;
 };
 
 function renderGroupCreationHeaderSenderName(text: string, senderName: string): ReactNode[] {
@@ -61,33 +58,27 @@ function renderGroupCreationHeaderSenderName(text: string, senderName: string): 
 }
 
 function renderGroupCreationHeader(options: RenderGroupCreationHeaderOptions): ReactElement {
-  const {htmlGroupCreationHeader, reactGroupCreationHeader, senderName, isReactTranslationRenderingEnabled} = options;
-
-  if (isReactTranslationRenderingEnabled) {
-    return (
-      <p className="message-group-creation-header-text">
-        {replaceReactComponents(reactGroupCreationHeader, [
-          {
-            start: '<strong>',
-            end: '</strong>',
-            render(text): ReactElement {
-              return <strong>{renderGroupCreationHeaderSenderName(text, senderName)}</strong>;
-            },
-          },
-          {
-            start: groupCreationHeaderSenderNameMarkerStart,
-            end: groupCreationHeaderSenderNameMarkerEnd,
-            render(): string {
-              return senderName;
-            },
-          },
-        ])}
-      </p>
-    );
-  }
+  const {groupCreationHeader, senderName} = options;
 
   return (
-    <p className="message-group-creation-header-text" dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}} />
+    <p className="message-group-creation-header-text">
+      {replaceReactComponents(groupCreationHeader, [
+        {
+          start: '<strong>',
+          end: '</strong>',
+          render(text): ReactElement {
+            return <strong>{renderGroupCreationHeaderSenderName(text, senderName)}</strong>;
+          },
+        },
+        {
+          start: groupCreationHeaderSenderNameMarkerStart,
+          end: groupCreationHeaderSenderNameMarkerEnd,
+          render(): string {
+            return senderName;
+          },
+        },
+      ])}
+    </p>
   );
 }
 
@@ -120,26 +111,17 @@ export const MemberMessage = ({
   isCellsConversation,
   isSelfGuest,
 }: MemberMessageProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
-  const {
-    otherUser,
-    timestamp,
-    user,
-    senderName,
-    htmlGroupCreationHeader,
-    reactGroupCreationHeader,
-    showNamedCreation,
-    hasUsers,
-  } = useKoSubscribableChildren(message, [
-    'otherUser',
-    'timestamp',
-    'user',
-    'senderName',
-    'htmlGroupCreationHeader',
-    'reactGroupCreationHeader',
-    'showNamedCreation',
-    'hasUsers',
-  ]);
+  const {translate} = useApplicationContext();
+  const {otherUser, timestamp, user, senderName, groupCreationHeader, showNamedCreation, hasUsers} =
+    useKoSubscribableChildren(message, [
+      'otherUser',
+      'timestamp',
+      'user',
+      'senderName',
+      'groupCreationHeader',
+      'showNamedCreation',
+      'hasUsers',
+    ]);
 
   const isGroupCreation = message.isGroupCreation();
   const isMemberRemoval = message.isMemberRemoval();
@@ -174,10 +156,8 @@ export const MemberMessage = ({
       {showNamedCreation && (
         <div className="message-group-creation-header">
           {renderGroupCreationHeader({
-            htmlGroupCreationHeader,
-            reactGroupCreationHeader,
+            groupCreationHeader,
             senderName,
-            isReactTranslationRenderingEnabled: isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName),
           })}
           <h2 className="message-group-creation-header-name" data-uie-name="conversation-name">
             {conversationName}

@@ -22,11 +22,11 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import * as Icon from 'Components/icon';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/protocolUpdateMessage';
 import {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessageBase} from '../systemMessage/systemMessageBase';
+import {renderMlsSystemMessageCaption} from '../systemMessage/systemMessageCaption';
 
 interface ProtocolUpdateMessageProps {
   message: ProtocolUpdateMessageEntity;
@@ -41,31 +41,36 @@ const createSystemMessage = (caption: string, translate: Translate) => {
 export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => {
   const {translate} = useApplicationContext();
   if (message.protocol === CONVERSATION_PROTOCOL.MIXED) {
-    const captions = [
-      translate(
-        'conversationProtocolUpdatedToMixedPart1',
-        undefined,
-        replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
-      ),
-      translate('conversationProtocolUpdatedToMixedPart2'),
+    const messages = [
+      {
+        caption: translate('conversationProtocolUpdatedToMixedPart1'),
+        captionContent: renderMlsSystemMessageCaption(translate('conversationProtocolUpdatedToMixedPart1')),
+      },
+      {
+        caption: translate('conversationProtocolUpdatedToMixedPart2'),
+        captionContent: translate('conversationProtocolUpdatedToMixedPart2'),
+      },
     ];
-    const messages = captions.map(caption => createSystemMessage(caption, translate));
     return (
       <>
-        {messages.map(message => (
-          <SystemMessageBase key={message.caption} icon={<Icon.InfoIcon />} message={message} />
+        {messages.map(({caption, captionContent}) => (
+          <SystemMessageBase
+            key={caption}
+            icon={<Icon.InfoIcon />}
+            message={createSystemMessage(caption, translate)}
+            captionContent={captionContent}
+          />
         ))}
       </>
     );
   }
 
-  const migratedToMLSMessage = createSystemMessage(
-    translate(
-      'conversationProtocolUpdatedToMLS',
-      undefined,
-      replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
-    ),
-    translate,
+  const caption = translate('conversationProtocolUpdatedToMLS');
+  return (
+    <SystemMessageBase
+      message={createSystemMessage(caption, translate)}
+      icon={<Icon.InfoIcon />}
+      captionContent={renderMlsSystemMessageCaption(caption)}
+    />
   );
-  return <SystemMessageBase message={migratedToMLSMessage} icon={<Icon.InfoIcon />} />;
 };

@@ -36,7 +36,7 @@ import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndica
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/environment';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue} from 'Util/storageUtil';
 
@@ -163,11 +163,27 @@ export class PropertiesRepository {
       {
         text: {
           title: this.translate('dataSharingModalTitle'),
-          htmlMessage: this.translate(
-            'dataSharingModalDescription',
-            undefined,
-            replaceLink(Config.getConfig().URL.PRIVACY_POLICY),
-          ),
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [
+              {
+                className: '',
+                dataUieName: '',
+                href: Config.getConfig().URL.PRIVACY_POLICY,
+                kind: 'link',
+                legacyClosingTokens: [],
+                legacyOpeningTokens: [],
+                markerName: 'link',
+                rel: 'nofollow noopener noreferrer',
+                target: '_blank',
+              },
+              {kind: 'line-break', legacyTokens: ['<br />'], markerName: 'br'},
+            ],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'dataSharingModalDescription',
+            values: [],
+          },
           closeBtnLabel: this.translate('dataSharingModalCloseBtnTitle'),
         },
         primaryAction: {

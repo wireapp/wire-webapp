@@ -22,10 +22,10 @@ exports[`"InputLabel" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <label
-    className="emotion-1"
+    class="emotion-1"
   >
     Label
   </label>
@@ -54,10 +54,10 @@ exports[`"InputLabel" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <label
-    className="emotion-1"
+    class="emotion-1"
   >
     Label
   </label>
@@ -97,10 +97,10 @@ exports[`"LabelLink" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <a
-    className="emotion-1"
+    class="emotion-1"
   >
     LabelLink
   </a>
@@ -140,10 +140,10 @@ exports[`"LabelLink" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <a
-    className="emotion-1"
+    class="emotion-1"
   >
     LabelLink
   </a>

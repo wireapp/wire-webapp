@@ -29,6 +29,9 @@ const upload: SharedDriveUploadStatus = {
   fileName: 'report.pdf',
   fileSize: 4,
   kind: 'uploading',
+  progress: 0,
+  hasProgress: false,
+  isTransferActive: true,
   canCancel: true,
   canRetry: false,
 };
@@ -42,7 +45,14 @@ const renderPopup = (
   render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup
-        upload={{...upload, fileName, kind, canCancel: kind === 'uploading', canRetry: kind === 'failed'}}
+        upload={{
+          ...upload,
+          fileName,
+          kind,
+          isTransferActive: kind === 'uploading',
+          canCancel: kind === 'uploading',
+          canRetry: kind === 'failed',
+        }}
         title={`${kind} report.pdf`}
         statusLabel={
           kind === 'failed' ? 'Couldn’t upload file' : `${kind === 'uploading' ? 'Uploading' : 'Uploaded'} 4 KB`
@@ -52,25 +62,168 @@ const renderPopup = (
         toggleLabel={isExpanded ? 'Hide upload details' : 'Show upload details'}
         cancelLabel="Cancel"
         dismissLabel="Close"
+        dismissAriaLabel="Close upload status"
         retryLabel="Retry"
         isCancelling={false}
         isRetrying={isRetrying}
         onToggle={jest.fn()}
-        onCancel={jest.fn()}
+        onCancelAll={jest.fn()}
+        onCancelUpload={jest.fn()}
         onRetry={jest.fn()}
-        onDismiss={jest.fn()}
+        onDismissAll={jest.fn()}
+        onDismissRow={jest.fn()}
       />
     </ThemeProvider>,
   );
 
 describe('SharedDriveUploadStatusPopup', () => {
+  it('renders ordered rows with distinct queued and active states', async () => {
+    const user = userEvent.setup();
+    const onCancelUpload = jest.fn();
+    const secondUpload: SharedDriveUploadStatus = {
+      ...upload,
+      uploadId: 'upload-2',
+      fileName: 'queued.txt',
+      kind: 'queued',
+      isTransferActive: false,
+      canCancel: true,
+    };
+
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={upload}
+          uploads={[upload, secondUpload]}
+          aggregateKind="uploading"
+          title="Uploading 2 files"
+          statusLabel="Uploading"
+          statusLabels={
+            new Map([
+              [upload.uploadId, 'Uploading 4 B'],
+              [secondUpload.uploadId, 'Queued'],
+            ])
+          }
+          destination="to Shared Drive"
+          isExpanded
+          toggleLabel="Hide upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancelAll={jest.fn()}
+          onCancelUpload={onCancelUpload}
+          onRetry={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    const rows = screen.getAllByTestId('shared-drive-upload-status-row');
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0]).getByText('report.pdf')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('queued.txt')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('Queued')).toBeInTheDocument();
+    expect(screen.getAllByTestId('shared-drive-upload-progress')).toHaveLength(1);
+    expect(within(rows[0]).queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
+    expect(within(rows[1]).queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
+
+    await user.click(within(rows[1]).getByRole('button', {name: 'Cancel'}));
+    expect(onCancelUpload).toHaveBeenCalledWith('upload-2');
+  });
+
   it('shows the filename and destination while uploading with indeterminate progress', () => {
     const {getByRole, getByText, getByTestId} = renderPopup('uploading');
 
     expect(getByRole('status')).toBeInTheDocument();
     expect(getByText('uploading report.pdf')).toBeInTheDocument();
     expect(getByText('to Shared Drive')).toBeInTheDocument();
+    const progress = getByRole('progressbar', {name: 'report.pdf'});
+    expect(progress).not.toHaveAttribute('aria-valuenow');
+    expect(progress).not.toHaveAttribute('aria-valuemin');
+    expect(progress).not.toHaveAttribute('aria-valuemax');
     expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+  });
+
+  it('shows determinate progress when Cells reports bytes sent', () => {
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, progress: 0.45, hasProgress: true}}
+          title="Uploading report.pdf"
+          statusLabel="Uploading 4 B"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancelAll={jest.fn()}
+          onCancelUpload={jest.fn()}
+          onRetry={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    const progress = screen.getByRole('progressbar', {name: 'report.pdf'});
+    expect(progress).toHaveAttribute('aria-valuemin', '0');
+    expect(progress).toHaveAttribute('aria-valuemax', '100');
+    expect(progress).toHaveAttribute('aria-valuenow', '45');
+    expect(progress).toHaveStyle({width: '100%', transform: 'scaleX(0.45)'});
+  });
+
+  it('updates progress without replacing the bar or its style rule', () => {
+    const {rerender} = render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, progress: 0.45, hasProgress: true}}
+          title="Uploading report.pdf"
+          statusLabel="Uploading 4 B"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancelAll={jest.fn()}
+          onCancelUpload={jest.fn()}
+          onRetry={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    const progress = screen.getByRole('progressbar', {name: 'report.pdf'});
+    const progressClassName = progress.className;
+    const statusIcon = screen.getByTestId('shared-drive-upload-uploading');
+
+    rerender(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, progress: 0.46, hasProgress: true}}
+          title="Uploading report.pdf"
+          statusLabel="Uploading 4 B"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Expand upload details"
+          cancelLabel="Cancel"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancelAll={jest.fn()}
+          onCancelUpload={jest.fn()}
+          onRetry={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toBe(progress);
+    expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toHaveClass(progressClassName);
+    expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toHaveStyle({transform: 'scaleX(0.46)'});
+    expect(screen.getByTestId('shared-drive-upload-uploading')).toBe(statusIcon);
   });
 
   it.each([
@@ -155,7 +308,8 @@ describe('SharedDriveUploadStatusPopup', () => {
         isCancelling={false}
         isRetrying={false}
         onToggle={onToggle}
-        onCancel={jest.fn()}
+        onCancelAll={jest.fn()}
+        onCancelUpload={jest.fn()}
         onRetry={jest.fn()}
       />,
     );
@@ -169,7 +323,7 @@ describe('SharedDriveUploadStatusPopup', () => {
 
   it('invokes cancellation from the header', async () => {
     const user = userEvent.setup();
-    const onCancel = jest.fn();
+    const onCancelAll = jest.fn();
     render(
       <ThemeProvider>
         <SharedDriveUploadStatusPopup
@@ -184,7 +338,8 @@ describe('SharedDriveUploadStatusPopup', () => {
           isCancelling={false}
           isRetrying={false}
           onToggle={jest.fn()}
-          onCancel={onCancel}
+          onCancelAll={onCancelAll}
+          onCancelUpload={jest.fn()}
           onRetry={jest.fn()}
         />
       </ThemeProvider>,
@@ -194,12 +349,12 @@ describe('SharedDriveUploadStatusPopup', () => {
       within(screen.getByTestId('shared-drive-upload-status-header')).getByRole('button', {name: 'Cancel'}),
     );
 
-    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onCancelAll).toHaveBeenCalledTimes(1);
   });
 
   it('invokes cancellation from the expanded row icon action', async () => {
     const user = userEvent.setup();
-    const onCancel = jest.fn();
+    const onCancelUpload = jest.fn();
     render(
       <ThemeProvider>
         <SharedDriveUploadStatusPopup
@@ -214,7 +369,8 @@ describe('SharedDriveUploadStatusPopup', () => {
           isCancelling={false}
           isRetrying={false}
           onToggle={jest.fn()}
-          onCancel={onCancel}
+          onCancelAll={jest.fn()}
+          onCancelUpload={onCancelUpload}
           onRetry={jest.fn()}
         />
       </ThemeProvider>,
@@ -226,7 +382,7 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(rowCancel.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
     await user.click(rowCancel);
 
-    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onCancelUpload).toHaveBeenCalledTimes(1);
   });
 
   it('disables every cancel action while cancellation is pending', () => {
@@ -244,7 +400,8 @@ describe('SharedDriveUploadStatusPopup', () => {
           isCancelling
           isRetrying={false}
           onToggle={jest.fn()}
-          onCancel={jest.fn()}
+          onCancelAll={jest.fn()}
+          onCancelUpload={jest.fn()}
           onRetry={jest.fn()}
         />
       </ThemeProvider>,
@@ -271,7 +428,8 @@ describe('SharedDriveUploadStatusPopup', () => {
           isCancelling={false}
           isRetrying={false}
           onToggle={jest.fn()}
-          onCancel={jest.fn()}
+          onCancelAll={jest.fn()}
+          onCancelUpload={jest.fn()}
           onRetry={onRetry}
         />
       </ThemeProvider>,
@@ -282,9 +440,58 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
-  it('invokes dismiss from the failed file row', async () => {
+  it('invokes dismiss from the uploaded header action', async () => {
     const user = userEvent.setup();
-    const onDismiss = jest.fn();
+    const onDismissAll = jest.fn();
+    render(
+      <ThemeProvider>
+        <SharedDriveUploadStatusPopup
+          upload={{...upload, kind: 'uploaded', isTransferActive: false, canCancel: false, canRetry: false}}
+          title="Uploaded report.pdf"
+          statusLabel="Uploaded 4 KB"
+          destination="to Shared Drive"
+          isExpanded={false}
+          toggleLabel="Show upload details"
+          cancelLabel="Cancel"
+          dismissLabel="Close"
+          dismissAriaLabel="Close upload status"
+          retryLabel="Retry"
+          isCancelling={false}
+          isRetrying={false}
+          onToggle={jest.fn()}
+          onCancelAll={jest.fn()}
+          onCancelUpload={jest.fn()}
+          onRetry={jest.fn()}
+          onDismissAll={onDismissAll}
+          onDismissRow={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    const headerClose = within(screen.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'Close upload status',
+    });
+    expect(headerClose).toHaveTextContent('Close');
+    expect(headerClose).toHaveAttribute('data-uie-name', 'shared-drive-upload-header-dismiss');
+
+    await user.click(headerClose);
+
+    expect(onDismissAll).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['uploading', 'failed'] as const)('does not show header close while %s status is actionable', kind => {
+    renderPopup(kind, true);
+
+    expect(
+      within(screen.getByTestId('shared-drive-upload-status-header')).queryByRole('button', {
+        name: 'Close upload status',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('invokes dismiss for an expanded failed row', async () => {
+    const user = userEvent.setup();
+    const onDismissRow = jest.fn();
     render(
       <ThemeProvider>
         <SharedDriveUploadStatusPopup
@@ -295,21 +502,24 @@ describe('SharedDriveUploadStatusPopup', () => {
           isExpanded
           toggleLabel="Hide upload details"
           cancelLabel="Cancel"
-          dismissLabel="Close"
+          dismissAriaLabel="Close upload status"
           retryLabel="Retry"
           isCancelling={false}
           isRetrying={false}
           onToggle={jest.fn()}
-          onCancel={jest.fn()}
+          onCancelAll={jest.fn()}
+          onCancelUpload={jest.fn()}
           onRetry={jest.fn()}
-          onDismiss={onDismiss}
+          onDismissRow={onDismissRow}
         />
       </ThemeProvider>,
     );
 
-    await user.click(screen.getByRole('button', {name: 'Close'}));
+    const dismiss = screen.getByRole('button', {name: 'Close upload status'});
+    expect(dismiss).toHaveAttribute('data-uie-name', 'shared-drive-upload-dismiss');
+    await user.click(dismiss);
 
-    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(onDismissRow).toHaveBeenCalledWith('upload-1');
   });
 
   it('disables retry while a failed upload is being retried', () => {

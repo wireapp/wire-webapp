@@ -55,12 +55,13 @@ const TopContact = ({user, clickOnUser}: TopContactProps) => {
         clickOnUser?.(user, event);
       }}
       onKeyPress={event =>
-        clickOnUser &&
-        handleKeyDown({
-          event,
-          callback: clickOnUser.bind(this, user, event),
-          keys: [KEY.ENTER, KEY.SPACE],
-        })
+        clickOnUser !== undefined
+          ? handleKeyDown({
+              event,
+              callback: clickOnUser.bind(this, user, event),
+              keys: [KEY.ENTER, KEY.SPACE],
+            })
+          : undefined
       }
     >
       <Avatar avatarSize={AVATAR_SIZE.LARGE} className="search-list-item-image" participant={user} />

@@ -17,9 +17,27 @@
  *
  */
 
-export function replaceLink(href: string, className: string = '', uieName: string = '') {
-  return {
-    '/link': '</a>',
-    link: `<a href="${href}" data-uie-name="${uieName}" class="${className}" rel="nofollow noopener noreferrer" target="_blank">`,
-  };
-}
+import {render, screen, waitFor} from '@testing-library/react';
+
+import {Opacity} from './animation';
+
+describe('animation', () => {
+  it('applies transition classes to its owned DOM node under React 19', async function (): Promise<void> {
+    const {rerender} = render(
+      <Opacity in={false}>
+        <span>Animated content</span>
+      </Opacity>,
+    );
+    const transitionNode = screen.getByText('Animated content').parentElement;
+
+    expect(transitionNode).not.toBeNull();
+
+    rerender(
+      <Opacity in timeout={0}>
+        <span>Animated content</span>
+      </Opacity>,
+    );
+
+    await waitFor(() => expect(transitionNode?.className).toMatch(/-enter-done/));
+  });
+});

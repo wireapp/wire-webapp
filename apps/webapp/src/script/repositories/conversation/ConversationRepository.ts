@@ -99,7 +99,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
@@ -134,6 +134,7 @@ import {
   MLSCapableConversation,
   MLSConversation,
   ProteusConversation,
+  supportsReadReceipts,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -711,6 +712,15 @@ export class ConversationRepository {
       return {found: []} as RemoteConversations;
     });
     return this.loadRemoteConversations(remoteConversations, connections, deadConnections);
+  }
+
+  /**
+   * Refreshes the complete conversation list before auditing MLS membership.
+   * This discovers conversations created while this client had no key packages
+   * and therefore could not receive their Welcome messages.
+   */
+  public async refreshConversationsForMLSRecovery(): Promise<Conversation[]> {
+    return this.loadConversations(this.connectionState.connections(), this.connectionState.deadConnections());
   }
 
   /**
@@ -1372,6 +1382,15 @@ export class ConversationRepository {
     );
   }
 
+  requestMeetingConversationCode(conversationId: QualifiedId, password?: string): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        await this.conversationService.postConversationCode(conversationId.id, password);
+      },
+    );
+  }
+
   /**
    * Get all the group conversations owned by self user's team from the local state.
    */
@@ -1901,6 +1920,10 @@ export class ConversationRepository {
         mlsConversation: JSON.stringify(mlsConversation),
       });
     }
+
+    // Migration can happen after startup has loaded unread events. Populate the new entity as well,
+    // since unread counts are derived from messages in memory, not just the persisted read timestamp.
+    await this.getUnreadEvents(mlsConversation);
 
     const wasProteus1to1ActiveConversation = proteusConversations.some(conversation =>
       this.conversationState.isActiveConversation(conversation),
@@ -3211,6 +3234,10 @@ export class ConversationRepository {
       protocol: newProtocol,
     });
 
+    if (!supportsReadReceipts(updatedConversation)) {
+      updatedConversation.receiptMode(RECEIPT_MODE.OFF);
+    }
+
     await this.saveConversationStateInDb(updatedConversation);
     return updatedConversation;
   }
@@ -3494,24 +3521,32 @@ export class ConversationRepository {
   }
 
   private showLegalHoldConsentError() {
-    const replaceLinkLegalHold = replaceLink(
-      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-      '',
-      'read-more-legal-hold',
-    );
-
-    const messageText = this.translate(
-      'modalLegalHoldConversationMissingConsentMessage',
-      undefined,
-      replaceLinkLegalHold,
-    );
     const titleText = this.translate('modalUserCannotBeAddedHeadline');
 
     PrimaryModal.show(
       PrimaryModal.type.ACKNOWLEDGE,
       {
         text: {
-          htmlMessage: messageText,
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [
+              {
+                className: '',
+                dataUieName: 'read-more-legal-hold',
+                href: Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+                kind: 'link',
+                legacyClosingTokens: [],
+                legacyOpeningTokens: [],
+                markerName: 'link',
+                rel: 'nofollow noopener noreferrer',
+                target: '_blank',
+              },
+            ],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'modalLegalHoldConversationMissingConsentMessage',
+            values: [],
+          },
           title: titleText,
         },
       },
@@ -3983,6 +4018,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.FEDERATION_STOP:
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
+      case ClientEvent.CONVERSATION.SESSION_RESET:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION:
       case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL:
@@ -5066,6 +5102,10 @@ export class ConversationRepository {
   //##############################################################################
 
   expectReadReceipt(conversationEntity: Conversation): boolean {
+    if (!supportsReadReceipts(conversationEntity)) {
+      return false;
+    }
+
     if (conversationEntity.is1to1()) {
       return this.propertyRepository.receiptMode() === RECEIPT_MODE.ON;
     }

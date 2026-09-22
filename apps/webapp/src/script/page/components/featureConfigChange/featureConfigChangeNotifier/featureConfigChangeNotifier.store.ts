@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
 
 const LOCAL_STORAGE_FEATURE_CONFIG_KEY = 'FEATURE_CONFIG_KEY';
@@ -25,7 +26,7 @@ export function loadFeatureConfig(selfUserId: string): FeatureList | undefined {
   const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
     window.localStorage.getItem(LOCAL_STORAGE_FEATURE_CONFIG_KEY) ?? '{}',
   );
-  if (featureConfigs && featureConfigs[selfUserId]) {
+  if (!isNullOrUndefined(featureConfigs) && featureConfigs[selfUserId] !== undefined) {
     return featureConfigs[selfUserId];
   }
   return undefined;

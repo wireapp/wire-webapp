@@ -17,9 +17,11 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {result, type Result} from 'true-myth';
 import {create} from 'zustand';
 
+import {getMeetingPasswordErrors} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import {
   getMeetingTitleError,
   getMeetingTitleInputError,
@@ -34,6 +36,8 @@ export const getDefaultMeetNowFormState = (): MeetNowFormState => ({
   title: '',
   selectedUsers: [],
   participantsFilter: '',
+  password: '',
+  passwordConfirmation: '',
 });
 
 type MeetNowModalState = {
@@ -46,6 +50,8 @@ type MeetNowModalState = {
   setTitle: (title: string) => void;
   setSelectedUsers: (selectedUsers: User[]) => void;
   setParticipantsFilter: (participantsFilter: string) => void;
+  setPassword: (password: string) => void;
+  setPasswordConfirmation: (passwordConfirmation: string) => void;
   validate: () => MeetNowFormErrors;
   clearErrors: () => void;
 };
@@ -56,11 +62,13 @@ const initialState = {
   errors: emptyMeetNowFormErrors(),
 };
 
-export const getMeetNowFormErrors = ({title}: MeetNowFormState): MeetNowFormErrors => ({
+export const getMeetNowFormErrors = ({title, password, passwordConfirmation}: MeetNowFormState): MeetNowFormErrors => ({
   title: getMeetingTitleError(title),
+  ...getMeetingPasswordErrors(password, passwordConfirmation),
 });
 
-export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean => errors.title !== undefined;
+export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean =>
+  !isUndefined(errors.title) || !isUndefined(errors.password) || !isUndefined(errors.passwordConfirmation);
 
 export const validateMeetNowForm = (formState: MeetNowFormState): Result<MeetNowFormState, MeetNowFormErrors> => {
   const errors = getMeetNowFormErrors(formState);
@@ -98,6 +106,16 @@ export const useMeetNowModal = create<MeetNowModalState>((set, get) => ({
   setParticipantsFilter: participantsFilter =>
     set(state => ({
       formState: {...state.formState, participantsFilter},
+    })),
+  setPassword: password =>
+    set(state => ({
+      formState: {...state.formState, password},
+      errors: {...state.errors, ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation)},
+    })),
+  setPasswordConfirmation: passwordConfirmation =>
+    set(state => ({
+      formState: {...state.formState, passwordConfirmation},
+      errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
     })),
   validate: () => {
     const errors = getMeetNowFormErrors(get().formState);

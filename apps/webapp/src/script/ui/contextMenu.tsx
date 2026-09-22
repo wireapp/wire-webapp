@@ -20,7 +20,7 @@
 import {ComponentType, CSSProperties, ReactNode, SVGProps, useEffect, useMemo, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
 
@@ -70,7 +70,7 @@ let reactRoot: Root;
 const cleanUp = () => {
   const {activeWindow} = useActiveWindowState.getState();
 
-  if (container) {
+  if (container !== undefined) {
     reactRoot.unmount();
     activeWindow.document.body.removeChild(container);
     container = undefined;
@@ -140,7 +140,7 @@ const ContextMenu = ({
     let leftPx = 0;
     let topPx = 0;
 
-    if (anchorEl) {
+    if (!isNullOrUndefined(anchorEl)) {
       const anchorRect = anchorEl.getBoundingClientRect();
       const position = getPositionFromPlacement(anchorRect, menuWidth, menuHeight, placement, offset);
       leftPx = position.left;
@@ -160,12 +160,12 @@ const ContextMenu = ({
       position: 'fixed',
       left: leftPx,
       top: topPx,
-      visibility: activeElement || placeholderElement.current ? 'unset' : 'hidden',
+      visibility: activeElement !== undefined || placeholderElement.current !== null ? 'unset' : 'hidden',
     };
   }, [activeElement, placeholderElement, anchorEl, placement, offset, posX, posY, activeWindow]);
 
   useEffect(() => {
-    if (selected) {
+    if (selected !== undefined) {
       // remove quotes from label
       const labelWithoutQuotes = selected?.label?.replaceAll('"', '');
 
@@ -185,7 +185,7 @@ const ContextMenu = ({
     const onWheel = (event: MouseEvent) => event.preventDefault();
 
     //after opening the menu first time, select the first option
-    if (!selected) {
+    if (selected === undefined) {
       setSelected(entries[0]);
     }
 
@@ -209,7 +209,7 @@ const ContextMenu = ({
         setSelected(entries[nextIndex]);
       }
       if (isEnterKey(event) || isSpaceKey(event)) {
-        if (selected && !selected.isDisabled) {
+        if (selected !== undefined && selected.isDisabled !== true) {
           cleanUp();
           resetMsgMenuStates();
           selected.click?.();
@@ -219,9 +219,10 @@ const ContextMenu = ({
     };
 
     const onMouseDown = (event: MouseEvent): void => {
-      const isOutsideClick = entries.length
-        ? activeElement && !activeElement.contains(event.target as Node)
-        : placeholderElement && !placeholderElement.current?.contains(event.target as Node);
+      const isOutsideClick =
+        entries.length > 0
+          ? activeElement !== undefined && !activeElement.contains(event.target as Node)
+          : placeholderElement.current !== null && !placeholderElement.current.contains(event.target as Node);
 
       if (isOutsideClick) {
         cleanUp();
@@ -256,7 +257,7 @@ const ContextMenu = ({
   return (
     <IgnoreOutsideClickWrapper>
       <div className="overlay">
-        {entries.length ? (
+        {entries.length > 0 ? (
           <ul
             className={contextMenuClassName}
             ref={el => setActiveElement(el ?? undefined)}
@@ -264,14 +265,14 @@ const ContextMenu = ({
             role="menu"
           >
             {entries.map((entry, index) =>
-              entry.isSeparator ? (
+              entry.isSeparator === true ? (
                 <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
               ) : (
                 <li
                   key={`${index}`}
                   className={cx(`${contextMenuClassName}__item`, {
-                    [`${contextMenuClassName}__item--checked`]: entry.isChecked,
-                    [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
+                    [`${contextMenuClassName}__item--checked`]: entry.isChecked === true,
+                    [`${contextMenuClassName}__item--disabled`]: entry.isDisabled === true,
                     selected: entry === selected,
                   })}
                   role="menuitem"
@@ -281,11 +282,11 @@ const ContextMenu = ({
                     id={getButtonId(entry.label)}
                     className={`${contextMenuClassName}__button`}
                     type="button"
-                    data-uie-name={entry.identifier || defaultIdentifier}
-                    title={entry.title || entry.label}
+                    data-uie-name={isNonEmptyString(entry.identifier) ? entry.identifier : defaultIdentifier}
+                    title={isNonEmptyString(entry.title) ? entry.title : entry.label}
                     aria-disabled={entry.isDisabled}
-                    {...(entry.css ? {css: entry.css} : {})}
-                    {...(entry.isDisabled
+                    {...(entry.css !== undefined ? {css: entry.css} : {})}
+                    {...(entry.isDisabled === true
                       ? undefined
                       : {
                           onClick: event => {
@@ -299,9 +300,9 @@ const ContextMenu = ({
                           },
                         })}
                   >
-                    {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
+                    {entry.icon !== undefined && <entry.icon className={`${contextMenuClassName}__icon`} />}
                     <span>{entry.label}</span>
-                    {entry.isChecked && (
+                    {entry.isChecked === true && (
                       <Icon.CheckIcon
                         className={`${contextMenuClassName}__check`}
                         data-uie-name={`${contextMenuClassName}-check`}

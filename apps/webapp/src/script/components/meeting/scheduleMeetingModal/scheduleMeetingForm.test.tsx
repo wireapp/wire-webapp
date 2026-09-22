@@ -56,6 +56,8 @@ describe('ScheduleMeetingForm', () => {
             recurrence: 'doesNotRepeat',
             selectedUsers: [],
             participantsFilter: '',
+            password: '',
+            passwordConfirmation: '',
           }}
           errors={{...emptyScheduleMeetingFormErrors(), title: undefined}}
           onTitleChange={jest.fn()}
@@ -75,9 +77,9 @@ describe('ScheduleMeetingForm', () => {
       ),
     );
 
-    expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveAttribute('autocomplete', 'off');
+    expect(screen.getByTestId('schedule-meeting-title')).toHaveAttribute('autocomplete', 'off');
 
-    const titleInput = screen.getByLabelText('meetings.scheduleModal.titleLabel');
+    const titleInput = screen.getByTestId('schedule-meeting-title');
     rerender(
       withThemeAndRootContext(
         <ScheduleMeetingForm
@@ -90,6 +92,8 @@ describe('ScheduleMeetingForm', () => {
             recurrence: 'doesNotRepeat',
             selectedUsers: [],
             participantsFilter: '',
+            password: '',
+            passwordConfirmation: '',
           }}
           errors={{...emptyScheduleMeetingFormErrors(), title: undefined}}
           onTitleChange={jest.fn()}

@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState, Fragment, FormEvent, ReactNode} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -35,7 +36,6 @@ import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {Config} from 'src/script/Config';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -68,7 +68,6 @@ type RenderAppLockTranslationOptions = {
 };
 
 type RenderAppLockSetupMessageOptions = {
-  readonly isReactTranslationRenderingEnabled: boolean;
   readonly translate: Translate;
 };
 
@@ -103,66 +102,38 @@ function renderAppLockTranslation(options: RenderAppLockTranslationOptions): Rea
 }
 
 function renderAppLockSetupMessage(options: RenderAppLockSetupMessageOptions): ReactNode {
-  const {isReactTranslationRenderingEnabled, translate} = options;
-
-  if (isReactTranslationRenderingEnabled) {
-    const lineBreakSubstitution = appLockLineBreakMarker.substitution;
-    const translatedText = translate(
-      'modalAppLockSetupMessage',
-      {br: lineBreakSubstitution},
-      {br: lineBreakSubstitution},
-    );
-
-    return (
-      <p className="modal__text" data-uie-name="label-applock-set-text">
-        {renderAppLockTranslation({translatedText, valueReplacements: []})}
-      </p>
-    );
-  }
+  const {translate} = options;
+  const lineBreakSubstitution = appLockLineBreakMarker.substitution;
+  const translatedText = translate(
+    'modalAppLockSetupMessage',
+    {br: lineBreakSubstitution},
+    {br: lineBreakSubstitution},
+  );
 
   return (
-    <p
-      className="modal__text"
-      dangerouslySetInnerHTML={{__html: translate('modalAppLockSetupMessage', undefined, {br: '<br><br>'})}}
-      data-uie-name="label-applock-set-text"
-    />
+    <p className="modal__text" data-uie-name="label-applock-set-text">
+      {renderAppLockTranslation({translatedText, valueReplacements: []})}
+    </p>
   );
 }
 
 function renderAppLockSetupChangeMessage(options: RenderAppLockSetupChangeMessageOptions): ReactNode {
-  const {brandName, isReactTranslationRenderingEnabled, translate} = options;
-
-  if (isReactTranslationRenderingEnabled) {
-    const brandNameSubstitution = appLockBrandNameMarker.substitution;
-    const lineBreakSubstitution = appLockLineBreakMarker.substitution;
-    const translatedText = translate(
-      'modalAppLockSetupChangeMessage',
-      {brandName: brandNameSubstitution, br: lineBreakSubstitution},
-      {br: lineBreakSubstitution},
-    );
-
-    return (
-      <div className="modal__text" data-uie-name="label-applock-set-text">
-        {renderAppLockTranslation({
-          translatedText,
-          valueReplacements: [{marker: appLockBrandNameMarker, runtimeText: brandName}],
-        })}
-      </div>
-    );
-  }
+  const {brandName, translate} = options;
+  const brandNameSubstitution = appLockBrandNameMarker.substitution;
+  const lineBreakSubstitution = appLockLineBreakMarker.substitution;
+  const translatedText = translate(
+    'modalAppLockSetupChangeMessage',
+    {brandName: brandNameSubstitution, br: lineBreakSubstitution},
+    {br: lineBreakSubstitution},
+  );
 
   return (
-    <div
-      className="modal__text"
-      dangerouslySetInnerHTML={{
-        __html: translate(
-          'modalAppLockSetupChangeMessage',
-          {brandName: Config.getConfig().BRAND_NAME},
-          {br: '<br><br>'},
-        ),
-      }}
-      data-uie-name="label-applock-set-text"
-    />
+    <div className="modal__text" data-uie-name="label-applock-set-text">
+      {renderAppLockTranslation({
+        translatedText,
+        valueReplacements: [{marker: appLockBrandNameMarker, runtimeText: brandName}],
+      })}
+    </div>
   );
 }
 
@@ -179,7 +150,7 @@ const AppLock = ({
   appLockState = container.resolve(AppLockState),
   appLockRepository,
 }: AppLockProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const [localAppLockState, setLocalAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [unlockError, setUnlockError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -195,7 +166,6 @@ const AppLock = ({
 
   const isTemporaryClient = clientState.currentClient?.isTemporary();
   const brandName = Config.getConfig().BRAND_NAME;
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   // We log the user out if there is a style change on the app element
   // i.e. if there is an attempt to remove the blur effect
@@ -212,7 +182,7 @@ const AppLock = ({
   const {current: modalObserver} = useRef(
     new MutationObserver(() => {
       const modalInDOM = document.querySelector('[data-uie-name="applock-modal"]');
-      if (!modalInDOM) {
+      if (modalInDOM === null) {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
       }
     }),
@@ -273,13 +243,13 @@ const AppLock = ({
 
     if (isVisible) {
       const wireMain = document.querySelector('#wire-main');
-      if (wireMain) {
+      if (wireMain !== null) {
         modalObserver.observe(wireMain, {
           childList: true,
         });
       }
       const appElement = document.querySelector('#app');
-      if (appElement) {
+      if (appElement !== null) {
         appObserver.observe(appElement, {attributes: true});
       }
     }
@@ -345,7 +315,7 @@ const AppLock = ({
   const onGoBack = () => setLocalAppLockState(APPLOCK_STATE.LOCKED);
   const onClickForgot = () => setLocalAppLockState(APPLOCK_STATE.FORGOT);
   const onClickLogout = async () => {
-    if (isTemporaryClient) {
+    if (isTemporaryClient === true) {
       await clientRepository.logoutClient();
     } else {
       setLocalAppLockState(APPLOCK_STATE.LOGOUT);
@@ -402,7 +372,7 @@ const AppLock = ({
       <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={localAppLockState}>
         {localAppLockState === APPLOCK_STATE.SETUP && (
           <form onSubmit={onSetCode}>
-            {renderAppLockSetupMessage({isReactTranslationRenderingEnabled, translate})}
+            {renderAppLockSetupMessage({translate})}
 
             {/* eslint jsx-a11y/no-autofocus : "off" */}
             <Input
@@ -490,7 +460,7 @@ const AppLock = ({
 
         {localAppLockState === APPLOCK_STATE.SETUP_CHANGE && (
           <form onSubmit={onSetCode}>
-            {renderAppLockSetupChangeMessage({brandName, isReactTranslationRenderingEnabled, translate})}
+            {renderAppLockSetupChangeMessage({brandName, translate})}
 
             <Input
               aria-label={translate('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME})}
@@ -551,8 +521,8 @@ const AppLock = ({
               onKeyDown={clearUnlockError}
               data-uie-name="input-applock-unlock"
               autoComplete="current-password"
-              aria-invalid={Boolean(unlockError)}
-              error={unlockError ? <ErrorMessage message={unlockError} /> : undefined}
+              aria-invalid={isNonEmptyString(unlockError)}
+              error={isNonEmptyString(unlockError) ? <ErrorMessage message={unlockError} /> : undefined}
             />
 
             <Button block type="submit" data-uie-name="do-action" css={applockStyles.unlockButtonStyle}>

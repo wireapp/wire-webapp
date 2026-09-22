@@ -107,43 +107,42 @@ exports[`"RangeInput" matches snapshot 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-0"
+    class="emotion-0"
   >
     <div
-      className="emotion-2"
+      class="emotion-2"
     >
       <label
-        className="emotion-3"
-        htmlFor="zoom-input"
+        class="emotion-3"
+        for="zoom-input"
       >
         Zoom
       </label>
       <div
-        className="emotion-4"
+        class="emotion-4"
       >
         <span
-          className="emotion-5"
+          class="emotion-5"
         >
           -
         </span>
         <span
-          className="emotion-6"
+          class="emotion-6"
         >
           +
         </span>
         <input
-          className="emotion-7"
+          class="emotion-7"
           id="zoom-input"
-          max={3}
-          min={1}
+          max="3"
+          min="1"
           name="zoom-input"
-          onChange={[MockFunction]}
-          step={0.1}
+          step="0.1"
           type="range"
-          value={0}
+          value="0"
         />
       </div>
     </div>

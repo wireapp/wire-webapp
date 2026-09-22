@@ -194,7 +194,7 @@ const openModalWithTitle = async (title: string) => {
     useMeetNowModal.getState().open();
   });
 
-  await userEvent.type(screen.getByLabelText('meetings.scheduleModal.titleLabel'), title);
+  await userEvent.type(screen.getByTestId('meet-now-title'), title);
 };
 
 const submitForm = async () => {
@@ -235,7 +235,7 @@ describe('MeetNowModal', () => {
       useMeetNowModal.getState().open();
     });
 
-    expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveAttribute('autocomplete', 'off');
+    expect(screen.getByTestId('meet-now-title')).toHaveAttribute('autocomplete', 'off');
   });
 
   it('focuses the title when the modal opens', () => {
@@ -245,7 +245,7 @@ describe('MeetNowModal', () => {
       useMeetNowModal.getState().open();
     });
 
-    expect(screen.getByLabelText('meetings.scheduleModal.titleLabel')).toHaveFocus();
+    expect(screen.getByTestId('meet-now-title')).toHaveFocus();
   });
 
   it('closes the modal when Escape is pressed after opening', () => {
@@ -255,7 +255,7 @@ describe('MeetNowModal', () => {
       useMeetNowModal.getState().open();
     });
 
-    fireEvent.keyDown(screen.getByLabelText('meetings.scheduleModal.titleLabel'), {key: KEY.ESC});
+    fireEvent.keyDown(screen.getByTestId('meet-now-title'), {key: KEY.ESC});
 
     expect(useMeetNowModal.getState().isOpen).toBe(false);
   });

@@ -19,13 +19,13 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect, useDispatch} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router';
 import {container} from 'tsyringe';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
@@ -156,15 +156,15 @@ const SingleSignOnFormComponent = ({
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
 
   useEffect(() => {
-    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON);
     if (isNonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
   }, [doCheckConversationCode, doGetConversationInfoByCode]);
 
   useEffect(() => {
-    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
 
     const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
@@ -208,7 +208,7 @@ const SingleSignOnFormComponent = ({
 
   const handleSubmit = useCallback(
     async (event?: React.FormEvent, password?: string): Promise<void> => {
-      if (event) {
+      if (!isUndefined(event)) {
         event.preventDefault();
       }
       void resetAuthError();
@@ -227,7 +227,7 @@ const SingleSignOnFormComponent = ({
       setIsCodeOrMailInputValid(isValid);
 
       try {
-        if (currentValidationError) {
+        if (isError(currentValidationError)) {
           throw currentValidationError;
         }
         const email = codeOrMail.trim();

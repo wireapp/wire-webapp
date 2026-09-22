@@ -44,6 +44,7 @@ import {
   inspectWebAppVersionSynchronization,
   synchronizeWebAppVersion,
 } from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
+import {validateWebAppVersionSynchronizationPreflight} from '../release-metadata/webappVersionSynchronizationPreflight.ts';
 import {
   readInspectionRuntimeEnvironment,
   readSynchronizationRuntimeEnvironment,
@@ -90,7 +91,7 @@ type RuntimeGitHubClientOptions = {
 
 function createRuntimeGitHubClient(options: RuntimeGitHubClientOptions): WebAppVersionSynchronizationGitHubClient {
   return createWebAppVersionSynchronizationGitHubClient({
-    httpClient: createRuntimeKyHttpClient(),
+    httpClient: createRuntimeKyHttpClient({reportRateLimitWait: writeRuntimeOutput}),
     githubApiUrl: options.githubApiUrl,
     githubRepository: options.githubRepository,
     githubToken: options.githubToken,
@@ -117,6 +118,12 @@ async function executeInspectionCommand(
   const output = createWebAppVersionSynchronizationInspectionOutput(inspection);
 
   writeOutput(serializeWebAppVersionSynchronizationOutput(output));
+
+  const preflightResult = validateWebAppVersionSynchronizationPreflight(inspection);
+
+  if (preflightResult.isErr) {
+    throw preflightResult.error;
+  }
 }
 
 async function executeSynchronizationCommand(

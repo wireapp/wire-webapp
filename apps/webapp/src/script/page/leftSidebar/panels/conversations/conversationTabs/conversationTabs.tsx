@@ -17,6 +17,8 @@
  *
  */
 
+import type {ReactNode} from 'react';
+
 import {container} from 'tsyringe';
 
 import {
@@ -50,7 +52,8 @@ import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';
-import {replaceLink} from 'Util/localizerUtil';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
@@ -71,6 +74,92 @@ import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../conversationTab';
 import {conversationFilters} from '../helpers';
 import {TabAndFilterSettings} from '../tabAndFilterSettings';
+
+const wireCloudUrl = 'https://app.wire.com';
+const environmentDisclaimerUrlMarker = createReactTranslationMarker('environment-disclaimer-url');
+const environmentDisclaimerLinkMarker = createReactTranslationMarker('environment-disclaimer-link');
+
+type RenderEnvironmentDisclaimerOptions = {
+  readonly translate: Translate;
+};
+
+type RenderedEnvironmentDisclaimer = readonly ReactNode[];
+
+function renderEnvironmentDisclaimer(options: RenderEnvironmentDisclaimerOptions): RenderedEnvironmentDisclaimer {
+  const {translate} = options;
+  const translatedText = translate(
+    'conversationInternalEnvironmentDisclaimer',
+    {url: environmentDisclaimerUrlMarker.substitution},
+    {
+      '/link': environmentDisclaimerLinkMarker.end,
+      link: environmentDisclaimerLinkMarker.start,
+    },
+  );
+
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [
+      {
+        start: environmentDisclaimerLinkMarker.start,
+        end: environmentDisclaimerLinkMarker.end,
+        render(children): ReactNode {
+          return (
+            <a href={wireCloudUrl} data-uie-name="" className="" rel="nofollow noopener noreferrer" target="_blank">
+              {children}
+            </a>
+          );
+        },
+      },
+    ],
+    nodeReplacements: [],
+    valueReplacements: [
+      {
+        marker: environmentDisclaimerUrlMarker,
+        runtimeText: wireCloudUrl,
+      },
+    ],
+  });
+}
+
+function renderEnvironmentDisclaimerTooltipBody(environmentDisclaimer: RenderedEnvironmentDisclaimer): ReactNode {
+  return <div>{environmentDisclaimer}</div>;
+}
+
+function renderEnvironmentDisclaimerFooterContent(environmentDisclaimer: RenderedEnvironmentDisclaimer): ReactNode {
+  return <div css={footerDisclaimerEllipsis}>{environmentDisclaimer}</div>;
+}
+
+function renderEnvironmentDisclaimerSection(options: RenderEnvironmentDisclaimerOptions): ReactNode {
+  const renderedEnvironmentDisclaimer = renderEnvironmentDisclaimer(options);
+
+  return (
+    <div css={footerDisclaimer}>
+      <Tooltip
+        css={footerDisclaimerTooltip}
+        body={renderEnvironmentDisclaimerTooltipBody(renderedEnvironmentDisclaimer)}
+      >
+        <Icon.ExclamationMark css={iconStyle} />
+      </Tooltip>
+
+      {renderEnvironmentDisclaimerFooterContent(renderedEnvironmentDisclaimer)}
+    </div>
+  );
+}
+
+function renderEnvironmentDisclaimerIfNeeded(options: RenderEnvironmentDisclaimerOptions): ReactNode {
+  const {translate} = options;
+  const webEnvironment = getWebEnvironment();
+
+  if (webEnvironment.isProduction) {
+    return null;
+  }
+
+  if (isDataDogEnabled() === false) {
+    return null;
+  }
+
+  return renderEnvironmentDisclaimerSection({translate});
+}
 
 interface ConversationTabsProps {
   unreadConversations: Conversation[];
@@ -244,8 +333,6 @@ export const ConversationTabs = ({
   const visibleConversationTabs = conversationTabs.filter(tab => isTabVisible(tab.type, visibleTabs));
 
   const manageTeamUrl = getManageTeamUrl();
-  const replaceWireLink = replaceLink('https://app.wire.com', '', '');
-
   const showCellsTab = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
   const connectTabIndex = visibleConversationTabs.length + 1;
   const cellsTabIndex = connectTabIndex + 1;
@@ -353,37 +440,7 @@ export const ConversationTabs = ({
       >
         {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
 
-        {!getWebEnvironment().isProduction && isDataDogEnabled() && (
-          <div css={footerDisclaimer}>
-            <Tooltip
-              css={footerDisclaimerTooltip}
-              body={
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: translate(
-                      'conversationInternalEnvironmentDisclaimer',
-                      {url: 'https://app.wire.com'},
-                      replaceWireLink,
-                    ),
-                  }}
-                />
-              }
-            >
-              <Icon.ExclamationMark css={iconStyle} />
-            </Tooltip>
-
-            <div
-              css={footerDisclaimerEllipsis}
-              dangerouslySetInnerHTML={{
-                __html: translate(
-                  'conversationInternalEnvironmentDisclaimer',
-                  {url: 'https://app.wire.com'},
-                  replaceWireLink,
-                ),
-              }}
-            />
-          </div>
-        )}
+        {renderEnvironmentDisclaimerIfNeeded({translate})}
 
         <SettingsTab
           settingsLabel={translate('preferencesHeadline')}

@@ -17,6 +17,7 @@
  */
 
 import {expect, type Locator, type Page} from '@playwright/test';
+import {gunzipSync} from 'node:zlib';
 
 import {ConfirmModal} from '../modals/confirm.modal';
 import {
@@ -37,8 +38,8 @@ export class MeetingsPage {
   readonly meetingsTab: Locator;
   readonly meetingsList: Locator;
   readonly emptyMeetingsList: Locator;
+  readonly meetNowButton: Locator;
   readonly scheduleMeetingButton: Locator;
-  readonly createMeetingButton: Locator;
   readonly scheduleMeetingModal: Locator;
   readonly meetNowModal: Locator;
   readonly notificationHost: Locator;
@@ -49,8 +50,8 @@ export class MeetingsPage {
     this.meetingsTab = page.getByTestId('go-meetings');
     this.meetingsList = page.getByTestId('meetings-list');
     this.emptyMeetingsList = page.getByTestId('empty-meetings-list');
-    this.scheduleMeetingButton = page.getByTestId('schedule-meeting');
-    this.createMeetingButton = page.getByTestId('create-meeting');
+    this.meetNowButton = page.getByTestId('meet-now');
+    this.scheduleMeetingButton = page.locator('header').getByTestId('schedule-meeting');
     this.scheduleMeetingModal = page.getByTestId('schedule-meeting-modal');
     this.meetNowModal = page.getByTestId('meet-now-modal');
     this.notificationHost = page.getByTestId('meeting-notification-host');
@@ -66,18 +67,16 @@ export class MeetingsPage {
 
   async openScheduleMeetingModal() {
     if (await this.emptyMeetingsList.isVisible()) {
-      await this.scheduleMeetingButton.click();
+      await this.emptyMeetingsList.getByTestId('schedule-meeting').click();
       return;
     }
 
-    await this.createMeetingButton.click();
-    await this.page.getByRole('menu').getByRole('button', {name: 'Schedule Meeting'}).click();
+    await this.scheduleMeetingButton.click();
   }
 
   async openMeetNowModal() {
     await this.openMeetingsTab();
-    await this.createMeetingButton.click();
-    await this.page.getByRole('menu').getByRole('button', {name: 'Meet now'}).click();
+    await this.meetNowButton.click();
     await expect(this.meetNowModal).toBeVisible();
   }
 
@@ -137,7 +136,7 @@ export class MeetingsPage {
   }
 
   async fillMeetingTitle(title: string) {
-    const titleInput = this.scheduleMeetingModal.getByLabel('Title', {exact: true});
+    const titleInput = this.meetingTitleInput();
     await titleInput.click();
     await this.page.keyboard.press('ControlOrMeta+a');
     await titleInput.fill(title);
@@ -168,7 +167,7 @@ export class MeetingsPage {
       return;
     }
 
-    await this.scheduleMeetingModal.getByLabel('Title', {exact: true}).click();
+    await this.meetingTitleInput().click();
     await expect(dropdown).toBeHidden();
   }
 
@@ -361,6 +360,27 @@ export class MeetingsPage {
     await this.submitScheduleMeetingModal();
   }
 
+  async fillScheduleMeetingPassword(password: string) {
+    await this.scheduleMeetingModal.getByTestId('guest-link-password').fill(password);
+    await this.scheduleMeetingModal.getByTestId('guest-link-password-confirm').fill(password);
+  }
+
+  conversationCodeRequest() {
+    return this.page.waitForRequest(request => {
+      const url = new URL(request.url());
+      return request.method() === 'POST' && /\/conversations\/[^/]+\/code$/.test(url.pathname);
+    });
+  }
+
+  async assertConversationCodeRequest(requestPromise: ReturnType<Page['waitForRequest']>, password: string) {
+    const request = await requestPromise;
+    expect(request.method()).toBe('POST');
+    expect(new URL(request.url()).pathname).toMatch(/\/conversations\/[^/]+\/code$/);
+    const postData = request.postDataBuffer();
+    const body = postData === null ? {} : parseRequestBody(postData);
+    expect(body).toEqual({password});
+  }
+
   async openEditMeetingModal(title: string, occurrenceIndex = 0) {
     const menu = await this.openMeetingContextMenu(title, occurrenceIndex);
     await menu.getByRole('button', {name: 'Edit meeting'}).click();
@@ -494,3 +514,11 @@ export class MeetingsPage {
     await expect(this.notificationCardContaining(text)).toHaveCount(0, {timeout: MEETINGS_LIST_TIMEOUT_MS});
   }
 }
+
+const parseRequestBody = (postData: Buffer): Record<string, string> => {
+  try {
+    return JSON.parse(postData.toString('utf8')) as Record<string, string>;
+  } catch {
+    return JSON.parse(gunzipSync(postData).toString('utf8')) as Record<string, string>;
+  }
+};

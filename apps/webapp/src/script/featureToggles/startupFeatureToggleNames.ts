@@ -22,7 +22,6 @@ export const conversationListCollapseFeatureToggleName = 'conversation-list-coll
 export const viewerPermissionFeatureToggleName = 'viewer-permission';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upload';
-export const reactTranslationRenderingFeatureToggleName = 'react-translation-rendering';
 export const meetingsM2FeatureToggleName = 'meetings-m2';
 
 export const startupFeatureToggleNames = [
@@ -31,7 +30,6 @@ export const startupFeatureToggleNames = [
   viewerPermissionFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
-  reactTranslationRenderingFeatureToggleName,
   meetingsM2FeatureToggleName,
 ] as const;
 

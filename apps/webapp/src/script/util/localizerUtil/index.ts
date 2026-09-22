@@ -17,7 +17,6 @@
  *
  */
 
-export * from './link';
 export * from './localizerUtil.types';
 export * from './translate';
 export * from './translationTypes';

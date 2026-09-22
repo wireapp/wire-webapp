@@ -28,7 +28,7 @@ import {Loading} from '../../dataDisplay';
 import {COLOR, Theme, THEME_ID} from '../../identity';
 import {InputProps} from '../input';
 
-export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
+export interface SwitchProps<T = HTMLInputElement> extends Omit<InputProps<T>, 'onToggle'> {
   activatedColor?: string;
   activatedColorDark?: string;
   checked: boolean;

@@ -18,6 +18,7 @@
  */
 
 import {memo, useCallback, useEffect, useRef, useState} from 'react';
+import type {ReactNode} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -26,6 +27,8 @@ import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './deviceSelect';
@@ -42,6 +45,63 @@ interface CameraPreferencesProps {
 }
 
 const DEBOUNCE_TIMEOUT = 100;
+
+const cameraBrandNameMarker = createReactTranslationMarker('camera-brand-name');
+const cameraLineBreakMarker = createReactTranslationMarker('camera-line-break');
+const cameraFaqLinkMarker = createReactTranslationMarker('camera-faq-link');
+
+type RenderNoCameraMessageOptions = {
+  readonly brandName: string;
+  readonly translate: Translate;
+};
+
+function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode {
+  const {brandName, translate} = options;
+  const translatedText = translate(
+    'preferencesAVNoCamera',
+    {brandName: cameraBrandNameMarker.substitution},
+    {
+      '/faqLink': cameraFaqLinkMarker.end,
+      br: cameraLineBreakMarker.substitution,
+      faqLink: cameraFaqLinkMarker.start,
+    },
+  );
+
+  return (
+    <div className="preferences-av-video-disabled__info">
+      {renderReactTranslation({
+        translatedText,
+        componentReplacements: [
+          {
+            start: cameraFaqLinkMarker.start,
+            end: cameraFaqLinkMarker.end,
+            render(children): ReactNode {
+              return (
+                <a
+                  href={Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED}
+                  data-uie-name="go-no-camera-faq"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {children}
+                </a>
+              );
+            },
+          },
+        ],
+        nodeReplacements: [
+          {
+            marker: cameraLineBreakMarker,
+            render(): ReactNode {
+              return <br />;
+            },
+          },
+        ],
+        valueReplacements: [{marker: cameraBrandNameMarker, runtimeText: brandName}],
+      })}
+    </div>
+  );
+}
 
 const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
   const {translate} = useApplicationContext();
@@ -63,13 +123,13 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
       // we should be able to change camera from preferences page in middle of the call
       if (hasActiveCameraStream) {
         const refreshedStream = await refreshStream();
-        if (!refreshedStream) {
+        if (refreshedStream === undefined || refreshedStream === null) {
           throw new Error('No stream returned');
         }
         setStream(refreshedStream);
       } else {
         const stream = await streamHandler.requestMediaStream(false, true, false, false);
-        if (!stream) {
+        if (stream === undefined || stream === null) {
           throw new Error('No stream returned');
         }
         setStream(stream);
@@ -88,7 +148,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   const debouncedRequestStream = useDebouncedCallback(requestStream, DEBOUNCE_TIMEOUT);
 
   const cleanUpVideoSrc = () => {
-    if (videoElement.current) {
+    if (videoElement.current !== null) {
       videoElement.current.srcObject = null;
     }
   };
@@ -98,7 +158,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   }, [videoInputDeviceId, videoInputDevices.length, debouncedRequestStream]);
 
   useEffect(() => {
-    if (videoElement.current && stream) {
+    if (videoElement.current !== null && stream !== null) {
       cleanUpVideoSrc();
 
       // Attach the new stream (autoPlay attribute handles playback)
@@ -113,7 +173,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
 
   useEffect(
     () => () => {
-      if (stream && !hasActiveCameraStream) {
+      if (stream !== null && hasActiveCameraStream !== true) {
         streamHandler.releaseTracksFromStream(stream);
       }
     },
@@ -122,7 +182,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
 
   return (
     <PreferencesSection title={translate('preferencesAVCamera')}>
-      {!stream && !isRequesting && (
+      {stream === null && isRequesting !== true && (
         <div className="preferences-av-detail">
           <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
             {translate('preferencesAVPermissionDetail')}
@@ -146,26 +206,11 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
         </div>
       ) : (
         <>
-          {stream ? (
+          {stream !== null ? (
             <video className="preferences-av-video mirror" autoPlay playsInline muted ref={videoElement} />
           ) : (
             <div className="preferences-av-video-disabled">
-              <div
-                className="preferences-av-video-disabled__info"
-                dangerouslySetInnerHTML={{
-                  __html: translate(
-                    'preferencesAVNoCamera',
-                    {brandName},
-                    {
-                      '/faqLink': '</a>',
-                      br: '<br>',
-                      faqLink: `<a href='${
-                        Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-                      }' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>`,
-                    },
-                  ),
-                }}
-              />
+              {renderNoCameraMessage({brandName, translate})}
               <button
                 type="button"
                 className="button-reset-default preferences-av-video-disabled__try-again"

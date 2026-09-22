@@ -19,20 +19,22 @@
 
 import type {ReactNode} from 'react';
 
-import {AlertIcon, ChevronIcon, CloseIcon, ReloadIcon, UploadIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon, ChevronIcon, CloseIcon, ReloadIcon, SharedDriveUploadStatusIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {getFileExtension} from 'Util/util';
 
-import type {SharedDriveUploadStatus} from './sharedDriveUploadStatus';
+import type {SharedDriveUploadStatus, SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
 import {
   sharedDriveUploadStatusPopupContentStyles,
+  sharedDriveUploadStatusPopupDeterminateProgressStyles,
   sharedDriveUploadStatusPopupDestinationStyles,
   sharedDriveUploadStatusPopupHeaderActionsStyles,
   sharedDriveUploadStatusPopupHeaderCancelStyles,
   sharedDriveUploadStatusPopupProgressStyles,
   sharedDriveUploadStatusPopupErrorIconInnerStyles,
   sharedDriveUploadStatusPopupErrorIconStyles,
+  sharedDriveUploadStatusPopupFailedRowActionsStyles,
   sharedDriveUploadStatusPopupRowActionButtonStyles,
   sharedDriveUploadStatusPopupRowActionIconStyles,
   sharedDriveUploadStatusPopupRowActionsStyles,
@@ -42,6 +44,7 @@ import {
   sharedDriveUploadStatusPopupRowLeadingStyles,
   sharedDriveUploadStatusPopupRowStatusStyles,
   sharedDriveUploadStatusPopupRowStyles,
+  sharedDriveUploadStatusPopupRowsStyles,
   sharedDriveUploadStatusPopupRowTextStyles,
   sharedDriveUploadStatusPopupStyles,
   sharedDriveUploadStatusPopupTextStyles,
@@ -50,32 +53,49 @@ import {
   sharedDriveUploadStatusPopupToggleStyles,
 } from './sharedDriveUploadStatusPopup.styles';
 
+const PROGRESS_PERCENTAGE_MAX = 100;
+
+type UploadActionState = boolean | ((uploadId: string) => boolean);
+
+const getProgressTransform = (progress: number): string => `scaleX(${Math.min(1, Math.max(0, progress))})`;
+
 interface SharedDriveUploadStatusPopupProps {
+  /** The representative status used for the collapsed header and backwards compatibility. */
   readonly upload: SharedDriveUploadStatus;
+  readonly uploads?: readonly SharedDriveUploadStatus[];
+  readonly aggregateKind?: SharedDriveUploadStatusKind;
   readonly title: string;
   readonly statusLabel: string;
+  readonly statusLabels?: ReadonlyMap<string, string>;
   readonly destination: string;
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
   readonly cancelLabel: string;
+  readonly headerCancelLabel?: string;
   readonly dismissLabel?: string;
+  readonly dismissAriaLabel?: string;
+  readonly canDismiss?: boolean;
   readonly retryLabel: string;
-  readonly isCancelling: boolean;
-  readonly isRetrying: boolean;
+  readonly isCancelling: UploadActionState;
+  readonly isRetrying: UploadActionState;
   readonly onToggle: () => void;
-  readonly onCancel: () => void;
-  readonly onRetry: () => void;
-  readonly onDismiss?: () => void;
+  readonly onCancelAll: () => void;
+  readonly onCancelUpload: (uploadId: string) => void;
+  readonly onRetry: (uploadId: string) => void;
+  readonly onDismissAll?: () => void;
+  readonly onDismissRow?: (uploadId: string) => void;
 }
 
+const isActionPending = (state: UploadActionState, uploadId: string): boolean =>
+  typeof state === 'function' ? state(uploadId) : state;
+
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
-  if (upload.kind === 'uploading') {
+  if (upload.kind === 'uploading' || upload.kind === 'queued') {
     return (
-      <UploadIcon
+      <SharedDriveUploadStatusIcon
         css={sharedDriveUploadStatusPopupRowIconStyles}
-        color="currentColor"
         aria-hidden="true"
-        data-uie-name="shared-drive-upload-uploading"
+        data-uie-name={`shared-drive-upload-${upload.kind}`}
       />
     );
   }
@@ -103,24 +123,76 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
   );
 };
 
+const renderProgress = (upload: SharedDriveUploadStatus, isExpanded: boolean): ReactNode => {
+  if (upload.isTransferActive && upload.hasProgress) {
+    return (
+      <div
+        role="progressbar"
+        aria-label={upload.fileName}
+        aria-valuemin={0}
+        aria-valuemax={PROGRESS_PERCENTAGE_MAX}
+        aria-valuenow={Math.round(upload.progress * PROGRESS_PERCENTAGE_MAX)}
+        css={sharedDriveUploadStatusPopupDeterminateProgressStyles(isExpanded)}
+        style={{transform: getProgressTransform(upload.progress)}}
+        data-testid="shared-drive-upload-progress"
+        data-uie-name="shared-drive-upload-progress"
+      />
+    );
+  }
+
+  if (upload.isTransferActive) {
+    return (
+      <div
+        role="progressbar"
+        aria-label={upload.fileName}
+        css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
+        data-testid="shared-drive-upload-progress"
+        data-uie-name="shared-drive-upload-progress"
+      />
+    );
+  }
+
+  if (upload.kind !== 'queued') {
+    return (
+      <div
+        css={sharedDriveUploadStatusPopupProgressStyles(isExpanded, upload.kind)}
+        data-testid="shared-drive-upload-progress"
+        data-uie-name="shared-drive-upload-progress"
+      />
+    );
+  }
+
+  return null;
+};
+
 export const SharedDriveUploadStatusPopup = ({
   upload,
+  uploads = [upload],
+  aggregateKind = upload.kind,
   title,
   statusLabel,
+  statusLabels,
   destination,
   isExpanded,
   toggleLabel,
   cancelLabel,
+  headerCancelLabel = cancelLabel,
   dismissLabel = cancelLabel,
+  dismissAriaLabel = dismissLabel,
+  canDismiss = upload.kind === 'uploaded',
   retryLabel,
   isCancelling,
   isRetrying,
   onToggle,
-  onCancel,
+  onCancelAll,
+  onCancelUpload,
   onRetry,
-  onDismiss,
+  onDismissAll,
+  onDismissRow,
 }: SharedDriveUploadStatusPopupProps) => {
-  const statusRowId = `shared-drive-upload-status-${upload.uploadId}`;
+  const statusRowId =
+    uploads.length === 1 ? `shared-drive-upload-status-${upload.uploadId}` : 'shared-drive-upload-status-rows';
+  const rowStatusLabel = (row: SharedDriveUploadStatus): string => statusLabels?.get(row.uploadId) ?? statusLabel;
 
   return (
     <div css={sharedDriveUploadStatusPopupStyles} data-uie-name="shared-drive-upload-status-popup">
@@ -129,7 +201,12 @@ export const SharedDriveUploadStatusPopup = ({
         data-uie-name="shared-drive-upload-status-header"
         data-testid="shared-drive-upload-status-header"
       >
-        <div css={sharedDriveUploadStatusPopupTextStyles} role="status" aria-live="polite">
+        <div
+          className="shared-drive-upload-status-popup__header-text"
+          css={sharedDriveUploadStatusPopupTextStyles}
+          role="status"
+          aria-live="polite"
+        >
           <strong css={sharedDriveUploadStatusPopupTitleStyles} title={title}>
             {title}
           </strong>
@@ -138,15 +215,26 @@ export const SharedDriveUploadStatusPopup = ({
           </span>
         </div>
         <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
-          {upload.canCancel && (
+          {uploads.some(row => row.canCancel) && (
             <button
               type="button"
               css={sharedDriveUploadStatusPopupHeaderCancelStyles}
-              disabled={isCancelling}
+              disabled={uploads.some(row => isActionPending(isCancelling, row.uploadId))}
               data-uie-name="shared-drive-upload-header-cancel"
-              onClick={onCancel}
+              onClick={onCancelAll}
             >
-              {cancelLabel}
+              {headerCancelLabel}
+            </button>
+          )}
+          {canDismiss && (
+            <button
+              type="button"
+              css={sharedDriveUploadStatusPopupHeaderCancelStyles}
+              aria-label={dismissAriaLabel}
+              data-uie-name="shared-drive-upload-header-dismiss"
+              onClick={onDismissAll}
+            >
+              {dismissLabel}
             </button>
           )}
           <button
@@ -167,73 +255,82 @@ export const SharedDriveUploadStatusPopup = ({
           </button>
         </div>
       </div>
+      {isExpanded && renderProgress(upload, true)}
       <div
         id={statusRowId}
-        css={sharedDriveUploadStatusPopupRowStyles}
-        data-uie-name="shared-drive-upload-status-row"
+        css={sharedDriveUploadStatusPopupRowsStyles}
+        data-uie-name="shared-drive-upload-status-rows"
         hidden={!isExpanded}
       >
-        <div css={sharedDriveUploadStatusPopupRowLeadingStyles}>
-          {statusIcon(upload)}
-          <div css={sharedDriveUploadStatusPopupRowTextStyles}>
-            <strong css={sharedDriveUploadStatusPopupRowFileNameStyles} title={upload.fileName}>
-              {upload.fileName}
-            </strong>
-            <span css={sharedDriveUploadStatusPopupRowStatusStyles(upload.kind)} title={statusLabel}>
-              {statusLabel}
-            </span>
+        {uploads.map(row => (
+          <div
+            key={row.uploadId}
+            css={sharedDriveUploadStatusPopupRowStyles}
+            data-testid="shared-drive-upload-status-row"
+            data-uie-name="shared-drive-upload-status-row"
+          >
+            <div css={sharedDriveUploadStatusPopupRowLeadingStyles}>
+              {statusIcon(row)}
+              <div css={sharedDriveUploadStatusPopupRowTextStyles}>
+                <strong css={sharedDriveUploadStatusPopupRowFileNameStyles} title={row.fileName}>
+                  {row.fileName}
+                </strong>
+                <span css={sharedDriveUploadStatusPopupRowStatusStyles(row.kind)} title={rowStatusLabel(row)}>
+                  {rowStatusLabel(row)}
+                </span>
+              </div>
+            </div>
+            <div
+              css={
+                row.kind === 'failed'
+                  ? sharedDriveUploadStatusPopupFailedRowActionsStyles
+                  : sharedDriveUploadStatusPopupRowActionsStyles
+              }
+            >
+              {row.canRetry && (
+                <button
+                  type="button"
+                  css={sharedDriveUploadStatusPopupRowActionButtonStyles}
+                  aria-label={retryLabel}
+                  disabled={isActionPending(isRetrying, row.uploadId)}
+                  data-uie-name="shared-drive-upload-retry"
+                  onClick={() => onRetry(row.uploadId)}
+                >
+                  <ReloadIcon
+                    css={sharedDriveUploadStatusPopupRowActionIconStyles}
+                    color="currentColor"
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
+              {row.canCancel && (
+                <button
+                  type="button"
+                  css={sharedDriveUploadStatusPopupRowCancelStyles}
+                  aria-label={cancelLabel}
+                  disabled={isActionPending(isCancelling, row.uploadId)}
+                  data-uie-name="shared-drive-upload-cancel"
+                  onClick={() => onCancelUpload(row.uploadId)}
+                >
+                  <CloseIcon color="currentColor" aria-hidden="true" />
+                </button>
+              )}
+              {row.kind === 'failed' && (
+                <button
+                  type="button"
+                  css={sharedDriveUploadStatusPopupRowCancelStyles}
+                  aria-label={dismissAriaLabel}
+                  data-uie-name="shared-drive-upload-dismiss"
+                  onClick={() => onDismissRow?.(row.uploadId)}
+                >
+                  <CloseIcon color="currentColor" aria-hidden="true" />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-        <div css={sharedDriveUploadStatusPopupRowActionsStyles}>
-          {upload.canRetry && (
-            <button
-              type="button"
-              css={sharedDriveUploadStatusPopupRowActionButtonStyles}
-              aria-label={retryLabel}
-              disabled={isRetrying}
-              data-uie-name="shared-drive-upload-retry"
-              onClick={onRetry}
-            >
-              <ReloadIcon
-                css={sharedDriveUploadStatusPopupRowActionIconStyles}
-                color="currentColor"
-                aria-hidden="true"
-              />
-            </button>
-          )}
-          {upload.canRetry && (
-            <button
-              type="button"
-              css={sharedDriveUploadStatusPopupRowActionButtonStyles}
-              aria-label={dismissLabel}
-              data-uie-name="shared-drive-upload-dismiss"
-              onClick={() => onDismiss?.()}
-            >
-              <CloseIcon
-                css={sharedDriveUploadStatusPopupRowActionIconStyles}
-                color="currentColor"
-                aria-hidden="true"
-              />
-            </button>
-          )}
-          {upload.canCancel && (
-            <button
-              type="button"
-              css={sharedDriveUploadStatusPopupRowCancelStyles}
-              aria-label={cancelLabel}
-              disabled={isCancelling}
-              data-uie-name="shared-drive-upload-cancel"
-              onClick={onCancel}
-            >
-              <CloseIcon color="currentColor" aria-hidden="true" />
-            </button>
-          )}
-        </div>
+        ))}
       </div>
-      <div
-        css={sharedDriveUploadStatusPopupProgressStyles(isExpanded, upload.kind)}
-        data-uie-name="shared-drive-upload-progress"
-      />
+      {!isExpanded && aggregateKind !== 'queued' && renderProgress(upload, false)}
     </div>
   );
 };

@@ -59,6 +59,9 @@ export class EventStorageMiddleware implements EventMiddleware {
 
     // We first validate that the event is valid
     this.validateEvent(event, source, duplicateEvent);
+    if (event.type === CONVERSATION.SESSION_RESET && duplicateEvent) {
+      return duplicateEvent;
+    }
     // Then ask the different handlers which DB operations to perform
     const operation = await this.getDbOperation(event, duplicateEvent);
     // And finally execute the operation

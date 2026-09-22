@@ -48,13 +48,13 @@ describe('MessageActions', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
-  test('renders the message actions menu', () => {
+  it('renders the message actions menu', () => {
     const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />, {wrapper: rootProviderWrapper});
     const messageActionsMenu = getByLabelText(translate('accessibility.messageActionsMenuLabel'));
     expect(messageActionsMenu).toBeDefined();
   });
 
-  test('renders the message actions buttons', () => {
+  it('renders the message actions buttons', () => {
     const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />, {wrapper: rootProviderWrapper});
     const thumbsUpButton = getByLabelText(translate('accessibility.messageActionsMenuThumbsUp'));
     const likeButton = getByLabelText(translate('accessibility.messageActionsMenuLike'));
@@ -66,7 +66,7 @@ describe('MessageActions', () => {
     expect(optionsButton).toBeDefined();
   });
 
-  test('displays the context menu on options button click', () => {
+  it('displays the context menu on options button click', () => {
     const {getByLabelText, getByText, queryByText} = render(<MessageActionsMenu {...defaultProps} />, {
       wrapper: rootProviderWrapper,
     });
@@ -76,7 +76,7 @@ describe('MessageActions', () => {
     expect(queryByText('option2')).toBeNull();
   });
 
-  test('keeps the message actions menu open when context menu is open', () => {
+  it('keeps the message actions menu open when context menu is open', () => {
     const {getByLabelText, getByText} = render(<MessageActionsMenu {...defaultProps} />, {
       wrapper: rootProviderWrapper,
     });
@@ -85,7 +85,7 @@ describe('MessageActions', () => {
     expect(getByText('option1')).toBeDefined();
   });
 
-  test('toggles the active message action on click of any action button', () => {
+  it('toggles the active message action on click of any action button', () => {
     const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />, {wrapper: rootProviderWrapper});
     const thumbsUpButton = getByLabelText(translate('accessibility.messageActionsMenuThumbsUp'));
     const likeButton = getByLabelText(translate('accessibility.messageActionsMenuLike'));

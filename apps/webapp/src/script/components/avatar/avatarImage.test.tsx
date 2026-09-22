@@ -175,7 +175,7 @@ describe('AvatarImage', () => {
     );
 
     await waitFor(() => {
-      expect(document.querySelector('img')).toHaveAttribute('src', '');
+      expect(document.querySelector('img')).not.toHaveAttribute('src');
     });
   });
 });

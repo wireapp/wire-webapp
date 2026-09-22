@@ -31,7 +31,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {UserState} from 'Repositories/user/userState';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -44,14 +43,7 @@ import {createUuid} from 'Util/uuid';
 import {AppLock, APPLOCK_STATE} from './appLock';
 
 const clientRepository = {} as unknown as ClientRepository;
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -118,7 +110,7 @@ const createAppLockRepository = (appLockState?: AppLockState) => {
 };
 describe('AppLock', () => {
   it(
-    'keeps the legacy setup message rendering when React translation rendering is disabled',
+    'renders the setup message with React line breaks',
     withTranslationStrings(en, () => {
       const appLockState = createAppLockState();
       const appLockRepository = createAppLockRepository(appLockState);
@@ -131,30 +123,7 @@ describe('AppLock', () => {
         clientRepository,
       };
 
-      const {getByTestId} = render(withTheme(<AppLock {...props} />));
-      const setupMessage = getByTestId('label-applock-set-text');
-
-      expect(setupMessage.querySelectorAll('br')).toHaveLength(2);
-    }),
-  );
-
-  it(
-    'renders setup line breaks as React nodes when React translation rendering is enabled',
-    withTranslationStrings(en, () => {
-      const appLockState = createAppLockState();
-      const appLockRepository = createAppLockRepository(appLockState);
-      appLockState.hasPassphrase(false);
-      appLockState.isActivatedInPreferences(true);
-
-      const props = {
-        appLockRepository,
-        appLockState,
-        clientRepository,
-      };
-
-      const {getByTestId} = render(
-        withThemeAndRootContext(<AppLock {...props} />, reactTranslationRenderingRootProviderWrapper),
-      );
+      const {getByTestId} = render(withThemeAndRootContext(<AppLock {...props} />, translationRootProviderWrapper));
       const setupMessage = getByTestId('label-applock-set-text');
 
       expect(setupMessage).toHaveTextContent('Wire will lock itself after 1 minute of inactivity.');
@@ -181,9 +150,7 @@ describe('AppLock', () => {
           clientRepository,
         };
 
-        const {getByTestId} = render(
-          withThemeAndRootContext(<AppLock {...props} />, reactTranslationRenderingRootProviderWrapper),
-        );
+        const {getByTestId} = render(withThemeAndRootContext(<AppLock {...props} />, translationRootProviderWrapper));
         const setupMessage = getByTestId('label-applock-set-text');
 
         expect(setupMessage).toHaveTextContent('<img src="example">Wire will lock itself.Enter your passcode.');

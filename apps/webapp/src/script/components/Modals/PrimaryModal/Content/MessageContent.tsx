@@ -17,25 +17,56 @@
  *
  */
 
+import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
+
+import type {Translate} from 'Util/localizerUtil';
+
+import {TranslatedMessageContent} from './TranslatedMessageContent';
+
+import type {PrimaryModalTranslatedMessage} from '../PrimaryModalTranslatedMessage';
+
 interface MessageContentProps {
-  messageHtml?: string;
   message?: React.ReactNode;
+  translatedMessage?: PrimaryModalTranslatedMessage;
+  translate: Translate;
 }
 
-const isStringMessage = (message: unknown): message is string => typeof message === 'string';
+export const MessageContent = ({message, translatedMessage, translate}: MessageContentProps) => {
+  const hasMessage = !isNullOrUndefined(message);
+  const hasTranslatedMessage = !isUndefined(translatedMessage);
 
-export const MessageContent = ({message, messageHtml}: MessageContentProps) => {
-  const hasMessage = message !== undefined && message !== null;
-  const hasMessageHtml = messageHtml !== undefined && messageHtml !== '';
-
-  if (!hasMessage && !hasMessageHtml) {
+  if (!hasMessage && !hasTranslatedMessage) {
     return null;
+  }
+
+  function renderRichMessageContent(): React.ReactNode {
+    if (hasTranslatedMessage) {
+      return <TranslatedMessageContent message={translatedMessage} translate={translate} />;
+    }
+
+    return null;
+  }
+
+  function renderMessageValue(): React.ReactNode {
+    if (isString(message)) {
+      return <p>{message}</p>;
+    }
+
+    return message;
+  }
+
+  function renderMessageContent(): React.ReactNode {
+    if (!hasMessage) {
+      return null;
+    }
+
+    return <div id="modal-description-text">{renderMessageValue()}</div>;
   }
 
   return (
     <div className="modal__text" data-uie-name="status-modal-text">
-      {hasMessageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-      {hasMessage && <div id="modal-description-text">{isStringMessage(message) ? <p>{message}</p> : message}</div>}
+      {renderRichMessageContent()}
+      {renderMessageContent()}
     </div>
   );
 };

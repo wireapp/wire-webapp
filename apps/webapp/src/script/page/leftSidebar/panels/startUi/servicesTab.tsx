@@ -19,7 +19,7 @@
 
 import {useState, useEffect} from 'react';
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -60,7 +60,7 @@ export const ServicesTab = ({
 
   const debouncedSearch = useDebouncedCallback(async () => {
     const results = await integrationRepository.searchForServices(searchQuery);
-    if (results) {
+    if (!isNullOrUndefined(results)) {
       setServices(results);
     }
   }, SEARCH_DEBOUNCE_MILLISECONDS);
@@ -73,7 +73,7 @@ export const ServicesTab = ({
     <>
       {services.length > 0 && (
         <>
-          {canManageServices && manageServicesUrl && (
+          {canManageServices === true && isNonEmptyString(manageServicesUrl) && (
             <ul className="start-ui-manage-services left-list-items">
               <li className="left-list-item">
                 <button
@@ -100,7 +100,7 @@ export const ServicesTab = ({
             <Icon.ServiceIcon />
           </span>
 
-          {canManageServices && manageServicesUrl ? (
+          {canManageServices === true && isNonEmptyString(manageServicesUrl) ? (
             <>
               <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
                 {translate('searchNoAppsManager')}

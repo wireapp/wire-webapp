@@ -46,11 +46,6 @@ let searchRepository: SearchRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(async () => {
-  conversationRepository = await testFactory.exposeConversationActors();
-  searchRepository = await testFactory.exposeSearchActors();
-});
-
 const getDefaultParams = (showReactions: boolean = false) => {
   return {
     conversationRepository,
@@ -66,6 +61,11 @@ const getDefaultParams = (showReactions: boolean = false) => {
 };
 
 describe('MessageDetails', () => {
+  beforeAll(async () => {
+    conversationRepository = await testFactory.exposeConversationActors();
+    searchRepository = await testFactory.exposeSearchActors();
+  });
+
   it('renders no reactions view', async () => {
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.teamId = 'mock-team-id';

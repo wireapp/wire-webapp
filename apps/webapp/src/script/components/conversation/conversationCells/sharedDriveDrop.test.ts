@@ -20,11 +20,8 @@
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {
-  getSharedDriveDropRejectionFeedback,
-  handleSharedDriveDroppedFiles,
-  validateSharedDriveDroppedFiles,
-} from './sharedDriveDrop';
+import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';
+import {validateSharedDriveUploadFiles} from './sharedDriveUploadValidation';
 
 const rootUploadPath = 'conversation-id@example.com';
 const nestedUploadPath = 'conversation-id@example.com/Marketing/Briefs';
@@ -113,17 +110,85 @@ describe('handleSharedDriveDroppedFiles', () => {
     expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
 
-  it('rejects multiple files with clear feedback until multiple upload is supported', () => {
+  it('starts direct upload for multiple accepted files', async () => {
     const firstFile = new File(['one'], 'one.txt');
     const secondFile = new File(['two'], 'two.txt');
     const dependencies = createDependencies();
 
     handleSharedDriveDroppedFiles([firstFile, secondFile], dependencies);
 
-    expect(dependencies.onReject).toHaveBeenCalledWith({
-      reason: 'multipleFiles',
-      invalidFiles: [firstFile, secondFile],
-    });
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    await uploadAction();
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [firstFile, secondFile],
+      rootUploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it.each(['.DS_Store', 'Thumbs.db', 'desktop.ini'])(
+    'filters filesystem metadata files before uploading dropped files',
+    async metadataFileName => {
+      const file = new File(['one'], 'one.txt');
+      const metadataFile = new File(['metadata'], metadataFileName);
+      const dependencies = createDependencies();
+
+      handleSharedDriveDroppedFiles([metadataFile, file], dependencies);
+
+      expect(dependencies.onReject).not.toHaveBeenCalled();
+      expect(dependencies.fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+      const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+      await uploadAction();
+      expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+        [file],
+        rootUploadPath,
+        dependencies.onRefresh,
+        conversationQualifiedId,
+      );
+    },
+  );
+
+  it('does not start an upload when only filesystem metadata files are dropped', () => {
+    const metadataFiles = [
+      new File(['metadata'], '.DS_Store'),
+      new File(['metadata'], 'Thumbs.db'),
+      new File(['metadata'], 'desktop.ini'),
+    ];
+    const dependencies = createDependencies();
+
+    handleSharedDriveDroppedFiles(metadataFiles, dependencies);
+
+    expect(dependencies.onReject).not.toHaveBeenCalled();
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
+  it('preserves intentional dotfiles when uploading dropped files', async () => {
+    const dotFile = new File(['one'], '.env');
+    const dependencies = createDependencies();
+
+    handleSharedDriveDroppedFiles([dotFile], dependencies);
+
+    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
+    await uploadAction();
+    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
+      [dotFile],
+      rootUploadPath,
+      dependencies.onRefresh,
+      conversationQualifiedId,
+    );
+  });
+
+  it('rejects the whole batch when any dropped file is invalid', () => {
+    const validFile = new File(['one'], 'one.txt');
+    const invalidFile = new File(['two'], 'two.exe');
+    const dependencies = createDependencies({isAcceptedFile: file => file !== invalidFile});
+
+    handleSharedDriveDroppedFiles([validFile, invalidFile], dependencies);
+
+    expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'notAccepted', invalidFiles: [invalidFile]});
     expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
 
@@ -148,12 +213,12 @@ describe('handleSharedDriveDroppedFiles', () => {
   });
 });
 
-describe('validateSharedDriveDroppedFiles', () => {
-  it('accepts exactly one valid file', () => {
+describe('validateSharedDriveUploadFiles', () => {
+  it('accepts valid files', () => {
     const file = new File(['content'], 'document.txt', {type: 'text/plain'});
 
     expect(
-      validateSharedDriveDroppedFiles([file], {
+      validateSharedDriveUploadFiles([file], {
         isUploadFilesEnabled: true,
         isInRecycleBin: false,
         maxFileSize,
@@ -171,10 +236,10 @@ describe('getSharedDriveDropRejectionFeedback', () => {
     const file = new File(['content'], 'document.txt');
 
     expect(
-      getSharedDriveDropRejectionFeedback({reason: 'multipleFiles', invalidFiles: [file]}, translate, maxFileSize),
+      getSharedDriveDropRejectionFeedback({reason: 'notAccepted', invalidFiles: [file]}, translate, maxFileSize),
     ).toEqual({
-      title: 'conversationFileUploadFailedTooManyFilesHeading',
-      message: 'conversationFileUploadFailedTooManyFilesMessage:{"maxFiles":1}',
+      title: 'conversationFileUploadFailedHeading',
+      message: 'sharedDriveDropUnsupportedFileMessage',
       invalidFiles: [file],
     });
   });

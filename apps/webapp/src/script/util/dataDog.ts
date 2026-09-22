@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 
 import {Config, Configuration} from '../Config';
 
@@ -98,7 +98,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     forwardConsoleLogs: ['info', 'warn', 'error'], // For now those logs should be fine, we need to investigate if we need another logs in the future
     sessionSampleRate: 100,
     beforeSend: log => {
-      if (log.message.match(/@wireapp\/webapp\/avs/) && !allowedAVSLogs(log.message)) {
+      if (isNonEmptyArray(log.message.match(/@wireapp\/webapp\/avs/)) && !allowedAVSLogs(log.message)) {
         // We filter avs logs as they are very verbose
         return false;
       }

@@ -19,7 +19,7 @@
 
 import {useEffect, useRef} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {createRoot, Root} from 'react-dom/client';
 import {toast, Toaster} from 'sonner';
 
@@ -81,7 +81,7 @@ let roots: Record<string, Root> = {};
 export const useAppNotification = (props?: AppNotificationOptions) => {
   const notificationId = useRef<string | number | null>(null);
 
-  const activeWindow = props?.activeWindow || window;
+  const activeWindow = !isNullOrUndefined(props?.activeWindow) ? props.activeWindow : window;
 
   useEffect(() => {
     setTimeout(() => {
@@ -135,7 +135,7 @@ const injectToaster = (activeWindow: Window) => {
 
   const container = activeWindow.document.querySelector(APP_NOTIFICATION_SELECTOR);
 
-  if (!container) {
+  if (container === null) {
     throw new Error('Notification container not found!');
   }
 

@@ -21,7 +21,12 @@ import type {UploadState} from 'Repositories/cells/upload';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
-export type SharedDriveUploadStatusKind = 'uploading' | 'uploaded' | 'failed';
+export type SharedDriveUploadStatusKind = 'queued' | 'uploading' | 'uploaded' | 'failed';
+
+export type DismissedUpload = {
+  readonly conversationQualifiedId: string;
+  readonly uploadId: string;
+};
 
 export type SharedDriveUploadStatus = {
   readonly uploadId: string;
@@ -29,6 +34,9 @@ export type SharedDriveUploadStatus = {
   readonly fileName: string;
   readonly fileSize: number;
   readonly kind: SharedDriveUploadStatusKind;
+  readonly progress: number;
+  readonly hasProgress: boolean;
+  readonly isTransferActive: boolean;
   readonly canCancel: boolean;
   readonly canRetry: boolean;
 };
@@ -42,6 +50,7 @@ const getSharedDriveUploadStatusKind = (state: UploadState): SharedDriveUploadSt
     case 'discardFailed':
       return 'failed';
     case 'queued':
+      return 'queued';
     case 'uploading':
     case 'draftReady':
     case 'publishing':
@@ -67,19 +76,44 @@ export const toSharedDriveUploadStatus = (
     fileName: state.source.name,
     fileSize: state.source.size,
     kind,
+    progress: state.kind === 'uploading' ? state.progress : 0,
+    hasProgress: state.kind === 'uploading' && state.progress > 0,
+    isTransferActive: state.kind === 'uploading',
     canCancel: state.kind === 'queued' || state.kind === 'uploading',
-    canRetry: state.kind === 'uploadFailed',
+    canRetry: state.kind === 'uploadFailed' || state.kind === 'publishFailed',
   };
 };
 
-export const getLatestSharedDriveUploadStatus = (
+export const getSharedDriveUploadStatuses = (
   controller: SharedDriveUploadController,
   conversationQualifiedId: string,
-): SharedDriveUploadStatus | null => {
-  const statuses = controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
+): SharedDriveUploadStatus[] =>
+  controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
     const status = toSharedDriveUploadStatus(snapshot, conversationQualifiedId);
     return status ? [status] : [];
   });
 
-  return statuses[statuses.length - 1] ?? null;
+export const getSharedDriveUploadAggregateKind = (
+  statuses: readonly SharedDriveUploadStatus[],
+): SharedDriveUploadStatusKind | null => {
+  if (statuses.some(status => status.kind === 'uploading')) {
+    return 'uploading';
+  }
+  if (statuses.some(status => status.kind === 'queued')) {
+    return 'queued';
+  }
+  if (statuses.some(status => status.kind === 'failed')) {
+    return 'failed';
+  }
+  return statuses.length > 0 ? 'uploaded' : null;
 };
+
+export const getRepresentativeSharedDriveUploadStatus = (
+  statuses: readonly SharedDriveUploadStatus[],
+  aggregateKind: SharedDriveUploadStatusKind,
+): SharedDriveUploadStatus | null =>
+  statuses.find(status => status.kind === aggregateKind) ??
+  statuses.find(status => status.kind === 'uploading') ??
+  statuses.find(status => status.kind === 'queued') ??
+  statuses[0] ??
+  null;

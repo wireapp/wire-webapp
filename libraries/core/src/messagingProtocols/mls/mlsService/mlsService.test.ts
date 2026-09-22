@@ -40,7 +40,7 @@ import {
 } from '@wireapp/core-crypto';
 
 import {CORE_CRYPTO_ERROR_NAMES} from './coreCryptoMlsError';
-import {InitClientOptions, MLSService} from './mlsService';
+import {InitClientOptions, MLSService, MLSServiceEvents} from './mlsService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB} from '../../../storage/coreDb';
@@ -121,11 +121,11 @@ const createMLSService = async () => {
   ] as const;
 };
 
-afterAll(() => {
-  jest.clearAllTimers();
-});
-
 describe('MLSService', () => {
+  afterAll(() => {
+    jest.clearAllTimers();
+  });
+
   afterAll(() => {
     apiClients.forEach(client => client.disconnect());
   });
@@ -208,6 +208,26 @@ describe('MLSService', () => {
       expect(coreCrypto.transaction).toHaveBeenCalledTimes(1);
       expect(transactionContext.createConversation).toHaveBeenCalledTimes(1);
       expect(mlsService.addUsersToExistingConversation).not.toHaveBeenCalled();
+    });
+
+    it('fails to establish an empty group when the keying material commit is rejected', async () => {
+      const [mlsService, {apiClient, transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const staleCommit = new Error('mls-stale-message');
+
+      jest
+        .spyOn(apiClient.api.client, 'getPublicKeys')
+        .mockResolvedValue({removal: {ed25519: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='}});
+      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages: [], failures: []});
+      const scheduleRenewalSpy = jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockResolvedValue(undefined);
+
+      // Losing the race against another client rejects our commit at the now stale epoch
+      jest.spyOn(transactionContext, 'updateKeyingMaterial').mockRejectedValue(staleCommit);
+
+      await expect(mlsService.registerConversation(groupId, [])).rejects.toThrow(staleCommit);
+
+      // Reporting success here is what left the client behind the group's epoch with no way back
+      expect(scheduleRenewalSpy).not.toHaveBeenCalled();
     });
 
     it('adds users to a group with one single transaction', async () => {
@@ -484,8 +504,11 @@ describe('MLSService', () => {
       expect(mlsService.config).toEqual({...config, nbKeyPackages: 100});
     });
 
-    it('uploads public key only if it was not yet defined on client entity', async () => {
-      const [mlsService, {apiClient, transactionContext, coreCrypto}] = await createMLSService();
+    it('uploads initial key packages after registering the public key without requiring conversation recovery', async () => {
+      const [mlsService, {apiClient, transactionContext, coreCrypto, coreDatabase}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      const onRecoveryRequired = jest.fn();
+      mlsService.on(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED, onRecoveryRequired);
 
       const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
       const mockClientId = 'client-1';
@@ -493,8 +516,14 @@ describe('MLSService', () => {
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
-      jest.spyOn(apiClient.api.client, 'putClient').mockResolvedValueOnce(undefined);
-      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
+      let publicKeyRegistered = false;
+      jest.spyOn(apiClient.api.client, 'putClient').mockImplementationOnce(async () => {
+        publicKeyRegistered = true;
+      });
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array([1, 2, 3])]);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockImplementationOnce(async () => {
+        expect(publicKeyRegistered).toBe(true);
+      });
       jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.FRESH);
       jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
 
@@ -502,6 +531,28 @@ describe('MLSService', () => {
 
       expect(transactionContext.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.putClient).toHaveBeenCalledWith(mockClientId, expect.anything());
+      expect(transactionContext.clientKeypackages).toHaveBeenCalledWith(
+        defaultMLSInitConfig.defaultCiphersuite,
+        expect.anything(),
+        mlsService.config.nbKeyPackages,
+      );
+      expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalledWith(mockClientId, ['AQID']);
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      expect(onRecoveryRequired).not.toHaveBeenCalled();
+    });
+
+    it('defers fresh client registration and key package upload when E2EI enrollment is required', async () => {
+      const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
+      const mockClient = {mls_public_keys: {}, id: 'client-1'} as RegisteredClient;
+      jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.FRESH);
+      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
+      const putClient = jest.spyOn(apiClient.api.client, 'putClient');
+      const uploadKeyPackages = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
+
+      await mlsService.initClient(createUserId(), mockClient, {...defaultMLSInitConfig, skipInitIdentity: true});
+
+      expect(putClient).not.toHaveBeenCalled();
+      expect(uploadKeyPackages).not.toHaveBeenCalled();
     });
 
     it('uploads key packages if there are not enough keys on backend', async () => {
@@ -552,6 +603,124 @@ describe('MLSService', () => {
       expect(transactionContext.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
       expect(apiClient.api.client.putClient).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('MLS conversation recovery after key-package exhaustion', () => {
+    it('persists recovery after uploading when the backend count is zero', async () => {
+      const [mlsService, {apiClient, coreDatabase, transactionContext}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockImplementationOnce(async () => {
+        expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      });
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      await mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1');
+
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(true);
+      expect(emitSpy).toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('does not schedule recovery for a normal low-count refill', async () => {
+      const [mlsService, {apiClient, coreDatabase, transactionContext}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(1);
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      await mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1');
+
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      expect(emitSpy).not.toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('does not persist recovery and does not emit when the zero-count refill fails', async () => {
+      const [mlsService, {apiClient, coreDatabase, transactionContext}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockRejectedValueOnce(new Error('upload failed'));
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      await expect(mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1')).rejects.toThrow('upload failed');
+
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      expect(emitSpy).not.toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('does not fail refill when recovery marker persistence fails', async () => {
+      const [mlsService, {apiClient, coreDatabase, transactionContext}] = await createMLSService();
+      await coreDatabase.clear('mlsConversationRecovery');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
+      jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      coreDatabase.put = jest.fn().mockRejectedValueOnce(new Error('DB write failed')) as typeof coreDatabase.put;
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      await expect(mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1')).resolves.toBeUndefined();
+
+      expect(transactionContext.clientKeypackages).toHaveBeenCalled();
+      expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalled();
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+      expect(emitSpy).not.toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('resumes persisted recovery after restart when packages are already available', async () => {
+      const [mlsService, {apiClient, coreDatabase}] = await createMLSService();
+      await coreDatabase.put('mlsConversationRecovery', {required: true}, 'required');
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
+      const emitSpy = jest.spyOn(mlsService, 'emit');
+
+      expect(await mlsService.prepareMLSConversationRecovery('client-1')).toBe(true);
+
+      expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
+    });
+
+    it('clears recovery only when explicitly completed', async () => {
+      const [mlsService, {coreDatabase}] = await createMLSService();
+      await coreDatabase.put('mlsConversationRecovery', {required: true}, 'required');
+
+      await mlsService.completeMLSConversationRecovery();
+
+      expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
+    });
+
+    it('tracks pending conversation IDs during recovery', async () => {
+      const [mlsService, {coreDatabase}] = await createMLSService();
+      await coreDatabase.put('mlsConversationRecovery', {required: true}, 'required');
+
+      const pendingIds = [
+        {id: 'conv1', domain: 'domain.com'},
+        {id: 'conv2', domain: 'domain.com'},
+        {id: 'conv3', domain: 'domain.com'},
+      ];
+      await mlsService.updatePendingRecoveryConversationIds(pendingIds);
+
+      expect(await mlsService.getPendingRecoveryConversationIds()).toEqual(pendingIds);
+    });
+
+    it('removes conversations from pending list as they are recovered', async () => {
+      const [mlsService, {coreDatabase}] = await createMLSService();
+      await coreDatabase.put('mlsConversationRecovery', {required: true}, 'required');
+      const initialPendingIds = [
+        {id: 'conv1', domain: 'domain.com'},
+        {id: 'conv2', domain: 'domain.com'},
+        {id: 'conv3', domain: 'domain.com'},
+      ];
+      await mlsService.updatePendingRecoveryConversationIds(initialPendingIds);
+
+      const updatedPendingIds = initialPendingIds.filter(({id}) => id !== 'conv2');
+      await mlsService.updatePendingRecoveryConversationIds(updatedPendingIds);
+
+      expect(await mlsService.getPendingRecoveryConversationIds()).toEqual([
+        {id: 'conv1', domain: 'domain.com'},
+        {id: 'conv3', domain: 'domain.com'},
+      ]);
     });
   });
 
@@ -747,6 +916,57 @@ describe('MLSService', () => {
       await mlsService.updateKeyingMaterialForConversation(groupId);
 
       expect(transactionContext.updateKeyingMaterial).toHaveBeenCalledWith(expect.any(ConversationId));
+    });
+
+    it('propagates the failure to the caller instead of retrying internally', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const error = new Error('commit rejected');
+
+      jest.spyOn(transactionContext, 'updateKeyingMaterial').mockRejectedValue(error);
+
+      // Fake timers are installed only once the service is built, as building it awaits the db
+      jest.useFakeTimers();
+      try {
+        await expect(mlsService.updateKeyingMaterialForConversation(groupId)).rejects.toThrow(error);
+
+        // A stale commit cannot succeed on a second attempt, so nothing must be scheduled for later
+        jest.runAllTimers();
+        expect(transactionContext.updateKeyingMaterial).toHaveBeenCalledTimes(1);
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+
+    it('does not emit a key material update failure event, so the error is handled by the caller', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const onFailure = jest.fn();
+
+      mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, onFailure);
+      jest.spyOn(transactionContext, 'updateKeyingMaterial').mockRejectedValue(new Error('commit rejected'));
+
+      await expect(mlsService.updateKeyingMaterialForConversation(groupId)).rejects.toThrow('commit rejected');
+
+      expect(onFailure).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('renewKeyMaterial', () => {
+    it('emits a key material update failure event when the renewal fails', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const error = new Error('commit rejected');
+      const onFailure = jest.fn();
+
+      mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, onFailure);
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
+      jest.spyOn(transactionContext, 'updateKeyingMaterial').mockRejectedValue(error);
+
+      // The renewal runs from a scheduled task, so it must not reject
+      await expect(mlsService.renewKeyMaterial(groupId)).resolves.toBeUndefined();
+
+      expect(onFailure).toHaveBeenCalledWith({error, groupId});
     });
   });
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNull} from '@sindresorhus/is';
 
 import {FORWARDED_QUERY_KEYS} from '../route';
 
@@ -46,7 +46,7 @@ export function pathWithParams(
   whitelistParams: string[] = FORWARDED_QUERY_KEYS,
 ): string {
   const params = getSearchParams(additionalParams, whitelistParams);
-  return `${path}${params.length ? `?${params}` : ''}`;
+  return `${path}${isNonEmptyString(params) ? `?${params}` : ''}`;
 }
 
 export function hasURLParameter(parameterName: string): boolean {
@@ -58,7 +58,7 @@ export function hasURLParameter(parameterName: string): boolean {
 
 export function openTab(url: string): Window | null {
   const newWindow = window.open(url);
-  if (newWindow) {
+  if (!isNull(newWindow)) {
     newWindow.opener = null;
   }
   return newWindow;

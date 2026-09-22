@@ -17,6 +17,7 @@
  *
  */
 
+import type {MeetingPasswordErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import type {User} from 'Repositories/entity/User';
 import type {TranslationKey} from 'Util/localizerUtil';
 
@@ -24,14 +25,20 @@ export type MeetNowFormState = {
   title: string;
   selectedUsers: User[];
   participantsFilter: string;
+  password: string;
+  passwordConfirmation: string;
 };
 
 export type MeetNowFormErrors = {
   title: TranslationKey | undefined;
+  password: MeetingPasswordErrorKey | undefined;
+  passwordConfirmation: MeetingPasswordErrorKey | undefined;
 };
 
 export const emptyMeetNowFormErrors = (): MeetNowFormErrors => ({
   title: undefined,
+  password: undefined,
+  passwordConfirmation: undefined,
 });
 
 export const meetNowSubmitResults = {

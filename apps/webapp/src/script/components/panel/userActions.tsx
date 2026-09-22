@@ -219,9 +219,20 @@ const UserActions = ({
                   {
                     text: {
                       title: translate('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
-                      htmlMessage: translate('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {
-                        name: user.name(),
-                      }),
+                      translatedMessage: {
+                        compatibilityReplacements: [],
+                        components: [{kind: 'line-break', legacyTokens: ['<br/>'], markerName: 'br'}],
+                        kind: 'translation',
+                        layout: 'default',
+                        translationKey: 'modal1To1ConversationCreateErrorNoKeyPackagesMessage',
+                        values: [
+                          {
+                            alternatePlaceholders: [],
+                            placeholder: 'name',
+                            runtimeText: user.name(),
+                          },
+                        ],
+                      },
                     },
                   },
                   undefined,

@@ -100,7 +100,7 @@ import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
-import {isMLSConversation} from './ConversationSelectors';
+import {isMLSConversation, supportsReadReceipts} from './ConversationSelectors';
 import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from './EventBuilder';
@@ -1179,7 +1179,7 @@ export class MessageRepository {
    * Sending a message to the remote end of a session reset.
    *
    * @note When we reset a session then we must inform the remote client about this action. It sends a ProtocolBuffer message
-   *  (which will not be rendered in the view) to the remote client. This message only needs to be sent to the affected
+   *  to the remote client, which renders a session-reset system message. This message only needs to be sent to the affected
    *  remote client, therefore we force the message sending.
    *
    * @param userId User ID
@@ -1221,6 +1221,10 @@ export class MessageRepository {
     type: Confirmation.Type,
     moreMessageEntities: Message[] = [],
   ) {
+    if (type === Confirmation.Type.READ && !supportsReadReceipts(conversationEntity)) {
+      return;
+    }
+
     const typeToConfirm = (EventTypeHandling.CONFIRM as string[]).includes(messageEntity.type);
 
     if (messageEntity.user().isMe || !typeToConfirm) {
@@ -1286,6 +1290,10 @@ export class MessageRepository {
   }
 
   private expectReadReceipt(conversationEntity: Conversation): boolean {
+    if (!supportsReadReceipts(conversationEntity)) {
+      return false;
+    }
+
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
     }

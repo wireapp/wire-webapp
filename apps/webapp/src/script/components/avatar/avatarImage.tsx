@@ -17,9 +17,10 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/serialize';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
@@ -56,6 +57,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   const [avatarImage, setAvatarImage] = useState('');
   const [showTransition, setShowTransition] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (!isVisible) {
@@ -78,7 +80,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
     void (async () => {
       try {
         const url = await assetRepository.getObjectUrl(pictureResource);
-        if (!cancelled && url) {
+        if (cancelled === false && isNonEmptyString(url)) {
           setAvatarImage(url);
         }
       } catch (error: unknown) {
@@ -98,10 +100,11 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
   return (
     <InViewport onVisible={() => setIsVisible(true)}>
-      <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
+      <Transition in={isNonEmptyString(avatarImage)} nodeRef={imageRef} timeout={showTransition ? 700 : 0}>
         {(state: string) => {
           return (
             <img
+              ref={imageRef}
               css={{
                 ...CSS_FILL_PARENT,
                 backgroundColor,
@@ -116,7 +119,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
                 width: '100%',
                 ...transitionImageStyles[state],
               }}
-              src={avatarImage}
+              src={avatarImage === '' ? undefined : avatarImage}
               alt={avatarAlt}
             />
           );

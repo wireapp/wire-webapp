@@ -33,10 +33,15 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import type {
+  PrimaryModalTranslatedComponent,
+  PrimaryModalTranslatedTranslation,
+  PrimaryModalTranslatedValue,
+} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceLink} from 'Util/localizerUtil';
+import {type TranslationKey} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatDuration} from 'Util/timeUtil';
 
@@ -58,10 +63,25 @@ type Title = `featureConfigChangeModal${Features}Headline`;
 type Translate = ReturnType<typeof useApplicationContext>['translate'];
 
 type FeatureNotificationMessage = {
-  htmlMessage: string;
+  translatedMessage: PrimaryModalTranslatedTranslation;
   title: Title;
   primaryAction?: ButtonAction;
 };
+
+function createFeatureTranslatedMessage(
+  translationKey: TranslationKey,
+  values: readonly PrimaryModalTranslatedValue[],
+  components: readonly PrimaryModalTranslatedComponent[],
+): PrimaryModalTranslatedTranslation {
+  return {
+    compatibilityReplacements: [],
+    components,
+    kind: 'translation',
+    layout: 'default',
+    translationKey,
+    values,
+  };
+}
 
 const createFeatureNotifications = (
   translate: Translate,
@@ -72,14 +92,17 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.FILE_SHARING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === undefined) {
         return undefined;
       }
+      let translationKey: TranslationKey;
+      if (status === FEATURE_STATUS.ENABLED) {
+        translationKey = 'featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled';
+      } else {
+        translationKey = 'featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled';
+      }
       return {
-        htmlMessage:
-          status === FEATURE_STATUS.ENABLED
-            ? translate('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
-            : translate('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
+        translatedMessage: createFeatureTranslatedMessage(translationKey, [], []),
         title: 'featureConfigChangeModalFileSharingHeadline',
       };
     },
@@ -88,14 +111,17 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.VIDEO_CALLING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === undefined) {
         return undefined;
       }
+      let translationKey: TranslationKey;
+      if (status === FEATURE_STATUS.ENABLED) {
+        translationKey = 'featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled';
+      } else {
+        translationKey = 'featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled';
+      }
       return {
-        htmlMessage:
-          status === FEATURE_STATUS.ENABLED
-            ? translate('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
-            : translate('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
+        translatedMessage: createFeatureTranslatedMessage(translationKey, [], []),
         title: 'featureConfigChangeModalAudioVideoHeadline',
       };
     },
@@ -105,11 +131,11 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.APPLOCK],
     ) => {
       const shouldWarn = oldConfig?.config.enforceAppLock === true && newConfig?.config.enforceAppLock === false;
-      if (!shouldWarn) {
+      if (shouldWarn !== true) {
         return undefined;
       }
       return {
-        htmlMessage: translate('featureConfigChangeModalApplock'),
+        translatedMessage: createFeatureTranslatedMessage('featureConfigChangeModalApplock', [], []),
         title: 'featureConfigChangeModalApplockHeadline',
       };
     },
@@ -120,8 +146,8 @@ const createFeatureNotifications = (
     ) => {
       const handleDlPathChange: (
         status: FEATURE_STATUS | undefined,
-      ) => undefined | {htmlMessage: string; title: Title; primaryAction?: ButtonAction} = status => {
-        if (newConfig && 'config' in newConfig) {
+      ) => FeatureNotificationMessage | undefined = status => {
+        if (newConfig !== undefined && 'config' in newConfig) {
           localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation ?? '');
           amplify.publish(
             WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
@@ -129,20 +155,20 @@ const createFeatureNotifications = (
           );
         }
 
-        let htmlMessage: string;
+        let translatedMessage: PrimaryModalTranslatedTranslation;
         switch (status) {
           case FEATURE_STATUS.ENABLED:
-            htmlMessage = translate('featureConfigChangeModalDownloadPathEnabled');
+            translatedMessage = createFeatureTranslatedMessage('featureConfigChangeModalDownloadPathEnabled', [], []);
             break;
           case FEATURE_STATUS.DISABLED:
-            htmlMessage = translate('featureConfigChangeModalDownloadPathDisabled');
+            translatedMessage = createFeatureTranslatedMessage('featureConfigChangeModalDownloadPathDisabled', [], []);
             break;
           default:
-            htmlMessage = translate('featureConfigChangeModalDownloadPathChanged');
+            translatedMessage = createFeatureTranslatedMessage('featureConfigChangeModalDownloadPathChanged', [], []);
         }
 
         return {
-          htmlMessage,
+          translatedMessage,
           title: 'featureConfigChangeModalDownloadPathHeadline',
           primaryAction: {
             action: () => {
@@ -154,14 +180,14 @@ const createFeatureNotifications = (
         };
       };
 
-      if (!oldConfig && newConfig?.status === FEATURE_STATUS.ENABLED && 'config' in newConfig) {
+      if (oldConfig === undefined && newConfig?.status === FEATURE_STATUS.ENABLED && 'config' in newConfig) {
         return handleDlPathChange(FEATURE_STATUS.ENABLED);
       }
 
       if (
-        newConfig &&
+        newConfig !== undefined &&
         'config' in newConfig &&
-        oldConfig &&
+        oldConfig !== undefined &&
         'config' in oldConfig &&
         Runtime.isDesktopApp() &&
         Runtime.isWindows()
@@ -171,7 +197,7 @@ const createFeatureNotifications = (
           newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation;
 
         // separate call for type narrowing
-        if (!status) {
+        if (status === undefined) {
           return undefined;
         }
         if (configStatus === undefined) {
@@ -187,7 +213,7 @@ const createFeatureNotifications = (
       oldConfig: FeatureList[FEATURE_KEY.SELF_DELETING_MESSAGES],
       newConfig: FeatureList[FEATURE_KEY.SELF_DELETING_MESSAGES],
     ) => {
-      if (!oldConfig || !('config' in oldConfig) || !newConfig || !('config' in newConfig)) {
+      if (oldConfig === undefined || !('config' in oldConfig) || newConfig === undefined || !('config' in newConfig)) {
         return undefined;
       }
       const previousTimeout = oldConfig?.config?.enforcedTimeoutSeconds * millisecondsInSecond;
@@ -201,25 +227,36 @@ const createFeatureNotifications = (
       const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
       const isFeatureEnabled = newStatus === FEATURE_STATUS.ENABLED;
 
-      if (!hasFeatureChanged) {
+      if (hasFeatureChanged !== true) {
         return undefined;
       }
 
-      let htmlMessage: string;
-      if (isFeatureEnabled) {
-        if (isEnforced) {
-          htmlMessage = translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
-            timeout: formatDuration(newTimeout, translate).text,
-          });
+      let translatedMessage: PrimaryModalTranslatedTranslation;
+      if (isFeatureEnabled === true) {
+        if (isEnforced === true) {
+          const timeoutText = formatDuration(newTimeout, translate).text;
+          translatedMessage = createFeatureTranslatedMessage(
+            'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced',
+            [{alternatePlaceholders: [], placeholder: 'timeout', runtimeText: timeoutText}],
+            [],
+          );
         } else {
-          htmlMessage = translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled');
+          translatedMessage = createFeatureTranslatedMessage(
+            'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled',
+            [],
+            [],
+          );
         }
       } else {
-        htmlMessage = translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled');
+        translatedMessage = createFeatureTranslatedMessage(
+          'featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled',
+          [],
+          [],
+        );
       }
 
       return {
-        htmlMessage,
+        translatedMessage,
         title: 'featureConfigChangeModalSelfDeletingMessagesHeadline',
       };
     },
@@ -228,20 +265,32 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.CONFERENCE_CALLING],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status || status === FEATURE_STATUS.DISABLED) {
+      if (status === undefined || status === FEATURE_STATUS.DISABLED) {
         return undefined;
       }
-      const replaceEnterprise = replaceLink(
-        Config.getConfig().URL.PRICING,
-        'modal__text__read-more',
-        'read-more-pricing',
-      );
-
       return {
-        htmlMessage: translate(
+        translatedMessage: createFeatureTranslatedMessage(
           'featureConfigChangeModalConferenceCallingEnabled',
-          {brandName: Config.getConfig().BRAND_NAME},
-          replaceEnterprise,
+          [
+            {
+              alternatePlaceholders: [],
+              placeholder: 'brandName',
+              runtimeText: Config.getConfig().BRAND_NAME,
+            },
+          ],
+          [
+            {
+              className: 'modal__text__read-more',
+              dataUieName: 'read-more-pricing',
+              href: Config.getConfig().URL.PRICING,
+              kind: 'link',
+              legacyClosingTokens: [],
+              legacyOpeningTokens: [],
+              markerName: 'link',
+              rel: 'nofollow noopener noreferrer',
+              target: '_blank',
+            },
+          ],
         ),
         title: 'featureConfigChangeModalConferenceCallingHeadline',
       };
@@ -251,14 +300,17 @@ const createFeatureNotifications = (
       newConfig: FeatureList[FEATURE_KEY.CONVERSATION_GUEST_LINKS],
     ) => {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      if (!status) {
+      if (status === undefined) {
         return undefined;
       }
+      let translationKey: TranslationKey;
+      if (status === FEATURE_STATUS.ENABLED) {
+        translationKey = 'featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled';
+      } else {
+        translationKey = 'featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled';
+      }
       return {
-        htmlMessage:
-          status === FEATURE_STATUS.ENABLED
-            ? translate('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
-            : translate('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled'),
+        translatedMessage: createFeatureTranslatedMessage(translationKey, [], []),
         title: 'featureConfigChangeModalConversationGuestLinksHeadline',
       };
     },
@@ -269,7 +321,7 @@ function wasTurnedOnOrOff(
   oldConfig?: FeatureWithoutConfig,
   newConfig?: FeatureWithoutConfig,
 ): FEATURE_STATUS | undefined {
-  if (oldConfig?.status && newConfig?.status && oldConfig.status !== newConfig.status) {
+  if (oldConfig?.status !== undefined && newConfig?.status !== undefined && oldConfig.status !== newConfig.status) {
     return newConfig.status === FEATURE_STATUS.ENABLED ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED;
   }
   return undefined;
@@ -290,15 +342,15 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
 
   useEffect(() => {
     const previous = previousConfig.current;
-    if (config) {
+    if (config !== undefined) {
       previousConfig.current = config;
       saveFeatureConfig(selfUserId, config);
     }
 
-    if (!previous) {
+    if (previous === undefined) {
       return;
     }
-    if (!config) {
+    if (config === undefined) {
       return;
     }
 
@@ -307,7 +359,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
       const message = getMessage(previous[featureKey], config[featureKey]);
       const isEnforceDownloadPath = featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH;
 
-      if (!message) {
+      if (message === undefined) {
         continue;
       }
 
@@ -320,7 +372,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
         PrimaryModal.type.ACKNOWLEDGE,
         {
           text: {
-            htmlMessage: message.htmlMessage,
+            translatedMessage: message.translatedMessage,
             title: translate(message.title, {
               brandName: Config.getConfig().BRAND_NAME,
             }),
@@ -330,7 +382,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
           preventClose: isEnforceDownloadPath,
           close: isEnforceDownloadPath
             ? () => {
-                if (Runtime.isDesktopApp() && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
+                if (Runtime.isDesktopApp() === true && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
                   amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
                 }
               }

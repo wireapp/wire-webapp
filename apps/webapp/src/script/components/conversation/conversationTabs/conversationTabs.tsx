@@ -21,6 +21,7 @@ import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState} from 'react
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {maybe} from 'true-myth';
 
 import {SharedDriveUploadCompletedIcon, SharedDriveUploadSpinnerIcon} from '@wireapp/react-ui-kit';
 
@@ -31,9 +32,12 @@ import {KEY} from 'Util/keyboardUtil';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
 import {
-  getLatestSharedDriveUploadStatus,
+  getRepresentativeSharedDriveUploadStatus,
+  getSharedDriveUploadAggregateKind,
+  getSharedDriveUploadStatuses,
   type SharedDriveUploadStatus,
 } from '../conversationCells/sharedDriveUploadStatus';
+import {useSharedDriveUploadStatus} from '../conversationCells/sharedDriveUploadStatusContext';
 
 interface ConversationTabsProps {
   activeTabIndex: number;
@@ -45,6 +49,7 @@ interface ConversationTabsProps {
 
 const FILE_PATH = 'files';
 const sharedDriveUploadTabStatusLabelKey = {
+  queued: 'cells.uploadStatus.queued',
   uploading: 'cells.uploadStatus.uploading',
   uploaded: 'cells.uploadStatus.uploaded',
   failed: 'cells.uploadStatus.failed',
@@ -58,14 +63,25 @@ export const ConversationTabs = ({
   isUploadStatusIndicatorEnabled,
 }: ConversationTabsProps) => {
   const {translate} = useApplicationContext();
+  const {dismissedUpload} = useSharedDriveUploadStatus();
   const filesUrl = generateConversationUrl({...conversationQualifiedId, filePath: FILE_PATH});
   const messagesUrl = generateConversationUrl(conversationQualifiedId);
   const conversationQualifiedIdString = stringifyQualifiedId(conversationQualifiedId);
-  const readUploadStatus = useCallback(
-    () => getLatestSharedDriveUploadStatus(sharedDriveUploadController, conversationQualifiedIdString),
-    [sharedDriveUploadController, conversationQualifiedIdString],
-  );
+  const readUploadStatus = useCallback((): SharedDriveUploadStatus | null => {
+    const statuses = getSharedDriveUploadStatuses(sharedDriveUploadController, conversationQualifiedIdString);
+    const aggregateKind = getSharedDriveUploadAggregateKind(statuses);
+    if (!aggregateKind) {
+      return null;
+    }
+
+    const representative = getRepresentativeSharedDriveUploadStatus(statuses, aggregateKind);
+    return representative ? {...representative, kind: aggregateKind} : null;
+  }, [sharedDriveUploadController, conversationQualifiedIdString]);
   const [uploadStatus, setUploadStatus] = useState<SharedDriveUploadStatus | null>(readUploadStatus);
+  const isUploadDismissed =
+    maybe.isJust(dismissedUpload) &&
+    dismissedUpload.value.conversationQualifiedId === conversationQualifiedIdString &&
+    uploadStatus?.uploadId === dismissedUpload.value.uploadId;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -130,7 +146,7 @@ export const ConversationTabs = ({
           id="files"
           label={translate('conversationDetailsActionCellsTitle')}
           isActive={activeTabIndex === 1}
-          uploadStatus={isUploadStatusIndicatorEnabled ? uploadStatus : null}
+          uploadStatus={isUploadStatusIndicatorEnabled && !isUploadDismissed ? uploadStatus : null}
           onClick={event => {
             createNavigate(filesUrl)(event);
             onIndexChange(1);
@@ -183,10 +199,11 @@ const ConversationTab = ({id, label, isActive, uploadStatus = null, onClick, onK
 };
 
 const SharedDriveTabUploadStatusIcon = ({kind}: {kind: SharedDriveUploadStatus['kind']}) => {
-  if (kind === 'uploading') {
+  if (kind === 'uploading' || kind === 'queued') {
     return (
       <SharedDriveUploadSpinnerIcon
         className="conversation-tabs__upload-status-icon conversation-tabs__upload-status-icon--uploading"
+        color="var(--accent-color)"
         width={16}
         height={16}
         data-uie-name="shared-drive-tab-upload-uploading"
@@ -199,6 +216,7 @@ const SharedDriveTabUploadStatusIcon = ({kind}: {kind: SharedDriveUploadStatus['
   return (
     <SharedDriveUploadCompletedIcon
       className="conversation-tabs__upload-status-icon"
+      color="var(--accent-color)"
       width={16}
       height={16}
       data-uie-name="shared-drive-tab-upload-completed"

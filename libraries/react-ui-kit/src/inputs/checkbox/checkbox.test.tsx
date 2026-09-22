@@ -48,14 +48,16 @@ describe('"CheckboxLabel"', () => {
 });
 
 //TODO: - create custom render for UI-Kit with a styledapp wrapper(SQSERVICES-1672)
-test('account creation terms and condition checkbox is checked/unchecked', () => {
-  const {getByTestId} = render(
-    <StyledApp themeId={THEME_ID.LIGHT}>
-      <Checkbox id="1" data-testid="do-terms"></Checkbox>
-    </StyledApp>,
-  );
-  const checkbox = getByTestId('do-terms');
-  expect(checkbox).not.toBeChecked();
-  fireEvent.click(checkbox);
-  expect(checkbox).toBeChecked();
+describe('account creation terms and conditions checkbox', () => {
+  it('is checked and unchecked', () => {
+    const {getByTestId} = render(
+      <StyledApp themeId={THEME_ID.LIGHT}>
+        <Checkbox id="1" data-testid="do-terms"></Checkbox>
+      </StyledApp>,
+    );
+    const checkbox = getByTestId('do-terms');
+    expect(checkbox).not.toBeChecked();
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+  });
 });

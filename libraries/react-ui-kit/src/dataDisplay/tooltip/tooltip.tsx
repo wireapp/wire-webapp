@@ -177,7 +177,7 @@ const filterTooltipProps = (props: TooltipProps) => filterProps(props, ['body', 
 
 export const Tooltip = ({children, ...props}: TooltipProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const wrapperRectRef = useRef<DOMRect>();
+  const wrapperRectRef = useRef<DOMRect | undefined>(undefined);
 
   const filteredProps = filterTooltipProps(props);
   const {body, selector = '#wire-app'} = props;

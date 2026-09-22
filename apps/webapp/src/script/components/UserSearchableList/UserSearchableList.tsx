@@ -102,7 +102,7 @@ export const UserSearchableList = ({
   let filteredSelectedUsers: User[] | undefined;
   if (showSelectedUsersRegardlessOfFilter) {
     filteredSelectedUsers = selectedUsers;
-  } else if (selectedUsers) {
+  } else if (selectedUsers !== undefined) {
     filteredSelectedUsers = searchRepository.searchUserInSet(filter, selectedUsers);
   }
 
@@ -195,15 +195,16 @@ export const UserSearchableList = ({
     );
   };
 
-  const toggleUserSelection = selectedUsers
-    ? (user: User) => {
-        if (selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
-          onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
-        } else {
-          onUpdateSelectedUsers?.([...selectedUsers, user]);
+  const toggleUserSelection =
+    selectedUsers !== undefined
+      ? (user: User) => {
+          if (selectedUsers.find(selectedUser => selectedUser.id === user.id) !== undefined) {
+            onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
+          } else {
+            onUpdateSelectedUsers?.([...selectedUsers, user]);
+          }
         }
-      }
-    : undefined;
+      : undefined;
 
   const userList = foundUserEntities().filter(
     user =>

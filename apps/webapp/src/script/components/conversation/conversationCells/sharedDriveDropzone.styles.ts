@@ -34,6 +34,7 @@ export const overlayStyles: CSSObject = {
   display: 'none',
   alignItems: 'center',
   justifyContent: 'center',
+  padding: '24px',
   border: '1px dashed var(--accent-color)',
   borderRadius: '8px',
   background: 'var(--accent-color-fade-16)',
@@ -47,7 +48,8 @@ export const overlayActiveStyles: CSSObject = {
 
 export const contentStyles: CSSObject = {
   display: 'inline-flex',
-  padding: '16px 24px',
+  minWidth: '184px',
+  padding: '16px 24px 18px',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',

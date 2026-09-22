@@ -19,7 +19,11 @@
 
 import type {UploadSource} from 'Repositories/cells/upload';
 
-import {toSharedDriveUploadStatus} from './sharedDriveUploadStatus';
+import {
+  getRepresentativeSharedDriveUploadStatus,
+  getSharedDriveUploadAggregateKind,
+  toSharedDriveUploadStatus,
+} from './sharedDriveUploadStatus';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'report.pdf', contentType: 'application/pdf', size: 4};
 const conversationQualifiedId = 'conversation@example.com';
@@ -27,16 +31,20 @@ const state = (kind: string) => ({
   kind,
   identity: {uploadId: 'upload-1'},
   source,
+  ...(kind === 'uploading' ? {progress: 0} : {}),
 });
 
 describe('toSharedDriveUploadStatus', () => {
-  it.each(['queued', 'uploading'])('maps %s to uploading and marks it cancellable', kind => {
+  it.each(['queued', 'uploading'])('maps %s to its distinct status and marks it cancellable', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual({
       uploadId: 'upload-1',
       conversationQualifiedId,
       fileName: 'report.pdf',
       fileSize: 4,
-      kind: 'uploading',
+      kind,
+      progress: 0,
+      hasProgress: false,
+      isTransferActive: kind === 'uploading',
       canCancel: true,
       canRetry: false,
     });
@@ -44,8 +52,20 @@ describe('toSharedDriveUploadStatus', () => {
 
   it.each(['draftReady', 'publishing'])('maps %s to uploading but marks it not cancellable', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'uploading', canCancel: false}),
+      expect.objectContaining({
+        kind: 'uploading',
+        progress: 0,
+        hasProgress: false,
+        isTransferActive: false,
+        canCancel: false,
+      }),
     );
+  });
+
+  it('preserves reported transfer progress', () => {
+    expect(
+      toSharedDriveUploadStatus({...state('uploading'), progress: 0.45} as never, conversationQualifiedId),
+    ).toEqual(expect.objectContaining({progress: 0.45, hasProgress: true, isTransferActive: true}));
   });
 
   it('maps published to uploaded', () => {
@@ -59,13 +79,51 @@ describe('toSharedDriveUploadStatus', () => {
     );
   });
 
-  it.each(['publishFailed', 'discardFailed'])('does not make a %s retryable', kind => {
-    expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual(
+  it('makes a publish failure retryable without allowing upload cancellation', () => {
+    expect(toSharedDriveUploadStatus(state('publishFailed') as never, conversationQualifiedId)).toEqual(
+      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: true}),
+    );
+  });
+
+  it('does not make a discard failure retryable', () => {
+    expect(toSharedDriveUploadStatus(state('discardFailed') as never, conversationQualifiedId)).toEqual(
       expect.objectContaining({kind: 'failed', canCancel: false, canRetry: false}),
     );
   });
 
   it.each(['cancelled', 'discarding', 'discarded'])('does not expose %s', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toBeNull();
+  });
+
+  it('selects a representative using aggregate precedence', () => {
+    const statuses = (['queued', 'uploading', 'uploadFailed', 'published'] as const).flatMap((kind, index) => {
+      const status = toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId);
+      return status ? [{...status, uploadId: `upload-${index}`}] : [];
+    });
+
+    expect(getRepresentativeSharedDriveUploadStatus(statuses, 'failed')?.uploadId).toBe('upload-2');
+    expect(getRepresentativeSharedDriveUploadStatus(statuses, 'uploading')?.uploadId).toBe('upload-1');
+    expect(getRepresentativeSharedDriveUploadStatus(statuses, 'queued')?.uploadId).toBe('upload-0');
+  });
+
+  it('aggregates statuses using active, queued, failed, then uploaded precedence', () => {
+    const statuses = ['queued', 'uploading', 'uploadFailed', 'published'].map(kind =>
+      toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId),
+    );
+    const visibleStatuses = statuses.filter((status): status is NonNullable<typeof status> => status !== null);
+
+    expect(getSharedDriveUploadAggregateKind(visibleStatuses)).toBe('uploading');
+    expect(getSharedDriveUploadAggregateKind(visibleStatuses.filter(status => status.kind !== 'uploading'))).toBe(
+      'queued',
+    );
+    expect(
+      getSharedDriveUploadAggregateKind(
+        visibleStatuses.filter(status => !['uploading', 'queued'].includes(status.kind)),
+      ),
+    ).toBe('failed');
+    expect(getSharedDriveUploadAggregateKind(visibleStatuses.filter(status => status.kind === 'uploaded'))).toBe(
+      'uploaded',
+    );
+    expect(getSharedDriveUploadAggregateKind([])).toBeNull();
   });
 });

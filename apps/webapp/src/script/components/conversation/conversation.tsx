@@ -77,9 +77,10 @@ import {getCurrentFolderName} from './conversationCells/common/getCurrentFolderN
 import {ConversationCells} from './conversationCells/conversationCells';
 import {SharedDriveUploadProvider} from './conversationCells/sharedDriveUploadContext';
 import {
-  createDirectSharedDriveUploadStrategy,
+  createDraftSharedDriveUploadStrategy,
   createSharedDriveUploadController,
 } from './conversationCells/sharedDriveUploadController';
+import {SharedDriveUploadStatusProvider} from './conversationCells/sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
 import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
@@ -98,6 +99,8 @@ import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
+import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
+import {createCellsUploadManager} from '../../repositories/cells/upload/manager';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 
 interface ConversationProps {
@@ -143,15 +146,18 @@ function ConversationContent({
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
     const createSource = (file: File) => ({blob: file, name: file.name, contentType: file.type, size: file.size});
+    const uploadManager = createCellsUploadManager({
+      gateway: createCellsRepositoryGateway(repositories.cells),
+      createResourceUuid: createUuid,
+      createVersionUuid: createUuid,
+      createAttemptId: createUuid,
+      createAbortController: () => new AbortController(),
+    });
 
     return createSharedDriveUploadController({
       createUploadId: createUuid,
       createSource,
-      uploadStrategy: createDirectSharedDriveUploadStrategy({
-        cellsRepository: repositories.cells,
-        createAbortController: () => new AbortController(),
-        createSource,
-      }),
+      uploadStrategy: createDraftSharedDriveUploadStrategy({manager: uploadManager}),
     });
   }, [repositories.cells]);
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
@@ -448,7 +454,20 @@ function ConversationContent({
           text: translate('modalOpenLinkAction'),
         },
         text: {
-          htmlMessage: translate('modalOpenLinkMessage', {link: href}, {}, true),
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'modalOpenLinkMessage',
+            values: [
+              {
+                alternatePlaceholders: [],
+                placeholder: 'link',
+                runtimeText: href,
+              },
+            ],
+          },
           title: translate('modalOpenLinkTitle'),
         },
       },
@@ -651,23 +670,16 @@ function ConversationContent({
     }
   }, [isFileTabActive, isSharedDriveSearchViewOpen]);
 
-  const {
-    getRootProps,
-    getInputProps,
-    openAllFilesView,
-    openFolderView,
-    openImageFilesView,
-    handlePastedFile,
-    isDragAccept,
-  } = useFilesUploadDropzone({
-    isTeam: inTeam,
-    cellsRepository: repositories.cells,
-    conversation: activeConversation,
-    isCellsEnabled: isCellsEnabled,
-    isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
-    isFileDropAllowed,
-    translate,
-  });
+  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept} =
+    useFilesUploadDropzone({
+      isTeam: inTeam,
+      cellsRepository: repositories.cells,
+      conversation: activeConversation,
+      isCellsEnabled: isCellsEnabled,
+      isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
+      isFileDropAllowed,
+      translate,
+    });
 
   const currentFolderName = getCurrentFolderName(getCellsFilesPath());
   const selfUserDriveRole = getSelfUserDriveRole({
@@ -687,6 +699,7 @@ function ConversationContent({
         isDragAccept={isDragAccept}
         isFileDropAllowed={isFileDropAllowed}
         isCellsEnabled={isCellsEnabled}
+        isConversationFileDropzoneEnabled={!isFileTabActive}
         isConversationLoaded={isConversationLoaded}
         activeConversationId={activeConversation?.id}
         onFileDropped={checkFileSharingPermission(uploadDroppedFiles, translate)}
@@ -694,7 +707,7 @@ function ConversationContent({
         inputProps={getInputProps()}
       >
         {activeConversation && (
-          <>
+          <SharedDriveUploadStatusProvider>
             <TitleBar
               repositories={repositories}
               conversation={activeConversation}
@@ -745,7 +758,6 @@ function ConversationContent({
                         isSearchViewOpen={isSharedDriveSearchViewOpen}
                         onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
                         onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
-                        onUploadFolder={openFolderView}
                         isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
                         showViewerPermission={showViewerPermission}
                       />
@@ -838,19 +850,18 @@ function ConversationContent({
                 <div className="icon-spinner spin accent-text"></div>
               </div>
             </ConversationMessagesWrapper>
-          </>
+
+            <SharedDriveUploadStatusPopupHost
+              controller={sharedDriveUploadController}
+              conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
+              isEnabled={isSharedDriveDirectUploadFeatureEnabled}
+              isFileTabActive={isFileTabActive}
+            />
+          </SharedDriveUploadStatusProvider>
         )}
 
         {isGiphyModalOpen && inputValue && (
           <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
-        )}
-        {activeConversation && (
-          <SharedDriveUploadStatusPopupHost
-            controller={sharedDriveUploadController}
-            conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
-            isEnabled={isSharedDriveDirectUploadFeatureEnabled}
-            isFileTabActive={isFileTabActive}
-          />
         )}
       </ConversationFileDropzone>
     </CellsSelfUserDriveRoleProvider>

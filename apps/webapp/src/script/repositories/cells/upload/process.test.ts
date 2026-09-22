@@ -113,11 +113,12 @@ const setup = (
         : Task.resolve<void, never>(undefined);
     },
   };
+  let resource = 0;
   let version = 0;
   let attempt = 0;
   const dependencies: CellsUploadProcessDependencies = {
     gateway,
-    createResourceUuid: () => 'resource-1',
+    createResourceUuid: () => `resource-${++resource}`,
     createVersionUuid: () => `version-${++version}`,
     createAttemptId: () => (duplicateAttemptIds ? 'attempt-1' : `attempt-${++attempt}`),
     createAbortController: () => {
@@ -156,6 +157,26 @@ describe('createCellsUploadProcess', () => {
     required(fixture.uploadTasks[0]).resolve(undefined);
     await unwrap(start);
     expect(snapshots).toEqual(['queued', 'uploading', 'uploading', 'draftReady']);
+  });
+
+  it('forwards every progress update before upload completion', async () => {
+    const fixture = setup();
+    const progressSnapshots: number[] = [];
+    fixture.process.subscribe(snapshot => {
+      if (snapshot.kind === 'uploading') {
+        progressSnapshots.push(snapshot.progress);
+      }
+    });
+
+    const start = fixture.process.start();
+    const request = required(fixture.uploads[0]);
+    request.onProgress(0.1);
+    request.onProgress(0.45);
+    request.onProgress(0.8);
+    expect(progressSnapshots).toEqual([0, 0.1, 0.45, 0.8]);
+
+    required(fixture.uploadTasks[0]).resolve(undefined);
+    await unwrap(start);
   });
 
   it('uses the repository-returned remote identity after upload', async () => {
@@ -237,7 +258,7 @@ describe('createCellsUploadProcess', () => {
     const secondRequest = required(fixture.uploads[1]);
     expect(secondRequest.path).toBe(path);
     expect(secondRequest.source.blob).toBe(source.blob);
-    expect(secondRequest.identity).toMatchObject({resourceUuid: 'resource-1', versionId: 'version-2'});
+    expect(secondRequest.identity).toMatchObject({resourceUuid: 'resource-2', versionId: 'version-2'});
     expect(secondRequest.attemptId).toBe('attempt-2');
     const snapshots: string[] = [];
     required(fixture.process.subscribe(snapshot => snapshots.push(snapshot.kind)));

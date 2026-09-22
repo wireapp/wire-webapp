@@ -19,11 +19,11 @@
 
 import {PriorityQueue, Priority} from '@wireapp/priority-queue';
 
-beforeAll(() => {
-  jest.useRealTimers();
-});
-
 describe('PriorityQueue', () => {
+  beforeAll(() => {
+    jest.useRealTimers();
+  });
+
   let queue: PriorityQueue;
 
   afterEach(() => {

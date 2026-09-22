@@ -36,14 +36,12 @@ import {
   ACCESS_MODES,
 } from 'Repositories/conversation/ConversationAccessPermission';
 import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
 import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKeyboardEvent} from 'Util/keyboardUtil';
-import {replaceLink} from 'Util/localizerUtil';
 
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
@@ -99,11 +97,7 @@ export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFed
     return access;
   };
 
-  const showParticipantsListEditModal = (
-    conversationName: string,
-    backendString: string,
-    replaceBackends: Record<string, string>,
-  ) => {
+  const showParticipantsListEditModal = (conversationName: string, backendString: string) => {
     PrimaryModal.show(
       PrimaryModal.type.MULTI_ACTIONS,
       {
@@ -124,7 +118,7 @@ export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFed
           },
         },
         text: {
-          htmlMessage: nonFederatingParticipantsModalCopy.getMessageHtml(backendString, replaceBackends),
+          translatedMessage: nonFederatingParticipantsModalCopy.getTranslatedMessage(backendString),
           title: nonFederatingParticipantsModalCopy.titleText,
         },
       },
@@ -138,12 +132,7 @@ export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFed
       hideModal();
 
       const backendString = error.backends.join(', and ');
-      const replaceBackends = replaceLink(
-        Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
-        'modal__text__read-more',
-        'read-more-backends',
-      );
-      showParticipantsListEditModal(conversationName, backendString, replaceBackends);
+      showParticipantsListEditModal(conversationName, backendString);
     }
   };
 

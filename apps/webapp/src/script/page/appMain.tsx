@@ -74,6 +74,7 @@ import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRouterWallClock, configureRoutes, navigate} from '../router/Router';
 import {Core} from '../service/coreSingleton';
 import {MainViewModel} from '../view_model/MainViewModel';
+import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 
 export type RightSidebarParams = {
@@ -322,6 +323,7 @@ export const AppMain = (properties: AppMainProps) => {
     currentTab === SidebarTabs.MEETINGS ||
     !isMobileView ||
     isMobileCentralColumnView;
+  const {hasLargeOffset, hasSmallOffset} = useWarningOffset();
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -340,6 +342,8 @@ export const AppMain = (properties: AppMainProps) => {
             className={cx('app', {
               'app--hide-main-content-on-mobile':
                 currentTab !== SidebarTabs.CELLS && currentTab !== SidebarTabs.MEETINGS,
+              'app--small-offset': hasSmallOffset,
+              'app--large-offset': hasLargeOffset,
             })}
           >
             {showLeftSidebar && (

@@ -61,7 +61,7 @@ import {ConversationSidebar} from './conversationSidebar/conversationSidebar';
 import {ConversationsList} from './conversationsList';
 import {EmptyConversationList} from './emptyConversationList';
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
-import {getTabConversations, scrollToConversation} from './helpers';
+import {getConversationFocusCandidates, getTabConversations, scrollToConversation} from './helpers';
 import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {
@@ -84,6 +84,8 @@ import {StartUI} from '../startUi';
 
 export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean =>
   ![SidebarTabs.PREFERENCES, SidebarTabs.MEETINGS].includes(tab);
+
+type FocusConversation = (conversationId: string) => boolean | 'pending';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -121,6 +123,9 @@ export const Conversations = ({
   const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const focusConversationRef = useRef<FocusConversation>(() => false);
+  const cancelPendingFocusRef = useRef<(() => void) | null>(null);
+  const focusConversation = useCallback((conversationId: string) => focusConversationRef.current(conversationId), []);
 
   const {
     currentTab,
@@ -185,8 +190,6 @@ export const Conversations = ({
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
     useShallow(state => state),
   );
-  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
-
   // false when screen is larger than 1000px
   // true when screen is smaller than 1000px
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
@@ -260,6 +263,34 @@ export const Conversations = ({
     !!conversationsFilter &&
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
     groupParticipantsConversations.length > 0;
+
+  const conversationsForFocus = useMemo(
+    () =>
+      getConversationFocusCandidates({
+        conversations: currentTabConversations,
+        conversationsFilter,
+        currentFolder,
+        currentTab,
+        groupParticipantsConversations,
+        isGroupParticipantsVisible,
+      }),
+    [
+      currentTab,
+      currentTabConversations,
+      conversationsFilter,
+      currentFolder,
+      groupParticipantsConversations,
+      isGroupParticipantsVisible,
+    ],
+  );
+  const {
+    currentFocus,
+    focusMountedConversation,
+    handleKeyDown,
+    registerConversationElement,
+    resetConversationFocus,
+    setCurrentFocus,
+  } = useConversationFocus(conversationsForFocus, conversationsFilter, focusConversation);
 
   const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
   const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionRequests;
@@ -449,7 +480,7 @@ export const Conversations = ({
 
   const handleEnterSearchClick = useCallback(
     (event: ReactKeyBoardEvent<HTMLDivElement>) => {
-      const firstFoundConversation = currentTabConversations?.[0];
+      const firstFoundConversation = conversationsForFocus?.[0];
 
       if (firstFoundConversation) {
         createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
@@ -457,7 +488,31 @@ export const Conversations = ({
         scrollToConversation(firstFoundConversation.id);
       }
     },
-    [currentTabConversations],
+    [conversationsForFocus],
+  );
+
+  const handleSearchTab = useCallback(
+    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+      cancelPendingFocusRef.current?.();
+      const firstResult = conversationsForFocus[0];
+
+      if (!conversationsFilter || !firstResult) {
+        return;
+      }
+
+      const wasMounted = focusMountedConversation(firstResult.id);
+      const wasFocused = wasMounted || focusConversation(firstResult.id);
+
+      if (!wasFocused) {
+        return;
+      }
+
+      event.preventDefault();
+      if (wasMounted) {
+        setCurrentFocus(firstResult.id);
+      }
+    },
+    [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
   );
 
   const onSearch = useCallback(
@@ -519,12 +574,17 @@ export const Conversations = ({
             handleArrowKeyDown={handleKeyDown}
             conversationState={conversationState}
             conversations={currentTabConversations}
+            conversationFocusCandidates={conversationsForFocus}
             resetConversationFocus={resetConversationFocus}
             clearSearchFilter={clearConversationFilter}
             isEmpty={hasEmptyConversationsList}
             groupParticipantsConversations={groupParticipantsConversations}
             isGroupParticipantsVisible={isGroupParticipantsVisible}
-            searchInputRef={searchInputRef}
+            focusConversationRef={focusConversationRef}
+            cancelPendingFocusRef={cancelPendingFocusRef}
+            registerConversationElement={registerConversationElement}
+            focusMountedConversation={focusMountedConversation}
+            onConversationFocused={setCurrentFocus}
           />
         )}
       </>
@@ -546,6 +606,7 @@ export const Conversations = ({
             setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
             onSearchEnterClick={handleEnterSearchClick}
+            onSearchTab={handleSearchTab}
             jumpToRecentSearch={jumpToRecentSearch}
             searchInputRef={searchInputRef}
             isListCollapsed={isConversationListCollapsed}

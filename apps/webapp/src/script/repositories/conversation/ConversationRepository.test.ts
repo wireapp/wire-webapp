@@ -17,6 +17,7 @@
  *
  */
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {faker} from '@faker-js/faker';
 import {waitFor} from '@testing-library/react';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
@@ -75,6 +76,7 @@ import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
+import {EventSource} from 'Repositories/event/EventSource';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
@@ -91,8 +93,7 @@ import {
   generateConversation as _generateConversation,
   generateAPIConversation,
 } from 'test/helper/ConversationGenerator';
-import {createDeleteEvent} from 'test/helper/EventGenerator';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {createDeleteEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {escapeRegex} from 'Util/sanitizationUtil';
@@ -954,7 +955,7 @@ describe('ConversationRepository', () => {
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
 
-    it('replaces proteus 1:1 with mls 1:1', async () => {
+    it('replaces proteus 1:1 with mls 1:1 and preserves unread messages', async () => {
       const conversationRepository = requireValueForTest(testFactory.conversation_repository);
       const userRepository = requireValueForTest(testFactory.user_repository);
 
@@ -988,6 +989,25 @@ describe('ConversationRepository', () => {
         mls1to1ConversationResponse,
         proteus1to1ConversationResponse,
       ]);
+
+      const lastReadTimestamp = 1_700_000_000_000;
+      proteus1to1Conversation.last_read_timestamp(lastReadTimestamp);
+      proteus1to1Conversation.last_event_timestamp(lastReadTimestamp + 1000);
+      const storedMessages = await Promise.all(
+        [lastReadTimestamp, lastReadTimestamp + 1000].map(timestamp =>
+          conversationRepository['eventService'].saveEvent(
+            createMessageAddEvent({
+              text: 'Message before migration',
+              overrides: {
+                conversation: proteus1to1Conversation.id,
+                qualified_conversation: proteus1to1Conversation.qualifiedId,
+                from: otherUser.id,
+                time: new Date(timestamp).toISOString(),
+              },
+            }),
+          ),
+        ),
+      );
 
       const connection = new ConnectionEntity();
       connection.conversationId = mls1to1Conversation.qualifiedId;
@@ -1045,6 +1065,8 @@ describe('ConversationRepository', () => {
       //Local properties were migrated from proteus to mls conversation
       expect(conversationEntity?.serialize().archived_state).toEqual(proteus1to1Conversation.archivedState());
       expect(conversationEntity?.serialize().muted_state).toEqual(proteus1to1Conversation.mutedState());
+      expect(conversationEntity?.last_read_timestamp()).toBe(lastReadTimestamp);
+      expect(conversationEntity?.unreadState().allMessages.map(message => message.id)).toEqual([storedMessages[1].id]);
 
       //proteus conversation was deleted from the local store
       expect(conversationRepository['conversationService'].deleteConversationFromDb).toHaveBeenCalledWith(
@@ -3281,6 +3303,17 @@ describe('ConversationRepository', () => {
   });
 
   describe('shouldSendReadReceipt', () => {
+    it.each([CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
+      'does not expect group read receipts for %s even with a stale enabled setting',
+      protocol => {
+        const conversation = _generateConversation({type: CONVERSATION_TYPE.REGULAR, protocol});
+        conversation.teamId = 'team';
+        conversation.receiptMode(RECEIPT_MODE.ON);
+
+        expect(testFactory.conversation_repository.expectReadReceipt(conversation)).toBe(false);
+      },
+    );
+
     it('uses the account preference for 1:1 conversations', () => {
       // Set a receipt mode on account-level
       const preferenceMode = RECEIPT_MODE.ON;
@@ -3736,12 +3769,61 @@ describe('ConversationRepository', () => {
   });
 
   describe('updateConversationProtocol', () => {
+    it('clears receipt mode when another client starts migration', async () => {
+      const conversation = _generateConversation({type: CONVERSATION_TYPE.REGULAR});
+      conversation.receiptMode(RECEIPT_MODE.ON);
+      const repository = await testFactory.exposeConversationActors();
+      jest.spyOn(repository['conversationService'], 'saveConversationStateInDb').mockResolvedValue(conversation);
+      jest
+        .spyOn(repository['conversationService'], 'getConversationById')
+        .mockResolvedValue(generateAPIConversation({protocol: CONVERSATION_PROTOCOL.MIXED}));
+      const eventHandler = repository as unknown as {
+        addEventToConversation: ConversationRepository['addEventToConversation'];
+      };
+      jest.spyOn(eventHandler, 'addEventToConversation').mockResolvedValue({
+        conversationEntity: conversation,
+        messageEntity: new Message('protocol-update', undefined, translateForTest),
+      });
+      const event = {
+        data: {protocol: CONVERSATION_PROTOCOL.MIXED},
+        qualified_conversation: conversation.qualifiedId,
+        time: '2020-10-13T14:00:00.000Z',
+        type: CONVERSATION_EVENT.PROTOCOL_UPDATE,
+      } as ConversationProtocolUpdateEvent;
+
+      await repository['onProtocolUpdate'](conversation, event);
+
+      expect(conversation.receiptMode()).toBe(RECEIPT_MODE.OFF);
+    });
+
+    it.each([CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
+      'clears and persists group receipt mode when refreshing protocol %s',
+      async protocol => {
+        const conversation = _generateConversation({type: CONVERSATION_TYPE.REGULAR});
+        conversation.receiptMode(RECEIPT_MODE.ON);
+        const repository = await testFactory.exposeConversationActors();
+        const save = jest
+          .spyOn(repository['conversationService'], 'saveConversationStateInDb')
+          .mockResolvedValue(conversation);
+        jest
+          .spyOn(repository['conversationService'], 'getConversationById')
+          .mockResolvedValue(generateAPIConversation({protocol, overwites: {receipt_mode: RECEIPT_MODE.ON}}));
+
+        const updated = await repository['refreshConversationProtocolProperties'](conversation);
+
+        expect(updated.receiptMode()).toBe(RECEIPT_MODE.OFF);
+        expect(save).toHaveBeenCalledWith(updated);
+        expect(updated.serialize().receipt_mode).toBe(RECEIPT_MODE.OFF);
+      },
+    );
+
     afterEach(() => {
       jest.clearAllMocks();
     });
 
     it('should update the protocol-related fields after protocol was updated to mixed and inject event', async () => {
-      const conversation = _generateConversation();
+      const conversation = _generateConversation({type: CONVERSATION_TYPE.REGULAR});
+      conversation.receiptMode(RECEIPT_MODE.ON);
       const conversationRepository = await testFactory.exposeConversationActors();
 
       const mockedProtocolUpdateEventResponse = {
@@ -3789,6 +3871,7 @@ describe('ConversationRepository', () => {
         EventRepository.SOURCE.BACKEND_RESPONSE,
       );
 
+      expect(updatedConversation.receiptMode()).toBe(RECEIPT_MODE.OFF);
       expect(updatedConversation.protocol).toEqual(CONVERSATION_PROTOCOL.MIXED);
       expect(updatedConversation.cipherSuite).toEqual(newCipherSuite);
       expect(updatedConversation.epoch).toEqual(newEpoch);
@@ -4131,6 +4214,25 @@ describe('deleteConversation', () => {
   });
 });
 
+describe('Proteus session reset', () => {
+  it('routes incoming session resets to the conversation timeline', async () => {
+    const [repository] = buildConversationRepository(translateForTest);
+    const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.PROTEUS});
+    const event = {
+      type: CONVERSATION.SESSION_RESET as const,
+      id: 'reset-id',
+      conversation: conversation.id,
+      from: 'resetting-user',
+      time: '2026-09-18T09:00:00.000Z',
+    };
+    const addEvent = jest.spyOn(repository as any, 'addEventToConversation').mockResolvedValue({});
+
+    await repository['reactToConversationEvent'](conversation, event, EventSource.WEBSOCKET);
+
+    expect(addEvent).toHaveBeenCalledWith(conversation, event);
+  });
+});
+
 describe('onMLSResetMessage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -4144,9 +4246,10 @@ describe('onMLSResetMessage', () => {
 
     conversationState.conversations([conversation]);
 
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
     const mlsResetEvent: ConversationMLSResetEvent = {
       type: CONVERSATION_EVENT.MLS_RESET,
-      time: new Date().toISOString(),
+      time: wallClock.currentDate.toISOString(),
       from: 'user-id',
       conversation: conversation.id,
       qualified_conversation: conversation.qualifiedId,
@@ -4159,6 +4262,7 @@ describe('onMLSResetMessage', () => {
     const coreConversationService = getConversationServiceFromCoreForTest(core);
     spyOn(coreConversationService, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
     spyOn(coreConversationService, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(false));
+    const addEventSpy = jest.spyOn(conversationRepository as any, 'addEventToConversation').mockResolvedValue({});
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
     const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
 
@@ -4169,6 +4273,7 @@ describe('onMLSResetMessage', () => {
       epoch: 0,
     });
     expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
+    expect(addEventSpy).not.toHaveBeenCalled();
   });
 
   it('Should get epoch from core crypto if new groupId already exists locally', async () => {
@@ -4180,9 +4285,10 @@ describe('onMLSResetMessage', () => {
 
     conversationState.conversations([conversation]);
 
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
     const mlsResetEvent: ConversationMLSResetEvent = {
       type: CONVERSATION_EVENT.MLS_RESET,
-      time: new Date().toISOString(),
+      time: wallClock.currentDate.toISOString(),
       from: 'user-id',
       conversation: conversation.id,
       qualified_conversation: conversation.qualifiedId,
@@ -4197,6 +4303,7 @@ describe('onMLSResetMessage', () => {
     spyOn(coreConversationService, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
     spyOn(getMlsServiceForTest(core), 'getEpoch').and.returnValue(Promise.resolve(5));
 
+    const addEventSpy = jest.spyOn(conversationRepository as any, 'addEventToConversation').mockResolvedValue({});
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
     const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
 
@@ -4207,6 +4314,7 @@ describe('onMLSResetMessage', () => {
       epoch: 5,
     });
     expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
+    expect(addEventSpy).not.toHaveBeenCalled();
     expect(conversation.epoch).toBe(5);
   });
 });

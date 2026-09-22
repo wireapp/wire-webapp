@@ -24,7 +24,6 @@ import cx from 'classnames';
 import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/icon';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
@@ -51,11 +50,6 @@ type RenderPermissionRequestTranslationOptions = {
   readonly translationKey: PermissionRequestTranslationKey;
 };
 
-type RenderPermissionRequestWarningMessageOptions = RenderPermissionRequestTranslationOptions & {
-  readonly isReactTranslationRenderingEnabled: boolean;
-  readonly legacyMessage: ReactNode;
-};
-
 const permissionRequestIconMarker = createReactTranslationMarker('permission-request-icon');
 
 function renderPermissionRequestTranslation(options: RenderPermissionRequestTranslationOptions): ReactNode[] {
@@ -78,20 +72,16 @@ function renderPermissionRequestTranslation(options: RenderPermissionRequestTran
   });
 }
 
-function renderPermissionRequestWarningMessage(options: RenderPermissionRequestWarningMessageOptions): ReactNode {
-  const {icon, isReactTranslationRenderingEnabled, legacyMessage, translate, translationKey} = options;
+function renderPermissionRequestWarningMessage(options: RenderPermissionRequestTranslationOptions): ReactNode {
+  const {icon, translate, translationKey} = options;
 
-  if (isReactTranslationRenderingEnabled) {
-    return (
-      <div className="warning-bar-message">{renderPermissionRequestTranslation({icon, translate, translationKey})}</div>
-    );
-  }
-
-  return legacyMessage;
+  return (
+    <div className="warning-bar-message">{renderPermissionRequestTranslation({icon, translate, translationKey})}</div>
+  );
 }
 
 const WarningsContainer = ({onRefresh}: WarningProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const name = useWarningsState(state => state.name);
   const warnings = useWarningsState(state => state.warnings);
   const type = TYPE;
@@ -99,23 +89,11 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
   const warningDimmed = warnings.some(warning => CONFIG.DIMMED_MODES.includes(warning));
 
   useEffect(() => {
-    const visibleWarning = warnings[warnings.length - 1];
-    const isConnectivityRecovery = visibleWarning === TYPE.CONNECTIVITY_RECOVERY;
-    const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
-    const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
-
-    const app = document.querySelector('#app');
-    if (app) {
-      app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
-      app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
-    }
-
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }, [warnings]);
 
   const brandName = Config.getConfig().BRAND_NAME;
   const URL = Config.getConfig().URL;
-  const isReactTranslationRenderingEnabled = isFeatureToggleEnabled(reactTranslationRenderingFeatureToggleName);
 
   const closeButton = (
     <button
@@ -136,17 +114,6 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
         <div data-uie-name="request-camera" className="warning-bar warning-bar-feature">
           {renderPermissionRequestWarningMessage({
             icon: <span className="warning-bar-icon icon-camera" />,
-            isReactTranslationRenderingEnabled,
-            legacyMessage: (
-              <div
-                className="warning-bar-message"
-                dangerouslySetInnerHTML={{
-                  __html: translate('warningPermissionRequestCamera', undefined, {
-                    icon: "<span class='warning-bar-icon icon-camera'></span>",
-                  }),
-                }}
-              />
-            ),
             translate,
             translationKey: 'warningPermissionRequestCamera',
           })}
@@ -173,17 +140,6 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
         <div data-uie-name="request-microphone" className="warning-bar warning-bar-feature">
           {renderPermissionRequestWarningMessage({
             icon: <Icon.MicOnIcon className="warning-bar-icon" />,
-            isReactTranslationRenderingEnabled,
-            legacyMessage: (
-              <div className="warning-bar-message">
-                <Icon.MicOnIcon className="warning-bar-icon" />
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: translate('warningPermissionRequestMicrophone', undefined, {icon: ''}),
-                  }}
-                />
-              </div>
-            ),
             translate,
             translationKey: 'warningPermissionRequestMicrophone',
           })}
@@ -210,17 +166,6 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
         <div data-uie-name="request-screen" className="warning-bar warning-bar-feature">
           {renderPermissionRequestWarningMessage({
             icon: <span className="warning-bar-icon icon-screensharing" />,
-            isReactTranslationRenderingEnabled,
-            legacyMessage: (
-              <div
-                className="warning-bar-message"
-                dangerouslySetInnerHTML={{
-                  __html: translate('warningPermissionRequestScreen', undefined, {
-                    icon: "<span class='warning-bar-icon icon-screensharing'></span>",
-                  }),
-                }}
-              />
-            ),
             translate,
             translationKey: 'warningPermissionRequestScreen',
           })}
@@ -279,17 +224,6 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
         <div data-uie-name="request-notification" className="warning-bar warning-bar-feature">
           {renderPermissionRequestWarningMessage({
             icon: <span className="warning-bar-icon icon-envelope" />,
-            isReactTranslationRenderingEnabled,
-            legacyMessage: (
-              <div
-                className="warning-bar-message"
-                dangerouslySetInnerHTML={{
-                  __html: translate('warningPermissionRequestNotification', undefined, {
-                    icon: "<span class='warning-bar-icon icon-envelope'></span>",
-                  }),
-                }}
-              />
-            ),
             translate,
             translationKey: 'warningPermissionRequestNotification',
           })}

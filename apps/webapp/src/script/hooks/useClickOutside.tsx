@@ -20,17 +20,19 @@
 import {useEffect, RefObject} from 'react';
 
 export const useClickOutside = (
-  ref: RefObject<Element>,
+  ref: RefObject<Element | null>,
   onClick: (e: MouseEvent) => void,
-  exclude?: RefObject<Element>,
+  exclude?: RefObject<Element | null>,
   windowDocument = window.document,
 ) => {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
-      const isOutsideClick = ref.current && ref.current !== event.target && !ref.current.contains(event.target as Node);
+      const isOutsideClick =
+        ref.current !== null && ref.current !== event.target && !ref.current.contains(event.target as Node);
       if (isOutsideClick) {
-        const isNonExcludedAreaClicked = exclude && exclude.current && !exclude.current.contains(event.target as Node);
-        if (isNonExcludedAreaClicked || !exclude) {
+        const isNonExcludedAreaClicked =
+          exclude !== undefined && exclude.current !== null && !exclude.current.contains(event.target as Node);
+        if (isNonExcludedAreaClicked || exclude === undefined) {
           onClick(event);
         }
       }

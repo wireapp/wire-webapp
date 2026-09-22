@@ -17,22 +17,24 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {currentLanguage} from './auth/localeConfig';
 import {Config} from './Config';
 
 const {URL, TERMS_OF_USE_URL_DE, PRIVACY_POLICY_URL_DE} = Config.getConfig();
 
-const isProductionWebsite = URL.WEBSITE_BASE && URL.WEBSITE_BASE === 'https://wire.com';
+const isProductionWebsite = isNonEmptyString(URL.WEBSITE_BASE) && URL.WEBSITE_BASE === 'https://wire.com';
 
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
-  const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
+  const query = isNonEmptyString(utmSource) ? `?utm_source=${utmSource}&utm_term=desktop` : '';
   const teamSettingsUrl = `${URL.TEAMS_BASE}${path}${query}`;
-  return URL.TEAMS_BASE ? teamSettingsUrl : undefined;
+  return isNonEmptyString(URL.TEAMS_BASE) ? teamSettingsUrl : undefined;
 };
 
 const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | undefined => {
-  if (URL.WEBSITE_BASE) {
-    const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
+  if (isNonEmptyString(URL.WEBSITE_BASE)) {
+    const query = isNonEmptyString(pkCampaign) ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
     const websiteUrl = `${URL.WEBSITE_BASE}${path}${query}`;
     return addLocaleToUrl(websiteUrl);
   }
@@ -40,7 +42,7 @@ const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | undefin
 };
 
 const getAccountPagesUrl = (path: string = ''): string | undefined => {
-  return URL.ACCOUNT_BASE ? `${URL.ACCOUNT_BASE}${path}` : undefined;
+  return isNonEmptyString(URL.ACCOUNT_BASE) ? `${URL.ACCOUNT_BASE}${path}` : undefined;
 };
 
 export const getUserProfileUrl = (userId: string, domain: string): string | undefined => {
@@ -87,7 +89,7 @@ const getCreateTeamUrl = (): string | undefined =>
   Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;
 
 const addLocaleToUrl = (url?: string): string | undefined => {
-  if (!url) {
+  if (!isNonEmptyString(url)) {
     return undefined;
   }
   if (!isProductionWebsite) {

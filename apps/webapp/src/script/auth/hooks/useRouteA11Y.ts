@@ -19,18 +19,19 @@
 
 import {useEffect} from 'react';
 
-import {useLocation} from 'react-router-dom';
+import {isNull} from '@sindresorhus/is';
+import {useLocation} from 'react-router';
 
 export function useRouteA11y(screenKey?: string) {
   const location = useLocation();
 
   useEffect(() => {
     const focusTarget: HTMLElement | null =
-      document.querySelector<HTMLElement>('[data-page-title]') ||
-      document.querySelector<HTMLElement>('main,[role="main"]') ||
+      document.querySelector<HTMLElement>('[data-page-title]') ??
+      document.querySelector<HTMLElement>('main,[role="main"]') ??
       document.querySelector<HTMLElement>('h1');
 
-    if (!focusTarget) {
+    if (isNull(focusTarget)) {
       return;
     }
 

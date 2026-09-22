@@ -178,15 +178,15 @@ describe('ConnectionRepository', () => {
 
       await connectionRepository.createConnection(user);
 
-      expect(translate).toHaveBeenCalledWith('modalUserCannotSendConnectionNotFederatingMessage', {
-        username: user.name(),
-      });
       expect(translate).toHaveBeenCalledWith('modalUserCannotConnectHeadline');
       expect(primaryModalShow).toHaveBeenCalledWith(
         PrimaryModal.type.ACKNOWLEDGE,
         expect.objectContaining({
           text: expect.objectContaining({
-            htmlMessage: 'translated:modalUserCannotSendConnectionNotFederatingMessage',
+            translatedMessage: expect.objectContaining({
+              translationKey: 'modalUserCannotSendConnectionNotFederatingMessage',
+              values: [expect.objectContaining({placeholder: 'username', runtimeText: user.name()})],
+            }),
             title: 'translated:modalUserCannotConnectHeadline',
           }),
         }),

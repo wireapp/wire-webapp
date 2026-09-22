@@ -33,7 +33,7 @@ interface UseDraftStateProps {
   conversation: Conversation;
   storageRepository: StorageRepository;
   messageRepository: MessageRepository;
-  editorRef: React.RefObject<LexicalEditor>;
+  editorRef: React.RefObject<LexicalEditor | null>;
   onLoad?: (draftState: DraftState) => void;
   editedMessageId?: string;
   replyMessageEntityId?: string;

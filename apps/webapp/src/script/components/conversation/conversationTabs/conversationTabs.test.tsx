@@ -19,6 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {Maybe} from 'true-myth';
 
 import type {UploadState} from 'Repositories/cells/upload';
 import {
@@ -28,8 +29,10 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
+import type {DismissedUpload} from '../conversationCells/sharedDriveUploadStatus';
 
 import {ConversationTabs} from './conversationTabs';
+import {SharedDriveUploadStatusProvider} from '../conversationCells/sharedDriveUploadStatusContext';
 
 const conversationQualifiedId = {id: 'conversation', domain: 'example.com'};
 const conversationQualifiedIdString = 'conversation@example.com';
@@ -39,6 +42,11 @@ const uploadingState: UploadState = {
   identity: {uploadId: 'upload-1'},
   source: uploadSource,
   progress: 0,
+};
+const queuedState: UploadState = {
+  kind: 'queued',
+  identity: {uploadId: 'upload-1'},
+  source: uploadSource,
 };
 const uploadedState: UploadState = {
   kind: 'published',
@@ -67,6 +75,7 @@ const createController = (state: UploadState | null = null) => {
       return jest.fn();
     }),
     upload: jest.fn(),
+    updateRefresh: jest.fn(),
     cancel: jest.fn(),
     retryUpload: jest.fn(),
     retryPublish: jest.fn(),
@@ -83,16 +92,22 @@ const createController = (state: UploadState | null = null) => {
   };
 };
 
-const renderTabs = (controller: SharedDriveUploadController, isUploadStatusIndicatorEnabled = true) =>
+const renderTabs = (
+  controller: SharedDriveUploadController,
+  isUploadStatusIndicatorEnabled = true,
+  dismissedUpload: Maybe<DismissedUpload> = Maybe.nothing<DismissedUpload>(),
+) =>
   render(
     <ThemeProvider>
-      <ConversationTabs
-        activeTabIndex={0}
-        onIndexChange={jest.fn()}
-        conversationQualifiedId={conversationQualifiedId}
-        sharedDriveUploadController={controller}
-        isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
-      />
+      <SharedDriveUploadStatusProvider initialDismissedUpload={dismissedUpload}>
+        <ConversationTabs
+          activeTabIndex={0}
+          onIndexChange={jest.fn()}
+          conversationQualifiedId={conversationQualifiedId}
+          sharedDriveUploadController={controller}
+          isUploadStatusIndicatorEnabled={isUploadStatusIndicatorEnabled}
+        />
+      </SharedDriveUploadStatusProvider>
     </ThemeProvider>,
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
   );
@@ -118,6 +133,16 @@ describe('ConversationTabs', () => {
     expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
   });
 
+  it('announces queued uploads without saying they are uploading', () => {
+    const {controller} = createController(queuedState);
+    const view = renderTabs(controller);
+
+    expect(view.getByTestId('shared-drive-tab-upload-uploading')).toHaveClass(
+      'conversation-tabs__upload-status-icon--uploading',
+    );
+    expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.queued');
+  });
+
   it('updates the shared drive tab icon as the upload status changes', () => {
     const {controller, setState} = createController(uploadingState);
     const view = renderTabs(controller);
@@ -127,7 +152,8 @@ describe('ConversationTabs', () => {
     act(() => setState(uploadedState));
 
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
-    expect(view.getByTestId('shared-drive-tab-upload-completed')).toBeInTheDocument();
+    const completedIcon = view.getByTestId('shared-drive-tab-upload-completed');
+    expect(completedIcon).toBeInTheDocument();
     expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.uploaded');
   });
 
@@ -138,6 +164,18 @@ describe('ConversationTabs', () => {
     expect(view.getByTestId('shared-drive-tab-upload-completed')).toBeInTheDocument();
     expect(view.getByRole('status')).toHaveTextContent('cells.uploadStatus.failed');
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
+  });
+
+  it('does not render a dismissed shared drive upload indicator', () => {
+    const {controller} = createController(uploadedState);
+    const view = renderTabs(
+      controller,
+      true,
+      Maybe.just({conversationQualifiedId: conversationQualifiedIdString, uploadId: 'upload-1'}),
+    );
+
+    expect(view.queryByTestId('shared-drive-tab-upload-completed')).not.toBeInTheDocument();
+    expect(view.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('does not render a shared drive upload icon when the indicator is disabled', () => {

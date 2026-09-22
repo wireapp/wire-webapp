@@ -17,8 +17,10 @@
  *
  */
 
+import type {ReactNode} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -46,6 +48,8 @@ import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {ViewModelRepositories} from 'src/script/view_model/MainViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -78,7 +82,7 @@ export const TitleBar = ({
   isSharedDriveSearchViewOpen = false,
   onCloseSharedDriveSearchView,
 }: TitleBarProps) => {
-  const {translate} = useApplicationContext();
+  const {isFeatureToggleEnabled, translate} = useApplicationContext();
   const {
     is1to1,
     isRequest,
@@ -135,24 +139,18 @@ export const TitleBar = ({
   // Button is disabled if starting, connecting, or already active
   const isCallButtonDisabled = isReadOnlyConversation || isStartingCallRef.current || isCallConnecting || isCallActive;
 
-  const badgeLabelCopy = useMemo(() => {
+  const badgeTranslationKey = useMemo(() => {
     if (is1to1 && isRequest) {
       return '';
     }
 
-    const translationKey = generateWarningBadgeKey({
+    return generateWarningBadgeKey({
       hasExternal,
       hasFederated: hasFederatedUsers,
       hasGuest: hasDirectGuest,
       hasService: hasService || hasApps,
     });
-
-    if (translationKey) {
-      return translate(translationKey);
-    }
-
-    return '';
-  }, [hasApps, hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest, translate]);
+  }, [hasApps, hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest]);
 
   const hasCall = useMemo(() => {
     const hasEntities = !!joinedCall;
@@ -406,13 +404,10 @@ export const TitleBar = ({
         )}
       </li>
 
-      {badgeLabelCopy && (
-        <li
-          className="conversation-title-bar-indication-badge"
-          data-uie-name="status-indication-badge"
-          dangerouslySetInnerHTML={{__html: badgeLabelCopy}}
-        />
-      )}
+      {renderWarningBadge({
+        badgeTranslationKey,
+        translate,
+      })}
     </ul>
   );
 };
@@ -434,6 +429,60 @@ type BadgeKeys =
   | 'Apps';
 
 type WarningBadgeKey = '' | 'guestRoomConversationBadge' | `${'guestRoomConversationBadge'}${BadgeKeys}`;
+type NonEmptyWarningBadgeKey = Exclude<WarningBadgeKey, ''>;
+
+type RenderWarningBadgeOptions = {
+  readonly badgeTranslationKey: WarningBadgeKey;
+  readonly translate: Translate;
+};
+
+const warningBadgeBoldMarker = createReactTranslationMarker('title-bar-warning-badge-bold');
+
+function getWarningBadgeTranslatedText(translationKey: NonEmptyWarningBadgeKey, translate: Translate): string {
+  const translatedText = translate(translationKey, undefined, {
+    bold: warningBadgeBoldMarker.start,
+    '/bold': warningBadgeBoldMarker.end,
+  });
+
+  if (translationKey === 'guestRoomConversationBadgeFederated') {
+    return translatedText.replace('/bold]', warningBadgeBoldMarker.end);
+  }
+
+  return translatedText;
+}
+
+function renderWarningBadgeTranslation(translationKey: NonEmptyWarningBadgeKey, translate: Translate): ReactNode[] {
+  return renderReactTranslation({
+    translatedText: getWarningBadgeTranslatedText(translationKey, translate),
+    componentReplacements: [
+      {
+        start: warningBadgeBoldMarker.start,
+        end: warningBadgeBoldMarker.end,
+        render(children): ReactNode {
+          return <strong>{children}</strong>;
+        },
+      },
+    ],
+    nodeReplacements: [],
+    valueReplacements: [],
+  });
+}
+
+function renderWarningBadge(options: RenderWarningBadgeOptions): ReactNode {
+  const {badgeTranslationKey, translate} = options;
+
+  if (isNonEmptyString(badgeTranslationKey) === false) {
+    return null;
+  }
+
+  const nonEmptyBadgeTranslationKey = badgeTranslationKey as NonEmptyWarningBadgeKey;
+
+  return (
+    <li className="conversation-title-bar-indication-badge" data-uie-name="status-indication-badge">
+      {renderWarningBadgeTranslation(nonEmptyBadgeTranslationKey, translate)}
+    </li>
+  );
+}
 
 export function generateWarningBadgeKey({
   hasFederated,

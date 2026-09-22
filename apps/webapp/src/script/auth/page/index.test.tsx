@@ -18,7 +18,7 @@
  */
 
 import {act, waitFor} from '@testing-library/react';
-import {Navigate} from 'react-router-dom';
+import {Navigate} from 'react-router';
 
 import {Index} from './index';
 
@@ -30,8 +30,8 @@ import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/testUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
   Navigate: jest.fn().mockImplementation(),
 }));
 
@@ -72,7 +72,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`}, {});
+    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`}, undefined);
   });
 
   it('shows the welcome text with default backend name', () => {
@@ -219,7 +219,7 @@ describe('when visiting the index page', () => {
     it('navigates directly to email login', async () => {
       mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
-      expect(Navigate).toHaveBeenCalledWith({to: ROUTE.LOGIN}, {});
+      expect(Navigate).toHaveBeenCalledWith({to: ROUTE.LOGIN}, undefined);
     });
   });
 });

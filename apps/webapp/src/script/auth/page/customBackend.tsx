@@ -17,9 +17,10 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {useSelector} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router';
 
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
@@ -43,7 +44,7 @@ export const CustomBackend = () => {
   };
 
   const onConnect = () => {
-    if (url) {
+    if (isNonEmptyString(url)) {
       const welcomeUrl = pathWithParams(url, {[QUERY_KEY.SSO_AUTO_LOGIN]: true});
       navigateTo(
         `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${

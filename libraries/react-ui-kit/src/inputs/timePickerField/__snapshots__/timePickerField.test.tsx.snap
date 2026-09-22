@@ -260,53 +260,49 @@ exports[`"TimePickerField" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="time-picker-test"
   >
     <label
-      className="emotion-2"
-      htmlFor="time-picker-test"
+      class="emotion-2"
+      for="time-picker-test"
       id="time-picker-test-label"
     >
       Select time
     </label>
     <div
-      autoFocus={false}
-      className="emotion-3"
+      class="emotion-3"
       data-uie-name="time-picker-test"
     >
       <div
-        className="emotion-4"
-        onKeyDown={[Function]}
+        class="emotion-4"
       >
         <div
-          className="emotion-5"
-          tabIndex={0}
+          class="emotion-5"
+          tabindex="0"
         >
           <span
-            className="emotion-6"
+            class="emotion-6"
             id="react-select-2-live-region"
           />
           <span
             aria-atomic="false"
             aria-live="polite"
             aria-relevant="additions text"
-            className="emotion-6"
+            class="emotion-6"
             role="log"
           />
           <div
-            className="emotion-8"
-            onMouseDown={[Function]}
-            onTouchEnd={[Function]}
+            class="emotion-8"
           >
             <div
-              className="emotion-9"
+              class="emotion-9"
             >
               <div
-                className="emotion-10"
+                class="emotion-10"
               >
                 12:00 AM
               </div>
@@ -314,38 +310,32 @@ exports[`"TimePickerField" renders 1`] = `
               <input
                 aria-activedescendant=""
                 aria-autocomplete="list"
-                aria-expanded={false}
-                aria-haspopup={true}
-                aria-readonly={true}
-                className="emotion-11"
-                disabled={false}
+                aria-expanded="false"
+                aria-haspopup="true"
+                aria-readonly="true"
+                class="emotion-11"
                 id="time-picker-test"
-                inputMode="none"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onFocus={[Function]}
+                inputmode="none"
                 role="combobox"
-                tabIndex={-1}
+                tabindex="-1"
                 value=""
               />
             </div>
             <div
-              className="emotion-12"
+              class="emotion-12"
             >
               <span
-                className="emotion-13"
+                class="emotion-13"
               />
               <div
                 aria-hidden="true"
-                className="emotion-14"
-                onMouseDown={[Function]}
-                onTouchEnd={[Function]}
+                class="emotion-14"
               >
                 <svg
-                  className="emotion-15"
-                  height={16}
+                  class="emotion-15"
+                  height="16"
                   viewBox="0 0 16 16"
-                  width={16}
+                  width="16"
                 >
                   <g>
                     <path
@@ -614,54 +604,50 @@ exports[`"TimePickerField" renders as disabled 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="time-picker-test"
   >
     <label
-      className="emotion-2"
-      htmlFor="time-picker-test"
+      class="emotion-2"
+      for="time-picker-test"
       id="time-picker-test-label"
     >
       Select time
     </label>
     <div
-      autoFocus={false}
-      className="emotion-3"
+      class="emotion-3"
       data-uie-name="time-picker-test"
     >
       <div
-        className="emotion-4"
-        onKeyDown={[Function]}
+        class="emotion-4"
       >
         <div
-          className="emotion-5"
-          tabIndex={0}
+          class="emotion-5"
+          tabindex="0"
         >
           <span
-            className="emotion-6"
+            class="emotion-6"
             id="react-select-5-live-region"
           />
           <span
             aria-atomic="false"
             aria-live="polite"
             aria-relevant="additions text"
-            className="emotion-6"
+            class="emotion-6"
             role="log"
           />
           <div
-            aria-disabled={true}
-            className="emotion-8"
-            onMouseDown={[Function]}
-            onTouchEnd={[Function]}
+            aria-disabled="true"
+            class="emotion-8"
           >
             <div
-              className="emotion-9"
+              class="emotion-9"
             >
               <div
-                className="emotion-10"
+                class="emotion-10"
               >
                 12:00 AM
               </div>
@@ -669,38 +655,33 @@ exports[`"TimePickerField" renders as disabled 1`] = `
               <input
                 aria-activedescendant=""
                 aria-autocomplete="list"
-                aria-expanded={false}
-                aria-haspopup={true}
-                aria-readonly={true}
-                className="emotion-11"
-                disabled={true}
+                aria-expanded="false"
+                aria-haspopup="true"
+                aria-readonly="true"
+                class="emotion-11"
+                disabled=""
                 id="time-picker-test"
-                inputMode="none"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onFocus={[Function]}
+                inputmode="none"
                 role="combobox"
-                tabIndex={-1}
+                tabindex="-1"
                 value=""
               />
             </div>
             <div
-              className="emotion-12"
+              class="emotion-12"
             >
               <span
-                className="emotion-13"
+                class="emotion-13"
               />
               <div
                 aria-hidden="true"
-                className="emotion-14"
-                onMouseDown={[Function]}
-                onTouchEnd={[Function]}
+                class="emotion-14"
               >
                 <svg
-                  className="emotion-15"
-                  height={16}
+                  class="emotion-15"
+                  height="16"
                   viewBox="0 0 16 16"
-                  width={16}
+                  width="16"
                 >
                   <g>
                     <path
@@ -970,53 +951,49 @@ exports[`"TimePickerField" renders as invalid 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="time-picker-test"
   >
     <label
-      className="emotion-2"
-      htmlFor="time-picker-test"
+      class="emotion-2"
+      for="time-picker-test"
       id="time-picker-test-label"
     >
       Select time
     </label>
     <div
-      autoFocus={false}
-      className="emotion-3"
+      class="emotion-3"
       data-uie-name="time-picker-test"
     >
       <div
-        className="emotion-4"
-        onKeyDown={[Function]}
+        class="emotion-4"
       >
         <div
-          className="emotion-5"
-          tabIndex={0}
+          class="emotion-5"
+          tabindex="0"
         >
           <span
-            className="emotion-6"
+            class="emotion-6"
             id="react-select-4-live-region"
           />
           <span
             aria-atomic="false"
             aria-live="polite"
             aria-relevant="additions text"
-            className="emotion-6"
+            class="emotion-6"
             role="log"
           />
           <div
-            className="emotion-8"
-            onMouseDown={[Function]}
-            onTouchEnd={[Function]}
+            class="emotion-8"
           >
             <div
-              className="emotion-9"
+              class="emotion-9"
             >
               <div
-                className="emotion-10"
+                class="emotion-10"
               >
                 12:00 AM
               </div>
@@ -1024,38 +1001,32 @@ exports[`"TimePickerField" renders as invalid 1`] = `
               <input
                 aria-activedescendant=""
                 aria-autocomplete="list"
-                aria-expanded={false}
-                aria-haspopup={true}
-                aria-readonly={true}
-                className="emotion-11"
-                disabled={false}
+                aria-expanded="false"
+                aria-haspopup="true"
+                aria-readonly="true"
+                class="emotion-11"
                 id="time-picker-test"
-                inputMode="none"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onFocus={[Function]}
+                inputmode="none"
                 role="combobox"
-                tabIndex={-1}
+                tabindex="-1"
                 value=""
               />
             </div>
             <div
-              className="emotion-12"
+              class="emotion-12"
             >
               <span
-                className="emotion-13"
+                class="emotion-13"
               />
               <div
                 aria-hidden="true"
-                className="emotion-14"
-                onMouseDown={[Function]}
-                onTouchEnd={[Function]}
+                class="emotion-14"
               >
                 <svg
-                  className="emotion-15"
-                  height={16}
+                  class="emotion-15"
+                  height="16"
                   viewBox="0 0 16 16"
-                  width={16}
+                  width="16"
                 >
                   <g>
                     <path
@@ -1330,53 +1301,49 @@ exports[`"TimePickerField" renders with label 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
     data-uie-name="time-picker-test"
   >
     <label
-      className="emotion-2"
-      htmlFor="time-picker-test"
+      class="emotion-2"
+      for="time-picker-test"
       id="time-picker-test-label"
     >
       Time
     </label>
     <div
-      autoFocus={false}
-      className="emotion-3"
+      class="emotion-3"
       data-uie-name="time-picker-test"
     >
       <div
-        className="emotion-4"
-        onKeyDown={[Function]}
+        class="emotion-4"
       >
         <div
-          className="emotion-5"
-          tabIndex={0}
+          class="emotion-5"
+          tabindex="0"
         >
           <span
-            className="emotion-6"
+            class="emotion-6"
             id="react-select-3-live-region"
           />
           <span
             aria-atomic="false"
             aria-live="polite"
             aria-relevant="additions text"
-            className="emotion-6"
+            class="emotion-6"
             role="log"
           />
           <div
-            className="emotion-8"
-            onMouseDown={[Function]}
-            onTouchEnd={[Function]}
+            class="emotion-8"
           >
             <div
-              className="emotion-9"
+              class="emotion-9"
             >
               <div
-                className="emotion-10"
+                class="emotion-10"
               >
                 12:00 AM
               </div>
@@ -1384,38 +1351,32 @@ exports[`"TimePickerField" renders with label 1`] = `
               <input
                 aria-activedescendant=""
                 aria-autocomplete="list"
-                aria-expanded={false}
-                aria-haspopup={true}
-                aria-readonly={true}
-                className="emotion-11"
-                disabled={false}
+                aria-expanded="false"
+                aria-haspopup="true"
+                aria-readonly="true"
+                class="emotion-11"
                 id="time-picker-test"
-                inputMode="none"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onFocus={[Function]}
+                inputmode="none"
                 role="combobox"
-                tabIndex={-1}
+                tabindex="-1"
                 value=""
               />
             </div>
             <div
-              className="emotion-12"
+              class="emotion-12"
             >
               <span
-                className="emotion-13"
+                class="emotion-13"
               />
               <div
                 aria-hidden="true"
-                className="emotion-14"
-                onMouseDown={[Function]}
-                onTouchEnd={[Function]}
+                class="emotion-14"
               >
                 <svg
-                  className="emotion-15"
-                  height={16}
+                  class="emotion-15"
+                  height="16"
                   viewBox="0 0 16 16"
-                  width={16}
+                  width="16"
                 >
                   <g>
                     <path

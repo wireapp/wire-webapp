@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
@@ -41,10 +43,13 @@ export const ParticipantAvatarTooltip = ({
   avatarRingColor,
 }: ParticipantAvatarTooltipProps) => {
   const name = useUserName(participant);
-  const label = getLabel ? getLabel(name) : name;
+  const label = getLabel !== undefined ? getLabel(name) : name;
 
   return (
-    <Tooltip body={label} css={avatarRingColor ? avatarItemStyles(index, avatarRingColor) : undefined}>
+    <Tooltip
+      body={label}
+      css={isNonEmptyString(avatarRingColor) ? avatarItemStyles(index, avatarRingColor) : undefined}
+    >
       <Avatar
         participant={participant}
         aria-label={label}

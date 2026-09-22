@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from 'Util/cssMixin';
 
 import {STATE} from '.';
@@ -52,9 +54,9 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state, iconSize
         '&::before': {
           ...CSS_ICON(icons[state], iconSize),
         },
-        backgroundColor: backgroundColor[state] || defaultBackgroundColor,
+        backgroundColor: isNonEmptyString(backgroundColor[state]) ? backgroundColor[state] : defaultBackgroundColor,
         borderRadius: '50%',
-        color: color[state] || defaultColor,
+        color: isNonEmptyString(color[state]) ? color[state] : defaultColor,
       }}
       data-uie-name="element-avatar-user-badge-icon"
       data-uie-value={state}

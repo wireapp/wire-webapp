@@ -18,7 +18,9 @@
  */
 
 import {useEffect, useMemo, useState} from 'react';
+import type {ReactNode} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -34,6 +36,8 @@ import {WireIdentity} from 'src/script/e2eIdentity';
 import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import type {Logger} from 'Util/logger';
 import {splitFingerprint} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
@@ -53,6 +57,70 @@ interface DeviceDetailsProps {
   noPadding: boolean;
   device: ClientEntity;
   user: User;
+}
+
+type RenderDeviceDetailsHeadlineOptions = {
+  readonly translate: Translate;
+  readonly userName: string;
+};
+
+const deviceDetailsBoldMarker = createReactTranslationMarker('device-details-bold');
+const deviceDetailsUserMarker = createReactTranslationMarker('device-details-user');
+
+function translateDeviceDetailsHeadlineWithReactMarkers(translate: Translate): string {
+  return translate(
+    'participantDevicesDetailHeadline',
+    {user: deviceDetailsUserMarker.substitution},
+    {
+      '/bold': deviceDetailsBoldMarker.end,
+      bold: deviceDetailsBoldMarker.start,
+    },
+  );
+}
+
+function normalizeDeviceDetailsHeadlineFormatting(translatedText: string): string {
+  const boldMarkerStartIndex = translatedText.indexOf(deviceDetailsBoldMarker.start);
+  const boldMarkerEndIndex = translatedText.indexOf(deviceDetailsBoldMarker.end);
+
+  if (boldMarkerStartIndex === -1) {
+    return boldMarkerEndIndex === -1 ? translatedText : translatedText.replace(deviceDetailsBoldMarker.end, '');
+  }
+
+  if (boldMarkerEndIndex === -1) {
+    return `${translatedText}${deviceDetailsBoldMarker.end}`;
+  }
+
+  if (boldMarkerStartIndex < boldMarkerEndIndex) {
+    return translatedText;
+  }
+
+  return `${translatedText.replace(deviceDetailsBoldMarker.end, '')}${deviceDetailsBoldMarker.end}`;
+}
+
+function renderDeviceDetailsHeadline(options: RenderDeviceDetailsHeadlineOptions): ReactNode {
+  const {translate, userName} = options;
+  const translatedText = normalizeDeviceDetailsHeadlineFormatting(
+    translateDeviceDetailsHeadlineWithReactMarkers(translate),
+  );
+
+  return (
+    <span>
+      {renderReactTranslation({
+        translatedText,
+        componentReplacements: [
+          {
+            start: deviceDetailsBoldMarker.start,
+            end: deviceDetailsBoldMarker.end,
+            render(children): ReactNode {
+              return <strong>{children}</strong>;
+            },
+          },
+        ],
+        nodeReplacements: [],
+        valueReplacements: [{marker: deviceDetailsUserMarker, runtimeText: userName}],
+      })}
+    </span>
+  );
 }
 
 export const DeviceDetails = ({
@@ -96,7 +164,7 @@ export const DeviceDetails = ({
       ? conversationState.getSelfProteusConversation()
       : conversationState.activeConversation();
     setIsResettingSession(true);
-    if (conversation) {
+    if (!isNullOrUndefined(conversation)) {
       messageRepository
         .resetSession(user.qualifiedId, device.id, conversation)
         .then(_resetProgress)
@@ -105,13 +173,13 @@ export const DeviceDetails = ({
   };
 
   const activeConversation = conversationState.activeConversation();
-  const isConversationMLS = activeConversation != null ? isMLSConversation(activeConversation) : false;
+  const isConversationMLS = !isNullOrUndefined(activeConversation) ? isMLSConversation(activeConversation) : false;
 
   const deviceIdentity = getDeviceIdentity?.(device.id);
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {deviceIdentity && (
+      {!isNullOrUndefined(deviceIdentity) && (
         <MLSDeviceDetails identity={deviceIdentity} isSelfUser={user.isMe} cipherSuite={device.getCipherSuite()} />
       )}
 
@@ -121,11 +189,7 @@ export const DeviceDetails = ({
         </h3>
 
         <p className="panel__info-text">
-          <span
-            dangerouslySetInnerHTML={{
-              __html: translate('participantDevicesDetailHeadline', {user: userName}),
-            }}
-          />
+          {renderDeviceDetailsHeadline({translate, userName})}
 
           <a
             className="participant-devices__link accent-text"

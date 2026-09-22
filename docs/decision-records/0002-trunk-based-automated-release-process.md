@@ -39,6 +39,9 @@ flowchart LR
   productionRuntimeVerification[Verify live Production runtime<br/>Artifact version and Production backends]
   productionTag[YYYY-MM-DD.N-production]
   productionDistribution[Publish Docker image and Helm chart<br/>Update wire-builds/main]
+  githubReleaseHandoff[GitHub Release handoff]
+  webAppVersionSynchronization[Create WebApp version synchronization PR<br/>against current main]
+  mergeWebAppVersionSynchronization[Merge through normal protected main flow]
   manualDistributionRepair[Manual distribution repair<br/>Validate confirmation, reason, and tag]
   maintenanceBranch[maintenance/maintenance-line-key]
   maintenanceTag[maintenance-line-key-maintenance.X]
@@ -56,6 +59,10 @@ flowchart LR
   productionEnvironment -->|Deploy promoted artifact| productionRuntimeVerification
   productionRuntimeVerification -->|Verified runtime creates| productionTag
   productionTag -->|Explicit reusable workflow| productionDistribution
+  productionTag --> githubReleaseHandoff
+  productionDistribution --> webAppVersionSynchronization
+  githubReleaseHandoff --> webAppVersionSynchronization --> mergeWebAppVersionSynchronization
+  mergeWebAppVersionSynchronization --> mainBranch
   manualDistributionRepair -->|Explicit reusable workflow| productionDistribution
   productionTag -->|Create only when needed| maintenanceBranch
   maintenanceBranch -->|Validated maintenance artifact creates| maintenanceTag
@@ -170,6 +177,24 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - If Production runtime verification fails, Production remains untagged, the release workflow fails, Deployoholics receives a failure notification, and the release captain performs incident assessment.
 - If the current release branch commit already has the matching production tag, the release workflow must not redeploy that commit.
 - Production tags are immutable release history and are never moved or deleted.
+
+### WebApp package version synchronization
+
+The release process has two separate version identities:
+
+- The operational release identity is `YYYY-MM-DD.N`, with Beta and Production tags such as `YYYY-MM-DD.N-beta.M` and `YYYY-MM-DD.N-production`. This identity remains authoritative for release branches, artifacts, Docker and Helm versions, `wire-builds`, runtime `BuildMetadata`, and release verification.
+- The WebApp package SemVer is repository metadata. The `version` fields in `package.json` and `apps/webapp/package.json` on `main` represent the latest successfully synchronized Production WebApp version, not the next development version. `apps/server/package.json` is unrelated.
+
+The existing legacy `0.x.y` package state bootstraps to `1.0.0` on the first successful Production synchronization under this process. Each subsequent normal Production synchronization increments only the patch component: `1.0.0` becomes `1.0.1`, then `1.0.2`, and so on. The package files remain unchanged on the release branch and on the immutable Production-tagged commit; the Production source commit may therefore still contain the previous package SemVer.
+
+After a new Production release has completed deployment, runtime verification, immutable Production tag creation, Docker, Helm, and `wire-builds/main` distribution, and GitHub Release handoff, the workflow performs repository bookkeeping. It checks out the current `main`, creates a dedicated branch, and opens an Otto pull request that changes only the two WebApp package `version` fields. The synchronization PR is not auto-merged and must pass normal `main` review, CI, branch protection, and merge-queue requirements. The workflow does not wait for that PR to merge.
+
+The synchronization marker in the pull request body is the authoritative mapping from ADR release identifier and immutable Production tag to WebApp package SemVer. Rerunning the same Production release reuses its recorded version forever, even after later releases advance `main`; it never allocates another patch version. A new or different Production release must not proceed while a previous synchronization is open or closed without merge. Conflicting or ambiguous synchronization history fails closed.
+
+Version allocation is protected by an early release-start preflight, a fresh pre-Production preflight after the blocking E2E gate, a repository-wide non-cancellable synchronization lock, and fresh `main` and synchronization-history validation inside the post-Production orchestration. If a race still allows another release to reach Production first, its already deployed and verified Production artifact remains untouched while its bookkeeping fails closed until the unresolved synchronization is resolved.
+
+Merging the synchronization PR is an ordinary `main` merge. It therefore continues through the normal `publish-main.yml` delivery path; no metadata-only exception or special CI bypass is introduced.
+
 Release workflows must be serialized:
 
 - Only one Beta deployment may run at a time for a given release branch.

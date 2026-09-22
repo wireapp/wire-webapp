@@ -17,65 +17,46 @@
  *
  */
 
-import {MouseEvent} from 'react';
-
-import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
 
 import {
+  callingButtonGroupStyles,
   callingButtonIconStyles,
   callingButtonStyles,
 } from 'Components/meeting/meetingMultiActionButton/meetingMultiActionButton.styles';
 import {useMeetingActions} from 'Components/meeting/useMeetingActions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {showContextMenu} from '../../../ui/contextMenu';
-
 export interface MeetingMultiActionButtonProps {
   useMeetingActionsHook?: typeof useMeetingActions;
-  triggerContextMenu?: typeof showContextMenu;
 }
 
 export const MeetingMultiActionButton = ({
-  triggerContextMenu = showContextMenu,
   useMeetingActionsHook = useMeetingActions,
 }: MeetingMultiActionButtonProps) => {
   const {translate} = useApplicationContext();
   const {handleMeetNow, handleScheduleMeeting} = useMeetingActionsHook();
 
-  const handleCreateMeetingClick = (event: MouseEvent<HTMLElement>) => {
-    triggerContextMenu({
-      event,
-      anchor: event.currentTarget,
-      placement: 'bottom-start',
-      offset: 0,
-      entries: [
-        {
-          title: translate('meetings.action.meetNow'),
-          label: translate('meetings.action.meetNow'),
-          click: () => {
-            handleMeetNow();
-          },
-        },
-        {
-          title: translate('meetings.action.scheduleMeeting'),
-          label: translate('meetings.action.scheduleMeeting'),
-          click: () => {
-            handleScheduleMeeting();
-          },
-        },
-      ],
-      identifier: 'meeting-actions-menu',
-    });
-  };
-
   return (
-    <Button
-      variant={ButtonVariant.TERTIARY}
-      css={callingButtonStyles}
-      onClick={handleCreateMeetingClick}
-      data-uie-name="create-meeting"
-    >
-      <CallIcon css={callingButtonIconStyles} /> {translate('meetings.action.createMeeting')}
-    </Button>
+    <div className="buttons-group" css={callingButtonGroupStyles}>
+      <Button
+        className="buttons-group-button buttons-group-button-left"
+        variant={ButtonVariant.TERTIARY}
+        onClick={handleMeetNow}
+        data-uie-name="meet-now"
+        css={callingButtonStyles}
+      >
+        <CallIcon css={callingButtonIconStyles} aria-hidden="true" /> {translate('meetings.action.meetNow')}
+      </Button>
+      <Button
+        className="buttons-group-button buttons-group-button-right"
+        variant={ButtonVariant.TERTIARY}
+        onClick={handleScheduleMeeting}
+        data-uie-name="schedule-meeting"
+        css={callingButtonStyles}
+      >
+        <CalendarIcon css={callingButtonIconStyles} aria-hidden="true" /> {translate('meetings.action.scheduleMeeting')}
+      </Button>
+    </div>
   );
 };

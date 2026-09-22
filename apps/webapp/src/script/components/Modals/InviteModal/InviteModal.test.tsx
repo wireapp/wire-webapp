@@ -24,14 +24,16 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {InviteModal} from './InviteModal';
 
-test('proper render invite modal text', async () => {
-  const userName = 'janek';
-  const user = new User('', '', translateForTest);
+describe('InviteModal', () => {
+  it('proper render invite modal text', async () => {
+    const userName = 'janek';
+    const user = new User('', '', translateForTest);
 
-  user.username(userName);
+    user.username(userName);
 
-  render(<InviteModal translate={translateForTest} selfUser={user} />);
+    render(<InviteModal translate={translateForTest} selfUser={user} />);
 
-  const textarea = await screen.getByTestId('invite-modal-message');
-  await waitFor(() => expect((textarea as HTMLTextAreaElement).value).toBe('inviteMessage'));
+    const textarea = await screen.getByTestId('invite-modal-message');
+    await waitFor(() => expect((textarea as HTMLTextAreaElement).value).toBe('inviteMessage'));
+  });
 });

@@ -61,6 +61,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
@@ -111,6 +112,7 @@ import {callingSubscriptions} from './callingSubscriptionsHandler';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCallInvite';
 import {ClientId, Participant, UserId} from './Participant';
 
 import {Config} from '../../Config';
@@ -194,6 +196,7 @@ export class CallingRepository {
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
   private isOnAvsRustSft = false;
+  private readonly incomingSetupReceivedAtByConversation = new Map<SerializedConversationId, number>();
 
   static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
 
@@ -1161,6 +1164,15 @@ export class CallingRepository {
 
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
+    const isFromSelf = !!this.selfUser && matchQualifiedIds(this.selfUser.qualifiedId, userId);
+    const incomingSetupReceivedAtMs = new Date(time).getTime();
+
+    if (isIncomingSetupOffer(content) && !isFromSelf && Number.isFinite(incomingSetupReceivedAtMs)) {
+      this.incomingSetupReceivedAtByConversation.set(
+        this.serializeQualifiedId(conversation.qualifiedId),
+        incomingSetupReceivedAtMs,
+      );
+    }
 
     let senderClientId = '';
     if (senderFullyQualifiedClientId) {
@@ -2577,6 +2589,26 @@ export class CallingRepository {
       );
       return;
     }
+
+    const nowMs = this.serverTimeHandler.toServerTimestamp();
+    if (
+      shouldRejectStaleIncomingRing({
+        shouldRing: !!shouldRing,
+        incomingSetupReceivedAtMs: Maybe.of(
+          this.incomingSetupReceivedAtByConversation.get(this.serializeQualifiedId(conversation.qualifiedId)),
+        ),
+        nowMs,
+        lifetimeMs: EventRepository.CONFIG.E_CALL_EVENT_LIFETIME,
+      })
+    ) {
+      this.logger.info(
+        `Skipping incoming ring, last incoming SETUP is older than ${EventRepository.CONFIG.E_CALL_EVENT_LIFETIME}ms`,
+        conversationId,
+      );
+      this.rejectCall(conversationId);
+      return;
+    }
+
     const storedCall = this.findCall(conversationId);
     if (storedCall) {
       // A call that has been picked up by another device can still be in storage.
@@ -3072,17 +3104,33 @@ export class CallingRepository {
     const modalOptions = {
       text: {
         closeBtnLabel: this.translate('modalNoCameraCloseBtn'),
-        htmlMessage: this.translate(
-          'modalNoCameraMessage',
-          {brandName: Config.getConfig().BRAND_NAME},
-          {
-            '/faqLink': '</a>',
-            br: '<br>',
-            faqLink: `<a href="${
-              Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-            }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
-          },
-        ),
+        translatedMessage: {
+          compatibilityReplacements: [],
+          components: [
+            {kind: 'line-break', legacyTokens: [], markerName: 'br'},
+            {
+              className: '',
+              dataUieName: 'go-no-camera-faq',
+              href: Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED,
+              kind: 'link',
+              legacyClosingTokens: [],
+              legacyOpeningTokens: [],
+              markerName: 'faqLink',
+              rel: 'noopener noreferrer',
+              target: '_blank',
+            },
+          ],
+          kind: 'translation',
+          layout: 'default',
+          translationKey: 'modalNoCameraMessage',
+          values: [
+            {
+              alternatePlaceholders: [],
+              placeholder: 'brandName',
+              runtimeText: Config.getConfig().BRAND_NAME,
+            },
+          ],
+        } satisfies PrimaryModalTranslatedMessage,
         title: this.translate('modalNoCameraTitle'),
       },
       close: restoreFocusCallback(),

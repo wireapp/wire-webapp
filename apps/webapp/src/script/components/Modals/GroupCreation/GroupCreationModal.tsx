@@ -55,7 +55,6 @@ import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBi
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
-import {replaceLink} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
@@ -280,11 +279,6 @@ const GroupCreationModal = ({
           setIsShown(false);
 
           const backendString = error.backends.join(', and ');
-          const replaceBackends = replaceLink(
-            Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
-            'modal__text__read-more',
-            'read-more-backends',
-          );
           return PrimaryModal.show(
             PrimaryModal.type.MULTI_ACTIONS,
             {
@@ -305,11 +299,32 @@ const GroupCreationModal = ({
                 },
               },
               text: {
-                htmlMessage: translate(
-                  'groupCreationPreferencesNonFederatingMessage',
-                  {backends: backendString},
-                  replaceBackends,
-                ),
+                translatedMessage: {
+                  compatibilityReplacements: [],
+                  components: [
+                    {
+                      className: 'modal__text__read-more',
+                      dataUieName: 'read-more-backends',
+                      href: Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
+                      kind: 'link',
+                      legacyClosingTokens: [],
+                      legacyOpeningTokens: [],
+                      markerName: 'link',
+                      rel: 'nofollow noopener noreferrer',
+                      target: '_blank',
+                    },
+                  ],
+                  kind: 'translation',
+                  layout: 'default',
+                  translationKey: 'groupCreationPreferencesNonFederatingMessage',
+                  values: [
+                    {
+                      alternatePlaceholders: [],
+                      placeholder: 'backends',
+                      runtimeText: backendString,
+                    },
+                  ],
+                },
                 title: translate('groupCreationPreferencesNonFederatingHeadline'),
               },
             },

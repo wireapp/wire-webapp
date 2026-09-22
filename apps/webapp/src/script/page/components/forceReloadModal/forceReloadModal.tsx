@@ -78,7 +78,14 @@ export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = p
         },
         text: {
           title: translate('forceReloadModalTitle'),
-          htmlMessage: translate('forceReloadModalMessage'),
+          translatedMessage: {
+            compatibilityReplacements: [],
+            components: [],
+            kind: 'translation',
+            layout: 'default',
+            translationKey: 'forceReloadModalMessage',
+            values: [],
+          },
         },
       },
       undefined,

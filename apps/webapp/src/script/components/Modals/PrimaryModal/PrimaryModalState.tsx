@@ -17,12 +17,12 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {isValid} from 'date-fns';
 import {escape} from 'underscore';
 import {create} from 'zustand';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
-import {replaceLink} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatLocale} from 'Util/timeUtil';
 import {noop} from 'Util/util';
@@ -62,7 +62,6 @@ const defaultContent: ModalContent = {
   currentType: '',
   inputPlaceholder: '',
   message: '',
-  messageHtml: '',
   modalUie: '',
   onBgClick: noop,
   primaryAction: {} as ButtonAction,
@@ -120,7 +119,7 @@ const addNewModalToQueue = (
 
 const showNextModalInQueue = (): void => {
   const {queue, currentModalId, removeFirstItemInQueue} = usePrimaryModalState.getState();
-  if (currentModalId !== null && currentModalId !== undefined && currentModalId !== '') {
+  if (!isNullOrUndefined(currentModalId) && currentModalId !== '') {
     // we already have a modal open which is awaiting a manual user action
     return;
   }
@@ -170,8 +169,8 @@ const updateCurrentModalContent = (
     copyPassword,
     currentType: type,
     inputPlaceholder: text.input ?? '',
-    messageHtml: text.htmlMessage,
     message: text.message,
+    translatedMessage: text.translatedMessage,
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
     primaryAction: primaryAction ?? null,
@@ -214,22 +213,21 @@ const updateCurrentModalContent = (
     }
     case PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
       content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
-      content.titleText =
-        data !== undefined && data !== null
-          ? translate('modalAccountReadReceiptsChangedOnHeadline')
-          : translate('modalAccountReadReceiptsChangedOffHeadline');
+      content.titleText = !isNullOrUndefined(data)
+        ? translate('modalAccountReadReceiptsChangedOnHeadline')
+        : translate('modalAccountReadReceiptsChangedOffHeadline');
       content.message = translate('modalAccountReadReceiptsChangedMessage');
       break;
     }
     case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: translate('modalAcknowledgeAction'), ...primaryAction};
       content.titleText = text.title ?? translate('modalAcknowledgeHeadline');
-      content.message = text.htmlMessage === undefined || text.htmlMessage === '' ? (text.message ?? '') : '';
+      content.message = text.message ?? '';
       break;
     }
     case PrimaryModalType.WITHOUT_TITLE: {
       content.primaryAction = {...primaryAction};
-      content.message = text.htmlMessage === undefined || text.htmlMessage === '' ? (text.message ?? '') : '';
+      content.message = text.message ?? '';
       break;
     }
     case PrimaryModalType.CONFIRM: {
@@ -251,22 +249,37 @@ const updateCurrentModalContent = (
     case PrimaryModalType.SESSION_RESET: {
       content.titleText = translate('modalSessionResetHeadline');
       content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
-      content.messageHtml = translate(
-        'modalSessionResetMessage',
-        undefined,
-        replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT),
-      );
+      content.translatedMessage = {
+        compatibilityReplacements: [],
+        components: [
+          {
+            className: '',
+            dataUieName: '',
+            href: Config.getConfig().URL.SUPPORT.BUG_REPORT,
+            kind: 'link',
+            legacyClosingTokens: ['[/link]', '/link]'],
+            legacyOpeningTokens: ['[link]', '[линк]'],
+            markerName: 'link',
+            rel: 'nofollow noopener noreferrer',
+            target: '_blank',
+          },
+        ],
+        kind: 'translation',
+        layout: 'default',
+        translationKey: 'modalSessionResetMessage',
+        values: [],
+      };
       break;
     }
   }
-  if (content.secondaryAction) {
+  if (!isNullOrUndefined(content.secondaryAction)) {
     const updatedSecondaryAction = Array.isArray(content.secondaryAction)
       ? content.secondaryAction
       : [content.secondaryAction];
     // force it into array format
     const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
     content.secondaryAction = updatedSecondaryAction.map((action, index) => {
-      const uieName = uieNames[index] || 'do-remaining';
+      const uieName = isNonEmptyString(uieNames[index]) ? uieNames[index] : 'do-remaining';
       return {...action, uieName};
     });
   }

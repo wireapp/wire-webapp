@@ -44,13 +44,17 @@ export const roundIconButtonStyle: <T>(theme: Theme, props: RoundIconButtonProps
   width: `${props.size}px`,
 });
 
-export const RoundIconButton: React.FC<RoundIconButtonProps> = ({children, ...props}) => (
-  <button css={(theme: Theme) => roundIconButtonStyle(theme, props)} {...filterButtonProps(props)}>
-    {childrenWithDefaultProps<SVGSVGElement, SVGIconProps>({children, defaultProps: {color: COLOR.WHITE}})}
-  </button>
-);
+export function RoundIconButton({
+  children,
+  backgroundColor = COLOR.BLUE,
+  size = 32,
+  ...props
+}: RoundIconButtonProps): React.ReactElement {
+  const buttonProps = {...props, backgroundColor, size};
 
-RoundIconButton.defaultProps = {
-  backgroundColor: COLOR.BLUE,
-  size: 32,
-};
+  return (
+    <button css={(theme: Theme) => roundIconButtonStyle(theme, buttonProps)} {...filterButtonProps(buttonProps)}>
+      {childrenWithDefaultProps<SVGSVGElement, SVGIconProps>({children, defaultProps: {color: COLOR.WHITE}})}
+    </button>
+  );
+}

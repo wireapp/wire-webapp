@@ -27,8 +27,10 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
 
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
@@ -52,15 +54,18 @@ import {
   loadMoreWrapperStyles,
   wrapperStyles,
 } from './conversationCells.styles';
+import {type SharedDriveDropRejection, getSharedDriveDropRejectionFeedback} from './sharedDriveDrop';
 import {SharedDriveDropzone} from './sharedDriveDropzone';
 import {useSharedDriveUploadController} from './sharedDriveUploadContext';
-import {handleSharedDriveUploadInput} from './sharedDriveUploadInput';
+import {SharedDriveUploadInput} from './sharedDriveUploadInput';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
+
+import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;
@@ -70,7 +75,6 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
-  onUploadFolder: () => void;
   isUploadFilesEnabled: boolean;
   showViewerPermission: boolean;
 }
@@ -84,16 +88,17 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
-    onUploadFolder,
     isUploadFilesEnabled,
     showViewerPermission,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
     const sharedDriveUploadController = useSharedDriveUploadController();
     const uploadInput = useRef<HTMLInputElement>(null);
+    const folderUploadInput = useRef<HTMLInputElement>(null);
     const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const onUploadFiles = () => uploadInput.current?.click();
+    const onUploadFolder = () => folderUploadInput.current?.click();
     const {
       cellsState: initialCellState,
       name,
@@ -202,7 +207,20 @@ export const ConversationCells = memo(
 
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+
+    useEffect(() => {
+      sharedDriveUploadController.updateRefresh(sharedDriveConversationQualifiedId, handleRefresh);
+    }, [handleRefresh, sharedDriveConversationQualifiedId, sharedDriveUploadController]);
     const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
+    const maxSharedDriveUploadFileSize = Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_CELLS;
+    const handleSharedDriveUploadRejection = useCallback(
+      (rejection: SharedDriveDropRejection): void => {
+        const feedback = getSharedDriveDropRejectionFeedback(rejection, translate, maxSharedDriveUploadFileSize);
+
+        showFileDropzoneErrorModal({...feedback, translate});
+      },
+      [maxSharedDriveUploadFileSize, translate],
+    );
     const handleDroppedFiles = useSharedDriveFileDrop({
       conversationQualifiedId: sharedDriveConversationQualifiedId,
       fireAndForgetInvoker,
@@ -213,23 +231,18 @@ export const ConversationCells = memo(
       translate,
       uploadPath: sharedDriveUploadPath,
     });
-    const handleUploadFiles = useCallback(
-      (event: React.ChangeEvent<HTMLInputElement>): void =>
-        handleSharedDriveUploadInput(event, {
-          fireAndForgetInvoker,
-          onRefresh: handleRefresh,
-          sharedDriveUploadController,
-          uploadPath: sharedDriveUploadPath,
-          conversationQualifiedId: sharedDriveConversationQualifiedId,
-        }),
-      [
-        fireAndForgetInvoker,
-        handleRefresh,
-        sharedDriveUploadController,
-        sharedDriveConversationQualifiedId,
-        sharedDriveUploadPath,
-      ],
-    );
+    const sharedDriveUploadInputDependencies = {
+      fireAndForgetInvoker,
+      onRefresh: handleRefresh,
+      onReject: handleSharedDriveUploadRejection,
+      isUploadFilesEnabled: canUploadToSharedDrive,
+      isInRecycleBin,
+      maxFileSize: maxSharedDriveUploadFileSize,
+      isAcceptedFile: (file: File) => allowsAllFiles() || hasAllowedExtension(file.name),
+      sharedDriveUploadController,
+      uploadPath: sharedDriveUploadPath,
+      conversationQualifiedId: sharedDriveConversationQualifiedId,
+    };
 
     const resetSharedDriveDropState = useCallback((): void => {
       setActiveFolderDropTargetName(null);
@@ -304,7 +317,12 @@ export const ConversationCells = memo(
           onDropFiles={handleDroppedFiles}
         >
           <div css={wrapperStyles}>
-            <input ref={uploadInput} type="file" hidden onChange={handleUploadFiles} />
+            <SharedDriveUploadInput ref={uploadInput} {...sharedDriveUploadInputDependencies} selectionMode="files" />
+            <SharedDriveUploadInput
+              ref={folderUploadInput}
+              {...sharedDriveUploadInputDependencies}
+              selectionMode="folder"
+            />
             <CellsHeader
               onRefresh={handleRefresh}
               conversationName={name}

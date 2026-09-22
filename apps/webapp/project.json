@@ -95,7 +95,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=853 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
+        "command": "eslint --config eslint.config.mjs --max-warnings=847 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
       }
     },
     "lint:full": {
@@ -137,6 +137,13 @@
       "options": {
         "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t",
         "cwd": "{projectRoot}"
+      }
+    },
+    "validate-translations": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/i18n/validateTranslationPlaceholders.mts",
+        "cwd": "{workspaceRoot}"
       }
     },
     "configure": {

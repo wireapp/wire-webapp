@@ -26,6 +26,7 @@
  */
 import React, {
   MutableRefObject,
+  ReactElement,
   ReactPortal,
   useCallback,
   useEffect,
@@ -90,7 +91,7 @@ export type MenuRenderFn<TOption extends TypeaheadOption> = (
   anchorElementRef: MutableRefObject<HTMLElement | null>,
   itemProps: ItemProps<TOption>,
   matchingString: string,
-) => ReactPortal | JSX.Element | null;
+) => ReactPortal | ReactElement | null;
 
 const scrollToOption = <TOption extends TypeaheadOption>(index: number, options: TOption[]) => {
   const selectedOption = options[index];
@@ -327,7 +328,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   ) => void;
   onMenuVisibilityChange?: (visible: boolean) => void;
   isReversed?: boolean;
-}): JSX.Element | null {
+}): ReactElement | null {
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedIndex, setHighlightedIndex] = useState<null | number>(null);
   const defaultSelectedIndex = isReversed ? options.length - 1 : 0;
@@ -596,7 +597,7 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
   anchorClassName,
   containerId,
   isReversed = false,
-}: TypeaheadMenuPluginProps<TOption>): JSX.Element | null {
+}: TypeaheadMenuPluginProps<TOption>): ReactElement | null {
   const previousText = useRef<string>('');
   const [editor] = useLexicalComposerContext();
   const [resolution, setResolution] = useState<Resolution | null>(null);

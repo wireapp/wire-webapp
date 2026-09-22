@@ -29,9 +29,9 @@ import {mapMeetNowCommandToCreateMeeting} from 'Components/meeting/mapMeetNowCom
 import {mapScheduleCommandToCreateMeeting} from 'Components/meeting/mapScheduleCommandToCreateMeeting';
 import {mapUpdateCommandToUpdateMeeting} from 'Components/meeting/mapUpdateCommandToUpdateMeeting';
 import {
+  type MeetingConversationSyncError,
   meetingConversationSyncErrors,
   syncMeetingConversationParticipants,
-  type MeetingConversationSyncError,
 } from 'Components/meeting/meetingConversationSync';
 import type {MeetingServiceDeps} from 'Components/meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
@@ -78,6 +78,7 @@ const saveMeetingConversationFromResponse = (
 
 const createMeetingAndSyncParticipants = (
   createPayload: CreateMeeting,
+  password: string | undefined,
   selectedUsers: User[],
   deps: MeetingServiceDeps,
 ): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
@@ -89,21 +90,27 @@ const createMeetingAndSyncParticipants = (
         deps.conversationRepository,
         createdMeeting.conversation,
         meetingSubmitErrors.conversationSetupFailed,
-      ).andThen(() =>
-        syncMeetingConversationParticipants(deps.conversationRepository, {
-          qualifiedConversationId: createdMeeting.qualified_conversation,
-          selectedUsers,
-          usersToAdd: selectedUsers,
-          userIdsToRemove: [],
-          isCreate: true,
-        })
-          .mapRejected(mapSyncErrorToSubmitError)
-          .map(syncResult => ({
-            ...syncResult,
-            qualifiedConversation: createdMeeting.qualified_conversation,
-            qualifiedMeetingId: createdMeeting.qualified_id,
-          })),
-      ),
+      )
+        .andThen(() =>
+          deps.conversationRepository
+            .requestMeetingConversationCode(createdMeeting.qualified_conversation, password)
+            .orElse(() => task.resolve(undefined)),
+        )
+        .andThen(() =>
+          syncMeetingConversationParticipants(deps.conversationRepository, {
+            qualifiedConversationId: createdMeeting.qualified_conversation,
+            selectedUsers,
+            usersToAdd: selectedUsers,
+            userIdsToRemove: [],
+            isCreate: true,
+          })
+            .mapRejected(mapSyncErrorToSubmitError)
+            .map(syncResult => ({
+              ...syncResult,
+              qualifiedConversation: createdMeeting.qualified_conversation,
+              qualifiedMeetingId: createdMeeting.qualified_id,
+            })),
+        ),
     );
 
 /**
@@ -115,6 +122,7 @@ export const scheduleMeeting = (
 ): Task<ScheduleMeetingSuccess, MeetingSubmitErrors> =>
   createMeetingAndSyncParticipants(
     mapScheduleCommandToCreateMeeting(command, deps.deviceTimeZone),
+    command.password,
     command.selectedUsers,
     deps,
   ).map(({failedToAdd, qualifiedMeetingId}) => ({
@@ -131,6 +139,7 @@ export const meetNowMeeting = (
 ): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
   createMeetingAndSyncParticipants(
     mapMeetNowCommandToCreateMeeting(command, deps.wallClock, deps.deviceTimeZone),
+    command.password,
     command.selectedUsers,
     deps,
   );

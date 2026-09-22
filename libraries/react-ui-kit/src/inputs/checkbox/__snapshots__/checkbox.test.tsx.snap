@@ -86,28 +86,20 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
   >
     <input
-      className="wireinput"
+      class="wireinput"
       id="1"
-      style={
-        {
-          "cursor": "pointer",
-          "height": "22px",
-          "marginBottom": "0",
-          "opacity": 0,
-          "width": "22px",
-        }
-      }
+      style="height: 22px; margin-bottom: 0px; opacity: 0; width: 22px; cursor: pointer;"
       type="checkbox"
     />
     <label
-      className="emotion-2"
-      htmlFor="1"
+      class="emotion-2"
+      for="1"
     >
       Checkbox
       <svg
@@ -211,28 +203,20 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
   >
     <input
-      className="wireinput"
+      class="wireinput"
       id="1"
-      style={
-        {
-          "cursor": "pointer",
-          "height": "22px",
-          "marginBottom": "0",
-          "opacity": 0,
-          "width": "22px",
-        }
-      }
+      style="height: 22px; margin-bottom: 0px; opacity: 0; width: 22px; cursor: pointer;"
       type="checkbox"
     />
     <label
-      className="emotion-2"
-      htmlFor="1"
+      class="emotion-2"
+      for="1"
     >
       Check
       <svg
@@ -336,28 +320,20 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
   >
     <input
-      className="wireinput"
+      class="wireinput"
       id="1"
-      style={
-        {
-          "cursor": "pointer",
-          "height": "22px",
-          "marginBottom": "0",
-          "opacity": 0,
-          "width": "22px",
-        }
-      }
+      style="height: 22px; margin-bottom: 0px; opacity: 0; width: 22px; cursor: pointer;"
       type="checkbox"
     />
     <label
-      className="emotion-2"
-      htmlFor="1"
+      class="emotion-2"
+      for="1"
     >
       Check
       <svg
@@ -457,29 +433,21 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <div
-    className="emotion-1"
+    class="emotion-1"
   >
     <input
-      className="wireinput"
-      disabled={true}
+      class="wireinput"
+      disabled=""
       id="1"
-      style={
-        {
-          "cursor": "not-allowed",
-          "height": "22px",
-          "marginBottom": "0",
-          "opacity": 0,
-          "width": "22px",
-        }
-      }
+      style="height: 22px; margin-bottom: 0px; opacity: 0; width: 22px; cursor: not-allowed;"
       type="checkbox"
     />
     <label
-      className="emotion-2"
-      htmlFor="1"
+      class="emotion-2"
+      for="1"
     >
       Check
       <svg
@@ -520,10 +488,10 @@ exports[`"CheckboxLabel" renders 1`] = `
 }
 
 <div
-  className="emotion-0"
+  class="emotion-0"
 >
   <span
-    className="emotion-1"
+    class="emotion-1"
   >
     Label
   </span>

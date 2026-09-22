@@ -17,7 +17,7 @@
  *
  */
 
-import {isString, isUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
 import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/verificationActionType';
@@ -109,7 +109,7 @@ export class AuthAction {
             throw new Error('Core services are not initialized.');
           }
           const existingClient = await coreServices.client.loadClient();
-          entropyData = existingClient ? undefined : await getEntropy();
+          entropyData = !isNullOrUndefined(existingClient) ? undefined : await getEntropy();
         }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(

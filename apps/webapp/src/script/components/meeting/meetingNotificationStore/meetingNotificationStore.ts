@@ -28,6 +28,7 @@ export enum MeetingNotificationKind {
   UPDATE = 'update',
   CANCELLED = 'cancelled',
   ONGOING = 'ongoing',
+  REMINDER = 'reminder',
 }
 
 type MeetingNotificationBase = {
@@ -53,6 +54,10 @@ export type AddNotificationInput = MeetingNotificationBase &
       }
     | {
         kind: MeetingNotificationKind.ONGOING;
+        qualifiedCreator: QualifiedId;
+      }
+    | {
+        kind: MeetingNotificationKind.REMINDER;
         qualifiedCreator: QualifiedId;
       }
   );
@@ -116,6 +121,18 @@ export const useMeetingNotificationStore = create<MeetingNotificationStore>(set 
           )
           .with(
             {kind: MeetingNotificationKind.ONGOING},
+            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
+              kind,
+              qualifiedId,
+              qualifiedConversationId,
+              meetingTitle,
+              id: `meeting-notification-${nextNotificationId++}`,
+              qualifiedCreator,
+              meetingStartTime,
+            }),
+          )
+          .with(
+            {kind: MeetingNotificationKind.REMINDER},
             ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
               kind,
               qualifiedId,

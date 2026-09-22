@@ -36,7 +36,8 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {replaceLink} from 'Util/localizerUtil';
+import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {useUserModalState} from './UserModal.state';
 import {
@@ -61,13 +62,52 @@ export interface UserModalProps {
 }
 
 const brandName = Config.getConfig().BRAND_NAME;
+const legalHoldLinkMarker = createReactTranslationMarker('legal-hold-link');
+
+type RenderBlockedForLegalHoldMessageOptions = {
+  readonly legalHoldBlockUrl: string;
+  readonly translate: Translate;
+};
+
+function renderBlockedForLegalHoldMessage(options: RenderBlockedForLegalHoldMessageOptions): ReactNode[] {
+  const {legalHoldBlockUrl, translate} = options;
+  const translatedText = translate('modalUserBlockedForLegalHold', undefined, {
+    link: legalHoldLinkMarker.start,
+    '/link': legalHoldLinkMarker.end,
+  });
+
+  return renderReactTranslation({
+    translatedText,
+    componentReplacements: [
+      {
+        start: legalHoldLinkMarker.start,
+        end: legalHoldLinkMarker.end,
+        render(children): ReactNode {
+          return (
+            <a
+              data-uie-name="read-more-legal-hold"
+              href={legalHoldBlockUrl}
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              {children}
+            </a>
+          );
+        },
+      },
+    ],
+    nodeReplacements: [],
+    valueReplacements: [],
+  });
+}
 
 interface UserModalUserActionsSectionProps {
   user: User;
   onAction: () => void;
   isSelfActivated: boolean;
   selfUser: User;
-  blockedForLegalHoldMessageHtml: string;
+  legalHoldBlockUrl: string;
+  translate: Translate;
 }
 
 const UserModalUserActionsSection = ({
@@ -75,18 +115,17 @@ const UserModalUserActionsSection = ({
   onAction,
   isSelfActivated,
   selfUser,
-  blockedForLegalHoldMessageHtml,
+  legalHoldBlockUrl,
+  translate,
 }: UserModalUserActionsSectionProps) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
   const {mainViewModel} = useApplicationContext();
 
   if (isBlockedLegalHold) {
     return (
-      <div
-        className="modal__message"
-        data-uie-name="status-blocked-legal-hold"
-        dangerouslySetInnerHTML={{__html: blockedForLegalHoldMessageHtml}}
-      />
+      <div className="modal__message" data-uie-name="status-blocked-legal-hold">
+        {renderBlockedForLegalHoldMessage({legalHoldBlockUrl, translate})}
+      </div>
     );
   }
 
@@ -178,6 +217,7 @@ const UserModal = ({
   teamState = container.resolve(TeamState),
 }: UserModalProps) => {
   const {translate} = useApplicationContext();
+  const legalHoldBlockUrl = Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK;
   const onClose = useUserModalState(state => state.onClose);
   const userId = useUserModalState(state => state.userId);
   const resetState = useUserModalState(state => state.resetState);
@@ -230,11 +270,8 @@ const UserModal = ({
     };
   }, [userId, userRepository]);
 
-  const replaceLinkLegalHold = replaceLink(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold');
-  const blockedForLegalHoldMessageHtml = translate('modalUserBlockedForLegalHold', undefined, replaceLinkLegalHold);
-
   let modalDataUieName = '';
-  if (user) {
+  if (user !== null) {
     modalDataUieName = 'modal-user-profile';
   } else if (userNotFound) {
     modalDataUieName = 'modal-cannot-open-profile';
@@ -273,9 +310,11 @@ const UserModal = ({
       </div>
 
       <FadingScrollbar
-        className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}
+        className={cx('modal__body user-modal__wrapper', {
+          'user-modal__wrapper--max': user === null && userNotFound === false,
+        })}
       >
-        {user && (
+        {user !== null && (
           <>
             <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
@@ -292,11 +331,12 @@ const UserModal = ({
               onAction={hide}
               isSelfActivated={isActivatedAccount}
               selfUser={selfUser}
-              blockedForLegalHoldMessageHtml={blockedForLegalHoldMessageHtml}
+              legalHoldBlockUrl={legalHoldBlockUrl}
+              translate={translate}
             />
           </>
         )}
-        {isShown && !user && !userNotFound && (
+        {isShown === true && user === null && userNotFound === false && (
           <div className="loading-wrapper">
             <Icon.LoadingIcon aria-hidden="true" />
           </div>

@@ -70,28 +70,12 @@ describe('FeatureConfigChangeNotifier', () => {
   };
 
   it.each([
-    [
-      FEATURE_KEY.FILE_SHARING,
-      'Sharing and receiving files of any type is now enabled',
-      'Sharing and receiving files of any type is now disabled',
-    ],
-    [FEATURE_KEY.VIDEO_CALLING, 'Camera in calls is enabled', 'Camera in calls is disabled'],
-    [
-      FEATURE_KEY.CONFERENCE_CALLING,
-      'Your team was upgraded to  Enterprise, which gives you access to features such as conference calls and more. <a href="undefined" data-uie-name="read-more-pricing" class="modal__text__read-more" rel="nofollow noopener noreferrer" target="_blank">Learn more about  Enterprise</a>',
-      undefined,
-    ],
-    [
-      FEATURE_KEY.CONVERSATION_GUEST_LINKS,
-      'Generating guest links is now enabled for all group admins.',
-      'Generating guest links is now disabled for all group admins.',
-    ],
-    [
-      FEATURE_KEY.ENFORCE_DOWNLOAD_PATH,
-      'You’ll find your downloaded files now in a specific standard location on your Windows computer. The app needs a restart for the new setting to take effect.',
-      'Standard file location on Windows computers is disabled. Restart the app to save downloaded files in a new location.',
-    ],
-  ] as const)('shows a modal when feature %s is turned on and off', async (feature, enabledString, disabledString) => {
+    [FEATURE_KEY.FILE_SHARING, true],
+    [FEATURE_KEY.VIDEO_CALLING, true],
+    [FEATURE_KEY.CONFERENCE_CALLING, false],
+    [FEATURE_KEY.CONVERSATION_GUEST_LINKS, true],
+    [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH, true],
+  ] as const)('shows a modal when feature %s is turned on and off', async (feature, hasDisabledNotification) => {
     const teamState = new TeamState();
     render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />, {wrapper: rootProviderWrapper});
     act(() => {
@@ -114,7 +98,7 @@ describe('FeatureConfigChangeNotifier', () => {
         PrimaryModal.type.ACKNOWLEDGE,
         expect.objectContaining({
           text: expect.objectContaining({
-            htmlMessage: enabledString,
+            translatedMessage: expect.objectContaining({kind: 'translation'}),
           }),
         }),
         undefined,
@@ -132,7 +116,7 @@ describe('FeatureConfigChangeNotifier', () => {
       });
     });
 
-    if (!disabledString) {
+    if (!hasDisabledNotification) {
       expect(showModalSpy).toHaveBeenCalledTimes(1);
     } else {
       await waitFor(() => {
@@ -141,7 +125,7 @@ describe('FeatureConfigChangeNotifier', () => {
           PrimaryModal.type.ACKNOWLEDGE,
           expect.objectContaining({
             text: expect.objectContaining({
-              htmlMessage: disabledString,
+              translatedMessage: expect.objectContaining({kind: 'translation'}),
             }),
           }),
           undefined,
@@ -190,7 +174,7 @@ describe('FeatureConfigChangeNotifier', () => {
     ],
   ])(
     'indicates the config change when self deleting messages have changed (%s) to (%s)',
-    async (fromStatus, toStatus, expectedText) => {
+    async (fromStatus, toStatus) => {
       const teamState = new TeamState();
       render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />, {
         wrapper: rootProviderWrapper,
@@ -218,7 +202,7 @@ describe('FeatureConfigChangeNotifier', () => {
             primaryAction: undefined,
             preventClose: false,
             text: expect.objectContaining({
-              htmlMessage: expectedText,
+              translatedMessage: expect.objectContaining({kind: 'translation'}),
             }),
           },
           undefined,

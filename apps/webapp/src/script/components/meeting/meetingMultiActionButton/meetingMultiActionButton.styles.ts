@@ -17,8 +17,12 @@
  *
  */
 
-export const callingButtonStyles = {
+export const callingButtonGroupStyles = {
   margin: '7px 0',
+};
+
+export const callingButtonStyles = {
+  marginBottom: '0px',
 };
 
 export const callingButtonIconStyles = {

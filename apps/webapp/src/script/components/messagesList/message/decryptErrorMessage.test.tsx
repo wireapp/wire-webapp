@@ -25,7 +25,6 @@ import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 import en from 'I18n/en-US.json';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
 import {User} from 'Repositories/entity/User';
-import {reactTranslationRenderingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {translateForTest} from 'Util/test/translateForTest';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {
@@ -38,17 +37,7 @@ import {DecryptErrorMessage} from './decryptErrorMessage';
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
-const legacyTranslationRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate}),
-);
-const reactTranslationRenderingRootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({
-    isFeatureToggleEnabled(featureName) {
-      return featureName === reactTranslationRenderingFeatureToggleName;
-    },
-    translate,
-  }),
-);
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -89,24 +78,7 @@ function getDecryptErrorCaption(container: HTMLElement): HTMLElement {
 
 describe('DecryptErrorMessage', () => {
   it(
-    'preserves the legacy highlighted caption when React translation rendering is disabled',
-    withTranslationStrings(en, () => {
-      const props = {
-        message: createError(ProteusErrors.InvalidMessage),
-        onClickResetSession: jest.fn(),
-      };
-
-      const {container} = render(<DecryptErrorMessage {...props} />, {wrapper: legacyTranslationRootProviderWrapper});
-      const decryptErrorCaption = getDecryptErrorCaption(container);
-
-      expect(decryptErrorCaption).toHaveTextContent('A message from Alice was not received.');
-      expect(decryptErrorCaption.querySelectorAll('.label-bold-xs')).toHaveLength(1);
-      expect(decryptErrorCaption.querySelector('.label-bold-xs')).toHaveTextContent('Alice');
-    }),
-  );
-
-  it(
-    'renders conversationUnableToDecrypt1 with React highlighting when enabled',
+    'renders conversationUnableToDecrypt1 with React highlighting',
     withTranslationStrings(en, () => {
       const props = {
         message: createError(ProteusErrors.InvalidMessage),
@@ -114,7 +86,7 @@ describe('DecryptErrorMessage', () => {
       };
 
       const {container} = render(<DecryptErrorMessage {...props} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       const decryptErrorCaption = getDecryptErrorCaption(container);
 
@@ -125,7 +97,7 @@ describe('DecryptErrorMessage', () => {
   );
 
   it(
-    'renders conversationUnableToDecrypt2 with React highlighting when enabled',
+    'renders conversationUnableToDecrypt2 with React highlighting',
     withTranslationStrings(en, () => {
       const props = {
         message: createError(ProteusErrors.RemoteIdentityChanged),
@@ -133,7 +105,7 @@ describe('DecryptErrorMessage', () => {
       };
 
       const {container} = render(<DecryptErrorMessage {...props} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       const decryptErrorCaption = getDecryptErrorCaption(container);
 
@@ -157,7 +129,7 @@ describe('DecryptErrorMessage', () => {
         };
 
         const {container} = render(<DecryptErrorMessage {...props} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const decryptErrorCaption = getDecryptErrorCaption(container);
 
@@ -176,7 +148,7 @@ describe('DecryptErrorMessage', () => {
       };
 
       const {container} = render(<DecryptErrorMessage {...props} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       const decryptErrorCaption = getDecryptErrorCaption(container);
 
@@ -196,7 +168,7 @@ describe('DecryptErrorMessage', () => {
       };
 
       const {container} = render(<DecryptErrorMessage {...props} />, {
-        wrapper: reactTranslationRenderingRootProviderWrapper,
+        wrapper: translationRootProviderWrapper,
       });
       const decryptErrorCaption = getDecryptErrorCaption(container);
 
@@ -221,7 +193,7 @@ describe('DecryptErrorMessage', () => {
         };
 
         const {container} = render(<DecryptErrorMessage {...props} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const decryptErrorCaption = getDecryptErrorCaption(container);
 
@@ -245,7 +217,7 @@ describe('DecryptErrorMessage', () => {
         };
 
         const {container} = render(<DecryptErrorMessage {...props} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const decryptErrorCaption = getDecryptErrorCaption(container);
 
@@ -270,7 +242,7 @@ describe('DecryptErrorMessage', () => {
         };
 
         const {container} = render(<DecryptErrorMessage {...props} />, {
-          wrapper: reactTranslationRenderingRootProviderWrapper,
+          wrapper: translationRootProviderWrapper,
         });
         const decryptErrorCaption = getDecryptErrorCaption(container);
 

@@ -20,10 +20,13 @@
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
+import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
+
+import {Config} from '../../../Config';
 
 export type Translate = RootContextValue['translate'];
 
@@ -31,7 +34,7 @@ export type NonFederatingParticipantsModalCopy = {
   readonly editParticipantsButtonText: string;
   readonly leaveButtonText: string;
   readonly titleText: string;
-  readonly getMessageHtml: (backendString: string, replaceBackends: Record<string, string>) => string;
+  readonly getTranslatedMessage: (backendString: string) => PrimaryModalTranslatedMessage;
 };
 
 export const getConversationAccessOptions = (translate: Translate, isPublicOptionEnabled = true) => {
@@ -151,8 +154,33 @@ export const getNonFederatingParticipantsModalCopy = (translate: Translate): Non
     editParticipantsButtonText: translate('groupCreationPreferencesNonFederatingEditList'),
     leaveButtonText: translate('groupCreationPreferencesNonFederatingLeave'),
     titleText: translate('groupCreationPreferencesNonFederatingHeadline'),
-    getMessageHtml: (backendString: string, replaceBackends: Record<string, string>) => {
-      return translate('groupCreationPreferencesNonFederatingMessage', {backends: backendString}, replaceBackends);
+    getTranslatedMessage: (backendString: string): PrimaryModalTranslatedMessage => {
+      return {
+        compatibilityReplacements: [],
+        components: [
+          {
+            className: 'modal__text__read-more',
+            dataUieName: 'read-more-backends',
+            href: Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
+            kind: 'link',
+            legacyClosingTokens: [],
+            legacyOpeningTokens: [],
+            markerName: 'link',
+            rel: 'nofollow noopener noreferrer',
+            target: '_blank',
+          },
+        ],
+        kind: 'translation',
+        layout: 'default',
+        translationKey: 'groupCreationPreferencesNonFederatingMessage',
+        values: [
+          {
+            alternatePlaceholders: [],
+            placeholder: 'backends',
+            runtimeText: backendString,
+          },
+        ],
+      };
     },
   };
 };

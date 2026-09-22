@@ -17,6 +17,7 @@
  *
  */
 
+export * from './collaborator/teamCollaborator';
 export * from './newTeamData';
 export * from './teamApi';
 export * from './teamChunkData';

@@ -21,11 +21,14 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {isNull} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import en from 'I18n/en-US.json';
+import ru from 'I18n/ru-RU.json';
 import {TitleBar} from 'Components/titleBar';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
@@ -34,7 +37,13 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {ContentState} from 'src/script/page/useAppState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {setStrings, translate} from 'Util/localizerUtil';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/rightSidebar/rightSidebar';
@@ -55,17 +64,12 @@ jest.mock('Components/calling/useCallAlertState', () => ({
 
 const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
+const translationRootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
+
 jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
 
 const testFactory = new TestFactory();
 let callingRepository: CallingRepository;
-
-beforeAll(() => {
-  return testFactory.exposeCallingActors().then(injectedCallingRepository => {
-    callingRepository = injectedCallingRepository;
-    return callingRepository;
-  });
-});
 
 const callActions = {
   answer: jest.fn(),
@@ -96,7 +100,39 @@ const getDefaultProps = (callingRepository: CallingRepository, conversation: Con
   withBottomDivider: true,
 });
 
+type TranslationTestFunction = () => void | Promise<void>;
+type IsolatedTranslationTestFunction = () => Promise<void>;
+
+function withTranslationStrings(
+  translationOverrides: Partial<typeof en>,
+  testFunction: TranslationTestFunction,
+): IsolatedTranslationTestFunction {
+  return async function runTranslationTest(): Promise<void> {
+    setStrings({en: {...en, ...translationOverrides}});
+
+    try {
+      await testFunction();
+    } finally {
+      setStrings({});
+    }
+  };
+}
+
+function getWarningBadge(container: HTMLElement): HTMLElement {
+  const warningBadge = container.querySelector<HTMLElement>('[data-uie-name="status-indication-badge"]');
+
+  if (isNull(warningBadge)) {
+    throw new Error('Expected warning badge to be rendered');
+  }
+
+  return warningBadge;
+}
+
 describe('TitleBar', () => {
+  beforeAll(async () => {
+    callingRepository = await testFactory.exposeCallingActors();
+  });
+
   it('subscribes to shortcut PEOPLE and add ADD_PEOPLE events on mount', async () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
@@ -279,9 +315,113 @@ describe('TitleBar', () => {
       isGroup: ko.pureComputed(() => true),
     });
 
-    const {getByText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
+    const {container, getByText} = render(
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />),
+    );
 
     expect(getByText('guestRoomConversationBadge')).toBeDefined();
+    expect(getWarningBadge(container)).toHaveAttribute('data-uie-name', 'status-indication-badge');
+  });
+
+  it(
+    'renders one warning badge bold region with React translation rendering',
+    withTranslationStrings(
+      {
+        guestRoomConversationBadge: '[bold]Guests[/bold] are present',
+      },
+      async () => {
+        const conversation = createConversationEntity({
+          hasDirectGuest: ko.pureComputed(() => true),
+          isGroup: ko.pureComputed(() => true),
+        });
+
+        const {container} = render(
+          withThemeAndRootContext(
+            <TitleBar {...getDefaultProps(callingRepository, conversation)} />,
+            translationRootProviderWrapper,
+          ),
+        );
+
+        const warningBadge = getWarningBadge(container);
+        expect(warningBadge).toHaveTextContent('Guests are present');
+        expect(warningBadge.querySelectorAll('strong')).toHaveLength(1);
+        expect(warningBadge.querySelector('strong')).toHaveTextContent('Guests');
+      },
+    ),
+  );
+
+  it(
+    'renders multiple warning badge bold regions and keeps unsupported markup as text',
+    withTranslationStrings(
+      {
+        guestRoomConversationBadgeExternalAndGuest:
+          '<img src="example">[bold]Externals[/bold] and [bold]guests[/bold] are present',
+      },
+      async () => {
+        const conversation = createConversationEntity({
+          hasDirectGuest: ko.pureComputed(() => true),
+          hasExternal: ko.pureComputed(() => true),
+          isGroup: ko.pureComputed(() => true),
+        });
+
+        const {container} = render(
+          withThemeAndRootContext(
+            <TitleBar {...getDefaultProps(callingRepository, conversation)} />,
+            translationRootProviderWrapper,
+          ),
+        );
+
+        const warningBadge = getWarningBadge(container);
+        expect(warningBadge).toHaveTextContent('<img src="example">Externals and guests are present');
+        expect(warningBadge.querySelectorAll('strong')).toHaveLength(2);
+        expect(warningBadge.querySelector('img')).toBeNull();
+        expect(warningBadge.querySelectorAll('strong')[0]).toHaveTextContent('Externals');
+        expect(warningBadge.querySelectorAll('strong')[1]).toHaveTextContent('guests');
+      },
+    ),
+  );
+
+  it(
+    'renders the audited malformed Russian warning badge through local compatibility',
+    withTranslationStrings(ru, async () => {
+      const conversation = createConversationEntity({
+        hasFederatedUsers: ko.pureComputed(() => true),
+        isGroup: ko.pureComputed(() => true),
+      });
+
+      const {container} = render(
+        withThemeAndRootContext(
+          <TitleBar {...getDefaultProps(callingRepository, conversation)} />,
+          translationRootProviderWrapper,
+        ),
+      );
+
+      const warningBadge = getWarningBadge(container);
+      expect(warningBadge).toHaveTextContent('Присутствуют федеративные пользователи');
+      expect(warningBadge.querySelectorAll('strong')).toHaveLength(1);
+      expect(warningBadge.querySelector('strong')).toHaveTextContent('федеративные пользователи');
+      expect(warningBadge).not.toHaveTextContent('/bold]');
+    }),
+  );
+
+  it('does not render a warning badge when no warning applies in React translation rendering', async () => {
+    const conversation = createConversationEntity({
+      hasDirectGuest: ko.pureComputed(() => false),
+      hasExternal: ko.pureComputed(() => false),
+      hasFederatedUsers: ko.pureComputed(() => false),
+      hasService: ko.pureComputed(() => false),
+      hasApps: ko.pureComputed(() => false),
+      isGroup: ko.pureComputed(() => true),
+    });
+
+    const {container} = render(
+      withThemeAndRootContext(
+        <TitleBar {...getDefaultProps(callingRepository, conversation)} />,
+        translationRootProviderWrapper,
+      ),
+    );
+
+    expect(container.querySelector('[data-uie-name="status-indication-badge"]')).toBeNull();
   });
 
   it.each([

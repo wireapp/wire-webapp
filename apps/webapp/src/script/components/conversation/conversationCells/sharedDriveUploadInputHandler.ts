@@ -21,14 +21,21 @@ import type {ChangeEvent} from 'react';
 
 import type {FireAndForgetInvoker} from '@wireapp/core';
 
+import type {SharedDriveDropRejection} from './sharedDriveDrop';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
+import {filterSharedDriveUploadFiles, validateSharedDriveUploadFiles} from './sharedDriveUploadValidation';
 
-type SharedDriveUploadInputDependencies = {
+export type SharedDriveUploadInputDependencies = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly sharedDriveUploadController: SharedDriveUploadController;
   readonly uploadPath: string;
   readonly conversationQualifiedId: string;
   readonly onRefresh: () => void;
+  readonly onReject: (rejection: SharedDriveDropRejection) => void;
+  readonly isUploadFilesEnabled: boolean;
+  readonly isInRecycleBin: boolean;
+  readonly maxFileSize: number;
+  readonly isAcceptedFile: (file: File) => boolean;
 };
 
 export const handleSharedDriveUploadInput = (
@@ -39,15 +46,31 @@ export const handleSharedDriveUploadInput = (
     uploadPath,
     conversationQualifiedId,
     onRefresh,
+    onReject,
+    isUploadFilesEnabled,
+    isInRecycleBin,
+    maxFileSize,
+    isAcceptedFile,
   }: SharedDriveUploadInputDependencies,
 ): void => {
-  const file = event.target.files?.[0];
+  const files = filterSharedDriveUploadFiles(Array.from(event.target.files ?? []));
   event.target.value = '';
-  if (!file) {
+  if (files.length === 0) {
+    return;
+  }
+
+  const validation = validateSharedDriveUploadFiles(files, {
+    isUploadFilesEnabled,
+    isInRecycleBin,
+    maxFileSize,
+    isAcceptedFile,
+  });
+  if (validation.isErr) {
+    onReject(validation.error);
     return;
   }
 
   fireAndForgetInvoker.fireAndForget(() =>
-    sharedDriveUploadController.upload([file], uploadPath, onRefresh, conversationQualifiedId),
+    sharedDriveUploadController.upload(files, uploadPath, onRefresh, conversationQualifiedId),
   );
 };

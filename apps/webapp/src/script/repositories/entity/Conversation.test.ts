@@ -265,7 +265,7 @@ describe('Conversation', () => {
 
     describe('affects last_read_timestamp', () => {
       it('and adding a message should update it if sent by self user', () => {
-        const message_et = createMessageForTest();
+        const message_et = new ContentMessage(undefined, translateForTest);
         message_et.timestamp(second_timestamp);
         message_et.user(self_user);
 
@@ -275,6 +275,20 @@ describe('Conversation', () => {
         conversation_et.addMessage(message_et);
 
         expect(conversation_et.last_read_timestamp()).toBe(second_timestamp);
+      });
+
+      it('should not update it for a system message sent by self user', () => {
+        const message_et = createMessageForTest();
+        message_et.timestamp(second_timestamp);
+        message_et.user(self_user);
+        jest.spyOn(message_et, 'isSystem').mockReturnValue(true);
+
+        conversation_et.last_read_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
+
+        conversation_et.addMessage(message_et);
+
+        expect(conversation_et.last_read_timestamp()).toBe(first_timestamp);
       });
 
       it('should not update last read if last message was not send from self user', () => {

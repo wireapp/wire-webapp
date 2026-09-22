@@ -17,12 +17,15 @@
  *
  */
 
+import {useEffect} from 'react';
+
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, CalendarIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CallIcon, CalendarIcon} from '@wireapp/react-ui-kit';
 
+import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
@@ -33,6 +36,7 @@ import {
   meetingNotificationCardActionsStyles,
   meetingNotificationCardActionStyles,
   meetingNotificationCardContainerStyles,
+  meetingNotificationCardJoinIconStyles,
   meetingNotificationCardMetadataStyles,
   meetingNotificationCardOngoingTimeStyles,
   meetingNotificationCardTitleStyles,
@@ -44,6 +48,45 @@ import {type MeetingNotification, MeetingNotificationKind} from '../meetingNotif
 
 type MeetingNotificationCardProps = MeetingNotification & {
   onDismiss: () => void;
+  onCallJoined?: () => void;
+};
+
+type MeetingNotificationJoinButtonProps = {
+  qualifiedConversationId: QualifiedId;
+  onDismiss: () => void;
+  onCallJoined?: () => void;
+};
+
+const MeetingNotificationJoinButton = ({
+  qualifiedConversationId,
+  onDismiss,
+  onCallJoined,
+}: MeetingNotificationJoinButtonProps) => {
+  const {translate} = useApplicationContext();
+  const {joinMeeting, isJoinDisabled, isCallActive, isCallConnecting, isJoining} =
+    useJoinMeetingCall(qualifiedConversationId);
+
+  useEffect(() => {
+    if (isCallActive) {
+      (onCallJoined ?? onDismiss)();
+    }
+  }, [isCallActive, onCallJoined, onDismiss]);
+
+  return (
+    <Button
+      variant={ButtonVariant.PRIMARY}
+      css={meetingNotificationCardActionStyles}
+      type="button"
+      onClick={joinMeeting}
+      disabled={isJoinDisabled}
+      showLoading={isJoining || isCallConnecting}
+      aria-label={translate('callJoin')}
+      data-uie-name="join-meeting-call"
+    >
+      <CallIcon aria-hidden="true" css={meetingNotificationCardJoinIconStyles} />
+      {translate('callJoin')}
+    </Button>
+  );
 };
 
 const notificationLabels = {
@@ -51,6 +94,7 @@ const notificationLabels = {
   [MeetingNotificationKind.UPDATE]: 'meetings.notifications.update',
   [MeetingNotificationKind.CANCELLED]: 'meetings.notifications.canceled',
   [MeetingNotificationKind.ONGOING]: 'meetings.notifications.ongoing',
+  [MeetingNotificationKind.REMINDER]: 'meetings.notifications.reminder',
 } as const satisfies Record<MeetingNotificationKind, TranslationKey>;
 
 const getOrganizer = (qualifiedCreator: QualifiedId) =>
@@ -122,12 +166,55 @@ const MeetingNotificationMetadata = ({
         </>
       );
     })
+    .with({kind: MeetingNotificationKind.REMINDER}, ({qualifiedCreator}) => {
+      const organizer = getOrganizer(qualifiedCreator);
+
+      return (
+        <>
+          {translate('meetings.notifications.by', {organizer}, undefined, true)}
+          {organizer && <span aria-hidden="true"> • </span>}
+          {translate('meetings.notifications.startsIn10Minutes')}
+        </>
+      );
+    })
     .exhaustive();
 };
 
 export const MeetingNotificationCard = (notification: MeetingNotificationCardProps) => {
   const {translate} = useApplicationContext();
   const {kind, meetingTitle, id, onDismiss} = notification;
+  const primaryAction = () => {
+    if (kind === MeetingNotificationKind.CANCELLED) {
+      return null;
+    }
+
+    if (kind === MeetingNotificationKind.ONGOING) {
+      return (
+        <MeetingNotificationJoinButton
+          qualifiedConversationId={notification.qualifiedConversationId}
+          onDismiss={onDismiss}
+          onCallJoined={notification.onCallJoined}
+        />
+      );
+    }
+
+    return (
+      <Button
+        variant={ButtonVariant.PRIMARY}
+        css={meetingNotificationCardActionStyles}
+        type="button"
+        onClick={() => {
+          onDismiss();
+          navigate('/meetings');
+        }}
+        aria-label={translate('meetings.notifications.view')}
+      >
+        <CalendarIcon css={meetingNotificationViewBtnStyles} aria-hidden="true" />
+        {translate('meetings.notifications.view')}
+      </Button>
+    );
+  };
+
   return (
     <div css={meetingNotificationCardContainerStyles} role="listitem" data-uie-name={`meeting-notification-card-${id}`}>
       <div css={meetingNotificationCardTitleStyles}>
@@ -146,24 +233,15 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
           variant={ButtonVariant.TERTIARY}
           css={meetingNotificationCardActionStyles}
           type="button"
-          onClick={onDismiss}
+          onClick={event => {
+            event.stopPropagation();
+            onDismiss();
+          }}
           aria-label={translate('meetings.notifications.dismiss')}
         >
           {translate('meetings.notifications.dismiss')}
         </Button>
-        {kind !== MeetingNotificationKind.CANCELLED && (
-          <Button
-            variant={ButtonVariant.PRIMARY}
-            css={meetingNotificationCardActionStyles}
-            type="button"
-            onClick={() => {
-              onDismiss();
-              navigate('/meetings');
-            }}
-          >
-            <CalendarIcon css={meetingNotificationViewBtnStyles} /> {translate('meetings.notifications.view')}
-          </Button>
-        )}
+        {primaryAction()}
       </div>
     </div>
   );

@@ -69,8 +69,3 @@ export const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...
     </svg>
   );
 };
-
-Loading.defaultProps = {
-  progress: undefined,
-  size: 43,
-};

@@ -72,7 +72,7 @@ export function ConfigToolbar() {
   const messageCountRef = useRef<number>(0);
   const [prefix, setPrefix] = useState('Message -');
   const [messageDelaySec, setMessageDelaySec] = useState<number>(0);
-  const wrapperRef = useRef(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(
     window.wire?.app?.debug?.isEnabledAvsDebugger() ?? false,
   );

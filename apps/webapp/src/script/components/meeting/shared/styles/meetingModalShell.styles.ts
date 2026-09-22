@@ -20,8 +20,8 @@
 import {CSSObject} from '@emotion/react';
 
 export const modalWrapperStyles: CSSObject = {
-  overflow: 'unset',
-  overflowY: 'unset',
+  overflow: 'hidden',
+  overflowY: 'hidden',
   maxWidth: '760px',
   width: '-webkit-fill-available',
   margin: '1rem',
@@ -30,6 +30,7 @@ export const modalWrapperStyles: CSSObject = {
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
+  minHeight: 0,
   width: '100%',
 };
 
@@ -61,9 +62,11 @@ export const closeButtonStyles: CSSObject = {
 };
 
 export const bodyStyles: CSSObject = {
+  flex: '1 1 auto',
   padding: '24px',
-  minHeight: '320px',
-  overflow: 'visible',
+  minHeight: 0,
+  maxHeight: 'calc(90vh - 140px)',
+  overflowY: 'auto',
 };
 
 export const footerStyles: CSSObject = {

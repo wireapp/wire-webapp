@@ -45,6 +45,8 @@ const ignores = [
   'apps/webapp/bin/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
+  '!**/*.config.test.*',
+  '!**/*.config.spec.*',
   'apps/webapp/src/sw.js',
   'apps/server/bin/',
   'apps/server/coverage/',
@@ -310,7 +312,8 @@ const testRestrictedSyntaxRule = [
 const jestMockRestrictionRule = [
   'warn',
   {
-    mock: 'Do not use jest.mock(). Pass dependencies explicitly instead of intercepting modules.',
+    mock: 'Do not use jest.mock() or jest.mocked(). Pass dependencies explicitly instead of intercepting modules.',
+    mocked: 'Do not use jest.mock() or jest.mocked(). Pass dependencies explicitly instead of intercepting modules.',
   },
 ];
 
@@ -456,6 +459,17 @@ const productionConfigs = [
     },
   },
   {
+    files: ['tools/i18n/**/*.{ts,mts}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './tsconfig.tools.json',
+        projectService: false,
+      },
+      globals: runtimeGlobals,
+    },
+  },
+  {
     files: [
       'apps/server/**/*.{ts,tsx}',
       'libraries/api-client/**/*.{ts,tsx}',
@@ -518,6 +532,222 @@ const productionConfigs = [
       'import/no-unresolved': ['error', {caseSensitive: false}],
       // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
       'import/order': webappImportOrderRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/LoadingBar/LoadingBar.tsx',
+      'apps/webapp/src/script/components/Note/Note.tsx',
+      'apps/webapp/src/script/components/ProgressBar/ProgressBar.tsx',
+      'apps/webapp/src/script/components/Radio/RadioGroup.tsx',
+      'apps/webapp/src/script/components/SearchInput/SearchInput.tsx',
+      'apps/webapp/src/script/components/SelectText/SelectText.tsx',
+      'apps/webapp/src/script/components/TextInput/TextInput.tsx',
+      'apps/webapp/src/script/components/UserName/UserName.tsx',
+      'apps/webapp/src/script/components/VerificationIcon/VerificationIcon.tsx',
+      'apps/webapp/src/script/components/fadingScrollbar/fadingScrollbar.tsx',
+      'apps/webapp/src/script/components/inViewport/inViewport.tsx',
+      'apps/webapp/src/script/components/ZoomableImage/ZoomableImage.tsx',
+      'apps/webapp/src/script/components/copyToClipboardButton/copyToClipboardButton.tsx',
+      'apps/webapp/src/script/components/draggableClickWrapper/draggableClickWrapper.tsx',
+      'apps/webapp/src/script/components/dropFileArea/dropFileArea.tsx',
+      'apps/webapp/src/script/components/toggle/BaseToggle.tsx',
+      'apps/webapp/src/script/hooks/useActiveWindow.ts',
+      'apps/webapp/src/script/hooks/useClickOutside.tsx',
+      'apps/webapp/src/script/hooks/useElementSize/useElementSize.ts',
+      'apps/webapp/src/script/hooks/useInView/useInView.ts',
+      'apps/webapp/src/script/hooks/useKeyPressAndHold/useKeyPressAndHold.ts',
+      'apps/webapp/src/script/hooks/useRoveFocus.ts',
+      'apps/webapp/src/script/hooks/useToggleState.ts',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/auth/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/browser/**/*.{ts,tsx}',
+      'apps/webapp/src/script/localization/**/*.{ts,tsx}',
+      'apps/webapp/src/script/router/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/externalRoute.ts',
+      'apps/webapp/src/script/hooks/useActiveWindow.ts',
+      'apps/webapp/src/script/hooks/useClickOutside.tsx',
+      'apps/webapp/src/script/hooks/useConnectionQuality.ts',
+      'apps/webapp/src/script/hooks/useDatePassed/useDatePassed.ts',
+      'apps/webapp/src/script/hooks/useElementSize/useElementSize.ts',
+      'apps/webapp/src/script/hooks/useInView/useInView.ts',
+      'apps/webapp/src/script/hooks/useKeyPressAndHold/useKeyPressAndHold.ts',
+      'apps/webapp/src/script/hooks/useLocalStorage.ts',
+      'apps/webapp/src/script/hooks/usePausableInterval.ts',
+      'apps/webapp/src/script/hooks/useRootFontSize.ts',
+      'apps/webapp/src/script/hooks/useRoveFocus.ts',
+      'apps/webapp/src/script/hooks/useSingleInstance.ts',
+      'apps/webapp/src/script/hooks/useToggleState.ts',
+      'apps/webapp/src/script/util/DOM/**/*.{ts,tsx}',
+      'apps/webapp/src/script/util/arrayUtil.ts',
+      'apps/webapp/src/script/util/connectionQualityHandler/**/*.{ts,tsx}',
+      'apps/webapp/src/script/util/countryCodes.ts',
+      'apps/webapp/src/script/util/dataDog.ts',
+      'apps/webapp/src/script/util/environment.ts',
+      'apps/webapp/src/script/util/focusUtil.ts',
+      'apps/webapp/src/script/util/imageUtil.ts',
+      'apps/webapp/src/script/util/localizerUtil/reactLocalizerUtil.tsx',
+      'apps/webapp/src/script/util/locationUtil.ts',
+      'apps/webapp/src/script/util/markdownUtil.ts',
+      'apps/webapp/src/script/util/modalFocusUtil.ts',
+      'apps/webapp/src/script/util/renderElement.ts',
+      'apps/webapp/src/script/util/sanitizationUtil.ts',
+      'apps/webapp/src/script/util/storageUtil.ts',
+      'apps/webapp/src/script/util/stringUtil.ts',
+      'apps/webapp/src/script/util/timeUtil.ts',
+      'apps/webapp/src/script/util/urlUtil.ts',
+      'apps/webapp/src/script/util/worker.ts',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/guards/common.ts',
+      'apps/webapp/src/script/guards/Event.ts',
+      'apps/webapp/src/script/guards/HTMLElement.ts',
+      'apps/webapp/src/script/guards/Mouse.ts',
+      'apps/webapp/src/script/main/reportStartupFailure.ts',
+      'apps/webapp/src/script/observability/**/*.{ts,tsx}',
+      'apps/webapp/src/script/service/apiClientSingleton.ts',
+      'apps/webapp/src/script/service/backendEnvironment.ts',
+      'apps/webapp/src/script/telemetry/app_init/**/*.{ts,tsx}',
+      'apps/webapp/src/script/featureToggles/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/page/mainContent/panels/preferences/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails/**/*',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/appLoader/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/appNotification/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/asset/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/availabilityIcon/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/avatar/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/badge/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/bannerPortal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/draggableClickWrapper/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/dropFileArea/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/emojiPicker/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/errorFallback/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/fadingScrollbar/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/fileCard/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/FileFullscreenModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/fullscreenModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/giphy/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/historyExport/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/historyImport/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/image/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/inViewport/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/LegalHoldDot/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/LoadingBar/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Note/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/participantItemContent/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/PasswordGeneratorButton/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/ProgressBar/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Radio/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/SearchInput/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/SelectText/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/ServiceList/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/TextInput/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/toggle/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/UserInfo/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/UserName/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/UserSearchableList/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/userDevices/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/userList/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/VerificationIcon/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/ZoomableImage/**/*.{ts,tsx}',
+    ],
+    ignores: ['apps/webapp/src/script/components/badge/components/verificationBadges/**/*'],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/InviteModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/ModalComponent/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/ServiceModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/UserModal/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/panel/enrichedFields.tsx',
+      'apps/webapp/src/script/components/panel/panelActions/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/panel/serviceDetails.tsx',
+      'apps/webapp/src/script/components/panel/singleAction/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/panel/userDetails.tsx',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/hooks/useActiveWindowMatchMedia.ts',
+      'apps/webapp/src/script/hooks/useAppSoftLock.ts',
+      'apps/webapp/src/script/hooks/useInitializeMediaDevices.ts',
+      'apps/webapp/src/script/hooks/useRelativeTimestamp.tsx',
+      'apps/webapp/src/script/hooks/useUserDevicesHistory/**/*.{ts,tsx}',
+      'apps/webapp/src/script/hooks/useUserProperty.ts',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/legal-hold/LegalHoldWarning.ts',
+      'apps/webapp/src/script/page/appLock/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/components/featureConfigChange/featureConfigChangeNotifier/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/components/forceReloadModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/components/windowTitleUpdater.ts',
+      'apps/webapp/src/script/page/leftSidebar/panels/listWrapper.tsx',
+      'apps/webapp/src/script/page/leftSidebar/panels/preferences.tsx',
+      'apps/webapp/src/script/page/leftSidebar/panels/startUi/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/rightSidebar/panelHeader/**/*.{ts,tsx}',
+      'apps/webapp/src/script/ui/contextMenu.tsx',
+      'apps/webapp/src/script/view_model/WarningsContainer/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
     },
   },
   {
@@ -713,6 +943,15 @@ const testJavaScriptFilePatterns = [
 
 const testJsxFilePatterns = testJavaScriptFilePatterns.map(filePattern => filePattern.replaceAll('.js', '.jsx'));
 
+const jestTestFilePatterns = [
+  ...testTypeScriptFilePatterns,
+  ...testTsxFilePatterns,
+  ...testJavaScriptFilePatterns,
+  ...testJsxFilePatterns,
+].filter(filePattern => {
+  return filePattern.includes('.test') || filePattern.includes('.spec');
+});
+
 const repositoryLinterOptions = {
   reportUnusedDisableDirectives: 'error',
 };
@@ -791,6 +1030,23 @@ const config = [
     ],
     rules: {
       'no-restricted-syntax': testRestrictedSyntaxRule,
+    },
+  },
+  {
+    files: jestTestFilePatterns,
+    ignores: ['apps/webapp/test/e2e_tests/**'],
+    plugins: {
+      jest: jestPlugin,
+    },
+    rules: {
+      'jest/require-top-level-describe': 'error',
+      'jest/consistent-test-it': [
+        'error',
+        {
+          fn: 'it',
+          withinDescribe: 'it',
+        },
+      ],
     },
   },
   {

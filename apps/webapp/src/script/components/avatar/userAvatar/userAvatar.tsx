@@ -19,6 +19,7 @@
 
 import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
@@ -103,7 +104,7 @@ export const UserAvatar = ({
     'initials',
   ]);
 
-  const avatarImgAlt = avatarAlt ? avatarAlt : `${translate('userProfileImageAlt')} ${name}`;
+  const avatarImgAlt = isNonEmptyString(avatarAlt) ? avatarAlt : `${translate('userProfileImageAlt')} ${name}`;
 
   const hasAvailabilityState = typeof availability === 'number' && availability !== AvailabilityType.Type.NONE;
 
@@ -122,7 +123,7 @@ export const UserAvatar = ({
     >
       <AvatarBackground backgroundColor={backgroundColor} />
 
-      {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
+      {isNonEmptyString(initials) && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
       {!hideProfilePicture && (
         <AvatarImage
           avatarSize={avatarSize}

@@ -19,14 +19,14 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
@@ -88,6 +88,8 @@ type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };
 
+const logger = getLogger('Login');
+
 const LoginComponent = ({
   authError,
   resetAuthError,
@@ -116,7 +118,6 @@ const LoginComponent = ({
   const secondsPerMinute = 60;
   const twoFactorExpiryMinutes = 10;
   const twoFactorExpiryMilliseconds = millisecondsPerSecond * secondsPerMinute * twoFactorExpiryMinutes;
-  const logger = getLogger('Login');
   const navigate = useNavigate();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
 
@@ -154,8 +155,8 @@ const LoginComponent = ({
     (isDomainDiscoveryEnabled === true || isSSOEnabled === true || isAccountRegistrationEnabled === true);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
-  const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
-  const entropy = useRef<Uint8Array | undefined>();
+  const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>(undefined);
+  const entropy = useRef<Uint8Array | undefined>(undefined);
 
   const getEntropy = useMemo(() => {
     if (isEntropyRequired !== true) {
@@ -191,8 +192,8 @@ const LoginComponent = ({
   }, [defaultSSOCode, embedded, navigate]);
 
   useEffect(() => {
-    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
 
     const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
@@ -205,7 +206,7 @@ const LoginComponent = ({
         logger.warn('Failed to fetch conversation info', error);
       });
     }
-  }, [doCheckConversationCode, doGetConversationInfoByCode, logger]);
+  }, [doCheckConversationCode, doGetConversationInfoByCode]);
 
   const immediateLogin = useCallback(async () => {
     try {
@@ -222,20 +223,23 @@ const LoginComponent = ({
       logger.error('Unable to login immediately', error);
       setShowEntropyForm(false);
     }
-  }, [doInit, doInitializeClient, getEntropy, isOauth, logger, navigate]);
+  }, [doInit, doInitializeClient, getEntropy, isOauth, navigate]);
 
   useEffect(() => {
     void resetAuthError();
+    return () => {
+      void resetAuthError();
+    };
+  }, [resetAuthError]);
+
+  useEffect(() => {
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
 
     if ((isImmediateLogin === true && is2FAEntropy !== true) || isOauth === true) {
       void immediateLogin();
     }
-    return () => {
-      void resetAuthError();
-    };
-  }, [immediateLogin, isEntropyRequired, isOauth, resetAuthError]);
+  }, [immediateLogin, isEntropyRequired, isOauth]);
 
   const handleSubmit = async (
     formLoginData: Partial<LoginData>,
@@ -258,7 +262,7 @@ const LoginComponent = ({
 
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-      if (validationErrors.length) {
+      if (isNonEmptyArray(validationErrors)) {
         throw validationErrors[0];
       }
 
@@ -449,7 +453,7 @@ const LoginComponent = ({
                 centerText
                 style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '16px'}}
               >
-                {twoFactorLoginData ? (
+                {!isUndefined(twoFactorLoginData) ? (
                   <div>
                     <Text
                       fontSize="1.5rem"

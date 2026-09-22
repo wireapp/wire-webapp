@@ -19,8 +19,9 @@
 
 import React, {useRef, useState} from 'react';
 
+import {isEmptyString, isNull} from '@sindresorhus/is';
 import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {ValidationUtil} from '@wireapp/commons';
@@ -59,7 +60,7 @@ const SetPasswordComponent = ({
     let validationError: ValidationError | null = null;
 
     const currentInputNode = passwordInput.current;
-    if (currentInputNode === null) {
+    if (isNull(currentInputNode)) {
       return;
     }
 
@@ -69,7 +70,7 @@ const SetPasswordComponent = ({
     }
     setIsValidPassword(currentInputNode.validity.valid);
     try {
-      if (validationError) {
+      if (!isNull(validationError)) {
         throw validationError;
       }
       await doSetPassword({new_password: password});
@@ -101,7 +102,7 @@ const SetPasswordComponent = ({
             hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
             markInvalid={!isValidPassword}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              if (passwordInput.current !== null) {
+              if (!isNull(passwordInput.current)) {
                 passwordInput.current.setCustomValidity('');
               }
 
@@ -117,7 +118,7 @@ const SetPasswordComponent = ({
           />
           <Small
             style={{
-              display: error ? 'none' : 'block',
+              display: !isNull(error) ? 'none' : 'block',
               padding: '0 16px',
             }}
             data-uie-name="element-password-help"
@@ -126,11 +127,11 @@ const SetPasswordComponent = ({
               minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
             })}
           </Small>
-          {!error ? <>&nbsp;</> : <Exception errors={[error]} />}
+          {isNull(error) ? <>&nbsp;</> : <Exception errors={[error]} />}
           <Button
             block
             showLoading={isFetching}
-            disabled={isFetching || !password}
+            disabled={isFetching || isEmptyString(password)}
             formNoValidate
             type="submit"
             data-uie-name="do-set-password"

@@ -19,21 +19,19 @@
 
 import type {FormEvent} from 'react';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
+import {Form} from '@wireapp/react-ui-kit';
 
+import {PasswordFields} from 'Components/PasswordFields/PasswordFields';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import type {Translate} from 'Util/localizerUtil';
-
-import {errorMessageStyles} from './GuestLinkPasswordForm.styles';
 
 interface GuestLinkPasswordFormProps {
   readonly translate: Translate;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onGeneratePassword: (password: string) => void;
   passwordValue: string;
-  passwordValueRef: React.RefObject<HTMLInputElement>;
+  passwordValueRef: React.RefObject<HTMLInputElement | null>;
   onPasswordValueChange: (value: string) => void;
   isPasswordInputMarkInvalid: boolean;
   passwordConfirmationValue: string;
@@ -66,59 +64,17 @@ export const GuestLinkPasswordForm = ({
         onSubmit={onSubmit}
         autoComplete="off"
       >
-        <Input
-          name="guest-link-password"
-          data-uie-name="guest-link-password"
-          required
-          placeholder={translate('modalGuestLinkJoinPlaceholder')}
-          label={translate('modalGuestLinkJoinLabel')}
-          helperText={translate('modalGuestLinkJoinHelperText', {
-            minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-          })}
-          id="modal_pswd"
-          className="modal__input"
-          type="password"
-          showTogglePasswordLabel={translate('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
-          autoComplete="off"
-          value={passwordValue}
-          ref={passwordValueRef}
-          onChange={event => onPasswordValueChange(event.currentTarget.value)}
-          pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
-          markInvalid={isPasswordInputMarkInvalid}
-          error={isPasswordInputMarkInvalid ? <GuestLinkPasswordModalErrorMessage translate={translate} /> : undefined}
-        />
-        <Input
-          name="guest-link-password-confirm"
-          data-uie-name="guest-link-password-confirm"
-          required
-          placeholder={translate('modalGuestLinkJoinConfirmPlaceholder')}
-          label={translate('modalGuestLinkJoinConfirmLabel')}
-          className="modal__input"
-          type="password"
-          showTogglePasswordLabel={translate('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
-          id="modal_pswd_confirmation"
-          autoComplete="off"
-          value={passwordConfirmationValue}
-          onChange={event => onPasswordConfirmationChange(event.currentTarget.value)}
-          markInvalid={isPasswordConfirmationMarkInvalid}
+        <PasswordFields
+          translate={translate}
+          passwordValue={passwordValue}
+          passwordValueRef={passwordValueRef}
+          onPasswordValueChange={onPasswordValueChange}
+          isPasswordInputMarkInvalid={isPasswordInputMarkInvalid}
+          passwordConfirmationValue={passwordConfirmationValue}
+          onPasswordConfirmationChange={onPasswordConfirmationChange}
+          isPasswordConfirmationMarkInvalid={isPasswordConfirmationMarkInvalid}
         />
       </Form>
     </>
-  );
-};
-
-interface GuestLinkPasswordModalErrorMessageProps {
-  readonly translate: Translate;
-}
-
-const GuestLinkPasswordModalErrorMessage = ({translate}: GuestLinkPasswordModalErrorMessageProps) => {
-  return (
-    <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
-      {translate('modalGuestLinkJoinHelperText', {
-        minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-      })}
-    </ErrorMessage>
   );
 };

@@ -19,6 +19,8 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -74,9 +76,9 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
   const [numberOfProcessedRecords, setNumberOfProcessedRecords] = useState<number>(0);
   const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * PERCENTAGE_MULTIPLIER);
 
-  const isPreparing = !error && historyImportState === HistoryImportState.PREPARING;
-  const isImporting = !error && historyImportState === HistoryImportState.IMPORTING;
-  const isDone = !error && historyImportState === HistoryImportState.DONE;
+  const isPreparing = error === null && historyImportState === HistoryImportState.PREPARING;
+  const isImporting = error === null && historyImportState === HistoryImportState.IMPORTING;
+  const isDone = error === null && historyImportState === HistoryImportState.DONE;
 
   const replacements = {
     processed: numberOfProcessedRecords.toString(),
@@ -208,7 +210,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
       if (isEncrypted) {
         const password = await getBackUpPassword();
 
-        if (password) {
+        if (isNonEmptyString(password)) {
           await processHistoryImport(file, password);
         }
       } else {
@@ -224,7 +226,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (file !== undefined) {
       setError(null);
       await importHistory(file);
     }
@@ -256,7 +258,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
           </div>
         )}
 
-        {error && (
+        {error !== null && (
           <div className="history-message">
             <h2 className="history-message__headline" data-uie-name="status-history-import-error-headline">
               {errorHeadline}

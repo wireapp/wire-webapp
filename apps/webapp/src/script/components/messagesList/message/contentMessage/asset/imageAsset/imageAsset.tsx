@@ -18,11 +18,12 @@
  */
 
 import React from 'react';
+import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
 import * as Icon from 'Components/icon';
-import {AssetImage} from 'Components/image';
+import {AssetImage, GetAssetUrl, ImageLogger} from 'Components/image';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -34,12 +35,15 @@ import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 export interface ImageAssetProps {
   asset: MediumImage;
+  getAssetUrl?: GetAssetUrl;
+  logger?: ImageLogger;
   message: ContentMessage;
   onClick: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
   isFocusable?: boolean;
 }
 
-export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
+export const ImageAsset: FunctionComponent<ImageAssetProps> = (properties: ImageAssetProps) => {
+  const {asset, getAssetUrl, logger, message, onClick} = properties;
   const {translate} = useApplicationContext();
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isUploading, uploadProgress, cancelUpload} = useAssetTransfer(message);
@@ -48,6 +52,7 @@ export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
     messageDate: `${message.displayTimestampShort()}`,
     username: `${message.user().name()}`,
   });
+  const retryLabel = translate('conversationImageAssetRetry');
 
   const imageContainerStyle: CSSObject = {
     maxWidth: 'var(--conversation-message-asset-width)',
@@ -77,6 +82,9 @@ export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
           data-uie-name="go-image-detail"
           data-uie-visible={visible && !isObfuscated}
           onClick={event => onClick(message, event)}
+          getAssetUrl={getAssetUrl}
+          logger={logger}
+          retryLabel={retryLabel}
           onKeyDown={event =>
             handleKeyDown({event, callback: onClick.bind(null, message, event), keys: [KEY.ENTER, KEY.SPACE]})
           }

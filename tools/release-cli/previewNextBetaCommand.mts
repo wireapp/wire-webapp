@@ -120,7 +120,7 @@ function writeRuntimeInformation(message: string): Promise<void> {
 }
 
 function createRuntimeDependencies(commandEnvironment: CommandEnvironment): PreviewNextBetaCommandDependencies {
-  const httpClient = createRuntimeKyHttpClient();
+  const httpClient = createRuntimeKyHttpClient({reportRateLimitWait: writeRuntimeOutput});
   const githubClient = createGitHubClient({
     httpClient,
     githubApiUrl: commandEnvironment.githubApiUrl,

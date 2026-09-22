@@ -21,6 +21,7 @@ import React, {
   CSSProperties,
   KeyboardEvent as ReactKeyBoardEvent,
   MouseEvent as ReactMouseEvent,
+  useCallback,
   useRef,
   useState,
 } from 'react';
@@ -37,6 +38,7 @@ import {UserBlockedBadge} from 'Components/badge';
 import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
 import {UserInfo} from 'Components/UserInfo';
 import {useConversationCall} from 'Hooks/useConversationCall';
+import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
@@ -62,6 +64,7 @@ interface ConversationListCellProps {
   listItemStyle?: CSSProperties;
   // This method resetting the current focused conversation to first conversation on click outside or click tab or shift + tab
   resetConversationFocus: () => void;
+  registerConversationElement?: RegisterConversationElement;
 }
 
 export const ConversationListCell = ({
@@ -77,6 +80,7 @@ export const ConversationListCell = ({
   listItemCss,
   listItemStyle,
   resetConversationFocus,
+  registerConversationElement,
 }: ConversationListCellProps) => {
   const {translate} = useApplicationContext();
   const {
@@ -123,7 +127,16 @@ export const ConversationListCell = ({
   const isActive = isSelected(conversation);
   const firstUserEntity = conversation.firstUserEntity();
 
-  const conversationRef = useRef<HTMLDivElement>(null);
+  const unregisterConversationElement = useRef<(() => void) | null>(null);
+  const setConversationElement = useCallback(
+    (element: HTMLDivElement | null) => {
+      unregisterConversationElement.current?.();
+      unregisterConversationElement.current = element
+        ? (registerConversationElement?.(conversation.id, element) ?? null)
+        : null;
+    },
+    [conversation.id, registerConversationElement],
+  );
   const contextMenuRef = useRef<HTMLButtonElement>(null);
   const [focusContextMenu, setContextMenuFocus] = useState(false);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
@@ -234,7 +247,7 @@ export const ConversationListCell = ({
     >
       <div
         role="button"
-        ref={conversationRef}
+        ref={setConversationElement}
         className="conversation-list-cell-main-button"
         onClick={event => {
           event.stopPropagation();

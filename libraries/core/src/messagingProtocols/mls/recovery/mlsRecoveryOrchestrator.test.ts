@@ -358,4 +358,44 @@ describe('MlsRecoveryOrchestrator', () => {
     expect(cb).toHaveBeenCalledTimes(2);
     expect(res).toBe('ok-establish');
   });
+
+  describe('seedError', () => {
+    it('maps the seeded error without invoking the callback first', async () => {
+      const deps = baseDeps();
+      const mapper = makeMapperReturning({type: 'GroupNotEstablished'} as DomainMlsError);
+      const orch = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, deps);
+
+      const seedError = new Error('reported out of band');
+      const cb = jest.fn().mockResolvedValue('ok');
+
+      await orch.execute({
+        context: {operationName: OperationName.keyMaterialUpdate, qualifiedConversationId: qid()},
+        callBack: cb,
+        seedError,
+      });
+
+      expect(mapper.map).toHaveBeenCalledWith(seedError, expect.anything());
+      expect(deps.resetAndReestablish).toHaveBeenCalledWith(qid());
+      // GroupNotEstablished/keyMaterialUpdate does not re-run, so the callback is never reached
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it('re-runs the real operation after recovery when the policy requests it', async () => {
+      const deps = baseDeps();
+      const mapper = makeMapperReturning({type: 'WrongEpoch'} as DomainMlsError);
+      const orch = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, deps);
+
+      const cb = jest.fn().mockResolvedValue('ok');
+
+      await orch.execute({
+        context: {operationName: OperationName.keyMaterialUpdate, qualifiedConversationId: qid()},
+        callBack: cb,
+        seedError: new Error('stale epoch'),
+      });
+
+      expect(deps.recoverFromEpochMismatch).toHaveBeenCalled();
+      // The epoch is re-synced first, so publishing keying material again can now succeed
+      expect(cb).toHaveBeenCalledTimes(1);
+    });
+  });
 });
