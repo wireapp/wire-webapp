@@ -131,7 +131,7 @@ const Avatar = ({
 
   let avatarState = STATE.NONE;
 
-  if (isMe === true) {
+  if (isMe) {
     avatarState = STATE.SELF;
   } else if (isTeamMember === true) {
     avatarState = STATE.NONE;

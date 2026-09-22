@@ -282,7 +282,7 @@ export const PeopleTab = ({
       {searchQuery.length === 0 && (
         <>
           <ul className="start-ui-list left-list-items">
-            {teamSize === 1 && canInviteTeamMembers === true && isNonEmptyString(manageTeamUrl) && (
+            {teamSize === 1 && canInviteTeamMembers && isNonEmptyString(manageTeamUrl) && (
               <li className="left-list-item">
                 <button
                   className="left-list-item-button"

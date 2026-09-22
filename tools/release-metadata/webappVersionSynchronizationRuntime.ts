@@ -48,7 +48,7 @@ function readRequiredEnvironmentValue(
 ): Result<string, Error> {
   const environmentValue = environment[environmentVariableName];
 
-  if (isNonEmptyStringAndNotWhitespace(environmentValue) === false) {
+  if (!isNonEmptyStringAndNotWhitespace(environmentValue)) {
     return Result.err(new Error(`Required environment variable is missing: ${environmentVariableName}`));
   }
 

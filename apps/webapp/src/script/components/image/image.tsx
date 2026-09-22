@@ -89,12 +89,7 @@ type ImageLoadingOptions = {
 function isImageReadyToLoad(options: ImageLoadingOptions): options is ImageLoadingOptions & {image: AssetRemoteData} {
   const {image, imageLoadState, isInViewport, isFileSharingReceivingEnabled} = options;
 
-  return (
-    isUndefined(image) === false &&
-    imageLoadState === 'waiting' &&
-    isInViewport === true &&
-    isFileSharingReceivingEnabled === true
-  );
+  return !isUndefined(image) && imageLoadState === 'waiting' && isInViewport && isFileSharingReceivingEnabled;
 }
 
 export const AssetImage: FunctionComponent<AssetImageProps> = (properties: AssetImageProps) => {
@@ -192,7 +187,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
       isFileSharingReceivingEnabled,
     };
 
-    if (isImageReadyToLoad(imageLoadingOptions) === false) {
+    if (!isImageReadyToLoad(imageLoadingOptions)) {
       return;
     }
 
@@ -207,7 +202,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
         ];
         const url = await getAssetUrl(availableImage, allowedImageTypes);
 
-        if (isMounted.current === false) {
+        if (!isMounted.current) {
           url.dispose();
 
           return;
@@ -215,7 +210,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
         setImageUrl(url);
         setImageLoadState('loaded');
       } catch (error: unknown) {
-        if (isMounted.current === false) {
+        if (!isMounted.current) {
           return;
         }
         logger.error('Failed to load image asset', error);
@@ -241,31 +236,31 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   const isLoading = imageLoadState === 'waiting' || imageLoadState === 'loading';
   const isLoaded = imageLoadState === 'loaded';
   const isFailed = imageLoadState === 'failed';
-  const isImageDetailInteractive = isLoaded === true && isUndefined(onClick) === false;
+  const isImageDetailInteractive = isLoaded && !isUndefined(onClick);
   let imageRole: string | undefined;
   let imageTabIndex: number | undefined;
   let imageStatus: ImageLoadState | 'error' = imageLoadState;
   let imageUieName = 'image-loader';
   let imageWrapperStyles: CSSObject = getWrapperStyles(isImageDetailInteractive);
 
-  if (isFailed === false) {
+  if (!isFailed) {
     imageRole = role;
     imageTabIndex = tabIndex;
   }
 
-  if (isFailed === true) {
+  if (isFailed) {
     imageStatus = 'error';
   }
 
-  if (isLoaded === true) {
+  if (isLoaded) {
     imageUieName = 'image-asset-img';
   }
 
-  if (isUndefined(css) === false) {
+  if (!isUndefined(css)) {
     imageWrapperStyles = css;
   }
 
-  if (isFailed === true) {
+  if (isFailed) {
     imageWrapperStyles = {...imageWrapperStyles, ...failedWrapperStyles};
   }
 
@@ -274,7 +269,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   }
 
   function handleImageClick(event: React.MouseEvent<HTMLDivElement>): void {
-    if (isLoaded === false) {
+    if (!isLoaded) {
       return;
     }
 
@@ -286,7 +281,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   }
 
   function handleImageKeyDown(event: React.KeyboardEvent<HTMLDivElement>): void {
-    if (isLoaded === false) {
+    if (!isLoaded) {
       return;
     }
 
@@ -298,7 +293,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   }
 
   function handleImageRetry(): void {
-    if (isFailed === false) {
+    if (!isFailed) {
       return;
     }
 
@@ -306,7 +301,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   }
 
   function renderImageContent(): React.ReactNode {
-    if (isFailed === true && isNonEmptyString(retryLabel)) {
+    if (isFailed && isNonEmptyString(retryLabel)) {
       return (
         <Button
           aria-label={retryLabel}

@@ -132,7 +132,7 @@ const ConversationJoinComponent = ({
   };
 
   const getConversationInfoAndJoin = async (password?: string) => {
-    if (isJoinGuestLinkPasswordModalOpen !== true && conversationHasPassword === true) {
+    if (!isJoinGuestLinkPasswordModalOpen && conversationHasPassword === true) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
     }
@@ -160,7 +160,7 @@ const ConversationJoinComponent = ({
   };
 
   const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
-    if (isJoinGuestLinkPasswordModalOpen !== true && conversationHasPassword === true) {
+    if (!isJoinGuestLinkPasswordModalOpen && conversationHasPassword === true) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
     }
@@ -191,7 +191,7 @@ const ConversationJoinComponent = ({
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
               error.label.endsWith(errorType),
             );
-            if (isValidationError === false) {
+            if (!isValidationError) {
               void doLogout();
               console.warn('Unable to create wireless account', error);
               setShowEntropyForm(false);
@@ -236,7 +236,7 @@ const ConversationJoinComponent = ({
     setEnteredName(event.target.value);
   };
 
-  if (isValidLink === false) {
+  if (!isValidLink) {
     return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
 
@@ -247,13 +247,13 @@ const ConversationJoinComponent = ({
     await handleSubmit(undefined, password);
   };
 
-  if (isFullConversation === true) {
+  if (isFullConversation) {
     return <ConversationJoinFull />;
   }
 
   return (
     <>
-      {isJoinGuestLinkPasswordModalOpen === true && (
+      {isJoinGuestLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
           onClose={() => {
             setIsJoinGuestLinkPasswordModalOpen(false);
@@ -262,7 +262,7 @@ const ConversationJoinComponent = ({
           error={!isNullOrUndefined(conversationError) ? conversationError : generalError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
-          onSubmitPassword={isTemporaryGuest === false ? getConversationInfoAndJoin : submitJoinCodeWithPassword}
+          onSubmitPassword={!isTemporaryGuest ? getConversationInfoAndJoin : submitJoinCodeWithPassword}
         />
       )}
       <WirelessContainer
@@ -274,7 +274,7 @@ const ConversationJoinComponent = ({
           <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
             {translate('conversationJoin.mainHeadline')}
           </H1>
-          {isWirePublicInstance === false && (
+          {!isWirePublicInstance && (
             <Muted data-uie-name="status-join-subhead">
               {translate('conversationJoin.headline', {domain: window.location.hostname})}
             </Muted>

@@ -351,7 +351,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     }
 
     //if it was dirty, trigger e2eiconversationstate for every conversation
-    if (dirty === true) {
+    if (dirty) {
       onDirty();
     }
   }

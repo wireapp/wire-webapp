@@ -151,15 +151,14 @@ const LoginComponent = ({
   } = Config.getConfig().FEATURE;
 
   const showBackButton =
-    embedded !== true &&
-    (isDomainDiscoveryEnabled === true || isSSOEnabled === true || isAccountRegistrationEnabled === true);
+    embedded !== true && (isDomainDiscoveryEnabled || isSSOEnabled || isAccountRegistrationEnabled);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>(undefined);
   const entropy = useRef<Uint8Array | undefined>(undefined);
 
   const getEntropy = useMemo(() => {
-    if (isEntropyRequired !== true) {
+    if (!isEntropyRequired) {
       return undefined;
     }
 
@@ -236,7 +235,7 @@ const LoginComponent = ({
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
 
-    if ((isImmediateLogin === true && is2FAEntropy !== true) || isOauth === true) {
+    if ((isImmediateLogin && !is2FAEntropy) || isOauth) {
       void immediateLogin();
     }
   }, [immediateLogin, isEntropyRequired, isOauth]);
@@ -249,7 +248,7 @@ const LoginComponent = ({
     setValidationErrors(validationErrors);
 
     if (
-      isLinkPasswordModalOpen !== true &&
+      !isLinkPasswordModalOpen &&
       (conversationInfo?.has_password === true ||
         (conversationError !== undefined &&
           conversationError !== null &&
@@ -289,7 +288,7 @@ const LoginComponent = ({
         return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
 
-      if (shouldDisplayWarning === true) {
+      if (shouldDisplayWarning) {
         setIsAccountAlreadyExistsModalOpen(true);
         return;
       }
@@ -409,7 +408,7 @@ const LoginComponent = ({
           </div>
         </IsMobile>
       )}
-      {isEntropyRequired === true && showEntropyForm === true ? (
+      {isEntropyRequired && showEntropyForm ? (
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
@@ -568,7 +567,7 @@ const LoginComponent = ({
                     >
                       {translate('login.forgotPassword')}
                     </Link>
-                    {embedded === true && (isDomainDiscoveryEnabled === true || isSSOEnabled === true) && (
+                    {embedded === true && (isDomainDiscoveryEnabled || isSSOEnabled) && (
                       <Button
                         type="button"
                         variant={ButtonVariant.SECONDARY}
@@ -579,7 +578,7 @@ const LoginComponent = ({
                         {translate(isDomainDiscoveryEnabled ? 'index.enterprise' : 'index.ssoLogin')}
                       </Button>
                     )}
-                    {isEnterpriseLoginV2Enabled && accountCreationEnabled === true && (
+                    {isEnterpriseLoginV2Enabled && accountCreationEnabled && (
                       <>
                         <div css={separator}>
                           <span>{translate('index.or')}</span>

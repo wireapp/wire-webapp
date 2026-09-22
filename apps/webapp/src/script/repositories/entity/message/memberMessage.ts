@@ -47,7 +47,7 @@ type GroupCreationHeaderTranslationOptions = {
 };
 
 function translateGroupCreationHeader(options: GroupCreationHeaderTranslationOptions): string {
-  if (options.isNamedCreation === false) {
+  if (!options.isNamedCreation) {
     return '';
   }
 
@@ -103,14 +103,14 @@ export class MemberMessage extends SystemMessage {
 
     this.targetedUsers = ko.pureComputed(() => {
       return this.userEntities().filter(userEntity => {
-        return matchQualifiedIds(this.user(), userEntity) === false;
+        return !matchQualifiedIds(this.user(), userEntity);
       });
     });
 
     // Users joined the conversation without self
     this.remoteUserEntities = ko.pureComputed(() => {
       return this.userEntities().filter(userEntity => {
-        return userEntity.isMe === false;
+        return !userEntity.isMe;
       });
     });
 

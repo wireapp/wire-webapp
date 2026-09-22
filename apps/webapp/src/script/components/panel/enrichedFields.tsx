@@ -52,9 +52,9 @@ export const useEnrichedFields = (
   useEffect(() => {
     let cancel = false;
     const returnFields: RichInfoField[] =
-      addEmail === true && isNonEmptyString(email) ? [{type: translate('userProfileEmail'), value: email}] : [];
+      addEmail && isNonEmptyString(email) ? [{type: translate('userProfileEmail'), value: email}] : [];
 
-    if (addDomain === true && isNonEmptyString(user.domain)) {
+    if (addDomain && isNonEmptyString(user.domain)) {
       returnFields.push({
         type: translate('userProfileDomain'),
         value: user.domain,

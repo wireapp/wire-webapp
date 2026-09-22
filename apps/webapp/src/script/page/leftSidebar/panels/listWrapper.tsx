@@ -101,9 +101,7 @@ const ListWrapper = memo(
       (typeof headerElement !== 'number' || (headerElement !== 0 && !isNan(headerElement))) &&
       (typeof headerElement !== 'bigint' || headerElement !== BigInt(0));
     const defaultHeadingId =
-      hasHeader === true && hasHeaderElement === false && isNonEmptyString(header)
-        ? getListWrapperHeadingId(id)
-        : undefined;
+      hasHeader && !hasHeaderElement && isNonEmptyString(header) ? getListWrapperHeadingId(id) : undefined;
     const sectionAriaLabelledBy = ariaLabelledBy ?? defaultHeadingId;
     const calculateBorders = throttle((element: HTMLElement) => {
       window.requestAnimationFrame(() => {

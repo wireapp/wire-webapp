@@ -141,7 +141,7 @@ const SingleSignOnFormComponent = ({
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
-    if (queryAutoLogin === true && isNonEmptyString(initialCode)) {
+    if (queryAutoLogin && isNonEmptyString(initialCode)) {
       setShouldAutoLogin(true);
     }
   }, [initialCode]);

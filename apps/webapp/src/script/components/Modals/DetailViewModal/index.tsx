@@ -241,7 +241,7 @@ export const DetailViewModal = ({
     const conversationId = currentMessageEntity.conversation_id;
     const isExpectedId = !isNullOrUndefined(conversationEntity) ? conversationId === conversationEntity.id : false;
 
-    if (isExpectedId === false) {
+    if (!isExpectedId) {
       conversationRepository.getConversationById({domain: '', id: conversationId}).then(conversation => {
         setConversationEntity(conversation);
         getAllImages(conversation);

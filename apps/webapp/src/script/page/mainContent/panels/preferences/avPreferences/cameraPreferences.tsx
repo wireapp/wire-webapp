@@ -173,7 +173,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
 
   useEffect(
     () => () => {
-      if (stream !== null && hasActiveCameraStream !== true) {
+      if (stream !== null && !hasActiveCameraStream) {
         streamHandler.releaseTracksFromStream(stream);
       }
     },
@@ -182,7 +182,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
 
   return (
     <PreferencesSection title={translate('preferencesAVCamera')}>
-      {stream === null && isRequesting !== true && (
+      {stream === null && !isRequesting && (
         <div className="preferences-av-detail">
           <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
             {translate('preferencesAVPermissionDetail')}

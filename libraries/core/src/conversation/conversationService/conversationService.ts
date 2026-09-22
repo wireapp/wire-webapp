@@ -982,7 +982,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   async getMLS1to1Conversation(userId: QualifiedId) {
     const conversation = await this.apiClient.api.conversation.getMLS1to1Conversation(userId);
 
-    if (isMLS1to1Conversation(conversation) === true) {
+    if (isMLS1to1Conversation(conversation)) {
       return conversation;
     }
     return {conversation};

@@ -1346,7 +1346,7 @@ export class Account extends TypedEventEmitter<Events> {
     const localStorageKey = 'has_missing_notification';
 
     // First-time handling: set flag and reload to trigger full re-fetch of state.
-    if (AccountLocalStorageStore.has(localStorageKey) === false) {
+    if (!AccountLocalStorageStore.has(localStorageKey)) {
       this.logger.info('First missed notification detected, reloading to recover state');
       AccountLocalStorageStore.add(localStorageKey, 'true');
       window.location.reload();

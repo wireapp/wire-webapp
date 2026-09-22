@@ -50,9 +50,9 @@ export const useOnMultipleClicks = ({
       const target = event.target;
       const element = elementRef.current;
       if (
-        target instanceof Element === false ||
+        !(target instanceof Element) ||
         isNullOrUndefined(element) ||
-        element.contains(target) === false ||
+        !element.contains(target) ||
         isNullOrUndefined(target.closest(elementSelector))
       ) {
         reset();

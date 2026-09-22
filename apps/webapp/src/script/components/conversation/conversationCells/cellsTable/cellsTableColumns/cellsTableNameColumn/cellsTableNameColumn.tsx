@@ -70,7 +70,7 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
       {shouldDisplayImagePreview ? (
         <div css={imagePreviewWrapperStyles}>
           <img src={previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
-          {isVideo === true && <PlayIcon css={playIconStyles} width={16} height={16} />}
+          {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
         </div>
       ) : (
         <FileTypeIcon extension={getFileExtension(name)} size={24} />

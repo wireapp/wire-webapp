@@ -60,7 +60,7 @@ export const useFilePaste = ({onFilePasted, isFileNameKept, translate}: UseFileP
 
   const handlePasteEvent = useCallback(
     (event: ClipboardEvent) => {
-      if ((event.clipboardData?.types.includes('text/plain') ?? false) === true) {
+      if (event.clipboardData?.types.includes('text/plain') ?? false) {
         return;
       }
       // Avoid copying the filename into the input field

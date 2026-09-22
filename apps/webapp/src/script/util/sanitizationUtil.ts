@@ -38,7 +38,7 @@ export const safeWindowOpen = (url: string, focus: boolean = true): Window | nul
 
   if (newWindow !== null) {
     newWindow.opener = null;
-    if (focus === true) {
+    if (focus) {
       newWindow.focus();
     }
   }

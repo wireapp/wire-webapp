@@ -94,7 +94,7 @@ export function createFetchLatestBuildMetadata(
 export async function checkForNewVersion(options: CheckForNewVersionOptions): Promise<string | void> {
   const {localAssetVersion, isOnline, fetchLatestBuildMetadata, onNewVersionAvailable} = options;
 
-  if (isOnline() === false) {
+  if (!isOnline()) {
     return;
   }
 

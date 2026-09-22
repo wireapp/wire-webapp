@@ -153,11 +153,11 @@ export const customStyles = ({
   }),
   valueContainer: (provided, {selectProps}) => ({
     ...provided,
-    display: selectProps.isMulti === true ? 'grid' : 'flex',
+    display: selectProps.isMulti ? 'grid' : 'flex',
     padding: 0,
     flex: 1,
     minWidth: 0,
-    ...(selectProps.isMulti === true && {
+    ...(selectProps.isMulti && {
       width: '100%',
     }),
   }),

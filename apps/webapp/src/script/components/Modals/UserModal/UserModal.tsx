@@ -311,7 +311,7 @@ const UserModal = ({
 
       <FadingScrollbar
         className={cx('modal__body user-modal__wrapper', {
-          'user-modal__wrapper--max': user === null && userNotFound === false,
+          'user-modal__wrapper--max': user === null && !userNotFound,
         })}
       >
         {user !== null && (
@@ -324,7 +324,7 @@ const UserModal = ({
               showAvailability={isTeam && !isTemporaryGuest && teamState.isInTeam(user)}
             />
 
-            {isTrusted === false && !isSameTeam && <UnverifiedUserWarning user={user} />}
+            {!isTrusted && !isSameTeam && <UnverifiedUserWarning user={user} />}
 
             <UserModalUserActionsSection
               user={user}
@@ -336,7 +336,7 @@ const UserModal = ({
             />
           </>
         )}
-        {isShown === true && user === null && userNotFound === false && (
+        {isShown && user === null && !userNotFound && (
           <div className="loading-wrapper">
             <Icon.LoadingIcon aria-hidden="true" />
           </div>

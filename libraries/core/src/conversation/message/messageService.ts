@@ -78,7 +78,7 @@ export class MessageService {
     try {
       return await send(encryptionResults);
     } catch (error: unknown) {
-      if (this.isClientMismatchError(error) === false) {
+      if (!this.isClientMismatchError(error)) {
         throw error;
       }
       const response = error.response;

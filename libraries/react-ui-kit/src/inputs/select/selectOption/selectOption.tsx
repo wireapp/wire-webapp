@@ -48,7 +48,7 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
         <div
           ref={selectedOptionRef}
           css={{
-            ...((isMulti === true || isGroup(options)) && {
+            ...((isMulti || isGroup(options)) && {
               display: 'grid',
               gridTemplateAreas: `"checkbox label"
                                 ". description"`,
@@ -62,7 +62,7 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
             'data-uie-selected': isSelected,
           })}
         >
-          {isMulti === true && (
+          {isMulti && (
             <input
               type="checkbox"
               checked={isSelected}

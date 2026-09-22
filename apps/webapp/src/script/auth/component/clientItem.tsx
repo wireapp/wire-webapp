@@ -237,12 +237,12 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const smoothMarginTop = animationPosition * cardHorizontalSpacingPixels;
 
   const renderErrorMessage = (): ReactElement | null => {
-    if (!isNull(validationError) && selected === true) {
+    if (!isNull(validationError) && selected) {
       return (
         <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
       );
     }
-    if (!isUndefined(clientError) && selected === true) {
+    if (!isUndefined(clientError) && selected) {
       return (
         <div style={{margin: `${cardHorizontalSpacingPixels}px 0 0 0`}} data-uie-name="error-message">
           {parseError(clientError)}
@@ -351,7 +351,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 <IconButton
                   aria-label={translate('modalAccountRemoveDeviceAction')}
                   data-uie-name="do-remove-device"
-                  disabled={!isNonEmptyString(password) || isValidPassword !== true}
+                  disabled={!isNonEmptyString(password) || !isValidPassword}
                   formNoValidate
                   css={{margin: `0 ${cardIconSpacingPixels}px`}}
                   onClick={handleSubmit}

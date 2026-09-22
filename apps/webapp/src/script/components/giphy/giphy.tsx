@@ -230,7 +230,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
               </div>
             )}
 
-            {isSingleGif === true && currentGif !== null && (
+            {isSingleGif && currentGif !== null && (
               <div className="gif-container">
                 <div className="button-reset-default gif-container-item">
                   <GifImage src={currentGif.animated} />

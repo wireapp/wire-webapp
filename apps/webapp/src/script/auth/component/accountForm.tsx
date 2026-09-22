@@ -140,7 +140,7 @@ const AccountFormComponent = ({
       await pushAccountRegistrationData({...registrationData});
       await doSendActivationCode(registrationData.email);
 
-      if (registrationData.privacyPolicyAccepted === true) {
+      if (registrationData.privacyPolicyAccepted) {
         initializeTelemetry();
         trackTelemetryEvent(EventName.ACCOUNT_SETUP_SCREEN_1, {
           [Segmentation.MULTIPLE_PASSWORD_TRIES]: hasMultiplePasswordEntries,
@@ -186,7 +186,7 @@ const AccountFormComponent = ({
     isNonEmptyString(registrationData.email) &&
     isNonEmptyString(registrationData.name) &&
     isNonEmptyString(registrationData.password) &&
-    registrationData.termsAccepted === true &&
+    registrationData.termsAccepted &&
     isNonEmptyString(registrationData.confirmPassword);
 
   const isSubmitDisabled = !hasRequiredRegistrationData || isFetching;

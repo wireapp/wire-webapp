@@ -465,7 +465,7 @@ export class ReconnectingWebsocket {
   }
 
   private stopConnectingWatchdog(reason: string): void {
-    if (isUndefined(this.connectingTimeoutId) === false) {
+    if (!isUndefined(this.connectingTimeoutId)) {
       this.options.wallClock.clearTimeout(this.connectingTimeoutId);
       this.connectingTimeoutId = undefined;
       this.logger.debug(

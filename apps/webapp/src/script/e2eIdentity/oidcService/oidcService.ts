@@ -71,7 +71,7 @@ export class OIDCService {
     };
 
     const params = {shouldBeRedirectedByProxy: true, claims: JSON.stringify(claims)};
-    return silent === true
+    return silent
       ? this.userManager.signinSilent({extraTokenParams: params})
       : this.userManager.signinRedirect({extraQueryParams: params});
   }

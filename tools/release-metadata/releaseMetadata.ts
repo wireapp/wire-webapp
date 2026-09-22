@@ -214,7 +214,7 @@ export function selectPrecedingProductionTag(
 
   const laterProductionTag = laterProductionTags[0];
 
-  if (isUndefined(laterProductionTag) === false) {
+  if (!isUndefined(laterProductionTag)) {
     return Result.err(
       new Error(
         `Cannot select a preceding Production tag because a newer ADR Production tag exists: ${laterProductionTag.tagName}`,

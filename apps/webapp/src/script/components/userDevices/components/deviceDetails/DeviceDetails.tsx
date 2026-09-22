@@ -239,7 +239,7 @@ export const DeviceDetails = ({
           {translate('preferencesDeviceDetailsFingerprintNotMatch')}
         </p>
 
-        {isConversationMLS !== true && (
+        {!isConversationMLS && (
           <Button
             variant={ButtonVariant.TERTIARY}
             showLoading={isResettingSession}

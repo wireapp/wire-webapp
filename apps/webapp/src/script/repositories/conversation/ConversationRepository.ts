@@ -4170,7 +4170,7 @@ export class ConversationRepository {
 
     const messageEntity = (await this.updateMessageUserEntities(message)) as MemberMessage;
     const userEntity = messageEntity.otherUser();
-    const isOutgoingRequest = userEntity?.isOutgoingRequest() === true;
+    const isOutgoingRequest = userEntity?.isOutgoingRequest();
     if (isOutgoingRequest) {
       messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
     }

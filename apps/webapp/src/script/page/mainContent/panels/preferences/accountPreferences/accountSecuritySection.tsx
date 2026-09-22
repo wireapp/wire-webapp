@@ -90,7 +90,7 @@ const AccountSecuritySection = ({
         </Link>
       )}
 
-      {isNonEmptyString(createTeamUrl) && isMacOsWrapper !== true && (
+      {isNonEmptyString(createTeamUrl) && !isMacOsWrapper && (
         <Link variant={LinkVariant.PRIMARY} targetBlank href={createTeamUrl} data-uie-name="do-create-team">
           {translate('preferencesAccountCreateTeam')}
         </Link>

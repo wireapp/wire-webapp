@@ -119,7 +119,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
   };
 
   const isPasswordOptional = () => {
-    const skipValidation = passwordOptional === true && passwordInput.trim().length === 0;
+    const skipValidation = passwordOptional && passwordInput.trim().length === 0;
     if (skipValidation) {
       return true;
     }
@@ -137,18 +137,18 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
   );
   const actionEnabled = isPasswordRequired ? isPasswordOptional() : true;
-  const inputActionEnabled = isInput === false || inputValue.trim().length > 0;
+  const inputActionEnabled = !isInput || inputValue.trim().length > 0;
 
   const areGuestLinkPasswordsValid = checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
 
   const passwordGuestLinkActionEnabled =
-    (isGuestLinkPassword === false || passwordValue.trim().length > 0) && areGuestLinkPasswordsValid;
+    (!isGuestLinkPassword || passwordValue.trim().length > 0) && areGuestLinkPasswordsValid;
 
   const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
     if (disabled === true) {
       return true;
     }
-    if (isConfirm === true) {
+    if (isConfirm) {
       return false;
     }
     if (isInput) {
@@ -162,17 +162,17 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
 
-      if (skipValidation === false && inputActionEnabled === false) {
+      if (!skipValidation && !inputActionEnabled) {
         return;
       }
 
-      if (hasPasswordWithRules === true && isBackupPasswordValid === false) {
+      if (hasPasswordWithRules && !isBackupPasswordValid) {
         setIsFormSubmitted(true);
         return;
       }
 
       // prevent from submit when validation not passed
-      if (skipValidation === false && isGuestLinkPassword === true && areGuestLinkPasswordsValid === false) {
+      if (!skipValidation && isGuestLinkPassword && !areGuestLinkPasswordsValid) {
         setIsFormSubmitted(true);
         return;
       }
@@ -218,7 +218,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
   }, [secondaryAction]);
 
   const closeAction = useCallback(() => {
-    if (hasPasswordWithRules === true) {
+    if (hasPasswordWithRules) {
       const [closeActionItem] = secondaryActions;
       closeActionItem?.action?.();
     }
