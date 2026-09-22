@@ -1,0 +1,79 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {result} from 'true-myth';
+
+import {Runtime} from '@wireapp/commons';
+
+import {systemNotificationErrors, type SystemNotificationApi} from 'src/script/notification/systemNotificationTypes';
+
+export type BrowserNotificationDependencies = {
+  notificationConstructor: typeof Notification;
+  isSupported: () => boolean;
+  focusWindow: () => void;
+};
+
+/**
+ * Presents system notifications through the page-context `window.Notification`. The Electron
+ * wrapper maps that very same API to a native OS toast, so this is the only adapter both the
+ * browser and the desktop app need.
+ *
+ * Every browser primitive is injected so the platform behaviour above can be exercised without
+ * touching globals.
+ */
+export const createSystemNotificationApiFromBrowserNotification = ({
+  notificationConstructor,
+  isSupported,
+  focusWindow,
+}: BrowserNotificationDependencies): SystemNotificationApi => ({
+  isSupported,
+  getPermission: () => notificationConstructor.permission,
+  show: ({title, body, tag, onClick}) =>
+    result.tryOrElse(
+      () => systemNotificationErrors.presentationFailed,
+      () => {
+        const notification = new notificationConstructor(title, {body, tag});
+
+        notification.onclick = () => {
+          focusWindow();
+          onClick();
+        };
+
+        return {
+          close: () =>
+            result.tryOrElse(
+              () => systemNotificationErrors.closeFailed,
+              () => {
+                notification.close();
+              },
+            ),
+        };
+      },
+    ),
+});
+
+/**
+ * The outermost browser boundary: the one place that reaches for the page globals.
+ */
+export const createBrowserSystemNotificationApi = (): SystemNotificationApi =>
+  createSystemNotificationApiFromBrowserNotification({
+    notificationConstructor: window.Notification,
+    isSupported: () => Runtime.isSupportingNotifications(),
+    focusWindow: () => window.focus(),
+  });

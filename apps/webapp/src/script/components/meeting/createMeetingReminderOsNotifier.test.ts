@@ -23,12 +23,12 @@ import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingR
 import type {Translate} from 'Util/localizerUtil';
 
 import {
-  createMeetingReminderOsNotifier,
-  meetingReminderNotificationErrors,
-  toMeetingReminderNotificationTag,
-  type MeetingReminderNotificationApi,
-  type MeetingReminderNotificationRequest,
-} from './createMeetingReminderOsNotifier';
+  systemNotificationErrors,
+  type SystemNotificationApi,
+  type SystemNotificationRequest,
+} from 'src/script/notification/systemNotificationTypes';
+
+import {createMeetingReminderOsNotifier, toMeetingReminderNotificationTag} from './createMeetingReminderOsNotifier';
 
 const createPayload = (overrides: Partial<MeetingReminderFirePayload> = {}): MeetingReminderFirePayload => ({
   qualifiedId: {id: 'meeting-id', domain: 'example.com'},
@@ -47,8 +47,8 @@ const translate = ((identifier: string, substitutions?: Record<string, string>) 
 const formatMeetingTime = (meetingStartTime: string): string =>
   meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
 
-const createHarness = (apiOverrides: Partial<MeetingReminderNotificationApi> = {}) => {
-  const requests: MeetingReminderNotificationRequest[] = [];
+const createHarness = (apiOverrides: Partial<SystemNotificationApi> = {}) => {
+  const requests: SystemNotificationRequest[] = [];
   const closedTags: string[] = [];
   const logger = {info: jest.fn(), warn: jest.fn()};
   const openMeetingsList = jest.fn();
@@ -137,25 +137,25 @@ describe('createMeetingReminderOsNotifier', () => {
 
   it('logs and drops a failure to present the toast', () => {
     const {logger, notifier} = createHarness({
-      show: () => result.err(meetingReminderNotificationErrors.presentationFailed),
+      show: () => result.err(systemNotificationErrors.presentationFailed),
     });
 
     notifier.notify(createPayload());
 
     expect(logger.warn).toHaveBeenCalledWith('failed to present meeting reminder OS notification', {
-      error: meetingReminderNotificationErrors.presentationFailed,
+      error: systemNotificationErrors.presentationFailed,
       tag: toMeetingReminderNotificationTag(createPayload()),
     });
   });
 
   it('logs a failure to close the toast', () => {
-    const requests: MeetingReminderNotificationRequest[] = [];
+    const requests: SystemNotificationRequest[] = [];
     const {logger, notifier} = createHarness({
       show: request => {
         requests.push(request);
 
         return result.ok({
-          close: () => result.err(meetingReminderNotificationErrors.closeFailed),
+          close: () => result.err(systemNotificationErrors.closeFailed),
         });
       },
     });
@@ -164,7 +164,7 @@ describe('createMeetingReminderOsNotifier', () => {
     requests[0].onClick();
 
     expect(logger.warn).toHaveBeenCalledWith('failed to close meeting reminder OS notification', {
-      error: meetingReminderNotificationErrors.closeFailed,
+      error: systemNotificationErrors.closeFailed,
       tag: requests[0].tag,
     });
   });

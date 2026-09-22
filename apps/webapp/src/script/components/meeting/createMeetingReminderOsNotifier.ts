@@ -17,11 +17,10 @@
  *
  */
 
-import {Maybe, result, type Result} from 'true-myth';
-
-import {Runtime} from '@wireapp/commons';
+import {Maybe, result} from 'true-myth';
 
 import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
+import type {SystemNotificationApi, SystemNotificationHandle} from 'src/script/notification/systemNotificationTypes';
 import type {Translate} from 'Util/localizerUtil';
 
 import {toMeetingIdKey} from './utils/toMeetingIdKey';
@@ -31,43 +30,8 @@ type MeetingReminderOsNotifierLogger = {
   warn: (message: string, context?: unknown) => void;
 };
 
-export const meetingReminderNotificationErrors = {
-  presentationFailed: 'presentationFailed',
-  closeFailed: 'closeFailed',
-} as const;
-
-export type MeetingReminderNotificationError =
-  (typeof meetingReminderNotificationErrors)[keyof typeof meetingReminderNotificationErrors];
-
-export type MeetingReminderNotificationRequest = {
-  title: string;
-  body: string;
-  tag: string;
-  onClick: () => void;
-};
-
-export type MeetingReminderNotificationHandle = {
-  close: () => Result<void, MeetingReminderNotificationError>;
-};
-
-/**
- * The page-context notification surface this presenter writes to. Kept behind a port so the
- * presenter stays testable without a DOM, and so the Electron wrapper needs no separate sink:
- * it maps the very same `window.Notification` to a native OS toast.
- *
- * The port owns the throwing browser boundary and reports failures as a `Result`, which keeps
- * the presenter itself free of exception handling.
- */
-export type MeetingReminderNotificationApi = {
-  isSupported: () => boolean;
-  getPermission: () => NotificationPermission;
-  show: (
-    request: MeetingReminderNotificationRequest,
-  ) => Result<MeetingReminderNotificationHandle, MeetingReminderNotificationError>;
-};
-
 export type CreateMeetingReminderOsNotifierDependencies = {
-  notificationApi: MeetingReminderNotificationApi;
+  notificationApi: SystemNotificationApi;
   openMeetingsList: () => void;
   formatMeetingTime: (meetingStartTime: string) => string;
   translate: Translate;
@@ -99,7 +63,7 @@ export const createMeetingReminderOsNotifier = ({
   translate,
   logger,
 }: CreateMeetingReminderOsNotifierDependencies): MeetingReminderOsNotifier => {
-  const openNotifications = new Map<string, MeetingReminderNotificationHandle>();
+  const openNotifications = new Map<string, SystemNotificationHandle>();
 
   const closeAndForget = (tag: string): void => {
     Maybe.of(openNotifications.get(tag)).inspect(handle => {
@@ -152,30 +116,3 @@ export const createMeetingReminderOsNotifier = ({
     },
   };
 };
-
-export const createBrowserMeetingReminderNotificationApi = (): MeetingReminderNotificationApi => ({
-  isSupported: () => Runtime.isSupportingNotifications(),
-  getPermission: () => window.Notification.permission,
-  show: ({title, body, tag, onClick}) =>
-    result.tryOrElse(
-      () => meetingReminderNotificationErrors.presentationFailed,
-      () => {
-        const notification = new window.Notification(title, {body, tag});
-
-        notification.onclick = () => {
-          window.focus();
-          onClick();
-        };
-
-        return {
-          close: () =>
-            result.tryOrElse(
-              () => meetingReminderNotificationErrors.closeFailed,
-              () => {
-                notification.close();
-              },
-            ),
-        };
-      },
-    ),
-});

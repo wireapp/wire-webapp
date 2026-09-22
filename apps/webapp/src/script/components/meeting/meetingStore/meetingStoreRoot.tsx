@@ -21,10 +21,7 @@ import {type ReactNode, useEffect, useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
-import {
-  createBrowserMeetingReminderNotificationApi,
-  createMeetingReminderOsNotifier,
-} from 'Components/meeting/createMeetingReminderOsNotifier';
+import {createMeetingReminderOsNotifier} from 'Components/meeting/createMeetingReminderOsNotifier';
 import {createMeetingReminderScheduler} from 'Components/meeting/createMeetingReminderScheduler';
 import {createBrowserDeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {createMeetingNotificationEventHandlers} from 'Components/meeting/meetingNotificationEventHandlers';
@@ -37,6 +34,7 @@ import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStore
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/meeting/shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/meeting/shared/service/meetingService';
 import {UserState} from 'Repositories/user/userState';
+import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 import {formatTimeShort} from 'Util/timeUtil';
@@ -110,7 +108,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       logger,
     });
     const reminderOsNotifier = createMeetingReminderOsNotifier({
-      notificationApi: createBrowserMeetingReminderNotificationApi(),
+      notificationApi: createBrowserSystemNotificationApi(),
       openMeetingsList: () => mainViewModel.list.openMeetingsList(),
       formatMeetingTime: formatTimeShort,
       translate,
