@@ -100,8 +100,12 @@ export const createSystemNotificationApiFromBrowserNotification = ({
           },
         );
 
-        // Only a close that worked means the notification is gone.
-        return closeAttempt.inspect(reportClose);
+        if (result.isOk(closeAttempt)) {
+          // Only a close that worked means the notification is gone.
+          reportClose();
+        }
+
+        return closeAttempt;
       };
 
       notification.onClick(() => {
@@ -121,13 +125,15 @@ export const createSystemNotificationApiFromBrowserNotification = ({
       notification.onError(event => {
         logger.warn('system notification failed after being shown', {tag, event});
 
-        closeNotification().inspectErr(error => {
+        const closeAttempt = closeNotification();
+
+        if (result.isErr(closeAttempt)) {
           logger.warn('failed to close a system notification that errored', {
-            error: error.kind,
-            cause: error.cause,
+            error: closeAttempt.error.kind,
+            cause: closeAttempt.error.cause,
             tag,
           });
-        });
+        }
       });
 
       return {close: closeNotification};

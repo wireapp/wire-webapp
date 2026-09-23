@@ -80,16 +80,20 @@ export const createMeetingReminderOsNotifier = ({
       return;
     }
 
-    openNotification.value
-      // Keep the handle until the close actually happened, so a failed close can be retried on
-      // teardown rather than leaving a toast on screen that we no longer know about.
-      .close()
-      .inspect(() => {
-        forget(tag);
-      })
-      .inspectErr(error => {
-        logger.warn('failed to close meeting reminder OS notification', {error: error.kind, cause: error.cause, tag});
+    const closeAttempt = openNotification.value.close();
+
+    if (result.isErr(closeAttempt)) {
+      logger.warn('failed to close meeting reminder OS notification', {
+        error: closeAttempt.error.kind,
+        cause: closeAttempt.error.cause,
+        tag,
       });
+      return;
+    }
+
+    // Only reached on a close that worked, so a failed close keeps the handle for teardown to
+    // retry rather than leaving a toast on screen that we no longer know about.
+    forget(tag);
   };
 
   return {
