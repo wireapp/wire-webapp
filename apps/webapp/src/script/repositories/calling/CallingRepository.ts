@@ -907,13 +907,6 @@ export class CallingRepository {
 
       return true;
     } catch (error: unknown) {
-      this.logger.warn('warmupMediaStreams failed', {
-        error,
-        name: error instanceof Error ? error.name : undefined,
-        constructor: error?.constructor?.name,
-        isNoAudioInputError: error instanceof NoAudioInputError,
-      });
-
       if (error instanceof NoAudioInputError) {
         throw error;
       }

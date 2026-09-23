@@ -17,9 +17,8 @@
  *
  */
 
-import {isString} from '@sindresorhus/is';
+import {isObject, isString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
-import {isObject} from 'underscore';
 
 import {Runtime} from '@wireapp/commons';
 
