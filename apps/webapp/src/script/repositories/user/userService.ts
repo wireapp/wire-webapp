@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
@@ -43,7 +44,7 @@ export class UserService {
   private get coreUserService() {
     const userService = this.core.service?.user;
 
-    if (!userService) {
+    if (isNullOrUndefined(userService)) {
       throw new Error('User service not available');
     }
 
@@ -82,7 +83,7 @@ export class UserService {
     const deletedEntries = [];
     for (const key of nonQualifiedKeys) {
       const entry = await this.storageService.load<UserRecord>(this.USER_STORE_NAME, key);
-      if (entry) {
+      if (!isNullOrUndefined(entry)) {
         deletedEntries.push(entry);
         await this.storageService.delete(this.USER_STORE_NAME, key);
       }
@@ -108,7 +109,7 @@ export class UserService {
   async updateUser(userId: QualifiedId, updates: Partial<UserRecord>) {
     const primaryKey = constructUserPrimaryKey(userId);
     const hasBeenUpdated = await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
-    if (!hasBeenUpdated) {
+    if (hasBeenUpdated === 0 || isNan(hasBeenUpdated)) {
       // If the user could not be found, create an entry for it
       await this.storageService.save(this.USER_STORE_NAME, primaryKey, {id: userId.id, ...updates});
     }
@@ -128,7 +129,7 @@ export class UserService {
   }
 
   async getUserByFQN({domain, handle}: QualifiedHandle): Promise<APIClientUser> {
-    if (domain) {
+    if (isNonEmptyString(domain)) {
       return this.apiClient.api.user.getUserByHandle({
         domain,
         handle,

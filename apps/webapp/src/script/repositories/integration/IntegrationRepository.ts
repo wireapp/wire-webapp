@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -72,10 +73,10 @@ export class IntegrationRepository {
    * @param entity Service or user to add provider name to
    */
   async addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User | ProviderEntity> {
-    if (entity.providerId) {
+    if (isNonEmptyString(entity.providerId)) {
       const providerEntity = await this.getProviderById(entity.providerId);
 
-      if (providerEntity) {
+      if (!isNullOrUndefined(providerEntity)) {
         entity.providerName(providerEntity.name);
       }
     }
@@ -94,7 +95,7 @@ export class IntegrationRepository {
 
     const {providerId, serviceId} = entity;
 
-    if (!providerId || !serviceId) {
+    if (!isNonEmptyString(providerId) || !isNonEmptyString(serviceId)) {
       return undefined;
     }
 
@@ -153,7 +154,7 @@ export class IntegrationRepository {
       }
 
       const [userEntity] = conversationEntity.participating_user_ets();
-      if (!userEntity) {
+      if (isUndefined(userEntity)) {
         // Disregard conversations with no user entities
         return false;
       }
@@ -169,17 +170,17 @@ export class IntegrationRepository {
       return isExpectedServiceId && isExpectedProviderId;
     });
 
-    return matchingConversationEntity || this.create1to1ConversationWithService(serviceEntity);
+    return matchingConversationEntity ?? this.create1to1ConversationWithService(serviceEntity);
   }
 
   async getProviderById(providerId: string): Promise<ProviderEntity | undefined> {
     const providerData = await this.integrationService.getProvider(providerId);
-    return providerData ? IntegrationMapper.mapProviderFromObject(providerData) : undefined;
+    return !isNullOrUndefined(providerData) ? IntegrationMapper.mapProviderFromObject(providerData) : undefined;
   }
 
   async getServiceById(providerId: string, serviceId: string, domain: string): Promise<ServiceEntity | undefined> {
     const serviceData = await this.integrationService.getService(providerId, serviceId);
-    if (serviceData) {
+    if (!isNullOrUndefined(serviceData)) {
       return IntegrationMapper.mapServiceFromObject(serviceData, domain);
     }
     return undefined;
@@ -206,13 +207,14 @@ export class IntegrationRepository {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     const teamId = this.teamState.team().id;
-    if (!teamId) {
+    if (!isNonEmptyString(teamId)) {
       return undefined;
     }
     try {
       let serviceEntities = await this.teamRepository.getWhitelistedServices(teamId, this.teamState.teamDomain() ?? '');
       const isCurrentQuery =
-        !queryObservable || normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
+        isNullOrUndefined(queryObservable) ||
+        normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
       if (isCurrentQuery) {
         serviceEntities = serviceEntities
           .filter(serviceEntity => compareTransliteration(serviceEntity.name(), normalizedQuery))

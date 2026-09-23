@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {UserConnectionEvent, USER_EVENT, UserEvent} from '@wireapp/api-client/lib/event/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -112,12 +113,12 @@ export class ConnectionRepository {
 
     // Try to find existing connection
     let connectionEntity = this.getConnectionByUserId(
-      connectionData.qualified_to || {domain: '', id: connectionData.to},
+      connectionData.qualified_to ?? {domain: '', id: connectionData.to},
     );
     const previousStatus = connectionEntity?.status();
 
     // Update connection status
-    if (connectionEntity) {
+    if (!isNullOrUndefined(connectionEntity)) {
       ConnectionMapper.updateConnectionFromJson(connectionEntity, connectionData);
     } else {
       // Create new connection if there was no connection before
@@ -204,7 +205,7 @@ export class ConnectionRepository {
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
       return {
         connectionStatus: response.status,
-        conversationId: response.qualified_conversation || {id: response.conversation, domain: ''},
+        conversationId: response.qualified_conversation ?? {id: response.conversation, domain: ''},
       };
     } catch (error: unknown) {
       if (isBackendError(error)) {
@@ -502,7 +503,7 @@ export class ConnectionRepository {
 
     await this.onDeleteConnectionRequestConversation?.(user.qualifiedId);
 
-    if (connection) {
+    if (!isNullOrUndefined(connection)) {
       this.connectionState.connections.remove(connection);
       user.connection(null);
     }
@@ -562,7 +563,7 @@ export class ConnectionRepository {
     const freshSelf = await this.selfService.getSelf([]);
     const newTeamId = freshSelf.team;
 
-    if (!newTeamId) {
+    if (!isNonEmptyString(newTeamId)) {
       return;
     }
 
@@ -602,8 +603,8 @@ export class ConnectionRepository {
     // If the connection is already accepted, we don't need to delete the conversation from our state
     // we're gonna use the previous 1:1 conversation with the newly joined user
     if (
-      !connectionWithNewlyJoinedUser ||
-      !conversationIdWithNewlyJoinedUser ||
+      isNullOrUndefined(connectionWithNewlyJoinedUser) ||
+      isNullOrUndefined(conversationIdWithNewlyJoinedUser) ||
       connectionWithNewlyJoinedUser?.status() === ConnectionStatus.ACCEPTED
     ) {
       return;

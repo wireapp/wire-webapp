@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Runtime} from '@wireapp/commons';
 
 import {formatString} from 'Util/stringUtil';
@@ -53,7 +55,7 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
   options = {...defaults, ...options};
   const iFrameContainer = `<div class="{0}"><iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}{6}></iframe></div>`;
 
-  if (!options.video) {
+  if (options.video !== true) {
     options.allowfullscreen = '';
     options.class = 'iframe-container';
   }
@@ -101,9 +103,9 @@ const _getParameters = (params: string): string => params.slice(params.indexOf('
  * @returns YouTube embed URL
  */
 const generateYouTubeEmbedUrl = (url: string): string | void => {
-  if (url.match(MediaEmbeds.regex.youtube)) {
+  if (url.match(MediaEmbeds.regex.youtube) !== null) {
     const videoId = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);
-    if (!videoId) {
+    if (videoId === null) {
       return;
     }
 
@@ -145,13 +147,13 @@ const generateYouTubeEmbedUrl = (url: string): string | void => {
  * @returns Timestamp in seconds
  */
 const convertYouTubeTimestampToSeconds = (timestamp: string): number => {
-  if (timestamp) {
+  if (isNonEmptyString(timestamp)) {
     if (/^[0-9]*$/.test(timestamp)) {
       return parseInt(timestamp, 10);
     }
 
     const _extractUnit = (unit: 'h' | 'm' | 's'): number => {
-      const extracted = (timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || ['0'])[0];
+      const extracted = (timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) ?? ['0'])[0];
       return parseInt(extracted, 10);
     };
 
@@ -183,7 +185,7 @@ export const MediaEmbeds = {
   soundcloud(link: HTMLAnchorElement, message: string): string {
     let linkSrc = link.href;
 
-    if (linkSrc.match(MediaEmbeds.regex.soundcloud)) {
+    if (linkSrc.match(MediaEmbeds.regex.soundcloud) !== null) {
       linkSrc = linkSrc.replace(/(m\.)/, '');
       let linkPathName = link.pathname;
 
@@ -227,7 +229,7 @@ export const MediaEmbeds = {
   spotify(link: HTMLAnchorElement, message: string): string {
     const linkSrc = link.href;
 
-    if (linkSrc.match(MediaEmbeds.regex.spotify)) {
+    if (linkSrc.match(MediaEmbeds.regex.spotify) !== null) {
       const iFrame = _createIFrameContainer({
         height: '80px',
         src: 'https://embed.spotify.com/?uri=spotify$1',
@@ -259,9 +261,9 @@ export const MediaEmbeds = {
    */
   vimeo(link: HTMLAnchorElement, message: string, themeColor: string): string {
     const linkSrc = link.href;
-    const vimeoColor = themeColor ? themeColor.replace('#', '') : undefined;
+    const vimeoColor = isNonEmptyString(themeColor) ? themeColor.replace('#', '') : undefined;
 
-    if (linkSrc.match(MediaEmbeds.regex.vimeo)) {
+    if (linkSrc.match(MediaEmbeds.regex.vimeo) !== null) {
       const iFrame = _createIFrameContainer({
         src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeoColor}&badge=0`,
         type: 'vimeo',
@@ -286,7 +288,7 @@ export const MediaEmbeds = {
   youtube(link: HTMLAnchorElement, message: string): string {
     const embedUrl = generateYouTubeEmbedUrl(link.href);
 
-    if (embedUrl) {
+    if (isNonEmptyString(embedUrl)) {
       const iFrame = _createIFrameContainer({
         referrerpolicy: ' referrerpolicy="strict-origin-when-cross-origin"',
         src: embedUrl,

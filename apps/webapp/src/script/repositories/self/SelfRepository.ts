@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -84,7 +85,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
 
   private get selfUser() {
     const selfUser = this.userState.self();
-    if (!selfUser) {
+    if (isNullOrUndefined(selfUser)) {
       throw new Error('Self user is not available');
     }
     return selfUser;
@@ -195,7 +196,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       previousSupportedProtocols,
     );
 
-    if (!localSupportedProtocols) {
+    if (isNullOrUndefined(localSupportedProtocols)) {
       await this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
       return refreshedSupportedProtocols;
     }
@@ -231,7 +232,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
   public getSelfSupportedProtocols = async (): Promise<CONVERSATION_PROTOCOL[]> => {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
 
-    if (localSupportedProtocols) {
+    if (!isNullOrUndefined(localSupportedProtocols)) {
       return localSupportedProtocols;
     }
 

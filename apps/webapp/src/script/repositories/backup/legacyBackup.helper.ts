@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {User} from 'Repositories/entity/User';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger} from 'Util/logger';
@@ -89,7 +91,7 @@ export const importLegacyBackupToDatabase = async ({
   fileDescriptors: FileDescriptor[];
 }> => {
   // Import legacy backup
-  if (!fileData[Filename.METADATA]) {
+  if (isNullOrUndefined(fileData[Filename.METADATA])) {
     throw new InvalidMetaDataError();
   }
 

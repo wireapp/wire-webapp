@@ -35,11 +35,11 @@ export class ProviderEntity {
   constructor(providerData: ProviderData = {}) {
     const {description, id, name, url, email} = providerData;
 
-    this.id = id || '';
+    this.id = id ?? '';
 
-    this.description = description || '';
-    this.email = email || '';
-    this.name = name || '';
-    this.url = url || '';
+    this.description = description ?? '';
+    this.email = email ?? '';
+    this.name = name ?? '';
+    this.url = url ?? '';
   }
 }

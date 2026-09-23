@@ -17,6 +17,8 @@
  *
  */
 
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
+
 import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 import {
   getBestMatchingQualityTier,
@@ -107,13 +109,13 @@ export class BackgroundEffectsController {
     const trackSettings = inputTrack.getSettings();
     const trackConstraints = inputTrack.getConstraints();
     let {width, height, frameRate} = trackSettings;
-    if (!width) {
+    if (isNullOrUndefined(width) || width === 0 || isNan(width)) {
       width = TIER_DEFINITIONS[QUALITY_TIERS.HD].resolution.width;
     }
-    if (!height) {
+    if (isNullOrUndefined(height) || height === 0 || isNan(height)) {
       height = TIER_DEFINITIONS[QUALITY_TIERS.HD].resolution.height;
     }
-    if (!frameRate) {
+    if (isNullOrUndefined(frameRate) || frameRate === 0 || isNan(frameRate)) {
       frameRate = DEFAULT_FRAME_RATE;
     }
     this.maxResolution = {width, height};
@@ -152,7 +154,7 @@ export class BackgroundEffectsController {
       );
       onWorkerMessage = ({data}: MessageEvent) => {
         const {name} = data as {name: string};
-        if (name === 'stats' && this.onMetrics) {
+        if (name === 'stats' && !isNullOrUndefined(this.onMetrics)) {
           const {stats} = data as {stats: Metrics};
           this.onMetrics(stats);
         }
@@ -189,7 +191,7 @@ export class BackgroundEffectsController {
       this.worker?.removeEventListener('message', onWorkerMessage);
 
       this.refcount--;
-      if (!this.refcount) {
+      if (this.refcount === 0 || isNan(this.refcount)) {
         if (this.worker !== null) {
           this.worker.terminate();
           this.worker = null;
@@ -306,7 +308,7 @@ export class BackgroundEffectsController {
    * its transferable ImageBitmap can be supplied for setBackgroundSource calls.
    */
   private pushOptionsUpdate(workerSource?: WorkerBackgroundSource, transferables: Transferable[] = []): void {
-    if (!this.refcount) {
+    if (this.refcount === 0 || isNan(this.refcount)) {
       return;
     }
 
@@ -325,11 +327,11 @@ export class BackgroundEffectsController {
       .setEffectiveQualityTier(qualityTierFromModel(effectiveModelPath, this.options.enhancePerformance));
 
     const {options: workerOptions} = getWorkerOptions(this.options);
-    const finalOptions: WorkerProcessVideoTrackOptions = workerSource
+    const finalOptions: WorkerProcessVideoTrackOptions = !isNullOrUndefined(workerSource)
       ? {...workerOptions, backgroundSource: workerSource}
       : workerOptions;
 
-    if (this.options.useWorker && this.worker) {
+    if (this.options.useWorker && !isNullOrUndefined(this.worker)) {
       this.worker.postMessage({name: 'options', options: finalOptions}, transferables);
     } else {
       updateSegmenterOptions(finalOptions);
@@ -337,7 +339,7 @@ export class BackgroundEffectsController {
   }
 
   private async changeResolution(quality: QualityTier): Promise<QualityTier> {
-    if (!this.inputTrack) {
+    if (isNullOrUndefined(this.inputTrack)) {
       return quality;
     }
 
@@ -457,7 +459,7 @@ const getWorkerOptions = (
   const transferables: Transferable[] = [];
   let workerBackgroundSource: WorkerBackgroundSource | null = null;
 
-  if (options.backgroundSource) {
+  if (!isNullOrUndefined(options.backgroundSource)) {
     const {type, media, url} = options.backgroundSource;
     workerBackgroundSource = {type, media: undefined, url};
 

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
 import {ConversationRecord} from 'Repositories/storage';
@@ -30,11 +31,13 @@ export const mapConversationRecord = ({
   name,
   lastModifiedTime,
 }: BackUpConversation): ConversationRecord | null => {
-  if (!qualifiedId) {
+  if (isNullOrUndefined(qualifiedId)) {
     return null;
   }
 
-  const lastEventTimestamp = lastModifiedTime ? new Date(lastModifiedTime.date.toString()).getTime() : 0;
+  const lastEventTimestamp = !isNullOrUndefined(lastModifiedTime)
+    ? new Date(lastModifiedTime.date.toString()).getTime()
+    : 0;
   const conversationName = name?.toString?.() ?? '';
 
   // We dont get all the "required" fields from the backup, so we need to outsmart the type system.

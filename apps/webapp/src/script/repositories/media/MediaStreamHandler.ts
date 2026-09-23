@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
@@ -53,9 +54,9 @@ export class MediaStreamHandler {
     this.requestHintTimeout = undefined;
 
     this.screensharingMethod = ScreensharingMethods.NONE;
-    if (window.desktopCapturer) {
+    if (!isNullOrUndefined(window.desktopCapturer)) {
       this.screensharingMethod = ScreensharingMethods.DESKTOP_CAPTURER;
-    } else if (!!navigator.mediaDevices?.getDisplayMedia) {
+    } else if (!isNullOrUndefined(navigator.mediaDevices?.getDisplayMedia)) {
       this.screensharingMethod = ScreensharingMethods.DISPLAY_MEDIA;
     } else if (Runtime.isFirefox()) {
       this.screensharingMethod = ScreensharingMethods.USER_MEDIA;
@@ -134,7 +135,7 @@ export class MediaStreamHandler {
       permissionTypes.push(PermissionType.CAMERA);
     }
     const shouldCheckPermissions = permissionTypes.length;
-    return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : true;
+    return shouldCheckPermissions > 0 ? checkPermissionStates(permissionTypes) : true;
   }
 
   releaseTracksFromStream(mediaStream: MediaStream, mediaType?: MediaType): void {
@@ -228,7 +229,7 @@ export class MediaStreamHandler {
   }
 
   private getMediaTracks(mediaStream: MediaStream, mediaType: MediaType = MediaType.AUDIO_VIDEO): MediaStreamTrack[] {
-    if (!mediaStream) {
+    if (isNullOrUndefined(mediaStream)) {
       throw new MediaError(MediaError.TYPE.STREAM_NOT_FOUND, MediaError.MESSAGE.STREAM_NOT_FOUND);
     }
 

@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {getLogger} from 'Util/logger';
 
 import {BrowserPermissionStatus} from './BrowserPermissionStatus';
@@ -53,7 +55,7 @@ export const getPermissionStates = (permissionTypes: PermissionType[]): Permissi
 export const queryBrowserPermission = async (
   permissionType: PermissionType,
 ): Promise<BrowserPermissionStatus | null> => {
-  if (!navigator.permissions) {
+  if (isNullOrUndefined(navigator.permissions)) {
     logger.debug('Permissions API not available');
     return null;
   }
@@ -75,7 +77,7 @@ export const setupPermissionListener = async (
   permissionType: PermissionType,
   onStateChange: (state: BrowserPermissionStatus) => void,
 ): Promise<PermissionStatus | null> => {
-  if (!navigator.permissions) {
+  if (isNullOrUndefined(navigator.permissions)) {
     return null;
   }
 
@@ -101,7 +103,7 @@ export const setupPermissionListener = async (
 export const initializePermissions = async (
   permissions: PermissionType[] = Object.values(PermissionType),
 ): Promise<void> => {
-  if (!navigator.permissions) {
+  if (isNullOrUndefined(navigator.permissions)) {
     logger.debug('Permissions API not available, keeping default states');
     return;
   }
@@ -110,7 +112,7 @@ export const initializePermissions = async (
     try {
       // Query initial state
       const initialState = await queryBrowserPermission(permissionType);
-      if (initialState) {
+      if (!isNullOrUndefined(initialState)) {
         setPermissionState(permissionType, initialState);
       }
 

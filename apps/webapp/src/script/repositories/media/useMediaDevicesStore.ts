@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
@@ -34,7 +34,7 @@ export const defaultScreenInputId = 'screen';
  * return MediaDeviceInfo[]
  */
 const filterInvalidDevices = (devices: MediaDeviceInfo[]): MediaDeviceInfo[] =>
-  devices.filter(device => device.deviceId && device.label);
+  devices.filter(device => isNonEmptyString(device.deviceId) && isNonEmptyString(device.label));
 
 type MediaChannelPatch<T> = Partial<Pick<MediaChannel<T>, 'devices' | 'selectedId' | 'supported'>>;
 // omit thumbnail (which is a native image) to avoid serialization issues in Zustand immer

@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
@@ -92,13 +92,13 @@ export class AssetRepository {
 
   async getObjectUrl(asset: AssetRemoteData): Promise<string> {
     const objectUrl = getAssetUrl(asset.identifier);
-    if (objectUrl !== undefined) {
+    if (!isUndefined(objectUrl)) {
       return objectUrl;
     }
 
     const urlPromise = new Promise<string>(async (resolve, reject) => {
       const blob = await this.load(asset);
-      if (!blob) {
+      if (isUndefined(blob)) {
         return reject(undefined);
       }
       const url = window.URL.createObjectURL(blob);
@@ -130,12 +130,11 @@ export class AssetRepository {
   }
 
   private loadBuffer(asset: AssetRemoteData) {
-    const isEncryptedAsset = !!asset.otrKey && !!asset.sha256;
     const progressCallback = (fraction: number) => {
       asset.updateProgress(fraction * 100);
     };
 
-    if (!isEncryptedAsset) {
+    if (isNullOrUndefined(asset.otrKey) || isNullOrUndefined(asset.sha256)) {
       return this.assetCoreService.downloadRawAsset(asset.urlData, progressCallback);
     }
     const otrKey = asset.otrKey instanceof Uint8Array ? asset.otrKey : Uint8Array.from(Object.values(asset.otrKey));
@@ -147,7 +146,7 @@ export class AssetRepository {
   public async download(asset: AssetRemoteData, fileName: string) {
     try {
       const blob = await this.load(asset);
-      if (!blob) {
+      if (isUndefined(blob)) {
         throw new Error('No blob received.');
       }
       return downloadBlob(blob, fileName);
@@ -160,7 +159,7 @@ export class AssetRepository {
     try {
       asset.status(AssetTransferState.DOWNLOADING);
       const blob = await this.load(asset.original_resource());
-      if (!blob) {
+      if (isUndefined(blob)) {
         throw new Error('No blob received.');
       }
       asset.status(AssetTransferState.UPLOADED);
@@ -210,7 +209,7 @@ export class AssetRepository {
     ]);
 
     const toAssetImageKey = (uploadedAsset: {domain?: string; key?: string}) => {
-      if (!uploadedAsset.key) {
+      if (!isNonEmptyString(uploadedAsset.key)) {
         throw new Error('Asset upload response is missing the asset key.');
       }
       return {domain: uploadedAsset.domain, key: uploadedAsset.key};
@@ -279,7 +278,9 @@ export class AssetRepository {
 
     if (isAuditLogEnabled) {
       const isIncompleteAuditData =
-        !options.auditData?.conversationId || !options.auditData.filename || !options.auditData.filetype;
+        isNullOrUndefined(options.auditData?.conversationId) ||
+        !isNonEmptyString(options.auditData.filename) ||
+        !isNonEmptyString(options.auditData.filetype);
       if (isIncompleteAuditData) {
         this.removeFromUploadQueue(messageId);
         throw new Error('Audit data is incomplete, file cannot be uploaded');
@@ -303,7 +304,7 @@ export class AssetRepository {
 
   cancelUpload(messageId: string): void {
     const cancelToken = this.uploadCancelTokens[messageId];
-    if (cancelToken) {
+    if (!isUndefined(cancelToken)) {
       cancelToken();
       this.removeFromUploadQueue(messageId);
     }

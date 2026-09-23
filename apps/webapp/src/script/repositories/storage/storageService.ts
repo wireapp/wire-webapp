@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import Dexie, {Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
@@ -197,7 +198,7 @@ export class StorageService {
   }
 
   async deleteEventInConversation(storeName: string, conversationId: string, eventId: string): Promise<number> {
-    if (!this.db) {
+    if (isNullOrUndefined(this.db)) {
       return 0;
     }
 
@@ -210,7 +211,7 @@ export class StorageService {
   }
 
   async deleteEventsByDate(storeName: string, conversationId: string, isoDate?: string): Promise<number> {
-    if (!this.db) {
+    if (isNullOrUndefined(this.db)) {
       return 0;
     }
 
@@ -218,7 +219,7 @@ export class StorageService {
       .table(storeName)
       .where('conversation')
       .equals(conversationId)
-      .filter(record => !isoDate || isoDate >= record.time)
+      .filter(record => !isNonEmptyString(isoDate) || isoDate >= record.time)
       .delete();
   }
 
@@ -243,7 +244,7 @@ export class StorageService {
    * @returns Resolves with matching tables
    */
   getTables(tableNames: string[]): Dexie.Table<any, any>[] {
-    if (!this.db) {
+    if (isNullOrUndefined(this.db)) {
       return [];
     }
     const database = this.db;
@@ -287,7 +288,14 @@ export class StorageService {
    * @returns Resolves with the primary key of the persisted object
    */
   async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
-    if (!entity) {
+    if (
+      isNullOrUndefined(entity) ||
+      entity === false ||
+      entity === '' ||
+      entity === 0 ||
+      entity === 0n ||
+      (typeof entity === 'number' && isNan(entity))
+    ) {
       throw new StorageError(StorageError.TYPE.NO_DATA, StorageError.MESSAGE.NO_DATA);
     }
 
@@ -311,7 +319,7 @@ export class StorageService {
    */
   terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);
-    if (this.db) {
+    if (!isNullOrUndefined(this.db)) {
       this.db.close();
     }
   }
