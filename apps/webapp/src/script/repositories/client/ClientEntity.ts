@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
@@ -105,7 +106,7 @@ export class ClientEntity {
   }
 
   getName(): string | undefined {
-    const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
+    const hasModel = isNonEmptyString(this.model) && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
     return hasModel ? this.model : this.class.toUpperCase();
   }
 
@@ -134,7 +135,7 @@ export class ClientEntity {
     jsonObject.meta.is_mls_verified = jsonObject.meta.isMLSVerified;
     delete jsonObject.meta.isMLSVerified;
 
-    if (jsonObject.meta.primaryKey) {
+    if (isNonEmptyString(jsonObject.meta.primaryKey)) {
       jsonObject.meta.primary_key = jsonObject.meta.primaryKey;
       delete jsonObject.meta.primaryKey;
     }

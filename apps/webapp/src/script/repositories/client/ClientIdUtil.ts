@@ -17,12 +17,13 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 export function constructClientId(userId: QualifiedId, clientId: string): string {
   const id = typeof userId === 'string' ? userId : userId.id;
   const baseId = `${id}@${clientId}`;
-  return userId.domain ? `${userId.domain}@${baseId}` : baseId;
+  return isNonEmptyString(userId.domain) ? `${userId.domain}@${baseId}` : baseId;
 }
 
 /**
@@ -32,6 +33,6 @@ export function parseClientId(id: string): {clientId: string; domain?: string; u
   // see https://regex101.com/r/c8FtCw/1
   const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
   const match = regex.exec(id);
-  const {domain, userId, clientId} = match?.groups || {};
+  const {domain, userId, clientId} = match?.groups ?? {};
   return {clientId, domain, userId};
 }

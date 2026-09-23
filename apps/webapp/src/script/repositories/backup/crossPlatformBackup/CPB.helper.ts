@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import Dexie from 'dexie';
 
 import {ClientEvent} from 'Repositories/event/Client';
@@ -62,7 +63,7 @@ export const peekCrossPlatformData = async (
     throw new IncompatibleBackupError('Incompatible cross-platform backup');
   }
   if (result instanceof BackupPeekResult.Success) {
-    const isUserBackup = userId ? await isCreatedBySameUser(result, userId) : false;
+    const isUserBackup = !isNullOrUndefined(userId) ? await isCreatedBySameUser(result, userId) : false;
 
     CPBLogger.log(`Backup version: ${result.version}`);
     return {
