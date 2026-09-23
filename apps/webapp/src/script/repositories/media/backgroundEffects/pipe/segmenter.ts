@@ -19,6 +19,7 @@
 
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
+import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import type {Metrics, Mode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
@@ -67,13 +68,13 @@ async function createSegmenter(canvas: OffscreenCanvas) {
 
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
 
-  if (!wasmLoaderPath || !wasmBinaryPath) {
+  if (!isNonEmptyString(wasmLoaderPath) || !isNonEmptyString(wasmBinaryPath)) {
     logger.error('wasmLoaderPath and wasmBinaryPath must be provided');
 
     throw new Error('wasmLoaderPath and wasmBinaryPath must be provided');
   }
 
-  if (!modelPath) {
+  if (!isNonEmptyString(modelPath)) {
     logger.error('Model path must be provided');
 
     throw new Error('Model path must be provided');
@@ -129,7 +130,7 @@ export async function runSegmenter(
   let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
   function onContextLost(event: Event) {
-    logger.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
+    logger.log(`[virtual-background] webglcontextlost (${!isNullOrUndefined(webGLRenderer)})`);
 
     event.preventDefault();
 
@@ -138,9 +139,9 @@ export async function runSegmenter(
   }
 
   function onContextRestored() {
-    logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
+    logger.log(`[virtual-background] webglcontextrestored (${!isNullOrUndefined(webGLRenderer)})`);
 
-    if (!webGLRenderer) {
+    if (isNullOrUndefined(webGLRenderer)) {
       const timer = createWallClock();
 
       timer.setTimeout(() => {
@@ -292,7 +293,7 @@ export async function runSegmenter(
   let hasLoggedTriggerGpuMissingWebGLContext = false;
   function triggerGpuTracking(gpuStart: number, frameDeltaMs: number, segmentationMs: number, filterMs: number) {
     const gl = webGLRenderer?.gl;
-    if (!gl) {
+    if (isNullOrUndefined(gl)) {
       if (!hasLoggedTriggerGpuMissingWebGLContext) {
         triggerGpuLogger.info('[virtual-background] WebGL context not available, ignore GPU measurement.');
         hasLoggedTriggerGpuMissingWebGLContext = true;
@@ -303,7 +304,7 @@ export async function runSegmenter(
     hasLoggedTriggerGpuMissingWebGLContext = false;
     // Create a Fence in the GPU queue after the Draw calls
     const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
-    if (!sync) {
+    if (isNullOrUndefined(sync)) {
       triggerGpuLogger.error('[virtual-background] Failed to create GPU sync object.');
       return;
     }
@@ -322,7 +323,7 @@ export async function runSegmenter(
   let hasLoggedMissingWebGLContext = false;
   function checkGpuQueries() {
     const gl = webGLRenderer?.gl;
-    if (!gl) {
+    if (isNullOrUndefined(gl)) {
       if (!hasLoggedMissingWebGLContext) {
         queriesLogger.warn('[virtual-background] WebGL context not available, GPU queries cannot be read.');
         hasLoggedMissingWebGLContext = true;
@@ -389,7 +390,7 @@ export async function runSegmenter(
       async write(videoFrame: VideoFrame) {
         const {codedWidth, codedHeight, timestamp} = videoFrame;
 
-        if (!codedWidth || !codedHeight) {
+        if (codedWidth === 0 || isNan(codedWidth) || codedHeight === 0 || isNan(codedHeight)) {
           videoFrame.close();
           return;
         }
@@ -485,7 +486,7 @@ export async function runSegmenter(
                     const confidenceMask = result.confidenceMasks?.[0];
 
                     try {
-                      if (!categoryMask || !confidenceMask) {
+                      if (isNullOrUndefined(categoryMask) || isNullOrUndefined(confidenceMask)) {
                         frameLogger.warn('Missing segmentation masks.');
 
                         const gpuStart = performance.now();

@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
@@ -265,7 +265,7 @@ export class ClientRepository {
       await this.getClientByIdFromBackend(clientEntity.id);
       const currentClient = this.clientState.currentClient;
 
-      if (!currentClient) {
+      if (isNullOrUndefined(currentClient)) {
         throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
       }
 
@@ -286,11 +286,12 @@ export class ClientRepository {
    * @returns Type of current client
    */
   private loadCurrentClientType(): ClientType.PERMANENT | ClientType.TEMPORARY | undefined {
-    if (this.clientState.currentClient) {
+    if (!isNullOrUndefined(this.clientState.currentClient)) {
       return this.clientState.currentClient.type;
     }
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
-    const type = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
+    const hasTruthyPersistValue = isTruthy(isPermanent);
+    const type = hasTruthyPersistValue ? ClientType.PERMANENT : ClientType.TEMPORARY;
     return Runtime.isDesktopApp() ? ClientType.PERMANENT : type;
   }
 
@@ -318,7 +319,7 @@ export class ClientRepository {
   }
 
   logoutClient = async (): Promise<void> => {
-    if (this.clientState.currentClient) {
+    if (!isNullOrUndefined(this.clientState.currentClient)) {
       if (this.clientState.currentClient.isTemporary()) {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
@@ -415,7 +416,7 @@ export class ClientRepository {
    * @returns Type of current client is permanent
    */
   isCurrentClientPermanent(): boolean {
-    if (!this.clientState.currentClient) {
+    if (isNullOrUndefined(this.clientState.currentClient)) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
     return Runtime.isDesktopApp() || this.clientState.currentClient.isPermanent();
@@ -470,7 +471,7 @@ export class ClientRepository {
           const clientId = databaseClient.id;
           const backendClient = clientsFromBackend[clientId];
 
-          if (backendClient) {
+          if (!isNullOrUndefined(backendClient)) {
             const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {
               ...backendClient,
               domain: userId.domain,
@@ -478,7 +479,7 @@ export class ClientRepository {
 
             delete clientsFromBackend[clientId];
 
-            if (this.clientState.currentClient && this.isCurrentClient(userId, clientId)) {
+            if (!isNullOrUndefined(this.clientState.currentClient) && this.isCurrentClient(userId, clientId)) {
               this.logger.warn(`Removing duplicate local self client`);
               await this.removeClient(userId, clientId);
             }
@@ -507,7 +508,7 @@ export class ClientRepository {
         for (const clientId in clientsFromBackend) {
           const clientPayload = clientsFromBackend[clientId];
 
-          if (this.clientState.currentClient && this.isCurrentClient(userId, clientId)) {
+          if (!isNullOrUndefined(this.clientState.currentClient) && this.isCurrentClient(userId, clientId)) {
             continue;
           }
 
@@ -542,13 +543,13 @@ export class ClientRepository {
    * @returns Is the client the current local client
    */
   private isCurrentClient(userId: QualifiedId, clientId: string): boolean {
-    if (!this.clientState.currentClient) {
+    if (isNullOrUndefined(this.clientState.currentClient)) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
-    if (!userId) {
+    if (isNullOrUndefined(userId)) {
       throw new ClientError(ClientError.TYPE.NO_USER_ID, ClientError.MESSAGE.NO_USER_ID);
     }
-    if (!clientId) {
+    if (!isNonEmptyString(clientId)) {
       throw new ClientError(ClientError.TYPE.NO_CLIENT_ID, ClientError.MESSAGE.NO_CLIENT_ID);
     }
     return matchQualifiedIds(userId, this.selfUser()) && clientId === this.clientState.currentClient.id;
@@ -591,7 +592,7 @@ export class ClientRepository {
    * @returns Resolves when the event has been handled
    */
   private async onClientRemove(eventJson: UserClientRemoveEvent, source: EventSource): Promise<void> {
-    const clientId = eventJson?.client ? eventJson.client.id : undefined;
+    const clientId = !isNullOrUndefined(eventJson?.client) ? eventJson.client.id : undefined;
     if (clientId === undefined || clientId === '') {
       return;
     }
@@ -605,7 +606,7 @@ export class ClientRepository {
     }
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);
-    if (removedClient?.isLegalHold()) {
+    if (removedClient?.isLegalHold() === true) {
       PrimaryModal.show(
         PrimaryModal.type.ACKNOWLEDGE,
         {

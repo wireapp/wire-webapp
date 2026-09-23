@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
+
 import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/logger';
@@ -139,7 +141,7 @@ export class MediaDevicesHandler {
       screen: {
         input: {
           selectedId: loadValue(MediaDeviceType.SCREEN_INPUT) ?? 'screen',
-          supported: !!window.desktopCapturer,
+          supported: !isNullOrUndefined(window.desktopCapturer),
         },
       },
     });
@@ -222,7 +224,7 @@ export class MediaDevicesHandler {
       this.removeAllDevices();
       const mediaDevices = await window.navigator.mediaDevices.enumerateDevices();
 
-      if (!mediaDevices) {
+      if (isNullOrUndefined(mediaDevices)) {
         throw new Error('No media devices found');
       }
 
@@ -286,7 +288,7 @@ export class MediaDevicesHandler {
     // fallback to favorite if current is not available
     const favorites = loadValue<string[]>(this.favoriteKeyFor(type)) ?? [];
     const matchedFavorite = favorites.find(fav => devices.some(({deviceId}) => deviceId === fav));
-    if (matchedFavorite) {
+    if (isNonEmptyString(matchedFavorite)) {
       return matchedFavorite;
     }
 
@@ -328,7 +330,7 @@ export class MediaDevicesHandler {
      * for further info please visit:
      * https://www.electronjs.org/docs/latest/breaking-changes#removed-desktopcapturergetsources-in-the-renderer
      */
-    if (window.desktopCapturer?.getDesktopSources) {
+    if (!isNullOrUndefined(window.desktopCapturer?.getDesktopSources)) {
       return window.desktopCapturer.getDesktopSources(options);
     }
     if (window.desktopCapturer?.getSources.constructor.name === 'AsyncFunction') {
@@ -338,7 +340,7 @@ export class MediaDevicesHandler {
     // Electron <= 4
     return new Promise((resolve, reject) =>
       window.desktopCapturer?.getSources(options, (error, screenSources) =>
-        error ? reject(error) : resolve(screenSources),
+        !isNullOrUndefined(error) ? reject(error) : resolve(screenSources),
       ),
     );
   }

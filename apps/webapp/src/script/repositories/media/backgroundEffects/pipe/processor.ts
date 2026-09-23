@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {setTimeout} from 'worker-timers';
 
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
@@ -36,7 +37,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
   readonly readable: ReadableStream;
 
   constructor({track}: {track: MediaStreamTrack}) {
-    if (!track) {
+    if (isNullOrUndefined(track)) {
       throw new Error('MediaStreamTrack is required');
     }
     if (track.kind !== 'video') {
@@ -50,7 +51,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
     video.srcObject = new MediaStream([track]);
     const canvas = new OffscreenCanvas(1, 1);
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
+    if (isNullOrUndefined(ctx)) {
       throw new Error('Failed to get 2D context from OffscreenCanvas');
     }
     let timestamp = 0;
@@ -65,7 +66,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         await this.startVideo(video);
         const configuredFrameRate = track.getSettings().frameRate;
 
-        if (configuredFrameRate && configuredFrameRate > 0) {
+        if (!isNullOrUndefined(configuredFrameRate) && configuredFrameRate > 0) {
           frameDuration = 1000 / configuredFrameRate;
         }
         timestamp = performance.now();

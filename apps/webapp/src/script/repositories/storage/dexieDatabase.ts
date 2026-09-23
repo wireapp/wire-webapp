@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {Dexie, Table, Transaction} from 'dexie';
 
 import {getLogger, Logger} from 'Util/logger';
@@ -66,7 +67,7 @@ export class DexieDatabase extends Dexie {
   private readonly initDbSchema = async (): Promise<void> => {
     StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
       const versionInstance = this.version(version).stores(schema);
-      if (upgrade) {
+      if (!isUndefined(upgrade)) {
         versionInstance.upgrade((transaction: Transaction) => {
           this.logger.warn(`Database upgrade to version '${version}'`);
           upgrade(transaction, this);
@@ -78,7 +79,7 @@ export class DexieDatabase extends Dexie {
   public readonly runDbSchemaUpdates = async (archiveVersion: number): Promise<void> => {
     for (const {upgrade, version} of StorageSchemata.SCHEMATA) {
       // If the archive version is greater than the current version, run the upgrade
-      if (upgrade && version > archiveVersion) {
+      if (!isUndefined(upgrade) && version > archiveVersion) {
         await this.transaction('rw', this.tables, transaction => {
           this.logger.info(`Running DB schema update for version '${version}'`);
           upgrade(transaction, this);

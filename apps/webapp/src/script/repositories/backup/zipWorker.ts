@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import JSZip from 'jszip';
 import sodium, {ready} from 'libsodium-wrappers-sumo';
 
@@ -39,7 +40,7 @@ export async function handleZipEvent(payload: Payload) {
 
       const OriginalData = await zip.generateAsync({compression: 'DEFLATE', type: 'uint8array'});
 
-      if (encrytionKey) {
+      if (!isNullOrUndefined(encrytionKey)) {
         // Encrypt the ZIP archive using the provided encrytionKey
         const encryptedData = await encryptFile(OriginalData, encrytionKey);
         return encryptedData;
@@ -49,10 +50,13 @@ export async function handleZipEvent(payload: Payload) {
     case 'unzip':
       let decryptedBytes;
 
-      if (!!encrytionKey) {
+      if (!isNullOrUndefined(encrytionKey)) {
         // Decrypt the ZIP archive using the provided encrytionKey
         const payloadBytes = new Uint8Array(payload.bytes);
-        const headerLength = payload.headerLength ? payload.headerLength : 0;
+        const headerLength =
+          !isNullOrUndefined(payload.headerLength) && payload.headerLength !== 0 && !isNan(payload.headerLength)
+            ? payload.headerLength
+            : 0;
         try {
           decryptedBytes = await decryptFile(payloadBytes, encrytionKey, headerLength);
         } catch (error: unknown) {
@@ -112,7 +116,7 @@ async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8
   const encryptedContent = encryptedDataSource.slice(headerBytes + metaDataHeader);
   const decrypted = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent, null, 'uint8array');
 
-  if (!decrypted) {
+  if (decrypted === false || isNullOrUndefined(decrypted)) {
     throw new ImportError('WRONG_PASSWORD');
   }
 

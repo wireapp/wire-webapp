@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined, isObject} from '@sindresorhus/is';
 import {FeatureList, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 
 export enum FeatureUpdateType {
@@ -62,9 +63,9 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
 ): FeatureUpdate<Key> => {
   const newFeature = newFeatureList?.[key];
 
-  if (!prevFeatureList) {
+  if (isNullOrUndefined(prevFeatureList)) {
     // Feature was added and is enabled
-    if (newFeature && newFeature.status === FEATURE_STATUS.ENABLED) {
+    if (!isNullOrUndefined(newFeature) && newFeature.status === FEATURE_STATUS.ENABLED) {
       return {type: FeatureUpdateType.ENABLED, next: newFeature};
     }
 
@@ -74,9 +75,7 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
 
   const prevFeature = prevFeatureList[key];
 
-  const wasFeatureAdded = !prevFeature && newFeature;
-
-  if (wasFeatureAdded) {
+  if (isNullOrUndefined(prevFeature) && !isNullOrUndefined(newFeature)) {
     // Feature was added and is enabled
     if (newFeature.status === FEATURE_STATUS.ENABLED) {
       return {type: FeatureUpdateType.ENABLED, next: newFeature};
@@ -86,19 +85,21 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
     return {type: FeatureUpdateType.UNCHANGED, next: newFeature};
   }
 
-  const wasFeatureRemoved = prevFeature && !newFeature;
-
-  if (wasFeatureRemoved) {
+  if (!isNullOrUndefined(prevFeature) && isNullOrUndefined(newFeature)) {
     // Feature was removed
     return {type: FeatureUpdateType.DISABLED, prev: prevFeature};
   }
 
   // This feature was never there;
-  if (!prevFeature && !newFeature) {
+  if (isNullOrUndefined(prevFeature) && isNullOrUndefined(newFeature)) {
     return {type: FeatureUpdateType.UNCHANGED};
   }
 
-  if (!prevFeature || !newFeature) {
+  if (isNullOrUndefined(prevFeature)) {
+    throw new Error('This should never happen');
+  }
+
+  if (isNullOrUndefined(newFeature)) {
     throw new Error('This should never happen');
   }
 
@@ -113,6 +114,8 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
   }
 
   const hasFeatureConfigChanged =
+    isObject(prevFeature) &&
+    isObject(newFeature) &&
     newFeature.status === FEATURE_STATUS.ENABLED &&
     'config' in prevFeature &&
     'config' in newFeature &&

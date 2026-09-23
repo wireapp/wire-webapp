@@ -17,6 +17,8 @@
  *
  */
 
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
+
 import type {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 
 import type {Metrics} from '../backgroundEffectsWorkerTypes';
@@ -95,7 +97,7 @@ export const resetMetricsWindow = (window: MetricsWindow): void => {
  */
 export const pushMetricsSample = (window: MetricsWindow, sample: MetricsSample): void => {
   const outgoing = window.samples[window.index];
-  if (outgoing) {
+  if (!isNullOrUndefined(outgoing)) {
     window.totals.totalMs -= outgoing.totalMs;
     window.totals.segmentationMs -= outgoing.segmentationMs;
     window.totals.gpuMs -= outgoing.gpuMs;
@@ -128,7 +130,7 @@ export const buildMetrics = (
   tier: Metrics['tier'],
   segmentationDelegate: 'CPU' | 'GPU' | null = null,
 ): Metrics => {
-  const count = window.count || 1;
+  const count = window.count !== 0 && !isNan(window.count) ? window.count : 1;
   return {
     avgTotalMs: window.totals.totalMs / count,
     avgSegmentationMs: window.totals.segmentationMs / count,

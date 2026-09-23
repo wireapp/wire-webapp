@@ -32,6 +32,7 @@ import {
 } from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {formatLocale} from 'Util/timeUtil';
 import {setStrings, translate, type Translate} from 'Util/localizerUtil';
+import type {Substitutions, TranslationKey} from 'Util/localizerUtil/translationTypes';
 import type {ReactElement} from 'react';
 import {
   createRootContextValueForTest,
@@ -49,14 +50,15 @@ const qualifiedCreator: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
 const specialCharacterName = `Eldon Bauch ±§!@#{}[]:"|;'\\<>?,./$%^&*()`;
+const renderedTranslations: Partial<Record<TranslationKey, (substitutions?: Substitutions) => string>> = {
+  'meetings.notifications.title': substitutions => `${substitutions?.label} ${substitutions?.meetingTitle}`,
+  'meetings.notifications.by': substitutions => `By ${substitutions?.organizer}`,
+  'meetings.meetingStatus.startedAt': substitutions => `Started at ${substitutions?.time}`,
+  'meetings.notifications.startsAt': substitutions => `Starts at ${substitutions?.time}`,
+};
+
 const translateForNotificationTest: Translate = (key, substitutions) =>
-  key === 'meetings.notifications.title'
-    ? `${substitutions?.label} ${substitutions?.meetingTitle}`
-    : key === 'meetings.notifications.by'
-      ? `By ${substitutions?.organizer}`
-      : key === 'meetings.meetingStatus.startedAt'
-        ? `Started at ${substitutions?.time}`
-        : key;
+  renderedTranslations[key]?.(substitutions) ?? key;
 const mainViewModel = {
   content: {repositories: {conversation: {}, calling: {}}},
   calling: {callActions: {answer: jest.fn(), startAudio: jest.fn()}},
@@ -166,7 +168,7 @@ describe('MeetingNotificationCard', () => {
 
     if (notification.kind === MeetingNotificationKind.REMINDER) {
       expect(card).toHaveTextContent('By creator-id');
-      expect(card).toHaveTextContent('meetings.notifications.startsIn10Minutes');
+      expect(card).toHaveTextContent(`Starts at ${formatLocale(meetingStartTime, 'p')}`);
     }
 
     if (notification.kind === MeetingNotificationKind.CANCELLED) {

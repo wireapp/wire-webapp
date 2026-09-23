@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
@@ -48,7 +48,7 @@ export class BackupService {
   }
 
   getDatabaseVersion(): number {
-    if (this.storageService.db) {
+    if (!isNullOrUndefined(this.storageService.db)) {
       return this.storageService.db.verno;
     }
     return 1;
@@ -70,7 +70,7 @@ export class BackupService {
 
   async runDbSchemaUpdates(archiveVersion: number): Promise<void> {
     const {db} = this.storageService;
-    if (!db) {
+    if (isNullOrUndefined(db)) {
       this.logger.warn('Database schema will not run because the database is not initialized');
       return;
     }
@@ -93,9 +93,9 @@ export class BackupService {
       generateId,
     }: {generatePrimaryKey?: (entry: T) => string; generateId?: (entry: T) => string | undefined} = {},
   ): Promise<number> {
-    if (this.storageService.db) {
+    if (!isNullOrUndefined(this.storageService.db)) {
       const table = await this.storageService.db.table(tableName);
-      if (generatePrimaryKey) {
+      if (!isUndefined(generatePrimaryKey)) {
         return this.addByPrimaryKeys(table, entities, generatePrimaryKey);
       }
       return this.addByIds(table, entities, generateId);
@@ -131,7 +131,7 @@ export class BackupService {
     entities: T[],
     generateId?: (entry: T) => string | undefined,
   ): Promise<number> {
-    if (!generateId) {
+    if (isUndefined(generateId)) {
       await table.bulkAdd(entities);
       return entities.length;
     }

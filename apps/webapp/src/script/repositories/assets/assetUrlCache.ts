@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 const cache = new Map<string, Promise<string>>();
 
 export const getAssetUrl = (identifier: string): Promise<string> | undefined => cache.get(identifier);
@@ -24,7 +26,7 @@ export const getAssetUrl = (identifier: string): Promise<string> | undefined => 
 export const setAssetUrl = (identifier: string, url: Promise<string>) => {
   const isExistingUrl = getAssetUrl(identifier);
 
-  if (!isExistingUrl) {
+  if (isUndefined(isExistingUrl)) {
     cache.set(identifier, url);
   }
 

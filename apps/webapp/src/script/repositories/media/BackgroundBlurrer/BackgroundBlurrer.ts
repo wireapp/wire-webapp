@@ -18,6 +18,7 @@
  */
 
 import {ImageSegmenterResult} from '@mediapipe/tasks-vision';
+import {isNullOrUndefined} from '@sindresorhus/is';
 // @ts-ignore
 import {createProgramFromSources} from 'webgl-utils.js';
 
@@ -56,7 +57,7 @@ let buffers: {
  */
 export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: VideoDimensions) {
   const gl = canvas.getContext('webgl2');
-  if (!gl) {
+  if (isNullOrUndefined(gl)) {
     throw new Error('WebGL not supported');
   }
 

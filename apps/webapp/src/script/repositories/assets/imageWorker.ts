@@ -19,24 +19,31 @@
 
 // For some reason, Jimp attaches to self, even in Node.
 // https://github.com/jimp-dev/jimp/issues/466
+import {isUndefined} from '@sindresorhus/is';
 import * as _Jimp from 'jimp';
 
-// @ts-ignore
-const Jimp: typeof _Jimp = typeof self !== 'undefined' ? self.Jimp || _Jimp : _Jimp;
+type JimpWorkerScope = typeof self & {Jimp?: typeof _Jimp};
+
+const workerScope: JimpWorkerScope | undefined = typeof self === 'undefined' ? undefined : (self as JimpWorkerScope);
+let Jimp: typeof _Jimp = _Jimp;
+
+if (!isUndefined(workerScope) && !isUndefined(workerScope.Jimp)) {
+  Jimp = workerScope.Jimp;
+}
 
 self.addEventListener('message', async event => {
   const COMPRESSION = 80;
   let MAX_SIZE = 1448;
   let MAX_FILE_SIZE = 310 * 1024;
 
-  if (event.data.useProfileImageSize) {
+  if (event.data.useProfileImageSize === true) {
     MAX_SIZE = 280;
     MAX_FILE_SIZE = 1024 * 1024;
   }
 
   // Unfortunately, Jimp doesn't support MIME type "image/webp": https://github.com/oliver-moran/jimp/issues/144
   const image = await Jimp.read(event.data.buffer);
-  if (event.data.useProfileImageSize) {
+  if (event.data.useProfileImageSize === true) {
     image.cover(MAX_SIZE, MAX_SIZE);
   } else if (image.bitmap.width > MAX_SIZE || image.bitmap.height > MAX_SIZE) {
     image.scaleToFit(MAX_SIZE, MAX_SIZE);

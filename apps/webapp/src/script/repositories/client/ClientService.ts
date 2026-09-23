@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import type {RegisteredClient, QualifiedUserClientMap} from '@wireapp/api-client/lib/client';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
@@ -110,7 +111,7 @@ export class ClientService {
   async loadClientFromDb(primaryKey: string): Promise<ClientRecord | string> {
     let clientRecord;
 
-    if (this.storageService.db) {
+    if (!isNullOrUndefined(this.storageService.db)) {
       clientRecord = await this.storageService.db
         .table(this.CLIENT_STORE_NAME)
         .where('meta.primary_key')
@@ -135,7 +136,7 @@ export class ClientService {
    * @returns Resolves with the client payload stored in database
    */
   saveClientInDb(primaryKey: string, clientPayload: ClientRecord): Promise<ClientRecord> {
-    if (!clientPayload.meta) {
+    if (isNullOrUndefined(clientPayload.meta)) {
       clientPayload.meta = {};
     }
 

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import type {MemberData, TeamData} from '@wireapp/api-client/lib/team/';
 import type {TeamUpdateData} from '@wireapp/api-client/lib/team/data/';
 
@@ -31,18 +32,18 @@ export class TeamMapper {
   updateTeamFromObject(): void;
   updateTeamFromObject(teamData: TeamData | TeamUpdateData, teamEntity?: TeamEntity): TeamEntity;
   updateTeamFromObject(teamData?: TeamData | TeamUpdateData, teamEntity = new TeamEntity()): TeamEntity | void {
-    if (teamData) {
+    if (!isNullOrUndefined(teamData)) {
       const {icon, icon_key: iconKey, name} = teamData;
 
       if ('creator' in teamData) {
         teamEntity.creator = teamData.creator;
       }
 
-      if (icon) {
+      if (isNonEmptyString(icon)) {
         teamEntity.icon = icon;
       }
 
-      if (iconKey) {
+      if (isNonEmptyString(iconKey)) {
         teamEntity.iconKey = iconKey;
       }
 
@@ -50,7 +51,7 @@ export class TeamMapper {
         teamEntity.id = teamData.id;
       }
 
-      if (name) {
+      if (isNonEmptyString(name)) {
         teamEntity.name(name);
       }
 
@@ -65,13 +66,13 @@ export class TeamMapper {
   mapMember(data: MemberData): TeamMemberEntity {
     const {created_by, permissions, user = '', legalhold_status} = data;
     const member = new TeamMemberEntity(user);
-    if (created_by) {
+    if (isNonEmptyString(created_by)) {
       member.invitedBy = created_by;
     }
-    if (permissions) {
+    if (!isNullOrUndefined(permissions)) {
       member.permissions = permissions;
     }
-    if (legalhold_status) {
+    if (isNonEmptyString(legalhold_status)) {
       member.legalholdStatus = legalhold_status;
     }
 

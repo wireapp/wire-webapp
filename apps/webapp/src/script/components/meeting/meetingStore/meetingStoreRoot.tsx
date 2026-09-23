@@ -21,6 +21,7 @@ import {type ReactNode, useEffect, useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
+import {createMeetingReminderOsNotifier} from 'Components/meeting/createMeetingReminderOsNotifier';
 import {createMeetingReminderScheduler} from 'Components/meeting/createMeetingReminderScheduler';
 import {createBrowserDeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {createMeetingNotificationEventHandlers} from 'Components/meeting/meetingNotificationEventHandlers';
@@ -33,8 +34,10 @@ import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStore
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/meeting/shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/meeting/shared/service/meetingService';
 import {UserState} from 'Repositories/user/userState';
+import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
+import {formatTimeShort} from 'Util/timeUtil';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
@@ -52,7 +55,7 @@ type MeetingStoreRootProps = {
  * meeting lifecycle events, independently of whether the meetings view is currently rendered.
  */
 export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
-  const {mainViewModel, wallClock} = useApplicationContext();
+  const {mainViewModel, wallClock, translate} = useApplicationContext();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {
     meetings: meetingsRepository,
@@ -104,6 +107,14 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
       logger,
     });
+    const reminderOsNotifier = createMeetingReminderOsNotifier({
+      notificationApi: createBrowserSystemNotificationApi(),
+      openMeetingsList: () => mainViewModel.list.openMeetingsList(),
+      formatMeetingTime: formatTimeShort,
+      translate,
+      logger,
+    });
+    // One scheduler, two sinks: the in-app card always fires, the OS toast is additive.
     const reminderScheduler = createMeetingReminderScheduler({
       wallClock,
       onReminder: payload => {
@@ -111,6 +122,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
           ...payload,
           kind: MeetingNotificationKind.REMINDER,
         });
+        reminderOsNotifier.notify(payload);
       },
     });
 
@@ -143,8 +155,9 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       unsubscribeFromMeetingConversationEvents();
       unsubscribeFromMeetingStore();
       reminderScheduler.stop();
+      reminderOsNotifier.stop();
     };
-  }, [isMeetingsEnabled, store, wallClock]);
+  }, [isMeetingsEnabled, store, wallClock, mainViewModel, translate]);
 
   return <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>;
 };

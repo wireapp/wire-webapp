@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {BaseError} from '../../error/baseError';
@@ -38,7 +40,7 @@ const valueFromType = (availabilityType: Availability.Type): string => {
   };
 
   const value = TYPE_VALUES[availabilityType];
-  if (value) {
+  if (isNonEmptyString(value)) {
     return value;
   }
   throw new UserError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);

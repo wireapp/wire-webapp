@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
@@ -195,7 +196,8 @@ export class MediaConstraintsHandler {
   }
 
   private getDeviceConstraint(mediaDeviceId?: string) {
-    const hasMediaDevice = mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
+    const hasMediaDevice =
+      isNonEmptyString(mediaDeviceId) && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
 
     return hasMediaDevice ? {deviceId: {exact: mediaDeviceId}} : {};
   }
@@ -234,7 +236,7 @@ export class MediaConstraintsHandler {
 
     const deviceConstraint = this.getDeviceConstraint(mediaDeviceId);
 
-    if (deviceConstraint.deviceId) {
+    if (!isNullOrUndefined(deviceConstraint.deviceId)) {
       return {
         ...streamConstraints,
         ...deviceConstraint,
