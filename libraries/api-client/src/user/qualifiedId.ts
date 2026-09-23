@@ -17,7 +17,11 @@
  *
  */
 
-export interface QualifiedId {
-  domain: string;
-  id: string;
-}
+import {z} from 'zod';
+
+export const QualifiedIdSchema = z.object({
+  domain: z.string().nonempty(),
+  id: z.string().nonempty(),
+});
+
+export type QualifiedId = z.infer<typeof QualifiedIdSchema>;
