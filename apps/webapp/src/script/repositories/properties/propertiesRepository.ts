@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConsentType} from '@wireapp/api-client/lib/self/';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
@@ -121,17 +122,24 @@ export class PropertiesRepository {
   }
 
   public getUserConsentStatus() {
-    const {
-      privacy: {marketing_consent: marketingConsent, telemetry_data_sharing: telemetryConsent},
-    } = this.properties.settings;
+    const marketingConsent: ConsentValue | boolean | undefined = this.properties.settings.privacy.marketing_consent;
+    const telemetryConsent: ConsentValue | boolean | undefined =
+      this.properties.settings.privacy.telemetry_data_sharing;
 
     let userConsentStatus = UserConsentStatus.ALL_DENIED;
 
-    if (marketingConsent && telemetryConsent) {
+    const isMarketingConsentGiven =
+      marketingConsent === true ||
+      (typeof marketingConsent === 'number' && marketingConsent !== 0 && !isNan(marketingConsent));
+    const isTelemetryConsentGiven =
+      telemetryConsent === true ||
+      (typeof telemetryConsent === 'number' && telemetryConsent !== 0 && !isNan(telemetryConsent));
+
+    if (isMarketingConsentGiven && isTelemetryConsentGiven) {
       userConsentStatus = UserConsentStatus.ALL_GRANTED;
-    } else if (marketingConsent) {
+    } else if (isMarketingConsentGiven) {
       userConsentStatus = UserConsentStatus.MARKETING_GRANTED;
-    } else if (telemetryConsent) {
+    } else if (isTelemetryConsentGiven) {
       userConsentStatus = UserConsentStatus.TRACKING_GRANTED;
     }
 
@@ -221,7 +229,9 @@ export class PropertiesRepository {
   init(selfUserEntity: User): Promise<void> | Promise<WebappProperties> {
     this.selfUser(selfUserEntity);
 
-    return this.selfUser()?.isTemporaryGuest() ? this.initTemporaryGuestAccount() : this.initActivatedAccount();
+    return this.selfUser()?.isTemporaryGuest() === true
+      ? this.initTemporaryGuestAccount()
+      : this.initActivatedAccount();
   }
 
   private fetchWebAppAccountSettings(): Promise<void> {
@@ -271,9 +281,10 @@ export class PropertiesRepository {
     if (updatedPreference !== this.getPreference(propertiesType)) {
       this.setPreference(propertiesType, updatedPreference);
 
-      const savePromise = this.selfUser()?.isTemporaryGuest()
-        ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
-        : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
+      const savePromise =
+        this.selfUser()?.isTemporaryGuest() === true
+          ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
+          : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
       void savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
     }
