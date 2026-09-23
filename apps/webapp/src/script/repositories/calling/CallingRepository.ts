@@ -249,7 +249,7 @@ export class CallingRepository {
 
         callParticipants[participant.user.id] = isVerified;
 
-        if (wasVerified === true && isVerified === false) {
+        if (wasVerified && !isVerified) {
           this.leaveCallOnUnverified(participant.user.qualifiedId);
           return;
         }
@@ -2103,7 +2103,7 @@ export class CallingRepository {
       call.muteState(shouldMute ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
       return;
     }
-    if (!shouldMute && call.hasWorkingAudioInput === false && call.muteState() !== MuteState.NOT_MUTED) {
+    if (!shouldMute && !call.hasWorkingAudioInput && call.muteState() !== MuteState.NOT_MUTED) {
       this.showNoAudioInputModal();
       return;
     }
@@ -2130,7 +2130,7 @@ export class CallingRepository {
       }
 
       // For camera streams, verify we have video tracks
-      if (camera === true) {
+      if (camera) {
         const videoTracks = stream.getVideoTracks();
         if (videoTracks.length === 0) {
           throw new Error('No video tracks found in camera stream');
@@ -2156,10 +2156,10 @@ export class CallingRepository {
         });
       }
 
-      if (audio === true) {
+      if (audio) {
         const audioTrack = stream.getAudioTracks()[0];
 
-        if (isUndefined(audioTrack) === false) {
+        if (!isUndefined(audioTrack)) {
           this.logger.info('Audio track details:', {
             enabled: audioTrack.enabled,
             muted: audioTrack.muted,
@@ -2172,7 +2172,7 @@ export class CallingRepository {
       }
 
       try {
-        await this.mediaDevicesHandler.initializeMediaDevices(camera === true, false);
+        await this.mediaDevicesHandler.initializeMediaDevices(camera, false);
       } catch (error: unknown) {
         this.logger.warn('Failed to initialize media devices:', error);
       }
@@ -2185,7 +2185,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackSettings(mediaTrack: MediaStreamTrack): Maybe<MediaTrackSettings> {
-    if (isFunction(mediaTrack.getSettings) === false) {
+    if (!isFunction(mediaTrack.getSettings)) {
       return Maybe.nothing();
     }
 
@@ -2193,7 +2193,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackConstraints(mediaTrack: MediaStreamTrack): Maybe<MediaTrackConstraints> {
-    if (isFunction(mediaTrack.getConstraints) === false) {
+    if (!isFunction(mediaTrack.getConstraints)) {
       return Maybe.nothing();
     }
 
@@ -2201,7 +2201,7 @@ export class CallingRepository {
   }
 
   private getMediaTrackCapabilities(mediaTrack: MediaStreamTrack): Maybe<MediaTrackCapabilities> {
-    if (isFunction(mediaTrack.getCapabilities) === false) {
+    if (!isFunction(mediaTrack.getCapabilities)) {
       return Maybe.nothing();
     }
 

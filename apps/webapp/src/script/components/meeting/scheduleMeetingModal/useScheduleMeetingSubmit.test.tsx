@@ -61,6 +61,8 @@ const formState = {
   recurrence: 'doesNotRepeat' as const,
   selectedUsers: [],
   participantsFilter: '',
+  password: '',
+  passwordConfirmation: '',
 };
 
 const scheduleCommand = {

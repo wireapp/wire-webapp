@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -63,11 +63,13 @@ const createDataTransfer = (files: readonly File[]): DataTransfer =>
 const renderCellsTable = ({
   folderPath = 'conversation-id@example.com/Marketing/images',
   onDropFilesToFolder = jest.fn(),
+  onDropReadError = jest.fn(),
   onFolderDropTargetChange = jest.fn(),
   folderDropResetKey,
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
+  readonly onDropReadError?: () => void;
   readonly onFolderDropTargetChange?: (folderName: string | null) => void;
   readonly folderDropResetKey?: number;
 } = {}) => {
@@ -92,6 +94,7 @@ const renderCellsTable = ({
         onRefresh={jest.fn()}
         onFolderDropTargetChange={onFolderDropTargetChange}
         onDropFilesToFolder={onDropFilesToFolder}
+        onDropReadError={onDropReadError}
         folderDropResetKey={resetKey}
         getDirectionFor={() => undefined}
         isSortingEnabled
@@ -106,13 +109,14 @@ const renderCellsTable = ({
     file,
     folder,
     onDropFilesToFolder,
+    onDropReadError,
     onFolderDropTargetChange,
     rerenderWithResetKey: (resetKey: number) => rerender(renderTable(resetKey)),
   };
 };
 
 describe('CellsTable folder row drop target', () => {
-  it('highlights a folder row and drops files into that folder path', () => {
+  it('highlights a folder row and drops files into that folder path', async () => {
     const droppedFile = new File(['content'], 'document.pdf', {type: 'application/pdf'});
     const dataTransfer = createDataTransfer([droppedFile]);
     const {onDropFilesToFolder, onFolderDropTargetChange} = renderCellsTable();
@@ -128,11 +132,13 @@ describe('CellsTable folder row drop target', () => {
 
     fireEvent.drop(folderRow, {dataTransfer});
 
-    expect(onDropFilesToFolder).toHaveBeenCalledWith([droppedFile], 'conversation-id@example.com/Marketing/images');
+    await waitFor(() =>
+      expect(onDropFilesToFolder).toHaveBeenCalledWith([droppedFile], 'conversation-id@example.com/Marketing/images'),
+    );
     expect(onFolderDropTargetChange).toHaveBeenLastCalledWith(null);
   });
 
-  it('preserves folder row paths exactly', () => {
+  it('preserves folder row paths exactly', async () => {
     const droppedFile = new File(['content'], 'document.pdf', {type: 'application/pdf'});
     const dataTransfer = createDataTransfer([droppedFile]);
     const {onDropFilesToFolder} = renderCellsTable({folderPath: 'direct-upload'});
@@ -140,7 +146,33 @@ describe('CellsTable folder row drop target', () => {
 
     fireEvent.drop(folderRow, {dataTransfer});
 
-    expect(onDropFilesToFolder).toHaveBeenCalledWith([droppedFile], 'direct-upload');
+    await waitFor(() => expect(onDropFilesToFolder).toHaveBeenCalledWith([droppedFile], 'direct-upload'));
+  });
+
+  it('reports folder discovery failure without uploading partial files to the folder row', async () => {
+    const {onDropFilesToFolder, onDropReadError} = renderCellsTable();
+    const folderRow = screen.getByRole('row', {name: /Marketing images/});
+    const failedDirectory = {
+      isDirectory: true,
+      isFile: false,
+      name: 'Reports',
+      fullPath: '/Reports',
+      createReader: () => ({
+        readEntries: (_success: unknown, failure: (error: DOMException) => void) =>
+          failure(new DOMException('Directory unavailable', 'NotFoundError')),
+      }),
+    };
+    const dataTransfer = {
+      dropEffect: 'none',
+      files: [],
+      items: [{webkitGetAsEntry: () => failedDirectory}],
+      types: ['Files'],
+    };
+
+    fireEvent.drop(folderRow, {dataTransfer});
+
+    await waitFor(() => expect(onDropReadError).toHaveBeenCalledTimes(1));
+    expect(onDropFilesToFolder).not.toHaveBeenCalled();
   });
 
   it('does not make file rows folder drop targets', () => {

@@ -327,7 +327,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (this.isProductReportingActivated === true) {
+    if (this.isProductReportingActivated) {
       telemetry.endSession();
     }
   };
@@ -372,7 +372,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
+    if (this.isProductReportingActivated || getForcedErrorReportingStatus()) {
       telemetry.beginSession();
       if (this.sendAppOpenEvent) {
         this.sendAppOpenEvent = false;
@@ -412,7 +412,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
+    if (this.isProductReportingActivated || getForcedErrorReportingStatus()) {
       const userData = this.getUserData();
 
       telemetry.setUserData(userData);

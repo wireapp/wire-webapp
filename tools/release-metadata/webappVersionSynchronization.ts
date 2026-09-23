@@ -190,7 +190,7 @@ export function validateWebAppVersionSynchronizationBranchName(
   const releaseIdentifier = branchNameMatch[1];
   const webAppVersion = branchNameMatch[2];
 
-  if (isString(releaseIdentifier) === false || isString(webAppVersion) === false) {
+  if (!isString(releaseIdentifier) || !isString(webAppVersion)) {
     return Result.err(new Error(`Invalid WebApp version synchronization branch name: ${branchName}`));
   }
 
@@ -216,7 +216,7 @@ export function validateWebAppVersionSynchronizationBranchName(
 export function parseWebAppVersionSynchronizationPullRequest(
   pullRequest: WebAppVersionSynchronizationPullRequest,
 ): Result<Maybe<WebAppVersionSynchronizationRecord>, Error> {
-  if (isClaimedWebAppVersionSynchronizationPullRequest(pullRequest) === false) {
+  if (!isClaimedWebAppVersionSynchronizationPullRequest(pullRequest)) {
     return Result.ok(Maybe.nothing<WebAppVersionSynchronizationRecord>());
   }
 
@@ -257,7 +257,7 @@ export function parseWebAppVersionSynchronizationPullRequest(
     );
   }
 
-  if (pullRequest.state === 'open' && isNull(pullRequest.mergedAt) === false) {
+  if (pullRequest.state === 'open' && !isNull(pullRequest.mergedAt)) {
     return Result.err(new Error(`Open WebApp version synchronization pull request #${pullRequest.number} is merged`));
   }
 

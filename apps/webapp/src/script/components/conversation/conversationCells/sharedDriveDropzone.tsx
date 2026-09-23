@@ -17,12 +17,13 @@
  *
  */
 
-import {DragEvent, ReactNode, useEffect, useRef, useState} from 'react';
+import {DragEvent, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 
 import {BlockIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import {getSharedDriveDroppedFiles} from './getSharedDriveDroppedFiles';
 import {
   contentStyles,
   descriptionStyles,
@@ -42,6 +43,7 @@ interface SharedDriveDropzoneProps {
   readonly isOverlaySuppressed?: boolean;
   readonly onDragStateReset?: () => void;
   readonly onDropFiles: (files: readonly File[]) => void;
+  readonly onDropReadError: () => void;
 }
 
 const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean =>
@@ -71,6 +73,7 @@ export const SharedDriveDropzone = ({
   isOverlaySuppressed = false,
   onDragStateReset,
   onDropFiles,
+  onDropReadError,
 }: SharedDriveDropzoneProps) => {
   const {translate} = useApplicationContext();
   const [isDraggingFiles, setIsDraggingFiles] = useState(false);
@@ -84,17 +87,20 @@ export const SharedDriveDropzone = ({
     ? translate('conversationFileUploadRestrictedOverlayDescription')
     : translate('sharedDriveDropOverlayDescription');
 
-  const resetDragState = ({notifyParent = false}: {readonly notifyParent?: boolean} = {}): void => {
-    nestedDragEventCount.current = 0;
-    setIsDraggingFiles(false);
-    if (notifyParent) {
-      onDragStateReset?.();
-    }
-  };
+  const resetDragState = useCallback(
+    ({notifyParent = false}: {readonly notifyParent?: boolean} = {}): void => {
+      nestedDragEventCount.current = 0;
+      setIsDraggingFiles(false);
+      if (notifyParent) {
+        onDragStateReset?.();
+      }
+    },
+    [onDragStateReset],
+  );
 
   useEffect(() => {
     resetDragState();
-  }, [dragStateResetKey]);
+  }, [dragStateResetKey, resetDragState]);
 
   useEffect(() => {
     if (!isDraggingFiles) {
@@ -112,7 +118,7 @@ export const SharedDriveDropzone = ({
       window.removeEventListener('dragend', resetActiveDragState);
       window.removeEventListener('blur', resetActiveDragState);
     };
-  }, [isDraggingFiles]);
+  }, [isDraggingFiles, resetDragState]);
 
   const handleDragEnter = (event: DragEvent<HTMLDivElement>): void => {
     if (!dragEventContainsFiles(event)) {
@@ -154,7 +160,14 @@ export const SharedDriveDropzone = ({
     preventDefaultFileDrop(event);
     resetDragState({notifyParent: true});
     if (isEnabled && isFileDropAllowed) {
-      onDropFiles(Array.from(event.dataTransfer.files));
+      void getSharedDriveDroppedFiles(event.dataTransfer).then(result => {
+        if (result.isErr) {
+          onDropReadError();
+          return;
+        }
+
+        onDropFiles(result.value);
+      });
     }
   };
 

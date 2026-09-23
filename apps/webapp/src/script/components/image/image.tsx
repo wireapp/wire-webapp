@@ -21,9 +21,11 @@ import React, {useEffect, useRef, useState} from 'react';
 import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {InViewport} from 'Components/inViewport';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
@@ -33,7 +35,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger, Logger} from 'Util/logger';
 
-import {getImageStyle, getWrapperStyles} from './image.styles';
+import {failedWrapperStyles, getImageStyle, getWrapperStyles} from './image.styles';
 import {RestrictedImage} from './restrictedImage';
 
 import {Config} from '../../Config';
@@ -55,6 +57,7 @@ interface BaseImageProps {
   css?: CSSObject;
   getAssetUrl?: GetAssetUrl;
   logger?: ImageLogger;
+  retryLabel?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   isQuote?: boolean;
@@ -86,12 +89,7 @@ type ImageLoadingOptions = {
 function isImageReadyToLoad(options: ImageLoadingOptions): options is ImageLoadingOptions & {image: AssetRemoteData} {
   const {image, imageLoadState, isInViewport, isFileSharingReceivingEnabled} = options;
 
-  return (
-    isUndefined(image) === false &&
-    imageLoadState === 'waiting' &&
-    isInViewport === true &&
-    isFileSharingReceivingEnabled === true
-  );
+  return !isUndefined(image) && imageLoadState === 'waiting' && isInViewport && isFileSharingReceivingEnabled;
 }
 
 export const AssetImage: FunctionComponent<AssetImageProps> = (properties: AssetImageProps) => {
@@ -109,6 +107,7 @@ export const AssetImage: FunctionComponent<AssetImageProps> = (properties: Asset
     logger,
     onClick,
     onKeyDown,
+    retryLabel,
     role,
     tabIndex,
     teamState,
@@ -131,6 +130,7 @@ export const AssetImage: FunctionComponent<AssetImageProps> = (properties: Asset
       logger={logger}
       onClick={onClick}
       onKeyDown={onKeyDown}
+      retryLabel={retryLabel}
       role={role}
       tabIndex={tabIndex}
       teamState={teamState}
@@ -155,6 +155,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
     alt,
     imageStyles,
     onKeyDown,
+    retryLabel,
     role,
     tabIndex,
   } = properties;
@@ -186,7 +187,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
       isFileSharingReceivingEnabled,
     };
 
-    if (isImageReadyToLoad(imageLoadingOptions) === false) {
+    if (!isImageReadyToLoad(imageLoadingOptions)) {
       return;
     }
 
@@ -201,7 +202,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
         ];
         const url = await getAssetUrl(availableImage, allowedImageTypes);
 
-        if (isMounted.current === false) {
+        if (!isMounted.current) {
           url.dispose();
 
           return;
@@ -209,7 +210,7 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
         setImageUrl(url);
         setImageLoadState('loaded');
       } catch (error: unknown) {
-        if (isMounted.current === false) {
+        if (!isMounted.current) {
           return;
         }
         logger.error('Failed to load image asset', error);
@@ -234,40 +235,115 @@ export const Image: FunctionComponent<RemoteDataImageProps> = (properties: Remot
   const assetUrl = imageUrl?.url ?? dummyImageUrl;
   const isLoading = imageLoadState === 'waiting' || imageLoadState === 'loading';
   const isLoaded = imageLoadState === 'loaded';
+  const isFailed = imageLoadState === 'failed';
+  const isImageDetailInteractive = isLoaded && !isUndefined(onClick);
+  let imageRole: string | undefined;
+  let imageTabIndex: number | undefined;
+  let imageStatus: ImageLoadState | 'error' = imageLoadState;
+  let imageUieName = 'image-loader';
+  let imageWrapperStyles: CSSObject = getWrapperStyles(isImageDetailInteractive);
 
-  function handleImageKeyDown(event: React.KeyboardEvent<HTMLDivElement>): void {
-    if (isLoaded) {
-      onKeyDown?.(event);
-    }
+  if (!isFailed) {
+    imageRole = role;
+    imageTabIndex = tabIndex;
   }
 
-  return (
-    <InViewport
-      onVisible={() => {
-        setIsInViewport(true);
-      }}
-      className={cx(className, {'loading-dots image-asset--no-image': isLoading})}
-      onClick={event => {
-        if (isLoaded) {
-          onClick?.(event);
-        }
-      }}
-      onKeyDown={handleImageKeyDown}
-      role={role}
-      tabIndex={tabIndex}
-      aria-label={ariaLabel}
-      data-uie-name={dataUieName}
-      data-uie-visible={dataUieVisible}
-      data-uie-status={imageLoadState === 'failed' ? 'error' : imageLoadState}
-      css={css ?? getWrapperStyles(onClick !== undefined)}
-    >
+  if (isFailed) {
+    imageStatus = 'error';
+  }
+
+  if (isLoaded) {
+    imageUieName = 'image-asset-img';
+  }
+
+  if (!isUndefined(css)) {
+    imageWrapperStyles = css;
+  }
+
+  if (isFailed) {
+    imageWrapperStyles = {...imageWrapperStyles, ...failedWrapperStyles};
+  }
+
+  function handleImageVisible(): void {
+    setIsInViewport(true);
+  }
+
+  function handleImageClick(event: React.MouseEvent<HTMLDivElement>): void {
+    if (!isLoaded) {
+      return;
+    }
+
+    if (isUndefined(onClick)) {
+      return;
+    }
+
+    onClick(event);
+  }
+
+  function handleImageKeyDown(event: React.KeyboardEvent<HTMLDivElement>): void {
+    if (!isLoaded) {
+      return;
+    }
+
+    if (isUndefined(onKeyDown)) {
+      return;
+    }
+
+    onKeyDown(event);
+  }
+
+  function handleImageRetry(): void {
+    if (!isFailed) {
+      return;
+    }
+
+    setImageLoadState('waiting');
+  }
+
+  function renderImageContent(): React.ReactNode {
+    if (isFailed && isNonEmptyString(retryLabel)) {
+      return (
+        <Button
+          aria-label={retryLabel}
+          data-uie-name="retry-image-load"
+          onClick={handleImageRetry}
+          type="button"
+          variant={ButtonVariant.TERTIARY}
+        >
+          {retryLabel}
+        </Button>
+      );
+    }
+
+    return (
       <img
         css={{...getImageStyle(imageSizes), ...imageStyles}}
         src={assetUrl}
         role="presentation"
         alt={alt}
-        data-uie-name={isLoaded ? 'image-asset-img' : 'image-loader'}
+        data-uie-name={imageUieName}
       />
+    );
+  }
+
+  return (
+    <InViewport
+      onVisible={handleImageVisible}
+      className={cx(className, {
+        'loading-dots': isLoading,
+        'image-asset--no-image': isLoading || isFailed,
+      })}
+      onClick={handleImageClick}
+      onKeyDown={handleImageKeyDown}
+      role={imageRole}
+      tabIndex={imageTabIndex}
+      aria-label={ariaLabel}
+      data-uie-name={dataUieName}
+      data-uie-visible={dataUieVisible}
+      data-uie-status={imageStatus}
+      css={imageWrapperStyles}
+    >
+      {renderImageContent()}
     </InViewport>
   );
 };

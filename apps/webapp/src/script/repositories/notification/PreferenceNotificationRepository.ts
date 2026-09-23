@@ -82,7 +82,7 @@ export class PreferenceNotificationRepository {
       const currentSelfUser = selfUser();
       const shouldNotifyClientAdded =
         clientEntity !== undefined &&
-        clientEntity.isLegalHold() === false &&
+        !clientEntity.isLegalHold() &&
         currentSelfUser !== undefined &&
         matchQualifiedIds(user, currentSelfUser);
       if (shouldNotifyClientAdded) {

@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -44,11 +44,13 @@ const renderDropzone = ({
   isFileDropAllowed = true,
   onDragStateReset,
   onDropFiles = jest.fn(),
+  onDropReadError = jest.fn(),
 }: {
   isEnabled?: boolean;
   isFileDropAllowed?: boolean;
   onDragStateReset?: () => void;
   onDropFiles?: jest.Mock;
+  onDropReadError?: jest.Mock;
 } = {}) => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
@@ -57,6 +59,7 @@ const renderDropzone = ({
         isFileDropAllowed={isFileDropAllowed}
         onDragStateReset={onDragStateReset}
         onDropFiles={onDropFiles}
+        onDropReadError={onDropReadError}
       >
         <div>Shared Drive content</div>
       </SharedDriveDropzone>
@@ -70,7 +73,7 @@ const renderDropzone = ({
     throw new Error('Shared Drive dropzone was not rendered');
   }
 
-  return {dropzone, onDropFiles};
+  return {dropzone, onDropFiles, onDropReadError};
 };
 
 describe('SharedDriveDropzone', () => {
@@ -84,17 +87,17 @@ describe('SharedDriveDropzone', () => {
     expect(screen.getByText('sharedDriveDropOverlayDescription')).toBeInTheDocument();
   });
 
-  it('dispatches dropped files without using the conversation attachment composer', () => {
+  it('dispatches dropped files without using the conversation attachment composer', async () => {
     const file = new File(['content'], 'document.txt', {type: 'text/plain'});
     const onDropFiles = jest.fn();
     const {dropzone} = renderDropzone({onDropFiles});
 
     fireEvent.drop(dropzone, {dataTransfer: createDataTransfer([file])});
 
-    expect(onDropFiles).toHaveBeenCalledWith([file]);
+    await waitFor(() => expect(onDropFiles).toHaveBeenCalledWith([file]));
   });
 
-  it('dispatches all dropped files for Shared Drive multi-file upload', () => {
+  it('dispatches all dropped files for Shared Drive multi-file upload', async () => {
     const files = [
       new File(['first'], 'first.txt', {type: 'text/plain'}),
       new File(['second'], 'second.png', {type: 'image/png'}),
@@ -105,8 +108,35 @@ describe('SharedDriveDropzone', () => {
 
     fireEvent.drop(dropzone, {dataTransfer: createDataTransfer(files)});
 
-    expect(onDropFiles).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onDropFiles).toHaveBeenCalledTimes(1));
     expect(onDropFiles).toHaveBeenCalledWith(files);
+  });
+
+  it('reports folder discovery failure without dispatching a partial upload', async () => {
+    const onDropFiles = jest.fn();
+    const onDropReadError = jest.fn();
+    const {dropzone} = renderDropzone({onDropFiles, onDropReadError});
+    const failedDirectory = {
+      isDirectory: true,
+      isFile: false,
+      name: 'Marketing',
+      fullPath: '/Marketing',
+      createReader: () => ({
+        readEntries: (_success: unknown, failure: (error: DOMException) => void) =>
+          failure(new DOMException('Directory unavailable', 'NotFoundError')),
+      }),
+    };
+    const dataTransfer = {
+      files: [],
+      items: [{webkitGetAsEntry: () => failedDirectory}],
+      types: ['Files'],
+      dropEffect: 'move',
+    };
+
+    fireEvent.drop(dropzone, {dataTransfer});
+
+    await waitFor(() => expect(onDropReadError).toHaveBeenCalledTimes(1));
+    expect(onDropFiles).not.toHaveBeenCalled();
   });
 
   it('clears the overlay after leaving the dropzone', () => {

@@ -206,8 +206,8 @@ export class MediaStreamHandler {
          * @see https://wearezeta.atlassian.net/browse/WEBAPP-7128
          */
         if (
-          audio === true &&
-          video !== true &&
+          audio &&
+          !video &&
           [
             MEDIA_STREAM_ERROR.NOT_READABLE_ERROR,
             MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR,

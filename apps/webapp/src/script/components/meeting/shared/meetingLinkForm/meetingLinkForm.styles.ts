@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,24 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import type {CSSObject} from '@emotion/react';
 
-export const errorMessageStyles: CSSObject = {
-  marginBottom: 18,
+export const embeddedPasswordSectionStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '16px',
+};
+
+export const embeddedPasswordActionsStyles: CSSObject = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  gap: '16px',
+  '& > div > *': {
+    width: '100%',
+  },
+};
+
+export const passwordFieldsStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
 };

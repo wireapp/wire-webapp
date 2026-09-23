@@ -55,9 +55,9 @@ const PageComponent = ({
   withSideBar,
 }: Props & ConnectedProps) => {
   if (
-    (hasAccountData === true && hasInvalidAccountData(account) && isStateAuthenticated !== true) ||
-    (hasTeamData === true && hasInvalidTeamData(account) && isStateAuthenticated !== true) ||
-    (isAuthenticated === true && isStateAuthenticated !== true)
+    (hasAccountData === true && hasInvalidAccountData(account) && !isStateAuthenticated) ||
+    (hasTeamData === true && hasInvalidTeamData(account) && !isStateAuthenticated) ||
+    (isAuthenticated === true && !isStateAuthenticated)
   ) {
     return <Navigate to={ROUTE.CREATE_ACCOUNT} replace />;
   }

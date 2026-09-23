@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchBuildMetadata: globalThis.fetch.bind(globalThis),
   });
   function isOnline(): boolean {
-    return globalThis.navigator.onLine === true;
+    return globalThis.navigator.onLine;
   }
 
   enableLogging(config);

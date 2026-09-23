@@ -184,7 +184,7 @@ function createHttpRequest(
 function parseGitHubTagPage(githubResponse: unknown): Result<ParsedGitHubTagPage, Error> {
   const validationResult = githubTagPageResponseSchema.safeParse(githubResponse);
 
-  if (validationResult.success === false) {
+  if (!validationResult.success) {
     return createFailure('Malformed GitHub tag response');
   }
 
@@ -199,7 +199,7 @@ function parseGitHubTagPage(githubResponse: unknown): Result<ParsedGitHubTagPage
 function parseGitHubRelease(githubResponse: unknown): Result<GitHubReleaseRecord, Error> {
   const validationResult = githubReleaseResponseSchema.safeParse(githubResponse);
 
-  if (validationResult.success === false) {
+  if (!validationResult.success) {
     return createFailure('Malformed GitHub Release response');
   }
 
@@ -213,7 +213,7 @@ function parseGitHubRelease(githubResponse: unknown): Result<GitHubReleaseRecord
 function parseGitHubReleasePage(githubResponse: unknown): Result<GitHubReleasePage, Error> {
   const validationResult = githubReleasePageResponseSchema.safeParse(githubResponse);
 
-  if (validationResult.success === false) {
+  if (!validationResult.success) {
     return createFailure('Malformed GitHub Release collection response');
   }
 
@@ -232,7 +232,7 @@ function parseGitHubReleasePage(githubResponse: unknown): Result<GitHubReleasePa
 function parseGitHubGeneratedReleaseNotes(githubResponse: unknown): Result<GitHubGeneratedReleaseNotes, Error> {
   const validationResult = githubGeneratedReleaseNotesResponseSchema.safeParse(githubResponse);
 
-  if (validationResult.success === false) {
+  if (!validationResult.success) {
     return createFailure('Malformed generated GitHub Release notes response');
   }
 
@@ -324,7 +324,7 @@ export function createGitHubReleaseClient(
             return release.tagName === options.tagName;
           });
 
-          if (isUndefined(matchingRelease) === false) {
+          if (!isUndefined(matchingRelease)) {
             return Result.ok<Maybe<GitHubReleaseRecord>, Error>(Maybe.just(matchingRelease));
           }
 

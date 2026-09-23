@@ -43,7 +43,7 @@ export const getActiveConversationsWithUsers = ({
   return conversationState
     .filteredConversations()
     .map((conversationEntity: Conversation) => {
-      if (conversationEntity.isSelfUserRemoved() === false) {
+      if (!conversationEntity.isSelfUserRemoved()) {
         const selfUser = userState.self();
         if (selfUser === undefined) {
           return undefined;

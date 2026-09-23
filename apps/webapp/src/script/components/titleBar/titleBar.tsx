@@ -471,7 +471,7 @@ function renderWarningBadgeTranslation(translationKey: NonEmptyWarningBadgeKey, 
 function renderWarningBadge(options: RenderWarningBadgeOptions): ReactNode {
   const {badgeTranslationKey, translate} = options;
 
-  if (isNonEmptyString(badgeTranslationKey) === false) {
+  if (!isNonEmptyString(badgeTranslationKey)) {
     return null;
   }
 

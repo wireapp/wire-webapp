@@ -29,8 +29,13 @@ import {
   validateSharedDriveUploadFiles,
 } from './sharedDriveUploadValidation';
 
-export type SharedDriveDropRejectionReason = SharedDriveUploadRejectionReason;
-export type SharedDriveDropRejection = SharedDriveUploadRejection;
+export type SharedDriveDropRejectionReason = SharedDriveUploadRejectionReason | 'readFailed';
+export type SharedDriveDropRejection =
+  | SharedDriveUploadRejection
+  | {
+      readonly reason: 'readFailed';
+      readonly invalidFiles: readonly File[];
+    };
 
 export interface SharedDriveDropFeedback {
   readonly title: string;
@@ -126,6 +131,14 @@ export const getSharedDriveDropRejectionFeedback = (
     return {
       title: translate('conversationFileUploadRestrictedOverlayTitle'),
       message: translate('conversationFileUploadRestrictedOverlayDescription'),
+      invalidFiles: [],
+    };
+  }
+
+  if (reason === 'readFailed') {
+    return {
+      title: translate('conversationFileUploadFailedHeading'),
+      message: translate('sharedDriveDropReadFailedMessage'),
       invalidFiles: [],
     };
   }

@@ -22,9 +22,10 @@ import {isUndefined} from '@sindresorhus/is';
 import type {Maybe, Result} from 'true-myth';
 import {result} from 'true-myth';
 
+import {getMeetingPasswordErrors} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import {getMeetingTitleError} from 'Components/meeting/shared/validation/meetingTitleValidation';
 
-import {type ScheduleMeetingFormErrors, ScheduleMeetingMode} from './scheduleMeetingTypes';
+import {type ScheduleMeetingFormErrors, ScheduleMeetingMode, scheduleMeetingModes} from './scheduleMeetingTypes';
 
 export interface ScheduleMeetingValidationInput {
   title: string;
@@ -32,6 +33,8 @@ export interface ScheduleMeetingValidationInput {
   end: Maybe<Date>;
   wallClock: WallClock;
   mode: ScheduleMeetingMode;
+  password?: string;
+  passwordConfirmation?: string;
 }
 
 export const getScheduleMeetingFormErrors = ({
@@ -40,10 +43,12 @@ export const getScheduleMeetingFormErrors = ({
   end,
   wallClock,
   mode,
+  password,
+  passwordConfirmation,
 }: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors => {
   const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
   const missingTimes = start.isNothing || end.isNothing ? 'meetings.scheduleModal.error.missingTimes' : undefined;
-  const allowPastTimes = mode === 'edit';
+  const allowPastTimes = mode === scheduleMeetingModes.edit;
   const endInPast =
     !allowPastTimes && isUndefined(missingTimes) && end.isJust && end.value.getTime() <= currentTimestampInMilliseconds
       ? 'meetings.schedule.errors.endInPast'
@@ -51,6 +56,7 @@ export const getScheduleMeetingFormErrors = ({
 
   return {
     title: getMeetingTitleError(title),
+    ...getMeetingPasswordErrors(password, passwordConfirmation),
     missingTimes,
     startInPast:
       !allowPastTimes &&
@@ -72,11 +78,13 @@ export const getScheduleMeetingFormErrors = ({
 };
 
 export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean =>
-  errors.title !== undefined ||
-  errors.missingTimes !== undefined ||
-  errors.startInPast !== undefined ||
-  errors.endInPast !== undefined ||
-  errors.endBeforeStart !== undefined;
+  !isUndefined(errors.title) ||
+  !isUndefined(errors.missingTimes) ||
+  !isUndefined(errors.startInPast) ||
+  !isUndefined(errors.endInPast) ||
+  !isUndefined(errors.endBeforeStart) ||
+  !isUndefined(errors.password) ||
+  !isUndefined(errors.passwordConfirmation);
 
 export const validateScheduleMeetingForm = (
   input: ScheduleMeetingValidationInput,

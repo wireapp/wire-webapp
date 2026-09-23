@@ -388,12 +388,23 @@ describe('Ky HTTP client', () => {
   it('disables automatic retries', async () => {
     let fetchCallCount = 0;
     const kyInstance = ky.create({
-      fetch: async () => {
+      async fetch() {
         fetchCallCount += 1;
         return new Response('service unavailable', {status: 503});
       },
     });
-    const httpClient = createKyHttpClient({kyInstance});
+    const httpClient = createKyHttpClient({
+      kyInstance,
+      currentTimeMilliseconds() {
+        return 1_800_000_000_000;
+      },
+      async sleep() {
+        return;
+      },
+      reportRateLimitWait() {
+        return;
+      },
+    });
 
     await expect(
       httpClient.requestJson({

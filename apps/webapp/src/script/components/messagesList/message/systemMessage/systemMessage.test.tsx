@@ -23,11 +23,13 @@ import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpd
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
+import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {SystemMessage} from './systemMessage';
+import {SystemMessageBase} from './systemMessageBase';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 
@@ -72,6 +74,54 @@ describe('SystemMessage', () => {
     render(withTheme(<SystemMessage message={message} />));
 
     expect(screen.queryByTestId('element-message-system')).not.toBeNull();
+  });
+
+  it('renders the member role update bold caption as a React element', () => {
+    const translatedCaption = '<strong>Sie</strong> wurden zum Gruppen-Admin ernannt';
+    const translate: Translate = identifier => {
+      if (identifier === 'conversationYouPromotedToAdmin') {
+        return translatedCaption;
+      }
+
+      return identifier;
+    };
+    const message = new MemberRoleUpdateMessage(translate);
+
+    render(withTheme(<SystemMessage message={message} />));
+
+    expect(message.caption).toBe(translatedCaption);
+    expect(screen.getByText('Sie', {selector: 'strong'})).toBeInTheDocument();
+    expect(screen.queryByText(translatedCaption)).not.toBeInTheDocument();
+  });
+
+  it('keeps unsupported member role update markup as text', () => {
+    const translatedCaption = '<img src="example">';
+    const translate: Translate = identifier => {
+      if (identifier === 'conversationYouPromotedToAdmin') {
+        return translatedCaption;
+      }
+
+      return identifier;
+    };
+    const message = new MemberRoleUpdateMessage(translate);
+    const {container} = render(withTheme(<SystemMessage message={message} />));
+    const caption = container.querySelector('.system-message-caption');
+
+    expect(caption).not.toBeNull();
+    expect(caption?.textContent).toBe(translatedCaption);
+    expect(caption?.querySelector('img')).toBeNull();
+  });
+
+  it('renders generic system message captions as React text', () => {
+    const translatedCaption = '<strong>Generic caption</strong>';
+    const message = new SystemMessageEntity(translateForTest);
+    message.caption = translatedCaption;
+    const {container} = render(<SystemMessageBase message={message} />);
+    const caption = container.querySelector('.system-message-caption');
+
+    expect(caption).not.toBeNull();
+    expect(caption?.textContent).toBe(translatedCaption);
+    expect(caption?.querySelector('strong')).toBeNull();
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {

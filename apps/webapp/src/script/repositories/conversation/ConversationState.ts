@@ -142,8 +142,8 @@ export class ConversationState {
       const selfTeamId = selfUser?.teamId;
       for (const conversation of this.conversations()) {
         for (const user of conversation.participating_user_ets()) {
-          const isNotService = user.isService === false;
-          const isNotIncluded = connectedUsers.includes(user) === false;
+          const isNotService = !user.isService;
+          const isNotIncluded = !connectedUsers.includes(user);
           if (isNotService && isNotIncluded && (user.teamId === selfTeamId || user.isConnected())) {
             connectedUsers.push(user);
           }

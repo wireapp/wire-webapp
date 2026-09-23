@@ -36,7 +36,7 @@ import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {SystemMessageBase} from './systemMessageBase';
-import {renderMlsSystemMessageCaption} from './systemMessageCaption';
+import {renderMemberRoleUpdateSystemMessageCaption, renderMlsSystemMessageCaption} from './systemMessageCaption';
 
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageComponent} from '../adminlessDeleteReminderMessage';
 import {messageBodyWrapper} from '../contentMessage/contentMessage.styles';
@@ -64,7 +64,13 @@ export const SystemMessage = ({message}: SystemMessageProps) => {
   }
 
   if (message instanceof MemberRoleUpdateMessage) {
-    return <SystemMessageBase message={message} icon={<ConversationSettingsIcon />} />;
+    return (
+      <SystemMessageBase
+        message={message}
+        icon={<ConversationSettingsIcon />}
+        captionContent={renderMemberRoleUpdateSystemMessageCaption(message.caption ?? '')}
+      />
+    );
   }
 
   if (message instanceof MessageTimerUpdateMessage) {

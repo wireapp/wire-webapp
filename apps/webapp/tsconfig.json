@@ -47,6 +47,6 @@
     "strictFunctionTypes": false
   },
   "types": ["@types/wicg-file-system-access", "jest", "@testing-library/jest-dom"],
-  "include": ["src/**/*", "test/**/*"],
+  "include": ["bin/**/*", "src/**/*", "test/**/*"],
   "exclude": ["node_modules", "../server/", "src/sw.js", "src/worker/"]
 }

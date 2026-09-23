@@ -28,6 +28,7 @@ import {
   resolveEndChange,
   resolveStartChange,
 } from 'Components/meeting/shared/defaults/meetingDateTimeDefaults';
+import {getMeetingPasswordErrors} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import {getMeetingTitleInputError} from 'Components/meeting/shared/validation/meetingTitleValidation';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
@@ -37,6 +38,7 @@ import {
   type ScheduleMeetingFormErrors,
   type ScheduleMeetingFormState,
   type ScheduleMeetingMode,
+  scheduleMeetingModes,
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
 import {getScheduleMeetingFormErrors} from './scheduleMeetingValidation';
@@ -63,6 +65,8 @@ export const getDefaultScheduleMeetingFormState = (wallClock: WallClock): Schedu
     recurrence: 'doesNotRepeat',
     selectedUsers: [],
     participantsFilter: '',
+    password: '',
+    passwordConfirmation: '',
   };
 };
 
@@ -93,6 +97,8 @@ type ScheduleMeetingModalState = {
   setRecurrence: (recurrence: ScheduleMeetingRecurrenceOption) => void;
   setSelectedUsers: (selectedUsers: User[]) => void;
   setParticipantsFilter: (participantsFilter: string) => void;
+  setPassword: (password: string) => void;
+  setPasswordConfirmation: (passwordConfirmation: string) => void;
   validate: (wallClock: WallClock) => ScheduleMeetingFormErrors;
   clearErrors: () => void;
 };
@@ -104,11 +110,13 @@ const emptyFormState: ScheduleMeetingFormState = {
   recurrence: 'doesNotRepeat',
   selectedUsers: [],
   participantsFilter: '',
+  password: '',
+  passwordConfirmation: '',
 };
 
 const initialState = {
   isOpen: false,
-  mode: 'create' as ScheduleMeetingMode,
+  mode: scheduleMeetingModes.create,
   formState: emptyFormState,
   errors: emptyScheduleMeetingFormErrors(),
   editingMeetingId: Maybe.nothing<QualifiedId>(),
@@ -125,7 +133,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
   openCreate: wallClock =>
     set({
       isOpen: true,
-      mode: 'create',
+      mode: scheduleMeetingModes.create,
       formState: getDefaultScheduleMeetingFormState(wallClock),
       errors: emptyScheduleMeetingFormErrors(),
       editingMeetingId: Maybe.nothing(),
@@ -144,7 +152,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
   ) =>
     set({
       isOpen: true,
-      mode: 'edit',
+      mode: scheduleMeetingModes.edit,
       formState,
       errors: emptyScheduleMeetingFormErrors(),
       editingMeetingId: maybe.just(meetingSeries.qualified_id),
@@ -231,10 +239,20 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
   setRecurrence: recurrence => set(state => ({formState: {...state.formState, recurrence}})),
   setSelectedUsers: selectedUsers => set(state => ({formState: {...state.formState, selectedUsers}})),
   setParticipantsFilter: participantsFilter => set(state => ({formState: {...state.formState, participantsFilter}})),
+  setPassword: password =>
+    set(state => ({
+      formState: {...state.formState, password},
+      errors: {...state.errors, ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation)},
+    })),
+  setPasswordConfirmation: passwordConfirmation =>
+    set(state => ({
+      formState: {...state.formState, passwordConfirmation},
+      errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
+    })),
   validate: wallClock => {
     const {formState, mode} = get();
-    const {title, start, end} = formState;
-    const errors = getScheduleMeetingFormErrors({title, start, end, wallClock, mode});
+    const {title, start, end, password, passwordConfirmation} = formState;
+    const errors = getScheduleMeetingFormErrors({title, start, end, password, passwordConfirmation, wallClock, mode});
     set({errors});
     return errors;
   },

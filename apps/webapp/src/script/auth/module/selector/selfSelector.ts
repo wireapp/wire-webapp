@@ -52,7 +52,7 @@ export const hasSelfEmail = (state: RootState) => {
   const selfEmail = getSelfEmail(state);
   return selfEmail !== undefined && selfEmail.length > 0;
 };
-export const hasSelfPassword = (state: RootState) => state.selfState.hasPassword === true;
+export const hasSelfPassword = (state: RootState) => state.selfState.hasPassword;
 export const isFetching = (state: RootState) => state.selfState.fetching;
 export const isSSOUser = (state: RootState) => getSelf(state).sso_id !== undefined;
 export const isNoPasswordSSO = (state: RootState) => {

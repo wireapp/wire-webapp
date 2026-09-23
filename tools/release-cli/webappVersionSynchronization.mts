@@ -91,7 +91,7 @@ type RuntimeGitHubClientOptions = {
 
 function createRuntimeGitHubClient(options: RuntimeGitHubClientOptions): WebAppVersionSynchronizationGitHubClient {
   return createWebAppVersionSynchronizationGitHubClient({
-    httpClient: createRuntimeKyHttpClient(),
+    httpClient: createRuntimeKyHttpClient({reportRateLimitWait: writeRuntimeOutput}),
     githubApiUrl: options.githubApiUrl,
     githubRepository: options.githubRepository,
     githubToken: options.githubToken,

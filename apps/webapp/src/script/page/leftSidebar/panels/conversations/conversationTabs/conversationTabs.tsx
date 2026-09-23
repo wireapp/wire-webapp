@@ -154,7 +154,7 @@ function renderEnvironmentDisclaimerIfNeeded(options: RenderEnvironmentDisclaime
     return null;
   }
 
-  if (isDataDogEnabled() === false) {
+  if (!isDataDogEnabled()) {
     return null;
   }
 

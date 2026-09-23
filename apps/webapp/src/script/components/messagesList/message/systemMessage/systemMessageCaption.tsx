@@ -20,7 +20,19 @@
 import {ReactNode} from 'react';
 
 import {Config} from 'src/script/Config';
-import {renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
+import {renderReactTranslation, replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+
+export function renderMemberRoleUpdateSystemMessageCaption(caption: string): ReactNode[] {
+  return replaceReactComponents(caption, [
+    {
+      start: '<strong>',
+      end: '</strong>',
+      render: text => {
+        return <strong>{text}</strong>;
+      },
+    },
+  ]);
+}
 
 export function renderMlsSystemMessageCaption(caption: string): ReactNode[] {
   return renderReactTranslation({

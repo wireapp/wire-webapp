@@ -177,7 +177,7 @@ function readMonotonicTime(): number {
 
 function createRuntimeDependencies(commandEnvironment: CommandEnvironment): ReleaseAppearanceCommandDependencies {
   actionsCore.setSecret(commandEnvironment.githubToken);
-  const httpClient = createRuntimeKyHttpClient();
+  const httpClient = createRuntimeKyHttpClient({reportRateLimitWait: actionsCore.info});
   const githubClient = createGitHubClient({
     httpClient,
     githubApiUrl: commandEnvironment.githubApiUrl,

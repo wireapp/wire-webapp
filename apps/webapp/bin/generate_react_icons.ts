@@ -16,35 +16,15 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import fs from 'fs';
+
 import {JSDOM} from 'jsdom';
+
+import fs from 'fs';
+
+import {convertSvgFileNameToReactComponentName, convertSvgMarkupToJsx} from './svgToJsx';
 
 const fileLocation = 'resource/image/icon';
 const fileList = fs.readdirSync(fileLocation).filter(file => file.endsWith('.svg'));
-
-function capitalize(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function convertToJsx(html: string): string {
-  // convert attributes to camelCase
-  return html.replace(/<(\w+)([^>]*)\/?>/g, (_, tagName: string, attributes: string) => {
-    // Convert attributes to camelCase
-    const camelCaseAttributes = attributes.trim().replace(/[\w-]+="[^"]*"/g, attr => {
-      const [key, value] = attr.split('=');
-      return `${camelize(key)}=${value}`;
-    });
-    return `<${tagName} ${camelCaseAttributes}>`;
-  });
-}
-
-function camelize(str: string) {
-  return str
-    .replace(/(?:^\w|[A-Z]|[\b\-_]\w)/g, function (word, index) {
-      return index === 0 ? word.toLowerCase() : word.toUpperCase().replace('-', '').replace('_', '');
-    })
-    .replace(/\s+/g, '');
-}
 
 const svgIcons = fileList.map(name => ({name, content: fs.readFileSync(`${fileLocation}/${name}`, 'utf8')}));
 const disclaimer = `
@@ -66,9 +46,9 @@ const reactComponents = svgIcons.map(({name, content}) => {
     viewBox: svgElement?.getAttribute('viewBox'),
   };
 
-  return `export const ${capitalize(camelize(name.replace(/\.svg$/, '')))} = (props: IconProps) => {
+  return `export const ${convertSvgFileNameToReactComponentName(name)} = (props: IconProps) => {
     return <svg width="${baseProps.width}" height="${baseProps.height}" viewBox="${baseProps.viewBox}" aria-hidden="true" {...props}>
-      ${convertToJsx(svgElement?.innerHTML ?? '')}
+      ${convertSvgMarkupToJsx(svgElement?.innerHTML ?? '')}
       </svg>;
   };`;
 });

@@ -455,7 +455,7 @@ export class DebugUtil {
     return checkForNewVersion({
       localAssetVersion: baseAssetVersion,
       isOnline() {
-        return globalThis.navigator.onLine === true;
+        return globalThis.navigator.onLine;
       },
       fetchLatestBuildMetadata,
       onNewVersionAvailable() {
@@ -834,7 +834,7 @@ export class DebugUtil {
       return Promise.resolve();
     }
     let users = [];
-    if (includeSelf === true) {
+    if (includeSelf) {
       users.push(this.userState.self().qualifiedId);
     }
     users.push(...conversation.participating_user_ids());

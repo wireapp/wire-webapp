@@ -1382,6 +1382,15 @@ export class ConversationRepository {
     );
   }
 
+  requestMeetingConversationCode(conversationId: QualifiedId, password?: string): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        await this.conversationService.postConversationCode(conversationId.id, password);
+      },
+    );
+  }
+
   /**
    * Get all the group conversations owned by self user's team from the local state.
    */
@@ -4161,7 +4170,7 @@ export class ConversationRepository {
 
     const messageEntity = (await this.updateMessageUserEntities(message)) as MemberMessage;
     const userEntity = messageEntity.otherUser();
-    const isOutgoingRequest = userEntity?.isOutgoingRequest() === true;
+    const isOutgoingRequest = userEntity?.isOutgoingRequest();
     if (isOutgoingRequest) {
       messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
     }

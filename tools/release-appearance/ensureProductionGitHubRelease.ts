@@ -80,7 +80,7 @@ function createNewReleaseHandoff(
     );
   }
 
-  if (createdRelease.isDraft === false) {
+  if (!createdRelease.isDraft) {
     return Result.err(new Error(`The GitHub Release for ${productionTagName} was not created as a draft.`));
   }
 

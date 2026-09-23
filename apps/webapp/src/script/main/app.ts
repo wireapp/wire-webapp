@@ -921,7 +921,7 @@ export class App {
       return this.repository.lifeCycle.redirectToLogin(signOutReason);
     }
 
-    if (navigator.onLine === true) {
+    if (navigator.onLine) {
       const isReload = this._isReload();
       switch (type) {
         case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {

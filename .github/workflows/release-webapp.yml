@@ -598,6 +598,7 @@ jobs:
   comment_beta_release_appearances:
     name: Comment Beta release appearances
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     needs: [build_artifact, create_beta_tag]
     if: ${{ needs.create_beta_tag.result == 'success' }}
     continue-on-error: true

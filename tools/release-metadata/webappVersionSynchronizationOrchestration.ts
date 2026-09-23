@@ -514,7 +514,7 @@ function allocateAndSynchronizeWebAppVersion(
           mainCommitSha: options.mainSnapshot.commitSha,
         })
         .andThen(branchInspection => {
-          if (isUndefined(branchInspection) === false) {
+          if (!isUndefined(branchInspection)) {
             return recoverExistingBranch(branchOptions, branchInspection);
           }
 

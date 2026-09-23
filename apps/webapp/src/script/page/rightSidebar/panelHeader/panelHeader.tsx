@@ -76,7 +76,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
     : translate('accessibility.rightPanel.close');
 
   useEffect(() => {
-    if (panelHeaderRef.current !== null && shouldFocusFirstButton === true) {
+    if (panelHeaderRef.current !== null && shouldFocusFirstButton) {
       const nextElementToFocus = panelHeaderRef.current.querySelector('button');
       // TO-DO Remove setTimeout after replacing transition group animation libray
       // triggering focus method without setTimeout is not working due to right side bar animation

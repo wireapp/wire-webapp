@@ -266,7 +266,7 @@ export const VerificationBadges = ({
   const id = useRef(new Date().getTime());
   const {translate} = useApplicationContext();
 
-  if (MLSStatus === undefined && isProteusVerified === false) {
+  if (MLSStatus === undefined && !isProteusVerified) {
     return null;
   }
 

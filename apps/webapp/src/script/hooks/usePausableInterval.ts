@@ -44,7 +44,7 @@ export const usePausableInterval = (callback: () => void, timer: number) => {
     };
 
     if (timer !== null) {
-      if (pause === false) {
+      if (!pause) {
         intervalId.current = window.setTimeout(function interval() {
           startTime.current = new Date().getTime();
           fn();
@@ -52,7 +52,7 @@ export const usePausableInterval = (callback: () => void, timer: number) => {
         }, timer - totalTimeRun.current);
         totalTimeRun.current = 0;
       }
-      if (pause === true) {
+      if (pause) {
         totalTimeRun.current = new Date().getTime() - startTime.current;
         clearInterval();
       }

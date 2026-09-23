@@ -206,7 +206,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           })}
 
         {isExpired &&
-          (isSelfUser === false ? (
+          (!isSelfUser ? (
             renderE2EITranslation({
               translationKey: 'conversation.E2EICertificateExpired',
               translate,
@@ -225,7 +225,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           ))}
 
         {isNewDevice &&
-          (isSelfUser === false ? (
+          (!isSelfUser ? (
             renderE2EITranslation({
               translationKey: 'conversation.E2EINewDeviceAdded',
               translate,
@@ -244,7 +244,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           ))}
 
         {isNewMember &&
-          (isSelfUser === false ? (
+          (!isSelfUser ? (
             renderE2EITranslation({
               translationKey: 'conversation.E2EINewUserAdded',
               translate,
@@ -263,7 +263,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           ))}
 
         {isRevoked &&
-          (isSelfUser === false
+          (!isSelfUser
             ? renderE2EITranslation({
                 translationKey: 'conversation.E2EICertificateRevoked',
                 translate,

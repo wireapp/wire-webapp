@@ -241,9 +241,9 @@ export const useCellPublicLink = ({
   }, []);
 
   useEffect(() => {
-    const shouldDeleteLink = isEnabled === false && isNonEmptyString(node?.publicLink?.url);
-    const shouldCreateNewLink = isEnabled === true && node?.publicLink?.alreadyShared !== true;
-    const shouldGetLink = isEnabled === true && node?.publicLink?.alreadyShared === true;
+    const shouldDeleteLink = !isEnabled && isNonEmptyString(node?.publicLink?.url);
+    const shouldCreateNewLink = isEnabled && node?.publicLink?.alreadyShared !== true;
+    const shouldGetLink = isEnabled && node?.publicLink?.alreadyShared === true;
 
     if (shouldGetLink) {
       fireAndForgetInvoker.fireAndForget(getPublicLink);

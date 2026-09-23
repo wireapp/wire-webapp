@@ -1103,7 +1103,7 @@ export class Conversation {
     const userEntities =
       selfUser !== undefined ? this.participating_user_ets().concat(selfUser) : this.participating_user_ets();
     return userEntities.filter(userEntity => {
-      return userEntity.is_verified() === false;
+      return !userEntity.is_verified();
     });
   }
 

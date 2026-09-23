@@ -60,7 +60,7 @@ export enum PageView {
 export const isTelemetryEnabled = () => {
   const {COUNTLY_ENABLE_LOGGING, COUNTLY_API_KEY} = Config.getConfig();
 
-  if (COUNTLY_ENABLE_LOGGING !== true || !isNonEmptyString(COUNTLY_API_KEY) || telemetry.isLoaded() !== true) {
+  if (!COUNTLY_ENABLE_LOGGING || !isNonEmptyString(COUNTLY_API_KEY) || !telemetry.isLoaded()) {
     return false;
   }
 

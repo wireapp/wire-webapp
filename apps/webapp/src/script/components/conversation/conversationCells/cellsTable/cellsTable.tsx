@@ -49,6 +49,7 @@ import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalConte
 
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
+import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
 
 interface CellsTableProps {
   nodes: Array<CellNode>;
@@ -61,6 +62,7 @@ interface CellsTableProps {
   folderDropResetKey?: number;
   onFolderDropTargetChange?: (folderName: string | null) => void;
   onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
+  onDropReadError: () => void;
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
@@ -108,6 +110,7 @@ export const CellsTable = ({
   folderDropResetKey,
   onFolderDropTargetChange,
   onDropFilesToFolder,
+  onDropReadError,
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
@@ -204,7 +207,14 @@ export const CellsTable = ({
 
         preventDefaultFileDrop(event);
         setActiveFolderDropTarget(null);
-        onDropFilesToFolder(Array.from(event.dataTransfer.files), node.path);
+        void getSharedDriveDroppedFiles(event.dataTransfer).then(result => {
+          if (result.isErr) {
+            onDropReadError();
+            return;
+          }
+
+          onDropFilesToFolder(result.value, node.path);
+        });
       },
     };
   };

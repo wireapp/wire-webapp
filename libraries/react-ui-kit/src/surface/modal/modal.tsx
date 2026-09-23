@@ -192,7 +192,7 @@ export const Modal: React.FC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
       {onClose !== noop && <ModalClose onClick={onClose} data-uie-name="do-close" />}
       {actions.length > 0 && <ModalActions actions={actions} data-uie-name="modal-actions" />}
     </ModalBody>
-    {fullscreen !== true && (
+    {!fullscreen && (
       <ModalBackground
         onClick={onBackgroundClick === noop ? onClose : onBackgroundClick}
         data-uie-name="modal-background"

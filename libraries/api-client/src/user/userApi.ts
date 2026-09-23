@@ -473,6 +473,9 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: {email, action},
       method: 'post',
+      requestOptions: {
+        skipIncrementalRetryBackoff: true,
+      },
       url: `/${UserAPI.URL.VERIFICATION}/${UserAPI.URL.SEND}`,
     };
     await this.client.sendJSON(config);

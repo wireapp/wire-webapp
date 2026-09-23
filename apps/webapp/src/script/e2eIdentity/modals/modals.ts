@@ -209,9 +209,7 @@ export const getModalOptions = (
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary === true || secondaryActionFn === undefined
-          ? PrimaryModal.type.ACKNOWLEDGE
-          : PrimaryModal.type.CONFIRM;
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.CERTIFICATE_RENEWAL:
@@ -232,9 +230,7 @@ export const getModalOptions = (
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary === true || secondaryActionFn === undefined
-          ? PrimaryModal.type.ACKNOWLEDGE
-          : PrimaryModal.type.CONFIRM;
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.SELF_CERTIFICATE_REVOKED:
@@ -283,9 +279,7 @@ export const getModalOptions = (
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary === true || secondaryActionFn === undefined
-          ? PrimaryModal.type.ACKNOWLEDGE
-          : PrimaryModal.type.CONFIRM;
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.ERROR:
@@ -305,9 +299,7 @@ export const getModalOptions = (
         },
       };
       modalType =
-        hideSecondary === true || secondaryActionFn === undefined
-          ? PrimaryModal.type.ACKNOWLEDGE
-          : PrimaryModal.type.CONFIRM;
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.LOADING:
@@ -378,7 +370,7 @@ export const getModalOptions = (
     };
   }
 
-  if (hideSecondary === true || secondaryActionFn === undefined) {
+  if (hideSecondary || secondaryActionFn === undefined) {
     delete options.secondaryAction;
     options = {
       ...options,
@@ -386,7 +378,7 @@ export const getModalOptions = (
     };
   }
 
-  if (hidePrimary === true) {
+  if (hidePrimary) {
     delete options.primaryAction;
   }
 

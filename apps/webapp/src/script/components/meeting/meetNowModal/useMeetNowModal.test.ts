@@ -21,6 +21,7 @@ import {
   MEETING_TITLE_MAX_LENGTH,
   meetingTitleErrorKeys,
 } from 'Components/meeting/shared/validation/meetingTitleValidation';
+import {meetingPasswordErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 
 import {
   getDefaultMeetNowFormState,
@@ -59,6 +60,16 @@ describe('useMeetNowModal', () => {
     expect(hasMeetNowFormErrors(errors)).toBe(true);
   });
 
+  it('accepts a valid title without a guest-link password', () => {
+    const errors = getMeetNowFormErrors({
+      ...getDefaultMeetNowFormState(),
+      title: 'Standup',
+    });
+
+    expect(errors).toEqual({title: undefined, password: undefined, passwordConfirmation: undefined});
+    expect(hasMeetNowFormErrors(errors)).toBe(false);
+  });
+
   it('shows a titleTooLong error on the input while typing past the maximum length', () => {
     useMeetNowModal.getState().open();
     useMeetNowModal.getState().setTitle('a'.repeat(MEETING_TITLE_MAX_LENGTH + 1));
@@ -72,5 +83,18 @@ describe('useMeetNowModal', () => {
     useMeetNowModal.getState().setTitle('a'.repeat(MEETING_TITLE_MAX_LENGTH));
 
     expect(useMeetNowModal.getState().errors.title).toBeUndefined();
+  });
+
+  it('clears password errors while typing a valid password', () => {
+    useMeetNowModal.getState().open();
+    useMeetNowModal.getState().setPassword('invalid');
+
+    expect(useMeetNowModal.getState().errors.password).toBe(meetingPasswordErrorKey);
+
+    useMeetNowModal.getState().setPassword('ValidPassword1!');
+    useMeetNowModal.getState().setPasswordConfirmation('ValidPassword1!');
+
+    expect(useMeetNowModal.getState().errors.password).toBeUndefined();
+    expect(useMeetNowModal.getState().errors.passwordConfirmation).toBeUndefined();
   });
 });

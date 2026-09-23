@@ -197,7 +197,7 @@ function createHttpRequest(
 function parsePullRequest(githubResponse: unknown): Result<WebAppVersionSynchronizationPullRequest, Error> {
   const validationResult = githubPullRequestResponseSchema.safeParse(githubResponse);
 
-  if (validationResult.success === false) {
+  if (!validationResult.success) {
     return Result.err(new Error('Malformed GitHub pull request response'));
   }
 
@@ -218,7 +218,7 @@ function parsePullRequest(githubResponse: unknown): Result<WebAppVersionSynchron
 function parsePullRequestSearchPage(githubResponse: unknown): Result<ParsedPullRequestSearchPage, Error> {
   const validationResult = githubPullRequestSearchResponseSchema.safeParse(githubResponse);
 
-  if (validationResult.success === false) {
+  if (!validationResult.success) {
     return Result.err(new Error('Malformed GitHub pull request search response'));
   }
 

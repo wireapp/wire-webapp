@@ -42,7 +42,6 @@ const ignores = [
   '**/build/**',
   '**/coverage/**',
   'apps/webapp/resource/',
-  'apps/webapp/bin/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
   '!**/*.config.test.*',
@@ -259,6 +258,16 @@ const strictBooleanExpressionsRule = [
     allowString: false,
   },
 ];
+
+const strictBooleanRules = {
+  '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+  '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+};
+
+const strictBooleanRulesWithUnnecessaryCondition = {
+  ...strictBooleanRules,
+  '@typescript-eslint/no-unnecessary-condition': 'error',
+};
 
 const emptyArrowFunctionRestrictions = [
   {
@@ -483,7 +492,7 @@ const productionConfigs = [
       'libraries/react-ui-kit/**/*.{ts,tsx}',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -561,13 +570,13 @@ const productionConfigs = [
       'apps/webapp/src/script/hooks/useToggleState.ts',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
     files: ['apps/webapp/src/script/auth/**/*.{ts,tsx}'],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -577,7 +586,7 @@ const productionConfigs = [
       'apps/webapp/src/script/router/**/*.{ts,tsx}',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -617,7 +626,7 @@ const productionConfigs = [
       'apps/webapp/src/script/util/worker.ts',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -634,7 +643,7 @@ const productionConfigs = [
       'apps/webapp/src/script/featureToggles/**/*.{ts,tsx}',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -643,7 +652,7 @@ const productionConfigs = [
       'apps/webapp/src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails/**/*',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -690,7 +699,7 @@ const productionConfigs = [
     ],
     ignores: ['apps/webapp/src/script/components/badge/components/verificationBadges/**/*'],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -704,7 +713,7 @@ const productionConfigs = [
       'apps/webapp/src/script/components/Modals/UserModal/**/*.{ts,tsx}',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -716,7 +725,7 @@ const productionConfigs = [
       'apps/webapp/src/script/components/panel/userDetails.tsx',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -729,7 +738,7 @@ const productionConfigs = [
       'apps/webapp/src/script/hooks/useUserProperty.ts',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
     },
   },
   {
@@ -747,7 +756,13 @@ const productionConfigs = [
       'apps/webapp/src/script/view_model/WarningsContainer/**/*.{ts,tsx}',
     ],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/page/rightSidebar/groupParticipantService/groupParticipantService.tsx'],
+    rules: {
+      ...strictBooleanRulesWithUnnecessaryCondition,
     },
   },
   {
