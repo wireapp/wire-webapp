@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import type {GiphyService} from './GiphyService';
 
 import {Logger, getLogger} from '../../util/logger';
@@ -83,7 +85,7 @@ export class GiphyRepository {
     }
 
     const {data: randomGif} = await this.giphyService.getRandom(options.tag);
-    if (!randomGif.id) {
+    if (!isNonEmptyString(randomGif.id)) {
       throw new Error(`Could not find any GIF with tag '${options.tag}'`);
     }
     const {
@@ -115,7 +117,7 @@ export class GiphyRepository {
       ...options,
     };
 
-    if (!query) {
+    if (!isNonEmptyString(query)) {
       const error = new Error('No query specified');
       this.logger.error(error.message, error);
       throw error;

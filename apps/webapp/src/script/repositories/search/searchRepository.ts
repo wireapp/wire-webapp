@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
@@ -127,7 +128,7 @@ export class SearchRepository {
   }
 
   private matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value: string = ''): number {
-    const isStrictMatch = (value || '').toLowerCase().startsWith(term.toLowerCase());
+    const isStrictMatch = (isNonEmptyString(value) ? value : '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match
       return 100;
@@ -183,7 +184,7 @@ export class SearchRepository {
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
     const userIds: QualifiedId[] = await this.getContacts(name, CONFIG.MAX_DIRECTORY_RESULTS, domain).then(
-      ({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})),
+      ({documents}) => documents.map(match => ({domain: match.qualified_id?.domain ?? '', id: match.id})),
     );
 
     const users = await this.userRepository.getUsersById(userIds);

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {UserType} from '@wireapp/api-client/lib/user';
 
 import {mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
@@ -27,26 +28,26 @@ import {ServiceData, ServiceEntity} from './ServiceEntity';
 
 export const IntegrationMapper = {
   mapProviderFromObject: (providerData: ProviderData, providerEntity = new ProviderEntity()) => {
-    if (providerData) {
+    if (!isNullOrUndefined(providerData)) {
       const {description, email, id, name, url} = providerData;
 
-      if (id) {
+      if (isNonEmptyString(id)) {
         providerEntity.id = id;
       }
 
-      if (description) {
+      if (isNonEmptyString(description)) {
         providerEntity.description = description;
       }
 
-      if (email) {
+      if (isNonEmptyString(email)) {
         providerEntity.email = email;
       }
 
-      if (name) {
+      if (isNonEmptyString(name)) {
         providerEntity.name = name;
       }
 
-      if (url) {
+      if (isNonEmptyString(url)) {
         providerEntity.url = url;
       }
     }
@@ -56,35 +57,35 @@ export const IntegrationMapper = {
 
   mapServiceFromObject: (serviceData: ServiceData, domain: string) => {
     const serviceEntity = new ServiceEntity();
-    if (serviceData) {
+    if (!isNullOrUndefined(serviceData)) {
       const {assets, description, id, name, provider: providerId, summary, tags} = serviceData;
 
-      if (id) {
+      if (isNonEmptyString(id)) {
         serviceEntity.id = id;
       }
 
-      if (assets?.length) {
+      if (isNonEmptyArray(assets)) {
         const mappedAssets = mapProfileAssets({domain, id: serviceEntity.id}, assets);
         updateUserEntityAssets(serviceEntity, mappedAssets);
       }
 
-      if (description) {
+      if (isNonEmptyString(description)) {
         serviceEntity.description = description;
       }
 
-      if (name) {
+      if (isNonEmptyString(name)) {
         serviceEntity.name(name);
       }
 
-      if (providerId) {
+      if (isNonEmptyString(providerId)) {
         serviceEntity.providerId = providerId;
       }
 
-      if (summary) {
+      if (isNonEmptyString(summary)) {
         serviceEntity.summary = summary;
       }
 
-      if (tags) {
+      if (!isNullOrUndefined(tags)) {
         serviceEntity.tags = tags;
       }
     }
@@ -115,7 +116,7 @@ export const IntegrationMapper = {
 
   mapServicesFromArray: (servicesData: ServiceData[] = [], domain: string) => {
     return servicesData
-      .filter(serviceData => serviceData.enabled)
+      .filter(serviceData => serviceData.enabled === true)
       .map(serviceData => IntegrationMapper.mapServiceFromObject(serviceData, domain));
   },
 };

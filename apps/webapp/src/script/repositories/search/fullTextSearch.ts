@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {escapeRegex} from 'Util/sanitizationUtil';
 
 export const getSearchRegex = (query: string): RegExp => {
@@ -25,7 +27,7 @@ export const getSearchRegex = (query: string): RegExp => {
   const regex = query
     .trim()
     .split(delimiter)
-    .filter(word => !!word)
+    .filter(word => isNonEmptyString(word))
     .map(word => `(${escapeRegex(word)})`)
     .join('(?:.*)');
 
