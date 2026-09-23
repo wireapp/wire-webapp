@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isObject, isString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
@@ -190,7 +190,12 @@ export class MediaStreamHandler {
       .catch((error: unknown) => {
         const mediaStreamError = toError(error);
         const message = mediaStreamError.message;
-        const name = mediaStreamError.name as MEDIA_STREAM_ERROR;
+
+        const name =
+          isObject(error) && 'name' in error && isString(error.name)
+            ? (error.name as MEDIA_STREAM_ERROR)
+            : (mediaStreamError.name as MEDIA_STREAM_ERROR);
+
         this.logger.warn(
           `MediaStream request for (audio: ${audio}, video: ${video}, screen: ${screen}) failed: ${name} ${message}`,
           error,
