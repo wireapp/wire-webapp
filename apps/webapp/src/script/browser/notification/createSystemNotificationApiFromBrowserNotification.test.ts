@@ -89,6 +89,8 @@ const createPlatformFake = ({
           }
 
           createdNotification.closeCallCount += 1;
+          // The real API emits the close event for a programmatic close too.
+          createdNotification.closeListener?.();
         },
       };
     },
@@ -225,8 +227,8 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     assert(result.isOk(handle));
     handle.value.close();
-    createdNotifications.at(0)?.closeListener?.();
 
+    expect(createdNotifications.at(0)?.closeCallCount).toBe(1);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
