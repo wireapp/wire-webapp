@@ -189,10 +189,8 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     const handle = api.show(notificationRequestFactory.build());
 
-    expect(result.isOk(handle)).toBe(true);
-    if (result.isOk(handle)) {
-      expect(result.isOk(handle.value.close())).toBe(true);
-    }
+    assert(result.isOk(handle));
+    expect(result.isOk(handle.value.close())).toBe(true);
     expect(createdNotifications.at(0)?.closeCallCount).toBe(1);
   });
 
@@ -280,14 +278,12 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     const handle = api.show(notificationRequestFactory.build());
 
-    expect(result.isOk(handle)).toBe(true);
-    if (result.isOk(handle)) {
-      expect(handle.value.close()).toEqual(
-        result.err({
-          kind: systemNotificationErrorKinds.closeFailed,
-          cause: new Error('notification could not be closed'),
-        }),
-      );
-    }
+    assert(result.isOk(handle));
+    expect(handle.value.close()).toEqual(
+      result.err({
+        kind: systemNotificationErrorKinds.closeFailed,
+        cause: new Error('notification could not be closed'),
+      }),
+    );
   });
 });
