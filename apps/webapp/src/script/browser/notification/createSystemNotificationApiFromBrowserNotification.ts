@@ -79,10 +79,30 @@ export const createSystemNotificationApiFromBrowserNotification = ({
   show: ({title, body, tag, onClick, onClose}) =>
     result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.presentationFailed), () => {
       const notification = createNotification({title, body, tag});
-      const closeNotification = () =>
-        result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.closeFailed), () => {
-          notification.close();
-        });
+      // The platform fires its close event for a programmatic close too, so without this guard a
+      // close we asked for would be reported twice.
+      let closeReported = false;
+
+      const reportClose = () => {
+        if (closeReported) {
+          return;
+        }
+
+        closeReported = true;
+        onClose();
+      };
+
+      const closeNotification = () => {
+        const closeAttempt = result.tryOrElse(
+          toSystemNotificationError(systemNotificationErrorKinds.closeFailed),
+          () => {
+            notification.close();
+          },
+        );
+
+        // Only a close that worked means the notification is gone.
+        return closeAttempt.inspect(reportClose);
+      };
 
       notification.onClick(() => {
         // wire-desktop listens for this to restore the window and switch to the account that
@@ -93,15 +113,21 @@ export const createSystemNotificationApiFromBrowserNotification = ({
       });
 
       notification.onClose(() => {
-        onClose();
+        reportClose();
       });
 
       // A notification can fail after the constructor returned, so `show` reporting `Ok` is not
       // the last word on whether it reached the user.
       notification.onError(() => {
         logger.warn('system notification failed after being shown', {tag});
-        onClose();
-        closeNotification();
+
+        closeNotification().inspectErr(error => {
+          logger.warn('failed to close a system notification that errored', {
+            error: error.kind,
+            cause: error.cause,
+            tag,
+          });
+        });
       });
 
       return {close: closeNotification};

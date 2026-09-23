@@ -17,6 +17,8 @@
  *
  */
 
+import assert from 'node:assert';
+
 import {result} from 'true-myth';
 
 import {
@@ -210,6 +212,45 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     });
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(createdNotifications.at(0)?.closeCallCount).toBe(1);
+  });
+
+  it('reports a close once even though the platform also fires its close event', () => {
+    const {api, createdNotifications} = createApi();
+    const onClose = jest.fn();
+
+    const handle = api.show({...request, onClose});
+
+    assert(result.isOk(handle));
+    handle.value.close();
+    createdNotifications.at(0)?.closeListener?.();
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not report a close that failed', () => {
+    const {api} = createApi({throwOnClose: true});
+    const onClose = jest.fn();
+
+    const handle = api.show({...request, onClose});
+
+    assert(result.isOk(handle));
+    expect(result.isErr(handle.value.close())).toBe(true);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('keeps the notification open and logs when closing it after an error fails', () => {
+    const {api, createdNotifications, logger} = createApi({throwOnClose: true});
+    const onClose = jest.fn();
+
+    api.show({...request, onClose});
+    createdNotifications.at(0)?.errorListener?.(new Event('error'));
+
+    expect(logger.warn).toHaveBeenCalledWith('failed to close a system notification that errored', {
+      error: systemNotificationErrorKinds.closeFailed,
+      cause: new Error('notification could not be closed'),
+      tag: 'meeting-reminder:tag',
+    });
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('reports a construction failure instead of throwing', () => {
