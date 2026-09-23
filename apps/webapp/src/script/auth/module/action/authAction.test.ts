@@ -18,7 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -122,6 +122,35 @@ describe('AuthAction', () => {
     });
     expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
     expect(spies.doInitializeClient.calls.count()).toEqual(1);
+  });
+
+  it('treats a rate-limited two-factor login code as successfully sent', async () => {
+    const emailAddress = 'test@example.com';
+    const rateLimitError = new BackendError(
+      'Verification code was already sent',
+      SyntheticErrorLabel.TOO_MANY_REQUESTS,
+      HTTP_STATUS.TOO_MANY_REQUESTS,
+    );
+    const mockedApiClient = {
+      api: {
+        user: {
+          postVerificationCode: (): Promise<void> => {
+            return Promise.reject(rateLimitError);
+          },
+        },
+      },
+    } as TypeUtil.RecursivePartial<APIClient>;
+    const store = mockStoreFactory({apiClient: mockedApiClient})();
+
+    await store.dispatch(actionRoot.authAction.doSendTwoFactorLoginCode(emailAddress));
+
+    const actualActions = store.getActions();
+    const expectedActions = [
+      AuthActionCreator.startSendTwoFactorCode(),
+      AuthActionCreator.successfulSendTwoFactorCode(),
+    ];
+
+    expect(actualActions).toEqual(expectedActions);
   });
 
   it('handles failed authentication', async () => {
