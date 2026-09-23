@@ -24,6 +24,7 @@ import {result} from 'true-myth';
 
 import {
   systemNotificationErrorKinds,
+  type SystemNotificationApi,
   type SystemNotificationPermission,
   type SystemNotificationRequest,
 } from 'src/script/notification/systemNotificationTypes';
@@ -99,10 +100,18 @@ const createPlatformFake = ({
   };
 };
 
+type ApiUnderTest = {
+  api: SystemNotificationApi;
+  createdNotifications: CreatedNotification[];
+  focusWindow: jest.Mock<void, []>;
+  publishNotificationClick: jest.Mock<void, []>;
+  logger: {warn: jest.Mock<void, [string, unknown?]>};
+};
+
 const createApi = ({
   permission = 'granted',
   ...fakeOptions
-}: PlatformFakeOptions & {permission?: SystemNotificationPermission} = {}) => {
+}: PlatformFakeOptions & {permission?: SystemNotificationPermission} = {}): ApiUnderTest => {
   const {createNotification, createdNotifications} = createPlatformFake(fakeOptions);
   const focusWindow = jest.fn();
   const publishNotificationClick = jest.fn();
