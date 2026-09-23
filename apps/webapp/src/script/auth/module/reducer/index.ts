@@ -17,6 +17,7 @@
  *
  */
 
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {AnyAction, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import type {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 
@@ -34,6 +35,7 @@ import type {Configuration} from '../../../Config';
 import type {ActionRoot} from '../action';
 
 export type Api = {
+  wallClock: WallClock;
   actions: ActionRoot;
   apiClient: APIClient;
   core: Account;

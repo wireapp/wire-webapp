@@ -55,9 +55,8 @@ exposeWrapperGlobals();
 
 const mainId = 'main';
 
-const apiClient = new APIClient({
-  wallClock: createWallClock(),
-});
+const wallClock = createWallClock();
+const apiClient = new APIClient({wallClock});
 container.registerInstance(APIClient, apiClient);
 const core = container.resolve(Core);
 
@@ -69,6 +68,7 @@ try {
 }
 
 const store = configureStore({
+  wallClock,
   actions: actionRoot,
   apiClient,
   core,
