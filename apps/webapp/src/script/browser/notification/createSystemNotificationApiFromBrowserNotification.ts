@@ -118,8 +118,8 @@ export const createSystemNotificationApiFromBrowserNotification = ({
 
       // A notification can fail after the constructor returned, so `show` reporting `Ok` is not
       // the last word on whether it reached the user.
-      notification.onError(() => {
-        logger.warn('system notification failed after being shown', {tag});
+      notification.onError(event => {
+        logger.warn('system notification failed after being shown', {tag, event});
 
         closeNotification().inspectErr(error => {
           logger.warn('failed to close a system notification that errored', {

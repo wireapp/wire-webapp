@@ -204,11 +204,14 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {api, createdNotifications, logger} = createApi();
     const onClose = jest.fn();
 
+    const errorEvent = new Event('error');
+
     api.show({...request, onClose});
-    createdNotifications.at(0)?.errorListener?.(new Event('error'));
+    createdNotifications.at(0)?.errorListener?.(errorEvent);
 
     expect(logger.warn).toHaveBeenCalledWith('system notification failed after being shown', {
       tag: 'meeting-reminder:tag',
+      event: errorEvent,
     });
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(createdNotifications.at(0)?.closeCallCount).toBe(1);
