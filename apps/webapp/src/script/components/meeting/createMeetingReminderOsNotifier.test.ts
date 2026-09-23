@@ -210,6 +210,31 @@ describe('createMeetingReminderOsNotifier', () => {
     expect(closedTags).toEqual([]);
   });
 
+  it('keeps a toast it failed to close, so teardown can try again', () => {
+    const closeAttempts: string[] = [];
+    const {requests, notifier} = createNotifierWithFakeNotificationApi({
+      show: request => {
+        requests.push(request);
+
+        return result.ok({
+          close: () => {
+            closeAttempts.push(request.tag);
+            return result.err({
+              kind: systemNotificationErrorKinds.closeFailed,
+              cause: new Error('notification could not be closed'),
+            });
+          },
+        });
+      },
+    });
+
+    notifier.notify(meetingReminderFirePayloadFactory.build());
+    firstRequestOf(requests).onClick();
+    notifier.stop();
+
+    expect(closeAttempts).toHaveLength(2);
+  });
+
   it('closes outstanding toasts on teardown, once', () => {
     const {closedTags, notifier} = createNotifierWithFakeNotificationApi();
 

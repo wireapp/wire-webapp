@@ -80,11 +80,16 @@ export const createMeetingReminderOsNotifier = ({
       return;
     }
 
-    forget(tag);
-
-    openNotification.value.close().inspectErr(error => {
-      logger.warn('failed to close meeting reminder OS notification', {error: error.kind, cause: error.cause, tag});
-    });
+    openNotification.value
+      // Keep the handle until the close actually happened, so a failed close can be retried on
+      // teardown rather than leaving a toast on screen that we no longer know about.
+      .close()
+      .inspect(() => {
+        forget(tag);
+      })
+      .inspectErr(error => {
+        logger.warn('failed to close meeting reminder OS notification', {error: error.kind, cause: error.cause, tag});
+      });
   };
 
   return {
