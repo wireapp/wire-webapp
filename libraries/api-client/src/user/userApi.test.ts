@@ -17,24 +17,47 @@
  *
  */
 
-import {APIClient} from '../apiClient';
+import {AxiosRequestConfig, AxiosResponse} from 'axios';
+
+import type {BackendFeatures} from '../apiClient';
 import {VerificationActionType} from '../auth/verificationActionType';
+import type {HttpClient} from '../http/httpClient';
+
+import {UserAPI} from './userApi';
 
 describe('UserAPI', () => {
   it('opts out of incremental retry backoff when generating a verification code', async () => {
-    const client = new APIClient();
-    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: undefined} as never);
+    const sentRequestConfigs: AxiosRequestConfig[] = [];
     const emailAddress = 'user@example.com';
+    const httpClient = {
+      sendJSON: async function sendJSON<ResponseData>(
+        requestConfig: AxiosRequestConfig,
+      ): Promise<AxiosResponse<ResponseData>> {
+        sentRequestConfigs.push(requestConfig);
+        return undefined as never;
+      },
+    } as unknown as HttpClient;
+    const backendFeatures: BackendFeatures = {
+      domain: 'test.zinfra.io',
+      federationEndpoints: false,
+      isFederated: false,
+      supportsGuestLinksWithPassword: false,
+      supportsMLS: false,
+      version: 0,
+    };
+    const userAPI = new UserAPI(httpClient, backendFeatures);
 
-    await client.api.user.postVerificationCode(emailAddress, VerificationActionType.LOGIN);
+    await userAPI.postVerificationCode(emailAddress, VerificationActionType.LOGIN);
 
-    expect(sendJSONSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: {action: VerificationActionType.LOGIN, email: emailAddress},
-        method: 'post',
-        requestOptions: {skipIncrementalRetryBackoff: true},
-        url: '/verification-code/send',
-      }),
-    );
+    const [actualRequestConfig] = sentRequestConfigs;
+    const expectedRequestConfig = expect.objectContaining({
+      data: {action: VerificationActionType.LOGIN, email: emailAddress},
+      method: 'post',
+      requestOptions: {skipIncrementalRetryBackoff: true},
+      url: '/verification-code/send',
+    });
+
+    expect(sentRequestConfigs).toHaveLength(1);
+    expect(actualRequestConfig).toEqual(expectedRequestConfig);
   });
 });
