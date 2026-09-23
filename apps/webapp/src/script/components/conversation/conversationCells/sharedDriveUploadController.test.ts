@@ -161,6 +161,33 @@ describe('createSharedDriveUploadController', () => {
     ]);
   });
 
+  it('starts a new batch after the previous batch reaches a terminal state', async () => {
+    const createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2');
+    const {controller} = createDirectUploadControllerHelper(undefined, createUploadId);
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, jest.fn(), conversationQualifiedId);
+    await controller.upload([new File(['two'], 'two.txt')], uploadPath, jest.fn(), conversationQualifiedId);
+
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-2'}), kind: 'published'}),
+    ]);
+  });
+
+  it('keeps the completed batch when every new upload registration fails', async () => {
+    const manager = createDraftUploadManagerMock();
+    const createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2');
+    const {controller} = createDraftUploadControllerHelper(manager, createUploadId);
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, jest.fn(), conversationQualifiedId);
+    manager.register.mockReturnValueOnce(Result.err({kind: 'duplicateUpload', uploadId: 'upload-2'}));
+
+    await controller.upload([new File(['two'], 'two.txt')], uploadPath, jest.fn(), conversationQualifiedId);
+
+    expect(controller.snapshots(conversationQualifiedId)).toEqual([
+      expect.objectContaining({identity: expect.objectContaining({uploadId: 'upload-1'}), kind: 'published'}),
+    ]);
+  });
+
   it('refreshes the latest view after a view change during an in-flight upload', async () => {
     const cellsRepository = createCellsRepositoryMock();
     let resolveUpload: ((result: {uuid: string; versionId: string}) => void) | undefined;
@@ -761,7 +788,6 @@ describe('createSharedDriveUploadController', () => {
     uploadRequests[1].onProgress(0.8);
 
     expect(controller.snapshots(conversationQualifiedId)).toEqual([
-      expect.objectContaining({identity: {uploadId: 'upload-1'}, kind: 'cancelled'}),
       expect.objectContaining({identity: {uploadId: 'upload-2'}, kind: 'uploading', progress: 0.8}),
     ]);
 

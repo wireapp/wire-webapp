@@ -57,6 +57,14 @@ type UploadWork = {
 
 const MAX_ACTIVE_UPLOADS = 3;
 
+const isTerminalUploadState = (state: UploadState | undefined): boolean => {
+  if (!state) {
+    return false;
+  }
+
+  return !['queued', 'uploading', 'draftReady', 'publishing', 'discarding'].includes(state.kind);
+};
+
 export type SharedDriveUploadStrategy = {
   readonly register: (uploadId: string, source: UploadSource, path: string) => Result<void, unknown>;
   readonly attach: (uploadId: string, listener: SharedDriveUploadSnapshotListener) => void;
@@ -68,6 +76,14 @@ export type SharedDriveUploadStrategy = {
   readonly discard: (uploadId: string) => Promise<void>;
   readonly retryDiscard: (uploadId: string) => Promise<void>;
 };
+
+const isTerminalBatch = (
+  currentBatchUploadIds: Set<string> | undefined,
+  uploadStrategy: SharedDriveUploadStrategy,
+): boolean =>
+  currentBatchUploadIds !== undefined &&
+  currentBatchUploadIds.size > 0 &&
+  [...currentBatchUploadIds].every(uploadId => isTerminalUploadState(uploadStrategy.snapshot(uploadId)));
 
 type DirectUploadStrategyDependencies = {
   readonly cellsRepository: Pick<CellsRepository, 'uploadNode'>;
@@ -242,6 +258,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const refreshByConversationId = new Map<string, () => void>();
   const listeners = new Set<() => void>();
   const workByUploadId = new Map<string, UploadWork>();
+  const currentBatchUploadIdsByConversation = new Map<string, Set<string>>();
   const queuedWork: UploadWork[] = [];
   let activeWorkCount = 0;
   const notify = () => listeners.forEach(listener => listener());
@@ -342,6 +359,8 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     conversationQualifiedId: string,
   ): Promise<void> => {
     const works: UploadWork[] = [];
+    const currentBatchUploadIds = currentBatchUploadIdsByConversation.get(conversationQualifiedId);
+    let nextBatchUploadIds = isTerminalBatch(currentBatchUploadIds, uploadStrategy) ? undefined : currentBatchUploadIds;
 
     for (const file of files) {
       const registration = registerFile(file, path, conversationQualifiedId, onRefresh);
@@ -350,6 +369,11 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
       }
 
       const uploadId = registration.value;
+      if (!nextBatchUploadIds) {
+        nextBatchUploadIds = new Set<string>();
+        currentBatchUploadIdsByConversation.set(conversationQualifiedId, nextBatchUploadIds);
+      }
+      nextBatchUploadIds.add(uploadId);
       const request = requestsByUploadId.get(uploadId);
       if (!request) {
         continue;
@@ -414,12 +438,8 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   };
 
   const snapshots = (conversationQualifiedId: string): readonly UploadState[] =>
-    ids.flatMap(id => {
-      if (conversationByUploadId.get(id) !== conversationQualifiedId) {
-        return [];
-      }
-
-      const snapshot = uploadStrategy.snapshot(id);
+    [...(currentBatchUploadIdsByConversation.get(conversationQualifiedId) ?? [])].flatMap(uploadId => {
+      const snapshot = uploadStrategy.snapshot(uploadId);
       return snapshot ? [snapshot] : [];
     });
 
