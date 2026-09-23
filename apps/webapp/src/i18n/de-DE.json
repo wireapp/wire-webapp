@@ -1378,7 +1378,7 @@
   "meetings.notifications.ongoing": "Aktuell",
   "meetings.notifications.reminder": "Erinnerung",
   "meetings.notifications.showAll": "Alle anzeigen",
-  "meetings.notifications.startsIn10Minutes": "Beginnt in 10 Minuten",
+  "meetings.notifications.startsAt": "Starts at {time}",
   "meetings.notifications.title": "{label}: {meetingTitle}",
   "meetings.notifications.total": "Meeting-Benachrichtigungen ({count})",
   "meetings.notifications.update": "Aktualisieren",
