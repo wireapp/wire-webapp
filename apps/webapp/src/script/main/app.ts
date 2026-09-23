@@ -19,7 +19,7 @@
 
 // Polyfill for "tsyringe" dependency injection
 
-import {isNonEmptyArray} from '@sindresorhus/is';
+import is from '@sindresorhus/is';
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
@@ -35,7 +35,7 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {createFireAndForgetInvoker} from '@wireapp/core';
+import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -827,7 +827,7 @@ export class App {
           const pendingIds = await mlsService.getPendingRecoveryConversationIds();
 
           // Only process conversations that haven't been recovered yet
-          const conversations = isNonEmptyArray(pendingIds)
+          const conversations = is.nonEmptyArray(pendingIds)
             ? allConversations.filter(conv => pendingIds.some(pending => matchQualifiedIds(pending, conv.qualifiedId)))
             : allConversations;
 

@@ -193,6 +193,29 @@ describe('HttpClient', () => {
       },
     );
 
+    it('skips incremental retry backoff when the request opts out', async () => {
+      const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        dependencies: httpClientDependenciesForTest,
+      });
+      const tooManyRequestsError = createRetryableBackendError(StatusCode.TOO_MANY_REQUESTS);
+
+      client._sendRequest = jest.fn().mockRejectedValueOnce(tooManyRequestsError);
+
+      await expect(
+        client.sendRequest(
+          {
+            method: 'POST',
+            requestOptions: {skipIncrementalRetryBackoff: true},
+            url: '/verification-code/send',
+          },
+          true,
+        ),
+      ).rejects.toBe(tooManyRequestsError);
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([]);
+    });
+
     it('retries 500 backend errors with incremental retry backoff', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
