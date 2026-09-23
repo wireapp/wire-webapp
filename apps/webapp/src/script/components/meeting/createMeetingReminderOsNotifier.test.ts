@@ -60,8 +60,8 @@ const meetingReminderFirePayloadFactory = createFactory<MeetingReminderFirePaylo
   };
 });
 
-const translate = ((identifier: string, substitutions?: Record<string, string>) =>
-  identifier === 'meetings.notifications.startsAt' ? `Starts at ${substitutions?.time}` : identifier) as Translate;
+const translate: Translate = (identifier, substitutions) =>
+  identifier === 'meetings.notifications.startsAt' ? `Starts at ${substitutions?.time}` : identifier;
 
 const formatMeetingTime = (meetingStartTime: string): string =>
   meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
