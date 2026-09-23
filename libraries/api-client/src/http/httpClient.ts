@@ -391,6 +391,10 @@ export class HttpClient extends EventEmitter {
       return this._sendRequest<T>({config, abortController});
     };
 
+    if (config.requestOptions?.skipIncrementalRetryBackoff === true) {
+      return runRequestAttempt();
+    }
+
     return this.incrementalRetryBackoffRunner.runWithIncrementalRetryBackoff({
       abortSignal: this.getIncrementalRetryBackoffAbortSignal(abortController),
       getIncrementalRetryBackoffState: () => {

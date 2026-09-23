@@ -23,6 +23,7 @@ declare module 'axios' {
   interface AxiosRequestConfig {
     requestOptions?: {
       skipLogout?: boolean;
+      skipIncrementalRetryBackoff?: boolean;
     };
   }
 }
