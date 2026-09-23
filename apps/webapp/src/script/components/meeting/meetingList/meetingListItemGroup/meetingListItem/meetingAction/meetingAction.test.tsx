@@ -23,6 +23,7 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {task} from 'true-myth';
 
 import * as MeetingLinkConfirmation from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
+import * as MeetingLinkRecovery from 'Components/meeting/shared/service/meetingLinkRecovery';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
 import type {MeetingStoreServiceTasks} from 'Components/meeting/meetingStore/meetingStoreDeps';
@@ -124,7 +125,9 @@ const clickMeetingLinkMenuEntry = () => {
     throw new Error('Expected context menu to be shown');
   }
 
-  const meetingLinkEntry = menuArgs.entries.find(entry => entry.label === 'meetings.action.meetingLink');
+  const meetingLinkEntry = menuArgs.entries.find(entry =>
+    ['meetings.action.meetingLink', 'meetings.action.generateMeetingLink'].includes(entry.label ?? ''),
+  );
 
   if (!meetingLinkEntry?.click) {
     throw new Error('Expected meeting link menu entry');
@@ -165,8 +168,11 @@ describe('MeetingAction', () => {
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
 
-  it('opens the retryable confirmation when loading the meeting link fails', async () => {
-    const getMeetingConversationCode = jest.fn().mockReturnValue(task.reject(new Error('get failed')));
+  it('opens generation for a host when the existing link is missing', async () => {
+    const showMeetingLinkPasswordModal = jest.spyOn(MeetingLinkRecovery, 'showMeetingLinkPasswordModal');
+    const getMeetingConversationCode = jest
+      .fn()
+      .mockReturnValue(task.reject({isAxiosError: true, response: {status: 404}}));
 
     const requestMeetingConversationCode = jest.fn();
 
@@ -187,16 +193,12 @@ describe('MeetingAction', () => {
     clickMeetingLinkMenuEntry();
 
     await waitFor(() =>
-      expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          meetingLinkUnavailable: true,
-          meetingLinkUnavailableForHost: true,
-          retryMeetingLink: expect.any(Function),
-          translate: translateForTest,
-        }),
+      expect(showMeetingLinkPasswordModal).toHaveBeenCalledWith(
+        expect.objectContaining({generate: true, translate: translateForTest}),
       ),
     );
 
+    expect(getMeetingConversationCode).toHaveBeenCalledWith({domain: 'example.com', id: 'conversation-id'});
     expect(requestMeetingConversationCode).not.toHaveBeenCalled();
   });
 
@@ -221,7 +223,7 @@ describe('MeetingAction', () => {
       },
     } as unknown as MainViewModel;
 
-    renderAction('2026-06-15T13:00:00.000Z', selfUser, undefined, mainViewModel);
+    renderAction('2026-06-15T13:00:00.000Z', new User('invitee-id', 'example.com', translateForTest), undefined, mainViewModel);
 
     clickActionButton();
     clickMeetingLinkMenuEntry();
@@ -229,7 +231,6 @@ describe('MeetingAction', () => {
     await waitFor(() =>
       expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith({
         meetingLink,
-        retryMeetingLink: expect.any(Function),
         translate: translateForTest,
       }),
     );
@@ -237,8 +238,42 @@ describe('MeetingAction', () => {
     expect(requestMeetingConversationCode).not.toHaveBeenCalled();
   });
 
+  it('closes the existing-link confirmation before opening the rotation form for a host', async () => {
+    const showMeetingLinkPasswordModal = jest.spyOn(MeetingLinkRecovery, 'showMeetingLinkPasswordModal');
+    showMeetingLinkPasswordModal.mockClear();
+
+    const meetingLink: MeetingLink = {
+      meetingLink: 'https://wire.example/meeting-link',
+      hasPassword: true,
+    };
+    const getMeetingConversationCode = jest.fn().mockReturnValue(task.resolve(meetingLink));
+
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {getMeetingConversationCode},
+        },
+      },
+    } as unknown as MainViewModel;
+
+    renderAction('2026-06-15T13:00:00.000Z', selfUser, undefined, mainViewModel);
+
+    clickActionButton();
+    clickMeetingLinkMenuEntry();
+
+    await waitFor(() => expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith(expect.objectContaining({meetingLink})));
+
+    const onRotateMeetingLink = showMeetingLinkConfirmationMock.mock.lastCall?.[0].onRotateMeetingLink;
+    expect(onRotateMeetingLink).toBeDefined();
+    onRotateMeetingLink?.();
+
+    expect(showMeetingLinkPasswordModal).toHaveBeenCalledWith(
+      expect.objectContaining({rotate: true, translate: translateForTest}),
+    );
+  });
+
   it('shows the unavailable-link message to a guest without generating a link', async () => {
-    const getMeetingConversationCode = jest.fn().mockReturnValue(task.reject(new Error('missing link')));
+    const getMeetingConversationCode = jest.fn().mockReturnValue(task.reject({isAxiosError: true, response: {status: 404}}));
 
     const requestMeetingConversationCode = jest.fn();
 
@@ -264,14 +299,11 @@ describe('MeetingAction', () => {
     clickMeetingLinkMenuEntry();
 
     await waitFor(() =>
-      expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          meetingLinkUnavailable: true,
-          meetingLinkUnavailableForHost: false,
-          retryMeetingLink: undefined,
-          translate: translateForTest,
-        }),
-      ),
+      expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith({
+        meetingLinkUnavailable: true,
+        meetingLinkUnavailableForHost: false,
+        translate: translateForTest,
+      }),
     );
 
     expect(getMeetingConversationCode).toHaveBeenCalledWith({
@@ -280,5 +312,42 @@ describe('MeetingAction', () => {
     });
 
     expect(requestMeetingConversationCode).not.toHaveBeenCalled();
+  });
+
+  it('offers generation from the unavailable-link message to a host', async () => {
+    const showMeetingLinkPasswordModal = jest.spyOn(MeetingLinkRecovery, 'showMeetingLinkPasswordModal');
+    const getMeetingConversationCode = jest
+      .fn()
+      .mockReturnValue(task.reject({isAxiosError: true, response: {status: 500}}));
+
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {getMeetingConversationCode},
+        },
+      },
+    } as unknown as MainViewModel;
+
+    renderAction('2026-06-15T13:00:00.000Z', selfUser, undefined, mainViewModel);
+
+    clickActionButton();
+    clickMeetingLinkMenuEntry();
+
+    await waitFor(() =>
+      expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          meetingLinkUnavailable: true,
+          meetingLinkUnavailableForHost: true,
+          onGenerateMeetingLink: expect.any(Function),
+        }),
+      ),
+    );
+
+    const onGenerateMeetingLink = showMeetingLinkConfirmationMock.mock.lastCall?.[0].onGenerateMeetingLink;
+    onGenerateMeetingLink?.();
+
+    expect(showMeetingLinkPasswordModal).toHaveBeenCalledWith(
+      expect.objectContaining({generate: true, translate: translateForTest}),
+    );
   });
 });

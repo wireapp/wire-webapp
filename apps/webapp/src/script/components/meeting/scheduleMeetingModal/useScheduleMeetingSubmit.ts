@@ -28,6 +28,7 @@ import {mapScheduleFormToUpdateMeetingCommand} from 'Components/meeting/mapSched
 import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import {showMeetingLinkPasswordModal} from 'Components/meeting/shared/service/meetingLinkRecovery';
 import type {MeetingSubmitSuccess} from 'Components/meeting/shared/service/meetingService';
 import {syncMeetingConversationName} from 'Components/meeting/shared/service/syncMeetingConversationName';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
@@ -45,8 +46,8 @@ import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvi
 import {
   type ScheduleMeetingFormState,
   type ScheduleMeetingMode,
-  type ScheduleMeetingSubmitResult,
   scheduleMeetingModes,
+  type ScheduleMeetingSubmitResult,
   scheduleMeetingSubmitResults,
 } from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
@@ -193,13 +194,15 @@ export const useScheduleMeetingSubmit = () => {
         (submitResult.value.meetingLink || submitResult.value.meetingLinkGenerationFailed) &&
         createdConversation
       ) {
-        showMeetingLinkConfirmation({
-          meetingLink: submitResult.value.meetingLink,
-          meetingLinkUnavailable: submitResult.value.meetingLinkGenerationFailed,
-          meetingLinkUnavailableForHost: submitResult.value.meetingLinkGenerationFailed,
-          retryMeetingLink: () => conversationRepository.requestMeetingConversationCode(createdConversation),
-          translate,
-        });
+        if (submitResult.value.meetingLinkGenerationFailed) {
+          showMeetingLinkPasswordModal({
+            conversationId: createdConversation,
+            conversationRepository,
+            translate,
+          });
+        } else {
+          showMeetingLinkConfirmation({meetingLink: submitResult.value.meetingLink, translate});
+        }
       }
 
       setIsSubmitting(false);

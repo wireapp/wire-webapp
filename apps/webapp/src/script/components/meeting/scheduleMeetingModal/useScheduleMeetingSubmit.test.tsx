@@ -27,7 +27,7 @@ import {maybe, task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import * as MeetingLinkConfirmation from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
+import * as MeetingLinkRecovery from 'Components/meeting/shared/service/meetingLinkRecovery';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -173,7 +173,7 @@ describe('useScheduleMeetingSubmit', () => {
   });
 
   it('shows the unavailable host message when meeting-link generation fails', async () => {
-    const showMeetingLinkConfirmation = jest.spyOn(MeetingLinkConfirmation, 'showMeetingLinkConfirmation');
+    const showMeetingLinkPasswordModal = jest.spyOn(MeetingLinkRecovery, 'showMeetingLinkPasswordModal');
     const scheduleMeeting = jest.fn().mockReturnValue(
       task.resolve({
         failedToAdd: [],
@@ -189,11 +189,9 @@ describe('useScheduleMeetingSubmit', () => {
       await result.current.submit(formState);
     });
 
-    expect(showMeetingLinkConfirmation).toHaveBeenCalledWith(
+    expect(showMeetingLinkPasswordModal).toHaveBeenCalledWith(
       expect.objectContaining({
-        meetingLinkUnavailable: true,
-        meetingLinkUnavailableForHost: true,
-        retryMeetingLink: expect.any(Function),
+        conversationId: {id: 'conversation-id', domain: 'example.com'},
         translate: translateForTest,
       }),
     );

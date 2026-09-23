@@ -39,6 +39,7 @@ export interface ButtonAction {
   uieName?: string;
   text?: React.ReactNode;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export interface Text {

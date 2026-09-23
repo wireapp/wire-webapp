@@ -20,7 +20,7 @@
 import {addNewModalToQueue, showNextModalInQueue} from './PrimaryModalState';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
-export {removeCurrentModal, usePrimaryModalState} from './PrimaryModalState';
+export {removeCurrentModal, setPrimaryModalLoading, usePrimaryModalState} from './PrimaryModalState';
 export {PrimaryModal};
 
 const PrimaryModal = {

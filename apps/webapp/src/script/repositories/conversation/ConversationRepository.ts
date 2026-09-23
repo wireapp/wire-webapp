@@ -1425,6 +1425,17 @@ export class ConversationRepository {
     );
   }
 
+  revokeMeetingConversationCode(conversationId: QualifiedId): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        await this.conversationService.deleteConversationCode(conversationId.id);
+        const conversation = this.conversationState.findConversation(conversationId);
+        conversation?.accessCode('');
+      },
+    );
+  }
+
   /**
    * Get all the group conversations owned by self user's team from the local state.
    */

@@ -17,10 +17,9 @@
  *
  */
 
-import {useState, type ReactNode} from 'react';
+import {type ReactNode} from 'react';
 
 import {toast} from 'sonner';
-import type {Task} from 'true-myth';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -35,48 +34,31 @@ import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
 type ShowMeetingLinkConfirmationParams = {
   meetingLink?: MeetingLink;
-  retryMeetingLink?: () => Task<MeetingLink, unknown>;
   meetingLinkUnavailable?: boolean;
   meetingLinkUnavailableForHost?: boolean;
+  onGenerateMeetingLink?: () => void;
+  onRotateMeetingLink?: () => void;
   translate: Translate;
 };
 
 type MeetingLinkConfirmationMessageProps = Pick<
   ShowMeetingLinkConfirmationParams,
-  'meetingLinkUnavailable' | 'meetingLinkUnavailableForHost' | 'retryMeetingLink' | 'translate'
+  'meetingLinkUnavailable' | 'meetingLinkUnavailableForHost' | 'onRotateMeetingLink' | 'translate'
 > & {
   meetingLink?: MeetingLink;
+  onGenerateMeetingLink?: () => void;
 };
 
 export const MeetingLinkConfirmationMessage = ({
   meetingLink: initialMeetingLink,
   meetingLinkUnavailable,
   meetingLinkUnavailableForHost,
-  retryMeetingLink,
+  onGenerateMeetingLink,
+  onRotateMeetingLink,
   translate,
 }: MeetingLinkConfirmationMessageProps) => {
-  const [meetingLink, setMeetingLink] = useState(initialMeetingLink);
-  const [isLinkUnavailable, setIsLinkUnavailable] = useState(meetingLinkUnavailable);
-  const [isRetrying, setIsRetrying] = useState(false);
-
-  const retry = async (): Promise<void> => {
-    if (retryMeetingLink === undefined || isRetrying) {
-      return;
-    }
-
-    setIsRetrying(true);
-    const result = await retryMeetingLink().toPromise();
-    result.match({
-      Ok: nextMeetingLink => {
-        setMeetingLink(nextMeetingLink);
-        setIsLinkUnavailable(false);
-      },
-      Err: () => {
-        toast.error(translate('meetings.meetingLink.loadFailed'));
-      },
-    });
-    setIsRetrying(false);
-  };
+  const meetingLink = initialMeetingLink;
+  const isLinkUnavailable = meetingLinkUnavailable;
 
   let action: ReactNode = null;
   if (meetingLink) {
@@ -90,16 +72,30 @@ export const MeetingLinkConfirmationMessage = ({
         onCopyError={() => toast.error(translate('meetings.meetingLink.copyLinkFailed'))}
       />
     );
-  } else if (retryMeetingLink) {
+    if (onRotateMeetingLink) {
+      action = (
+        <>
+          {action}
+          <Button
+            css={meetingLinkActionsButtonsStyles}
+            type="button"
+            variant={ButtonVariant.SECONDARY}
+            onClick={onRotateMeetingLink}
+          >
+            {translate('meetings.meetingLink.rotate')}
+          </Button>
+        </>
+      );
+    }
+  } else if (meetingLinkUnavailableForHost && onGenerateMeetingLink) {
     action = (
       <Button
         css={meetingLinkActionsButtonsStyles}
         type="button"
         variant={ButtonVariant.PRIMARY}
-        disabled={isRetrying}
-        onClick={retry}
+        onClick={onGenerateMeetingLink}
       >
-        {translate('meetings.meetingLink.retry')}
+        {translate('meetings.meetingLink.generate')}
       </Button>
     );
   }
@@ -120,7 +116,7 @@ export const MeetingLinkConfirmationMessage = ({
           css={meetingLinkActionsButtonsStyles}
           type="button"
           variant={ButtonVariant.SECONDARY}
-          onClick={removeCurrentModal}
+          onClick={() => removeCurrentModal()}
         >
           {translate('meetings.meetingLink.close')}
         </Button>
@@ -133,7 +129,8 @@ export const showMeetingLinkConfirmation = ({
   meetingLink,
   meetingLinkUnavailable,
   meetingLinkUnavailableForHost,
-  retryMeetingLink,
+  onGenerateMeetingLink,
+  onRotateMeetingLink,
   translate,
 }: ShowMeetingLinkConfirmationParams): void => {
   const message: ReactNode = (
@@ -141,7 +138,8 @@ export const showMeetingLinkConfirmation = ({
       meetingLink={meetingLink}
       meetingLinkUnavailable={meetingLinkUnavailable}
       meetingLinkUnavailableForHost={meetingLinkUnavailableForHost}
-      retryMeetingLink={retryMeetingLink}
+      onGenerateMeetingLink={onGenerateMeetingLink}
+      onRotateMeetingLink={onRotateMeetingLink}
       translate={translate}
     />
   );
@@ -151,6 +149,7 @@ export const showMeetingLinkConfirmation = ({
     {
       confirmCancelBtnLabel: '',
       hideSecondary: true,
+      size: 'large',
       text: {
         closeBtnLabel: translate('meetings.meetingLink.close'),
         message,

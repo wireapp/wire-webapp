@@ -29,11 +29,16 @@ import {
   iconContainerStyle,
   iconStyles,
 } from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingAction.styles';
+import {
+  classifyMeetingLinkError,
+  showMeetingLinkPasswordModal,
+} from 'Components/meeting/shared/service/meetingLinkRecovery';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {useDeleteMeeting} from 'Components/meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/meeting/useEditMeeting';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
 import {canEditMeeting, isMeetingHost} from 'Components/meeting/utils/canEditMeeting';
+import {removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
@@ -59,6 +64,28 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
     }
 
     const nowMilliseconds = wallClock.currentTimestampInMilliseconds;
+    const conversation = container
+      .resolve(ConversationState)
+      .findConversation(meetingInstance.meetingSeries.qualified_conversation);
+    const isHost = isMeetingHost(meetingInstance.meetingSeries, selfUser);
+    const rotateMeetingLink = isHost
+      ? () =>
+          showMeetingLinkPasswordModal({
+            conversationId: meetingInstance.meetingSeries.qualified_conversation,
+            conversationRepository: content.repositories.conversation,
+            rotate: true,
+            translate,
+          })
+      : undefined;
+    const generateMeetingLink = isHost
+      ? () =>
+          showMeetingLinkPasswordModal({
+            conversationId: meetingInstance.meetingSeries.qualified_conversation,
+            conversationRepository: content.repositories.conversation,
+            generate: true,
+            translate,
+          })
+      : undefined;
 
     showContextMenu({
       event,
@@ -85,17 +112,7 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
           }
         },
         onMeetingLink: () => {
-          const isHost = isMeetingHost(meetingInstance.meetingSeries, selfUser);
-          const conversation = container
-            .resolve(ConversationState)
-            .findConversation(meetingInstance.meetingSeries.qualified_conversation);
           const cachedAccessCode = conversation?.accessCode();
-          const requestMeetingLinkTask = isHost
-            ? () =>
-                content.repositories.conversation.requestMeetingConversationCode(
-                  meetingInstance.meetingSeries.qualified_conversation,
-                )
-            : undefined;
           const getMeetingLinkTask = () =>
             content.repositories.conversation.getMeetingConversationCode(
               meetingInstance.meetingSeries.qualified_conversation,
@@ -107,7 +124,12 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
                 meetingLink: cachedAccessCode,
                 hasPassword: conversation?.accessCodeHasPassword() === true,
               },
-              retryMeetingLink: requestMeetingLinkTask,
+              onRotateMeetingLink: rotateMeetingLink
+                ? () => {
+                    removeCurrentModal();
+                    rotateMeetingLink();
+                  }
+                : undefined,
               translate,
             });
             return;
@@ -117,14 +139,33 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
             const result = await getMeetingLinkTask().toPromise();
             result.match({
               Ok: meetingLink =>
-                showMeetingLinkConfirmation({meetingLink, retryMeetingLink: requestMeetingLinkTask, translate}),
-              Err: () =>
+                showMeetingLinkConfirmation({
+                  meetingLink,
+                  onRotateMeetingLink: rotateMeetingLink
+                    ? () => {
+                        removeCurrentModal();
+                        rotateMeetingLink();
+                      }
+                    : undefined,
+                  translate,
+                }),
+              Err: error => {
+                if (isHost && classifyMeetingLinkError(error) === 'missing') {
+                  generateMeetingLink?.();
+                  return;
+                }
                 showMeetingLinkConfirmation({
                   meetingLinkUnavailable: true,
                   meetingLinkUnavailableForHost: isHost,
-                  retryMeetingLink: requestMeetingLinkTask,
+                  onGenerateMeetingLink: generateMeetingLink
+                    ? () => {
+                        removeCurrentModal();
+                        generateMeetingLink();
+                      }
+                    : undefined,
                   translate,
-                }),
+                });
+              },
             });
           };
           fireAndForgetInvoker.fireAndForget(openMeetingLink);
