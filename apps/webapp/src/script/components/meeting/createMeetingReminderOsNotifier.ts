@@ -20,7 +20,11 @@
 import {Maybe, maybe, result} from 'true-myth';
 
 import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
-import type {SystemNotificationApi, SystemNotificationHandle} from 'src/script/notification/systemNotificationTypes';
+import type {
+  SystemNotificationApi,
+  SystemNotificationHandle,
+  SystemNotificationPermission,
+} from 'src/script/notification/systemNotificationTypes';
 import type {Translate} from 'Util/localizerUtil';
 
 import {toMeetingIdKey} from './utils/toMeetingIdKey';
@@ -43,7 +47,7 @@ export type MeetingReminderOsNotifier = {
   stop: () => void;
 };
 
-const grantedPermission: NotificationPermission = 'granted';
+const grantedPermission: SystemNotificationPermission = 'granted';
 
 export const toMeetingReminderNotificationTag = (payload: MeetingReminderFirePayload): string =>
   `meeting-reminder:${toMeetingIdKey(payload.qualifiedId)}:${payload.meetingStartTime}`;

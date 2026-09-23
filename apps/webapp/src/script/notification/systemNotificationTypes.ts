@@ -37,6 +37,9 @@ export const toSystemNotificationError =
   (kind: SystemNotificationErrorKind) =>
   (cause: unknown): SystemNotificationError => ({kind, cause});
 
+/** The three permission states, owned here so the port carries no DOM type. */
+export type SystemNotificationPermission = 'default' | 'denied' | 'granted';
+
 export type SystemNotificationRequest = {
   title: string;
   body: string;
@@ -51,14 +54,14 @@ export type SystemNotificationHandle = {
 };
 
 /**
- * The OS/system notification surface of the application, kept free of any browser type so a
- * feature can present a notification without reaching for `window` and can be tested without a DOM.
+ * How the application presents an OS notification. Free of DOM types, so a feature can ask for a
+ * notification without reaching for `window` and can be tested without a DOM.
  *
  * The adapter behind this port owns the throwing browser boundary and reports failures as a
  * `Result`, which keeps its callers free of exception handling.
  */
 export type SystemNotificationApi = {
   isSupported: () => boolean;
-  getPermission: () => NotificationPermission;
+  getPermission: () => SystemNotificationPermission;
   show: (request: SystemNotificationRequest) => Result<SystemNotificationHandle, SystemNotificationError>;
 };
