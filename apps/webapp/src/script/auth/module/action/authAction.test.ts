@@ -17,6 +17,7 @@
  *
  */
 
+import {VerificationActionType} from '@wireapp/api-client/lib/auth/verificationActionType';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
@@ -126,6 +127,10 @@ describe('AuthAction', () => {
 
   it('treats a rate-limited two-factor login code as successfully sent', async () => {
     const emailAddress = 'test@example.com';
+    const verificationCodeRequests: {
+      readonly email: string;
+      readonly action: VerificationActionType;
+    }[] = [];
     const rateLimitError = new BackendError(
       'Verification code was already sent',
       SyntheticErrorLabel.TOO_MANY_REQUESTS,
@@ -134,7 +139,8 @@ describe('AuthAction', () => {
     const mockedApiClient = {
       api: {
         user: {
-          postVerificationCode: (): Promise<void> => {
+          postVerificationCode: (email: string, action: VerificationActionType): Promise<void> => {
+            verificationCodeRequests.push({email, action});
             return Promise.reject(rateLimitError);
           },
         },
@@ -143,6 +149,13 @@ describe('AuthAction', () => {
     const store = mockStoreFactory({apiClient: mockedApiClient})();
 
     await store.dispatch(actionRoot.authAction.doSendTwoFactorLoginCode(emailAddress));
+
+    expect(verificationCodeRequests).toEqual([
+      {
+        action: VerificationActionType.LOGIN,
+        email: emailAddress,
+      },
+    ]);
 
     const actualActions = store.getActions();
     const expectedActions = [
