@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyArray} from '@sindresorhus/is';
+import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, task} from 'true-myth';
 import {match, P} from 'ts-pattern';
@@ -91,7 +91,7 @@ export async function recoverMLSConversationsInBatches({
   // Initialize pending conversation IDs on first run
   if (mlsService && eligibleConversations.length > 0) {
     const pendingIds = await mlsService.getPendingRecoveryConversationIds();
-    if (!isNonEmptyArray(pendingIds)) {
+    if (!is.nonEmptyArray(pendingIds)) {
       const allPendingIds = eligibleConversations.map(conv => conv.qualifiedId);
       await mlsService.updatePendingRecoveryConversationIds(allPendingIds);
     }

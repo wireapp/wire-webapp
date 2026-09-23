@@ -17,8 +17,9 @@
  *
  */
 
-import is from '@sindresorhus/is';
 import {type RefObject, useCallback, useEffect, useRef} from 'react';
+
+import is from '@sindresorhus/is';
 
 export const useOnMultipleClicks = ({
   count,
