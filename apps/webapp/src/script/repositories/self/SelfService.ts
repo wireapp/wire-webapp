@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import type {TraceState} from '@wireapp/api-client/lib/http/';
 import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -34,7 +35,7 @@ export class SelfService {
 
   private get coreSelfService() {
     const selfService = this.core.service?.self;
-    if (!selfService) {
+    if (isNullOrUndefined(selfService)) {
       throw new Error('Self service not available');
     }
 

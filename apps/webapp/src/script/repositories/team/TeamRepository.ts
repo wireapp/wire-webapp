@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {ConversationRolesList} from '@wireapp/api-client/lib/conversation';
 import type {
   TeamConversationDeleteEvent,
@@ -39,6 +40,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
 import {EventSource} from 'Repositories/event/EventSource';
@@ -145,18 +147,21 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     this.teamState.teamFeatures(newFeatureList);
 
-    if (newFeatureList[FEATURE_KEY.MLS]?.config?.supportedProtocols?.includes(CONVERSATION_PROTOCOL.MLS)) {
+    if (newFeatureList[FEATURE_KEY.MLS]?.config?.supportedProtocols?.includes(CONVERSATION_PROTOCOL.MLS) === true) {
       this.updatePersistedSupportedProtocols();
     }
 
-    if (this.hasPersistedSupportedProtocols && newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols) {
+    if (
+      this.hasPersistedSupportedProtocols &&
+      !isNullOrUndefined(newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols)
+    ) {
       newFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
         CONVERSATION_PROTOCOL.MLS,
         CONVERSATION_PROTOCOL.PROTEUS,
       ];
     }
 
-    if (!teamId) {
+    if (!isNonEmptyString(teamId)) {
       return {team: undefined, features: {}, members: []};
     }
     // Subscribe to team members change and update the user role and guest status
@@ -164,7 +169,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       this.userRepository.mapGuestStatus(members);
       const roles = this.teamState.memberRoles();
       members.forEach(user => {
-        if (roles[user.id]) {
+        if (isNonEmptyString(roles[user.id])) {
           user.teamRole(roles[user.id]);
         }
       });
@@ -181,8 +186,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     if (
       this.hasPersistedSupportedProtocols &&
-      prevFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols &&
-      newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols
+      !isNullOrUndefined(prevFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols) &&
+      !isNullOrUndefined(newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols)
     ) {
       prevFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
         CONVERSATION_PROTOCOL.MLS,
@@ -308,12 +313,15 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   async getTeam(): Promise<TeamEntity> {
     const teamId = this.userState.self().teamId;
-    const teamData = !!teamId && (await this.getTeamById(teamId));
+    const teamData = isNonEmptyString(teamId) && (await this.getTeamById(teamId));
 
-    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
+    const teamEntity =
+      teamData !== false && !isNullOrUndefined(teamData)
+        ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team())
+        : new TeamEntity();
     this.teamState.team(teamEntity);
 
-    if (teamId) {
+    if (isNonEmptyString(teamId)) {
       await this.getSelfMember(teamId);
       this.teamState.hasWhitelistedServices(
         (await this.teamService.getWhitelistedServices(teamId)).services.length > 0,
@@ -491,11 +499,11 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         : this.userState.self().previewPictureResource();
       let imageDataUrl;
 
-      if (imageResource) {
+      if (imageResource instanceof AssetRemoteData) {
         try {
-          const imageBlob = imageResource && (await this.assetRepository.load(imageResource));
+          const imageBlob = await this.assetRepository.load(imageResource);
 
-          if (imageBlob) {
+          if (!isUndefined(imageBlob)) {
             imageDataUrl = await loadDataUrl(imageBlob);
           }
         } catch (error: unknown) {
@@ -507,12 +515,13 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         accentID: this.userState.self().accent_id(),
         name: this.teamState.teamName(),
         picture: imageDataUrl?.toString(),
-        teamID: this.teamState.team() ? this.teamState.team().id : undefined,
+        teamID: this.teamState.team().id,
         teamRole: this.userState.self().teamRole(),
         userID: this.userState.self().id,
       };
 
-      const [majorVersion, minorVersion] = (Environment.version(true) || '').split('.');
+      const version = Environment.version(true);
+      const [majorVersion, minorVersion] = (isNonEmptyString(version) ? version : '').split('.');
 
       if (Number(majorVersion) >= 3 && Number(minorVersion) >= 20) {
         accountInfo.availability = this.userState.self().availability();
@@ -607,12 +616,14 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   private updateMemberRoles(members: TeamMemberEntity[] = []): void {
     const memberRoles = members.reduce((accumulator, member) => {
-      accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
+      accumulator[member.userId] = !isNullOrUndefined(member.permissions)
+        ? roleFromTeamPermissions(member.permissions)
+        : ROLE.INVALID;
       return accumulator;
     }, this.teamState.memberRoles());
 
     const memberInvites = members.reduce((accumulator, member) => {
-      if (member.invitedBy) {
+      if (isNonEmptyString(member.invitedBy)) {
         accumulator[member.userId] = member.invitedBy;
       }
       return accumulator;
@@ -632,7 +643,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   public getTeamSupportedProtocols(): CONVERSATION_PROTOCOL[] {
     const mlsFeature = this.teamState.teamFeatures()?.mls;
 
-    if (!mlsFeature || mlsFeature.status === FEATURE_STATUS.DISABLED) {
+    if (isNullOrUndefined(mlsFeature) || mlsFeature.status === FEATURE_STATUS.DISABLED) {
       return [CONVERSATION_PROTOCOL.PROTEUS];
     }
 
@@ -644,9 +655,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     // For old teams (created on some older backend versions) supportedProtocols field might not exist or be empty,
     // we fallback to proteus in this case.
-    return teamSupportedProtocols && teamSupportedProtocols.length > 0
-      ? teamSupportedProtocols
-      : [CONVERSATION_PROTOCOL.PROTEUS];
+    return isNonEmptyArray(teamSupportedProtocols) ? teamSupportedProtocols : [CONVERSATION_PROTOCOL.PROTEUS];
   }
 
   public readonly getTeamMLSMigrationStatus = (): MLSMigrationStatus => {

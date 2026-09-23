@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {UserType} from '@wireapp/api-client/lib/user';
 
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
@@ -65,8 +66,10 @@ export class UserMapper {
    * @returns Mapped user entities
    */
   mapUsersFromJson(usersData: UserRecord[], localDomain: string): User[] {
-    if (usersData?.length) {
-      return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData, localDomain));
+    if (isNonEmptyArray(usersData)) {
+      return usersData
+        .filter(userData => !isNullOrUndefined(userData))
+        .map(userData => this.mapUserFromJson(userData, localDomain));
     }
     this.logger.warn('We got no user data from the backend');
     return [];
@@ -82,24 +85,25 @@ export class UserMapper {
    */
   updateUserFromObject(userEntity: User, userData: Partial<UserRecord>, localDomain: string): User {
     // We are trying to update non-matching users
-    const isUnexpectedId = userEntity.id && userData.id && userData.id !== userEntity.id;
+    const isUnexpectedId =
+      isNonEmptyString(userEntity.id) && isNonEmptyString(userData.id) && userData.id !== userEntity.id;
     if (isUnexpectedId) {
       throw new Error(`Updating wrong user entity. User '${userEntity.id}' does not match data '${userData.id}'.`);
     }
 
     const isNewUser = userEntity.id === '' && userData.id !== '';
-    if (isNewUser && userData.id) {
+    if (isNewUser && isNonEmptyString(userData.id)) {
       userEntity.id = userData.id;
     }
 
-    if (userData.qualified_id) {
+    if (!isNullOrUndefined(userData.qualified_id)) {
       userEntity.domain = userData.qualified_id.domain;
       userEntity.id = userData.qualified_id.id;
-      userEntity.isFederated = !!localDomain && userData.qualified_id.domain !== localDomain;
+      userEntity.isFederated = isNonEmptyString(localDomain) && userData.qualified_id.domain !== localDomain;
     }
 
     const isSelf = isSelfAPIUser(userData);
-    const ssoId = isSelf && userData.sso_id;
+    const ssoId = isSelf ? userData.sso_id : undefined;
     const managedBy = isSelf && userData.managed_by;
 
     const {
@@ -118,34 +122,34 @@ export class UserMapper {
       type,
     } = userData;
 
-    if (accentId) {
+    if (typeof accentId === 'number' && accentId !== (0 as number) && !isNan(accentId)) {
       userEntity.accent_id(accentId);
     }
 
-    if (availability !== undefined) {
+    if (!isUndefined(availability)) {
       // Availability should only change when it's a valid value (undefined should not reset the availability)
       userEntity.availability(availability);
     }
 
     let mappedAssets: MappedAsset = {};
-    if (assets?.length) {
+    if (isNonEmptyArray(assets)) {
       mappedAssets = mapProfileAssets(userEntity.qualifiedId, assets);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 
-    if (email) {
+    if (isNonEmptyString(email)) {
       userEntity.email(email);
     }
 
-    if (managedBy) {
+    if (isNonEmptyString(managedBy)) {
       userEntity.managedBy(managedBy);
     }
 
-    if (supportedProtocols) {
+    if (!isNullOrUndefined(supportedProtocols)) {
       userEntity.supportedProtocols(supportedProtocols);
     }
 
-    if (expirationDate) {
+    if (isNonEmptyString(expirationDate)) {
       userEntity.isTemporaryGuest(true);
       const setAdjustedTimestamp = () => {
         const adjustedTimestamp = this.serverTimeHandler.toLocalTimestamp(new Date(expirationDate).getTime());
@@ -159,39 +163,39 @@ export class UserMapper {
       }
     }
 
-    if (handle) {
+    if (isNonEmptyString(handle)) {
       userEntity.username(handle);
     }
 
-    if (name) {
+    if (isNonEmptyString(name)) {
       userEntity.name(name.trim());
     }
 
-    if (service) {
+    if (!isNullOrUndefined(service)) {
       userEntity.isService = true;
       userEntity.providerId = service.provider;
       userEntity.providerName('');
       userEntity.serviceId = service.id;
     }
 
-    if (ssoId && Object.keys(ssoId).length) {
+    if (!isNullOrUndefined(ssoId) && Object.keys(ssoId).length > 0) {
       userEntity.isSingleSignOn = true;
-      if (ssoId.subject) {
+      if (isNonEmptyString(ssoId.subject)) {
         userEntity.isNoPasswordSSO = true;
       }
     }
 
-    if (teamId) {
+    if (isNonEmptyString(teamId)) {
       userEntity.teamId = teamId;
     }
 
-    if (deleted) {
+    if (deleted === true) {
       userEntity.isDeleted = true;
     }
 
     userEntity.type = type ?? UserType.REGULAR;
 
-    if (app) {
+    if (!isNullOrUndefined(app)) {
       userEntity.description = app.description;
       userEntity.category = app.category;
     } else {

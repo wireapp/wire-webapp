@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
@@ -43,12 +44,12 @@ export class TeamEntity {
     let hasIcon = false;
 
     try {
-      hasIcon = !!this.icon && isValidAsset(this.icon);
+      hasIcon = isNonEmptyString(this.icon) && isValidAsset(this.icon);
     } catch (error: unknown) {
       // ignore error
     }
 
-    if (hasIcon && teamDomain) {
+    if (hasIcon && isNonEmptyString(teamDomain)) {
       return new AssetRemoteData({assetKey: this.icon, assetDomain: teamDomain});
     }
   }

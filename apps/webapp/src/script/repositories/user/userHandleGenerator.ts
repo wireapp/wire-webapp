@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
 import {randomElement} from 'Util/arrayUtil';
@@ -84,12 +85,12 @@ export const normalizeName = (name: string): string =>
  * Validates that an input is a valid handle.
  */
 export const validateHandle = (handle: string = '', domain?: string): boolean => {
-  if (!handle.length || handle.length < MIN_HANDLE_LENGTH || handle.length > MAX_HANDLE_LENGTH) {
+  if (handle.length === 0 || handle.length < MIN_HANDLE_LENGTH || handle.length > MAX_HANDLE_LENGTH) {
     return false;
   }
 
   const isValidDomain =
-    !domain ||
+    !isNonEmptyString(domain) ||
     /^((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(domain);
   const isValidName = handle.split('').every(validateCharacter);
 
@@ -114,7 +115,7 @@ export const createSuggestions = (name: string): string[] => {
   const randomName = getRandomWordCombination();
   const suggestions = [];
 
-  if (normalizedName) {
+  if (isNonEmptyString(normalizedName)) {
     suggestions.push(normalizedName);
     const normalizedNameVariations = generateHandleVariations(normalizedName);
     suggestions.push(...normalizedNameVariations);

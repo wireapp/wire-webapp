@@ -17,6 +17,8 @@
  *
  */
 
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
+
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -34,7 +36,14 @@ type Translate = (
 
 function showModal(storageKey: string, title: string, message: string, translate: Translate): void {
   const hideModal = loadValue(storageKey);
-  if (!hideModal) {
+  if (
+    isNullOrUndefined(hideModal) ||
+    hideModal === false ||
+    hideModal === '' ||
+    hideModal === 0 ||
+    hideModal === 0n ||
+    (typeof hideModal === 'number' && isNan(hideModal))
+  ) {
     PrimaryModal.show(
       PrimaryModal.type.OPTION,
       {
@@ -42,7 +51,7 @@ function showModal(storageKey: string, title: string, message: string, translate
         preventClose: true,
         primaryAction: {
           action: (dontShowAgain?: boolean) => {
-            if (dontShowAgain) {
+            if (dontShowAgain === true) {
               storeValue(storageKey, 'true');
             }
           },
@@ -106,7 +115,15 @@ export function showAvailabilityModal(availability: Availability.Type, translate
 
 export function showInitialModal(availability: Availability.Type, translate: Translate): void {
   const hideInitialModal = loadValue(initialKey);
-  if (!hideInitialModal && availability !== Availability.Type.NONE) {
+  if (
+    (isNullOrUndefined(hideInitialModal) ||
+      hideInitialModal === false ||
+      hideInitialModal === '' ||
+      hideInitialModal === 0 ||
+      hideInitialModal === 0n ||
+      (typeof hideInitialModal === 'number' && isNan(hideInitialModal))) &&
+    availability !== Availability.Type.NONE
+  ) {
     showAvailabilityModal(availability, translate);
   }
 }
