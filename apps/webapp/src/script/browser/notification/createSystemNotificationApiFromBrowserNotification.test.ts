@@ -19,76 +19,92 @@
 
 import {result} from 'true-myth';
 
-import {systemNotificationErrorKinds} from 'src/script/notification/systemNotificationTypes';
+import {
+  systemNotificationErrorKinds,
+  type SystemNotificationPermission,
+} from 'src/script/notification/systemNotificationTypes';
 
-import {createSystemNotificationApiFromBrowserNotification} from './createSystemNotificationApiFromBrowserNotification';
+import {
+  createSystemNotificationApiFromBrowserNotification,
+  type PlatformNotification,
+  type PlatformNotificationRequest,
+} from './createSystemNotificationApiFromBrowserNotification';
 
 type CreatedNotification = {
-  title: string;
-  options: NotificationOptions | undefined;
+  request: PlatformNotificationRequest;
   closeCallCount: number;
-  onclick: (() => void) | null;
-  onclose: (() => void) | null;
-  onerror: (() => void) | null;
-  close: () => void;
+  clickListener: (() => void) | null;
+  closeListener: (() => void) | null;
+  errorListener: ((event: unknown) => void) | null;
 };
 
-type NotificationConstructorFake = {
-  notificationConstructor: typeof Notification;
+type PlatformFakeOptions = {
+  throwOnConstruction?: boolean;
+  throwOnClose?: boolean;
+};
+
+type PlatformFake = {
+  createNotification: (request: PlatformNotificationRequest) => PlatformNotification;
   createdNotifications: CreatedNotification[];
 };
 
-const createNotificationConstructorFake = ({
-  permission = 'granted',
+const createPlatformFake = ({
   throwOnConstruction = false,
   throwOnClose = false,
-}: {
-  permission?: NotificationPermission;
-  throwOnConstruction?: boolean;
-  throwOnClose?: boolean;
-} = {}): NotificationConstructorFake => {
+}: PlatformFakeOptions = {}): PlatformFake => {
   const createdNotifications: CreatedNotification[] = [];
 
-  const notificationConstructor = function (title: string, options?: NotificationOptions) {
-    if (throwOnConstruction) {
-      throw new Error('notification could not be constructed');
-    }
-
-    const createdNotification: CreatedNotification = {
-      title,
-      options,
-      closeCallCount: 0,
-      onclick: null,
-      onclose: null,
-      onerror: null,
-      close: () => {
-        if (throwOnClose) {
-          throw new Error('notification could not be closed');
-        }
-
-        createdNotification.closeCallCount += 1;
-      },
-    };
-
-    createdNotifications.push(createdNotification);
-
-    return createdNotification;
-  };
-
   return {
-    notificationConstructor: Object.assign(notificationConstructor, {permission}) as unknown as typeof Notification,
     createdNotifications,
+    createNotification: request => {
+      if (throwOnConstruction) {
+        throw new Error('notification could not be constructed');
+      }
+
+      const createdNotification: CreatedNotification = {
+        request,
+        closeCallCount: 0,
+        clickListener: null,
+        closeListener: null,
+        errorListener: null,
+      };
+
+      createdNotifications.push(createdNotification);
+
+      return {
+        onClick: listener => {
+          createdNotification.clickListener = listener;
+        },
+        onClose: listener => {
+          createdNotification.closeListener = listener;
+        },
+        onError: listener => {
+          createdNotification.errorListener = listener;
+        },
+        close: () => {
+          if (throwOnClose) {
+            throw new Error('notification could not be closed');
+          }
+
+          createdNotification.closeCallCount += 1;
+        },
+      };
+    },
   };
 };
 
-const createApi = (fakeOptions: Parameters<typeof createNotificationConstructorFake>[0] = {}) => {
-  const {notificationConstructor, createdNotifications} = createNotificationConstructorFake(fakeOptions);
+const createApi = ({
+  permission = 'granted',
+  ...fakeOptions
+}: PlatformFakeOptions & {permission?: SystemNotificationPermission} = {}) => {
+  const {createNotification, createdNotifications} = createPlatformFake(fakeOptions);
   const focusWindow = jest.fn();
   const publishNotificationClick = jest.fn();
   const logger = {warn: jest.fn()};
 
   const api = createSystemNotificationApiFromBrowserNotification({
-    notificationConstructor,
+    createNotification,
+    getPermission: () => permission,
     isSupported: () => true,
     focusWindow,
     publishNotificationClick,
@@ -108,9 +124,9 @@ const request = {
 
 describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('reports support from the injected predicate', () => {
-    const {notificationConstructor} = createNotificationConstructorFake();
     const api = createSystemNotificationApiFromBrowserNotification({
-      notificationConstructor,
+      createNotification: createPlatformFake().createNotification,
+      getPermission: () => 'granted',
       isSupported: () => false,
       focusWindow: jest.fn(),
       publishNotificationClick: jest.fn(),
@@ -120,7 +136,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     expect(api.isSupported()).toBe(false);
   });
 
-  it.each(['granted', 'denied', 'default'] as const)('reads the %s permission from the browser', permission => {
+  it.each(['granted', 'denied', 'default'] as const)('reads the %s permission from the platform', permission => {
     const {api} = createApi({permission});
 
     expect(api.getPermission()).toBe(permission);
@@ -132,8 +148,12 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
 
     expect(createdNotifications).toHaveLength(1);
-    expect(createdNotifications.at(0)?.title).toBe('Weekly sync');
-    expect(createdNotifications.at(0)?.options).toEqual({body: 'Starts at 12:00 PM', tag: 'meeting-reminder:tag'});
+    expect(createdNotifications.at(0)?.request.title).toBe('Weekly sync');
+    expect(createdNotifications.at(0)?.request).toEqual({
+      title: 'Weekly sync',
+      body: 'Starts at 12:00 PM',
+      tag: 'meeting-reminder:tag',
+    });
   });
 
   it('focuses the window and calls back when the notification is clicked', () => {
@@ -141,7 +161,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const onClick = jest.fn();
 
     api.show({...request, onClick, onClose: jest.fn()});
-    createdNotifications.at(0)?.onclick?.();
+    createdNotifications.at(0)?.clickListener?.();
 
     expect(focusWindow).toHaveBeenCalledTimes(1);
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -151,7 +171,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {api, createdNotifications, publishNotificationClick} = createApi();
 
     api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
-    createdNotifications.at(0)?.onclick?.();
+    createdNotifications.at(0)?.clickListener?.();
 
     expect(publishNotificationClick).toHaveBeenCalledTimes(1);
   });
@@ -173,7 +193,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const onClose = jest.fn();
 
     api.show({...request, onClose});
-    createdNotifications.at(0)?.onclose?.();
+    createdNotifications.at(0)?.closeListener?.();
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -183,7 +203,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const onClose = jest.fn();
 
     api.show({...request, onClose});
-    createdNotifications.at(0)?.onerror?.();
+    createdNotifications.at(0)?.errorListener?.(new Event('error'));
 
     expect(logger.warn).toHaveBeenCalledWith('system notification failed after being shown', {
       tag: 'meeting-reminder:tag',

@@ -27,6 +27,7 @@ import {
   systemNotificationErrorKinds,
   toSystemNotificationError,
   type SystemNotificationApi,
+  type SystemNotificationPermission,
 } from 'src/script/notification/systemNotificationTypes';
 import {getLogger} from 'Util/logger';
 
@@ -34,8 +35,23 @@ type SystemNotificationLogger = {
   warn: (message: string, context?: unknown) => void;
 };
 
+/** The part of a platform notification this adapter uses, so nothing has to fake the rest of it. */
+export type PlatformNotification = {
+  onClick: (listener: () => void) => void;
+  onClose: (listener: () => void) => void;
+  onError: (listener: (event: unknown) => void) => void;
+  close: () => void;
+};
+
+export type PlatformNotificationRequest = {
+  title: string;
+  body: string;
+  tag: string;
+};
+
 export type BrowserNotificationDependencies = {
-  notificationConstructor: typeof Notification;
+  createNotification: (request: PlatformNotificationRequest) => PlatformNotification;
+  getPermission: () => SystemNotificationPermission;
   logger: SystemNotificationLogger;
   isSupported: () => boolean;
   focusWindow: () => void;
@@ -51,52 +67,73 @@ export type BrowserNotificationDependencies = {
  * touching globals.
  */
 export const createSystemNotificationApiFromBrowserNotification = ({
-  notificationConstructor,
+  createNotification,
+  getPermission,
   logger,
   isSupported,
   focusWindow,
   publishNotificationClick,
 }: BrowserNotificationDependencies): SystemNotificationApi => ({
   isSupported,
-  getPermission: () => notificationConstructor.permission,
+  getPermission,
   show: ({title, body, tag, onClick, onClose}) =>
     result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.presentationFailed), () => {
-      const notification = new notificationConstructor(title, {body, tag});
+      const notification = createNotification({title, body, tag});
       const closeNotification = () =>
         result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.closeFailed), () => {
           notification.close();
         });
 
-      notification.onclick = () => {
+      notification.onClick(() => {
         // wire-desktop listens for this to restore the window and switch to the account that
         // raised the notification. window.focus() alone does neither from inside a webview.
         publishNotificationClick();
         focusWindow();
         onClick();
-      };
+      });
 
-      notification.onclose = () => {
+      notification.onClose(() => {
         onClose();
-      };
+      });
 
       // A notification can fail after the constructor returned, so `show` reporting `Ok` is not
       // the last word on whether it reached the user.
-      notification.onerror = () => {
+      notification.onError(() => {
         logger.warn('system notification failed after being shown', {tag});
         onClose();
         closeNotification();
-      };
+      });
 
       return {close: closeNotification};
     }),
 });
+
+const createBrowserNotification = ({title, body, tag}: PlatformNotificationRequest): PlatformNotification => {
+  const notification = new window.Notification(title, {body, tag});
+
+  return {
+    onClick: listener => {
+      notification.onclick = listener;
+    },
+    onClose: listener => {
+      notification.onclose = listener;
+    },
+    onError: listener => {
+      notification.onerror = listener;
+    },
+    close: () => {
+      notification.close();
+    },
+  };
+};
 
 /**
  * The outermost browser boundary: the one place that reaches for the page globals.
  */
 export const createBrowserSystemNotificationApi = (): SystemNotificationApi =>
   createSystemNotificationApiFromBrowserNotification({
-    notificationConstructor: window.Notification,
+    createNotification: createBrowserNotification,
+    getPermission: () => window.Notification.permission,
     logger: getLogger('SystemNotification'),
     isSupported: () => Runtime.isSupportingNotifications(),
     focusWindow: () => window.focus(),
