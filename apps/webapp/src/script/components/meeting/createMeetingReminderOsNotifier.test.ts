@@ -19,6 +19,8 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import assert from 'node:assert';
+
 import {isUndefined} from '@sindresorhus/is';
 
 import {createFactory} from '@enormora/objectory';
@@ -39,9 +41,7 @@ import {createMeetingReminderOsNotifier, toMeetingReminderNotificationTag} from 
 const firstRequestOf = (requests: SystemNotificationRequest[]): SystemNotificationRequest => {
   const firstRequest = requests.at(0);
 
-  if (isUndefined(firstRequest)) {
-    throw new Error('expected the notifier to have requested a notification');
-  }
+  assert(!isUndefined(firstRequest), 'expected the notifier to have requested a notification');
 
   return firstRequest;
 };
