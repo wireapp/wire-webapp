@@ -1378,7 +1378,7 @@
   "meetings.notifications.ongoing": "В настоящее время",
   "meetings.notifications.reminder": "Напоминание",
   "meetings.notifications.showAll": "Показать все",
-  "meetings.notifications.startsIn10Minutes": "Начинается через 10 минут",
+  "meetings.notifications.startsAt": "Начинается в {time}",
   "meetings.notifications.title": "{label}: {meetingTitle}",
   "meetings.notifications.total": "Уведомления о встречах ({count})",
   "meetings.notifications.update": "Обновить",
