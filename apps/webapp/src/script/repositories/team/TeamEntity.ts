@@ -40,7 +40,7 @@ export class TeamEntity {
     this.name = ko.observable('');
   }
 
-  getIconResource(teamDomain?: string): AssetRemoteData | void {
+  getIconResource(teamDomain?: string): AssetRemoteData | undefined {
     let hasIcon = false;
 
     try {
@@ -52,5 +52,7 @@ export class TeamEntity {
     if (hasIcon && isNonEmptyString(teamDomain)) {
       return new AssetRemoteData({assetKey: this.icon, assetDomain: teamDomain});
     }
+
+    return undefined;
   }
 }

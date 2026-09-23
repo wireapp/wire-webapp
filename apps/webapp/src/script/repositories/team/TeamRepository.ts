@@ -40,7 +40,6 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
 import {EventSource} from 'Repositories/event/EventSource';
@@ -499,7 +498,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         : this.userState.self().previewPictureResource();
       let imageDataUrl;
 
-      if (imageResource instanceof AssetRemoteData) {
+      if (!isUndefined(imageResource)) {
         try {
           const imageBlob = await this.assetRepository.load(imageResource);
 
