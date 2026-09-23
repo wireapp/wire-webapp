@@ -19,11 +19,13 @@
 
 import assert from 'node:assert';
 
+import {createFactory} from '@enormora/objectory';
 import {result} from 'true-myth';
 
 import {
   systemNotificationErrorKinds,
   type SystemNotificationPermission,
+  type SystemNotificationRequest,
 } from 'src/script/notification/systemNotificationTypes';
 
 import {
@@ -118,13 +120,15 @@ const createApi = ({
   return {api, createdNotifications, focusWindow, publishNotificationClick, logger};
 };
 
-const request = {
-  title: 'Weekly sync',
-  body: 'Starts at 12:00 PM',
-  tag: 'meeting-reminder:tag',
-  onClick: jest.fn(),
-  onClose: jest.fn(),
-};
+const notificationRequestFactory = createFactory<SystemNotificationRequest>(() => {
+  return {
+    title: 'Weekly sync',
+    body: 'Starts at 12:00 PM',
+    tag: 'meeting-reminder:tag',
+    onClick: jest.fn(),
+    onClose: jest.fn(),
+  };
+});
 
 describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('reports support from the injected predicate', () => {
@@ -149,7 +153,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('constructs a notification carrying the title, body and tag', () => {
     const {api, createdNotifications} = createApi();
 
-    api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
+    api.show(notificationRequestFactory.build());
 
     expect(createdNotifications).toHaveLength(1);
     expect(createdNotifications.at(0)?.request.title).toBe('Weekly sync');
@@ -164,7 +168,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {api, createdNotifications, focusWindow} = createApi();
     const onClick = jest.fn();
 
-    api.show({...request, onClick, onClose: jest.fn()});
+    api.show(notificationRequestFactory.build({onClick}));
     createdNotifications.at(0)?.clickListener?.();
 
     expect(focusWindow).toHaveBeenCalledTimes(1);
@@ -174,7 +178,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('announces the click so the desktop app restores its window and switches account', () => {
     const {api, createdNotifications, publishNotificationClick} = createApi();
 
-    api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
+    api.show(notificationRequestFactory.build());
     createdNotifications.at(0)?.clickListener?.();
 
     expect(publishNotificationClick).toHaveBeenCalledTimes(1);
@@ -183,7 +187,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('closes the underlying notification through the returned handle', () => {
     const {api, createdNotifications} = createApi();
 
-    const handle = api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
+    const handle = api.show(notificationRequestFactory.build());
 
     expect(result.isOk(handle)).toBe(true);
     if (result.isOk(handle)) {
@@ -196,7 +200,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {api, createdNotifications} = createApi();
     const onClose = jest.fn();
 
-    api.show({...request, onClose});
+    api.show(notificationRequestFactory.build({onClose}));
     createdNotifications.at(0)?.closeListener?.();
 
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -208,7 +212,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     const errorEvent = new Event('error');
 
-    api.show({...request, onClose});
+    api.show(notificationRequestFactory.build({onClose}));
     createdNotifications.at(0)?.errorListener?.(errorEvent);
 
     expect(logger.warn).toHaveBeenCalledWith('system notification failed after being shown', {
@@ -223,7 +227,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {api, createdNotifications} = createApi();
     const onClose = jest.fn();
 
-    const handle = api.show({...request, onClose});
+    const handle = api.show(notificationRequestFactory.build({onClose}));
 
     assert(result.isOk(handle));
     handle.value.close();
@@ -236,7 +240,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {api} = createApi({throwOnClose: true});
     const onClose = jest.fn();
 
-    const handle = api.show({...request, onClose});
+    const handle = api.show(notificationRequestFactory.build({onClose}));
 
     assert(result.isOk(handle));
     expect(result.isErr(handle.value.close())).toBe(true);
@@ -247,7 +251,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {api, createdNotifications, logger} = createApi({throwOnClose: true});
     const onClose = jest.fn();
 
-    api.show({...request, onClose});
+    api.show(notificationRequestFactory.build({onClose}));
     createdNotifications.at(0)?.errorListener?.(new Event('error'));
 
     expect(logger.warn).toHaveBeenCalledWith('failed to close a system notification that errored', {
@@ -261,7 +265,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('reports a construction failure instead of throwing', () => {
     const {api} = createApi({throwOnConstruction: true});
 
-    const handle = api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
+    const handle = api.show(notificationRequestFactory.build());
 
     expect(handle).toEqual(
       result.err({
@@ -274,7 +278,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('reports a close failure instead of throwing', () => {
     const {api} = createApi({throwOnClose: true});
 
-    const handle = api.show({...request, onClick: jest.fn(), onClose: jest.fn()});
+    const handle = api.show(notificationRequestFactory.build());
 
     expect(result.isOk(handle)).toBe(true);
     if (result.isOk(handle)) {
