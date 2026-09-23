@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {chunk} from 'Util/arrayUtil';
 import {capToByte, rootMeanSquare} from 'Util/numberUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -121,12 +123,12 @@ const convertEventToError = (event: any): MediaError => {
   let error = event;
 
   // Chrome v60
-  if (event.path?.[0]) {
+  if (!isNullOrUndefined(event.path?.[0])) {
     error = event.path[0].error;
   }
 
   // Firefox v55
-  if (event.originalTarget) {
+  if (!isNullOrUndefined(event.originalTarget)) {
     error = error.originalTarget.error;
   }
 

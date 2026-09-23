@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import type {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 import {
   QualityTier,
@@ -357,7 +359,7 @@ export class QualityController {
    */
   private addSample(sample: PerformanceSample): void {
     const outgoing = this.samples[this.sampleIndex];
-    if (outgoing) {
+    if (!isNullOrUndefined(outgoing)) {
       this.sampleTotals.totalMs -= outgoing.totalMs;
       this.sampleTotals.segmentationMs -= outgoing.segmentationMs;
       this.sampleTotals.gpuMs -= outgoing.gpuMs;

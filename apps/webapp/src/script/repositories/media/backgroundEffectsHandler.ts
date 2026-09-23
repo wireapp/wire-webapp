@@ -17,6 +17,8 @@
  *
  */
 
+import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+
 import {detectCapabilities, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
@@ -52,11 +54,11 @@ const getBlurStrength = (effect: BackgroundEffectSelection) => {
 
 const computeRenderMetrics = (metrics: Metrics): RenderMetrics => {
   const budget = 1000 / TARGET_FPS;
-  const total = metrics.avgTotalMs || 0;
+  const total = metrics.avgTotalMs !== 0 && !isNan(metrics.avgTotalMs) ? metrics.avgTotalMs : 0;
   const utilShare = budget > 0 ? Math.min(999, (total / budget) * 100) : 0;
   const mlShare = total > 0 ? (metrics.avgSegmentationMs / total) * 100 : 0;
   const webglShare = total > 0 ? (metrics.avgGpuMs / total) * 100 : 0;
-  const ml = metrics.segmentationDelegate ? `ML(${metrics.segmentationDelegate})` : 'ML';
+  const ml = isNonEmptyString(metrics.segmentationDelegate) ? `ML(${metrics.segmentationDelegate})` : 'ML';
 
   return {
     ...metrics,
@@ -74,9 +76,11 @@ const parseStoredPreferredEffect = (stored: string | null): BackgroundEffectSele
   }
 
   try {
-    const parsed = JSON.parse(stored);
+    const parsed: unknown = JSON.parse(stored);
+    const parsedType =
+      isNullOrUndefined(parsed) || typeof parsed !== 'object' || !('type' in parsed) ? undefined : parsed.type;
 
-    if (!parsed?.type) {
+    if (isNullOrUndefined(parsedType) || parsedType === false || parsedType === 0 || parsedType === '') {
       return DEFAULT_BACKGROUND_EFFECT;
     }
 
@@ -110,7 +114,7 @@ export class BackgroundEffectsHandler {
 
     backgroundEffectsStore.subscribe((state, prevState) => {
       if (state.preferredEffect !== prevState.preferredEffect) {
-        if (this.saveDebounceTimer) {
+        if (!isNullOrUndefined(this.saveDebounceTimer)) {
           clearTimeout(this.saveDebounceTimer);
         }
         this.saveDebounceTimer = setTimeout(
@@ -137,7 +141,7 @@ export class BackgroundEffectsHandler {
 
     const videoTrack = originalVideoStream.getVideoTracks()[0];
 
-    if (!videoTrack) {
+    if (isNullOrUndefined(videoTrack)) {
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
@@ -145,10 +149,10 @@ export class BackgroundEffectsHandler {
     const blurStrength = getBlurStrength(preferredEffect);
     const backgroundSource = isVirtual ? await this.loadBackgroundSource(preferredEffect) : null;
 
-    if (this.controller.isProcessing() && this.currentReleasableStream) {
+    if (this.controller.isProcessing() && !isNullOrUndefined(this.currentReleasableStream)) {
       if (isVirtual) {
         this.controller.setMode('virtual');
-        if (backgroundSource) {
+        if (!isNullOrUndefined(backgroundSource)) {
           await this.controller.setBackgroundSource(backgroundSource);
         }
       } else {
@@ -189,7 +193,7 @@ export class BackgroundEffectsHandler {
     effect: BackgroundEffectSelection,
     customBackground: BackgroundSource | null = null,
   ): void {
-    if (effect.type === 'custom' && !customBackground) {
+    if (effect.type === 'custom' && isNullOrUndefined(customBackground)) {
       backgroundEffectsStore
         .getState()
         .setPreferredEffect({type: 'virtual', backgroundId: DEFAULT_BUILTIN_BACKGROUND_ID});
@@ -263,7 +267,7 @@ export class BackgroundEffectsHandler {
       }
 
       if (effect.type === 'custom') {
-        if (!this.customBackground) {
+        if (isNullOrUndefined(this.customBackground)) {
           this.logger.warn('Failed to load custom background source');
         }
         return this.customBackground;

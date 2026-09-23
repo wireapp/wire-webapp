@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {AssetUrlData} from '@wireapp/core/lib/conversation/assetService/assetService';
 import {noop} from 'noop-esm';
 
@@ -105,7 +106,7 @@ export class AssetRemoteData {
    */
   public updateProgress(progress: number): void {
     this.progress = progress;
-    if (this.progressCallback) {
+    if (!isUndefined(this.progressCallback)) {
       this.progressCallback(progress);
     }
   }

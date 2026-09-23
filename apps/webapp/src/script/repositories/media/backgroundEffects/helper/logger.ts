@@ -23,6 +23,7 @@
  * we've solved the problem.
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'log';
@@ -32,7 +33,8 @@ type Logger = Record<LogLevel, (...args: unknown[]) => void>;
 export function getSafeLogger(scope = 'worker'): Logger {
   const prefix = `[${scope}]`;
 
-  const safeConsole = typeof globalThis !== 'undefined' && globalThis.console ? globalThis.console : undefined;
+  const safeConsole =
+    typeof globalThis !== 'undefined' && !isNullOrUndefined(globalThis.console) ? globalThis.console : undefined;
 
   return {
     log: safeConsole?.log?.bind(safeConsole, prefix) ?? noop,

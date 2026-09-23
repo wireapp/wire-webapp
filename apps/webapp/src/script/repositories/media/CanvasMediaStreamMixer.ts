@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 // Canvas configuration
 const DEFAULT_CANVAS_WIDTH = 1920;
@@ -103,8 +103,14 @@ export class CanvasMediaStreamMixer {
 
       const screenTrack = screenShare.getVideoTracks()[0];
       const settings = screenTrack.getSettings();
-      this.canvas.width = settings.width || DEFAULT_CANVAS_WIDTH;
-      this.canvas.height = settings.height || DEFAULT_CANVAS_HEIGHT;
+      this.canvas.width =
+        !isNullOrUndefined(settings.width) && settings.width !== 0 && !isNan(settings.width)
+          ? settings.width
+          : DEFAULT_CANVAS_WIDTH;
+      this.canvas.height =
+        !isNullOrUndefined(settings.height) && settings.height !== 0 && !isNan(settings.height)
+          ? settings.height
+          : DEFAULT_CANVAS_HEIGHT;
 
       this.startAnimation();
       await this.togglePictureInPicture();
@@ -132,10 +138,10 @@ export class CanvasMediaStreamMixer {
     const video = document.createElement('video');
     video.srcObject = stream;
     video.muted = options.muted ?? false;
-    if (options.autoplay) {
+    if (options.autoplay === true) {
       video.playsInline = true;
     }
-    if (options.id) {
+    if (isNonEmptyString(options.id)) {
       video.id = options.id;
     }
     return video;
@@ -143,7 +149,7 @@ export class CanvasMediaStreamMixer {
 
   private startAnimation() {
     const mixFrames = () => {
-      if (!this.screenVideo || !this.cameraVideo) {
+      if (isNullOrUndefined(this.screenVideo) || isNullOrUndefined(this.cameraVideo)) {
         return;
       }
 
@@ -160,7 +166,7 @@ export class CanvasMediaStreamMixer {
 
           // Draw screen share
           if (this.screenVideo.readyState >= this.screenVideo.HAVE_CURRENT_DATA) {
-            if (this.tempCanvas && this.tempContext) {
+            if (!isNullOrUndefined(this.tempCanvas) && !isNullOrUndefined(this.tempContext)) {
               this.tempCanvas.width = this.canvas.width;
               this.tempCanvas.height = this.canvas.height;
               this.tempContext.drawImage(this.screenVideo, 0, 0, this.canvas.width, this.canvas.height);
@@ -203,13 +209,13 @@ export class CanvasMediaStreamMixer {
   }
 
   async togglePictureInPicture(): Promise<void> {
-    if (!document.pictureInPictureEnabled || !window.documentPictureInPicture) {
+    if (!document.pictureInPictureEnabled || isNullOrUndefined(window.documentPictureInPicture)) {
       console.warn('Picture-in-Picture not supported');
       return;
     }
 
     try {
-      if (window.documentPictureInPicture.window) {
+      if (!isNullOrUndefined(window.documentPictureInPicture.window)) {
         window.documentPictureInPicture.window.close();
         this.resetPipState();
         return;
@@ -239,7 +245,7 @@ export class CanvasMediaStreamMixer {
     `;
 
     const video = document.getElementById(PIP_VIDEO_ID) as HTMLVideoElement;
-    if (!video) {
+    if (isNullOrUndefined(video)) {
       throw new Error('Camera video element not found');
     }
 
@@ -262,14 +268,18 @@ export class CanvasMediaStreamMixer {
     this.positionAnimationFrame = requestAnimationFrame(updatePosition);
 
     pipWindow.addEventListener('pagehide', () => {
-      if (this.positionAnimationFrame) {
+      if (
+        !isNullOrUndefined(this.positionAnimationFrame) &&
+        this.positionAnimationFrame !== 0 &&
+        !isNan(this.positionAnimationFrame)
+      ) {
         cancelAnimationFrame(this.positionAnimationFrame);
         this.positionAnimationFrame = null;
       }
       this.resetPipState();
 
       const videoContainer = document.getElementById('videoContainer');
-      if (video && videoContainer && !videoContainer.contains(video)) {
+      if (!isNullOrUndefined(video) && !isNullOrUndefined(videoContainer) && !videoContainer.contains(video)) {
         videoContainer.appendChild(video);
       }
     });
@@ -281,29 +291,37 @@ export class CanvasMediaStreamMixer {
     this.smallOffsetY = 0;
     this.targetOffsetX = 0;
     this.targetOffsetY = 0;
-    if (this.positionAnimationFrame) {
+    if (
+      !isNullOrUndefined(this.positionAnimationFrame) &&
+      this.positionAnimationFrame !== 0 &&
+      !isNan(this.positionAnimationFrame)
+    ) {
       cancelAnimationFrame(this.positionAnimationFrame);
       this.positionAnimationFrame = null;
     }
   }
 
   releaseStreams(): void {
-    if (this.animationFrame) {
+    if (!isNullOrUndefined(this.animationFrame) && this.animationFrame !== 0 && !isNan(this.animationFrame)) {
       cancelAnimationFrame(this.animationFrame);
       this.animationFrame = null;
     }
 
-    if (this.positionAnimationFrame) {
+    if (
+      !isNullOrUndefined(this.positionAnimationFrame) &&
+      this.positionAnimationFrame !== 0 &&
+      !isNan(this.positionAnimationFrame)
+    ) {
       cancelAnimationFrame(this.positionAnimationFrame);
       this.positionAnimationFrame = null;
     }
 
-    if (window.documentPictureInPicture?.window) {
+    if (!isNullOrUndefined(window.documentPictureInPicture?.window)) {
       window.documentPictureInPicture.window.close();
     }
 
     [this.screenVideo, this.cameraVideo].forEach(video => {
-      if (video) {
+      if (!isNullOrUndefined(video)) {
         const tracks = video.srcObject as MediaStream;
         tracks?.getTracks().forEach(track => track.stop());
         video.srcObject = null;
@@ -318,7 +336,7 @@ export class CanvasMediaStreamMixer {
     this.resetPipState();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (this.tempCanvas) {
+    if (!isNullOrUndefined(this.tempCanvas)) {
       this.tempCanvas.width = 0;
       this.tempCanvas.height = 0;
     }

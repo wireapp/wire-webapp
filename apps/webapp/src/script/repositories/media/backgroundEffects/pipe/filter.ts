@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
@@ -28,12 +28,12 @@ type QuadBuffers = {
 
 function createShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
   const shader = gl.createShader(type);
-  if (!shader) {
+  if (isNullOrUndefined(shader)) {
     throw new Error(`Failed to create shader type: ${type}`);
   }
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) !== true) {
     const info = gl.getShaderInfoLog(shader);
     gl.deleteShader(shader);
     throw new Error(`Failed to compile shader: ${info}`);
@@ -51,17 +51,17 @@ function createAndLinkProgram(
   const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
 
   const program = gl.createProgram();
-  if (!program) {
+  if (isNullOrUndefined(program)) {
     throw new Error('Failed to create program');
   }
   gl.attachShader(program, vs);
   gl.attachShader(program, fs);
   gl.linkProgram(program);
 
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+  if (gl.getProgramParameter(program, gl.LINK_STATUS) !== true) {
     const info = gl.getProgramInfoLog(program);
     gl.deleteProgram(program);
-    if (!customVertexShader) {
+    if (isNullOrUndefined(customVertexShader)) {
       gl.deleteShader(vs);
     }
     gl.deleteShader(fs);
@@ -69,7 +69,7 @@ function createAndLinkProgram(
   }
   gl.detachShader(program, vs);
   gl.detachShader(program, fs);
-  if (!customVertexShader) {
+  if (isNullOrUndefined(customVertexShader)) {
     gl.deleteShader(vs);
   }
   gl.deleteShader(fs);
@@ -197,7 +197,7 @@ export class VideoFilter {
   constructor(canvas: OffscreenCanvas | HTMLCanvasElement) {
     this.canvas = canvas;
     const gl = this.canvas.getContext('webgl2') as WebGL2RenderingContext;
-    if (!gl) {
+    if (isNullOrUndefined(gl)) {
       throw new Error('WebGL2 not supported or canvas context failed.');
     }
     this.gl = gl;
@@ -223,7 +223,7 @@ export class VideoFilter {
     };
 
     const positionBuffer = gl.createBuffer();
-    if (!positionBuffer) {
+    if (isNullOrUndefined(positionBuffer)) {
       throw new Error('Failed to create position buffer for BlurFilter');
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -247,7 +247,7 @@ export class VideoFilter {
     );
 
     const texCoordBuffer = gl.createBuffer();
-    if (!texCoordBuffer) {
+    if (isNullOrUndefined(texCoordBuffer)) {
       throw new Error('Failed to create texCoord buffer for BlurFilter');
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
@@ -279,16 +279,16 @@ export class VideoFilter {
     this.currentWidth = width;
     this.currentHeight = height;
 
-    if (this.texture1) {
+    if (!isNullOrUndefined(this.texture1)) {
       this.gl.deleteTexture(this.texture1);
     }
-    if (this.fbo1) {
+    if (!isNullOrUndefined(this.fbo1)) {
       this.gl.deleteFramebuffer(this.fbo1);
     }
-    if (this.texture2) {
+    if (!isNullOrUndefined(this.texture2)) {
       this.gl.deleteTexture(this.texture2);
     }
-    if (this.fbo2) {
+    if (!isNullOrUndefined(this.fbo2)) {
       this.gl.deleteFramebuffer(this.fbo2);
     }
 
@@ -302,7 +302,7 @@ export class VideoFilter {
   private createTexture(width: number, height: number): WebGLTexture {
     const gl = this.gl;
     const texture = gl.createTexture();
-    if (!texture) {
+    if (isNullOrUndefined(texture)) {
       throw new Error('Failed to create texture for blur filter');
     }
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -318,7 +318,7 @@ export class VideoFilter {
   private createFramebuffer(texture: WebGLTexture | null): WebGLFramebuffer {
     const gl = this.gl;
     const fbo = gl.createFramebuffer();
-    if (!fbo) {
+    if (isNullOrUndefined(fbo)) {
       throw new Error('Failed to create FBO for blur filter');
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
@@ -346,7 +346,12 @@ export class VideoFilter {
     // --- Blur Passes (if blur > 0) ---
     if (blur > 0) {
       this.ensureTextures(outputWidth, outputHeight);
-      if (!this.fbo1 || !this.texture1 || !this.fbo2 || !this.texture2) {
+      if (
+        isNullOrUndefined(this.fbo1) ||
+        isNullOrUndefined(this.texture1) ||
+        isNullOrUndefined(this.fbo2) ||
+        isNullOrUndefined(this.texture2)
+      ) {
         this.logger.error('Blur filter FBOs not initialized');
         return sourceTexture; // Or null if strict error handling
       }
@@ -384,7 +389,12 @@ export class VideoFilter {
     const needsColorAdjust = brightness !== 0 || contrast !== 1 || gamma !== 1;
     if (needsColorAdjust) {
       this.ensureTextures(outputWidth, outputHeight); // Ensure FBOs are ready if not already from blur
-      if (!this.fbo1 || !this.texture1 || !this.fbo2 || !this.texture2) {
+      if (
+        isNullOrUndefined(this.fbo1) ||
+        isNullOrUndefined(this.texture1) ||
+        isNullOrUndefined(this.fbo2) ||
+        isNullOrUndefined(this.texture2)
+      ) {
         this.logger.error('Color adjust FBOs not initialized');
         return currentTexture; // Return whatever we have so far
       }
@@ -455,28 +465,28 @@ export class VideoFilter {
 
   public destroy() {
     const gl = this.gl;
-    if (this.blurProgram) {
+    if (!isNullOrUndefined(this.blurProgram)) {
       gl.deleteProgram(this.blurProgram);
     }
-    if (this.colorAdjustProgram) {
-      gl.deleteProgram(this.colorAdjustProgram);
-    } // New program
-    if (this.texture1) {
+    if (!isNullOrUndefined(this.colorAdjustProgram)) {
+      gl.deleteProgram(this.colorAdjustProgram); // New program
+    }
+    if (!isNullOrUndefined(this.texture1)) {
       gl.deleteTexture(this.texture1);
     }
-    if (this.fbo1) {
+    if (!isNullOrUndefined(this.fbo1)) {
       gl.deleteFramebuffer(this.fbo1);
     }
-    if (this.texture2) {
+    if (!isNullOrUndefined(this.texture2)) {
       gl.deleteTexture(this.texture2);
     }
-    if (this.fbo2) {
+    if (!isNullOrUndefined(this.fbo2)) {
       gl.deleteFramebuffer(this.fbo2);
     }
-    if (this.quadBuffers.positionBuffer) {
+    if (!isNullOrUndefined(this.quadBuffers.positionBuffer)) {
       gl.deleteBuffer(this.quadBuffers.positionBuffer);
     }
-    if (this.quadBuffers.texCoordBuffer) {
+    if (!isNullOrUndefined(this.quadBuffers.texCoordBuffer)) {
       gl.deleteBuffer(this.quadBuffers.texCoordBuffer);
     }
   }
@@ -491,12 +501,12 @@ export class VideoFilter {
       canvas.height = frameHeight;
     }
 
-    if (!frameWidth || !frameHeight) {
+    if (frameWidth === 0 || isNan(frameWidth) || frameHeight === 0 || isNan(frameHeight)) {
       throw new Error('VideoFrame has invalid dimensions for videoFrame.');
     }
 
     const sourceTexture = gl.createTexture();
-    if (!sourceTexture) {
+    if (isNullOrUndefined(sourceTexture)) {
       throw new Error('Failed to create source texture for videoFrame');
     }
     gl.bindTexture(gl.TEXTURE_2D, sourceTexture);
@@ -510,7 +520,7 @@ export class VideoFilter {
 
     const finalTexture = this.apply(sourceTexture, frameWidth, frameHeight, blur, brightness, contrast, gamma);
 
-    if (!finalTexture) {
+    if (isNullOrUndefined(finalTexture)) {
       gl.deleteTexture(sourceTexture);
       throw new Error('BlurFilter.apply failed to return a texture.');
     }

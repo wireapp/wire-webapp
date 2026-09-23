@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 
@@ -110,7 +112,7 @@ export class WebGLRenderer {
       desynchronized: true,
     });
 
-    if (!gl) {
+    if (isNullOrUndefined(gl)) {
       throw new Error('WebGL2 not supported');
     }
 
@@ -475,7 +477,7 @@ export class WebGLRenderer {
 
     const stateTexture = this.updateMaskState(options, categoryTexture, confidenceTexture, useSelfieModel);
 
-    if (!stateTexture) {
+    if (isNullOrUndefined(stateTexture)) {
       this.logger.warn('Unable to update segmentation mask state.');
 
       this.renderPassthrough(videoFrame);
@@ -507,7 +509,7 @@ export class WebGLRenderer {
 
     const stateTexture = this.storedStateTextures[this.currentStateIndex];
 
-    if (!stateTexture) {
+    if (isNullOrUndefined(stateTexture)) {
       this.logger.warn('Stored segmentation texture is missing.');
 
       this.renderPassthrough(videoFrame);
@@ -536,7 +538,7 @@ export class WebGLRenderer {
 
     const frameTexture = this.createFrameTexture(videoFrame);
 
-    if (!frameTexture) {
+    if (isNullOrUndefined(frameTexture)) {
       this.logger.warn('Unable to create frame texture.');
 
       return;
@@ -571,7 +573,7 @@ export class WebGLRenderer {
   ): WebGLTexture | null {
     const {gl, fbo, storedStateTextures, stateUpdateProgram, stateUpdateLocations} = this;
 
-    if (!fbo) {
+    if (isNullOrUndefined(fbo)) {
       return null;
     }
 
@@ -586,7 +588,7 @@ export class WebGLRenderer {
 
     const newStateTexture = storedStateTextures[writeStateIndex];
 
-    if (!previousStateTexture || !newStateTexture) {
+    if (isNullOrUndefined(previousStateTexture) || isNullOrUndefined(newStateTexture)) {
       return null;
     }
 
@@ -657,7 +659,7 @@ export class WebGLRenderer {
 
     const frameTexture = this.createFrameTexture(videoFrame);
 
-    if (!frameTexture) {
+    if (isNullOrUndefined(frameTexture)) {
       this.logger.warn('Unable to create frame texture.');
 
       return;
@@ -674,7 +676,7 @@ export class WebGLRenderer {
 
     gl.uniform1i(blendLocations.currentStateTexture, 1);
 
-    if (this.backgroundRenderInfo) {
+    if (!isNullOrUndefined(this.backgroundRenderInfo)) {
       gl.activeTexture(gl.TEXTURE2);
 
       gl.bindTexture(gl.TEXTURE_2D, this.backgroundRenderInfo.texture);
@@ -723,7 +725,7 @@ export class WebGLRenderer {
 
     const frameTexture = gl.createTexture();
 
-    if (!frameTexture) {
+    if (isNullOrUndefined(frameTexture)) {
       return null;
     }
 
@@ -779,7 +781,7 @@ export class WebGLRenderer {
 
     const program = this.gl.createProgram();
 
-    if (!program) {
+    if (isNullOrUndefined(program)) {
       throw new Error('Failed to create program');
     }
 
@@ -789,7 +791,7 @@ export class WebGLRenderer {
 
     this.gl.linkProgram(program);
 
-    if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
+    if (this.gl.getProgramParameter(program, this.gl.LINK_STATUS) !== true) {
       this.logger.error('Program link error:', this.gl.getProgramInfoLog(program));
 
       this.gl.deleteProgram(program);
@@ -810,7 +812,7 @@ export class WebGLRenderer {
   private createShader(type: number, source: string): WebGLShader {
     const shader = this.gl.createShader(type);
 
-    if (!shader) {
+    if (isNullOrUndefined(shader)) {
       throw new Error(`Failed to create shader type: ${type}`);
     }
 
@@ -818,7 +820,7 @@ export class WebGLRenderer {
 
     this.gl.compileShader(shader);
 
-    if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+    if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS) !== true) {
       this.logger.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
 
       this.gl.deleteShader(shader);
@@ -840,7 +842,7 @@ export class WebGLRenderer {
   } {
     const texture = this.gl.createTexture();
 
-    if (!texture) {
+    if (isNullOrUndefined(texture)) {
       throw new Error('Failed to create texture for color');
     }
 
@@ -871,7 +873,7 @@ export class WebGLRenderer {
 
     let newIdentifier: string;
 
-    if (!newSource) {
+    if (isNullOrUndefined(newSource)) {
       const [red, green, blue, alpha] = WebGLRenderer.DEFAULT_BG_COLOR;
 
       newIdentifier = `color(${red},${green},${blue},${alpha})`;
@@ -879,11 +881,11 @@ export class WebGLRenderer {
       newIdentifier = newSource.url;
     }
 
-    if (newIdentifier === this.activeBackgroundSourceIdentifier && this.backgroundRenderInfo) {
+    if (newIdentifier === this.activeBackgroundSourceIdentifier && !isNullOrUndefined(this.backgroundRenderInfo)) {
       return;
     }
 
-    if (this.backgroundRenderInfo) {
+    if (!isNullOrUndefined(this.backgroundRenderInfo)) {
       gl.deleteTexture(this.backgroundRenderInfo.texture);
 
       this.backgroundRenderInfo = null;
@@ -891,7 +893,7 @@ export class WebGLRenderer {
 
     this.activeBackgroundSourceIdentifier = newIdentifier;
 
-    if (!newSource) {
+    if (isNullOrUndefined(newSource)) {
       const [red, green, blue, alpha] = WebGLRenderer.DEFAULT_BG_COLOR;
 
       const colorTexture = this.createColorTexture(red, green, blue, alpha);
@@ -909,7 +911,7 @@ export class WebGLRenderer {
 
       const texture = gl.createTexture();
 
-      if (!texture) {
+      if (isNullOrUndefined(texture)) {
         throw new Error('Failed to create texture object for image.');
       }
 
@@ -936,7 +938,7 @@ export class WebGLRenderer {
       };
     }
 
-    if (!this.backgroundRenderInfo) {
+    if (isNullOrUndefined(this.backgroundRenderInfo)) {
       this.logger.error('Background information is missing. Using the default color.');
 
       const [red, green, blue, alpha] = WebGLRenderer.DEFAULT_BG_COLOR;
@@ -976,14 +978,14 @@ export class WebGLRenderer {
     gl.deleteBuffer(this.texCoordBuffer);
 
     this.storedStateTextures.forEach(texture => {
-      if (texture) {
+      if (!isNullOrUndefined(texture)) {
         gl.deleteTexture(texture);
       }
     });
 
     this.storedStateTextures = [];
 
-    if (this.backgroundRenderInfo?.texture) {
+    if (!isNullOrUndefined(this.backgroundRenderInfo?.texture)) {
       gl.deleteTexture(this.backgroundRenderInfo.texture);
 
       this.backgroundRenderInfo = null;

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 
@@ -38,16 +39,17 @@ export const mapProfileAssets = (userId: QualifiedId, assets: APIClientUserAsset
     .reduce((mappedAssets, asset) => {
       const domain = asset.domain ?? userId.domain;
       const assetRemoteData = new AssetRemoteData({assetKey: asset.key, assetDomain: domain, otrKey: new Uint8Array()});
-      return !sizeMap[asset.size] ? mappedAssets : {...mappedAssets, [sizeMap[asset.size]]: assetRemoteData};
+      const mappedSize = sizeMap[asset.size];
+      return isNonEmptyString(mappedSize) ? {...mappedAssets, [mappedSize]: assetRemoteData} : mappedAssets;
     }, {});
 };
 
 export const updateUserEntityAssets = (userEntity: User | ServiceEntity, mappedAssets: MappedAsset = {}) => {
   const {preview, medium} = mappedAssets;
-  if (preview) {
+  if (!isUndefined(preview)) {
     userEntity.previewPictureResource(preview);
   }
-  if (medium) {
+  if (!isUndefined(medium)) {
     userEntity.mediumPictureResource(medium);
   }
 };

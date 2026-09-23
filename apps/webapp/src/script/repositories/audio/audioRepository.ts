@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
@@ -78,7 +79,7 @@ export class AudioRepository {
 
   private updateSinkIds() {
     const currentOutputDevice = mediaDevicesStore.getState().audio.output.selectedId;
-    if (!currentOutputDevice) {
+    if (!isNonEmptyString(currentOutputDevice)) {
       return;
     }
     Object.values(this.audioElements).forEach(element => {
@@ -142,7 +143,7 @@ export class AudioRepository {
   async play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
     this.updateSinkIds();
     const audioElement = this.getSoundById(audioId);
-    if (!audioElement) {
+    if (isUndefined(audioElement)) {
       this.logger.error(`Failed to play '${audioId}': sound not found`);
       return;
     }
