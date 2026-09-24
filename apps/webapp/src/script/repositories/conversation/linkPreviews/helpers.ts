@@ -17,6 +17,7 @@
  *
  */
 
+import {isNull, isUndefined} from '@sindresorhus/is';
 import Linkify from 'linkify-it';
 
 // Matches with a fenced code block (```), whether it is closed or not
@@ -34,7 +35,8 @@ const linkify = new Linkify();
 export const containsOnlyLink = (text: string): boolean => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '').replace(inlineCodeRegex, ``);
 
-  const urls = linkify.match(textWithoutCode) || [];
+  const matchedUrls = linkify.match(textWithoutCode);
+  const urls = isNull(matchedUrls) ? [] : matchedUrls;
   return urls.length === 1 && urls[0].raw === textWithoutCode;
 };
 
@@ -46,13 +48,14 @@ export const containsOnlyLink = (text: string): boolean => {
 export const getFirstLinkWithOffset = (text: string): {offset: number; url: string} | undefined => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '').replace(inlineCodeRegex, ``);
 
-  const links = linkify.match(textWithoutCode) || [];
+  const matchedLinks = linkify.match(textWithoutCode);
+  const links = isNull(matchedLinks) ? [] : matchedLinks;
   const [firstLink] = links.filter(link => ['http:', 'https:', ''].includes(link.schema));
 
-  return firstLink
-    ? {
+  return isUndefined(firstLink)
+    ? undefined
+    : {
         offset: firstLink.index,
         url: firstLink.raw,
-      }
-    : undefined;
+      };
 };

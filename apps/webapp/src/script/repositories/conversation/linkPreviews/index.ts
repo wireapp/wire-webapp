@@ -17,6 +17,7 @@
  *
  */
 
+import {isFunction, isNullOrUndefined, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import type {Data as OpenGraphResult} from 'open-graph';
 
 import {deArrayify} from 'Util/arrayUtil';
@@ -62,12 +63,12 @@ const logger = getLogger('LinkPreviewRepository');
  * @returns Resolves with link preview details
  */
 export async function getLinkPreviewFromString(string: string): Promise<LinkPreviewContent | undefined> {
-  if (!window.openGraphAsync) {
+  if (!isFunction(window.openGraphAsync)) {
     return undefined;
   }
 
   const linkData = getFirstLinkWithOffset(string);
-  if (!linkData) {
+  if (isUndefined(linkData)) {
     return undefined;
   }
 
@@ -96,7 +97,7 @@ async function getLinkPreview(url: string, offset: number = 0): Promise<LinkPrev
   }
 
   const openGraphData = await fetchOpenGraphData(url);
-  if (!openGraphData) {
+  if (isUndefined(openGraphData)) {
     throw new LinkPreviewError(LinkPreviewError.TYPE.NO_DATA_AVAILABLE, LinkPreviewError.MESSAGE.NO_DATA_AVAILABLE);
   }
   return toLinkPreviewData(openGraphData, url, offset);
@@ -104,7 +105,7 @@ async function getLinkPreview(url: string, offset: number = 0): Promise<LinkPrev
 
 function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: number): LinkPreviewContent {
   const base64Image = (openGraphData.image as {data: string})?.data;
-  const image = base64Image
+  const image = isNonEmptyString(base64Image)
     ? {
         data: base64ToArray(base64Image),
         height: 0,
@@ -131,7 +132,7 @@ function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: 
   return {
     image,
     permanantUrl: deArrayify(openGraphData.url) ?? '',
-    title: tweet ? truncatedDescription : truncatedTitle,
+    title: isUndefined(tweet) ? truncatedTitle : truncatedDescription,
     tweet,
     url,
     urlOffset: offset,
@@ -147,7 +148,7 @@ function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: 
 async function fetchOpenGraphData(link: string): Promise<OpenGraphResult | undefined> {
   try {
     const data = await window.openGraphAsync?.(link);
-    if (data) {
+    if (!isNullOrUndefined(data)) {
       return Object.entries(data).reduce((result, [key, value]) => {
         result[key] = Array.isArray(value) ? value[0] : value;
         return result;

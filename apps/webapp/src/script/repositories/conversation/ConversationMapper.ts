@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
@@ -120,7 +120,7 @@ export class ConversationMapper {
     if (conversationsData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
-    if (!Array.isArray(conversationsData) || !conversationsData.length) {
+    if (!isNonEmptyArray(conversationsData)) {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData: ConversationDatabaseData, index: number) => {
@@ -425,7 +425,7 @@ export class ConversationMapper {
     if (conversationData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
-    if (!isObject(conversationData) || !Object.keys(conversationData).length) {
+    if (!isObject(conversationData) || isEmptyArray(Object.keys(conversationData))) {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
@@ -639,7 +639,7 @@ export class ConversationMapper {
       .map(({qualified_id}) => qualified_id)
       .filter((qualifiedId): qualifiedId is QualifiedId => qualifiedId !== undefined);
 
-    if (qualified_others.length) {
+    if (isNonEmptyArray(qualified_others)) {
       updates.qualified_others = qualified_others;
     }
 
@@ -716,7 +716,9 @@ export class ConversationMapper {
 
     if (accessCode.uri !== undefined && isTeamConversation) {
       const baseUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
-      const accessCodeUrl = conversation.domain ? `${baseUrl}&domain=${conversation.domain}` : baseUrl;
+      const accessCodeUrl = isNonEmptyString(conversation.domain)
+        ? `${baseUrl}&domain=${conversation.domain}`
+        : baseUrl;
       conversation.accessCode(accessCodeUrl);
       conversation.accessCodeHasPassword(accessCode.has_password);
     }
@@ -728,7 +730,7 @@ export class ConversationMapper {
     accessRole: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[],
     accessRoleV2?: CONVERSATION_ACCESS_ROLE[],
   ): typeof ACCESS_STATE {
-    if (conversationEntity.teamId) {
+    if (isNonEmptyString(conversationEntity.teamId)) {
       if (conversationEntity.is1to1()) {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
