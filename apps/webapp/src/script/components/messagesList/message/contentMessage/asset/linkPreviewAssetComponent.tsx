@@ -19,6 +19,7 @@
 
 import {UIEvent, useRef} from 'react';
 
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {Image} from 'Components/image';
@@ -50,7 +51,7 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
     previews: [preview],
   } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);
 
-  const isTypeTweet = !!preview?.tweet;
+  const isTypeTweet = !isNullOrUndefined(preview?.tweet);
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
   const author = isTweet ? preview.tweet?.author?.substring(0, maximumTweetAuthorLength) : '';
   const previewImage = preview?.image;
@@ -95,7 +96,7 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
       onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
     >
       <div className="link-preview-image-container">
-        {previewImage !== undefined ? (
+        {!isUndefined(previewImage) ? (
           <Image
             className="link-preview-image"
             imageStyles={{height: '100%', objectFit: 'cover', objectPosition: 'center'}}
@@ -108,7 +109,7 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
       </div>
       <div className="link-preview-info">
         {header && <AssetHeader message={message} />}
-        {preview !== undefined && (
+        {!isUndefined(preview) && (
           <>
             <p
               className={cx(

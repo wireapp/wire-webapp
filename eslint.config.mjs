@@ -773,6 +773,21 @@ const productionConfigs = [
     },
   },
   {
+    files: ['apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**/*.{ts,tsx}'],
+    ignores: [
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+      '**/test/**',
+      '**/mocks/**',
+      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
     files: [
       'apps/webapp/src/script/repositories/assets/**/*.{ts,tsx}',
       'apps/webapp/src/script/repositories/audio/**/*.{ts,tsx}',

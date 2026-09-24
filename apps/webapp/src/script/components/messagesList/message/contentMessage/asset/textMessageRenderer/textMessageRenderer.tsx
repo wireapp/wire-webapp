@@ -19,6 +19,8 @@
 
 import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
 
+import {isNan, isNull} from '@sindresorhus/is';
+
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
@@ -59,11 +61,15 @@ const TextMessage: FC<TextMessageRendererProps> = ({
   useEffect(() => {
     const element = containerRef.current;
 
-    if (element && collapse) {
+    if (!isNull(element) && collapse) {
       const preNode = element.querySelector('pre');
-      const collapsedHeight = collapsedHeightRef.current || element.clientHeight;
-      const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
-      const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
+      const previousCollapsedHeight = collapsedHeightRef.current;
+      const collapsedHeight =
+        previousCollapsedHeight !== 0 && !isNan(previousCollapsedHeight)
+          ? previousCollapsedHeight
+          : element.clientHeight;
+      const width = Math.max(element.scrollWidth, !isNull(preNode) ? preNode.scrollWidth : 0);
+      const height = Math.max(element.scrollHeight, !isNull(preNode) ? preNode.scrollHeight : 0);
       const isWider = width > element.clientWidth;
       const isHigher = height > collapsedHeight;
       collapsedHeightRef.current = collapsedHeight;
@@ -74,7 +80,7 @@ const TextMessage: FC<TextMessageRendererProps> = ({
   useEffect(() => {
     const element = containerRef.current;
 
-    if (!element) {
+    if (isNull(element)) {
       return;
     }
 
@@ -112,19 +118,19 @@ const TextMessage: FC<TextMessageRendererProps> = ({
     const markdownLinkElement = target.closest('[data-md-link]');
     const mentionElement = target.closest('.message-mention');
 
-    if (markdownLinkElement) {
+    if (!isNull(markdownLinkElement)) {
       const href = (markdownLinkElement as HTMLAnchorElement).href;
       const markdownLinkDetails = {
         href: href,
       };
       forwardEvent(event.nativeEvent, 'markdownLink', markdownLinkDetails);
-    } else if (emailElement) {
+    } else if (!isNull(emailElement)) {
       const href = (emailElement as HTMLAnchorElement).href;
       const markdownLinkDetails = {
         href: href,
       };
       forwardEvent(event.nativeEvent, 'email', markdownLinkDetails);
-    } else if (mentionElement) {
+    } else if (!isNull(mentionElement)) {
       const mentionMsgDetails = {
         userId: target.dataset.userId,
         userDomain: target.dataset.userDomain,

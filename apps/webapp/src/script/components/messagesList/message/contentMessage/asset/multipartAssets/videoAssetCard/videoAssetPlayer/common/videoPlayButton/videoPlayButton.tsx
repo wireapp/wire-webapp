@@ -19,6 +19,8 @@
 
 import {ReactNode, useEffect} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
@@ -49,7 +51,7 @@ export const VideoPlayButton = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
-    if (!mediaElement) {
+    if (isUndefined(mediaElement)) {
       return undefined;
     }
 

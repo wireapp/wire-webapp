@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
 import type {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
@@ -59,11 +61,14 @@ export const MessageButton = ({id, label, message, onClick = noop}: MessageButto
         {label}
       </Button>
 
-      {hasError && errorMessage && (
-        <div className="message-button__error" data-uie-name="message-button-error">
-          {errorMessage}
-        </div>
-      )}
+      {hasError &&
+        (isNonEmptyString(errorMessage) ? (
+          <div className="message-button__error" data-uie-name="message-button-error">
+            {errorMessage}
+          </div>
+        ) : (
+          errorMessage
+        ))}
     </>
   );
 };

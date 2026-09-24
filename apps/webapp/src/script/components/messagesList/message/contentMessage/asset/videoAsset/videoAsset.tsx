@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -97,7 +98,7 @@ const VideoAsset = ({
   }, [videoSrc]);
 
   useEffect(() => {
-    if (assetPreviewResource === undefined || !isFileSharingReceivingEnabled) {
+    if (isUndefined(assetPreviewResource) || !isFileSharingReceivingEnabled) {
       setVideoPreview(undefined);
       return;
     }
@@ -157,7 +158,7 @@ const VideoAsset = ({
     if (isFileSharingReceivingEnabled) {
       setDisplaySmall(false);
 
-      if (videoSrc && videoElement) {
+      if (!isUndefined(videoSrc) && !isUndefined(videoElement)) {
         void videoElement.play();
       } else {
         asset.status(AssetTransferState.DOWNLOADING);
@@ -217,14 +218,14 @@ const VideoAsset = ({
   };
 
   const onVideoPlaying = (): void => {
-    if (!videoElement) {
+    if (isUndefined(videoElement)) {
       return;
     }
     videoElement.style.backgroundColor = '#000';
   };
 
   useEffect(() => {
-    if (videoSrc && videoElement) {
+    if (!isUndefined(videoSrc) && !isUndefined(videoElement)) {
       const playPromise = videoElement.play();
 
       playPromise?.catch((error: unknown) => {
@@ -234,7 +235,7 @@ const VideoAsset = ({
   }, [videoElement, videoSrc]);
 
   const syncVideoTimeRest = () => {
-    if (videoElement) {
+    if (!isUndefined(videoElement)) {
       setVideoTimeRest(videoElement.duration - videoElement.currentTime);
     }
   };
@@ -276,7 +277,7 @@ const VideoAsset = ({
               onTimeUpdate={syncVideoTimeRest}
               onLoadedMetadata={syncVideoTimeRest}
               className={cx({hidden: isUploading})}
-              style={{backgroundColor: videoPreview ? '#000' : ''}}
+              style={{backgroundColor: !isUndefined(videoPreview) ? '#000' : ''}}
               tabIndex={TabIndex.UNFOCUSABLE}
             />
             {videoPlaybackError ? (
@@ -310,22 +311,25 @@ const VideoAsset = ({
                       />
                     </div>
 
-                    {isVideoLoaded && videoElement && (
-                      <div className="video-asset__controls__bottom">
-                        <SeekBar
-                          className="video-asset__controls__bottom__seekbar"
-                          data-uie-name="status-video-seekbar"
-                          mediaElement={videoElement}
-                          isFocusable={isFocusable}
-                        />
-                        <span
-                          className="video-asset__controls__bottom__time label-xs"
-                          data-uie-name="status-video-time"
-                        >
-                          {formatSeconds(videoTimeRest)}
-                        </span>
-                      </div>
-                    )}
+                    {isVideoLoaded &&
+                      (!isUndefined(videoElement) ? (
+                        <div className="video-asset__controls__bottom">
+                          <SeekBar
+                            className="video-asset__controls__bottom__seekbar"
+                            data-uie-name="status-video-seekbar"
+                            mediaElement={videoElement}
+                            isFocusable={isFocusable}
+                          />
+                          <span
+                            className="video-asset__controls__bottom__time label-xs"
+                            data-uie-name="status-video-time"
+                          >
+                            {formatSeconds(videoTimeRest)}
+                          </span>
+                        </div>
+                      ) : (
+                        videoElement
+                      ))}
                   </div>
                 )}
               </>
