@@ -21,8 +21,7 @@ import type {ComponentProps} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {Maybe} from 'true-myth';
-import {maybe} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {
   CircleCloseIcon,
@@ -195,7 +194,7 @@ export const ScheduleMeetingForm = ({
 
     const currentStart = formState.start.unwrapOr(wallClock.currentDate);
     const nextStart = combineDateAndTime(date, nearestTimeOptionFromDate(currentStart, regionalLocale));
-    onStartChange(nextStart === null ? maybe.nothing() : maybe.just(nextStart));
+    onStartChange(Maybe.of(nextStart));
   };
 
   const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
