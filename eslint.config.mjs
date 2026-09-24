@@ -766,6 +766,13 @@ const productionConfigs = [
     },
   },
   {
+    files: ['apps/webapp/src/script/repositories/entity/message/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', '**/test/**', '**/mocks/**'],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
     files: [
       'apps/webapp/src/script/repositories/assets/**/*.{ts,tsx}',
       'apps/webapp/src/script/repositories/audio/**/*.{ts,tsx}',

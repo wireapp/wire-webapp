@@ -189,6 +189,6 @@ export class MemberMessage extends SystemMessage {
   }
 
   isUserAffected(userId: QualifiedId): boolean {
-    return !!this.userIds().find(user => matchQualifiedIds(user, userId));
+    return Boolean(this.userIds().find(user => matchQualifiedIds(user, userId)));
   }
 }
