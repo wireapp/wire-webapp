@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+
 import {Message} from 'Repositories/entity/message/message';
 import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -45,7 +47,7 @@ function getMessageMarkerType(
   lastReadTimestamp: number,
   previousMessage?: Message,
 ): Marker['type'] | undefined {
-  if (!previousMessage || message.isCall()) {
+  if (isNullOrUndefined(previousMessage) || message.isCall()) {
     return undefined;
   }
 
@@ -110,13 +112,16 @@ function shouldGroupMessagesByTimestamp(
  * @param messages - the sorted list of messages
  * @param lastReadTimestamp - the timestamp of the last read message (used to mark unread messages)
  */
-export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimestamp: number) {
+export function groupMessagesBySenderAndTime(
+  messages: Message[],
+  lastReadTimestamp: number,
+): Array<MessagesGroup | Marker> {
   return messages.reduce<Array<MessagesGroup | Marker>>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
     const marker = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
-    if (marker) {
+    if (!isUndefined(marker)) {
       // if there is a marker to insert, we insert it before the current message
       acc.push({type: marker, timestamp: message.timestamp()});
     }
@@ -128,7 +133,7 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
 
     if (
       areContentMessages &&
-      lastGroupInfo &&
+      !isNullOrUndefined(lastGroupInfo) &&
       lastGroupInfo.sender === message.from &&
       shouldGroupMessagesByTimestamp(
         lastGroupInfo.firstMessageTimestamp,

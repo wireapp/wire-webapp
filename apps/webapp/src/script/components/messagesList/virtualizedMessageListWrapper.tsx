@@ -19,6 +19,7 @@
 
 import {useRef} from 'react';
 
+import {isNull} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -71,7 +72,9 @@ export const VirtualizedMessageListWrapper = ({
         </div>
       )}
 
-      {parentRef.current && (
+      {isNull(parentRef.current) ? (
+        parentRef.current
+      ) : (
         <VirtualizedMessagesList
           parentElement={parentRef.current}
           conversationLastReadTimestamp={conversationLastReadTimestamp}

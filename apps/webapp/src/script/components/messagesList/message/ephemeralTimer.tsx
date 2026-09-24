@@ -17,6 +17,8 @@
  *
  */
 
+import {isNan} from '@sindresorhus/is';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import type {Message} from 'Repositories/entity/message/message';
@@ -38,6 +40,8 @@ const EphemeralTimer = ({message}: EphemeralTimerProps) => {
   } = useKoSubscribableChildren(message, ['ephemeral_remaining', 'ephemeral_started', 'ephemeral_expires']);
 
   const duration = Number(expires) - started;
+  const timerProgress = remaining / duration;
+  const timerProgressOrZero = timerProgress !== 0 && !isNan(timerProgress) ? timerProgress : 0;
 
   return (
     <svg
@@ -50,7 +54,7 @@ const EphemeralTimer = ({message}: EphemeralTimerProps) => {
     >
       <circle css={ephemeralTimerBackgroundStyle} cx={4} cy={4} r={3.5} />
       <circle
-        css={ephemeralTimerDialStyle(remaining / duration || 0)}
+        css={ephemeralTimerDialStyle(timerProgressOrZero)}
         data-uie-name="ephemeral-timer-circle"
         cx={4}
         cy={4}

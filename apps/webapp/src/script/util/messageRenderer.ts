@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isEmptyString, isNonEmptyArray, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import MarkdownIt from 'markdown-it';
 import {escape} from 'underscore';
@@ -67,7 +67,7 @@ markdownit.linkify.add('wire:', {
 
     // A simple matcher: up to the first space, <, or a parenthesis.
     const match = /^[^\s<>()]+/.exec(tail);
-    if (match) {
+    if (!isNull(match)) {
       return match[0].length;
     }
     return 0;
@@ -97,7 +97,7 @@ if (isUndefined(originalNormalizeLink)) {
 
 const isValidUrl = (url: string): boolean => {
   // only allow urls to wire://, https://, http:// and mailto:
-  return !!url.match(/^(wire:\/\/|https?:\/\/|mailto:)/i);
+  return !isNull(url.match(/^(wire:\/\/|https?:\/\/|mailto:)/i));
 };
 markdownit.validateLink = isValidUrl;
 markdownit.normalizeLink = (url: string): string => {
@@ -106,7 +106,7 @@ markdownit.normalizeLink = (url: string): string => {
     return url;
   }
   // prepend "https://" if url does not begin with a protocol or vbscript:, javascript:, file:, data:
-  if (!url.match(/^(.*:\/\/|(vbscript|javascript|file|data):)/i)) {
+  if (isNull(url.match(/^(.*:\/\/|(vbscript|javascript|file|data):)/i))) {
     return `https://${url}`;
   }
   return url;
@@ -118,13 +118,17 @@ markdownit.renderer.rules.blockquote_close = () => '</blockquote>';
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
 markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
-  const [position] = tokens[idx].map || [0, 0];
+  const tokenMap = tokens[idx].map;
+  const [position] = isNullOrUndefined(tokenMap) ? [0, 0] : tokenMap;
 
   const previousWithMap = tokens
     .slice(0, idx)
     .toReversed()
-    .find(({map}) => map?.length);
-  const previousPosition = previousWithMap ? (previousWithMap.map || [0, 0])[1] - 1 : 0;
+    .find(({map}) => isNonEmptyArray(map));
+  const previousMap = previousWithMap?.map;
+  const previousPosition = isNullOrUndefined(previousWithMap)
+    ? 0
+    : (isNullOrUndefined(previousMap) ? [0, 0] : previousMap)[1] - 1;
   const count = position - previousPosition;
 
   const previousToken = tokens[idx - 1];
@@ -171,7 +175,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
       const mentionKey = createMentionHash(mention);
       mentionTexts[mentionKey] = {
         domain: mention.domain,
-        isSelfMentioned: !!selfId && mention.targetsUser(selfId),
+        isSelfMentioned: !isNullOrUndefined(selfId) && mention.targetsUser(selfId),
         text: mentionText,
         userId: mention.userId,
       };
@@ -240,8 +244,8 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
     const text = nextToken?.type === 'text' ? nextToken.content : '';
     const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
 
-    if (href == '' || closeToken == nextToken || (!text.trim() && closeToken == tokens[idx + 2])) {
-      if (closeToken) {
+    if (href == '' || closeToken == nextToken || (isEmptyString(text.trim()) && closeToken == tokens[idx + 2])) {
+      if (!isNullOrUndefined(closeToken)) {
         closeToken.type = 'text';
         closeToken.content = `](${cleanString(href)})`;
       }

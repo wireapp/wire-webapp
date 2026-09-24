@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
@@ -59,7 +61,7 @@ export const ConnectedMessage = ({
         <p className="message-connected-username label-username">{handle}</p>
       )}
 
-      {isOutgoingRequest && classifiedDomains && (
+      {isOutgoingRequest && !isNullOrUndefined(classifiedDomains) && (
         <UserClassifiedBar users={[user]} classifiedDomains={classifiedDomains} />
       )}
 

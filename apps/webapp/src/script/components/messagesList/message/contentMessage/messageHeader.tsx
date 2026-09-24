@@ -17,6 +17,10 @@
  *
  */
 
+import {type ReactElement} from 'react';
+
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {AVATAR_SIZE, Avatar} from 'Components/avatar';
@@ -105,7 +109,7 @@ export function MessageHeader({
   noColor = false,
   uieName = '',
   children,
-}: MessageHeaderParams) {
+}: MessageHeaderParams): ReactElement {
   const {user: sender} = useKoSubscribableChildren(message, ['user']);
   const {isAvailable, isBlocked} = useKoSubscribableChildren(sender, ['isAvailable', 'isBlocked']);
 
@@ -124,7 +128,7 @@ export function MessageHeader({
         <h4
           className={`message-header-label-sender ${!noColor && message.accent_color()}`}
           css={!isAvailable ? {color: 'var(--text-input-placeholder)'} : {}}
-          data-uie-name={uieName ? `${uieName}-sender-name` : 'sender-name'}
+          data-uie-name={isNonEmptyString(uieName) ? `${uieName}-sender-name` : 'sender-name'}
           data-uie-uid={sender.id}
         >
           <UserName user={sender} />

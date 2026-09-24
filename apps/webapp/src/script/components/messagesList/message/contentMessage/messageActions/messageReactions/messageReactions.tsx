@@ -19,6 +19,8 @@
 
 import {useState, RefObject, FC, useRef} from 'react';
 
+import {isNull} from '@sindresorhus/is';
+
 import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
@@ -70,7 +72,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
       handleMenuOpen(false);
       setShowEmojis(false);
     }
-    if (emojiButtonRef.current) {
+    if (!isNull(emojiButtonRef.current)) {
       emojiButtonRef.current.focus();
     }
   };
