@@ -845,6 +845,9 @@ const productionConfigs = [
       'apps/webapp/src/script/components/conversation/conversationCells/**',
       'apps/webapp/src/script/components/conversation/conversationTabs/conversationTabs.tsx',
       'apps/webapp/src/script/components/conversation/hooks/useReadReceipt.ts',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/buildCellFileMetadata/**',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/createFileDropHandler/**',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/transformAcceptedFiles/**',
       'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/useFilesUploadDropzone.ts',
     ],
     rules: {
