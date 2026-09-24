@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan} from '@sindresorhus/is';
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
@@ -82,21 +83,21 @@ export const getChatHistorySharingUnitOptions = (translate: Translate, historySh
     {
       value: HistorySharingUnit.Days,
       label:
-        historySharingQuantity && historySharingQuantity > 1
+        historySharingQuantity !== 0 && !isNan(historySharingQuantity) && historySharingQuantity > 1
           ? translate('conversationHistoryModalOptionDays')
           : translate('conversationHistoryModalOptionDay'),
     },
     {
       value: HistorySharingUnit.Weeks,
       label:
-        historySharingQuantity && historySharingQuantity > 1
+        historySharingQuantity !== 0 && !isNan(historySharingQuantity) && historySharingQuantity > 1
           ? translate('conversationHistoryModalOptionWeeks')
           : translate('conversationHistoryModalOptionWeek'),
     },
     {
       value: HistorySharingUnit.Months,
       label:
-        historySharingQuantity && historySharingQuantity > 1
+        historySharingQuantity !== 0 && !isNan(historySharingQuantity) && historySharingQuantity > 1
           ? translate('conversationHistoryModalOptionMonths')
           : translate('conversationHistoryModalOptionMonth'),
     },
@@ -142,7 +143,7 @@ export const getChatHistoryOptions = (
   if (enableCustomHistory === true || teamState.isConferenceCallingEnabled()) {
     chatHistoryOptions.push({
       value: ChatHistory.Custom,
-      label: `${translate('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
+      label: `${translate('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity !== 0 && !isNan(historySharingQuantity) ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
     });
   }
 

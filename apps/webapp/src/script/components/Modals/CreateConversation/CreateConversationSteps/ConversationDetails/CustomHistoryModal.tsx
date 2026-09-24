@@ -17,6 +17,8 @@
  *
  */
 
+import {isNan} from '@sindresorhus/is';
+
 import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -72,7 +74,7 @@ export const CustomHistoryModal = () => {
       <FlexBox css={customHistorySharingFormContainerCss}>
         <Input
           wrapperCSS={customHistorySharingInputCss}
-          value={historySharingQuantity || ''}
+          value={historySharingQuantity !== 0 && !isNan(historySharingQuantity) ? historySharingQuantity : ''}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             setHistorySharingQuantity(Number(event.target.value))
           }
@@ -101,7 +103,7 @@ export const CustomHistoryModal = () => {
         </Button>
         <Button
           css={customHistorySharingButtonCss}
-          disabled={!historySharingQuantity || historySharingQuantity < 1}
+          disabled={historySharingQuantity === 0 || isNan(historySharingQuantity) || historySharingQuantity < 1}
           type="button"
           onClick={onSubmit}
           data-uie-name="do-submit"

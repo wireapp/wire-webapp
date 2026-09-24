@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
+
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Translate} from 'Util/localizerUtil';
@@ -45,7 +47,7 @@ export const showFileDropzoneErrorModal = ({
         text: {
           message: (
             <>
-              {!!invalidFiles.length && <InvalidFilesList invalidFiles={invalidFiles} />}
+              {isNonEmptyArray(invalidFiles) && <InvalidFilesList invalidFiles={invalidFiles} />}
               <p>{message}</p>
             </>
           ),
