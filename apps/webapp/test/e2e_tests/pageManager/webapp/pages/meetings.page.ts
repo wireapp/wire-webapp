@@ -212,10 +212,6 @@ export class MeetingsPage {
     await this.closeParticipantsPicker();
   }
 
-  startTimeCombobox() {
-    return this.scheduleMeetingModal.getByRole('group', {name: 'Starts'}).getByRole('combobox', {name: 'Select time'});
-  }
-
   startDateOpenCalendarButton() {
     return this.scheduleMeetingModal.getByTestId('schedule-meeting-date').getByRole('button', {name: 'Open calendar'});
   }
