@@ -18,6 +18,8 @@
  */
 
 import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {maybe} from 'true-myth';
 
 import type {User} from 'Repositories/entity/User';
@@ -173,5 +175,61 @@ describe('ScheduleMeetingForm', () => {
     expect(screen.getByTestId('schedule-meeting-end-time-error')).toHaveTextContent(
       'meetings.scheduleModal.error.endBeforeStart',
     );
+  });
+
+  it('rounds a cleared start time up to the next available interval', async () => {
+    const user = userEvent.setup();
+    const onStartChange = jest.fn();
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {},
+          search: {},
+          team: {},
+        },
+      },
+    };
+    const wallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: new Date(2026, 8, 24, 12, 49).getTime(),
+    });
+
+    render(
+      withThemeAndRootContext(
+        <ScheduleMeetingForm
+          isOpen={false}
+          mode="create"
+          formState={{
+            title: '',
+            start: maybe.nothing(),
+            end: maybe.nothing(),
+            recurrence: 'doesNotRepeat',
+            selectedUsers: [],
+            participantsFilter: '',
+            password: '',
+            passwordConfirmation: '',
+          }}
+          errors={emptyScheduleMeetingFormErrors()}
+          onTitleChange={jest.fn()}
+          onStartChange={onStartChange}
+          onEndChange={jest.fn()}
+          onRecurrenceChange={jest.fn()}
+          onSelectedUsersChange={jest.fn()}
+          onParticipantsFilterChange={jest.fn()}
+          selfUser={{} as User}
+        />,
+        createRootProviderWrapperForTest(
+          createRootContextValueForTest({
+            translate: translateForTest,
+            mainViewModel: mainViewModel as unknown as MainViewModel,
+            wallClock,
+          }),
+        ),
+      ),
+    );
+
+    await user.click(screen.getByRole('button', {name: /meetings\.scheduleModal\.openCalendarAriaLabel/}));
+    await user.click(screen.getByRole('button', {name: /Thursday, September 24, 2026/}));
+
+    expect(onStartChange).toHaveBeenCalledWith(maybe.just(new Date(2026, 8, 24, 13, 0)));
   });
 });

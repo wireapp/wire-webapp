@@ -33,6 +33,7 @@ import {
   Input,
   nearestTimeOptionFromDate,
   Select,
+  TIME_INTERVAL_MINUTES,
   TimePickerField,
 } from '@wireapp/react-ui-kit';
 
@@ -192,9 +193,11 @@ export const ScheduleMeetingForm = ({
       return;
     }
 
-    const currentStart = formState.start.unwrapOr(wallClock.currentDate);
+    const currentStart = formState.start.unwrapOr(
+      new Date(wallClock.currentTimestampInMilliseconds + TIME_INTERVAL_MINUTES * 60 * 1000),
+    );
     const nextStart = combineDateAndTime(date, nearestTimeOptionFromDate(currentStart, regionalLocale));
-    onStartChange(Maybe.of(nextStart));
+    onStartChange(Maybe.of(nextStart !== null && nextStart.getTime() > wallClock.currentTimestampInMilliseconds ? nextStart : null));
   };
 
   const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
