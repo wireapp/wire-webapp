@@ -71,6 +71,7 @@ const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotif
   const closedTags: string[] = [];
   const logger = {info: jest.fn(), warn: jest.fn()};
   const openMeetingsList = jest.fn();
+  const openMeetingPrep = jest.fn();
 
   const notifier = createMeetingReminderOsNotifier({
     notificationApi: {
@@ -89,12 +90,13 @@ const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotif
       ...apiOverrides,
     },
     openMeetingsList,
+    openMeetingPrep,
     formatMeetingTime,
     translate,
     logger,
   });
 
-  return {requests, closedTags, logger, openMeetingsList, notifier};
+  return {requests, closedTags, logger, openMeetingsList, openMeetingPrep, notifier};
 };
 
 describe('createMeetingReminderOsNotifier', () => {
@@ -116,13 +118,15 @@ describe('createMeetingReminderOsNotifier', () => {
     expect(Object.keys(firstRequestOf(requests)).sort()).toEqual(['body', 'onClick', 'onClose', 'tag', 'title']);
   });
 
-  it('focuses the meetings list and closes the toast when clicked', () => {
-    const {requests, closedTags, openMeetingsList, notifier} = createNotifierWithFakeNotificationApi();
+  it('focuses the meetings list, opens the prep modal, and closes the toast when clicked', () => {
+    const {requests, closedTags, openMeetingsList, openMeetingPrep, notifier} = createNotifierWithFakeNotificationApi();
+    const payload = meetingReminderFirePayloadFactory.build();
 
-    notifier.notify(meetingReminderFirePayloadFactory.build());
+    notifier.notify(payload);
     firstRequestOf(requests).onClick();
 
     expect(openMeetingsList).toHaveBeenCalledTimes(1);
+    expect(openMeetingPrep).toHaveBeenCalledWith(payload);
     expect(closedTags).toEqual([firstRequestOf(requests).tag]);
   });
 

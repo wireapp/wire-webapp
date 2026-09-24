@@ -29,6 +29,7 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/meeting/shared/service/deleteMeeting';
@@ -110,6 +111,14 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const reminderOsNotifier = createMeetingReminderOsNotifier({
       notificationApi: createBrowserSystemNotificationApi(),
       openMeetingsList: () => mainViewModel.list.openMeetingsList(),
+      openMeetingPrep: payload => {
+        useMeetingPrepModal.getState().open({
+          meetingTitle: payload.meetingTitle,
+          meetingStartTime: payload.meetingStartTime,
+          qualifiedMeetingId: payload.qualifiedId,
+          qualifiedConversationId: payload.qualifiedConversationId,
+        });
+      },
       formatMeetingTime: formatTimeShort,
       translate,
       logger,
