@@ -28,6 +28,7 @@ import {MeetingHeader} from 'Components/meeting/meetingHeader/meetingHeader';
 import {MeetingList} from 'Components/meeting/meetingList/meetingList';
 import {createMeetingPrepPreview} from 'Components/meeting/meetingPrep/createMeetingPrepPreview';
 import {MeetingPrepModal} from 'Components/meeting/meetingPrep/meetingPrepModal';
+import {useMeetingPrepJoin} from 'Components/meeting/meetingPrep/useMeetingPrepJoin';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {MeetNowModal} from 'Components/meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal';
@@ -44,6 +45,7 @@ export const Meetings = () => {
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
   const selfUser = container.resolve(UserState).self();
   const preview = useMemo(() => createMeetingPrepPreview(container.resolve(MediaStreamHandler)), []);
+  const joinMeeting = useMeetingPrepJoin();
 
   const refreshMeetings = useCallback(
     () => fireAndForgetInvoker.fireAndForget(loadMeetings),
@@ -74,6 +76,7 @@ export const Meetings = () => {
         participantName={selfUser.name()}
         requestPreviewStream={preview.requestPreviewStream}
         releasePreviewStream={preview.releasePreviewStream}
+        joinMeeting={joinMeeting}
       />
     </div>
   );

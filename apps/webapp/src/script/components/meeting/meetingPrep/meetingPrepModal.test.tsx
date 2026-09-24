@@ -52,7 +52,7 @@ const expectClosed = async () => {
   });
 };
 
-const renderModal = () => {
+const renderModal = (joinMeeting: jest.Mock = jest.fn().mockResolvedValue(true)) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
@@ -63,6 +63,7 @@ const renderModal = () => {
         participantName="Ada"
         requestPreviewStream={pendingPreview}
         releasePreviewStream={jest.fn()}
+        joinMeeting={joinMeeting}
       />
     </ThemeProvider>,
     {wrapper: rootProviderWrapper},
@@ -117,5 +118,39 @@ describe('MeetingPrepModal', () => {
     });
     fireEvent.click(screen.getByRole('dialog'));
     await expectClosed();
+  });
+
+  it('joins with the chosen camera and microphone, then closes', async () => {
+    const joinMeeting = jest.fn().mockResolvedValue(true);
+    renderModal(joinMeeting);
+    act(() => {
+      useMeetingPrepModal.getState().open(session);
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+    fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
+
+    await waitFor(() => {
+      expect(joinMeeting).toHaveBeenCalledWith(session.qualifiedConversationId, {
+        cameraEnabled: false,
+        microphoneEnabled: true,
+      });
+    });
+    await expectClosed();
+  });
+
+  it('stays open when the join does not start', async () => {
+    const joinMeeting = jest.fn().mockResolvedValue(false);
+    renderModal(joinMeeting);
+    act(() => {
+      useMeetingPrepModal.getState().open(session);
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
+
+    await waitFor(() => {
+      expect(joinMeeting).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
   });
 });

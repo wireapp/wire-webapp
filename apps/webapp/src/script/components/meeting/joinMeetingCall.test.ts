@@ -34,6 +34,7 @@ import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};
+const media = {cameraEnabled: true, microphoneEnabled: false};
 
 const createMeetingConversation = (): Conversation =>
   createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS, qualifiedConversationId, 'meeting-group-id');
@@ -94,7 +95,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isOk).toBe(true);
     expect(startAudio).toHaveBeenCalledTimes(1);
@@ -119,14 +120,14 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isOk).toBe(true);
     expect(safeEnsureConversationExists).toHaveBeenCalledWith({
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     });
-    expect(startAudio).toHaveBeenCalledWith(conversation);
+    expect(startAudio).toHaveBeenCalledWith(conversation, media);
   });
 
   it('returns joinFailed when ensuring the MLS group fails', async () => {
@@ -146,7 +147,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
@@ -171,10 +172,10 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isOk).toBe(true);
-    expect(answer).toHaveBeenCalledWith(incomingCall);
+    expect(answer).toHaveBeenCalledWith(incomingCall, media);
     expect(startAudio).not.toHaveBeenCalled();
   });
 
@@ -198,7 +199,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isOk).toBe(true);
     expect(findConversation).toHaveBeenCalledWith(qualifiedConversationId);
@@ -207,7 +208,7 @@ describe('joinMeetingCall', () => {
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     });
-    expect(startAudio).toHaveBeenCalledWith(conversation);
+    expect(startAudio).toHaveBeenCalledWith(conversation, media);
   });
 
   it('returns conversationNotFound when the conversation cannot be resolved', async () => {
@@ -220,7 +221,7 @@ describe('joinMeetingCall', () => {
       } as unknown as ConversationRepository,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.conversationNotFound);
@@ -238,7 +239,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
@@ -262,7 +263,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);

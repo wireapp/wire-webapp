@@ -23,6 +23,7 @@ import {Maybe, Task, task} from 'true-myth';
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -80,19 +81,23 @@ const ensureMlsConversationReady = (
     .mapRejected(() => joinMeetingCallErrors.joinFailed);
 };
 
-const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Task<void, JoinMeetingCallError> => {
+const performJoin = (
+  deps: JoinMeetingCallDeps,
+  conversation: Conversation,
+  media: CallMediaChoice,
+): Task<void, JoinMeetingCallError> => {
   const call = deps.callingRepository.findCall(conversation.qualifiedId);
 
   if (call && call.state() === CALL_STATE.INCOMING) {
     return task.tryOrElse(
       () => joinMeetingCallErrors.joinFailed,
-      () => deps.callingViewModel.callActions.answer(call),
+      () => deps.callingViewModel.callActions.answer(call, media),
     );
   }
 
   return task.tryOrElse(
     () => joinMeetingCallErrors.joinFailed,
-    () => deps.callingViewModel.callActions.startAudio(conversation),
+    () => deps.callingViewModel.callActions.startAudio(conversation, media),
   );
 };
 
@@ -103,7 +108,8 @@ const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Tas
 export const joinMeetingCall = (
   deps: JoinMeetingCallDeps,
   qualifiedConversationId: QualifiedId,
+  media: CallMediaChoice,
 ): Task<void, JoinMeetingCallError> =>
   resolveConversation(deps, qualifiedConversationId)
     .andThen(conversation => ensureMlsConversationReady(deps, conversation))
-    .andThen(conversation => performJoin(deps, conversation));
+    .andThen(conversation => performJoin(deps, conversation, media));

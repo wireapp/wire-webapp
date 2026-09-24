@@ -17,10 +17,12 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
 import {modalWrapperStyles} from 'Components/meeting/shared/styles/meetingModalShell.styles';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {handleEscDown} from 'Util/keyboardUtil';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';
@@ -31,12 +33,14 @@ export type MeetingPrepModalProps = {
   participantName: string;
   requestPreviewStream: RequestMeetingPrepPreview;
   releasePreviewStream: (stream: MediaStream) => void;
+  joinMeeting: (qualifiedConversationId: QualifiedId, media: CallMediaChoice) => Promise<boolean>;
 };
 
 export const MeetingPrepModal = ({
   participantName,
   requestPreviewStream,
   releasePreviewStream,
+  joinMeeting,
 }: MeetingPrepModalProps) => {
   const session = useMeetingPrepModal(state => state.session);
   const close = useMeetingPrepModal(state => state.close);
@@ -56,7 +60,12 @@ export const MeetingPrepModal = ({
           meetingStartTime={session.value.meetingStartTime}
           participantName={participantName}
           onCancel={close}
-          onJoin={close}
+          onJoin={async choice => {
+            const joined = await joinMeeting(session.value.qualifiedConversationId, choice);
+            if (joined) {
+              close();
+            }
+          }}
           requestPreviewStream={requestPreviewStream}
           releasePreviewStream={releasePreviewStream}
         />

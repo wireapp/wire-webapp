@@ -384,6 +384,36 @@ describe('CallingRepository', () => {
       );
     });
 
+    it('unmutes before starting an ordinary call', async () => {
+      const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.PROTEUS);
+      const setMute = jest.spyOn(wCall, 'setMute');
+
+      await callingRepository.startCall(conversation);
+
+      expect(setMute).toHaveBeenCalledWith(wUser, 0);
+    });
+
+    it.each([
+      {cameraEnabled: true, microphoneEnabled: true, callType: CALL_TYPE.VIDEO, mute: 0},
+      {cameraEnabled: true, microphoneEnabled: false, callType: CALL_TYPE.VIDEO, mute: 1},
+      {cameraEnabled: false, microphoneEnabled: true, callType: CALL_TYPE.NORMAL, mute: 0},
+      {cameraEnabled: false, microphoneEnabled: false, callType: CALL_TYPE.NORMAL, mute: 1},
+    ])(
+      'starts a meeting call with camera $cameraEnabled and microphone $microphoneEnabled',
+      async ({cameraEnabled, microphoneEnabled, callType, mute}) => {
+        jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+        const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
+        conversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+        const setMute = jest.spyOn(wCall, 'setMute');
+        jest.spyOn(wCall, 'start');
+
+        await callingRepository.startCall(conversation, {cameraEnabled, microphoneEnabled});
+
+        expect(setMute).toHaveBeenCalledWith(wUser, mute);
+        expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE_MLS, 0, 1);
+      },
+    );
+
     it('subscribes to epoch updates after initiating a mls conference call', async () => {
       const conversationId = {domain: 'example.com', id: 'conversation1'};
 
@@ -617,6 +647,45 @@ describe('CallingRepository', () => {
       expect(audioModalSpy).toHaveBeenCalled();
       expect(cameraModalSpy).not.toHaveBeenCalled();
     });
+
+    it.each([
+      {cameraEnabled: true, microphoneEnabled: true, callType: CALL_TYPE.VIDEO, mute: 0},
+      {cameraEnabled: true, microphoneEnabled: false, callType: CALL_TYPE.VIDEO, mute: 1},
+      {cameraEnabled: false, microphoneEnabled: true, callType: CALL_TYPE.NORMAL, mute: 0},
+      {cameraEnabled: false, microphoneEnabled: false, callType: CALL_TYPE.NORMAL, mute: 1},
+    ])(
+      'answers a meeting call with camera $cameraEnabled and microphone $microphoneEnabled',
+      async ({cameraEnabled, microphoneEnabled, callType, mute}) => {
+        const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
+        conversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+        const incomingCall = new Call(
+          {domain: '', id: ''},
+          conversation,
+          CONV_TYPE.CONFERENCE_MLS,
+          createSelfParticipant(),
+          CALL_TYPE.VIDEO,
+          buildMediaDevicesHandler(),
+          true,
+        );
+        incomingCall.state(CALL_STATE.INCOMING);
+        incomingCall.muteState(MuteState.SELF_MUTED);
+
+        jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
+        const setMute = jest.spyOn(wCall, 'setMute');
+        const answer = jest.spyOn(wCall, 'answer');
+        callingRepository['conversationState'].conversations.push(conversation);
+
+        await callingRepository.answerCall(incomingCall, undefined, {cameraEnabled, microphoneEnabled});
+
+        expect(setMute).toHaveBeenCalledWith(wUser, mute);
+        expect(answer).toHaveBeenCalledWith(
+          wUser,
+          conversation.id,
+          callType,
+          callingRepository['callState'].cbrEncoding(),
+        );
+      },
+    );
   });
 
   describe('showNoAudioInputModal', () => {
