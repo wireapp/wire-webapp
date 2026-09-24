@@ -172,6 +172,44 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(within(rows[2]).getByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).toBeInTheDocument();
   });
 
+  it('collapses nested folder files and retries only failed children', async () => {
+    const user = userEvent.setup();
+    const controller = createController([
+      {
+        ...uploadedState,
+        identity: {uploadId: 'upload-folder-1', resourceUuid: 'resource-1', versionId: 'version-1'},
+        source: {...uploadSource, name: 'cover.jpg', relativePath: 'Marketing/cover.jpg'},
+      },
+      {
+        ...failedState,
+        identity: {uploadId: 'upload-folder-2'},
+        source: {...uploadSource, name: 'logo.svg', relativePath: 'Marketing/Assets/logo.svg'},
+      },
+    ]);
+    controller.retryUpload.mockResolvedValue(undefined);
+    const translateFolder: Translate = (key, substitutions) => {
+      if (key === 'cells.uploadStatus.failedFiles') {
+        return `Couldn’t upload ${substitutions?.failed} of ${substitutions?.total} files`;
+      }
+      if (key === 'cells.uploadStatus.failedItems') {
+        return 'Failed to upload items';
+      }
+      return translateForTest(key);
+    };
+
+    const view = renderHost(controller, conversationQualifiedId, true, true, translateFolder);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    const rows = view.getAllByTestId('shared-drive-upload-status-row');
+    expect(rows).toHaveLength(1);
+    expect(within(rows[0]).getByText('Marketing')).toBeInTheDocument();
+    expect(within(rows[0]).getByText('Couldn’t upload 1 of 2 files')).toBeInTheDocument();
+
+    await user.click(within(rows[0]).getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
+    expect(controller.retryUpload).toHaveBeenCalledWith('upload-folder-2');
+    expect(controller.retryUpload).not.toHaveBeenCalledWith('upload-folder-1');
+  });
+
   it.each([
     ['uploading', uploadState],
     ['uploaded', uploadedState],
