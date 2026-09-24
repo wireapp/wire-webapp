@@ -42,6 +42,7 @@ export type SharedDriveUploadStatus = {
   readonly relativePath?: string;
   readonly isFolder?: boolean;
   readonly fileCount?: number;
+  readonly uploadedFileCount?: number;
   readonly failedFileCount?: number;
   readonly childUploadIds?: readonly string[];
 };
@@ -100,9 +101,6 @@ const getTopLevelFolder = (relativePath: string | undefined): string | null => {
 };
 
 const getFolderStatus = (statuses: readonly SharedDriveUploadStatus[]): SharedDriveUploadStatusKind => {
-  if (statuses.some(status => status.kind === 'failed')) {
-    return 'failed';
-  }
   return getSharedDriveUploadAggregateKind(statuses) ?? 'queued';
 };
 
@@ -147,6 +145,7 @@ export const getSharedDriveUploadDisplayStatuses = (
         }, 0) / totalSize
       : 0;
     const failedFileCount = folderStatuses.filter(status => status.kind === 'failed').length;
+    const uploadedFileCount = folderStatuses.filter(status => status.kind === 'uploaded').length;
     const folderId = `folder:${folderName}`;
 
     const displayStatus = {
@@ -162,6 +161,7 @@ export const getSharedDriveUploadDisplayStatuses = (
       canRetry: folderStatuses.some(status => status.canRetry),
       isFolder: true,
       fileCount: folderStatuses.length,
+      uploadedFileCount,
       failedFileCount,
       childUploadIds: folderStatuses.map(status => status.uploadId),
     } satisfies SharedDriveUploadStatus;

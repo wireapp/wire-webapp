@@ -61,7 +61,8 @@ const getRowStatusLabel = (
       return translate('cells.uploadStatus.queuedFiles', {count: row.fileCount ?? 0});
     }
     return translate('cells.uploadStatus.uploadingFiles', {
-      count: row.fileCount ?? 0,
+      uploaded: row.uploadedFileCount ?? 0,
+      total: row.fileCount ?? 0,
     });
   }
 

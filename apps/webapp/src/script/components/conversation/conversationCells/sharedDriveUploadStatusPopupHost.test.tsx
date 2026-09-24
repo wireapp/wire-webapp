@@ -210,6 +210,41 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(controller.retryUpload).not.toHaveBeenCalledWith('upload-folder-1');
   });
 
+  it('keeps a folder uploading while a child fails and another child is active', async () => {
+    const user = userEvent.setup();
+    const controller = createController([
+      {
+        ...uploadedState,
+        identity: {uploadId: 'upload-folder-uploaded', resourceUuid: 'resource-1', versionId: 'version-1'},
+        source: {...uploadSource, relativePath: 'Marketing/cover.jpg'},
+      },
+      {
+        ...failedState,
+        identity: {uploadId: 'upload-folder-failed'},
+        source: {...uploadSource, relativePath: 'Marketing/logo.svg'},
+      },
+      {
+        ...uploadState,
+        identity: {uploadId: 'upload-folder-active'},
+        source: {...uploadSource, relativePath: 'Marketing/hero.jpg'},
+      },
+    ]);
+    const translateFolder: Translate = (key, substitutions) => {
+      if (key === 'cells.uploadStatus.uploadingFiles') {
+        return `Uploading ${substitutions?.uploaded} of ${substitutions?.total} files…`;
+      }
+      return translateForTest(key);
+    };
+
+    const view = renderHost(controller, conversationQualifiedId, true, true, translateFolder);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    const row = view.getByTestId('shared-drive-upload-status-row');
+    expect(within(row).getByText('Uploading 1 of 3 files…')).toBeInTheDocument();
+    expect(within(row).getByRole('button', {name: 'conversationAssetUploadCancel'})).toBeInTheDocument();
+    expect(within(row).queryByRole('button', {name: 'fileCardDefaultCloseButtonLabel'})).not.toBeInTheDocument();
+  });
+
   it.each([
     ['uploading', uploadState],
     ['uploaded', uploadedState],
