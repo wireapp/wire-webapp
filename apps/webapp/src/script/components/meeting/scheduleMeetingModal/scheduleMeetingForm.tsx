@@ -197,7 +197,9 @@ export const ScheduleMeetingForm = ({
       new Date(wallClock.currentTimestampInMilliseconds + TIME_INTERVAL_MINUTES * 60 * 1000),
     );
     const nextStart = combineDateAndTime(date, nearestTimeOptionFromDate(currentStart, regionalLocale));
-    onStartChange(Maybe.of(nextStart !== null && nextStart.getTime() > wallClock.currentTimestampInMilliseconds ? nextStart : null));
+    onStartChange(
+      Maybe.of(nextStart !== null && nextStart.getTime() > wallClock.currentTimestampInMilliseconds ? nextStart : null),
+    );
   };
 
   const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
