@@ -23,7 +23,7 @@ import {Maybe, maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {CameraIcon, ChevronIcon, MicOffIcon, MicOnIcon} from 'Components/icon';
+import {CameraIcon, CameraOffIcon, ChevronIcon, MicOffIcon, MicOnIcon} from 'Components/icon';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {InputLevel} from 'src/script/page/mainContent/panels/preferences/avPreferences/inputLevel';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -38,6 +38,8 @@ import {
   meetingPrepFooterStyles,
   meetingPrepHeaderStyles,
   meetingPrepHeaderTextStyles,
+  meetingPrepMeterRowStyles,
+  meetingPrepMeterStyles,
   meetingPrepMenuButtonStyles,
   meetingPrepMenuLabelStyles,
   meetingPrepMenuStyles,
@@ -68,6 +70,49 @@ type DeviceOption = {
 
 const toDeviceOptions = (devices: readonly MediaDeviceInfo[]): DeviceOption[] =>
   devices.map(device => ({id: device.deviceId, label: device.label}));
+
+const usePreviewStream = (
+  enabled: boolean,
+  deviceId: string,
+  channel: 'audio' | 'video',
+  requestPreviewStream: RequestMeetingPrepPreview,
+  releasePreviewStream: (stream: MediaStream) => void,
+): Maybe<MediaStream> => {
+  const [stream, setStream] = useState<Maybe<MediaStream>>(Maybe.nothing());
+
+  useEffect(() => {
+    if (!enabled) {
+      setStream(Maybe.nothing());
+      return undefined;
+    }
+
+    let disposed = false;
+    let streamToRelease: MediaStream | undefined;
+    const pendingPreview = requestPreviewStream({audio: channel === 'audio', video: channel === 'video'});
+
+    void pendingPreview.then(result => {
+      if (result.isErr || disposed) {
+        if (result.isOk) {
+          releasePreviewStream(result.value);
+        }
+        return;
+      }
+
+      streamToRelease = result.value;
+      setStream(Maybe.just(result.value));
+    });
+
+    return () => {
+      disposed = true;
+      if (streamToRelease !== undefined) {
+        releasePreviewStream(streamToRelease);
+      }
+      setStream(Maybe.nothing());
+    };
+  }, [channel, deviceId, enabled, releasePreviewStream, requestPreviewStream]);
+
+  return stream;
+};
 
 const MeetingPrepDeviceList = ({
   label,
@@ -110,7 +155,8 @@ export const MeetingPrepSurface = ({
   const [microphoneEnabled, setMicrophoneEnabled] = useState(true);
   const [microphoneMenuOpen, setMicrophoneMenuOpen] = useState(false);
   const [cameraMenuOpen, setCameraMenuOpen] = useState(false);
-  const [previewStream, setPreviewStream] = useState<Maybe<MediaStream>>(Maybe.nothing());
+  const microphoneMenuRef = useRef<HTMLDivElement | null>(null);
+  const cameraMenuRef = useRef<HTMLDivElement | null>(null);
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
   const {
     audioInputDevices,
@@ -133,44 +179,43 @@ export const MeetingPrepSurface = ({
     videoInputDeviceId: state.video.input.selectedId,
     setVideoInputDeviceId: state.setVideoInputDeviceId,
   }));
+  const audioPreview = usePreviewStream(
+    microphoneEnabled,
+    audioInputDeviceId,
+    'audio',
+    requestPreviewStream,
+    releasePreviewStream,
+  );
+  const videoPreview = usePreviewStream(
+    cameraEnabled,
+    videoInputDeviceId,
+    'video',
+    requestPreviewStream,
+    releasePreviewStream,
+  );
 
   useEffect(() => {
-    if (!cameraEnabled && !microphoneEnabled) {
-      setPreviewStream(Maybe.nothing());
+    if (!microphoneMenuOpen && !cameraMenuOpen) {
       return undefined;
     }
 
-    let disposed = false;
-    let streamToRelease: MediaStream | undefined;
-    const pendingPreview = requestPreviewStream({audio: microphoneEnabled, video: cameraEnabled});
-
-    void pendingPreview.then(result => {
-      if (result.isErr || disposed) {
-        if (result.isOk) {
-          releasePreviewStream(result.value);
-        }
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
         return;
       }
-
-      streamToRelease = result.value;
-      setPreviewStream(Maybe.just(result.value));
-    });
-
-    return () => {
-      disposed = true;
-      if (streamToRelease !== undefined) {
-        releasePreviewStream(streamToRelease);
+      const insideMicrophoneMenu = microphoneMenuRef.current?.contains(target) ?? false;
+      const insideCameraMenu = cameraMenuRef.current?.contains(target) ?? false;
+      if (insideMicrophoneMenu || insideCameraMenu) {
+        return;
       }
-      setPreviewStream(Maybe.nothing());
+      setMicrophoneMenuOpen(false);
+      setCameraMenuOpen(false);
     };
-  }, [
-    audioInputDeviceId,
-    cameraEnabled,
-    microphoneEnabled,
-    releasePreviewStream,
-    requestPreviewStream,
-    videoInputDeviceId,
-  ]);
+
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+  }, [cameraMenuOpen, microphoneMenuOpen]);
 
   useEffect(() => {
     const videoElement = videoElementRef.current;
@@ -178,11 +223,13 @@ export const MeetingPrepSurface = ({
       return;
     }
 
-    videoElement.srcObject = maybe.isJust(previewStream) ? previewStream.value : null;
-  }, [previewStream]);
+    videoElement.srcObject = maybe.isJust(videoPreview) ? videoPreview.value : null;
+  }, [videoPreview]);
 
-  const preview = previewStream.mapOr(null, stream => stream);
-  const showVideo = cameraEnabled && maybe.isJust(previewStream);
+  const audioStream = audioPreview.mapOr(null, stream => stream);
+  const showVideo = cameraEnabled && maybe.isJust(videoPreview);
+  const meterStream =
+    microphoneEnabled && audioStream !== null && audioStream.getAudioTracks().length > 0 ? audioStream : null;
 
   return (
     <section css={meetingPrepSurfaceStyles} data-uie-name="meeting-prep-surface">
@@ -204,16 +251,18 @@ export const MeetingPrepSurface = ({
       </header>
 
       <div css={meetingPrepBodyStyles}>
-        <div css={meetingPrepSelfViewStyles}>
-          {showVideo && <video css={meetingPrepVideoStyles} autoPlay playsInline muted ref={videoElementRef} />}
-          <span css={meetingPrepNameStyles}>{participantName}</span>
-        </div>
-        <InputLevel
-          disabled={!microphoneEnabled || preview === null}
-          mediaStream={microphoneEnabled ? preview : null}
-        />
-        <div css={meetingPrepControlsStyles}>
-          <div css={meetingPrepControlStyles}>
+        {cameraEnabled && (
+          <div css={meetingPrepSelfViewStyles}>
+            {showVideo && <video css={meetingPrepVideoStyles} autoPlay playsInline muted ref={videoElementRef} />}
+            <span css={meetingPrepNameStyles}>{participantName}</span>
+          </div>
+        )}
+        <div css={meetingPrepMeterRowStyles}>
+          <div css={meetingPrepMeterStyles}>
+            <InputLevel disabled={!microphoneEnabled || meterStream === null} mediaStream={meterStream} />
+          </div>
+          <div css={meetingPrepControlsStyles}>
+          <div css={meetingPrepControlStyles} ref={microphoneMenuRef}>
             <button
               type="button"
               css={meetingPrepToggleStyles(microphoneEnabled)}
@@ -228,7 +277,10 @@ export const MeetingPrepSurface = ({
               css={meetingPrepMenuButtonStyles}
               aria-expanded={microphoneMenuOpen}
               aria-label={translate('meetings.prepModal.openMicrophoneDevices')}
-              onClick={() => setMicrophoneMenuOpen(open => !open)}
+              onClick={() => {
+                setCameraMenuOpen(false);
+                setMicrophoneMenuOpen(open => !open);
+              }}
             >
               <ChevronIcon />
             </button>
@@ -249,7 +301,7 @@ export const MeetingPrepSurface = ({
               </div>
             )}
           </div>
-          <div css={meetingPrepControlStyles}>
+          <div css={meetingPrepControlStyles} ref={cameraMenuRef}>
             <button
               type="button"
               css={meetingPrepToggleStyles(cameraEnabled)}
@@ -257,14 +309,17 @@ export const MeetingPrepSurface = ({
               aria-label={translate('preferencesAVCamera')}
               onClick={() => setCameraEnabled(enabled => !enabled)}
             >
-              <CameraIcon />
+              {cameraEnabled ? <CameraIcon /> : <CameraOffIcon />}
             </button>
             <button
               type="button"
               css={meetingPrepMenuButtonStyles}
               aria-expanded={cameraMenuOpen}
               aria-label={translate('meetings.prepModal.openCameraDevices')}
-              onClick={() => setCameraMenuOpen(open => !open)}
+              onClick={() => {
+                setMicrophoneMenuOpen(false);
+                setCameraMenuOpen(open => !open);
+              }}
             >
               <ChevronIcon />
             </button>
@@ -280,6 +335,7 @@ export const MeetingPrepSurface = ({
             )}
           </div>
         </div>
+      </div>
       </div>
 
       <footer css={meetingPrepFooterStyles}>

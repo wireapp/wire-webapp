@@ -128,4 +128,29 @@ describe('MeetingPrepSurface', () => {
 
     expect(mediaDevicesStore.getState().audio.input.selectedId).toBe('mic-2');
   });
+
+  it('closes the device list when the pointer goes outside it', () => {
+    renderSurface();
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.prepModal.openMicrophoneDevices'}));
+    expect(screen.getByRole('button', {name: 'Mic 2'})).toBeInTheDocument();
+
+    fireEvent.pointerDown(screen.getByRole('heading', {name: 'Design review'}));
+
+    expect(screen.queryByRole('button', {name: 'Mic 2'})).not.toBeInTheDocument();
+  });
+
+  it('keeps only one device list open and removes the preview when the camera is off', () => {
+    renderSurface();
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.prepModal.openMicrophoneDevices'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.prepModal.openCameraDevices'}));
+
+    expect(screen.queryByRole('button', {name: 'Mic 2'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Camera 1'})).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+
+    expect(screen.queryByText('Ada')).not.toBeInTheDocument();
+  });
 });

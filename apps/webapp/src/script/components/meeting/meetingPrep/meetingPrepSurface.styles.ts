@@ -23,7 +23,6 @@ export const meetingPrepSurfaceStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
-  maxWidth: '420px',
   backgroundColor: 'var(--modal-bg)',
   borderRadius: '12px',
   overflow: 'hidden',
@@ -95,59 +94,108 @@ export const meetingPrepVideoStyles: CSSObject = {
 
 export const meetingPrepNameStyles: CSSObject = {
   position: 'absolute',
-  left: '12px',
-  bottom: '12px',
-  color: 'var(--app-bg)',
-  backgroundColor: 'var(--text-color)',
-  borderRadius: '4px',
-  padding: '2px 8px',
-  fontSize: 'var(--font-size-small)',
+  left: '50%',
+  bottom: '8px',
+  zIndex: 1,
+  transform: 'translateX(-50%)',
+  maxWidth: 'calc(100% - 16px)',
+  margin: 0,
+  padding: '2px 6px',
+  borderRadius: '2px',
+  backgroundColor: 'var(--black)',
+  color: 'var(--white)',
+  fontSize: '12px',
+  lineHeight: '14px',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+};
+
+export const meetingPrepMeterRowStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+};
+
+export const meetingPrepMeterStyles: CSSObject = {
+  width: 'auto',
+  '.input-level': {
+    justifyContent: 'flex-start',
+    gap: '3px',
+  },
+  '.input-level__bullet, .input-level__bullet--disabled': {
+    width: '8px',
+    height: '8px',
+    minWidth: '8px',
+    flex: '0 0 8px',
+    borderRadius: '4px',
+    backgroundColor: '#ececec',
+    borderColor: '#d7d7d7',
+  },
+  '.input-level__bullet--active': {
+    backgroundColor: '#1f9d55',
+    borderColor: 'transparent',
+  },
+  '.input-level__bullet--active:nth-child(n + 17)': {
+    backgroundColor: '#e5484d',
+  },
 };
 
 export const meetingPrepControlsStyles: CSSObject = {
   display: 'flex',
-  justifyContent: 'center',
-  gap: '16px',
+  alignItems: 'center',
+  gap: '12px',
+  flexShrink: 0,
 };
 
 export const meetingPrepControlStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  gap: '4px',
   position: 'relative',
+  height: '36px',
+  padding: '0 2px 0 6px',
+  borderRadius: '18px',
+  backgroundColor: 'var(--black)',
 };
 
-export const meetingPrepToggleStyles = (enabled: boolean): CSSObject => ({
+export const meetingPrepToggleStyles = (_enabled: boolean): CSSObject => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '40px',
-  height: '40px',
+  width: '32px',
+  height: '32px',
+  padding: 0,
   border: 'none',
-  borderRadius: '12px',
+  borderRadius: '16px',
   cursor: 'pointer',
-  color: enabled ? 'var(--app-bg)' : 'var(--text-color)',
-  backgroundColor: enabled ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
+  backgroundColor: 'transparent',
+  'svg, svg > path, svg > g > path': {
+    fill: 'var(--white)',
+  },
 });
 
 export const meetingPrepMenuButtonStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '28px',
-  height: '40px',
+  width: '22px',
+  height: '32px',
   padding: 0,
   border: 'none',
   borderRadius: '8px',
   background: 'transparent',
   cursor: 'pointer',
-  color: 'var(--text-color)',
+  color: 'var(--white)',
+  'svg, svg > path, svg > g > path': {
+    fill: 'var(--white)',
+  },
 };
 
 export const meetingPrepMenuStyles: CSSObject = {
   position: 'absolute',
-  top: '44px',
-  left: 0,
+  bottom: '40px',
+  right: 0,
+  left: 'auto',
   zIndex: 1,
   display: 'flex',
   flexDirection: 'column',
@@ -179,7 +227,14 @@ export const meetingPrepDeviceButtonStyles = (selected: boolean): CSSObject => (
 
 export const meetingPrepFooterStyles: CSSObject = {
   display: 'flex',
-  justifyContent: 'flex-end',
   gap: '12px',
   padding: '16px 24px 24px',
+  button: {
+    flex: 1,
+    minHeight: '44px',
+    borderRadius: '8px',
+  },
+  'button:last-of-type': {
+    color: 'var(--white)',
+  },
 };
