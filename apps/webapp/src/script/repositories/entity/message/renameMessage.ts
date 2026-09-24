@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
@@ -51,7 +51,7 @@ export class RenameMessage extends SystemMessage {
   }
 
   private generateCaption(): string {
-    if (!Boolean(this.user())) {
+    if (isNullOrUndefined(this.user())) {
       return this.translate('conversationRename');
     }
 

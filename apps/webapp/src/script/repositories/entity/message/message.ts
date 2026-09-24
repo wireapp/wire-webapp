@@ -263,7 +263,7 @@ export class Message {
     if (this.isContent()) {
       const assetEntity = this.getFirstAsset();
 
-      if (Boolean(assetEntity) && typeof (assetEntity as FileAsset).original_resource === 'function') {
+      if (assetEntity !== undefined && typeof (assetEntity as FileAsset).original_resource === 'function') {
         return true;
       }
     }
