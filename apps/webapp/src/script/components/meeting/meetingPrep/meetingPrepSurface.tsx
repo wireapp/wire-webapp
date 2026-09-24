@@ -265,7 +265,7 @@ export const MeetingPrepSurface = ({
             <div css={meetingPrepControlStyles} ref={microphoneMenuRef}>
               <button
                 type="button"
-                css={meetingPrepToggleStyles(microphoneEnabled)}
+                css={meetingPrepToggleStyles}
                 aria-pressed={microphoneEnabled}
                 aria-label={translate('preferencesAVMicrophone')}
                 onClick={() => setMicrophoneEnabled(enabled => !enabled)}
@@ -304,7 +304,7 @@ export const MeetingPrepSurface = ({
             <div css={meetingPrepControlStyles} ref={cameraMenuRef}>
               <button
                 type="button"
-                css={meetingPrepToggleStyles(cameraEnabled)}
+                css={meetingPrepToggleStyles}
                 aria-pressed={cameraEnabled}
                 aria-label={translate('preferencesAVCamera')}
                 onClick={() => setCameraEnabled(enabled => !enabled)}

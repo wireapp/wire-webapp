@@ -158,7 +158,7 @@ export const meetingPrepControlStyles: CSSObject = {
   backgroundColor: 'var(--black)',
 };
 
-export const meetingPrepToggleStyles = (_enabled: boolean): CSSObject => ({
+export const meetingPrepToggleStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -172,7 +172,7 @@ export const meetingPrepToggleStyles = (_enabled: boolean): CSSObject => ({
   'svg, svg > path, svg > g > path': {
     fill: 'var(--white)',
   },
-});
+};
 
 export const meetingPrepMenuButtonStyles: CSSObject = {
   display: 'flex',
