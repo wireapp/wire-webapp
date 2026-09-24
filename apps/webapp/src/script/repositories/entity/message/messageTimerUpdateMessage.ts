@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isNull} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
@@ -43,7 +44,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
 }
 
 const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: Translate) => {
-  if (messageTimer !== null && messageTimer !== 0 && !Number.isNaN(messageTimer)) {
+  if (!isNull(messageTimer) && messageTimer !== 0 && !isNan(messageTimer)) {
     const timeString = formatDuration(messageTimer, translate).text;
     return isSelfUser
       ? translate('conversationUpdatedTimerYou', {time: timeString})
