@@ -1358,6 +1358,8 @@
   "meetings.meetNowModal.error.createFailedTitle": "Could not start meeting",
   "meetings.meetNowModal.startMeeting": "Start Meeting",
   "meetings.meetNowModal.title": "Meet now",
+  "meetings.prepModal.openCameraDevices": "Choose a camera",
+  "meetings.prepModal.openMicrophoneDevices": "Choose a microphone or speaker",
   "meetings.meetingStatus.endedAt": "Ended at {time}",
   "meetings.meetingStatus.endsAt": "Ends at {time}",
   "meetings.meetingStatus.participating": "Attending",
