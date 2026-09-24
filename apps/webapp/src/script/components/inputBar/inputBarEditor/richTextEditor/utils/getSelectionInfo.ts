@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {$getSelection, $isRangeSelection, $isTextNode, LexicalNode, RangeSelection} from 'lexical';
 
 const PUNCTUATION = '\\.,\\*\\?\\$\\|#{}\\(\\)\\^\\[\\]\\\\/!%\'"~=<>_:;\\s';
@@ -64,7 +65,7 @@ type SelectionInfo = {
 export function getSelectionInfo(triggers: string[]): SelectionInfo | undefined {
   const selection = $getSelection();
 
-  if (!selection || !$isRangeSelection(selection)) {
+  if (isNullOrUndefined(selection) || !$isRangeSelection(selection)) {
     return undefined;
   }
 
