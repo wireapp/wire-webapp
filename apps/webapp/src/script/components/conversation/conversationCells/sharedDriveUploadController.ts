@@ -45,6 +45,11 @@ export type SharedDriveUploadRequest = {
   readonly path: string;
 };
 
+const addUploadMetadata = (source: UploadSource, file: File): UploadSource => ({
+  ...source,
+  ...(file.webkitRelativePath ? {relativePath: file.webkitRelativePath} : {}),
+});
+
 type SharedDriveUploadSnapshotListener = () => void;
 
 type UploadWork = {
@@ -174,7 +179,7 @@ export const createDirectSharedDriveUploadStrategy = ({
   };
 
   const uploadDirectFile = async (uploadId: string, request: SharedDriveUploadRequest): Promise<boolean> => {
-    const source = createSource(request.file);
+    const source = addUploadMetadata(createSource(request.file), request.file);
     const abortController = createAbortController();
     abortControllersByUploadId.set(uploadId, abortController);
     setState(uploadId, {kind: 'uploading', identity: {uploadId}, source, progress: 0});
@@ -325,7 +330,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     onRefresh: () => void,
   ): Result<string, unknown> => {
     const uploadId = createUploadId();
-    const source = createSource(file);
+    const source = addUploadMetadata(createSource(file), file);
     const request = {file, path};
     const registered = uploadStrategy.register(uploadId, source, path);
 
