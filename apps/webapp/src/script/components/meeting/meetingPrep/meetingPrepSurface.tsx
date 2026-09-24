@@ -262,80 +262,80 @@ export const MeetingPrepSurface = ({
             <InputLevel disabled={!microphoneEnabled || meterStream === null} mediaStream={meterStream} />
           </div>
           <div css={meetingPrepControlsStyles}>
-          <div css={meetingPrepControlStyles} ref={microphoneMenuRef}>
-            <button
-              type="button"
-              css={meetingPrepToggleStyles(microphoneEnabled)}
-              aria-pressed={microphoneEnabled}
-              aria-label={translate('preferencesAVMicrophone')}
-              onClick={() => setMicrophoneEnabled(enabled => !enabled)}
-            >
-              {microphoneEnabled ? <MicOnIcon /> : <MicOffIcon />}
-            </button>
-            <button
-              type="button"
-              css={meetingPrepMenuButtonStyles}
-              aria-expanded={microphoneMenuOpen}
-              aria-label={translate('meetings.prepModal.openMicrophoneDevices')}
-              onClick={() => {
-                setCameraMenuOpen(false);
-                setMicrophoneMenuOpen(open => !open);
-              }}
-            >
-              <ChevronIcon />
-            </button>
-            {microphoneMenuOpen && (
-              <div css={meetingPrepMenuStyles}>
-                <MeetingPrepDeviceList
-                  label={translate('preferencesAVMicrophone')}
-                  devices={toDeviceOptions(audioInputDevices)}
-                  selectedId={audioInputDeviceId}
-                  onSelect={setAudioInputDeviceId}
-                />
-                <MeetingPrepDeviceList
-                  label={translate('preferencesAVSpeakers')}
-                  devices={toDeviceOptions(audioOutputDevices)}
-                  selectedId={audioOutputDeviceId}
-                  onSelect={setAudioOutputDeviceId}
-                />
-              </div>
-            )}
-          </div>
-          <div css={meetingPrepControlStyles} ref={cameraMenuRef}>
-            <button
-              type="button"
-              css={meetingPrepToggleStyles(cameraEnabled)}
-              aria-pressed={cameraEnabled}
-              aria-label={translate('preferencesAVCamera')}
-              onClick={() => setCameraEnabled(enabled => !enabled)}
-            >
-              {cameraEnabled ? <CameraIcon /> : <CameraOffIcon />}
-            </button>
-            <button
-              type="button"
-              css={meetingPrepMenuButtonStyles}
-              aria-expanded={cameraMenuOpen}
-              aria-label={translate('meetings.prepModal.openCameraDevices')}
-              onClick={() => {
-                setMicrophoneMenuOpen(false);
-                setCameraMenuOpen(open => !open);
-              }}
-            >
-              <ChevronIcon />
-            </button>
-            {cameraMenuOpen && (
-              <div css={meetingPrepMenuStyles}>
-                <MeetingPrepDeviceList
-                  label={translate('preferencesAVCamera')}
-                  devices={toDeviceOptions(videoInputDevices)}
-                  selectedId={videoInputDeviceId}
-                  onSelect={setVideoInputDeviceId}
-                />
-              </div>
-            )}
+            <div css={meetingPrepControlStyles} ref={microphoneMenuRef}>
+              <button
+                type="button"
+                css={meetingPrepToggleStyles(microphoneEnabled)}
+                aria-pressed={microphoneEnabled}
+                aria-label={translate('preferencesAVMicrophone')}
+                onClick={() => setMicrophoneEnabled(enabled => !enabled)}
+              >
+                {microphoneEnabled ? <MicOnIcon /> : <MicOffIcon />}
+              </button>
+              <button
+                type="button"
+                css={meetingPrepMenuButtonStyles}
+                aria-expanded={microphoneMenuOpen}
+                aria-label={translate('meetings.prepModal.openMicrophoneDevices')}
+                onClick={() => {
+                  setCameraMenuOpen(false);
+                  setMicrophoneMenuOpen(open => !open);
+                }}
+              >
+                <ChevronIcon />
+              </button>
+              {microphoneMenuOpen && (
+                <div css={meetingPrepMenuStyles}>
+                  <MeetingPrepDeviceList
+                    label={translate('preferencesAVMicrophone')}
+                    devices={toDeviceOptions(audioInputDevices)}
+                    selectedId={audioInputDeviceId}
+                    onSelect={setAudioInputDeviceId}
+                  />
+                  <MeetingPrepDeviceList
+                    label={translate('preferencesAVSpeakers')}
+                    devices={toDeviceOptions(audioOutputDevices)}
+                    selectedId={audioOutputDeviceId}
+                    onSelect={setAudioOutputDeviceId}
+                  />
+                </div>
+              )}
+            </div>
+            <div css={meetingPrepControlStyles} ref={cameraMenuRef}>
+              <button
+                type="button"
+                css={meetingPrepToggleStyles(cameraEnabled)}
+                aria-pressed={cameraEnabled}
+                aria-label={translate('preferencesAVCamera')}
+                onClick={() => setCameraEnabled(enabled => !enabled)}
+              >
+                {cameraEnabled ? <CameraIcon /> : <CameraOffIcon />}
+              </button>
+              <button
+                type="button"
+                css={meetingPrepMenuButtonStyles}
+                aria-expanded={cameraMenuOpen}
+                aria-label={translate('meetings.prepModal.openCameraDevices')}
+                onClick={() => {
+                  setMicrophoneMenuOpen(false);
+                  setCameraMenuOpen(open => !open);
+                }}
+              >
+                <ChevronIcon />
+              </button>
+              {cameraMenuOpen && (
+                <div css={meetingPrepMenuStyles}>
+                  <MeetingPrepDeviceList
+                    label={translate('preferencesAVCamera')}
+                    devices={toDeviceOptions(videoInputDevices)}
+                    selectedId={videoInputDeviceId}
+                    onSelect={setVideoInputDeviceId}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
       </div>
 
       <footer css={meetingPrepFooterStyles}>
