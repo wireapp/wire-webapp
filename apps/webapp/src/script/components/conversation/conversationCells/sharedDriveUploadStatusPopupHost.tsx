@@ -100,8 +100,9 @@ export const SharedDriveUploadStatusPopupHost = ({
     (upload: DismissedUpload) => {
       setLocalDismissedUpload(Maybe.just(upload));
       onDismissUpload(upload);
+      controller.dismiss?.(upload.conversationQualifiedId, upload.uploadId);
     },
-    [onDismissUpload],
+    [controller, onDismissUpload],
   );
   const rawUploads =
     uploadSnapshot.conversationQualifiedId === conversationQualifiedId ? uploadSnapshot.uploads : readStatuses();
@@ -113,9 +114,11 @@ export const SharedDriveUploadStatusPopupHost = ({
     : null;
   const canDismissUploadStatus = visibleUploads.length > 0 && visibleUploads.every(({kind}) => kind === 'uploaded');
   const isUploadDismissed =
-    maybe.isJust(dismissedUpload) &&
-    dismissedUpload.value.conversationQualifiedId === conversationQualifiedId &&
-    representativeUpload?.uploadId === dismissedUpload.value.uploadId;
+    (maybe.isJust(dismissedUpload) &&
+      dismissedUpload.value.conversationQualifiedId === conversationQualifiedId &&
+      representativeUpload?.uploadId === dismissedUpload.value.uploadId) ||
+    (representativeUpload !== null &&
+      controller.isDismissed?.(conversationQualifiedId, representativeUpload.uploadId) === true);
 
   const isCancelling = useCallback(
     (uploadId: string): boolean => {

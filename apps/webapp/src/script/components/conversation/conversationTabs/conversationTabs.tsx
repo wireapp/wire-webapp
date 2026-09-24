@@ -34,6 +34,7 @@ import type {SharedDriveUploadController} from '../conversationCells/sharedDrive
 import {
   getRepresentativeSharedDriveUploadStatus,
   getSharedDriveUploadAggregateKind,
+  getSharedDriveUploadDisplayStatuses,
   getSharedDriveUploadStatuses,
   type SharedDriveUploadStatus,
 } from '../conversationCells/sharedDriveUploadStatus';
@@ -68,7 +69,9 @@ export const ConversationTabs = ({
   const messagesUrl = generateConversationUrl(conversationQualifiedId);
   const conversationQualifiedIdString = stringifyQualifiedId(conversationQualifiedId);
   const readUploadStatus = useCallback((): SharedDriveUploadStatus | null => {
-    const statuses = getSharedDriveUploadStatuses(sharedDriveUploadController, conversationQualifiedIdString);
+    const statuses = getSharedDriveUploadDisplayStatuses(
+      getSharedDriveUploadStatuses(sharedDriveUploadController, conversationQualifiedIdString),
+    );
     const aggregateKind = getSharedDriveUploadAggregateKind(statuses);
     if (!aggregateKind) {
       return null;
@@ -82,6 +85,9 @@ export const ConversationTabs = ({
     maybe.isJust(dismissedUpload) &&
     dismissedUpload.value.conversationQualifiedId === conversationQualifiedIdString &&
     uploadStatus?.uploadId === dismissedUpload.value.uploadId;
+  const isControllerUploadDismissed =
+    uploadStatus !== null &&
+    sharedDriveUploadController.isDismissed?.(conversationQualifiedIdString, uploadStatus.uploadId) === true;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -146,7 +152,9 @@ export const ConversationTabs = ({
           id="files"
           label={translate('conversationDetailsActionCellsTitle')}
           isActive={activeTabIndex === 1}
-          uploadStatus={isUploadStatusIndicatorEnabled && !isUploadDismissed ? uploadStatus : null}
+          uploadStatus={
+            isUploadStatusIndicatorEnabled && !isUploadDismissed && !isControllerUploadDismissed ? uploadStatus : null
+          }
           onClick={event => {
             createNavigate(filesUrl)(event);
             onIndexChange(1);

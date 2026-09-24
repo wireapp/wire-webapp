@@ -68,6 +68,8 @@ type TestController = SharedDriveUploadController & {
   cancel: jest.MockedFunction<SharedDriveUploadController['cancel']>;
   retryUpload: jest.MockedFunction<SharedDriveUploadController['retryUpload']>;
   retryPublish: jest.MockedFunction<SharedDriveUploadController['retryPublish']>;
+  dismiss: jest.MockedFunction<NonNullable<SharedDriveUploadController['dismiss']>>;
+  isDismissed: jest.MockedFunction<NonNullable<SharedDriveUploadController['isDismissed']>>;
 };
 
 const createController = (state: UploadState | readonly UploadState[] = uploadState): TestController => ({
@@ -80,6 +82,8 @@ const createController = (state: UploadState | readonly UploadState[] = uploadSt
   retryPublish: jest.fn(),
   discard: jest.fn(),
   retryDiscard: jest.fn(),
+  dismiss: jest.fn(),
+  isDismissed: jest.fn((_conversationQualifiedId: string, _uploadId: string) => false),
 });
 
 const renderHost = (
@@ -362,6 +366,23 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(close);
 
     expect(view.queryByRole('status')).not.toBeInTheDocument();
+    expect(controller.dismiss).toHaveBeenCalledWith(conversationQualifiedId, 'upload-1');
+  });
+
+  it('keeps a dismissed successful upload hidden after the popup is remounted', async () => {
+    const user = userEvent.setup();
+    const controller = createController(uploadedState);
+    const firstRender = renderHost(controller, conversationQualifiedId);
+    const close = within(firstRender.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'cells.uploadStatus.closeAriaLabel',
+    });
+
+    await user.click(close);
+    controller.isDismissed.mockReturnValue(true);
+    firstRender.unmount();
+    renderHost(controller, conversationQualifiedId);
+
+    expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).not.toBeInTheDocument();
   });
 
   it('does not show close for a failed upload because retry is still actionable', () => {
