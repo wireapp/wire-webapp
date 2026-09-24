@@ -78,6 +78,13 @@ describe('ScheduleMeetingForm', () => {
     );
 
     expect(screen.getByTestId('schedule-meeting-title')).toHaveAttribute('autocomplete', 'off');
+    expect(screen.getByTestId('schedule-meeting-date')).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', {name: translateForTest('meetings.scheduleModal.startsLabel')}),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', {name: translateForTest('meetings.scheduleModal.endsLabel')}),
+    ).toBeInTheDocument();
 
     const titleInput = screen.getByTestId('schedule-meeting-title');
     rerender(
@@ -114,5 +121,57 @@ describe('ScheduleMeetingForm', () => {
     );
 
     expect(titleInput).toHaveFocus();
+  });
+
+  it('renders the end-time validation error next to the end-time field', () => {
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {},
+          search: {},
+          team: {},
+        },
+      },
+    };
+
+    render(
+      withThemeAndRootContext(
+        <ScheduleMeetingForm
+          isOpen={false}
+          mode="create"
+          formState={{
+            title: '',
+            start: maybe.just(new Date(2026, 5, 16, 15, 0)),
+            end: maybe.just(new Date(2026, 5, 16, 14, 0)),
+            recurrence: 'doesNotRepeat',
+            selectedUsers: [],
+            participantsFilter: '',
+            password: '',
+            passwordConfirmation: '',
+          }}
+          errors={{
+            ...emptyScheduleMeetingFormErrors(),
+            endBeforeStart: translateForTest('meetings.scheduleModal.error.endBeforeStart'),
+          }}
+          onTitleChange={jest.fn()}
+          onStartChange={jest.fn()}
+          onEndChange={jest.fn()}
+          onRecurrenceChange={jest.fn()}
+          onSelectedUsersChange={jest.fn()}
+          onParticipantsFilterChange={jest.fn()}
+          selfUser={{} as User}
+        />,
+        createRootProviderWrapperForTest(
+          createRootContextValueForTest({
+            translate: translateForTest,
+            mainViewModel: mainViewModel as unknown as MainViewModel,
+          }),
+        ),
+      ),
+    );
+
+    expect(screen.getByTestId('schedule-meeting-end-time-error')).toHaveTextContent(
+      'meetings.scheduleModal.error.endBeforeStart',
+    );
   });
 });
