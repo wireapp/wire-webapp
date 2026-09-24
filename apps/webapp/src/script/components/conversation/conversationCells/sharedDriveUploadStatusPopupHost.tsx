@@ -45,8 +45,6 @@ interface SharedDriveUploadStatusPopupHostProps {
   readonly isFileTabActive: boolean;
 }
 
-const PROGRESS_PERCENTAGE_MAX = 100;
-
 const getRowStatusLabel = (
   row: SharedDriveUploadStatus,
   translate: Translate,
@@ -64,7 +62,6 @@ const getRowStatusLabel = (
     }
     return translate('cells.uploadStatus.uploadingFiles', {
       count: row.fileCount ?? 0,
-      progress: Math.round(row.progress * PROGRESS_PERCENTAGE_MAX),
     });
   }
 

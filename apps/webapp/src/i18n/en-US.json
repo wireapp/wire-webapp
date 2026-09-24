@@ -598,7 +598,7 @@
   "cells.uploadStatus.uploaded": "Uploaded {name}",
   "cells.uploadStatus.uploadedItems": "Uploaded {count} items",
   "cells.uploadStatus.uploadedSize": "Uploaded {size}",
-  "cells.uploadStatus.uploadingFiles": "Uploading {count} files · {progress}%",
+  "cells.uploadStatus.uploadingFiles": "Uploading {count} files…",
   "cells.uploadStatus.uploading": "Uploading {name}",
   "cells.uploadStatus.uploadingItems": "Uploading {count} items",
   "cells.uploadStatus.uploadingSize": "Uploading {size}…",
