@@ -17,10 +17,9 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 
-import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {mapMeetNowFormToMeetingCommand} from 'Components/meeting/mapMeetNowFormToMeetingCommand';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
@@ -32,86 +31,24 @@ import {
 import {showMeetingPartialAddFailureModal} from 'Components/meeting/shared/submit/showMeetingPartialAddFailureModal';
 import {showMeetingSubmitError} from 'Components/meeting/shared/submit/showMeetingSubmitError';
 import type {MeetNowMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
-import {handleJoinMeetingCallResult} from 'Components/meeting/useJoinMeetingCall';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {
-  showCallNotEstablishedModal,
-  type NoInternetCallGuardCopy,
-} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import {Config} from 'src/script/Config';
 import type {Translate} from 'Util/localizerUtil';
 
 import {meetNowSubmitResults, type MeetNowFormState, type MeetNowSubmitResult} from './meetNowTypes';
-
-const showConversationNotFoundModal = (translate: Translate): void => {
-  PrimaryModal.show(
-    PrimaryModal.type.ACKNOWLEDGE,
-    {
-      text: {
-        message: translate('conversationNotFoundMessage'),
-        title: translate('conversationNotFoundTitle', {brandName: Config.getConfig().BRAND_NAME}),
-      },
-    },
-    undefined,
-    translate,
-  );
-};
-
-type JoinCreatedMeetingParams = {
-  qualifiedConversationId: QualifiedId;
-  joinDeps: JoinMeetingCallDeps;
-  guardCall: (startCall: () => void) => void;
-  translate: Translate;
-  callNotEstablishedCopy: NoInternetCallGuardCopy;
-};
-
-const joinCreatedMeeting = async ({
-  qualifiedConversationId,
-  joinDeps,
-  guardCall,
-  translate,
-  callNotEstablishedCopy,
-}: JoinCreatedMeetingParams): Promise<MeetNowSubmitResult> => {
-  let joinAllowed = false;
-  guardCall(() => {
-    joinAllowed = true;
-  });
-
-  if (!joinAllowed) {
-    return meetNowSubmitResults.joinBlocked;
-  }
-
-  const result = await joinMeetingCall(joinDeps, qualifiedConversationId);
-
-  if (result.isErr) {
-    handleJoinMeetingCallResult(result, {
-      showConversationNotFoundModal: () => showConversationNotFoundModal(translate),
-      showJoinFailedModal: () => showCallNotEstablishedModal(callNotEstablishedCopy),
-    });
-    return meetNowSubmitResults.joinFailed;
-  }
-
-  return meetNowSubmitResults.joined;
-};
 
 export type SubmitMeetNowParams = {
   formState: MeetNowFormState;
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   loadMeetings: () => Promise<void>;
-  joinDeps: JoinMeetingCallDeps;
-  guardCall: (startCall: () => void) => void;
   translate: Translate;
-  callNotEstablishedCopy: NoInternetCallGuardCopy;
+  meetingStartTime: string;
 };
 
 export const submitMeetNow = async ({
   formState,
   meetNowMeeting,
   loadMeetings,
-  joinDeps,
-  guardCall,
   translate,
-  callNotEstablishedCopy,
+  meetingStartTime,
 }: SubmitMeetNowParams): Promise<MeetNowSubmitResult> => {
   const commandResult = mapMeetNowFormToMeetingCommand(formState);
 
@@ -141,11 +78,12 @@ export const submitMeetNow = async ({
     });
   }
 
-  return joinCreatedMeeting({
+  useMeetingPrepModal.getState().open({
+    meetingTitle: commandResult.value.title,
+    meetingStartTime,
+    qualifiedMeetingId: submitResult.value.qualifiedMeetingId,
     qualifiedConversationId: submitResult.value.qualifiedConversation,
-    joinDeps,
-    guardCall,
-    translate,
-    callNotEstablishedCopy,
   });
+
+  return meetNowSubmitResults.prepOpened;
 };
