@@ -19,6 +19,7 @@
 
 import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
@@ -260,7 +261,7 @@ export const Conversations = ({
   });
 
   const isGroupParticipantsVisible =
-    !!conversationsFilter &&
+    isNonEmptyString(conversationsFilter) &&
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
     groupParticipantsConversations.length > 0;
 
@@ -334,7 +335,7 @@ export const Conversations = ({
 
   useEffect(() => {
     const handleConversationShow = (conversation?: Conversation) => {
-      if (!conversation) {
+      if (isNullOrUndefined(conversation)) {
         return;
       }
 
@@ -356,14 +357,14 @@ export const Conversations = ({
   }, [currentTab, currentTabConversations, setCurrentTab]);
 
   useEffect(() => {
-    if (activeConversation && !conversationState.isVisible(activeConversation)) {
+    if (!isNullOrUndefined(activeConversation) && !conversationState.isVisible(activeConversation)) {
       // If the active conversation is not visible, switch to the recent view
       listViewModel.contentViewModel.loadPreviousContent();
     }
   }, [activeConversation, conversationState, listViewModel.contentViewModel, conversations.length]);
 
   useEffect(() => {
-    if (!activeConversation) {
+    if (isNullOrUndefined(activeConversation)) {
       return noop;
     }
 
@@ -390,7 +391,7 @@ export const Conversations = ({
 
   const changeTab = useCallback(
     (nextTab: SidebarTabs, folderId?: string) => {
-      if (!folderId) {
+      if (!isNonEmptyString(folderId)) {
         closeFolder();
       }
 
@@ -482,7 +483,7 @@ export const Conversations = ({
     (event: ReactKeyBoardEvent<HTMLDivElement>) => {
       const firstFoundConversation = conversationsForFocus?.[0];
 
-      if (firstFoundConversation) {
+      if (!isNullOrUndefined(firstFoundConversation)) {
         createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
         setConversationsFilter('');
         scrollToConversation(firstFoundConversation.id);
@@ -496,14 +497,14 @@ export const Conversations = ({
       cancelPendingFocusRef.current?.();
       const firstResult = conversationsForFocus[0];
 
-      if (!conversationsFilter || !firstResult) {
+      if (!isNonEmptyString(conversationsFilter) || isNullOrUndefined(firstResult)) {
         return;
       }
 
       const wasMounted = focusMountedConversation(firstResult.id);
       const wasFocused = wasMounted || focusConversation(firstResult.id);
 
-      if (!wasFocused) {
+      if (wasFocused === false) {
         return;
       }
 
@@ -601,7 +602,7 @@ export const Conversations = ({
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
-            showSearchInput={(showSearchInput && hasVisibleConversations) || !!conversationsFilter}
+            showSearchInput={(showSearchInput && hasVisibleConversations) || isNonEmptyString(conversationsFilter)}
             searchValue={conversationsFilter}
             setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}

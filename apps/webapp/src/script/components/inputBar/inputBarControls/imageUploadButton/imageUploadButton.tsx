@@ -19,6 +19,8 @@
 
 import {useRef} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -37,7 +39,7 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUpl
   const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {files} = event.target;
 
-    if (!files) {
+    if (isNullOrUndefined(files)) {
       return;
     }
 

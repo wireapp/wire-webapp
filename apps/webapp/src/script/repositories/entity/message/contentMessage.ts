@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
@@ -106,7 +107,7 @@ export class ContentMessage extends Message {
    * @returns `true` if the user was mentioned or quoted, `false` otherwise.
    */
   isUserTargeted(userId: QualifiedId): boolean {
-    return userId && (this.isUserMentioned(userId) || this.isUserQuoted(userId.id));
+    return this.isUserMentioned(userId) || this.isUserQuoted(userId.id);
   }
 
   /**
@@ -131,12 +132,12 @@ export class ContentMessage extends Message {
     const asset_et = this.getFirstAsset() as FileAsset;
     let {file_name} = asset_et;
 
-    if (!file_name) {
+    if (!isNonEmptyString(file_name)) {
       const date = this.timestamp();
       file_name = `Wire ${formatLocale(date, 'yyyy-MM-dd')} at ${formatTimeShort(date)}`;
     }
 
-    if (asset_et.file_type) {
+    if (isNonEmptyString(asset_et.file_type)) {
       const file_extension = asset_et.file_type.split('/').pop();
       file_name = `${file_name}.${file_extension}`;
     }

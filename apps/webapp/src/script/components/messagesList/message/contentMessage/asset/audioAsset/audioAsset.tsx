@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -66,7 +67,7 @@ export const AudioAsset = ({
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration ?? 0);
   const [audioSrc, setAudioSrc] = useState<AssetUrl>();
   const onTimeupdate = () => {
-    if (audioElement !== undefined) {
+    if (!isUndefined(audioElement)) {
       setAudioTime(audioElement.currentTime);
     }
   };
@@ -74,7 +75,7 @@ export const AudioAsset = ({
   const onPauseButtonClicked = () => audioElement?.pause();
 
   const onPlayButtonClicked = async () => {
-    if (audioSrc !== undefined) {
+    if (!isUndefined(audioSrc)) {
       audioElement?.play();
     } else {
       asset.status(AssetTransferState.DOWNLOADING);
@@ -89,7 +90,7 @@ export const AudioAsset = ({
   };
 
   useEffect(() => {
-    if (audioSrc && audioElement) {
+    if (!isUndefined(audioSrc) && !isUndefined(audioElement)) {
       const playPromise = audioElement.play();
 
       playPromise?.catch((error: unknown) => {
@@ -129,23 +130,26 @@ export const AudioAsset = ({
                     isFocusable={isFocusable}
                   />
 
-                  {transferState !== AssetTransferState.UPLOADING && audioElement && (
-                    <>
-                      <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
-                        {formatSeconds(audioTime)}
-                      </span>
-                      {showLoudnessPreview ? (
-                        <AudioSeekBar audioElement={audioElement} asset={asset} disabled={!audioSrc} />
-                      ) : (
-                        <SeekBar
-                          dark
-                          mediaElement={audioElement}
-                          disabled={!audioSrc}
-                          data-uie-name="status-audio-seekbar"
-                        />
-                      )}
-                    </>
-                  )}
+                  {transferState !== AssetTransferState.UPLOADING &&
+                    (!isUndefined(audioElement) ? (
+                      <>
+                        <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
+                          {formatSeconds(audioTime)}
+                        </span>
+                        {showLoudnessPreview ? (
+                          <AudioSeekBar audioElement={audioElement} asset={asset} disabled={isUndefined(audioSrc)} />
+                        ) : (
+                          <SeekBar
+                            dark
+                            mediaElement={audioElement}
+                            disabled={isUndefined(audioSrc)}
+                            data-uie-name="status-audio-seekbar"
+                          />
+                        )}
+                      </>
+                    ) : (
+                      audioElement
+                    ))}
                 </div>
               )}
             </>

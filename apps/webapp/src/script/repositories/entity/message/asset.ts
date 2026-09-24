@@ -69,7 +69,7 @@ export class Asset {
   }
 
   isVideo(): boolean {
-    return this.type === AssetType.FILE && !!this.file_type?.startsWith('video');
+    return this.type === AssetType.FILE && this.file_type?.startsWith('video') === true;
   }
 
   isAudio(): boolean {

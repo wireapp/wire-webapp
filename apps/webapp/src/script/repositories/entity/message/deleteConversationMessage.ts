@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/teamEvent';
 
 import {type Translate} from 'Util/localizerUtil';
@@ -33,8 +34,8 @@ export class DeleteConversationMessage extends SystemMessage {
     this.type = TEAM_EVENT.DELETE;
     this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
 
-    this.caption = conversationEntity
-      ? this.translate('notificationConversationDeletedNamed', {name: conversationEntity.name()})
-      : this.translate('notificationConversationDeleted');
+    this.caption = isNullOrUndefined(conversationEntity)
+      ? this.translate('notificationConversationDeleted')
+      : this.translate('notificationConversationDeletedNamed', {name: conversationEntity.name()});
   }
 }

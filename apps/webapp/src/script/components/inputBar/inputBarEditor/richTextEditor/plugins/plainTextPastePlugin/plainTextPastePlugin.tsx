@@ -20,6 +20,7 @@
 import {useCallback, useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {isEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {$getSelection, $isRangeSelection, COMMAND_PRIORITY_HIGH, PASTE_COMMAND} from 'lexical';
 
 export const PlainTextPastePlugin = (): null => {
@@ -29,7 +30,7 @@ export const PlainTextPastePlugin = (): null => {
     const plainText = event.clipboardData?.getData('text/plain');
     const selection = $getSelection();
 
-    if (!plainText || !$isRangeSelection(selection)) {
+    if (isNullOrUndefined(plainText) || isEmptyString(plainText) || !$isRangeSelection(selection)) {
       return false;
     }
 

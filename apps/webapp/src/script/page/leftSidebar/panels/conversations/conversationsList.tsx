@@ -28,6 +28,7 @@ import React, {
   RefObject,
 } from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {useDebouncedCallback} from 'use-debounce';
@@ -145,7 +146,7 @@ export const ConversationsList = ({
         matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
       );
 
-      return !!call && !conversation.isSelfUserRemoved();
+      return !isNullOrUndefined(call) && !conversation.isSelfUserRemoved();
     },
     [joinableCalls],
   );
@@ -175,7 +176,7 @@ export const ConversationsList = ({
         return item.id;
       }
 
-      if (item && 'heading' in item) {
+      if (!isNullOrUndefined(item) && 'heading' in item) {
         return `heading-${item.heading}`;
       }
 
@@ -201,7 +202,7 @@ export const ConversationsList = ({
   }, []);
 
   useEffect(() => {
-    if (!cancelPendingFocusRef) {
+    if (isNullOrUndefined(cancelPendingFocusRef)) {
       return;
     }
 
@@ -225,7 +226,7 @@ export const ConversationsList = ({
   );
   const focusConversation = useCallback(
     (conversationId: string) => {
-      if (focusMountedConversation?.(conversationId)) {
+      if (focusMountedConversation?.(conversationId) === true) {
         return true;
       }
 
@@ -248,7 +249,7 @@ export const ConversationsList = ({
   );
 
   useEffect(() => {
-    if (!focusConversationRef) {
+    if (isNullOrUndefined(focusConversationRef)) {
       return;
     }
 
@@ -262,7 +263,7 @@ export const ConversationsList = ({
   }, [focusConversation, focusConversationRef]);
 
   useLayoutEffect(() => {
-    if (!pendingFocusRequest) {
+    if (isNullOrUndefined(pendingFocusRequest)) {
       return;
     }
 
@@ -281,7 +282,7 @@ export const ConversationsList = ({
       return;
     }
 
-    if (focusMountedConversation?.(pendingFocusRequest.conversationId)) {
+    if (focusMountedConversation?.(pendingFocusRequest.conversationId) === true) {
       onConversationFocused?.(pendingFocusRequest.conversationId);
       setPendingFocusRequest(null);
     }
@@ -350,7 +351,7 @@ export const ConversationsList = ({
   };
 
   useEffect(() => {
-    if (!conversationsFilter && clickedFilteredConversationId) {
+    if (!isNonEmptyString(conversationsFilter) && isNonEmptyString(clickedFilteredConversationId)) {
       const conversationIndex = conversationsToDisplay
         .filter(conv => isConversationEntity(conv))
         .findIndex(conv => conv.id === clickedFilteredConversationId);
@@ -422,7 +423,7 @@ export const ConversationsList = ({
           // in the future
           const isHeading = 'isHeader' in conversation && 'heading' in conversation;
 
-          if (!isConversationEntity(conversation) && conversationsFilter && !isEmpty && isHeading) {
+          if (!isConversationEntity(conversation) && isNonEmptyString(conversationsFilter) && !isEmpty && isHeading) {
             const translationKey = conversation.heading as 'searchConversationNames' | 'searchGroupParticipants';
             return (
               <li

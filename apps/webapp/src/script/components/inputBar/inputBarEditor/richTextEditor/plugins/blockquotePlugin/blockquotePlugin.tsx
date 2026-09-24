@@ -21,6 +21,7 @@ import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$isQuoteNode} from '@lexical/rich-text';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {
   COMMAND_PRIORITY_LOW,
   KEY_ENTER_COMMAND,
@@ -56,7 +57,7 @@ const registerBlockquoteEnterCommand = (editor: LexicalEditor) => {
   return editor.registerCommand(
     KEY_ENTER_COMMAND,
     event => {
-      if (!event) {
+      if (isNullOrUndefined(event)) {
         return false;
       }
 

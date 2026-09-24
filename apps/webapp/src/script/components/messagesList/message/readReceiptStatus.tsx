@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {isFunction, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {ReadIcon} from 'Components/icon';
@@ -41,7 +42,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
   useEffect(() => {
-    if (message.expectsReadConfirmation && readReceipts.length) {
+    if (message.expectsReadConfirmation && isNonEmptyArray(readReceipts)) {
       const text = is1to1Conversation
         ? formatTimeShort(readReceipts[0].time)
         : readReceipts.length.toString(DECIMAL_NUMBER_BASE);
@@ -49,7 +50,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
     }
   }, [is1to1Conversation, message.expectsReadConfirmation, readReceipts]);
 
-  const showEyeIndicator = !!readReceiptText;
+  const showEyeIndicator = isNonEmptyString(readReceiptText);
 
   if (!showEyeIndicator) {
     return null;
@@ -60,7 +61,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
       className={cx(
         'message-status-read',
         is1to1Conversation && 'message-status-read__one-on-one',
-        !!onClickDetails && 'message-status-read__clickable',
+        isFunction(onClickDetails) && 'message-status-read__clickable',
       )}
       data-uie-name="status-message-read-receipts"
       aria-label={translate('accessibility.messageDetailsReadReceipts', {readReceiptText})}

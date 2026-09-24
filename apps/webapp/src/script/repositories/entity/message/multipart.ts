@@ -17,6 +17,7 @@
  *
  */
 
+import {isEmptyArray, isNonEmptyArray, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
@@ -46,7 +47,7 @@ export class Multipart extends Asset {
     this.mentions = ko.observableArray();
     this.previews = ko.observableArray();
 
-    if (attachments?.length) {
+    if (isNonEmptyArray(attachments)) {
       this.attachments = ko.observableArray(attachments);
     }
 
@@ -54,7 +55,7 @@ export class Multipart extends Asset {
       if (this.text === null || this.text.length === 0) {
         return false;
       }
-      const has_link_previews = this.previews().length > 0;
+      const has_link_previews = isNonEmptyArray(this.previews());
       return !has_link_previews || (has_link_previews && !containsOnlyLink(this.text));
     });
   }
@@ -62,7 +63,7 @@ export class Multipart extends Asset {
   // Process text before rendering it
   render(selfId: QualifiedId, themeColor?: string): string {
     const message = renderMessage(this.text, selfId, this.mentions());
-    return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
+    return isEmptyArray(this.previews()) ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 
   isUserMentioned(userId: QualifiedId): boolean {
@@ -72,12 +73,12 @@ export class Multipart extends Asset {
   getCellAssets(): Array<ICellAsset> {
     const attachments = this.attachments?.();
 
-    if (!attachments) {
+    if (isUndefined(attachments)) {
       return [];
     }
 
     return attachments
-      .map(attachment => (attachment.cellAsset ? {...attachment.cellAsset} : null))
-      .filter(Boolean) as Array<ICellAsset>;
+      .map(attachment => (!isNullOrUndefined(attachment.cellAsset) ? {...attachment.cellAsset} : null))
+      .filter((cellAsset): cellAsset is ICellAsset => !isNull(cellAsset));
   }
 }

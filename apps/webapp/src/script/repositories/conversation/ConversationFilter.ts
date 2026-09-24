@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
+
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 
@@ -27,7 +29,7 @@ export class ConversationFilter {
 
   static showCallControls(conversationEntity: Conversation, hasCall: boolean): boolean {
     const isSupportedConversation = conversationEntity.isGroupOrChannel() || conversationEntity.is1to1();
-    const hasParticipants = !!conversationEntity.participating_user_ids().length;
+    const hasParticipants = isNonEmptyArray(conversationEntity.participating_user_ids());
     const isActiveConversation = hasParticipants && !conversationEntity.isSelfUserRemoved();
     return !hasCall && isSupportedConversation && isActiveConversation;
   }

@@ -19,6 +19,7 @@
 
 import {useRef, useState} from 'react';
 
+import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
 
@@ -96,7 +97,8 @@ export const EmojiPill = ({
 
   const reactingUserNames = tooltipReactorIds.map(reactorId => {
     const user = resolvedReactingUsers.find(reactingUser => matchQualifiedIds(reactorId, reactingUser.qualifiedId));
-    return user?.name() || translate('deletedUser');
+    const reactingUserName = user?.name();
+    return isNonEmptyString(reactingUserName) ? reactingUserName : translate('deletedUser');
   });
 
   async function loadMissingReactingUsers(): Promise<void> {
@@ -151,7 +153,13 @@ export const EmojiPill = ({
       );
     }
 
-    return translate('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''}, {}, true);
+    const reactingUserName = reactingUserNames[0];
+    return translate(
+      'conversationLikesCaptionSingular',
+      {userName: isNonEmptyString(reactingUserName) ? reactingUserName : ''},
+      {},
+      true,
+    );
   };
 
   const caption = conversationReactionCaption();
@@ -178,7 +186,8 @@ export const EmojiPill = ({
   ]);
 
   return (
-    !!emojiCount && (
+    emojiCount !== 0 &&
+    !isNan(emojiCount) && (
       <Tooltip
         body={
           <div css={messageReactionButtonTooltip}>

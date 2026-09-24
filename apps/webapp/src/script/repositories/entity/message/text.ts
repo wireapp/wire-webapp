@@ -17,6 +17,7 @@
  *
  */
 
+import {isEmptyArray, isNonEmptyArray} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
@@ -47,7 +48,7 @@ export class Text extends Asset {
       if (this.text === null || this.text.length === 0) {
         return false;
       }
-      const has_link_previews = this.previews().length > 0;
+      const has_link_previews = isNonEmptyArray(this.previews());
       return !has_link_previews || (has_link_previews && !containsOnlyLink(this.text));
     });
   }
@@ -55,7 +56,7 @@ export class Text extends Asset {
   // Process text before rendering it
   render(selfId: QualifiedId, themeColor?: string): string {
     const message = renderMessage(this.text, selfId, this.mentions());
-    return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
+    return isEmptyArray(this.previews()) ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 
   isUserMentioned(userId: QualifiedId): boolean {

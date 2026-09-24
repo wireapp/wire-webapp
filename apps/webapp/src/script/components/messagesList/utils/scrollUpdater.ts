@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {Message} from 'Repositories/entity/message/message';
 import {StatusType} from 'src/script/message/statusType';
 
@@ -33,13 +35,13 @@ type MessageListContext = {
 export function updateScroll(
   container: HTMLElement,
   {focusedElement, prevScrollHeight, prevNbMessages, messages, selfUserId}: MessageListContext,
-) {
+): number {
   const newNbMessages = messages.length;
   const lastMessage = messages[newNbMessages - 1];
   const scrollBottomPosition = container.scrollTop + container.clientHeight;
   const shouldStickToBottom = prevScrollHeight - scrollBottomPosition < 100;
 
-  if (focusedElement) {
+  if (!isNullOrUndefined(focusedElement)) {
     // If we have an element we want to focus
     const {element, center} = focusedElement;
     const elementPosition = element.getBoundingClientRect();

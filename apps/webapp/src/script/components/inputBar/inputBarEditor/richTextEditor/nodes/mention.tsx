@@ -22,6 +22,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {useLexicalNodeSelection} from '@lexical/react/useLexicalNodeSelection';
 import {mergeRegister} from '@lexical/utils';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {
   $getNodeByKey,
   $getSelection,
@@ -71,7 +72,8 @@ export const Mention = (props: MentionComponentProps) => {
       classes.push(classNameFocused);
     }
 
-    return classes.join(' ').trim() || undefined;
+    const mentionClasses = classes.join(' ').trim();
+    return isNonEmptyString(mentionClasses) ? mentionClasses : undefined;
   }, [className, classNameFocused, isFocused]);
 
   const deleteMention = useCallback(
@@ -130,7 +132,7 @@ export const Mention = (props: MentionComponentProps) => {
   const moveCursor = useCallback(
     (event: KeyboardEvent) => {
       const node = $getNodeByKey(nodeKey);
-      if (!node || !node.isSelected()) {
+      if (isNullOrUndefined(node) || !node.isSelected()) {
         return false;
       }
 

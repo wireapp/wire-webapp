@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
+
 import * as Icon from 'Components/icon';
 import {Message} from 'Repositories/entity/message/message';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -40,14 +42,14 @@ export const ReadIndicator = ({
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
   if (is1to1Conversation) {
-    const readReceiptText = readReceipts.length ? formatTimeShort(readReceipts[0].time) : '';
+    const readReceiptText = isNonEmptyArray(readReceipts) ? formatTimeShort(readReceipts[0].time) : '';
 
     return (
       <div css={ReadIndicatorContainer} className="read-indicator-wrapper">
         <span css={ReadIndicatorStyles(showIconOnly)} data-uie-name="status-message-read-receipts">
-          {showIconOnly && readReceiptText && <Icon.ReadIcon />}
+          {showIconOnly && (isNonEmptyString(readReceiptText) ? <Icon.ReadIcon /> : readReceiptText)}
 
-          {!showIconOnly && !!readReceiptText && (
+          {!showIconOnly && isNonEmptyString(readReceiptText) && (
             <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-text">
               <Icon.ReadIcon /> {readReceiptText}
             </div>

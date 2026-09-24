@@ -19,6 +19,7 @@
 
 import React, {useLayoutEffect, useRef, useEffect} from 'react';
 
+import {isFunction, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
@@ -103,7 +104,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocused);
 
   useLayoutEffect(() => {
-    if (!messageElementRef.current) {
+    if (isNull(messageElementRef.current)) {
       return;
     }
     if (isHighlighted) {
@@ -116,7 +117,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     // when a message is focused set its elements focusable
     if (!event.shiftKey && isTabKey(event)) {
-      if (!messageElementRef.current) {
+      if (isNull(messageElementRef.current)) {
         return;
       }
       setMsgElementsFocusable(true);
@@ -142,7 +143,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
   useEffect(() => {
-    if (!messageElementRef.current || message.isContent()) {
+    if (isNull(messageElementRef.current) || message.isContent()) {
       return;
     }
     const interactiveMsgElements = getAllFocusableElements(messageElementRef.current);
@@ -177,7 +178,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
       onKeyDown={handleDivKeyDown}
       onClick={() => handleFocus(message.id)}
     >
-      {onVisible ? (
+      {isFunction(onVisible) ? (
         <InViewport
           requireFullyInView
           allowBiggerThanViewport

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -52,7 +53,7 @@ const getConversationActions = ({
   isParticipantBlocked = false,
   translate,
 }: GetConversationActionsParams): MenuItem[] => {
-  if (!conversationEntity) {
+  if (isNullOrUndefined(conversationEntity)) {
     return [];
   }
 
@@ -97,7 +98,7 @@ const getConversationActions = ({
       condition: conversationEntity.isRequest(),
       item: {
         click: async () => {
-          if (!userEntity) {
+          if (isNullOrUndefined(userEntity)) {
             return;
           }
           void actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation());
@@ -117,10 +118,10 @@ const getConversationActions = ({
       },
     },
     {
-      condition: isSingleUser && Boolean(userEntity?.isConnected() || userEntity?.isRequest()),
+      condition: isSingleUser && (userEntity?.isConnected() === true || userEntity?.isRequest() === true),
       item: {
         click: () => {
-          if (!userEntity) {
+          if (isNullOrUndefined(userEntity)) {
             return;
           }
           void actionsViewModel.blockUser(userEntity);
@@ -134,7 +135,7 @@ const getConversationActions = ({
       condition: isSingleUser && isParticipantBlocked,
       item: {
         click: () => {
-          if (!userEntity) {
+          if (isNullOrUndefined(userEntity)) {
             return;
           }
           void actionsViewModel.unblockUser(userEntity);

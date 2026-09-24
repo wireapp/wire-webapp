@@ -17,10 +17,11 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {ElementNode, TextNode} from 'lexical';
 
 export const isListNode = (node: TextNode | ElementNode | null, listType: 'ordered' | 'unordered'): boolean => {
-  if (!node) {
+  if (isNullOrUndefined(node)) {
     return false;
   }
 

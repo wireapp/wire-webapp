@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
@@ -40,7 +41,7 @@ export class RenameMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
     this.name = name;
 
-    if (userId) {
+    if (isNonEmptyString(userId)) {
       this.from = userId;
       this.fromDomain = userDomain;
       this.user(new User(userId, userDomain ?? '', this.translate));
@@ -50,7 +51,7 @@ export class RenameMessage extends SystemMessage {
   }
 
   private generateCaption(): string {
-    if (!this.user()) {
+    if (isNullOrUndefined(this.user())) {
       return this.translate('conversationRename');
     }
 

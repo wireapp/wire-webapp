@@ -766,6 +766,28 @@ const productionConfigs = [
     },
   },
   {
+    files: ['apps/webapp/src/script/repositories/entity/message/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', '**/test/**', '**/mocks/**'],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**/*.{ts,tsx}'],
+    ignores: [
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+      '**/test/**',
+      '**/mocks/**',
+      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
     files: [
       'apps/webapp/src/script/repositories/assets/**/*.{ts,tsx}',
       'apps/webapp/src/script/repositories/audio/**/*.{ts,tsx}',
@@ -812,6 +834,131 @@ const productionConfigs = [
       'apps/webapp/src/script/repositories/storage/record/eventRecordGuards.ts',
       'apps/webapp/src/script/repositories/storage/storageSchemata.ts',
     ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/components/conversation/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/components/conversation/conversation.tsx',
+      'apps/webapp/src/script/components/conversation/conversationCells/**',
+      'apps/webapp/src/script/components/conversation/conversationTabs/conversationTabs.tsx',
+      'apps/webapp/src/script/components/conversation/hooks/useReadReceipt.ts',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/buildCellFileMetadata/**',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/createFileDropHandler/**',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/transformAcceptedFiles/**',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/useFilesUploadDropzone.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/components/messagesList/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**',
+      'apps/webapp/src/script/components/messagesList/message/e2eiVerificationMessage/**',
+      'apps/webapp/src/script/components/messagesList/message/messageWrapper.tsx',
+      'apps/webapp/src/script/components/messagesList/uploadAssets/**',
+      'apps/webapp/src/script/components/messagesList/utils/messagesFilter.ts',
+      'apps/webapp/src/script/components/messagesList/utils/useLoadConversation.ts',
+      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/useLoadMessages.ts',
+      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/virtualizedMessagesList.tsx',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/components/inputBar/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/components/inputBar/inputBar.tsx',
+      'apps/webapp/src/script/components/inputBar/filePreviews/useFilePreview/useFilePreview.ts',
+      'apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/sendPlugin/sendPlugin.tsx',
+      'apps/webapp/src/script/components/inputBar/useFileHandling/**',
+      'apps/webapp/src/script/components/inputBar/useMessageHandling/**',
+      'apps/webapp/src/script/components/inputBar/usePing/usePing.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/inputBar/useMessageHandling/useDraftState/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/inputBar/useMessageHandling/useOutsideInputClick/**/*.{ts,tsx}',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/page/leftSidebar/panels/conversations/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/page/leftSidebar/panels/conversations/conversationCallingView/**',
+      'apps/webapp/src/script/page/leftSidebar/panels/conversations/useFoldersStore.ts',
+      'apps/webapp/src/script/page/leftSidebar/panels/conversations/useSidebarStore.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/page/rightSidebar/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/page/rightSidebar/calling/**',
+      'apps/webapp/src/script/page/rightSidebar/groupParticipantService/**',
+      'apps/webapp/src/script/page/rightSidebar/panelHeader/**',
+      'apps/webapp/src/script/page/rightSidebar/sharedDrive/**',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/repositories/conversation/AccessState.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationAccessPermission.ts',
+      'apps/webapp/src/script/repositories/conversation/ClientMismatchUtil.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationFilter.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationLabelRepository.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationMapper.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationRoleRepository.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationState.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationStatus.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationStatusIcon.ts',
+      'apps/webapp/src/script/repositories/conversation/NotificationSetting.ts',
+      'apps/webapp/src/script/repositories/conversation/isSelfInitiatedConversationLeave.ts',
+      'apps/webapp/src/script/repositories/conversation/linkPreviews/**/*.{ts,tsx}',
+      'apps/webapp/src/script/repositories/conversation/userClientsUtils.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationHeader.tsx',
+      'apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationSteps/ConversationDetails/ConversationNameInput.tsx',
+      'apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationSteps/ConversationDetails/CustomHistoryModal.tsx',
+      'apps/webapp/src/script/components/Modals/CreateConversation/utils.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/conversationListCell/**/*.{ts,tsx}',
+      'apps/webapp/src/script/hooks/useConversationFocus.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/util/messageRenderer.ts'],
     rules: {
       ...strictBooleanRules,
     },

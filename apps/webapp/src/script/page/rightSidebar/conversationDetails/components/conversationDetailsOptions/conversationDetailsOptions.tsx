@@ -19,7 +19,7 @@
 
 import {type ReactElement} from 'react';
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
@@ -156,8 +156,8 @@ function ConversationDetailsOptionsContent({
   });
 
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
-  const isTeamConversation = !!teamId;
-  const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isTeamConversation = isNonEmptyString(teamId);
+  const isCellsConversation = isNonEmptyString(cellsState) && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
   const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
   const selfUserDriveRole = getSelfUserDriveRole({conversationTeamId: teamId, selfUserTeamId: selfUser.teamId});
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
@@ -220,11 +220,11 @@ function ConversationDetailsOptionsContent({
               className="conversation-details__access"
               onClick={openAccessPanel}
               dataUieName="go-access"
-              icon={isChannelPublic ? <UnlockedIcon /> : <LockClosedIcon width={14} height={14} />}
+              icon={isChannelPublic === true ? <UnlockedIcon /> : <LockClosedIcon width={14} height={14} />}
               title={translate('conversationAccessTitle')}
               statusUieName="status-access"
               statusText={
-                isChannelPublic
+                isChannelPublic === true
                   ? translate('createConversationAccessOptionPublic')
                   : translate('createConversationAccessOptionPrivate')
               }
@@ -326,11 +326,9 @@ function ConversationDetailsOptionsContent({
           <>
             <ConversationDetailsBottomActions
               isDeviceActionEnabled={
-                !!(
-                  isSingleUserMode &&
-                  firstParticipant &&
-                  (firstParticipant.isConnected() || teamState.isInTeam(firstParticipant))
-                )
+                isSingleUserMode &&
+                !isNullOrUndefined(firstParticipant) &&
+                (firstParticipant.isConnected() || teamState.isInTeam(firstParticipant))
               }
               showDevices={openParticipantDevices}
               showNotifications={showNotifications}

@@ -29,7 +29,7 @@ import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor, EditorState} from 'lexical';
 import {noop} from 'noop-esm';
 
@@ -118,7 +118,7 @@ export const RichTextEditor = ({
 
   const handleChange = (editorState: EditorState) => {
     editorState.read(() => {
-      if (!editorRef.current) {
+      if (isNull(editorRef.current)) {
         return;
       }
 
@@ -136,7 +136,7 @@ export const RichTextEditor = ({
     });
   };
 
-  const isEditing = !!editedMessage;
+  const isEditing = !isNullOrUndefined(editedMessage);
 
   return (
     <LexicalComposer initialConfig={editorConfig}>

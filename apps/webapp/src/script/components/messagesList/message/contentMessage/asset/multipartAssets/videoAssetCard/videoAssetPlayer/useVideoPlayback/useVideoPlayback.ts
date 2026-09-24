@@ -19,6 +19,8 @@
 
 import {useState, useCallback, useRef, SyntheticEvent} from 'react';
 
+import {isEmptyString, isUndefined} from '@sindresorhus/is';
+
 import {isVideoPlayable} from './isVideoPlayable/isVideoPlayable';
 
 interface UseVideoPlaybackProps {
@@ -37,14 +39,14 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
   const playabilityStatusRef = useRef<PlayabilityStatus>('not-checked');
 
   const handleTimeUpdate = useCallback(() => {
-    if (!videoElement) {
+    if (isUndefined(videoElement)) {
       return;
     }
     setCurrentTime(videoElement.currentTime);
   }, [videoElement]);
 
   const getPlayabilityStatus = useCallback(async (url?: string): Promise<PlayabilityStatus> => {
-    if (url === undefined || url === '') {
+    if (isUndefined(url) || isEmptyString(url)) {
       return 'unplayable';
     }
 
@@ -68,7 +70,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
   }, []);
 
   const play = useCallback(async () => {
-    if (!videoElement) {
+    if (isUndefined(videoElement)) {
       return;
     }
 
@@ -78,7 +80,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
   }, [videoElement]);
 
   const handlePlay = useCallback(async (): Promise<void> => {
-    if (!isEnabled || url === undefined || url === '' || !videoElement) {
+    if (!isEnabled || isUndefined(url) || isEmptyString(url) || isUndefined(videoElement)) {
       return;
     }
 
