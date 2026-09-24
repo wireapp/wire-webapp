@@ -19,6 +19,8 @@
 
 import {FC, useEffect, useState} from 'react';
 
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
@@ -76,7 +78,12 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
       value: time,
     }));
 
-    if (!!messageTimer && !EphemeralTimings.VALUES.includes(messageTimer)) {
+    if (
+      !isNullOrUndefined(messageTimer) &&
+      messageTimer !== 0 &&
+      !isNan(messageTimer) &&
+      !EphemeralTimings.VALUES.includes(messageTimer)
+    ) {
       mappedTimes.push({
         isCustom: true,
         text: formatDuration(messageTimer, translate).text,

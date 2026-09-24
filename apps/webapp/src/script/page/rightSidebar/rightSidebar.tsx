@@ -19,6 +19,7 @@
 
 import {cloneElement, FC, isValidElement, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
@@ -138,12 +139,13 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const lastItem = rightSidebar.history.length - 1;
   const currentState = rightSidebar.history[lastItem];
 
-  const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
-  const userServiceEntity = currentEntity && isUserAppOrServiceEntity(currentEntity) ? currentEntity : null;
-  const messageEntity = currentEntity && isReadableMessage(currentEntity) ? currentEntity : null;
-  const serviceEntity = currentEntity && isAppOrServiceEntity(currentEntity) ? currentEntity : null;
+  const userEntity = !isNullOrUndefined(currentEntity) && isUserEntity(currentEntity) ? currentEntity : null;
+  const userServiceEntity =
+    !isNullOrUndefined(currentEntity) && isUserAppOrServiceEntity(currentEntity) ? currentEntity : null;
+  const messageEntity = !isNullOrUndefined(currentEntity) && isReadableMessage(currentEntity) ? currentEntity : null;
+  const serviceEntity = !isNullOrUndefined(currentEntity) && isAppOrServiceEntity(currentEntity) ? currentEntity : null;
 
-  const goToRoot = () => rightSidebar.goToRoot(activeConversation || null);
+  const goToRoot = () => rightSidebar.goToRoot(isNullOrUndefined(activeConversation) ? null : activeConversation);
 
   const closePanel = () => rightSidebar.close();
 
@@ -152,9 +154,11 @@ const RightSidebar: FC<RightSidebarProps> = ({
     rightSidebar.goTo(newState, {entity, isAddMode});
   };
 
-  const onBackClick = (entity: PanelEntity | null = activeConversation || null) => {
+  const onBackClick = (
+    entity: PanelEntity | null = isNullOrUndefined(activeConversation) ? null : activeConversation,
+  ) => {
     const previousHistory = rightSidebar.history.slice(0, -1);
-    const hasPreviousHistory = !!previousHistory.length;
+    const hasPreviousHistory = isNonEmptyArray(previousHistory);
     setAnimatePanelToLeft(false);
 
     if (hasPreviousHistory && previousHistory.length === 1 && previousHistory[0] === PanelState.MESSAGE_DETAILS) {
@@ -180,7 +184,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const switchContent = (newContentState: string) => {
     const isCollectionState = newContentState === ContentState.COLLECTION;
 
-    if (isCollectionState && currentState) {
+    if (isCollectionState && isNonEmptyString(currentState)) {
       closePanel();
     }
   };
@@ -197,9 +201,31 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const containerRef = useCallback((element: HTMLDivElement | null) => element?.focus(), [currentState]);
 
-  if (!activeConversation) {
+  if (isNullOrUndefined(activeConversation)) {
     return null;
   }
+
+  const shouldRenderGroupParticipantService =
+    currentState === PanelState.GROUP_PARTICIPANT_SERVICE &&
+    !isNullOrUndefined(serviceEntity) &&
+    !isNullOrUndefined(userServiceEntity);
+
+  const groupParticipantService = shouldRenderGroupParticipantService ? (
+    <GroupParticipantService
+      activeConversation={activeConversation}
+      actionsViewModel={actionsViewModel}
+      integrationRepository={integrationRepository}
+      conversationRepository={conversationRepository}
+      teamRepository={teamRepository}
+      enableRemove={conversationRoleRepository.canRemoveParticipants(activeConversation)}
+      goToRoot={goToRoot}
+      onBack={onBackClick}
+      onClose={closePanel}
+      serviceEntity={serviceEntity}
+      selfUser={selfUser}
+      isAddMode={rightSidebar.isAddMode}
+    />
+  ) : null;
 
   return (
     <TransitionGroup
@@ -235,23 +261,24 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
-            <GroupParticipantUser
-              key={userEntity.id}
-              onBack={onBackClick}
-              onClose={closePanel}
-              goToRoot={goToRoot}
-              showDevices={showDevices}
-              currentUser={userEntity}
-              activeConversation={activeConversation}
-              actionsViewModel={actionsViewModel}
-              conversationRoleRepository={conversationRoleRepository}
-              teamRepository={teamRepository}
-              teamState={teamState}
-              selfUser={selfUser}
-              isFederated={isFederated}
-            />
-          )}
+          {currentState === PanelState.GROUP_PARTICIPANT_USER &&
+            (isNullOrUndefined(userEntity) ? null : (
+              <GroupParticipantUser
+                key={userEntity.id}
+                onBack={onBackClick}
+                onClose={closePanel}
+                goToRoot={goToRoot}
+                showDevices={showDevices}
+                currentUser={userEntity}
+                activeConversation={activeConversation}
+                actionsViewModel={actionsViewModel}
+                conversationRoleRepository={conversationRoleRepository}
+                teamRepository={teamRepository}
+                teamState={teamState}
+                selfUser={selfUser}
+                isFederated={isFederated}
+              />
+            ))}
 
           {currentState === PanelState.NOTIFICATIONS && (
             <Notifications
@@ -262,15 +289,16 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
-            <ParticipantDevices
-              groupId={activeConversation.groupId}
-              repositories={repositories}
-              onClose={closePanel}
-              onGoBack={onBackClick}
-              user={userEntity}
-            />
-          )}
+          {currentState === PanelState.PARTICIPANT_DEVICES &&
+            (isNullOrUndefined(userEntity) ? null : (
+              <ParticipantDevices
+                groupId={activeConversation.groupId}
+                repositories={repositories}
+                onClose={closePanel}
+                onGoBack={onBackClick}
+                user={userEntity}
+              />
+            ))}
 
           {currentState === PanelState.TIMED_MESSAGES && (
             <TimedMessages
@@ -299,22 +327,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.GROUP_PARTICIPANT_SERVICE && serviceEntity && userServiceEntity && (
-            <GroupParticipantService
-              activeConversation={activeConversation}
-              actionsViewModel={actionsViewModel}
-              integrationRepository={integrationRepository}
-              conversationRepository={conversationRepository}
-              teamRepository={teamRepository}
-              enableRemove={conversationRoleRepository.canRemoveParticipants(activeConversation)}
-              goToRoot={goToRoot}
-              onBack={onBackClick}
-              onClose={closePanel}
-              serviceEntity={serviceEntity}
-              selfUser={selfUser}
-              isAddMode={rightSidebar.isAddMode}
-            />
-          )}
+          {groupParticipantService}
 
           {currentState === PanelState.ADD_PARTICIPANTS && (
             <AddParticipants
@@ -332,18 +345,19 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
-            <MessageDetails
-              activeConversation={activeConversation}
-              selfUser={selfUser}
-              conversationRepository={conversationRepository}
-              messageEntity={messageEntity}
-              showReactions={rightSidebar.showReactions}
-              userRepository={userRepository}
-              onClose={closePanel}
-              togglePanel={togglePanel}
-            />
-          )}
+          {currentState === PanelState.MESSAGE_DETAILS &&
+            (isNullOrUndefined(messageEntity) ? null : (
+              <MessageDetails
+                activeConversation={activeConversation}
+                selfUser={selfUser}
+                conversationRepository={conversationRepository}
+                messageEntity={messageEntity}
+                showReactions={rightSidebar.showReactions}
+                userRepository={userRepository}
+                onClose={closePanel}
+                togglePanel={togglePanel}
+              />
+            ))}
 
           {currentState === PanelState.CONVERSATION_PARTICIPANTS && (
             <ConversationParticipants
@@ -352,7 +366,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               togglePanel={togglePanel}
-              highlightedUsers={rightSidebar.highlightedUsers || []}
+              highlightedUsers={isNullOrUndefined(rightSidebar.highlightedUsers) ? [] : rightSidebar.highlightedUsers}
               onBack={onBackClick}
               onClose={closePanel}
             />

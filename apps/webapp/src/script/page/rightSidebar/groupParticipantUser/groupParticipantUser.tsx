@@ -19,6 +19,7 @@
 
 import {FC, useCallback, useEffect} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 import {amplify} from 'amplify';
 
@@ -128,7 +129,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   }, [currentUser, goToRoot]);
 
   useEffect(() => {
-    if (team.id) {
+    if (isNonEmptyString(team.id)) {
       void teamRepository.updateTeamMembersByIds(team.id, [currentUser.id], true);
     }
   }, [currentUser, teamRepository, team]);

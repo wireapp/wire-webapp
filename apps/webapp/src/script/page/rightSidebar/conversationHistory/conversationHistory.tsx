@@ -19,6 +19,7 @@
 
 import {useState} from 'react';
 
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
@@ -82,7 +83,13 @@ export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
           <FlexBox css={conversationHistoryCustomCss}>
             <Input
               wrapperCSS={customHistorySharingInputCss}
-              value={historySharingQuantity || ''}
+              value={
+                !isNullOrUndefined(historySharingQuantity) &&
+                historySharingQuantity !== 0 &&
+                !isNan(historySharingQuantity)
+                  ? historySharingQuantity
+                  : ''
+              }
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setHistorySharingQuantity(Number(event.target.value))
               }

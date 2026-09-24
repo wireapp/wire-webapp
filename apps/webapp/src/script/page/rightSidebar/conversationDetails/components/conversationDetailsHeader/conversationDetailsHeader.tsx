@@ -19,6 +19,8 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+
 import {ConversationVerificationBadges} from 'Components/badge';
 import * as Icon from 'Components/icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -98,7 +100,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
 
   useEffect(() => {
     if (isEditingName) {
-      if (textAreaRef.current) {
+      if (!isNullOrUndefined(textAreaRef.current)) {
         textAreaRef.current.style.height = `0px`;
         const {scrollHeight} = textAreaRef.current;
         textAreaRef.current.style.height = `${scrollHeight}px`;
@@ -107,7 +109,11 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
       if (!isEditGroupNameTouched.current) {
         setTimeout(() => {
           const currentValue = textAreaRef.current?.value;
-          const caretPosition = currentValue?.length || 0;
+          const currentValueLength = currentValue?.length;
+          const caretPosition =
+            !isNullOrUndefined(currentValueLength) && currentValueLength !== 0 && !isNan(currentValueLength)
+              ? currentValueLength
+              : 0;
 
           textAreaRef.current?.setSelectionRange(caretPosition, caretPosition);
           textAreaRef.current?.focus();
@@ -130,7 +136,11 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
                 onClick: clickToEditGroupName,
               })}
             >
-              {displayName && <span className="conversation-details__name">{displayName}</span>}
+              {isNonEmptyString(displayName) ? (
+                <span className="conversation-details__name">{displayName}</span>
+              ) : (
+                displayName
+              )}
 
               {canRenameGroup && (
                 <button

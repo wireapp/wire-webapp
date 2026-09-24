@@ -19,7 +19,7 @@
 
 import {forwardRef, useEffect, useMemo, useState, type ReactElement} from 'react';
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {UserType} from '@wireapp/api-client/lib/user';
@@ -200,7 +200,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       : translate('conversationDetailsOff');
     const isChannelPublic = activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK);
 
-    const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+    const isCellsConversation = isNonEmptyString(cellsState) && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
 
     const notificationStatusText = getNotificationText(notificationState, translate);
     function getTimedMessagesText(): string {
@@ -210,7 +210,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       if (isSelfDeletingMessagesEnforced) {
         return formatDuration(getEnforcedSelfDeletingMessagesTimeout, translate).text;
       }
-      if (hasTimer && globalMessageTimer) {
+      if (
+        hasTimer &&
+        !isNullOrUndefined(globalMessageTimer) &&
+        globalMessageTimer !== 0 &&
+        !isNan(globalMessageTimer)
+      ) {
         return formatDuration(globalMessageTimer, translate).text;
       }
       return translate('ephemeralUnitsNone');
@@ -275,7 +280,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
       const user = participatingUserEts.find(participant => participant.id === entity.id);
 
-      if (user) {
+      if (!isNullOrUndefined(user)) {
         const serviceEntity = integrationRepository.mapServiceFromUser(user);
         togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
       }
@@ -294,17 +299,17 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     }, [activeConversation, conversationRepository]);
 
     useEffect(() => {
-      if (team.id && isSingleUserMode && !isUndefined(firstParticipant)) {
+      if (isNonEmptyString(team.id) && isSingleUserMode && !isUndefined(firstParticipant)) {
         void teamRepository.updateTeamMembersByIds(team.id, [firstParticipant.id], true);
       }
     }, [firstParticipant, isSingleUserMode, team, teamRepository]);
 
     useEffect(() => {
       const getService = async () => {
-        if (firstParticipant) {
+        if (!isUndefined(firstParticipant)) {
           const serviceEntity = await integrationRepository.getServiceFromUser(firstParticipant);
 
-          if (serviceEntity) {
+          if (!isNullOrUndefined(serviceEntity)) {
             setSelectedService(serviceEntity);
             await integrationRepository.addProviderNameToParticipant(serviceEntity);
           }
@@ -333,20 +338,24 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         />
 
         <FadingScrollbar className="panel__content">
-          {isSingleUserMode && isServiceMode && selectedService && <ServiceDetails service={selectedService} />}
+          {isSingleUserMode &&
+            isServiceMode &&
+            (isUndefined(selectedService) ? undefined : <ServiceDetails service={selectedService} />)}
 
-          {isSingleUserMode && !isServiceMode && firstParticipant && (
-            <ConversationDetailsParticipant
-              activeConversation={activeConversation}
-              classifiedDomains={classifiedDomains}
-              isFederated={isFederated}
-              isTeam={isTeam}
-              isVerified={isVerified}
-              participant={firstParticipant}
-              teamRepository={teamRepository}
-              teamState={teamState}
-            />
-          )}
+          {isSingleUserMode &&
+            !isServiceMode &&
+            (isUndefined(firstParticipant) ? undefined : (
+              <ConversationDetailsParticipant
+                activeConversation={activeConversation}
+                classifiedDomains={classifiedDomains}
+                isFederated={isFederated}
+                isTeam={isTeam}
+                isVerified={isVerified}
+                participant={firstParticipant}
+                teamRepository={teamRepository}
+                teamState={teamState}
+              />
+            ))}
 
           {!isSingleUserMode && (
             <>
@@ -385,7 +394,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 </div>
               )}
 
-              {isGroupOrChannel && (!!userParticipants.length || !!serviceParticipants.length) && (
+              {isGroupOrChannel && (isNonEmptyArray(userParticipants) || isNonEmptyArray(serviceParticipants)) && (
                 <ConversationDetailsParticipants
                   activeConversation={activeConversation}
                   allUsersCount={allUsersCount}

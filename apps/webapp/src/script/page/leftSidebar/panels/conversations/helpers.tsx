@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmptyString, isNan, isNull} from '@sindresorhus/is';
+
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -92,7 +94,7 @@ export function getTabConversations({
   const conversationArchivedFilter = (conversation: Conversation) => !archivedConversations.includes(conversation);
 
   if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
-    if (!conversationsFilter) {
+    if (isEmptyString(conversationsFilter)) {
       return {
         conversations: conversations,
         searchInputPlaceholder: searchInputPlaceholders.searchConversations,
@@ -315,7 +317,7 @@ export const getConversationFocusCandidates = ({
 export const scrollToConversation = (conversationId: string) => {
   const element = document.querySelector<HTMLElement>(`.conversation-list-cell[data-uie-uid="${conversationId}"]`);
 
-  if (!element) {
+  if (isNull(element)) {
     return;
   }
 
@@ -324,8 +326,12 @@ export const scrollToConversation = (conversationId: string) => {
   const isVisible =
     rect.top >= 0 &&
     rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+    rect.bottom <=
+      (window.innerHeight !== 0 && !isNan(window.innerHeight)
+        ? window.innerHeight
+        : document.documentElement.clientHeight) &&
+    rect.right <=
+      (window.innerWidth !== 0 && !isNan(window.innerWidth) ? window.innerWidth : document.documentElement.clientWidth);
 
   if (!isVisible) {
     element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
@@ -337,7 +343,7 @@ export const getConversationsWithHeadings = (
   conversationsFilter: string,
   currentTab: SidebarTabs,
 ) => {
-  if (!conversationsFilter || currentTab !== SidebarTabs.RECENT) {
+  if (isEmptyString(conversationsFilter) || currentTab !== SidebarTabs.RECENT) {
     return currentConversations;
   }
 

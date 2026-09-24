@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -57,7 +59,7 @@ export const getGroupParticipantsConversations = ({
   const archivedSet = new Set(archivedConversations);
   const conversationsSet = new Set(conversations);
   const currentFolderConversations =
-    isFolderView && currentFolder?.conversations() ? new Set(currentFolder.conversations()) : null;
+    isFolderView && !isNullOrUndefined(currentFolder?.conversations()) ? new Set(currentFolder.conversations()) : null;
 
   if (isFavoritesView) {
     filteredGroup = filteredGroup.filter(item => favoriteSet.has(item));
@@ -67,7 +69,7 @@ export const getGroupParticipantsConversations = ({
     filteredGroup = filteredGroup.filter(item => archivedSet.has(item));
   }
 
-  if (isFolderView && currentFolderConversations) {
+  if (isFolderView && !isNullOrUndefined(currentFolderConversations)) {
     filteredGroup = filteredGroup.filter(item => currentFolderConversations.has(item));
   }
 

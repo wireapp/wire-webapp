@@ -19,6 +19,7 @@
 
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -100,13 +101,13 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     : isTeamStateGuestLinkEnabled && conversationHasGuestLinkEnabled;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
 
-  const hasAccessCode: boolean = isGuestEnabled ? !!accessCode : false;
+  const hasAccessCode: boolean = isGuestEnabled ? isNonEmptyString(accessCode) : false;
 
   const guestInfoText = useMemo(() => {
     if (!inTeam) {
       return translate('guestRoomToggleInfoDisabled');
     }
-    if (accessCodeHasPassword) {
+    if (accessCodeHasPassword === true) {
       return isGuestEnabled ? (
         <span>
           <span style={{marginBottom: 8, display: 'block'}}>{translate('guestOptionsInfoTextWithPassword')}</span>
@@ -253,7 +254,8 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   };
 
   const updateCode = useCallback(async () => {
-    const canUpdateCode = (isGuestRoom || isGuestAndServicesRoom) && !accessCode && isGuestLinkEnabled;
+    const canUpdateCode =
+      (isGuestRoom || isGuestAndServicesRoom) && !isNonEmptyString(accessCode) && isGuestLinkEnabled;
 
     if (canUpdateCode) {
       setIsRequestOngoing(true);
@@ -299,7 +301,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           toggleId="guests"
         />
         <p className="guest-options__info-head">
-          {hasAccessCode && accessCodeHasPassword ? (
+          {hasAccessCode && accessCodeHasPassword === true ? (
             <span style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
               <Icon.ShieldIcon
                 data-uie-name="generate-password-icon"
