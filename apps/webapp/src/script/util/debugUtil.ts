@@ -430,6 +430,7 @@ export class DebugUtil {
     config = {
       startTime: new Date().toISOString(),
       finaliseRegardlessAfter: new Date(Date.now() + TIME_IN_MILLIS.YEAR).toISOString(),
+      allowManualMigration: true,
     },
   ) {
     const {teamId} = await this.userRepository.getSelf();

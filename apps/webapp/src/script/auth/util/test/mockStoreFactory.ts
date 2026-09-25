@@ -17,6 +17,8 @@
  *
  */
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import configureStore from 'redux-mock-store';
 import {withExtraArgument} from 'redux-thunk';
 
@@ -28,6 +30,7 @@ import {ActionRoot, actionRoot} from '../../module/action/';
 import type {RootState, ThunkDispatch} from '../../module/reducer';
 
 interface MockStoreParameters {
+  wallClock?: WallClock;
   actions?: TypeUtil.RecursivePartial<ActionRoot>;
   apiClient?: TypeUtil.RecursivePartial<APIClient>;
   core?: TypeUtil.RecursivePartial<Account>;
@@ -59,12 +62,20 @@ export const mockStoreFactory = (
     localStorage: defaultLocalStorage,
   },
 ) => {
-  const {actions, apiClient, core, getConfig, localStorage} = parameters;
+  const {
+    actions,
+    apiClient,
+    core,
+    getConfig,
+    localStorage,
+    wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0}),
+  } = parameters;
   if (core) {
     (core as any).apiClient = apiClient;
   }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
     withExtraArgument({
+      wallClock,
       actions,
       apiClient,
       core,

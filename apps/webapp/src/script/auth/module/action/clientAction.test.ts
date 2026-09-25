@@ -17,6 +17,12 @@
  *
  */
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {ClientType} from '@wireapp/api-client/lib/client';
+import type {RegisteredClient} from '@wireapp/api-client/lib/client';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
+import type {Account} from '@wireapp/core';
+
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
@@ -25,6 +31,54 @@ import {ClientActionCreator} from '../action/creator/';
 import {actionRoot} from '.';
 
 describe('ClientAction', () => {
+  it.each([
+    ['default clock', {}, 1000],
+    [
+      'injected clock at the migration deadline',
+      {
+        wallClock: createDeterministicWallClock({
+          initialCurrentTimestampInMilliseconds: Date.parse('2026-09-23T12:00:00Z'),
+        }),
+      },
+      100,
+    ],
+  ] as const)('initializes MLS with the %s', async (_name, clockParameters, expectedAllowance) => {
+    const client = {id: 'client-id'} as RegisteredClient;
+    const features: FeatureList = {
+      mls: {
+        status: FEATURE_STATUS.ENABLED,
+        config: {
+          allowedCipherSuites: [1],
+          defaultCipherSuite: 1,
+          defaultProtocol: CONVERSATION_PROTOCOL.MLS,
+          protocolToggleUsers: [],
+          supportedProtocols: [CONVERSATION_PROTOCOL.MLS],
+        },
+      },
+      mlsMigration: {
+        status: FEATURE_STATUS.ENABLED,
+        config: {finaliseRegardlessAfter: '2026-09-23T12:00:00Z'},
+      },
+    };
+    const initClient: Account['initClient'] = async (localClient, config) => {
+      expect(config?.getNbKeyPackages?.()).toBe(expectedAllowance);
+      return localClient;
+    };
+    const store = mockStoreFactory({
+      ...clockParameters,
+      actions: actionRoot,
+      core: {
+        getLocalClient: async () => client,
+        service: {team: {getCommonFeatureConfig: async () => features}} as Account['service'],
+        initClient,
+      },
+    })({});
+
+    await store.dispatch(actionRoot.clientAction.doInitializeClient(ClientType.PERMANENT));
+
+    expect(store.getActions()).toEqual([ClientActionCreator.successfulInitializeClient({isNew: false, client})]);
+  });
+
   it('fetches all self clients', async () => {
     const mockedActions = {};
     const mockedApiClient = {
