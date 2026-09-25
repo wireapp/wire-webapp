@@ -17,8 +17,8 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {result, Result} from 'true-myth';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 
 import type {ScheduleMeetingFormState} from './scheduleMeetingTypes';
 
@@ -26,7 +26,7 @@ import {ScheduleFormErrors, scheduleFormErrors} from '../scheduleFormErrors';
 
 export const requireScheduleMeetingTimes = (
   formState: ScheduleMeetingFormState,
-  wallClock: WallClock,
+  clock: WallClock,
 ): Result<{start: Date; end: Date}, ScheduleFormErrors> => {
   if (formState.start.isNothing || formState.end.isNothing) {
     return result.err(scheduleFormErrors.missingTimes);
@@ -34,7 +34,7 @@ export const requireScheduleMeetingTimes = (
 
   const start = formState.start.value;
   const end = formState.end.value;
-  const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
+  const currentTimestampInMilliseconds = clock.currentTimestampInMilliseconds;
 
   if (start.getTime() <= currentTimestampInMilliseconds) {
     return result.err(scheduleFormErrors.startInPast);

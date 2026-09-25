@@ -56,8 +56,8 @@ export {
   validateScheduleMeetingForm,
 } from './scheduleMeetingValidation';
 
-export const getDefaultScheduleMeetingFormState = (wallClock: WallClock): ScheduleMeetingFormState => {
-  const start = getDefaultScheduleMeetingStartDateTime(wallClock);
+export const getDefaultScheduleMeetingFormState = (clock: WallClock): ScheduleMeetingFormState => {
+  const start = getDefaultScheduleMeetingStartDateTime(clock);
   return {
     title: '',
     start: maybe.just(start),
@@ -82,7 +82,7 @@ type ScheduleMeetingModalState = {
   originalEnd: Maybe<Date>;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
-  openCreate: (wallClock: WallClock) => void;
+  openCreate: (clock: WallClock) => void;
   openEdit: (
     meetingSeries: MeetingSeries,
     formState: ScheduleMeetingFormState,
@@ -90,7 +90,7 @@ type ScheduleMeetingModalState = {
     originalSelectedUsers: User[],
   ) => void;
   close: () => void;
-  reset: (wallClock: WallClock) => void;
+  reset: (clock: WallClock) => void;
   setTitle: (title: string) => void;
   setStart: (start: Maybe<Date>) => void;
   setEnd: (end: Maybe<Date>) => void;
@@ -99,7 +99,7 @@ type ScheduleMeetingModalState = {
   setParticipantsFilter: (participantsFilter: string) => void;
   setPassword: (password: string) => void;
   setPasswordConfirmation: (passwordConfirmation: string) => void;
-  validate: (wallClock: WallClock) => ScheduleMeetingFormErrors;
+  validate: (clock: WallClock) => ScheduleMeetingFormErrors;
   clearErrors: () => void;
 };
 
@@ -130,11 +130,11 @@ const initialState = {
 
 export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, get) => ({
   ...initialState,
-  openCreate: wallClock =>
+  openCreate: clock =>
     set({
       isOpen: true,
       mode: scheduleMeetingModes.create,
-      formState: getDefaultScheduleMeetingFormState(wallClock),
+      formState: getDefaultScheduleMeetingFormState(clock),
       errors: emptyScheduleMeetingFormErrors(),
       editingMeetingId: Maybe.nothing(),
       qualifiedConversation: Maybe.nothing(),
@@ -173,7 +173,7 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       originalRecurrence: 'doesNotRepeat',
       originalSelectedUsers: [],
     }),
-  reset: wallClock => set({...initialState, formState: getDefaultScheduleMeetingFormState(wallClock)}),
+  reset: clock => set({...initialState, formState: getDefaultScheduleMeetingFormState(clock)}),
   setTitle: title =>
     set(state => ({
       formState: {...state.formState, title},
@@ -249,10 +249,18 @@ export const useScheduleMeetingModal = create<ScheduleMeetingModalState>((set, g
       formState: {...state.formState, passwordConfirmation},
       errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
     })),
-  validate: wallClock => {
+  validate: clock => {
     const {formState, mode} = get();
     const {title, start, end, password, passwordConfirmation} = formState;
-    const errors = getScheduleMeetingFormErrors({title, start, end, password, passwordConfirmation, wallClock, mode});
+    const errors = getScheduleMeetingFormErrors({
+      title,
+      start,
+      end,
+      password,
+      passwordConfirmation,
+      clock,
+      mode,
+    });
     set({errors});
     return errors;
   },

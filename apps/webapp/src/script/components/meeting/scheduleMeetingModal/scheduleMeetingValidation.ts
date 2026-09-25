@@ -17,8 +17,8 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {isUndefined} from '@sindresorhus/is';
+import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Maybe, Result} from 'true-myth';
 import {result} from 'true-myth';
 
@@ -31,22 +31,22 @@ export interface ScheduleMeetingValidationInput {
   title: string;
   start: Maybe<Date>;
   end: Maybe<Date>;
-  wallClock: WallClock;
+  clock: WallClock;
   mode: ScheduleMeetingMode;
   password?: string;
   passwordConfirmation?: string;
 }
 
-export const getScheduleMeetingFormErrors = ({
+export function getScheduleMeetingFormErrors({
   title,
   start,
   end,
-  wallClock,
+  clock,
   mode,
   password,
   passwordConfirmation,
-}: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors => {
-  const currentTimestampInMilliseconds = wallClock.currentTimestampInMilliseconds;
+}: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors {
+  const currentTimestampInMilliseconds = clock.currentTimestampInMilliseconds;
   const missingTimes = start.isNothing || end.isNothing ? 'meetings.scheduleModal.error.missingTimes' : undefined;
   const allowPastTimes = mode === scheduleMeetingModes.edit;
   const endInPast =
@@ -75,7 +75,7 @@ export const getScheduleMeetingFormErrors = ({
         ? 'meetings.scheduleModal.error.endBeforeStart'
         : undefined,
   };
-};
+}
 
 export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean =>
   !isUndefined(errors.title) ||
@@ -86,9 +86,9 @@ export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors):
   !isUndefined(errors.password) ||
   !isUndefined(errors.passwordConfirmation);
 
-export const validateScheduleMeetingForm = (
+export function validateScheduleMeetingForm(
   input: ScheduleMeetingValidationInput,
-): Result<ScheduleMeetingValidationInput, ScheduleMeetingFormErrors> => {
+): Result<ScheduleMeetingValidationInput, ScheduleMeetingFormErrors> {
   const errors = getScheduleMeetingFormErrors(input);
 
   if (hasScheduleMeetingFormErrors(errors)) {
@@ -96,4 +96,4 @@ export const validateScheduleMeetingForm = (
   }
 
   return result.ok(input);
-};
+}

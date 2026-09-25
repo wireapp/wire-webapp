@@ -31,7 +31,7 @@ import {
 import {validateScheduleMeetingForm} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingValidation';
 import type {ScheduleMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
 
-const mapScheduleFormErrorToFormErrors = (error: ScheduleFormErrors): ScheduleMeetingFormErrors => {
+function mapScheduleFormErrorToFormErrors(error: ScheduleFormErrors): ScheduleMeetingFormErrors {
   switch (error) {
     case scheduleFormErrors.missingTimes:
       return {...emptyScheduleMeetingFormErrors(), missingTimes: 'meetings.scheduleModal.error.missingTimes'};
@@ -40,19 +40,19 @@ const mapScheduleFormErrorToFormErrors = (error: ScheduleFormErrors): ScheduleMe
     case scheduleFormErrors.endInPast:
       return {...emptyScheduleMeetingFormErrors(), endInPast: 'meetings.schedule.errors.endInPast'};
   }
-};
+}
 
-export const mapScheduleFormToMeetingCommand = (
+export function mapScheduleFormToMeetingCommand(
   formState: ScheduleMeetingFormState,
-  wallClock: WallClock,
-): Result<ScheduleMeetingCommand, ScheduleMeetingFormErrors> => {
+  clock: WallClock,
+): Result<ScheduleMeetingCommand, ScheduleMeetingFormErrors> {
   const validationResult = validateScheduleMeetingForm({
     title: formState.title,
     start: formState.start,
     end: formState.end,
     password: formState.password,
     passwordConfirmation: formState.passwordConfirmation,
-    wallClock,
+    clock,
     mode: scheduleMeetingModes.create,
   });
 
@@ -60,7 +60,7 @@ export const mapScheduleFormToMeetingCommand = (
     return result.err(validationResult.error);
   }
 
-  const timesResult = requireScheduleMeetingTimes(formState, wallClock);
+  const timesResult = requireScheduleMeetingTimes(formState, clock);
 
   if (timesResult.isErr) {
     return result.err(mapScheduleFormErrorToFormErrors(timesResult.error));
@@ -76,4 +76,4 @@ export const mapScheduleFormToMeetingCommand = (
     selectedUsers: formState.selectedUsers,
     ...(formState.password?.trim() ? {password: formState.password} : {}),
   });
-};
+}

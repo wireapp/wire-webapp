@@ -18,8 +18,8 @@
  */
 
 import {maybe} from 'true-myth';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {scheduleFormErrors} from '../scheduleFormErrors';
 
@@ -31,7 +31,7 @@ const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
 const pastStartDate = new Date('2026-06-23T10:00:00.000Z');
 
-const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+const clock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
 
 const baseFormState = (): ScheduleMeetingFormState => ({
   title: 'Weekly sync',
@@ -52,7 +52,7 @@ describe('requireScheduleMeetingTimes', () => {
         start: maybe.just(futureStartDate),
         end: maybe.just(futureEndDate),
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isOk).toBe(true);
@@ -65,7 +65,7 @@ describe('requireScheduleMeetingTimes', () => {
         ...baseFormState(),
         start: maybe.nothing(),
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isErr).toBe(true);
@@ -78,7 +78,7 @@ describe('requireScheduleMeetingTimes', () => {
         ...baseFormState(),
         end: maybe.nothing(),
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isErr).toBe(true);
@@ -91,7 +91,7 @@ describe('requireScheduleMeetingTimes', () => {
         ...baseFormState(),
         start: maybe.just(pastStartDate),
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isErr).toBe(true);
@@ -105,7 +105,7 @@ describe('requireScheduleMeetingTimes', () => {
         start: maybe.just(futureStartDate),
         end: maybe.just(pastStartDate),
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isErr).toBe(true);
