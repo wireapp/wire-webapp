@@ -37,6 +37,7 @@ const esmPackagesToTransform = [
   'noop-esm',
   'uuid',
   '@enormora/objectory',
+  '@enormora/clock',
   '@enormora/wall-clock',
   '@sindresorhus/is',
   '@faker-js/faker',
