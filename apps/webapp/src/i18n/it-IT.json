@@ -1389,6 +1389,7 @@
   "meetings.schedule.errors.startInPast": "Start time must be in the future",
   "meetings.scheduleModal.closeAriaLabel": "Close",
   "meetings.scheduleModal.confirmChanges": "Confirm changes",
+  "meetings.scheduleModal.dateLabel": "Date",
   "meetings.scheduleModal.editTitle": "Edit Meeting",
   "meetings.scheduleModal.endsLabel": "Ends",
   "meetings.scheduleModal.error.addParticipantsFailed": "The meeting was saved, but some participants could not be added. Please try again.",

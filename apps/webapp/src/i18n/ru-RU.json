@@ -1389,6 +1389,7 @@
   "meetings.schedule.errors.startInPast": "Время начала должно быть в будущем",
   "meetings.scheduleModal.closeAriaLabel": "Закрыть",
   "meetings.scheduleModal.confirmChanges": "Подтвердить изменения",
+  "meetings.scheduleModal.dateLabel": "Дата",
   "meetings.scheduleModal.editTitle": "Изменить встречу",
   "meetings.scheduleModal.endsLabel": "Окончание",
   "meetings.scheduleModal.error.addParticipantsFailed": "Информация о встрече была сохранена, но некоторых участников добавить не удалось. Пожалуйста, попробуйте еще раз.",
