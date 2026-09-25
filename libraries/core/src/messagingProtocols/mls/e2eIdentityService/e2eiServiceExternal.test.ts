@@ -18,6 +18,7 @@
  */
 
 import axios from 'axios';
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
 
@@ -28,7 +29,6 @@ import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
-import {createFireAndForgetInvoker} from '../../../taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {MLSService} from '../mlsService';
 
 async function buildE2EIService(dbName = 'core-test-db') {
@@ -63,7 +63,7 @@ async function buildE2EIService(dbName = 'core-test-db') {
         await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
       },
     },
-    createFireAndForgetInvoker({logger: {error: jest.fn()}}),
+    createFireAndForgetInvoker({reportError: jest.fn<void, [unknown]>()}),
   );
 
   return [
