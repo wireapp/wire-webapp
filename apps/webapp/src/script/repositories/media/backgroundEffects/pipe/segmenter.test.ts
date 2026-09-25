@@ -27,8 +27,8 @@ import {
 } from 'Repositories/media/backgroundEffects/pipe/segmenter';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
-jest.mock('@enormora/wall-clock/wall-clock', () => ({
-  createWallClock: jest.fn(() => ({
+jest.mock('@enormora/clock/clock', () => ({
+  createClock: jest.fn(() => ({
     setTimeout: jest.fn((callback: () => void) => {
       callback();
       return 1;
@@ -36,7 +36,7 @@ jest.mock('@enormora/wall-clock/wall-clock', () => ({
     clearTimeout: jest.fn(),
     setInterval: jest.fn(),
     clearInterval: jest.fn(),
-    currentTimestampInMilliseconds: 0,
+    currentUnixEpochMilliseconds: 0,
     currentDate: new Date(0),
   })),
 }));
@@ -229,7 +229,7 @@ describe('segmenter tests', () => {
       );
 
       const {WebGLRenderer} = await import('./renderer');
-      const {createWallClock} = await import('@enormora/wall-clock/wall-clock');
+      const {createClock} = await import('@enormora/clock/clock');
 
       const firstRenderer = (WebGLRenderer as unknown as jest.Mock).mock.results[0].value;
 
@@ -244,7 +244,7 @@ describe('segmenter tests', () => {
 
       listeners.get('webglcontextrestored')?.({} as Event);
 
-      expect(createWallClock).toHaveBeenCalled();
+      expect(createClock).toHaveBeenCalled();
       expect(WebGLRenderer).toHaveBeenCalledTimes(2);
 
       const secondRenderer = (WebGLRenderer as unknown as jest.Mock).mock.results[1].value;
