@@ -39,7 +39,6 @@ interface UseMeetingParticipantsPickerOptions {
   onSelectedUsersChange: (users: User[]) => void;
   onFilterChange: (filter: string) => void;
   conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'>;
-  meetingsM2Enabled: boolean;
 }
 
 export const useMeetingParticipantsPicker = ({
@@ -49,7 +48,6 @@ export const useMeetingParticipantsPicker = ({
   onSelectedUsersChange,
   onFilterChange,
   conversationRepository,
-  meetingsM2Enabled,
 }: UseMeetingParticipantsPickerOptions) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConversationsOpen, setIsConversationsOpen] = useState(true);
@@ -58,7 +56,7 @@ export const useMeetingParticipantsPicker = ({
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const matchingConversations = useMemo(() => {
-    if (!meetingsM2Enabled || !conversationRepository) {
+    if (!conversationRepository) {
       return [];
     }
 
@@ -72,7 +70,7 @@ export const useMeetingParticipantsPicker = ({
           !conversation.is_cleared() &&
           conversation.display_name().toLowerCase().includes(normalizedFilter),
       );
-  }, [conversationRepository, filter, meetingsM2Enabled]);
+  }, [conversationRepository, filter]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
