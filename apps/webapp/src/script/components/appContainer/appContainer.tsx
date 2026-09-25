@@ -20,6 +20,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import type {Clock} from '@enormora/clock/clock';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
@@ -55,7 +56,6 @@ import {AppMain} from '../../page/appMain';
 import {RootProvider} from '../../page/rootProvider';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
-import type {MonotonicClock} from '../../time/monotonicClock';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {AppLoader} from '../appLoader/index';
@@ -64,13 +64,13 @@ type AppProps = {
   readonly config: Configuration;
   readonly clientType: ClientType;
   readonly applicationObservability: ApplicationObservability;
-  readonly applicationBootstrapStartedAt: number;
-  readonly domContentLoadedAt: number;
+  readonly applicationBootstrapStartedAtMonotonicMicroseconds: bigint;
+  readonly domContentLoadedAtMonotonicMicroseconds: bigint;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly fetchLatestBuildMetadata: FetchLatestBuildMetadata;
   readonly isOnline: () => boolean;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
-  readonly monotonicClock: MonotonicClock;
+  readonly clock: Clock;
   readonly translate: Translate;
   readonly wallClock: WallClock;
 };
@@ -80,13 +80,13 @@ export const AppContainer = (properties: AppProps) => {
     config,
     clientType,
     applicationObservability,
-    applicationBootstrapStartedAt,
-    domContentLoadedAt,
+    applicationBootstrapStartedAtMonotonicMicroseconds,
+    domContentLoadedAtMonotonicMicroseconds,
     fireAndForgetInvoker,
     fetchLatestBuildMetadata,
     isOnline,
     isFeatureToggleEnabled,
-    monotonicClock,
+    clock,
     translate,
     wallClock,
   } = properties;
@@ -194,12 +194,12 @@ export const AppContainer = (properties: AppProps) => {
               fetchLatestBuildMetadata,
               fireAndForgetInvoker,
               isOnline,
-              monotonicClock,
+              clock,
               wallClock,
             },
             timing: {
-              applicationBootstrapStartedAt,
-              domContentLoadedAt,
+              applicationBootstrapStartedAtMonotonicMicroseconds,
+              domContentLoadedAtMonotonicMicroseconds,
             },
           });
         }}

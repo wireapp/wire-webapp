@@ -18,6 +18,7 @@
  */
 
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {createClock} from '@enormora/clock';
 // eslint-disable-next-line import/order
 import 'core-js/full/reflect';
 
@@ -52,13 +53,11 @@ import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {createMonotonicClock} from '../time/monotonicClock';
-
-const applicationMonotonicClock = createMonotonicClock({performance: globalThis.performance});
-const applicationBootstrapStartedAt = applicationMonotonicClock.nowMilliseconds;
+const applicationClock = createClock();
+const applicationBootstrapStartedAtMonotonicMicroseconds = applicationClock.currentMonotonicMicroseconds;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const domContentLoadedAt = applicationMonotonicClock.nowMilliseconds;
+  const domContentLoadedAtMonotonicMicroseconds = applicationClock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
   const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
     fetchBuildMetadata: globalThis.fetch.bind(globalThis),
@@ -96,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     createApplicationObservability() {
       return createApplicationObservabilityFromConfig(config);
     },
+    clock: applicationClock,
     createFireAndForgetInvoker: () => {
       return createFireAndForgetInvoker({
         reportError(error) {
@@ -104,10 +104,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     },
     createWallClock,
-    monotonicClock: applicationMonotonicClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {applicationObservability, fireAndForgetInvoker, monotonicClock, wallClock} = applicationServices;
+  const {applicationObservability, clock, fireAndForgetInvoker, wallClock} = applicationServices;
   const apiClient = new APIClient({
     wallClock,
   });
@@ -143,13 +142,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
       applicationObservability={applicationObservability}
-      applicationBootstrapStartedAt={applicationBootstrapStartedAt}
-      domContentLoadedAt={domContentLoadedAt}
+      applicationBootstrapStartedAtMonotonicMicroseconds={applicationBootstrapStartedAtMonotonicMicroseconds}
+      domContentLoadedAtMonotonicMicroseconds={domContentLoadedAtMonotonicMicroseconds}
       fireAndForgetInvoker={fireAndForgetInvoker}
       fetchLatestBuildMetadata={fetchLatestBuildMetadata}
       isOnline={isOnline}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
-      monotonicClock={monotonicClock}
+      clock={clock}
       translate={translate}
       wallClock={wallClock}
     />,

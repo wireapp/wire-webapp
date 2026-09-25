@@ -20,6 +20,7 @@
 // Polyfill for "tsyringe" dependency injection
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import type {Clock} from '@enormora/clock/clock';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {Context} from '@wireapp/api-client/lib/auth';
@@ -136,7 +137,6 @@ import {Core} from '../service/coreSingleton';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
-import type {MonotonicClock} from '../time/monotonicClock';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -150,8 +150,8 @@ type WaitUntilAllMessagesAreProcessedDependencies = {
 };
 
 type ApplicationStartupTimingInput = {
-  readonly applicationBootstrapStartedAt: number;
-  readonly domContentLoadedAt: number;
+  readonly applicationBootstrapStartedAtMonotonicMicroseconds: bigint;
+  readonly domContentLoadedAtMonotonicMicroseconds: bigint;
 };
 
 type ApplicationStartupDependencies = {
@@ -159,7 +159,7 @@ type ApplicationStartupDependencies = {
   readonly fetchLatestBuildMetadata: FetchLatestBuildMetadata;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isOnline: () => boolean;
-  readonly monotonicClock: MonotonicClock;
+  readonly clock: Clock;
   readonly wallClock: WallClock;
 };
 
@@ -452,16 +452,19 @@ export class App {
       fetchLatestBuildMetadata,
       fireAndForgetInvoker,
       isOnline,
-      monotonicClock,
+      clock,
       wallClock,
     } = startupInput.dependencies;
-    const {applicationBootstrapStartedAt, domContentLoadedAt} = startupInput.timing;
-    const appInitStartedAtMilliseconds = monotonicClock.nowMilliseconds;
+    const {
+      applicationBootstrapStartedAtMonotonicMicroseconds,
+      domContentLoadedAtMonotonicMicroseconds,
+    } = startupInput.timing;
+    const appInitStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
     const applicationStartupReportingDependencies = {applicationObservability, logger: this.logger};
 
-    const telemetry = new AppInitTelemetry(monotonicClock, applicationBootstrapStartedAt);
-    telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAt);
-    telemetry.timeStepAt(AppInitTimingsStep.INIT_APP_STARTED, appInitStartedAtMilliseconds);
+    const telemetry = new AppInitTelemetry(clock, applicationBootstrapStartedAtMonotonicMicroseconds);
+    telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAtMonotonicMicroseconds);
+    telemetry.timeStepAt(AppInitTimingsStep.INIT_APP_STARTED, appInitStartedAtMonotonicMicroseconds);
 
     function reportStartup(result: ApplicationStartupReport['result']) {
       return reportApplicationStartup(
@@ -784,7 +787,8 @@ export class App {
       );
 
       await e2eiHandler?.startTimers();
-      const appInitDurationMilliseconds = monotonicClock.nowMilliseconds - appInitStartedAtMilliseconds;
+      const appInitDurationMilliseconds =
+        Number(clock.currentMonotonicMicroseconds - appInitStartedAtMonotonicMicroseconds) / 1_000;
       this.logger.info(`App version ${Environment.version()} loaded in ${appInitDurationMilliseconds}ms`);
 
       eventLogger.log(AppInitializationStep.AppInitCompleted);

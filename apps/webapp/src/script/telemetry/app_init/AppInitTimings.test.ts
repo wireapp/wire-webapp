@@ -17,17 +17,17 @@
  *
  */
 
-import {createDeterministicMonotonicClock} from '../../time/deterministicMonotonicClock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {AppInitTimings} from './AppInitTimings';
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
 describe('AppInitTimings', () => {
   it('records elapsed step timing from the monotonic clock', () => {
-    const monotonicClock = createDeterministicMonotonicClock({initialCurrentTimeMilliseconds: 100});
-    const appInitTimings = new AppInitTimings(monotonicClock, monotonicClock.nowMilliseconds);
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const appInitTimings = new AppInitTimings(clock, clock.currentMonotonicMicroseconds);
 
-    monotonicClock.advanceByMilliseconds(42);
+    clock.advanceByMilliseconds(42);
     appInitTimings.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
     expect(appInitTimings.get()).toEqual({
@@ -36,10 +36,12 @@ describe('AppInitTimings', () => {
   });
 
   it('records elapsed step timing from an explicit monotonic start time', () => {
-    const monotonicClock = createDeterministicMonotonicClock({initialCurrentTimeMilliseconds: 200});
-    const appInitTimings = new AppInitTimings(monotonicClock, 100);
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    clock.advanceByMilliseconds(200);
+    const startedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds - 100_000n;
+    const appInitTimings = new AppInitTimings(clock, startedAtMonotonicMicroseconds);
 
-    monotonicClock.setCurrentTimeMilliseconds(250);
+    clock.advanceByMilliseconds(50);
     appInitTimings.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
     expect(appInitTimings.get()).toEqual({
@@ -48,10 +50,12 @@ describe('AppInitTimings', () => {
   });
 
   it('records elapsed step timing from an explicit monotonic occurrence time', () => {
-    const monotonicClock = createDeterministicMonotonicClock({initialCurrentTimeMilliseconds: 200});
-    const appInitTimings = new AppInitTimings(monotonicClock, 100);
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    clock.advanceByMilliseconds(100);
+    const startedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+    const appInitTimings = new AppInitTimings(clock, startedAtMonotonicMicroseconds);
 
-    appInitTimings.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, 125);
+    appInitTimings.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, startedAtMonotonicMicroseconds + 25_000n);
 
     expect(appInitTimings.get()).toEqual({
       [AppInitTimingsStep.DOM_CONTENT_LOADED]: 25,
@@ -59,15 +63,31 @@ describe('AppInitTimings', () => {
   });
 
   it('records a zero millisecond step only once', () => {
-    const monotonicClock = createDeterministicMonotonicClock();
-    const appInitTimings = new AppInitTimings(monotonicClock, 0);
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const appInitTimings = new AppInitTimings(clock, clock.currentMonotonicMicroseconds);
 
     appInitTimings.timeStep(AppInitTimingsStep.INIT_APP_STARTED);
-    monotonicClock.advanceByMilliseconds(5);
+    clock.advanceByMilliseconds(5);
     appInitTimings.timeStep(AppInitTimingsStep.INIT_APP_STARTED);
 
     expect(appInitTimings.get()).toEqual({
       [AppInitTimingsStep.INIT_APP_STARTED]: 0,
+    });
+  });
+
+  it('ignores wall-clock changes when calculating elapsed duration', () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    clock.advanceByMilliseconds(100);
+    const appInitTimings = new AppInitTimings(clock, clock.currentMonotonicMicroseconds);
+
+    clock.setCurrentUnixEpochMicroseconds(10_000_000n);
+    appInitTimings.timeStep(AppInitTimingsStep.DOM_CONTENT_LOADED);
+    clock.advanceByMilliseconds(5);
+    appInitTimings.timeStep(AppInitTimingsStep.INIT_APP_STARTED);
+
+    expect(appInitTimings.get()).toEqual({
+      [AppInitTimingsStep.DOM_CONTENT_LOADED]: 0,
+      [AppInitTimingsStep.INIT_APP_STARTED]: 5,
     });
   });
 });
