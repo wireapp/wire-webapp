@@ -19,9 +19,8 @@
 
 import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {Translate} from 'Util/localizerUtil';
 

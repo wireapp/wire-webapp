@@ -17,7 +17,7 @@
  *
  */
 
-import type {FireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';

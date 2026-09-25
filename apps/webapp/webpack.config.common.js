@@ -274,6 +274,8 @@ module.exports = {
   ],
   resolve: {
     alias: {
+      // Core builds as CommonJS, while this package only exports ESM.
+      '@enormora/fire-and-forget$': path.resolve(ROOT_PATH, 'node_modules/@enormora/fire-and-forget/index.js'),
       Components: path.resolve(srcScript, 'components'),
       Hooks: path.resolve(srcScript, 'hooks'),
       Repositories: path.resolve(srcScript, 'repositories'),

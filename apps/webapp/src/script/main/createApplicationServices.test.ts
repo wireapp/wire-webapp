@@ -17,7 +17,7 @@
  *
  */
 
-import {FireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {asyncNoop} from 'noop-esm';

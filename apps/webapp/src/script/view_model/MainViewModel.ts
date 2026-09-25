@@ -17,9 +17,8 @@
  *
  */
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {container} from 'tsyringe';
-
-import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {AudioRepository} from 'Repositories/audio/audioRepository';
