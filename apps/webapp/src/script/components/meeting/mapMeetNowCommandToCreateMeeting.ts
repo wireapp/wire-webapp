@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
 import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
@@ -26,10 +26,10 @@ import type {MeetNowMeetingCommand} from 'Components/meeting/shared/types/meetin
 
 export const mapMeetNowCommandToCreateMeeting = (
   command: MeetNowMeetingCommand,
-  wallClock: WallClock,
+  clock: Pick<Clock, 'currentDate'>,
   deviceTimeZone: DeviceTimeZone,
 ): CreateMeeting => {
-  const {start, end} = getMeetNowMeetingTimes(wallClock);
+  const {start, end} = getMeetNowMeetingTimes(clock);
 
   return {
     title: command.title,

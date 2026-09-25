@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 
 const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DAY = 24;
@@ -115,11 +115,11 @@ export const resolveEndChange = (previousStart: Date, previousEnd: Date, nextEnd
   return {start: nextStart, end: capEndForStart(nextStart, alignedNextEnd)};
 };
 
-export const getDefaultScheduleMeetingStartDateTime = (wallClock: WallClock): Date =>
-  getNextHalfHourDateTime(wallClock.currentDate);
+export const getDefaultScheduleMeetingStartDateTime = (clock: Pick<Clock, 'currentDate'>): Date =>
+  getNextHalfHourDateTime(clock.currentDate);
 
-export const getMeetNowMeetingTimes = (wallClock: WallClock): {start: Date; end: Date} => {
-  const start = wallClock.currentDate;
+export const getMeetNowMeetingTimes = (clock: Pick<Clock, 'currentDate'>): {start: Date; end: Date} => {
+  const start = clock.currentDate;
 
   return {start, end: getDefaultMeetingEndDateTime(start)};
 };
