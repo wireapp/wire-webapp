@@ -19,8 +19,8 @@
 
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
-import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {Clock} from '@enormora/clock/clock';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
@@ -152,6 +152,7 @@ export const AppContainer = (properties: AppProps) => {
     return {
       fireAndForgetInvoker,
       mainViewModel: mainView,
+      clock,
       wallClock,
       doesApplicationNeedForceReload,
       isFeatureToggleEnabled,
@@ -171,7 +172,15 @@ export const AppContainer = (properties: AppProps) => {
         },
       },
     };
-  }, [doesApplicationNeedForceReload, fireAndForgetInvoker, isFeatureToggleEnabled, mainView, translate, wallClock]);
+  }, [
+    clock,
+    doesApplicationNeedForceReload,
+    fireAndForgetInvoker,
+    isFeatureToggleEnabled,
+    mainView,
+    translate,
+    wallClock,
+  ]);
 
   if (hasOtherInstance) {
     // Automatically sign out the user if the user has multiple tabs open

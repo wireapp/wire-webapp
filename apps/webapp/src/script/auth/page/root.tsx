@@ -19,6 +19,7 @@
 
 import {FC, ReactNode, useEffect, useMemo} from 'react';
 
+import {createClock} from '@enormora/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {isNonEmptyString} from '@sindresorhus/is';
@@ -99,6 +100,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     return {
       fireAndForgetInvoker: authFireAndForgetInvoker,
       mainViewModel: createAuthMainViewModel(),
+      clock: createClock(),
       wallClock: createWallClock(),
       doesApplicationNeedForceReload: false,
       isFeatureToggleEnabled() {

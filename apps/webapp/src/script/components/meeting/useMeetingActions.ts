@@ -22,7 +22,7 @@ import {useScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useMeetingActions = () => {
-  const {wallClock} = useApplicationContext();
+  const {clock} = useApplicationContext();
   const openCreate = useScheduleMeetingModal(state => state.openCreate);
   const openMeetNow = useMeetNowModal(state => state.open);
 
@@ -31,7 +31,7 @@ export const useMeetingActions = () => {
   };
 
   const handleScheduleMeeting = () => {
-    openCreate(wallClock);
+    openCreate(clock);
   };
 
   return {handleMeetNow, handleScheduleMeeting};

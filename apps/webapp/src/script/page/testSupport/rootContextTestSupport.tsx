@@ -19,6 +19,8 @@
 
 import {ReactNode} from 'react';
 
+import type {Clock} from '@enormora/clock/clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
@@ -37,6 +39,7 @@ type CreateRootContextValueForTestParameters = {
   readonly isFeatureToggleEnabled?: (featureName: StartupFeatureToggleName) => boolean;
   readonly mainViewModel?: MainViewModel;
   readonly translate: Translate;
+  readonly clock?: Clock;
   readonly wallClock?: WallClock;
 };
 
@@ -84,6 +87,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     isFeatureToggleEnabled = isFeatureToggleDisabledForTest,
     mainViewModel = createMainViewModelForTest(),
     translate,
+    clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
     wallClock = createWallClock(),
   } = parameters;
 
@@ -92,6 +96,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     fireAndForgetInvoker,
     isFeatureToggleEnabled,
     mainViewModel,
+    clock,
     translate,
     wallClock,
     applicationNavigation: {

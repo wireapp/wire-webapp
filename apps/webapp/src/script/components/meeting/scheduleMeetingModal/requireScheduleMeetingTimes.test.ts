@@ -18,8 +18,8 @@
  */
 
 import {maybe} from 'true-myth';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 
 import {scheduleFormErrors} from '../scheduleFormErrors';
 
@@ -31,7 +31,7 @@ const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
 const pastStartDate = new Date('2026-06-23T10:00:00.000Z');
 
-const clock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
 
 const baseFormState = (): ScheduleMeetingFormState => ({
   title: 'Weekly sync',

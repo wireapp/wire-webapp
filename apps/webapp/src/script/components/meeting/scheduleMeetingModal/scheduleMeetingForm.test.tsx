@@ -19,7 +19,7 @@
 
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {Maybe, maybe} from 'true-myth';
 
 import type {User} from 'Repositories/entity/User';
@@ -56,8 +56,8 @@ const renderScheduleMeetingForm = ({
       },
     },
   };
-  const wallClock = createDeterministicWallClock({
-    initialCurrentTimestampInMilliseconds: new Date(2026, 8, 24, 12, 49).getTime(),
+  const clock = createDeterministicClock({
+    initialUnixEpochMicroseconds: BigInt(new Date(2026, 8, 24, 12, 49).getTime()) * 1_000n,
   });
 
   render(
@@ -88,7 +88,7 @@ const renderScheduleMeetingForm = ({
         createRootContextValueForTest({
           translate: translateForTest,
           mainViewModel: mainViewModel as unknown as MainViewModel,
-          wallClock,
+          clock,
         }),
       ),
     ),
@@ -250,8 +250,8 @@ describe('ScheduleMeetingForm', () => {
         },
       },
     };
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: new Date(2026, 8, 24, 12, 49).getTime(),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(new Date(2026, 8, 24, 12, 49).getTime()) * 1_000n,
     });
 
     render(
@@ -282,7 +282,7 @@ describe('ScheduleMeetingForm', () => {
           createRootContextValueForTest({
             translate: translateForTest,
             mainViewModel: mainViewModel as unknown as MainViewModel,
-            wallClock,
+            clock,
           }),
         ),
       ),

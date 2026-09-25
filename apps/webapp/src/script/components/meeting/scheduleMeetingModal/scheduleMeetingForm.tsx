@@ -107,7 +107,7 @@ export const ScheduleMeetingForm = ({
 }: ScheduleMeetingFormProps) => {
   const titleInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
-  const {mainViewModel, translate, wallClock} = useApplicationContext();
+  const {mainViewModel, translate, clock} = useApplicationContext();
   const {users} = useMeetingParticipants();
   const portalContainer = getOverlayPortalContainer();
   const regionalLocale = getRegionalDateLocale();
@@ -140,10 +140,10 @@ export const ScheduleMeetingForm = ({
     [translate],
   );
 
-  const todayValue = dateValueFromDate(wallClock.currentDate);
+  const todayValue = dateValueFromDate(clock.currentDate);
   const currentDateTime = useMemo(
-    () => new Date(wallClock.currentTimestampInMilliseconds),
-    [wallClock.currentTimestampInMilliseconds],
+    () => new Date(clock.currentUnixEpochMilliseconds),
+    [clock.currentUnixEpochMilliseconds],
   );
 
   const getMinTimeForDate = useCallback(
@@ -152,7 +152,7 @@ export const ScheduleMeetingForm = ({
         return null;
       }
 
-      const today = wallClock.currentDate;
+      const today = clock.currentDate;
       const isToday =
         date.getFullYear() === today.getFullYear() &&
         date.getMonth() === today.getMonth() &&
@@ -160,7 +160,7 @@ export const ScheduleMeetingForm = ({
 
       return isToday ? currentDateTime : null;
     },
-    [currentDateTime, wallClock],
+    [clock, currentDateTime],
   );
 
   const startMinTime = useMemo(
@@ -194,13 +194,13 @@ export const ScheduleMeetingForm = ({
     }
 
     const currentStart = formState.start.unwrapOr(
-      new Date(wallClock.currentTimestampInMilliseconds + TIME_INTERVAL_MINUTES * 60 * 1000),
+      new Date(clock.currentUnixEpochMilliseconds + TIME_INTERVAL_MINUTES * 60 * 1000),
     );
     const nextStart = combineDateAndTime(date, nearestTimeOptionFromDate(currentStart, regionalLocale));
     const adjustedStart =
       mode === scheduleMeetingModes.create &&
       nextStart !== null &&
-      nextStart.getTime() <= wallClock.currentTimestampInMilliseconds
+      nextStart.getTime() <= clock.currentUnixEpochMilliseconds
         ? null
         : nextStart;
     onStartChange(Maybe.of(adjustedStart));

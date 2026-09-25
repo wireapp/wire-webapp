@@ -18,7 +18,7 @@
  */
 
 import {maybe} from 'true-myth';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {
   MEETING_TITLE_MAX_LENGTH,
@@ -34,7 +34,7 @@ describe('scheduleMeetingValidation', () => {
   const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
   const pastStartDate = new Date('2026-06-23T10:00:00.000Z');
 
-  const clock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+  const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
   const futureStart = maybe.just(futureStartDate);
   const futureEnd = maybe.just(futureEndDate);
   const createMode = {mode: 'create' as const};

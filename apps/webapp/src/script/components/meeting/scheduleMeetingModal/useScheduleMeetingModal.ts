@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, maybe} from 'true-myth';
 import {create} from 'zustand';
@@ -56,7 +56,7 @@ export {
   validateScheduleMeetingForm,
 } from './scheduleMeetingValidation';
 
-export const getDefaultScheduleMeetingFormState = (clock: WallClock): ScheduleMeetingFormState => {
+export const getDefaultScheduleMeetingFormState = (clock: Clock): ScheduleMeetingFormState => {
   const start = getDefaultScheduleMeetingStartDateTime(clock);
   return {
     title: '',
@@ -82,7 +82,7 @@ type ScheduleMeetingModalState = {
   originalEnd: Maybe<Date>;
   originalRecurrence: ScheduleMeetingRecurrenceOption;
   originalSelectedUsers: User[];
-  openCreate: (clock: WallClock) => void;
+  openCreate: (clock: Clock) => void;
   openEdit: (
     meetingSeries: MeetingSeries,
     formState: ScheduleMeetingFormState,
@@ -90,7 +90,7 @@ type ScheduleMeetingModalState = {
     originalSelectedUsers: User[],
   ) => void;
   close: () => void;
-  reset: (clock: WallClock) => void;
+  reset: (clock: Clock) => void;
   setTitle: (title: string) => void;
   setStart: (start: Maybe<Date>) => void;
   setEnd: (end: Maybe<Date>) => void;
@@ -99,7 +99,7 @@ type ScheduleMeetingModalState = {
   setParticipantsFilter: (participantsFilter: string) => void;
   setPassword: (password: string) => void;
   setPasswordConfirmation: (passwordConfirmation: string) => void;
-  validate: (clock: WallClock) => ScheduleMeetingFormErrors;
+  validate: (clock: Clock) => ScheduleMeetingFormErrors;
   clearErrors: () => void;
 };
 

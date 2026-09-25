@@ -17,8 +17,8 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import type {Maybe, Result} from 'true-myth';
 import {result} from 'true-myth';
 
@@ -31,7 +31,7 @@ export interface ScheduleMeetingValidationInput {
   title: string;
   start: Maybe<Date>;
   end: Maybe<Date>;
-  clock: WallClock;
+  clock: Clock;
   mode: ScheduleMeetingMode;
   password?: string;
   passwordConfirmation?: string;
@@ -46,11 +46,11 @@ export function getScheduleMeetingFormErrors({
   password,
   passwordConfirmation,
 }: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors {
-  const currentTimestampInMilliseconds = clock.currentTimestampInMilliseconds;
+  const currentUnixEpochMilliseconds = clock.currentUnixEpochMilliseconds;
   const missingTimes = start.isNothing || end.isNothing ? 'meetings.scheduleModal.error.missingTimes' : undefined;
   const allowPastTimes = mode === scheduleMeetingModes.edit;
   const endInPast =
-    !allowPastTimes && isUndefined(missingTimes) && end.isJust && end.value.getTime() <= currentTimestampInMilliseconds
+    !allowPastTimes && isUndefined(missingTimes) && end.isJust && end.value.getTime() <= currentUnixEpochMilliseconds
       ? 'meetings.schedule.errors.endInPast'
       : undefined;
 
@@ -62,7 +62,7 @@ export function getScheduleMeetingFormErrors({
       !allowPastTimes &&
       isUndefined(missingTimes) &&
       start.isJust &&
-      start.value.getTime() <= currentTimestampInMilliseconds
+      start.value.getTime() <= currentUnixEpochMilliseconds
         ? 'meetings.schedule.errors.startInPast'
         : undefined,
     endInPast,
