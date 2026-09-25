@@ -181,8 +181,6 @@ describe('getSharedDriveUploadDisplayStatuses', () => {
       uploadId: 'upload-2',
     };
 
-    expect(getSharedDriveUploadDisplayStatuses([first, second])[0]).toEqual(
-      expect.objectContaining({progress: 0.875}),
-    );
+    expect(getSharedDriveUploadDisplayStatuses([first, second])[0]).toEqual(expect.objectContaining({progress: 0.875}));
   });
 });
