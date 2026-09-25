@@ -4108,6 +4108,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@enormora/clock@npm:0.0.2":
+  version: 0.0.2
+  resolution: "@enormora/clock@npm:0.0.2"
+  checksum: 10/873e3eae83fe5120cd45a55dca83a0896884bcf3c4b52017bb0016d0e5a54491207485f7bdaf92ef163bdb9f74042d9778ad79e8ed13029596a937f1a5fd2f68
+  languageName: node
+  linkType: hard
+
 "@enormora/fire-and-forget@npm:0.0.4":
   version: 0.0.4
   resolution: "@enormora/fire-and-forget@npm:0.0.4"
@@ -4119,13 +4126,6 @@ __metadata:
   version: 0.0.22
   resolution: "@enormora/objectory@npm:0.0.22"
   checksum: 10/a25ab9f3d259cf2224db1839dd9f1c2db7445bd5abb2f6ec514351c850f7f4fd4dafae4727a8ce56ba0217790dd0100bd5cf2f798c9d98f37e2adb4a96d09f2e
-  languageName: node
-  linkType: hard
-
-"@enormora/wall-clock@npm:0.0.3":
-  version: 0.0.3
-  resolution: "@enormora/wall-clock@npm:0.0.3"
-  checksum: 10/7d6cc95ce9ba154f368e51a3907e864e9c5c32db36e38c3b72c0c41327129961ca0ba965fdbd7e82804391fb8eb4dc9a182063cd08e10cac05371cb970f07edb
   languageName: node
   linkType: hard
 
@@ -12114,8 +12114,8 @@ __metadata:
     "@datadog/browser-rum": "npm:7.13.0"
     "@date-fns/tz": "npm:1.5.0"
     "@emotion/react": "npm:11.14.0"
+    "@enormora/clock": "npm:0.0.2"
     "@enormora/fire-and-forget": "npm:0.0.4"
-    "@enormora/wall-clock": "npm:0.0.3"
     "@formatjs/cli": "npm:6.16.31"
     "@formkit/auto-animate": "npm:0.10.0"
     "@lexical/code": "npm:0.27.2"

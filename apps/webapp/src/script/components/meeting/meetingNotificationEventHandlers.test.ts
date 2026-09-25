@@ -18,7 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {
   type AddNotificationInput,
@@ -32,8 +32,8 @@ import {createMeetingNotificationEventHandlers} from './meetingNotificationEvent
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const creatorId: QualifiedId = {id: 'creator-id', domain: 'example.com'};
 const conversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
-const wallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T12:00:00.000Z'),
+const defaultClock = createDeterministicClock({
+  initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T12:00:00.000Z')) * 1_000n,
 });
 
 const meetingSeries: MeetingSeries = {
@@ -69,14 +69,14 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   const createHandlers = ({
     getMeetingSeries = () => [meetingSeries],
-    activeWallClock = wallClock,
+    clock = defaultClock,
     notifications = [] as AddNotificationInput[],
     dismissedMeetings = [] as Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}>,
     warnings = [] as Array<{message: string; context?: unknown}>,
   } = {}) =>
     createMeetingNotificationEventHandlers({
       getMeetingSeries,
-      wallClock: activeWallClock,
+      clock,
       addNotification: notification => {
         notifications.push(notification);
       },
@@ -185,11 +185,11 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('notifies with ONGOING when the first notification arrives during the meeting', () => {
     const notifications: AddNotificationInput[] = [];
-    const activeMeetingWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T13:30:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T13:30:00.000Z')) * 1_000n,
     });
 
-    const {notifyMeetingChange} = createHandlers({notifications, activeWallClock: activeMeetingWallClock});
+    const {notifyMeetingChange} = createHandlers({notifications, clock});
 
     notifyMeetingChange(meetingSeries);
 
@@ -207,11 +207,11 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('keeps an active meeting ongoing on subsequent notifications', () => {
     const notifications: AddNotificationInput[] = [];
-    const activeMeetingWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T13:30:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T13:30:00.000Z')) * 1_000n,
     });
 
-    const {notifyMeetingChange} = createHandlers({notifications, activeWallClock: activeMeetingWallClock});
+    const {notifyMeetingChange} = createHandlers({notifications, clock});
 
     notifyMeetingChange(meetingSeries);
     notifyMeetingChange(meetingSeries);
@@ -224,8 +224,8 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('notifies with ONGOING for the current instance of a recurring meeting', () => {
     const notifications: AddNotificationInput[] = [];
-    const activeMeetingWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-08T10:30:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-08T10:30:00.000Z')) * 1_000n,
     });
     const recurringMeeting = {
       ...meetingSeries,
@@ -236,7 +236,7 @@ describe('createMeetingNotificationEventHandlers', () => {
 
     const {notifyMeetingChange} = createHandlers({
       notifications,
-      activeWallClock: activeMeetingWallClock,
+      clock,
     });
 
     notifyMeetingChange(recurringMeeting);
@@ -246,13 +246,13 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('keeps a one-shot meeting ongoing at its exact end time', () => {
     const notifications: AddNotificationInput[] = [];
-    const activeMeetingWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T14:00:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T14:00:00.000Z')) * 1_000n,
     });
 
     const {notifyMeetingChange} = createHandlers({
       notifications,
-      activeWallClock: activeMeetingWallClock,
+      clock,
     });
 
     notifyMeetingChange(meetingSeries);
@@ -262,13 +262,13 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('notifies with INVITE when the first notification arrives after the meeting ends', () => {
     const notifications: AddNotificationInput[] = [];
-    const activeMeetingWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T14:00:00.001Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T14:00:00.001Z')) * 1_000n,
     });
 
     const {notifyMeetingChange} = createHandlers({
       notifications,
-      activeWallClock: activeMeetingWallClock,
+      clock,
     });
 
     notifyMeetingChange(meetingSeries);
@@ -376,7 +376,7 @@ describe('createMeetingNotificationEventHandlers', () => {
     const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
     const {onMeetingCancelled} = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => [meetingSeries],
-      wallClock,
+      clock: defaultClock,
       addNotification: notification => {
         notifications.push(notification);
       },

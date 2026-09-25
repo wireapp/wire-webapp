@@ -67,8 +67,8 @@ const MeetingListItemComponent = ({
 }: MeetingListItemProps) => {
   const {meetingSeries, start, end} = meetingInstance;
   const {title, recurrence} = meetingSeries;
-  const {translate, wallClock} = useApplicationContext();
-  const nowMilliseconds = providedNowMilliseconds ?? wallClock.currentTimestampInMilliseconds;
+  const {translate, clock} = useApplicationContext();
+  const nowMilliseconds = providedNowMilliseconds ?? clock.currentUnixEpochMilliseconds;
   const {
     joinMeeting,
     isJoinDisabled,

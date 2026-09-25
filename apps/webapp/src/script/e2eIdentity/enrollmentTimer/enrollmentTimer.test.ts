@@ -17,9 +17,9 @@
  *
  */
 
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {noop} from 'noop-esm';
 
 import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './enrollmentTimer';
@@ -51,15 +51,21 @@ const generateWireIdentity = (
 
 describe('e2ei delays', () => {
   const gracePeriod = 7 * TimeInMillis.DAY;
-  beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(1709050878009);
-  });
+
+  function createClockForTest(): ReturnType<typeof createDeterministicClock> {
+    return createDeterministicClock({initialUnixEpochMicroseconds: 1_709_050_878_009_000n});
+  }
 
   it('should return an immediate delay if the identity is expired', () => {
-    const delay = getEnrollmentTimer({status: MLSStatuses.EXPIRED} as any, Date.now(), gracePeriod);
+    const clock = createClockForTest();
+    const delay = getEnrollmentTimer(
+      generateWireIdentity(CredentialType.X509, MLSStatuses.EXPIRED),
+      clock.currentUnixEpochMilliseconds,
+      gracePeriod,
+      clock,
+    );
 
-    expect(delay).toEqual({firingDate: Date.now(), isSnoozable: false});
+    expect(delay).toEqual({firingDate: clock.currentUnixEpochMilliseconds, isSnoozable: false});
   });
 
   it.each([
@@ -70,24 +76,27 @@ describe('e2ei delays', () => {
     [TimeInMillis.MINUTE * 10, TimeInMillis.DAY * 30, TimeInMillis.MINUTE * 5],
     [TimeInMillis.MINUTE * 30, TimeInMillis.DAY * 30, TimeInMillis.MINUTE * 15],
   ])('should return a snoozable timer if device is still valid', (validityPeriod, grace, expectedTimer) => {
+    const clock = createClockForTest();
     const {firingDate, isSnoozable} = getEnrollmentTimer(
       {
         credentialType: CredentialType.X509,
         x509Identity: {
           certificate: ' ',
-          notAfter: (Date.now() + validityPeriod) / 1000,
+          notAfter: (clock.currentUnixEpochMilliseconds + validityPeriod) / 1000,
         },
       } as any,
-      Date.now(),
+      clock.currentUnixEpochMilliseconds,
       grace,
+      clock,
     );
 
     expect(isSnoozable).toBeTruthy();
-    expect(firingDate).toBe(Date.now() + expectedTimer);
+    expect(firingDate).toBe(clock.currentUnixEpochMilliseconds + expectedTimer);
   });
 
   it('should return a snoozable timer in the long future if device is certified before the grace period', () => {
-    const deadline = Date.now() + messageRetentionTime + gracePeriod + 1000;
+    const clock = createClockForTest();
+    const deadline = clock.currentUnixEpochMilliseconds + messageRetentionTime + gracePeriod + 1000;
     const gracePeriodStartingPoint = deadline - gracePeriod;
 
     const {firingDate, isSnoozable} = getEnrollmentTimer(
@@ -98,8 +107,9 @@ describe('e2ei delays', () => {
           notAfter: deadline / 1000,
         },
       } as any,
-      Date.now(),
+      clock.currentUnixEpochMilliseconds,
       gracePeriod,
+      clock,
     );
 
     expect(isSnoozable).toBeTruthy();
@@ -107,7 +117,8 @@ describe('e2ei delays', () => {
   });
 
   it('should return a snoozable timer scheduled at the start of the grace period if we are not in it yet', () => {
-    const deadline = Date.now() + gracePeriod + 1000;
+    const clock = createClockForTest();
+    const deadline = clock.currentUnixEpochMilliseconds + gracePeriod + 1000;
     const gracePeriodStartingPoint = deadline - gracePeriod;
     const {firingDate, isSnoozable} = getEnrollmentTimer(
       {
@@ -117,8 +128,9 @@ describe('e2ei delays', () => {
           notAfter: deadline / 1000,
         },
       } as any,
-      Date.now(),
+      clock.currentUnixEpochMilliseconds,
       gracePeriod,
+      clock,
     );
 
     expect(isSnoozable).toBeTruthy();
@@ -132,50 +144,46 @@ describe('e2ei delays', () => {
     TimeInMillis.HOUR * 24,
     TimeInMillis.WEEK,
   ])('should keep full remaining grace period for first enrollment: %i ms', grace => {
-    const remainingDelay = getRemainingGracePeriodDelay(undefined, Date.now(), grace);
+    const clock = createClockForTest();
+    const remainingDelay = getRemainingGracePeriodDelay(undefined, clock.currentUnixEpochMilliseconds, grace, clock);
 
     expect(remainingDelay).toBe(grace);
   });
 
   it('should return a deterministic full grace-period delay when identity is undefined', () => {
-    const deterministicWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n,
     });
     const grace = TimeInMillis.HOUR * 12;
 
-    const remainingDelay = getRemainingGracePeriodDelay(
-      undefined,
-      deterministicWallClock.currentTimestampInMilliseconds,
-      grace,
-      deterministicWallClock,
-    );
+    const remainingDelay = getRemainingGracePeriodDelay(undefined, clock.currentUnixEpochMilliseconds, grace, clock);
 
     expect(remainingDelay).toBe(grace);
   });
 
   it('should return only the remaining grace-period delay when first enrollment started in the past', () => {
-    const deterministicWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n,
     });
     const grace = TimeInMillis.DAY * 7;
-    const e2eiActivatedAt = deterministicWallClock.currentTimestampInMilliseconds - TimeInMillis.DAY * 2;
+    const e2eiActivatedAt = clock.currentUnixEpochMilliseconds - TimeInMillis.DAY * 2;
 
-    const remainingDelay = getRemainingGracePeriodDelay(undefined, e2eiActivatedAt, grace, deterministicWallClock);
+    const remainingDelay = getRemainingGracePeriodDelay(undefined, e2eiActivatedAt, grace, clock);
 
     expect(remainingDelay).toBe(TimeInMillis.DAY * 5);
   });
 
   it('should treat NOT_ACTIVATED identity as first enrollment', () => {
-    const deterministicWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n,
     });
     const grace = TimeInMillis.HOUR * 6;
 
     const remainingDelay = getRemainingGracePeriodDelay(
       generateWireIdentity(CredentialType.X509, MLSStatuses.NOT_ACTIVATED),
-      deterministicWallClock.currentTimestampInMilliseconds,
+      clock.currentUnixEpochMilliseconds,
       grace,
-      deterministicWallClock,
+      clock,
     );
 
     expect(remainingDelay).toBe(grace);

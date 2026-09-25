@@ -19,7 +19,7 @@
 
 import {useEffect, useRef, useState} from 'react';
 
-import {createWallClock, type WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import {isError} from '@sindresorhus/is';
 import {Maybe, result} from 'true-myth';
 import {z} from 'zod';
@@ -45,8 +45,10 @@ type UseSingleInstanceDependencies = {
   createInstanceId: () => string;
   isDesktopApp: () => boolean;
   singleInstanceStorage: StringKeyValueStorage;
-  wallClock: WallClock;
+  clock: Clock;
 };
+
+type DefaultUseSingleInstanceDependencies = Omit<UseSingleInstanceDependencies, 'clock'>;
 
 type UseSingleInstanceResult = {
   hasOtherInstance: boolean;
@@ -54,11 +56,10 @@ type UseSingleInstanceResult = {
   registerInstance: () => () => void;
 };
 
-const defaultUseSingleInstanceDependencies: UseSingleInstanceDependencies = {
+const defaultUseSingleInstanceDependencies: DefaultUseSingleInstanceDependencies = {
   createInstanceId: createUuid,
   isDesktopApp: Runtime.isDesktopApp,
   singleInstanceStorage: createStringKeyValueStorageFromWebStorage(Maybe.of(getStorage())),
-  wallClock: createWallClock(),
 };
 
 function getStoredInstanceId(storage: StringKeyValueStorage): Maybe<string> {
@@ -114,16 +115,16 @@ function startSingleInstancePolling(
   isDesktopApp: () => boolean,
   onNewInstance: () => void,
   storage: StringKeyValueStorage,
-  wallClock: WallClock,
+  clock: Clock,
 ): () => void {
   const checkSingleInstance = (): void => {
     if (!isRunningInstance(getCurrentInstanceId(), isDesktopApp, storage)) {
       onNewInstance();
     }
   };
-  const interval = wallClock.setInterval(checkSingleInstance, CONFIG.INTERVAL);
+  const interval = clock.setInterval(checkSingleInstance, CONFIG.INTERVAL);
   return () => {
-    return wallClock.clearInterval(interval);
+    return clock.clearInterval(interval);
   };
 }
 
@@ -139,7 +140,7 @@ function register(instanceId: string, storage: StringKeyValueStorage): () => voi
 }
 
 export function createUseSingleInstance(dependencies: UseSingleInstanceDependencies): () => UseSingleInstanceResult {
-  const {createInstanceId, isDesktopApp, singleInstanceStorage, wallClock} = dependencies;
+  const {createInstanceId, isDesktopApp, singleInstanceStorage, clock} = dependencies;
 
   return function useSingleInstanceWithDependencies(): UseSingleInstanceResult {
     const instanceId = useRef<Maybe<string>>(Maybe.nothing());
@@ -168,7 +169,7 @@ export function createUseSingleInstance(dependencies: UseSingleInstanceDependenc
           return setHasOtherInstance(true);
         },
         singleInstanceStorage,
-        wallClock,
+        clock,
       );
     });
 
@@ -176,4 +177,8 @@ export function createUseSingleInstance(dependencies: UseSingleInstanceDependenc
   };
 }
 
-export const useSingleInstance = createUseSingleInstance(defaultUseSingleInstanceDependencies);
+export function useSingleInstance(clock: Clock): UseSingleInstanceResult {
+  const useSingleInstanceWithClock = createUseSingleInstance({...defaultUseSingleInstanceDependencies, clock});
+
+  return useSingleInstanceWithClock();
+}

@@ -28,8 +28,8 @@ interface AppAlreadyOpenProps {
   fullscreen?: boolean;
 }
 export const AppAlreadyOpen = ({fullscreen}: AppAlreadyOpenProps) => {
-  const {translate} = useApplicationContext();
-  const {hasOtherInstance, killRunningInstance} = useSingleInstance();
+  const {clock, translate} = useApplicationContext();
+  const {hasOtherInstance, killRunningInstance} = useSingleInstance(clock);
   if (!hasOtherInstance) {
     return null;
   }

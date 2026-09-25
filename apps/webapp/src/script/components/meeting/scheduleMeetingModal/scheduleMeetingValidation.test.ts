@@ -18,7 +18,7 @@
  */
 
 import {maybe} from 'true-myth';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {
   MEETING_TITLE_MAX_LENGTH,
@@ -34,7 +34,7 @@ describe('scheduleMeetingValidation', () => {
   const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
   const pastStartDate = new Date('2026-06-23T10:00:00.000Z');
 
-  const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+  const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
   const futureStart = maybe.just(futureStartDate);
   const futureEnd = maybe.just(futureEndDate);
   const createMode = {mode: 'create' as const};
@@ -45,7 +45,7 @@ describe('scheduleMeetingValidation', () => {
       title: '   ',
       start: futureStart,
       end: futureEnd,
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -59,7 +59,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'Weekly sync',
       start: maybe.just(pastStartDate),
       end: futureEnd,
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -71,7 +71,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'Weekly sync',
       start: futureStart,
       end: maybe.just(pastStartDate),
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -80,14 +80,14 @@ describe('scheduleMeetingValidation', () => {
   });
 
   it('returns startInPast for a past time on today while allowing today as a date', () => {
-    const pastTimeToday = new Date(wallClock.currentDate);
+    const pastTimeToday = new Date(clock.currentDate);
     pastTimeToday.setHours(pastTimeToday.getHours() - 1);
 
     const errors = getScheduleMeetingFormErrors({
       title: 'Weekly sync',
       start: maybe.just(pastTimeToday),
       end: futureEnd,
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -99,7 +99,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'Weekly sync',
       start: futureStart,
       end: maybe.just(futureStartDate),
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -111,7 +111,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'a'.repeat(MEETING_TITLE_MAX_LENGTH + 1),
       start: futureStart,
       end: futureEnd,
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -124,7 +124,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'Weekly sync',
       start: futureStart,
       end: futureEnd,
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -137,7 +137,7 @@ describe('scheduleMeetingValidation', () => {
       start: futureStart,
       end: futureEnd,
       passwordConfirmation: 'ValidConfirmation1!',
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -151,7 +151,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'Weekly sync',
       start: maybe.just(pastStartDate),
       end: maybe.just(pastEndDate),
-      wallClock,
+      clock,
       ...editMode,
     });
 
@@ -166,7 +166,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'Weekly sync',
       start: maybe.just(pastStartDate),
       end: maybe.just(pastStartDate),
-      wallClock,
+      clock,
       ...editMode,
     });
 
@@ -179,7 +179,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'Weekly sync',
       start: maybe.nothing(),
       end: futureEnd,
-      wallClock,
+      clock,
       ...createMode,
     });
 
@@ -193,7 +193,7 @@ describe('scheduleMeetingValidation', () => {
       title: 'Weekly sync',
       start: maybe.nothing(),
       end: futureEnd,
-      wallClock,
+      clock,
       ...editMode,
     });
 

@@ -29,7 +29,7 @@ import {MainContent} from './mainContent';
 
 import {withTheme} from '../../auth/util/test/testUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {createRootContextValueForTest} from '../testSupport/rootContextTestSupport';
 import {RootProvider} from '../rootProvider';
 import {ContentState, useAppState} from '../useAppState';
@@ -75,7 +75,7 @@ describe('Preferences', () => {
     selfUser: new User('selfUser', '', translateForTest),
     reloadApp: jest.fn(),
   };
-  const wallClock = createDeterministicWallClock();
+  const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
 
   it('renders the right component according to view state', () => {
     const {setContentState} = useAppState.getState();
@@ -88,7 +88,7 @@ describe('Preferences', () => {
             translate: translateForTest,
             isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
             mainViewModel,
-            wallClock,
+            clock,
           })}
         >
           <MainContent {...defaultParams} />

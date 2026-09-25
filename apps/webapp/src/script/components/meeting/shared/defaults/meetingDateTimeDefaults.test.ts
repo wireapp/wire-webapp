@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {
   capEndForStart,
@@ -118,18 +118,18 @@ describe('meetingDateTimeDefaults', () => {
   });
 
   it('derives defaults from the wall clock', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: new Date(2026, 6, 13, 16, 47, 0, 0).getTime(),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(new Date(2026, 6, 13, 16, 47, 0, 0).getTime()) * 1_000n,
     });
 
-    expect(getDefaultScheduleMeetingStartDateTime(wallClock)).toEqual(new Date(2026, 6, 13, 17, 0, 0, 0));
+    expect(getDefaultScheduleMeetingStartDateTime(clock)).toEqual(new Date(2026, 6, 13, 17, 0, 0, 0));
   });
 
   it('uses the current time as the meet-now start time', () => {
     const now = new Date(2026, 6, 13, 16, 47, 0, 0);
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: now.getTime()});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(now.getTime()) * 1_000n});
 
-    expect(getMeetNowMeetingTimes(wallClock)).toEqual({
+    expect(getMeetNowMeetingTimes(clock)).toEqual({
       start: now,
       end: new Date(2026, 6, 13, 17, 47, 0, 0),
     });
@@ -137,9 +137,9 @@ describe('meetingDateTimeDefaults', () => {
 
   it('caps meet-now end time at 11:45 PM for late starts', () => {
     const now = new Date(2026, 6, 13, 23, 45, 0, 0);
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: now.getTime()});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(now.getTime()) * 1_000n});
 
-    expect(getMeetNowMeetingTimes(wallClock)).toEqual({
+    expect(getMeetNowMeetingTimes(clock)).toEqual({
       start: now,
       end: new Date(2026, 6, 13, 23, 45, 0, 0),
     });

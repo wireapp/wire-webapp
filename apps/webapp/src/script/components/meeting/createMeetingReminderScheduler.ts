@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
@@ -37,7 +37,7 @@ export type MeetingReminderFirePayload = {
 };
 
 export type CreateMeetingReminderSchedulerDependencies = {
-  wallClock: WallClock;
+  clock: Clock;
   onReminder: (payload: MeetingReminderFirePayload) => void;
 };
 
@@ -47,7 +47,7 @@ export type MeetingReminderScheduler = {
 };
 
 type ScheduledMeetingReminder = {
-  timeoutId: ReturnType<WallClock['setTimeout']> | undefined;
+  timeoutId: ReturnType<Clock['setTimeout']> | undefined;
   fireAt: number;
   occurrenceStartMs: number;
   meeting: MeetingSeries;
@@ -65,7 +65,7 @@ const toReminderPayload = (meeting: MeetingSeries, occurrenceStartMs: number): M
 });
 
 export const createMeetingReminderScheduler = ({
-  wallClock,
+  clock,
   onReminder,
 }: CreateMeetingReminderSchedulerDependencies): MeetingReminderScheduler => {
   const scheduled = new Map<string, ScheduledMeetingReminder>();
@@ -76,7 +76,7 @@ export const createMeetingReminderScheduler = ({
 
   const clearTimeoutIfScheduled = (scheduledReminder: ScheduledMeetingReminder): void => {
     if (!isUndefined(scheduledReminder.timeoutId)) {
-      wallClock.clearTimeout(scheduledReminder.timeoutId);
+      clock.clearTimeout(scheduledReminder.timeoutId);
     }
   };
 
@@ -104,8 +104,8 @@ export const createMeetingReminderScheduler = ({
 
     clearTimeoutIfScheduled(scheduledReminder);
 
-    const delayInMilliseconds = Math.max(0, scheduledReminder.fireAt - wallClock.currentTimestampInMilliseconds);
-    scheduledReminder.timeoutId = wallClock.setTimeout(
+    const delayInMilliseconds = Math.max(0, scheduledReminder.fireAt - clock.currentUnixEpochMilliseconds);
+    scheduledReminder.timeoutId = clock.setTimeout(
       () => onTimeout(meetingKey),
       Math.min(delayInMilliseconds, MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS),
     );
@@ -113,10 +113,8 @@ export const createMeetingReminderScheduler = ({
 
   const scheduleMeeting = (meeting: MeetingSeries): void => {
     const meetingKey = toMeetingIdKey(meeting.qualified_id);
-    const reminder = getNextSchedulableMeetingReminder(
-      meeting,
-      wallClock.currentTimestampInMilliseconds,
-      occurrenceStartMs => hasFiredOccurrence(meetingKey, occurrenceStartMs),
+    const reminder = getNextSchedulableMeetingReminder(meeting, clock.currentUnixEpochMilliseconds, occurrenceStartMs =>
+      hasFiredOccurrence(meetingKey, occurrenceStartMs),
     );
 
     if (maybe.isNothing(reminder)) {
@@ -161,7 +159,7 @@ export const createMeetingReminderScheduler = ({
       return;
     }
 
-    if (wallClock.currentTimestampInMilliseconds < scheduledReminder.fireAt) {
+    if (clock.currentUnixEpochMilliseconds < scheduledReminder.fireAt) {
       armTimeout(meetingKey);
       return;
     }
@@ -169,7 +167,7 @@ export const createMeetingReminderScheduler = ({
     scheduled.delete(meetingKey);
     firedOccurrenceKeys.add(toFiredOccurrenceKey(meetingKey, scheduledReminder.occurrenceStartMs));
 
-    if (wallClock.currentTimestampInMilliseconds < scheduledReminder.occurrenceStartMs) {
+    if (clock.currentUnixEpochMilliseconds < scheduledReminder.occurrenceStartMs) {
       onReminder(toReminderPayload(scheduledReminder.meeting, scheduledReminder.occurrenceStartMs));
     }
 

@@ -17,22 +17,22 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 
 interface StartApplicationPeriodicChecksOptions {
-  readonly wallClock: WallClock;
+  readonly clock: Clock;
   readonly periodicChecksIntervalDelayInMilliseconds: number;
   readonly runPeriodicCheck: () => void;
 }
 
 export function startApplicationPeriodicChecks(options: StartApplicationPeriodicChecksOptions): () => void {
-  const {wallClock, periodicChecksIntervalDelayInMilliseconds, runPeriodicCheck} = options;
+  const {clock, periodicChecksIntervalDelayInMilliseconds, runPeriodicCheck} = options;
 
   runPeriodicCheck();
 
-  const intervalIdentifier = wallClock.setInterval(runPeriodicCheck, periodicChecksIntervalDelayInMilliseconds);
+  const intervalIdentifier = clock.setInterval(runPeriodicCheck, periodicChecksIntervalDelayInMilliseconds);
 
   return () => {
-    wallClock.clearInterval(intervalIdentifier);
+    clock.clearInterval(intervalIdentifier);
   };
 }

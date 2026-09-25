@@ -19,8 +19,8 @@
 
 import {FC, ReactNode, useEffect, useMemo} from 'react';
 
+import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
@@ -68,6 +68,7 @@ import {Index} from './index';
 
 interface RootProps {
   translate: Translate;
+  clock: Clock;
 }
 
 const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
@@ -94,12 +95,13 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   isFetchingSSOSettings,
   doGetSSOSettings,
   translate,
+  clock,
 }) => {
   const rootContextValue = useMemo(() => {
     return {
       fireAndForgetInvoker: authFireAndForgetInvoker,
       mainViewModel: createAuthMainViewModel(),
-      wallClock: createWallClock(),
+      clock,
       doesApplicationNeedForceReload: false,
       isFeatureToggleEnabled() {
         return false;
@@ -120,7 +122,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
         },
       },
     };
-  }, [translate]);
+  }, [clock, translate]);
   // Injects the helper class used by useRouteA11y so programmatic focus targets (for screen readers)
   // lose their outlines while the focus trap is active.
   useEffect(() => {

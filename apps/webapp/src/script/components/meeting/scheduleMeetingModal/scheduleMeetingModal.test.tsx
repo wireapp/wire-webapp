@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -43,8 +43,8 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
-const testWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: Date.parse('2026-08-12T10:00:00Z'),
+const clock = createDeterministicClock({
+  initialUnixEpochMicroseconds: BigInt(Date.parse('2026-08-12T10:00:00Z')) * 1_000n,
 });
 
 function createDeferred<T>(): PromiseWithResolvers<T> {
@@ -112,7 +112,7 @@ const renderModal = (scheduleMeeting = jest.fn().mockReturnValue(task.resolve({f
       createRootProviderWrapperForTest(
         createRootContextValueForTest({
           translate: translateForTest,
-          wallClock: testWallClock,
+          clock,
           mainViewModel: mainViewModel as never,
           fireAndForgetInvoker,
         }),
@@ -121,7 +121,7 @@ const renderModal = (scheduleMeeting = jest.fn().mockReturnValue(task.resolve({f
   );
 
   act(() => {
-    useScheduleMeetingModal.getState().openCreate(testWallClock);
+    useScheduleMeetingModal.getState().openCreate(clock);
   });
 
   return {fireAndForgetInvoker};
@@ -131,7 +131,7 @@ describe('ScheduleMeetingModal', () => {
   afterEach(() => {
     act(() => {
       useScheduleMeetingModal.getState().close();
-      useScheduleMeetingModal.getState().reset(testWallClock);
+      useScheduleMeetingModal.getState().reset(clock);
     });
     jest.restoreAllMocks();
   });

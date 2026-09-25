@@ -18,7 +18,7 @@
  */
 
 import {renderHook} from '@testing-library/react';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {useMeetNowModal} from 'Components/meeting/meetNowModal/useMeetNowModal';
 import {useMeetingActions} from 'Components/meeting/useMeetingActions';
@@ -28,12 +28,12 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const wallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-16T10:00:00.000Z'),
+const clock = createDeterministicClock({
+  initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T10:00:00.000Z')) * 1_000n,
 });
 
 const RootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest, wallClock}),
+  createRootContextValueForTest({translate: translateForTest, clock}),
 );
 
 describe('useMeetingActions', () => {

@@ -17,6 +17,7 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {Maybe} from 'true-myth';
 
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
@@ -24,14 +25,12 @@ import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import {AppInitTimings} from './AppInitTimings';
 import type {AppInitTimingsStep} from './AppInitTimingsStep';
 
-import type {MonotonicClock} from '../../time/monotonicClock';
-
 export class AppInitTelemetry {
   private readonly appInitTimings: AppInitTimings;
   private readonly appInitStatistics: AppInitStatistics;
 
-  constructor(monotonicClock: MonotonicClock, startedAtMilliseconds: number) {
-    this.appInitTimings = new AppInitTimings(monotonicClock, startedAtMilliseconds);
+  constructor(clock: Clock, startedAtMonotonicMicroseconds: bigint) {
+    this.appInitTimings = new AppInitTimings(clock, startedAtMonotonicMicroseconds);
     this.appInitStatistics = new AppInitStatistics();
   }
 
@@ -70,7 +69,7 @@ export class AppInitTelemetry {
     return this.appInitTimings.timeStep(step);
   }
 
-  timeStepAt(step: AppInitTimingsStep, occurredAtMilliseconds: number): void {
-    return this.appInitTimings.timeStepAt(step, occurredAtMilliseconds);
+  timeStepAt(step: AppInitTimingsStep, occurredAtMonotonicMicroseconds: bigint): void {
+    return this.appInitTimings.timeStepAt(step, occurredAtMonotonicMicroseconds);
   }
 }

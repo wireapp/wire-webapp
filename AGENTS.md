@@ -63,10 +63,10 @@ Per-file checks: pass a single file path as the last argument, not `yarn nx run 
 
 When editing `apps/webapp/**/*.{ts,tsx}`:
 
-- Do not call `Date.now()`, `new Date()` for "now", `setTimeout`, `setInterval`, or their `clear*` variants directly in testable logic. Accept a `WallClock` dependency instead.
-- Wire production wall clocks with `createWallClock()` from `@enormora/wall-clock/wall-clock` only at composition roots, such as `createApplicationServices` or `RootProvider`.
-- Use `wallClock.currentTimestampInMilliseconds`, `wallClock.currentDate`, `wallClock.setTimeout`, and related `WallClock` APIs.
-- In tests, pass `createDeterministicWallClock({initialCurrentTimestampInMilliseconds: ...})` via dependencies. Do not use `jest.mock`, `jest.useFakeTimers`, or `jest.setSystemTime` in new tests.
+- Do not call `Date.now()`, `new Date()` for "now", `setTimeout`, `setInterval`, or their `clear*` variants directly in testable logic. Accept a `Clock` dependency from `@enormora/clock/clock` instead.
+- Create the production `Clock` with `createClock()` at the application composition root and pass that same instance to code that needs wall time or timers.
+- Use `clock.currentUnixEpochMilliseconds` and `clock.currentDate` for calendar and wall time. Use `clock.currentMonotonicMicroseconds` for elapsed-time measurements; subtract monotonic timestamps first, then convert the duration to milliseconds where an existing API expects milliseconds. Never use wall time to measure elapsed durations.
+- In tests, pass `createDeterministicClock({initialUnixEpochMicroseconds: ...})` from `@enormora/clock/deterministic-clock` via dependencies. Use `0n` when the calendar date is irrelevant. Convert millisecond values explicitly, for example `BigInt(timestampMilliseconds) * 1_000n`. Do not use `jest.mock`, `jest.useFakeTimers`, or `jest.setSystemTime` in new tests.
 - Import optionals and fallible operation types from `true-myth`.
 - Use `Maybe<T>` (`Maybe.just`, `Maybe.nothing`, `Maybe.of`) for optional values instead of `null` or `undefined`.
 - Use `Result<T, E>` (`result.ok`, `result.err`) for synchronous fallible operations instead of `try/catch` or `throw`.

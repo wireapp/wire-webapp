@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {faker} from '@faker-js/faker';
 import {waitFor} from '@testing-library/react';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
@@ -4246,10 +4246,10 @@ describe('onMLSResetMessage', () => {
 
     conversationState.conversations([conversation]);
 
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n});
     const mlsResetEvent: ConversationMLSResetEvent = {
       type: CONVERSATION_EVENT.MLS_RESET,
-      time: wallClock.currentDate.toISOString(),
+      time: clock.currentDate.toISOString(),
       from: 'user-id',
       conversation: conversation.id,
       qualified_conversation: conversation.qualifiedId,
@@ -4285,10 +4285,10 @@ describe('onMLSResetMessage', () => {
 
     conversationState.conversations([conversation]);
 
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n});
     const mlsResetEvent: ConversationMLSResetEvent = {
       type: CONVERSATION_EVENT.MLS_RESET,
-      time: wallClock.currentDate.toISOString(),
+      time: clock.currentDate.toISOString(),
       from: 'user-id',
       conversation: conversation.id,
       qualified_conversation: conversation.qualifiedId,

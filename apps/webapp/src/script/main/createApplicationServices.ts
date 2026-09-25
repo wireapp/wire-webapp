@@ -17,33 +17,28 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 
 import type {ApplicationObservability} from '../observability/applicationObservability';
-import type {MonotonicClock} from '../time/monotonicClock';
-
 export type ApplicationServices = {
   readonly applicationObservability: ApplicationObservability;
+  readonly clock: Clock;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
-  readonly monotonicClock: MonotonicClock;
-  readonly wallClock: WallClock;
 };
 
 type CreateApplicationServicesDependencies = {
   readonly createApplicationObservability: () => ApplicationObservability;
+  readonly clock: Clock;
   readonly createFireAndForgetInvoker: () => FireAndForgetInvoker;
-  readonly createWallClock: () => WallClock;
-  readonly monotonicClock: MonotonicClock;
 };
 
 export function createApplicationServices(dependencies: CreateApplicationServicesDependencies): ApplicationServices {
-  const {createApplicationObservability, createFireAndForgetInvoker, createWallClock, monotonicClock} = dependencies;
+  const {createApplicationObservability, clock, createFireAndForgetInvoker} = dependencies;
 
   return {
     applicationObservability: createApplicationObservability(),
+    clock,
     fireAndForgetInvoker: createFireAndForgetInvoker(),
-    monotonicClock,
-    wallClock: createWallClock(),
   };
 }

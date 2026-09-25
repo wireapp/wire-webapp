@@ -17,45 +17,45 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {startApplicationPeriodicChecks} from './startApplicationPeriodicChecks';
 
 describe('startApplicationPeriodicChecks', () => {
   it('executes periodic checks immediately and again after each configured delay', () => {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const periodicChecksIntervalDelayInMilliseconds = 1_234;
     const runPeriodicCheck = jest.fn();
 
     startApplicationPeriodicChecks({
-      wallClock: deterministicWallClock,
+      clock,
       periodicChecksIntervalDelayInMilliseconds,
       runPeriodicCheck,
     });
 
     expect(runPeriodicCheck).toHaveBeenCalledTimes(1);
 
-    deterministicWallClock.advanceByMilliseconds(periodicChecksIntervalDelayInMilliseconds - 1);
+    clock.advanceByMilliseconds(periodicChecksIntervalDelayInMilliseconds - 1);
     expect(runPeriodicCheck).toHaveBeenCalledTimes(1);
 
-    deterministicWallClock.advanceByMilliseconds(periodicChecksIntervalDelayInMilliseconds);
+    clock.advanceByMilliseconds(periodicChecksIntervalDelayInMilliseconds);
 
     expect(runPeriodicCheck).toHaveBeenCalledTimes(2);
   });
 
   it('stops executing periodic checks after cleanup is called', () => {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const periodicChecksIntervalDelayInMilliseconds = 567;
     const runPeriodicCheck = jest.fn();
 
     const stopPeriodicChecks = startApplicationPeriodicChecks({
-      wallClock: deterministicWallClock,
+      clock,
       periodicChecksIntervalDelayInMilliseconds,
       runPeriodicCheck,
     });
 
-    deterministicWallClock.advanceByMilliseconds(periodicChecksIntervalDelayInMilliseconds);
+    clock.advanceByMilliseconds(periodicChecksIntervalDelayInMilliseconds);
     stopPeriodicChecks();
-    deterministicWallClock.advanceByMilliseconds(periodicChecksIntervalDelayInMilliseconds);
+    clock.advanceByMilliseconds(periodicChecksIntervalDelayInMilliseconds);
 
     expect(runPeriodicCheck).toHaveBeenCalledTimes(2);
   });

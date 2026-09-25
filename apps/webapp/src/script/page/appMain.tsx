@@ -19,8 +19,8 @@
 
 import {useEffect, useLayoutEffect, useMemo} from 'react';
 
+import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -71,7 +71,7 @@ import {ContentState, useAppState} from './useAppState';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {configureRouterWallClock, configureRoutes, navigate} from '../router/Router';
+import {configureRouterClock, configureRoutes, navigate} from '../router/Router';
 import {Core} from '../service/coreSingleton';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
@@ -90,7 +90,7 @@ type AppMainProps = {
   readonly mainView: MainViewModel;
   readonly conversationState?: ConversationState;
   readonly callState?: CallState;
-  readonly wallClock: WallClock;
+  readonly clock: Clock;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
   readonly locked: boolean;
 };
@@ -103,7 +103,7 @@ export const AppMain = (properties: AppMainProps) => {
     selfUser,
     conversationState = container.resolve(ConversationState),
     callState = container.resolve(CallState),
-    wallClock,
+    clock,
     locked,
   } = properties;
   const translate = mainView.translate;
@@ -247,7 +247,7 @@ export const AppMain = (properties: AppMainProps) => {
       showUserModal({domain, id: userId}, () => navigate('/'));
     };
 
-    configureRouterWallClock(wallClock);
+    configureRouterClock(clock);
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId/:domain': showConversationMessages,
@@ -315,7 +315,7 @@ export const AppMain = (properties: AppMainProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locked]);
 
-  useE2EIFeatureConfigUpdate(repositories.team);
+  useE2EIFeatureConfigUpdate(repositories.team, clock);
 
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent =

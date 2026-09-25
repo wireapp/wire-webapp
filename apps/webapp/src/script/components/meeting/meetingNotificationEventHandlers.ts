@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {
@@ -43,7 +43,7 @@ export const staleMeetingNotificationKinds = [
 
 export type MeetingNotificationEventHandlersDependencies = {
   getMeetingSeries: () => readonly MeetingSeries[];
-  wallClock: WallClock;
+  clock: Clock;
   addNotification: (input: AddNotificationInput) => void;
   dismissNotificationsForMeeting: (meetingId: QualifiedId, kinds?: readonly MeetingNotificationKind[]) => void;
   logger: MeetingNotificationLogger;
@@ -63,7 +63,7 @@ export type MeetingNotificationEventHandlers = {
 
 export const createMeetingNotificationEventHandlers = ({
   getMeetingSeries,
-  wallClock,
+  clock,
   addNotification,
   dismissNotificationsForMeeting,
   logger,
@@ -148,7 +148,7 @@ export const createMeetingNotificationEventHandlers = ({
   return {
     notifyMeetingChange: meeting => {
       const meetingKey = toMeetingIdKey(meeting.qualified_id);
-      const now = wallClock.currentTimestampInMilliseconds;
+      const now = clock.currentUnixEpochMilliseconds;
       const hasInvalidDates =
         Number.isNaN(Date.parse(meeting.series_start_date)) || Number.isNaN(Date.parse(meeting.series_end_date));
 

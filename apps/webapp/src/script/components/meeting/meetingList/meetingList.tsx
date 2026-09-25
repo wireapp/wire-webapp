@@ -141,16 +141,13 @@ export const MeetingList = ({
   scrollElementRef,
   useMeetingListVirtualizer: useMeetingListVirtualizerDependency = useMeetingListVirtualizer,
 }: MeetingListProps) => {
-  const {translate, wallClock} = useApplicationContext();
-  const [nowMilliseconds, setNowMilliseconds] = useState(() => wallClock.currentTimestampInMilliseconds);
+  const {translate, clock} = useApplicationContext();
+  const [nowMilliseconds, setNowMilliseconds] = useState(() => clock.currentUnixEpochMilliseconds);
 
   useEffect(() => {
-    const id = wallClock.setInterval(
-      () => setNowMilliseconds(wallClock.currentTimestampInMilliseconds),
-      TIME_IN_MILLIS.SECOND,
-    );
-    return () => wallClock.clearInterval(id);
-  }, [wallClock]);
+    const id = clock.setInterval(() => setNowMilliseconds(clock.currentUnixEpochMilliseconds), TIME_IN_MILLIS.SECOND);
+    return () => clock.clearInterval(id);
+  }, [clock]);
 
   const visibleDayStartTimestamp = startOfDay(new Date(nowMilliseconds)).getTime();
   const visibleDayStart = useMemo(() => new Date(visibleDayStartTimestamp), [visibleDayStartTimestamp]);
@@ -253,7 +250,7 @@ export const MeetingList = ({
     itemCount: timelineItems.length,
     hasMore: meetingInstancePage.hasMore,
     onLoadMore: loadMoreMeetingInstances,
-    wallClock,
+    clock,
   });
 
   const hasVisibleMeetingInstances = visibleDayGroups.length > 0;

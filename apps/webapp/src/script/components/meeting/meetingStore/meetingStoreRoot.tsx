@@ -55,7 +55,7 @@ type MeetingStoreRootProps = {
  * meeting lifecycle events, independently of whether the meetings view is currently rendered.
  */
 export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
-  const {mainViewModel, wallClock, translate} = useApplicationContext();
+  const {mainViewModel, clock, translate} = useApplicationContext();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {
     meetings: meetingsRepository,
@@ -69,7 +69,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       meetingsRepository,
       conversationRepository,
       callingRepository,
-      wallClock,
+      clock,
       deviceTimeZone,
     };
 
@@ -83,7 +83,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
         deleteMeetingForAll: command => deleteMeetingForAll(command, meetingServiceDeps),
       },
     });
-  }, [meetingsRepository, conversationRepository, callingRepository, wallClock, deviceTimeZone]);
+  }, [meetingsRepository, conversationRepository, callingRepository, clock, deviceTimeZone]);
 
   useEffect(() => {
     if (!isMeetingsEnabled) {
@@ -102,7 +102,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     const notificationStore = useMeetingNotificationStore.getState();
     const notificationHandlers = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => store.getState().meetingSeries,
-      wallClock,
+      clock,
       addNotification: notificationStore.addNotification,
       dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
       logger,
@@ -116,7 +116,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     });
     // One scheduler, two sinks: the in-app card always fires, the OS toast is additive.
     const reminderScheduler = createMeetingReminderScheduler({
-      wallClock,
+      clock,
       onReminder: payload => {
         notificationStore.addNotification({
           ...payload,
@@ -157,7 +157,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       reminderScheduler.stop();
       reminderOsNotifier.stop();
     };
-  }, [isMeetingsEnabled, store, wallClock, mainViewModel, translate]);
+  }, [isMeetingsEnabled, store, clock, mainViewModel, translate]);
 
   return <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>;
 };

@@ -19,7 +19,7 @@
 
 import {useCallback, useState} from 'react';
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {type Maybe, task, type Task} from 'true-myth';
 
@@ -60,7 +60,7 @@ type SubmitMeetingParams = {
   originalEnd: Maybe<Date>;
   originalRecurrence: ScheduleMeetingFormState['recurrence'];
   originalSelectedUsers: User[];
-  wallClock: WallClock;
+  clock: Clock;
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
@@ -75,12 +75,12 @@ const submitMeeting = ({
   originalEnd,
   originalRecurrence,
   originalSelectedUsers,
-  wallClock,
+  clock,
   scheduleMeeting,
   updateMeeting,
 }: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
   if (mode === scheduleMeetingModes.create) {
-    const commandResult = mapScheduleFormToMeetingCommand(formState, wallClock);
+    const commandResult = mapScheduleFormToMeetingCommand(formState, clock);
 
     if (commandResult.isErr) {
       return task.reject(meetingSubmitErrors.createFailed);
@@ -117,7 +117,7 @@ const submitMeeting = ({
 
 export const useScheduleMeetingSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {translate, wallClock} = useApplicationContext();
+  const {translate, clock} = useApplicationContext();
   const {content} = useMainViewModel();
   const conversationRepository = content.repositories.conversation;
   const scheduleMeeting = useMeetingStore(state => state.scheduleMeeting);
@@ -146,7 +146,7 @@ export const useScheduleMeetingSubmit = () => {
         originalEnd,
         originalRecurrence,
         originalSelectedUsers,
-        wallClock,
+        clock,
         scheduleMeeting,
         updateMeeting,
       });
@@ -202,7 +202,7 @@ export const useScheduleMeetingSubmit = () => {
       scheduleMeeting,
       translate,
       updateMeeting,
-      wallClock,
+      clock,
     ],
   );
 

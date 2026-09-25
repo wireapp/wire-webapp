@@ -17,12 +17,12 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {mapMeetNowCommandToCreateMeeting} from './mapMeetNowCommandToCreateMeeting';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
-const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
 
 describe('mapMeetNowCommandToCreateMeeting', () => {
   it('maps title, immediate start/end times, and device tzid', () => {
@@ -31,7 +31,7 @@ describe('mapMeetNowCommandToCreateMeeting', () => {
         title: 'Standup',
         selectedUsers: [],
       },
-      wallClock,
+      clock,
       {ianaTimeZoneId: 'Pacific/Auckland'},
     );
 

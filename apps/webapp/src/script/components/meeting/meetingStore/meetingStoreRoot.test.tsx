@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -86,7 +86,7 @@ type RenderParameters = {
   readonly getMeeting?: jest.Mock;
   readonly isMeetingsFeatureEnabled?: boolean;
   readonly apiVersion?: number;
-  readonly wallClock?: ReturnType<typeof createDeterministicWallClock>;
+  readonly clock?: ReturnType<typeof createDeterministicClock>;
 };
 
 const renderMeetingStoreRoot = ({
@@ -94,7 +94,7 @@ const renderMeetingStoreRoot = ({
   getMeeting = jest.fn(() => task.resolve(createApiMeeting('Weekly sync (updated)'))),
   isMeetingsFeatureEnabled = true,
   apiVersion = Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION,
-  wallClock = createDeterministicWallClock(),
+  clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
 }: RenderParameters = {}) => {
   setMeetingsTeamFeature(isMeetingsFeatureEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED);
   setNegotiatedApiVersion(apiVersion);
@@ -113,7 +113,7 @@ const renderMeetingStoreRoot = ({
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
-      wallClock,
+      clock,
       mainViewModel,
     }),
   );
@@ -484,22 +484,22 @@ describe('MeetingStoreRoot', () => {
   });
 
   it('shows an in-app reminder ten minutes before a loaded meeting starts', async () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-16T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T09:49:00.000Z')) * 1_000n,
     });
-    renderMeetingStoreRoot({wallClock});
+    renderMeetingStoreRoot({clock});
 
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('Weekly sync');
     });
 
     act(() => {
-      wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE - 1);
+      clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE - 1);
     });
     expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
 
     act(() => {
-      wallClock.advanceByMilliseconds(1);
+      clock.advanceByMilliseconds(1);
     });
 
     expect(useMeetingNotificationStore.getState().notifications).toEqual([
@@ -513,13 +513,13 @@ describe('MeetingStoreRoot', () => {
   });
 
   it('shows the T-10 reminder for a meeting the signed-in user created', async () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-16T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T09:49:00.000Z')) * 1_000n,
     });
     renderMeetingStoreRoot({
       getMeetingsList: jest.fn(() => task.resolve([])),
       getMeeting: jest.fn(() => task.resolve(createApiMeeting('Newly created meeting'))),
-      wallClock,
+      clock,
     });
 
     act(() => {
@@ -532,7 +532,7 @@ describe('MeetingStoreRoot', () => {
     expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
 
     act(() => {
-      wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+      clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
     });
 
     expect(useMeetingNotificationStore.getState().notifications).toEqual([
@@ -545,10 +545,10 @@ describe('MeetingStoreRoot', () => {
   });
 
   it('does not fire a reminder after the meeting is deleted', async () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-16T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T09:49:00.000Z')) * 1_000n,
     });
-    renderMeetingStoreRoot({wallClock});
+    renderMeetingStoreRoot({clock});
 
     await waitFor(() => {
       expect(getRenderedMeetingTitles()).toBe('Weekly sync');
@@ -563,7 +563,7 @@ describe('MeetingStoreRoot', () => {
     });
 
     act(() => {
-      wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+      clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
     });
 
     expect(useMeetingNotificationStore.getState().notifications).toEqual([]);
