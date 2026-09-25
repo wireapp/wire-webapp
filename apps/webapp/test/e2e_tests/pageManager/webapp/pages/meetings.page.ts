@@ -212,12 +212,8 @@ export class MeetingsPage {
     await this.closeParticipantsPicker();
   }
 
-  startTimeCombobox() {
-    return this.scheduleMeetingModal.getByRole('group', {name: 'Starts'}).getByRole('combobox', {name: 'Select time'});
-  }
-
   startDateOpenCalendarButton() {
-    return this.scheduleMeetingModal.getByRole('group', {name: 'Starts'}).getByRole('button', {name: 'Open calendar'});
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-date').getByRole('button', {name: 'Open calendar'});
   }
 
   scheduleMeetingForm() {
@@ -234,11 +230,7 @@ export class MeetingsPage {
   }
 
   startDateInput() {
-    return this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-start-date"] input[type="text"]');
-  }
-
-  endDateInput() {
-    return this.scheduleMeetingModal.locator('[data-uie-name="schedule-meeting-end-date"] input[type="text"]');
+    return this.scheduleMeetingModal.getByTestId('schedule-meeting-date').locator('input[type="text"]');
   }
 
   recurrenceSelect() {

@@ -17,26 +17,31 @@
  *
  */
 
+import type {ComponentProps} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import type {Maybe} from 'true-myth';
-import {maybe} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {
   CircleCloseIcon,
-  DateTimePickerField,
+  combineDateAndTime,
+  DatePickerField,
   dateValueFromDate,
   ErrorMessage,
   getOverlayPortalContainer,
   Input,
+  nearestTimeOptionFromDate,
   Select,
+  TIME_INTERVAL_MINUTES,
+  TimePickerField,
 } from '@wireapp/react-ui-kit';
 
 import {MeetingParticipantsPicker} from 'Components/meeting/meetingParticipantsPicker';
 import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
 import {useMeetingParticipants} from 'Components/meeting/shared/participants/useMeetingParticipants';
 import {
+  scheduleMeetingFormBottomWrapperCss,
   scheduleMeetingFormColumnCss,
   scheduleMeetingFormDividerCss,
   scheduleMeetingFormLayoutCss,
@@ -44,6 +49,7 @@ import {
   scheduleMeetingParticipantsSectionCss,
   scheduleMeetingRecurrenceSelectWrapperStyles,
   scheduleMeetingSelectMenuPortalStyles,
+  scheduleMeetingTimeFieldsRowCss,
   scheduleMeetingTitleClearButtonStyles,
   scheduleMeetingTitleInputStyles,
   scheduleMeetingTitleInputWrapperStyles,
@@ -64,11 +70,6 @@ import {
   scheduleMeetingModes,
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
-
-const toDateTimePickerValue = (value: Maybe<Date>): Date | null => value.unwrapOr(null);
-
-const fromDateTimePickerValue = (value: Date | null): Maybe<Date> =>
-  value === null ? maybe.nothing() : maybe.just(value);
 
 const firstNonEmptyError = (...errorMessages: Array<string | undefined>): string | undefined =>
   errorMessages.find(message => isNonEmptyString(message));
@@ -132,8 +133,6 @@ export const ScheduleMeetingForm = ({
 
   const dateTimePickerLabels = useMemo(
     () => ({
-      dateAriaLabel: translate('meetings.scheduleModal.openCalendarAriaLabel'),
-      timeAriaLabel: translate('meetings.scheduleModal.timeSelectAriaLabel'),
       openCalendarLabel: translate('meetings.scheduleModal.openCalendarAriaLabel'),
       previousMonthLabel: translate('meetings.scheduleModal.previousMonthAriaLabel'),
       nextMonthLabel: translate('meetings.scheduleModal.nextMonthAriaLabel'),
@@ -165,23 +164,14 @@ export const ScheduleMeetingForm = ({
   );
 
   const startMinTime = useMemo(
-    () => (mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(toDateTimePickerValue(formState.start))),
+    () => (mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(formState.start.unwrapOr(null))),
     [formState.start, getMinTimeForDate, mode],
   );
 
   const endMinTime = useMemo(
-    () => (mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(toDateTimePickerValue(formState.end))),
+    () => (mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(formState.end.unwrapOr(null))),
     [formState.end, getMinTimeForDate, mode],
   );
-
-  const endDateMinValue = useMemo(() => {
-    if (formState.start.isNothing) {
-      return todayValue;
-    }
-
-    const startDate = dateValueFromDate(formState.start.value);
-    return startDate.compare(todayValue) > 0 ? startDate : todayValue;
-  }, [formState.start, todayValue]);
 
   const startErrorText = firstNonEmptyError(
     errors.startInPast,
@@ -192,6 +182,50 @@ export const ScheduleMeetingForm = ({
     errors.endBeforeStart,
     formState.end.isNothing ? errors.missingTimes : undefined,
   );
+
+  const startDate = formState.start.map(dateValueFromDate).unwrapOr(null);
+  const startTime = formState.start.map(value => nearestTimeOptionFromDate(value, regionalLocale)).unwrapOr(null);
+  const endTime = formState.end.map(value => nearestTimeOptionFromDate(value, regionalLocale)).unwrapOr(null);
+
+  const handleDateChange = (date: Parameters<ComponentProps<typeof DatePickerField>['onChange']>[0]) => {
+    if (date === null) {
+      onStartChange(maybe.nothing());
+      return;
+    }
+
+    const currentStart = formState.start.unwrapOr(
+      new Date(wallClock.currentTimestampInMilliseconds + TIME_INTERVAL_MINUTES * 60 * 1000),
+    );
+    const nextStart = combineDateAndTime(date, nearestTimeOptionFromDate(currentStart, regionalLocale));
+    const adjustedStart =
+      mode === scheduleMeetingModes.create &&
+      nextStart !== null &&
+      nextStart.getTime() <= wallClock.currentTimestampInMilliseconds
+        ? null
+        : nextStart;
+    onStartChange(Maybe.of(adjustedStart));
+  };
+
+  const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
+    if (value === null || formState.start.isNothing) {
+      onStartChange(maybe.nothing());
+      return;
+    }
+
+    const nextStart = combineDateAndTime(dateValueFromDate(formState.start.value), value);
+    onStartChange(Maybe.of(nextStart));
+  };
+
+  const handleEndTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
+    if (value === null || formState.end.isNothing) {
+      onEndChange(maybe.nothing());
+      return;
+    }
+
+    const endDate = formState.start.map(dateValueFromDate).unwrapOr(dateValueFromDate(formState.end.value));
+    const nextEnd = combineDateAndTime(endDate, value);
+    onEndChange(Maybe.of(nextEnd));
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -276,38 +310,57 @@ export const ScheduleMeetingForm = ({
       <div css={scheduleMeetingFormDividerCss} aria-hidden="true" />
 
       <div css={scheduleMeetingFormColumnCss}>
-        <DateTimePickerField
-          dataUieName="schedule-meeting-start"
-          label={translate('meetings.scheduleModal.startsLabel')}
-          value={toDateTimePickerValue(formState.start)}
-          onChange={date => onStartChange(fromDateTimePickerValue(date))}
+        <DatePickerField
+          id="schedule-meeting-date"
+          dataUieName="schedule-meeting-date"
+          label={translate('meetings.scheduleModal.dateLabel')}
+          value={startDate}
+          onChange={handleDateChange}
           labels={dateTimePickerLabels}
           locale={currentLanguage()}
-          timeLocale={regionalLocale}
           markInvalid={isNonEmptyString(startErrorText)}
-          errorText={startErrorText}
           minValue={todayValue}
-          minTime={startMinTime}
-          menuPortalTarget={portalContainer}
           popoverPortalContainer={portalContainer}
+          wrapperCSS={scheduleMeetingFormBottomWrapperCss}
         />
 
-        <DateTimePickerField
-          dataUieName="schedule-meeting-end"
-          label={translate('meetings.scheduleModal.endsLabel')}
-          value={toDateTimePickerValue(formState.end)}
-          onChange={date => onEndChange(fromDateTimePickerValue(date))}
-          labels={dateTimePickerLabels}
-          locale={currentLanguage()}
-          timeLocale={regionalLocale}
-          markInvalid={isNonEmptyString(endErrorText)}
-          errorText={endErrorText}
-          minValue={endDateMinValue}
-          minTime={endMinTime}
-          dateDisabled
-          menuPortalTarget={portalContainer}
-          popoverPortalContainer={portalContainer}
-        />
+        <div css={scheduleMeetingTimeFieldsRowCss}>
+          <div>
+            <TimePickerField
+              id="schedule-meeting-start-time"
+              dataUieName="schedule-meeting-start-time"
+              label={translate('meetings.scheduleModal.startsLabel')}
+              value={startTime}
+              onChange={handleTimeChange}
+              locale={regionalLocale}
+              markInvalid={isNonEmptyString(startErrorText)}
+              minTime={startMinTime}
+              menuPortalTarget={portalContainer}
+              wrapperCSS={scheduleMeetingFormBottomWrapperCss}
+            />
+            {isNonEmptyString(startErrorText) && (
+              <ErrorMessage data-uie-name="schedule-meeting-start-time-error">{startErrorText}</ErrorMessage>
+            )}
+          </div>
+
+          <div>
+            <TimePickerField
+              id="schedule-meeting-end-time"
+              dataUieName="schedule-meeting-end-time"
+              label={translate('meetings.scheduleModal.endsLabel')}
+              value={endTime}
+              onChange={handleEndTimeChange}
+              locale={regionalLocale}
+              markInvalid={isNonEmptyString(endErrorText)}
+              minTime={endMinTime}
+              menuPortalTarget={portalContainer}
+              wrapperCSS={scheduleMeetingFormBottomWrapperCss}
+            />
+            {isNonEmptyString(endErrorText) && (
+              <ErrorMessage data-uie-name="schedule-meeting-end-time-error">{endErrorText}</ErrorMessage>
+            )}
+          </div>
+        </div>
 
         <Select
           id="schedule-meeting-recurrence"
