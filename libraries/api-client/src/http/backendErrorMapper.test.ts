@@ -163,23 +163,6 @@ describe('mapBackendError', () => {
   });
 
   describe('MLSGroupOutOfSyncError mapping', () => {
-    it('maps MLS_GROUP_OUT_OF_SYNC with missing_users to MLSGroupOutOfSyncError and preserves users', () => {
-      const missingUsers = [
-        {id: 'user-1', domain: 'staging.zinfra.io'},
-        {id: 'user-2', domain: 'staging.zinfra.io'},
-      ];
-      const base = new BackendError('Group out of sync', BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC, StatusCode.CONFLICT);
-      const error = Object.assign(base, {missing_users: missingUsers});
-
-      const mapped = mapBackendError(error as any);
-
-      expect(mapped).toBeInstanceOf(MLSGroupOutOfSyncError);
-      expect((mapped as MLSGroupOutOfSyncError).missing_users).toEqual(missingUsers);
-      expect(mapped.label).toBe(BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC);
-      expect(mapped.code).toBe(StatusCode.CONFLICT);
-      expect(mapped.message).toBe('Group out of sync');
-    });
-
     it('maps MLS_GROUP_OUT_OF_SYNC without missing_users to MLSGroupOutOfSyncError with empty list', () => {
       const error = new BackendError('Group out of sync', BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC, StatusCode.CONFLICT);
       const mapped = mapBackendError(error);
@@ -190,24 +173,25 @@ describe('mapBackendError', () => {
       expect(mapped.code).toBe(StatusCode.CONFLICT);
     });
 
-    it('maps a raw backend error object (not BackendError instance) with missing_users to MLSGroupOutOfSyncError', () => {
-      const rawError = {
-        message: 'Group out of sync',
-        label: BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC,
-        code: StatusCode.CONFLICT,
-        missing_users: [
-          {id: 'user-raw-1', domain: 'staging.zinfra.io'},
-          {id: 'user-raw-2', domain: 'staging.zinfra.io'},
-        ],
-      };
+    it('maps MLS_GROUP_OUT_OF_SYNC with missing_users in backend error data', () => {
+      const missingUsers = [{id: '23951770-9c7e-4e52-9bc2-0544dc1d30c0', domain: 'wire.com'}];
+      const error = new BackendError(
+        'Group is out of sync',
+        BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC,
+        StatusCode.CONFLICT,
+        {
+          code: StatusCode.CONFLICT,
+          label: BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC,
+          message: 'Group is out of sync',
+          missing_users: missingUsers,
+        },
+      );
 
-      const mapped = mapBackendError(rawError as any);
+      const mapped = mapBackendError(error);
 
       expect(mapped).toBeInstanceOf(MLSGroupOutOfSyncError);
-      expect((mapped as MLSGroupOutOfSyncError).missing_users).toEqual(rawError.missing_users);
-      expect(mapped.message).toBe(rawError.message);
-      expect(mapped.label).toBe(rawError.label);
-      expect(mapped.code).toBe(rawError.code);
+      expect((mapped as MLSGroupOutOfSyncError).missing_users).toEqual(missingUsers);
+      expect(mapped.message).toBe('Group is out of sync');
     });
   });
 

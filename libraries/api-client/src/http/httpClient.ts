@@ -266,9 +266,13 @@ export class HttpClient extends EventEmitter {
       }
 
       if (HttpClient.isBackendError(error)) {
-        const mappedError = mapBackendError(
-          new BackendError(error.response.data.message, error.response.data.label, error.response.data.code),
+        const backendError = new BackendError(
+          error.response.data.message,
+          error.response.data.label,
+          error.response.data.code,
+          error.response.data,
         );
+        const mappedError = mapBackendError(backendError);
 
         const isUnauthorized = mappedError.code === StatusCode.UNAUTHORIZED;
         const isExpiredTokenError = mappedError instanceof TokenExpiredError;
