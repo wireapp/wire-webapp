@@ -36,11 +36,13 @@ import {emptyScheduleMeetingFormErrors} from './scheduleMeetingTypes';
 
 const renderScheduleMeetingForm = ({
   end = maybe.just(new Date(2026, 8, 24, 14, 0)),
+  mode = 'create',
   onEndChange = jest.fn(),
   onStartChange = jest.fn(),
   start = maybe.just(new Date(2026, 8, 24, 13, 0)),
 }: {
   end?: Maybe<Date>;
+  mode?: 'create' | 'edit';
   onEndChange?: jest.Mock;
   onStartChange?: jest.Mock;
   start?: Maybe<Date>;
@@ -62,7 +64,7 @@ const renderScheduleMeetingForm = ({
     withThemeAndRootContext(
       <ScheduleMeetingForm
         isOpen={false}
-        mode="create"
+        mode={mode}
         formState={{
           title: '',
           start,
@@ -301,6 +303,21 @@ describe('ScheduleMeetingForm', () => {
     await user.click(screen.getByRole('button', {name: /Friday, September 25, 2026/}));
 
     expect(onStartChange).toHaveBeenCalledWith(maybe.just(new Date(2026, 8, 25, 13, 0)));
+  });
+
+  it('allows selecting a past start time while editing', async () => {
+    const user = userEvent.setup();
+    const onStartChange = jest.fn();
+    renderScheduleMeetingForm({
+      mode: 'edit',
+      onStartChange,
+      start: maybe.just(new Date(2026, 8, 25, 10, 0)),
+    });
+
+    await user.click(screen.getByRole('button', {name: /meetings\.scheduleModal\.openCalendarAriaLabel/}));
+    await user.click(screen.getByRole('button', {name: /Thursday, September 24, 2026/}));
+
+    expect(onStartChange).toHaveBeenCalledWith(maybe.just(new Date(2026, 8, 24, 10, 0)));
   });
 
   it('updates the start time while preserving its date', async () => {

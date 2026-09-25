@@ -197,9 +197,13 @@ export const ScheduleMeetingForm = ({
       new Date(wallClock.currentTimestampInMilliseconds + TIME_INTERVAL_MINUTES * 60 * 1000),
     );
     const nextStart = combineDateAndTime(date, nearestTimeOptionFromDate(currentStart, regionalLocale));
-    onStartChange(
-      Maybe.of(nextStart !== null && nextStart.getTime() > wallClock.currentTimestampInMilliseconds ? nextStart : null),
-    );
+    const adjustedStart =
+      mode === scheduleMeetingModes.create &&
+      nextStart !== null &&
+      nextStart.getTime() <= wallClock.currentTimestampInMilliseconds
+        ? null
+        : nextStart;
+    onStartChange(Maybe.of(adjustedStart));
   };
 
   const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
@@ -209,7 +213,7 @@ export const ScheduleMeetingForm = ({
     }
 
     const nextStart = combineDateAndTime(dateValueFromDate(formState.start.value), value);
-    onStartChange(nextStart === null ? maybe.nothing() : maybe.just(nextStart));
+    onStartChange(Maybe.of(nextStart));
   };
 
   const handleEndTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
@@ -220,7 +224,7 @@ export const ScheduleMeetingForm = ({
 
     const endDate = formState.start.map(dateValueFromDate).unwrapOr(dateValueFromDate(formState.end.value));
     const nextEnd = combineDateAndTime(endDate, value);
-    onEndChange(nextEnd === null ? maybe.nothing() : maybe.just(nextEnd));
+    onEndChange(Maybe.of(nextEnd));
   };
 
   useEffect(() => {
