@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import {isError} from '@sindresorhus/is';
 import {task, type Task} from 'true-myth';
 
@@ -45,7 +45,7 @@ export type CreateFetchLatestBuildMetadataOptions = {
 };
 
 export type StartNewVersionPollingOptions = {
-  readonly wallClock: WallClock;
+  readonly clock: Clock;
   readonly pollingIntervalMilliseconds: number;
   readonly runUpdateCheck: () => void;
 };
@@ -141,10 +141,10 @@ export function createNewVersionPollingCallback(options: CreateNewVersionPolling
  * Starts delayed polling for update checks and returns cleanup for this polling instance.
  */
 export function startNewVersionPolling(options: StartNewVersionPollingOptions): () => void {
-  const {wallClock, pollingIntervalMilliseconds, runUpdateCheck} = options;
-  const intervalIdentifier = wallClock.setInterval(runUpdateCheck, pollingIntervalMilliseconds);
+  const {clock, pollingIntervalMilliseconds, runUpdateCheck} = options;
+  const intervalIdentifier = clock.setInterval(runUpdateCheck, pollingIntervalMilliseconds);
 
   return function cleanupNewVersionPolling(): void {
-    wallClock.clearInterval(intervalIdentifier);
+    clock.clearInterval(intervalIdentifier);
   };
 }

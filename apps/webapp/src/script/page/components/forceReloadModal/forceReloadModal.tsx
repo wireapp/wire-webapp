@@ -35,7 +35,7 @@ const forceReloadDelayInMilliseconds = TIME_IN_MILLIS.SECOND * forceReloadDelayM
 
 export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = properties => {
   const {reloadApplication} = properties;
-  const {doesApplicationNeedForceReload, translate, wallClock} = useApplicationContext();
+  const {doesApplicationNeedForceReload, translate, clock} = useApplicationContext();
 
   useEffect((): void | (() => void) => {
     if (!doesApplicationNeedForceReload) {
@@ -43,13 +43,13 @@ export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = p
     }
 
     let hasApplicationReloadBeenTriggered = false;
-    let forceReloadTimeoutIdentifier: Maybe<ReturnType<typeof globalThis.setTimeout>> = Maybe.nothing();
+    let forceReloadTimeoutIdentifier: Maybe<ReturnType<typeof clock.setTimeout>> = Maybe.nothing();
 
     function clearScheduledForceReloadTimeout(): void {
       const timeoutIdentifier = forceReloadTimeoutIdentifier.unwrapOr(undefined);
 
       if (timeoutIdentifier !== undefined) {
-        wallClock.clearTimeout(timeoutIdentifier);
+        clock.clearTimeout(timeoutIdentifier);
       }
 
       forceReloadTimeoutIdentifier = Maybe.nothing();
@@ -92,13 +92,13 @@ export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = p
       translate,
     );
     forceReloadTimeoutIdentifier = Maybe.just(
-      wallClock.setTimeout(triggerReloadApplicationOnce, forceReloadDelayInMilliseconds),
+      clock.setTimeout(triggerReloadApplicationOnce, forceReloadDelayInMilliseconds),
     );
 
     return () => {
       clearScheduledForceReloadTimeout();
     };
-  }, [doesApplicationNeedForceReload, reloadApplication, translate, wallClock]);
+  }, [doesApplicationNeedForceReload, reloadApplication, translate, clock]);
 
   return null;
 };

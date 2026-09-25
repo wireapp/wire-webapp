@@ -24,7 +24,7 @@ import {StatusCodes} from 'http-status-codes';
 import {Dispatch} from 'redux';
 
 import {APIClient} from 'src/script/service/apiClientSingleton';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ROUTE} from '../../route';
@@ -153,7 +153,7 @@ describe('Login util', () => {
       navigate = jest.fn();
       loginWithSSO = jest.fn().mockResolvedValue(undefined);
       apiClient = new APIClient({
-        wallClock: createDeterministicWallClock(),
+        clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       });
       jest.spyOn(ROOT_ACTIONS.authAction, 'pushAccountRegistrationData').mockImplementation(() => {
         return () => Promise.resolve();

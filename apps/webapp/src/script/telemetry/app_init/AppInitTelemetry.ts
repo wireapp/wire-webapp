@@ -17,8 +17,8 @@
  *
  */
 
-import {Maybe} from 'true-myth';
 import type {Clock} from '@enormora/clock/clock';
+import {Maybe} from 'true-myth';
 
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
 import type {AppInitStatisticsValue} from './AppInitStatisticsValue';

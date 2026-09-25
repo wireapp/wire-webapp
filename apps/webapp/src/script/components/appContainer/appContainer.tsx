@@ -21,7 +21,6 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import ky from 'ky';
@@ -72,7 +71,6 @@ type AppProps = {
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly clock: Clock;
   readonly translate: Translate;
-  readonly wallClock: WallClock;
 };
 
 export const AppContainer = (properties: AppProps) => {
@@ -88,7 +86,6 @@ export const AppContainer = (properties: AppProps) => {
     isFeatureToggleEnabled,
     clock,
     translate,
-    wallClock,
   } = properties;
   setAppLocale();
   const app = useMemo(() => {
@@ -109,7 +106,7 @@ export const AppContainer = (properties: AppProps) => {
   );
   const themeId = themePreference === 'dark' ? THEME_ID.DARK : THEME_ID.DEFAULT;
 
-  const {hasOtherInstance, registerInstance} = useSingleInstance();
+  const {hasOtherInstance, registerInstance} = useSingleInstance(clock);
 
   useEffect(() => {
     if (hasOtherInstance) {
@@ -142,18 +139,17 @@ export const AppContainer = (properties: AppProps) => {
 
   useEffect(() => {
     return startApplicationPeriodicChecks({
-      wallClock,
+      clock,
       periodicChecksIntervalDelayInMilliseconds: TIME_IN_MILLIS.FIVE_MINUTES,
       runPeriodicCheck: runApplicationPeriodicCheck,
     });
-  }, [wallClock, runApplicationPeriodicCheck]);
+  }, [clock, runApplicationPeriodicCheck]);
 
   const rootContextValue = useMemo(() => {
     return {
       fireAndForgetInvoker,
       mainViewModel: mainView,
       clock,
-      wallClock,
       doesApplicationNeedForceReload,
       isFeatureToggleEnabled,
       translate,
@@ -172,15 +168,7 @@ export const AppContainer = (properties: AppProps) => {
         },
       },
     };
-  }, [
-    clock,
-    doesApplicationNeedForceReload,
-    fireAndForgetInvoker,
-    isFeatureToggleEnabled,
-    mainView,
-    translate,
-    wallClock,
-  ]);
+  }, [clock, doesApplicationNeedForceReload, fireAndForgetInvoker, isFeatureToggleEnabled, mainView, translate]);
 
   if (hasOtherInstance) {
     // Automatically sign out the user if the user has multiple tabs open
@@ -204,7 +192,6 @@ export const AppContainer = (properties: AppProps) => {
               fireAndForgetInvoker,
               isOnline,
               clock,
-              wallClock,
             },
             timing: {
               applicationBootstrapStartedAtMonotonicMicroseconds,
@@ -222,7 +209,7 @@ export const AppContainer = (properties: AppProps) => {
                 mainView={mainView}
                 locked={softLockEnabled}
                 fireAndForgetInvoker={fireAndForgetInvoker}
-                wallClock={wallClock}
+                clock={clock}
               />
             </MeetingStoreRoot>
           );

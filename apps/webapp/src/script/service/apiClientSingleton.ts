@@ -17,8 +17,8 @@
  *
  */
 
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import {createClock, type Clock, type IntervalIdentifier, type TimeoutIdentifier} from '@enormora/clock/clock';
+import type {ReconnectingWebsocketWallClock} from '@wireapp/api-client/lib/tcp';
 import {singleton} from 'tsyringe';
 
 import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
@@ -29,22 +29,35 @@ const wireClientHeaderName = 'Wire-Client';
 const wireClientVersionHeaderName = 'Wire-Client-Version';
 const wireClientIdentifier = 'Web';
 
+type APIClientProperties = {
+  readonly clock?: Clock;
+};
+
 type RetryBackoffResettableHttpClient = {
   readonly resetRetryBackoff: () => void;
 };
 
-type APIClientProperties = {
-  readonly wallClock: WallClock;
-};
-
 @singleton()
 export class APIClient extends APIClientUnconfigured {
-  constructor(
-    {wallClock}: APIClientProperties = {
-      wallClock: createWallClock(),
-    },
-  ) {
+  constructor({clock = createClock()}: APIClientProperties = {}) {
     const webAppConfiguration = Config.getConfig();
+    const apiClientClock: ReconnectingWebsocketWallClock = {
+      get currentTimestampInMilliseconds() {
+        return clock.currentUnixEpochMilliseconds;
+      },
+      setTimeout: (callback, delayInMilliseconds) => {
+        return clock.setTimeout(callback, delayInMilliseconds) as unknown as ReturnType<typeof globalThis.setTimeout>;
+      },
+      clearTimeout: timeoutIdentifier => {
+        clock.clearTimeout(timeoutIdentifier as unknown as TimeoutIdentifier);
+      },
+      setInterval: (callback, delayInMilliseconds) => {
+        return clock.setInterval(callback, delayInMilliseconds) as unknown as ReturnType<typeof globalThis.setInterval>;
+      },
+      clearInterval: intervalIdentifier => {
+        clock.clearInterval(intervalIdentifier as unknown as IntervalIdentifier);
+      },
+    };
 
     const unconfiguredApiClientConfiguration = {
       headers: {
@@ -56,7 +69,7 @@ export class APIClient extends APIClientUnconfigured {
         rest: webAppConfiguration.BACKEND_REST,
         ws: webAppConfiguration.BACKEND_WS,
       },
-      wallClock,
+      wallClock: apiClientClock,
     };
 
     super(unconfiguredApiClientConfiguration);

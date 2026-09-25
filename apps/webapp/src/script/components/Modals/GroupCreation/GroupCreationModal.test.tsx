@@ -11,7 +11,7 @@ import {mountComponent} from '../../../auth/util/test/testUtil';
 import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
 import {TypeUtil} from '@wireapp/commons';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {RootProvider} from 'src/script/page/rootProvider';
@@ -98,7 +98,7 @@ describe('GroupCreationModal', () => {
       const rootContextValue = createRootContextValueForTest({
         translate: translateForTest,
         mainViewModel: mockRootContext.mainViewModel as unknown as MainViewModel,
-        wallClock: createDeterministicWallClock(),
+        clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       });
 
       // Act

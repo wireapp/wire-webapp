@@ -21,7 +21,6 @@ import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
 
 import type {Translate} from 'Util/localizerUtil';
 
@@ -39,7 +38,6 @@ export type RootContextValue = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly mainViewModel: MainViewModel;
   readonly clock: Clock;
-  readonly wallClock: WallClock;
   readonly doesApplicationNeedForceReload: boolean;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly applicationNavigation: ApplicationNavigation;

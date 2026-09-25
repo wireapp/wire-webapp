@@ -17,8 +17,8 @@
  *
  */
 
-import {Maybe} from 'true-myth';
 import type {Clock} from '@enormora/clock/clock';
+import {Maybe} from 'true-myth';
 
 import {Logger, getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -75,7 +75,7 @@ export class AppInitTimings {
   timeStepAt(step: AppInitTimingsStep, occurredAtMonotonicMicroseconds: bigint): void {
     if (this.timings[step] === undefined) {
       const durationInMonotonicMicroseconds = occurredAtMonotonicMicroseconds - this.startedAtMonotonicMicroseconds;
-      this.timings[step] = Number(durationInMonotonicMicroseconds) / 1_000;
+      this.timings[step] = Number(durationInMonotonicMicroseconds) / TIME_IN_MILLIS.SECOND;
       this.lastRecordedStep = Maybe.just(step);
     }
   }

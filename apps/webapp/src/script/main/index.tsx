@@ -17,8 +17,8 @@
  *
  */
 
+import {createClock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {createClock} from '@enormora/clock';
 // eslint-disable-next-line import/order
 import 'core-js/full/reflect';
 
@@ -42,10 +42,6 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
-
-// eslint-disable-next-line import/order
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
-
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
@@ -53,11 +49,11 @@ import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-const applicationClock = createClock();
-const applicationBootstrapStartedAtMonotonicMicroseconds = applicationClock.currentMonotonicMicroseconds;
+const clock = createClock();
+const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const domContentLoadedAtMonotonicMicroseconds = applicationClock.currentMonotonicMicroseconds;
+  const domContentLoadedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
   const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
     fetchBuildMetadata: globalThis.fetch.bind(globalThis),
@@ -95,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     createApplicationObservability() {
       return createApplicationObservabilityFromConfig(config);
     },
-    clock: applicationClock,
+    clock,
     createFireAndForgetInvoker: () => {
       return createFireAndForgetInvoker({
         reportError(error) {
@@ -103,13 +99,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
       });
     },
-    createWallClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {applicationObservability, clock, fireAndForgetInvoker, wallClock} = applicationServices;
-  const apiClient = new APIClient({
-    wallClock,
-  });
+  const {applicationObservability, fireAndForgetInvoker} = applicationServices;
+  const apiClient = new APIClient({clock: applicationServices.clock});
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,
@@ -148,9 +141,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       fetchLatestBuildMetadata={fetchLatestBuildMetadata}
       isOnline={isOnline}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
-      clock={clock}
+      clock={applicationServices.clock}
       translate={translate}
-      wallClock={wallClock}
     />,
   );
 });

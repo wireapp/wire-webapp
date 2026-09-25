@@ -17,10 +17,9 @@
  *
  */
 
-import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {asyncNoop} from 'noop-esm';
 
 import type {ApplicationObservability} from '../observability/applicationObservability';
@@ -29,7 +28,6 @@ import {createApplicationServices} from './createApplicationServices';
 describe('createApplicationServices', () => {
   it('creates application services through injected dependencies', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
-    const deterministicWallClock = createDeterministicWallClock();
     const applicationObservability: ApplicationObservability = {
       reportApplicationStartup: jest.fn(asyncNoop),
     };
@@ -43,23 +41,16 @@ describe('createApplicationServices', () => {
     const createFireAndForgetInvoker = jest.fn(() => {
       return fireAndForgetInvoker;
     });
-    const createWallClock = jest.fn(() => {
-      return deterministicWallClock;
-    });
-
     const applicationServices = createApplicationServices({
       createApplicationObservability,
       clock,
       createFireAndForgetInvoker,
-      createWallClock,
     });
 
     expect(applicationServices.applicationObservability).toBe(applicationObservability);
     expect(applicationServices.clock).toBe(clock);
     expect(applicationServices.fireAndForgetInvoker).toBe(fireAndForgetInvoker);
-    expect(applicationServices.wallClock).toBe(deterministicWallClock);
     expect(createApplicationObservability).toHaveBeenCalledTimes(1);
     expect(createFireAndForgetInvoker).toHaveBeenCalledTimes(1);
-    expect(createWallClock).toHaveBeenCalledTimes(1);
   });
 });

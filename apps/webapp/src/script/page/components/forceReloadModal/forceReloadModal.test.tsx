@@ -23,8 +23,8 @@ import {ReactElement} from 'react';
 import {render} from '@testing-library/react';
 
 import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
-import type {DeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {translate} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -37,7 +37,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 interface ForceReloadModalTestContextValue {
   readonly doesApplicationNeedForceReload: boolean;
   readonly reloadApplication: () => void;
-  readonly wallClock?: DeterministicWallClock;
+  readonly clock?: DeterministicClock;
 }
 
 function isFeatureToggleDisabledForTest(): boolean {
@@ -72,7 +72,7 @@ function createForceReloadModalTestElement(contextValue: ForceReloadModalTestCon
   const {
     doesApplicationNeedForceReload,
     reloadApplication,
-    wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_111}),
+    clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_111) * 1_000n}),
   } = contextValue;
 
   return (
@@ -82,7 +82,7 @@ function createForceReloadModalTestElement(contextValue: ForceReloadModalTestCon
         doesApplicationNeedForceReload,
         isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
         mainViewModel: createMainViewModelForTest(),
-        wallClock,
+        clock,
       })}
     >
       <ForceReloadModal reloadApplication={reloadApplication} />
@@ -105,13 +105,13 @@ describe('ForceReloadModal', () => {
   });
 
   it('opens the modal when force reload becomes required', () => {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const reloadApplication = jest.fn();
     const {rerender} = render(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: false,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
@@ -119,7 +119,7 @@ describe('ForceReloadModal', () => {
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
@@ -128,13 +128,13 @@ describe('ForceReloadModal', () => {
   });
 
   it('does not open the modal repeatedly while force reload remains required', () => {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const reloadApplication = jest.fn();
     const {rerender} = render(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
@@ -142,14 +142,14 @@ describe('ForceReloadModal', () => {
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
     rerender(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
@@ -157,13 +157,13 @@ describe('ForceReloadModal', () => {
   });
 
   it('opens the modal again after force reload status returns to false and then true', () => {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const reloadApplication = jest.fn();
     const {rerender} = render(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: false,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
@@ -171,21 +171,21 @@ describe('ForceReloadModal', () => {
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
     rerender(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: false,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
     rerender(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
@@ -219,35 +219,35 @@ describe('ForceReloadModal', () => {
   });
 
   it('reloads automatically after 60 seconds when no user action is performed', () => {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const reloadApplication = jest.fn();
 
     render(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
-    deterministicWallClock.advanceByMilliseconds(forceReloadDelayInMilliseconds - 1);
+    clock.advanceByMilliseconds(forceReloadDelayInMilliseconds - 1);
     expect(reloadApplication).not.toHaveBeenCalled();
 
-    deterministicWallClock.advanceByMilliseconds(1);
+    clock.advanceByMilliseconds(1);
     expect(reloadApplication).toHaveBeenCalledTimes(1);
 
-    deterministicWallClock.advanceByMilliseconds(forceReloadDelayInMilliseconds);
+    clock.advanceByMilliseconds(forceReloadDelayInMilliseconds);
     expect(reloadApplication).toHaveBeenCalledTimes(1);
   });
 
   it('cancels automatic reload if force reload requirement is removed before timeout', () => {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const reloadApplication = jest.fn();
     const {rerender} = render(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: false,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
@@ -255,31 +255,31 @@ describe('ForceReloadModal', () => {
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
     rerender(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: false,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
-    deterministicWallClock.advanceByMilliseconds(forceReloadDelayInMilliseconds);
+    clock.advanceByMilliseconds(forceReloadDelayInMilliseconds);
 
     expect(reloadApplication).not.toHaveBeenCalled();
   });
 
   it('does not trigger reload twice if the user clicks reload before timeout', () => {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const reloadApplication = jest.fn();
 
     render(
       createForceReloadModalTestElement({
         doesApplicationNeedForceReload: true,
         reloadApplication,
-        wallClock: deterministicWallClock,
+        clock,
       }),
     );
 
@@ -287,7 +287,7 @@ describe('ForceReloadModal', () => {
 
     assert(currentModalContent.primaryAction?.action);
     currentModalContent.primaryAction.action();
-    deterministicWallClock.advanceByMilliseconds(forceReloadDelayInMilliseconds);
+    clock.advanceByMilliseconds(forceReloadDelayInMilliseconds);
 
     expect(reloadApplication).toHaveBeenCalledTimes(1);
   });

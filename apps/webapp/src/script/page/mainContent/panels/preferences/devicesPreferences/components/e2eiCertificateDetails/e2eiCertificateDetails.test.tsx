@@ -22,6 +22,7 @@ import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conver
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
@@ -80,7 +81,11 @@ describe('E2EICertificateDetails', () => {
     container.resolve(UserState).self(selfUser);
 
     const handler = E2EIHandler.getInstance();
-    await handler.initialize({discoveryUrl: '', gracePeriodInSeconds: 100});
+    await handler.initialize({
+      discoveryUrl: '',
+      gracePeriodInSeconds: 100,
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+    });
   });
 
   describe('idicates the state of the e2ei identity', () => {

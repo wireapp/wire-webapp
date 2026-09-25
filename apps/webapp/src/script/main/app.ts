@@ -19,9 +19,8 @@
 
 // Polyfill for "tsyringe" dependency injection
 
-import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {Clock} from '@enormora/clock/clock';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
@@ -160,7 +159,6 @@ type ApplicationStartupDependencies = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isOnline: () => boolean;
   readonly clock: Clock;
-  readonly wallClock: WallClock;
 };
 
 type ApplicationStartupInput = {
@@ -447,18 +445,10 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (message?: string) => void, startupInput: ApplicationStartupInput) {
     const application = this;
-    const {
-      applicationObservability,
-      fetchLatestBuildMetadata,
-      fireAndForgetInvoker,
-      isOnline,
-      clock,
-      wallClock,
-    } = startupInput.dependencies;
-    const {
-      applicationBootstrapStartedAtMonotonicMicroseconds,
-      domContentLoadedAtMonotonicMicroseconds,
-    } = startupInput.timing;
+    const {applicationObservability, fetchLatestBuildMetadata, fireAndForgetInvoker, isOnline, clock} =
+      startupInput.dependencies;
+    const {applicationBootstrapStartedAtMonotonicMicroseconds, domContentLoadedAtMonotonicMicroseconds} =
+      startupInput.timing;
     const appInitStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
     const applicationStartupReportingDependencies = {applicationObservability, logger: this.logger};
 
@@ -572,7 +562,7 @@ export class App {
         this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
       }
 
-      const e2eiHandler = await configureE2EI(teamFeatures);
+      const e2eiHandler = await configureE2EI(teamFeatures, clock);
       configureDownloadPath(teamFeatures, this.translate);
 
       this.core.configureCoreCallbacks({
@@ -767,7 +757,7 @@ export class App {
         });
 
         this.newVersionPollingCleanup = startNewVersionPolling({
-          wallClock,
+          clock,
           pollingIntervalMilliseconds: NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
           runUpdateCheck: runNewVersionCheck,
         });
@@ -788,7 +778,7 @@ export class App {
 
       await e2eiHandler?.startTimers();
       const appInitDurationMilliseconds =
-        Number(clock.currentMonotonicMicroseconds - appInitStartedAtMonotonicMicroseconds) / 1_000;
+        Number(clock.currentMonotonicMicroseconds - appInitStartedAtMonotonicMicroseconds) / TIME_IN_MILLIS.SECOND;
       this.logger.info(`App version ${Environment.version()} loaded in ${appInitDurationMilliseconds}ms`);
 
       eventLogger.log(AppInitializationStep.AppInitCompleted);
