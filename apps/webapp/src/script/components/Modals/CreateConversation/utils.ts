@@ -31,6 +31,10 @@ import {Config} from '../../../Config';
 
 export type Translate = RootContextValue['translate'];
 
+export const getSharedDrivePermissionHint = (translate: Translate, isViewerPermissionFeatureEnabled: boolean) => {
+  return isViewerPermissionFeatureEnabled ? translate('modalCreateConversationAdminHint') : undefined;
+};
+
 export type NonFederatingParticipantsModalCopy = {
   readonly editParticipantsButtonText: string;
   readonly leaveButtonText: string;
