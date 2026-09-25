@@ -4108,6 +4108,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@enormora/fire-and-forget@npm:0.0.4":
+  version: 0.0.4
+  resolution: "@enormora/fire-and-forget@npm:0.0.4"
+  checksum: 10/7cd033b62d0af8cb4bba9ba8d0ee705c6513b9a58bb0ca8d6f7e8a8776d13451fa22ea19cb4b9fa8f1286740aeed9b1b8e4d55f6ab89c5fca50fcd84308b5eda
+  languageName: node
+  linkType: hard
+
 "@enormora/objectory@npm:0.0.22":
   version: 0.0.22
   resolution: "@enormora/objectory@npm:0.0.22"
@@ -11773,6 +11780,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/core@workspace:libraries/core"
   dependencies:
+    "@enormora/fire-and-forget": "npm:0.0.4"
     "@sindresorhus/is": "npm:8.1.0"
     "@swc/core": "npm:1.16.2"
     "@swc/jest": "npm:0.2.39"
@@ -12106,6 +12114,7 @@ __metadata:
     "@datadog/browser-rum": "npm:7.13.0"
     "@date-fns/tz": "npm:1.5.0"
     "@emotion/react": "npm:11.14.0"
+    "@enormora/fire-and-forget": "npm:0.0.4"
     "@enormora/wall-clock": "npm:0.0.3"
     "@formatjs/cli": "npm:6.16.31"
     "@formkit/auto-animate": "npm:0.10.0"
