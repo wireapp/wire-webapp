@@ -52,7 +52,7 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
   const [level, setLevel] = useState(0);
 
   useEffect(() => {
-    if (mediaStream === null) {
+    if (mediaStream === null || mediaStream.getAudioTracks().length === 0) {
       return undefined;
     }
     logger.info(`Initiating new audio meter for stream ID "${mediaStream.id}"`);

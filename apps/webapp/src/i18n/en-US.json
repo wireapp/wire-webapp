@@ -1385,6 +1385,8 @@
   "meetings.notifications.view": "View",
   "meetings.participant.nameWithOrganizer": "{name} ({organizer})",
   "meetings.participant.organizer": "Organizer",
+  "meetings.prepModal.openCameraDevices": "Choose a camera",
+  "meetings.prepModal.openMicrophoneDevices": "Choose a microphone or speaker",
   "meetings.schedule.errors.endInPast": "End time must be in the future",
   "meetings.schedule.errors.startInPast": "Start time must be in the future",
   "meetings.scheduleModal.closeAriaLabel": "Close",

@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -26,9 +26,13 @@ import {MeetingCallingView} from 'Components/meeting/meetingCallingView/meetingC
 import {meetingsContentWrapperStyles} from 'Components/meeting/meetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from 'Components/meeting/meetingHeader/meetingHeader';
 import {MeetingList} from 'Components/meeting/meetingList/meetingList';
+import {createMeetingPrepPreview} from 'Components/meeting/meetingPrep/createMeetingPrepPreview';
+import {MeetingPrepModal} from 'Components/meeting/meetingPrep/meetingPrepModal';
+import {useMeetingPrepJoin} from 'Components/meeting/meetingPrep/useMeetingPrepJoin';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {MeetNowModal} from 'Components/meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -40,6 +44,8 @@ export const Meetings = () => {
   const hasLoadError = useMeetingStore(state => state.hasLoadError);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
   const selfUser = container.resolve(UserState).self();
+  const preview = useMemo(() => createMeetingPrepPreview(container.resolve(MediaStreamHandler)), []);
+  const joinMeeting = useMeetingPrepJoin();
 
   const refreshMeetings = useCallback(
     () => fireAndForgetInvoker.fireAndForget(loadMeetings),
@@ -66,6 +72,12 @@ export const Meetings = () => {
       <MeetingCallingView />
       <ScheduleMeetingModal />
       <MeetNowModal />
+      <MeetingPrepModal
+        participantName={selfUser.name()}
+        requestPreviewStream={preview.requestPreviewStream}
+        releasePreviewStream={preview.releasePreviewStream}
+        joinMeeting={joinMeeting}
+      />
     </div>
   );
 };

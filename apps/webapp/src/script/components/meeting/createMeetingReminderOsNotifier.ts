@@ -37,6 +37,7 @@ type MeetingReminderOsNotifierLogger = {
 export type CreateMeetingReminderOsNotifierDependencies = {
   notificationApi: SystemNotificationApi;
   openMeetingsList: () => void;
+  openMeetingPrep: (payload: MeetingReminderFirePayload) => void;
   formatMeetingTime: (meetingStartTime: string) => string;
   translate: Translate;
   logger: MeetingReminderOsNotifierLogger;
@@ -63,6 +64,7 @@ export const toMeetingReminderNotificationTag = (payload: MeetingReminderFirePay
 export const createMeetingReminderOsNotifier = ({
   notificationApi,
   openMeetingsList,
+  openMeetingPrep,
   formatMeetingTime,
   translate,
   logger,
@@ -116,9 +118,8 @@ export const createMeetingReminderOsNotifier = ({
         body: translate('meetings.notifications.startsAt', {time: formatMeetingTime(payload.meetingStartTime)}),
         tag,
         onClick: () => {
-          // WPB-28121 will additionally open the meeting prep modal from here. Until it ships,
-          // focusing Wire on the meetings list is the whole click behaviour.
           openMeetingsList();
+          openMeetingPrep(payload);
           closeAndForget(tag);
         },
         onClose: () => {

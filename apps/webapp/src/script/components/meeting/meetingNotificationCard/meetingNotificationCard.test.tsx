@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
 import {MeetingNotificationCard} from './meetingNotificationCard';
 import {
@@ -200,7 +201,7 @@ describe('MeetingNotificationCard', () => {
     });
   });
 
-  it('joins the meeting conversation when Join is clicked', () => {
+  it('opens the prep modal when Join is clicked', () => {
     const joinMeeting = jest.fn();
     const onDismiss = jest.fn();
     jest.mocked(useJoinMeetingCall).mockReturnValue({
@@ -227,7 +228,8 @@ describe('MeetingNotificationCard', () => {
     fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
 
     expect(useJoinMeetingCall).toHaveBeenCalledWith(qualifiedConversationId);
-    expect(joinMeeting).toHaveBeenCalledTimes(1);
+    expect(joinMeeting).not.toHaveBeenCalled();
+    expect(useMeetingPrepModal.getState().session.unwrapOr({meetingTitle: ''}).meetingTitle).toBe('Meeting Title');
     expect(onDismiss).not.toHaveBeenCalled();
   });
 
