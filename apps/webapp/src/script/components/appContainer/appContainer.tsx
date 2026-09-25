@@ -19,13 +19,13 @@
 
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import ky from 'ky';
 import {container} from 'tsyringe';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 

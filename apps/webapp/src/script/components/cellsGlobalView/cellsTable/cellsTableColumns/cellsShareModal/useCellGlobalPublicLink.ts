@@ -17,7 +17,7 @@
  *
  */
 
-import type {FireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useCellPublicLink} from 'src/script/components/cells/common/useCellPublicLink/useCellPublicLink';

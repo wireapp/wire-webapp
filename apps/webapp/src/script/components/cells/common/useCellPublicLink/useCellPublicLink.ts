@@ -19,10 +19,9 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {RestShareLink} from '@wireapp/api-client/lib/cells';
-
-import type {FireAndForgetInvoker} from '@wireapp/core';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';

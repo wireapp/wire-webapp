@@ -19,11 +19,10 @@
 
 import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {MarkerComponent} from 'Components/messagesList/message/marker';
 import {Message} from 'Components/messagesList/message/virtualizedMessage';

@@ -17,9 +17,8 @@
  *
  */
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {ApplicationObservability} from '../observability/applicationObservability';
 import type {MonotonicClock} from '../time/monotonicClock';

@@ -19,7 +19,7 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import type {FireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {Config} from 'src/script/Config';
 import {translateForTest} from 'Util/test/translateForTest';

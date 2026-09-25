@@ -19,10 +19,10 @@
 
 import {FC, useCallback, useRef, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ReactionType} from '@wireapp/core/lib/conversation';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DownloadButton} from 'Components/messagesList/message/contentMessage/messageActions/downloadButton';

@@ -19,6 +19,7 @@
 
 // Polyfill for "tsyringe" dependency injection
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {WallClock} from '@enormora/wall-clock/wall-clock';
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {Context} from '@wireapp/api-client/lib/auth';
@@ -36,7 +37,6 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import type {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';

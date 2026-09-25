@@ -19,12 +19,12 @@
 
 import {ChangeEvent, useEffect, useRef, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {
   Checkbox,
   CheckboxLabel,

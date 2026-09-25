@@ -28,6 +28,7 @@ const isContinuousIntegrationEnvironment = process.env.CI === 'true';
 process.env.TZ = 'UTC';
 
 const esmPackagesToTransform = [
+  '@enormora/fire-and-forget',
   'true-myth',
   'p-timeout',
   'p-queue',
@@ -56,6 +57,7 @@ const config: Config = {
   moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
+    '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
     '^@enormora/wall-clock/(.*)$': '<rootDir>/../../node_modules/@enormora/wall-clock/$1.js',
     'Components/(.*)': '<rootDir>/src/script/components/$1',
     'Hooks/(.*)': '<rootDir>/src/script/hooks/$1',

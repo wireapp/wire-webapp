@@ -19,9 +19,8 @@
 
 import {useEffect, useCallback, useRef, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';

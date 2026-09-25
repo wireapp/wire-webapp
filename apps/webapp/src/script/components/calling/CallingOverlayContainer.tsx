@@ -19,10 +19,9 @@
 
 import {Fragment, useEffect, type ReactNode} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Call} from 'Repositories/calling/Call';

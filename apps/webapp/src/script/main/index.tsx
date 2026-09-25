@@ -17,6 +17,7 @@
  *
  */
 
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 // eslint-disable-next-line import/order
 import 'core-js/full/reflect';
 
@@ -27,7 +28,6 @@ import {createRoot} from 'react-dom/client';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {createFireAndForgetInvoker} from '@wireapp/core';
 
 import {AppContainer} from 'Components/appContainer/appContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
@@ -97,7 +97,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       return createApplicationObservabilityFromConfig(config);
     },
     createFireAndForgetInvoker: () => {
-      return createFireAndForgetInvoker({logger: fireAndForgetInvokerLogger});
+      return createFireAndForgetInvoker({
+        reportError(error) {
+          fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+        },
+      });
     },
     createWallClock,
     monotonicClock: applicationMonotonicClock,

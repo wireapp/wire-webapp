@@ -17,12 +17,12 @@
  *
  */
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import type {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';

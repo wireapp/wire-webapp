@@ -19,6 +19,7 @@
 
 import {FC, ReactNode, useEffect, useMemo} from 'react';
 
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {createWallClock} from '@enormora/wall-clock/wall-clock';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
@@ -27,11 +28,11 @@ import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {RootProvider} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {ClientManager} from './clientManager';
 import {ConversationJoin} from './conversationJoin';
@@ -69,14 +70,12 @@ interface RootProps {
   translate: Translate;
 }
 
-const authFireAndForgetInvoker: FireAndForgetInvoker = {
-  fireAndForget(asyncAction) {
-    void asyncAction();
+const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+const authFireAndForgetInvoker = createFireAndForgetInvoker({
+  reportError(error) {
+    fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
   },
-  async waitUntilAllSettled(): Promise<void> {
-    return undefined;
-  },
-};
+});
 
 function createAuthMainViewModel(): MainViewModel {
   return {} as MainViewModel;

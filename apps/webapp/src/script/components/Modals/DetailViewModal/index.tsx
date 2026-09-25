@@ -19,11 +19,11 @@
 
 import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ZoomableImage} from 'Components/ZoomableImage';
