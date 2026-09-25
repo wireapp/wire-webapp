@@ -50,7 +50,7 @@ const renderScheduleMeetingForm = ({
   const mainViewModel = {
     content: {
       repositories: {
-        conversation: {},
+        conversation: {getAllGroupConversations: () => []},
         search: {},
         team: {},
       },
@@ -100,7 +100,7 @@ describe('ScheduleMeetingForm', () => {
     const mainViewModel = {
       content: {
         repositories: {
-          conversation: {},
+          conversation: {getAllGroupConversations: () => []},
           search: {},
           team: {},
         },
@@ -190,7 +190,7 @@ describe('ScheduleMeetingForm', () => {
     const mainViewModel = {
       content: {
         repositories: {
-          conversation: {},
+          conversation: {getAllGroupConversations: () => []},
           search: {},
           team: {},
         },
@@ -244,7 +244,7 @@ describe('ScheduleMeetingForm', () => {
     const mainViewModel = {
       content: {
         repositories: {
-          conversation: {},
+          conversation: {getAllGroupConversations: () => []},
           search: {},
           team: {},
         },

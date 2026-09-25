@@ -85,6 +85,7 @@ const createMainViewModel = (): MainViewModel => {
         conversation: {
           safeGetConversationById,
           hasConversationWith: jest.fn().mockReturnValue(false),
+          getAllGroupConversations: () => [],
         },
         calling: {
           findCall: jest.fn().mockReturnValue(undefined),

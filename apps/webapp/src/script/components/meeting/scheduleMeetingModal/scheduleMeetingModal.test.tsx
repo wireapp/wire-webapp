@@ -94,7 +94,7 @@ const renderModal = (scheduleMeeting = jest.fn().mockReturnValue(task.resolve({f
   const mainViewModel = {
     content: {
       repositories: {
-        conversation: {findConversation: jest.fn()},
+        conversation: {findConversation: jest.fn(), getAllGroupConversations: () => []},
         search: {searchByName: async () => [], searchUserInSet: () => []},
         team: {
           filterExternals: async (users: User[]) => users,
