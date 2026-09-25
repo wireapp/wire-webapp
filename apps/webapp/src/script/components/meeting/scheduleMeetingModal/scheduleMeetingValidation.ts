@@ -37,7 +37,7 @@ export interface ScheduleMeetingValidationInput {
   passwordConfirmation?: string;
 }
 
-export function getScheduleMeetingFormErrors({
+export const getScheduleMeetingFormErrors = ({
   title,
   start,
   end,
@@ -45,7 +45,7 @@ export function getScheduleMeetingFormErrors({
   mode,
   password,
   passwordConfirmation,
-}: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors {
+}: ScheduleMeetingValidationInput): ScheduleMeetingFormErrors => {
   const currentUnixEpochMilliseconds = clock.currentUnixEpochMilliseconds;
   const missingTimes = start.isNothing || end.isNothing ? 'meetings.scheduleModal.error.missingTimes' : undefined;
   const allowPastTimes = mode === scheduleMeetingModes.edit;
@@ -75,7 +75,7 @@ export function getScheduleMeetingFormErrors({
         ? 'meetings.scheduleModal.error.endBeforeStart'
         : undefined,
   };
-}
+};
 
 export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean =>
   !isUndefined(errors.title) ||
@@ -86,9 +86,9 @@ export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors):
   !isUndefined(errors.password) ||
   !isUndefined(errors.passwordConfirmation);
 
-export function validateScheduleMeetingForm(
+export const validateScheduleMeetingForm = (
   input: ScheduleMeetingValidationInput,
-): Result<ScheduleMeetingValidationInput, ScheduleMeetingFormErrors> {
+): Result<ScheduleMeetingValidationInput, ScheduleMeetingFormErrors> => {
   const errors = getScheduleMeetingFormErrors(input);
 
   if (hasScheduleMeetingFormErrors(errors)) {
@@ -96,4 +96,4 @@ export function validateScheduleMeetingForm(
   }
 
   return result.ok(input);
-}
+};

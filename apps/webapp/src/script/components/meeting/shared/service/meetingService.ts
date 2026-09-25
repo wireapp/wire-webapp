@@ -138,7 +138,7 @@ export const meetNowMeeting = (
   deps: MeetingServiceDeps,
 ): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
   createMeetingAndSyncParticipants(
-    mapMeetNowCommandToCreateMeeting(command, deps.wallClock, deps.deviceTimeZone),
+    mapMeetNowCommandToCreateMeeting(command, deps.clock, deps.deviceTimeZone),
     command.password,
     command.selectedUsers,
     deps,

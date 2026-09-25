@@ -31,7 +31,7 @@ import {
 import {validateScheduleMeetingForm} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingValidation';
 import type {ScheduleMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
 
-function mapScheduleFormErrorToFormErrors(error: ScheduleFormErrors): ScheduleMeetingFormErrors {
+const mapScheduleFormErrorToFormErrors = (error: ScheduleFormErrors): ScheduleMeetingFormErrors => {
   switch (error) {
     case scheduleFormErrors.missingTimes:
       return {...emptyScheduleMeetingFormErrors(), missingTimes: 'meetings.scheduleModal.error.missingTimes'};
@@ -40,12 +40,12 @@ function mapScheduleFormErrorToFormErrors(error: ScheduleFormErrors): ScheduleMe
     case scheduleFormErrors.endInPast:
       return {...emptyScheduleMeetingFormErrors(), endInPast: 'meetings.schedule.errors.endInPast'};
   }
-}
+};
 
-export function mapScheduleFormToMeetingCommand(
+export const mapScheduleFormToMeetingCommand = (
   formState: ScheduleMeetingFormState,
   clock: Clock,
-): Result<ScheduleMeetingCommand, ScheduleMeetingFormErrors> {
+): Result<ScheduleMeetingCommand, ScheduleMeetingFormErrors> => {
   const validationResult = validateScheduleMeetingForm({
     title: formState.title,
     start: formState.start,
@@ -76,4 +76,4 @@ export function mapScheduleFormToMeetingCommand(
     selectedUsers: formState.selectedUsers,
     ...(formState.password?.trim() ? {password: formState.password} : {}),
   });
-}
+};

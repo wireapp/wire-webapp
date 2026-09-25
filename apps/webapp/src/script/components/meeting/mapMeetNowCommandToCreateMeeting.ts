@@ -26,7 +26,7 @@ import type {MeetNowMeetingCommand} from 'Components/meeting/shared/types/meetin
 
 export const mapMeetNowCommandToCreateMeeting = (
   command: MeetNowMeetingCommand,
-  clock: Pick<Clock, 'currentDate'>,
+  clock: Clock,
   deviceTimeZone: DeviceTimeZone,
 ): CreateMeeting => {
   const {start, end} = getMeetNowMeetingTimes(clock);

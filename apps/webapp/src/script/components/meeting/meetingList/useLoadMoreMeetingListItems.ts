@@ -19,7 +19,7 @@
 
 import {useEffect, useRef, type RefObject} from 'react';
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import type {Virtualizer} from '@tanstack/react-virtual';
 
 type UseLoadMoreMeetingListItemsParams = {
@@ -28,7 +28,7 @@ type UseLoadMoreMeetingListItemsParams = {
   itemCount: number;
   hasMore: boolean;
   onLoadMore: () => void;
-  wallClock: WallClock;
+  clock: Clock;
 };
 
 const LOAD_MORE_DEBOUNCE_MS = 100;
@@ -46,7 +46,7 @@ export const useLoadMoreMeetingListItems = ({
   itemCount,
   hasMore,
   onLoadMore,
-  wallClock,
+  clock,
 }: UseLoadMoreMeetingListItemsParams): void => {
   const virtualizerRef = useRef(virtualizer);
   virtualizerRef.current = virtualizer;
@@ -58,14 +58,14 @@ export const useLoadMoreMeetingListItems = ({
       return undefined;
     }
 
-    let timeoutId: ReturnType<WallClock['setTimeout']> | undefined;
+    let timeoutId: ReturnType<Clock['setTimeout']> | undefined;
 
     const handleScroll = () => {
       if (timeoutId !== undefined) {
-        wallClock.clearTimeout(timeoutId);
+        clock.clearTimeout(timeoutId);
       }
 
-      timeoutId = wallClock.setTimeout(() => {
+      timeoutId = clock.setTimeout(() => {
         if (isScrolledNearBottom(scrollElement) && isVirtualizedTailVisible(virtualizerRef.current, itemCount)) {
           onLoadMore();
         }
@@ -78,8 +78,8 @@ export const useLoadMoreMeetingListItems = ({
       scrollElement.removeEventListener('scroll', handleScroll);
 
       if (timeoutId !== undefined) {
-        wallClock.clearTimeout(timeoutId);
+        clock.clearTimeout(timeoutId);
       }
     };
-  }, [hasMore, itemCount, onLoadMore, scrollElementRef, wallClock]);
+  }, [hasMore, itemCount, onLoadMore, scrollElementRef, clock]);
 };

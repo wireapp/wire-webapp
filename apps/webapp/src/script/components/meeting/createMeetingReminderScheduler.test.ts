@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -40,35 +40,35 @@ const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSer
 
 describe('createMeetingReminderScheduler', () => {
   it('fires one reminder at T-10 for a scheduled meeting', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:49:00.000Z')) * 1_000n,
     });
     const reminders: Array<{meetingTitle: string; meetingStartTime: string}> = [];
     const scheduler = createMeetingReminderScheduler({
-      wallClock,
+      clock,
       onReminder: reminder => {
         reminders.push({meetingTitle: reminder.meetingTitle, meetingStartTime: reminder.meetingStartTime});
       },
     });
 
     scheduler.sync([createMeetingSeries()]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE - 1);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE - 1);
     expect(reminders).toEqual([]);
 
-    wallClock.advanceByMilliseconds(1);
+    clock.advanceByMilliseconds(1);
     expect(reminders).toEqual([{meetingTitle: 'Weekly sync', meetingStartTime: '2026-06-01T10:00:00.000Z'}]);
 
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
     expect(reminders).toHaveLength(1);
     scheduler.stop();
   });
 
   it('does not fire a reminder for Meet Now', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T10:00:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T10:00:00.000Z')) * 1_000n,
     });
     const onReminder = jest.fn();
-    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+    const scheduler = createMeetingReminderScheduler({clock, onReminder});
 
     scheduler.sync([
       createMeetingSeries({
@@ -76,33 +76,33 @@ describe('createMeetingReminderScheduler', () => {
         duration_ms: TIME_IN_MILLIS.MINUTE * 30,
       }),
     ]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
 
     expect(onReminder).not.toHaveBeenCalled();
     scheduler.stop();
   });
 
   it('does not fire a late reminder when invited after T-10', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:51:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:51:00.000Z')) * 1_000n,
     });
     const onReminder = jest.fn();
-    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+    const scheduler = createMeetingReminderScheduler({clock, onReminder});
 
     scheduler.sync([createMeetingSeries()]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 9);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 9);
 
     expect(onReminder).not.toHaveBeenCalled();
     scheduler.stop();
   });
 
   it('moves the pending reminder when the start time changes', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:40:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:40:00.000Z')) * 1_000n,
     });
     const reminders: string[] = [];
     const scheduler = createMeetingReminderScheduler({
-      wallClock,
+      clock,
       onReminder: reminder => {
         reminders.push(reminder.meetingStartTime);
       },
@@ -116,54 +116,54 @@ describe('createMeetingReminderScheduler', () => {
       }),
     ]);
 
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 10);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 10);
     expect(reminders).toEqual([]);
 
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 60);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 60);
     expect(reminders).toEqual(['2026-06-01T11:00:00.000Z']);
     scheduler.stop();
   });
 
   it('drops the pending reminder when the meeting is removed', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:49:00.000Z')) * 1_000n,
     });
     const onReminder = jest.fn();
-    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+    const scheduler = createMeetingReminderScheduler({clock, onReminder});
 
     scheduler.sync([createMeetingSeries()]);
     scheduler.sync([]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
 
     expect(onReminder).not.toHaveBeenCalled();
     scheduler.stop();
   });
 
   it('fires only one reminder for the same occurrence', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:49:00.000Z')) * 1_000n,
     });
     const onReminder = jest.fn();
-    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+    const scheduler = createMeetingReminderScheduler({clock, onReminder});
     const meeting = createMeetingSeries();
 
     scheduler.sync([meeting]);
     scheduler.sync([meeting]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
     scheduler.sync([meeting]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
 
     expect(onReminder).toHaveBeenCalledTimes(1);
     scheduler.stop();
   });
 
   it('uses the latest meeting title at fire time', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:49:00.000Z')) * 1_000n,
     });
     const titles: string[] = [];
     const scheduler = createMeetingReminderScheduler({
-      wallClock,
+      clock,
       onReminder: reminder => {
         titles.push(reminder.meetingTitle);
       },
@@ -171,47 +171,47 @@ describe('createMeetingReminderScheduler', () => {
 
     scheduler.sync([createMeetingSeries()]);
     scheduler.sync([createMeetingSeries({title: 'Renamed sync'})]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE);
 
     expect(titles).toEqual(['Renamed sync']);
     scheduler.stop();
   });
 
   it('does not fire a reminder when the timeout runs after the meeting has started', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:49:00.000Z')) * 1_000n,
     });
     const onReminder = jest.fn();
-    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+    const scheduler = createMeetingReminderScheduler({clock, onReminder});
 
     scheduler.sync([createMeetingSeries()]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 21);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 21);
 
     expect(onReminder).not.toHaveBeenCalled();
     scheduler.stop();
   });
 
   it('still fires a reminder when the timeout is late but the meeting has not started', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:49:00.000Z')) * 1_000n,
     });
     const onReminder = jest.fn();
-    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+    const scheduler = createMeetingReminderScheduler({clock, onReminder});
 
     scheduler.sync([createMeetingSeries()]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 6);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 6);
 
     expect(onReminder).toHaveBeenCalledTimes(1);
     scheduler.stop();
   });
 
   it('still reminds for the next recurring occurrence after skipping a stale fire', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T09:49:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:49:00.000Z')) * 1_000n,
     });
     const reminders: string[] = [];
     const scheduler = createMeetingReminderScheduler({
-      wallClock,
+      clock,
       onReminder: reminder => {
         reminders.push(reminder.meetingStartTime);
       },
@@ -224,20 +224,20 @@ describe('createMeetingReminderScheduler', () => {
         series_end_date: '2026-06-01T11:00:00.000Z',
       }),
     ]);
-    wallClock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 21);
+    clock.advanceByMilliseconds(TIME_IN_MILLIS.MINUTE * 21);
     expect(reminders).toEqual([]);
 
-    wallClock.advanceByMilliseconds(Date.parse('2026-06-08T09:50:00.000Z') - Date.parse('2026-06-01T10:10:00.000Z'));
+    clock.advanceByMilliseconds(Date.parse('2026-06-08T09:50:00.000Z') - Date.parse('2026-06-01T10:10:00.000Z'));
     expect(reminders).toEqual(['2026-06-08T10:00:00.000Z']);
     scheduler.stop();
   });
 
   it('does not fire a far-future reminder on the first timeout chunk', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-01T10:00:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T10:00:00.000Z')) * 1_000n,
     });
     const onReminder = jest.fn();
-    const scheduler = createMeetingReminderScheduler({wallClock, onReminder});
+    const scheduler = createMeetingReminderScheduler({clock, onReminder});
 
     scheduler.sync([
       createMeetingSeries({
@@ -245,7 +245,7 @@ describe('createMeetingReminderScheduler', () => {
         series_end_date: '2026-08-01T11:00:00.000Z',
       }),
     ]);
-    wallClock.advanceByMilliseconds(MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS);
+    clock.advanceByMilliseconds(MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS);
 
     expect(onReminder).not.toHaveBeenCalled();
     scheduler.stop();

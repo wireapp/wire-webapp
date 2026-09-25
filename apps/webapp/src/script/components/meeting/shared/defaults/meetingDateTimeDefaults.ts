@@ -115,10 +115,10 @@ export const resolveEndChange = (previousStart: Date, previousEnd: Date, nextEnd
   return {start: nextStart, end: capEndForStart(nextStart, alignedNextEnd)};
 };
 
-export const getDefaultScheduleMeetingStartDateTime = (clock: Pick<Clock, 'currentDate'>): Date =>
+export const getDefaultScheduleMeetingStartDateTime = (clock: Clock): Date =>
   getNextHalfHourDateTime(clock.currentDate);
 
-export const getMeetNowMeetingTimes = (clock: Pick<Clock, 'currentDate'>): {start: Date; end: Date} => {
+export const getMeetNowMeetingTimes = (clock: Clock): {start: Date; end: Date} => {
   const start = clock.currentDate;
 
   return {start, end: getDefaultMeetingEndDateTime(start)};
