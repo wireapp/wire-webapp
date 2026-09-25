@@ -1389,7 +1389,7 @@
   "meetings.schedule.errors.startInPast": "Beginn des Meetings muss in der Zukunft liegen",
   "meetings.scheduleModal.closeAriaLabel": "Schließen",
   "meetings.scheduleModal.confirmChanges": "Änderungen bestätigen",
-  "meetings.scheduleModal.dateLabel": "Date",
+  "meetings.scheduleModal.dateLabel": "Datum",
   "meetings.scheduleModal.editTitle": "Meeting bearbeiten",
   "meetings.scheduleModal.endsLabel": "Endet",
   "meetings.scheduleModal.error.addParticipantsFailed": "Das Meeting wurde gespeichert, aber einige Teilnehmer konnten nicht hinzugefügt werden. Bitte versuchen Sie es erneut.",
