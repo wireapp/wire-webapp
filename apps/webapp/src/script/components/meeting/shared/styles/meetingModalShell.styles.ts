@@ -71,6 +71,7 @@ export const bodyStyles: CSSObject = {
 
 export const footerStyles: CSSObject = {
   display: 'flex',
+  gap: '8px',
   justifyContent: 'flex-end',
   padding: '16px 24px 24px',
   position: 'relative',

@@ -20,6 +20,8 @@
 import {useState} from 'react';
 
 import type {JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
+import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
+import {showMeetingLinkPasswordModal} from 'Components/meeting/shared/service/meetingLinkRecovery';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -68,6 +70,17 @@ export const useMeetNowSubmit = (conversationState: ConversationState) => {
         guardCall,
         translate,
         callNotEstablishedCopy,
+        onMeetingCreated: ({meetingLink, meetingLinkGenerationFailed, qualifiedConversation}) => {
+          if (meetingLinkGenerationFailed) {
+            showMeetingLinkPasswordModal({
+              conversationId: qualifiedConversation,
+              conversationRepository,
+              translate,
+            });
+            return;
+          }
+          showMeetingLinkConfirmation({meetingLink, translate});
+        },
       });
     } finally {
       setIsSubmitting(false);

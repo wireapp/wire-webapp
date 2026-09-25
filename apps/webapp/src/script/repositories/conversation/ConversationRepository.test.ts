@@ -213,6 +213,49 @@ describe('ConversationRepository', () => {
   let storage_service: StorageService;
   const messageSenderId = createUuid();
 
+  it('unwraps a newly created conversation code event for meeting links', async () => {
+    const [conversationRepository, {conversationService}] = buildConversationRepository(translateForTest);
+    conversationService.postConversationCode = jest.fn().mockResolvedValue({
+      code: 'generated-code',
+      has_password: false,
+      key: 'conversation-key',
+    });
+
+    const result = await conversationRepository
+      .requestMeetingConversationCode({domain: 'example.com', id: 'meeting-conversation'})
+      .toPromise();
+
+    expect(result.isOk).toBe(true);
+    if (result.isOk) {
+      expect(result.value).toEqual({
+        hasPassword: false,
+        meetingLink: expect.stringContaining('key=conversation-key&code=generated-code'),
+      });
+    }
+  });
+
+  it('gets an existing meeting link and includes the qualified conversation domain', async () => {
+    const [conversationRepository, {conversationService}] = buildConversationRepository(translateForTest);
+    conversationService.getConversationCode = jest.fn().mockResolvedValue({
+      code: 'existing-code',
+      has_password: true,
+      key: 'conversation-key',
+    });
+
+    const result = await conversationRepository
+      .getMeetingConversationCode({domain: 'example.com', id: 'meeting-conversation'})
+      .toPromise();
+
+    expect(result.isOk).toBe(true);
+    if (result.isOk) {
+      expect(result.value).toEqual({
+        hasPassword: true,
+        meetingLink: expect.stringContaining('key=conversation-key&code=existing-code&domain=example.com'),
+      });
+    }
+    expect(conversationService.getConversationCode).toHaveBeenCalledWith('meeting-conversation');
+  });
+
   const _findConversation = (conversation: Conversation, conversations: () => Conversation[]) => {
     return ko.utils.arrayFirst(conversations(), _conversation => _conversation.id === conversation.id);
   };

@@ -17,13 +17,17 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {task} from 'true-myth';
 
+import * as MeetingLinkConfirmation from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
+import * as MeetingLinkRecovery from 'Components/meeting/shared/service/meetingLinkRecovery';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
 import type {MeetingStoreServiceTasks} from 'Components/meeting/meetingStore/meetingStoreDeps';
+import type {MeetingLink} from 'Components/meeting/shared/service/meetingService';
 import {MeetingAction} from './meetingAction';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
@@ -33,9 +37,16 @@ import {User} from 'Repositories/entity/User';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
+  createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+
+import * as ContextMenu from '../../../../../../ui/contextMenu';
+
+const showContextMenuMock = jest.spyOn(ContextMenu, 'showContextMenu');
+const showMeetingLinkConfirmationMock = jest.spyOn(MeetingLinkConfirmation, 'showMeetingLinkConfirmation');
 
 const start = new Date('2026-06-15T14:00:00.000Z');
 const end = new Date('2026-06-15T15:00:00.000Z');
@@ -51,7 +62,13 @@ const series: MeetingSeries = {
   qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
   tzid: 'Europe/Berlin',
 };
-const meetingInstance: MeetingInstance = {meetingSeries: series, start, end};
+
+const meetingInstance: MeetingInstance = {
+  meetingSeries: series,
+  start,
+  end,
+};
+
 const selfUser = new User('host-id', 'example.com', translateForTest);
 
 const createMeetingStoreForTest = () =>
@@ -73,7 +90,10 @@ const createMeetingStoreForTest = () =>
 const renderAction = (
   now: string,
   user = selfUser,
-  wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: Date.parse(now)}),
+  wallClock = createDeterministicWallClock({
+    initialCurrentTimestampInMilliseconds: Date.parse(now),
+  }),
+  mainViewModel = {} as MainViewModel,
 ) =>
   render(
     <MeetingStoreProvider store={createMeetingStoreForTest()}>
@@ -89,12 +109,42 @@ const renderAction = (
     {
       wrapper: createRootProviderWrapperForTest(
         createRootContextValueForTest({
+          fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+          mainViewModel,
           translate: translateForTest,
           wallClock,
         }),
       ),
     },
   );
+
+const clickMeetingLinkMenuEntry = () => {
+  const menuArgs = showContextMenuMock.mock.lastCall?.[0];
+
+  if (!menuArgs) {
+    throw new Error('Expected context menu to be shown');
+  }
+
+  const meetingLinkEntry = menuArgs.entries.find(entry =>
+    ['meetings.action.meetingLink', 'meetings.action.generateMeetingLink'].includes(entry.label ?? ''),
+  );
+
+  if (!meetingLinkEntry?.click) {
+    throw new Error('Expected meeting link menu entry');
+  }
+
+  meetingLinkEntry.click();
+};
+
+const clickActionButton = () => {
+  const actionButton = screen.getAllByRole('button').at(-1);
+
+  if (!actionButton) {
+    throw new Error('Expected meeting action button');
+  }
+
+  fireEvent.click(actionButton);
+};
 
 describe('MeetingAction', () => {
   it.each([
@@ -116,5 +166,188 @@ describe('MeetingAction', () => {
     renderAction(now, new User('invitee-id', 'example.com', translateForTest));
 
     expect(screen.getByRole('button')).toBeInTheDocument();
+  });
+
+  it('opens generation for a host when the existing link is missing', async () => {
+    const showMeetingLinkPasswordModal = jest.spyOn(MeetingLinkRecovery, 'showMeetingLinkPasswordModal');
+    const getMeetingConversationCode = jest
+      .fn()
+      .mockReturnValue(task.reject({isAxiosError: true, response: {status: 404}}));
+
+    const requestMeetingConversationCode = jest.fn();
+
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {
+            getMeetingConversationCode,
+            requestMeetingConversationCode,
+          },
+        },
+      },
+    } as unknown as MainViewModel;
+
+    renderAction('2026-06-15T13:00:00.000Z', selfUser, undefined, mainViewModel);
+
+    clickActionButton();
+    clickMeetingLinkMenuEntry();
+
+    await waitFor(() =>
+      expect(showMeetingLinkPasswordModal).toHaveBeenCalledWith(
+        expect.objectContaining({generate: true, translate: translateForTest}),
+      ),
+    );
+
+    expect(getMeetingConversationCode).toHaveBeenCalledWith({domain: 'example.com', id: 'conversation-id'});
+    expect(requestMeetingConversationCode).not.toHaveBeenCalled();
+  });
+
+  it('opens the meeting link confirmation when loading the meeting link succeeds', async () => {
+    const meetingLink: MeetingLink = {
+      meetingLink: 'https://wire.example/meeting-link',
+      hasPassword: false,
+    };
+
+    const getMeetingConversationCode = jest.fn().mockReturnValue(task.resolve(meetingLink));
+
+    const requestMeetingConversationCode = jest.fn();
+
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {
+            getMeetingConversationCode,
+            requestMeetingConversationCode,
+          },
+        },
+      },
+    } as unknown as MainViewModel;
+
+    renderAction('2026-06-15T13:00:00.000Z', new User('invitee-id', 'example.com', translateForTest), undefined, mainViewModel);
+
+    clickActionButton();
+    clickMeetingLinkMenuEntry();
+
+    await waitFor(() =>
+      expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith({
+        meetingLink,
+        translate: translateForTest,
+      }),
+    );
+
+    expect(requestMeetingConversationCode).not.toHaveBeenCalled();
+  });
+
+  it('closes the existing-link confirmation before opening the rotation form for a host', async () => {
+    const showMeetingLinkPasswordModal = jest.spyOn(MeetingLinkRecovery, 'showMeetingLinkPasswordModal');
+    showMeetingLinkPasswordModal.mockClear();
+
+    const meetingLink: MeetingLink = {
+      meetingLink: 'https://wire.example/meeting-link',
+      hasPassword: true,
+    };
+    const getMeetingConversationCode = jest.fn().mockReturnValue(task.resolve(meetingLink));
+
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {getMeetingConversationCode},
+        },
+      },
+    } as unknown as MainViewModel;
+
+    renderAction('2026-06-15T13:00:00.000Z', selfUser, undefined, mainViewModel);
+
+    clickActionButton();
+    clickMeetingLinkMenuEntry();
+
+    await waitFor(() => expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith(expect.objectContaining({meetingLink})));
+
+    const onRotateMeetingLink = showMeetingLinkConfirmationMock.mock.lastCall?.[0].onRotateMeetingLink;
+    expect(onRotateMeetingLink).toBeDefined();
+    onRotateMeetingLink?.();
+
+    expect(showMeetingLinkPasswordModal).toHaveBeenCalledWith(
+      expect.objectContaining({rotate: true, translate: translateForTest}),
+    );
+  });
+
+  it('shows the unavailable-link message to a guest without generating a link', async () => {
+    const getMeetingConversationCode = jest.fn().mockReturnValue(task.reject({isAxiosError: true, response: {status: 404}}));
+
+    const requestMeetingConversationCode = jest.fn();
+
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {
+            getMeetingConversationCode,
+            requestMeetingConversationCode,
+          },
+        },
+      },
+    } as unknown as MainViewModel;
+
+    renderAction(
+      '2026-06-15T13:00:00.000Z',
+      new User('invitee-id', 'example.com', translateForTest),
+      undefined,
+      mainViewModel,
+    );
+
+    clickActionButton();
+    clickMeetingLinkMenuEntry();
+
+    await waitFor(() =>
+      expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith({
+        meetingLinkUnavailable: true,
+        meetingLinkUnavailableForHost: false,
+        translate: translateForTest,
+      }),
+    );
+
+    expect(getMeetingConversationCode).toHaveBeenCalledWith({
+      domain: 'example.com',
+      id: 'conversation-id',
+    });
+
+    expect(requestMeetingConversationCode).not.toHaveBeenCalled();
+  });
+
+  it('offers generation from the unavailable-link message to a host', async () => {
+    const showMeetingLinkPasswordModal = jest.spyOn(MeetingLinkRecovery, 'showMeetingLinkPasswordModal');
+    const getMeetingConversationCode = jest
+      .fn()
+      .mockReturnValue(task.reject({isAxiosError: true, response: {status: 500}}));
+
+    const mainViewModel = {
+      content: {
+        repositories: {
+          conversation: {getMeetingConversationCode},
+        },
+      },
+    } as unknown as MainViewModel;
+
+    renderAction('2026-06-15T13:00:00.000Z', selfUser, undefined, mainViewModel);
+
+    clickActionButton();
+    clickMeetingLinkMenuEntry();
+
+    await waitFor(() =>
+      expect(showMeetingLinkConfirmationMock).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          meetingLinkUnavailable: true,
+          meetingLinkUnavailableForHost: true,
+          onGenerateMeetingLink: expect.any(Function),
+        }),
+      ),
+    );
+
+    const onGenerateMeetingLink = showMeetingLinkConfirmationMock.mock.lastCall?.[0].onGenerateMeetingLink;
+    onGenerateMeetingLink?.();
+
+    expect(showMeetingLinkPasswordModal).toHaveBeenCalledWith(
+      expect.objectContaining({generate: true, translate: translateForTest}),
+    );
   });
 });

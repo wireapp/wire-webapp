@@ -22,7 +22,7 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, use
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {ErrorMessage} from '@wireapp/react-ui-kit';
+import {ErrorMessage, Loading} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
@@ -293,7 +293,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
       disabled={isPrimaryActionDisabled(primaryAction.disabled)}
       fullWidth={hasMultipleSecondary || allButtonsFullWidth}
     >
-      {primaryAction.text}
+      {primaryAction.loading === true ? <Loading size={16} /> : primaryAction.text}
     </PrimaryButton>
   );
 

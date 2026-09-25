@@ -33,6 +33,56 @@ import {ConversationService} from './ConversationService';
 type EventServiceLike = Pick<EventService, 'loadEventsWithCategory'>;
 
 describe('ConversationService', () => {
+  it('unwraps a newly created conversation code event', async () => {
+    const accessCode = {
+      code: 'generated-code',
+      has_password: false,
+      key: 'conversation-key',
+    };
+    const apiClient = {
+      api: {
+        conversation: {
+          postConversationCodeRequest: jest.fn().mockResolvedValue({
+            data: accessCode,
+            time: '2026-06-15T14:00:00.000Z',
+            type: 'conversation.code-update',
+          }),
+        },
+      },
+    } as unknown as APIClient;
+    const conversationService = new ConversationService(
+      {} as EventServiceLike,
+      {} as StorageService,
+      apiClient,
+      {} as Core,
+    );
+
+    await expect(conversationService.postConversationCode('conversation-id')).resolves.toEqual(accessCode);
+  });
+
+  it('returns a raw conversation code response unchanged', async () => {
+    const accessCode = {
+      code: 'generated-code',
+      has_password: true,
+      key: 'conversation-key',
+    };
+    const apiClient = {
+      api: {
+        conversation: {
+          postConversationCodeRequest: jest.fn().mockResolvedValue(accessCode),
+        },
+      },
+    } as unknown as APIClient;
+    const conversationService = new ConversationService(
+      {} as EventServiceLike,
+      {} as StorageService,
+      apiClient,
+      {} as Core,
+    );
+
+    await expect(conversationService.postConversationCode('conversation-id')).resolves.toEqual(accessCode);
+  });
+
   describe('searchInConversation', () => {
     function createMessageEvent(id: string, content: string, overrides: Partial<EventRecord> = {}): EventRecord {
       return {

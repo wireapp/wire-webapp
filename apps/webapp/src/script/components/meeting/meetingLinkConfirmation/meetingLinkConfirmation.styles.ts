@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  *
  */
 
-import {addNewModalToQueue, showNextModalInQueue} from './PrimaryModalState';
-import {PrimaryModalType} from './PrimaryModalTypes';
+export const meetingLinkConfirmationStyles = {
+  display: 'flex',
+  gap: '8px',
+  marginTop: '32px',
+  // There is no way to remove padding from modal_text,
+  // so we need this negative padding to align the buttons with the modal footer,
+  marginBottom: '-50px',
+  justifyContent: 'flex-end',
+};
 
-export {removeCurrentModal, setPrimaryModalLoading, usePrimaryModalState} from './PrimaryModalState';
-export {PrimaryModal};
-
-const PrimaryModal = {
-  init: (): void => {
-    showNextModalInQueue();
-  },
-  show: addNewModalToQueue,
-  type: PrimaryModalType,
+export const meetingLinkActionsButtonsStyles = {
+  marginBottom: '16px',
 };

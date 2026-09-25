@@ -25,8 +25,10 @@ import {type Maybe, task, type Task} from 'true-myth';
 
 import {mapScheduleFormToMeetingCommand} from 'Components/meeting/mapScheduleFormToMeetingCommand';
 import {mapScheduleFormToUpdateMeetingCommand} from 'Components/meeting/mapScheduleFormToUpdateMeetingCommand';
+import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import {showMeetingLinkPasswordModal} from 'Components/meeting/shared/service/meetingLinkRecovery';
 import type {MeetingSubmitSuccess} from 'Components/meeting/shared/service/meetingService';
 import {syncMeetingConversationName} from 'Components/meeting/shared/service/syncMeetingConversationName';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
@@ -65,6 +67,8 @@ type SubmitMeetingParams = {
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 
+type ScheduleSubmitSuccess = MeetingSubmitSuccess & {qualifiedConversation?: QualifiedId};
+
 const submitMeeting = ({
   formState,
   mode,
@@ -78,7 +82,7 @@ const submitMeeting = ({
   wallClock,
   scheduleMeeting,
   updateMeeting,
-}: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+}: SubmitMeetingParams): Task<ScheduleSubmitSuccess, MeetingSubmitErrors> => {
   if (mode === scheduleMeetingModes.create) {
     const commandResult = mapScheduleFormToMeetingCommand(formState, wallClock);
 
@@ -182,6 +186,23 @@ export const useScheduleMeetingSubmit = () => {
           users: formState.selectedUsers,
           translate,
         });
+      }
+
+      const createdConversation = submitResult.value.qualifiedConversation;
+      if (
+        mode === scheduleMeetingModes.create &&
+        (submitResult.value.meetingLink || submitResult.value.meetingLinkGenerationFailed) &&
+        createdConversation
+      ) {
+        if (submitResult.value.meetingLinkGenerationFailed) {
+          showMeetingLinkPasswordModal({
+            conversationId: createdConversation,
+            conversationRepository,
+            translate,
+          });
+        } else {
+          showMeetingLinkConfirmation({meetingLink: submitResult.value.meetingLink, translate});
+        }
       }
 
       setIsSubmitting(false);

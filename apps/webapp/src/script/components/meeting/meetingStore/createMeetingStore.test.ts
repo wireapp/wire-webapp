@@ -254,6 +254,37 @@ describe('createMeetingStore', () => {
     expect(store.getState().meetingSeries).toEqual([expect.objectContaining(meetingSeriesEntry)]);
   });
 
+  it('preserves the generated meeting-link result when syncing a scheduled meeting', async () => {
+    const meetingLink = {meetingLink: 'https://wire.example/meeting-link', hasPassword: false};
+    const scheduleMeeting = jest.fn().mockReturnValue(
+      task.resolve({
+        failedToAdd: [],
+        qualifiedConversation: apiMeeting.qualified_conversation,
+        qualifiedMeetingId: apiMeeting.qualified_id,
+        meetingLink,
+        meetingLinkGenerationFailed: true,
+      }),
+    );
+    const getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting));
+    const store = createMeetingStore(createDeps({getMeeting, serviceTasks: createServiceTasks({scheduleMeeting})}));
+
+    const result = await store.getState().scheduleMeeting({
+      title: 'Weekly sync',
+      start: new Date('2026-06-16T10:00:00.000Z'),
+      end: new Date('2026-06-16T11:00:00.000Z'),
+      recurrence: 'doesNotRepeat',
+      selectedUsers: [],
+    });
+
+    expect(unwrap(result)).toEqual({
+      failedToAdd: [],
+      qualifiedConversation: apiMeeting.qualified_conversation,
+      qualifiedMeetingId: apiMeeting.qualified_id,
+      meetingLink,
+      meetingLinkGenerationFailed: true,
+    });
+  });
+
   it('syncs a newly created Meet now meeting into the store without reloading the meetings list', async () => {
     const meetNowMeeting = jest.fn().mockReturnValue(
       task.resolve({

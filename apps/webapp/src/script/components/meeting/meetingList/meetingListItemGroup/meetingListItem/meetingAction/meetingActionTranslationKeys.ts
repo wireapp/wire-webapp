@@ -24,4 +24,5 @@ export const MEETING_ACTION_TRANSLATION_KEYS = {
   deleteMeetingForAll: 'meetings.action.deleteMeetingForAll',
   deleteMeetingForMe: 'meetings.action.deleteMeetingForMe',
   editMeeting: 'meetings.action.editMeeting',
+  meetingLink: 'meetings.action.meetingLink',
 } as const satisfies Record<string, TranslationKey>;

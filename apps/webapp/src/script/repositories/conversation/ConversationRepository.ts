@@ -1382,11 +1382,56 @@ export class ConversationRepository {
     );
   }
 
-  requestMeetingConversationCode(conversationId: QualifiedId, password?: string): Task<void, unknown> {
+  getMeetingConversationCode(conversationId: QualifiedId): Task<{meetingLink: string; hasPassword: boolean}, unknown> {
     return task.tryOrElse(
       error => error,
       async () => {
-        await this.conversationService.postConversationCode(conversationId.id, password);
+        const accessCode = await this.conversationService.getConversationCode(conversationId.id);
+        const conversation = this.conversationState.findConversation(conversationId);
+        if (conversation !== undefined) {
+          ConversationMapper.mapAccessCode(conversation, accessCode);
+        }
+        const meetingLink = accessCode.uri
+          ? accessCode.uri
+          : `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}${
+              conversationId.domain ? `&domain=${conversationId.domain}` : ''
+            }`;
+
+        return {meetingLink, hasPassword: accessCode.has_password === true};
+      },
+    );
+  }
+
+  requestMeetingConversationCode(
+    conversationId: QualifiedId,
+    password?: string,
+  ): Task<{meetingLink: string; hasPassword: boolean}, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        const accessCode = await this.conversationService.postConversationCode(conversationId.id, password);
+        const conversation = this.conversationState.findConversation(conversationId);
+        if (conversation !== undefined) {
+          ConversationMapper.mapAccessCode(conversation, accessCode);
+        }
+        const meetingLink = accessCode.uri
+          ? accessCode.uri
+          : `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}${
+              conversationId.domain ? `&domain=${conversationId.domain}` : ''
+            }`;
+
+        return {meetingLink, hasPassword: accessCode.has_password === true};
+      },
+    );
+  }
+
+  revokeMeetingConversationCode(conversationId: QualifiedId): Task<void, unknown> {
+    return task.tryOrElse(
+      error => error,
+      async () => {
+        await this.conversationService.deleteConversationCode(conversationId.id);
+        const conversation = this.conversationState.findConversation(conversationId);
+        conversation?.accessCode('');
       },
     );
   }

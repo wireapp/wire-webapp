@@ -92,6 +92,7 @@ describe('getMeetingActionEntries', () => {
 
     expect(getEntryLabels(entries)).toEqual([
       MEETING_ACTION_TRANSLATION_KEYS.joinNow,
+      MEETING_ACTION_TRANSLATION_KEYS.meetingLink,
       MEETING_ACTION_TRANSLATION_KEYS.editMeeting,
       MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll,
     ]);
@@ -150,6 +151,21 @@ describe('getMeetingActionEntries', () => {
     });
 
     expect(getEditEntryLabel(entries)).toBeUndefined();
+  });
+
+  it('includes the meeting link for a non-host invitee', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser('invitee-id'),
+      nowMilliseconds: futureNowMilliseconds,
+      translate,
+      onJoin: noop,
+      onEdit: jest.fn(),
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    expect(getEntryLabels(entries)).toContain(MEETING_ACTION_TRANSLATION_KEYS.meetingLink);
   });
 
   it('includes Edit meeting when the instance is ongoing', () => {

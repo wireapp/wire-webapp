@@ -191,6 +191,7 @@ describe('scheduleMeeting', () => {
     expect(result.isOk).toBe(true);
     expect(result.match({Ok: value => value, Err: () => null})).toEqual({
       failedToAdd: [],
+      qualifiedConversation,
       qualifiedMeetingId: meetingId,
     });
     expect(createMeetingMock).toHaveBeenCalledWith({
@@ -271,6 +272,23 @@ describe('scheduleMeeting', () => {
     expect(requestMeetingConversationCode).toHaveBeenCalledWith(qualifiedConversation, 'ValidPassword1!');
   });
 
+  it('returns the generated meeting link after creating a meeting', async () => {
+    const {deps} = createDeps({
+      requestMeetingConversationCode: jest
+        .fn()
+        .mockReturnValue(task.resolve({meetingLink: 'https://wire.example/meeting-link', hasPassword: false})),
+    });
+
+    const result = await scheduleMeeting(scheduleCommand, deps);
+
+    expect(result.match({Ok: value => value, Err: () => null})).toEqual({
+      failedToAdd: [],
+      qualifiedConversation,
+      qualifiedMeetingId: meetingId,
+      meetingLink: {meetingLink: 'https://wire.example/meeting-link', hasPassword: false},
+    });
+  });
+
   it('continues meeting setup when requesting the conversation code fails', async () => {
     const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const {deps} = createDeps({
@@ -282,6 +300,9 @@ describe('scheduleMeeting', () => {
 
     expect(result.isOk).toBe(true);
     expect(establishMeetingConversation).toHaveBeenCalled();
+    expect(result.match({Ok: value => value, Err: () => null})).toMatchObject({
+      meetingLinkGenerationFailed: true,
+    });
   });
 });
 

@@ -549,7 +549,7 @@ export class ConversationAPI {
   public async postConversationCodeRequest(
     conversationId: string,
     password?: string,
-  ): Promise<ConversationCodeUpdateEvent> {
+  ): Promise<ConversationCode | ConversationCodeUpdateEvent> {
     const config: AxiosRequestConfig = {
       method: 'post',
       url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
@@ -560,7 +560,7 @@ export class ConversationAPI {
       config.data = {password};
     }
 
-    const response = await this.client.sendJSON<ConversationCodeUpdateEvent>(config);
+    const response = await this.client.sendJSON<ConversationCode | ConversationCodeUpdateEvent>(config);
     return response.data;
   }
 

@@ -35,7 +35,6 @@ import type {
 import {ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event';
 import type {
   ConversationCodeDeleteEvent,
-  ConversationCodeUpdateEvent,
   ConversationEvent,
   ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
@@ -345,8 +344,9 @@ export class ConversationService {
    * @param conversationId ID of conversation to request access code for
    * @returns Resolves with the server response
    */
-  postConversationCode(conversationId: string, password?: string): Promise<ConversationCodeUpdateEvent> {
-    return this.apiClient.api.conversation.postConversationCodeRequest(conversationId, password);
+  async postConversationCode(conversationId: string, password?: string): Promise<ConversationCode> {
+    const response = await this.apiClient.api.conversation.postConversationCodeRequest(conversationId, password);
+    return 'data' in response ? response.data : response;
   }
 
   /**

@@ -43,14 +43,35 @@ import type {
 } from 'Components/meeting/shared/types/meetingCommandTypes';
 import type {User} from 'Repositories/entity/User';
 
-export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
+export type MeetingLink = {meetingLink: string; hasPassword: boolean};
+export type MeetingSubmitSuccess = {
+  failedToAdd: AddUsersFailure[];
+  meetingLink?: MeetingLink;
+  meetingLinkGenerationFailed?: boolean;
+};
 
 export type CreateMeetingSuccess = MeetingSubmitSuccess & {
   qualifiedConversation: QualifiedId;
   qualifiedMeetingId: QualifiedId;
 };
 
-export type ScheduleMeetingSuccess = MeetingSubmitSuccess & {qualifiedMeetingId: QualifiedId};
+export type ScheduleMeetingSuccess = MeetingSubmitSuccess & {
+  qualifiedConversation: QualifiedId;
+  qualifiedMeetingId: QualifiedId;
+};
+
+const mapMeetingLinkResult = ({
+  meetingLink,
+  meetingLinkGenerationFailed,
+}: Pick<MeetingSubmitSuccess, 'meetingLink' | 'meetingLinkGenerationFailed'>): Pick<
+  MeetingSubmitSuccess,
+  'meetingLink' | 'meetingLinkGenerationFailed'
+> => ({
+  ...(meetingLink ? {meetingLink} : {}),
+  ...(meetingLinkGenerationFailed ? {meetingLinkGenerationFailed} : {}),
+});
+
+type MeetingLinkGenerationResult = Pick<MeetingSubmitSuccess, 'meetingLink' | 'meetingLinkGenerationFailed'>;
 
 const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
   switch (error) {
@@ -94,9 +115,12 @@ const createMeetingAndSyncParticipants = (
         .andThen(() =>
           deps.conversationRepository
             .requestMeetingConversationCode(createdMeeting.qualified_conversation, password)
-            .orElse(() => task.resolve(undefined)),
+            .map((meetingLink): MeetingLinkGenerationResult => ({meetingLink}))
+            .orElse(() =>
+              task.resolve<MeetingLinkGenerationResult, MeetingSubmitErrors>({meetingLinkGenerationFailed: true}),
+            ),
         )
-        .andThen(() =>
+        .andThen(({meetingLink, meetingLinkGenerationFailed}) =>
           syncMeetingConversationParticipants(deps.conversationRepository, {
             qualifiedConversationId: createdMeeting.qualified_conversation,
             selectedUsers,
@@ -109,6 +133,7 @@ const createMeetingAndSyncParticipants = (
               ...syncResult,
               qualifiedConversation: createdMeeting.qualified_conversation,
               qualifiedMeetingId: createdMeeting.qualified_id,
+              ...mapMeetingLinkResult({meetingLink, meetingLinkGenerationFailed}),
             })),
         ),
     );
@@ -125,9 +150,11 @@ export const scheduleMeeting = (
     command.password,
     command.selectedUsers,
     deps,
-  ).map(({failedToAdd, qualifiedMeetingId}) => ({
+  ).map(({failedToAdd, qualifiedConversation, qualifiedMeetingId, meetingLink, meetingLinkGenerationFailed}) => ({
     failedToAdd,
+    qualifiedConversation,
     qualifiedMeetingId,
+    ...mapMeetingLinkResult({meetingLink, meetingLinkGenerationFailed}),
   }));
 
 /**

@@ -289,11 +289,41 @@ const updateCurrentModalContent = (
   updateCurrentModalId(id ?? null);
 };
 
-const removeCurrentModal = (): void => {
+const removeCurrentModal = (expectedModalId?: string): void => {
+  const {currentModalId} = usePrimaryModalState.getState();
+  if (expectedModalId !== undefined && currentModalId !== expectedModalId) {
+    return;
+  }
+
   const {currentModalContent, updateCurrentModalId} = usePrimaryModalState.getState();
 
   currentModalContent?.closeFn();
   updateCurrentModalId(null);
 };
 
-export {usePrimaryModalState, defaultContent, addNewModalToQueue, showNextModalInQueue, removeCurrentModal};
+const setPrimaryModalLoading = (loading: boolean, expectedModalId?: string): void => {
+  const {currentModalContent, currentModalId, updateCurrentModalContent} = usePrimaryModalState.getState();
+  if (expectedModalId !== undefined && currentModalId !== expectedModalId) {
+    return;
+  }
+
+  const primaryAction = currentModalContent.primaryAction;
+
+  if (primaryAction === null) {
+    return;
+  }
+
+  updateCurrentModalContent({
+    ...currentModalContent,
+    primaryAction: {...primaryAction, disabled: loading, loading},
+  });
+};
+
+export {
+  usePrimaryModalState,
+  defaultContent,
+  addNewModalToQueue,
+  showNextModalInQueue,
+  removeCurrentModal,
+  setPrimaryModalLoading,
+};

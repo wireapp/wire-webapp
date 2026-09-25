@@ -23,6 +23,11 @@ import {
 } from './meetingPasswordValidation';
 
 describe('getMeetingPasswordError', () => {
+  it('returns translation keys rather than browser validation labels', () => {
+    expect(meetingPasswordErrorKey).toBe('ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH');
+    expect(meetingPasswordConfirmationErrorKey).toBe('ValidationError.FIELD.CONFIRM_PASSWORD.PATTERN_MISMATCH');
+  });
+
   it('allows both optional password fields to be empty', () => {
     expect(getMeetingPasswordErrors('', '')).toEqual({password: undefined, passwordConfirmation: undefined});
   });

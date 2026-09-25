@@ -29,7 +29,9 @@ interface CopyToClipboardButtonProps {
   displayText: string;
   copySuccessText: string;
   onCopySuccess?: () => void;
+  onCopyError?: () => void;
   disabled?: boolean;
+  variant?: ButtonVariant;
 }
 
 const COPY_CONFIRM_DURATION = 1500;
@@ -40,6 +42,8 @@ export const CopyToClipboardButton = ({
   displayText,
   copySuccessText,
   onCopySuccess,
+  onCopyError,
+  variant = ButtonVariant.TERTIARY,
 }: CopyToClipboardButtonProps) => {
   const [isCopying, setIsCopying] = useState<boolean>(false);
 
@@ -48,10 +52,14 @@ export const CopyToClipboardButton = ({
       return;
     }
     if (!isCopying) {
-      await copyText(textToCopy);
-      onCopySuccess?.();
-      setIsCopying(true);
-      window.setTimeout(() => setIsCopying(false), COPY_CONFIRM_DURATION);
+      await Promise.resolve(copyText(textToCopy)).then(
+        () => {
+          onCopySuccess?.();
+          setIsCopying(true);
+          window.setTimeout(() => setIsCopying(false), COPY_CONFIRM_DURATION);
+        },
+        () => onCopyError?.(),
+      );
     }
   };
 
@@ -60,7 +68,7 @@ export const CopyToClipboardButton = ({
       type="button"
       disabled={disabled}
       onClick={copyToClipboard}
-      variant={ButtonVariant.TERTIARY}
+      variant={variant}
       data-uie-name="do-copy-to-clipboard"
     >
       <Icon.CopyIcon data-uie-name="copy-to-clipboard-icon" width="16" height="16" css={{marginRight: '10px'}} />

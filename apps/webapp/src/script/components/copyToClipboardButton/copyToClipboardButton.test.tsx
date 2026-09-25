@@ -69,4 +69,28 @@ describe('CopyToClipboardButton', () => {
       expect(getByText(copySuccessText)).toBeTruthy();
     });
   });
+
+  it('calls the error callback when copying fails', async () => {
+    const {copyText} = jest.requireMock('Util/clipboardUtil') as {copyText: jest.Mock};
+    const onCopyError = jest.fn();
+    copyText.mockRejectedValue(new Error('copy failed'));
+
+    const {getByText} = render(
+      withTheme(
+        <CopyToClipboardButton
+          textToCopy={textToCopy}
+          displayText={displayText}
+          copySuccessText={copySuccessText}
+          onCopyError={onCopyError}
+        />,
+      ),
+    );
+
+    act(() => {
+      getByText(displayText).click();
+    });
+
+    await waitFor(() => expect(onCopyError).toHaveBeenCalledTimes(1));
+    expect(getByText(displayText)).toBeTruthy();
+  });
 });
