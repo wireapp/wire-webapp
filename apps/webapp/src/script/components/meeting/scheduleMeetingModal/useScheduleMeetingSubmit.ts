@@ -44,8 +44,8 @@ import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvi
 import {
   type ScheduleMeetingFormState,
   type ScheduleMeetingMode,
-  type ScheduleMeetingSubmitResult,
   scheduleMeetingModes,
+  type ScheduleMeetingSubmitResult,
   scheduleMeetingSubmitResults,
 } from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
