@@ -6,7 +6,7 @@
     "commander": "15.0.0",
     "dotenv": "16.6.1",
     "dotenv-extended": "2.9.0",
-    "fs-extra": "11.4.0",
+    "fs-extra": "11.4.1",
     "http-status-codes": "2.3.0",
     "ky": "2.0.2",
     "logdown": "3.3.1",
