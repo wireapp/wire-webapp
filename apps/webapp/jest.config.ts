@@ -38,7 +38,6 @@ const esmPackagesToTransform = [
   'uuid',
   '@enormora/objectory',
   '@enormora/clock',
-  '@enormora/wall-clock',
   '@sindresorhus/is',
   '@faker-js/faker',
 ];
@@ -61,7 +60,6 @@ const config: Config = {
     '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
     '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
-    '^@enormora/wall-clock/(.*)$': '<rootDir>/../../node_modules/@enormora/wall-clock/$1.js',
     'Components/(.*)': '<rootDir>/src/script/components/$1',
     'Hooks/(.*)': '<rootDir>/src/script/hooks/$1',
     'I18n/(.*)': '<rootDir>/src/i18n/$1',

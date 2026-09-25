@@ -27,7 +27,6 @@
     "@emotion/react": "11.14.0",
     "@enormora/clock": "0.0.2",
     "@enormora/fire-and-forget": "0.0.4",
-    "@enormora/wall-clock": "0.0.3",
     "@formkit/auto-animate": "0.10.0",
     "@lexical/code": "0.27.2",
     "@lexical/history": "0.27.2",
