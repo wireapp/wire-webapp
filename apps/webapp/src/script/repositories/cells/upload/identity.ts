@@ -22,6 +22,8 @@ export interface UploadSource {
   readonly name: string;
   readonly contentType: string;
   readonly size: number;
+  /** The browser-provided path used to group direct folder uploads in the UI. */
+  readonly relativePath?: string;
 }
 
 export interface UploadIdentity {

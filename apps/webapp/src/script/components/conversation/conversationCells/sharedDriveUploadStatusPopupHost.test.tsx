@@ -68,6 +68,8 @@ type TestController = SharedDriveUploadController & {
   cancel: jest.MockedFunction<SharedDriveUploadController['cancel']>;
   retryUpload: jest.MockedFunction<SharedDriveUploadController['retryUpload']>;
   retryPublish: jest.MockedFunction<SharedDriveUploadController['retryPublish']>;
+  dismiss: jest.MockedFunction<NonNullable<SharedDriveUploadController['dismiss']>>;
+  isDismissed: jest.MockedFunction<NonNullable<SharedDriveUploadController['isDismissed']>>;
 };
 
 const createController = (state: UploadState | readonly UploadState[] = uploadState): TestController => ({
@@ -80,6 +82,8 @@ const createController = (state: UploadState | readonly UploadState[] = uploadSt
   retryPublish: jest.fn(),
   discard: jest.fn(),
   retryDiscard: jest.fn(),
+  dismiss: jest.fn(),
+  isDismissed: jest.fn((_conversationQualifiedId: string, _uploadId: string) => false),
 });
 
 const renderHost = (
@@ -170,6 +174,79 @@ describe('SharedDriveUploadStatusPopupHost', () => {
       'uploaded-7.txt',
     ]);
     expect(within(rows[2]).getByRole('button', {name: 'cells.uploadStatus.closeAriaLabel'})).toBeInTheDocument();
+  });
+
+  it('collapses nested folder files and retries only failed children', async () => {
+    const user = userEvent.setup();
+    const controller = createController([
+      {
+        ...uploadedState,
+        identity: {uploadId: 'upload-folder-1', resourceUuid: 'resource-1', versionId: 'version-1'},
+        source: {...uploadSource, name: 'cover.jpg', relativePath: 'Marketing/cover.jpg'},
+      },
+      {
+        ...failedState,
+        identity: {uploadId: 'upload-folder-2'},
+        source: {...uploadSource, name: 'logo.svg', relativePath: 'Marketing/Assets/logo.svg'},
+      },
+    ]);
+    controller.retryUpload.mockResolvedValue(undefined);
+    const translateFolder: Translate = (key, substitutions) => {
+      if (key === 'cells.uploadStatus.failedFiles') {
+        return `Couldn’t upload ${substitutions?.failed} of ${substitutions?.total} files`;
+      }
+      if (key === 'cells.uploadStatus.failedItems') {
+        return 'Failed to upload items';
+      }
+      return translateForTest(key);
+    };
+
+    const view = renderHost(controller, conversationQualifiedId, true, true, translateFolder);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    const rows = view.getAllByTestId('shared-drive-upload-status-row');
+    expect(rows).toHaveLength(1);
+    expect(within(rows[0]).getByText('Marketing')).toBeInTheDocument();
+    expect(within(rows[0]).getByText('Couldn’t upload 1 of 2 files')).toBeInTheDocument();
+
+    await user.click(within(rows[0]).getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
+    expect(controller.retryUpload).toHaveBeenCalledWith('upload-folder-2');
+    expect(controller.retryUpload).not.toHaveBeenCalledWith('upload-folder-1');
+  });
+
+  it('keeps a folder uploading while a child fails and another child is active', async () => {
+    const user = userEvent.setup();
+    const controller = createController([
+      {
+        ...uploadedState,
+        identity: {uploadId: 'upload-folder-uploaded', resourceUuid: 'resource-1', versionId: 'version-1'},
+        source: {...uploadSource, relativePath: 'Marketing/cover.jpg'},
+      },
+      {
+        ...failedState,
+        identity: {uploadId: 'upload-folder-failed'},
+        source: {...uploadSource, relativePath: 'Marketing/logo.svg'},
+      },
+      {
+        ...uploadState,
+        identity: {uploadId: 'upload-folder-active'},
+        source: {...uploadSource, relativePath: 'Marketing/hero.jpg'},
+      },
+    ]);
+    const translateFolder: Translate = (key, substitutions) => {
+      if (key === 'cells.uploadStatus.uploadingFiles') {
+        return `Uploading ${substitutions?.uploaded} of ${substitutions?.total} files…`;
+      }
+      return translateForTest(key);
+    };
+
+    const view = renderHost(controller, conversationQualifiedId, true, true, translateFolder);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    const row = view.getByTestId('shared-drive-upload-status-row');
+    expect(within(row).getByText('Uploading 1 of 3 files…')).toBeInTheDocument();
+    expect(within(row).getByRole('button', {name: 'conversationAssetUploadCancel'})).toBeInTheDocument();
+    expect(within(row).queryByRole('button', {name: 'fileCardDefaultCloseButtonLabel'})).not.toBeInTheDocument();
   });
 
   it.each([
@@ -289,6 +366,23 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(close);
 
     expect(view.queryByRole('status')).not.toBeInTheDocument();
+    expect(controller.dismiss).toHaveBeenCalledWith(conversationQualifiedId, 'upload-1');
+  });
+
+  it('keeps a dismissed successful upload hidden after the popup is remounted', async () => {
+    const user = userEvent.setup();
+    const controller = createController(uploadedState);
+    const firstRender = renderHost(controller, conversationQualifiedId);
+    const close = within(firstRender.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      name: 'cells.uploadStatus.closeAriaLabel',
+    });
+
+    await user.click(close);
+    controller.isDismissed.mockReturnValue(true);
+    firstRender.unmount();
+    renderHost(controller, conversationQualifiedId);
+
+    expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).not.toBeInTheDocument();
   });
 
   it('does not show close for a failed upload because retry is still actionable', () => {

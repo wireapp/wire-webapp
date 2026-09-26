@@ -19,7 +19,14 @@
 
 import type {ReactNode} from 'react';
 
-import {AlertIcon, ChevronIcon, CloseIcon, ReloadIcon, SharedDriveUploadStatusIcon} from '@wireapp/react-ui-kit';
+import {
+  AlertIcon,
+  ChevronIcon,
+  CloseIcon,
+  FolderIcon,
+  ReloadIcon,
+  SharedDriveUploadStatusIcon,
+} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {getFileExtension} from 'Util/util';
@@ -90,6 +97,10 @@ const isActionPending = (state: UploadActionState, uploadId: string): boolean =>
   typeof state === 'function' ? state(uploadId) : state;
 
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
+  if (upload.isFolder && upload.kind !== 'failed') {
+    return <FolderIcon css={sharedDriveUploadStatusPopupRowIconStyles} aria-hidden="true" />;
+  }
+
   if (upload.kind === 'uploading' || upload.kind === 'queued') {
     return (
       <SharedDriveUploadStatusIcon

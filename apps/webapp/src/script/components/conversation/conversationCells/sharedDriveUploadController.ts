@@ -38,12 +38,19 @@ export type SharedDriveUploadController = {
   readonly retryPublish: (uploadId: string) => Promise<void>;
   readonly discard: (uploadId: string) => Promise<void>;
   readonly retryDiscard: (uploadId: string) => Promise<void>;
+  readonly dismiss?: (conversationQualifiedId: string, uploadId: string) => void;
+  readonly isDismissed?: (conversationQualifiedId: string, uploadId: string) => boolean;
 };
 
 export type SharedDriveUploadRequest = {
   readonly file: File;
   readonly path: string;
 };
+
+const addUploadMetadata = (source: UploadSource, file: File): UploadSource => ({
+  ...source,
+  ...(file.webkitRelativePath ? {relativePath: file.webkitRelativePath} : {}),
+});
 
 type SharedDriveUploadSnapshotListener = () => void;
 
@@ -174,7 +181,7 @@ export const createDirectSharedDriveUploadStrategy = ({
   };
 
   const uploadDirectFile = async (uploadId: string, request: SharedDriveUploadRequest): Promise<boolean> => {
-    const source = createSource(request.file);
+    const source = addUploadMetadata(createSource(request.file), request.file);
     const abortController = createAbortController();
     abortControllersByUploadId.set(uploadId, abortController);
     setState(uploadId, {kind: 'uploading', identity: {uploadId}, source, progress: 0});
@@ -259,6 +266,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const listeners = new Set<() => void>();
   const workByUploadId = new Map<string, UploadWork>();
   const currentBatchUploadIdsByConversation = new Map<string, Set<string>>();
+  const dismissedUploadIdsByConversation = new Map<string, Set<string>>();
   const queuedWork: UploadWork[] = [];
   let activeWorkCount = 0;
   const notify = () => listeners.forEach(listener => listener());
@@ -325,7 +333,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     onRefresh: () => void,
   ): Result<string, unknown> => {
     const uploadId = createUploadId();
-    const source = createSource(file);
+    const source = addUploadMetadata(createSource(file), file);
     const request = {file, path};
     const registered = uploadStrategy.register(uploadId, source, path);
 
@@ -361,6 +369,10 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     const works: UploadWork[] = [];
     const currentBatchUploadIds = currentBatchUploadIdsByConversation.get(conversationQualifiedId);
     let nextBatchUploadIds = isTerminalBatch(currentBatchUploadIds, uploadStrategy) ? undefined : currentBatchUploadIds;
+
+    if (!nextBatchUploadIds) {
+      dismissedUploadIdsByConversation.delete(conversationQualifiedId);
+    }
 
     for (const file of files) {
       const registration = registerFile(file, path, conversationQualifiedId, onRefresh);
@@ -456,5 +468,12 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     retryPublish: uploadStrategy.retryPublish,
     discard: uploadStrategy.discard,
     retryDiscard: uploadStrategy.retryDiscard,
+    dismiss: (conversationQualifiedId: string, uploadId: string): void => {
+      const dismissedUploadIds = dismissedUploadIdsByConversation.get(conversationQualifiedId) ?? new Set<string>();
+      dismissedUploadIds.add(uploadId);
+      dismissedUploadIdsByConversation.set(conversationQualifiedId, dismissedUploadIds);
+    },
+    isDismissed: (conversationQualifiedId: string, uploadId: string): boolean =>
+      dismissedUploadIdsByConversation.get(conversationQualifiedId)?.has(uploadId) ?? false,
   } satisfies SharedDriveUploadController;
 };

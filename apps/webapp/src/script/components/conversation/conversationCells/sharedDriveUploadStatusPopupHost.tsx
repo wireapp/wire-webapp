@@ -22,13 +22,17 @@ import {useCallback, useEffect, useState} from 'react';
 import {Maybe, maybe} from 'true-myth';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import type {Translate} from 'Util/localizerUtil';
 import {formatBytes} from 'Util/util';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {
   getRepresentativeSharedDriveUploadStatus,
   getSharedDriveUploadAggregateKind,
+  getSharedDriveUploadDisplayStatuses,
   getSharedDriveUploadStatuses,
+  type SharedDriveUploadStatus,
+  type SharedDriveUploadStatusKind,
   type DismissedUpload,
 } from './sharedDriveUploadStatus';
 import {useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
@@ -40,6 +44,34 @@ interface SharedDriveUploadStatusPopupHostProps {
   readonly isEnabled: boolean;
   readonly isFileTabActive: boolean;
 }
+
+const getRowStatusLabel = (
+  row: SharedDriveUploadStatus,
+  translate: Translate,
+  statusLabelKey: Record<SharedDriveUploadStatusKind, Parameters<Translate>[0]>,
+): string => {
+  if (row.isFolder) {
+    if (row.kind === 'failed') {
+      return translate('cells.uploadStatus.failedFiles', {failed: row.failedFileCount ?? 0, total: row.fileCount ?? 0});
+    }
+    if (row.kind === 'uploaded') {
+      return translate('cells.uploadStatus.uploadedFiles', {count: row.fileCount ?? 0});
+    }
+    if (row.kind === 'queued') {
+      return translate('cells.uploadStatus.queuedFiles', {count: row.fileCount ?? 0});
+    }
+    return translate('cells.uploadStatus.uploadingFiles', {
+      uploaded: row.uploadedFileCount ?? 0,
+      total: row.fileCount ?? 0,
+    });
+  }
+
+  if (row.kind === 'failed') {
+    return translate(statusLabelKey.failed);
+  }
+
+  return translate(statusLabelKey[row.kind], {size: formatBytes(row.fileSize)});
+};
 
 export const SharedDriveUploadStatusPopupHost = ({
   controller,
@@ -68,11 +100,13 @@ export const SharedDriveUploadStatusPopupHost = ({
     (upload: DismissedUpload) => {
       setLocalDismissedUpload(Maybe.just(upload));
       onDismissUpload(upload);
+      controller.dismiss?.(upload.conversationQualifiedId, upload.uploadId);
     },
-    [onDismissUpload],
+    [controller, onDismissUpload],
   );
-  const uploads =
+  const rawUploads =
     uploadSnapshot.conversationQualifiedId === conversationQualifiedId ? uploadSnapshot.uploads : readStatuses();
+  const uploads = getSharedDriveUploadDisplayStatuses(rawUploads);
   const visibleUploads = uploads.filter(({uploadId}) => !dismissedRowIds.has(uploadId));
   const aggregateKind = getSharedDriveUploadAggregateKind(visibleUploads);
   const representativeUpload = aggregateKind
@@ -80,17 +114,40 @@ export const SharedDriveUploadStatusPopupHost = ({
     : null;
   const canDismissUploadStatus = visibleUploads.length > 0 && visibleUploads.every(({kind}) => kind === 'uploaded');
   const isUploadDismissed =
-    maybe.isJust(dismissedUpload) &&
-    dismissedUpload.value.conversationQualifiedId === conversationQualifiedId &&
-    representativeUpload?.uploadId === dismissedUpload.value.uploadId;
+    (maybe.isJust(dismissedUpload) &&
+      dismissedUpload.value.conversationQualifiedId === conversationQualifiedId &&
+      representativeUpload?.uploadId === dismissedUpload.value.uploadId) ||
+    (representativeUpload !== null &&
+      controller.isDismissed?.(conversationQualifiedId, representativeUpload.uploadId) === true);
 
   const isCancelling = useCallback(
-    (uploadId: string): boolean => cancellingUploadIds.has(uploadId),
-    [cancellingUploadIds],
+    (uploadId: string): boolean => {
+      const row = visibleUploads.find(upload => upload.uploadId === uploadId);
+      return (row?.childUploadIds ?? [uploadId]).some(childUploadId => cancellingUploadIds.has(childUploadId));
+    },
+    [cancellingUploadIds, visibleUploads],
+  );
+  const childUploadIds = useCallback(
+    (uploadId: string): readonly string[] =>
+      visibleUploads.find(upload => upload.uploadId === uploadId)?.childUploadIds ?? [uploadId],
+    [visibleUploads],
+  );
+  const retryableUploadIds = useCallback(
+    (uploadId: string): readonly string[] => {
+      const ids = childUploadIds(uploadId);
+      const snapshots = controller.snapshots(conversationQualifiedId);
+      return ids.filter(id => {
+        const kind = snapshots.find(state => state.identity.uploadId === id)?.kind;
+        return kind === 'uploadFailed' || kind === 'publishFailed';
+      });
+    },
+    [childUploadIds, controller, conversationQualifiedId],
   );
   const cancelUploadIds = useCallback(
     (uploadIds: readonly string[]): void => {
-      const pendingIds = uploadIds.filter(uploadId => !cancellingUploadIds.has(uploadId));
+      const pendingIds = uploadIds
+        .flatMap(uploadId => childUploadIds(uploadId))
+        .filter(uploadId => !cancellingUploadIds.has(uploadId));
       if (pendingIds.length === 0) {
         return;
       }
@@ -111,7 +168,7 @@ export const SharedDriveUploadStatusPopupHost = ({
           );
       });
     },
-    [cancellingUploadIds, controller],
+    [cancellingUploadIds, childUploadIds, controller],
   );
   const cancelAllUploads = useCallback(
     (): void => cancelUploadIds(visibleUploads.filter(({canCancel}) => canCancel).map(({uploadId}) => uploadId)),
@@ -125,24 +182,28 @@ export const SharedDriveUploadStatusPopupHost = ({
 
   const retryUpload = useCallback(
     (uploadId: string): void => {
-      if (retryingUploadIds.has(uploadId)) {
+      const uploadIds = retryableUploadIds(uploadId);
+      if (uploadIds.some(id => retryingUploadIds.has(id))) {
         return;
       }
 
-      setRetryingUploadIds(current => new Set([...current, uploadId]));
-      const finishRetry = () =>
+      setRetryingUploadIds(current => new Set([...current, ...uploadIds]));
+      const finishRetry = (id: string) =>
         setRetryingUploadIds(current => {
           const next = new Set(current);
-          next.delete(uploadId);
+          next.delete(id);
           return next;
         });
-      const snapshot = controller
-        .snapshots(conversationQualifiedId)
-        .find(state => state.identity.uploadId === uploadId);
-      const retry = snapshot?.kind === 'publishFailed' ? controller.retryPublish : controller.retryUpload;
-      void retry(uploadId).then(finishRetry, finishRetry);
+      uploadIds.forEach(id => {
+        const snapshot = controller.snapshots(conversationQualifiedId).find(state => state.identity.uploadId === id);
+        const retry = snapshot?.kind === 'publishFailed' ? controller.retryPublish : controller.retryUpload;
+        void retry(id).then(
+          () => finishRetry(id),
+          () => finishRetry(id),
+        );
+      });
     },
-    [controller, conversationQualifiedId, retryingUploadIds],
+    [controller, conversationQualifiedId, retryableUploadIds, retryingUploadIds],
   );
 
   useEffect(() => {
@@ -175,12 +236,7 @@ export const SharedDriveUploadStatusPopupHost = ({
   } as const;
   const displayName = representativeUpload.fileName;
   const statusLabels = new Map(
-    visibleUploads.map(row => [
-      row.uploadId,
-      row.kind === 'failed'
-        ? translate(statusLabelKey.failed)
-        : translate(statusLabelKey[row.kind], {size: formatBytes(row.fileSize)}),
-    ]),
+    visibleUploads.map(row => [row.uploadId, getRowStatusLabel(row, translate, statusLabelKey)]),
   );
   const statusLabel = statusLabels.get(representativeUpload.uploadId) ?? '';
 
@@ -207,7 +263,7 @@ export const SharedDriveUploadStatusPopupHost = ({
       canDismiss={canDismissUploadStatus}
       retryLabel={translate('conversationFilePreviewErrorRetry')}
       isCancelling={isCancelling}
-      isRetrying={(uploadId: string) => retryingUploadIds.has(uploadId)}
+      isRetrying={(uploadId: string) => retryableUploadIds(uploadId).some(id => retryingUploadIds.has(id))}
       onToggle={() => setIsExpanded(expanded => !expanded)}
       onCancelAll={cancelAllUploads}
       onCancelUpload={cancelUpload}

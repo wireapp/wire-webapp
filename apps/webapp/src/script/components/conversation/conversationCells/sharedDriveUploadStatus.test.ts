@@ -22,6 +22,7 @@ import type {UploadSource} from 'Repositories/cells/upload';
 import {
   getRepresentativeSharedDriveUploadStatus,
   getSharedDriveUploadAggregateKind,
+  getSharedDriveUploadDisplayStatuses,
   toSharedDriveUploadStatus,
 } from './sharedDriveUploadStatus';
 
@@ -33,6 +34,14 @@ const state = (kind: string) => ({
   source,
   ...(kind === 'uploading' ? {progress: 0} : {}),
 });
+
+const statusFor = (uploadState: unknown) => {
+  const status = toSharedDriveUploadStatus(uploadState as never, conversationQualifiedId);
+  if (!status) {
+    throw new Error('Expected upload status');
+  }
+  return status;
+};
 
 describe('toSharedDriveUploadStatus', () => {
   it.each(['queued', 'uploading'])('maps %s to its distinct status and marks it cancellable', kind => {
@@ -125,5 +134,53 @@ describe('toSharedDriveUploadStatus', () => {
       'uploaded',
     );
     expect(getSharedDriveUploadAggregateKind([])).toBeNull();
+  });
+});
+
+describe('getSharedDriveUploadDisplayStatuses', () => {
+  it('collapses files from a top-level folder while keeping individual files separate', () => {
+    const statuses = [
+      {
+        ...statusFor({...state('published'), source: {...source, relativePath: 'Reports/one.txt'}}),
+        uploadId: 'upload-1',
+      },
+      {
+        ...statusFor({...state('uploadFailed'), source: {...source, relativePath: 'Reports/Archive/two.txt'}}),
+        uploadId: 'upload-2',
+      },
+      {...statusFor(state('queued')), uploadId: 'upload-3'},
+    ];
+
+    const displayStatuses = getSharedDriveUploadDisplayStatuses(statuses);
+    expect(displayStatuses).toEqual([
+      expect.objectContaining({
+        uploadId: 'folder:Reports',
+        fileName: 'Reports',
+        isFolder: true,
+        fileCount: 2,
+        failedFileCount: 1,
+        kind: 'failed',
+        childUploadIds: ['upload-1', 'upload-2'],
+      }),
+      expect.objectContaining({uploadId: 'upload-3'}),
+    ]);
+    expect(displayStatuses[1]).not.toHaveProperty('isFolder');
+  });
+
+  it('uses byte-weighted progress for a folder', () => {
+    const first = {
+      ...statusFor({
+        ...state('uploading'),
+        source: {...source, size: 1, relativePath: 'Reports/one.txt'},
+        progress: 0.5,
+      }),
+      uploadId: 'upload-1',
+    };
+    const second = {
+      ...statusFor({...state('published'), source: {...source, size: 3, relativePath: 'Reports/two.txt'}}),
+      uploadId: 'upload-2',
+    };
+
+    expect(getSharedDriveUploadDisplayStatuses([first, second])[0]).toEqual(expect.objectContaining({progress: 0.875}));
   });
 });

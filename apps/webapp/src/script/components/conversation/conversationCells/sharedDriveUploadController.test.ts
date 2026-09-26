@@ -859,4 +859,17 @@ describe('createSharedDriveUploadController', () => {
     expect(manager.publish).toHaveBeenCalledTimes(1);
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
+
+  it('persists dismissal for a batch and clears it when a new batch starts', async () => {
+    const {controller} = createDirectUploadControllerHelper();
+
+    await controller.upload([new File(['one'], 'one.txt')], uploadPath, jest.fn(), conversationQualifiedId);
+    controller.dismiss?.(conversationQualifiedId, 'upload-1');
+
+    expect(controller.isDismissed?.(conversationQualifiedId, 'upload-1')).toBe(true);
+
+    await controller.upload([new File(['two'], 'two.txt')], uploadPath, jest.fn(), conversationQualifiedId);
+
+    expect(controller.isDismissed?.(conversationQualifiedId, 'upload-1')).toBe(false);
+  });
 });
