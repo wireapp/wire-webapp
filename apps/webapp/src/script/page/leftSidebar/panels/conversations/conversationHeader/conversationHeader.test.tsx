@@ -47,7 +47,8 @@ describe('ConversationHeader', () => {
           selfUser={new User('', '', translateForTest)}
           showSearchInput
           searchValue="search"
-          setSearchValue={jest.fn()}
+          onSearchChange={jest.fn()}
+          onClearSearch={jest.fn()}
           searchInputPlaceholder="Search conversations"
           currentFolder={undefined}
           onSearchEnterClick={onSearchEnterClick}
