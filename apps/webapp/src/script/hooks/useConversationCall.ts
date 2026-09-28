@@ -19,6 +19,7 @@
 
 import {useEffect, useMemo, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
@@ -54,7 +55,7 @@ export const useConversationCall = (conversation: Conversation): ConversationCal
 
   // Subscribe to the call's state changes
   useEffect(() => {
-    if (!call) {
+    if (isUndefined(call)) {
       setCurrentCallState(null);
       return noop;
     }

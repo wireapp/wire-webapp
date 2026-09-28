@@ -116,7 +116,7 @@ function CallingContainerWithJoinedCall({
 
   const setActiveCallViewTab = (tab: CallViewTab) => {
     callState.activeCallViewTab(tab);
-    if (tab === CallViewTab.ALL && joinedCall) {
+    if (tab === CallViewTab.ALL) {
       callingRepository.requestCurrentPageVideoStreams(joinedCall);
     }
   };
@@ -177,7 +177,7 @@ function CallingContainerWithJoinedCall({
 
   return (
     <Fragment>
-      {isFullScreenOrDetached && !!videoGrid?.grid.length && (
+      {isFullScreenOrDetached && videoGrid?.grid.length > 0 && (
         <FullscreenVideoCall
           key={conversation.id}
           videoGrid={videoGrid}

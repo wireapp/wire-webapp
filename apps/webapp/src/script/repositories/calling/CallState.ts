@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -82,7 +83,12 @@ export class CallState {
 
   constructor() {
     this.joinedCall = ko.pureComputed(() => this.calls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
-    this.activeCalls = ko.pureComputed(() => this.calls().filter(call => !call.reason()));
+    this.activeCalls = ko.pureComputed(() =>
+      this.calls().filter((call): boolean => {
+        const callReason = call.reason();
+        return isNullOrUndefined(callReason) || callReason === 0 || isNan(callReason);
+      }),
+    );
     this.joinableCalls = ko.pureComputed(() =>
       this.calls().filter(
         call => call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE,
@@ -99,7 +105,7 @@ export class CallState {
 
     this.isMaximisedViewActive = ko.pureComputed(() => {
       const call = this.joinedCall();
-      if (!call) {
+      if (isUndefined(call)) {
         return false;
       }
       return call.maximizedParticipant() !== null;

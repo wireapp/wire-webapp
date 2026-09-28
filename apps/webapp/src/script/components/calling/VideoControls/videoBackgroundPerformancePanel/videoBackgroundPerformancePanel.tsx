@@ -19,6 +19,7 @@
 
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
@@ -117,7 +118,7 @@ const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
   const renderMetrics = useBackgroundEffectsStore(state => state.metrics);
   const model = useBackgroundEffectsStore(state => state.model);
 
-  const metricRows = renderMetrics ? getMetricRows(renderMetrics) : [];
+  const metricRows = isNullOrUndefined(renderMetrics) ? [] : getMetricRows(renderMetrics);
 
   const capabilityRows = getCapabilityRows(capabilityInfo);
 
@@ -282,7 +283,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
             </Button>
           </div>
 
-          {capabilityInfo && <MetricsDisplay capabilityInfo={capabilityInfo} />}
+          {!isNullOrUndefined(capabilityInfo) && <MetricsDisplay capabilityInfo={capabilityInfo} />}
         </div>
       )}
     </div>

@@ -19,6 +19,7 @@
 
 import React, {useCallback, useEffect, useRef} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
@@ -197,7 +198,7 @@ export const CallingCell = ({
 
   const isGroupCall = isGroupOrChannel || isMeeting;
   const resolvedConversationName = conversationDisplayName ?? conversationName;
-  const conversationParticipants = selfUser ? userEts.concat(selfUser) : userEts;
+  const conversationParticipants = isUndefined(selfUser) ? userEts : userEts.concat(selfUser);
   const conversationUrl = generateConversationUrl(conversation.qualifiedId);
 
   const isOutgoingVideoCall = isOutgoing && selfSharesCamera;
@@ -409,7 +410,7 @@ export const CallingCell = ({
             conversationID={conversation.id}
           />
 
-          {(isOngoing || selfHasActiveVideo) && !isDetachedWindow && !!videoGrid?.grid?.length && isFullUi ? (
+          {(isOngoing || selfHasActiveVideo) && !isDetachedWindow && videoGrid?.grid?.length > 0 && isFullUi ? (
             <>
               {!isDetachedWindow && (
                 <div
@@ -449,7 +450,7 @@ export const CallingCell = ({
             )
           )}
 
-          {classifiedDomains && (
+          {classifiedDomains !== undefined && (
             <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
           )}
 

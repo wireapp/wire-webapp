@@ -43,18 +43,16 @@ export const ConversationCallingView = ({
         const {callingRepository} = callingViewModel;
 
         return (
-          conversation && (
-            <CallingCell
-              key={conversation.id}
-              classifiedDomains={classifiedDomains}
-              call={call}
-              callActions={callingViewModel.callActions}
-              callingRepository={callingRepository}
-              propertiesRepository={propertiesRepository}
-              isFullUi
-              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-            />
-          )
+          <CallingCell
+            key={conversation.id}
+            classifiedDomains={classifiedDomains}
+            call={call}
+            callActions={callingViewModel.callActions}
+            callingRepository={callingRepository}
+            propertiesRepository={propertiesRepository}
+            isFullUi
+            hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+          />
         );
       })}
     </>

@@ -26,5 +26,5 @@ export const isDetachedCallingFeatureEnabled = () => {
     return false;
   }
 
-  return Runtime.isDesktopApp() ? Boolean(Config.getDesktopConfig()?.supportsCallingPopoutWindow) : true;
+  return Runtime.isDesktopApp() ? Config.getDesktopConfig()?.supportsCallingPopoutWindow === true : true;
 };
