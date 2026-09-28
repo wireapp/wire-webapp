@@ -17,6 +17,19 @@
  *
  */
 
+const mockCellRender = jest.fn();
+
+jest.mock('Components/conversationListCell', () => {
+  const actual = jest.requireActual('Components/conversationListCell');
+  return {
+    ...actual,
+    ConversationListCell: (props: {conversation: Conversation}) => {
+      mockCellRender(props.conversation.id);
+      return <actual.ConversationListCell {...props} />;
+    },
+  };
+});
+
 jest.mock('@tanstack/react-virtual', () => ({
   useVirtualizer: ({count}: {count: number}) => ({
     getVirtualItems: () =>
@@ -108,6 +121,57 @@ describe('ConversationsList', () => {
       />,
       {wrapper: rootProviderWrapper},
     );
+
+  it('updates only the focused rows while arrow navigation keeps other rows interactive', () => {
+    const conversations = ['Alice', 'Bob', 'Charlie'].map(create1to1Conversation);
+    currentFocus = conversations[0].id;
+
+    const renderList = () => (
+      <ConversationsList
+        conversationLabelRepository={conversationLabelRepository}
+        conversations={conversations}
+        conversationFocusCandidates={conversations}
+        conversationsFilter=""
+        listViewModel={listViewModel}
+        connectRequests={connectRequests}
+        conversationState={conversationState}
+        callState={callState}
+        currentFocus={currentFocus}
+        currentFolder={currentFolder}
+        resetConversationFocus={resetConversationFocus}
+        handleArrowKeyDown={handleArrowKeyDown}
+        clearSearchFilter={clearSearchFilter}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
+      />
+    );
+    const {container, rerender} = render(renderList(), {wrapper: rootProviderWrapper});
+    const buttonFor = (conversation: Conversation) =>
+      container.querySelector<HTMLElement>(
+        `[data-uie-uid="${conversation.id}"] [data-uie-name="go-open-conversation"]`,
+      );
+
+    expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '0');
+    mockCellRender.mockClear();
+
+    const previousArrowHandler = handleArrowKeyDown;
+    handleArrowKeyDown = jest.fn(() => jest.fn());
+    currentFocus = conversations[1].id;
+    rerender(renderList());
+
+    expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '-1');
+    expect(buttonFor(conversations[1])).toHaveAttribute('tabindex', '0');
+    expect(mockCellRender.mock.calls.some(([id]) => id === conversations[2].id)).toBe(false);
+
+    const unaffectedButton = buttonFor(conversations[2]);
+    expect(unaffectedButton).not.toBeNull();
+    if (unaffectedButton) {
+      fireEvent.keyDown(unaffectedButton, {key: 'ArrowDown'});
+    }
+    expect(handleArrowKeyDown).toHaveBeenCalledWith(conversations[2].id);
+    expect(previousArrowHandler).not.toHaveBeenCalledWith(conversations[2].id);
+  });
 
   it("should render all 1:1 conversations if there's no search filter", async () => {
     const userNames = ['Alice', 'Bob', 'Charlie'];
