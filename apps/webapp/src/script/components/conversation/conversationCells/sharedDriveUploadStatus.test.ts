@@ -22,6 +22,7 @@ import type {UploadSource} from 'Repositories/cells/upload';
 import {
   getRepresentativeSharedDriveUploadStatus,
   getSharedDriveUploadAggregateKind,
+  getSharedDriveUploadDisplayStatuses,
   toSharedDriveUploadStatus,
 } from './sharedDriveUploadStatus';
 
@@ -34,6 +35,14 @@ const state = (kind: string) => ({
   ...(kind === 'uploading' ? {progress: 0} : {}),
 });
 
+const statusFor = (uploadState: unknown) => {
+  const status = toSharedDriveUploadStatus(uploadState as never, conversationQualifiedId);
+  if (!status) {
+    throw new Error('Expected upload status');
+  }
+  return status;
+};
+
 describe('toSharedDriveUploadStatus', () => {
   it.each(['queued', 'uploading'])('maps %s to its distinct status and marks it cancellable', kind => {
     expect(toSharedDriveUploadStatus(state(kind) as never, conversationQualifiedId)).toEqual({
@@ -45,8 +54,9 @@ describe('toSharedDriveUploadStatus', () => {
       progress: 0,
       hasProgress: false,
       isTransferActive: kind === 'uploading',
-      canCancel: true,
-      canRetry: false,
+      isFolder: false,
+      cancellableUploadIds: ['upload-1'],
+      retryableUploads: [],
     });
   });
 
@@ -57,7 +67,7 @@ describe('toSharedDriveUploadStatus', () => {
         progress: 0,
         hasProgress: false,
         isTransferActive: false,
-        canCancel: false,
+        cancellableUploadIds: [],
       }),
     );
   });
@@ -70,24 +80,34 @@ describe('toSharedDriveUploadStatus', () => {
 
   it('maps published to uploaded', () => {
     expect(toSharedDriveUploadStatus(state('published') as never, conversationQualifiedId)?.kind).toBe('uploaded');
-    expect(toSharedDriveUploadStatus(state('published') as never, conversationQualifiedId)?.canRetry).toBe(false);
+    expect(toSharedDriveUploadStatus(state('published') as never, conversationQualifiedId)?.retryableUploads).toEqual(
+      [],
+    );
   });
 
   it('marks an upload failure as retryable', () => {
     expect(toSharedDriveUploadStatus(state('uploadFailed') as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: true}),
+      expect.objectContaining({
+        kind: 'failed',
+        cancellableUploadIds: [],
+        retryableUploads: [{uploadId: 'upload-1', action: 'upload'}],
+      }),
     );
   });
 
   it('makes a publish failure retryable without allowing upload cancellation', () => {
     expect(toSharedDriveUploadStatus(state('publishFailed') as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: true}),
+      expect.objectContaining({
+        kind: 'failed',
+        cancellableUploadIds: [],
+        retryableUploads: [{uploadId: 'upload-1', action: 'publish'}],
+      }),
     );
   });
 
   it('does not make a discard failure retryable', () => {
     expect(toSharedDriveUploadStatus(state('discardFailed') as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: false}),
+      expect.objectContaining({kind: 'failed', cancellableUploadIds: [], retryableUploads: []}),
     );
   });
 
@@ -125,5 +145,99 @@ describe('toSharedDriveUploadStatus', () => {
       'uploaded',
     );
     expect(getSharedDriveUploadAggregateKind([])).toBeNull();
+  });
+});
+
+describe('getSharedDriveUploadDisplayStatuses', () => {
+  it('collapses files from a top-level folder while keeping individual files separate', () => {
+    const statuses = [
+      {
+        ...statusFor({
+          ...state('published'),
+          identity: {uploadId: 'upload-1'},
+          source: {...source, relativePath: 'Reports/one.txt'},
+        }),
+      },
+      {
+        ...statusFor({
+          ...state('uploadFailed'),
+          identity: {uploadId: 'upload-2'},
+          source: {...source, relativePath: 'Reports/Archive/two.txt'},
+        }),
+      },
+      statusFor({...state('queued'), identity: {uploadId: 'upload-3'}}),
+    ];
+
+    const displayStatuses = getSharedDriveUploadDisplayStatuses(statuses);
+    expect(displayStatuses).toEqual([
+      expect.objectContaining({
+        uploadId: 'folder:upload-1',
+        fileName: 'Reports',
+        isFolder: true,
+        fileCount: 2,
+        failedFileCount: 1,
+        kind: 'failed',
+        cancellableUploadIds: [],
+        retryableUploads: [{uploadId: 'upload-2', action: 'upload'}],
+      }),
+      expect.objectContaining({uploadId: 'upload-3'}),
+    ]);
+    expect(displayStatuses[1]).toEqual(expect.objectContaining({isFolder: false}));
+  });
+
+  it('uses byte-weighted progress for a folder', () => {
+    const first = {
+      ...statusFor({
+        ...state('uploading'),
+        source: {...source, size: 1, relativePath: 'Reports/one.txt'},
+        progress: 0.5,
+      }),
+      uploadId: 'upload-1',
+    };
+    const second = {
+      ...statusFor({...state('published'), source: {...source, size: 3, relativePath: 'Reports/two.txt'}}),
+      uploadId: 'upload-2',
+    };
+
+    expect(getSharedDriveUploadDisplayStatuses([first, second])[0]).toEqual(expect.objectContaining({progress: 0.875}));
+  });
+
+  it('exposes only actionable children on a folder row', () => {
+    const statuses = (['published', 'uploading', 'queued', 'uploadFailed', 'publishFailed'] as const).map(
+      (kind, index) =>
+        statusFor({
+          ...state(kind),
+          identity: {uploadId: `upload-${index}`},
+          source: {...source, relativePath: `Reports/file-${index}.txt`},
+        }),
+    );
+
+    expect(getSharedDriveUploadDisplayStatuses(statuses)[0]).toEqual(
+      expect.objectContaining({
+        cancellableUploadIds: ['upload-1', 'upload-2'],
+        retryableUploads: [
+          {uploadId: 'upload-3', action: 'upload'},
+          {uploadId: 'upload-4', action: 'publish'},
+        ],
+      }),
+    );
+  });
+
+  it('derives repeated folder row identities from their upload IDs', () => {
+    const firstBatch = [
+      {
+        ...statusFor({...state('published'), source: {...source, relativePath: 'Marketing/one.txt'}}),
+        uploadId: 'first-batch-upload',
+      },
+    ];
+    const secondBatch = [
+      {
+        ...statusFor({...state('published'), source: {...source, relativePath: 'Marketing/one.txt'}}),
+        uploadId: 'second-batch-upload',
+      },
+    ];
+
+    expect(getSharedDriveUploadDisplayStatuses(firstBatch)[0].uploadId).toBe('folder:first-batch-upload');
+    expect(getSharedDriveUploadDisplayStatuses(secondBatch)[0].uploadId).toBe('folder:second-batch-upload');
   });
 });
