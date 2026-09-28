@@ -54,8 +54,9 @@ describe('toSharedDriveUploadStatus', () => {
       progress: 0,
       hasProgress: false,
       isTransferActive: kind === 'uploading',
-      canCancel: true,
-      canRetry: false,
+      isFolder: false,
+      cancellableUploadIds: ['upload-1'],
+      retryableUploads: [],
     });
   });
 
@@ -66,7 +67,7 @@ describe('toSharedDriveUploadStatus', () => {
         progress: 0,
         hasProgress: false,
         isTransferActive: false,
-        canCancel: false,
+        cancellableUploadIds: [],
       }),
     );
   });
@@ -79,24 +80,34 @@ describe('toSharedDriveUploadStatus', () => {
 
   it('maps published to uploaded', () => {
     expect(toSharedDriveUploadStatus(state('published') as never, conversationQualifiedId)?.kind).toBe('uploaded');
-    expect(toSharedDriveUploadStatus(state('published') as never, conversationQualifiedId)?.canRetry).toBe(false);
+    expect(toSharedDriveUploadStatus(state('published') as never, conversationQualifiedId)?.retryableUploads).toEqual(
+      [],
+    );
   });
 
   it('marks an upload failure as retryable', () => {
     expect(toSharedDriveUploadStatus(state('uploadFailed') as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: true}),
+      expect.objectContaining({
+        kind: 'failed',
+        cancellableUploadIds: [],
+        retryableUploads: [{uploadId: 'upload-1', action: 'upload'}],
+      }),
     );
   });
 
   it('makes a publish failure retryable without allowing upload cancellation', () => {
     expect(toSharedDriveUploadStatus(state('publishFailed') as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: true}),
+      expect.objectContaining({
+        kind: 'failed',
+        cancellableUploadIds: [],
+        retryableUploads: [{uploadId: 'upload-1', action: 'publish'}],
+      }),
     );
   });
 
   it('does not make a discard failure retryable', () => {
     expect(toSharedDriveUploadStatus(state('discardFailed') as never, conversationQualifiedId)).toEqual(
-      expect.objectContaining({kind: 'failed', canCancel: false, canRetry: false}),
+      expect.objectContaining({kind: 'failed', cancellableUploadIds: [], retryableUploads: []}),
     );
   });
 
@@ -141,14 +152,20 @@ describe('getSharedDriveUploadDisplayStatuses', () => {
   it('collapses files from a top-level folder while keeping individual files separate', () => {
     const statuses = [
       {
-        ...statusFor({...state('published'), source: {...source, relativePath: 'Reports/one.txt'}}),
-        uploadId: 'upload-1',
+        ...statusFor({
+          ...state('published'),
+          identity: {uploadId: 'upload-1'},
+          source: {...source, relativePath: 'Reports/one.txt'},
+        }),
       },
       {
-        ...statusFor({...state('uploadFailed'), source: {...source, relativePath: 'Reports/Archive/two.txt'}}),
-        uploadId: 'upload-2',
+        ...statusFor({
+          ...state('uploadFailed'),
+          identity: {uploadId: 'upload-2'},
+          source: {...source, relativePath: 'Reports/Archive/two.txt'},
+        }),
       },
-      {...statusFor(state('queued')), uploadId: 'upload-3'},
+      statusFor({...state('queued'), identity: {uploadId: 'upload-3'}}),
     ];
 
     const displayStatuses = getSharedDriveUploadDisplayStatuses(statuses);
@@ -160,11 +177,12 @@ describe('getSharedDriveUploadDisplayStatuses', () => {
         fileCount: 2,
         failedFileCount: 1,
         kind: 'failed',
-        childUploadIds: ['upload-1', 'upload-2'],
+        cancellableUploadIds: [],
+        retryableUploads: [{uploadId: 'upload-2', action: 'upload'}],
       }),
       expect.objectContaining({uploadId: 'upload-3'}),
     ]);
-    expect(displayStatuses[1]).not.toHaveProperty('isFolder');
+    expect(displayStatuses[1]).toEqual(expect.objectContaining({isFolder: false}));
   });
 
   it('uses byte-weighted progress for a folder', () => {
@@ -182,6 +200,27 @@ describe('getSharedDriveUploadDisplayStatuses', () => {
     };
 
     expect(getSharedDriveUploadDisplayStatuses([first, second])[0]).toEqual(expect.objectContaining({progress: 0.875}));
+  });
+
+  it('exposes only actionable children on a folder row', () => {
+    const statuses = (['published', 'uploading', 'queued', 'uploadFailed', 'publishFailed'] as const).map(
+      (kind, index) =>
+        statusFor({
+          ...state(kind),
+          identity: {uploadId: `upload-${index}`},
+          source: {...source, relativePath: `Reports/file-${index}.txt`},
+        }),
+    );
+
+    expect(getSharedDriveUploadDisplayStatuses(statuses)[0]).toEqual(
+      expect.objectContaining({
+        cancellableUploadIds: ['upload-1', 'upload-2'],
+        retryableUploads: [
+          {uploadId: 'upload-3', action: 'upload'},
+          {uploadId: 'upload-4', action: 'publish'},
+        ],
+      }),
+    );
   });
 
   it('derives repeated folder row identities from their upload IDs', () => {

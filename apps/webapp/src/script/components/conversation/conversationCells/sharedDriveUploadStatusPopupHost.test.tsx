@@ -72,19 +72,27 @@ type TestController = SharedDriveUploadController & {
   isDismissed: jest.MockedFunction<NonNullable<SharedDriveUploadController['isDismissed']>>;
 };
 
-const createController = (state: UploadState | readonly UploadState[] = uploadState): TestController => ({
-  snapshots: jest.fn(scope => (scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [])),
-  subscribe: jest.fn((_listener: () => void) => jest.fn()),
-  upload: jest.fn(),
-  updateRefresh: jest.fn(),
-  cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
-  retryUpload: jest.fn(),
-  retryPublish: jest.fn(),
-  discard: jest.fn(),
-  retryDiscard: jest.fn(),
-  dismiss: jest.fn(),
-  isDismissed: jest.fn((_conversationQualifiedId: string, _uploadId: string) => false),
-});
+const createController = (state: UploadState | readonly UploadState[] = uploadState): TestController => {
+  const dismissedUploadIdsByConversation = new Map<string, Set<string>>();
+
+  return {
+    snapshots: jest.fn(scope => (scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [])),
+    subscribe: jest.fn((_listener: () => void) => jest.fn()),
+    upload: jest.fn(),
+    updateRefresh: jest.fn(),
+    cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
+    retryUpload: jest.fn(),
+    retryPublish: jest.fn(),
+    discard: jest.fn(),
+    retryDiscard: jest.fn(),
+    dismiss: jest.fn((scope, uploadId) => {
+      const dismissedUploadIds = dismissedUploadIdsByConversation.get(scope) ?? new Set<string>();
+      dismissedUploadIds.add(uploadId);
+      dismissedUploadIdsByConversation.set(scope, dismissedUploadIds);
+    }),
+    isDismissed: jest.fn((scope, uploadId) => dismissedUploadIdsByConversation.get(scope)?.has(uploadId) ?? false),
+  };
+};
 
 const renderHost = (
   controller: TestController,
@@ -249,6 +257,44 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(within(row).queryByRole('button', {name: 'fileCardDefaultCloseButtonLabel'})).not.toBeInTheDocument();
   });
 
+  it('cancels only cancellable children in a mixed folder', async () => {
+    const user = userEvent.setup();
+    const controller = createController([
+      {
+        ...uploadedState,
+        identity: {uploadId: 'completed-child', resourceUuid: 'resource-1', versionId: 'version-1'},
+        source: {...uploadSource, relativePath: 'Marketing/completed.pdf'},
+      },
+      {
+        ...failedState,
+        identity: {uploadId: 'failed-child'},
+        source: {...uploadSource, relativePath: 'Marketing/failed.pdf'},
+      },
+      {
+        ...uploadState,
+        identity: {uploadId: 'active-child'},
+        source: {...uploadSource, relativePath: 'Marketing/active.pdf'},
+      },
+      {
+        ...queuedState,
+        identity: {uploadId: 'queued-child'},
+        source: {...uploadSource, relativePath: 'Marketing/queued.pdf'},
+      },
+    ]);
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    await user.click(
+      within(view.getByTestId('shared-drive-upload-status-row')).getByRole('button', {
+        name: 'conversationAssetUploadCancel',
+      }),
+    );
+
+    expect(controller.cancel).toHaveBeenCalledTimes(2);
+    expect(controller.cancel).toHaveBeenNthCalledWith(1, 'active-child');
+    expect(controller.cancel).toHaveBeenNthCalledWith(2, 'queued-child');
+  });
+
   it.each([
     ['uploading', uploadState],
     ['uploaded', uploadedState],
@@ -378,7 +424,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     });
 
     await user.click(close);
-    controller.isDismissed.mockReturnValue(true);
+    expect(controller.dismiss).toHaveBeenCalledWith(conversationQualifiedId, 'upload-1');
     firstRender.unmount();
     renderHost(controller, conversationQualifiedId);
 
@@ -537,6 +583,38 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     expect(controller.retryPublish).toHaveBeenCalledWith('upload-1');
     expect(controller.retryUpload).not.toHaveBeenCalled();
+  });
+
+  it('uses the correct retry action for each failed child in a folder', async () => {
+    const user = userEvent.setup();
+    const controller = createController([
+      {
+        ...failedState,
+        identity: {uploadId: 'upload-failed-child'},
+        source: {...uploadSource, relativePath: 'Marketing/upload-failed.pdf'},
+      },
+      {
+        ...publishFailedState,
+        identity: {uploadId: 'publish-failed-child', resourceUuid: 'resource-2', versionId: 'version-2'},
+        source: {...uploadSource, relativePath: 'Marketing/publish-failed.pdf'},
+      },
+      {
+        ...uploadedState,
+        identity: {uploadId: 'completed-child', resourceUuid: 'resource-3', versionId: 'version-3'},
+        source: {...uploadSource, relativePath: 'Marketing/completed.pdf'},
+      },
+    ]);
+    controller.retryUpload.mockResolvedValue(undefined);
+    controller.retryPublish.mockResolvedValue(undefined);
+    const view = renderHost(controller, conversationQualifiedId);
+    await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
+
+    await user.click(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
+
+    expect(controller.retryUpload).toHaveBeenCalledTimes(1);
+    expect(controller.retryUpload).toHaveBeenCalledWith('upload-failed-child');
+    expect(controller.retryPublish).toHaveBeenCalledTimes(1);
+    expect(controller.retryPublish).toHaveBeenCalledWith('publish-failed-child');
   });
 
   it('renders every incremental progress update before completion', () => {

@@ -226,7 +226,7 @@ export const SharedDriveUploadStatusPopup = ({
           </span>
         </div>
         <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
-          {uploads.some(row => row.canCancel) && (
+          {uploads.some(row => row.cancellableUploadIds.length > 0) && (
             <button
               type="button"
               css={sharedDriveUploadStatusPopupHeaderCancelStyles}
@@ -298,7 +298,7 @@ export const SharedDriveUploadStatusPopup = ({
                   : sharedDriveUploadStatusPopupRowActionsStyles
               }
             >
-              {row.canRetry && (
+              {row.retryableUploads.length > 0 && (
                 <button
                   type="button"
                   css={sharedDriveUploadStatusPopupRowActionButtonStyles}
@@ -314,7 +314,7 @@ export const SharedDriveUploadStatusPopup = ({
                   />
                 </button>
               )}
-              {row.canCancel && (
+              {row.cancellableUploadIds.length > 0 && (
                 <button
                   type="button"
                   css={sharedDriveUploadStatusPopupRowCancelStyles}

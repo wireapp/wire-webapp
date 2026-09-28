@@ -28,7 +28,7 @@ export type DismissedUpload = {
   readonly uploadId: string;
 };
 
-export type SharedDriveUploadStatus = {
+type SharedDriveUploadStatusBase = {
   readonly uploadId: string;
   readonly conversationQualifiedId: string;
   readonly fileName: string;
@@ -37,15 +37,30 @@ export type SharedDriveUploadStatus = {
   readonly progress: number;
   readonly hasProgress: boolean;
   readonly isTransferActive: boolean;
-  readonly canCancel: boolean;
-  readonly canRetry: boolean;
-  readonly relativePath?: string;
-  readonly isFolder?: boolean;
-  readonly fileCount?: number;
-  readonly uploadedFileCount?: number;
-  readonly failedFileCount?: number;
-  readonly childUploadIds?: readonly string[];
 };
+
+export type SharedDriveRetryableUpload = {
+  readonly uploadId: string;
+  readonly action: 'upload' | 'publish';
+};
+
+export type SharedDriveUploadFileStatus = SharedDriveUploadStatusBase & {
+  readonly isFolder: false;
+  readonly relativePath?: string;
+  readonly cancellableUploadIds: readonly string[];
+  readonly retryableUploads: readonly SharedDriveRetryableUpload[];
+};
+
+export type SharedDriveUploadFolderStatus = SharedDriveUploadStatusBase & {
+  readonly isFolder: true;
+  readonly fileCount: number;
+  readonly uploadedFileCount: number;
+  readonly failedFileCount: number;
+  readonly cancellableUploadIds: readonly string[];
+  readonly retryableUploads: readonly SharedDriveRetryableUpload[];
+};
+
+export type SharedDriveUploadStatus = SharedDriveUploadFileStatus | SharedDriveUploadFolderStatus;
 
 const getSharedDriveUploadStatusKind = (state: UploadState): SharedDriveUploadStatusKind | null => {
   switch (state.kind) {
@@ -66,10 +81,20 @@ const getSharedDriveUploadStatusKind = (state: UploadState): SharedDriveUploadSt
   }
 };
 
+const getRetryableUploads = (state: UploadState): readonly SharedDriveRetryableUpload[] => {
+  if (state.kind === 'uploadFailed') {
+    return [{uploadId: state.identity.uploadId, action: 'upload'}];
+  }
+  if (state.kind === 'publishFailed') {
+    return [{uploadId: state.identity.uploadId, action: 'publish'}];
+  }
+  return [];
+};
+
 export const toSharedDriveUploadStatus = (
   state: UploadState,
   conversationQualifiedId: string,
-): SharedDriveUploadStatus | null => {
+): SharedDriveUploadFileStatus | null => {
   const kind = getSharedDriveUploadStatusKind(state);
 
   if (!kind) {
@@ -85,8 +110,9 @@ export const toSharedDriveUploadStatus = (
     progress: state.kind === 'uploading' ? state.progress : 0,
     hasProgress: state.kind === 'uploading' && state.progress > 0,
     isTransferActive: state.kind === 'uploading',
-    canCancel: state.kind === 'queued' || state.kind === 'uploading',
-    canRetry: state.kind === 'uploadFailed' || state.kind === 'publishFailed',
+    isFolder: false,
+    cancellableUploadIds: state.kind === 'queued' || state.kind === 'uploading' ? [state.identity.uploadId] : [],
+    retryableUploads: getRetryableUploads(state),
     ...(state.source.relativePath ? {relativePath: state.source.relativePath} : {}),
   };
 };
@@ -100,15 +126,15 @@ const getTopLevelFolder = (relativePath: string | undefined): string | null => {
   return folderName && fileName ? folderName : null;
 };
 
-const getFolderStatus = (statuses: readonly SharedDriveUploadStatus[]): SharedDriveUploadStatusKind => {
+const getFolderStatus = (statuses: readonly SharedDriveUploadFileStatus[]): SharedDriveUploadStatusKind => {
   return getSharedDriveUploadAggregateKind(statuses) ?? 'queued';
 };
 
 export const getSharedDriveUploadDisplayStatuses = (
-  statuses: readonly SharedDriveUploadStatus[],
+  statuses: readonly SharedDriveUploadFileStatus[],
 ): SharedDriveUploadStatus[] => {
-  const grouped = new Map<string, SharedDriveUploadStatus[]>();
-  const orderedGroups: Array<{folderId: string; folderName: string; statuses: SharedDriveUploadStatus[]}> = [];
+  const grouped = new Map<string, SharedDriveUploadFileStatus[]>();
+  const orderedGroups: Array<{folderId: string; folderName: string; statuses: SharedDriveUploadFileStatus[]}> = [];
   const individualStatuses: SharedDriveUploadStatus[] = [];
   const rowOrder: string[] = [];
 
@@ -156,13 +182,12 @@ export const getSharedDriveUploadDisplayStatuses = (
       progress,
       hasProgress: folderStatuses.some(status => status.hasProgress || status.kind === 'uploaded'),
       isTransferActive: folderStatuses.some(status => status.isTransferActive),
-      canCancel: folderStatuses.some(status => status.canCancel),
-      canRetry: folderStatuses.some(status => status.canRetry),
       isFolder: true,
       fileCount: folderStatuses.length,
       uploadedFileCount,
       failedFileCount,
-      childUploadIds: folderStatuses.map(status => status.uploadId),
+      cancellableUploadIds: folderStatuses.flatMap(status => status.cancellableUploadIds),
+      retryableUploads: folderStatuses.flatMap(status => status.retryableUploads),
     } satisfies SharedDriveUploadStatus;
     individualStatuses.push(displayStatus);
   });
@@ -181,7 +206,7 @@ export const getSharedDriveUploadDisplayStatuses = (
 export const getSharedDriveUploadStatuses = (
   controller: SharedDriveUploadController,
   conversationQualifiedId: string,
-): SharedDriveUploadStatus[] =>
+): SharedDriveUploadFileStatus[] =>
   controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
     const status = toSharedDriveUploadStatus(snapshot, conversationQualifiedId);
     return status ? [status] : [];
