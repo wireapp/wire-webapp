@@ -17,9 +17,9 @@
  *
  */
 
-import {KeyboardEvent, MutableRefObject, useEffect} from 'react';
+import {KeyboardEvent, MutableRefObject, useEffect, useState} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
@@ -64,13 +64,15 @@ interface ConversationHeaderProps {
   setSearchValue: (searchValue: string) => void;
   searchInputPlaceholder: string;
   currentFolder?: ConversationLabel;
-  onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
-  onSearchTab: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>, query: string) => void;
+  onSearchTab: (event: KeyboardEvent<HTMLInputElement>, query: string) => void;
   jumpToRecentSearch: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
   isListCollapsed?: boolean;
   onExpandList?: () => void;
 }
+
+const SEARCH_DELAY_IN_MILLISECONDS = 200;
 
 export const ConversationHeaderComponent = ({
   currentTab,
@@ -87,7 +89,22 @@ export const ConversationHeaderComponent = ({
   isListCollapsed = false,
   onExpandList,
 }: ConversationHeaderProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, wallClock} = useApplicationContext();
+  const [inputValue, setInputValue] = useState(searchValue);
+
+  useEffect(() => {
+    if (!inputValue || inputValue === searchValue) {
+      return;
+    }
+
+    const timeout = wallClock.setTimeout(() => setSearchValue(inputValue), SEARCH_DELAY_IN_MILLISECONDS);
+    return () => wallClock.clearTimeout(timeout);
+  }, [inputValue, searchValue, setSearchValue, wallClock]);
+
+  const clearSearch = () => {
+    setInputValue('');
+    setSearchValue('');
+  };
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const {canCreateChannels, isChannelsEnabled} = useChannelsFeatureFlag();
   const canExternalUserCreateChannel = canCreateChannels && isChannelsEnabled && selfUser.isExternal();
@@ -107,11 +124,11 @@ export const ConversationHeaderComponent = ({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    handleEscDown(event, () => setSearchValue(''));
-    handleEnterDown(event, () => onSearchEnterClick(event));
+    handleEscDown(event, clearSearch);
+    handleEnterDown(event, () => onSearchEnterClick(event, inputValue));
 
     if (!event.shiftKey && isTabKey(event)) {
-      onSearchTab(event);
+      onSearchTab(event, inputValue);
     }
   };
 
@@ -210,15 +227,17 @@ export const ConversationHeaderComponent = ({
           onKeyDown={onKeyDown}
           ref={searchInputRef}
           className="label-1"
-          value={searchValue}
-          onChange={event => setSearchValue(event.currentTarget.value)}
+          value={inputValue}
+          onChange={event => {
+            const nextValue = event.currentTarget.value;
+            setInputValue(nextValue);
+            if (!nextValue) {
+              setSearchValue('');
+            }
+          }}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={
-            isNonEmptyString(searchValue) ? (
-              <CircleCloseIcon className="cursor-pointer" onClick={() => setSearchValue('')} css={closeIconStyles} />
-            ) : (
-              searchValue
-            )
+            inputValue && <CircleCloseIcon className="cursor-pointer" onClick={clearSearch} css={closeIconStyles} />
           }
           inputCSS={searchInputStyles}
           wrapperCSS={searchInputWrapperStyles}

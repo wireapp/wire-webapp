@@ -23,6 +23,8 @@ import userEvent from '@testing-library/user-event';
 import {act, render, waitFor} from '@testing-library/react';
 import {observable} from 'knockout';
 
+import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
@@ -35,7 +37,11 @@ import {User} from 'Repositories/entity/User';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
 import * as Router from 'src/script/router/Router';
 import {TestFactory} from 'test/helper/TestFactory';
@@ -137,7 +143,9 @@ describe('Conversations', () => {
 
     searchInput.focus();
     const searchTabEvent = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Tab'});
-    act(() => searchInput.dispatchEvent(searchTabEvent));
+    await act(async () => {
+      searchInput.dispatchEvent(searchTabEvent);
+    });
     expect(searchTabEvent.defaultPrevented).toBe(true);
     expect(firstResult).toHaveFocus();
 
@@ -197,6 +205,166 @@ describe('Conversations', () => {
     await user.clear(searchInput);
     await user.type(searchInput, 'Alic');
     expect(searchInput).toHaveFocus();
+  });
+
+  it('debounces sidebar filtering without delaying typing or replaying a cleared query', async () => {
+    const conversationState = new ConversationState();
+    const alice = create1to1Conversation('Alice');
+    const bob = create1to1Conversation('Bob');
+    conversationState.conversations([alice, bob]);
+    const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, wallClock});
+    const rootWrapper = createRootProviderWrapperForTest(rootContext);
+    const lookupGroups = jest.spyOn(conversationRepository, 'getGroupsByName').mockReturnValue([]);
+    window.HTMLElement.prototype.scrollTo = jest.fn();
+
+    const {getByRole, queryByText, unmount} = render(
+      withThemeAndRootContext(
+        <Conversations
+          {...defaultParams}
+          callState={callState}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+        rootWrapper,
+      ),
+    );
+    const user = userEvent.setup();
+    const searchInput = getByRole('textbox');
+
+    await user.type(searchInput, 'Ali');
+    expect(searchInput).toHaveValue('Ali');
+    expect(queryByText('Bob')).toBeInTheDocument();
+    expect(lookupGroups).not.toHaveBeenCalled();
+
+    act(() => wallClock.advanceByMilliseconds(199));
+    await user.type(searchInput, 'ce');
+    act(() => wallClock.advanceByMilliseconds(1));
+    expect(searchInput).toHaveValue('Alice');
+    expect(queryByText('Bob')).toBeInTheDocument();
+    expect(lookupGroups).not.toHaveBeenCalled();
+
+    await user.clear(searchInput);
+    act(() => wallClock.advanceByMilliseconds(200));
+    expect(searchInput).toHaveValue('');
+    expect(lookupGroups).not.toHaveBeenCalled();
+
+    await user.type(searchInput, 'Alice');
+    act(() => wallClock.advanceByMilliseconds(200));
+    expect(lookupGroups).toHaveBeenCalledWith('alice', false);
+    expect(queryByText('Bob')).not.toBeInTheDocument();
+
+    await user.type(searchInput, 's');
+    unmount();
+    lookupGroups.mockClear();
+    act(() => wallClock.advanceByMilliseconds(200));
+    expect(lookupGroups).not.toHaveBeenCalled();
+  });
+
+  it('uses the pending query when Enter selects a conversation', async () => {
+    const alice = create1to1Conversation('Alice');
+    const bob = create1to1Conversation('Bob');
+    const conversationState = new ConversationState();
+    conversationState.conversations([alice, bob]);
+    const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, wallClock});
+    const navigate = jest.spyOn(Router, 'navigate').mockImplementation(() => undefined);
+    window.HTMLElement.prototype.scrollTo = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
+
+    const {getByRole} = render(
+      withThemeAndRootContext(
+        <Conversations
+          {...defaultParams}
+          callState={callState}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+        createRootProviderWrapperForTest(rootContext),
+      ),
+    );
+    const user = userEvent.setup();
+    const searchInput = getByRole('textbox');
+
+    await user.type(searchInput, 'Bob');
+    await user.keyboard('{Enter}');
+
+    expect(navigate).toHaveBeenCalledWith(expect.stringContaining(bob.id));
+    expect(getByRole('textbox')).toHaveValue('');
+    navigate.mockClear();
+    act(() => wallClock.advanceByMilliseconds(200));
+    expect(navigate).not.toHaveBeenCalled();
+    navigate.mockRestore();
+  });
+
+  it('focuses the pending query result on Tab instead of the stale result', async () => {
+    const alice = create1to1Conversation('Alice');
+    const bob = create1to1Conversation('Bob');
+    const conversationState = new ConversationState();
+    conversationState.conversations([alice, bob]);
+    const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, wallClock});
+    window.HTMLElement.prototype.scrollTo = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
+
+    const {container, getByRole} = render(
+      withThemeAndRootContext(
+        <Conversations
+          {...defaultParams}
+          callState={callState}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+        createRootProviderWrapperForTest(rootContext),
+      ),
+    );
+    const user = userEvent.setup();
+    const searchInput = getByRole('textbox');
+
+    await user.type(searchInput, 'Bob');
+    await user.tab();
+
+    const bobResult = container.querySelector<HTMLElement>(
+      `[data-uie-uid="${bob.id}"] [data-uie-name="go-open-conversation"]`,
+    );
+    expect(bobResult).toHaveFocus();
+  });
+
+  it('cancels a pending search when switching tabs', async () => {
+    const conversationState = new ConversationState();
+    conversationState.conversations([create1to1Conversation('Alice')]);
+    const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
+    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, wallClock});
+    const lookupGroups = jest.spyOn(conversationRepository, 'getGroupsByName').mockReturnValue([]);
+    window.HTMLElement.prototype.scrollTo = jest.fn();
+
+    const {getByRole, getByTitle} = render(
+      withThemeAndRootContext(
+        <Conversations
+          {...defaultParams}
+          callState={callState}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+        createRootProviderWrapperForTest(rootContext),
+      ),
+    );
+    const user = userEvent.setup();
+
+    await user.type(getByRole('textbox'), 'Alice');
+    await user.click(getByTitle('conversationLabelFavorites'));
+    act(() => wallClock.advanceByMilliseconds(200));
+
+    expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.FAVORITES);
+    expect(lookupGroups).not.toHaveBeenCalled();
   });
 
   it('cancels delayed focus when the conversation list unmounts', async () => {

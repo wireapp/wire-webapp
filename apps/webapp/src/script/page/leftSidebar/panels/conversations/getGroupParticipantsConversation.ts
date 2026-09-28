@@ -52,6 +52,10 @@ export const getGroupParticipantsConversations = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const {query, isHandleQuery} = searchRepository.normalizeQuery(conversationsFilter);
+  if (!query) {
+    return [];
+  }
+
   let filteredGroup = conversationRepository.getGroupsByName(query, isHandleQuery);
 
   // Convert arrays to Sets for faster lookups
