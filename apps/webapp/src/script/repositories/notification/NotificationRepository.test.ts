@@ -18,12 +18,15 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {NotificationPreference} from '@wireapp/api-client/lib/user/data';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+import {result} from 'true-myth';
 
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
@@ -32,6 +35,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
@@ -66,22 +70,39 @@ import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {truncate} from 'Util/stringUtil';
 import {createUuid} from 'Util/uuid';
+import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {NotificationRepository} from './NotificationRepository';
+import type {SystemNotificationApi} from '../../notification/systemNotificationTypes';
 
-function buildNotificationRepository(translate: Translate) {
+function buildNotificationRepository(
+  translate: Translate,
+  clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+  notificationApi?: SystemNotificationApi,
+  fireAndForgetInvoker: FireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
+) {
   const userState = container.resolve(UserState);
+  const conversationRepository = {isMessageRead: jest.fn(async () => false)};
   const notificationRepository = new NotificationRepository(
-    {} as any,
+    conversationRepository as unknown as ConversationRepository,
     new AudioRepository(),
     {} as CallingRepository,
     translate,
+    clock,
+    notificationApi ??
+      ({
+        isSupported: () => true,
+        getPermission: () => 'granted',
+        requestPermission: async () => 'granted',
+        show: () => result.ok({close: () => result.ok(undefined)}),
+      } as SystemNotificationApi),
+    fireAndForgetInvoker,
     userState,
     container.resolve(ConversationState),
     container.resolve(CallState),
   );
 
-  return [notificationRepository, {userState}] as const;
+  return [notificationRepository, {userState, clock, fireAndForgetInvoker}] as const;
 }
 
 (window as any).Notification = jest.fn();
@@ -108,6 +129,147 @@ describe('NotificationRepository', () => {
     const actualTitle = notificationRepository['createTitleObfuscated']();
 
     expect(actualTitle).toBe('translated:notificationObfuscatedTitle');
+  });
+
+  it('routes permission checks through the fire-and-forget invoker', () => {
+    const fireAndForgetInvoker: FireAndForgetInvoker = {
+      fireAndForget: jest.fn(),
+      waitUntilAllSettled: jest.fn(async (): Promise<void> => undefined),
+    };
+    const [notificationRepository] = buildNotificationRepository(
+      translateForTest,
+      undefined,
+      undefined,
+      fireAndForgetInvoker,
+    );
+
+    notificationRepository.updatedNotificationsProperty(NotificationPreference.OBFUSCATE);
+
+    expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
+  });
+
+  it('requests permission when the platform reports the default permission', async () => {
+    const requestPermission = jest.fn(async () => 'granted' as const);
+    const [notificationRepository] = buildNotificationRepository(translateForTest, undefined, {
+      isSupported: () => true,
+      getPermission: () => 'default',
+      requestPermission,
+      show: () => result.ok({close: () => result.ok(undefined)}),
+    });
+
+    notificationRepository.updatePermissionState(BrowserPermissionStatus.PROMPT);
+    jest.spyOn(Runtime, 'isSupportingPermissions').mockReturnValue(false);
+
+    await notificationRepository.checkPermission();
+
+    expect(requestPermission).toHaveBeenCalledTimes(1);
+  });
+
+  describe('system notification lifecycle', () => {
+    const notificationContent = {
+      options: {
+        body: 'A message',
+        data: {messageType: 'content'},
+        icon: '/notification.png',
+        silent: true,
+        tag: 'conversation',
+      },
+      timeout: 5000,
+      title: 'A conversation',
+      trigger: jest.fn(),
+    };
+
+    it('does not schedule a timeout until the platform shows the notification', () => {
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const setTimeoutSpy = jest.spyOn(clock, 'setTimeout');
+      let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
+      const notificationApi = {
+        isSupported: () => true,
+        getPermission: () => 'granted' as const,
+        requestPermission: async () => 'granted' as const,
+        show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
+          request = nextRequest;
+          return result.ok({close: () => result.ok(undefined)});
+        },
+      } as SystemNotificationApi;
+      const [repository] = buildNotificationRepository(translateForTest, clock, notificationApi);
+
+      repository['showNotificationInBrowser'](notificationContent);
+
+      expect(setTimeoutSpy).not.toHaveBeenCalled();
+      request?.onShow?.();
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('clears the timeout when the notification closes', () => {
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const setTimeoutSpy = jest.spyOn(clock, 'setTimeout');
+      const clearTimeoutSpy = jest.spyOn(clock, 'clearTimeout');
+      let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
+      const notificationApi = {
+        isSupported: () => true,
+        getPermission: () => 'granted' as const,
+        requestPermission: async () => 'granted' as const,
+        show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
+          request = nextRequest;
+          return result.ok({close: () => result.ok(undefined)});
+        },
+      } as SystemNotificationApi;
+      const [repository] = buildNotificationRepository(translateForTest, clock, notificationApi);
+
+      repository['showNotificationInBrowser'](notificationContent);
+      request?.onShow?.();
+      request?.onClose();
+
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+      expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+      expect(repository.notifications).toHaveLength(0);
+    });
+
+    it('does not queue a notification that closes before it is shown', () => {
+      let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
+      const notificationApi = {
+        isSupported: () => true,
+        getPermission: () => 'granted' as const,
+        requestPermission: async () => 'granted' as const,
+        show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
+          request = nextRequest;
+          return result.ok({close: () => result.ok(undefined)});
+        },
+      } as SystemNotificationApi;
+      const [repository] = buildNotificationRepository(translateForTest, undefined, notificationApi);
+
+      repository['showNotificationInBrowser'](notificationContent);
+      request?.onClose();
+
+      expect(repository.notifications).toHaveLength(0);
+    });
+
+    it('closes the platform handle and removes the queue entry on timeout', () => {
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const setTimeoutSpy = jest.spyOn(clock, 'setTimeout');
+      const close = jest.fn(() => result.ok(undefined));
+      let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
+      const notificationApi = {
+        isSupported: () => true,
+        getPermission: () => 'granted' as const,
+        requestPermission: async () => 'granted' as const,
+        show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
+          request = nextRequest;
+          return result.ok({close});
+        },
+      } as SystemNotificationApi;
+      const [repository] = buildNotificationRepository(translateForTest, clock, notificationApi);
+
+      repository['showNotificationInBrowser'](notificationContent);
+      request?.onShow?.();
+      const timeoutCallback = setTimeoutSpy.mock.calls[0]?.[0];
+      timeoutCallback?.();
+      request?.onClose();
+
+      expect(close).toHaveBeenCalledTimes(1);
+      expect(repository.notifications).toHaveLength(0);
+    });
   });
 
   beforeEach(() => {
