@@ -52,7 +52,7 @@ export const getGroupParticipantsConversations = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const {query, isHandleQuery} = searchRepository.normalizeQuery(conversationsFilter);
-  if (!query) {
+  if (query.length === 0) {
     return [];
   }
 

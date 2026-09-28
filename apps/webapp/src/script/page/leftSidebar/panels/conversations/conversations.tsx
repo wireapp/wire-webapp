@@ -539,13 +539,13 @@ export const Conversations = ({
   useEffect(() => {
     const enterEvent = pendingEnterSearchRef.current;
     pendingEnterSearchRef.current = null;
-    if (enterEvent) {
+    if (!isNullOrUndefined(enterEvent)) {
       handleEnterSearchClick(enterEvent, conversationsFilter);
     }
 
     const tabEvent = pendingTabSearchRef.current;
     pendingTabSearchRef.current = null;
-    if (tabEvent) {
+    if (!isNullOrUndefined(tabEvent)) {
       handleSearchTab(tabEvent, conversationsFilter);
     }
   }, [conversationsFilter, handleEnterSearchClick, handleSearchTab]);

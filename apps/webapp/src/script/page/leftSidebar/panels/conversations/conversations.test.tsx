@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event';
 import {act, render, waitFor} from '@testing-library/react';
 import {observable} from 'knockout';
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -213,8 +213,8 @@ describe('Conversations', () => {
     const bob = create1to1Conversation('Bob');
     conversationState.conversations([alice, bob]);
     const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
-    const rootContext = createRootContextValueForTest({translate: translateForTest, wallClock});
+    const wallClock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, clock: wallClock});
     const rootWrapper = createRootProviderWrapperForTest(rootContext);
     const lookupGroups = jest.spyOn(conversationRepository, 'getGroupsByName').mockReturnValue([]);
     window.HTMLElement.prototype.scrollTo = jest.fn();
@@ -269,8 +269,8 @@ describe('Conversations', () => {
     const conversationState = new ConversationState();
     conversationState.conversations([alice, bob]);
     const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
-    const rootContext = createRootContextValueForTest({translate: translateForTest, wallClock});
+    const wallClock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, clock: wallClock});
     const navigate = jest.spyOn(Router, 'navigate').mockImplementation(() => undefined);
     window.HTMLElement.prototype.scrollTo = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = jest.fn();
@@ -307,8 +307,8 @@ describe('Conversations', () => {
     const conversationState = new ConversationState();
     conversationState.conversations([alice, bob]);
     const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
-    const rootContext = createRootContextValueForTest({translate: translateForTest, wallClock});
+    const wallClock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, clock: wallClock});
     window.HTMLElement.prototype.scrollTo = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = jest.fn();
 
@@ -340,8 +340,8 @@ describe('Conversations', () => {
     const conversationState = new ConversationState();
     conversationState.conversations([create1to1Conversation('Alice')]);
     const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
-    const rootContext = createRootContextValueForTest({translate: translateForTest, wallClock});
+    const wallClock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, clock: wallClock});
     const lookupGroups = jest.spyOn(conversationRepository, 'getGroupsByName').mockReturnValue([]);
     window.HTMLElement.prototype.scrollTo = jest.fn();
 
