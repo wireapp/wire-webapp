@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {task} from 'true-myth';
 
@@ -52,7 +52,7 @@ const pendingPreview: RequestMeetingPrepPreview = () =>
 const renderSurface = (
   overrides: Partial<{
     onCancel: () => void;
-    onJoin: (choice: {cameraEnabled: boolean; microphoneEnabled: boolean}) => void;
+    onJoin: (choice: {cameraEnabled: boolean; microphoneEnabled: boolean}) => void | Promise<void>;
   }> = {},
 ) => {
   const onCancel = overrides.onCancel ?? jest.fn();
@@ -107,17 +107,48 @@ describe('MeetingPrepSurface', () => {
     expect(onJoin).not.toHaveBeenCalled();
   });
 
-  it('joins with the camera and microphone toggles', () => {
+  it('joins with the camera and microphone toggles', async () => {
     const {onJoin} = renderSurface();
 
     fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
     expect(onJoin).toHaveBeenCalledWith({cameraEnabled: true, microphoneEnabled: true});
+    await act(async () => {
+      await Promise.resolve();
+    });
 
     fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
     fireEvent.click(screen.getByRole('button', {name: 'preferencesAVMicrophone'}));
     fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
 
     expect(onJoin).toHaveBeenLastCalledWith({cameraEnabled: false, microphoneEnabled: false});
+    await act(async () => {
+      await Promise.resolve();
+    });
+  });
+
+  it('ignores another Join click while the first request is still running', async () => {
+    let finishJoin = () => undefined;
+    const onJoin = jest.fn(
+      () =>
+        new Promise<void>(resolve => {
+          finishJoin = resolve;
+        }),
+    );
+    renderSurface({onJoin});
+
+    const joinButton = screen.getByRole('button', {name: 'callJoin'});
+    fireEvent.click(joinButton);
+    fireEvent.click(joinButton);
+
+    expect(onJoin).toHaveBeenCalledTimes(1);
+    expect(joinButton).toBeDisabled();
+
+    await act(async () => {
+      finishJoin();
+      await Promise.resolve();
+    });
+
+    expect(joinButton).toBeEnabled();
   });
 
   it('writes the chosen microphone to the shared device store', () => {

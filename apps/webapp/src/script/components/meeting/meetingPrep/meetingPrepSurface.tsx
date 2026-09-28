@@ -58,7 +58,7 @@ export type MeetingPrepSurfaceProps = {
   meetingStartTime: string;
   participantName: string;
   onCancel: () => void;
-  onJoin: (choice: MeetingPrepJoinChoice) => void;
+  onJoin: (choice: MeetingPrepJoinChoice) => void | Promise<void>;
   requestPreviewStream: RequestMeetingPrepPreview;
   releasePreviewStream: (stream: MediaStream) => void;
 };
@@ -158,6 +158,8 @@ export const MeetingPrepSurface = ({
   const microphoneMenuRef = useRef<HTMLDivElement | null>(null);
   const cameraMenuRef = useRef<HTMLDivElement | null>(null);
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
+  const isJoiningRef = useRef(false);
+  const [isJoining, setIsJoining] = useState(false);
   const {
     audioInputDevices,
     audioInputDeviceId,
@@ -225,6 +227,19 @@ export const MeetingPrepSurface = ({
 
     videoElement.srcObject = maybe.isJust(videoPreview) ? videoPreview.value : null;
   }, [videoPreview]);
+
+  const join = () => {
+    if (isJoiningRef.current) {
+      return;
+    }
+
+    isJoiningRef.current = true;
+    setIsJoining(true);
+    void Promise.resolve(onJoin({cameraEnabled, microphoneEnabled})).finally(() => {
+      isJoiningRef.current = false;
+      setIsJoining(false);
+    });
+  };
 
   const audioStream = audioPreview.mapOr(null, stream => stream);
   const showVideo = cameraEnabled && maybe.isJust(videoPreview);
@@ -342,11 +357,7 @@ export const MeetingPrepSurface = ({
         <Button type="button" variant={ButtonVariant.TERTIARY} onClick={onCancel}>
           {translate('modalConfirmSecondary')}
         </Button>
-        <Button
-          type="button"
-          variant={ButtonVariant.PRIMARY}
-          onClick={() => onJoin({cameraEnabled, microphoneEnabled})}
-        >
+        <Button type="button" variant={ButtonVariant.PRIMARY} disabled={isJoining} onClick={join}>
           {translate('callJoin')}
         </Button>
       </footer>
