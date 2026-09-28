@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
+
 import {TextInput} from 'Components/TextInput';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -37,7 +39,7 @@ export const ConversationNameInput = () => {
 
     const trimmedNameInput = value.trim();
     const nameTooLong = trimmedNameInput.length > maxNameLength;
-    const nameTooShort = !trimmedNameInput.length;
+    const nameTooShort = isEmptyString(trimmedNameInput);
 
     setConversationName(value);
     if (nameTooLong) {
@@ -55,7 +57,7 @@ export const ConversationNameInput = () => {
   const clickOnNext = (): void => {
     const nameTooLong = groupNameLength > maxNameLength;
 
-    if (groupNameLength && !nameTooLong) {
+    if (isNonEmptyString(conversationName) && !nameTooLong) {
       gotoNextStep();
     }
   };

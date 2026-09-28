@@ -19,6 +19,7 @@
 
 import {useLayoutEffect, useRef} from 'react';
 
+import {isNull} from '@sindresorhus/is';
 import {Virtualizer} from '@tanstack/react-virtual';
 
 import {StatusType} from '../../../message/statusType';
@@ -34,10 +35,10 @@ function shouldStickToBottomFromPrev(
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   prevTotalSize: number,
   threshold = 100,
-) {
+): boolean {
   const scrollElement = virtualizer.options.getScrollElement?.();
 
-  if (!scrollElement) {
+  if (isNull(scrollElement)) {
     return false;
   }
 

@@ -343,13 +343,13 @@ function MessageDetails({failure, isMessageFocused, allUsers, translate}: Messag
   const users = useMemo(() => {
     const users: User[] = userIds.reduce<User[]>((previous, current) => {
       const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
-      return foundUser ? [...previous, foundUser] : previous;
+      return !isUndefined(foundUser) ? [...previous, foundUser] : previous;
     }, []);
     return users;
   }, [allUsers, userIds]);
 
   const uniqueDomains = 'backends' in failure ? Array.from(new Set(failure.backends)) : undefined;
-  const domainStr = uniqueDomains && uniqueDomains.join(', ');
+  const domainStr = isUndefined(uniqueDomains) ? uniqueDomains : uniqueDomains.join(', ');
 
   const {link} = reasonToMessageDataMap[reason];
 

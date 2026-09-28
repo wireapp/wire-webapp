@@ -22,6 +22,7 @@ import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
 import {noop} from 'noop-esm';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
@@ -90,7 +91,8 @@ const generateWireIdentity = (
 const modalMock = jest.spyOn(PrimaryModal, 'show');
 
 describe('E2EIHandler', () => {
-  const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
+  const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1_700_000_000_000_000n});
+  const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30, clock};
   const user = new User('userId', 'domain', translateForTest);
   user.name('John Doe');
   user.username('johndoe');
@@ -340,7 +342,7 @@ describe('E2EIHandler', () => {
       .mockReturnValue(new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest) as any);
 
     const enrollmentStore = getEnrollmentStore({id: 'userId', domain: 'domain'}, 'clientId');
-    enrollmentStore.store.e2eiActivatedAt(Date.now());
+    enrollmentStore.store.e2eiActivatedAt(clock.currentUnixEpochMilliseconds);
 
     jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
     jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
@@ -372,7 +374,7 @@ describe('E2EIHandler', () => {
 
       const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
 
-      const mockedFireDate = Date.now() + 1000;
+      const mockedFireDate = clock.currentUnixEpochMilliseconds + 1000;
 
       enrollmentStore.store.timer(mockedFireDate);
       jest.spyOn(enrollmentStore.clear, 'timer');

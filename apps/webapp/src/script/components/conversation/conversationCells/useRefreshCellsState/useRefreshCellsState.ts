@@ -19,11 +19,10 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 

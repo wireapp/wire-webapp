@@ -19,9 +19,8 @@
 
 import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react';
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
+import type {Clock} from '@enormora/clock/clock';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import type {Translate} from 'Util/localizerUtil';
 
@@ -38,7 +37,7 @@ export type ApplicationNavigation = {
 export type RootContextValue = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly mainViewModel: MainViewModel;
-  readonly wallClock: WallClock;
+  readonly clock: Clock;
   readonly doesApplicationNeedForceReload: boolean;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly applicationNavigation: ApplicationNavigation;

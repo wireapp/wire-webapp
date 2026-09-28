@@ -18,14 +18,62 @@
  */
 
 import {Config} from '../Config';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {APIClient} from './apiClientSingleton';
 
 describe('APIClientSingleton', () => {
+  it('uses the injected Clock for API client timestamps', () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 1_234_000n});
+    const apiClient = new APIClient({clock});
+
+    try {
+      expect(apiClient.config.wallClock.currentTimestampInMilliseconds).toBe(1_234);
+
+      clock.advanceByMilliseconds(10);
+
+      expect(apiClient.config.wallClock.currentTimestampInMilliseconds).toBe(1_244);
+    } finally {
+      apiClient.disconnect();
+    }
+  });
+
+  it('executes API client timeouts when the injected Clock advances', () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const apiClient = new APIClient({clock});
+    const timeoutCallback = jest.fn();
+
+    try {
+      apiClient.config.wallClock.setTimeout(timeoutCallback, 100);
+
+      clock.advanceByMilliseconds(99);
+      expect(timeoutCallback).not.toHaveBeenCalled();
+
+      clock.advanceByMilliseconds(1);
+      expect(timeoutCallback).toHaveBeenCalledTimes(1);
+    } finally {
+      apiClient.disconnect();
+    }
+  });
+
+  it('clears API client timeouts through the injected Clock', () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const apiClient = new APIClient({clock});
+    const timeoutCallback = jest.fn();
+
+    try {
+      const timeoutIdentifier = apiClient.config.wallClock.setTimeout(timeoutCallback, 100);
+      apiClient.config.wallClock.clearTimeout(timeoutIdentifier);
+
+      clock.advanceByMilliseconds(100);
+
+      expect(timeoutCallback).not.toHaveBeenCalled();
+    } finally {
+      apiClient.disconnect();
+    }
+  });
+
   it('configures wire client metadata headers for backend requests', () => {
-    const apiClient = new APIClient({
-      wallClock: createDeterministicWallClock(),
-    });
+    const apiClient = new APIClient({clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n})});
 
     try {
       expect(apiClient.config.headers).toEqual({
@@ -38,9 +86,7 @@ describe('APIClientSingleton', () => {
   });
 
   it('uses the incremental http retry backoff http client by default', () => {
-    const apiClient = new APIClient({
-      wallClock: createDeterministicWallClock(),
-    });
+    const apiClient = new APIClient({clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n})});
 
     try {
       expect(apiClient.transport.http['incrementalRetryBackoffRunner']).toBeDefined();

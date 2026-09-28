@@ -19,7 +19,7 @@
 
 import {useCallback} from 'react';
 
-import type {FireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {Config} from 'src/script/Config';
 import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';

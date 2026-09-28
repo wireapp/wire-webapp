@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmptyString, isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageKey} from 'Repositories/storage';
 import {getLogger} from 'Util/logger';
@@ -43,23 +45,29 @@ export const conversationHasDraft = (conversation: Conversation): boolean => {
   const storageKey = `${storageKeyPrefix}${conversation.id}`;
   const draftData = localStorage.getItem(storageKey);
 
-  if (!draftData) {
+  if (isNullOrUndefined(draftData) || isEmptyString(draftData)) {
     return false;
   }
 
   try {
     const amplifyData: AmplifyWrapper | DraftData = JSON.parse(draftData);
     // Amplify wraps the data in an object with 'data' and 'expires' properties
-    const draft = (amplifyData as AmplifyWrapper).data || (amplifyData as DraftData);
+    const wrappedDraft = (amplifyData as AmplifyWrapper).data;
+    const draft = isNullOrUndefined(wrappedDraft) ? (amplifyData as DraftData) : wrappedDraft;
 
-    if (!draft) {
+    if (isNullOrUndefined(draft)) {
       return false;
     }
 
     // Check plainMessage for actual content (not just whitespace)
-    const plainMessage = draft.plainMessage || '';
+    const plainMessage = isNonEmptyString(draft.plainMessage) ? draft.plainMessage : '';
     const hasTextContent = plainMessage.trim().length > 0;
-    const hasEditorStateContent = Boolean(draft.editorState);
+    const hasEditorStateContent =
+      !isNullOrUndefined(draft.editorState) &&
+      draft.editorState !== false &&
+      draft.editorState !== 0 &&
+      !isNan(draft.editorState) &&
+      !isEmptyString(draft.editorState);
 
     return hasTextContent || hasEditorStateContent;
   } catch (error: unknown) {

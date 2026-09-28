@@ -18,6 +18,7 @@
  */
 
 import {$createHeadingNode} from '@lexical/rich-text';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {$getSelection, $isRangeSelection} from 'lexical';
 
 export const headingCommand = () => {
@@ -31,7 +32,7 @@ export const headingCommand = () => {
     const node = selection.anchor.getNode();
     const parent = node.getParent();
 
-    if (!parent || parent.getType() === 'root') {
+    if (isNullOrUndefined(parent) || parent.getType() === 'root') {
       return false;
     }
 

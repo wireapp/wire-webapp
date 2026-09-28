@@ -18,6 +18,7 @@
  */
 
 import {StatusCodes as StatusCode} from 'http-status-codes';
+import {z} from 'zod';
 
 import {LogFactory} from '@wireapp/commons';
 
@@ -40,7 +41,7 @@ import {
   MLSStaleMessageError,
 } from '../conversation/';
 import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/';
-import {UnconnectedUserError, UserIsUnknownError} from '../user/';
+import {QualifiedId, QualifiedIdSchema, UnconnectedUserError, UserIsUnknownError} from '../user/';
 
 import {BackendError, BackendErrorLabel} from './';
 
@@ -126,15 +127,16 @@ const defaultHandlers: StatusCodeToLabelMap = {
     [BackendErrorLabel.MLS_STALE_MESSAGE]: e =>
       new MLSStaleMessageError('The conversation epoch in a message is too old', e.label, e.code),
     [BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC]: error => {
-      if (isMlsGroupOutOfSyncError(error)) {
-        return new MLSGroupOutOfSyncError(error.code, error.missing_users, error.message);
+      const missingUsers = getMlsGroupOutOfSyncMissingUsers(error);
+      if (missingUsers !== undefined) {
+        return new MLSGroupOutOfSyncError(error.code, missingUsers, error.message, error.label, error.data);
       }
 
       logger.warn(
         'Failed to detect missing_users field in MLSGroupOutOfSyncError, using empty array for missing_users',
         {error},
       );
-      return new MLSGroupOutOfSyncError(error.code, [], error.message);
+      return new MLSGroupOutOfSyncError(error.code, [], error.message, error.label, error.data);
     },
   },
   [StatusCode.NOT_FOUND]: {
@@ -185,12 +187,9 @@ const messageVariantHandlers: StatusCodeToMessageVariantMap = {
   },
 };
 
-export function isMlsGroupOutOfSyncError(error: BackendError): error is MLSGroupOutOfSyncError {
-  return (
-    error.code === StatusCode.CONFLICT &&
-    error.label === BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC &&
-    'missing_users' in error
-  );
+function getMlsGroupOutOfSyncMissingUsers(error: BackendError): QualifiedId[] | undefined {
+  const missingUsers = z.array(QualifiedIdSchema).safeParse(error.data?.missing_users);
+  return missingUsers.success ? missingUsers.data : undefined;
 }
 
 /**
@@ -200,11 +199,7 @@ export function mapBackendError(error: BackendError): BackendError {
   const code = Number(error.code) as StatusCode;
   const label = error.label as BackendErrorLabel;
   const message = (error.message ?? '').trim();
-
-  // Special-case: MLS group out of sync (structural field-based)
-  if (isMlsGroupOutOfSyncError(error)) {
-    return new MLSGroupOutOfSyncError(error.code, error.missing_users, error.message);
-  }
+  const backendErrorWithLabel = {...error, label, message};
 
   // Consolidated handling for common "invalid token" variants
   if (code === StatusCode.FORBIDDEN) {
@@ -219,7 +214,7 @@ export function mapBackendError(error: BackendError): BackendError {
   // 1) Message-specific variant
   const messageVariantHandler = messageVariantHandlers[code]?.[label]?.[message];
   if (messageVariantHandler !== undefined) {
-    const mapped = messageVariantHandler({...error, label});
+    const mapped = messageVariantHandler(backendErrorWithLabel);
     logger.info('Mapped backend error with message variant', {error, mapped});
     return mapped;
   }
@@ -227,7 +222,7 @@ export function mapBackendError(error: BackendError): BackendError {
   // 2) Default fallback for this (code,label)
   const fallbackHandler = defaultHandlers[code]?.[label];
   if (fallbackHandler !== undefined) {
-    const mapped = fallbackHandler({...error, label});
+    const mapped = fallbackHandler(backendErrorWithLabel);
     logger.info('Mapped backend error with default handler', {error, mapped});
     return mapped;
   }

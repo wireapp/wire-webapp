@@ -19,10 +19,9 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
 import {

@@ -18,10 +18,10 @@
  */
 
 import {advanceJestTimersWithPromise} from '@wireapp/commons/lib/util/testUtils';
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {TimeUtil} from '@wireapp/commons';
 
-import {createFireAndForgetInvoker} from '../../taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {RecurringTaskScheduler} from './recurringTaskScheduler';
 
 const mockedStore = {
@@ -41,7 +41,7 @@ const mockedStore = {
 };
 
 const createRecurringTaskSchedulerForTest = () => {
-  const fireAndForgetInvoker = createFireAndForgetInvoker({logger: {error: jest.fn()}});
+  const fireAndForgetInvoker = createFireAndForgetInvoker({reportError: jest.fn<void, [unknown]>()});
 
   return {
     fireAndForgetInvoker,

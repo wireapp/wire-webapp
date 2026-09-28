@@ -17,7 +17,7 @@
  *
  */
 
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import {createClock} from '@enormora/clock/clock';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
@@ -142,7 +142,7 @@ export async function runSegmenter(
     logger.log(`[virtual-background] webglcontextrestored (${!isNullOrUndefined(webGLRenderer)})`);
 
     if (isNullOrUndefined(webGLRenderer)) {
-      const timer = createWallClock();
+      const timer = createClock();
 
       timer.setTimeout(() => {
         logger.log('[virtual-background] restart segmenter onContextRestored');

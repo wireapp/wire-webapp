@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, Task, task} from 'true-myth';
 
@@ -88,7 +89,7 @@ const performJoin = (
 ): Task<void, JoinMeetingCallError> => {
   const call = deps.callingRepository.findCall(conversation.qualifiedId);
 
-  if (call && call.state() === CALL_STATE.INCOMING) {
+  if (!isUndefined(call) && call.state() === CALL_STATE.INCOMING) {
     return task.tryOrElse(
       () => joinMeetingCallErrors.joinFailed,
       () => deps.callingViewModel.callActions.answer(call, media),

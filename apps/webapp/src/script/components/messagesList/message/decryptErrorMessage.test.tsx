@@ -253,6 +253,22 @@ describe('DecryptErrorMessage', () => {
     ),
   );
 
+  it.each([0, Number.NaN])('preserves falsy numeric error code %s in the rendered output', errorCode => {
+    const props = {
+      message: createError(errorCode),
+      onClickResetSession: jest.fn(),
+    };
+
+    const {container} = render(<DecryptErrorMessage {...props} />, {wrapper: rootProviderWrapper});
+    const decryptErrorLabel = container.querySelector<HTMLElement>('[data-uie-name="status-decrypt-error"]');
+
+    if (isNull(decryptErrorLabel)) {
+      throw new Error('Expected the decrypt error label to be rendered');
+    }
+
+    expect(decryptErrorLabel.textContent).toContain(String(errorCode));
+  });
+
   it('shows "reset session" action when error is recoverable', async () => {
     const props = {
       message: createError(ProteusErrors.InvalidMessage),

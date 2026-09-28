@@ -19,7 +19,7 @@
 
 import type {ChangeEvent} from 'react';
 
-import type {FireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import type {SharedDriveDropRejection} from './sharedDriveDrop';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';

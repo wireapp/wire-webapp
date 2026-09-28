@@ -19,6 +19,8 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
@@ -72,7 +74,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
       return isUser ? [user] : [];
     });
 
-    if (!isSelfUserRemoved && selfUser) {
+    if (!isSelfUserRemoved && !isNullOrUndefined(selfUser)) {
       return [...users, selfUser].toSorted(sortUsersByPriority);
     }
 

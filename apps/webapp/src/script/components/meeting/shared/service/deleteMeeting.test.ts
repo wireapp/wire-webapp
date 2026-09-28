@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {task} from 'true-myth';
 
@@ -36,8 +36,8 @@ const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 const command = {meetingId, qualifiedConversation};
 
-const wallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+const clock = createDeterministicClock({
+  initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T13:00:00.000Z')) * 1_000n,
 });
 
 const createConversation = () => {
@@ -93,7 +93,7 @@ const createDeps = ({
       conversationRepository,
       callingRepository,
       meetingsRepository,
-      wallClock,
+      clock,
       deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
     },
     leaveCall,

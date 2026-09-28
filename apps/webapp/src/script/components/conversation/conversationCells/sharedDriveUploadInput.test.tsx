@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import type {FireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {SharedDriveUploadInput} from './sharedDriveUploadInput';

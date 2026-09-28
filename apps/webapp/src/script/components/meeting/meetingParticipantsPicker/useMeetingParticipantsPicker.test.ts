@@ -51,7 +51,6 @@ const createOptions = (overrides: Partial<Parameters<typeof useMeetingParticipan
   selectedUsers: [],
   onSelectedUsersChange: jest.fn(),
   onFilterChange: jest.fn(),
-  meetingsM2Enabled: true,
   ...overrides,
 });
 

@@ -27,6 +27,7 @@ import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/l
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {randomUUID} from 'crypto';
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {APIClient} from '@wireapp/api-client';
 import {
@@ -45,7 +46,6 @@ import {InitClientOptions, MLSService, MLSServiceEvents} from './mlsService';
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB} from '../../../storage/coreDb';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
-import {createFireAndForgetInvoker} from '../../../taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {TaskScheduler} from '../../../util/taskScheduler';
 import * as Helper from '../e2eIdentityService/helper';
 
@@ -109,7 +109,7 @@ const createMLSService = async () => {
         await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
       },
     },
-    createFireAndForgetInvoker({logger: {error: jest.fn()}}),
+    createFireAndForgetInvoker({reportError: jest.fn<void, [unknown]>()}),
   );
 
   const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, recurringTaskScheduler);

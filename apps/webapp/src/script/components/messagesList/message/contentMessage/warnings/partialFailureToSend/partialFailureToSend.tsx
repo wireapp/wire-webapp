@@ -19,6 +19,7 @@
 
 import {useState} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {countBy, map} from 'underscore';
@@ -54,7 +55,7 @@ function generateNamedUsers(
     return userClientsOrQualifiedIds.reduce<ParsedUsers>(
       (parsedUsers, currentQulifiedId) => {
         const user = users.find(user => matchQualifiedIds(user.qualifiedId, currentQulifiedId));
-        if (user && user.name()) {
+        if (!isNullOrUndefined(user) && isNonEmptyString(user.name())) {
           parsedUsers.namedUsers.push(user);
         } else {
           parsedUsers.unknownUsers.push(currentQulifiedId);
@@ -69,7 +70,7 @@ function generateNamedUsers(
       const domainNamedUsers = Object.keys(domainUsers).reduce<ParsedUsers>(
         (domainNamedUsers, userId) => {
           const user = users.find(user => matchQualifiedIds(user.qualifiedId, {id: userId, domain}));
-          if (user && user.name()) {
+          if (!isNullOrUndefined(user) && isNonEmptyString(user.name())) {
             domainNamedUsers.namedUsers.push(user);
           } else {
             domainNamedUsers.unknownUsers.push({id: userId, domain});

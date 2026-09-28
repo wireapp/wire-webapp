@@ -19,7 +19,7 @@
 
 import assert from 'node:assert';
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {maybe} from 'true-myth';
 
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
@@ -59,13 +59,13 @@ const createMeetingInstance = (
 
 describe('mapMeetingInstanceToScheduleFormState', () => {
   it('maps the edit anchor start/end for recurring meetings when today’s slot has ended', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-10T12:00:00.000Z')) * 1_000n,
     });
     const selectedUsers = [createUser('1'), createUser('2')];
     const meetingInstance = createMeetingInstance({}, '2026-06-29T10:00:00.000Z', '2026-06-29T11:00:00.000Z');
 
-    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, wallClock);
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, clock);
 
     expect(result.title).toBe('Weekly sync');
     assert(maybe.isJust(result.start));
@@ -78,12 +78,12 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
   });
 
   it('uses today’s in-progress occurrence when editing a future row (WPB-27894)', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T10:30:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T10:30:00.000Z')) * 1_000n,
     });
     const meetingInstance = createMeetingInstance({}, '2026-06-22T10:00:00.000Z', '2026-06-22T11:00:00.000Z');
 
-    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], clock);
 
     assert(maybe.isJust(result.start));
     expect(result.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
@@ -92,8 +92,8 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
   });
 
   it('does not use a later selected instance start/end for recurring meetings', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-10T12:00:00.000Z')) * 1_000n,
     });
     const meetingInstance = createMeetingInstance(
       {
@@ -104,7 +104,7 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
       '2026-06-29T11:00:00.000Z',
     );
 
-    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], clock);
 
     assert(maybe.isJust(result.start));
     expect(result.start.value).toEqual(new Date('2026-06-15T10:00:00.000Z'));
@@ -113,8 +113,8 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
   });
 
   it('uses the series anchor for non-repeating meetings', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-10T12:00:00.000Z')) * 1_000n,
     });
     const meetingInstance = createMeetingInstance(
       {
@@ -126,7 +126,7 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
       '2026-06-16T11:00:00.000Z',
     );
 
-    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], wallClock);
+    const result = mapMeetingInstanceToScheduleFormState(meetingInstance, [], clock);
 
     assert(maybe.isJust(result.start));
     expect(result.start.value).toEqual(new Date('2026-06-16T10:00:00.000Z'));
@@ -135,14 +135,14 @@ describe('mapMeetingInstanceToScheduleFormState', () => {
   });
 
   it('uses selectedUsers passed by the caller', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-10T12:00:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-10T12:00:00.000Z')) * 1_000n,
     });
     const alice = createUser('1');
     const bob = createUser('2');
     const selectedUsers = [alice, bob];
 
-    const result = mapMeetingInstanceToScheduleFormState(createMeetingInstance(), selectedUsers, wallClock);
+    const result = mapMeetingInstanceToScheduleFormState(createMeetingInstance(), selectedUsers, clock);
 
     expect(result.selectedUsers).toHaveLength(2);
     expect(result.selectedUsers[0]).toBe(alice);

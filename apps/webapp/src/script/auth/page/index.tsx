@@ -51,9 +51,9 @@ import {getPrefixedSSOCode} from '../util/urlUtil';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & DispatchProps) => {
-  const {translate} = useApplicationContext();
+  const {clock, translate} = useApplicationContext();
   const navigate = useNavigate();
-  const {hasOtherInstance} = useSingleInstance();
+  const {hasOtherInstance} = useSingleInstance(clock);
   const core = container.resolve(Core);
   const [logoutReason, setLogoutReason] = useState<string>();
 

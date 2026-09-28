@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -120,7 +120,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
           .map(conversationId =>
             this.allConversations().find(({id}) => id.toLowerCase() === conversationId.toLowerCase()),
           )
-          .filter(conversation => !!conversation),
+          .filter(conversation => !isNullOrUndefined(conversation)),
       ),
       id,
       name,
@@ -235,7 +235,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       const normalizedLabels = event.value?.labels?.map((label: ConversationLabelJson) => {
         return {
           ...label,
-          name: label.name ? fixWebsocketString(label.name) : undefined,
+          name: isNonEmptyString(label.name) ? fixWebsocketString(label.name) : undefined,
         };
       });
       const value: LabelProperty = {
@@ -264,7 +264,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly getFavorites = (conversations = this.conversations()): Conversation[] => {
     const favoriteLabel = this.getFavoriteLabel();
-    return favoriteLabel ? this.getLabelConversations(favoriteLabel, conversations) : [];
+    return !isNullOrUndefined(favoriteLabel) ? this.getLabelConversations(favoriteLabel, conversations) : [];
   };
 
   readonly getLabelConversations = (label: ConversationLabel, conversations = this.conversations()): Conversation[] => {
@@ -276,14 +276,15 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   readonly addConversationToFavorites = (addedConversation: Conversation): void => {
     // update the reference to the favorite label in the labels array to trigger a rerender
     const favoriteLabel = this.getFavoriteLabel();
+    const favoriteConversations = favoriteLabel?.conversations();
     const updatedLabel = createLabel(
       '',
-      [...(favoriteLabel?.conversations() || []), addedConversation],
+      [...(isNullOrUndefined(favoriteConversations) ? [] : favoriteConversations), addedConversation],
       undefined,
       LabelType.Favorite,
     );
 
-    if (favoriteLabel) {
+    if (!isNullOrUndefined(favoriteLabel)) {
       const folderIndex = this.labels.indexOf(favoriteLabel);
       this.labels(this.labels().with(folderIndex, updatedLabel));
     } else {
@@ -297,7 +298,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   readonly removeConversationFromFavorites = (removedConversation: Conversation): void => {
     // update the reference to the favorite label in the labels array to trigger a rerender
     const favoriteLabel = this.getFavoriteLabel();
-    if (favoriteLabel) {
+    if (!isNullOrUndefined(favoriteLabel)) {
       const updatedLabel = createLabel(
         '',
         favoriteLabel.conversations().filter(conversation => conversation !== removedConversation),
@@ -327,7 +328,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
     if (isInCustomFolder) {
       const customLabel = this.getConversationCustomLabel(conversation);
-      if (customLabel) {
+      if (!isNullOrUndefined(customLabel)) {
         ids.push(customLabel.id);
       }
     } else if (conversation.isGroupOrChannel()) {
@@ -385,7 +386,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       if (removeFromFavorites || isCustom) {
         label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
       }
-      if (isCustom && !label.conversations().length) {
+      if (isCustom && isEmptyArray(label.conversations())) {
         this.labels.remove(label);
       }
     });

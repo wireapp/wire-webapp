@@ -36,7 +36,6 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
-import {meetingsM2FeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
 import {MeetingParticipantsPicker} from './meetingParticipantsPicker';
@@ -117,12 +116,9 @@ const conversationStateDouble = {
 } satisfies Pick<ConversationState, 'hasConversationWith'>;
 
 const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-let meetingsM2EnabledForTest = true;
-
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({
     fireAndForgetInvoker,
-    isFeatureToggleEnabled: featureName => featureName === meetingsM2FeatureToggleName && meetingsM2EnabledForTest,
     translate: translateForTest,
   }),
 );
@@ -168,15 +164,7 @@ const ControlledPicker = ({
 
 const getSearchInput = (accessibleName = PARTICIPANTS_LABEL) => screen.getByRole('combobox', {name: accessibleName});
 
-const setMeetingsM2Enabled = (enabled: boolean) => {
-  meetingsM2EnabledForTest = enabled;
-};
-
 describe('MeetingParticipantsPicker', () => {
-  beforeEach(() => setMeetingsM2Enabled(true));
-
-  afterEach(() => setMeetingsM2Enabled(false));
-
   it('renders label and search input', () => {
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
@@ -304,38 +292,6 @@ describe('MeetingParticipantsPicker', () => {
     expect(screen.queryByText('Removed group')).not.toBeInTheDocument();
     expect(screen.queryByText('Archived group')).not.toBeInTheDocument();
     expect(screen.queryByText('Cleared group')).not.toBeInTheDocument();
-  });
-
-  it('does not query or render groups and channels when meetings M2 is disabled', async () => {
-    setMeetingsM2Enabled(false);
-    const getAllGroupConversations = jest.fn(() => [createConversation('group', 'Engineering', [users[0]])]);
-    const user = userEvent.setup();
-
-    render(
-      withThemeAndRootContext(
-        <ControlledPicker conversationRepository={{getAllGroupConversations}} />,
-        rootProviderWrapper,
-      ),
-    );
-
-    await user.click(getSearchInput());
-
-    expect(screen.queryByText(GROUPS_AND_CHANNELS_LABEL)).not.toBeInTheDocument();
-    expect(screen.queryByText('Engineering')).not.toBeInTheDocument();
-    expect(getAllGroupConversations).not.toHaveBeenCalled();
-  });
-
-  it('keeps contact searching available when meetings M2 is disabled', async () => {
-    setMeetingsM2Enabled(false);
-    const user = userEvent.setup();
-
-    render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
-
-    await user.click(getSearchInput());
-    await user.type(getSearchInput(), 'alice');
-
-    expect(screen.getByText('Alice Anderson')).toBeInTheDocument();
-    expect(screen.queryByText(GROUPS_AND_CHANNELS_LABEL)).not.toBeInTheDocument();
   });
 
   it('allows groups and channels to be collapsed until the search input is focused again', async () => {

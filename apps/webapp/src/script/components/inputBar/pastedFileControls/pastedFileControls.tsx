@@ -19,6 +19,8 @@
 
 import {FC} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -48,7 +50,7 @@ export const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onC
       <div className="controls-left"></div>
 
       <div className="controls-center">
-        {pastedFilePreviewUrl ? (
+        {isNonEmptyString(pastedFilePreviewUrl) ? (
           <img
             className="conversation-input-bar-paste-image conversation-input-bar-paste-icon"
             src={pastedFilePreviewUrl}

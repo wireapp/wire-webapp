@@ -19,6 +19,8 @@
 
 import {MouseEvent, useCallback, useEffect, useMemo, useState} from 'react';
 
+import {isNan, isNull, isUndefined} from '@sindresorhus/is';
+
 import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {interpolate} from 'Util/arrayUtil';
 import {clamp} from 'Util/numberUtil';
@@ -50,13 +52,14 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
   }, [svgRef]);
 
   const onTimeUpdate = useCallback(() => {
-    if (!audioElement?.duration) {
+    const audioDuration = audioElement?.duration;
+    if (isUndefined(audioDuration) || audioDuration === 0 || isNan(audioDuration)) {
       return;
     }
 
     setState(state => ({
       ...state,
-      position: audioElement.currentTime / audioElement.duration,
+      position: audioElement.currentTime / audioDuration,
     }));
   }, [audioElement]);
 
@@ -66,22 +69,24 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
   const onLevelClick = useCallback(
     (event: MouseEvent<SVGSVGElement>) => {
-      if (!svgRef.current || !audioElement?.duration) {
+      const svgElement = svgRef.current;
+      const audioDuration = audioElement?.duration;
+      if (isNull(svgElement) || isUndefined(audioDuration) || audioDuration === 0 || isNan(audioDuration)) {
         return;
       }
 
-      const mouseX = (event.pageX ?? event.clientX) - svgRef.current.getBoundingClientRect().left;
-      const calculatedTime = (audioElement.duration * mouseX) / svgRef.current.clientWidth;
+      const mouseX = (event.pageX ?? event.clientX) - svgElement.getBoundingClientRect().left;
+      const calculatedTime = (audioDuration * mouseX) / svgElement.clientWidth;
       const currentTime = isNaN(calculatedTime) ? 0 : calculatedTime;
 
-      audioElement.currentTime = clamp(currentTime, 0, audioElement.duration);
+      audioElement.currentTime = clamp(currentTime, 0, audioDuration);
       onTimeUpdate();
     },
     [audioElement, svgRef, onTimeUpdate],
   );
 
   const path = useMemo(() => {
-    if (!svgWidth) {
+    if (svgWidth === 0 || isNan(svgWidth)) {
       return '';
     }
 
@@ -106,7 +111,7 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
   useEffect(() => {
     const assetLoudness = asset.meta?.loudness;
-    if (!assetLoudness) {
+    if (isUndefined(assetLoudness)) {
       return;
     }
 

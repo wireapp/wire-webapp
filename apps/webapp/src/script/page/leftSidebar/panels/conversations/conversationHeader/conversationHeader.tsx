@@ -19,6 +19,7 @@
 
 import {KeyboardEvent, MutableRefObject, useEffect} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
@@ -144,7 +145,8 @@ export const ConversationHeaderComponent = ({
   const showCreateButton =
     currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateChannel);
 
-  const headerTitle = isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab];
+  const headerTitle =
+    isFolderView && !isNullOrUndefined(currentFolder) ? currentFolder.name : conversationsHeaderTitle[currentTab];
 
   if (isListCollapsed) {
     return (
@@ -212,8 +214,10 @@ export const ConversationHeaderComponent = ({
           onChange={event => setSearchValue(event.currentTarget.value)}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={
-            searchValue && (
+            isNonEmptyString(searchValue) ? (
               <CircleCloseIcon className="cursor-pointer" onClick={() => setSearchValue('')} css={closeIconStyles} />
+            ) : (
+              searchValue
             )
           }
           inputCSS={searchInputStyles}

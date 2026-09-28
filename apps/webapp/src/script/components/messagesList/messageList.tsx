@@ -19,6 +19,7 @@
 
 import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -139,7 +140,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   const loadConversation = async (conversation: Conversation, message?: MessageEntity): Promise<MessageEntity[]> => {
     await conversationRepository.updateParticipatingUserEntities(conversation, false, true);
 
-    return message
+    return !isNullOrUndefined(message)
       ? conversationRepository.getMessagesWithOffset(conversation, message)
       : conversationRepository.getPrecedingMessages(conversation);
   };
@@ -158,7 +159,7 @@ export const MessagesList: FC<MessagesListParams> = ({
 
   const syncScrollPosition = useCallback(() => {
     const scrollingContainer = messagesContainer?.parentElement;
-    if (!scrollingContainer || !loaded) {
+    if (isNullOrUndefined(scrollingContainer) || !loaded) {
       return;
     }
 
@@ -192,7 +193,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   const loadFollowingMessages = () => {
     const lastMessage = conversation.getNewestMessage();
 
-    if (lastMessage) {
+    if (!isNullOrUndefined(lastMessage)) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
         conversationRepository.getSubsequentMessages(conversation, lastMessage);
@@ -219,7 +220,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   }, [conversation]);
 
   useLayoutEffect(() => {
-    if (loaded && messageListRef.current) {
+    if (loaded && !isNullOrUndefined(messageListRef.current)) {
       onHitTopOrBottom(messageListRef.current, loadPrecedingMessages, loadFollowingMessages);
     }
   }, [loaded]);
@@ -310,7 +311,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                   }
                 : undefined;
 
-              const key = `${message.id || 'message'}-${message.timestamp()}`;
+              const key = `${isNonEmptyString(message.id) ? message.id : 'message'}-${message.timestamp()}`;
 
               const isHighlighted =
                 highlightedMessage !== undefined && highlightedMessage !== '' && highlightedMessage === message.id;
@@ -346,7 +347,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                     setTimeout(() => setHighlightedMessage(undefined), 5000);
                     const messageIsLoaded = conversation.getMessage(messageId);
 
-                    if (!messageIsLoaded) {
+                    if (isNullOrUndefined(messageIsLoaded)) {
                       setLoaded(false); // this will block automatic scroll triggers (like loading extra messages)
                       const messageEntity = await messageRepository.getMessageInConversationById(
                         conversation,

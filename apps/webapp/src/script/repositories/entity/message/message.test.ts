@@ -271,4 +271,12 @@ describe('Message', () => {
       expect(message.hasMultipartAsset()).toBe(false);
     });
   });
+
+  describe('file asset resource state', () => {
+    it('keeps download progress undefined before a resource is assigned', () => {
+      const fileAsset = new FileAsset();
+
+      expect(fileAsset.downloadProgress()).toBeUndefined();
+    });
+  });
 });

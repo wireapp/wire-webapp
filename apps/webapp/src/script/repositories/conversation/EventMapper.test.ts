@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
@@ -51,14 +51,14 @@ describe('Event Mapper', () => {
 
   describe('mapJsonEvent', () => {
     it('maps a stored Proteus session reset event to a system message with its sender', () => {
-      const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n});
       const event = {
         id: 'reset-event-id',
         type: CONVERSATION.SESSION_RESET as const,
         conversation: conversation.id,
         qualified_conversation: conversation.qualifiedId,
         from: 'resetting-user-id',
-        time: wallClock.currentDate.toISOString(),
+        time: clock.currentDate.toISOString(),
       };
       const mapper = new EventMapper(undefined, translateForTest);
 
@@ -71,7 +71,7 @@ describe('Event Mapper', () => {
       expect(message.from).toBe(event.from);
       expect(message.id).toBe(event.id);
       expect(message.type).toBe(ClientEvent.CONVERSATION.SESSION_RESET);
-      expect(message.timestamp()).toBe(wallClock.currentTimestampInMilliseconds);
+      expect(message.timestamp()).toBe(clock.currentUnixEpochMilliseconds);
     });
 
     it('maps text messages without link previews', () => {

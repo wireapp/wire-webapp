@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {type BuildMetadata} from '@wireapp/config';
 import {task, type Task} from 'true-myth';
 
@@ -223,75 +223,75 @@ describe('checkForNewVersion', () => {
 
 describe('startNewVersionPolling', () => {
   it('performs the first check after one complete interval', function (): void {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const pollingIntervalMilliseconds = 1_234;
     const runUpdateCheck = jest.fn();
     const cleanupNewVersionPolling = startNewVersionPolling({
-      wallClock: deterministicWallClock,
+      clock,
       pollingIntervalMilliseconds,
       runUpdateCheck,
     });
 
     expect(runUpdateCheck).not.toHaveBeenCalled();
-    deterministicWallClock.advanceByMilliseconds(pollingIntervalMilliseconds - 1);
+    clock.advanceByMilliseconds(pollingIntervalMilliseconds - 1);
     expect(runUpdateCheck).not.toHaveBeenCalled();
-    deterministicWallClock.advanceByMilliseconds(1);
+    clock.advanceByMilliseconds(1);
     expect(runUpdateCheck).toHaveBeenCalledTimes(1);
 
     cleanupNewVersionPolling();
   });
 
   it('runs once per completed interval', function (): void {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const pollingIntervalMilliseconds = 567;
     const runUpdateCheck = jest.fn();
     const cleanupNewVersionPolling = startNewVersionPolling({
-      wallClock: deterministicWallClock,
+      clock,
       pollingIntervalMilliseconds,
       runUpdateCheck,
     });
 
-    deterministicWallClock.advanceByMilliseconds(pollingIntervalMilliseconds * 3);
+    clock.advanceByMilliseconds(pollingIntervalMilliseconds * 3);
 
     expect(runUpdateCheck).toHaveBeenCalledTimes(3);
     cleanupNewVersionPolling();
   });
 
   it('stops running checks after cleanup', function (): void {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const pollingIntervalMilliseconds = 567;
     const runUpdateCheck = jest.fn();
     const cleanupNewVersionPolling = startNewVersionPolling({
-      wallClock: deterministicWallClock,
+      clock,
       pollingIntervalMilliseconds,
       runUpdateCheck,
     });
 
-    deterministicWallClock.advanceByMilliseconds(pollingIntervalMilliseconds);
+    clock.advanceByMilliseconds(pollingIntervalMilliseconds);
     cleanupNewVersionPolling();
-    deterministicWallClock.advanceByMilliseconds(pollingIntervalMilliseconds * 2);
+    clock.advanceByMilliseconds(pollingIntervalMilliseconds * 2);
 
     expect(runUpdateCheck).toHaveBeenCalledTimes(1);
   });
 
   it('keeps independent polling instances separate', function (): void {
-    const deterministicWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const firstPollingCallback = jest.fn();
     const secondPollingCallback = jest.fn();
     const firstCleanup = startNewVersionPolling({
-      wallClock: deterministicWallClock,
+      clock,
       pollingIntervalMilliseconds: 100,
       runUpdateCheck: firstPollingCallback,
     });
     const secondCleanup = startNewVersionPolling({
-      wallClock: deterministicWallClock,
+      clock,
       pollingIntervalMilliseconds: 250,
       runUpdateCheck: secondPollingCallback,
     });
 
-    deterministicWallClock.advanceByMilliseconds(250);
+    clock.advanceByMilliseconds(250);
     firstCleanup();
-    deterministicWallClock.advanceByMilliseconds(250);
+    clock.advanceByMilliseconds(250);
 
     expect(firstPollingCallback).toHaveBeenCalledTimes(2);
     expect(secondPollingCallback).toHaveBeenCalledTimes(2);
@@ -301,7 +301,7 @@ describe('startNewVersionPolling', () => {
 
 describe('new version polling composition', () => {
   it('passes the application clock and asset version to the update warning callback', async function (): Promise<void> {
-    const applicationWallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const applicationAssetVersion = 'main-aaaaaaa';
     const serverBuildMetadata: BuildMetadata = {
       ...mainBuildMetadata,
@@ -331,12 +331,12 @@ describe('new version polling composition', () => {
       invokeAsynchronously,
     });
     const cleanupNewVersionPolling = startNewVersionPolling({
-      wallClock: applicationWallClock,
+      clock,
       pollingIntervalMilliseconds: NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
       runUpdateCheck: runNewVersionCheck,
     });
 
-    applicationWallClock.advanceByMilliseconds(NEW_VERSION_POLLING_INTERVAL_MILLISECONDS);
+    clock.advanceByMilliseconds(NEW_VERSION_POLLING_INTERVAL_MILLISECONDS);
     await Promise.all(pendingAsynchronousOperations);
 
     expect(onNewVersionAvailable).toHaveBeenCalledTimes(1);

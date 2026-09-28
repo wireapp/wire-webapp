@@ -17,18 +17,20 @@
  *
  */
 
-import {createMonotonicClock} from './monotonicClock';
+import {QualifiedIdSchema} from './qualifiedId';
 
-describe('createMonotonicClock', () => {
-  it('uses the injected performance object for elapsed-time measurements', () => {
-    const performance = {
-      now: jest.fn(() => {
-        return 123.45;
-      }),
-    };
-    const monotonicClock = createMonotonicClock({performance});
+describe('QualifiedIdSchema', () => {
+  it('parses a valid qualified id', () => {
+    const input = {domain: 'wire.com', id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0'};
+    expect(QualifiedIdSchema.parse(input)).toEqual(input);
+  });
 
-    expect(monotonicClock.nowMilliseconds).toBe(123.45);
-    expect(performance.now).toHaveBeenCalledTimes(1);
+  it.each([
+    ['an empty domain', {domain: '', id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0'}],
+    ['an empty id', {domain: 'wire.com', id: ''}],
+    ['a missing domain', {id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0'}],
+    ['a missing id', {domain: 'wire.com'}],
+  ])('rejects %s', (_, input) => {
+    expect(QualifiedIdSchema.safeParse(input).success).toBe(false);
   });
 });

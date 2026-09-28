@@ -18,6 +18,7 @@
  */
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
 
 import {
@@ -146,7 +147,7 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
       />
       <LinkDialog
         isOpen={isModalOpen}
-        isEditing={!!linkNode}
+        isEditing={!isNullOrUndefined(linkNode)}
         initialUrl={linkUrl}
         initialText={selectedText}
         onSubmit={insertLink}

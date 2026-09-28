@@ -20,6 +20,7 @@
 import {useEffect, RefObject, useCallback} from 'react';
 
 import {$convertToMarkdownString} from '@lexical/markdown';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor} from 'lexical';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -43,7 +44,7 @@ export const useEditorDraftState = ({
 }: UseEditorDraftStateProps) => {
   const saveDraft = useCallback(() => {
     const editor = editorRef.current;
-    if (!editor) {
+    if (isNullOrUndefined(editor)) {
       return;
     }
 

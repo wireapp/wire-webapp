@@ -20,6 +20,8 @@
 import {useState} from 'react';
 import type {FunctionComponent, ReactNode} from 'react';
 
+import {isNan, isNonEmptyString} from '@sindresorhus/is';
+
 import * as Icon from 'Components/icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
 import {Config} from 'src/script/Config';
@@ -134,13 +136,15 @@ const DecryptErrorMessage: FunctionComponent<DecryptErrorMessageProps> = functio
       <div css={messageBodyWrapper()}>
         <div className="message-body message-body-decrypt-error">
           <p className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
-            {message.code && (
+            {message.code !== 0 && !isNan(message.code) ? (
               <>
                 {`${translate('conversationUnableToDecryptErrorMessage')} `}
                 <span className="label-bold-xs">{message.code}</span>{' '}
               </>
+            ) : (
+              message.code
             )}
-            {message.clientId && (
+            {isNonEmptyString(message.clientId) && (
               <>
                 {'ID: '}
                 <FormattedId idSlices={splitFingerprint(message.clientId)} smallPadding />

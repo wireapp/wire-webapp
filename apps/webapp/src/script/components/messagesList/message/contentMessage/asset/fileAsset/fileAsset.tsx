@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -67,11 +68,12 @@ const FileAsset = ({
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to
   // transition into the `AssetTransferState.UPLOADING` state.
-  const assetStatus =
-    uploadProgress &&
-    (uploadProgress > 0 && uploadProgress < uploadProgressCompletePercentage
-      ? AssetTransferState.UPLOADING
-      : transferState);
+  const hasTruthyUploadProgress = uploadProgress !== 0 && !isNan(uploadProgress);
+  const isUploadInProgress = uploadProgress > 0 && uploadProgress < uploadProgressCompletePercentage;
+  let assetStatus: AssetTransferState | number = uploadProgress;
+  if (hasTruthyUploadProgress) {
+    assetStatus = isUploadInProgress ? AssetTransferState.UPLOADING : transferState;
+  }
 
   const isPendingUpload = assetStatus === AssetTransferState.UPLOAD_PENDING;
   const isFailedUpload = assetStatus === AssetTransferState.UPLOAD_FAILED;
@@ -123,7 +125,12 @@ const FileAsset = ({
                 <AssetLoader loadProgress={downloadProgress ?? 0} onCancel={() => asset.cancelDownload()} />
               )}
 
-              {isUploading && <AssetLoader loadProgress={uploadProgress || 0} onCancel={() => cancelUpload()} />}
+              {isUploading && (
+                <AssetLoader
+                  loadProgress={uploadProgress === 0 || isNan(uploadProgress) ? 0 : uploadProgress}
+                  onCancel={() => cancelUpload()}
+                />
+              )}
 
               {(isFailedUpload || isFailedDownloadingDecrypt || isFailedDownloadingHash) && (
                 <div className="media-button media-button-error" />
@@ -138,7 +145,7 @@ const FileAsset = ({
                     {formattedFileSize}
                   </li>
 
-                  {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+                  {isNonEmptyString(fileExtension) ? <li data-uie-name="file-type">{fileExtension}</li> : fileExtension}
 
                   {isUploading && <li data-uie-name="file-status">{translate('conversationAssetUploading')}</li>}
 

@@ -17,6 +17,8 @@
  *
  */
 
+import {createClock} from '@enormora/clock/clock';
+import type {Clock} from '@enormora/clock/clock';
 import {isNull, isUndefined} from '@sindresorhus/is';
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
@@ -42,9 +44,6 @@ import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import {Root} from './page/root';
 
-// eslint-disable-next-line import/order
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
-
 import {Config} from '../Config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
@@ -55,9 +54,8 @@ exposeWrapperGlobals();
 
 const mainId = 'main';
 
-const apiClient = new APIClient({
-  wallClock: createWallClock(),
-});
+const clock = createClock();
+const apiClient = new APIClient({clock});
 container.registerInstance(APIClient, apiClient);
 const core = container.resolve(Core);
 
@@ -76,14 +74,14 @@ const store = configureStore({
   localStorage,
 });
 
-const render = (Component: FC<{translate: Translate}>): void => {
+const render = (Component: FC<{translate: Translate; clock: Clock}>): void => {
   const container = document.getElementById(mainId);
   if (isNull(container)) {
     throw new Error(`No container '${mainId}' found to render application`);
   }
   createRoot(container).render(
     <Provider store={store}>
-      <Component translate={translate} />
+      <Component translate={translate} clock={clock} />
     </Provider>,
   );
 };

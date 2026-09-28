@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {Config} from 'src/script/Config';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
@@ -53,7 +55,7 @@ export const validateFiles = ({
 
   const firstError = validations.find(validation => !validation.isValid);
 
-  if (!firstError) {
+  if (isUndefined(firstError)) {
     return {isValid: true};
   }
 

@@ -27,7 +27,7 @@ import {submitMeetNow} from './submitMeetNow';
 
 export const useMeetNowSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {translate, wallClock} = useApplicationContext();
+  const {translate, clock} = useApplicationContext();
   const meetNowMeeting = useMeetingStore(state => state.meetNowMeeting);
   const loadMeetings = useMeetingStore(state => state.loadMeetings);
 
@@ -40,7 +40,7 @@ export const useMeetNowSubmit = () => {
         meetNowMeeting,
         loadMeetings,
         translate,
-        meetingStartTime: wallClock.currentDate.toISOString(),
+        meetingStartTime: clock.currentDate.toISOString(),
       });
     } finally {
       setIsSubmitting(false);

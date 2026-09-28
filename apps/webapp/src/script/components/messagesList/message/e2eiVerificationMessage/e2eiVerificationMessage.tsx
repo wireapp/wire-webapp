@@ -31,8 +31,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {TranslationKey} from 'Util/localizerUtil/translationTypes';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
+import type {TranslationKey, Translate} from 'Util/localizerUtil/translationTypes';
 import {getLogger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 

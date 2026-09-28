@@ -19,12 +19,18 @@
 
 import {StatusCodes as StatusCode} from 'http-status-codes';
 
-import {SyntheticErrorLabel} from './backendErrorLabel';
+import {BackendErrorLabel, SyntheticErrorLabel} from './backendErrorLabel';
 
-import {BackendErrorLabel} from '../http/';
+export type BackendErrorData = {
+  code?: StatusCode;
+  label?: BackendErrorLabel | SyntheticErrorLabel;
+  message?: string;
+  [key: string]: unknown;
+};
 
 export class BackendError extends Error {
   code?: StatusCode;
+  data?: BackendErrorData;
   label: BackendErrorLabel | SyntheticErrorLabel;
   message: string;
 
@@ -32,9 +38,11 @@ export class BackendError extends Error {
     message: string,
     label: BackendErrorLabel | SyntheticErrorLabel = SyntheticErrorLabel.UNKNOWN,
     code?: StatusCode,
+    data?: BackendErrorData,
   ) {
     super(message);
     this.code = code;
+    this.data = data;
     this.label = label;
     this.message = message;
     Object.setPrototypeOf(this, new.target.prototype);

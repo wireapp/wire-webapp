@@ -337,9 +337,10 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
             passwordValueRef={passwordValueRef}
             onPasswordValueChange={setPasswordValue}
             isPasswordInputMarkInvalid={isPasswordFieldValid}
+            passwordConfirmationError={translate('ValidationError.FIELD.CONFIRM_PASSWORD.PATTERN_MISMATCH')}
             passwordConfirmationValue={passwordConfirmationValue}
             onPasswordConfirmationChange={setPasswordConfirmationValue}
-            isPasswordConfirmationMarkInvalid={isFormSubmitted && !areGuestLinkPasswordsValid}
+            isPasswordConfirmationMarkInvalid={isFormSubmitted && passwordValue !== passwordConfirmationValue}
           />
         )}
 

@@ -168,7 +168,25 @@ describe('PrimaryModal', () => {
 
       fireEvent.click(getPrimaryActionButton());
 
-      expect(getErrorMessages()).toHaveLength(2);
+      expect(getErrorMessages()).toHaveLength(1);
+    });
+
+    it('should show the password format error only under the password field', () => {
+      const {getErrorMessages, getPasswordInput, getConfirmPasswordInput, getPrimaryActionButton} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: action,
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.GUEST_LINK_PASSWORD,
+      });
+
+      fireEvent.change(getPasswordInput(), {target: {value: 'wrongPassword'}});
+      fireEvent.change(getConfirmPasswordInput(), {target: {value: 'wrongPassword'}});
+      fireEvent.click(getPrimaryActionButton());
+
+      expect(getErrorMessages()).toHaveLength(1);
+      expect(getErrorMessages()[0]).toHaveTextContent('modalGuestLinkJoinHelperText');
     });
 
     it('should fill password fields when generate password button clicked', async () => {

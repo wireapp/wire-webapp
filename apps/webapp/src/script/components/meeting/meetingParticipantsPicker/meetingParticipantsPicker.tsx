@@ -31,7 +31,6 @@ import type {User} from 'Repositories/entity/User';
 import type {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import type {TeamState} from 'Repositories/team/TeamState';
-import {meetingsM2FeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
@@ -96,7 +95,7 @@ export const MeetingParticipantsPicker = ({
   noUnderline = false,
   popoverPortalContainer,
 }: MeetingParticipantsPickerProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const listboxId = useId();
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
 
@@ -105,7 +104,6 @@ export const MeetingParticipantsPicker = ({
     : undefined;
   const searchPlaceholder = placeholder ?? translate('meetings.scheduleModal.participantsPlaceholder');
   const showPlaceholder = filter.length === 0;
-  const meetingsM2Enabled = isFeatureToggleEnabled(meetingsM2FeatureToggleName);
   const {
     handleOpenChange,
     handleSelectedUsersChange,
@@ -124,7 +122,6 @@ export const MeetingParticipantsPicker = ({
     onSelectedUsersChange,
     onFilterChange,
     conversationRepository,
-    meetingsM2Enabled,
   });
 
   return (
@@ -217,14 +214,14 @@ export const MeetingParticipantsPicker = ({
               onUpdateSelectedUsers={handleSelectedUsersChange}
               searchRepository={searchRepository}
               teamRepository={teamRepository}
-              conversationRepository={meetingsM2Enabled ? conversationRepository : undefined}
+              conversationRepository={conversationRepository}
               conversationState={conversationState}
               teamState={teamState}
               noUnderline={noUnderline}
               allowRemoteSearch
               filterRemoteTeamUsers
               showAllProvidedUsers
-              hideEmptyState={meetingsM2Enabled && matchingConversations.length > 0}
+              hideEmptyState={matchingConversations.length > 0}
               showSelectedUsersRegardlessOfFilter
               dataUieName={dataUieName ? `${dataUieName}-list` : undefined}
             />

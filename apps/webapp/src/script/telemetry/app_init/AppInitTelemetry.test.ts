@@ -18,19 +18,20 @@
  */
 
 import {Maybe} from 'true-myth';
-
-import {createDeterministicMonotonicClock} from '../../time/deterministicMonotonicClock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {AppInitTelemetry} from './AppInitTelemetry';
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
 describe('AppInitTelemetry', () => {
   it('records timings from an explicit monotonic start time', () => {
-    const monotonicClock = createDeterministicMonotonicClock({initialCurrentTimeMilliseconds: 200});
-    const appInitTelemetry = new AppInitTelemetry(monotonicClock, 100);
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    clock.advanceByMilliseconds(100);
+    const startedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
+    const appInitTelemetry = new AppInitTelemetry(clock, startedAtMonotonicMicroseconds);
 
-    appInitTelemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, 125);
-    monotonicClock.setCurrentTimeMilliseconds(250);
+    appInitTelemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, startedAtMonotonicMicroseconds + 25_000n);
+    clock.advanceByMilliseconds(150);
     appInitTelemetry.timeStep(AppInitTimingsStep.INIT_APP_STARTED);
 
     expect(appInitTelemetry.timings).toEqual({
@@ -41,8 +42,8 @@ describe('AppInitTelemetry', () => {
   });
 
   it('returns no last step before a timing step is recorded', () => {
-    const monotonicClock = createDeterministicMonotonicClock({initialCurrentTimeMilliseconds: 100});
-    const appInitTelemetry = new AppInitTelemetry(monotonicClock, 100);
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const appInitTelemetry = new AppInitTelemetry(clock, clock.currentMonotonicMicroseconds);
 
     expect(appInitTelemetry.lastStep).toEqual(Maybe.nothing());
   });

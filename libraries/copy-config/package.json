@@ -17,7 +17,7 @@
     "axios": "1.20.0",
     "copy": "0.3.2",
     "cosmiconfig": "9.0.2",
-    "fs-extra": "11.4.0",
+    "fs-extra": "11.4.1",
     "jszip": "3.10.2",
     "logdown": "3.3.1",
     "noop-esm": "1.1.0",

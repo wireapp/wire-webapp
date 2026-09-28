@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
@@ -189,6 +190,6 @@ export class MemberMessage extends SystemMessage {
   }
 
   isUserAffected(userId: QualifiedId): boolean {
-    return !!this.userIds().find(user => matchQualifiedIds(user, userId));
+    return !isUndefined(this.userIds().find(user => matchQualifiedIds(user, userId)));
   }
 }

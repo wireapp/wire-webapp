@@ -17,10 +17,11 @@
  *
  */
 
-import {MutableRefObject, useCallback, useState} from 'react';
+import {type ReactElement, MutableRefObject, useCallback, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {MenuOption as _MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {isEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
@@ -117,7 +118,7 @@ function MentionMenu({
   );
 }
 
-export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
+export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps): ReactElement {
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>();
 
@@ -128,7 +129,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const insertMention = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
       editor.update(() => {
-        if (nodeToReplace) {
+        if (!isNullOrUndefined(nodeToReplace)) {
           const mentionNode = $createMentionNode(TRIGGER, selectedOption.value);
           nodeToReplace.replace(mentionNode);
           mentionNode.insertAfter($createTextNode(' '));
@@ -142,7 +143,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const checkForMentionMatch = useCallback((text: string) => {
     // Don't show the menu if the next character is a word character
     const info = getSelectionInfo([TRIGGER]);
-    if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
+    if (isNullOrUndefined(info) || (info.isTextNode && info.wordCharAfterCursor)) {
       return null;
     }
     return checkForMentions(text);
@@ -151,7 +152,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const rootElement = editor.getRootElement();
 
   const getPosition = () => {
-    if (!rootElement) {
+    if (isNullOrUndefined(rootElement)) {
       return {bottom: 0, left: 0};
     }
 
@@ -161,7 +162,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   };
 
   const menuRenderFn: MenuRenderFn<MenuOption> = (anchorElementRef, params) => {
-    if (!anchorElementRef.current || !options.length) {
+    if (isNullOrUndefined(anchorElementRef.current) || isEmptyArray(options)) {
       return null;
     }
 

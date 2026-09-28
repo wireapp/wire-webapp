@@ -20,7 +20,7 @@
 import type {ReactNode} from 'react';
 
 import {act, renderHook} from '@testing-library/react';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
@@ -50,8 +50,8 @@ const fixedNow = new Date('2026-06-16T09:00:00.000Z');
 const futureStartDate = new Date('2026-06-16T10:00:00.000Z');
 const futureEndDate = new Date('2026-06-16T11:00:00.000Z');
 
-const testWallClock = createDeterministicWallClock({
-  initialCurrentTimestampInMilliseconds: fixedNow.getTime(),
+const clock = createDeterministicClock({
+  initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n,
 });
 
 const formState = {
@@ -132,7 +132,7 @@ const createWrapper =
     const RootProviderWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
-        wallClock: testWallClock,
+        clock,
         mainViewModel,
       }),
     );
@@ -146,7 +146,7 @@ const createWrapper =
 
 describe('useScheduleMeetingSubmit', () => {
   beforeEach(() => {
-    useScheduleMeetingModal.getState().reset(testWallClock);
+    useScheduleMeetingModal.getState().reset(clock);
     jest.spyOn(PrimaryModal, 'show').mockImplementation(jest.fn());
   });
 

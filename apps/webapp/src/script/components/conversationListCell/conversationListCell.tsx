@@ -27,7 +27,7 @@ import React, {
 } from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 
@@ -131,7 +131,7 @@ export const ConversationListCell = ({
   const setConversationElement = useCallback(
     (element: HTMLDivElement | null) => {
       unregisterConversationElement.current?.();
-      unregisterConversationElement.current = element
+      unregisterConversationElement.current = !isNullOrUndefined(element)
         ? (registerConversationElement?.(conversation.id, element) ?? null)
         : null;
     },

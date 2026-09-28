@@ -1100,6 +1100,26 @@ describe('CallingRepository', () => {
     });
   });
 
+  describe('updateActiveSpeakers', () => {
+    it('ignores falsy parsed active speakers', () => {
+      const call = new Call(
+        requireValueForTest(callingRepository['selfUser']).qualifiedId,
+        createConversation(),
+        CONV_TYPE.CONFERENCE,
+        createSelfParticipant(),
+        CALL_TYPE.NORMAL,
+        buildMediaDevicesHandler(),
+      );
+      const setActiveSpeakers = jest.spyOn(call, 'setActiveSpeakers');
+      jest.spyOn(callingRepository, 'findCall').mockReturnValue(call);
+
+      expect(() => {
+        callingRepository['updateActiveSpeakers'](0, 'conversation-id', 'null');
+      }).not.toThrow();
+      expect(setActiveSpeakers).not.toHaveBeenCalled();
+    });
+  });
+
   describe('stopMediaSource', () => {
     it('releases media streams', () => {
       const selfParticipant = createSelfParticipant();

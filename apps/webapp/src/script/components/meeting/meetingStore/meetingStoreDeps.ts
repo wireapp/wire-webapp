@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import type {Task} from 'true-myth';
 
 import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
@@ -49,7 +49,7 @@ export type MeetingServiceDeps = {
   meetingsRepository: MeetingsRepository;
   conversationRepository: ConversationRepository;
   callingRepository: CallingRepository;
-  wallClock: WallClock;
+  clock: Clock;
   deviceTimeZone: DeviceTimeZone;
 };
 

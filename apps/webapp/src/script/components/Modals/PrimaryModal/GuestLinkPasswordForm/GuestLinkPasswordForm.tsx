@@ -34,6 +34,7 @@ interface GuestLinkPasswordFormProps {
   passwordValueRef: React.RefObject<HTMLInputElement | null>;
   onPasswordValueChange: (value: string) => void;
   isPasswordInputMarkInvalid: boolean;
+  passwordConfirmationError?: React.ReactNode;
   passwordConfirmationValue: string;
   onPasswordConfirmationChange: (value: string) => void;
   isPasswordConfirmationMarkInvalid: boolean;
@@ -47,6 +48,7 @@ export const GuestLinkPasswordForm = ({
   passwordValueRef,
   onPasswordValueChange,
   isPasswordInputMarkInvalid,
+  passwordConfirmationError,
   passwordConfirmationValue,
   onPasswordConfirmationChange,
   isPasswordConfirmationMarkInvalid,
@@ -70,6 +72,7 @@ export const GuestLinkPasswordForm = ({
           passwordValueRef={passwordValueRef}
           onPasswordValueChange={onPasswordValueChange}
           isPasswordInputMarkInvalid={isPasswordInputMarkInvalid}
+          passwordConfirmationError={passwordConfirmationError}
           passwordConfirmationValue={passwordConfirmationValue}
           onPasswordConfirmationChange={onPasswordConfirmationChange}
           isPasswordConfirmationMarkInvalid={isPasswordConfirmationMarkInvalid}

@@ -19,6 +19,7 @@
 
 import {useEffect, useState, useRef, useCallback} from 'react';
 
+import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -40,7 +41,7 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
 
   const checkForDrafts = useCallback(() => {
     // Early return if no conversations to check
-    if (!conversationsRef.current.length) {
+    if (!isNonEmptyArray(conversationsRef.current)) {
       return;
     }
 
@@ -54,7 +55,7 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
       const draftData = localStorage.getItem(storageKey);
 
       // Track current state
-      currentCheck[conversation.id] = draftData || '';
+      currentCheck[conversation.id] = isNonEmptyString(draftData) ? draftData : '';
 
       // Check if this conversation's draft state changed
       if (lastCheckRef.current[conversation.id] !== currentCheck[conversation.id]) {
@@ -87,7 +88,7 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
 
     // Listen for storage changes from other tabs
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key?.includes(StorageKey.CONVERSATION.INPUT)) {
+      if (event.key?.includes(StorageKey.CONVERSATION.INPUT) === true) {
         debouncedCheck();
       }
     };

@@ -20,6 +20,7 @@
 import {useLayoutEffect, useMemo, useRef} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
+import {isNull} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -78,7 +79,7 @@ export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props
   `;
 
   useLayoutEffect(() => {
-    if (!isVirtualizedMessagesListEnabled && marker.type === 'unread' && elementRef.current) {
+    if (!isVirtualizedMessagesListEnabled && marker.type === 'unread' && !isNull(elementRef.current)) {
       scrollTo?.({element: elementRef.current}, true);
     }
   }, [isVirtualizedMessagesListEnabled, marker.type, scrollTo]);

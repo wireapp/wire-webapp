@@ -18,20 +18,32 @@
  */
 
 import {useCallback, useEffect, useRef, useState} from 'react';
-import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
+import type {Dispatch, KeyboardEvent as ReactKeyboardEvent, SetStateAction} from 'react';
+
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
 
 type FocusConversation = (conversationId: string) => boolean | 'pending';
 type RegisterConversationElement = (conversationId: string, element: HTMLElement) => () => void;
+type UseConversationFocusResult = {
+  currentFocus: string;
+  focusFirstMountedConversation: () => boolean;
+  focusMountedConversation: (conversationId: string) => boolean;
+  handleKeyDown: (conversationId: string) => (event: ReactKeyboardEvent | KeyboardEvent) => void;
+  registerConversationElement: RegisterConversationElement;
+  setCurrentFocus: Dispatch<SetStateAction<string>>;
+  resetConversationFocus: () => void;
+};
 
 function useConversationFocus(
   conversations: Conversation[],
   focusKey = '',
   focusConversation: FocusConversation = () => false,
-) {
-  const [currentFocus, setCurrentFocus] = useState(conversations[0]?.id || '');
+): UseConversationFocusResult {
+  const firstConversationId = conversations[0]?.id;
+  const [currentFocus, setCurrentFocus] = useState(isNonEmptyString(firstConversationId) ? firstConversationId : '');
   const conversationIds = conversations.map(conversation => conversation.id).join('\u0000');
   const focusStateKey = `${focusKey}\u0000${conversationIds}`;
   const previousFocusStateKey = useRef(focusStateKey);
@@ -52,10 +64,10 @@ function useConversationFocus(
 
   const focusMountedConversation = useCallback((conversationId: string) => {
     const elements = registeredElements.current.get(conversationId);
-    const element = elements && [...elements].find(candidate => candidate.isConnected);
+    const element = isNullOrUndefined(elements) ? undefined : [...elements].find(candidate => candidate.isConnected);
 
-    if (!element) {
-      if (elements) {
+    if (isNullOrUndefined(element)) {
+      if (!isNullOrUndefined(elements)) {
         elements.clear();
         registeredElements.current.delete(conversationId);
       }
@@ -76,7 +88,10 @@ function useConversationFocus(
       const effectiveIndex = currentIndex === -1 ? 0 : currentIndex;
 
       if (isKey(event, KEY.ARROW_DOWN)) {
-        const nextConversation = conversations[effectiveIndex + 1] || conversations[0];
+        const nextConversationCandidate = conversations[effectiveIndex + 1];
+        const nextConversation = isNullOrUndefined(nextConversationCandidate)
+          ? conversations[0]
+          : nextConversationCandidate;
 
         if (focusMountedConversation(nextConversation.id)) {
           event.preventDefault();
@@ -85,7 +100,7 @@ function useConversationFocus(
         }
 
         const focusResult = focusConversation(nextConversation.id);
-        if (!focusResult) {
+        if (focusResult === false) {
           return;
         }
 
@@ -94,22 +109,25 @@ function useConversationFocus(
           setCurrentFocus(nextConversation.id);
         }
       } else if (isKey(event, KEY.ARROW_UP)) {
-        const prevConversation = conversations[effectiveIndex - 1] || conversations[conversations.length - 1];
+        const previousConversationCandidate = conversations[effectiveIndex - 1];
+        const previousConversation = isNullOrUndefined(previousConversationCandidate)
+          ? conversations[conversations.length - 1]
+          : previousConversationCandidate;
 
-        if (focusMountedConversation(prevConversation.id)) {
+        if (focusMountedConversation(previousConversation.id)) {
           event.preventDefault();
-          setCurrentFocus(prevConversation.id);
+          setCurrentFocus(previousConversation.id);
           return;
         }
 
-        const focusResult = focusConversation(prevConversation.id);
-        if (!focusResult) {
+        const focusResult = focusConversation(previousConversation.id);
+        if (focusResult === false) {
           return;
         }
 
         event.preventDefault();
         if (focusResult === true) {
-          setCurrentFocus(prevConversation.id);
+          setCurrentFocus(previousConversation.id);
         }
       } else if (isTabKey(event)) {
         setCurrentFocus(conversations[0].id);
@@ -118,17 +136,22 @@ function useConversationFocus(
     [conversations, focusConversation, focusMountedConversation],
   );
 
-  const resetConversationFocus = useCallback(() => setCurrentFocus(conversations[0]?.id || ''), [conversations]);
+  const resetConversationFocus = useCallback(() => {
+    const firstConversationId = conversations[0]?.id;
+    setCurrentFocus(isNonEmptyString(firstConversationId) ? firstConversationId : '');
+  }, [conversations]);
 
   useEffect(() => {
     if (focusStateKey !== previousFocusStateKey.current) {
       previousFocusStateKey.current = focusStateKey;
-      setCurrentFocus(conversations[0]?.id || '');
+      const firstConversationId = conversations[0]?.id;
+      setCurrentFocus(isNonEmptyString(firstConversationId) ? firstConversationId : '');
       return;
     }
 
-    if (currentFocus && !conversations.some(conversation => conversation.id === currentFocus)) {
-      setCurrentFocus(conversations[0]?.id || '');
+    if (isNonEmptyString(currentFocus) && !conversations.some(conversation => conversation.id === currentFocus)) {
+      const firstConversationId = conversations[0]?.id;
+      setCurrentFocus(isNonEmptyString(firstConversationId) ? firstConversationId : '');
     }
   }, [focusStateKey, conversations, currentFocus]);
 
@@ -146,7 +169,7 @@ function useConversationFocus(
 
   const focusFirstMountedConversation = useCallback(() => {
     const firstConversation = conversations[0];
-    return firstConversation ? focusMountedConversation(firstConversation.id) : false;
+    return !isNullOrUndefined(firstConversation) ? focusMountedConversation(firstConversation.id) : false;
   }, [conversations, focusMountedConversation]);
 
   return {

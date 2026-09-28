@@ -19,6 +19,7 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import classNames from 'classnames';
 import {container} from 'tsyringe';
 
@@ -118,7 +119,7 @@ const mapVideoInputDevices = (
   devices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[],
   translate: ReturnType<typeof useApplicationContext>['translate'],
 ) => {
-  if (!devices.length) {
+  if (devices.length === 0) {
     return [
       {
         label: translate('videoCallNoCameraAvailable'),
@@ -218,7 +219,7 @@ export const VideoControls = ({
     ENABLE_IN_CALL_HAND_RAISE: isInCallHandRaiseEnable,
   } = Config.getConfig().FEATURE;
 
-  const isSelfHandRaised = Boolean(selfHandRaisedAt);
+  const isSelfHandRaised = !isNullOrUndefined(selfHandRaisedAt) && selfHandRaisedAt !== 0 && !isNan(selfHandRaisedAt);
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
 
@@ -232,7 +233,8 @@ export const VideoControls = ({
   const [showEmojisBar, setShowEmojisBar] = useState(false);
 
   const {viewMode, detachedWindow} = useKoSubscribableChildren(callState, ['viewMode', 'detachedWindow']);
-  const activeWindow = viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow : window;
+  const activeWindow =
+    viewMode === CallingViewMode.DETACHED_WINDOW && !isNullOrUndefined(detachedWindow) ? detachedWindow : window;
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 

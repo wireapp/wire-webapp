@@ -32,8 +32,9 @@ const upload: SharedDriveUploadStatus = {
   progress: 0,
   hasProgress: false,
   isTransferActive: true,
-  canCancel: true,
-  canRetry: false,
+  isFolder: false,
+  cancellableUploadIds: ['upload-1'],
+  retryableUploads: [],
 };
 
 const renderPopup = (
@@ -50,8 +51,8 @@ const renderPopup = (
           fileName,
           kind,
           isTransferActive: kind === 'uploading',
-          canCancel: kind === 'uploading',
-          canRetry: kind === 'failed',
+          cancellableUploadIds: kind === 'uploading' ? [upload.uploadId] : [],
+          retryableUploads: kind === 'failed' ? [{uploadId: upload.uploadId, action: 'upload'}] : [],
         }}
         title={`${kind} report.pdf`}
         statusLabel={
@@ -86,7 +87,7 @@ describe('SharedDriveUploadStatusPopup', () => {
       fileName: 'queued.txt',
       kind: 'queued',
       isTransferActive: false,
-      canCancel: true,
+      cancellableUploadIds: ['upload-2'],
     };
 
     render(
@@ -417,7 +418,12 @@ describe('SharedDriveUploadStatusPopup', () => {
     render(
       <ThemeProvider>
         <SharedDriveUploadStatusPopup
-          upload={{...upload, kind: 'failed', canCancel: false, canRetry: true}}
+          upload={{
+            ...upload,
+            kind: 'failed',
+            cancellableUploadIds: [],
+            retryableUploads: [{uploadId: upload.uploadId, action: 'upload'}],
+          }}
           title="Upload failed report.pdf"
           statusLabel="Couldn’t upload file"
           destination="to Shared Drive"
@@ -446,7 +452,13 @@ describe('SharedDriveUploadStatusPopup', () => {
     render(
       <ThemeProvider>
         <SharedDriveUploadStatusPopup
-          upload={{...upload, kind: 'uploaded', isTransferActive: false, canCancel: false, canRetry: false}}
+          upload={{
+            ...upload,
+            kind: 'uploaded',
+            isTransferActive: false,
+            cancellableUploadIds: [],
+            retryableUploads: [],
+          }}
           title="Uploaded report.pdf"
           statusLabel="Uploaded 4 KB"
           destination="to Shared Drive"
@@ -495,7 +507,12 @@ describe('SharedDriveUploadStatusPopup', () => {
     render(
       <ThemeProvider>
         <SharedDriveUploadStatusPopup
-          upload={{...upload, kind: 'failed', canCancel: false, canRetry: true}}
+          upload={{
+            ...upload,
+            kind: 'failed',
+            cancellableUploadIds: [],
+            retryableUploads: [{uploadId: upload.uploadId, action: 'upload'}],
+          }}
           title="Upload failed report.pdf"
           statusLabel="Couldn’t upload file"
           destination="to Shared Drive"
