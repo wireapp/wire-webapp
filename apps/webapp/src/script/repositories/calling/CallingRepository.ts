@@ -1885,7 +1885,7 @@ export class CallingRepository {
       conversation.groupId,
     );
 
-    if (isUndefined(subconversationEpochInfo)) {
+    if (isNullOrUndefined(subconversationEpochInfo)) {
       return;
     }
 
@@ -2594,17 +2594,13 @@ export class CallingRepository {
     }
 
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE, REASON.REJECTED];
+    const startedAt = call.startedAt();
+    const startedAtOrZero = isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : startedAt;
 
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
-      [Segmentation.CALL.DURATION]: Math.ceil(
-        (call.endedAt() -
-          (isNullOrUndefined(call.startedAt()) || call.startedAt() === 0 || isNan(call.startedAt())
-            ? 0
-            : call.startedAt())) /
-          TIME_IN_MILLIS.SECOND,
-      ),
+      [Segmentation.CALL.DURATION]: Math.ceil((call.endedAt() - startedAtOrZero) / TIME_IN_MILLIS.SECOND),
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.REASON]: this.getCallEndReasonText(reason),
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
@@ -2631,9 +2627,7 @@ export class CallingRepository {
       this.injectDeactivateEvent(
         call.conversation.qualifiedId,
         call.initiator,
-        isNullOrUndefined(call.startedAt()) || call.startedAt() === 0 || isNan(call.startedAt())
-          ? 0
-          : Date.now() - call.startedAt(),
+        isNullOrUndefined(startedAt) || startedAt === 0 || isNan(startedAt) ? 0 : Date.now() - startedAt,
         reason,
         new Date().toISOString(),
         EventSource.WEBSOCKET,
@@ -2922,7 +2916,7 @@ export class CallingRepository {
         conversation.groupId,
       );
 
-      if (!isUndefined(subconversationEpochInfo)) {
+      if (!isNullOrUndefined(subconversationEpochInfo)) {
         this.setEpochInfo(conversation.qualifiedId, subconversationEpochInfo);
       }
 

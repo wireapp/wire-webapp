@@ -169,7 +169,7 @@ export class CallingViewModel {
       }
 
       const call = await this.callingRepository.startCall(conversation);
-      if (isUndefined(call)) {
+      if (call === undefined) {
         return;
       }
 
