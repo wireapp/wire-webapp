@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -91,7 +91,7 @@ const checkUserInCallAndViewMode = (callState: CallState): boolean => {
   const {activeWindow} = useActiveWindowState.getState();
   const {viewMode, detachedWindow} = callState;
 
-  const isInCall = callState.joinedCall() !== undefined;
+  const isInCall = isTruthy(callState.joinedCall());
   const isFullScreenView = CallingViewMode.FULL_SCREEN === viewMode();
   const isDetatchedWindowView = CallingViewMode.DETACHED_WINDOW === viewMode();
   const isHighlightedDetatchedWindow = isDetatchedWindowView && detachedWindow() === activeWindow;
