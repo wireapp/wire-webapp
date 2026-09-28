@@ -89,17 +89,17 @@ export const ConversationHeaderComponent = ({
   isListCollapsed = false,
   onExpandList,
 }: ConversationHeaderProps) => {
-  const {translate, wallClock} = useApplicationContext();
+  const {translate, clock} = useApplicationContext();
   const [inputValue, setInputValue] = useState(searchValue);
 
   useEffect(() => {
-    if (!inputValue || inputValue === searchValue) {
+    if (inputValue.length === 0 || inputValue === searchValue) {
       return;
     }
 
-    const timeout = wallClock.setTimeout(() => setSearchValue(inputValue), SEARCH_DELAY_IN_MILLISECONDS);
-    return () => wallClock.clearTimeout(timeout);
-  }, [inputValue, searchValue, setSearchValue, wallClock]);
+    const timeout = clock.setTimeout(() => setSearchValue(inputValue), SEARCH_DELAY_IN_MILLISECONDS);
+    return () => clock.clearTimeout(timeout);
+  }, [clock, inputValue, searchValue, setSearchValue]);
 
   const clearSearch = () => {
     setInputValue('');
@@ -231,13 +231,15 @@ export const ConversationHeaderComponent = ({
           onChange={event => {
             const nextValue = event.currentTarget.value;
             setInputValue(nextValue);
-            if (!nextValue) {
+            if (nextValue.length === 0) {
               setSearchValue('');
             }
           }}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={
-            inputValue && <CircleCloseIcon className="cursor-pointer" onClick={clearSearch} css={closeIconStyles} />
+            inputValue.length > 0 ? (
+              <CircleCloseIcon className="cursor-pointer" onClick={clearSearch} css={closeIconStyles} />
+            ) : null
           }
           inputCSS={searchInputStyles}
           wrapperCSS={searchInputWrapperStyles}
