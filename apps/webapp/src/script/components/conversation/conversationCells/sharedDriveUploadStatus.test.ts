@@ -154,7 +154,7 @@ describe('getSharedDriveUploadDisplayStatuses', () => {
     const displayStatuses = getSharedDriveUploadDisplayStatuses(statuses);
     expect(displayStatuses).toEqual([
       expect.objectContaining({
-        uploadId: 'folder:Reports',
+        uploadId: 'folder:upload-1',
         fileName: 'Reports',
         isFolder: true,
         fileCount: 2,
@@ -182,5 +182,23 @@ describe('getSharedDriveUploadDisplayStatuses', () => {
     };
 
     expect(getSharedDriveUploadDisplayStatuses([first, second])[0]).toEqual(expect.objectContaining({progress: 0.875}));
+  });
+
+  it('derives repeated folder row identities from their upload IDs', () => {
+    const firstBatch = [
+      {
+        ...statusFor({...state('published'), source: {...source, relativePath: 'Marketing/one.txt'}}),
+        uploadId: 'first-batch-upload',
+      },
+    ];
+    const secondBatch = [
+      {
+        ...statusFor({...state('published'), source: {...source, relativePath: 'Marketing/one.txt'}}),
+        uploadId: 'second-batch-upload',
+      },
+    ];
+
+    expect(getSharedDriveUploadDisplayStatuses(firstBatch)[0].uploadId).toBe('folder:first-batch-upload');
+    expect(getSharedDriveUploadDisplayStatuses(secondBatch)[0].uploadId).toBe('folder:second-batch-upload');
   });
 });

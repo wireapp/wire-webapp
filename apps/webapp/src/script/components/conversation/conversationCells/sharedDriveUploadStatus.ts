@@ -108,7 +108,7 @@ export const getSharedDriveUploadDisplayStatuses = (
   statuses: readonly SharedDriveUploadStatus[],
 ): SharedDriveUploadStatus[] => {
   const grouped = new Map<string, SharedDriveUploadStatus[]>();
-  const orderedGroups: Array<{folderName: string; statuses: SharedDriveUploadStatus[]}> = [];
+  const orderedGroups: Array<{folderId: string; folderName: string; statuses: SharedDriveUploadStatus[]}> = [];
   const individualStatuses: SharedDriveUploadStatus[] = [];
   const rowOrder: string[] = [];
 
@@ -125,13 +125,14 @@ export const getSharedDriveUploadDisplayStatuses = (
       group.push(status);
     } else {
       const folderStatuses = [status];
+      const folderId = `folder:${status.uploadId}`;
       grouped.set(folderName, folderStatuses);
-      orderedGroups.push({folderName, statuses: folderStatuses});
-      rowOrder.push(`folder:${folderName}`);
+      orderedGroups.push({folderId, folderName, statuses: folderStatuses});
+      rowOrder.push(folderId);
     }
   });
 
-  orderedGroups.forEach(({statuses: folderStatuses, folderName}) => {
+  orderedGroups.forEach(({folderId, statuses: folderStatuses, folderName}) => {
     const totalSize = folderStatuses.reduce((total, status) => total + status.fileSize, 0);
     const progress = totalSize
       ? folderStatuses.reduce((total, status) => {
@@ -146,8 +147,6 @@ export const getSharedDriveUploadDisplayStatuses = (
       : 0;
     const failedFileCount = folderStatuses.filter(status => status.kind === 'failed').length;
     const uploadedFileCount = folderStatuses.filter(status => status.kind === 'uploaded').length;
-    const folderId = `folder:${folderName}`;
-
     const displayStatus = {
       uploadId: folderId,
       conversationQualifiedId: folderStatuses[0].conversationQualifiedId,

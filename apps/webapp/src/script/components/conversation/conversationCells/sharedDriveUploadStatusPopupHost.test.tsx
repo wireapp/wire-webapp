@@ -385,6 +385,57 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).not.toBeInTheDocument();
   });
 
+  it('shows a new upload of a previously dismissed folder', async () => {
+    const user = userEvent.setup();
+    let states: readonly UploadState[] = [
+      {
+        ...uploadedState,
+        identity: {uploadId: 'first-marketing-upload', resourceUuid: 'resource-1', versionId: 'version-1'},
+        source: {...uploadSource, relativePath: 'Marketing/report.pdf'},
+      },
+    ];
+    let notify: () => void = jest.fn();
+    const dismissedUploadIds = new Set<string>();
+    const queriedUploadIds: string[] = [];
+    const controller = createController(states);
+    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? states : []));
+    controller.dismiss.mockImplementation((scope, uploadId) => {
+      if (scope === conversationQualifiedId) {
+        dismissedUploadIds.add(uploadId);
+      }
+    });
+    controller.isDismissed.mockImplementation((scope, uploadId) => {
+      queriedUploadIds.push(uploadId);
+      return scope === conversationQualifiedId && dismissedUploadIds.has(uploadId);
+    });
+    controller.subscribe.mockImplementation(listener => {
+      notify = listener;
+      return jest.fn();
+    });
+    const view = renderHost(controller, conversationQualifiedId);
+
+    await user.click(
+      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+        name: 'cells.uploadStatus.closeAriaLabel',
+      }),
+    );
+    expect(controller.dismiss).toHaveBeenCalledWith(conversationQualifiedId, 'folder:first-marketing-upload');
+
+    states = [
+      {
+        ...uploadedState,
+        identity: {uploadId: 'second-marketing-upload', resourceUuid: 'resource-2', versionId: 'version-2'},
+        source: {...uploadSource, relativePath: 'Marketing/report.pdf'},
+      },
+    ];
+    act(() => notify());
+
+    expect(view.getByRole('status')).toBeInTheDocument();
+    expect(queriedUploadIds).toContain('folder:second-marketing-upload');
+    expect(dismissedUploadIds).toEqual(new Set(['folder:first-marketing-upload']));
+    expect(controller.dismiss).toHaveBeenCalledTimes(1);
+  });
+
   it('does not show close for a failed upload because retry is still actionable', () => {
     const controller = createController(failedState);
     const view = renderHost(controller, conversationQualifiedId);
