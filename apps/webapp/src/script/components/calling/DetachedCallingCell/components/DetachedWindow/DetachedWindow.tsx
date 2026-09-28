@@ -20,6 +20,7 @@
 import createCache from '@emotion/cache';
 import {CacheProvider} from '@emotion/react';
 import weakMemoize from '@emotion/weak-memoize';
+import {isNull} from '@sindresorhus/is';
 import {createPortal} from 'react-dom';
 import {container} from 'tsyringe';
 
@@ -46,7 +47,7 @@ export const DetachedWindow = ({children, callState = container.resolve(CallStat
 
   useActiveWindow(detachedWindow);
 
-  if (!detachedWindow) {
+  if (isNull(detachedWindow)) {
     return null;
   }
 

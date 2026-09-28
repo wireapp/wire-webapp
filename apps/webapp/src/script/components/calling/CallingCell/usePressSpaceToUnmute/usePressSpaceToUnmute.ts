@@ -91,7 +91,7 @@ const checkUserInCallAndViewMode = (callState: CallState): boolean => {
   const {activeWindow} = useActiveWindowState.getState();
   const {viewMode, detachedWindow} = callState;
 
-  const isInCall = !!callState.joinedCall();
+  const isInCall = callState.joinedCall() !== undefined;
   const isFullScreenView = CallingViewMode.FULL_SCREEN === viewMode();
   const isDetatchedWindowView = CallingViewMode.DETACHED_WINDOW === viewMode();
   const isHighlightedDetatchedWindow = isDetatchedWindowView && detachedWindow() === activeWindow;
