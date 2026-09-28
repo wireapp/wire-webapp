@@ -25,7 +25,7 @@ import {createSessionResetMessage} from 'Repositories/entity/message/sessionRese
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {SystemMessage} from './systemMessage';
+import {SystemMessage} from './SystemMessage';
 
 describe('SystemMessage MLS reset messages', () => {
   it('shows the resetting user and the recovery explanation as a system message', () => {
