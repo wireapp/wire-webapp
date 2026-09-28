@@ -148,6 +148,9 @@ export const Conversations = ({
   );
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
+  const [searchResetToken, setSearchResetToken] = useState(0);
+  const pendingEnterSearchRef = useRef<ReactKeyBoardEvent<HTMLInputElement> | null>(null);
+  const pendingTabSearchRef = useRef<ReactKeyBoardEvent<HTMLInputElement> | null>(null);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -397,7 +400,10 @@ export const Conversations = ({
   }, [activeConversation, openFolder]);
 
   const clearConversationFilter = useCallback(() => {
-    return setConversationsFilter('');
+    pendingEnterSearchRef.current = null;
+    pendingTabSearchRef.current = null;
+    setConversationsFilter('');
+    setSearchResetToken(previous => previous + 1);
   }, []);
 
   const switchList = listViewModel.switchList;
@@ -505,21 +511,33 @@ export const Conversations = ({
   );
 
   const handleEnterSearchClick = useCallback(
-    (event: ReactKeyBoardEvent<HTMLDivElement>) => {
-      const firstFoundConversation = conversationsForFocus?.[0];
+    (event: ReactKeyBoardEvent<HTMLInputElement>, query: string) => {
+      if (query !== conversationsFilter) {
+        event.preventDefault();
+        pendingEnterSearchRef.current = event;
+        setConversationsFilter(query);
+        return;
+      }
 
+      const firstFoundConversation = conversationsForFocus[0];
       if (!isNullOrUndefined(firstFoundConversation)) {
         createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
-        setConversationsFilter('');
+        clearConversationFilter();
         scrollToConversation(firstFoundConversation.id);
       }
     },
-    [conversationsForFocus],
+    [clearConversationFilter, conversationsFilter, conversationsForFocus],
   );
 
   const handleSearchTab = useCallback(
-    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+    (event: ReactKeyBoardEvent<HTMLInputElement>, query: string) => {
       cancelPendingFocusRef.current?.();
+      if (query !== conversationsFilter) {
+        pendingTabSearchRef.current = event;
+        setConversationsFilter(query);
+        return;
+      }
+
       const firstResult = conversationsForFocus[0];
 
       if (!isNonEmptyString(conversationsFilter) || isNullOrUndefined(firstResult)) {
@@ -540,6 +558,20 @@ export const Conversations = ({
     },
     [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
   );
+
+  useEffect(() => {
+    const enterEvent = pendingEnterSearchRef.current;
+    pendingEnterSearchRef.current = null;
+    if (enterEvent) {
+      handleEnterSearchClick(enterEvent, conversationsFilter);
+    }
+
+    const tabEvent = pendingTabSearchRef.current;
+    pendingTabSearchRef.current = null;
+    if (tabEvent) {
+      handleSearchTab(tabEvent, conversationsFilter);
+    }
+  }, [conversationsFilter, handleEnterSearchClick, handleSearchTab]);
 
   const onSearch = useCallback(
     (searchValue: string) => {
@@ -624,6 +656,7 @@ export const Conversations = ({
         id="conversations"
         headerElement={
           <ConversationHeader
+            key={`${currentTab}:${currentFolder?.id ?? ''}:${searchResetToken}`}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
