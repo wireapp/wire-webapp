@@ -17,7 +17,7 @@
  *
  */
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
@@ -123,7 +123,7 @@ export class Call {
   }
 
   get hasWorkingAudioInput(): boolean {
-    return !!this.selfParticipant.audioStream();
+    return !isUndefined(this.selfParticipant.audioStream());
   }
 
   getSelfParticipant(): Participant {
@@ -138,7 +138,7 @@ export class Call {
   removeAudio(audioId: string) {
     this.releaseStream(this.audios[audioId]?.stream);
     const audioElement = this.audios[audioId]?.audioElement;
-    if (audioElement) {
+    if (!isNullOrUndefined(audioElement)) {
       audioElement.remove();
       audioElement.srcObject = null;
     }
@@ -152,7 +152,7 @@ export class Call {
   }
 
   private releaseStream(mediaStream?: MediaStream): void {
-    if (!mediaStream) {
+    if (isUndefined(mediaStream)) {
       return;
     }
 
@@ -167,7 +167,7 @@ export class Call {
       if ((audio.audioElement?.srcObject as MediaStream)?.active) {
         return;
       }
-      if (audio.audioElement?.srcObject) {
+      if (!isNullOrUndefined(audio.audioElement?.srcObject)) {
         audio.audioElement.remove();
         audio.audioElement.srcObject = null;
       }
@@ -183,7 +183,7 @@ export class Call {
 
   updateAudioStreamsSink() {
     const outputDeviceId = mediaDevicesStore.getState().audio.output.selectedId;
-    if (!outputDeviceId) {
+    if (!isNonEmptyString(outputDeviceId)) {
       return;
     }
 
@@ -268,6 +268,6 @@ export class Call {
     if (!conversationName.includes('Sync - Calling')) {
       return false;
     }
-    return !!window.wire?.app?.debug?.isEnabledAvsRustSFT();
+    return Boolean(window.wire?.app?.debug?.isEnabledAvsRustSFT());
   }
 }

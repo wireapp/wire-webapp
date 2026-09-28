@@ -1063,6 +1063,24 @@ const productionConfigs = [
       'no-void': 'error',
     },
   },
+  {
+    files: [
+      'apps/webapp/src/script/components/calling/**/*.{ts,tsx}',
+      'apps/webapp/src/script/repositories/calling/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/leftSidebar/panels/conversations/conversationCallingView/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/meeting/meetingCallingView/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/meeting/joinMeetingCall.ts',
+      'apps/webapp/src/script/components/meeting/useJoinMeetingCall.ts',
+      'apps/webapp/src/script/guards/CallView.ts',
+      'apps/webapp/src/script/hooks/useConversationCall.ts',
+      'apps/webapp/src/script/hooks/useNoInternetCallGuard/**/*.{ts,tsx}',
+      'apps/webapp/src/script/util/isDetachedCallingFeatureEnabled.ts',
+      'apps/webapp/src/script/view_model/CallingViewModel.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
 ].map(addProductionFileIgnores);
 
 const testTypeScriptFilePatterns = [
