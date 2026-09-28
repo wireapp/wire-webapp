@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNan, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
@@ -101,7 +101,10 @@ export class Call {
     this.participants = ko.observableArray([selfParticipant]);
     this.handRaisedParticipants = ko.pureComputed(() =>
       this.participants()
-        .filter(participant => Boolean(participant.handRaisedAt()))
+        .filter(participant => {
+          const handRaisedAt = participant.handRaisedAt();
+          return !isNullOrUndefined(handRaisedAt) && handRaisedAt !== 0 && !isNan(handRaisedAt);
+        })
         .toSorted((p1, p2) => {
           const firstHandRaisedAt = p1.handRaisedAt();
           const secondHandRaisedAt = p2.handRaisedAt();
@@ -268,6 +271,6 @@ export class Call {
     if (!conversationName.includes('Sync - Calling')) {
       return false;
     }
-    return Boolean(window.wire?.app?.debug?.isEnabledAvsRustSFT());
+    return window.wire?.app?.debug?.isEnabledAvsRustSFT() === true;
   }
 }
