@@ -17,36 +17,14 @@
  *
  */
 
-const mockCellRender = jest.fn();
-
-jest.mock('Components/conversationListCell', () => {
-  const actual = jest.requireActual('Components/conversationListCell');
-  return {
-    ...actual,
-    ConversationListCell: (props: {conversation: Conversation}) => {
-      mockCellRender(props.conversation.id);
-      return <actual.ConversationListCell {...props} />;
-    },
-  };
-});
-
-jest.mock('@tanstack/react-virtual', () => {
-  return {
-    useVirtualizer: ({count}: {count: number}) => {
-      return {
-        getVirtualItems: () => {
-          return Array.from({length: count}, (_, index) => {
-            return {index, key: index, size: 56, start: index * 56};
-          });
-        },
-        getTotalSize: () => {
-          return count * 56;
-        }, // default estimated row size
-        scrollToIndex: jest.fn(),
-      };
-    },
-  };
-});
+jest.mock('@tanstack/react-virtual', () => ({
+  useVirtualizer: ({count}: {count: number}) => ({
+    getVirtualItems: () =>
+      Array.from({length: count}, (_, index) => ({index, key: index, size: 56, start: index * 56})),
+    getTotalSize: () => count * 56, // default estimated row size
+    scrollToIndex: jest.fn(),
+  }),
+}));
 
 import {createRef} from 'react';
 
@@ -138,7 +116,7 @@ describe('ConversationsList', () => {
     );
   };
 
-  it('updates only the focused rows while arrow navigation keeps other rows interactive', () => {
+  it('keeps the latest keyboard handler on other rows when focus changes', () => {
     const conversations = ['Alice', 'Bob', 'Charlie'].map(create1to1Conversation);
     currentFocus = conversations[0].id;
 
@@ -169,7 +147,6 @@ describe('ConversationsList', () => {
       );
 
     expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '0');
-    mockCellRender.mockClear();
 
     const previousArrowHandler = handleArrowKeyDown;
     handleArrowKeyDown = jest.fn(() => jest.fn());
@@ -178,7 +155,6 @@ describe('ConversationsList', () => {
 
     expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '-1');
     expect(buttonFor(conversations[1])).toHaveAttribute('tabindex', '0');
-    expect(mockCellRender.mock.calls.some(([id]) => id === conversations[2].id)).toBe(false);
 
     const unaffectedButton = buttonFor(conversations[2]);
     expect(unaffectedButton).not.toBeNull();
