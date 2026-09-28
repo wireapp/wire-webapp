@@ -127,11 +127,11 @@ describe('MeetingPrepSurface', () => {
   });
 
   it('ignores another Join click while the first request is still running', async () => {
-    let finishJoin = () => undefined;
+    let finishJoin: () => void = () => undefined;
     const onJoin = jest.fn(
       () =>
         new Promise<void>(resolve => {
-          finishJoin = resolve;
+          finishJoin = () => resolve();
         }),
     );
     renderSurface({onJoin});

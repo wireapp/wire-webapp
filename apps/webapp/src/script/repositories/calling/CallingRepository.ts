@@ -1331,7 +1331,7 @@ export class CallingRepository {
     }
     const conversationId = conversation.qualifiedId;
     const convId = this.serializeQualifiedId(conversationId);
-    const callType = media?.cameraEnabled ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+    const callType = media?.cameraEnabled === true ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
     try {
       const rejectedCallInConversation = this.findCall(conversationId);
@@ -1358,7 +1358,7 @@ export class CallingRepository {
       // Microphone access is required to start a call.
       try {
         await this.acquireCallMedia(call, {audio: true, camera: media?.cameraEnabled ?? false});
-        if (media?.cameraEnabled && call.state() !== CALL_STATE.NONE) {
+        if (media?.cameraEnabled === true && call.state() !== CALL_STATE.NONE) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
       } catch (error: unknown) {
@@ -1384,7 +1384,7 @@ export class CallingRepository {
        * we are stuck in muted state so we should call the AVS function setMute(this.wUser, 0) before initiating the call to fix this
        * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
        */
-      if (media) {
+      if (media !== undefined) {
         this.setMute(!media.microphoneEnabled);
       } else {
         this.wCall?.setMute(this.wUser, 0);
@@ -1738,7 +1738,7 @@ export class CallingRepository {
 
     const {conversation} = call;
     try {
-      if (media) {
+      if (media !== undefined) {
         callType = media.cameraEnabled ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
       } else {
         callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -1787,7 +1787,7 @@ export class CallingRepository {
         this.rejectCall(conversation.qualifiedId);
         return;
       }
-      if (media) {
+      if (media !== undefined) {
         this.setMute(!media.microphoneEnabled);
       } else {
         this.setMute(call.muteState() !== MuteState.NOT_MUTED);

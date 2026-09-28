@@ -169,9 +169,10 @@ export class CallingViewModel {
         return;
       }
 
-      const call = media
-        ? await this.callingRepository.startCall(conversation, media)
-        : await this.callingRepository.startCall(conversation);
+      const call =
+        media !== undefined
+          ? await this.callingRepository.startCall(conversation, media)
+          : await this.callingRepository.startCall(conversation);
       if (call === undefined) {
         return;
       }
@@ -189,7 +190,7 @@ export class CallingViewModel {
         return;
       }
 
-      if (media) {
+      if (media !== undefined) {
         await this.callingRepository.answerCall(call, undefined, media);
       } else {
         await this.callingRepository.answerCall(call);
