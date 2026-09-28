@@ -336,6 +336,38 @@ describe('Conversations', () => {
     expect(bobResult).toHaveFocus();
   });
 
+  it('discards an uncommitted query when the active tab changes outside the search', async () => {
+    const conversationState = new ConversationState();
+    conversationState.conversations([create1to1Conversation('Alice')]);
+    const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const rootContext = createRootContextValueForTest({translate: translateForTest, clock});
+    const lookupGroups = jest.spyOn(conversationRepository, 'getGroupsByName').mockReturnValue([]);
+    window.HTMLElement.prototype.scrollTo = jest.fn();
+
+    const {getByRole} = render(
+      withThemeAndRootContext(
+        <Conversations
+          {...defaultParams}
+          callState={callState}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+        createRootProviderWrapperForTest(rootContext),
+      ),
+    );
+    const user = userEvent.setup();
+
+    await user.type(getByRole('textbox'), 'Alice');
+    act(() => useSidebarStore.setState({currentTab: SidebarTabs.FAVORITES}));
+    act(() => useSidebarStore.setState({currentTab: SidebarTabs.RECENT}));
+    act(() => clock.advanceByMilliseconds(200));
+
+    expect(getByRole('textbox')).toHaveValue('');
+    expect(lookupGroups).not.toHaveBeenCalled();
+  });
+
   it('cancels a pending search when switching tabs', async () => {
     const conversationState = new ConversationState();
     conversationState.conversations([create1to1Conversation('Alice')]);

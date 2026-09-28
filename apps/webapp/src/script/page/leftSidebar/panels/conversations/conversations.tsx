@@ -63,6 +63,7 @@ import {ConversationsList} from './conversationsList';
 import {EmptyConversationList} from './emptyConversationList';
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
 import {getConversationFocusCandidates, getTabConversations, scrollToConversation} from './helpers';
+import {useConversationSearch} from './hooks/useConversationSearch';
 import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {
@@ -121,7 +122,7 @@ export const Conversations = ({
   selfUser,
   isConversationListCollapseEnabled,
 }: ConversationsProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, clock} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const focusConversationRef = useRef<FocusConversation>(() => false);
@@ -139,9 +140,6 @@ export const Conversations = ({
   } = useSidebarStore(useShallow(state => state));
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
-  const [searchResetToken, setSearchResetToken] = useState(0);
-  const pendingEnterSearchRef = useRef<ReactKeyBoardEvent<HTMLInputElement> | null>(null);
-  const pendingTabSearchRef = useRef<ReactKeyBoardEvent<HTMLInputElement> | null>(null);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -378,12 +376,66 @@ export const Conversations = ({
     };
   }, [activeConversation, openFolder]);
 
-  const clearConversationFilter = useCallback(() => {
-    pendingEnterSearchRef.current = null;
-    pendingTabSearchRef.current = null;
-    setConversationsFilter('');
-    setSearchResetToken(previous => previous + 1);
-  }, []);
+  const onSearch = useCallback(
+    (searchValue: string) => {
+      setConversationsFilter(searchValue);
+      conversationListRef?.scrollTo(0, 0);
+    },
+    [conversationListRef],
+  );
+
+  const activateSearchResult = useCallback(
+    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+      const firstResult = conversationsForFocus[0];
+      if (isNullOrUndefined(firstResult)) {
+        return false;
+      }
+
+      createNavigateKeyboard(generateConversationUrl(firstResult.qualifiedId), true)(event);
+      scrollToConversation(firstResult.id);
+      return true;
+    },
+    [conversationsForFocus],
+  );
+
+  const focusSearchResult = useCallback(
+    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+      const firstResult = conversationsForFocus[0];
+      if (!isNonEmptyString(conversationsFilter) || isNullOrUndefined(firstResult)) {
+        return;
+      }
+
+      const wasMounted = focusMountedConversation(firstResult.id);
+      const wasFocused = wasMounted || focusConversation(firstResult.id);
+      if (wasFocused === false) {
+        return;
+      }
+
+      event.preventDefault();
+      if (wasMounted) {
+        setCurrentFocus(firstResult.id);
+      }
+    },
+    [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
+  );
+
+  const searchContextKey = `${currentTab}:${currentFolder?.id ?? ''}`;
+  const {
+    inputValue,
+    changeInput: changeSearchInput,
+    clear: clearConversationFilter,
+    enter: handleEnterSearchClick,
+    tab: handleSearchTab,
+  } = useConversationSearch({
+    clock,
+    filter: conversationsFilter,
+    searchContextKey,
+    setFilter: setConversationsFilter,
+    onSearch,
+    onEnter: activateSearchResult,
+    onTab: focusSearchResult,
+    onBeforeTab: () => cancelPendingFocusRef.current?.(),
+  });
 
   const switchList = listViewModel.switchList;
   const switchContent = listViewModel.contentViewModel.switchContent;
@@ -487,77 +539,6 @@ export const Conversations = ({
     [listViewModel, setCurrentView],
   );
 
-  const handleEnterSearchClick = useCallback(
-    (event: ReactKeyBoardEvent<HTMLInputElement>, query: string) => {
-      if (query !== conversationsFilter) {
-        event.preventDefault();
-        pendingEnterSearchRef.current = event;
-        setConversationsFilter(query);
-        return;
-      }
-
-      const firstFoundConversation = conversationsForFocus[0];
-      if (!isNullOrUndefined(firstFoundConversation)) {
-        createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
-        clearConversationFilter();
-        scrollToConversation(firstFoundConversation.id);
-      }
-    },
-    [clearConversationFilter, conversationsFilter, conversationsForFocus],
-  );
-
-  const handleSearchTab = useCallback(
-    (event: ReactKeyBoardEvent<HTMLInputElement>, query: string) => {
-      cancelPendingFocusRef.current?.();
-      if (query !== conversationsFilter) {
-        pendingTabSearchRef.current = event;
-        setConversationsFilter(query);
-        return;
-      }
-
-      const firstResult = conversationsForFocus[0];
-
-      if (!isNonEmptyString(conversationsFilter) || isNullOrUndefined(firstResult)) {
-        return;
-      }
-
-      const wasMounted = focusMountedConversation(firstResult.id);
-      const wasFocused = wasMounted || focusConversation(firstResult.id);
-
-      if (wasFocused === false) {
-        return;
-      }
-
-      event.preventDefault();
-      if (wasMounted) {
-        setCurrentFocus(firstResult.id);
-      }
-    },
-    [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
-  );
-
-  useEffect(() => {
-    const enterEvent = pendingEnterSearchRef.current;
-    pendingEnterSearchRef.current = null;
-    if (!isNullOrUndefined(enterEvent)) {
-      handleEnterSearchClick(enterEvent, conversationsFilter);
-    }
-
-    const tabEvent = pendingTabSearchRef.current;
-    pendingTabSearchRef.current = null;
-    if (!isNullOrUndefined(tabEvent)) {
-      handleSearchTab(tabEvent, conversationsFilter);
-    }
-  }, [conversationsFilter, handleEnterSearchClick, handleSearchTab]);
-
-  const onSearch = useCallback(
-    (searchValue: string) => {
-      setConversationsFilter(searchValue);
-      conversationListRef?.scrollTo(0, 0);
-    },
-    [conversationListRef],
-  );
-
   const jumpToRecentSearch = useCallback(() => {
     switchList(ListState.CONVERSATIONS);
     setCurrentTab(SidebarTabs.RECENT);
@@ -633,13 +614,14 @@ export const Conversations = ({
         id="conversations"
         headerElement={
           <ConversationHeader
-            key={`${currentTab}:${currentFolder?.id ?? ''}:${searchResetToken}`}
+            key={searchContextKey}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
             showSearchInput={(showSearchInput && hasVisibleConversations) || isNonEmptyString(conversationsFilter)}
-            searchValue={conversationsFilter}
-            setSearchValue={onSearch}
+            searchValue={inputValue}
+            onSearchChange={changeSearchInput}
+            onClearSearch={clearConversationFilter}
             searchInputPlaceholder={searchInputPlaceholder}
             onSearchEnterClick={handleEnterSearchClick}
             onSearchTab={handleSearchTab}
