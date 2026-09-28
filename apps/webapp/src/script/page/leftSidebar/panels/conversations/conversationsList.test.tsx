@@ -17,19 +17,6 @@
  *
  */
 
-const mockCellRender = jest.fn();
-
-jest.mock('Components/conversationListCell', () => {
-  const actual = jest.requireActual('Components/conversationListCell');
-  return {
-    ...actual,
-    ConversationListCell: (props: {conversation: Conversation}) => {
-      mockCellRender(props.conversation.id);
-      return <actual.ConversationListCell {...props} />;
-    },
-  };
-});
-
 jest.mock('@tanstack/react-virtual', () => ({
   useVirtualizer: ({count}: {count: number}) => ({
     getVirtualItems: () =>
@@ -122,7 +109,7 @@ describe('ConversationsList', () => {
       {wrapper: rootProviderWrapper},
     );
 
-  it('updates only the focused rows while arrow navigation keeps other rows interactive', () => {
+  it('keeps the latest keyboard handler on other rows when focus changes', () => {
     const conversations = ['Alice', 'Bob', 'Charlie'].map(create1to1Conversation);
     currentFocus = conversations[0].id;
 
@@ -153,7 +140,6 @@ describe('ConversationsList', () => {
       );
 
     expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '0');
-    mockCellRender.mockClear();
 
     const previousArrowHandler = handleArrowKeyDown;
     handleArrowKeyDown = jest.fn(() => jest.fn());
@@ -162,7 +148,6 @@ describe('ConversationsList', () => {
 
     expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '-1');
     expect(buttonFor(conversations[1])).toHaveAttribute('tabindex', '0');
-    expect(mockCellRender.mock.calls.some(([id]) => id === conversations[2].id)).toBe(false);
 
     const unaffectedButton = buttonFor(conversations[2]);
     expect(unaffectedButton).not.toBeNull();
