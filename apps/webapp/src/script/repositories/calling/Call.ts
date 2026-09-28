@@ -185,7 +185,8 @@ export class Call {
   }
 
   updateAudioStreamsSink() {
-    const outputDeviceId = mediaDevicesStore.getState().audio.output.selectedId;
+    const outputDeviceId = mediaDevicesStore.getState().audio.output.activeId;
+
     if (!isNonEmptyString(outputDeviceId)) {
       return;
     }

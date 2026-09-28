@@ -246,9 +246,9 @@ export const VideoControls = ({
     audioInputDevices,
     audioOutputDevices,
   } = useMediaDevicesStore(state => ({
-    currentCameraDevice: state.video.input.selectedId,
-    currentMicrophoneDevice: state.audio.input.selectedId,
-    currentSpeakerDevice: state.audio.output.selectedId,
+    currentCameraDevice: state.video.input.activeId,
+    currentMicrophoneDevice: state.audio.input.activeId,
+    currentSpeakerDevice: state.audio.output.activeId,
     videoInputDevices: state.video.input.devices,
     audioInputDevices: state.audio.input.devices,
     audioOutputDevices: state.audio.output.devices,

@@ -78,7 +78,7 @@ export class AudioRepository {
   }
 
   private updateSinkIds() {
-    const currentOutputDevice = mediaDevicesStore.getState().audio.output.selectedId;
+    const currentOutputDevice = mediaDevicesStore.getState().audio.output.activeId;
     if (!isNonEmptyString(currentOutputDevice)) {
       return;
     }
