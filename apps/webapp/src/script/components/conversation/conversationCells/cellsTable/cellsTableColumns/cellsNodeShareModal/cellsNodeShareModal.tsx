@@ -19,7 +19,7 @@
 
 import {useEffect, useRef, useState} from 'react';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {CellsShareModalContent} from 'Components/cells/shareModal/cellsShareModalContent';
 import {serializeShareModalInput} from 'Components/cells/shareModal/shareModalSerializer';

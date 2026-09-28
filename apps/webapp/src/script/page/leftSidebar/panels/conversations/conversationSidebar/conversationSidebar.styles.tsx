@@ -19,12 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const conversationsSidebarStyles = (mdBreakpoint: Boolean): CSSObject => ({
+export const conversationsSidebarStyles = (mdBreakpoint: boolean): CSSObject => ({
   position: mdBreakpoint ? 'absolute' : 'relative',
   zIndex: mdBreakpoint ? '1000' : 'auto',
 });
 
-export const conversationsSidebarHandleStyles = (isSidebarOpen: Boolean): CSSObject => ({
+export const conversationsSidebarHandleStyles = (isSidebarOpen: boolean): CSSObject => ({
   position: 'absolute',
   zIndex: '1000',
   top: '8px',

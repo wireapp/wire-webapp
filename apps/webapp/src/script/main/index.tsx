@@ -17,6 +17,8 @@
  *
  */
 
+import {createClock} from '@enormora/clock/clock';
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 // eslint-disable-next-line import/order
 import 'core-js/full/reflect';
 
@@ -27,7 +29,6 @@ import {createRoot} from 'react-dom/client';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {createFireAndForgetInvoker} from '@wireapp/core';
 
 import {AppContainer} from 'Components/appContainer/appContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
@@ -41,10 +42,6 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
-
-// eslint-disable-next-line import/order
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
-
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
@@ -52,13 +49,11 @@ import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {createMonotonicClock} from '../time/monotonicClock';
-
-const applicationMonotonicClock = createMonotonicClock({performance: globalThis.performance});
-const applicationBootstrapStartedAt = applicationMonotonicClock.nowMilliseconds;
+const clock = createClock();
+const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const domContentLoadedAt = applicationMonotonicClock.nowMilliseconds;
+  const domContentLoadedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
   const config = Config.getConfig();
   const fetchLatestBuildMetadata = createFetchLatestBuildMetadata({
     fetchBuildMetadata: globalThis.fetch.bind(globalThis),
@@ -96,17 +91,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     createApplicationObservability() {
       return createApplicationObservabilityFromConfig(config);
     },
+    clock,
     createFireAndForgetInvoker: () => {
-      return createFireAndForgetInvoker({logger: fireAndForgetInvokerLogger});
+      return createFireAndForgetInvoker({
+        reportError(error) {
+          fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
+        },
+      });
     },
-    createWallClock,
-    monotonicClock: applicationMonotonicClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {applicationObservability, fireAndForgetInvoker, monotonicClock, wallClock} = applicationServices;
-  const apiClient = new APIClient({
-    wallClock,
-  });
+  const {applicationObservability, fireAndForgetInvoker} = applicationServices;
+  const apiClient = new APIClient({clock: applicationServices.clock});
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,
@@ -139,15 +135,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
       applicationObservability={applicationObservability}
-      applicationBootstrapStartedAt={applicationBootstrapStartedAt}
-      domContentLoadedAt={domContentLoadedAt}
+      applicationBootstrapStartedAtMonotonicMicroseconds={applicationBootstrapStartedAtMonotonicMicroseconds}
+      domContentLoadedAtMonotonicMicroseconds={domContentLoadedAtMonotonicMicroseconds}
       fireAndForgetInvoker={fireAndForgetInvoker}
       fetchLatestBuildMetadata={fetchLatestBuildMetadata}
       isOnline={isOnline}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
-      monotonicClock={monotonicClock}
+      clock={applicationServices.clock}
       translate={translate}
-      wallClock={wallClock}
     />,
   );
 });

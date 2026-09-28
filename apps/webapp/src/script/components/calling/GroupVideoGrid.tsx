@@ -20,7 +20,7 @@
 import {CSSProperties, ReactNode, useEffect, useState} from 'react';
 
 import {css} from '@emotion/react';
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Loading, QUERY} from '@wireapp/react-ui-kit';
@@ -202,7 +202,7 @@ const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndC
   const {totalCount} = params;
   const desiredColumns = getDesiredColumns(params);
   const columns = Math.min(totalCount, desiredColumns);
-  const rows = totalCount ? Math.ceil(totalCount / columns) : 1;
+  const rows = totalCount !== 0 && !isNan(totalCount) ? Math.ceil(totalCount / columns) : 1;
 
   return {'--columns': columns, '--rows': rows};
 };
@@ -272,11 +272,11 @@ const GroupVideoGrid = ({
       return;
     }
 
-    const participant = grid.grid.find(participant => participant?.doesMatchIds(userId, clientId)) || null;
+    const participant = grid.grid.find(participant => participant.doesMatchIds(userId, clientId)) ?? null;
     setMaximizedParticipant(participant);
   };
 
-  const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(Boolean);
+  const participants = (isNullOrUndefined(maximizedParticipant) ? grid.grid : [maximizedParticipant]).filter(Boolean);
 
   useEffect(() => {
     setRowsAndColumns(
@@ -298,7 +298,7 @@ const GroupVideoGrid = ({
     }) => {
       if (isShort) {
         // Special case: use different layout for 2 participants when in short mode
-        if (grid.thumbnail && limits.WITH_THUMBNAIL != null) {
+        if (!isNullOrUndefined(grid.thumbnail) && limits.WITH_THUMBNAIL != null) {
           return call.setNumberOfParticipantsInOnePage(limits.WITH_THUMBNAIL);
         }
         return call.setNumberOfParticipantsInOnePage(limits.SHORT);
@@ -366,7 +366,7 @@ const GroupVideoGrid = ({
             key={participant.clientId}
             selfParticipant={selfParticipant}
             participantCount={participants.length}
-            isMaximized={!!maximizedParticipant}
+            isMaximized={!isNullOrUndefined(maximizedParticipant)}
             onTileDoubleClick={doubleClickedOnVideo}
           />
         ))}

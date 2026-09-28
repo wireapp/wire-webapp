@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
 
 import {getMLSKeyPackageUploadAmount} from './mlsKeyPackagePolicy';
@@ -26,13 +26,13 @@ const now = Date.parse('2026-09-23T12:00:00Z');
 
 describe('MLS key package allowance', () => {
   it('returns to the regular allowance when the clock reaches the deadline', () => {
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: now - 1});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(now - 1) * 1_000n});
     const features: FeatureList = {
       mlsMigration: {status: FEATURE_STATUS.ENABLED, config: {finaliseRegardlessAfter: '2026-09-23T12:00:00Z'}},
     };
-    expect(getMLSKeyPackageUploadAmount(features, wallClock)).toBe(1000);
-    wallClock.advanceByMilliseconds(1);
-    expect(getMLSKeyPackageUploadAmount(features, wallClock)).toBe(100);
+    expect(getMLSKeyPackageUploadAmount(features, clock)).toBe(1000);
+    clock.advanceByMilliseconds(1);
+    expect(getMLSKeyPackageUploadAmount(features, clock)).toBe(100);
   });
 
   it.each([
@@ -65,7 +65,7 @@ describe('MLS key package allowance', () => {
       100,
     ],
   ] satisfies [string, FeatureList, number][])('%s', (_name, features, expected) => {
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: now});
-    expect(getMLSKeyPackageUploadAmount(features, wallClock)).toBe(expected);
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(now) * 1_000n});
+    expect(getMLSKeyPackageUploadAmount(features, clock)).toBe(expected);
   });
 });

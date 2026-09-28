@@ -72,19 +72,27 @@ export function teamPermissionsForAccessState(state: ACCESS_STATE): number {
 
 export function hasAccessToFeature(feature: number, state: ACCESS_STATE): boolean {
   const permissions = teamPermissionsForAccessState(state);
-  return !!(feature & permissions);
+  return (feature & permissions) !== 0;
 }
 
 export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE) {
   return !hasAccessToFeature(feature, prevState) && hasAccessToFeature(feature, current);
 }
 
-export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_STATE) {
+type FeatureStateChange = {
+  feature: CONVERSATION_ACCESS_ROLE | undefined;
+  featureName: 'Guest' | 'Service' | undefined;
+  isAvailable: boolean | undefined;
+  bitmask: number;
+};
+
+export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_STATE): FeatureStateChange {
   if (prevState === current) {
     return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
   }
   const featureEntry = Object.entries(ACCESS).find(
-    ([, bitmask]) => bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
+    ([, bitmask]) =>
+      (bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current))) !== 0,
   );
   if (featureEntry === undefined) {
     return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};

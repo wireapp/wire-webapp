@@ -38,6 +38,7 @@ import React, {
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {mergeRegister} from '@lexical/utils';
+import {isFunction, isNonEmptyArray, isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {
   $getSelection,
   $isRangeSelection,
@@ -228,7 +229,7 @@ export function getScrollParent(element: HTMLElement, includeHidden: boolean): H
   if (style.position === 'fixed') {
     return document.body;
   }
-  for (let parent: HTMLElement | null = element; (parent = parent.parentElement);) {
+  for (let parent: HTMLElement | null = element; !isNull((parent = parent.parentElement));) {
     style = getComputedStyle(parent);
     if (excludeStaticParent && style.position === 'static') {
       continue;
@@ -392,7 +393,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         KEY_ARROW_DOWN_COMMAND,
         payload => {
           const event = payload;
-          if (options !== null && options.length && selectedIndex !== null) {
+          if (isNonEmptyArray(options) && selectedIndex !== null) {
             const newSelectedIndex = (selectedIndex + 1) % options.length;
             updateSelectedIndex(newSelectedIndex);
             event.preventDefault();
@@ -406,7 +407,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         KEY_ARROW_UP_COMMAND,
         payload => {
           const event = payload;
-          if (options !== null && options.length && selectedIndex !== null) {
+          if (isNonEmptyArray(options) && selectedIndex !== null) {
             const newSelectedIndex = selectedIndex > 0 ? selectedIndex - 1 : options.length - 1;
             updateSelectedIndex(newSelectedIndex);
             event.preventDefault();
@@ -472,10 +473,10 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   const menu = menuRenderFn(anchorElementRef, listItemProps, resolution.match.matchingString);
 
   useLayoutEffect(() => {
-    if (onMenuVisibilityChange && menu !== null && !menuVisible) {
+    if (isFunction(onMenuVisibilityChange) && menu !== null && !menuVisible) {
       onMenuVisibilityChange(true);
       setMenuVisible(true);
-    } else if (onMenuVisibilityChange && menu === null && menuVisible) {
+    } else if (isFunction(onMenuVisibilityChange) && menu === null && menuVisible) {
       onMenuVisibilityChange(false);
       setMenuVisible(false);
     }
@@ -642,7 +643,7 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
           return;
         }
         const match = triggerFn(text, editor);
-        onQueryChange(match ? match.matchingString : null);
+        onQueryChange(isNullOrUndefined(match) ? null : match.matchingString);
 
         if (match !== null && !isSelectionOnEntityBoundary(editor, match.leadOffset)) {
           const isRangePositioned = tryToPositionRange(match.leadOffset, range);

@@ -46,7 +46,7 @@ import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useSchedu
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
 export const ScheduleMeetingModal = () => {
-  const {fireAndForgetInvoker, translate, wallClock} = useApplicationContext();
+  const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
   const {
     isOpen,
     mode,
@@ -89,11 +89,11 @@ export const ScheduleMeetingModal = () => {
     }
 
     close();
-    reset(wallClock);
+    reset(clock);
   };
 
   const handleSubmit = () => {
-    const validationErrors = validate(wallClock);
+    const validationErrors = validate(clock);
     if (hasScheduleMeetingFormErrors(validationErrors)) {
       return;
     }

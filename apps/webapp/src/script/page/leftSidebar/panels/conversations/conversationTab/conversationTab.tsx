@@ -19,6 +19,7 @@
 
 import {ReactElement} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
@@ -73,7 +74,7 @@ export const ConversationTab = ({
       role="tab"
       className={cx(`conversations-sidebar-btn`, {active: isActive})}
       onClick={event => {
-        if (onClick) {
+        if (onClick !== undefined) {
           onClick(event);
           return;
         }
@@ -97,7 +98,7 @@ export const ConversationTab = ({
             data-uie-name={showNotificationsBadge ? 'notification-badge' : 'unread-badge'}
           />
         )}
-        <span className="conversations-sidebar-btn--text">{label || title}</span>
+        <span className="conversations-sidebar-btn--text">{isNonEmptyString(label) ? label : title}</span>
       </span>
     </button>
   );

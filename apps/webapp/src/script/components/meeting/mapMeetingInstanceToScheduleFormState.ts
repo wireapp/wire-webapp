@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import {maybe} from 'true-myth';
 
 import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
@@ -35,10 +35,10 @@ import type {User} from 'Repositories/entity/User';
 export const mapMeetingInstanceToScheduleFormState = (
   meetingInstance: MeetingInstance,
   selectedUsers: User[],
-  wallClock: WallClock,
+  clock: Clock,
 ): ScheduleMeetingFormState => {
   const {meetingSeries} = meetingInstance;
-  const anchorInstance = getEditAnchorMeetingInstance(meetingSeries, wallClock.currentDate);
+  const anchorInstance = getEditAnchorMeetingInstance(meetingSeries, clock.currentDate);
 
   return {
     title: meetingSeries.title,

@@ -17,8 +17,7 @@
  *
  */
 
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
@@ -42,13 +41,12 @@ type GracePeriod = {
   end: number;
 };
 
-const wallClock = createWallClock();
 /**
  * Will return a suitable snooze time based on the grace period
  * @param deadline - the full grace period length in milliseconds
  */
-function getNextTick({end, start}: GracePeriod, activeWallClock: WallClock): number {
-  const now = activeWallClock.currentTimestampInMilliseconds;
+function getNextTick({end, start}: GracePeriod, clock: Clock): number {
+  const now = clock.currentUnixEpochMilliseconds;
 
   if (now >= end) {
     // If the grace period is over, we should force the user to enroll
@@ -77,7 +75,7 @@ function getGracePeriod(
   identity: WireIdentity | undefined,
   e2eActivatedAt: number,
   teamGracePeriodDuration: number,
-  activeWallClock: WallClock,
+  clock: Clock,
 ): GracePeriod {
   const isFirstEnrollment =
     isUndefined(identity) ||
@@ -88,7 +86,7 @@ function getGracePeriod(
     // For a new device, the deadline is the e2ei activate date + the grace period
     return {
       end: e2eActivatedAt + teamGracePeriodDuration,
-      start: activeWallClock.currentTimestampInMilliseconds,
+      start: clock.currentUnixEpochMilliseconds,
     };
   }
 
@@ -105,35 +103,35 @@ export function getEnrollmentTimer(
   identity: WireIdentity | undefined,
   e2eiActivatedAt: number,
   teamGracePeriodDuration: number,
-  activeWallClock: WallClock = wallClock,
+  clock: Clock,
 ) {
   if (identity?.status === MLSStatuses.EXPIRED) {
-    return {isSnoozable: false, firingDate: activeWallClock.currentTimestampInMilliseconds};
+    return {isSnoozable: false, firingDate: clock.currentUnixEpochMilliseconds};
   }
 
-  const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration, activeWallClock);
-  const nextTick = getNextTick(deadline, activeWallClock);
+  const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration, clock);
+  const nextTick = getNextTick(deadline, clock);
 
   // When logging in to a old device that doesn't have an identity yet, we trigger an enrollment timer
-  return {isSnoozable: nextTick > 0, firingDate: activeWallClock.currentTimestampInMilliseconds + nextTick};
+  return {isSnoozable: nextTick > 0, firingDate: clock.currentUnixEpochMilliseconds + nextTick};
 }
 
 export function getRemainingGracePeriodDelay(
   identity: WireIdentity | undefined,
   e2eiActivatedAt: number,
   teamGracePeriodDuration: number,
-  activeWallClock: WallClock = wallClock,
+  clock: Clock,
 ): number {
-  const {end} = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration, activeWallClock);
-  return Math.max(0, end - activeWallClock.currentTimestampInMilliseconds);
+  const {end} = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration, clock);
+  return Math.max(0, end - clock.currentUnixEpochMilliseconds);
 }
 
 export function hasGracePeriodStartedForSelfClient(
   identity: WireIdentity | undefined,
   e2eiActivatedAt: number,
   teamGracePeriodDuration: number,
-  activeWallClock: WallClock = wallClock,
+  clock: Clock,
 ) {
-  const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration, activeWallClock);
-  return activeWallClock.currentTimestampInMilliseconds >= deadline.start;
+  const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration, clock);
+  return clock.currentUnixEpochMilliseconds >= deadline.start;
 }

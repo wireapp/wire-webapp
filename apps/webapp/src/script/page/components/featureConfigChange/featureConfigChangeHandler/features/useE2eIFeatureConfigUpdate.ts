@@ -19,6 +19,7 @@
 
 import {useEffect} from 'react';
 
+import type {Clock} from '@enormora/clock/clock';
 import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {
@@ -29,24 +30,24 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 
 import {configureE2EI} from './e2eIdentity';
 
-const onConfigUpdate = async (configUpdate: {
-  prevFeatureList?: FeatureList | undefined;
-  newFeatureList: FeatureList;
-}) => {
-  const {type} = detectTeamFeatureUpdate(configUpdate, FEATURE_KEY.MLSE2EID);
-
-  if (type !== FeatureUpdateType.UNCHANGED) {
-    const client = await configureE2EI(configUpdate.newFeatureList);
-    await client?.startTimers();
-  }
-};
-
-export const useE2EIFeatureConfigUpdate = (teamRepository: TeamRepository) => {
+export function useE2EIFeatureConfigUpdate(teamRepository: TeamRepository, clock: Clock): void {
   useEffect(() => {
+    async function onConfigUpdate(configUpdate: {
+      prevFeatureList?: FeatureList | undefined;
+      newFeatureList: FeatureList;
+    }): Promise<void> {
+      const {type} = detectTeamFeatureUpdate(configUpdate, FEATURE_KEY.MLSE2EID);
+
+      if (type !== FeatureUpdateType.UNCHANGED) {
+        const client = await configureE2EI(configUpdate.newFeatureList, clock);
+        await client?.startTimers();
+      }
+    }
+
     teamRepository.on('featureConfigUpdated', onConfigUpdate);
 
     return () => {
       teamRepository.off('featureConfigUpdated', onConfigUpdate);
     };
-  }, [teamRepository]);
-};
+  }, [teamRepository, clock]);
+}

@@ -19,10 +19,9 @@
 
 import {Fragment, useEffect, type ReactNode} from 'react';
 
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Call} from 'Repositories/calling/Call';
@@ -117,7 +116,7 @@ function CallingContainerWithJoinedCall({
 
   const setActiveCallViewTab = (tab: CallViewTab) => {
     callState.activeCallViewTab(tab);
-    if (tab === CallViewTab.ALL && joinedCall) {
+    if (tab === CallViewTab.ALL) {
       callingRepository.requestCurrentPageVideoStreams(joinedCall);
     }
   };
@@ -178,7 +177,7 @@ function CallingContainerWithJoinedCall({
 
   return (
     <Fragment>
-      {isFullScreenOrDetached && !!videoGrid?.grid.length && (
+      {isFullScreenOrDetached && videoGrid?.grid.length > 0 && (
         <FullscreenVideoCall
           key={conversation.id}
           videoGrid={videoGrid}

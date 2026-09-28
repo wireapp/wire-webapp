@@ -17,10 +17,11 @@
  *
  */
 
-import {MutableRefObject, useMemo, useState} from 'react';
+import {type ReactElement, MutableRefObject, useMemo, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {isEmptyArray, isNan, isNullOrUndefined} from '@sindresorhus/is';
 // The emoji list comes from the emoji-picker-react package that we also use for reactions. It's a little hacky how we import it but since it's typechecked, we will be warned if this file doesn't exist in the repo with further updates
 import emojiList from 'emoji-picker-react/src/data/emojis.json';
 import {$createTextNode, TextNode} from 'lexical';
@@ -77,13 +78,17 @@ export class EmojiOption extends MenuOption {
     super(title + options.keywords?.join('_'));
     this.title = title.replace(/_/g, ' ');
     this.emoji = emoji;
-    this.keywords = options.keywords || [];
+    this.keywords = isNullOrUndefined(options.keywords) ? [] : options.keywords;
   }
 }
 
-const emojiUsageCount: Record<string, number> = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+const loadedEmojiUsageCount = loadValue<Record<string, number>>(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT);
+const emojiUsageCount: Record<string, number> = isNullOrUndefined(loadedEmojiUsageCount) ? {} : loadedEmojiUsageCount;
 
-const getUsageCount = (emojiName: string): number => emojiUsageCount[emojiName] || 0;
+const getUsageCount = (emojiName: string): number => {
+  const usageCount = emojiUsageCount[emojiName];
+  return !isNullOrUndefined(usageCount) && usageCount !== 0 && !isNan(usageCount) ? usageCount : 0;
+};
 
 const MAX_EMOJI_SUGGESTION_COUNT = 5;
 
@@ -100,7 +105,7 @@ const emojiOptions = emojies.map(({n: aliases, u: codepoint}) => {
   });
 });
 
-export function EmojiPickerPlugin({openStateRef}: Props) {
+export function EmojiPickerPlugin({openStateRef}: Props): ReactElement {
   const [lexicalEditor] = useLexicalComposerContext();
 
   const [queryString, setQueryString] = useState<string | null>(null);
@@ -158,7 +163,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   const getPosition = () => {
     const nativeSelection = window.getSelection();
 
-    if (!rootElement || !nativeSelection) {
+    if (isNullOrUndefined(rootElement) || isNullOrUndefined(nativeSelection)) {
       return {bottom: 0, left: 0};
     }
 
@@ -174,7 +179,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
     anchorElementRef,
     {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex},
   ) => {
-    if (!anchorElementRef.current || !options.length) {
+    if (isNullOrUndefined(anchorElementRef.current) || isEmptyArray(options)) {
       return null;
     }
 

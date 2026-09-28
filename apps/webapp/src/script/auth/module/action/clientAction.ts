@@ -66,7 +66,7 @@ export class ClientAction {
     verificationCode?: string,
     entropyData?: Uint8Array,
   ): ThunkAction => {
-    return async (dispatch, getState, {core, wallClock, actions: {clientAction}}) => {
+    return async (dispatch, getState, {core, clock, actions: {clientAction}}) => {
       const localClient = await core.getLocalClient();
       const commonConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
 
@@ -87,7 +87,7 @@ export class ClientAction {
             ),
           };
 
-      await core.initClient(creationStatus.client, getClientMLSConfig(commonConfig, wallClock));
+      await core.initClient(creationStatus.client, getClientMLSConfig(commonConfig, clock));
       dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
     };
   };

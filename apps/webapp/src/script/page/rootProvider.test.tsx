@@ -22,7 +22,7 @@ import {ReactNode, useContext} from 'react';
 import {renderHook} from '@testing-library/react';
 
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {applockRefactoredFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';
@@ -36,17 +36,17 @@ interface WrapperProperties {
 interface RootProviderWrapper {
   wrapper: (properties: WrapperProperties) => ReactNode;
   isFeatureToggleEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
-  deterministicWallClock: ReturnType<typeof createDeterministicWallClock>;
+  clock: ReturnType<typeof createDeterministicClock>;
   rootContextValue: RootContextValue;
 }
 
 function createRootProviderWrapper(
   mainViewModel: MainViewModel,
-  wallClockTimestampInMilliseconds: number,
+  initialTimestampInMilliseconds: number,
   doesApplicationNeedForceReload: boolean,
 ): RootProviderWrapper {
-  const deterministicWallClock = createDeterministicWallClock({
-    initialCurrentTimestampInMilliseconds: wallClockTimestampInMilliseconds,
+  const clock = createDeterministicClock({
+    initialUnixEpochMicroseconds: BigInt(initialTimestampInMilliseconds) * 1_000n,
   });
   function isFeatureToggleEnabledForTest(featureName: StartupFeatureToggleName): boolean {
     return featureName === applockRefactoredFeatureToggleName;
@@ -58,11 +58,11 @@ function createRootProviderWrapper(
     doesApplicationNeedForceReload,
     isFeatureToggleEnabled,
     mainViewModel,
-    wallClock: deterministicWallClock,
+    clock,
   });
   const wrapper = createRootProviderWrapperForTest(rootContextValue);
 
-  return {wrapper, deterministicWallClock, isFeatureToggleEnabled, rootContextValue};
+  return {wrapper, clock, isFeatureToggleEnabled, rootContextValue};
 }
 
 function getRootContextValue(): RootContextValue | null {
@@ -74,25 +74,25 @@ function getRootContextValue(): RootContextValue | null {
 describe('RootProvider', () => {
   const mainViewModel = {} as MainViewModel;
 
-  it('provides the injected wall clock through context', () => {
-    const {wrapper, deterministicWallClock, rootContextValue} = createRootProviderWrapper(mainViewModel, 1_234, false);
+  it('provides the injected clock through context', () => {
+    const {wrapper, clock, rootContextValue} = createRootProviderWrapper(mainViewModel, 1_234, false);
 
     const {result} = renderHook(getRootContextValue, {wrapper});
 
     expect(result.current?.mainViewModel).toBe(mainViewModel);
     expect(result.current?.fireAndForgetInvoker).toBe(rootContextValue.fireAndForgetInvoker);
-    expect(result.current?.wallClock).toBe(deterministicWallClock);
-    expect(result.current?.wallClock.currentTimestampInMilliseconds).toBe(1_234);
+    expect(result.current?.clock).toBe(clock);
+    expect(result.current?.clock.currentUnixEpochMilliseconds).toBe(1_234);
     expect(result.current?.doesApplicationNeedForceReload).toBe(false);
   });
 
   it('provides the main view model through useMainViewModel()', () => {
-    const {wrapper, deterministicWallClock} = createRootProviderWrapper(mainViewModel, 8_765, false);
+    const {wrapper, clock} = createRootProviderWrapper(mainViewModel, 8_765, false);
 
     const {result} = renderHook(useMainViewModel, {wrapper});
 
     expect(result.current).toBe(mainViewModel);
-    expect(deterministicWallClock.currentTimestampInMilliseconds).toBe(8_765);
+    expect(clock.currentUnixEpochMilliseconds).toBe(8_765);
   });
 
   it('provides force reload status through RootContext', () => {

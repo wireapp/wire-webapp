@@ -17,8 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import {createClock, type Clock} from '@enormora/clock/clock';
 import {isEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {match} from 'path-to-regexp';
 
@@ -26,15 +25,15 @@ import {isConversationListTab, useSidebarStore} from '../page/leftSidebar/panels
 
 type Routes = Record<string, ((...args: any[]) => void | Promise<void>) | null>;
 
-let routerWallClock: WallClock = createWallClock();
-
-export const configureRouterWallClock = (wallClock: WallClock): void => {
-  routerWallClock = wallClock;
-};
-
 const defaultRoute: Routes = {
   // do nothing if url was not matched
   '*': null,
+};
+
+let routerClock: Clock = createClock();
+
+export const configureRouterClock = (clock: Clock): void => {
+  routerClock = clock;
 };
 
 let routes: Routes = {};
@@ -115,7 +114,7 @@ export const setHistoryParam = (path: string): boolean => {
     // never run. Force route re-evaluation async, matching the timing of a real hashchange, so
     // callers that synchronously update content state right after calling this still take effect
     // first.
-    routerWallClock.setTimeout(() => {
+    routerClock.setTimeout(() => {
       if (!isConversationListTab(useSidebarStore.getState().currentTab)) {
         return;
       }

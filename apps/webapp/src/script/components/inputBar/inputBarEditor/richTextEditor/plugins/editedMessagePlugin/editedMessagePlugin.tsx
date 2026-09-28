@@ -21,6 +21,7 @@ import {useEffect} from 'react';
 
 import {$convertFromMarkdownString} from '@lexical/markdown';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {$getRoot, $setSelection} from 'lexical';
 
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
@@ -41,7 +42,7 @@ export function EditedMessagePlugin({message, showMarkdownPreview}: Props): null
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    if (message) {
+    if (!isNullOrUndefined(message)) {
       // Need to timeout to be sure the editor is in a state to receive the new message (could cause problems with cursor position)
       setTimeout(() => {
         editor.update(() => {

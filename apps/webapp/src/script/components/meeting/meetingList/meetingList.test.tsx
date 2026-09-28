@@ -21,7 +21,7 @@ import {useMemo} from 'react';
 
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import type {Virtualizer} from '@tanstack/react-virtual';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {createStore} from 'zustand/vanilla';
 
 import type {UseMeetingListVirtualizer} from 'Components/meeting/meetingList/useMeetingListVirtualizer';
@@ -115,13 +115,13 @@ const createMeetingStoreForTest = () =>
 const renderMeetingList = (
   props: Omit<MeetingListProps, 'useMeetingListVirtualizer' | 'selfUser' | 'onRefresh'> &
     Partial<Pick<MeetingListProps, 'selfUser' | 'onRefresh'>>,
-  wallClock = createDeterministicWallClock(),
+  clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   useMeetingListVirtualizer = createUseMeetingListVirtualizerForTest(),
 ) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
-      wallClock,
+      clock,
       mainViewModel: createMainViewModelForTest(),
     }),
   );
@@ -168,12 +168,12 @@ describe('MeetingList', () => {
   });
 
   it('renders ongoing meetings within the today section', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: new Date('2026-06-15T14:30:00.000Z').getTime(),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(new Date('2026-06-15T14:30:00.000Z').getTime()) * 1_000n,
     });
 
     const createRelativeSeries = (startHour: number, endHour: number, title: string): MeetingSeries => {
-      const start = new Date(wallClock.currentDate);
+      const start = new Date(clock.currentDate);
       start.setHours(startHour, 0, 0, 0);
 
       const end = new Date(start);
@@ -187,7 +187,7 @@ describe('MeetingList', () => {
       createRelativeSeries(16, 17, 'Upcoming meeting'),
     ];
 
-    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock);
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, clock);
 
     expect(screen.getByText('Ongoing meeting')).toBeInTheDocument();
     expect(screen.getByText('Upcoming meeting')).toBeInTheDocument();
@@ -198,12 +198,12 @@ describe('MeetingList', () => {
   });
 
   it('renders completed meetings in the today section until local midnight', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: new Date('2026-06-15T16:00:00.000Z').getTime(),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(new Date('2026-06-15T16:00:00.000Z').getTime()) * 1_000n,
     });
 
     const createRelativeSeries = (startHour: number, endHour: number, title: string): MeetingSeries => {
-      const start = new Date(wallClock.currentDate);
+      const start = new Date(clock.currentDate);
       start.setHours(startHour, 0, 0, 0);
 
       const end = new Date(start);
@@ -217,7 +217,7 @@ describe('MeetingList', () => {
       createRelativeSeries(17, 18, 'Upcoming meeting'),
     ];
 
-    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock);
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, clock);
 
     expect(screen.getByRole('heading', {name: /meetings\.list\.today/})).toBeInTheDocument();
     expect(screen.getByText('Completed meeting')).toBeInTheDocument();
@@ -226,22 +226,22 @@ describe('MeetingList', () => {
   });
 
   it('renders the next meeting even when it is more than one year away', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: new Date('2026-06-15T12:00:00.000Z').getTime(),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(new Date('2026-06-15T12:00:00.000Z').getTime()) * 1_000n,
     });
 
     const meetingSeries = [
       createMeetingSeries('2027-07-10T10:00:00.000Z', '2027-07-10T11:00:00.000Z', 'Far future meeting'),
     ];
 
-    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock);
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, clock);
 
     expect(screen.getByText('Far future meeting')).toBeInTheDocument();
   });
 
   it('renders only virtualized entries when one day contains multiple meetings', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: new Date('2026-06-15T12:00:00.000Z').getTime(),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(new Date('2026-06-15T12:00:00.000Z').getTime()) * 1_000n,
     });
     const meetingSeries = [
       createMeetingSeries('2026-06-15T14:00:00.000Z', '2026-06-15T15:00:00.000Z', 'First meeting'),
@@ -250,15 +250,15 @@ describe('MeetingList', () => {
     const useFirstVirtualEntryOnly: UseMeetingListVirtualizer = ({getEstimatedItemHeight}) =>
       createMeetingListVirtualizerForTest(1, getEstimatedItemHeight);
 
-    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock, useFirstVirtualEntryOnly);
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, clock, useFirstVirtualEntryOnly);
 
     expect(screen.queryByText('First meeting')).not.toBeInTheDocument();
     expect(screen.queryByText('Second meeting')).not.toBeInTheDocument();
   });
 
   it('keeps the day description available when its virtualized heading is unmounted', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: new Date('2026-06-15T12:00:00.000Z').getTime(),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(new Date('2026-06-15T12:00:00.000Z').getTime()) * 1_000n,
     });
     const meetingSeries = [
       createMeetingSeries('2026-06-15T14:00:00.000Z', '2026-06-15T15:00:00.000Z', 'Visible meeting'),
@@ -266,7 +266,7 @@ describe('MeetingList', () => {
     const useMeetingRowOnly: UseMeetingListVirtualizer = ({getEstimatedItemHeight}) =>
       createMeetingListVirtualizerForTest(1, getEstimatedItemHeight, 1);
 
-    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, wallClock, useMeetingRowOnly);
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, clock, useMeetingRowOnly);
 
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
     const meetingItem = screen.getByText('Visible meeting').closest('[aria-describedby]');
@@ -328,8 +328,8 @@ describe('MeetingList', () => {
   });
 
   it('loads another occurrence page when the virtualized tail is reached', () => {
-    const wallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: new Date('2026-06-15T12:00:00.000Z').getTime(),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(new Date('2026-06-15T12:00:00.000Z').getTime()) * 1_000n,
     });
     const meetingSeries = Array.from({length: 51}, (_unused, index) => {
       const start = new Date('2026-06-15T14:00:00.000Z');
@@ -346,12 +346,12 @@ describe('MeetingList', () => {
     });
     const scrollElementRef = {current: scrollElement};
 
-    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false, scrollElementRef}, wallClock);
+    renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false, scrollElementRef}, clock);
     expect(screen.queryByText('Meeting 51')).not.toBeInTheDocument();
 
     act(() => {
       fireEvent.scroll(scrollElement);
-      wallClock.advanceByMilliseconds(100);
+      clock.advanceByMilliseconds(100);
     });
 
     expect(screen.getByText('Meeting 51')).toBeInTheDocument();

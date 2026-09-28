@@ -19,6 +19,8 @@
 
 import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
+import {isNull, isNullOrUndefined} from '@sindresorhus/is';
+
 import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -94,14 +96,14 @@ export const TabAndFilterSettings = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!event.target) {
+      if (isNull(event.target)) {
         return;
       }
 
       if (
-        dropdownRef.current &&
+        !isNull(dropdownRef.current) &&
         !dropdownRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
+        !isNull(buttonRef.current) &&
         !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
@@ -129,7 +131,7 @@ export const TabAndFilterSettings = () => {
 
   // Focus the item when focusedIndex changes
   useEffect(() => {
-    if (isOpen && itemRefs.current[focusedIndex]) {
+    if (isOpen && !isNullOrUndefined(itemRefs.current[focusedIndex])) {
       itemRefs.current[focusedIndex]?.focus();
     }
   }, [isOpen, focusedIndex]);

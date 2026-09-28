@@ -17,6 +17,7 @@
  *
  */
 
+import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -76,7 +77,9 @@ export const CreateConversationHeader = () => {
   };
 
   const isNextButtonDisabled =
-    !!error || !conversationName || (selfUser?.isExternal() && conversationType === ConversationType.Group);
+    isNonEmptyString(error) ||
+    isEmptyString(conversationName) ||
+    (selfUser?.isExternal() && conversationType === ConversationType.Group);
 
   return (
     <div className="modal__header modal__header--list" css={createConversationHeaderContainerCss}>

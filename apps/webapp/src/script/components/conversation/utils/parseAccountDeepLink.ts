@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 export type ParseAccountDeepLink =
   | {type: 'user-profile'; id: string; domain?: string}
   | {type: 'conversation-join'; key: string; code: string; domain?: string}
@@ -33,9 +35,11 @@ const parseQualifiedUserId = (value: string): ParsedQualifiedId => {
     return {id: value};
   }
 
+  const domain = value.slice(atIndex + 1);
+
   return {
     id: value.slice(0, atIndex),
-    domain: value.slice(atIndex + 1) || undefined,
+    domain: isNonEmptyString(domain) ? domain : undefined,
   };
 };
 

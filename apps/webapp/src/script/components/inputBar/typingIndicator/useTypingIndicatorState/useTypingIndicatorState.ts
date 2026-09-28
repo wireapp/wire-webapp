@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {create} from 'zustand';
 
 import {User} from 'Repositories/entity/User';
@@ -41,8 +42,10 @@ export const useTypingIndicatorState = create<TypingIndicatorState>((set, get) =
   addTypingUser: ({conversationId, user, timerId}) =>
     set(state => {
       if (
-        state.typingUsers.find(
-          typingUser => typingUser.conversationId === conversationId && typingUser.user.id === user.id,
+        !isNullOrUndefined(
+          state.typingUsers.find(
+            typingUser => typingUser.conversationId === conversationId && typingUser.user.id === user.id,
+          ),
         )
       ) {
         return state;

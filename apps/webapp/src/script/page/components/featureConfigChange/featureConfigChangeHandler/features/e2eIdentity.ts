@@ -17,6 +17,7 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
@@ -53,7 +54,7 @@ export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE
   return e2eiConfig;
 };
 
-export const configureE2EI = (config: FeatureList): undefined | Promise<E2EIHandler> => {
+export const configureE2EI = (config: FeatureList, clock: Clock): undefined | Promise<E2EIHandler> => {
   // Either get the current E2EIdentity handler instance or create a new one
   const e2eiConfig = getE2EIConfig(config);
   if (!e2eiConfig) {
@@ -66,5 +67,6 @@ export const configureE2EI = (config: FeatureList): undefined | Promise<E2EIHand
   return E2EIHandler.getInstance().initialize({
     discoveryUrl,
     gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
+    clock,
   });
 };

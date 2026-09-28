@@ -19,12 +19,11 @@
 
 import {ReactNode} from 'react';
 
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
-
-import {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {Translate} from 'Util/localizerUtil';
 
@@ -38,7 +37,7 @@ type CreateRootContextValueForTestParameters = {
   readonly isFeatureToggleEnabled?: (featureName: StartupFeatureToggleName) => boolean;
   readonly mainViewModel?: MainViewModel;
   readonly translate: Translate;
-  readonly wallClock?: WallClock;
+  readonly clock?: Clock;
 };
 
 type RootProviderWrapperProperties = {
@@ -71,32 +70,11 @@ export function createFireAndForgetInvokerForTest(): FireAndForgetInvoker {
 }
 
 export function createExecutingFireAndForgetInvokerForTest(): FireAndForgetInvoker {
-  const activePromises = new Set<Promise<unknown>>();
-
-  async function observePromise(activePromise: Promise<unknown>): Promise<void> {
-    try {
-      await activePromise;
-    } catch {
+  return createFireAndForgetInvoker({
+    reportError() {
       return undefined;
-    } finally {
-      activePromises.delete(activePromise);
-    }
-  }
-
-  function fireAndForget(asyncAction: () => Promise<unknown>): void {
-    const activePromise = asyncAction();
-    activePromises.add(activePromise);
-    observePromise(activePromise).catch(() => undefined);
-  }
-
-  async function waitUntilAllSettled(): Promise<void> {
-    await Promise.allSettled(activePromises);
-  }
-
-  return {
-    fireAndForget,
-    waitUntilAllSettled,
-  };
+    },
+  });
 }
 
 export function createRootContextValueForTest(parameters: CreateRootContextValueForTestParameters): RootContextValue {
@@ -106,7 +84,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     isFeatureToggleEnabled = isFeatureToggleDisabledForTest,
     mainViewModel = createMainViewModelForTest(),
     translate,
-    wallClock = createWallClock(),
+    clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   } = parameters;
 
   return {
@@ -114,8 +92,8 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     fireAndForgetInvoker,
     isFeatureToggleEnabled,
     mainViewModel,
+    clock,
     translate,
-    wallClock,
     applicationNavigation: {
       get currentPathname(): string {
         return '/';

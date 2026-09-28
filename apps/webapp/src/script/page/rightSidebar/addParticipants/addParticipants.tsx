@@ -19,7 +19,7 @@
 
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
-import {isNonEmptyArray} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 
@@ -154,7 +154,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
 
   const contacts = useMemo(() => {
-    if (!teamCollaborators.length) {
+    if (isEmptyArray(teamCollaborators)) {
       return baseContacts;
     }
 
@@ -180,13 +180,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
-  const headerText = selectedContacts.length
+  const headerText = isNonEmptyArray(selectedContacts)
     ? translate('addParticipantsHeaderWithCounter', {number: selectedContacts.length})
     : translate('addParticipantsHeader');
 
   const showIntegrations = useMemo(() => {
     const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
-    const isService = !!firstUserEntity?.isService;
+    const isService = firstUserEntity?.isService === true;
     const allowIntegrations = isGroupOrChannel || isService;
 
     // Don't allow new apps to be added if the feature has been disabled
@@ -228,7 +228,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   };
 
   const openManageServices = () => {
-    if (manageServicesUrl) {
+    if (isNonEmptyString(manageServicesUrl)) {
       safeWindowOpen(manageServicesUrl);
     }
   };
@@ -337,7 +337,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
             <>
               {isNonEmptyArray(servicesList) && (
                 <>
-                  {canManageServices() && !!manageServicesUrl && (
+                  {canManageServices() && isNonEmptyString(manageServicesUrl) && (
                     <ul className="panel-manage-services left-list-items">
                       <li
                         role="presentation"
@@ -366,11 +366,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                 </>
               )}
 
-              {!servicesList.length && !isInitialServiceSearch && (
+              {isEmptyArray(servicesList) && !isInitialServiceSearch && (
                 <div className="search__no-services">
                   <Icon.ServiceIcon className="search__no-services__icon" />
 
-                  {canManageServices() && !!manageServicesUrl && (
+                  {canManageServices() && isNonEmptyString(manageServicesUrl) && (
                     <>
                       <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
                         {translate('addParticipantsNoAppsManager')}

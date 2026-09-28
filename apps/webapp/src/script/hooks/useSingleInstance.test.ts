@@ -18,8 +18,8 @@
  */
 
 import {renderHook} from '@testing-library/react';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
-import type {DeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
 import {act} from 'react';
 import {Maybe, maybe} from 'true-myth';
 
@@ -62,7 +62,7 @@ type UseSingleInstanceTestEnvironment = {
   isDesktopApp: jest.Mock<boolean, []>;
   singleInstanceStorage: StringKeyValueStorage;
   useSingleInstance: ReturnType<typeof createUseSingleInstance>;
-  wallClock: DeterministicWallClock;
+  clock: DeterministicClock;
 };
 
 function createUseSingleInstanceTestEnvironment(): UseSingleInstanceTestEnvironment {
@@ -75,10 +75,10 @@ function createUseSingleInstanceTestEnvironment(): UseSingleInstanceTestEnvironm
   });
 
   const singleInstanceStorage = createInMemoryStringKeyValueStorage();
-  const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 0});
-  const useSingleInstance = createUseSingleInstance({createInstanceId, isDesktopApp, singleInstanceStorage, wallClock});
+  const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+  const useSingleInstance = createUseSingleInstance({createInstanceId, isDesktopApp, singleInstanceStorage, clock});
 
-  return {isDesktopApp, singleInstanceStorage, useSingleInstance, wallClock};
+  return {isDesktopApp, singleInstanceStorage, useSingleInstance, clock};
 }
 
 describe('useSingleInstance', () => {
@@ -127,7 +127,7 @@ describe('useSingleInstance', () => {
   });
 
   it('detects a new instance that has started', () => {
-    const {useSingleInstance, wallClock} = createUseSingleInstanceTestEnvironment();
+    const {useSingleInstance, clock} = createUseSingleInstanceTestEnvironment();
 
     const {
       result: {current: firstInstance},
@@ -144,7 +144,7 @@ describe('useSingleInstance', () => {
     firstInstance.registerInstance();
 
     act(() => {
-      wallClock.advanceByMilliseconds(1001);
+      clock.advanceByMilliseconds(1001);
     });
     expect(secondInstance.current.hasOtherInstance).toBeTruthy();
 
@@ -152,8 +152,7 @@ describe('useSingleInstance', () => {
   });
 
   it('allows desktop app instances regardless of stored instance data', () => {
-    const {isDesktopApp, singleInstanceStorage, useSingleInstance, wallClock} =
-      createUseSingleInstanceTestEnvironment();
+    const {isDesktopApp, singleInstanceStorage, useSingleInstance, clock} = createUseSingleInstanceTestEnvironment();
 
     isDesktopApp.mockReturnValue(true);
     singleInstanceStorage.setItem('app_opened', JSON.stringify({appInstanceId: 'other-instance-id'}));
@@ -165,7 +164,7 @@ describe('useSingleInstance', () => {
     expect(currentInstance.current.hasOtherInstance).toBeFalsy();
 
     act(() => {
-      wallClock.advanceByMilliseconds(1001);
+      clock.advanceByMilliseconds(1001);
     });
 
     expect(currentInstance.current.hasOtherInstance).toBeFalsy();

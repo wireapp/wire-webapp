@@ -17,6 +17,7 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {Maybe} from 'true-myth';
 
 import {Logger, getLogger} from 'Util/logger';
@@ -24,15 +25,13 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
-import type {MonotonicClock} from '../../time/monotonicClock';
-
 type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
 
 export class AppInitTimings {
   private readonly timings: AppTimings;
-  private readonly init: number;
+  private readonly startedAtMonotonicMicroseconds: bigint;
   private readonly logger: Logger;
-  private readonly monotonicClock: MonotonicClock;
+  private readonly clock: Clock;
   private lastRecordedStep: Maybe<AppInitTimingsStep> = Maybe.nothing();
 
   static get CONFIG() {
@@ -43,10 +42,10 @@ export class AppInitTimings {
     };
   }
 
-  constructor(monotonicClock: MonotonicClock, startedAtMilliseconds: number) {
+  constructor(clock: Clock, startedAtMonotonicMicroseconds: bigint) {
     this.logger = getLogger('AppInitTimings');
-    this.init = startedAtMilliseconds;
-    this.monotonicClock = monotonicClock;
+    this.startedAtMonotonicMicroseconds = startedAtMonotonicMicroseconds;
+    this.clock = clock;
     this.timings = {};
   }
 
@@ -70,12 +69,13 @@ export class AppInitTimings {
   }
 
   timeStep(step: AppInitTimingsStep): void {
-    this.timeStepAt(step, this.monotonicClock.nowMilliseconds);
+    this.timeStepAt(step, this.clock.currentMonotonicMicroseconds);
   }
 
-  timeStepAt(step: AppInitTimingsStep, occurredAtMilliseconds: number): void {
+  timeStepAt(step: AppInitTimingsStep, occurredAtMonotonicMicroseconds: bigint): void {
     if (this.timings[step] === undefined) {
-      this.timings[step] = occurredAtMilliseconds - this.init;
+      const durationInMonotonicMicroseconds = occurredAtMonotonicMicroseconds - this.startedAtMonotonicMicroseconds;
+      this.timings[step] = Number(durationInMonotonicMicroseconds) / TIME_IN_MILLIS.SECOND;
       this.lastRecordedStep = Maybe.just(step);
     }
   }

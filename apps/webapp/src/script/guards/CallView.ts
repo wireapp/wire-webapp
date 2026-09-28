@@ -27,7 +27,7 @@ interface CallViewOption {
 export const isCallViewOption = (option: unknown): option is CallViewOption => {
   const callViewValues = Object.values(CallViewTab) as string[];
   return (
-    !!option &&
+    option !== null &&
     typeof option === 'object' &&
     'value' in option &&
     typeof option?.value === 'string' &&

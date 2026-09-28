@@ -19,7 +19,8 @@
 
 import {FC, ReactNode, useEffect, useMemo} from 'react';
 
-import {createWallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
@@ -27,11 +28,11 @@ import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {RootProvider} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {ClientManager} from './clientManager';
 import {ConversationJoin} from './conversationJoin';
@@ -67,16 +68,15 @@ import {Index} from './index';
 
 interface RootProps {
   translate: Translate;
+  clock: Clock;
 }
 
-const authFireAndForgetInvoker: FireAndForgetInvoker = {
-  fireAndForget(asyncAction) {
-    void asyncAction();
+const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
+const authFireAndForgetInvoker = createFireAndForgetInvoker({
+  reportError(error) {
+    fireAndForgetInvokerLogger.error('failed to execute fire-and-forget action', error);
   },
-  async waitUntilAllSettled(): Promise<void> {
-    return undefined;
-  },
-};
+});
 
 function createAuthMainViewModel(): MainViewModel {
   return {} as MainViewModel;
@@ -95,12 +95,13 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   isFetchingSSOSettings,
   doGetSSOSettings,
   translate,
+  clock,
 }) => {
   const rootContextValue = useMemo(() => {
     return {
       fireAndForgetInvoker: authFireAndForgetInvoker,
       mainViewModel: createAuthMainViewModel(),
-      wallClock: createWallClock(),
+      clock,
       doesApplicationNeedForceReload: false,
       isFeatureToggleEnabled() {
         return false;
@@ -121,7 +122,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
         },
       },
     };
-  }, [translate]);
+  }, [clock, translate]);
   // Injects the helper class used by useRouteA11y so programmatic focus targets (for screen readers)
   // lose their outlines while the focus trap is active.
   useEffect(() => {

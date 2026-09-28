@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
@@ -41,7 +41,7 @@ const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
 const futureStartIso = futureStartDate.toISOString();
 const futureEndIso = futureEndDate.toISOString();
 
-const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
 const deviceTimeZone = {ianaTimeZoneId: 'Europe/Berlin'};
 
 const scheduleCommand: ScheduleMeetingCommand = {
@@ -167,7 +167,7 @@ describe('scheduleMeeting', () => {
         meetingsRepository,
         conversationRepository,
         callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
-        wallClock,
+        clock,
         deviceTimeZone,
       },
       createMeetingMock,
@@ -325,7 +325,7 @@ describe('meetNowMeeting', () => {
         meetingsRepository,
         conversationRepository,
         callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
-        wallClock,
+        clock,
         deviceTimeZone,
       },
       createMeetingMock,
@@ -435,7 +435,7 @@ describe('updateMeeting', () => {
         meetingsRepository,
         conversationRepository,
         callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
-        wallClock,
+        clock,
         deviceTimeZone,
       },
       updateMeetingMock,

@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 import type {Result} from 'true-myth';
@@ -81,7 +82,7 @@ const useMeetingConversationCall = (qualifiedConversationId: QualifiedId) => {
   );
 
   useEffect(() => {
-    if (!call || isCallActive) {
+    if (isUndefined(call) || isCallActive) {
       setConnectingCallState(null);
       return noop;
     }

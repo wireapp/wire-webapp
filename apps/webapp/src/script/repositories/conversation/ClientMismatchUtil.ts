@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import type {MessageSendingStatus, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
@@ -63,7 +64,7 @@ export function extractClientDiff(
     missingClients: missingClients.map(toClientDiff),
     missingUserIds: [],
   };
-  if (!users) {
+  if (isNullOrUndefined(users)) {
     return clientDiff;
   }
 
@@ -71,8 +72,8 @@ export function extractClientDiff(
     .filter(user => !user.isMe)
     .filter(user => {
       const userClients = user.devices().map(({id}) => id);
-      const userDeletedClients =
-        deletedClients.find(({userId}) => matchQualifiedIds(user.qualifiedId, userId))?.data || [];
+      const deletedClientData = deletedClients.find(({userId}) => matchQualifiedIds(user.qualifiedId, userId))?.data;
+      const userDeletedClients = isNullOrUndefined(deletedClientData) ? [] : deletedClientData;
       const commonDevices = intersection(userClients, userDeletedClients);
       return commonDevices.length === userClients.length;
     });
@@ -104,18 +105,21 @@ export function extractClientDiff(
 type Recipients = UserClients | QualifiedUserClients;
 
 export function findDeletedClients<T extends Recipients>(referenceRecipients: T, localRecipients: T): Recipients {
-  const filterKnownClients = (clients: UserClients, knownClients: UserClients) => {
+  const filterKnownClients = (clients: UserClients, knownClients: UserClients): UserClients => {
     return Object.entries(clients).reduce<UserClients>((missing, [userId, clients]) => {
       const knownUserClients = knownClients[userId] ?? [];
       const missingClients = difference(knownUserClients, clients);
-      return missingClients.length ? {...missing, [userId]: missingClients} : missing;
+      return isNonEmptyArray(missingClients) ? {...missing, [userId]: missingClients} : missing;
     }, {});
   };
 
-  const filterKnownQualifiedClients = (clients: QualifiedUserClients, knownClients: QualifiedUserClients) => {
+  const filterKnownQualifiedClients = (
+    clients: QualifiedUserClients,
+    knownClients: QualifiedUserClients,
+  ): QualifiedUserClients => {
     return Object.entries(clients).reduce<QualifiedUserClients>((missing, [domain, userClients]) => {
       const missingUserClients = filterKnownClients(userClients, knownClients[domain]);
-      return Object.keys(missingUserClients).length ? {...missing, [domain]: missingUserClients} : missing;
+      return isNonEmptyArray(Object.keys(missingUserClients)) ? {...missing, [domain]: missingUserClients} : missing;
     }, {});
   };
 

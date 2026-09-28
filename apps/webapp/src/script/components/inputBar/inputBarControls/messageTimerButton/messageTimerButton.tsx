@@ -19,6 +19,7 @@
 
 import {MouseEvent, KeyboardEvent} from 'react';
 
+import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -48,7 +49,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
     'isSelfDeletingMessagesEnabled',
     'isSelfDeletingMessagesEnforced',
   ]);
-  const hasMessageTimer = !!messageTimer;
+  const hasMessageTimer = !isNullOrUndefined(messageTimer) && messageTimer !== 0 && !isNan(messageTimer);
   const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
   const duration = hasMessageTimer ? formatDuration(messageTimer, translate) : ({} as DurationUnit);
 

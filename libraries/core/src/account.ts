@@ -17,6 +17,7 @@
  *
  */
 
+import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {
   RegisterData,
@@ -95,7 +96,6 @@ import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from '
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
-import {createFireAndForgetInvoker} from './taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
@@ -218,6 +218,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
     this.logger = LogFactory.getLogger('@wireapp/core/Account');
+    const accountLogger = this.logger;
     this.recurringTaskScheduler = new RecurringTaskScheduler(
       {
         get: async key => {
@@ -231,7 +232,11 @@ export class Account extends TypedEventEmitter<Events> {
           await this.db?.delete('recurringTasks', key);
         },
       },
-      createFireAndForgetInvoker({logger: this.logger}),
+      createFireAndForgetInvoker({
+        reportError(error) {
+          accountLogger.error('failed to execute fire-and-forget action', error);
+        },
+      }),
     );
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {

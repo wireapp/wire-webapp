@@ -17,6 +17,7 @@
  *
  */
 
+import {isFunction, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
@@ -154,7 +155,7 @@ export class Message {
   }
 
   public get qualifiedFrom(): QualifiedId {
-    return {domain: this.fromDomain || '', id: this.from};
+    return {domain: isNonEmptyString(this.fromDomain) ? this.fromDomain : '', id: this.from};
   }
 
   readonly displayTimestampShort = (): string => {
@@ -263,7 +264,7 @@ export class Message {
     if (this.isContent()) {
       const assetEntity = this.getFirstAsset();
 
-      if (assetEntity && typeof (assetEntity as FileAsset).original_resource === 'function') {
+      if (!isUndefined(assetEntity) && isFunction((assetEntity as FileAsset).original_resource)) {
         return true;
       }
     }
@@ -280,7 +281,7 @@ export class Message {
       this.hasAssetText() &&
       (this as unknown as ContentMessage)
         .assets()
-        .some(assetEntity => assetEntity.isText() && assetEntity.previews().length)
+        .some(assetEntity => assetEntity.isText() && isNonEmptyArray(assetEntity.previews()))
     );
   }
 

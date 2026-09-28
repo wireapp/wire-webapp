@@ -19,6 +19,8 @@
 
 import {FC} from 'react';
 
+import {isNan, isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
+
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
@@ -53,17 +55,19 @@ const GroupDetails: FC<GroupDetailsProps> = ({
   return (
     <>
       <div className="conversation-details__participant_count">
-        {!!userParticipants.length && (
+        {isNonEmptyArray(userParticipants) && (
           <span className="conversation-details__participant_count__user">
             <span className="conversation-details__participant_count__number" data-uie-name="status-user-count">
-              {allUsersCount || userParticipants.length}
+              {!isNullOrUndefined(allUsersCount) && allUsersCount !== 0 && !isNan(allUsersCount)
+                ? allUsersCount
+                : userParticipants.length}
             </span>
             &nbsp;
             <span className="conversation-details__participant_count__text">{participantsUserText}</span>
           </span>
         )}
 
-        {!!serviceParticipants.length && (
+        {isNonEmptyArray(serviceParticipants) && (
           <span className="conversation-details__participant_count__service">
             <span className="conversation-details__participant_count__number" data-uie-name="status-service-count">
               {serviceParticipants.length}

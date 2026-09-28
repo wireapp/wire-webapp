@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {act, render, screen} from '@testing-library/react';
 
 import enUS from 'src/i18n/en-US.json';
@@ -29,9 +29,9 @@ import {SystemMessage} from './systemMessage';
 
 describe('SystemMessage MLS reset messages', () => {
   it('shows the resetting user and the recovery explanation as a system message', () => {
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n});
     const message = createSessionResetMessage(key => enUS[key]);
-    message.timestamp(wallClock.currentTimestampInMilliseconds);
+    message.timestamp(clock.currentUnixEpochMilliseconds);
     const user = new User('resetting-user-id', 'staging.zinfra.io', translateForTest);
     user.name('User X');
     render(<SystemMessage message={message} />);
@@ -44,9 +44,9 @@ describe('SystemMessage MLS reset messages', () => {
   });
 
   it('shows the success caption without a sender name once the resetting user resolves to self', () => {
-    const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_700_000_000_000});
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n});
     const message = createSessionResetMessage(key => enUS[key]);
-    message.timestamp(wallClock.currentTimestampInMilliseconds);
+    message.timestamp(clock.currentUnixEpochMilliseconds);
     render(<SystemMessage message={message} />);
 
     const user = new User('self-user-id', 'staging.zinfra.io', translateForTest);

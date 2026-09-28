@@ -17,20 +17,20 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
 import {Maybe} from 'true-myth';
 
 const REGULAR_UPLOAD_AMOUNT = 100;
 const MIGRATION_UPLOAD_AMOUNT = 1000;
 
-export const getMLSKeyPackageUploadAmount = (features: FeatureList, wallClock: WallClock): number => {
+export const getMLSKeyPackageUploadAmount = (features: FeatureList, clock: Clock): number => {
   const migration = Maybe.of(features.mlsMigration);
   return migration.match({
     Just: feature => {
       const deadline = Maybe.of(feature.config.finaliseRegardlessAfter);
       const beforeDeadline = deadline.match({
-        Just: value => wallClock.currentTimestampInMilliseconds < Date.parse(value),
+        Just: value => clock.currentUnixEpochMilliseconds < Date.parse(value),
         Nothing: () => true,
       });
       return feature.status === FEATURE_STATUS.ENABLED && beforeDeadline

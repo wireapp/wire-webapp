@@ -17,12 +17,12 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
+import {BackendError, BackendErrorData, BackendErrorLabel, StatusCode} from '../http/';
 import {QualifiedId} from '../user';
 
 export class ConversationError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
-    super(message, label, code);
+  constructor(message: string, label: BackendErrorLabel, code: StatusCode, data?: BackendErrorData) {
+    super(message, label, code, data);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConversationError';
   }
@@ -132,8 +132,9 @@ export class MLSGroupOutOfSyncError extends ConversationError {
     missingUsers: QualifiedId[] = [],
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC,
+    data?: BackendErrorData,
   ) {
-    super(message, label, code);
+    super(message, label, code, data);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'MLSGroupOutOfSyncError';
     this.missing_users = missingUsers;

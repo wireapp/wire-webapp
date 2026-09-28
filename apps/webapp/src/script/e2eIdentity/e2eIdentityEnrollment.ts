@@ -17,6 +17,7 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {isArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
@@ -50,6 +51,7 @@ import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
+  clock: Clock;
 }
 
 export type E2EIDeviceStatus = 'valid' | 'locked';
@@ -68,6 +70,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
   #config?: EnrollmentConfig;
+  private applicationClock?: Clock;
   private oidcService?: OIDCService;
   public certificateTtl?: number;
 
@@ -120,6 +123,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return this.#config;
   }
 
+  private get clock(): Clock {
+    if (this.applicationClock === undefined) {
+      throw new Error('Trying to access the clock without initializing the E2EIHandler');
+    }
+
+    return this.applicationClock;
+  }
+
   /**
    * Reset the instance
    */
@@ -136,7 +147,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   /** will initialize the e2ei enrollment handler eventually triggering an enrollment flow if the device is a fresh new one */
-  public async initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
+  public async initialize({discoveryUrl, gracePeriodInSeconds, clock}: E2EIHandlerParams) {
+    this.applicationClock = clock;
     const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
     this.#config = {
       discoveryUrl,
@@ -178,6 +190,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       identity,
       this.enrollmentStore.get.e2eiActivatedAt(),
       this.config.gracePeriodInMs,
+      this.clock,
     );
   }
 
@@ -190,9 +203,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
+    const clock = this.clock;
     // We store the first time the user was prompted with the enrollment modal
     const storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
-    const e2eActivatedAt = storedE2eActivatedAt || Date.now();
+    const e2eActivatedAt = storedE2eActivatedAt || clock.currentUnixEpochMilliseconds;
     this.enrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
@@ -206,17 +220,20 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       identity,
       e2eActivatedAt,
       this.config.gracePeriodInMs,
+      clock,
     );
 
-    const task = async (isSnoozable: boolean) => {
+    const task = async (isSnoozable: boolean): Promise<void> => {
       await this.processEnrollmentUponExpiry(isSnoozable, () => this.enrollmentStore.clear.timer());
     };
 
     const storedFiringDate = this.enrollmentStore.get.timer();
-    const firingDate = isFirstE2EIActivation ? Date.now() : storedFiringDate || computedFiringDate;
+    const firingDate = isFirstE2EIActivation
+      ? clock.currentUnixEpochMilliseconds
+      : storedFiringDate || computedFiringDate;
     this.enrollmentStore.store.timer(firingDate);
 
-    if (firingDate <= Date.now()) {
+    if (firingDate <= clock.currentUnixEpochMilliseconds) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now
       void task(isSnoozable);
@@ -224,7 +241,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       LowPrecisionTaskScheduler.addTask({
         key: timerKey,
         task: () => {
-          const {isSnoozable} = getEnrollmentTimer(identity, e2eActivatedAt, this.config.gracePeriodInMs);
+          const {isSnoozable} = getEnrollmentTimer(identity, e2eActivatedAt, this.config.gracePeriodInMs, clock);
           return task(isSnoozable);
         },
         firingDate: firingDate,
@@ -232,12 +249,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       });
     }
     return {
-      nextReminderDelay: firingDate - Date.now(),
-      remainingGracePeriodDelay: getRemainingGracePeriodDelay(identity, e2eActivatedAt, this.config.gracePeriodInMs),
+      nextReminderDelay: firingDate - clock.currentUnixEpochMilliseconds,
+      remainingGracePeriodDelay: getRemainingGracePeriodDelay(
+        identity,
+        e2eActivatedAt,
+        this.config.gracePeriodInMs,
+        clock,
+      ),
     };
   }
 
-  private async processEnrollmentUponExpiry(snoozable: boolean, onUserAction: () => void) {
+  private async processEnrollmentUponExpiry(snoozable: boolean, onUserAction: () => void): Promise<void> {
     const hasCertificate = await hasActiveCertificate();
     const enrollmentType = hasCertificate ? ModalType.CERTIFICATE_RENEWAL : ModalType.ENROLL;
     this.emit('deviceStatusUpdated', {status: snoozable ? 'valid' : 'locked'});
@@ -283,7 +305,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return oidcService.getUser();
   }
 
-  public async enroll({snoozable = true, resetTimers = false}: {snoozable?: boolean; resetTimers?: boolean} = {}) {
+  public async enroll({
+    snoozable = true,
+    resetTimers = false,
+  }: {snoozable?: boolean; resetTimers?: boolean} = {}): Promise<void> {
     if (resetTimers) {
       this.enrollmentStore.clear.timer();
     }

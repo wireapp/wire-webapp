@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor, $nodesOfType} from 'lexical';
 
 import {User} from 'Repositories/entity/User';
@@ -39,7 +40,7 @@ export const parseMentions = (editor: LexicalEditor, textValue: string, mentions
     const mentionOption = mentions.find(user => user.name() === mention);
 
     position = mentionPosition;
-    return mentionOption ? [createMentionEntity(mentionOption, mentionPosition)] : [];
+    return !isNullOrUndefined(mentionOption) ? [createMentionEntity(mentionOption, mentionPosition)] : [];
   });
 };
 

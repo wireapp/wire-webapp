@@ -80,6 +80,16 @@ export const scheduleMeetingFormColumnCss: CSSObject = {
   minWidth: 0,
 };
 
+export const scheduleMeetingFormBottomWrapperCss: CSSObject = {
+  marginBottom: 0,
+};
+
+export const scheduleMeetingTimeFieldsRowCss: CSSObject = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  gap: '12px',
+};
+
 export const scheduleMeetingFormLeftColumnCss: CSSObject = {
   ...scheduleMeetingFormColumnCss,
 };

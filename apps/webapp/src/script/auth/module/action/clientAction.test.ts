@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import type {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
@@ -36,8 +36,8 @@ describe('ClientAction', () => {
     [
       'injected clock at the migration deadline',
       {
-        wallClock: createDeterministicWallClock({
-          initialCurrentTimestampInMilliseconds: Date.parse('2026-09-23T12:00:00Z'),
+        clock: createDeterministicClock({
+          initialUnixEpochMicroseconds: BigInt(Date.parse('2026-09-23T12:00:00Z')) * 1_000n,
         }),
       },
       100,

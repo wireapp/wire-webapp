@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
@@ -61,12 +62,12 @@ const MediaButton = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
-    if (mediaElement) {
+    if (!isUndefined(mediaElement)) {
       mediaElement.addEventListener('playing', onPlay);
       mediaElement.addEventListener('pause', onPause);
     }
     return () => {
-      if (mediaElement) {
+      if (!isUndefined(mediaElement)) {
         mediaElement.removeEventListener('playing', onPlay);
         mediaElement.removeEventListener('pause', onPause);
       }
@@ -83,16 +84,20 @@ const MediaButton = ({
         'media-button-lg': large,
       })}
     >
-      {isUploaded && !isPlaying && mediaElement && (
-        <button
-          type="button"
-          className="button-reset-default media-button media-button-play icon-play"
-          onClick={play}
-          data-uie-name="do-play-media"
-          aria-label={translate('mediaBtnPlay')}
-          tabIndex={messageFocusedTabIndex}
-        />
-      )}
+      {isUploaded &&
+        !isPlaying &&
+        (!isUndefined(mediaElement) ? (
+          <button
+            type="button"
+            className="button-reset-default media-button media-button-play icon-play"
+            onClick={play}
+            data-uie-name="do-play-media"
+            aria-label={translate('mediaBtnPlay')}
+            tabIndex={messageFocusedTabIndex}
+          />
+        ) : (
+          mediaElement
+        ))}
       {isUploaded && isPlaying && (
         <button
           type="button"

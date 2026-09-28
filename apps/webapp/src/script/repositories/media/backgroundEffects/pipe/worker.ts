@@ -26,7 +26,6 @@ import {WorkerProcessVideoTrackOptions} from './options';
 import {runSegmenter, updateSegmenterOptions} from './segmenter';
 
 const workerLogger = getSafeLogger('virtual-background-worker');
-
 globalThis.onmessage = ({data}) => {
   workerLogger.log(`[virtual-background] worker onmessage`, data);
   const {name} = data as {name: string};

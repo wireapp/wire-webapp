@@ -22,7 +22,7 @@ import {useCallback, useEffect} from 'react';
 import {$createLinkNode, $isLinkNode, LinkNode} from '@lexical/link';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$findMatchingParent} from '@lexical/utils';
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
 import {
   $getSelection,
   $isRangeSelection,
@@ -72,7 +72,7 @@ export const useLinkState = () => {
       const node = getSelectedNode(selection);
       const existingLink = $findMatchingParent(node, $isLinkNode);
 
-      if (!existingLink) {
+      if (isNullOrUndefined(existingLink)) {
         setEditingLink({
           text: selection.getTextContent(),
           url: '',
@@ -113,7 +113,7 @@ export const useLinkState = () => {
       editor.update(() => {
         const sanitizedUrl = sanitizeUrl(url);
 
-        if (editingLink.node && $isLinkNode(editingLink.node)) {
+        if (!isNullOrUndefined(editingLink.node) && $isLinkNode(editingLink.node)) {
           if (!editingLink.node.isAttached()) {
             // Node no longer exists in the editor
             return;
@@ -140,7 +140,7 @@ export const useLinkState = () => {
           return;
         }
 
-        if (editingLink.selection) {
+        if (!isNullOrUndefined(editingLink.selection)) {
           restoreSelection(selection, editingLink.selection);
         }
 
@@ -185,7 +185,7 @@ export const useLinkState = () => {
   const handleClickCommand = useCallback(
     (event: MouseEvent) => {
       const linkDomNode = (event.target as HTMLElement).closest('a');
-      if (!linkDomNode) {
+      if (isNullOrUndefined(linkDomNode)) {
         return false;
       }
 
@@ -199,7 +199,7 @@ export const useLinkState = () => {
 
         const node = getSelectedNode(selection);
         const linkNode = $findMatchingParent(node, $isLinkNode);
-        if (linkNode) {
+        if (!isNullOrUndefined(linkNode)) {
           handleLinkClick(linkNode);
         }
       });

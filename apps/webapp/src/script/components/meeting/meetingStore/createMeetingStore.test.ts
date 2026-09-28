@@ -19,7 +19,7 @@
 
 import assert from 'node:assert';
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {MEETING_EVENT} from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -71,8 +71,8 @@ describe('createMeetingStore', () => {
     end: new Date('2026-06-16T11:00:00.000Z'),
   };
 
-  const wallClock = createDeterministicWallClock({
-    initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T13:00:00.000Z'),
+  const clock = createDeterministicClock({
+    initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T13:00:00.000Z')) * 1_000n,
   });
 
   const createServiceTasks = (overrides: Partial<MeetingStoreServiceTasks> = {}): MeetingStoreServiceTasks => ({
@@ -97,18 +97,18 @@ describe('createMeetingStore', () => {
     getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting)),
     safeGetConversationById = jest.fn(),
     serviceTasks = createServiceTasks(),
-    wallClock: wallClockOverride = wallClock,
+    clock: clockOverride = clock,
   }: {
     getMeetingsList?: jest.Mock;
     getMeeting?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     serviceTasks?: MeetingStoreServiceTasks;
-    wallClock?: typeof wallClock;
+    clock?: typeof clock;
   } = {}): MeetingStoreDeps => ({
     meetingsRepository: {getMeetingsList, getMeeting} as unknown as MeetingsRepository,
     conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
     callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
-    wallClock: wallClockOverride,
+    clock: clockOverride,
     deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
     serviceTasks,
   });
@@ -353,10 +353,10 @@ describe('createMeetingStore', () => {
       translateForTest,
     );
     const safeGetConversationById = jest.fn().mockReturnValue(task.resolve(conversation));
-    const ongoingWallClock = createDeterministicWallClock({
-      initialCurrentTimestampInMilliseconds: Date.parse('2026-06-15T10:30:00.000Z'),
+    const clock = createDeterministicClock({
+      initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T10:30:00.000Z')) * 1_000n,
     });
-    const store = createMeetingStore(createDeps({safeGetConversationById, wallClock: ongoingWallClock}));
+    const store = createMeetingStore(createDeps({safeGetConversationById, clock}));
     const recurringMeetingInstance = {
       meetingSeries: {
         ...meetingSeriesEntry,

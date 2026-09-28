@@ -19,6 +19,7 @@
 
 import {ReactNode} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
@@ -94,11 +95,11 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
 
   switch (message.memberMessageType) {
     case SystemMessageType.CONVERSATION_CREATE: {
-      if (message.name().length) {
+      if (isNonEmptyString(message.name())) {
         const exceedsMaxTeam = targetedUsers.length > CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
-        if (message.allTeamMembers && exceedsMaxTeam) {
+        if (!isNullOrUndefined(message.allTeamMembers) && exceedsMaxTeam) {
           const guestCount = targetedUsers.filter(userEntity => userEntity.isGuest()).length;
-          if (!guestCount) {
+          if (guestCount === 0) {
             return translate('conversationCreateTeam');
           }
 
@@ -198,7 +199,7 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
       }
 
       const allUsers = generateNames(targetedUsers, translate);
-      if (!actor.id) {
+      if (!isNonEmptyString(actor.id)) {
         return translate('conversationMemberWereRemoved', {users: allUsers});
       }
       return actor.isMe

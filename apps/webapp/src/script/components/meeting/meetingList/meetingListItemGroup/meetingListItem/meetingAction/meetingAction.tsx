@@ -44,7 +44,7 @@ interface MeetingActionProps {
 }
 
 export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDisabled}: MeetingActionProps) => {
-  const {translate, wallClock, fireAndForgetInvoker} = useApplicationContext();
+  const {translate, clock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
 
@@ -53,7 +53,7 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
       return;
     }
 
-    const nowMilliseconds = wallClock.currentTimestampInMilliseconds;
+    const nowMilliseconds = clock.currentUnixEpochMilliseconds;
 
     showContextMenu({
       event,
@@ -65,7 +65,7 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
         onJoin: joinMeeting,
         isJoinDisabled,
         onEdit: () => {
-          if (canEditMeeting(meetingInstance, selfUser, wallClock.currentTimestampInMilliseconds)) {
+          if (canEditMeeting(meetingInstance, selfUser, clock.currentUnixEpochMilliseconds)) {
             fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
           }
         },

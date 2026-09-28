@@ -19,6 +19,8 @@
 
 import {useEffect, useRef, useState} from 'react';
 
+import {isNull} from '@sindresorhus/is';
+
 /**
  * It's used to detect if the user is dragging a file over the dropzone.
  * Instead of using status from useDropzone, we use the native drag and drop events, which are more reliable.
@@ -31,7 +33,7 @@ export const useIsDragging = () => {
   useEffect(() => {
     const element = wrapperRef.current;
 
-    if (!element) {
+    if (isNull(element)) {
       return undefined;
     }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import type {WallClock} from '@enormora/wall-clock/wall-clock';
+import type {Clock} from '@enormora/clock/clock';
 import {result, Result} from 'true-myth';
 
 import {ScheduleFormErrors, scheduleFormErrors} from 'Components/meeting/scheduleFormErrors';
@@ -44,7 +44,7 @@ const mapScheduleFormErrorToFormErrors = (error: ScheduleFormErrors): ScheduleMe
 
 export const mapScheduleFormToMeetingCommand = (
   formState: ScheduleMeetingFormState,
-  wallClock: WallClock,
+  clock: Clock,
 ): Result<ScheduleMeetingCommand, ScheduleMeetingFormErrors> => {
   const validationResult = validateScheduleMeetingForm({
     title: formState.title,
@@ -52,7 +52,7 @@ export const mapScheduleFormToMeetingCommand = (
     end: formState.end,
     password: formState.password,
     passwordConfirmation: formState.passwordConfirmation,
-    wallClock,
+    clock,
     mode: scheduleMeetingModes.create,
   });
 
@@ -60,7 +60,7 @@ export const mapScheduleFormToMeetingCommand = (
     return result.err(validationResult.error);
   }
 
-  const timesResult = requireScheduleMeetingTimes(formState, wallClock);
+  const timesResult = requireScheduleMeetingTimes(formState, clock);
 
   if (timesResult.isErr) {
     return result.err(mapScheduleFormErrorToFormErrors(timesResult.error));

@@ -18,7 +18,7 @@
  */
 
 import {render, screen} from '@testing-library/react';
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
@@ -59,7 +59,7 @@ const createMeetingStoreForTest = () =>
     meetingsRepository: {} as MeetingsRepository,
     conversationRepository: {} as ConversationRepository,
     callingRepository: {} as CallingRepository,
-    wallClock: createDeterministicWallClock(),
+    clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
     deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
     serviceTasks: {
       scheduleMeeting: jest.fn(),
@@ -73,7 +73,7 @@ const createMeetingStoreForTest = () =>
 const renderAction = (
   now: string,
   user = selfUser,
-  wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: Date.parse(now)}),
+  clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(Date.parse(now)) * 1_000n}),
 ) =>
   render(
     <MeetingStoreProvider store={createMeetingStoreForTest()}>
@@ -90,7 +90,7 @@ const renderAction = (
       wrapper: createRootProviderWrapperForTest(
         createRootContextValueForTest({
           translate: translateForTest,
-          wallClock,
+          clock,
         }),
       ),
     },

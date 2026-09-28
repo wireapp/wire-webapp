@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicWallClock} from '@enormora/wall-clock/deterministic-wall-clock';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {maybe} from 'true-myth';
 
 import {User} from 'Repositories/entity/User';
@@ -30,7 +30,7 @@ import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingM
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
-const wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: fixedNow.getTime()});
+const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
 
 const createUser = (id: string) => {
   const user = new User(id, 'example.com', translateForTest);
@@ -58,7 +58,7 @@ describe('mapScheduleFormToMeetingCommand', () => {
         ...baseFormState(),
         selectedUsers: [alice, bob],
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isOk).toBe(true);
@@ -78,7 +78,7 @@ describe('mapScheduleFormToMeetingCommand', () => {
         password: 'ValidPassword1!',
         passwordConfirmation: 'ValidPassword1!',
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isOk).toBe(true);
@@ -98,7 +98,7 @@ describe('mapScheduleFormToMeetingCommand', () => {
         ...baseFormState(),
         start: maybe.nothing(),
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isErr).toBe(true);
@@ -117,7 +117,7 @@ describe('mapScheduleFormToMeetingCommand', () => {
         ...baseFormState(),
         start: maybe.just(new Date('2026-06-23T10:00:00.000Z')),
       },
-      wallClock,
+      clock,
     );
 
     expect(result.isErr).toBe(true);

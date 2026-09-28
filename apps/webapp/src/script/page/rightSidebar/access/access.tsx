@@ -19,6 +19,7 @@
 
 import {useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -56,7 +57,7 @@ export const Access = ({
   const {translate} = useApplicationContext();
   const {conversationModerator} = useKoSubscribableChildren(activeConversation, ['conversationModerator']);
   const [access, setAccess] = useState<ConversationAccess>(
-    activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK)
+    activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK) === true
       ? ConversationAccess.Public
       : ConversationAccess.Private,
   );
@@ -64,7 +65,7 @@ export const Access = ({
   const {isPublicChannelsEnabled} = useChannelsFeatureFlag();
 
   const updateAddPermission = async (addPermission: ADD_PERMISSION) => {
-    if (activeConversation.qualifiedId) {
+    if (!isNullOrUndefined(activeConversation.qualifiedId)) {
       await conversationRepository.updateAddPermission(activeConversation.qualifiedId, addPermission);
     }
   };

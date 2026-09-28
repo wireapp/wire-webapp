@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
+
 import * as Icon from 'Components/icon';
 import {ServiceList} from 'Components/ServiceList';
 import {UserList} from 'Components/userList';
@@ -53,7 +55,7 @@ export const ConversationDetailsParticipants = ({
 
   return (
     <div className="conversation-details__participants">
-      {!!userParticipants.length && (
+      {isNonEmptyArray(userParticipants) && (
         <>
           <div className="user-list-wrapper" data-uie-name="list-users">
             <UserList
@@ -91,7 +93,7 @@ export const ConversationDetailsParticipants = ({
         </>
       )}
 
-      {!!serviceParticipants.length && (
+      {isNonEmptyArray(serviceParticipants) && (
         <div className="service-list-wrapper">
           <h3 className="conversation-details__list-head" data-uie-name="label-conversation-services">
             {translate('conversationDetailsApps')}

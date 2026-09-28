@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmptyString, isUndefined} from '@sindresorhus/is';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useInView} from 'src/script/hooks/useInView/useInView';
@@ -102,7 +104,7 @@ export const VideoAssetPlayer = ({
     );
   }
 
-  if (isLoading || url === undefined || url === '') {
+  if (isLoading || isUndefined(url) || isEmptyString(url)) {
     return (
       <VideoAssetCard
         id={id}
@@ -152,15 +154,17 @@ export const VideoAssetPlayer = ({
               isFocusable={isFocusable}
             />
           )}
-          {videoElement && isPlayedRef.current && (
-            <VideoControls
-              isPlaying={isPlaying}
-              videoElement={videoElement}
-              handlePlay={handlePlay}
-              handlePause={handlePause}
-              isFocusable={isFocusable}
-            />
-          )}
+          {!isUndefined(videoElement)
+            ? isPlayedRef.current && (
+                <VideoControls
+                  isPlaying={isPlaying}
+                  videoElement={videoElement}
+                  handlePlay={handlePlay}
+                  handlePause={handlePause}
+                  isFocusable={isFocusable}
+                />
+              )
+            : videoElement}
         </div>
       </div>
     </VideoAssetCard>

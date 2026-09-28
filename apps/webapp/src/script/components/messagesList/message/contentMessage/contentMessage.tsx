@@ -19,6 +19,7 @@
 
 import {useMemo, useState, useEffect, useRef} from 'react';
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import ko from 'knockout';
@@ -220,7 +221,7 @@ export const ContentMessageComponent = ({
         {isEphemeralMessage && (
           <div
             css={messageEphemeralTimer}
-            {...(ephemeralCaption && {title: ephemeralCaption})}
+            {...(isNonEmptyString(ephemeralCaption) ? {title: ephemeralCaption} : {})}
             className="message-ephemeral-timer"
           >
             <EphemeralTimer message={message} />
@@ -231,13 +232,15 @@ export const ContentMessageComponent = ({
           <div
             className={cx('message-body', {
               'message-asset': isAssetMessage,
-              'message-quoted': !!quote,
+              'message-quoted': !isNullOrUndefined(quote),
               'ephemeral-asset-expired': isObfuscated && isAssetMessage,
               'icon-file': isObfuscated && isFileMessage,
               'icon-movie': isObfuscated && isVideoMessage,
             })}
           >
-            {quote && (
+            {isNullOrUndefined(quote) ? (
+              quote
+            ) : (
               <Quote
                 conversation={conversation}
                 quote={quote}
@@ -309,7 +312,9 @@ export const ContentMessageComponent = ({
         />
       )}
 
-      {failedToSend && (
+      {isNullOrUndefined(failedToSend) ? (
+        failedToSend
+      ) : (
         <PartialFailureToSendWarning
           isMessageFocused={msgFocusState}
           failedToSend={failedToSend}
