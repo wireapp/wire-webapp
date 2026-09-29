@@ -1319,7 +1319,7 @@
   "manualMlsMigrationDescription": "Das Standard-Nachrichtenprotokoll wird von Proteus auf Messaging-Layer-Security (MLS) umgestellt.",
   "manualMlsMigrationFailure": "Die Umstellung der Unterhaltung auf MLS ist fehlgeschlagen.",
   "manualMlsMigrationMissingGroup": "Migration could not continue because the Mixed conversation has no MLS group.",
-  "manualMlsMigrationNotAllowed": "Manual migration is no longer allowed for this conversation.",
+  "manualMlsMigrationNotAllowed": "Manuelle Migration ist für diese Unterhaltung nicht mehr erlaubt.",
   "manualMlsMigrationProgress": "Umstellung des Protokolls auf MLS…",
   "manualMlsMigrationProtocolUnchanged": "Das Protokoll wurde nicht auf MLS umgestellt. Bitte versuchen Sie es erneut.",
   "manualMlsMigrationSuccess": "Die Unterhaltung wurde erfolgreich auf MLS umgestellt.",
