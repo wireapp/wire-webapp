@@ -74,7 +74,8 @@ export const transformCellsNodes = ({
       maybe.find(user => matchQualifiedIds(user.qualifiedId, userQualifiedId), users),
     );
     const user = matchingUser.unwrapOr(null);
-    const owner = user?.name() || getOwner(node);
+    const userName = user?.name();
+    const owner = isNonEmptyString(userName) ? userName : getOwner(node);
 
     if (node.Type === 'COLLECTION') {
       return {
