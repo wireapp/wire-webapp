@@ -19,9 +19,16 @@
 
 import assert from 'node:assert';
 import {Buffer} from 'node:buffer';
+import {mkdtemp, mkdir, rm, writeFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+
+import {simpleGit} from 'simple-git';
 
 import {
   createWebAppVersionSynchronizationGitAuthenticationEnvironment,
+  createRuntimeWebAppVersionSynchronizationFileSystem,
+  createSimpleGitWebAppVersionSynchronizationClient,
   redactWebAppVersionSynchronizationGitFailureMessage,
   parseWebAppVersionSynchronizationPackageDocument,
   validateWebAppVersionSynchronizationBranch,
@@ -135,6 +142,55 @@ describe('WebApp synchronization Git authentication', () => {
     expect(actualFailureMessage).toBe('fatal: authorization failed for [REDACTED] ([REDACTED])');
     expect(actualFailureMessage).not.toContain(githubToken);
     expect(actualFailureMessage).not.toContain(basicCredential);
+  });
+
+  it('pushes a synchronization branch through the authenticated simple-git adapter', async () => {
+    const temporaryDirectoryPath = await mkdtemp(join(tmpdir(), 'wire-webapp-version-synchronization-'));
+    const repositoryPath = join(temporaryDirectoryPath, 'repository');
+    const bareRemotePath = join(temporaryDirectoryPath, 'origin.git');
+
+    try {
+      await mkdir(repositoryPath);
+      await mkdir(bareRemotePath);
+
+      const repositoryGit = simpleGit(repositoryPath);
+      const bareRemoteGit = simpleGit(bareRemotePath);
+
+      await bareRemoteGit.init(true);
+      await repositoryGit.raw(['init', '--initial-branch', 'main']);
+      await repositoryGit.raw(['config', 'user.name', 'WebApp synchronization test']);
+      await repositoryGit.raw(['config', 'user.email', 'webapp-synchronization-test@example.com']);
+      await repositoryGit.raw(['config', 'commit.gpgSign', 'false']);
+      await repositoryGit.addRemote('origin', bareRemotePath);
+      await writeFile(join(repositoryPath, 'synchronization.txt'), 'initial\n', 'utf8');
+      await repositoryGit.add('synchronization.txt');
+      await repositoryGit.commit('Initial commit');
+      await repositoryGit.raw(['switch', '--create', synchronizationBranchName]);
+      await writeFile(join(repositoryPath, 'synchronization.txt'), 'synchronization\n', 'utf8');
+      await repositoryGit.add('synchronization.txt');
+      await repositoryGit.commit('Create synchronization branch');
+
+      const gitClient = createSimpleGitWebAppVersionSynchronizationClient({
+        repositoryPath,
+        fileSystem: createRuntimeWebAppVersionSynchronizationFileSystem(),
+        authentication: {githubToken: 'otto-write-token'},
+      });
+      const actualResult = await gitClient.pushBranch({branchName: synchronizationBranchName});
+
+      if (actualResult.isErr) {
+        assert.fail(actualResult.error.message);
+      }
+
+      const remoteBranchOutput = await bareRemoteGit.raw([
+        'for-each-ref',
+        '--format=%(refname:short)',
+        `refs/heads/${synchronizationBranchName}`,
+      ]);
+
+      expect(remoteBranchOutput.trim()).toBe(synchronizationBranchName);
+    } finally {
+      await rm(temporaryDirectoryPath, {force: true, recursive: true});
+    }
   });
 });
 
