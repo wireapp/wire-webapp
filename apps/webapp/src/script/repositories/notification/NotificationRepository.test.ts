@@ -73,7 +73,7 @@ import {createUuid} from 'Util/uuid';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {NotificationRepository} from './NotificationRepository';
-import type {SystemNotificationApi} from '../../notification/systemNotificationTypes';
+import {systemNotificationErrorKinds, type SystemNotificationApi} from '../../notification/systemNotificationTypes';
 
 function buildNotificationRepository(
   translate: Translate,
@@ -269,6 +269,126 @@ describe('NotificationRepository', () => {
 
       expect(close).toHaveBeenCalledTimes(1);
       expect(repository.notifications).toHaveLength(0);
+    });
+
+    it('logs a timeout close failure without reporting that the notification closed', () => {
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const closeError = new Error('notification could not be closed');
+      const close = jest.fn(() => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError}));
+      let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
+      const notificationApi = {
+        isSupported: () => true,
+        getPermission: () => 'granted' as const,
+        requestPermission: async () => 'granted' as const,
+        show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
+          request = nextRequest;
+          return result.ok({close});
+        },
+      } as SystemNotificationApi;
+      const [repository] = buildNotificationRepository(translateForTest, clock, notificationApi);
+      const errorSpy = jest.spyOn(repository['logger'], 'error');
+      const infoSpy = jest.spyOn(repository['logger'], 'info');
+      const setTimeoutSpy = jest.spyOn(clock, 'setTimeout');
+
+      repository['showNotificationInBrowser'](notificationContent);
+      request?.onShow?.();
+      const timeoutCallback = setTimeoutSpy.mock.calls[0]?.[0];
+      timeoutCallback?.();
+
+      expect(close).toHaveBeenCalledTimes(1);
+      expect(errorSpy).toHaveBeenCalledWith(
+        "Failed to close notification for 'content' message in 'undefined' by timeout.",
+        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+      );
+      expect(infoSpy).not.toHaveBeenCalledWith("Notification for 'content' message in 'undefined' closed by timeout.");
+    });
+
+    it('logs a click close failure without reporting that the notification closed', () => {
+      let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
+      const closeError = new Error('notification could not be closed');
+      const notificationApi = {
+        isSupported: () => true,
+        getPermission: () => 'granted' as const,
+        requestPermission: async () => 'granted' as const,
+        show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
+          request = nextRequest;
+          return result.ok({
+            close: () => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError}),
+          });
+        },
+      } as SystemNotificationApi;
+      const [repository] = buildNotificationRepository(translateForTest, undefined, notificationApi);
+      repository['callingRepository'].setViewModeMinimized = jest.fn(async () => undefined);
+      const errorSpy = jest.spyOn(repository['logger'], 'error');
+      const infoSpy = jest.spyOn(repository['logger'], 'info');
+
+      repository['showNotificationInBrowser'](notificationContent);
+      request?.onClick();
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        "Failed to close notification for 'content' message in 'undefined' by click.",
+        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+      );
+      expect(infoSpy).not.toHaveBeenCalledWith("Notification for 'content' message in 'undefined' closed by click.");
+    });
+
+    it('logs an unload close failure with its cause', () => {
+      const closeError = new Error('notification could not be closed');
+      const [repository] = buildNotificationRepository(translateForTest, undefined, {
+        isSupported: () => true,
+        getPermission: () => 'granted',
+        requestPermission: async () => 'granted',
+        show: () =>
+          result.ok({close: () => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError})}),
+      });
+      const errorSpy = jest.spyOn(repository['logger'], 'error');
+      repository.notifications = [
+        {
+          body: 'A message',
+          data: {messageType: 'content'},
+          handle: {close: () => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError})},
+          icon: '/notification.png',
+          onclick: () => undefined,
+          title: 'A conversation',
+        },
+      ];
+
+      repository.clearNotifications();
+
+      expect(errorSpy).toHaveBeenCalledWith("Failed to close notification for 'undefined' in 'undefined' on unload.", {
+        kind: systemNotificationErrorKinds.closeFailed,
+        cause: closeError,
+      });
+    });
+
+    it('logs a read-notification close failure with its cause', async () => {
+      const closeError = new Error('notification could not be closed');
+      const [repository, {fireAndForgetInvoker}] = buildNotificationRepository(translateForTest, undefined, {
+        isSupported: () => true,
+        getPermission: () => 'granted',
+        requestPermission: async () => 'granted',
+        show: () => result.ok({close: () => result.ok(undefined)}),
+      });
+      jest.spyOn(repository['conversationRepository'], 'isMessageRead').mockResolvedValue(true);
+      const errorSpy = jest.spyOn(repository['logger'], 'error');
+      repository.notifications = [
+        {
+          body: 'A message',
+          data: {conversationId: {id: 'conversation', domain: ''}, messageId: 'message', messageType: 'content'},
+          handle: {close: () => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError})},
+          icon: '/notification.png',
+          onclick: () => undefined,
+          title: 'A conversation',
+        },
+      ];
+
+      repository.removeReadNotifications();
+      await fireAndForgetInvoker.waitUntilAllSettled();
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        "Failed to close read notification for message 'message' of type 'content' in 'conversation'.",
+        {kind: systemNotificationErrorKinds.closeFailed, cause: closeError},
+      );
     });
   });
 

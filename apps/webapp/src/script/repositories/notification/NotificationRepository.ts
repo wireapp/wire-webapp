@@ -223,9 +223,12 @@ export class NotificationRepository {
    */
   clearNotifications(): void {
     this.notifications.forEach(notification => {
-      notification.handle.close();
       const {conversationId, messageId} = notification.data;
-      this.logger.info(`Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`);
+      this.closeNotification(
+        notification.handle,
+        `Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`,
+        `Failed to close notification for '${messageId}' in '${conversationId?.id}' on unload.`,
+      );
     });
   }
 
@@ -283,12 +286,13 @@ export class NotificationRepository {
         this.fireAndForgetInvoker.fireAndForget(async () => {
           const isRead = await this.conversationRepository.isMessageRead(conversationId, messageId);
           if (isRead) {
-            notification.handle.close();
             const messageInfo = messageId
               ? `message '${messageId}' of type '${messageType}'`
               : `'${messageType}' message`;
-            this.logger.info(
+            this.closeNotification(
+              notification.handle,
               `Removed read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
+              `Failed to close read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
             );
           }
         });
@@ -830,6 +834,17 @@ export class NotificationRepository {
     this.updatePermissionState(permissionState);
   }
 
+  private closeNotification(handle: SystemNotificationHandle, successMessage: string, failureMessage: string): void {
+    const closeAttempt = handle.close();
+
+    if (result.isErr(closeAttempt)) {
+      this.logger.error(failureMessage, closeAttempt.error);
+      return;
+    }
+
+    this.logger.info(successMessage);
+  }
+
   /**
    * Should message in a notification be obfuscated?
    *
@@ -918,10 +933,11 @@ export class NotificationRepository {
       }
 
       notificationEntry.timeoutIdentifier = this.clock.setTimeout(() => {
-        this.logger.info(
+        this.closeNotification(
+          notificationEntry.handle,
           `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by timeout.`,
+          `Failed to close notification for ${messageInfo} in '${conversationId?.id || conversationId}' by timeout.`,
         );
-        notificationEntry.handle.close();
       }, notificationContent.timeout);
     };
 
@@ -929,9 +945,15 @@ export class NotificationRepository {
       void this.callingRepository.setViewModeMinimized();
       notificationContent.trigger();
 
-      this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);
       if (presentationState.kind !== 'closed') {
-        presentationState.entry?.handle.close();
+        const notificationEntry = presentationState.entry;
+        if (notificationEntry !== undefined) {
+          this.closeNotification(
+            notificationEntry.handle,
+            `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`,
+            `Failed to close notification for ${messageInfo} in '${conversationId?.id || conversationId}' by click.`,
+          );
+        }
       }
     };
     const isClosed = (): boolean => presentationState.kind === 'closed';
