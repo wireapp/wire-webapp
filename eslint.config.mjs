@@ -855,6 +855,24 @@ const productionConfigs = [
     },
   },
   {
+    files: [
+      'apps/webapp/src/script/components/cells/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/cellsGlobalView/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/cellsSearchInput/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/conversationCells/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/buildCellFileMetadata/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/createFileDropHandler/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/transformAcceptedFiles/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/useFilesUploadDropzone.ts',
+      'apps/webapp/src/script/repositories/cells/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/rightSidebar/sharedDrive/**/*.{ts,tsx}',
+    ],
+    ignores: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', '**/test/**', '**/mocks/**'],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
     files: ['apps/webapp/src/script/components/messagesList/**/*.{ts,tsx}'],
     ignores: [
       'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**',
