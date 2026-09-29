@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {isNull} from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -109,7 +110,7 @@ export const SharedDriveUploadStatusPopupHost = ({
   const uploads = getSharedDriveUploadDisplayStatuses(rawUploads);
   const visibleUploads = uploads.filter(({uploadId}) => !dismissedRowIds.has(uploadId));
   const aggregateKind = getSharedDriveUploadAggregateKind(visibleUploads);
-  const representativeUpload = aggregateKind
+  const representativeUpload = !isNull(aggregateKind)
     ? getRepresentativeSharedDriveUploadStatus(visibleUploads, aggregateKind)
     : null;
   const canDismissUploadStatus = visibleUploads.length > 0 && visibleUploads.every(({kind}) => kind === 'uploaded');
@@ -117,7 +118,7 @@ export const SharedDriveUploadStatusPopupHost = ({
     (maybe.isJust(dismissedUpload) &&
       dismissedUpload.value.conversationQualifiedId === conversationQualifiedId &&
       representativeUpload?.uploadId === dismissedUpload.value.uploadId) ||
-    (representativeUpload !== null &&
+    (!isNull(representativeUpload) &&
       controller.isDismissed?.(conversationQualifiedId, representativeUpload.uploadId) === true);
 
   const isCancelling = useCallback(
@@ -204,7 +205,7 @@ export const SharedDriveUploadStatusPopupHost = ({
     return controller.subscribe(updateStatus);
   }, [controller, conversationQualifiedId, readStatuses]);
 
-  if (!isEnabled || !isFileTabActive || !representativeUpload || isUploadDismissed || !aggregateKind) {
+  if (!isEnabled || !isFileTabActive || isNull(representativeUpload) || isUploadDismissed || isNull(aggregateKind)) {
     return null;
   }
 

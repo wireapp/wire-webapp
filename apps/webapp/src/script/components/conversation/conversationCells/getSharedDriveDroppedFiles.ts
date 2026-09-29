@@ -55,7 +55,8 @@ const toReadError =
   (cause: unknown): SharedDriveDropReadError => ({cause, path});
 
 const withRelativePath = (file: File, entry: DroppedFileEntry): File => {
-  const relativePath = entry.fullPath.replace(/^\/+/, '') || entry.name;
+  const normalizedRelativePath = entry.fullPath.replace(/^\/+/, '');
+  const relativePath = normalizedRelativePath.length > 0 ? normalizedRelativePath : entry.name;
   if (relativePath === file.name) {
     return file;
   }

@@ -19,6 +19,8 @@
 
 import type {ReactNode} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {
   AlertIcon,
   ChevronIcon,
@@ -112,13 +114,15 @@ const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
   }
 
   if (upload.kind === 'uploaded') {
+    const fileExtension = getFileExtension(upload.fileName);
+
     return (
       <div
         css={sharedDriveUploadStatusPopupRowIconStyles}
         aria-hidden="true"
         data-uie-name="shared-drive-upload-uploaded"
       >
-        <FileTypeIcon extension={getFileExtension(upload.fileName) || 'pdf'} size={24} />
+        <FileTypeIcon extension={isNonEmptyString(fileExtension) ? fileExtension : 'pdf'} size={24} />
       </div>
     );
   }
