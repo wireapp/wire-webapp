@@ -17,7 +17,8 @@
  *
  */
 
-import {isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
+import {isArray, isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
+import {maybe as Maybe} from 'true-myth';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -25,20 +26,22 @@ import {getLogger, Logger} from 'Util/logger';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
-import {MediaDevicesState, mediaDevicesStore} from './useMediaDevicesStore';
+import {resolveActiveDeviceId} from './resolveActiveDeviceId';
+import {mediaDevicesStore} from './useMediaDevicesStore';
+import type {MediaDevicesState} from './useMediaDevicesStore';
 
-export interface ElectronDesktopCapturerSource {
-  display_id: string;
-  id: string;
-  name: string;
-  thumbnail: HTMLCanvasElement;
-}
+export type ElectronDesktopCapturerSource = {
+  readonly display_id: string;
+  readonly id: string;
+  readonly name: string;
+  readonly thumbnail: HTMLCanvasElement;
+};
 
-interface ElectronGetSourcesOptions {
-  fetchWindowIcons?: boolean;
-  thumbnailSize?: {height: number; width: number};
-  types: string[];
-}
+type ElectronGetSourcesOptions = {
+  readonly fetchWindowIcons?: boolean;
+  readonly thumbnailSize?: {readonly height: number; readonly width: number};
+  readonly types: string[];
+};
 
 type ElectronDesktopCapturerCallback = (error: Error | null, screenSources: ElectronDesktopCapturerSource[]) => void;
 
@@ -54,8 +57,6 @@ declare global {
   }
 }
 
-export type PreviousDeviceSupport = Partial<Record<MediaDeviceType, number>>;
-
 enum FavoriteDeviceTypes {
   AUDIO_INPUT = `${MediaDeviceType.AUDIO_INPUT}-fave`,
   AUDIO_OUTPUT = `${MediaDeviceType.AUDIO_OUTPUT}-fave`,
@@ -63,10 +64,73 @@ enum FavoriteDeviceTypes {
   SCREEN_INPUT = `${MediaDeviceType.SCREEN_INPUT}-fave`,
 }
 
+type FilteredMediaDevices = {
+  readonly cameras: MediaDeviceInfo[];
+  readonly microphones: MediaDeviceInfo[];
+  readonly speakers: MediaDeviceInfo[];
+};
+
+type PersistDevicePreferenceOptions = {
+  readonly deviceType: MediaDeviceType;
+  readonly preferredId: string;
+  readonly previousPreferredId: string;
+};
+
+type PreviousDeviceSupport = Partial<Record<MediaDeviceType, number>>;
+
+type ResolveMediaDeviceIdOptions = {
+  readonly deviceType: MediaDeviceType;
+  readonly devices: readonly MediaDeviceInfo[];
+  readonly previousActiveId: string;
+  readonly preferredId: string;
+};
+
+type PickDeviceIdOptions = {
+  readonly deviceType: MediaDeviceType;
+  readonly devices: readonly MediaDeviceInfo[];
+  readonly currentId: string;
+};
+
+type UpdateFavoriteListOptions = {
+  readonly deviceType: MediaDeviceType;
+  readonly currentActiveId: string;
+  readonly previousActiveId: string;
+  readonly state: MediaDevicesState;
+};
+
+type OrderFavoriteDevicesOptions = {
+  readonly favoriteIds: readonly string[];
+  readonly currentActiveId: string;
+  readonly deviceDisconnected: boolean;
+};
+
+export type MediaDevicesHandlerOptions = {
+  readonly isPreferredMediaDevicePersistenceEnabled: boolean;
+};
+
+function loadStoredDeviceId(storageKey: string, defaultId: string): string {
+  const storedId = loadValue<unknown>(storageKey);
+
+  return isNonEmptyString(storedId) ? storedId : defaultId;
+}
+
+function loadStoredDeviceIds(storageKey: string): string[] {
+  const storedIds = loadValue<unknown>(storageKey);
+
+  return isArray(storedIds) ? storedIds.filter(isNonEmptyString) : [];
+}
+
+function getMediaDeviceIds(devices: readonly MediaDeviceInfo[]): string[] {
+  return devices.map(device => {
+    return device.deviceId;
+  });
+}
+
 export class MediaDevicesHandler {
   private readonly logger: Logger;
-  private onMediaDevicesRefresh?: () => void;
+  private readonly isPreferredMediaDevicePersistenceEnabled: boolean;
   private previousDeviceSupport: PreviousDeviceSupport = {};
+  private onMediaDevicesRefresh?: () => void;
   private devicesAreInit = false;
 
   static get CONFIG() {
@@ -84,68 +148,128 @@ export class MediaDevicesHandler {
   /**
    * Construct a new MediaDevices handler.
    */
-  constructor() {
+  constructor(options: MediaDevicesHandlerOptions) {
+    const {isPreferredMediaDevicePersistenceEnabled} = options;
+
     this.logger = getLogger('MediaDevicesHandler');
+    this.isPreferredMediaDevicePersistenceEnabled = isPreferredMediaDevicePersistenceEnabled;
 
     const supportsUserMedia = Runtime.isSupportingUserMedia();
     this.initializeDeviceState(supportsUserMedia);
 
-    mediaDevicesStore.subscribe((state, prev) => {
-      this.updateFavoriteList(
-        MediaDeviceType.AUDIO_INPUT,
-        state.audio.input.selectedId,
-        prev.audio.input.selectedId,
-        state,
-      );
-      this.updateFavoriteList(
-        MediaDeviceType.AUDIO_OUTPUT,
-        state.audio.output.selectedId,
-        prev.audio.output.selectedId,
-        state,
-      );
-      this.updateFavoriteList(
-        MediaDeviceType.VIDEO_INPUT,
-        state.video.input.selectedId,
-        prev.video.input.selectedId,
-        state,
-      );
-      this.updateFavoriteList(
-        MediaDeviceType.SCREEN_INPUT,
-        state.screen.input.selectedId,
-        prev.screen.input.selectedId,
-        state,
-      );
-    });
+    this.subscribeToDevicePersistence();
 
     void this.initializeMediaDevices(false, false);
   }
 
-  private initializeDeviceState = (supportsUserMedia: boolean) => {
+  private initializeDeviceState(supportsUserMedia: boolean): void {
+    const preferredAudioInputId = this.loadInitialDeviceId(
+      MediaDeviceType.AUDIO_INPUT,
+      MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioinput,
+    );
+    const preferredAudioOutputId = this.loadInitialDeviceId(
+      MediaDeviceType.AUDIO_OUTPUT,
+      MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audiooutput,
+    );
+    const preferredVideoInputId = this.loadInitialDeviceId(
+      MediaDeviceType.VIDEO_INPUT,
+      MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.videoinput,
+    );
+    const activeScreenInputId = this.loadLegacyDeviceId(
+      MediaDeviceType.SCREEN_INPUT,
+      MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.screeninput,
+    );
+
     mediaDevicesStore.getState().setAll({
       audio: {
         input: {
-          selectedId: loadValue(MediaDeviceType.AUDIO_INPUT) ?? 'default',
+          activeId: preferredAudioInputId,
+          preferredId: preferredAudioInputId,
           supported: supportsUserMedia,
         },
         output: {
-          selectedId: loadValue(MediaDeviceType.AUDIO_OUTPUT) ?? 'default',
+          activeId: preferredAudioOutputId,
+          preferredId: preferredAudioOutputId,
           supported: false,
         },
       },
       video: {
         input: {
-          selectedId: loadValue(MediaDeviceType.VIDEO_INPUT) ?? 'default',
+          activeId: preferredVideoInputId,
+          preferredId: preferredVideoInputId,
           supported: supportsUserMedia,
         },
       },
       screen: {
         input: {
-          selectedId: loadValue(MediaDeviceType.SCREEN_INPUT) ?? 'screen',
+          activeId: activeScreenInputId,
           supported: !isNullOrUndefined(window.desktopCapturer),
         },
       },
     });
-  };
+  }
+
+  private loadInitialDeviceId(storageKey: string, defaultId: string): string {
+    if (this.isPreferredMediaDevicePersistenceEnabled) {
+      return loadStoredDeviceId(storageKey, defaultId);
+    }
+
+    return this.loadLegacyDeviceId(storageKey, defaultId);
+  }
+
+  private loadLegacyDeviceId(storageKey: string, defaultId: string): string {
+    const storedId = loadValue<string>(storageKey);
+
+    return isNullOrUndefined(storedId) ? defaultId : storedId;
+  }
+
+  private subscribeToDevicePersistence(): void {
+    mediaDevicesStore.subscribe((state, previousState) => {
+      if (this.isPreferredMediaDevicePersistenceEnabled) {
+        this.persistDevicePreference({
+          deviceType: MediaDeviceType.AUDIO_INPUT,
+          preferredId: state.audio.input.preferredId,
+          previousPreferredId: previousState.audio.input.preferredId,
+        });
+        this.persistDevicePreference({
+          deviceType: MediaDeviceType.AUDIO_OUTPUT,
+          preferredId: state.audio.output.preferredId,
+          previousPreferredId: previousState.audio.output.preferredId,
+        });
+        this.persistDevicePreference({
+          deviceType: MediaDeviceType.VIDEO_INPUT,
+          preferredId: state.video.input.preferredId,
+          previousPreferredId: previousState.video.input.preferredId,
+        });
+      } else {
+        this.updateFavoriteList({
+          deviceType: MediaDeviceType.AUDIO_INPUT,
+          currentActiveId: state.audio.input.activeId,
+          previousActiveId: previousState.audio.input.activeId,
+          state,
+        });
+        this.updateFavoriteList({
+          deviceType: MediaDeviceType.AUDIO_OUTPUT,
+          currentActiveId: state.audio.output.activeId,
+          previousActiveId: previousState.audio.output.activeId,
+          state,
+        });
+        this.updateFavoriteList({
+          deviceType: MediaDeviceType.VIDEO_INPUT,
+          currentActiveId: state.video.input.activeId,
+          previousActiveId: previousState.video.input.activeId,
+          state,
+        });
+      }
+
+      this.updateFavoriteList({
+        deviceType: MediaDeviceType.SCREEN_INPUT,
+        currentActiveId: state.screen.input.activeId,
+        previousActiveId: previousState.screen.input.activeId,
+        state,
+      });
+    });
+  }
 
   public setOnMediaDevicesRefreshHandler(handler: () => void) {
     this.onMediaDevicesRefresh = handler;
@@ -168,33 +292,23 @@ export class MediaDevicesHandler {
     }
   }
 
-  private orderFavoriteDevices(selectedId: string, favoriteDevices: string[], disconnected: boolean) {
-    return disconnected ? favoriteDevices : [selectedId, ...favoriteDevices.filter(id => id !== selectedId)];
-  }
-
-  private updateFavoriteList(type: MediaDeviceType, newId: string, prevId: string, state: MediaDevicesState) {
-    if (newId === prevId) {
+  private persistDevicePreference(options: PersistDevicePreferenceOptions): void {
+    const {deviceType, preferredId, previousPreferredId} = options;
+    if (preferredId === previousPreferredId) {
       return;
     }
 
-    const lengths = {
-      [MediaDeviceType.AUDIO_INPUT]: state.audio.input.devices.length,
-      [MediaDeviceType.AUDIO_OUTPUT]: state.audio.output.devices.length,
-      [MediaDeviceType.VIDEO_INPUT]: state.video.input.devices.length,
-      [MediaDeviceType.SCREEN_INPUT]: state.screen.input.devices.length,
-    };
+    storeValue(deviceType, preferredId);
 
-    storeValue(type, newId);
-
-    const favoriteKey = this.favoriteKeyFor(type);
-    const faves = loadValue<string[]>(favoriteKey) ?? [];
-
-    const prevCount = this.previousDeviceSupport[type] ?? 0;
-    const nowCount = lengths[type];
-    const disconnected = prevCount > nowCount;
-
-    const newFaves = this.orderFavoriteDevices(newId, faves, disconnected);
-    storeValue(favoriteKey, newFaves);
+    const favoriteKey = this.favoriteKeyFor(deviceType);
+    const favoriteIds = loadStoredDeviceIds(favoriteKey);
+    const updatedFavoriteIds = [
+      preferredId,
+      ...favoriteIds.filter(favoriteId => {
+        return favoriteId !== preferredId;
+      }),
+    ];
+    storeValue(favoriteKey, updatedFavoriteIds);
   }
 
   /**
@@ -207,10 +321,17 @@ export class MediaDevicesHandler {
     };
   }
 
-  private filterMediaDevices(mediaDevices: MediaDeviceInfo[]) {
-    const cameras = mediaDevices.filter(({kind}) => kind === MediaDeviceType.VIDEO_INPUT);
-    const microphones = mediaDevices.filter(({kind}) => kind === MediaDeviceType.AUDIO_INPUT);
-    const speakers = mediaDevices.filter(({kind}) => kind === MediaDeviceType.AUDIO_OUTPUT);
+  private filterMediaDevices(mediaDevices: MediaDeviceInfo[]): FilteredMediaDevices {
+    const cameras = mediaDevices.filter(mediaDevice => {
+      return mediaDevice.kind === MediaDeviceType.VIDEO_INPUT;
+    });
+    const microphones = mediaDevices.filter(mediaDevice => {
+      return mediaDevice.kind === MediaDeviceType.AUDIO_INPUT;
+    });
+    const speakers = mediaDevices.filter(mediaDevice => {
+      return mediaDevice.kind === MediaDeviceType.AUDIO_OUTPUT;
+    });
+
     return {cameras, microphones, speakers};
   }
 
@@ -230,40 +351,55 @@ export class MediaDevicesHandler {
 
       const {microphones, speakers, cameras} = this.filterMediaDevices(mediaDevices);
 
-      const prev = mediaDevicesStore.getState();
-
-      const audioInputId = this.pickDeviceId(MediaDeviceType.AUDIO_INPUT, microphones, prev.audio.input.selectedId);
-      const audioOutputId = this.pickDeviceId(MediaDeviceType.AUDIO_OUTPUT, speakers, prev.audio.output.selectedId);
-      const videoInputId = this.pickDeviceId(MediaDeviceType.VIDEO_INPUT, cameras, prev.video.input.selectedId);
+      const previousState = mediaDevicesStore.getState();
+      const audioInputActiveId = this.resolveMediaDeviceId({
+        deviceType: MediaDeviceType.AUDIO_INPUT,
+        devices: microphones,
+        previousActiveId: previousState.audio.input.activeId,
+        preferredId: previousState.audio.input.preferredId,
+      });
+      const audioOutputActiveId = this.resolveMediaDeviceId({
+        deviceType: MediaDeviceType.AUDIO_OUTPUT,
+        devices: speakers,
+        previousActiveId: previousState.audio.output.activeId,
+        preferredId: previousState.audio.output.preferredId,
+      });
+      const videoInputActiveId = this.resolveMediaDeviceId({
+        deviceType: MediaDeviceType.VIDEO_INPUT,
+        devices: cameras,
+        previousActiveId: previousState.video.input.activeId,
+        preferredId: previousState.video.input.preferredId,
+      });
 
       mediaDevicesStore.getState().setAll({
         audio: {
           input: {
             devices: microphones,
             supported: microphones.length > 0,
-            selectedId: audioInputId,
+            activeId: audioInputActiveId,
           },
           output: {
             devices: speakers,
             supported: speakers.length > 0,
-            selectedId: audioOutputId,
+            activeId: audioOutputActiveId,
           },
         },
         video: {
           input: {
             devices: cameras,
             supported: cameras.length > 0,
-            selectedId: videoInputId,
+            activeId: videoInputActiveId,
           },
         },
       });
 
-      // update for next disconnected detection pass
-      this.previousDeviceSupport = {
-        [MediaDeviceType.AUDIO_INPUT]: microphones.length,
-        [MediaDeviceType.AUDIO_OUTPUT]: speakers.length,
-        [MediaDeviceType.VIDEO_INPUT]: cameras.length,
-      };
+      if (!this.isPreferredMediaDevicePersistenceEnabled) {
+        this.previousDeviceSupport = {
+          [MediaDeviceType.AUDIO_INPUT]: microphones.length,
+          [MediaDeviceType.AUDIO_OUTPUT]: speakers.length,
+          [MediaDeviceType.VIDEO_INPUT]: cameras.length,
+        };
+      }
 
       if (refreshMediaStreams) {
         this.onMediaDevicesRefresh?.();
@@ -274,26 +410,6 @@ export class MediaDevicesHandler {
       this.logger.error(`Failed to update MediaDevice list: ${error instanceof Error ? error.message : ''}`, error);
       throw error;
     }
-  }
-
-  private pickDeviceId(type: MediaDeviceType, devices: MediaDeviceInfo[], currentId: string) {
-    const defaults = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[type];
-    const first = devices[0]?.deviceId;
-
-    // prioritize current selection if still available
-    if (devices.some(({deviceId}) => deviceId === currentId)) {
-      return currentId;
-    }
-
-    // fallback to favorite if current is not available
-    const favorites = loadValue<string[]>(this.favoriteKeyFor(type)) ?? [];
-    const matchedFavorite = favorites.find(fav => devices.some(({deviceId}) => deviceId === fav));
-    if (isNonEmptyString(matchedFavorite)) {
-      return matchedFavorite;
-    }
-
-    // else first available or default
-    return first ?? defaults;
   }
 
   public async getScreenSources() {
@@ -350,6 +466,104 @@ export class MediaDevicesHandler {
    */
   private removeAllDevices() {
     mediaDevicesStore.getState().resetDevices();
+  }
+
+  private resolveMediaDeviceId(options: ResolveMediaDeviceIdOptions): string {
+    const {deviceType, devices, previousActiveId, preferredId} = options;
+
+    if (!this.isPreferredMediaDevicePersistenceEnabled) {
+      return this.pickDeviceId({deviceType, devices, currentId: previousActiveId});
+    }
+
+    return resolveActiveDeviceId({
+      availableIds: getMediaDeviceIds(devices),
+      defaultId: MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType],
+      fallbackIds: [previousActiveId, ...loadStoredDeviceIds(this.favoriteKeyFor(deviceType))],
+      preferredId,
+    });
+  }
+
+  private pickDeviceId(options: PickDeviceIdOptions): string {
+    const {deviceType, devices, currentId} = options;
+    const defaultId = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
+
+    const currentDeviceIsAvailable = devices.some(device => {
+      return device.deviceId === currentId;
+    });
+    if (currentDeviceIsAvailable) {
+      return currentId;
+    }
+
+    const favoriteIds = loadStoredDeviceIds(this.favoriteKeyFor(deviceType));
+    const availableFavoriteId = Maybe.find(favoriteId => {
+      return devices.some(device => {
+        return device.deviceId === favoriteId;
+      });
+    }, favoriteIds);
+
+    return availableFavoriteId.match({
+      Just: favoriteId => {
+        return favoriteId;
+      },
+      Nothing: () => {
+        return Maybe.find(isNonEmptyString, getMediaDeviceIds(devices)).unwrapOr(defaultId);
+      },
+    });
+  }
+
+  private updateFavoriteList(options: UpdateFavoriteListOptions): void {
+    const {deviceType, currentActiveId, previousActiveId, state} = options;
+    if (currentActiveId === previousActiveId) {
+      return;
+    }
+
+    const availableDeviceCount = this.getAvailableDeviceCount({deviceType, state});
+    const previousDeviceCount = this.previousDeviceSupport[deviceType] ?? 0;
+    const deviceDisconnected = previousDeviceCount > availableDeviceCount;
+    storeValue(deviceType, currentActiveId);
+
+    const favoriteIds = loadStoredDeviceIds(this.favoriteKeyFor(deviceType));
+    const updatedFavoriteIds = this.orderFavoriteDevices({
+      favoriteIds,
+      currentActiveId,
+      deviceDisconnected,
+    });
+    storeValue(this.favoriteKeyFor(deviceType), updatedFavoriteIds);
+  }
+
+  private getAvailableDeviceCount(options: {
+    readonly deviceType: MediaDeviceType;
+    readonly state: MediaDevicesState;
+  }): number {
+    const {deviceType, state} = options;
+
+    switch (deviceType) {
+      case MediaDeviceType.AUDIO_INPUT:
+        return state.audio.input.devices.length;
+      case MediaDeviceType.AUDIO_OUTPUT:
+        return state.audio.output.devices.length;
+      case MediaDeviceType.VIDEO_INPUT:
+        return state.video.input.devices.length;
+      case MediaDeviceType.SCREEN_INPUT:
+        return state.screen.input.devices.length;
+      default:
+        return 0;
+    }
+  }
+
+  private orderFavoriteDevices(options: OrderFavoriteDevicesOptions): string[] {
+    const {favoriteIds, currentActiveId, deviceDisconnected} = options;
+
+    if (deviceDisconnected) {
+      return [...favoriteIds];
+    }
+
+    return [
+      currentActiveId,
+      ...favoriteIds.filter(favoriteId => {
+        return favoriteId !== currentActiveId;
+      }),
+    ];
   }
 
   private favoriteKeyFor(type: MediaDeviceType) {

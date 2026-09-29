@@ -19,8 +19,10 @@
 
 import {MediaDeviceType} from './MediaDeviceType';
 import {MediaDevicesHandler} from './MediaDevicesHandler';
+import {isUndefined} from '@sindresorhus/is';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {loadValue, storeValue} from 'Util/storageUtil';
 
 /* yarn test:app --specs media/MediaDevicesHandler --nolegacy */
 describe('MediaDevicesHandler', () => {
@@ -144,22 +146,28 @@ describe('MediaDevicesHandler', () => {
       {deviceId: 'speaker2', kind: MediaDeviceType.AUDIO_OUTPUT, label: 'Speaker 2', groupId: '2'},
     ],
     microphones: [
+      {deviceId: 'default', kind: MediaDeviceType.AUDIO_INPUT, label: 'Default - Microphone', groupId: 'default'},
       {deviceId: 'mic1', kind: MediaDeviceType.AUDIO_INPUT, label: 'Mic 1', groupId: '1'},
       {deviceId: 'mic2', kind: MediaDeviceType.AUDIO_INPUT, label: 'Mic 2', groupId: '2'},
     ],
   };
 
   let enumerateDevicesSpy: jasmine.Spy;
+  const enabledMediaDevicePersistenceOptions = {
+    isPreferredMediaDevicePersistenceEnabled: true,
+  } as const;
 
   beforeEach(() => {
+    localStorage.clear();
     const store = mediaDevicesStore.getState();
     store.resetDevices();
-    store.setAudioInputDeviceId('default');
-    store.setAudioOutputDeviceId('default');
-    store.setVideoInputDeviceId('default');
-    store.setScreenInputDeviceId('screen');
+    store.resetSelections();
 
     enumerateDevicesSpy = spyOn(window.navigator.mediaDevices, 'enumerateDevices');
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
   describe('refreshMediaDevices', () => {
     it('does not filter duplicate microphones', async () => {
@@ -186,7 +194,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler();
+      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
       await devicesHandler.initializeMediaDevices(true);
 
       setTimeout(() => {
@@ -204,7 +212,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler();
+      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
       await devicesHandler.initializeMediaDevices(true);
 
       const {
@@ -235,7 +243,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler();
+      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
       await devicesHandler.initializeMediaDevices(true);
 
       expect(enumerateDevicesSpy.calls.count()).toBe(2);
@@ -271,6 +279,170 @@ describe('MediaDevicesHandler', () => {
     });
   });
 
+  describe('physical device preferences', () => {
+    it('restores a persisted preferred microphone when it is available', async () => {
+      const preferredMicrophoneId = 'mic2';
+      storeValue(MediaDeviceType.AUDIO_INPUT, preferredMicrophoneId);
+      storeValue(`${MediaDeviceType.AUDIO_INPUT}-fave`, [preferredMicrophoneId]);
+      enumerateDevicesSpy.and.returnValue(
+        Promise.resolve([
+          ...fakeWorldTestSetup.cameras,
+          ...fakeWorldTestSetup.microphones,
+          ...fakeWorldTestSetup.speakers,
+        ]),
+      );
+
+      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      await devicesHandler.initializeMediaDevices(true);
+
+      const audioInputState = mediaDevicesStore.getState().audio.input;
+      expect(audioInputState.activeId).toBe(preferredMicrophoneId);
+      expect(audioInputState.preferredId).toBe(preferredMicrophoneId);
+      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe(preferredMicrophoneId);
+      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual([preferredMicrophoneId]);
+    });
+
+    it('preserves a persisted preferred microphone while it is unavailable during initial enumeration', async () => {
+      const preferredMicrophoneId = 'mic2';
+      const initiallyAvailableDevices = [
+        ...fakeWorldTestSetup.cameras,
+        ...fakeWorldTestSetup.microphones.filter(device => {
+          return device.deviceId !== preferredMicrophoneId;
+        }),
+        ...fakeWorldTestSetup.speakers,
+      ];
+      const allDevices = [
+        ...fakeWorldTestSetup.cameras,
+        ...fakeWorldTestSetup.microphones,
+        ...fakeWorldTestSetup.speakers,
+      ];
+      storeValue(MediaDeviceType.AUDIO_INPUT, preferredMicrophoneId);
+      storeValue(`${MediaDeviceType.AUDIO_INPUT}-fave`, [preferredMicrophoneId]);
+      let completeInitialEnumeration: ((devices: typeof initiallyAvailableDevices) => void) | undefined;
+      const initialEnumeration = new Promise<typeof initiallyAvailableDevices>(resolve => {
+        completeInitialEnumeration = resolve;
+      });
+      enumerateDevicesSpy.and.returnValue(initialEnumeration);
+
+      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      if (isUndefined(completeInitialEnumeration)) {
+        throw new Error('Expected the initial media-device enumeration to be pending');
+      }
+      completeInitialEnumeration(initiallyAvailableDevices);
+      await initialEnumeration;
+
+      let audioInputState = mediaDevicesStore.getState().audio.input;
+      expect(audioInputState.activeId).toBe('default');
+      expect(audioInputState.preferredId).toBe(preferredMicrophoneId);
+      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe(preferredMicrophoneId);
+      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual([preferredMicrophoneId]);
+
+      enumerateDevicesSpy.and.returnValue(Promise.resolve(allDevices));
+      await devicesHandler.refreshMediaDevices(false);
+
+      audioInputState = mediaDevicesStore.getState().audio.input;
+      expect(audioInputState.activeId).toBe(preferredMicrophoneId);
+      expect(audioInputState.preferredId).toBe(preferredMicrophoneId);
+      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe(preferredMicrophoneId);
+      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual([preferredMicrophoneId]);
+    });
+
+    it('preserves a preferred microphone while it is temporarily unavailable and restores it when it returns', async () => {
+      const preferredMicrophoneId = 'mic2';
+      const defaultMicrophoneId = 'mic1';
+      storeValue(MediaDeviceType.AUDIO_INPUT, preferredMicrophoneId);
+      storeValue(`${MediaDeviceType.AUDIO_INPUT}-fave`, [preferredMicrophoneId]);
+      enumerateDevicesSpy.and.returnValue(
+        Promise.resolve([
+          ...fakeWorldTestSetup.cameras,
+          ...fakeWorldTestSetup.microphones,
+          ...fakeWorldTestSetup.speakers,
+        ]),
+      );
+
+      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      await devicesHandler.initializeMediaDevices(true);
+
+      enumerateDevicesSpy.and.returnValue(
+        Promise.resolve([
+          ...fakeWorldTestSetup.cameras,
+          ...fakeWorldTestSetup.microphones.filter(device => {
+            return device.deviceId === defaultMicrophoneId;
+          }),
+          ...fakeWorldTestSetup.speakers,
+        ]),
+      );
+      await devicesHandler.refreshMediaDevices(false);
+
+      let audioInputState = mediaDevicesStore.getState().audio.input;
+      expect(audioInputState.activeId).toBe(defaultMicrophoneId);
+      expect(audioInputState.preferredId).toBe(preferredMicrophoneId);
+      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe(preferredMicrophoneId);
+      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual([preferredMicrophoneId]);
+
+      enumerateDevicesSpy.and.returnValue(
+        Promise.resolve([
+          ...fakeWorldTestSetup.cameras,
+          ...fakeWorldTestSetup.microphones,
+          ...fakeWorldTestSetup.speakers,
+        ]),
+      );
+      await devicesHandler.refreshMediaDevices(false);
+
+      audioInputState = mediaDevicesStore.getState().audio.input;
+      expect(audioInputState.activeId).toBe(preferredMicrophoneId);
+      expect(audioInputState.preferredId).toBe(preferredMicrophoneId);
+      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe(preferredMicrophoneId);
+      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual([preferredMicrophoneId]);
+    });
+
+    it('persists an explicit default microphone selection after an automatic fallback', async () => {
+      const preferredMicrophoneId = 'mic2';
+      const defaultMicrophoneId = 'default';
+      storeValue(MediaDeviceType.AUDIO_INPUT, preferredMicrophoneId);
+      storeValue(`${MediaDeviceType.AUDIO_INPUT}-fave`, [preferredMicrophoneId]);
+      enumerateDevicesSpy.and.returnValue(
+        Promise.resolve([
+          ...fakeWorldTestSetup.cameras,
+          ...fakeWorldTestSetup.microphones,
+          ...fakeWorldTestSetup.speakers,
+        ]),
+      );
+
+      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      await devicesHandler.initializeMediaDevices(true);
+
+      enumerateDevicesSpy.and.returnValue(
+        Promise.resolve([
+          ...fakeWorldTestSetup.cameras,
+          ...fakeWorldTestSetup.microphones.filter(device => {
+            return device.deviceId === defaultMicrophoneId;
+          }),
+          ...fakeWorldTestSetup.speakers,
+        ]),
+      );
+      await devicesHandler.refreshMediaDevices(false);
+
+      let audioInputState = mediaDevicesStore.getState().audio.input;
+      expect(audioInputState.activeId).toBe(defaultMicrophoneId);
+      expect(audioInputState.preferredId).toBe(preferredMicrophoneId);
+      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe(preferredMicrophoneId);
+      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual([preferredMicrophoneId]);
+
+      const audioInputStore = mediaDevicesStore.getState();
+      audioInputStore.setAudioInputDeviceId(defaultMicrophoneId);
+
+      audioInputState = mediaDevicesStore.getState().audio.input;
+      expect(audioInputState.activeId).toBe(defaultMicrophoneId);
+      expect(audioInputState.preferredId).toBe(defaultMicrophoneId);
+      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe(defaultMicrophoneId);
+      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual([
+        defaultMicrophoneId,
+        preferredMicrophoneId,
+      ]);
+    });
+  });
+
   describe('currentAvailableDeviceId', () => {
     it('only exposes available device', async () => {
       enumerateDevicesSpy.and.returnValue(
@@ -281,27 +453,67 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler();
+      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
       await devicesHandler.initializeMediaDevices(true);
 
       const store = mediaDevicesStore.getState();
+      const firstCamera = fakeWorldTestSetup.cameras.at(0);
+      const firstMicrophone = fakeWorldTestSetup.microphones.at(0);
+      const firstSpeaker = fakeWorldTestSetup.speakers.at(0);
+      const secondSpeaker = fakeWorldTestSetup.speakers.at(1);
 
-      store.setVideoInputDeviceId(fakeWorldTestSetup.cameras[0].deviceId);
-      expect(mediaDevicesStore.getState().video.input.selectedId).toBe(fakeWorldTestSetup.cameras[0].deviceId);
+      if (
+        isUndefined(firstCamera) ||
+        isUndefined(firstMicrophone) ||
+        isUndefined(firstSpeaker) ||
+        isUndefined(secondSpeaker)
+      ) {
+        throw new Error('Expected the fake media-device setup to contain enough devices');
+      }
 
-      store.setAudioInputDeviceId(fakeWorldTestSetup.microphones[0].deviceId);
-      expect(mediaDevicesStore.getState().audio.input.selectedId).toBe(fakeWorldTestSetup.microphones[0].deviceId);
+      store.setVideoInputDeviceId(firstCamera.deviceId);
+      expect(mediaDevicesStore.getState().video.input.activeId).toBe(firstCamera.deviceId);
+      expect(mediaDevicesStore.getState().video.input.preferredId).toBe(firstCamera.deviceId);
 
-      store.setAudioOutputDeviceId(fakeWorldTestSetup.speakers[0].deviceId);
-      expect(mediaDevicesStore.getState().audio.output.selectedId).toBe(fakeWorldTestSetup.speakers[0].deviceId);
+      store.setAudioInputDeviceId(firstMicrophone.deviceId);
+      expect(mediaDevicesStore.getState().audio.input.activeId).toBe(firstMicrophone.deviceId);
+      expect(mediaDevicesStore.getState().audio.input.preferredId).toBe(firstMicrophone.deviceId);
 
-      store.setAudioOutputDeviceId(fakeWorldTestSetup.speakers[1].deviceId);
-      expect(mediaDevicesStore.getState().audio.output.selectedId).toBe(fakeWorldTestSetup.speakers[1].deviceId);
+      store.setAudioOutputDeviceId(firstSpeaker.deviceId);
+      expect(mediaDevicesStore.getState().audio.output.activeId).toBe(firstSpeaker.deviceId);
+      expect(mediaDevicesStore.getState().audio.output.preferredId).toBe(firstSpeaker.deviceId);
+
+      store.setAudioOutputDeviceId(secondSpeaker.deviceId);
+      expect(mediaDevicesStore.getState().audio.output.activeId).toBe(secondSpeaker.deviceId);
+      expect(mediaDevicesStore.getState().audio.output.preferredId).toBe(secondSpeaker.deviceId);
 
       store.setAudioOutputDeviceId('inexistant-id');
-      expect(mediaDevicesStore.getState().audio.output.selectedId).toBe(
+      expect(mediaDevicesStore.getState().audio.output.activeId).toBe(
         MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audiooutput,
       );
+      expect(mediaDevicesStore.getState().audio.output.preferredId).toBe(secondSpeaker.deviceId);
+    });
+
+    it('preserves legacy fallback persistence when preferred media-device persistence is disabled', async () => {
+      const preferredMicrophoneId = 'mic2';
+      const initiallyAvailableDevices = [
+        ...fakeWorldTestSetup.cameras,
+        ...fakeWorldTestSetup.microphones.filter(device => {
+          return device.deviceId !== preferredMicrophoneId;
+        }),
+        ...fakeWorldTestSetup.speakers,
+      ];
+      storeValue(MediaDeviceType.AUDIO_INPUT, preferredMicrophoneId);
+      storeValue(`${MediaDeviceType.AUDIO_INPUT}-fave`, [preferredMicrophoneId]);
+      enumerateDevicesSpy.and.returnValue(Promise.resolve(initiallyAvailableDevices));
+
+      const devicesHandler = new MediaDevicesHandler({isPreferredMediaDevicePersistenceEnabled: false});
+      await devicesHandler.initializeMediaDevices(true);
+
+      const audioInputState = mediaDevicesStore.getState().audio.input;
+      expect(audioInputState.activeId).toBe('default');
+      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe('default');
+      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual(['default', preferredMicrophoneId]);
     });
   });
 });

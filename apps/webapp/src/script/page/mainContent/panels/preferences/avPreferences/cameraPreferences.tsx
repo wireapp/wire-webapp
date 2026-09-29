@@ -111,7 +111,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
 
   const {videoInputDevices, videoInputDeviceId, setVideoInputDeviceId} = useMediaDevicesStore(state => ({
     videoInputDevices: state.video.input.devices,
-    videoInputDeviceId: state.video.input.selectedId,
+    videoInputDeviceId: state.video.input.activeId,
     setVideoInputDeviceId: state.setVideoInputDeviceId,
   }));
 

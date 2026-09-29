@@ -131,10 +131,10 @@ export class MediaConstraintsHandler {
   ): MediaStreamConstraints {
     const {
       audio: {
-        input: {selectedId: audioInputDeviceId},
+        input: {activeId: audioInputDeviceId},
       },
       video: {
-        input: {selectedId: videoInputDeviceId},
+        input: {activeId: videoInputDeviceId},
       },
     } = mediaDevicesStore.getState();
     const mode = this.getVideoQualityMode(isGroup);
@@ -153,7 +153,7 @@ export class MediaConstraintsHandler {
         const desktopCapturer = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER;
         const {
           screen: {
-            input: {selectedId: screenInputDeviceId},
+            input: {activeId: screenInputDeviceId},
           },
         } = mediaDevicesStore.getState();
 
