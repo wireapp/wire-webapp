@@ -498,7 +498,12 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
   const authenticationEnvironment = createWebAppVersionSynchronizationGitAuthenticationEnvironment(
     options.authentication,
   );
-  const authenticatedGit = simpleGit(options.repositoryPath).env(authenticationEnvironment);
+  const authenticatedGit = simpleGit({
+    baseDir: options.repositoryPath,
+    unsafe: {
+      allowUnsafeConfigEnvCount: true,
+    },
+  }).env(authenticationEnvironment);
   const basicCredential = createGitHubBasicCredential(options.authentication.githubToken);
   const redactedAuthenticationValues = [options.authentication.githubToken, basicCredential];
 
