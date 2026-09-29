@@ -20,10 +20,10 @@
 export interface createGroupConversationDataParams {
   name: string;
   protocol: 'proteus' | 'mls';
-  qualifiedUsers: Array<{
+  qualifiedUsers: {
     domain: string;
     id: string;
-  }>;
+  }[];
   team: {
     teamid: string;
   };

@@ -33,7 +33,7 @@ interface BreadcrumbsProps {
    */
   maxNotCombinedItems?: number;
 
-  items: Array<{name: string; icon?: ReactNode}>;
+  items: {name: string; icon?: ReactNode}[];
 
   onItemClick: (item: {name: string}) => void;
 }

@@ -28,7 +28,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface ImageUploadButtonProps {
   onSelectImages: (files: File[]) => void;
-  acceptedImageTypes: ReadonlyArray<string>;
+  acceptedImageTypes: readonly string[];
 }
 
 export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUploadButtonProps) => {

@@ -37,7 +37,7 @@ export type MetricsSample = PerformanceSample;
  */
 export interface MetricsWindow {
   /** Ring buffer of performance samples (null slots indicate unused positions). */
-  samples: Array<MetricsSample | null>;
+  samples: (MetricsSample | null)[];
   /** Maximum number of samples in the window. */
   maxSamples: number;
   /** Next write index into the ring buffer (wraps around). */

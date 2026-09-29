@@ -129,7 +129,7 @@ describe('Login', () => {
       BackendErrorLabel.INVALID_CREDENTIALS,
       StatusCodes.FORBIDDEN,
     );
-    const authErrorTransitions: Array<Error | null> = [];
+    const authErrorTransitions: (Error | null)[] = [];
 
     spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(async (dispatch: ThunkDispatch): Promise<void> => {

@@ -2945,8 +2945,8 @@ describe('set background effect', () => {
   });
 });
 
-function extractAudioStats(stats: Array<{stats: RTCStatsReport}>) {
-  const audioStats: Array<{bytesFlowing: number; id: string | undefined}> = [];
+function extractAudioStats(stats: {stats: RTCStatsReport}[]) {
+  const audioStats: {bytesFlowing: number; id: string | undefined}[] = [];
   stats.forEach(userStats => {
     userStats.stats.forEach(data => {
       const audioStat = data as AudioFlowStat;

@@ -43,7 +43,7 @@ describe('createMeetingReminderScheduler', () => {
     const clock = createDeterministicClock({
       initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-01T09:49:00.000Z')) * 1_000n,
     });
-    const reminders: Array<{meetingTitle: string; meetingStartTime: string}> = [];
+    const reminders: {meetingTitle: string; meetingStartTime: string}[] = [];
     const scheduler = createMeetingReminderScheduler({
       clock,
       onReminder: reminder => {

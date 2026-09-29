@@ -128,7 +128,7 @@ export function EmojiPickerPlugin({openStateRef}: Props): ReactElement {
     return checkForEmojis(text);
   };
 
-  const options: Array<EmojiOption> = useMemo(() => {
+  const options: EmojiOption[] = useMemo(() => {
     const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
       if (queryString === null) {
         return false;

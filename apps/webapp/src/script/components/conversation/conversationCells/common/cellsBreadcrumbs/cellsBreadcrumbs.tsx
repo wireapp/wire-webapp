@@ -21,7 +21,7 @@ import {Breadcrumbs} from '@wireapp/react-ui-kit';
 
 interface CellsBreadcrumbsProps {
   maxNotCombinedItems?: number;
-  items: Array<{name: string; path: string}>;
+  items: {name: string; path: string}[];
   onItemClick: (item: {name: string}) => void;
 }
 

@@ -75,7 +75,7 @@ const validateFileSize = ({files, maxSize, translate}: ValidateFileSizeParams): 
 
   const oversizedImages = files.filter(
     file =>
-      (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type) &&
+      (CONFIG.ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type) &&
       file.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE,
   );
 

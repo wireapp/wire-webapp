@@ -31,7 +31,7 @@ import {
 } from './cellsFolderList.styles';
 
 interface CellsFolderListProps {
-  items: Array<{id: string; name: string; path: string}>;
+  items: {id: string; name: string; path: string}[];
   onNavigate: (path: string) => void;
 }
 

@@ -85,7 +85,7 @@ export type ItemProps<TOption extends TypeaheadOption> = {
   selectedIndex: number | null;
   selectOptionAndCleanUp: (option: TOption) => void;
   setHighlightedIndex: (index: number) => void;
-  options: Array<TOption>;
+  options: TOption[];
 };
 
 export type MenuRenderFn<TOption extends TypeaheadOption> = (
@@ -319,7 +319,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   setResolution: (r: Resolution | null) => void;
   containerId: string;
   anchorClassName?: string;
-  options: Array<TOption>;
+  options: TOption[];
   menuRenderFn: MenuRenderFn<TOption>;
   onSelectOption: (
     option: TOption,
@@ -575,7 +575,7 @@ export type TypeaheadMenuPluginProps<TOption extends TypeaheadOption> = {
     closeMenu: () => void,
     matchingString: string,
   ) => void;
-  options: Array<TOption>;
+  options: TOption[];
   menuRenderFn: MenuRenderFn<TOption>;
   triggerFn: TriggerFn;
   onOpen?: (resolution: Resolution) => void;

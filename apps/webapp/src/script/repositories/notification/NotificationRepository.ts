@@ -110,7 +110,7 @@ type PresentationState =
 export class NotificationRepository {
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  notifications: ReadonlyArray<NotificationEntry>;
+  notifications: readonly NotificationEntry[];
   private readonly notificationApi: SystemNotificationApi;
   private readonly clock: Clock;
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;

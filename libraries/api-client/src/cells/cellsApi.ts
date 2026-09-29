@@ -408,7 +408,7 @@ export class CellsAPI {
     return node;
   }
 
-  async getNodeVersions({uuid, flags}: {uuid: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<NodeVersions> {
+  async getNodeVersions({uuid, flags}: {uuid: string; flags?: GetByUuidFlagsEnum[]}): Promise<NodeVersions> {
     if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
@@ -424,7 +424,7 @@ export class CellsAPI {
     return result.data.Versions !== undefined ? result.data.Versions : [];
   }
 
-  async getNode({id, flags}: {id: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<Node> {
+  async getNode({id, flags}: {id: string; flags?: GetByUuidFlagsEnum[]}): Promise<Node> {
     if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }

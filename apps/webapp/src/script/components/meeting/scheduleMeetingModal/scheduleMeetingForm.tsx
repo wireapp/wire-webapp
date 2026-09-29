@@ -71,7 +71,7 @@ import {
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
 
-const firstNonEmptyError = (...errorMessages: Array<string | undefined>): string | undefined =>
+const firstNonEmptyError = (...errorMessages: (string | undefined)[]): string | undefined =>
   errorMessages.find(message => isNonEmptyString(message));
 
 export interface ScheduleMeetingFormProps {

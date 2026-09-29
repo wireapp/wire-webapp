@@ -53,7 +53,7 @@ import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCe
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
 
 interface CellsTableProps {
-  nodes: Array<CellNode>;
+  nodes: CellNode[];
   cellsRepository: CellsRepository;
   conversation: Conversation;
   conversationQualifiedId: QualifiedId;

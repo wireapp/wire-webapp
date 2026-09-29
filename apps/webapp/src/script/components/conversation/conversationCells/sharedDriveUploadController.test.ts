@@ -246,7 +246,7 @@ describe('createSharedDriveUploadController', () => {
 
   it('limits concurrent batches to three active uploads and preserves global queue order', async () => {
     const cellsRepository = createCellsRepositoryMock();
-    const pendingUploads: Array<{resolve: () => void}> = [];
+    const pendingUploads: {resolve: () => void}[] = [];
     let activeUploads = 0;
     let maximumActiveUploads = 0;
     cellsRepository.uploadNode.mockImplementation(
@@ -297,7 +297,7 @@ describe('createSharedDriveUploadController', () => {
 
   it('limits a single batch to three active uploads and preserves queue order', async () => {
     const cellsRepository = createCellsRepositoryMock();
-    const pendingUploads: Array<{resolve: () => void}> = [];
+    const pendingUploads: {resolve: () => void}[] = [];
     let activeUploads = 0;
     let maximumActiveUploads = 0;
     cellsRepository.uploadNode.mockImplementation(
@@ -349,7 +349,7 @@ describe('createSharedDriveUploadController', () => {
 
   it('advances queued work after an active failure and refreshes mixed outcomes', async () => {
     const cellsRepository = createCellsRepositoryMock();
-    const pendingUploads: Array<{resolve: () => void; reject: () => void}> = [];
+    const pendingUploads: {resolve: () => void; reject: () => void}[] = [];
     cellsRepository.uploadNode.mockImplementation(
       () =>
         new Promise((resolve, reject) => {
@@ -395,7 +395,7 @@ describe('createSharedDriveUploadController', () => {
 
   it('advances queued work after an active cancellation', async () => {
     const cellsRepository = createCellsRepositoryMock();
-    const pendingUploads: Array<{resolve: () => void}> = [];
+    const pendingUploads: {resolve: () => void}[] = [];
     cellsRepository.uploadNode.mockImplementation(
       ({abortController}: {abortController?: AbortController}) =>
         new Promise((resolve, reject) => {
@@ -430,7 +430,7 @@ describe('createSharedDriveUploadController', () => {
 
   it('cancels queued work without starting it and advances the queue', async () => {
     const cellsRepository = createCellsRepositoryMock();
-    const pendingUploads: Array<{resolve: () => void}> = [];
+    const pendingUploads: {resolve: () => void}[] = [];
     cellsRepository.uploadNode.mockImplementation(
       () =>
         new Promise(resolve => {
@@ -565,7 +565,7 @@ describe('createSharedDriveUploadController', () => {
 
   it('retries a failed row while another upload from the same batch remains active', async () => {
     const cellsRepository = createCellsRepositoryMock();
-    const pendingUploads = new Map<string, Array<{resolve: () => void; reject: () => void}>>();
+    const pendingUploads = new Map<string, {resolve: () => void; reject: () => void}[]>();
     cellsRepository.uploadNode.mockImplementation(({uuid}: {uuid: string}) => {
       const pending = new Promise<{uuid: string; versionId: string}>((resolve, reject) => {
         const attempts = pendingUploads.get(uuid) ?? [];
@@ -740,7 +740,7 @@ describe('createSharedDriveUploadController', () => {
 
   it('ignores late progress from a cancelled upload when the next upload starts', async () => {
     const uploadRequests: UploadDraftRequest[] = [];
-    const uploadTasks: Array<{resolve: (value?: DraftIdentity) => void}> = [];
+    const uploadTasks: {resolve: (value?: DraftIdentity) => void}[] = [];
     const remoteIdentity: DraftIdentity = {
       uploadId: 'remote-upload',
       resourceUuid: 'remote-resource',

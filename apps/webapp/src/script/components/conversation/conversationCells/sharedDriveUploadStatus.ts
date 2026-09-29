@@ -136,7 +136,7 @@ export const getSharedDriveUploadDisplayStatuses = (
   statuses: readonly SharedDriveUploadFileStatus[],
 ): SharedDriveUploadStatus[] => {
   const grouped = new Map<string, SharedDriveUploadFileStatus[]>();
-  const orderedGroups: Array<{folderId: string; folderName: string; statuses: SharedDriveUploadFileStatus[]}> = [];
+  const orderedGroups: {folderId: string; folderName: string; statuses: SharedDriveUploadFileStatus[]}[] = [];
   const individualStatuses: SharedDriveUploadStatus[] = [];
   const rowOrder: string[] = [];
 

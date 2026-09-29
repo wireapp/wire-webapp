@@ -54,7 +54,7 @@ export const useToolbarState = () => {
 
       const node = selection.anchor.getNode();
 
-      const formatChecks: Array<{format: FormatTypes; check: () => boolean}> = [
+      const formatChecks: {format: FormatTypes; check: () => boolean}[] = [
         {format: 'bold', check: () => selection.hasFormat('bold')},
         {format: 'italic', check: () => selection.hasFormat('italic')},
         {format: 'strikethrough', check: () => selection.hasFormat('strikethrough')},
