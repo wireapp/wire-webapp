@@ -17,10 +17,14 @@
  *
  */
 
+import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {result} from 'true-myth';
+import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
@@ -64,13 +68,18 @@ import {AppPermissionState} from './AppPermissionState';
 
 import {SuperType} from '../../message/superType';
 import {SystemMessageType} from '../../message/systemMessageType';
+import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';
 import {ContentState, useAppState} from '../../page/useAppState';
 import {Warnings} from '../../view_model/WarningsContainer';
 
-type NotificationData = {conversationId?: QualifiedId; messageId?: string; messageType: string};
+type NotificationData = {
+  conversationId?: QualifiedId;
+  messageId?: string;
+  messageType: string;
+};
 interface NotificationContent {
   /** Notification options */
-  options: {data: NotificationData; tag: string};
+  options: {body: string; data: NotificationData; icon: string; silent: boolean; tag: string};
   /** Timeout for notification */
   timeout: number;
   /** Notification title */
@@ -78,9 +87,19 @@ interface NotificationContent {
   /** Function to be triggered on click */
   trigger: Function;
 }
-interface WebappNotifications extends Notification {
+type NotificationEntry = {
+  body: string;
   data: NotificationData;
-}
+  handle: SystemNotificationHandle;
+  icon: string;
+  /** Consumed by the E2E notification bridge to simulate user clicks. */
+  onclick: (event?: Event) => void;
+  title: string;
+  timeoutIdentifier?: TimeoutIdentifier;
+};
+
+type PresentationState =
+  {kind: 'pending'; entry?: NotificationEntry} | {kind: 'shown'; entry?: NotificationEntry} | {kind: 'closed'};
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -91,7 +110,9 @@ interface WebappNotifications extends Notification {
 export class NotificationRepository {
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  notifications: ReadonlyArray<WebappNotifications>;
+  notifications: ReadonlyArray<NotificationEntry>;
+  private readonly notificationApi: SystemNotificationApi;
+  private readonly clock: Clock;
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly assetRepository: AssetRepository;
   private isSoftLock = false;
@@ -100,7 +121,8 @@ export class NotificationRepository {
     return {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
-      TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
+      // Keep system notifications visible long enough to be noticed before auto-closing.
+      TIMEOUT: TIME_IN_MILLIS.SECOND * 5, // eslint-disable-line no-magic-numbers
       TITLE_LENGTH: 17,
       TITLE_MAX_LENGTH: 38,
     };
@@ -113,20 +135,32 @@ export class NotificationRepository {
   /**
    * Construct a new Notification Repository.
    * @param conversationRepository Repository for all conversation interactions
-   * @param permissionRepository Repository for all permission interactions
+   * @param audioRepository
+   * @param callingRepository
+   * @param translate
+   * @param clock
+   * @param notificationApi
+   * @param fireAndForgetInvoker
    * @param userState Repository for users
+   * @param conversationState
+   * @param callState
    */
   constructor(
     conversationRepository: ConversationRepository,
     private readonly audioRepository: AudioRepository,
     private readonly callingRepository: CallingRepository,
     private readonly translate: Translate,
+    clock: Clock,
+    notificationApi: SystemNotificationApi,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
   ) {
     this.assetRepository = container.resolve(AssetRepository);
     this.conversationRepository = conversationRepository;
+    this.clock = clock;
+    this.notificationApi = notificationApi;
 
     this.logger = getLogger('NotificationRepository');
 
@@ -137,7 +171,7 @@ export class NotificationRepository {
     this.notificationsPreference.subscribe(notificationsPreference => {
       const preferenceIsNone = notificationsPreference === NotificationPreference.NONE;
       if (!preferenceIsNone) {
-        this.checkPermission();
+        this.fireAndForgetInvoker.fireAndForget(() => this.checkPermission());
       }
     });
   }
@@ -165,7 +199,7 @@ export class NotificationRepository {
       return isPermitted;
     }
 
-    if (!Runtime.isSupportingNotifications()) {
+    if (!this.notificationApi.isSupported()) {
       return this.updatePermissionState(AppPermissionState.UNSUPPORTED);
     }
 
@@ -175,7 +209,11 @@ export class NotificationRepository {
       return shouldRequestPermission ? this.requestPermission() : this.checkPermissionState();
     }
 
-    const currentPermission = window.Notification.permission as BrowserPermissionStatus;
+    const currentPermission = match(this.notificationApi.getPermission())
+      .with('default', () => BrowserPermissionStatus.PROMPT)
+      .with('denied', () => BrowserPermissionStatus.DENIED)
+      .with('granted', () => BrowserPermissionStatus.GRANTED)
+      .exhaustive();
     const shouldRequestPermission = currentPermission === BrowserPermissionStatus.PROMPT;
     return shouldRequestPermission ? this.requestPermission() : this.updatePermissionState(currentPermission);
   }
@@ -185,11 +223,12 @@ export class NotificationRepository {
    */
   clearNotifications(): void {
     this.notifications.forEach(notification => {
-      notification.close();
-      if (notification.data) {
-        const {conversationId, messageId} = notification.data;
-        this.logger.info(`Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`);
-      }
+      const {conversationId, messageId} = notification.data;
+      this.closeNotification(
+        notification.handle,
+        `Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`,
+        `Failed to close notification for '${messageId}' in '${conversationId?.id}' on unload.`,
+      );
     });
   }
 
@@ -241,17 +280,19 @@ export class NotificationRepository {
   /** Remove notifications from the queue that are no longer unread */
   readonly removeReadNotifications = (): void => {
     this.notifications.forEach(notification => {
-      const {conversationId, messageId, messageType} = notification.data || {};
+      const {conversationId, messageId, messageType} = notification.data;
 
       if (conversationId && messageId) {
-        this.conversationRepository.isMessageRead(conversationId, messageId).then(isRead => {
+        this.fireAndForgetInvoker.fireAndForget(async () => {
+          const isRead = await this.conversationRepository.isMessageRead(conversationId, messageId);
           if (isRead) {
-            notification.close();
             const messageInfo = messageId
               ? `message '${messageId}' of type '${messageType}'`
               : `'${messageType}' message`;
-            this.logger.info(
+            this.closeNotification(
+              notification.handle,
               `Removed read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
+              `Failed to close read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
             );
           }
         });
@@ -788,11 +829,20 @@ export class NotificationRepository {
     Warnings.showWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
-    if (window.Notification.requestPermission) {
-      const permissionState = await window.Notification.requestPermission();
-      Warnings.hideWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
-      this.updatePermissionState(permissionState);
+    const permissionState = await this.notificationApi.requestPermission();
+    Warnings.hideWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
+    this.updatePermissionState(permissionState);
+  }
+
+  private closeNotification(handle: SystemNotificationHandle, successMessage: string, failureMessage: string): void {
+    const closeAttempt = handle.close();
+
+    if (result.isErr(closeAttempt)) {
+      this.logger.error(failureMessage, closeAttempt.error);
+      return;
     }
+
+    this.logger.info(successMessage);
   }
 
   /**
@@ -843,7 +893,7 @@ export class NotificationRepository {
     // The in-app notification settings should be ignored for alerts (which are composite messages for now)
     const preferenceIsNone =
       this.notificationsPreference() === NotificationPreference.NONE && !messageEntity.isComposite();
-    const supportsNotification = Runtime.isSupportingNotifications();
+    const supportsNotification = this.notificationApi.isSupported();
 
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
@@ -868,48 +918,92 @@ export class NotificationRepository {
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
     this.removeReadNotifications();
-    const notification: WebappNotifications = new window.Notification(
-      notificationContent.title,
-      notificationContent.options,
-    );
     const {conversationId, messageId, messageType} = notificationContent.options.data;
-    let timeoutTriggerId: number;
-
     const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
-    notification.onclick = () => {
-      amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
-      window.focus();
-      void this.callingRepository.setViewModeMinimized();
-      notificationContent.trigger();
+    let presentationState: PresentationState = {kind: 'pending'};
 
-      this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);
-      notification.close();
-    };
+    const scheduleTimeout = () => {
+      if (presentationState.kind !== 'shown' || presentationState.entry === undefined) {
+        return;
+      }
 
-    notification.onclose = () => {
-      window.clearTimeout(timeoutTriggerId);
-      this.notifications = this.notifications.toSpliced(this.notifications.indexOf(notification), 1);
-      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`);
-    };
+      const {entry: notificationEntry} = presentationState;
+      if (notificationEntry.timeoutIdentifier !== undefined) {
+        return;
+      }
 
-    notification.onerror = error => {
-      this.logger.error(
-        `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by error.`,
-        error,
-      );
-      notification.close();
-    };
-
-    notification.onshow = () => {
-      timeoutTriggerId = window.setTimeout(() => {
-        this.logger.info(
+      notificationEntry.timeoutIdentifier = this.clock.setTimeout(() => {
+        this.closeNotification(
+          notificationEntry.handle,
           `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by timeout.`,
+          `Failed to close notification for ${messageInfo} in '${conversationId?.id || conversationId}' by timeout.`,
         );
-        notification.close();
       }, notificationContent.timeout);
     };
 
-    this.notifications = this.notifications.concat(notification);
+    const onClick = () => {
+      void this.callingRepository.setViewModeMinimized();
+      notificationContent.trigger();
+
+      if (presentationState.kind !== 'closed') {
+        const notificationEntry = presentationState.entry;
+        if (notificationEntry !== undefined) {
+          this.closeNotification(
+            notificationEntry.handle,
+            `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`,
+            `Failed to close notification for ${messageInfo} in '${conversationId?.id || conversationId}' by click.`,
+          );
+        }
+      }
+    };
+    const isClosed = (): boolean => presentationState.kind === 'closed';
+    const notificationResult = this.notificationApi.show({
+      ...notificationContent.options,
+      title: notificationContent.title,
+      onClick,
+      onShow: () => {
+        if (presentationState.kind === 'pending') {
+          presentationState = {kind: 'shown', entry: presentationState.entry};
+        }
+        scheduleTimeout();
+      },
+      onClose: () => {
+        if (presentationState.kind !== 'closed') {
+          const {entry: notificationEntry} = presentationState;
+          if (notificationEntry?.timeoutIdentifier !== undefined) {
+            this.clock.clearTimeout(notificationEntry.timeoutIdentifier);
+          }
+          if (notificationEntry !== undefined) {
+            this.notifications = this.notifications.filter(entry => entry !== notificationEntry);
+          }
+        }
+        presentationState = {kind: 'closed'};
+        this.logger.info(
+          `Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`,
+        );
+      },
+    });
+
+    if (result.isErr(notificationResult)) {
+      this.logger.error(`Failed to present notification for ${messageInfo}.`, notificationResult.error);
+      return;
+    }
+
+    if (isClosed()) {
+      return;
+    }
+
+    const notificationEntry: NotificationEntry = {
+      body: notificationContent.options.body,
+      data: notificationContent.options.data,
+      handle: notificationResult.value,
+      icon: notificationContent.options.icon,
+      onclick: onClick,
+      title: notificationContent.title,
+    };
+    presentationState = {...presentationState, entry: notificationEntry};
+    this.notifications = this.notifications.concat(notificationEntry);
+    scheduleTimeout();
     this.logger.info(`Added notification for ${messageInfo} in '${conversationId?.id || conversationId}' to queue.`);
   }
 

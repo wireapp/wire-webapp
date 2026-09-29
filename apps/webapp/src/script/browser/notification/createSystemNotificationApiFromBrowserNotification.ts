@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {result} from 'true-myth';
 
@@ -24,10 +25,10 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {
-  systemNotificationErrorKinds,
-  toSystemNotificationError,
   type SystemNotificationApi,
+  systemNotificationErrorKinds,
   type SystemNotificationPermission,
+  toSystemNotificationError,
 } from 'src/script/notification/systemNotificationTypes';
 import {getLogger} from 'Util/logger';
 
@@ -38,6 +39,7 @@ type SystemNotificationLogger = {
 /** The part of a platform notification this adapter uses, so nothing has to fake the rest of it. */
 export type PlatformNotification = {
   onClick: (listener: () => void) => void;
+  onShow: (listener: () => void) => void;
   onClose: (listener: () => void) => void;
   onError: (listener: (event: unknown) => void) => void;
   close: () => void;
@@ -47,11 +49,15 @@ export type PlatformNotificationRequest = {
   title: string;
   body: string;
   tag: string;
+  icon?: string;
+  silent?: boolean;
+  data?: unknown;
 };
 
 export type BrowserNotificationDependencies = {
   createNotification: (request: PlatformNotificationRequest) => PlatformNotification;
   getPermission: () => SystemNotificationPermission;
+  requestPermission?: () => Promise<SystemNotificationPermission>;
   logger: SystemNotificationLogger;
   isSupported: () => boolean;
   focusWindow: () => void;
@@ -69,6 +75,7 @@ export type BrowserNotificationDependencies = {
 export const createSystemNotificationApiFromBrowserNotification = ({
   createNotification,
   getPermission,
+  requestPermission,
   logger,
   isSupported,
   focusWindow,
@@ -76,9 +83,10 @@ export const createSystemNotificationApiFromBrowserNotification = ({
 }: BrowserNotificationDependencies): SystemNotificationApi => ({
   isSupported,
   getPermission,
-  show: ({title, body, tag, onClick, onClose}) =>
+  requestPermission: requestPermission ?? (() => Promise.resolve(getPermission())),
+  show: ({title, body, tag, icon, silent, data, onClick, onShow, onClose}) =>
     result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.presentationFailed), () => {
-      const notification = createNotification({title, body, tag});
+      const notification = createNotification({title, body, tag, icon, silent, data});
       // The platform fires its close event for a programmatic close too, so without this guard a
       // close we asked for would be reported twice.
       let closeReported = false;
@@ -116,6 +124,10 @@ export const createSystemNotificationApiFromBrowserNotification = ({
         onClick();
       });
 
+      if (!isUndefined(onShow)) {
+        notification.onShow(onShow);
+      }
+
       notification.onClose(() => {
         reportClose();
       });
@@ -140,12 +152,22 @@ export const createSystemNotificationApiFromBrowserNotification = ({
     }),
 });
 
-const createBrowserNotification = ({title, body, tag}: PlatformNotificationRequest): PlatformNotification => {
-  const notification = new window.Notification(title, {body, tag});
+const createBrowserNotification = ({
+  title,
+  body,
+  tag,
+  icon,
+  silent,
+  data,
+}: PlatformNotificationRequest): PlatformNotification => {
+  const notification = new window.Notification(title, {body, tag, icon, silent, data});
 
   return {
     onClick: listener => {
       notification.onclick = listener;
+    },
+    onShow: listener => {
+      notification.onshow = listener;
     },
     onClose: listener => {
       notification.onclose = listener;
@@ -166,6 +188,10 @@ export const createBrowserSystemNotificationApi = (): SystemNotificationApi =>
   createSystemNotificationApiFromBrowserNotification({
     createNotification: createBrowserNotification,
     getPermission: () => window.Notification.permission,
+    requestPermission: () =>
+      Runtime.isSupportingNotifications()
+        ? window.Notification.requestPermission()
+        : Promise.resolve(window.Notification.permission),
     logger: getLogger('SystemNotification'),
     isSupported: () => Runtime.isSupportingNotifications(),
     focusWindow: () => window.focus(),

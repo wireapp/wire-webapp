@@ -93,10 +93,16 @@ export const AppContainer = (properties: AppProps) => {
     preferredMediaDevicePersistenceFeatureToggleName,
   );
   const app = useMemo(() => {
-    return new App(container.resolve(Core), container.resolve(APIClient), config, translate, {
-      isPreferredMediaDevicePersistenceEnabled,
-    });
-  }, [config, isPreferredMediaDevicePersistenceEnabled, translate]);
+    return new App(
+      container.resolve(Core),
+      container.resolve(APIClient),
+      config,
+      translate,
+      {isPreferredMediaDevicePersistenceEnabled},
+      clock,
+      fireAndForgetInvoker,
+    );
+  }, [config, fireAndForgetInvoker, isPreferredMediaDevicePersistenceEnabled, translate, clock]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;

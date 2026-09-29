@@ -39,6 +39,7 @@ type CreatedNotification = {
   request: PlatformNotificationRequest;
   closeCallCount: number;
   clickListener: (() => void) | null;
+  showListener: (() => void) | null;
   closeListener: (() => void) | null;
   errorListener: ((event: unknown) => void) | null;
 };
@@ -70,6 +71,7 @@ const createPlatformFake = ({
         request,
         closeCallCount: 0,
         clickListener: null,
+        showListener: null,
         closeListener: null,
         errorListener: null,
       };
@@ -79,6 +81,9 @@ const createPlatformFake = ({
       return {
         onClick: listener => {
           createdNotification.clickListener = listener;
+        },
+        onShow: listener => {
+          createdNotification.showListener = listener;
         },
         onClose: listener => {
           createdNotification.closeListener = listener;
@@ -115,11 +120,13 @@ const createApi = ({
   const {createNotification, createdNotifications} = createPlatformFake(fakeOptions);
   const focusWindow = jest.fn();
   const publishNotificationClick = jest.fn();
+  const requestPermission = jest.fn(async () => permission);
   const logger = {warn: jest.fn()};
 
   const api = createSystemNotificationApiFromBrowserNotification({
     createNotification,
     getPermission: () => permission,
+    requestPermission,
     isSupported: () => true,
     focusWindow,
     publishNotificationClick,
@@ -144,6 +151,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const api = createSystemNotificationApiFromBrowserNotification({
       createNotification: createPlatformFake().createNotification,
       getPermission: () => 'granted',
+      requestPermission: async () => 'granted',
       isSupported: () => false,
       focusWindow: jest.fn(),
       publishNotificationClick: jest.fn(),
@@ -159,10 +167,36 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     expect(api.getPermission()).toBe(permission);
   });
 
-  it('constructs a notification carrying the title, body and tag', () => {
+  it('requests permission through the platform', async () => {
+    const {api} = createApi();
+
+    await expect(api.requestPermission()).resolves.toBe('granted');
+  });
+
+  it('returns the current permission when the platform cannot request permission', async () => {
+    const {createNotification} = createPlatformFake();
+    const api = createSystemNotificationApiFromBrowserNotification({
+      createNotification,
+      getPermission: () => 'denied',
+      isSupported: () => false,
+      focusWindow: jest.fn(),
+      publishNotificationClick: jest.fn(),
+      logger: {warn: jest.fn()},
+    });
+
+    await expect(api.requestPermission()).resolves.toBe('denied');
+  });
+
+  it('constructs a notification carrying the notification options', () => {
     const {api, createdNotifications} = createApi();
 
-    api.show(notificationRequestFactory.build());
+    api.show(
+      notificationRequestFactory.build({
+        icon: '/image/logo/notification.png',
+        silent: true,
+        data: {messageType: 'content'},
+      }),
+    );
 
     expect(createdNotifications).toHaveLength(1);
     expect(createdNotifications.at(0)?.request.title).toBe('Weekly sync');
@@ -170,6 +204,9 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
       title: 'Weekly sync',
       body: 'Starts at 12:00 PM',
       tag: 'meeting-reminder:tag',
+      icon: '/image/logo/notification.png',
+      silent: true,
+      data: {messageType: 'content'},
     });
   });
 
@@ -182,6 +219,16 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     expect(focusWindow).toHaveBeenCalledTimes(1);
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls back when the platform shows the notification', () => {
+    const {api, createdNotifications} = createApi();
+    const onShow = jest.fn();
+
+    api.show(notificationRequestFactory.build({onShow}));
+    createdNotifications.at(0)?.showListener?.();
+
+    expect(onShow).toHaveBeenCalledTimes(1);
   });
 
   it('announces the click so the desktop app restores its window and switches account', () => {

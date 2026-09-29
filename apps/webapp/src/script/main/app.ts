@@ -95,6 +95,7 @@ import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingReposi
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserService} from 'Repositories/user/userService';
 import {UserState} from 'Repositories/user/userState';
+import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
@@ -119,8 +120,8 @@ import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
 import {TeamError} from '../error/teamError';
 import {
   createNewVersionPollingCallback,
-  NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
   type FetchLatestBuildMetadata,
+  NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
   startNewVersionPolling,
 } from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
@@ -210,6 +211,10 @@ export class App {
   /**
    * @param core
    * @param apiClient Configured backend client
+   * @param config
+   * @param translate
+   * @param clock
+   * @param fireAndForgetInvoker
    */
   constructor(
     private readonly core: Core,
@@ -217,6 +222,8 @@ export class App {
     private readonly config: Configuration,
     private readonly translate: Translate,
     options: AppOptions,
+    private readonly clock: Clock,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
   ) {
     this.appOptions = options;
     this.config = config;
@@ -363,6 +370,9 @@ export class App {
       repositories.audio,
       repositories.calling,
       this.translate,
+      this.clock,
+      createBrowserSystemNotificationApi(),
+      this.fireAndForgetInvoker,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 

@@ -76,6 +76,7 @@ const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotif
     notificationApi: {
       isSupported: () => true,
       getPermission: () => 'granted',
+      requestPermission: async () => 'granted',
       show: request => {
         requests.push(request);
 

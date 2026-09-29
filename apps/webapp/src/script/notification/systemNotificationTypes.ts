@@ -44,7 +44,12 @@ export type SystemNotificationRequest = {
   title: string;
   body: string;
   tag: string;
+  icon?: string;
+  silent?: boolean;
+  data?: unknown;
   onClick: () => void;
+  /** Called when the platform has displayed the notification. */
+  onShow?: () => void;
   /** Called when the platform closed the notification on its own: user dismissal, OS lifecycle or an error. */
   onClose: () => void;
 };
@@ -63,5 +68,6 @@ export type SystemNotificationHandle = {
 export type SystemNotificationApi = {
   isSupported: () => boolean;
   getPermission: () => SystemNotificationPermission;
+  requestPermission: () => Promise<SystemNotificationPermission>;
   show: (request: SystemNotificationRequest) => Result<SystemNotificationHandle, SystemNotificationError>;
 };
