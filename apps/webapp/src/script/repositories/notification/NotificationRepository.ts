@@ -68,15 +68,15 @@ import {AppPermissionState} from './AppPermissionState';
 
 import {SuperType} from '../../message/superType';
 import {SystemMessageType} from '../../message/systemMessageType';
-import type {
-  SystemNotificationApi,
-  SystemNotificationData,
-  SystemNotificationHandle,
-} from '../../notification/systemNotificationTypes';
+import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';
 import {ContentState, useAppState} from '../../page/useAppState';
 import {Warnings} from '../../view_model/WarningsContainer';
 
-type NotificationData = SystemNotificationData;
+type NotificationData = {
+  conversationId?: QualifiedId;
+  messageId?: string;
+  messageType: string;
+};
 interface NotificationContent {
   /** Notification options */
   options: {body: string; data: NotificationData; icon: string; silent: boolean; tag: string};

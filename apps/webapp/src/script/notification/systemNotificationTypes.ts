@@ -17,7 +17,6 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {type Result} from 'true-myth';
 
 export const systemNotificationErrorKinds = {
@@ -41,19 +40,13 @@ export const toSystemNotificationError =
 /** The three permission states, owned here so the port carries no DOM type. */
 export type SystemNotificationPermission = 'default' | 'denied' | 'granted';
 
-export type SystemNotificationData = {
-  conversationId?: QualifiedId;
-  messageId?: string;
-  messageType: string;
-};
-
 export type SystemNotificationRequest = {
   title: string;
   body: string;
   tag: string;
   icon?: string;
   silent?: boolean;
-  data?: SystemNotificationData;
+  data?: unknown;
   onClick: () => void;
   /** Called when the platform has displayed the notification. */
   onShow?: () => void;

@@ -28,7 +28,6 @@ import {
   type SystemNotificationApi,
   systemNotificationErrorKinds,
   type SystemNotificationPermission,
-  type SystemNotificationRequest,
   toSystemNotificationError,
 } from 'src/script/notification/systemNotificationTypes';
 import {getLogger} from 'Util/logger';
@@ -52,7 +51,7 @@ export type PlatformNotificationRequest = {
   tag: string;
   icon?: string;
   silent?: boolean;
-  data?: SystemNotificationRequest['data'];
+  data?: unknown;
 };
 
 export type BrowserNotificationDependencies = {
