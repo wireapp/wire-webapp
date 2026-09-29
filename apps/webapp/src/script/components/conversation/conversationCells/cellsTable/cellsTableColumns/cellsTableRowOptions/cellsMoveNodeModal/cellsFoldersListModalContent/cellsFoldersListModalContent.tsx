@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
+
 import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from 'Components/conversation/conversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -53,7 +55,7 @@ export const CellsFoldersListModalContent = ({
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
 
-  const shouldDisplayEmptyItems = status === 'success' && !items.length;
+  const shouldDisplayEmptyItems = status === 'success' && !isNonEmptyArray(items);
 
   const handleFolderNavigate = (path: string) => {
     const newPath = path.split('/').slice(1).join('/');

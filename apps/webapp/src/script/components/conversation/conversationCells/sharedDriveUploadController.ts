@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -49,7 +50,7 @@ export type SharedDriveUploadRequest = {
 
 const addUploadMetadata = (source: UploadSource, file: File): UploadSource => ({
   ...source,
-  ...(file.webkitRelativePath ? {relativePath: file.webkitRelativePath} : {}),
+  ...(isNonEmptyString(file.webkitRelativePath) ? {relativePath: file.webkitRelativePath} : {}),
 });
 
 type SharedDriveUploadSnapshotListener = () => void;
@@ -65,7 +66,7 @@ type UploadWork = {
 const MAX_ACTIVE_UPLOADS = 3;
 
 const isTerminalUploadState = (state: UploadState | undefined): boolean => {
-  if (!state) {
+  if (isUndefined(state)) {
     return false;
   }
 
@@ -224,7 +225,7 @@ export const createDirectSharedDriveUploadStrategy = ({
   const retryUpload = async (uploadId: string): Promise<boolean> => {
     const request = requestsByUploadId.get(uploadId);
     const currentState = statesByUploadId.get(uploadId);
-    if (!request || currentState?.kind !== 'uploadFailed') {
+    if (isUndefined(request) || currentState?.kind !== 'uploadFailed') {
       return false;
     }
 
@@ -276,7 +277,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     const promise = new Promise<boolean>(resolve => {
       resolvePromise = resolve;
     });
-    if (!resolvePromise) {
+    if (isUndefined(resolvePromise)) {
       throw new Error('Upload work resolver was not created');
     }
 
@@ -319,7 +320,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   function pumpQueue(): void {
     while (activeWorkCount < MAX_ACTIVE_UPLOADS && queuedWork.length > 0) {
       const work = queuedWork.shift();
-      if (!work || work.state !== 'queued') {
+      if (isUndefined(work) || work.state !== 'queued') {
         continue;
       }
       startWork(work);
@@ -370,7 +371,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     const currentBatchUploadIds = currentBatchUploadIdsByConversation.get(conversationQualifiedId);
     let nextBatchUploadIds = isTerminalBatch(currentBatchUploadIds, uploadStrategy) ? undefined : currentBatchUploadIds;
 
-    if (!nextBatchUploadIds) {
+    if (isUndefined(nextBatchUploadIds)) {
       dismissedUploadIdsByConversation.delete(conversationQualifiedId);
     }
 
@@ -381,13 +382,13 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
       }
 
       const uploadId = registration.value;
-      if (!nextBatchUploadIds) {
+      if (isUndefined(nextBatchUploadIds)) {
         nextBatchUploadIds = new Set<string>();
         currentBatchUploadIdsByConversation.set(conversationQualifiedId, nextBatchUploadIds);
       }
       nextBatchUploadIds.add(uploadId);
       const request = requestsByUploadId.get(uploadId);
-      if (!request) {
+      if (isUndefined(request)) {
         continue;
       }
 
@@ -424,7 +425,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
 
   const retryUpload = async (id: string): Promise<void> => {
     const currentWork = workByUploadId.get(id);
-    if (currentWork) {
+    if (!isUndefined(currentWork)) {
       await currentWork.promise;
       return;
     }
@@ -452,7 +453,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const snapshots = (conversationQualifiedId: string): readonly UploadState[] =>
     [...(currentBatchUploadIdsByConversation.get(conversationQualifiedId) ?? [])].flatMap(uploadId => {
       const snapshot = uploadStrategy.snapshot(uploadId);
-      return snapshot ? [snapshot] : [];
+      return !isUndefined(snapshot) ? [snapshot] : [];
     });
 
   return {

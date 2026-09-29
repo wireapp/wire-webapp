@@ -20,6 +20,7 @@
 import {useEffect, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isUndefined} from '@sindresorhus/is';
 
 import {CellsShareModalContent} from 'Components/cells/shareModal/cellsShareModalContent';
 import {serializeShareModalInput} from 'Components/cells/shareModal/shareModalSerializer';
@@ -84,7 +85,7 @@ export const showShareModal = ({
       primaryAction: {
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
-          if (submitHandler) {
+          if (!isUndefined(submitHandler)) {
             fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
               await submitHandler();
             });

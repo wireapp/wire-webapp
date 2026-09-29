@@ -19,6 +19,8 @@
 
 import {createContext, useContext, ReactNode, useMemo} from 'react';
 
+import {isNull} from '@sindresorhus/is';
+
 interface CellsModalContextType {
   onClose: () => void;
 }
@@ -27,7 +29,7 @@ export const CellsModalContext = createContext<CellsModalContextType | null>(nul
 
 export const useCellsModal = () => {
   const context = useContext(CellsModalContext);
-  if (!context) {
+  if (isNull(context)) {
     throw new Error('useCellsModal must be used within a CellsModalProvider');
   }
   return context;

@@ -54,7 +54,7 @@ export interface FilterItem {
 }
 
 export const filterItems = (items: FilterItem[], query: string): FilterItem[] => {
-  if (!query) {
+  if (query.length === 0) {
     return items;
   }
   const lowerQuery = query.toLowerCase();
@@ -164,7 +164,7 @@ export const FilterPopover = ({
               onChange={event => setSearchValue(event.target.value)}
               data-uie-name="filter-popover-search"
             />
-            {searchValue && (
+            {searchValue.length > 0 && (
               <button
                 type="button"
                 css={searchClearButtonStyles}

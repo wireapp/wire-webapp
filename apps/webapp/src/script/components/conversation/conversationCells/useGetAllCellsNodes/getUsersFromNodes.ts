@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RestNode} from 'cells-sdk-ts';
 
@@ -48,7 +49,7 @@ export const getUsersFromNodes = async ({
   nodes: RestNode[];
   userRepository: UserRepository;
 }) => {
-  if (!nodes?.length) {
+  if (!isNonEmptyArray(nodes)) {
     return [];
   }
 

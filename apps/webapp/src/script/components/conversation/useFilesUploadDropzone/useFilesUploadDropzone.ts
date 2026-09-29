@@ -19,6 +19,7 @@
 
 import {useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {Accept, DropzoneInputProps, FileRejection, useDropzone} from 'react-dropzone';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -229,7 +230,7 @@ export const useFilesUploadDropzone = ({
         try {
           const metadata = await buildFileMetadata(file);
 
-          if (!metadata) {
+          if (isNullOrUndefined(metadata)) {
             return;
           }
 

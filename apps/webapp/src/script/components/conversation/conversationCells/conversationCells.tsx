@@ -19,6 +19,7 @@
 
 import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -286,7 +287,7 @@ export const ConversationCells = memo(
     const isError = nodesStatus === 'error';
     const isSuccess = nodesStatus === 'success';
 
-    const hasNodes = !!nodes.length;
+    const hasNodes = isNonEmptyArray(nodes);
     const emptyView = !isError && !hasNodes && isCellsStateReady;
 
     const isLoadingVisible = isLoading && isCellsStateReady;

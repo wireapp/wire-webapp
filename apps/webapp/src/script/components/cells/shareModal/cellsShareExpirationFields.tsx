@@ -20,6 +20,7 @@
 import {useEffect, useMemo, useState} from 'react';
 
 import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
+import {isNull, isNullOrUndefined, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {
   Button,
   Calendar,
@@ -93,10 +94,10 @@ export interface CellsShareExpirationSelection {
 
 const parseTimeLabel = (value: string | number) => {
   const [timePart, periodPart] = `${value}`.trim().split(' ');
-  const [hourPart, minutePart] = (timePart || '').split(':');
+  const [hourPart, minutePart] = (isNonEmptyString(timePart) ? timePart : '').split(':');
   const hour = Number(hourPart);
   const minutes = Number(minutePart);
-  const isPm = (periodPart || '').toUpperCase() === 'PM';
+  const isPm = (isNonEmptyString(periodPart) ? periodPart : '').toUpperCase() === 'PM';
   let hour24 = 0;
   if (Number.isFinite(hour)) {
     if (isPm) {
@@ -173,7 +174,7 @@ export const CellsShareExpirationFields = ({
     return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour24, minutes, 0, 0);
   }, [selectedDate, selectedTime]);
   const isExpirationInvalid = useMemo(
-    () => Boolean(selectedDateTime && selectedDateTime.getTime() < Date.now()),
+    () => !isNull(selectedDateTime) && selectedDateTime.getTime() < Date.now(),
     [selectedDateTime],
   );
   const dateGroupStyles = isExpirationInvalid
@@ -255,7 +256,7 @@ export const CellsShareExpirationFields = ({
               placement="top start"
               shouldFlip={false}
               offset={8}
-              {...(portalContainer ? {portalContainer} : {})}
+              {...(!isUndefined(portalContainer) ? {portalContainer} : {})}
             >
               <Dialog>
                 <Calendar>
@@ -293,9 +294,9 @@ export const CellsShareExpirationFields = ({
             menuCSS={timeSelectMenuStyles}
             menuPlacement="top"
             maxMenuHeight={menuMaxHeight}
-            {...(portalContainer && {menuPortalTarget: portalContainer})}
+            {...(!isUndefined(portalContainer) ? {menuPortalTarget: portalContainer} : {})}
             onChange={option => {
-              if (option) {
+              if (!isNullOrUndefined(option)) {
                 setSelectedTime(option as Option);
               }
             }}

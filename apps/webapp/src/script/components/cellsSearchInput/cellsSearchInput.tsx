@@ -59,7 +59,7 @@ export const CellsSearchInput = ({
       onChange={event => onChange(event.currentTarget.value)}
       data-uie-name={uieName}
     />
-    {value && (
+    {value.length > 0 && (
       <button type="button" css={clearButtonStyles} aria-label={clearAriaLabel} onClick={onClear}>
         <CircleCloseIcon color="currentColor" />
       </button>

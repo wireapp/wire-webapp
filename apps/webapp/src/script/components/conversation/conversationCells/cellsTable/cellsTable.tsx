@@ -19,6 +19,7 @@
 
 import {DragEvent, useEffect, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -76,7 +77,7 @@ interface CellsTableHeaderCellProps {
 
 const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
-  const ariaSort = isSortingEnabled && sortField ? toAriaSort(getDirectionFor(sortField)) : undefined;
+  const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
   return (
     <th

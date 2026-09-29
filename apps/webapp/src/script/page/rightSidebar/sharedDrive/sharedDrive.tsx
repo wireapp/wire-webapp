@@ -19,6 +19,7 @@
 
 import {useMemo} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {UserType} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 
@@ -74,7 +75,7 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
       (participant): participant is User => participant.type === UserType.REGULAR,
     );
 
-    if (!isSelfUserRemoved && selfUser) {
+    if (!isSelfUserRemoved && !isNullOrUndefined(selfUser)) {
       return [...users, selfUser].toSorted(sortUsersByPriority);
     }
 
