@@ -177,7 +177,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     groupId: string,
     userClientsMap: Record<string, QualifiedId>,
   ): Promise<DeviceIdentity[]> {
-    const clientIds: Array<ClientId> = Object.entries(userClientsMap).map(
+    const clientIds: ClientId[] = Object.entries(userClientsMap).map(
       ([clientId, userId]) => new ClientId(getE2EIClientId(clientId, userId.id, userId.domain).asBytes),
     );
     const deviceIdentities = await this.coreCryptoClient.getDeviceIdentities(

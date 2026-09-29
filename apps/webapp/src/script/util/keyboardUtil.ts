@@ -92,7 +92,7 @@ export const handleKeyDown = ({
 }: {
   event: ReactKeyboardEvent<Element> | KeyboardEvent;
   callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void;
-  keys: Array<(typeof KEY)[keyof typeof KEY]>;
+  keys: (typeof KEY)[keyof typeof KEY][];
 }) => {
   if (keys.includes(event.key as (typeof KEY)[keyof typeof KEY])) {
     if ('preventDefault' in event) {

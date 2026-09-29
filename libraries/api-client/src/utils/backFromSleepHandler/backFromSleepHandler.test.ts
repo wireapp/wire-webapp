@@ -27,7 +27,7 @@ jest.useFakeTimers();
 describe('onBackFromSleep', () => {
   let originalDateNow: () => number;
   let now: number;
-  const stopFunctions: Array<() => void> = [];
+  const stopFunctions: (() => void)[] = [];
 
   beforeEach(() => {
     originalDateNow = Date.now;

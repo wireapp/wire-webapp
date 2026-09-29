@@ -67,7 +67,7 @@ export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadat
   const router = express.Router();
 
   router.get('/robots.txt', async (req, res) => {
-    const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as ReadonlyArray<string>).includes(req.hostname)
+    const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as readonly string[]).includes(req.hostname)
       ? config.ROBOTS.ALLOW
       : config.ROBOTS.DISALLOW;
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);

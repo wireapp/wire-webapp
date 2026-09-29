@@ -54,7 +54,7 @@ export const useGetCellsFolders = ({
   enabled,
   fireAndForgetInvoker,
 }: UseGetCellsFoldersProps) => {
-  const [folders, setFolders] = useState<Array<Folder>>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [status, setStatus] = useState<Status>('idle');
   const [shouldShowLoadingSpinner, setShouldShowLoadingSpinner] = useState(true);
 

@@ -28,7 +28,7 @@ import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTyp
 import {createUseSingleInstance} from './useSingleInstance';
 
 function createInMemoryStringKeyValueStorage(): StringKeyValueStorage {
-  const storedValues: Array<{key: string; value: string}> = [];
+  const storedValues: {key: string; value: string}[] = [];
 
   const storage: StringKeyValueStorage = {
     getItem: key => {

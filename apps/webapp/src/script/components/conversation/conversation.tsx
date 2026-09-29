@@ -295,7 +295,7 @@ function ConversationContent({
 
       if (!isHittingUploadLimit(droppedFiles, repositories.asset, translate)) {
         Array.from(droppedFiles).forEach(file => {
-          const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type);
+          const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type);
 
           if (isSupportedImage) {
             images.push(file);

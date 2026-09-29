@@ -30,7 +30,7 @@ import {CellsFolderListLoading} from './cellsFolderListLoading/cellsFolderListLo
 import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsFoldersListModalContent.styles';
 
 interface CellsFoldersListModalContentProps {
-  items: Array<{id: string; name: string; path: string}>;
+  items: {id: string; name: string; path: string}[];
   status: 'idle' | 'loading' | 'success' | 'error';
   shouldShowLoadingSpinner: boolean;
   conversationName: string;

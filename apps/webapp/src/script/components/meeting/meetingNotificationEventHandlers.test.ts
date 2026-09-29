@@ -71,8 +71,8 @@ describe('createMeetingNotificationEventHandlers', () => {
     getMeetingSeries = () => [meetingSeries],
     clock = defaultClock,
     notifications = [] as AddNotificationInput[],
-    dismissedMeetings = [] as Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}>,
-    warnings = [] as Array<{message: string; context?: unknown}>,
+    dismissedMeetings = [] as {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[],
+    warnings = [] as {message: string; context?: unknown}[],
   } = {}) =>
     createMeetingNotificationEventHandlers({
       getMeetingSeries,
@@ -93,8 +93,8 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('creates meeting notifications from the current meeting series snapshot', () => {
     const notifications: AddNotificationInput[] = [];
-    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
-    const warnings: Array<{message: string; context?: unknown}> = [];
+    const dismissedMeetings: {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[] = [];
+    const warnings: {message: string; context?: unknown}[] = [];
 
     const {notifyUpdate, onMeetingCancelled} = createHandlers({notifications, dismissedMeetings, warnings});
 
@@ -122,7 +122,7 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('warns and queues notification creation when a meeting is missing', () => {
     const notifications: AddNotificationInput[] = [];
-    const warnings: Array<{message: string; context?: unknown}> = [];
+    const warnings: {message: string; context?: unknown}[] = [];
 
     const {onMeetingCancelled} = createHandlers({
       getMeetingSeries: () => [],
@@ -278,7 +278,7 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('logs invalid meeting dates and does not create a notification', () => {
     const notifications: AddNotificationInput[] = [];
-    const warnings: Array<{message: string; context?: unknown}> = [];
+    const warnings: {message: string; context?: unknown}[] = [];
     const invalidMeeting = {...meetingSeries, series_start_date: 'invalid-start'};
     const {notifyMeetingChange} = createHandlers({notifications, warnings});
 
@@ -312,7 +312,7 @@ describe('createMeetingNotificationEventHandlers', () => {
   });
 
   it('dismisses stale notifications before creating a cancellation for involuntary self-removal', () => {
-    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    const dismissedMeetings: {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[] = [];
     const notifications: AddNotificationInput[] = [];
     const {onMeetingCancelled} = createHandlers({notifications, dismissedMeetings});
 
@@ -346,7 +346,7 @@ describe('createMeetingNotificationEventHandlers', () => {
   });
 
   it('dismisses stale notifications without creating a cancellation when notify is false', () => {
-    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    const dismissedMeetings: {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[] = [];
     const notifications: AddNotificationInput[] = [];
     const {notifyUpdate, onMeetingCancelled} = createHandlers({notifications, dismissedMeetings});
 
@@ -373,7 +373,7 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('creates only one cancellation notification when cancelled twice', () => {
     const notifications: AddNotificationInput[] = [];
-    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    const dismissedMeetings: {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[] = [];
     const {onMeetingCancelled} = createMeetingNotificationEventHandlers({
       getMeetingSeries: () => [meetingSeries],
       clock: defaultClock,
@@ -412,7 +412,7 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('retries pending cancellations with the full cancellation path', () => {
     const notifications: AddNotificationInput[] = [];
-    const dismissedMeetings: Array<{meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}> = [];
+    const dismissedMeetings: {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[] = [];
     let meetingSeriesSnapshot: MeetingSeries[] = [];
 
     const {onMeetingCancelled, retryPendingNotifications} = createHandlers({

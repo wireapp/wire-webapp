@@ -454,10 +454,7 @@ describe('segmenter tests', () => {
           (
             _source: VideoFrame,
             _timestamp: number,
-            callback: (result: {
-              categoryMask: typeof categoryMask;
-              confidenceMasks: Array<typeof confidenceMask>;
-            }) => void,
+            callback: (result: {categoryMask: typeof categoryMask; confidenceMasks: (typeof confidenceMask)[]}) => void,
           ) => {
             callback({
               categoryMask,
@@ -546,7 +543,7 @@ describe('segmenter tests', () => {
             (
               _source: VideoFrame,
               _timestamp: number,
-              callback: (result: {categoryMask: typeof mask; confidenceMasks: Array<typeof mask>}) => void,
+              callback: (result: {categoryMask: typeof mask; confidenceMasks: (typeof mask)[]}) => void,
             ) => {
               callback({categoryMask: mask, confidenceMasks: [mask]});
             },

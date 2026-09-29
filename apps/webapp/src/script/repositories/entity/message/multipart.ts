@@ -70,7 +70,7 @@ export class Multipart extends Asset {
     return this.mentions().some(MentionEntity => MentionEntity.targetsUser(userId));
   }
 
-  getCellAssets(): Array<ICellAsset> {
+  getCellAssets(): ICellAsset[] {
     const attachments = this.attachments?.();
 
     if (isUndefined(attachments)) {

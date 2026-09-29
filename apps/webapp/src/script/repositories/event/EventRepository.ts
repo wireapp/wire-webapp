@@ -219,7 +219,7 @@ export class EventRepository {
   ): Promise<void> {
     await this.handleTimeDrift();
 
-    const cleanupHandlers: Array<() => void> = [];
+    const cleanupHandlers: (() => void)[] = [];
     let actualDisconnect: () => void = noop;
     let connectionInProgress = false;
     let healthCheckInProgress = false;

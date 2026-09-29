@@ -309,7 +309,7 @@ export function ConfigToolbar() {
   };
 
   const renderCoreCryptoLogLevelSelect = () => {
-    const options: Array<{label: string; value: CoreCryptoLogLevel}> = [
+    const options: {label: string; value: CoreCryptoLogLevel}[] = [
       {label: 'Off', value: CoreCryptoLogLevel.Off},
       {label: 'Trace', value: CoreCryptoLogLevel.Trace},
       {label: 'Debug', value: CoreCryptoLogLevel.Debug},

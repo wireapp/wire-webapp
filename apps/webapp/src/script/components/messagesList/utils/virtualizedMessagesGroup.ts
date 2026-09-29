@@ -124,8 +124,8 @@ function shouldGroupMessagesByTimestamp(
 export function groupMessagesBySenderAndTime(
   messages: Message[],
   lastReadTimestamp: number,
-): Array<Marker | GroupedMessage> {
-  return messages.reduce<Array<Marker | GroupedMessage>>((acc, message, index) => {
+): (Marker | GroupedMessage)[] {
+  return messages.reduce<(Marker | GroupedMessage)[]>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
     const markerMessage = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
