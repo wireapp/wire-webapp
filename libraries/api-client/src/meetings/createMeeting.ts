@@ -21,6 +21,7 @@ import {MeetingRecurrence} from './meetingRecurrence';
 
 export interface CreateMeeting {
   end_time: string;
+  password?: string;
   recurrence?: MeetingRecurrence;
   start_time: string;
   title: string;

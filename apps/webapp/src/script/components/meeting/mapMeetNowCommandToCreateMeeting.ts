@@ -36,5 +36,6 @@ export const mapMeetNowCommandToCreateMeeting = (
     start_time: start.toISOString(),
     end_time: end.toISOString(),
     tzid: deviceTimeZone.ianaTimeZoneId,
+    ...(command.password?.trim() && {password: command.password}),
   };
 };

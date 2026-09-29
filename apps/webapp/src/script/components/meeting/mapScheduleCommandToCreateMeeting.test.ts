@@ -47,4 +47,18 @@ describe('mapScheduleCommandToCreateMeeting', () => {
       tzid: 'Pacific/Auckland',
     });
   });
+
+  it('includes a non-empty password and omits whitespace-only passwords', () => {
+    const withPassword = mapScheduleCommandToCreateMeeting(
+      {...{title: 'Weekly sync', start: futureStartDate, end: futureEndDate, recurrence: 'weekly', selectedUsers: []}, password: 'secret'},
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
+    const withoutPassword = mapScheduleCommandToCreateMeeting(
+      {...{title: 'Weekly sync', start: futureStartDate, end: futureEndDate, recurrence: 'weekly', selectedUsers: []}, password: '  '},
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
+
+    expect(withPassword.password).toBe('secret');
+    expect(withoutPassword).not.toHaveProperty('password');
+  });
 });

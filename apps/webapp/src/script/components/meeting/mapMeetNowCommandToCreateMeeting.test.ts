@@ -42,4 +42,20 @@ describe('mapMeetNowCommandToCreateMeeting', () => {
       tzid: 'Pacific/Auckland',
     });
   });
+
+  it('includes a non-empty password and omits whitespace-only passwords', () => {
+    const withPassword = mapMeetNowCommandToCreateMeeting(
+      {title: 'Standup', selectedUsers: [], password: 'secret'},
+      clock,
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
+    const withoutPassword = mapMeetNowCommandToCreateMeeting(
+      {title: 'Standup', selectedUsers: [], password: '  '},
+      clock,
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
+
+    expect(withPassword.password).toBe('secret');
+    expect(withoutPassword).not.toHaveProperty('password');
+  });
 });

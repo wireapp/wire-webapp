@@ -46,6 +46,10 @@ export class MeetingsAPI {
     return `${MeetingsAPI.URL.MEETINGS}/${meetingId.domain}/${meetingId.id}`;
   }
 
+  private generateMeetingLinkRefreshUrl(meetingId: QualifiedId): string {
+    return `${this.generateMeetingUrl(meetingId)}/link/refresh`;
+  }
+
   private parseMeetingResponse(data: unknown): Meeting {
     return meetingSchema.parse(data);
   }
@@ -73,9 +77,21 @@ export class MeetingsAPI {
     return this.parseMeetingWithConversationResponse(response.data);
   }
 
+  /** Refresh the join link for a live meeting created by the authenticated user. */
+  public async refreshMeetingLink(meetingId: QualifiedId): Promise<MeetingWithConversation> {
+    const config: AxiosRequestConfig = {
+      method: 'post',
+      url: this.generateMeetingLinkRefreshUrl(meetingId),
+      ...disableInfiniteNetworkRetries,
+    };
+
+    const response = await this.client.sendJSON<MeetingWithConversation>(config);
+    return this.parseMeetingWithConversationResponse(response.data);
+  }
+
   /**
    * List all meetings for the authenticated user.
-   * @see https://staging-nginz-https.zinfra.io/v17/api/swagger-ui/#/default/get_meetings_list
+   * @see https://staging-nginz-https.zinfra.io/v19/api/swagger-ui/#/default/get_meetings_list
    */
   public async getMeetingsList(): Promise<Meeting[]> {
     const config: AxiosRequestConfig = {

@@ -27,5 +27,6 @@ export interface MeetingsDataSource {
   deleteMeeting(meetingId: QualifiedId): Promise<void>;
   getMeeting(meetingId: QualifiedId): Promise<Meeting>;
   getMeetingsList(): Promise<Meeting[]>;
+  refreshMeetingLink(meetingId: QualifiedId): Promise<MeetingWithConversation>;
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<MeetingWithConversation>;
 }

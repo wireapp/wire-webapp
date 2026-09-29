@@ -129,6 +129,7 @@ describe('scheduleMeeting', () => {
       task.resolve({
         qualified_conversation: qualifiedConversation,
         qualified_id: meetingId,
+        link: 'https://wire.example/meeting',
         conversation: meetingConversationResponse,
       }),
     ),
@@ -136,20 +137,17 @@ describe('scheduleMeeting', () => {
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    requestMeetingConversationCode = jest.fn().mockReturnValue(task.resolve(undefined)),
   }: {
     createMeetingMock?: jest.Mock;
     saveMeetingConversationFromBackend?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
-    requestMeetingConversationCode?: jest.Mock;
   } = {}): {
     deps: MeetingServiceDeps;
     createMeetingMock: jest.Mock;
     establishMeetingConversation: jest.Mock;
     saveMeetingConversationFromBackend: jest.Mock;
-    requestMeetingConversationCode: jest.Mock;
   } => {
     const meetingsRepository = {
       createMeeting: createMeetingMock,
@@ -161,7 +159,6 @@ describe('scheduleMeeting', () => {
       safeGetConversationById,
       establishMeetingConversation,
       safeAddUsers,
-      requestMeetingConversationCode,
     } as unknown as ConversationRepository;
 
     return {
@@ -175,7 +172,6 @@ describe('scheduleMeeting', () => {
       createMeetingMock,
       establishMeetingConversation,
       saveMeetingConversationFromBackend,
-      requestMeetingConversationCode,
     };
   };
 
@@ -185,7 +181,6 @@ describe('scheduleMeeting', () => {
       createMeetingMock,
       establishMeetingConversation,
       saveMeetingConversationFromBackend,
-      requestMeetingConversationCode,
     } = createDeps();
 
     const result = await scheduleMeeting(scheduleCommand, deps);
@@ -203,6 +198,7 @@ describe('scheduleMeeting', () => {
     ).toEqual({
       failedToAdd: [],
       qualifiedMeetingId: meetingId,
+      link: 'https://wire.example/meeting',
     });
     expect(createMeetingMock).toHaveBeenCalledWith({
       title: 'Weekly sync',
@@ -216,7 +212,6 @@ describe('scheduleMeeting', () => {
       userIdsToAdd: [],
       conversationQualifiedId: qualifiedConversation,
     });
-    expect(requestMeetingConversationCode).toHaveBeenCalledWith(qualifiedConversation, undefined);
   });
 
   it('establishes the meeting conversation with selected users on create', async () => {
@@ -273,27 +268,6 @@ describe('scheduleMeeting', () => {
     expect(unwrapErr(result)).toBe(meetingSubmitErrors.createFailed);
   });
 
-  it('requests a password-protected conversation code after creating a meeting', async () => {
-    const {deps, requestMeetingConversationCode} = createDeps();
-
-    const result = await scheduleMeeting({...scheduleCommand, password: 'ValidPassword1!'}, deps);
-
-    expect(result.isOk).toBe(true);
-    expect(requestMeetingConversationCode).toHaveBeenCalledWith(qualifiedConversation, 'ValidPassword1!');
-  });
-
-  it('continues meeting setup when requesting the conversation code fails', async () => {
-    const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
-    const {deps} = createDeps({
-      establishMeetingConversation,
-      requestMeetingConversationCode: jest.fn().mockReturnValue(task.reject(new Error('code request failed'))),
-    });
-
-    const result = await scheduleMeeting(scheduleCommand, deps);
-
-    expect(result.isOk).toBe(true);
-    expect(establishMeetingConversation).toHaveBeenCalled();
-  });
 });
 
 describe('meetNowMeeting', () => {
@@ -302,6 +276,7 @@ describe('meetNowMeeting', () => {
       task.resolve({
         qualified_conversation: qualifiedConversation,
         qualified_id: meetingId,
+        link: 'https://wire.example/meeting',
         conversation: meetingConversationResponse,
       }),
     ),
@@ -309,14 +284,12 @@ describe('meetNowMeeting', () => {
     safeGetConversationById = jest.fn().mockReturnValue(task.resolve(createConversation())),
     establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
     safeAddUsers = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    requestMeetingConversationCode = jest.fn().mockReturnValue(task.resolve(undefined)),
   }: {
     createMeetingMock?: jest.Mock;
     saveMeetingConversationFromBackend?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
-    requestMeetingConversationCode?: jest.Mock;
   } = {}) => {
     const meetingsRepository = {
       createMeeting: createMeetingMock,
@@ -328,7 +301,6 @@ describe('meetNowMeeting', () => {
       safeGetConversationById,
       establishMeetingConversation,
       safeAddUsers,
-      requestMeetingConversationCode,
     } as unknown as ConversationRepository;
 
     return {
@@ -341,7 +313,6 @@ describe('meetNowMeeting', () => {
       },
       createMeetingMock,
       establishMeetingConversation,
-      requestMeetingConversationCode,
     };
   };
 
@@ -370,6 +341,7 @@ describe('meetNowMeeting', () => {
       failedToAdd: [],
       qualifiedConversation,
       qualifiedMeetingId: meetingId,
+      link: 'https://wire.example/meeting',
     });
     expect(createMeetingMock).toHaveBeenCalledWith({
       title: 'Standup',
@@ -379,21 +351,6 @@ describe('meetNowMeeting', () => {
     });
   });
 
-  it('requests a password-protected conversation code for an instant meeting', async () => {
-    const {deps, requestMeetingConversationCode} = createDeps();
-
-    const result = await meetNowMeeting(
-      {
-        title: 'Standup',
-        selectedUsers: [],
-        password: 'ValidPassword1!',
-      },
-      deps,
-    );
-
-    expect(result.isOk).toBe(true);
-    expect(requestMeetingConversationCode).toHaveBeenCalledWith(qualifiedConversation, 'ValidPassword1!');
-  });
 });
 
 describe('updateMeeting', () => {

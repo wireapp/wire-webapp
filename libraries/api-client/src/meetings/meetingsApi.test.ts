@@ -35,6 +35,7 @@ describe('MeetingsAPI', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    link: 'https://wire.example/meeting/abc',
     tzid: 'Europe/Berlin',
     recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
   };
@@ -75,16 +76,16 @@ describe('MeetingsAPI', () => {
   it('sends meeting requests through the versioned HTTP client', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 17);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
 
     const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: []} as never);
 
     await client.api.meetings.getMeetingsList();
 
-    expect(client.transport.http.getBaseUrl()).toBe('https://test.zinfra.io/v17');
+    expect(client.transport.http.getBaseUrl()).toBe('https://test.zinfra.io/v19');
     expect(sendJSONSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         method: 'get',
@@ -96,10 +97,10 @@ describe('MeetingsAPI', () => {
   it('throws when meeting responses fail schema validation', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 17);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
 
     jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: [{title: 'invalid'}]} as never);
 
@@ -109,10 +110,10 @@ describe('MeetingsAPI', () => {
   it('returns parsed meeting responses for valid payloads', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 17);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
 
     jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeeting} as never);
 
@@ -124,10 +125,10 @@ describe('MeetingsAPI', () => {
   it('returns parsed create meeting responses with embedded conversation', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 17);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
 
     const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({
       data: validMeetingWithConversation,
@@ -158,10 +159,10 @@ describe('MeetingsAPI', () => {
   it('returns parsed update meeting responses with embedded conversation', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 17);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
 
     jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: validMeetingWithConversation} as never);
 
@@ -180,13 +181,30 @@ describe('MeetingsAPI', () => {
     );
   });
 
+  it('refreshes a meeting link through the meetings API', async () => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
+    } as never);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
+    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({
+      data: validMeetingWithConversation,
+    } as never);
+
+    await client.api.meetings.refreshMeetingLink({id: 'meeting-id', domain: 'example.com'});
+
+    expect(sendJSONSpy).toHaveBeenCalledWith(
+      expect.objectContaining({method: 'post', url: '/meetings/example.com/meeting-id/link/refresh'}),
+    );
+  });
+
   it('deletes a meeting by qualified id', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 17);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
 
     const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: undefined} as never);
 
@@ -244,10 +262,10 @@ describe('MeetingsAPI', () => {
   ] as const)('disables infinite network retries for %s', async (_name, callMeetingsApi, responseData) => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 17], domain: 'test.zinfra.io'},
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
     } as never);
 
-    await client.useVersion(MINIMUM_API_VERSION, 17);
+    await client.useVersion(MINIMUM_API_VERSION, 19);
 
     const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({data: responseData} as never);
 

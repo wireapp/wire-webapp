@@ -48,9 +48,10 @@ export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 export type CreateMeetingSuccess = MeetingSubmitSuccess & {
   qualifiedConversation: QualifiedId;
   qualifiedMeetingId: QualifiedId;
+  link?: string;
 };
 
-export type ScheduleMeetingSuccess = MeetingSubmitSuccess & {qualifiedMeetingId: QualifiedId};
+export type ScheduleMeetingSuccess = MeetingSubmitSuccess & {qualifiedMeetingId: QualifiedId; link?: string};
 
 const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
   switch (error) {
@@ -79,32 +80,36 @@ const saveMeetingConversationFromResponse = (
     : task.resolve(undefined);
 };
 
+const requireMeetingLink = (
+  meeting: MeetingWithConversation,
+): Task<MeetingWithConversation, MeetingSubmitErrors> =>
+  meeting.link === undefined || meeting.link.trim() === ''
+    ? task.reject(meetingSubmitErrors.meetingLinkMissing)
+    : task.resolve(meeting);
+
 const createMeetingAndSyncParticipants = (
   createPayload: CreateMeeting,
   password: string | undefined,
   selectedUsers: User[],
   deps: MeetingServiceDeps,
-): Task<CreateMeetingSuccess, MeetingSubmitErrors> => {
-  return deps.meetingsRepository
+): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
+  deps.meetingsRepository
     .createMeeting(createPayload)
-    .mapRejected(() => {
-      return meetingSubmitErrors.createFailed;
-    })
-    .andThen(createdMeeting => {
-      return saveMeetingConversationFromResponse(
+    .mapRejected(() => meetingSubmitErrors.createFailed)
+    .andThen(requireMeetingLink)
+    .andThen(createdMeeting =>
+      saveMeetingConversationFromResponse(
         deps.conversationRepository,
         createdMeeting.conversation,
         meetingSubmitErrors.conversationSetupFailed,
       )
-        .andThen(() => {
-          return deps.conversationRepository
+        .andThen(() =>
+          deps.conversationRepository
             .requestMeetingConversationCode(createdMeeting.qualified_conversation, password)
-            .orElse(() => {
-              return task.resolve(undefined);
-            });
-        })
-        .andThen(() => {
-          return syncMeetingConversationParticipants(deps.conversationRepository, {
+            .orElse(() => task.resolve(undefined)),
+        )
+        .andThen(() =>
+          syncMeetingConversationParticipants(deps.conversationRepository, {
             qualifiedConversationId: createdMeeting.qualified_conversation,
             selectedUsers,
             usersToAdd: selectedUsers,
@@ -112,16 +117,14 @@ const createMeetingAndSyncParticipants = (
             isCreate: true,
           })
             .mapRejected(mapSyncErrorToSubmitError)
-            .map(syncResult => {
-              return {
-                ...syncResult,
-                qualifiedConversation: createdMeeting.qualified_conversation,
-                qualifiedMeetingId: createdMeeting.qualified_id,
-              };
-            });
-        });
-    });
-};
+            .map(syncResult => ({
+              ...syncResult,
+              qualifiedConversation: createdMeeting.qualified_conversation,
+              qualifiedMeetingId: createdMeeting.qualified_id,
+              ...(createdMeeting.link !== undefined && {link: createdMeeting.link}),
+            })),
+        ),
+    );
 
 /**
  * Schedules a meeting and establishes the MLS conversation with selected participants.
@@ -135,12 +138,11 @@ export const scheduleMeeting = (
     command.password,
     command.selectedUsers,
     deps,
-  ).map(({failedToAdd, qualifiedMeetingId}) => {
-    return {
-      failedToAdd,
-      qualifiedMeetingId,
-    };
-  });
+  ).map(({failedToAdd, qualifiedMeetingId, link}) => ({
+    failedToAdd,
+    qualifiedMeetingId,
+    link,
+  }));
 };
 
 /**

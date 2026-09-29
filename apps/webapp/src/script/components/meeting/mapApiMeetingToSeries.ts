@@ -59,6 +59,7 @@ export const mapApiMeetingToSeries = (apiMeeting: ApiMeeting): Result<MeetingSer
     qualified_conversation: apiMeeting.qualified_conversation,
     qualified_id: apiMeeting.qualified_id,
     qualified_creator: apiMeeting.qualified_creator,
+    ...(apiMeeting.link !== undefined && {link: apiMeeting.link}),
     title: apiMeeting.title,
     tzid: apiMeeting.tzid,
   });

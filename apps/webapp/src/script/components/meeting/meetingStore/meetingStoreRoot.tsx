@@ -62,9 +62,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     conversation: conversationRepository,
     calling: callingRepository,
   } = mainViewModel.content.repositories;
-  const deviceTimeZone = useMemo(() => {
-    return createBrowserDeviceTimeZone();
-  }, []);
+  const deviceTimeZone = useMemo(() => createBrowserDeviceTimeZone(), []);
 
   const store = useMemo(() => {
     const meetingServiceDeps = {
@@ -78,21 +76,12 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     return createMeetingStore({
       ...meetingServiceDeps,
       serviceTasks: {
-        scheduleMeeting: command => {
-          return scheduleMeeting(command, meetingServiceDeps);
-        },
-        meetNowMeeting: command => {
-          return meetNowMeeting(command, meetingServiceDeps);
-        },
-        updateMeeting: command => {
-          return updateMeeting(command, meetingServiceDeps);
-        },
-        deleteMeetingForMe: command => {
-          return deleteMeetingForMe(command, meetingServiceDeps);
-        },
-        deleteMeetingForAll: command => {
-          return deleteMeetingForAll(command, meetingServiceDeps);
-        },
+        scheduleMeeting: command => scheduleMeeting(command, meetingServiceDeps),
+        meetNowMeeting: command => meetNowMeeting(command, meetingServiceDeps),
+        updateMeeting: command => updateMeeting(command, meetingServiceDeps),
+        deleteMeetingForMe: command => deleteMeetingForMe(command, meetingServiceDeps),
+        deleteMeetingForAll: command => deleteMeetingForAll(command, meetingServiceDeps),
+        rotateMeetingLink: meetingId => meetingsRepository.rotateMeetingLink(meetingId),
       },
     });
   }, [meetingsRepository, conversationRepository, callingRepository, clock, deviceTimeZone]);
@@ -103,15 +92,9 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     }
 
     const dispatcher = createMeetingLifecycleDispatcher({
-      loadMeetings: () => {
-        return store.getState().loadMeetings();
-      },
-      syncMeeting: meetingId => {
-        return store.getState().syncMeetingByQualifiedId(meetingId);
-      },
-      removeMeeting: meetingId => {
-        return store.getState().removeMeetingByQualifiedId(meetingId);
-      },
+      loadMeetings: () => store.getState().loadMeetings(),
+      syncMeeting: meetingId => store.getState().syncMeetingByQualifiedId(meetingId),
+      removeMeeting: meetingId => store.getState().removeMeetingByQualifiedId(meetingId),
       reportOperationFailure: operationName => {
         logger.warn('meeting lifecycle operation failed', {operationName});
       },
@@ -119,9 +102,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
 
     const notificationStore = useMeetingNotificationStore.getState();
     const notificationHandlers = createMeetingNotificationEventHandlers({
-      getMeetingSeries: () => {
-        return store.getState().meetingSeries;
-      },
+      getMeetingSeries: () => store.getState().meetingSeries,
       clock,
       addNotification: notificationStore.addNotification,
       dismissNotificationsForMeeting: notificationStore.dismissNotificationsForMeeting,
@@ -129,9 +110,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     });
     const reminderOsNotifier = createMeetingReminderOsNotifier({
       notificationApi: createBrowserSystemNotificationApi(),
-      openMeetingsList: () => {
-        return mainViewModel.list.openMeetingsList();
-      },
+      openMeetingsList: () => mainViewModel.list.openMeetingsList(),
       formatMeetingTime: formatTimeShort,
       translate,
       logger,
@@ -148,9 +127,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       },
     });
 
-    const getSelfUserQualifiedId = () => {
-      return container.resolve(UserState).self().qualifiedId;
-    };
+    const getSelfUserQualifiedId = () => container.resolve(UserState).self().qualifiedId;
 
     const unsubscribeFromMeetingLifecycleEvents = subscribeToMeetingLifecycleEvents({
       dispatcher,
@@ -161,9 +138,7 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
     });
     const unsubscribeFromMeetingConversationEvents = subscribeToMeetingConversationEvents({
       dispatcher,
-      getMeetingSeries: () => {
-        return store.getState().meetingSeries;
-      },
+      getMeetingSeries: () => store.getState().meetingSeries,
       onMeetingCancelled: notificationHandlers.onMeetingCancelled,
     });
     const unsubscribeFromMeetingStore = store.subscribe((state, previousState) => {

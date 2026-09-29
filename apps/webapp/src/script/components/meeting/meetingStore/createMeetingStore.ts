@@ -27,7 +27,11 @@ import {mapMeetingInstanceToScheduleFormState} from 'Components/meeting/mapMeeti
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 import type {DeleteMeetingCommand} from 'Components/meeting/shared/service/deleteMeeting';
-import {type CreateMeetingSuccess, type MeetingSubmitSuccess} from 'Components/meeting/shared/service/meetingService';
+import {
+  type CreateMeetingSuccess,
+  type MeetingSubmitSuccess,
+  type ScheduleMeetingSuccess,
+} from 'Components/meeting/shared/service/meetingService';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,
@@ -44,27 +48,18 @@ import type {MeetingStoreDeps} from './meetingStoreDeps';
 
 const logger = getLogger('createMeetingStore');
 
-const toDeleteMeetingCommand = (meetingInstance: MeetingInstance): DeleteMeetingCommand => {
-  return {
-    meetingId: meetingInstance.meetingSeries.qualified_id,
-    qualifiedConversation: meetingInstance.meetingSeries.qualified_conversation,
-  };
-};
+const toDeleteMeetingCommand = (meetingInstance: MeetingInstance): DeleteMeetingCommand => ({
+  meetingId: meetingInstance.meetingSeries.qualified_id,
+  qualifiedConversation: meetingInstance.meetingSeries.qualified_conversation,
+});
 
-const filterOutMeetingSeries = (meetingSeries: MeetingSeries[], meetingId: QualifiedId): MeetingSeries[] => {
-  return meetingSeries.filter(series => {
-    return !matchQualifiedIds(series.qualified_id, meetingId);
-  });
-};
+const filterOutMeetingSeries = (meetingSeries: MeetingSeries[], meetingId: QualifiedId): MeetingSeries[] =>
+  meetingSeries.filter(series => !matchQualifiedIds(series.qualified_id, meetingId));
 
-const upsertMeetingSeries = (meetingSeries: MeetingSeries[], updatedSeries: MeetingSeries): MeetingSeries[] => {
-  return [
-    ...meetingSeries.filter(series => {
-      return !matchQualifiedIds(series.qualified_id, updatedSeries.qualified_id);
-    }),
-    updatedSeries,
-  ];
-};
+const upsertMeetingSeries = (meetingSeries: MeetingSeries[], updatedSeries: MeetingSeries): MeetingSeries[] => [
+  ...meetingSeries.filter(series => !matchQualifiedIds(series.qualified_id, updatedSeries.qualified_id)),
+  updatedSeries,
+];
 
 export const syncMeetingErrors = {
   fetchFailed: 'fetchFailed',
@@ -89,11 +84,12 @@ export type MeetingStoreState = {
   isLoading: boolean;
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
-  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<ScheduleMeetingSuccess, MeetingSubmitErrors>;
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
+  rotateMeetingLink?: (meetingId: QualifiedId) => Task<MeetingSeries, unknown>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
   syncMeetingByQualifiedId: (meetingId: QualifiedId) => Task<SyncMeetingResult, SyncMeetingError>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
@@ -106,142 +102,128 @@ type MeetingStoreInitialState = Partial<Pick<MeetingStoreState, 'meetingSeries' 
 export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: MeetingStoreInitialState): MeetingStore => {
   const meetingMutationVersions = new Map<string, number>();
   let meetingStoreMutationVersion = 0;
-  const getMeetingMutationVersion = (meetingId: QualifiedId): number => {
-    return meetingMutationVersions.get(toMeetingIdKey(meetingId)) ?? 0;
-  };
+  const getMeetingMutationVersion = (meetingId: QualifiedId): number =>
+    meetingMutationVersions.get(toMeetingIdKey(meetingId)) ?? 0;
   const incrementMeetingMutationVersion = (meetingId: QualifiedId): void => {
     const meetingIdKey = toMeetingIdKey(meetingId);
     meetingMutationVersions.set(meetingIdKey, getMeetingMutationVersion(meetingId) + 1);
     meetingStoreMutationVersion += 1;
   };
 
-  return createStore<MeetingStoreState>((set, get) => {
-    return {
-      meetingSeries: initialState?.meetingSeries ?? [],
-      isLoading: initialState?.isLoading ?? false,
-      hasLoadError: initialState?.hasLoadError ?? false,
-      loadMeetings: async () => {
-        const mutationVersionBeforeFetch = meetingStoreMutationVersion;
-        const hasExistingMeetings = get().meetingSeries.length > 0;
+  return createStore<MeetingStoreState>((set, get) => ({
+    meetingSeries: initialState?.meetingSeries ?? [],
+    isLoading: initialState?.isLoading ?? false,
+    hasLoadError: initialState?.hasLoadError ?? false,
+    loadMeetings: async () => {
+      const mutationVersionBeforeFetch = meetingStoreMutationVersion;
+      const hasExistingMeetings = get().meetingSeries.length > 0;
 
-        if (hasExistingMeetings) {
-          set({hasLoadError: false});
-        } else {
-          set({isLoading: true, hasLoadError: false});
+      if (hasExistingMeetings) {
+        set({hasLoadError: false});
+      } else {
+        set({isLoading: true, hasLoadError: false});
+      }
+
+      const listResult = await loadMeetingsList(deps.meetingsRepository);
+
+      if (meetingStoreMutationVersion !== mutationVersionBeforeFetch) {
+        set({isLoading: false});
+        return;
+      }
+
+      set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
+    },
+    scheduleMeeting: command =>
+      deps.serviceTasks.scheduleMeeting(command).andThen(result =>
+        get()
+          .syncMeetingByQualifiedId(result.qualifiedMeetingId)
+          .map(() => result)
+          .orElse(() => task.resolve(result)),
+      ),
+    meetNowMeeting: command =>
+      deps.serviceTasks.meetNowMeeting(command).andThen(result =>
+        get()
+          .syncMeetingByQualifiedId(result.qualifiedMeetingId)
+          .map(() => result)
+          .orElse(() => task.resolve(result)),
+      ),
+    rotateMeetingLink: meetingId =>
+      (
+        deps.serviceTasks.rotateMeetingLink?.(meetingId) ?? task.reject(new Error('Meeting link rotation unavailable'))
+      ).andThen(refreshedMeeting => {
+        const mapResult = mapApiMeetingToSeries(refreshedMeeting);
+        if (mapResult.isErr) {
+          return task.reject<MeetingSeries, unknown>(mapResult.error);
         }
+        set(state => ({meetingSeries: upsertMeetingSeries(state.meetingSeries, mapResult.value)}));
+        meetingStoreMutationVersion += 1;
+        return task.resolve(mapResult.value);
+      }),
+    updateMeeting: command =>
+      deps.serviceTasks.updateMeeting(command).andThen(result =>
+        get()
+          .syncMeetingByQualifiedId(command.meetingId)
+          .map(() => ({failedToAdd: result.failedToAdd}))
+          .orElse(() => task.resolve({failedToAdd: result.failedToAdd})),
+      ),
+    deleteMeetingForMe: meetingInstance =>
+      deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance)),
+    deleteMeetingForAll: meetingInstance =>
+      deps.serviceTasks.deleteMeetingForAll(toDeleteMeetingCommand(meetingInstance)),
+    removeMeetingByQualifiedId: meetingId => {
+      incrementMeetingMutationVersion(meetingId);
+      set(state => ({
+        meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingId),
+      }));
+    },
+    syncMeetingByQualifiedId: meetingId => {
+      const mutationVersionBeforeFetch = getMeetingMutationVersion(meetingId);
 
-        const listResult = await loadMeetingsList(deps.meetingsRepository);
+      return deps.meetingsRepository
+        .getMeeting(meetingId)
+        .mapRejected((error): SyncMeetingError => {
+          logger.warn('Failed to fetch meeting for sync', {error, qualifiedId: meetingId});
+          return syncMeetingErrors.fetchFailed;
+        })
+        .andThen(apiMeeting => {
+          const mapResult = mapApiMeetingToSeries(apiMeeting);
 
-        if (meetingStoreMutationVersion !== mutationVersionBeforeFetch) {
-          set({isLoading: false});
-          return;
-        }
+          if (mapResult.isErr) {
+            logger.warn('Failed to map fetched meeting for sync', {
+              error: mapResult.error,
+              qualifiedId: meetingId,
+            });
+            return task.reject<SyncMeetingResult, SyncMeetingError>(syncMeetingErrors.mapFailed);
+          }
 
-        set({meetingSeries: listResult.meetingSeries, hasLoadError: listResult.hasLoadError, isLoading: false});
-      },
-      scheduleMeeting: command => {
-        return deps.serviceTasks.scheduleMeeting(command).andThen(result => {
-          return get()
-            .syncMeetingByQualifiedId(result.qualifiedMeetingId)
-            .map(() => {
-              return {failedToAdd: result.failedToAdd};
-            })
-            .orElse(() => {
-              return task.resolve({failedToAdd: result.failedToAdd});
-            });
+          return task.resolve<SyncMeetingResult, SyncMeetingError>({meeting: mapResult.value, applied: false});
+        })
+        .map(({meeting}) => {
+          const applied = getMeetingMutationVersion(meetingId) === mutationVersionBeforeFetch;
+          if (applied) {
+            set(state => ({meetingSeries: upsertMeetingSeries(state.meetingSeries, meeting)}));
+            meetingStoreMutationVersion += 1;
+          }
+
+          return {meeting, applied};
         });
-      },
-      meetNowMeeting: command => {
-        return deps.serviceTasks.meetNowMeeting(command).andThen(result => {
-          return get()
-            .syncMeetingByQualifiedId(result.qualifiedMeetingId)
-            .map(() => {
-              return result;
-            })
-            .orElse(() => {
-              return task.resolve(result);
-            });
-        });
-      },
-      updateMeeting: command => {
-        return deps.serviceTasks.updateMeeting(command).andThen(result => {
-          return get()
-            .syncMeetingByQualifiedId(command.meetingId)
-            .map(() => {
-              return {failedToAdd: result.failedToAdd};
-            })
-            .orElse(() => {
-              return task.resolve({failedToAdd: result.failedToAdd});
-            });
-        });
-      },
-      deleteMeetingForMe: meetingInstance => {
-        return deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance));
-      },
-      deleteMeetingForAll: meetingInstance => {
-        return deps.serviceTasks.deleteMeetingForAll(toDeleteMeetingCommand(meetingInstance));
-      },
-      removeMeetingByQualifiedId: meetingId => {
-        incrementMeetingMutationVersion(meetingId);
-        set(state => {
+    },
+    loadMeetingForEdit: meetingInstance => {
+      const {meetingSeries} = meetingInstance;
+
+      return deps.conversationRepository
+        .safeGetConversationById(meetingSeries.qualified_conversation)
+        .mapRejected(() => meetingSubmitErrors.updateFailed)
+        .map(conversation => {
+          const selectedUsers = [...conversation.participating_user_ets()];
+          const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, deps.clock);
+
           return {
-            meetingSeries: filterOutMeetingSeries(state.meetingSeries, meetingId),
+            formState,
+            qualifiedConversation: meetingSeries.qualified_conversation,
+            originalSelectedUsers: selectedUsers,
           };
         });
-      },
-      syncMeetingByQualifiedId: meetingId => {
-        const mutationVersionBeforeFetch = getMeetingMutationVersion(meetingId);
-
-        return deps.meetingsRepository
-          .getMeeting(meetingId)
-          .mapRejected((error): SyncMeetingError => {
-            logger.warn('Failed to fetch meeting for sync', {error, qualifiedId: meetingId});
-            return syncMeetingErrors.fetchFailed;
-          })
-          .andThen(apiMeeting => {
-            const mapResult = mapApiMeetingToSeries(apiMeeting);
-
-            if (mapResult.isErr) {
-              logger.warn('Failed to map fetched meeting for sync', {
-                error: mapResult.error,
-                qualifiedId: meetingId,
-              });
-              return task.reject<SyncMeetingResult, SyncMeetingError>(syncMeetingErrors.mapFailed);
-            }
-
-            return task.resolve<SyncMeetingResult, SyncMeetingError>({meeting: mapResult.value, applied: false});
-          })
-          .map(({meeting}) => {
-            const applied = getMeetingMutationVersion(meetingId) === mutationVersionBeforeFetch;
-            if (applied) {
-              set(state => {
-                return {meetingSeries: upsertMeetingSeries(state.meetingSeries, meeting)};
-              });
-              meetingStoreMutationVersion += 1;
-            }
-
-            return {meeting, applied};
-          });
-      },
-      loadMeetingForEdit: meetingInstance => {
-        const {meetingSeries} = meetingInstance;
-
-        return deps.conversationRepository
-          .safeGetConversationById(meetingSeries.qualified_conversation)
-          .mapRejected(() => {
-            return meetingSubmitErrors.updateFailed;
-          })
-          .map(conversation => {
-            const selectedUsers = [...conversation.participating_user_ets()];
-            const formState = mapMeetingInstanceToScheduleFormState(meetingInstance, selectedUsers, deps.clock);
-
-            return {
-              formState,
-              qualifiedConversation: meetingSeries.qualified_conversation,
-              originalSelectedUsers: selectedUsers,
-            };
-          });
-      },
-    };
-  });
+    },
+  }));
 };
