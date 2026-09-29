@@ -163,6 +163,6 @@ describe('CellsFilePreviewModal', () => {
     expect(screen.getByRole('button', {name: 'Editing'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'More options'})).toBeInTheDocument();
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
-    expect(screen.getByTitle('Collabora editor')).toBeInTheDocument();
+    expect(await screen.findByTitle('Collabora editor')).toBeInTheDocument();
   });
 });
