@@ -35,7 +35,7 @@ export type CellsNewNodeFormValidationCopy = {
 };
 
 export const getNameValidationError = (name: string, validationCopy: CellsNewNodeFormValidationCopy): Maybe<string> => {
-  if (!name) {
+  if (name.length === 0) {
     return Maybe.just(validationCopy.nameRequired);
   }
 

@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
@@ -54,7 +55,7 @@ export const useRestoreParentNode = ({
       try {
         const rootParentNode = await cellsRepository.lookupNodeByPath({path});
 
-        if (!rootParentNode) {
+        if (isUndefined(rootParentNode)) {
           throw new Error('Root parent node not found');
         }
 
