@@ -439,6 +439,12 @@ const productionConfigs = [
         },
       ],
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
+      '@typescript-eslint/array-type': [
+        'error',
+        {
+          default: 'array',
+        },
+      ],
       '@typescript-eslint/typedef': 'off',
       'no-dupe-class-members': 'off',
       'no-unsanitized/property': 'off',
