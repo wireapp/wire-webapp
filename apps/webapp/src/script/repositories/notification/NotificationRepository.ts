@@ -878,7 +878,7 @@ export class NotificationRepository {
     // The in-app notification settings should be ignored for alerts (which are composite messages for now)
     const preferenceIsNone =
       this.notificationsPreference() === NotificationPreference.NONE && !messageEntity.isComposite();
-    const supportsNotification = Runtime.isSupportingNotifications();
+    const supportsNotification = this.notificationApi.isSupported();
 
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;

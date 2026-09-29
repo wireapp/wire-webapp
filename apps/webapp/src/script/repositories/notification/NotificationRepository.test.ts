@@ -304,7 +304,7 @@ describe('NotificationRepository', () => {
     // Mocks
     document.hasFocus = () => false;
     notificationRepository.updatePermissionState(BrowserPermissionStatus.GRANTED);
-    spyOn(Runtime, 'isSupportingNotifications').and.returnValue(true);
+    jest.spyOn(notificationRepository['notificationApi'], 'isSupported').mockReturnValue(true);
     spyOn(notificationRepository['assetRepository'], 'getObjectUrl').and.returnValue(
       Promise.resolve('/image/logo/notification.png'),
     );
@@ -406,7 +406,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if the browser does not support them', () => {
-      jest.spyOn(Runtime, 'isSupportingNotifications').mockReturnValue(false);
+      jest.spyOn(notificationRepository['notificationApi'], 'isSupported').mockReturnValue(false);
       return notificationRepository.notify(message, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
       });
