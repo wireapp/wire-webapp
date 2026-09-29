@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {NodeFlags, RestShareLink} from '@wireapp/api-client/lib/cells';
 import {container, singleton} from 'tsyringe';
 
@@ -78,8 +79,8 @@ export class CellsRepository {
     progressCallback?: (progress: number) => void;
     abortController?: AbortController;
   }): Promise<{uuid: string; versionId: string}> {
-    const uploadFilePath = file.webkitRelativePath || file.name;
-    const filePath = `${path || this.basePath}/${uploadFilePath}`;
+    const uploadFilePath = isNonEmptyString(file.webkitRelativePath) ? file.webkitRelativePath : file.name;
+    const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${uploadFilePath}`;
 
     await this.apiClient.api.cells.uploadNode({
       path: filePath,
@@ -108,10 +109,10 @@ export class CellsRepository {
     progressCallback?: (progress: number) => void;
     abortController?: AbortController;
   }): Promise<{uuid: string; versionId: string}> {
-    const uploadFilePath = file.webkitRelativePath || file.name;
-    const filePath = `${path || this.basePath}/${uploadFilePath}`;
+    const uploadFilePath = isNonEmptyString(file.webkitRelativePath) ? file.webkitRelativePath : file.name;
+    const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${uploadFilePath}`;
     const controller = abortController ?? new AbortController();
-    if (!abortController) {
+    if (isNullOrUndefined(abortController)) {
       this.uploadControllers.set(uuid, controller);
     }
 
@@ -127,7 +128,7 @@ export class CellsRepository {
 
       return {uuid, versionId};
     } finally {
-      if (!abortController && this.uploadControllers.get(uuid) === controller) {
+      if (isNullOrUndefined(abortController) && this.uploadControllers.get(uuid) === controller) {
         this.uploadControllers.delete(uuid);
       }
     }
@@ -173,12 +174,12 @@ export class CellsRepository {
     deleted?: boolean;
   }) {
     return this.apiClient.api.cells.getAllNodes({
-      path: path || this.basePath,
+      path: isNonEmptyString(path) ? path : this.basePath,
       limit,
       offset,
       sortBy,
       sortDirection,
-      ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
+      ...(isNonEmptyString(type) ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
       deleted,
     });
   }
@@ -196,14 +197,14 @@ export class CellsRepository {
   }
 
   async createFolder({path, name}: {path: string; name: string}) {
-    const filePath = `${path || this.basePath}/${name}`;
+    const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${name}`;
     const uuid = createUuid();
 
     return this.apiClient.api.cells.createFolder({path: filePath, uuid});
   }
 
   async createFile({path, name, templateUuid}: {path: string; name: string; templateUuid?: string}) {
-    const filePath = `${path || this.basePath}/${name}`;
+    const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${name}`;
     const uuid = createUuid();
     const versionId = createUuid();
 
@@ -211,12 +212,12 @@ export class CellsRepository {
   }
 
   async checkFileAlreadyExists({path, name}: {path: string; name: string}): Promise<boolean> {
-    const filePath = `${path || this.basePath}/${name}`;
+    const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${name}`;
     const uuid = createUuid();
     const versionId = createUuid();
     const result = await this.apiClient.api.cells.checkNodeCreation({path: filePath, uuid, versionId, type: 'LEAF'});
 
-    return result.Results?.some(checkResult => checkResult.Exists) ?? false;
+    return result.Results?.some(checkResult => isTruthy(checkResult.Exists)) ?? false;
   }
 
   async createPublicLink({
@@ -310,7 +311,7 @@ export class CellsRepository {
       creatorIds,
       path,
       deleted,
-      ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
+      ...(isNonEmptyString(type) ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }
 
