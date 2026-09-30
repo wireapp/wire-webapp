@@ -69,6 +69,62 @@ import {ContentState} from '../../../useAppState';
 const CONVERSATION_ROW_HEIGHT = 56;
 const CONVERSATION_CLICK_DEBOUNCE_DIVISOR = 2;
 type FocusConversation = (conversationId: string) => boolean | 'pending';
+type ConversationClickEvent = ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>;
+
+type ConversationRowHandlers = {
+  handleArrowKeyDown: (conversationId: string) => (event: React.KeyboardEvent) => void;
+  onConversationClick: (conversation: Conversation) => (event: ConversationClickEvent) => void;
+  resetConversationFocus: () => void;
+  answerCall: (conversation: Conversation) => Promise<void>;
+  openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
+};
+
+type ConversationRowProps = {
+  conversation: Conversation;
+  isFocused: boolean;
+  isActive: boolean;
+  showJoinButton: boolean;
+  handlersRef: RefObject<ConversationRowHandlers>;
+  registerConversationElement?: RegisterConversationElement;
+  virtualStart?: number;
+  virtualSize?: number;
+};
+
+const ConversationRow = React.memo(
+  ({
+    conversation,
+    isFocused,
+    isActive,
+    showJoinButton,
+    handlersRef,
+    registerConversationElement,
+    virtualStart,
+    virtualSize,
+  }: ConversationRowProps) => {
+    return (
+      <ConversationListCell
+        conversation={conversation}
+        dataUieName="item-conversation"
+        isFocused={isFocused}
+        isSelected={() => isActive}
+        showJoinButton={showJoinButton}
+        registerConversationElement={registerConversationElement}
+        handleArrowKeyDown={event => handlersRef.current.handleArrowKeyDown(conversation.id)(event)}
+        onClick={event => handlersRef.current.onConversationClick(conversation)(event)}
+        resetConversationFocus={() => handlersRef.current.resetConversationFocus()}
+        onJoinCall={conversation => handlersRef.current.answerCall(conversation)}
+        rightClick={(conversation, event) => handlersRef.current.openContextMenu(conversation, event)}
+        listItemCss={virtualStart !== undefined ? virtualizationStyles : undefined}
+        listItemStyle={
+          virtualStart !== undefined && virtualSize !== undefined
+            ? {height: `${virtualSize}px`, transform: `translateY(${virtualStart}px)`}
+            : undefined
+        }
+      />
+    );
+  },
+);
+ConversationRow.displayName = 'ConversationRow';
 
 interface ConversationsListProps {
   callState: CallState;
@@ -334,21 +390,32 @@ export const ConversationsList = ({
     [debouncedOnConversationClick],
   );
 
-  const getCommonConversationCellProps = (conversation: Conversation) => {
-    return {
-      isFocused: currentFocus === conversation.id,
-      handleArrowKeyDown: handleArrowKeyDown(conversation.id),
-      registerConversationElement,
+  // Keep event handlers fresh without invalidating every mounted row on a focus change.
+  const rowHandlersRef = useRef<ConversationRowHandlers>({
+    handleArrowKeyDown,
+    onConversationClick,
+    resetConversationFocus,
+    answerCall,
+    openContextMenu,
+  });
+  useLayoutEffect(() => {
+    rowHandlersRef.current = {
+      handleArrowKeyDown,
+      onConversationClick,
       resetConversationFocus,
-      dataUieName: 'item-conversation',
-      conversation,
-      onClick: onConversationClick(conversation),
-      isSelected: isActiveConversation,
-      onJoinCall: answerCall,
-      rightClick: openContextMenu,
-      showJoinButton: hasJoinableCall(conversation),
+      answerCall,
+      openContextMenu,
     };
-  };
+  });
+
+  const getCommonConversationRowProps = (conversation: Conversation) => ({
+    conversation,
+    isFocused: currentFocus === conversation.id,
+    isActive: isActiveConversation(conversation),
+    showJoinButton: hasJoinableCall(conversation),
+    handlersRef: rowHandlersRef,
+    registerConversationElement,
+  });
 
   useEffect(() => {
     if (!isNonEmptyString(conversationsFilter) && isNonEmptyString(clickedFilteredConversationId)) {
@@ -381,7 +448,7 @@ export const ConversationsList = ({
           className="group-participants-conversations"
         >
           {groupParticipantsConversations.map(conversation => (
-            <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation)} />
+            <ConversationRow key={conversation.id} {...getCommonConversationRowProps(conversation)} />
           ))}
         </ul>
       </li>
@@ -443,14 +510,11 @@ export const ConversationsList = ({
 
           if (isConversationEntity(conversation)) {
             return (
-              <ConversationListCell
+              <ConversationRow
                 key={virtualItem.key}
-                listItemCss={virtualizationStyles}
-                listItemStyle={{
-                  height: `${virtualItem.size}px`,
-                  transform: `translateY(${virtualItem.start}px)`,
-                }}
-                {...getCommonConversationCellProps(conversation)}
+                virtualStart={virtualItem.start}
+                virtualSize={virtualItem.size}
+                {...getCommonConversationRowProps(conversation)}
               />
             );
           }

@@ -139,6 +139,7 @@ export const Conversations = ({
   } = useSidebarStore(useShallow(state => state));
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
+  const [searchResetToken, setSearchResetToken] = useState(0);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -375,7 +376,53 @@ export const Conversations = ({
     };
   }, [activeConversation, openFolder]);
 
-  const clearConversationFilter = useCallback(() => setConversationsFilter(''), []);
+  const onSearch = useCallback(
+    (searchValue: string) => {
+      setConversationsFilter(searchValue);
+      conversationListRef?.scrollTo(0, 0);
+    },
+    [conversationListRef],
+  );
+
+  const activateSearchResult = useCallback(
+    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+      const firstResult = conversationsForFocus[0];
+      if (isNullOrUndefined(firstResult)) {
+        return false;
+      }
+
+      createNavigateKeyboard(generateConversationUrl(firstResult.qualifiedId), true)(event);
+      scrollToConversation(firstResult.id);
+      return true;
+    },
+    [conversationsForFocus],
+  );
+
+  const focusSearchResult = useCallback(
+    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
+      const firstResult = conversationsForFocus[0];
+      if (!isNonEmptyString(conversationsFilter) || isNullOrUndefined(firstResult)) {
+        return;
+      }
+
+      const wasMounted = focusMountedConversation(firstResult.id);
+      const wasFocused = wasMounted || focusConversation(firstResult.id);
+      if (wasFocused === false) {
+        return;
+      }
+
+      event.preventDefault();
+      if (wasMounted) {
+        setCurrentFocus(firstResult.id);
+      }
+    },
+    [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
+  );
+
+  const clearConversationFilter = useCallback(() => {
+    setConversationsFilter('');
+    setSearchResetToken(previous => previous + 1);
+  }, []);
 
   const switchList = listViewModel.switchList;
   const switchContent = listViewModel.contentViewModel.switchContent;
@@ -479,51 +526,6 @@ export const Conversations = ({
     [listViewModel, setCurrentView],
   );
 
-  const handleEnterSearchClick = useCallback(
-    (event: ReactKeyBoardEvent<HTMLDivElement>) => {
-      const firstFoundConversation = conversationsForFocus?.[0];
-
-      if (!isNullOrUndefined(firstFoundConversation)) {
-        createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
-        setConversationsFilter('');
-        scrollToConversation(firstFoundConversation.id);
-      }
-    },
-    [conversationsForFocus],
-  );
-
-  const handleSearchTab = useCallback(
-    (event: ReactKeyBoardEvent<HTMLInputElement>) => {
-      cancelPendingFocusRef.current?.();
-      const firstResult = conversationsForFocus[0];
-
-      if (!isNonEmptyString(conversationsFilter) || isNullOrUndefined(firstResult)) {
-        return;
-      }
-
-      const wasMounted = focusMountedConversation(firstResult.id);
-      const wasFocused = wasMounted || focusConversation(firstResult.id);
-
-      if (wasFocused === false) {
-        return;
-      }
-
-      event.preventDefault();
-      if (wasMounted) {
-        setCurrentFocus(firstResult.id);
-      }
-    },
-    [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
-  );
-
-  const onSearch = useCallback(
-    (searchValue: string) => {
-      setConversationsFilter(searchValue);
-      conversationListRef?.scrollTo(0, 0);
-    },
-    [conversationListRef],
-  );
-
   const jumpToRecentSearch = useCallback(() => {
     switchList(ListState.CONVERSATIONS);
     setCurrentTab(SidebarTabs.RECENT);
@@ -599,15 +601,17 @@ export const Conversations = ({
         id="conversations"
         headerElement={
           <ConversationHeader
+            key={`${currentTab}:${currentFolder?.id ?? ''}:${searchResetToken}`}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
             showSearchInput={(showSearchInput && hasVisibleConversations) || isNonEmptyString(conversationsFilter)}
             searchValue={conversationsFilter}
-            setSearchValue={onSearch}
+            onSearchChange={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
-            onSearchEnterClick={handleEnterSearchClick}
-            onSearchTab={handleSearchTab}
+            onSearchEnterClick={activateSearchResult}
+            onSearchTab={focusSearchResult}
+            onBeforeSearchTab={() => cancelPendingFocusRef.current?.()}
             jumpToRecentSearch={jumpToRecentSearch}
             searchInputRef={searchInputRef}
             isListCollapsed={isConversationListCollapsed}
