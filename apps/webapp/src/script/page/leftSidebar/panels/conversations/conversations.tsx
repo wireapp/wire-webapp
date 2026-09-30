@@ -63,7 +63,6 @@ import {ConversationsList} from './conversationsList';
 import {EmptyConversationList} from './emptyConversationList';
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
 import {getConversationFocusCandidates, getTabConversations, scrollToConversation} from './helpers';
-import {useConversationSearch} from './hooks/useConversationSearch';
 import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {
@@ -122,7 +121,7 @@ export const Conversations = ({
   selfUser,
   isConversationListCollapseEnabled,
 }: ConversationsProps) => {
-  const {translate, clock} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const focusConversationRef = useRef<FocusConversation>(() => false);
@@ -140,6 +139,7 @@ export const Conversations = ({
   } = useSidebarStore(useShallow(state => state));
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
+  const [searchResetToken, setSearchResetToken] = useState(0);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -419,23 +419,10 @@ export const Conversations = ({
     [conversationsFilter, conversationsForFocus, focusConversation, focusMountedConversation, setCurrentFocus],
   );
 
-  const searchContextKey = `${currentTab}:${currentFolder?.id ?? ''}`;
-  const {
-    inputValue,
-    changeInput: changeSearchInput,
-    clear: clearConversationFilter,
-    enter: handleEnterSearchClick,
-    tab: handleSearchTab,
-  } = useConversationSearch({
-    clock,
-    filter: conversationsFilter,
-    searchContextKey,
-    setFilter: setConversationsFilter,
-    onSearch,
-    onEnter: activateSearchResult,
-    onTab: focusSearchResult,
-    onBeforeTab: () => cancelPendingFocusRef.current?.(),
-  });
+  const clearConversationFilter = useCallback(() => {
+    setConversationsFilter('');
+    setSearchResetToken(previous => previous + 1);
+  }, []);
 
   const switchList = listViewModel.switchList;
   const switchContent = listViewModel.contentViewModel.switchContent;
@@ -614,17 +601,17 @@ export const Conversations = ({
         id="conversations"
         headerElement={
           <ConversationHeader
-            key={searchContextKey}
+            key={`${currentTab}:${currentFolder?.id ?? ''}:${searchResetToken}`}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
             showSearchInput={(showSearchInput && hasVisibleConversations) || isNonEmptyString(conversationsFilter)}
-            searchValue={inputValue}
-            onSearchChange={changeSearchInput}
-            onClearSearch={clearConversationFilter}
+            searchValue={conversationsFilter}
+            onSearchChange={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
-            onSearchEnterClick={handleEnterSearchClick}
-            onSearchTab={handleSearchTab}
+            onSearchEnterClick={activateSearchResult}
+            onSearchTab={focusSearchResult}
+            onBeforeSearchTab={() => cancelPendingFocusRef.current?.()}
             jumpToRecentSearch={jumpToRecentSearch}
             searchInputRef={searchInputRef}
             isListCollapsed={isConversationListCollapsed}

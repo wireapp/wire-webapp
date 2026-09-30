@@ -30,6 +30,7 @@ import {useCreateConversationModal} from 'Components/Modals/CreateConversation/h
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {User} from 'Repositories/entity/User';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
+import {useConversationSearch} from 'src/script/page/leftSidebar/panels/conversations/hooks/useConversationSearch';
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown, handleEscDown, isTabKey} from 'Util/keyboardUtil';
@@ -62,11 +63,11 @@ interface ConversationHeaderProps {
   showSearchInput?: boolean;
   searchValue: string;
   onSearchChange: (searchValue: string) => void;
-  onClearSearch: () => void;
   searchInputPlaceholder: string;
   currentFolder?: ConversationLabel;
-  onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => boolean;
   onSearchTab: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onBeforeSearchTab: () => void;
   jumpToRecentSearch: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
   isListCollapsed?: boolean;
@@ -79,17 +80,26 @@ export const ConversationHeaderComponent = ({
   showSearchInput = false,
   searchValue,
   onSearchChange,
-  onClearSearch,
   currentFolder,
   searchInputPlaceholder,
   onSearchEnterClick,
   onSearchTab,
+  onBeforeSearchTab,
   jumpToRecentSearch,
   searchInputRef,
   isListCollapsed = false,
   onExpandList,
 }: ConversationHeaderProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, clock} = useApplicationContext();
+  const {inputValue, changeInput, clear, enter, tab} = useConversationSearch({
+    clock,
+    filter: searchValue,
+    setFilter: onSearchChange,
+    onSearch: onSearchChange,
+    onEnter: onSearchEnterClick,
+    onTab: onSearchTab,
+    onBeforeTab: onBeforeSearchTab,
+  });
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const {canCreateChannels, isChannelsEnabled} = useChannelsFeatureFlag();
   const canExternalUserCreateChannel = canCreateChannels && isChannelsEnabled && selfUser.isExternal();
@@ -109,11 +119,11 @@ export const ConversationHeaderComponent = ({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    handleEscDown(event, onClearSearch);
-    handleEnterDown(event, () => onSearchEnterClick(event));
+    handleEscDown(event, clear);
+    handleEnterDown(event, () => enter(event));
 
     if (!event.shiftKey && isTabKey(event)) {
-      onSearchTab(event);
+      tab(event);
     }
   };
 
@@ -212,12 +222,12 @@ export const ConversationHeaderComponent = ({
           onKeyDown={onKeyDown}
           ref={searchInputRef}
           className="label-1"
-          value={searchValue}
-          onChange={event => onSearchChange(event.currentTarget.value)}
+          value={inputValue}
+          onChange={event => changeInput(event.currentTarget.value)}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={
-            searchValue.length > 0 ? (
-              <CircleCloseIcon className="cursor-pointer" onClick={onClearSearch} css={closeIconStyles} />
+            inputValue.length > 0 ? (
+              <CircleCloseIcon className="cursor-pointer" onClick={clear} css={closeIconStyles} />
             ) : null
           }
           inputCSS={searchInputStyles}
