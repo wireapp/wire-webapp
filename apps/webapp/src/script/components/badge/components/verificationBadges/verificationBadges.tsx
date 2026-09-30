@@ -23,6 +23,7 @@ import {CSSObject} from '@emotion/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
+import {Maybe} from 'true-myth';
 
 import {
   TabIndex,
@@ -98,7 +99,7 @@ const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?:
   });
 };
 
-export const UserVerificationBadges = ({
+export const useUserVerificationStatus = ({
   user,
   groupId,
   isSelfUser,
@@ -115,12 +116,57 @@ export const UserVerificationBadges = ({
     user,
   });
 
-  let status: MLSStatuses | undefined = undefined;
-  if (mlsStatuses && mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)) {
-    status = MLSStatuses.VALID;
+  const mlsStatus = Maybe.of<MLSStatuses.VALID>(
+    mlsStatuses && mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)
+      ? MLSStatuses.VALID
+      : undefined,
+  );
+
+  return {mlsStatus, isProteusVerified};
+};
+
+export const getUserVerificationBadgeLabel = (
+  translate: RootContextValue['translate'],
+  {mlsStatus, isProteusVerified}: {mlsStatus: Maybe<MLSStatuses.VALID>; isProteusVerified: boolean},
+): string | undefined => {
+  const labels: string[] = [];
+
+  mlsStatus.map(() => labels.push(translate('E2EI.userDevicesVerified')));
+
+  if (isProteusVerified) {
+    labels.push(translate('proteusDeviceVerified'));
   }
 
-  return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={status} />;
+  return labels.length > 0 ? labels.join(', ') : undefined;
+};
+
+export const UserVerificationBadgesContent = ({
+  mlsStatus,
+  isProteusVerified,
+}: {
+  mlsStatus: Maybe<MLSStatuses.VALID>;
+  isProteusVerified: boolean;
+}) => {
+  return (
+    <VerificationBadges
+      context="user"
+      isProteusVerified={isProteusVerified}
+      MLSStatus={mlsStatus.unwrapOr(undefined)}
+    />
+  );
+};
+
+export const UserVerificationBadges = ({
+  user,
+  groupId,
+  isSelfUser,
+}: {
+  user: User;
+  groupId?: string;
+  isSelfUser?: boolean;
+}) => {
+  const {mlsStatus, isProteusVerified} = useUserVerificationStatus({user, groupId, isSelfUser});
+  return <UserVerificationBadgesContent mlsStatus={mlsStatus} isProteusVerified={isProteusVerified} />;
 };
 
 export const DeviceVerificationBadges = ({
