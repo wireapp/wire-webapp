@@ -99,9 +99,10 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
           } catch {
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
             if (featureName !== undefined) {
-              const messageKey = featureInfo.isAvailable
-                ? ACCESS_FEATURE_TRANSLATION_KEYS[featureName].allow
-                : ACCESS_FEATURE_TRANSLATION_KEYS[featureName].disable;
+              const messageKey =
+                featureInfo.isAvailable === true
+                  ? ACCESS_FEATURE_TRANSLATION_KEYS[featureName].allow
+                  : ACCESS_FEATURE_TRANSLATION_KEYS[featureName].disable;
               this._showModal(this.translate(messageKey));
             }
           }
