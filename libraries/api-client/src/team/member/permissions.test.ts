@@ -21,93 +21,164 @@ import {Permissions, hasPermissions} from './permissions';
 
 describe('Permission', () => {
   describe('hasPermission true for', () => {
-    it('CREATE_CONVERSATION and 1', () => expect(hasPermissions(1, Permissions.CREATE_CONVERSATION)).toBe(true));
+    it('CREATE_CONVERSATION and 1', () => {
+      return expect(hasPermissions(1, Permissions.CREATE_CONVERSATION)).toBe(true);
+    });
 
-    it('DELETE_CONVERSATION and 2', () => expect(hasPermissions(2, Permissions.DELETE_CONVERSATION)).toBe(true));
+    it('DELETE_CONVERSATION and 2', () => {
+      return expect(hasPermissions(2, Permissions.DELETE_CONVERSATION)).toBe(true);
+    });
 
-    it('ADD_TEAM_MEMBER and 4', () => expect(hasPermissions(4, Permissions.ADD_TEAM_MEMBER)).toBe(true));
+    it('ADD_TEAM_MEMBER and 4', () => {
+      return expect(hasPermissions(4, Permissions.ADD_TEAM_MEMBER)).toBe(true);
+    });
 
-    it('REMOVE_TEAM_MEMBER and 8', () => expect(hasPermissions(8, Permissions.REMOVE_TEAM_MEMBER)).toBe(true));
+    it('REMOVE_TEAM_MEMBER and 8', () => {
+      return expect(hasPermissions(8, Permissions.REMOVE_TEAM_MEMBER)).toBe(true);
+    });
 
-    it('ADD_CONVERSATION_MEMBER and 16', () =>
-      expect(hasPermissions(16, Permissions.ADD_CONVERSATION_MEMBER)).toBe(true));
+    it('ADD_CONVERSATION_MEMBER and 16', () => {
+      return expect(hasPermissions(16, Permissions.ADD_CONVERSATION_MEMBER)).toBe(true);
+    });
 
-    it('REMOVE_CONVERSATION_MEMBER and 32', () =>
-      expect(hasPermissions(32, Permissions.REMOVE_CONVERSATION_MEMBER)).toBe(true));
+    it('REMOVE_CONVERSATION_MEMBER and 32', () => {
+      return expect(hasPermissions(32, Permissions.REMOVE_CONVERSATION_MEMBER)).toBe(true);
+    });
 
-    it('GET_BILLING and 64', () => expect(hasPermissions(64, Permissions.GET_BILLING)).toBe(true));
+    it('GET_BILLING and 64', () => {
+      return expect(hasPermissions(64, Permissions.GET_BILLING)).toBe(true);
+    });
 
-    it('SET_BILLING and 128', () => expect(hasPermissions(128, Permissions.SET_BILLING)).toBe(true));
+    it('SET_BILLING and 128', () => {
+      return expect(hasPermissions(128, Permissions.SET_BILLING)).toBe(true);
+    });
 
-    it('SET_TEAM_DATA and 256', () => expect(hasPermissions(256, Permissions.SET_TEAM_DATA)).toBe(true));
+    it('SET_TEAM_DATA and 256', () => {
+      return expect(hasPermissions(256, Permissions.SET_TEAM_DATA)).toBe(true);
+    });
 
-    it('GET_MEMBER_PERMISSIONS and 512', () =>
-      expect(hasPermissions(512, Permissions.GET_MEMBER_PERMISSIONS)).toBe(true));
+    it('GET_MEMBER_PERMISSIONS and 512', () => {
+      return expect(hasPermissions(512, Permissions.GET_MEMBER_PERMISSIONS)).toBe(true);
+    });
 
-    it('GET_TEAM_CONVERSATIONS and 1024', () =>
-      expect(hasPermissions(1024, Permissions.GET_TEAM_CONVERSATIONS)).toBe(true));
+    it('GET_TEAM_CONVERSATIONS and 1024', () => {
+      return expect(hasPermissions(1024, Permissions.GET_TEAM_CONVERSATIONS)).toBe(true);
+    });
 
-    it('DELETE_TEAM and 2048', () => expect(hasPermissions(2048, Permissions.DELETE_TEAM)).toBe(true));
+    it('DELETE_TEAM and 2048', () => {
+      return expect(hasPermissions(2048, Permissions.DELETE_TEAM)).toBe(true);
+    });
 
-    it('SET_MEMBER_PERMISSIONS and 4096', () =>
-      expect(hasPermissions(4096, Permissions.SET_MEMBER_PERMISSIONS)).toBe(true));
+    it('SET_MEMBER_PERMISSIONS and 4096', () => {
+      return expect(hasPermissions(4096, Permissions.SET_MEMBER_PERMISSIONS)).toBe(true);
+    });
   });
 
   describe('hasPermission false for 0', () => {
-    it('CREATE_CONVERSATION', () => expect(hasPermissions(0, Permissions.CREATE_CONVERSATION)).toBe(false));
+    it('CREATE_CONVERSATION', () => {
+      return expect(hasPermissions(0, Permissions.CREATE_CONVERSATION)).toBe(false);
+    });
 
-    it('DELETE_CONVERSATION', () => expect(hasPermissions(0, Permissions.DELETE_CONVERSATION)).toBe(false));
+    it('DELETE_CONVERSATION', () => {
+      return expect(hasPermissions(0, Permissions.DELETE_CONVERSATION)).toBe(false);
+    });
 
-    it('ADD_TEAM_MEMBER', () => expect(hasPermissions(0, Permissions.ADD_TEAM_MEMBER)).toBe(false));
+    it('ADD_TEAM_MEMBER', () => {
+      return expect(hasPermissions(0, Permissions.ADD_TEAM_MEMBER)).toBe(false);
+    });
 
-    it('REMOVE_TEAM_MEMBER', () => expect(hasPermissions(0, Permissions.REMOVE_TEAM_MEMBER)).toBe(false));
+    it('REMOVE_TEAM_MEMBER', () => {
+      return expect(hasPermissions(0, Permissions.REMOVE_TEAM_MEMBER)).toBe(false);
+    });
 
-    it('ADD_CONVERSATION_MEMBER', () => expect(hasPermissions(0, Permissions.ADD_CONVERSATION_MEMBER)).toBe(false));
+    it('ADD_CONVERSATION_MEMBER', () => {
+      return expect(hasPermissions(0, Permissions.ADD_CONVERSATION_MEMBER)).toBe(false);
+    });
 
-    it('REMOVE_CONVERSATION_MEMBER', () =>
-      expect(hasPermissions(0, Permissions.REMOVE_CONVERSATION_MEMBER)).toBe(false));
+    it('REMOVE_CONVERSATION_MEMBER', () => {
+      return expect(hasPermissions(0, Permissions.REMOVE_CONVERSATION_MEMBER)).toBe(false);
+    });
 
-    it('GET_BILLING', () => expect(hasPermissions(0, Permissions.GET_BILLING)).toBe(false));
+    it('GET_BILLING', () => {
+      return expect(hasPermissions(0, Permissions.GET_BILLING)).toBe(false);
+    });
 
-    it('SET_BILLING', () => expect(hasPermissions(0, Permissions.SET_BILLING)).toBe(false));
+    it('SET_BILLING', () => {
+      return expect(hasPermissions(0, Permissions.SET_BILLING)).toBe(false);
+    });
 
-    it('SET_TEAM_DATA', () => expect(hasPermissions(0, Permissions.SET_TEAM_DATA)).toBe(false));
+    it('SET_TEAM_DATA', () => {
+      return expect(hasPermissions(0, Permissions.SET_TEAM_DATA)).toBe(false);
+    });
 
-    it('GET_MEMBER_PERMISSIONS', () => expect(hasPermissions(0, Permissions.GET_MEMBER_PERMISSIONS)).toBe(false));
+    it('GET_MEMBER_PERMISSIONS', () => {
+      return expect(hasPermissions(0, Permissions.GET_MEMBER_PERMISSIONS)).toBe(false);
+    });
 
-    it('GET_TEAM_CONVERSATIONS', () => expect(hasPermissions(0, Permissions.GET_TEAM_CONVERSATIONS)).toBe(false));
+    it('GET_TEAM_CONVERSATIONS', () => {
+      return expect(hasPermissions(0, Permissions.GET_TEAM_CONVERSATIONS)).toBe(false);
+    });
 
-    it('DELETE_TEAM', () => expect(hasPermissions(0, Permissions.DELETE_TEAM)).toBe(false));
+    it('DELETE_TEAM', () => {
+      return expect(hasPermissions(0, Permissions.DELETE_TEAM)).toBe(false);
+    });
 
-    it('SET_MEMBER_PERMISSIONS', () => expect(hasPermissions(0, Permissions.SET_MEMBER_PERMISSIONS)).toBe(false));
+    it('SET_MEMBER_PERMISSIONS', () => {
+      return expect(hasPermissions(0, Permissions.SET_MEMBER_PERMISSIONS)).toBe(false);
+    });
   });
 
   describe('hasPermission false for -1', () => {
-    it('CREATE_CONVERSATION', () => expect(hasPermissions(-1, Permissions.CREATE_CONVERSATION)).toBe(false));
+    it('CREATE_CONVERSATION', () => {
+      return expect(hasPermissions(-1, Permissions.CREATE_CONVERSATION)).toBe(false);
+    });
 
-    it('DELETE_CONVERSATION', () => expect(hasPermissions(-1, Permissions.DELETE_CONVERSATION)).toBe(false));
+    it('DELETE_CONVERSATION', () => {
+      return expect(hasPermissions(-1, Permissions.DELETE_CONVERSATION)).toBe(false);
+    });
 
-    it('ADD_TEAM_MEMBER', () => expect(hasPermissions(-1, Permissions.ADD_TEAM_MEMBER)).toBe(false));
+    it('ADD_TEAM_MEMBER', () => {
+      return expect(hasPermissions(-1, Permissions.ADD_TEAM_MEMBER)).toBe(false);
+    });
 
-    it('REMOVE_TEAM_MEMBER', () => expect(hasPermissions(-1, Permissions.REMOVE_TEAM_MEMBER)).toBe(false));
+    it('REMOVE_TEAM_MEMBER', () => {
+      return expect(hasPermissions(-1, Permissions.REMOVE_TEAM_MEMBER)).toBe(false);
+    });
 
-    it('ADD_CONVERSATION_MEMBER', () => expect(hasPermissions(-1, Permissions.ADD_CONVERSATION_MEMBER)).toBe(false));
+    it('ADD_CONVERSATION_MEMBER', () => {
+      return expect(hasPermissions(-1, Permissions.ADD_CONVERSATION_MEMBER)).toBe(false);
+    });
 
-    it('REMOVE_CONVERSATION_MEMBER', () =>
-      expect(hasPermissions(-1, Permissions.REMOVE_CONVERSATION_MEMBER)).toBe(false));
+    it('REMOVE_CONVERSATION_MEMBER', () => {
+      return expect(hasPermissions(-1, Permissions.REMOVE_CONVERSATION_MEMBER)).toBe(false);
+    });
 
-    it('GET_BILLING', () => expect(hasPermissions(-1, Permissions.GET_BILLING)).toBe(false));
+    it('GET_BILLING', () => {
+      return expect(hasPermissions(-1, Permissions.GET_BILLING)).toBe(false);
+    });
 
-    it('SET_BILLING', () => expect(hasPermissions(-1, Permissions.SET_BILLING)).toBe(false));
+    it('SET_BILLING', () => {
+      return expect(hasPermissions(-1, Permissions.SET_BILLING)).toBe(false);
+    });
 
-    it('SET_TEAM_DATA', () => expect(hasPermissions(-1, Permissions.SET_TEAM_DATA)).toBe(false));
+    it('SET_TEAM_DATA', () => {
+      return expect(hasPermissions(-1, Permissions.SET_TEAM_DATA)).toBe(false);
+    });
 
-    it('GET_MEMBER_PERMISSIONS', () => expect(hasPermissions(-1, Permissions.GET_MEMBER_PERMISSIONS)).toBe(false));
+    it('GET_MEMBER_PERMISSIONS', () => {
+      return expect(hasPermissions(-1, Permissions.GET_MEMBER_PERMISSIONS)).toBe(false);
+    });
 
-    it('GET_TEAM_CONVERSATIONS', () => expect(hasPermissions(-1, Permissions.GET_TEAM_CONVERSATIONS)).toBe(false));
+    it('GET_TEAM_CONVERSATIONS', () => {
+      return expect(hasPermissions(-1, Permissions.GET_TEAM_CONVERSATIONS)).toBe(false);
+    });
 
-    it('DELETE_TEAM', () => expect(hasPermissions(-1, Permissions.DELETE_TEAM)).toBe(false));
+    it('DELETE_TEAM', () => {
+      return expect(hasPermissions(-1, Permissions.DELETE_TEAM)).toBe(false);
+    });
 
-    it('SET_MEMBER_PERMISSIONS', () => expect(hasPermissions(-1, Permissions.SET_MEMBER_PERMISSIONS)).toBe(false));
+    it('SET_MEMBER_PERMISSIONS', () => {
+      return expect(hasPermissions(-1, Permissions.SET_MEMBER_PERMISSIONS)).toBe(false);
+    });
   });
 });

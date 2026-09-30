@@ -55,7 +55,9 @@ export const useGiphy = ({
     return text.length > 0 && text.length <= maxLength;
   }, [text.length, maxLength, isMessageFormatButtonsFlagEnabled]);
 
-  const handleGifClick = () => openGiphy(text);
+  const handleGifClick = () => {
+    return openGiphy(text);
+  };
 
   const sendGiphy = useCallback(
     (gifUrl: string, tag: string): void => {

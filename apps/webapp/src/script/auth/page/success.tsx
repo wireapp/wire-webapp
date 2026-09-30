@@ -60,7 +60,9 @@ export const Success = () => {
 
           <ActionLinkButton
             data-uie-name="do-download-wire"
-            onClick={() => secureOpen(pathWithParams(Config.getConfig().GET_WIRE_URL))}
+            onClick={() => {
+              return secureOpen(pathWithParams(Config.getConfig().GET_WIRE_URL));
+            }}
             css={styles.link}
           >
             {translate('success.downloadButton')}
@@ -68,7 +70,9 @@ export const Success = () => {
 
           <ActionLinkButton
             data-uie-name="do-open-wire-web"
-            onClick={() => secureOpen(pathWithParams(EXTERNAL_ROUTE.WEBAPP))}
+            onClick={() => {
+              return secureOpen(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+            }}
             css={styles.link}
           >
             {translate('success.openWebAppText')}

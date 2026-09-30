@@ -69,8 +69,11 @@ export const createMeetingNotificationEventHandlers = ({
   dismissNotificationsForMeeting,
   logger,
 }: MeetingNotificationEventHandlersDependencies): MeetingNotificationEventHandlers => {
-  const getMeeting = (meetingId: QualifiedId) =>
-    getMeetingSeries().find(meeting => matchQualifiedIds(meeting.qualified_id, meetingId));
+  const getMeeting = (meetingId: QualifiedId) => {
+    return getMeetingSeries().find(meeting => {
+      return matchQualifiedIds(meeting.qualified_id, meetingId);
+    });
+  };
 
   // Only deleted events can fire before the meeting store has synced.
   const pending = new Map<string, QualifiedId>();
@@ -171,7 +174,9 @@ export const createMeetingNotificationEventHandlers = ({
       notifiedMeetings.add(meetingKey);
       notifyForMeeting(kind, meeting);
     },
-    notifyUpdate: meeting => notifyForMeeting(MeetingNotificationKind.UPDATE, meeting),
+    notifyUpdate: meeting => {
+      return notifyForMeeting(MeetingNotificationKind.UPDATE, meeting);
+    },
     onMeetingCancelled: (meetingId, options) => {
       notifyMeetingCancellation(meetingId, options);
     },

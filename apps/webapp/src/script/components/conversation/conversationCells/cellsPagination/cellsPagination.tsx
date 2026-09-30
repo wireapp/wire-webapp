@@ -82,7 +82,9 @@ export const CellsPagination = ({
         <FlexBox css={pagesContainerStyles} align="flex-end" data-uie-name="element-pagination">
           <div css={previousPageStyles}>
             <IconButton
-              onClick={() => goToPage(currentPage - 1)}
+              onClick={() => {
+                return goToPage(currentPage - 1);
+              }}
               data-uie-name="go-previous-page"
               disabled={isFirstPage}
               aria-disabled={isFirstPage}
@@ -98,7 +100,9 @@ export const CellsPagination = ({
 
           <div css={nextPageStyles}>
             <IconButton
-              onClick={() => goToPage(currentPage + 1)}
+              onClick={() => {
+                return goToPage(currentPage + 1);
+              }}
               data-uie-name="go-next-page"
               disabled={isLastPage}
               aria-disabled={isLastPage}

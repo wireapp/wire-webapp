@@ -118,9 +118,15 @@ const setup = (
   let attempt = 0;
   const dependencies: CellsUploadProcessDependencies = {
     gateway,
-    createResourceUuid: () => `resource-${++resource}`,
-    createVersionUuid: () => `version-${++version}`,
-    createAttemptId: () => (duplicateAttemptIds ? 'attempt-1' : `attempt-${++attempt}`),
+    createResourceUuid: () => {
+      return `resource-${++resource}`;
+    },
+    createVersionUuid: () => {
+      return `version-${++version}`;
+    },
+    createAttemptId: () => {
+      return duplicateAttemptIds ? 'attempt-1' : `attempt-${++attempt}`;
+    },
     createAbortController: () => {
       const controller = new AbortController();
       aborts.push(controller);
@@ -150,7 +156,9 @@ describe('createCellsUploadProcess', () => {
   it('uploads successfully and emits ordered snapshots', async () => {
     const fixture = setup();
     const snapshots: string[] = [];
-    const subscription = fixture.process.subscribe(snapshot => snapshots.push(snapshot.kind));
+    const subscription = fixture.process.subscribe(snapshot => {
+      return snapshots.push(snapshot.kind);
+    });
     expect(subscription.isOk).toBe(true);
     const start = fixture.process.start();
     required(fixture.uploads[0]).onProgress(0.25);
@@ -261,7 +269,11 @@ describe('createCellsUploadProcess', () => {
     expect(secondRequest.identity).toMatchObject({resourceUuid: 'resource-2', versionId: 'version-2'});
     expect(secondRequest.attemptId).toBe('attempt-2');
     const snapshots: string[] = [];
-    required(fixture.process.subscribe(snapshot => snapshots.push(snapshot.kind)));
+    required(
+      fixture.process.subscribe(snapshot => {
+        return snapshots.push(snapshot.kind);
+      }),
+    );
     firstRequest.onProgress(0.9);
     firstRequest.onProgress(1);
     expect(
@@ -412,8 +424,12 @@ describe('createCellsUploadProcess', () => {
   it('notifies subscribers synchronously in registration order and supports unsubscribe', async () => {
     const fixture = setup();
     const events: string[] = [];
-    const first = fixture.process.subscribe(() => events.push('first'));
-    const second = fixture.process.subscribe(() => events.push('second'));
+    const first = fixture.process.subscribe(() => {
+      return events.push('first');
+    });
+    const second = fixture.process.subscribe(() => {
+      return events.push('second');
+    });
     expect(events).toEqual(['first', 'second']);
     unwrapResult(first)();
     const start = fixture.process.start();
@@ -421,7 +437,11 @@ describe('createCellsUploadProcess', () => {
     await start;
     expect(events).toEqual(['first', 'second', 'second', 'second']);
     const before = events.length;
-    unwrapResult(fixture.process.subscribe(() => events.push('third')))();
+    unwrapResult(
+      fixture.process.subscribe(() => {
+        return events.push('third');
+      }),
+    )();
     expect(events.length).toBe(before + 1);
     expect(second.isOk).toBe(true);
   });
@@ -434,6 +454,10 @@ describe('createCellsUploadProcess', () => {
     await fixture.process.publish();
     expect(fixture.process.release().isOk).toBe(true);
     expect(fixture.process.snapshot().isErr).toBe(true);
-    expect(fixture.process.start().then(result => result.isErr)).resolves.toBe(true);
+    expect(
+      fixture.process.start().then(result => {
+        return result.isErr;
+      }),
+    ).resolves.toBe(true);
   });
 });

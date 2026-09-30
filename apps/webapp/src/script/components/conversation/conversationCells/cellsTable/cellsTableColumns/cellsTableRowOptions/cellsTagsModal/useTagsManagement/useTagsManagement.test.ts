@@ -46,18 +46,25 @@ describe('useTagsManagement', () => {
 
   it('keeps a newly created tag appended to the selected tags', () => {
     const {result} = renderHook(
-      () =>
-        useTagsManagement({
+      () => {
+        return useTagsManagement({
           cellsRepository: {} as CellsRepository,
           fetchTagsEnabled: true,
           initialSelectedTags: ['Alpha', 'Zulu'],
           commaValidationError: 'Tags cannot contain commas',
-        }),
+        });
+      },
       {wrapper: rootProviderWrapper},
     );
 
-    act(() => result.current.handleCreateOption('Beta'));
+    act(() => {
+      return result.current.handleCreateOption('Beta');
+    });
 
-    expect(result.current.selectedTags.map(tag => tag.label)).toEqual(['Alpha', 'Zulu', 'Beta']);
+    expect(
+      result.current.selectedTags.map(tag => {
+        return tag.label;
+      }),
+    ).toEqual(['Alpha', 'Zulu', 'Beta']);
   });
 });

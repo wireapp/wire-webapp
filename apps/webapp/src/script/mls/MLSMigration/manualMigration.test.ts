@@ -44,17 +44,21 @@ const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
 const arrange = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
   const conversation = createConversation(protocol);
   const repository = {
-    updateConversationProtocol: jest.fn(async (current: Conversation, next: CONVERSATION_PROTOCOL) =>
-      ConversationMapper.updateProperties(current, {protocol: next, groupId: 'group'}),
-    ),
+    updateConversationProtocol: jest.fn(async (current: Conversation, next: CONVERSATION_PROTOCOL) => {
+      return ConversationMapper.updateProperties(current, {protocol: next, groupId: 'group'});
+    }),
     tryEstablishingMLSGroup: jest.fn(asyncNoop),
-    safeEnsureConversationExists: jest.fn(() => task.resolve().map(noop)),
+    safeEnsureConversationExists: jest.fn(() => {
+      return task.resolve().map(noop);
+    }),
   };
   const deps = {
     conversation,
     selfUser,
     repository,
-    getFeature: () => Maybe.just(feature),
+    getFeature: () => {
+      return Maybe.just(feature);
+    },
   };
   return {deps, repository};
 };
@@ -192,7 +196,9 @@ describe('manual MLS migration', () => {
     });
     const outcome = await manuallyMigrateConversation({
       ...deps,
-      getFeature: () => (allowed ? Maybe.just(feature) : Maybe.nothing()),
+      getFeature: () => {
+        return allowed ? Maybe.just(feature) : Maybe.nothing();
+      },
     });
     expect(outcome.isErr && outcome.error.stage).toBe('eligibility');
     expect(outcome.isErr && outcome.error.reason).toBe('notAllowed');
@@ -201,9 +207,9 @@ describe('manual MLS migration', () => {
 
   it('handles another client completing migration during initialisation', async () => {
     const {deps, repository} = arrange();
-    repository.updateConversationProtocol.mockImplementationOnce(async current =>
-      ConversationMapper.updateProperties(current, {protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'group'}),
-    );
+    repository.updateConversationProtocol.mockImplementationOnce(async current => {
+      return ConversationMapper.updateProperties(current, {protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'group'});
+    });
     expect((await manuallyMigrateConversation(deps)).isOk).toBe(true);
     expect(repository.updateConversationProtocol).toHaveBeenCalledTimes(1);
     expect(repository.tryEstablishingMLSGroup).not.toHaveBeenCalled();
@@ -211,7 +217,12 @@ describe('manual MLS migration', () => {
 
   it('rechecks flags before making any request', async () => {
     const {deps, repository} = arrange();
-    const outcome = await manuallyMigrateConversation({...deps, getFeature: () => Maybe.nothing()});
+    const outcome = await manuallyMigrateConversation({
+      ...deps,
+      getFeature: () => {
+        return Maybe.nothing();
+      },
+    });
     expect(outcome.isErr && outcome.error.stage).toBe('eligibility');
     expect(outcome.isErr && outcome.error.reason).toBe('notAllowed');
     expect(repository.updateConversationProtocol).not.toHaveBeenCalled();

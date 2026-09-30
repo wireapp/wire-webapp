@@ -36,8 +36,9 @@ export const MLSPublicKeys = {
   ecdsa_secp256r1_sha256: 'P256',
 } as const;
 
-export const isKnownSignature = (signature: unknown): signature is keyof typeof MLSPublicKeys =>
-  signature !== undefined && typeof signature === 'string' && Object.keys(MLSPublicKeys).includes(signature);
+export const isKnownSignature = (signature: unknown): signature is keyof typeof MLSPublicKeys => {
+  return signature !== undefined && typeof signature === 'string' && Object.keys(MLSPublicKeys).includes(signature);
+};
 
 export class ClientEntity {
   static CONFIG = {
@@ -123,10 +124,14 @@ export class ClientEntity {
     const jsonObject = JSON.parse(ko.toJSON(this));
     delete jsonObject.isSelfClient;
 
-    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this.removeDefaultValues(jsonObject, name));
+    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => {
+      return this.removeDefaultValues(jsonObject, name);
+    });
 
     if (this.isSelfClient) {
-      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this.removeDefaultValues(jsonObject, name));
+      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => {
+        return this.removeDefaultValues(jsonObject, name);
+      });
     }
 
     jsonObject.meta.is_verified = jsonObject.meta.isVerified;

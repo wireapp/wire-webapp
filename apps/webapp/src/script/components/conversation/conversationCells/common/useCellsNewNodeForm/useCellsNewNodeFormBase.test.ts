@@ -38,18 +38,23 @@ describe('useCellsNewNodeFormBase', () => {
     maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
     nameRequired: 'cells.newItemMenuModalForm.nameRequired',
   };
-  const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
-  const createNodeMock = () => jest.fn().mockResolvedValue(undefined) as CreateNodeMock;
+  const createEvent = () => {
+    return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
+  };
+  const createNodeMock = () => {
+    return jest.fn().mockResolvedValue(undefined) as CreateNodeMock;
+  };
 
   const setup = ({createNode = createNodeMock(), normalizeNameForCreation, isOpen = true}: SetupOptions = {}) => {
     const {result, rerender} = renderHook(
-      ({modalIsOpen}: {modalIsOpen: boolean}) =>
-        useCellsNewNodeFormBase({
+      ({modalIsOpen}: {modalIsOpen: boolean}) => {
+        return useCellsNewNodeFormBase({
           createNode,
           validationCopy,
           normalizeNameForCreation,
           isOpen: modalIsOpen,
-        }),
+        });
+      },
       {initialProps: {modalIsOpen: isOpen}},
     );
 
@@ -87,7 +92,9 @@ describe('useCellsNewNodeFormBase', () => {
   });
 
   it('trims input and applies normalizeNameForCreation before calling createNode', async () => {
-    const normalizeNameForCreation = jest.fn((rawName: string) => `${rawName}.normalized`);
+    const normalizeNameForCreation = jest.fn((rawName: string) => {
+      return `${rawName}.normalized`;
+    });
     const {result, createNode} = setup({normalizeNameForCreation});
 
     act(() => {

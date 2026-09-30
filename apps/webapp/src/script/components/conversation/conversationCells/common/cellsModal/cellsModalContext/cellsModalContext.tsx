@@ -42,6 +42,12 @@ interface CellsModalProviderProps {
 
 export const CellsModalProvider = ({children, onClose}: CellsModalProviderProps) => {
   return (
-    <CellsModalContext.Provider value={useMemo(() => ({onClose}), [onClose])}>{children}</CellsModalContext.Provider>
+    <CellsModalContext.Provider
+      value={useMemo(() => {
+        return {onClose};
+      }, [onClose])}
+    >
+      {children}
+    </CellsModalContext.Provider>
   );
 };

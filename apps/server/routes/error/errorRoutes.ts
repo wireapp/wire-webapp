@@ -30,29 +30,31 @@ const logger = logdown('@wireapp/wire-webapp/routes/error/errorRoutes', {
   markdown: false,
 });
 
-const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, next) => {
-  void next;
-  logger.error(`[${formatDate()}] ${err.stack}`);
-  const error = {
-    code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-    message: 'Internal server error',
-    stack: err.stack,
+const InternalErrorRoute = (): express.ErrorRequestHandler => {
+  return (err, req, res, next) => {
+    void next;
+    logger.error(`[${formatDate()}] ${err.stack}`);
+    const error = {
+      code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error',
+      stack: err.stack,
+    };
+    const request: any = {
+      host: req.hostname,
+      ip: req.ip,
+      url: req.url,
+    };
+    if (req.headers?.date !== undefined) {
+      request.date = req.headers.date;
+    }
+    req.app.locals.error = error;
+    req.app.locals.request = request;
+    return res.status(error.code).render('error');
   };
-  const request: any = {
-    host: req.hostname,
-    ip: req.ip,
-    url: req.url,
-  };
-  if (req.headers?.date !== undefined) {
-    request.date = req.headers.date;
-  }
-  req.app.locals.error = error;
-  req.app.locals.request = request;
-  return res.status(error.code).render('error');
 };
 
-const NotFoundRoute = () =>
-  router.get('*', (req, res) => {
+const NotFoundRoute = () => {
+  return router.get('*', (req, res) => {
     const error = {
       code: HTTP_STATUS.NOT_FOUND,
       message: 'Not found',
@@ -67,5 +69,6 @@ const NotFoundRoute = () =>
     req.app.locals.request = request;
     return res.status(error.code).render('error');
   });
+};
 
 export {InternalErrorRoute, NotFoundRoute};

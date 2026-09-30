@@ -97,7 +97,9 @@ export const importLegacyBackupToDatabase = async ({
 
   const archiveVersion = await verifyMetadata({user, backupService, fileData});
   const fileDescriptors = Object.entries(fileData)
-    .filter(([filename]) => filename !== Filename.METADATA)
+    .filter(([filename]) => {
+      return filename !== Filename.METADATA;
+    })
     .map(([filename, content]) => {
       const data = new TextDecoder().decode(content);
       const entities = JSON.parse(data);

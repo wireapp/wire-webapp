@@ -28,7 +28,13 @@ describe('UserAction', () => {
     const email = 'mail@mail.com';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {user: {postActivationCode: () => Promise.resolve()}},
+      api: {
+        user: {
+          postActivationCode: () => {
+            return Promise.resolve();
+          },
+        },
+      },
     };
 
     const store = mockStoreFactory({
@@ -48,7 +54,13 @@ describe('UserAction', () => {
     const email = 'mail@mail.com';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {user: {postActivationCode: () => Promise.reject(error)}},
+      api: {
+        user: {
+          postActivationCode: () => {
+            return Promise.reject(error);
+          },
+        },
+      },
     };
 
     const store = mockStoreFactory({

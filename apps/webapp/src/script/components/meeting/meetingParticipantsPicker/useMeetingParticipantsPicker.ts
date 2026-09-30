@@ -61,15 +61,14 @@ export const useMeetingParticipantsPicker = ({
     }
 
     const normalizedFilter = filter.trim().toLowerCase();
-    return conversationRepository
-      .getAllGroupConversations()
-      .filter(
-        conversation =>
-          !conversation.isSelfUserRemoved() &&
-          !conversation.is_archived() &&
-          !conversation.is_cleared() &&
-          conversation.display_name().toLowerCase().includes(normalizedFilter),
+    return conversationRepository.getAllGroupConversations().filter(conversation => {
+      return (
+        !conversation.isSelfUserRemoved() &&
+        !conversation.is_archived() &&
+        !conversation.is_cleared() &&
+        conversation.display_name().toLowerCase().includes(normalizedFilter)
       );
+    });
   }, [conversationRepository, filter]);
 
   const handleOpenChange = useCallback(
@@ -105,9 +104,11 @@ export const useMeetingParticipantsPicker = ({
       if (nextSelectedConversations.has(conversationKey)) {
         nextSelectedConversations.delete(conversationKey);
         const importedUsers = [...selectedConversations.values()].flat();
-        const manuallySelectedUsers = selectedUsers.filter(
-          user => !importedUsers.some(imported => matchQualifiedIds(imported.qualifiedId, user.qualifiedId)),
-        );
+        const manuallySelectedUsers = selectedUsers.filter(user => {
+          return !importedUsers.some(imported => {
+            return matchQualifiedIds(imported.qualifiedId, user.qualifiedId);
+          });
+        });
         onSelectedUsersChange(
           mergeUsersIntoSelection(manuallySelectedUsers, [...nextSelectedConversations.values()].flat()),
         );

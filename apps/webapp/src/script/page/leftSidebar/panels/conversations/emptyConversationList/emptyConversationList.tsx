@@ -49,13 +49,19 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
               : translate('conversationAllWelcomeMessage')}
           </p>
 
-          <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
+          <ConnectWithNewUsersButton
+            onClick={() => {
+              return onChangeTab(SidebarTabs.CONNECT);
+            }}
+          />
 
           <span css={seperator}>{translate('conversationButtonSeparator')}</span>
 
           <Button
             variant={ButtonVariant.TERTIARY}
-            onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP)}
+            onClick={() => {
+              return amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP);
+            }}
             data-uie-name="go-create-group"
             css={button}
           >
@@ -99,13 +105,19 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
               : translate('conversationGroupEmptyMessage')}
           </p>
 
-          <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
+          <ConnectWithNewUsersButton
+            onClick={() => {
+              return onChangeTab(SidebarTabs.CONNECT);
+            }}
+          />
 
           <span css={seperator}>{translate('conversationButtonSeparator')}</span>
 
           <Button
             variant={ButtonVariant.TERTIARY}
-            onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details')}
+            onClick={() => {
+              return amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
+            }}
             data-uie-name="go-create-group"
             css={button}
           >
@@ -144,7 +156,11 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
               : translate('conversationDirectEmptyMessage', {brandName: Config.getConfig().BRAND_NAME})}
           </p>
 
-          <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
+          <ConnectWithNewUsersButton
+            onClick={() => {
+              return onChangeTab(SidebarTabs.CONNECT);
+            }}
+          />
         </div>
       </div>
     );

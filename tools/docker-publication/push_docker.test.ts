@@ -121,21 +121,18 @@ describe('push_docker metadata', () => {
   it('rejects a Docker context outside the working directory', () => {
     const workingDirectory = '/workspace/wire-webapp';
 
-    assert.throws(
-      () => resolveDockerContextPath('../outside', workingDirectory),
-      /Docker context path must remain inside the working directory/,
-    );
-    assert.throws(
-      () => resolveDockerContextPath('/tmp/outside', workingDirectory),
-      /Docker context path must remain inside the working directory/,
-    );
+    assert.throws(() => {
+      return resolveDockerContextPath('../outside', workingDirectory);
+    }, /Docker context path must remain inside the working directory/);
+    assert.throws(() => {
+      return resolveDockerContextPath('/tmp/outside', workingDirectory);
+    }, /Docker context path must remain inside the working directory/);
   });
 
   it('rejects a Docker context containing a null byte', () => {
-    assert.throws(
-      () => resolveDockerContextPath('distribution\0context', '/workspace/wire-webapp'),
-      /Docker context path must not contain null bytes/,
-    );
+    assert.throws(() => {
+      return resolveDockerContextPath('distribution\0context', '/workspace/wire-webapp');
+    }, /Docker context path must not contain null bytes/);
   });
 
   it('invokes Docker with separate arguments and writes the image tag without a shell', () => {
@@ -155,15 +152,27 @@ describe('push_docker metadata', () => {
       },
     });
 
-    const processEvents = events.filter(
-      (event): event is Extract<ProcessEvent, {kind: 'process'}> => event.kind === 'process',
-    );
-    const loginEvent = processEvents.find(event => event.commandArguments[0] === 'login');
-    const buildEvent = processEvents.find(event => event.commandArguments[0] === 'build');
-    const runEvent = processEvents.find(event => event.commandArguments[0] === 'run');
-    const tagEvents = processEvents.filter(event => event.commandArguments[0] === 'tag');
-    const pushEvents = processEvents.filter(event => event.commandArguments[0] === 'push');
-    const writeEvent = events.find(event => event.kind === 'write');
+    const processEvents = events.filter((event): event is Extract<ProcessEvent, {kind: 'process'}> => {
+      return event.kind === 'process';
+    });
+    const loginEvent = processEvents.find(event => {
+      return event.commandArguments[0] === 'login';
+    });
+    const buildEvent = processEvents.find(event => {
+      return event.commandArguments[0] === 'build';
+    });
+    const runEvent = processEvents.find(event => {
+      return event.commandArguments[0] === 'run';
+    });
+    const tagEvents = processEvents.filter(event => {
+      return event.commandArguments[0] === 'tag';
+    });
+    const pushEvents = processEvents.filter(event => {
+      return event.commandArguments[0] === 'push';
+    });
+    const writeEvent = events.find(event => {
+      return event.kind === 'write';
+    });
 
     assert.ok(loginEvent);
     assert.ok(buildEvent);
@@ -181,15 +190,41 @@ describe('push_docker metadata', () => {
       '1234567',
     ]);
     expect(runEvent.commandArguments.slice(0, 6)).toEqual(['run', '--rm', '--entrypoint', 'sh', '1234567', '-c']);
-    expect(tagEvents.every(event => event.commandArguments.length === 3)).toBe(true);
-    expect(tagEvents.every(event => event.commandArguments[1] === '1234567')).toBe(true);
-    expect(tagEvents.map(event => event.commandArguments[2])).toEqual([
+    expect(
+      tagEvents.every(event => {
+        return event.commandArguments.length === 3;
+      }),
+    ).toBe(true);
+    expect(
+      tagEvents.every(event => {
+        return event.commandArguments[1] === '1234567';
+      }),
+    ).toBe(true);
+    expect(
+      tagEvents.map(event => {
+        return event.commandArguments[2];
+      }),
+    ).toEqual([
       'quay.io/wire/webapp:2026-07-15.1-production',
       'quay.io/wire/webapp:2026-07-15.1-production-v0.34.9-0-1234567',
     ]);
-    expect(pushEvents.every(event => event.commandArguments.length === 2)).toBe(true);
-    expect(pushEvents.every(event => typeof event.commandArguments[1] === 'string')).toBe(true);
-    expect(events.map(event => event.kind).slice(0, 4)).toEqual(['process', 'process', 'process', 'write']);
+    expect(
+      pushEvents.every(event => {
+        return event.commandArguments.length === 2;
+      }),
+    ).toBe(true);
+    expect(
+      pushEvents.every(event => {
+        return typeof event.commandArguments[1] === 'string';
+      }),
+    ).toBe(true);
+    expect(
+      events
+        .map(event => {
+          return event.kind;
+        })
+        .slice(0, 4),
+    ).toEqual(['process', 'process', 'process', 'write']);
     expect(writeEvent).toEqual({kind: 'write', filePath: outputPath, fileContents: actualImageTag});
   });
 
@@ -210,20 +245,21 @@ describe('push_docker metadata', () => {
   });
 
   it('reports process failures with the executable and status', () => {
-    assert.throws(
-      () => runProcess('docker', ['push', 'quay.io/wire/webapp:production'], {}, () => ({error: undefined, status: 7})),
-      /docker exited with status 7/,
-    );
+    assert.throws(() => {
+      return runProcess('docker', ['push', 'quay.io/wire/webapp:production'], {}, () => {
+        return {error: undefined, status: 7};
+      });
+    }, /docker exited with status 7/);
   });
 
   it('reports process startup errors without exposing unrelated input', () => {
-    assert.throws(
-      () =>
-        runProcess('docker', ['login', '--username', 'docker-user', '--password-stdin', 'quay.io'], {}, () => ({
+    assert.throws(() => {
+      return runProcess('docker', ['login', '--username', 'docker-user', '--password-stdin', 'quay.io'], {}, () => {
+        return {
           error: new Error('not found'),
           status: null,
-        })),
-      /docker failed with status unknown: not found/,
-    );
+        };
+      });
+    }, /docker failed with status unknown: not found/);
   });
 });

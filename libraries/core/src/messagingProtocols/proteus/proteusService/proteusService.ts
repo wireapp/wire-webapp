@@ -264,7 +264,9 @@ export class ProteusService {
     const {sendingClientId, recipients, plainText, options} = messageParams;
     const response = await this.messageService.sendMessage(sendingClientId, recipients, plainText, {
       ...options,
-      onClientMismatch: mismatch => onClientMismatch?.(mismatch, false),
+      onClientMismatch: mismatch => {
+        return onClientMismatch?.(mismatch, false);
+      },
     });
 
     if (response.canceled !== true) {

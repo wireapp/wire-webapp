@@ -46,14 +46,16 @@ interface CellsTableLabels {
   tags: string;
 }
 
-export const getCellsTableDataCellLabels = (labels: CellsTableLabels): Record<string, string | undefined> => ({
-  name: labels.name,
-  owner: labels.owner,
-  publicLink: labels.publicLink,
-  sizeMb: labels.size,
-  tags: labels.tags,
-  uploadedAtTimestamp: labels.created,
-});
+export const getCellsTableDataCellLabels = (labels: CellsTableLabels): Record<string, string | undefined> => {
+  return {
+    name: labels.name,
+    owner: labels.owner,
+    publicLink: labels.publicLink,
+    sizeMb: labels.size,
+    tags: labels.tags,
+    uploadedAtTimestamp: labels.created,
+  };
+};
 
 export const getCellsTableColumns = ({
   cellsRepository,
@@ -75,74 +77,102 @@ export const getCellsTableColumns = ({
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
-}) => [
-  columnHelper.accessor('name', {
-    header: isSortingEnabled
-      ? () => (
-          <CellsTableSortableHeader
-            label={labels.name}
-            direction={getDirectionFor('name')}
-            onClick={() => onToggleSort('name')}
+}) => {
+  return [
+    columnHelper.accessor('name', {
+      header: isSortingEnabled
+        ? () => {
+            return (
+              <CellsTableSortableHeader
+                label={labels.name}
+                direction={getDirectionFor('name')}
+                onClick={() => {
+                  return onToggleSort('name');
+                }}
+              />
+            );
+          }
+        : labels.name,
+      cell: info => {
+        return <CellsTableNameColumn node={info.row.original} onCloseSearchView={onCloseSearchView} />;
+      },
+    }),
+    columnHelper.accessor('owner', {
+      header: labels.owner,
+      cell: info => {
+        return <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />;
+      },
+      size: 170,
+    }),
+    columnHelper.accessor('sizeMb', {
+      header: isSortingEnabled
+        ? () => {
+            return (
+              <CellsTableSortableHeader
+                label={labels.size}
+                direction={getDirectionFor('size')}
+                onClick={() => {
+                  return onToggleSort('size');
+                }}
+              />
+            );
+          }
+        : labels.size,
+      cell: info => {
+        return info.getValue();
+      },
+      size: 100,
+    }),
+    columnHelper.accessor('tags', {
+      header: labels.tags,
+      cell: info => {
+        return <CellsTagsColumn tags={info.getValue()} />;
+      },
+      size: 120,
+    }),
+    columnHelper.accessor('uploadedAtTimestamp', {
+      header: isSortingEnabled
+        ? () => {
+            return (
+              <CellsTableSortableHeader
+                label={labels.created}
+                direction={getDirectionFor('mtime')}
+                onClick={() => {
+                  return onToggleSort('mtime');
+                }}
+              />
+            );
+          }
+        : labels.created,
+      cell: info => {
+        return <CellsTableDateColumn timestamp={info.getValue()} />;
+      },
+      size: 125,
+    }),
+    columnHelper.accessor('publicLink', {
+      header: labels.publicLink,
+      cell: info => {
+        return <CellsTableSharedColumn isShared={info.getValue()?.alreadyShared === true} />;
+      },
+      size: 60,
+    }),
+    columnHelper.accessor('id', {
+      header: () => {
+        return <span className="visually-hidden">{labels.actions}</span>;
+      },
+      size: 40,
+      cell: info => {
+        return (
+          <CellsTableRowOptions
+            node={info.row.original}
+            cellsRepository={cellsRepository}
+            conversationQualifiedId={conversationQualifiedId}
+            conversationName={conversationName}
+            onRefresh={onRefresh}
+            onCloseSearchView={onCloseSearchView}
           />
-        )
-      : labels.name,
-    cell: info => <CellsTableNameColumn node={info.row.original} onCloseSearchView={onCloseSearchView} />,
-  }),
-  columnHelper.accessor('owner', {
-    header: labels.owner,
-    cell: info => <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />,
-    size: 170,
-  }),
-  columnHelper.accessor('sizeMb', {
-    header: isSortingEnabled
-      ? () => (
-          <CellsTableSortableHeader
-            label={labels.size}
-            direction={getDirectionFor('size')}
-            onClick={() => onToggleSort('size')}
-          />
-        )
-      : labels.size,
-    cell: info => info.getValue(),
-    size: 100,
-  }),
-  columnHelper.accessor('tags', {
-    header: labels.tags,
-    cell: info => <CellsTagsColumn tags={info.getValue()} />,
-    size: 120,
-  }),
-  columnHelper.accessor('uploadedAtTimestamp', {
-    header: isSortingEnabled
-      ? () => (
-          <CellsTableSortableHeader
-            label={labels.created}
-            direction={getDirectionFor('mtime')}
-            onClick={() => onToggleSort('mtime')}
-          />
-        )
-      : labels.created,
-    cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
-    size: 125,
-  }),
-  columnHelper.accessor('publicLink', {
-    header: labels.publicLink,
-    cell: info => <CellsTableSharedColumn isShared={info.getValue()?.alreadyShared === true} />,
-    size: 60,
-  }),
-  columnHelper.accessor('id', {
-    header: () => <span className="visually-hidden">{labels.actions}</span>,
-    size: 40,
-    cell: info => {
-      return (
-        <CellsTableRowOptions
-          node={info.row.original}
-          cellsRepository={cellsRepository}
-          conversationQualifiedId={conversationQualifiedId}
-          conversationName={conversationName}
-          onRefresh={onRefresh}
-          onCloseSearchView={onCloseSearchView}
-        />
-      );
-    },
-  }),
-];
+        );
+      },
+    }),
+  ];
+};

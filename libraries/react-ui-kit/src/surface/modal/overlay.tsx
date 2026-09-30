@@ -40,31 +40,35 @@ export const overlayWrapperStyle: CSSObject = {
   zIndex: 9997,
 };
 
-export const OverlayWrapper = (props: OverlayWrapperProps) => <div css={overlayWrapperStyle} {...props} />;
+export const OverlayWrapper = (props: OverlayWrapperProps) => {
+  return <div css={overlayWrapperStyle} {...props} />;
+};
 
-export const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
-  <div
-    css={{
-      '*': {
-        color: COLOR.WHITE,
-      },
-      alignItems: 'center',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      margin: 'auto',
-      maxWidth: '100%',
-      overflowY: 'auto',
-      position: 'relative',
-      transform: 'translate3d(0, 0, 0)',
-      zIndex: 9999,
-      [media[QueryKeys.TABLET_DOWN]]: {
-        width: '100%',
-      },
-    }}
-    {...props}
-  />
-);
+export const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => {
+  return (
+    <div
+      css={{
+        '*': {
+          color: COLOR.WHITE,
+        },
+        alignItems: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        margin: 'auto',
+        maxWidth: '100%',
+        overflowY: 'auto',
+        position: 'relative',
+        transform: 'translate3d(0, 0, 0)',
+        zIndex: 9999,
+        [media[QueryKeys.TABLET_DOWN]]: {
+          width: '100%',
+        },
+      }}
+      {...props}
+    />
+  );
+};
 
 export type OverlayBackgroundProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
@@ -79,15 +83,19 @@ export const overlayBackgroundStyle: CSSObject = {
   zIndex: 9998,
 };
 
-export const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyle} {...props} />;
+export const OverlayBackground = (props: OverlayBackgroundProps) => {
+  return <div css={overlayBackgroundStyle} {...props} />;
+};
 
 export interface OverlayProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   onBackgroundClick?: () => void;
 }
 
-export const Overlay = ({onBackgroundClick = noop, children = null, ...props}: OverlayProps) => (
-  <OverlayWrapper {...props} data-uie-name="modal">
-    <OverlayContent>{children}</OverlayContent>
-    <OverlayBackground onClick={onBackgroundClick} data-uie-name="overlay-background" />
-  </OverlayWrapper>
-);
+export const Overlay = ({onBackgroundClick = noop, children = null, ...props}: OverlayProps) => {
+  return (
+    <OverlayWrapper {...props} data-uie-name="modal">
+      <OverlayContent>{children}</OverlayContent>
+      <OverlayBackground onClick={onBackgroundClick} data-uie-name="overlay-background" />
+    </OverlayWrapper>
+  );
+};

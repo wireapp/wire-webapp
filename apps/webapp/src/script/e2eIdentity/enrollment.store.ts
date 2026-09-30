@@ -40,20 +40,34 @@ interface EnrollmentStore {
 
 export const getEnrollmentStore = ({id: userId, domain}: QualifiedId, clientId: string): EnrollmentStore => {
   const clientStoreId = constructFullyQualifiedClientId(userId, clientId, domain);
-  const constructKey = (key: string) => `${clientStoreId}_${key}`;
+  const constructKey = (key: string) => {
+    return `${clientStoreId}_${key}`;
+  };
 
   return {
     store: {
-      e2eiActivatedAt: (time: number) => localStorage.setItem(constructKey(e2eActivatedAtKey), String(time)),
-      timer: (time: number) => localStorage.setItem(constructKey(e2eTimer), String(time)),
+      e2eiActivatedAt: (time: number) => {
+        return localStorage.setItem(constructKey(e2eActivatedAtKey), String(time));
+      },
+      timer: (time: number) => {
+        return localStorage.setItem(constructKey(e2eTimer), String(time));
+      },
     },
     get: {
-      e2eiActivatedAt: () => Number(localStorage.getItem(constructKey(e2eActivatedAtKey))),
-      timer: () => Number(localStorage.getItem(constructKey(e2eTimer))),
+      e2eiActivatedAt: () => {
+        return Number(localStorage.getItem(constructKey(e2eActivatedAtKey)));
+      },
+      timer: () => {
+        return Number(localStorage.getItem(constructKey(e2eTimer)));
+      },
     },
     clear: {
-      deviceCreatedAt: () => localStorage.removeItem(constructKey(e2eActivatedAtKey)),
-      timer: () => localStorage.removeItem(constructKey(e2eTimer)),
+      deviceCreatedAt: () => {
+        return localStorage.removeItem(constructKey(e2eActivatedAtKey));
+      },
+      timer: () => {
+        return localStorage.removeItem(constructKey(e2eTimer));
+      },
     },
   };
 };

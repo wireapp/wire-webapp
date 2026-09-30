@@ -128,7 +128,11 @@ export function generateConversation({
 
   if (users) {
     conversation.participating_user_ets(users);
-    conversation.participating_user_ids(users.map(user => user.qualifiedId));
+    conversation.participating_user_ids(
+      users.map(user => {
+        return user.qualifiedId;
+      }),
+    );
   }
 
   return conversation;

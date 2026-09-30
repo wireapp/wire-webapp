@@ -28,10 +28,13 @@ const LAST_MINUTE_OF_DAY = 45;
 const HALF_HOUR_MINUTES = 30;
 const MEETING_DURATION_MILLISECONDS = MINUTES_PER_HOUR * MINUTES_PER_HOUR * MILLISECONDS_PER_SECOND;
 
-const isSameCalendarDay = (left: Date, right: Date): boolean =>
-  left.getFullYear() === right.getFullYear() &&
-  left.getMonth() === right.getMonth() &&
-  left.getDate() === right.getDate();
+const isSameCalendarDay = (left: Date, right: Date): boolean => {
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
+  );
+};
 
 export const getLatestMeetingEndDateTime = (date: Date): Date => {
   const latestEnd = new Date(date);
@@ -115,8 +118,9 @@ export const resolveEndChange = (previousStart: Date, previousEnd: Date, nextEnd
   return {start: nextStart, end: capEndForStart(nextStart, alignedNextEnd)};
 };
 
-export const getDefaultScheduleMeetingStartDateTime = (clock: Clock): Date =>
-  getNextHalfHourDateTime(clock.currentDate);
+export const getDefaultScheduleMeetingStartDateTime = (clock: Clock): Date => {
+  return getNextHalfHourDateTime(clock.currentDate);
+};
 
 export const getMeetNowMeetingTimes = (clock: Clock): {start: Date; end: Date} => {
   const start = clock.currentDate;

@@ -63,11 +63,11 @@ describe('ConversationAccessPermissions', () => {
       ACCESS_MODES.LINK,
   };
 
-  const accessStateMapper = <V>(teamObject: {[state in keyof typeof ACCESS_STATE.TEAM]: V}): [TEAM, V][] =>
-    Object.entries(teamObject).map(([state, value]) => [
-      ACCESS_STATE.TEAM[state as keyof typeof ACCESS_STATE.TEAM],
-      value,
-    ]);
+  const accessStateMapper = <V>(teamObject: {[state in keyof typeof ACCESS_STATE.TEAM]: V}): [TEAM, V][] => {
+    return Object.entries(teamObject).map(([state, value]) => {
+      return [ACCESS_STATE.TEAM[state as keyof typeof ACCESS_STATE.TEAM], value];
+    });
+  };
 
   const mockAccessTeam = accessStateMapper(mockTeam);
 
@@ -88,9 +88,11 @@ describe('ConversationAccessPermissions', () => {
       const features = [ACCESS_TYPES.SERVICE, ACCESS_TYPES.GUEST | ACCESS_TYPES.NON_TEAM_MEMBER | ACCESS_MODES.CODE];
       features.forEach(feature =>
         // toggling the feature should mean the current access state no longer has access to it.
-        expect(hasAccessToFeature(feature, state)).not.toEqual(
-          hasAccessToFeature(feature, toggleFeature(feature, state)),
-        ),
+        {
+          return expect(hasAccessToFeature(feature, state)).not.toEqual(
+            hasAccessToFeature(feature, toggleFeature(feature, state)),
+          );
+        },
       );
     });
   });
@@ -119,7 +121,9 @@ describe('ConversationAccessPermissions', () => {
         const result = featureFromStateChange(prev, team);
 
         if (prev === team) {
-          return Object.values(result).forEach(value => expect(value).toBeFalsy());
+          return Object.values(result).forEach(value => {
+            return expect(value).toBeFalsy();
+          });
         }
         expect(['guest', 'service']).toContain(result.feature);
         expect(['Guest', 'Service']).toContain(result.featureName);

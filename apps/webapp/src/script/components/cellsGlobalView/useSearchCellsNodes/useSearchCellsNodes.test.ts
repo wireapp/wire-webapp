@@ -95,7 +95,9 @@ function createControllableDebouncedSearchStub() {
   return {
     create: (search: (value: string) => Promise<void>) => {
       const debouncedSearch = (async (value: string): Promise<void> => {
-        pendingSearch = () => search(value);
+        pendingSearch = () => {
+          return search(value);
+        };
       }) as ((value: string) => Promise<void>) & {cancel: () => void};
       debouncedSearch.cancel = () => {
         pendingSearch = undefined;
@@ -137,8 +139,8 @@ function renderSearchHook({
 } = {}) {
   return {
     fireAndForgetInvoker,
-    ...renderHook(() =>
-      useSearchCellsNodes({
+    ...renderHook(() => {
+      return useSearchCellsNodes({
         cellsRepository: cellsRepository as unknown as CellsRepository,
         userRepository: userRepository as unknown as UserRepository,
         conversationRepository: conversationRepository as unknown as ConversationRepository,
@@ -147,8 +149,8 @@ function renderSearchHook({
         sort,
         createDebouncedSearch,
         logger: logger as unknown as Logger,
-      }),
-    ),
+      });
+    }),
   };
 }
 
@@ -160,7 +162,9 @@ describe('useSearchCellsNodes', () => {
   it('requests global files with recency sorting by default', async () => {
     const cellsRepository = buildCellsRepositoryMock();
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -178,7 +182,9 @@ describe('useSearchCellsNodes', () => {
       cellsRepository,
       sort: {field: 'name', direction: 'asc'},
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -202,7 +208,9 @@ describe('useSearchCellsNodes', () => {
       cellsRepository,
       createDebouncedSearch: debouncedSearchStub.create,
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     await act(async () => {
       result.current.handleSearch('stale-query');
@@ -211,7 +219,11 @@ describe('useSearchCellsNodes', () => {
     });
 
     expect(result.current.searchValue).toBe('');
-    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['browse-file.pdf']);
+    expect(
+      useCellsStore.getState().nodes.map(node => {
+        return node.name;
+      }),
+    ).toEqual(['browse-file.pdf']);
     expect(useCellsStore.getState().status).toBe('success');
   });
 
@@ -228,7 +240,9 @@ describe('useSearchCellsNodes', () => {
       cellsRepository,
       createDebouncedSearch: debouncedSearchStub.create,
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     await act(async () => {
       result.current.handleSearch('stale-query');
@@ -237,7 +251,11 @@ describe('useSearchCellsNodes', () => {
       await debouncedSearchStub.flush();
     });
 
-    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['reload-file.pdf']);
+    expect(
+      useCellsStore.getState().nodes.map(node => {
+        return node.name;
+      }),
+    ).toEqual(['reload-file.pdf']);
     expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(2);
   });
 
@@ -255,7 +273,9 @@ describe('useSearchCellsNodes', () => {
       cellsRepository,
       createDebouncedSearch: debouncedSearchStub.create,
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     await act(async () => {
       result.current.handleSearch('stale-query');
@@ -269,7 +289,11 @@ describe('useSearchCellsNodes', () => {
       await flushMicrotasks();
     });
 
-    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['browse-file.pdf']);
+    expect(
+      useCellsStore.getState().nodes.map(node => {
+        return node.name;
+      }),
+    ).toEqual(['browse-file.pdf']);
     expect(useCellsStore.getState().status).toBe('success');
   });
 
@@ -282,7 +306,9 @@ describe('useSearchCellsNodes', () => {
         .mockReturnValueOnce(requestAfterUnmount.promise),
     };
     const {fireAndForgetInvoker, result, unmount} = renderSearchHook({cellsRepository});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     act(() => {
       void result.current.handleReload();
@@ -325,10 +351,16 @@ describe('useSearchCellsNodes', () => {
     });
 
     staleSearch.resolve({Nodes: [buildRestNodeStub('stale-file.pdf')]});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(logger.debug).toHaveBeenCalledWith('Ignoring stale request version:', 1);
-    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
+    expect(
+      useCellsStore.getState().nodes.map(node => {
+        return node.name;
+      }),
+    ).toEqual(['current-file.pdf']);
   });
 
   it('keeps newer results when an older request rejects last', async () => {
@@ -356,7 +388,11 @@ describe('useSearchCellsNodes', () => {
       await fireAndForgetInvoker.waitUntilAllSettled();
     });
 
-    expect(useCellsStore.getState().nodes.map(node => node.name)).toEqual(['current-file.pdf']);
+    expect(
+      useCellsStore.getState().nodes.map(node => {
+        return node.name;
+      }),
+    ).toEqual(['current-file.pdf']);
     expect(useCellsStore.getState().status).toBe('success');
   });
 
@@ -370,7 +406,9 @@ describe('useSearchCellsNodes', () => {
     };
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository, conversationRepository});
 
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(useCellsStore.getState().nodes).toEqual([]);
     expect(useCellsStore.getState().pagination).toBeNull();
@@ -383,7 +421,9 @@ describe('useSearchCellsNodes', () => {
     };
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
 
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(useCellsStore.getState().nodes).toEqual([]);
     expect(useCellsStore.getState().pagination).toBeNull();

@@ -56,7 +56,9 @@ export function extractClientDiff(
   const deletedClients = flattenUserMap(allDeleted);
   const missingClients = flattenUserMap(missing);
 
-  const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}) => ({clients: data, userId});
+  const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}) => {
+    return {clients: data, userId};
+  };
 
   const clientDiff: ClientDiff = {
     deletedClients: deletedClients.map(toClientDiff),
@@ -69,30 +71,48 @@ export function extractClientDiff(
   }
 
   const emptyUsers = users
-    .filter(user => !user.isMe)
     .filter(user => {
-      const userClients = user.devices().map(({id}) => id);
-      const deletedClientData = deletedClients.find(({userId}) => matchQualifiedIds(user.qualifiedId, userId))?.data;
+      return !user.isMe;
+    })
+    .filter(user => {
+      const userClients = user.devices().map(({id}) => {
+        return id;
+      });
+      const deletedClientData = deletedClients.find(({userId}) => {
+        return matchQualifiedIds(user.qualifiedId, userId);
+      })?.data;
       const userDeletedClients = isNullOrUndefined(deletedClientData) ? [] : deletedClientData;
       const commonDevices = intersection(userClients, userDeletedClients);
       return commonDevices.length === userClients.length;
     });
 
   const missingUserIds = missingClients
-    .filter(({userId}) => !users.some(user => matchQualifiedIds(userId, user.qualifiedId)))
-    .map(({userId}) => userId);
+    .filter(({userId}) => {
+      return !users.some(user => {
+        return matchQualifiedIds(userId, user.qualifiedId);
+      });
+    })
+    .map(({userId}) => {
+      return userId;
+    });
 
   const unknownMissingClients = missingClients
     .map(({userId, data}) => {
       const userDevices =
         users
-          .find(user => matchQualifiedIds(user.qualifiedId, userId))
+          .find(user => {
+            return matchQualifiedIds(user.qualifiedId, userId);
+          })
           ?.devices()
-          .map(device => device.id) ?? [];
+          .map(device => {
+            return device.id;
+          }) ?? [];
       const unknownDevices = difference(data, userDevices);
       return {data: unknownDevices, userId};
     })
-    .filter(({data}) => data.length > 0);
+    .filter(({data}) => {
+      return data.length > 0;
+    });
 
   return {
     ...clientDiff,

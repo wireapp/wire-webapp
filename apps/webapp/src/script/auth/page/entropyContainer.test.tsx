@@ -34,11 +34,19 @@ jest.mock('../component/entropyCanvas', () => {
     }: {
       ariaLabel?: string;
       onProgress: (entropyData: InstanceType<typeof EntropyData>, percent: number, pause: boolean) => void;
-    }) => (
-      <button type="button" aria-label={ariaLabel} onClick={() => onProgress(new EntropyData(), 25, false)}>
-        Mock entropy canvas
-      </button>
-    ),
+    }) => {
+      return (
+        <button
+          type="button"
+          aria-label={ariaLabel}
+          onClick={() => {
+            return onProgress(new EntropyData(), 25, false);
+          }}
+        >
+          Mock entropy canvas
+        </button>
+      );
+    },
   };
 });
 

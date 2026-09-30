@@ -24,7 +24,9 @@ import {SelectText} from './SelectText';
 const selectionMock = window.getSelection() || ({} as Selection);
 selectionMock.removeAllRanges = jest.fn();
 selectionMock.addRange = jest.fn();
-window.getSelection = jest.fn(() => selectionMock);
+window.getSelection = jest.fn(() => {
+  return selectionMock;
+});
 
 describe('SelectText', () => {
   it('displays the given text', () => {

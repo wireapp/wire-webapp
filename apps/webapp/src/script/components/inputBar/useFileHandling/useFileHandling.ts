@@ -50,7 +50,9 @@ export const useFileHandling = ({
     translate,
   });
 
-  const clearPastedFile = () => setPastedFile(null);
+  const clearPastedFile = () => {
+    return setPastedFile(null);
+  };
 
   const sendPastedFile = () => {
     if (pastedFile) {
@@ -67,7 +69,9 @@ export const useFileHandling = ({
 
   useEffect(() => {
     if (!pastedFile) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     window.addEventListener('keydown', sendImageOnEnterClick);

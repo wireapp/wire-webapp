@@ -111,7 +111,9 @@ export class SearchRepository {
         }
         return result2.weight - result1.weight;
       })
-      .map(result => result.user);
+      .map(result => {
+        return result.user;
+      });
   }
 
   /**
@@ -184,7 +186,11 @@ export class SearchRepository {
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
     const userIds: QualifiedId[] = await this.getContacts(name, CONFIG.MAX_DIRECTORY_RESULTS, domain).then(
-      ({documents}) => documents.map(match => ({domain: match.qualified_id?.domain ?? '', id: match.id})),
+      ({documents}) => {
+        return documents.map(match => {
+          return {domain: match.qualified_id?.domain ?? '', id: match.id};
+        });
+      },
     );
 
     const users = await this.userRepository.getUsersById(userIds);
@@ -192,8 +198,12 @@ export class SearchRepository {
     return (
       users
         // Filter out selfUser
-        .filter(user => !user.isMe)
-        .filter(user => !isHandleQuery || startsWith(user.username(), query))
+        .filter(user => {
+          return !user.isMe;
+        })
+        .filter(user => {
+          return !isHandleQuery || startsWith(user.username(), query);
+        })
         .toSorted((userA, userB) => {
           if (userA.teamId === teamId && userB.teamId !== teamId) {
             // put team members first

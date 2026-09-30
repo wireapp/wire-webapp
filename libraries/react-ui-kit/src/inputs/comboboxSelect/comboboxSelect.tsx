@@ -141,15 +141,19 @@ const Select = ({
 
   const components = useMemo(() => {
     return {
-      ClearIndicator: () => null,
+      ClearIndicator: () => {
+        return null;
+      },
       DropdownIndicator: BaseSelectDropdownIndicator,
-      MultiValueRemove: (props: MultiValueRemoveProps<ComboboxSelectOption, true>) => <MultiValueRemove {...props} />,
-      NoOptionsMessage: (props: NoticeProps<ComboboxSelectOption, true>) => (
-        <NoOptionsMessage {...props} message={noOptionsMessage} />
-      ),
-      LoadingMessage: (props: NoticeProps<ComboboxSelectOption, true>) => (
-        <LoadingMessage {...props} message={loadingMessage ?? ''} />
-      ),
+      MultiValueRemove: (props: MultiValueRemoveProps<ComboboxSelectOption, true>) => {
+        return <MultiValueRemove {...props} />;
+      },
+      NoOptionsMessage: (props: NoticeProps<ComboboxSelectOption, true>) => {
+        return <NoOptionsMessage {...props} message={noOptionsMessage} />;
+      },
+      LoadingMessage: (props: NoticeProps<ComboboxSelectOption, true>) => {
+        return <LoadingMessage {...props} message={loadingMessage ?? ''} />;
+      },
     };
   }, [loadingMessage, noOptionsMessage]);
 
@@ -199,20 +203,26 @@ const Select = ({
   );
 };
 
-const MultiValueRemove = (props: MultiValueRemoveProps<ComboboxSelectOption, true>) => (
-  <components.MultiValueRemove {...props}>
-    <CloseIcon width={10} height={10} />
-  </components.MultiValueRemove>
-);
+const MultiValueRemove = (props: MultiValueRemoveProps<ComboboxSelectOption, true>) => {
+  return (
+    <components.MultiValueRemove {...props}>
+      <CloseIcon width={10} height={10} />
+    </components.MultiValueRemove>
+  );
+};
 
-const NoOptionsMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption, true> & {message: string}) => (
-  <components.NoOptionsMessage {...props}>
-    <div css={noOptionsMessageStyles}>{message}</div>
-  </components.NoOptionsMessage>
-);
+const NoOptionsMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption, true> & {message: string}) => {
+  return (
+    <components.NoOptionsMessage {...props}>
+      <div css={noOptionsMessageStyles}>{message}</div>
+    </components.NoOptionsMessage>
+  );
+};
 
-const LoadingMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption, true> & {message: string}) => (
-  <components.LoadingMessage {...props}>
-    <div css={loadingMessageStyles}>{message}</div>
-  </components.LoadingMessage>
-);
+const LoadingMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption, true> & {message: string}) => {
+  return (
+    <components.LoadingMessage {...props}>
+      <div css={loadingMessageStyles}>{message}</div>
+    </components.LoadingMessage>
+  );
+};

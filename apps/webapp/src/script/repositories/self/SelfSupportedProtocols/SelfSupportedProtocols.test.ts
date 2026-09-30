@@ -104,9 +104,13 @@ const createMockClientResponse = (doesSupportMLS = false, wasActiveWithinLast4We
 const generateListOfSelfClients = ({allActiveClientsMLSCapable}: {allActiveClientsMLSCapable: boolean}) => {
   const clients: RegisteredClient[] = [];
 
-  new Array(4).fill(0).forEach(() => clients.push(createMockClientResponse(true, true)));
+  new Array(4).fill(0).forEach(() => {
+    return clients.push(createMockClientResponse(true, true));
+  });
   if (!allActiveClientsMLSCapable) {
-    new Array(2).fill(0).forEach(() => clients.push(createMockClientResponse(false, true)));
+    new Array(2).fill(0).forEach(() => {
+      return clients.push(createMockClientResponse(false, true));
+    });
   }
 
   return clients;

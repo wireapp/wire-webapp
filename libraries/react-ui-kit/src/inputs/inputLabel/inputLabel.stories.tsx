@@ -47,12 +47,14 @@ export const WithInput: Story = {
     htmlFor: 'example-input',
   },
   decorators: [
-    Story => (
-      <div>
-        <Story />
-        <Input id="example-input" type="email" placeholder="Enter email" />
-      </div>
-    ),
+    Story => {
+      return (
+        <div>
+          <Story />
+          <Input id="example-input" type="email" placeholder="Enter email" />
+        </div>
+      );
+    },
   ],
 };
 

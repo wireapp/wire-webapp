@@ -36,12 +36,16 @@ export const useCellGlobalPublicLink = ({
   fireAndForgetInvoker,
 }: UseCellGlobalPublicLinkParams) => {
   const {nodes, setPublicLink} = useCellsStore();
-  const node = nodes.find(n => n.id === uuid);
+  const node = nodes.find(n => {
+    return n.id === uuid;
+  });
   return useCellPublicLink({
     uuid,
     node,
     cellsRepository,
-    setPublicLink: data => setPublicLink(uuid, data),
+    setPublicLink: data => {
+      return setPublicLink(uuid, data);
+    },
     setStatusOnPublicLinkUrl: true,
     includeNodePublicLinkInCallbacks: true,
     fireAndForgetInvoker,

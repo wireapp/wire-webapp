@@ -31,7 +31,9 @@ describe('LowPrecisionTaskScheduler', () => {
   });
 
   it("task won't run again after it was executed previously", async () => {
-    const mockedTask = jest.fn(() => Promise.resolve('hello task'));
+    const mockedTask = jest.fn(() => {
+      return Promise.resolve('hello task');
+    });
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test-key',
@@ -46,7 +48,9 @@ describe('LowPrecisionTaskScheduler', () => {
   });
 
   it('adds single task to schedule and runs it after given delay', async () => {
-    const mockedTask = jest.fn(() => Promise.resolve('hello task'));
+    const mockedTask = jest.fn(() => {
+      return Promise.resolve('hello task');
+    });
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test-key',

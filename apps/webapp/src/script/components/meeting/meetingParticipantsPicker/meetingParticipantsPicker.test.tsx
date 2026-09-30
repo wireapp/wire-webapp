@@ -62,16 +62,29 @@ const createConversation = (
   members: User[],
   channel = false,
   {removed = false, archived = false, cleared = false}: {removed?: boolean; archived?: boolean; cleared?: boolean} = {},
-) =>
-  ({
-    display_name: () => name,
-    isSelfUserRemoved: () => removed,
-    is_archived: () => archived,
-    is_cleared: () => cleared,
-    isChannel: () => channel,
-    participating_user_ets: () => members,
+) => {
+  return {
+    display_name: () => {
+      return name;
+    },
+    isSelfUserRemoved: () => {
+      return removed;
+    },
+    is_archived: () => {
+      return archived;
+    },
+    is_cleared: () => {
+      return cleared;
+    },
+    isChannel: () => {
+      return channel;
+    },
+    participating_user_ets: () => {
+      return members;
+    },
     qualifiedId: {domain: 'example.com', id},
-  }) as unknown as Conversation;
+  } as unknown as Conversation;
+};
 
 const users = [
   createUser('1', 'Thomas Goodwin', 'thomas'),
@@ -162,7 +175,9 @@ const ControlledPicker = ({
   );
 };
 
-const getSearchInput = (accessibleName = PARTICIPANTS_LABEL) => screen.getByRole('combobox', {name: accessibleName});
+const getSearchInput = (accessibleName = PARTICIPANTS_LABEL) => {
+  return screen.getByRole('combobox', {name: accessibleName});
+};
 
 describe('MeetingParticipantsPicker', () => {
   it('renders label and search input', () => {
@@ -245,7 +260,9 @@ describe('MeetingParticipantsPicker', () => {
   it('shows local groups and channels below contacts and filters them with the same input', async () => {
     const group = createConversation('group', 'Engineering', [users[0]]);
     const channel = createConversation('channel', 'Announcements', [users[1]], true);
-    const getAllGroupConversations = jest.fn(() => [group, channel]);
+    const getAllGroupConversations = jest.fn(() => {
+      return [group, channel];
+    });
     const user = userEvent.setup();
 
     render(
@@ -280,7 +297,11 @@ describe('MeetingParticipantsPicker', () => {
     render(
       withThemeAndRootContext(
         <ControlledPicker
-          conversationRepository={{getAllGroupConversations: () => [active, removed, archived, cleared]}}
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [active, removed, archived, cleared];
+            },
+          }}
         />,
         rootProviderWrapper,
       ),
@@ -300,7 +321,13 @@ describe('MeetingParticipantsPicker', () => {
 
     render(
       withThemeAndRootContext(
-        <ControlledPicker conversationRepository={{getAllGroupConversations: () => [conversation]}} />,
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
+        />,
         rootProviderWrapper,
       ),
     );
@@ -323,7 +350,13 @@ describe('MeetingParticipantsPicker', () => {
 
     const {unmount} = render(
       withThemeAndRootContext(
-        <ControlledPicker conversationRepository={{getAllGroupConversations: () => [conversation]}} />,
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
+        />,
         rootProviderWrapper,
       ),
     );
@@ -334,7 +367,13 @@ describe('MeetingParticipantsPicker', () => {
     unmount();
     render(
       withThemeAndRootContext(
-        <ControlledPicker conversationRepository={{getAllGroupConversations: () => [conversation]}} />,
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
+        />,
         rootProviderWrapper,
       ),
     );
@@ -348,7 +387,9 @@ describe('MeetingParticipantsPicker', () => {
     const guest = createUser('guest', 'Guest User', 'guest');
     const conversation = createConversation('group', 'Project', [selected, guest]);
     const user = userEvent.setup();
-    const getAllGroupConversations = jest.fn(() => [conversation]);
+    const getAllGroupConversations = jest.fn(() => {
+      return [conversation];
+    });
 
     render(
       withThemeAndRootContext(
@@ -370,7 +411,9 @@ describe('MeetingParticipantsPicker', () => {
     const first = createConversation('first', 'First group', [shared, onlyInFirst]);
     const second = createConversation('second', 'Second group', [shared]);
     const user = userEvent.setup();
-    const getAllGroupConversations = jest.fn(() => [first, second]);
+    const getAllGroupConversations = jest.fn(() => {
+      return [first, second];
+    });
 
     render(
       withThemeAndRootContext(
@@ -399,7 +442,11 @@ describe('MeetingParticipantsPicker', () => {
       withThemeAndRootContext(
         <ControlledPicker
           initialSelected={[manual]}
-          conversationRepository={{getAllGroupConversations: () => [conversation]}}
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
         />,
         rootProviderWrapper,
       ),
@@ -420,7 +467,13 @@ describe('MeetingParticipantsPicker', () => {
 
     render(
       withThemeAndRootContext(
-        <ControlledPicker conversationRepository={{getAllGroupConversations: () => [conversation]}} />,
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
+        />,
         rootProviderWrapper,
       ),
     );
@@ -439,7 +492,13 @@ describe('MeetingParticipantsPicker', () => {
 
     render(
       withThemeAndRootContext(
-        <ControlledPicker conversationRepository={{getAllGroupConversations: () => [conversation]}} />,
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
+        />,
         rootProviderWrapper,
       ),
     );
@@ -458,7 +517,13 @@ describe('MeetingParticipantsPicker', () => {
 
     render(
       withThemeAndRootContext(
-        <ControlledPicker conversationRepository={{getAllGroupConversations: () => [conversation]}} />,
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
+        />,
         rootProviderWrapper,
       ),
     );
@@ -478,9 +543,9 @@ describe('MeetingParticipantsPicker', () => {
   });
 
   it('shows all provided users when there are more than the truncated default', async () => {
-    const manyUsers = Array.from({length: 8}, (_, index) =>
-      createUser(`user-${index}`, `User ${index}`, `user${index}`),
-    );
+    const manyUsers = Array.from({length: 8}, (_, index) => {
+      return createUser(`user-${index}`, `User ${index}`, `user${index}`);
+    });
     const user = userEvent.setup();
 
     render(withThemeAndRootContext(<ControlledPicker availableUsers={manyUsers} />, rootProviderWrapper));

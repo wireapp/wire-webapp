@@ -103,7 +103,9 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     for (let i = 0; i < 5; i++) {
       const res = await this.axiosInstance.put(`/teams/${teamId}/billing/info`, billingInfo, {
         headers: {Authorization: `Bearer ${user.token}`},
-        validateStatus: _status => true, // Since we want the request to be retried we need to prevent axios from throwing automatically
+        validateStatus: _status => {
+          return true;
+        }, // Since we want the request to be retried we need to prevent axios from throwing automatically
       });
       if (res.status !== 412) break;
 
@@ -112,7 +114,9 @@ export class TeamRepositoryE2E extends BackendClientE2E {
       }
 
       console.log(`Failed to upgrade team with id ${teamId}, retrying in ${1 * (i + 1)} seconds...`, res.data);
-      await new Promise(res => setTimeout(res, 1_000 * (i + 1)));
+      await new Promise(res => {
+        return setTimeout(res, 1_000 * (i + 1));
+      });
     }
 
     await this.axiosInstance.put(
@@ -132,7 +136,9 @@ export class TeamRepositoryE2E extends BackendClientE2E {
       throw new Error('No valid enterprise plans found to upgrade to');
     }
 
-    const plan = plansResponse.data.find(plan => plan.premium === true);
+    const plan = plansResponse.data.find(plan => {
+      return plan.premium === true;
+    });
 
     await this.axiosInstance.put(
       `/teams/${teamId}/billing/subscription`,

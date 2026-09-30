@@ -31,11 +31,13 @@ const meta: Meta<typeof Pagination> = {
   component: Pagination,
   title: 'navigation/pagination',
   decorators: [
-    Story => (
-      <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 
@@ -55,8 +57,12 @@ export const CustomNavigation: Story = {
     currentPage: 0,
     numberOfPages: 5,
     goPage: noop,
-    previousPageComponent: () => 'Previous',
-    nextPageComponent: () => 'Next',
+    previousPageComponent: () => {
+      return 'Previous';
+    },
+    nextPageComponent: () => {
+      return 'Next';
+    },
   },
 };
 
@@ -85,18 +91,24 @@ export const Interactive = () => {
   return (
     <div>
       <div style={{marginBottom: '24px'}}>
-        {paginatedList[currentPage].map(item => (
-          <Small key={item} center bold block style={{border: `1px solid ${COLOR.GRAY}`, margin: 10, padding: '8px'}}>
-            {`Item ${item}`}
-          </Small>
-        ))}
+        {paginatedList[currentPage].map(item => {
+          return (
+            <Small key={item} center bold block style={{border: `1px solid ${COLOR.GRAY}`, margin: 10, padding: '8px'}}>
+              {`Item ${item}`}
+            </Small>
+          );
+        })}
       </div>
       <Pagination
         currentPage={currentPage}
         goPage={setCurrentPage}
-        nextPageComponent={() => 'Next'}
+        nextPageComponent={() => {
+          return 'Next';
+        }}
         numberOfPages={paginatedList.length}
-        previousPageComponent={() => 'Previous'}
+        previousPageComponent={() => {
+          return 'Previous';
+        }}
       />
     </div>
   );
@@ -110,8 +122,12 @@ export const CustomStyling = () => {
       currentPage={currentPage}
       goPage={setCurrentPage}
       numberOfPages={5}
-      previousPageComponent={() => <div style={{color: COLOR.BLUE, fontWeight: 'bold'}}>{'←'}</div>}
-      nextPageComponent={() => <div style={{color: COLOR.BLUE, fontWeight: 'bold'}}>{'→'}</div>}
+      previousPageComponent={() => {
+        return <div style={{color: COLOR.BLUE, fontWeight: 'bold'}}>{'←'}</div>;
+      }}
+      nextPageComponent={() => {
+        return <div style={{color: COLOR.BLUE, fontWeight: 'bold'}}>{'→'}</div>;
+      }}
       style={{
         backgroundColor: COLOR.GRAY_LIGHTEN_92,
         borderRadius: '8px',
@@ -128,8 +144,12 @@ export const FirstPage = () => {
       currentPage={currentPage}
       goPage={setCurrentPage}
       numberOfPages={5}
-      previousPageComponent={() => 'Previous'}
-      nextPageComponent={() => 'Next'}
+      previousPageComponent={() => {
+        return 'Previous';
+      }}
+      nextPageComponent={() => {
+        return 'Next';
+      }}
     />
   );
 };
@@ -141,8 +161,12 @@ export const LastPage = () => {
       currentPage={currentPage}
       goPage={setCurrentPage}
       numberOfPages={5}
-      previousPageComponent={() => 'Previous'}
-      nextPageComponent={() => 'Next'}
+      previousPageComponent={() => {
+        return 'Previous';
+      }}
+      nextPageComponent={() => {
+        return 'Next';
+      }}
     />
   );
 };
@@ -154,8 +178,12 @@ export const MiddlePage = () => {
       currentPage={currentPage}
       goPage={setCurrentPage}
       numberOfPages={10}
-      previousPageComponent={() => 'Previous'}
-      nextPageComponent={() => 'Next'}
+      previousPageComponent={() => {
+        return 'Previous';
+      }}
+      nextPageComponent={() => {
+        return 'Next';
+      }}
     />
   );
 };

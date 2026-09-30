@@ -53,7 +53,9 @@ test.describe('Markdown', () => {
       await expect(messageInput).toContainText('first line');
       await expect(messageInput).toContainText('second line');
 
-      const actualEditorText = await messageInput.evaluate((element: HTMLElement): string => element.innerText);
+      const actualEditorText = await messageInput.evaluate((element: HTMLElement): string => {
+        return element.innerText;
+      });
       const expectedEditorText = 'first line\nsecond line';
 
       expect(actualEditorText).toBe(expectedEditorText);
@@ -101,28 +103,36 @@ test.describe('Markdown', () => {
       description: 'I want to write a bold message',
       tag: '@TC-1313',
       message: '**Bold Message from User A**',
-      getSelector: (locator: Locator) => locator.getByRole('strong'),
+      getSelector: (locator: Locator) => {
+        return locator.getByRole('strong');
+      },
       expectedText: 'Bold Message from User A',
     },
     {
       description: 'I want to write strikethrough message',
       tag: '@TC-9481',
       message: '~~Strikethrough Message from User A~~',
-      getSelector: (locator: Locator) => locator.locator('s'),
+      getSelector: (locator: Locator) => {
+        return locator.locator('s');
+      },
       expectedText: 'Strikethrough Message from User A',
     },
     {
       description: 'I want to write a emphasized message',
       tag: '@TC-1314',
       message: '*Emphasized message from User A*',
-      getSelector: (locator: Locator) => locator.getByRole('emphasis'),
+      getSelector: (locator: Locator) => {
+        return locator.getByRole('emphasis');
+      },
       expectedText: 'Emphasized message from User A',
     },
     {
       description: 'I want to write a code message',
       tag: '@TC-1315',
       message: '`Code message from User A`',
-      getSelector: (locator: Locator) => locator.getByRole('code'),
+      getSelector: (locator: Locator) => {
+        return locator.getByRole('code');
+      },
       expectedText: 'Code message from User A',
     },
   ].forEach(({description, tag, message, getSelector, expectedText}) => {

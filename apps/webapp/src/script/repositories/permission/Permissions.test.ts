@@ -196,14 +196,16 @@ describe('Permission System Integration', () => {
 
     it('should handle browser permission API failures', async () => {
       // Reset and setup mock that fails
-      spyOn(navigator.permissions, 'query').and.callFake(() =>
-        Promise.reject(new Error('Permission API not supported')),
-      );
+      spyOn(navigator.permissions, 'query').and.callFake(() => {
+        return Promise.reject(new Error('Permission API not supported'));
+      });
 
       await initializePermissions();
 
       // Wait for async permission queries to complete/fail
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 10);
+      });
 
       // Should maintain default states when API fails
       Object.values(PermissionType).forEach(permissionType => {

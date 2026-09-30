@@ -129,7 +129,9 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     const style = document.createElement('style');
     style.textContent = `.sr-only-focus:focus, .sr-only-focus:focus-visible { outline: none !important; }`;
     document.head.appendChild(style);
-    return () => style.remove();
+    return () => {
+      style.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -179,13 +181,25 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     );
   };
 
-  const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
-  const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
+  const ProtectedHistoryInfo = () => {
+    return isAuthenticatedCheck(<HistoryInfo />);
+  };
+  const ProtectedClientManager = () => {
+    return isAuthenticatedCheck(<ClientManager />);
+  };
 
-  const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
-  const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
-  const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
-  const ProtectedOAuthPermissions = () => isOAuthCheck(<OAuthPermissions />);
+  const ProtectedSetHandle = () => {
+    return isAuthenticatedCheck(<SetHandle />);
+  };
+  const ProtectedSetEmail = () => {
+    return isAuthenticatedCheck(<SetEmail />);
+  };
+  const ProtectedSetPassword = () => {
+    return isAuthenticatedCheck(<SetPassword />);
+  };
+  const ProtectedOAuthPermissions = () => {
+    return isOAuthCheck(<OAuthPermissions />);
+  };
 
   // Send user back to index page after e2ei oauth redirect
   // This is needed because the oauth redirect is only done by logged in users
@@ -300,20 +314,23 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  isAuthenticated: AuthSelector.isAuthenticated(state),
-  isFetchingSSOSettings: AuthSelector.isFetchingSSOSettings(state),
-  language: LanguageSelector.getLanguage(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    isAuthenticated: AuthSelector.isAuthenticated(state),
+    isFetchingSSOSettings: AuthSelector.isFetchingSSOSettings(state),
+    language: LanguageSelector.getLanguage(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       doGetSSOSettings: ROOT_ACTIONS.authAction.doGetSSOSettings,
     },
     dispatch,
   );
+};
 
 const Root = connect(mapStateToProps, mapDispatchToProps)(RootComponent);
 

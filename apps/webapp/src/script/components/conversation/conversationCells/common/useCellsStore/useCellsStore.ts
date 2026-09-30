@@ -46,77 +46,103 @@ interface CellsState {
   getPagination: (params: {conversationId: string}) => CellPagination | null;
 }
 
-export const useCellsStore = create<CellsState>((set, get) => ({
-  nodesByConversation: {},
-  paginationByConversation: {},
-  status: 'idle',
-  error: null,
-  pageSize: DEFAULT_PAGE_SIZE,
-  setPageSize: pageSize => set({pageSize}),
-  setNodes: ({conversationId, nodes}) =>
-    set(state => ({
-      nodesByConversation: {
-        ...state.nodesByConversation,
-        [conversationId]: nodes,
-      },
-    })),
-  appendNodes: ({conversationId, nodes}) =>
-    set(state => ({
-      nodesByConversation: {
-        ...state.nodesByConversation,
-        [conversationId]: [...(state.nodesByConversation[conversationId] ?? []), ...nodes],
-      },
-    })),
-  setPagination: ({conversationId, pagination}) =>
-    set(state => ({
-      paginationByConversation: {
-        ...state.paginationByConversation,
-        [conversationId]: pagination,
-      },
-    })),
-  setStatus: status => set({status}),
-  setError: error => set({error}),
-  setPublicLink: ({conversationId, nodeId, data}) =>
-    set(state => ({
-      nodesByConversation: {
-        ...state.nodesByConversation,
-        [conversationId]:
-          state.nodesByConversation[conversationId]?.map(node =>
-            node.id === nodeId
-              ? {
-                  ...node,
-                  publicLink: data,
-                }
-              : node,
-          ) ?? [],
-      },
-    })),
-  removeNode: ({conversationId, nodeId}) =>
-    set(state => ({
-      nodesByConversation: {
-        ...state.nodesByConversation,
-        [conversationId]: state.nodesByConversation[conversationId]?.filter(node => node.id !== nodeId) ?? [],
-      },
-    })),
-  clearAll: ({conversationId}) => {
-    const state = get();
-    const updatedNodesByConversation = {...state.nodesByConversation};
-    const updatedPaginationByConversation = {...state.paginationByConversation};
-    delete updatedNodesByConversation[conversationId];
-    delete updatedPaginationByConversation[conversationId];
-    set({
-      nodesByConversation: updatedNodesByConversation,
-      paginationByConversation: updatedPaginationByConversation,
-      status: 'idle',
-      error: null,
-    });
-  },
-  getNodes: ({conversationId}) => {
-    const state = get().nodesByConversation;
-    return state[conversationId] ?? [];
-  },
-  getPagination: ({conversationId}) => {
-    const state = get().paginationByConversation;
-    return state[conversationId] ?? null;
-  },
-}));
+export const useCellsStore = create<CellsState>((set, get) => {
+  return {
+    nodesByConversation: {},
+    paginationByConversation: {},
+    status: 'idle',
+    error: null,
+    pageSize: DEFAULT_PAGE_SIZE,
+    setPageSize: pageSize => {
+      return set({pageSize});
+    },
+    setNodes: ({conversationId, nodes}) => {
+      return set(state => {
+        return {
+          nodesByConversation: {
+            ...state.nodesByConversation,
+            [conversationId]: nodes,
+          },
+        };
+      });
+    },
+    appendNodes: ({conversationId, nodes}) => {
+      return set(state => {
+        return {
+          nodesByConversation: {
+            ...state.nodesByConversation,
+            [conversationId]: [...(state.nodesByConversation[conversationId] ?? []), ...nodes],
+          },
+        };
+      });
+    },
+    setPagination: ({conversationId, pagination}) => {
+      return set(state => {
+        return {
+          paginationByConversation: {
+            ...state.paginationByConversation,
+            [conversationId]: pagination,
+          },
+        };
+      });
+    },
+    setStatus: status => {
+      return set({status});
+    },
+    setError: error => {
+      return set({error});
+    },
+    setPublicLink: ({conversationId, nodeId, data}) => {
+      return set(state => {
+        return {
+          nodesByConversation: {
+            ...state.nodesByConversation,
+            [conversationId]:
+              state.nodesByConversation[conversationId]?.map(node => {
+                return node.id === nodeId
+                  ? {
+                      ...node,
+                      publicLink: data,
+                    }
+                  : node;
+              }) ?? [],
+          },
+        };
+      });
+    },
+    removeNode: ({conversationId, nodeId}) => {
+      return set(state => {
+        return {
+          nodesByConversation: {
+            ...state.nodesByConversation,
+            [conversationId]:
+              state.nodesByConversation[conversationId]?.filter(node => {
+                return node.id !== nodeId;
+              }) ?? [],
+          },
+        };
+      });
+    },
+    clearAll: ({conversationId}) => {
+      const state = get();
+      const updatedNodesByConversation = {...state.nodesByConversation};
+      const updatedPaginationByConversation = {...state.paginationByConversation};
+      delete updatedNodesByConversation[conversationId];
+      delete updatedPaginationByConversation[conversationId];
+      set({
+        nodesByConversation: updatedNodesByConversation,
+        paginationByConversation: updatedPaginationByConversation,
+        status: 'idle',
+        error: null,
+      });
+    },
+    getNodes: ({conversationId}) => {
+      const state = get().nodesByConversation;
+      return state[conversationId] ?? [];
+    },
+    getPagination: ({conversationId}) => {
+      const state = get().paginationByConversation;
+      return state[conversationId] ?? null;
+    },
+  };
+});

@@ -22,12 +22,14 @@ import type {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {LOGIN_TIMEOUT, type Team} from 'test/e2e_tests/test.fixtures';
 
-export const loginWithMeetingsEnabled = (user: Pick<User, 'email' | 'password'>) => async (page: Page) => {
-  const pageManager = PageManager.from(page);
-  const {pages, components} = pageManager.webapp;
-  await pageManager.openLoginPage();
-  await pages.login().login(user);
-  await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+export const loginWithMeetingsEnabled = (user: Pick<User, 'email' | 'password'>) => {
+  return async (page: Page) => {
+    const pageManager = PageManager.from(page);
+    const {pages, components} = pageManager.webapp;
+    await pageManager.openLoginPage();
+    await pages.login().login(user);
+    await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+  };
 };
 
 export const createMeetingsTeam = async (
@@ -35,7 +37,11 @@ export const createMeetingsTeam = async (
   createTeam: (name: string, options: {users: User[]; features: {meetings: true; mls: true}}) => Promise<Team>,
   memberCount: number,
 ) => {
-  const members = await Promise.all(Array.from({length: memberCount}, () => createUser()));
+  const members = await Promise.all(
+    Array.from({length: memberCount}, () => {
+      return createUser();
+    }),
+  );
   const team = await createTeam('Meetings', {users: members, features: {meetings: true, mls: true}});
 
   return {team, members, owner: team.owner};
@@ -44,4 +50,10 @@ export const createMeetingsTeam = async (
 export const loginMeetingsUsers = async (
   createPage: (setup: ReturnType<typeof loginWithMeetingsEnabled>) => Promise<import('@playwright/test').Page>,
   users: Pick<User, 'email' | 'password'>[],
-) => Promise.all(users.map(user => createPage(loginWithMeetingsEnabled(user))));
+) => {
+  return Promise.all(
+    users.map(user => {
+      return createPage(loginWithMeetingsEnabled(user));
+    }),
+  );
+};

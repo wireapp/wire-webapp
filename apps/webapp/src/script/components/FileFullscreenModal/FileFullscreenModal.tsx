@@ -88,7 +88,9 @@ export const FileFullscreenModal = ({
   const isEditable = isFileEditable(fileExtension);
 
   const refreshModalContent = () => {
-    setRefreshKey(prev => prev + 1);
+    setRefreshKey(prev => {
+      return prev + 1;
+    });
   };
 
   const onCloseModal = () => {

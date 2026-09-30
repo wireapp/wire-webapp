@@ -22,34 +22,40 @@ import {noop} from 'noop-esm';
 
 export {noop};
 
-export const inlineSVG = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+export const inlineSVG = (svg: string) => {
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
 
 export const filterProps: <T extends Record<string, any>>(props: T, propsToFilter: (keyof T)[]) => Object = (
   props,
   propsToFilter,
 ) => {
-  return Object.entries(props).reduce<Object>(
-    (accumulator, [key, value]) => (!propsToFilter.includes(key) ? {...accumulator, [key]: value} : accumulator),
-    {},
-  );
+  return Object.entries(props).reduce<Object>((accumulator, [key, value]) => {
+    return !propsToFilter.includes(key) ? {...accumulator, [key]: value} : accumulator;
+  }, {});
 };
 
-export const manySelectors = (selectors: string[], css: CSSObject) =>
-  selectors.reduce<Record<string, CSSObject>>((acc, selector) => {
+export const manySelectors = (selectors: string[], css: CSSObject) => {
+  return selectors.reduce<Record<string, CSSObject>>((acc, selector) => {
     acc[selector] = css;
     return acc;
   }, {});
+};
 
-export const ellipsis = (): CSSObject => ({
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-});
+export const ellipsis = (): CSSObject => {
+  return {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  };
+};
 
-export const visuallyHidden = (): CSSObject => ({
-  position: 'absolute',
-  left: '-9999px',
-  top: 'auto',
-  width: '1px',
-  height: '1px',
-});
+export const visuallyHidden = (): CSSObject => {
+  return {
+    position: 'absolute',
+    left: '-9999px',
+    top: 'auto',
+    width: '1px',
+    height: '1px',
+  };
+};

@@ -33,11 +33,13 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createDataTransfer = (files: File[]) => ({
-  files,
-  types: ['Files'],
-  dropEffect: 'move',
-});
+const createDataTransfer = (files: File[]) => {
+  return {
+    files,
+    types: ['Files'],
+    dropEffect: 'move',
+  };
+};
 
 const renderDropzone = ({
   isEnabled = true,
@@ -94,7 +96,9 @@ describe('SharedDriveDropzone', () => {
 
     fireEvent.drop(dropzone, {dataTransfer: createDataTransfer([file])});
 
-    await waitFor(() => expect(onDropFiles).toHaveBeenCalledWith([file]));
+    await waitFor(() => {
+      return expect(onDropFiles).toHaveBeenCalledWith([file]);
+    });
   });
 
   it('dispatches all dropped files for Shared Drive multi-file upload', async () => {
@@ -108,7 +112,9 @@ describe('SharedDriveDropzone', () => {
 
     fireEvent.drop(dropzone, {dataTransfer: createDataTransfer(files)});
 
-    await waitFor(() => expect(onDropFiles).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(onDropFiles).toHaveBeenCalledTimes(1);
+    });
     expect(onDropFiles).toHaveBeenCalledWith(files);
   });
 
@@ -121,21 +127,32 @@ describe('SharedDriveDropzone', () => {
       isFile: false,
       name: 'Marketing',
       fullPath: '/Marketing',
-      createReader: () => ({
-        readEntries: (_success: unknown, failure: (error: DOMException) => void) =>
-          failure(new DOMException('Directory unavailable', 'NotFoundError')),
-      }),
+      createReader: () => {
+        return {
+          readEntries: (_success: unknown, failure: (error: DOMException) => void) => {
+            return failure(new DOMException('Directory unavailable', 'NotFoundError'));
+          },
+        };
+      },
     };
     const dataTransfer = {
       files: [],
-      items: [{webkitGetAsEntry: () => failedDirectory}],
+      items: [
+        {
+          webkitGetAsEntry: () => {
+            return failedDirectory;
+          },
+        },
+      ],
       types: ['Files'],
       dropEffect: 'move',
     };
 
     fireEvent.drop(dropzone, {dataTransfer});
 
-    await waitFor(() => expect(onDropReadError).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(onDropReadError).toHaveBeenCalledTimes(1);
+    });
     expect(onDropFiles).not.toHaveBeenCalled();
   });
 

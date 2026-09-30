@@ -80,77 +80,84 @@ export const createSystemNotificationApiFromBrowserNotification = ({
   isSupported,
   focusWindow,
   publishNotificationClick,
-}: BrowserNotificationDependencies): SystemNotificationApi => ({
-  isSupported,
-  getPermission,
-  requestPermission: requestPermission ?? (() => Promise.resolve(getPermission())),
-  show: ({title, body, tag, icon, silent, data, onClick, onShow, onClose}) =>
-    result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.presentationFailed), () => {
-      const notification = createNotification({title, body, tag, icon, silent, data});
-      // The platform fires its close event for a programmatic close too, so without this guard a
-      // close we asked for would be reported twice.
-      let closeReported = false;
+}: BrowserNotificationDependencies): SystemNotificationApi => {
+  return {
+    isSupported,
+    getPermission,
+    requestPermission:
+      requestPermission ??
+      (() => {
+        return Promise.resolve(getPermission());
+      }),
+    show: ({title, body, tag, icon, silent, data, onClick, onShow, onClose}) => {
+      return result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.presentationFailed), () => {
+        const notification = createNotification({title, body, tag, icon, silent, data});
+        // The platform fires its close event for a programmatic close too, so without this guard a
+        // close we asked for would be reported twice.
+        let closeReported = false;
 
-      const reportClose = () => {
-        if (closeReported) {
-          return;
+        const reportClose = () => {
+          if (closeReported) {
+            return;
+          }
+
+          closeReported = true;
+          onClose();
+        };
+
+        const closeNotification = () => {
+          const closeAttempt = result.tryOrElse(
+            toSystemNotificationError(systemNotificationErrorKinds.closeFailed),
+            () => {
+              notification.close();
+            },
+          );
+
+          if (result.isOk(closeAttempt)) {
+            // Only a close that worked means the notification is gone.
+            reportClose();
+          }
+
+          return closeAttempt;
+        };
+
+        notification.onClick(() => {
+          // wire-desktop listens for this to restore the window and switch to the account that
+          // raised the notification. window.focus() alone does neither from inside a webview.
+          publishNotificationClick();
+          focusWindow();
+          onClick();
+        });
+
+        if (!isUndefined(onShow)) {
+          notification.onShow(onShow);
         }
 
-        closeReported = true;
-        onClose();
-      };
-
-      const closeNotification = () => {
-        const closeAttempt = result.tryOrElse(
-          toSystemNotificationError(systemNotificationErrorKinds.closeFailed),
-          () => {
-            notification.close();
-          },
-        );
-
-        if (result.isOk(closeAttempt)) {
-          // Only a close that worked means the notification is gone.
+        notification.onClose(() => {
           reportClose();
-        }
+        });
 
-        return closeAttempt;
-      };
+        // A notification can fail after the constructor returned, so `show` reporting `Ok` is not
+        // the last word on whether it reached the user.
+        notification.onError(event => {
+          logger.warn('system notification failed after being shown', {tag, event});
 
-      notification.onClick(() => {
-        // wire-desktop listens for this to restore the window and switch to the account that
-        // raised the notification. window.focus() alone does neither from inside a webview.
-        publishNotificationClick();
-        focusWindow();
-        onClick();
+          const closeAttempt = closeNotification();
+
+          if (result.isErr(closeAttempt)) {
+            logger.warn('failed to close a system notification that errored', {
+              error: closeAttempt.error.kind,
+              cause: closeAttempt.error.cause,
+              tag,
+            });
+          }
+        });
+
+        return {close: closeNotification};
       });
-
-      if (!isUndefined(onShow)) {
-        notification.onShow(onShow);
-      }
-
-      notification.onClose(() => {
-        reportClose();
-      });
-
-      // A notification can fail after the constructor returned, so `show` reporting `Ok` is not
-      // the last word on whether it reached the user.
-      notification.onError(event => {
-        logger.warn('system notification failed after being shown', {tag, event});
-
-        const closeAttempt = closeNotification();
-
-        if (result.isErr(closeAttempt)) {
-          logger.warn('failed to close a system notification that errored', {
-            error: closeAttempt.error.kind,
-            cause: closeAttempt.error.cause,
-            tag,
-          });
-        }
-      });
-
-      return {close: closeNotification};
-    }),
-});
+    },
+  };
+};
 
 const createBrowserNotification = ({
   title,
@@ -184,16 +191,26 @@ const createBrowserNotification = ({
 /**
  * The outermost browser boundary: the one place that reaches for the page globals.
  */
-export const createBrowserSystemNotificationApi = (): SystemNotificationApi =>
-  createSystemNotificationApiFromBrowserNotification({
+export const createBrowserSystemNotificationApi = (): SystemNotificationApi => {
+  return createSystemNotificationApiFromBrowserNotification({
     createNotification: createBrowserNotification,
-    getPermission: () => window.Notification.permission,
-    requestPermission: () =>
-      Runtime.isSupportingNotifications()
+    getPermission: () => {
+      return window.Notification.permission;
+    },
+    requestPermission: () => {
+      return Runtime.isSupportingNotifications()
         ? window.Notification.requestPermission()
-        : Promise.resolve(window.Notification.permission),
+        : Promise.resolve(window.Notification.permission);
+    },
     logger: getLogger('SystemNotification'),
-    isSupported: () => Runtime.isSupportingNotifications(),
-    focusWindow: () => window.focus(),
-    publishNotificationClick: () => amplify.publish(WebAppEvents.NOTIFICATION.CLICK),
+    isSupported: () => {
+      return Runtime.isSupportingNotifications();
+    },
+    focusWindow: () => {
+      return window.focus();
+    },
+    publishNotificationClick: () => {
+      return amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
+    },
   });
+};

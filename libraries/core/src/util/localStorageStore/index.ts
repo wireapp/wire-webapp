@@ -17,20 +17,30 @@
  *
  */
 
-const prependKey = (key: string, pKey: string) => `${pKey}_${key}`;
+const prependKey = (key: string, pKey: string) => {
+  return `${pKey}_${key}`;
+};
 
-export const LocalStorageStore = <T = string>(pKey: string) => ({
-  get: (key: string): T | undefined => {
-    const value = localStorage.getItem(prependKey(key, pKey));
-    if (value !== null) {
-      if (!Number.isNaN(Number(value))) {
-        return Number(value) as T;
+export const LocalStorageStore = <T = string>(pKey: string) => {
+  return {
+    get: (key: string): T | undefined => {
+      const value = localStorage.getItem(prependKey(key, pKey));
+      if (value !== null) {
+        if (!Number.isNaN(Number(value))) {
+          return Number(value) as T;
+        }
+        return value as T;
       }
-      return value as T;
-    }
-    return undefined;
-  },
-  add: (key: string, value: T) => localStorage.setItem(prependKey(key, pKey), String(value)),
-  remove: (key: string) => localStorage.removeItem(prependKey(key, pKey)),
-  has: (key: string) => localStorage.getItem(prependKey(key, pKey)) !== null,
-});
+      return undefined;
+    },
+    add: (key: string, value: T) => {
+      return localStorage.setItem(prependKey(key, pKey), String(value));
+    },
+    remove: (key: string) => {
+      return localStorage.removeItem(prependKey(key, pKey));
+    },
+    has: (key: string) => {
+      return localStorage.getItem(prependKey(key, pKey)) !== null;
+    },
+  };
+};

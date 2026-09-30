@@ -32,29 +32,34 @@ interface GetDefaultPropsType {
   multiple?: boolean;
 }
 
-const getDefaultProps = ({accept, multiple}: GetDefaultPropsType) => ({
-  accept,
-  multiple,
-  onInvalidFilesDropError: jest.fn(),
-  onFilesUploaded: jest.fn(),
-  headingText: 'Drag & Drop an image \nor',
-  labelText: 'select one from your device',
-  description: 'Image (JPG/PNG) size up to 1 MB, minimum 200 x 600 px',
-});
+const getDefaultProps = ({accept, multiple}: GetDefaultPropsType) => {
+  return {
+    accept,
+    multiple,
+    onInvalidFilesDropError: jest.fn(),
+    onFilesUploaded: jest.fn(),
+    headingText: 'Drag & Drop an image \nor',
+    labelText: 'select one from your device',
+    description: 'Image (JPG/PNG) size up to 1 MB, minimum 200 x 600 px',
+  };
+};
 
-const ThemedDropFileInput = (props: DropFileInputProps) => (
-  <StyledApp themeId={THEME_ID.LIGHT}>
-    <DropFileInput {...props} />
-  </StyledApp>
-);
+const ThemedDropFileInput = (props: DropFileInputProps) => {
+  return (
+    <StyledApp themeId={THEME_ID.LIGHT}>
+      <DropFileInput {...props} />
+    </StyledApp>
+  );
+};
 
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
 const jpegFile = new File(['(⌐□_□)'], 'chucknorris.jpg', {type: 'image/jpeg'});
 const xlsxFile = new File(['(⌐□_□)'], 'chucknorris.xlsx', {type: '.xlsx'});
 
 describe('"DropFileInput"', () => {
-  it('matches snapshot', () =>
-    matchComponent(<ThemedDropFileInput {...getDefaultProps({accept: 'image/png, image/jpeg'})} />));
+  it('matches snapshot', () => {
+    return matchComponent(<ThemedDropFileInput {...getDefaultProps({accept: 'image/png, image/jpeg'})} />);
+  });
 
   it('returns file on native file upload', () => {
     const props = getDefaultProps({});

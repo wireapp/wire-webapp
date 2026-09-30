@@ -30,13 +30,27 @@ type UserModalState = {
   updateUserId: (userId: QualifiedId | null) => void;
 };
 
-const useUserModalState = create<UserModalState>((set, get) => ({
-  onClose: noop,
-  resetState: () => set(state => ({...state, onClose: noop, userId: null})),
-  updateOnClose: (onClose: () => void) => set(state => ({...state, onClose})),
-  updateUserId: (userId: QualifiedId | null) => set(state => ({...state, userId})),
-  userId: null,
-}));
+const useUserModalState = create<UserModalState>((set, get) => {
+  return {
+    onClose: noop,
+    resetState: () => {
+      return set(state => {
+        return {...state, onClose: noop, userId: null};
+      });
+    },
+    updateOnClose: (onClose: () => void) => {
+      return set(state => {
+        return {...state, onClose};
+      });
+    },
+    updateUserId: (userId: QualifiedId | null) => {
+      return set(state => {
+        return {...state, userId};
+      });
+    },
+    userId: null,
+  };
+});
 
 const showUserModal = (userId: QualifiedId, onClose = noop) => {
   const {updateOnClose, updateUserId} = useUserModalState.getState();

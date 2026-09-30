@@ -68,7 +68,9 @@ export const CallingParticipantList = ({
     event.preventDefault();
 
     const muteParticipant = {
-      click: () => callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]),
+      click: () => {
+        return callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]);
+      },
       icon: Icon.MicOffIcon,
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
@@ -79,7 +81,9 @@ export const CallingParticipantList = ({
       click: () => {
         callingRepository.sendModeratorMute(
           conversation.qualifiedId,
-          participants.filter(participantCandidate => participantCandidate !== participant),
+          participants.filter(participantCandidate => {
+            return participantCandidate !== participant;
+          }),
         );
       },
       icon: Icon.MicOffIcon,
@@ -118,19 +122,23 @@ export const CallingParticipantList = ({
               </Tooltip>
             </p>
             <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
-              {handRaisedParticipants.map((participant, index, participantsArray) => (
-                <li key={participant.clientId} className="call-ui__participant-list__participant">
-                  <CallParticipantsListItem
-                    handRaisedAt={participant.handRaisedAt()}
-                    key={participant.clientId}
-                    callParticipant={participant}
-                    isSelfVerified={isSelfVerified}
-                    showContextMenu={isModerator === true}
-                    onContextMenu={event => getParticipantContext(event, participant)}
-                    isLast={participantsArray.length === index}
-                  />
-                </li>
-              ))}
+              {handRaisedParticipants.map((participant, index, participantsArray) => {
+                return (
+                  <li key={participant.clientId} className="call-ui__participant-list__participant">
+                    <CallParticipantsListItem
+                      handRaisedAt={participant.handRaisedAt()}
+                      key={participant.clientId}
+                      callParticipant={participant}
+                      isSelfVerified={isSelfVerified}
+                      showContextMenu={isModerator === true}
+                      onContextMenu={event => {
+                        return getParticipantContext(event, participant);
+                      }}
+                      isLast={participantsArray.length === index}
+                    />
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}
@@ -138,19 +146,25 @@ export const CallingParticipantList = ({
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
           {participants
             .slice()
-            .toSorted((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
-            .map((participant, index, participantsArray) => (
-              <li key={participant.clientId} className="call-ui__participant-list__participant">
-                <CallParticipantsListItem
-                  key={participant.clientId}
-                  callParticipant={participant}
-                  isSelfVerified={isSelfVerified}
-                  showContextMenu={isModerator === true}
-                  onContextMenu={event => getParticipantContext(event, participant)}
-                  isLast={participantsArray.length === index}
-                />
-              </li>
-            ))}
+            .toSorted((participantA, participantB) => {
+              return sortUsersByPriority(participantA.user, participantB.user);
+            })
+            .map((participant, index, participantsArray) => {
+              return (
+                <li key={participant.clientId} className="call-ui__participant-list__participant">
+                  <CallParticipantsListItem
+                    key={participant.clientId}
+                    callParticipant={participant}
+                    isSelfVerified={isSelfVerified}
+                    showContextMenu={isModerator === true}
+                    onContextMenu={event => {
+                      return getParticipantContext(event, participant);
+                    }}
+                    isLast={participantsArray.length === index}
+                  />
+                </li>
+              );
+            })}
         </ul>
       </FadingScrollbar>
     </div>

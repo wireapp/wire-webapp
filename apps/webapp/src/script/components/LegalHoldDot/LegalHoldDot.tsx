@@ -48,7 +48,9 @@ export const LegalHoldDot = ({
   dataUieName = 'legal-hold-dot-pending-icon',
 }: LegalHoldDotProps) => {
   const {translate} = useApplicationContext();
-  const {showRequestModal, showUsers} = useLegalHoldModalState(state => state);
+  const {showRequestModal, showUsers} = useLegalHoldModalState(state => {
+    return state;
+  });
 
   const onClick = (event: React.MouseEvent) => {
     event.stopPropagation();

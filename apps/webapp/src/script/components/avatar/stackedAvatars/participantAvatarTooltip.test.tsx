@@ -53,9 +53,9 @@ const renderParticipantAvatarTooltip = (participant: User, organizer?: User, ind
     <ThemeProvider>
       <ParticipantAvatarTooltip
         participant={participant}
-        getLabel={name =>
-          participant === organizer ? `${name} (${translateForTest('meetings.participant.organizer')})` : name
-        }
+        getLabel={name => {
+          return participant === organizer ? `${name} (${translateForTest('meetings.participant.organizer')})` : name;
+        }}
         index={index}
         avatarSize={AVATAR_SIZE.X_SMALL}
         avatarRingColor="black"
@@ -101,7 +101,9 @@ describe('ParticipantAvatarTooltip', () => {
     const participant = createUser('participant', 'Alice Anderson');
 
     renderParticipantAvatarTooltip(participant);
-    act(() => participant.name('Alex Anderson'));
+    act(() => {
+      return participant.name('Alex Anderson');
+    });
 
     await waitFor(() => {
       expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Alex Anderson');

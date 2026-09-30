@@ -71,7 +71,11 @@ export const ACCENT_COLORS: AccentColor[] = [
 ];
 
 export const accentColorById = (id: number): AccentColor => {
-  return ACCENT_COLORS.find(color => color.id === id) ?? STRONG_BLUE;
+  return (
+    ACCENT_COLORS.find(color => {
+      return color.id === id;
+    }) ?? STRONG_BLUE
+  );
 };
 
 export const random = (): AccentColor => {

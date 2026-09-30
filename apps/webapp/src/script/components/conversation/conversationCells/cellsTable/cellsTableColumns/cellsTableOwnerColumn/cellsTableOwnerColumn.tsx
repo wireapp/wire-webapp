@@ -36,7 +36,12 @@ export const CellsTableOwnerColumn = ({owner, user}: CellsTableOwnerColumnProps)
   }
 
   return (
-    <button css={wrapperStyles} onClick={() => showUserModal(user.qualifiedId)}>
+    <button
+      css={wrapperStyles}
+      onClick={() => {
+        return showUserModal(user.qualifiedId);
+      }}
+    >
       <div css={avatarWrapperStyles}>
         <Avatar participant={user} avatarSize={AVATAR_SIZE.XXX_SMALL} />
       </div>

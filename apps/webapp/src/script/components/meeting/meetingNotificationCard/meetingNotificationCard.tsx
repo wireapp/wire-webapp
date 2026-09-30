@@ -98,14 +98,21 @@ const notificationLabels = {
   [MeetingNotificationKind.REMINDER]: 'meetings.notifications.reminder',
 } as const satisfies Record<MeetingNotificationKind, TranslationKey>;
 
-const getOrganizer = (qualifiedCreator: QualifiedId) =>
-  container
-    .resolve(UserState)
-    .users()
-    .find(user => matchQualifiedIds(user.qualifiedId, qualifiedCreator))
-    ?.name() ?? qualifiedCreator.id;
+const getOrganizer = (qualifiedCreator: QualifiedId) => {
+  return (
+    container
+      .resolve(UserState)
+      .users()
+      .find(user => {
+        return matchQualifiedIds(user.qualifiedId, qualifiedCreator);
+      })
+      ?.name() ?? qualifiedCreator.id
+  );
+};
 
-const getMeetingTime = (meetingStartTime: string) => formatLocale(meetingStartTime, 'PP, p');
+const getMeetingTime = (meetingStartTime: string) => {
+  return formatLocale(meetingStartTime, 'PP, p');
+};
 
 const MeetingNotificationOrganizerAndTimeMetadata = ({
   qualifiedCreator,
@@ -144,13 +151,15 @@ const MeetingNotificationMetadata = ({
           MeetingNotificationKind.CANCELLED,
         ),
       },
-      ({qualifiedCreator, meetingStartTime}) => (
-        <MeetingNotificationOrganizerAndTimeMetadata
-          qualifiedCreator={qualifiedCreator}
-          meetingStartTime={meetingStartTime}
-          translate={translate}
-        />
-      ),
+      ({qualifiedCreator, meetingStartTime}) => {
+        return (
+          <MeetingNotificationOrganizerAndTimeMetadata
+            qualifiedCreator={qualifiedCreator}
+            meetingStartTime={meetingStartTime}
+            translate={translate}
+          />
+        );
+      },
     )
     .with({kind: MeetingNotificationKind.ONGOING}, ({qualifiedCreator, meetingStartTime}) => {
       const organizer = getOrganizer(qualifiedCreator);

@@ -53,7 +53,9 @@ interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
 
 const CLOSE_DELAY = 350;
 
-const memoizedCreateCacheForHead = weakMemoize((container: HTMLHeadElement) => createCache({container, key: 'modal'}));
+const memoizedCreateCacheForHead = weakMemoize((container: HTMLHeadElement) => {
+  return createCache({container, key: 'modal'});
+});
 
 const ModalComponent = ({
   id,
@@ -80,7 +82,9 @@ const ModalComponent = ({
       ? ((container as HTMLElement).ownerDocument ?? document)
       : document;
 
-    const trapFocus = (event: KeyboardEvent) => preventFocusOutside(event, trapId, targetDocument);
+    const trapFocus = (event: KeyboardEvent) => {
+      return preventFocusOutside(event, trapId, targetDocument);
+    };
 
     if (isShown) {
       targetDocument.addEventListener('keydown', trapFocus);
@@ -142,9 +146,13 @@ const ModalComponent = ({
         // eslint-disable-next-line jsx-a11y/no-static-element-interactions --- tabIndex is already set to -1 through enum value
         <div
           id={trapId}
-          onClick={event => event.stopPropagation()}
+          onClick={event => {
+            return event.stopPropagation();
+          }}
           tabIndex={TabIndex.UNFOCUSABLE}
-          onKeyDown={event => (onKeyDown !== undefined ? onKeyDown(event) : event.stopPropagation())}
+          onKeyDown={event => {
+            return onKeyDown !== undefined ? onKeyDown(event) : event.stopPropagation();
+          }}
           css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >
           {hasVisibleClass ? children : null}

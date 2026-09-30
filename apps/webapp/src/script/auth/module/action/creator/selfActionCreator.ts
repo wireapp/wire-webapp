@@ -158,86 +158,128 @@ export interface SetSelfPasswordFailedAction extends AppAction {
 }
 
 export class SelfActionCreator {
-  static startSetHandle = (): SetHandleStartAction => ({
-    type: SELF_ACTION.HANDLE_SET_START,
-  });
-  static successfulSetHandle = (selfUser: Self): SetHandleSuccessAction => ({
-    payload: selfUser,
-    type: SELF_ACTION.HANDLE_SET_SUCCESS,
-  });
-  static failedSetHandle = (error: Error): SetHandleFailedAction => ({
-    error,
-    type: SELF_ACTION.HANDLE_SET_FAILED,
-  });
+  static startSetHandle = (): SetHandleStartAction => {
+    return {
+      type: SELF_ACTION.HANDLE_SET_START,
+    };
+  };
+  static successfulSetHandle = (selfUser: Self): SetHandleSuccessAction => {
+    return {
+      payload: selfUser,
+      type: SELF_ACTION.HANDLE_SET_SUCCESS,
+    };
+  };
+  static failedSetHandle = (error: Error): SetHandleFailedAction => {
+    return {
+      error,
+      type: SELF_ACTION.HANDLE_SET_FAILED,
+    };
+  };
 
-  static startSetPasswordState = (): SetPasswordStateStartAction => ({
-    type: SELF_ACTION.SELF_SET_PASSWORD_STATE_START,
-  });
-  static successfulSetPasswordState = ({hasPassword}: {hasPassword: boolean}): SetPasswordStateSuccessAction => ({
-    payload: hasPassword,
-    type: SELF_ACTION.SELF_SET_PASSWORD_STATE_SUCCESS,
-  });
-  static failedSetPasswordState = (error: Error): SetPasswordStateFailedAction => ({
-    error,
-    type: SELF_ACTION.SELF_SET_PASSWORD_STATE_FAILED,
-  });
+  static startSetPasswordState = (): SetPasswordStateStartAction => {
+    return {
+      type: SELF_ACTION.SELF_SET_PASSWORD_STATE_START,
+    };
+  };
+  static successfulSetPasswordState = ({hasPassword}: {hasPassword: boolean}): SetPasswordStateSuccessAction => {
+    return {
+      payload: hasPassword,
+      type: SELF_ACTION.SELF_SET_PASSWORD_STATE_SUCCESS,
+    };
+  };
+  static failedSetPasswordState = (error: Error): SetPasswordStateFailedAction => {
+    return {
+      error,
+      type: SELF_ACTION.SELF_SET_PASSWORD_STATE_FAILED,
+    };
+  };
 
-  static startFetchSelf = (): FetchSelfStartAction => ({
-    type: SELF_ACTION.SELF_FETCH_START,
-  });
-  static successfulFetchSelf = (selfUser: Self): FetchSelfSuccessAction => ({
-    payload: selfUser,
-    type: SELF_ACTION.SELF_FETCH_SUCCESS,
-  });
-  static failedFetchSelf = (error: Error): FetchSelfFailedAction => ({
-    error,
-    type: SELF_ACTION.SELF_FETCH_FAILED,
-  });
+  static startFetchSelf = (): FetchSelfStartAction => {
+    return {
+      type: SELF_ACTION.SELF_FETCH_START,
+    };
+  };
+  static successfulFetchSelf = (selfUser: Self): FetchSelfSuccessAction => {
+    return {
+      payload: selfUser,
+      type: SELF_ACTION.SELF_FETCH_SUCCESS,
+    };
+  };
+  static failedFetchSelf = (error: Error): FetchSelfFailedAction => {
+    return {
+      error,
+      type: SELF_ACTION.SELF_FETCH_FAILED,
+    };
+  };
 
-  static startGetConsents = (): GetConsentsStartAction => ({
-    type: SELF_ACTION.CONSENT_GET_START,
-  });
-  static successfulGetConsents = (consents: Consent[]): GetConsentsSuccessAction => ({
-    payload: consents,
-    type: SELF_ACTION.CONSENT_GET_SUCCESS,
-  });
-  static failedGetConsents = (error: Error): GetConsentsFailedAction => ({
-    error,
-    type: SELF_ACTION.CONSENT_GET_FAILED,
-  });
+  static startGetConsents = (): GetConsentsStartAction => {
+    return {
+      type: SELF_ACTION.CONSENT_GET_START,
+    };
+  };
+  static successfulGetConsents = (consents: Consent[]): GetConsentsSuccessAction => {
+    return {
+      payload: consents,
+      type: SELF_ACTION.CONSENT_GET_SUCCESS,
+    };
+  };
+  static failedGetConsents = (error: Error): GetConsentsFailedAction => {
+    return {
+      error,
+      type: SELF_ACTION.CONSENT_GET_FAILED,
+    };
+  };
 
-  static startSetConsent = (): SetConsentStartAction => ({
-    type: SELF_ACTION.CONSENT_SET_START,
-  });
-  static successfulSetConsent = (consent: Consent): SetConsentSuccessAction => ({
-    payload: consent,
-    type: SELF_ACTION.CONSENT_SET_SUCCESS,
-  });
-  static failedSetConsent = (error: Error): SetConsentFailedAction => ({
-    error,
-    type: SELF_ACTION.CONSENT_SET_FAILED,
-  });
+  static startSetConsent = (): SetConsentStartAction => {
+    return {
+      type: SELF_ACTION.CONSENT_SET_START,
+    };
+  };
+  static successfulSetConsent = (consent: Consent): SetConsentSuccessAction => {
+    return {
+      payload: consent,
+      type: SELF_ACTION.CONSENT_SET_SUCCESS,
+    };
+  };
+  static failedSetConsent = (error: Error): SetConsentFailedAction => {
+    return {
+      error,
+      type: SELF_ACTION.CONSENT_SET_FAILED,
+    };
+  };
 
-  static startSetSelfEmail = (): SetSelfEmailStartAction => ({
-    type: SELF_ACTION.SELF_SET_EMAIL_START,
-  });
-  static successfulSetSelfEmail = (email: string): SetSelfEmailSuccessAction => ({
-    payload: email,
-    type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS,
-  });
-  static failedSetSelfEmail = (error: Error): SetSelfEmailFailedAction => ({
-    error,
-    type: SELF_ACTION.SELF_SET_EMAIL_FAILED,
-  });
+  static startSetSelfEmail = (): SetSelfEmailStartAction => {
+    return {
+      type: SELF_ACTION.SELF_SET_EMAIL_START,
+    };
+  };
+  static successfulSetSelfEmail = (email: string): SetSelfEmailSuccessAction => {
+    return {
+      payload: email,
+      type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS,
+    };
+  };
+  static failedSetSelfEmail = (error: Error): SetSelfEmailFailedAction => {
+    return {
+      error,
+      type: SELF_ACTION.SELF_SET_EMAIL_FAILED,
+    };
+  };
 
-  static startSetSelfPassword = (): SetSelfPasswordStartAction => ({
-    type: SELF_ACTION.SELF_SET_PASSWORD_START,
-  });
-  static successfulSetSelfPassword = (): SetSelfPasswordSuccessAction => ({
-    type: SELF_ACTION.SELF_SET_PASSWORD_SUCCESS,
-  });
-  static failedSetSelfPassword = (error: Error): SetSelfPasswordFailedAction => ({
-    error,
-    type: SELF_ACTION.SELF_SET_PASSWORD_FAILED,
-  });
+  static startSetSelfPassword = (): SetSelfPasswordStartAction => {
+    return {
+      type: SELF_ACTION.SELF_SET_PASSWORD_START,
+    };
+  };
+  static successfulSetSelfPassword = (): SetSelfPasswordSuccessAction => {
+    return {
+      type: SELF_ACTION.SELF_SET_PASSWORD_SUCCESS,
+    };
+  };
+  static failedSetSelfPassword = (error: Error): SetSelfPasswordFailedAction => {
+    return {
+      error,
+      type: SELF_ACTION.SELF_SET_PASSWORD_FAILED,
+    };
+  };
 }

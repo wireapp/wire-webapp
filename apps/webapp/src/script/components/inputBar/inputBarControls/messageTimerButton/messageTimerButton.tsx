@@ -53,10 +53,12 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
   const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
   const duration = hasMessageTimer ? formatDuration(messageTimer, translate) : ({} as DurationUnit);
 
-  const setEntries = () =>
-    [
+  const setEntries = () => {
+    return [
       {
-        click: () => conversation.localMessageTimer(0),
+        click: () => {
+          return conversation.localMessageTimer(0);
+        },
         label: translate('ephemeralUnitsNone'),
       },
     ].concat(
@@ -64,11 +66,14 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
         const {text} = formatDuration(milliseconds, translate);
 
         return {
-          click: () => conversation.localMessageTimer(milliseconds),
+          click: () => {
+            return conversation.localMessageTimer(milliseconds);
+          },
           label: text,
         };
       }),
     );
+  };
 
   // Click on ephemeral button
   const onClick = (event: MouseEvent<HTMLSpanElement>): void => {

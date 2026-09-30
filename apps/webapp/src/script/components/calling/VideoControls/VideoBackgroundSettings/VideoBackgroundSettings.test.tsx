@@ -271,47 +271,51 @@ describe('VideoBackgroundSettings', () => {
 
   describe('getBackgroundEffectLabel', () => {
     it('returns label for no effect', () => {
-      expect(getBackgroundEffectLabel({type: 'none'}, backgrounds, translationKey => translationKey)).toBe(
-        'videoCallBackgroundNoEffect',
-      );
+      expect(
+        getBackgroundEffectLabel({type: 'none'}, backgrounds, translationKey => {
+          return translationKey;
+        }),
+      ).toBe('videoCallBackgroundNoEffect');
     });
 
     it('returns label for low blur', () => {
       expect(
-        getBackgroundEffectLabel({type: 'blur', level: 'low'}, backgrounds, translationKey => translationKey),
+        getBackgroundEffectLabel({type: 'blur', level: 'low'}, backgrounds, translationKey => {
+          return translationKey;
+        }),
       ).toBe('videoCallBackgroundBlurLow');
     });
 
     it('returns label for high blur', () => {
       expect(
-        getBackgroundEffectLabel({type: 'blur', level: 'high'}, backgrounds, translationKey => translationKey),
+        getBackgroundEffectLabel({type: 'blur', level: 'high'}, backgrounds, translationKey => {
+          return translationKey;
+        }),
       ).toBe('videoCallBackgroundBlurHigh');
     });
 
     it('returns label for matching virtual background', () => {
       expect(
-        getBackgroundEffectLabel(
-          {type: 'virtual', backgroundId: 'office'},
-          backgrounds,
-          translationKey => translationKey,
-        ),
+        getBackgroundEffectLabel({type: 'virtual', backgroundId: 'office'}, backgrounds, translationKey => {
+          return translationKey;
+        }),
       ).toBe('videoCallBackgroundOffice1');
     });
 
     it('returns fallback label for unknown virtual background', () => {
       expect(
-        getBackgroundEffectLabel(
-          {type: 'virtual', backgroundId: 'missing'},
-          backgrounds,
-          translationKey => translationKey,
-        ),
+        getBackgroundEffectLabel({type: 'virtual', backgroundId: 'missing'}, backgrounds, translationKey => {
+          return translationKey;
+        }),
       ).toBe('videoCallBackgroundVirtual');
     });
 
     it('returns label for custom background', () => {
-      expect(getBackgroundEffectLabel({type: 'custom'}, backgrounds, translationKey => translationKey)).toBe(
-        'videoCallBackgroundCustom',
-      );
+      expect(
+        getBackgroundEffectLabel({type: 'custom'}, backgrounds, translationKey => {
+          return translationKey;
+        }),
+      ).toBe('videoCallBackgroundCustom');
     });
   });
 });

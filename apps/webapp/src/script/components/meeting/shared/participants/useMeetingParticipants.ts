@@ -37,7 +37,9 @@ export const useMeetingParticipants = (): {users: User[]} => {
   const users = useMemo(() => {
     const contacts = isTeam ? teamMembers.toSorted(sortUsersByPriority) : connectedUsers;
 
-    return contacts.filter(user => user.isAvailable());
+    return contacts.filter(user => {
+      return user.isAvailable();
+    });
   }, [connectedUsers, isTeam, teamMembers]);
 
   return {users};

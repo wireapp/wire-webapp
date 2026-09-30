@@ -273,7 +273,9 @@ describe('Event Mapper', () => {
     });
 
     it('uses the injected translate function for team member leave fallback names', () => {
-      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const translate = jest.fn((translationKey: string) => {
+        return `translated:${translationKey}`;
+      });
       const teamMember = new User(createUuid(), '', translateForTest);
       const mapperWithTranslate = new EventMapper(undefined, translate);
       const event = EventBuilder.buildTeamMemberLeave(conversation, teamMember, Date.now());

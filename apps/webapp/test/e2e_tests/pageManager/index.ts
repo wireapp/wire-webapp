@@ -91,7 +91,11 @@ export class PageManager {
   static from(page: Page): PageManager;
   static from(page: Promise<Page>): Promise<PageManager>;
   static from(page: Page | Promise<Page>): PageManager | Promise<PageManager> {
-    return 'then' in page ? page.then(p => new PageManager(p)) : new PageManager(page);
+    return 'then' in page
+      ? page.then(p => {
+          return new PageManager(p);
+        })
+      : new PageManager(page);
   }
 
   openNewTab = async <T>(url?: string, handler?: (tab: PageManager) => Promise<T>): Promise<T> => {
@@ -160,91 +164,320 @@ export class PageManager {
   // ───────────── WEBAPP ─────────────
   public webapp = {
     pages: {
-      login: () => this.getOrCreate('webapp.pages.login', () => new LoginPage(this.page)),
-      singleSignOn: () => this.getOrCreate('webapp.pages.singleSignOn', () => new SingleSignOnPage(this.page)),
-      welcome: () => this.getOrCreate('webapp.pages.welcome', () => new WelcomePage(this.page)),
-      registration: () => this.getOrCreate('webapp.pages.registration', () => new RegistrationPage(this.page)),
-      sidebar: () => this.getOrCreate('webapp.pages.sidebar', () => new ConversationSidebar(this.page)),
-      startUI: () => this.getOrCreate('webapp.pages.startUI', () => new StartUIPage(this.page)),
-      account: () => this.getOrCreate('webapp.pages.account', () => new AccountPage(this.page)),
-      conversationList: () =>
-        this.getOrCreate('webapp.pages.conversationList', () => new ConversationListPage(this.page)),
-      conversationDetails: () =>
-        this.getOrCreate('webapp.pages.conversationDetails', () => new ConversationDetailsPage(this.page)),
-      conversation: () => this.getOrCreate('webapp.pages.conversation', () => new ConversationPage(this.page)),
-      collection: () => this.getOrCreate('webapp.pages.collection', () => new CollectionPage(this.page)),
-      cellsConversationFiles: () =>
-        this.getOrCreate('webapp.pages.cellsConversationFiles', () => new CellsConversationFilesPage(this.page)),
-      connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
-      calling: () => this.getOrCreate('webapp.pages.calling', () => new CallingPage(this.page)),
-      fullScreenCall: () => this.getOrCreate('webapp.pages.fullScreenCall', () => FullScreenCallPage(this.page)),
-      settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
-      devices: () => this.getOrCreate('webapp.pages.devices', () => new DevicesPage(this.page)),
-      deviceDetails: () => this.getOrCreate('webapp.pages.deviceDetails', () => DeviceDetailsPage(this.page)),
-      participantDevices: () =>
-        this.getOrCreate('webapp.pages.participantDevices', () => ParticipantDevicesPage(this.page)),
-      participantDeviceDetails: () =>
-        this.getOrCreate('webapp.pages.participantDeviceDetails', () => ParticipantDeviceDetailsPage(this.page)),
-      options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
-      audioVideoSettings: () =>
-        this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
-      about: () => this.getOrCreate('webapp.pages.about', () => new AboutPage(this.page)),
-      outgoingConnection: () =>
-        this.getOrCreate('webapp.pages.outgoingConnection', () => new OutgoingConnectionPage(this.page)),
-      guestOptions: () => this.getOrCreate('webapp.pages.guestOptions', () => GuestOptionsPage(this.page)),
-      deleteAccount: () => this.getOrCreate('webapp.pages.deleteAccount', () => new DeleteAccountPage(this.page)),
-      groupCreation: () => this.getOrCreate('webapp.pages.groupCreation', () => new GroupCreationPage(this.page)),
-      historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
-      historyExport: () => this.getOrCreate('webapp.pages.historyExport', () => new HistoryExportPage(this.page)),
-      historyImport: () => this.getOrCreate('webapp.pages.historyImport', () => new HistoryImportPage(this.page)),
-      meetings: () => this.getOrCreate('webapp.pages.meetings', () => new MeetingsPage(this.page)),
-      messageDetails: () => this.getOrCreate('webapp.pages.messageDetails', () => new MessageDetailsPage(this.page)),
-      participantDetails: () =>
-        this.getOrCreate('webapp.pages.participantsDetails', () => new ParticipantDetails(this.page)),
-      requestResetPassword: () =>
-        this.getOrCreate('webapp.pages.requestResetPassword', () => new RequestResetPasswordPage(this.page)),
-      resetPassword: () => this.getOrCreate('webapp.pages.resetPassword', () => new ResetPasswordPage(this.page)),
-      registerSuccess: () => this.getOrCreate('webapp.pages.registerSuccess', () => new RegisterSuccessPage(this.page)),
-      emailVerification: () =>
-        this.getOrCreate('webapp.pages.verification', () => new EmailVerificationPage(this.page)),
-      setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
-      conversationJoin: () => this.getOrCreate('webapp.pages.conversationJoin', () => ConversationJoinPage(this.page)),
+      login: () => {
+        return this.getOrCreate('webapp.pages.login', () => {
+          return new LoginPage(this.page);
+        });
+      },
+      singleSignOn: () => {
+        return this.getOrCreate('webapp.pages.singleSignOn', () => {
+          return new SingleSignOnPage(this.page);
+        });
+      },
+      welcome: () => {
+        return this.getOrCreate('webapp.pages.welcome', () => {
+          return new WelcomePage(this.page);
+        });
+      },
+      registration: () => {
+        return this.getOrCreate('webapp.pages.registration', () => {
+          return new RegistrationPage(this.page);
+        });
+      },
+      sidebar: () => {
+        return this.getOrCreate('webapp.pages.sidebar', () => {
+          return new ConversationSidebar(this.page);
+        });
+      },
+      startUI: () => {
+        return this.getOrCreate('webapp.pages.startUI', () => {
+          return new StartUIPage(this.page);
+        });
+      },
+      account: () => {
+        return this.getOrCreate('webapp.pages.account', () => {
+          return new AccountPage(this.page);
+        });
+      },
+      conversationList: () => {
+        return this.getOrCreate('webapp.pages.conversationList', () => {
+          return new ConversationListPage(this.page);
+        });
+      },
+      conversationDetails: () => {
+        return this.getOrCreate('webapp.pages.conversationDetails', () => {
+          return new ConversationDetailsPage(this.page);
+        });
+      },
+      conversation: () => {
+        return this.getOrCreate('webapp.pages.conversation', () => {
+          return new ConversationPage(this.page);
+        });
+      },
+      collection: () => {
+        return this.getOrCreate('webapp.pages.collection', () => {
+          return new CollectionPage(this.page);
+        });
+      },
+      cellsConversationFiles: () => {
+        return this.getOrCreate('webapp.pages.cellsConversationFiles', () => {
+          return new CellsConversationFilesPage(this.page);
+        });
+      },
+      connectRequest: () => {
+        return this.getOrCreate('webapp.pages.connectRequest', () => {
+          return new ConnectRequestPage(this.page);
+        });
+      },
+      calling: () => {
+        return this.getOrCreate('webapp.pages.calling', () => {
+          return new CallingPage(this.page);
+        });
+      },
+      fullScreenCall: () => {
+        return this.getOrCreate('webapp.pages.fullScreenCall', () => {
+          return FullScreenCallPage(this.page);
+        });
+      },
+      settings: () => {
+        return this.getOrCreate('webapp.pages.settings', () => {
+          return new SettingsPage(this.page);
+        });
+      },
+      devices: () => {
+        return this.getOrCreate('webapp.pages.devices', () => {
+          return new DevicesPage(this.page);
+        });
+      },
+      deviceDetails: () => {
+        return this.getOrCreate('webapp.pages.deviceDetails', () => {
+          return DeviceDetailsPage(this.page);
+        });
+      },
+      participantDevices: () => {
+        return this.getOrCreate('webapp.pages.participantDevices', () => {
+          return ParticipantDevicesPage(this.page);
+        });
+      },
+      participantDeviceDetails: () => {
+        return this.getOrCreate('webapp.pages.participantDeviceDetails', () => {
+          return ParticipantDeviceDetailsPage(this.page);
+        });
+      },
+      options: () => {
+        return this.getOrCreate('webapp.pages.options', () => {
+          return new OptionsPage(this.page);
+        });
+      },
+      audioVideoSettings: () => {
+        return this.getOrCreate('webapp.pages.audioVideoSettings', () => {
+          return new AudioVideoSettingsPage(this.page);
+        });
+      },
+      about: () => {
+        return this.getOrCreate('webapp.pages.about', () => {
+          return new AboutPage(this.page);
+        });
+      },
+      outgoingConnection: () => {
+        return this.getOrCreate('webapp.pages.outgoingConnection', () => {
+          return new OutgoingConnectionPage(this.page);
+        });
+      },
+      guestOptions: () => {
+        return this.getOrCreate('webapp.pages.guestOptions', () => {
+          return GuestOptionsPage(this.page);
+        });
+      },
+      deleteAccount: () => {
+        return this.getOrCreate('webapp.pages.deleteAccount', () => {
+          return new DeleteAccountPage(this.page);
+        });
+      },
+      groupCreation: () => {
+        return this.getOrCreate('webapp.pages.groupCreation', () => {
+          return new GroupCreationPage(this.page);
+        });
+      },
+      historyInfo: () => {
+        return this.getOrCreate('webapp.pages.infoHostory', () => {
+          return new HistoryInfoPage(this.page);
+        });
+      },
+      historyExport: () => {
+        return this.getOrCreate('webapp.pages.historyExport', () => {
+          return new HistoryExportPage(this.page);
+        });
+      },
+      historyImport: () => {
+        return this.getOrCreate('webapp.pages.historyImport', () => {
+          return new HistoryImportPage(this.page);
+        });
+      },
+      meetings: () => {
+        return this.getOrCreate('webapp.pages.meetings', () => {
+          return new MeetingsPage(this.page);
+        });
+      },
+      messageDetails: () => {
+        return this.getOrCreate('webapp.pages.messageDetails', () => {
+          return new MessageDetailsPage(this.page);
+        });
+      },
+      participantDetails: () => {
+        return this.getOrCreate('webapp.pages.participantsDetails', () => {
+          return new ParticipantDetails(this.page);
+        });
+      },
+      requestResetPassword: () => {
+        return this.getOrCreate('webapp.pages.requestResetPassword', () => {
+          return new RequestResetPasswordPage(this.page);
+        });
+      },
+      resetPassword: () => {
+        return this.getOrCreate('webapp.pages.resetPassword', () => {
+          return new ResetPasswordPage(this.page);
+        });
+      },
+      registerSuccess: () => {
+        return this.getOrCreate('webapp.pages.registerSuccess', () => {
+          return new RegisterSuccessPage(this.page);
+        });
+      },
+      emailVerification: () => {
+        return this.getOrCreate('webapp.pages.verification', () => {
+          return new EmailVerificationPage(this.page);
+        });
+      },
+      setUsername: () => {
+        return this.getOrCreate('webapp.pages.setUsername', () => {
+          return new SetUsernamePage(this.page);
+        });
+      },
+      conversationJoin: () => {
+        return this.getOrCreate('webapp.pages.conversationJoin', () => {
+          return ConversationJoinPage(this.page);
+        });
+      },
     },
     modals: {
-      appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
-      userProfile: () => this.getOrCreate('webapp.modals.userProfile', () => new UserProfileModal(this.page)),
-      confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
-      leaveConversation: () =>
-        this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),
-      passwordAdvancedSecurity: () =>
-        this.getOrCreate('webapp.modals.passwordAdvancedSecurity', () => new PasswordAdvancedSecurityModal(this.page)),
-      detailViewModal: () => this.getOrCreate('webapp.modals.detailView', () => new DetailViewModal(this.page)),
-      marketingConsent: () =>
-        this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
-      acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
-      confirm: () => this.getOrCreate('webapp.modals.confirm', () => new ConfirmModal(this.page)),
-      password: () => this.getOrCreate('webapp.modals.password', () => new PasswordModal(this.page)),
-      cellsFileDetailView: () =>
-        this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
-      optionModal: () => this.getOrCreate('webapp.modals.optionModal', () => new OptionModal(this.page)),
-      guestLinkPassword: () =>
-        this.getOrCreate('webapp.modals.guestLinkPassword', () => new GuestLinkPasswordModal(this.page)),
-      joinGuestLinkPassword: () =>
-        this.getOrCreate('webapp.modals.joinGuestLinkPassword', () => new JoinGuestLinkPasswordModal(this.page)),
-      createConversation: () =>
-        this.getOrCreate('webapp.modals.createConversation', () => CreateConversationModal(this.page)),
-      invite: () => this.getOrCreate('webapp.modals.invite', () => InviteModal(this.page)),
-      withoutTitle: () => this.getOrCreate('webapp.modals.withoutTitle', () => new WithoutTitle(this.page)),
-      newDevice: () => this.getOrCreate('webapp.modals.newDevice', () => new NewDeviceModal(this.page)),
-      readReceipt: () => this.getOrCreate('webapp.modals.readReceipt', () => new ReadReceiptModal(this.page)),
+      appLock: () => {
+        return this.getOrCreate('webapp.modals.appLock', () => {
+          return new AppLockModal(this.page);
+        });
+      },
+      userProfile: () => {
+        return this.getOrCreate('webapp.modals.userProfile', () => {
+          return new UserProfileModal(this.page);
+        });
+      },
+      confirmLogout: () => {
+        return this.getOrCreate('webapp.modals.confirmLogout', () => {
+          return new ConfirmLogoutModal(this.page);
+        });
+      },
+      leaveConversation: () => {
+        return this.getOrCreate('webapp.modals.leaveConversation', () => {
+          return new LeaveConversationModal(this.page);
+        });
+      },
+      passwordAdvancedSecurity: () => {
+        return this.getOrCreate('webapp.modals.passwordAdvancedSecurity', () => {
+          return new PasswordAdvancedSecurityModal(this.page);
+        });
+      },
+      detailViewModal: () => {
+        return this.getOrCreate('webapp.modals.detailView', () => {
+          return new DetailViewModal(this.page);
+        });
+      },
+      marketingConsent: () => {
+        return this.getOrCreate('webapp.modals.marketingConsent', () => {
+          return new MarketingConsentModal(this.page);
+        });
+      },
+      acknowledge: () => {
+        return this.getOrCreate('webapp.modals.marketingConsent', () => {
+          return new AcknowledgeModal(this.page);
+        });
+      },
+      confirm: () => {
+        return this.getOrCreate('webapp.modals.confirm', () => {
+          return new ConfirmModal(this.page);
+        });
+      },
+      password: () => {
+        return this.getOrCreate('webapp.modals.password', () => {
+          return new PasswordModal(this.page);
+        });
+      },
+      cellsFileDetailView: () => {
+        return this.getOrCreate('webapp.modals.cellsFileDetailView', () => {
+          return new CellsFileDetailViewModal(this.page);
+        });
+      },
+      optionModal: () => {
+        return this.getOrCreate('webapp.modals.optionModal', () => {
+          return new OptionModal(this.page);
+        });
+      },
+      guestLinkPassword: () => {
+        return this.getOrCreate('webapp.modals.guestLinkPassword', () => {
+          return new GuestLinkPasswordModal(this.page);
+        });
+      },
+      joinGuestLinkPassword: () => {
+        return this.getOrCreate('webapp.modals.joinGuestLinkPassword', () => {
+          return new JoinGuestLinkPasswordModal(this.page);
+        });
+      },
+      createConversation: () => {
+        return this.getOrCreate('webapp.modals.createConversation', () => {
+          return CreateConversationModal(this.page);
+        });
+      },
+      invite: () => {
+        return this.getOrCreate('webapp.modals.invite', () => {
+          return InviteModal(this.page);
+        });
+      },
+      withoutTitle: () => {
+        return this.getOrCreate('webapp.modals.withoutTitle', () => {
+          return new WithoutTitle(this.page);
+        });
+      },
+      newDevice: () => {
+        return this.getOrCreate('webapp.modals.newDevice', () => {
+          return new NewDeviceModal(this.page);
+        });
+      },
+      readReceipt: () => {
+        return this.getOrCreate('webapp.modals.readReceipt', () => {
+          return new ReadReceiptModal(this.page);
+        });
+      },
     },
     components: {
-      contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),
-      conversationSidebar: () =>
-        this.getOrCreate('webapp.components.conversationSidebar', () => new ConversationSidebar(this.page)),
-      inputBarControls: () =>
-        this.getOrCreate('webapp.components.inputBarControls', () => new InputBarControls(this.page)),
-      calling: () => this.getOrCreate('webapp.components.calling', () => new CallingPage(this.page)),
+      contactList: () => {
+        return this.getOrCreate('webapp.components.ContactList', () => {
+          return new ContactList(this.page);
+        });
+      },
+      conversationSidebar: () => {
+        return this.getOrCreate('webapp.components.conversationSidebar', () => {
+          return new ConversationSidebar(this.page);
+        });
+      },
+      inputBarControls: () => {
+        return this.getOrCreate('webapp.components.inputBarControls', () => {
+          return new InputBarControls(this.page);
+        });
+      },
+      calling: () => {
+        return this.getOrCreate('webapp.components.calling', () => {
+          return new CallingPage(this.page);
+        });
+      },
     },
   } as const;
 }

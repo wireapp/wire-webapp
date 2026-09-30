@@ -260,7 +260,16 @@ describe('ConversationService', () => {
       const settled = await task;
 
       expect(settled.isOk).toBe(true);
-      expect(settled.match({Ok: c => c, Err: () => null})).toEqual(conversation);
+      expect(
+        settled.match({
+          Ok: c => {
+            return c;
+          },
+          Err: () => {
+            return null;
+          },
+        }),
+      ).toEqual(conversation);
       expect(getConversation).toHaveBeenCalledWith(conversationId);
     });
 
@@ -272,7 +281,16 @@ describe('ConversationService', () => {
       const settled = await service.getSafeConversationById(conversationId);
 
       expect(settled.isErr).toBe(true);
-      expect(settled.match({Ok: () => null, Err: e => e})).toBe(error);
+      expect(
+        settled.match({
+          Ok: () => {
+            return null;
+          },
+          Err: e => {
+            return e;
+          },
+        }),
+      ).toBe(error);
     });
 
     it('does not throw on rejection (the failure stays in the data model)', async () => {

@@ -231,23 +231,47 @@ test.describe('Calling', () => {
       }
 
       // Ensure no audio is playing on both devices initially
-      await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(false);
-      await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(false);
+      await expect
+        .poll(() => {
+          return isPlayingAudio(userBPage1, AudioType.INCOMING_CALL);
+        })
+        .toBe(false);
+      await expect
+        .poll(() => {
+          return isPlayingAudio(userBPage2, AudioType.INCOMING_CALL);
+        })
+        .toBe(false);
 
       // User A calls user B, confirming both devices are ringing
       await userAPages.conversation().clickCallButton();
       await expect(userAPages.calling().callCell).toBeVisible();
 
       await expect(userBDevice1Pages.calling().callCell).toBeVisible();
-      await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(true);
-      await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(true);
+      await expect
+        .poll(() => {
+          return isPlayingAudio(userBPage1, AudioType.INCOMING_CALL);
+        })
+        .toBe(true);
+      await expect
+        .poll(() => {
+          return isPlayingAudio(userBPage2, AudioType.INCOMING_CALL);
+        })
+        .toBe(true);
 
       // User B accepts the call from the first device and both devices should stop ringing
       await userBDevice1Pages.calling().clickAcceptCallButton();
       await expect(userBDevice1Pages.calling().callCell).toBeVisible();
-      await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(false);
+      await expect
+        .poll(() => {
+          return isPlayingAudio(userBPage1, AudioType.INCOMING_CALL);
+        })
+        .toBe(false);
       await expect(userBDevice2Pages.calling().callCell).not.toBeVisible();
-      await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(false);
+      await expect
+        .poll(() => {
+          return isPlayingAudio(userBPage2, AudioType.INCOMING_CALL);
+        })
+        .toBe(false);
     });
   });
 
@@ -291,8 +315,12 @@ test.describe('Calling', () => {
   ].forEach(({description, tag, verifyScreenShare}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
       const [userAPages, userBPages, userCPage] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
         createPage(withLogin(userC)),
       ]);
 
@@ -325,8 +353,12 @@ test.describe('Calling', () => {
 
   test('Verify Call UI checks', {tag: ['@TC-8771', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userA))).then(pm => {
+        return pm.webapp.pages;
+      }),
+      PageManager.from(createPage(withLogin(userB))).then(pm => {
+        return pm.webapp.pages;
+      }),
     ]);
 
     await createGroup(userAPages, groupName, [userB, userC]);
@@ -344,8 +376,12 @@ test.describe('Calling', () => {
 
   test('Verify leaving and coming back to the group call', {tag: ['@TC-2808', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userA))).then(pm => {
+        return pm.webapp.pages;
+      }),
+      PageManager.from(createPage(withLogin(userB))).then(pm => {
+        return pm.webapp.pages;
+      }),
     ]);
 
     await createGroup(userAPages, groupName, [userB]);
@@ -384,11 +420,19 @@ test.describe('Calling', () => {
 
     await expect(userAPages.calling().callCell).toBeVisible();
     await expect(userBPages.calling().callCell).toBeVisible();
-    await expect.poll(() => isPlayingAudio(userBPage, AudioType.INCOMING_CALL)).toBe(true);
+    await expect
+      .poll(() => {
+        return isPlayingAudio(userBPage, AudioType.INCOMING_CALL);
+      })
+      .toBe(true);
 
     await userBPages.calling().clickLeaveCallButton();
     await expect(userBPages.calling().callCell).toBeHidden();
-    await expect.poll(() => isPlayingAudio(userBPage, AudioType.INCOMING_CALL)).toBe(false);
+    await expect
+      .poll(() => {
+        return isPlayingAudio(userBPage, AudioType.INCOMING_CALL);
+      })
+      .toBe(false);
   });
 
   test(
@@ -396,8 +440,12 @@ test.describe('Calling', () => {
     {tag: ['@TC-2827', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       // Log in a second session/device for User A.
@@ -446,9 +494,15 @@ test.describe('Calling', () => {
     {tag: ['@TC-2837', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages, userCPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userC))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await createGroup(userAPages, groupName, [userB, userC]);
@@ -481,8 +535,12 @@ test.describe('Calling', () => {
     {tag: ['@TC-2838', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await createGroup(userAPages, groupName, [userB]);
@@ -513,7 +571,11 @@ test.describe('Calling', () => {
     {tag: ['@TC-2842', '@regression']},
     async ({createPage, createUser}) => {
       // Create Users and add to team
-      const extraMembers = await Promise.all(Array.from({length: 4}, () => createUser()));
+      const extraMembers = await Promise.all(
+        Array.from({length: 4}, () => {
+          return createUser();
+        }),
+      );
 
       for (const member of extraMembers) {
         await team.addTeamMember(member);
@@ -547,7 +609,9 @@ test.describe('Calling', () => {
       await sendConnectionRequest(userAPage, guestUser);
       await connectWithUser(userAPage, userB);
 
-      const [userAPages, userBPages, guestPages] = [userAPage, userBPage, guestPage].map(pm => pm.webapp.pages);
+      const [userAPages, userBPages, guestPages] = [userAPage, userBPage, guestPage].map(pm => {
+        return pm.webapp.pages;
+      });
 
       // --- Setup and Call Initialization ---
       await test.step('Setup: Accept connection and start group call', async () => {
@@ -580,7 +644,9 @@ test.describe('Calling', () => {
       const features = [
         {
           name: 'Mute',
-          action: (p: PageManager['webapp']['pages']) => p.calling().toggleMuteButton.click(),
+          action: (p: PageManager['webapp']['pages']) => {
+            return p.calling().toggleMuteButton.click();
+          },
           verify: async (name: string) => {
             await expect(userACall.getCallingParticipant(name).muteIcon).not.toBeVisible();
             await expect(userACall.getGridTile(name).muteIcon).not.toBeVisible();
@@ -588,7 +654,9 @@ test.describe('Calling', () => {
         },
         {
           name: 'Screenshare',
-          action: (p: PageManager['webapp']['pages']) => p.calling().clickToggleScreenShareButton(),
+          action: (p: PageManager['webapp']['pages']) => {
+            return p.calling().clickToggleScreenShareButton();
+          },
           verify: async (name: string) => {
             await expect(userACall.getCallingParticipant(name).screenShareIcon).toBeVisible();
             await expect(userACall.getGridTile(name).videoElement).toBeVisible();
@@ -596,7 +664,9 @@ test.describe('Calling', () => {
         },
         {
           name: 'Video',
-          action: (p: PageManager['webapp']['pages']) => p.calling().clickToggleVideoButton(),
+          action: (p: PageManager['webapp']['pages']) => {
+            return p.calling().clickToggleVideoButton();
+          },
           verify: async (name: string) => {
             await expect(userACall.getCallingParticipant(name).videoIcon).toBeVisible();
             await expect(userACall.getGridTile(name).videoElement).toBeVisible();
@@ -690,8 +760,12 @@ test.describe('Calling', () => {
       verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>, localUser: string) => {
         await expect(callScreen.gridTiles).toHaveCount(6); // Ensure first grid page is full
         const displayedNames = await callScreen.gridTiles.getByTestId('call-participant-name').allInnerTexts();
-        const listToVerify = displayedNames.filter(name => name !== localUser);
-        const sortedNames = listToVerify.toSorted((a, b) => a.localeCompare(b));
+        const listToVerify = displayedNames.filter(name => {
+          return name !== localUser;
+        });
+        const sortedNames = listToVerify.toSorted((a, b) => {
+          return a.localeCompare(b);
+        });
 
         expect(listToVerify).toEqual(sortedNames);
       },
@@ -704,10 +778,18 @@ test.describe('Calling', () => {
       const {groupMembers, memberPages} =
         await test.step('Setup: Create members and initialize all browser pages', async () => {
           // Generate a large participant list to trigger pagination
-          const extraMembers = await Promise.all(Array.from({length: 7}, () => createUser()));
+          const extraMembers = await Promise.all(
+            Array.from({length: 7}, () => {
+              return createUser();
+            }),
+          );
           const groupMembers = [userB, userC, ...extraMembers];
 
-          await Promise.all(extraMembers.map(member => team.addTeamMember(member)));
+          await Promise.all(
+            extraMembers.map(member => {
+              return team.addTeamMember(member);
+            }),
+          );
 
           const memberPages = await Promise.all(
             groupMembers.map(async member => {
@@ -774,9 +856,15 @@ test.describe('Calling', () => {
   ].forEach(({description, tag, verify}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
       const [userAPages, userBPages, userCPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userC))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await test.step('Setup: Create group and start call', async () => {
@@ -941,9 +1029,15 @@ test.describe('Calling', () => {
 
   test('I want to see multiple active speakers in 1 call', {tag: ['@TC-2945', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages, userCPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userA))).then(pm => {
+        return pm.webapp.pages;
+      }),
+      PageManager.from(createPage(withLogin(userB))).then(pm => {
+        return pm.webapp.pages;
+      }),
+      PageManager.from(createPage(withLogin(userC))).then(pm => {
+        return pm.webapp.pages;
+      }),
     ]);
 
     await test.step('Setup: Create group and start call', async () => {

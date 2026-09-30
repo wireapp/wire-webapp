@@ -87,17 +87,19 @@ export const SetAccountType = () => {
           </FlexBox>
         </FlexBox>
         <FlexBox css={styles.optionWrapper}>
-          {accountTypeOptions.map((option, index) => (
-            <AccountTypeOption
-              key={index}
-              heading={option.heading}
-              description={option.description}
-              buttonText={option.buttonText}
-              action={option.action}
-              features={option.features}
-              isPrimary={option.isPrimary}
-            />
-          ))}
+          {accountTypeOptions.map((option, index) => {
+            return (
+              <AccountTypeOption
+                key={index}
+                heading={option.heading}
+                description={option.description}
+                buttonText={option.buttonText}
+                action={option.action}
+                features={option.features}
+                isPrimary={option.isPrimary}
+              />
+            );
+          })}
         </FlexBox>
       </FlexBox>
     </Page>
@@ -121,15 +123,17 @@ const AccountTypeOption = ({action, buttonText, description, heading, features, 
         <p css={styles.optionDescription}>{description}</p>
         <div css={styles.featureList}>
           <div css={styles.horizontalLine} />
-          {features.map((feature, index) => (
-            <>
-              <FlexBox key={index} css={styles.optionFeatureContainer}>
-                <CheckRoundIcon css={styles.featureIcon} />
-                <p css={styles.featureText}>{feature}</p>
-              </FlexBox>
-              <div css={styles.horizontalLine} />
-            </>
-          ))}
+          {features.map((feature, index) => {
+            return (
+              <>
+                <FlexBox key={index} css={styles.optionFeatureContainer}>
+                  <CheckRoundIcon css={styles.featureIcon} />
+                  <p css={styles.featureText}>{feature}</p>
+                </FlexBox>
+                <div css={styles.horizontalLine} />
+              </>
+            );
+          })}
         </div>
         <Button
           data-uie-name="select-account-type-button"

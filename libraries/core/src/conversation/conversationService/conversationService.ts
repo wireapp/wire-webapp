@@ -119,7 +119,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     private readonly subconversationService: SubconversationService,
     private readonly isMLSConversationRecoveryEnabled: () => Promise<boolean>,
     private readonly _mlsService?: MLSService,
-    private readonly isConnectionLive: () => boolean = () => true,
+    private readonly isConnectionLive: () => boolean = () => {
+      return true;
+    },
   ) {
     super();
     this.messageTimer = new MessageTimer();
@@ -138,15 +140,22 @@ export class ConversationService extends TypedEventEmitter<Events> {
       const mapper = createDefaultMlsErrorMapper();
       this.MLSRecoveryOrchestrator = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, {
         // Call the low-level API to avoid nested recovery when orchestrator triggers an external commit join
-        joinViaExternalCommit: (conversationId: QualifiedId) => this.performJoinByExternalCommitAPI(conversationId),
-        resetAndReestablish: (conversationId: QualifiedId) => this.handleBrokenMLSConversation(conversationId),
+        joinViaExternalCommit: (conversationId: QualifiedId) => {
+          return this.performJoinByExternalCommitAPI(conversationId);
+        },
+        resetAndReestablish: (conversationId: QualifiedId) => {
+          return this.handleBrokenMLSConversation(conversationId);
+        },
         recoverFromEpochMismatch: (
           conversationId: QualifiedId,
           subconvId?: SUBCONVERSATION_ID,
           trigger?: MlsEpochRecoveryTrigger,
-        ) => this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, trigger),
-        addMissingUsers: (conversationId: QualifiedId, groupId: string, users: QualifiedId[]) =>
-          this.performAddUsersToMLSConversationAPI({conversationId, groupId, qualifiedUsers: users}),
+        ) => {
+          return this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, trigger);
+        },
+        addMissingUsers: (conversationId: QualifiedId, groupId: string, users: QualifiedId[]) => {
+          return this.performAddUsersToMLSConversationAPI({conversationId, groupId, qualifiedUsers: users});
+        },
         wipeMLSConversation: this.wipeMLSConversation,
       });
     }
@@ -183,12 +192,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const allClients = await this.apiClient.api.user.postListClients({qualified_users: qualifiedMembers});
     const qualifiedUserClients: QualifiedUserClients = {};
 
-    Object.entries(allClients.qualified_user_map).map(([domain, userClientMap]) =>
-      Object.entries(userClientMap).map(async ([userId, clients]) => {
+    Object.entries(allClients.qualified_user_map).map(([domain, userClientMap]) => {
+      return Object.entries(userClientMap).map(async ([userId, clients]) => {
         qualifiedUserClients[domain] ||= {};
-        qualifiedUserClients[domain][userId] = clients.map(client => client.id);
-      }),
-    );
+        qualifiedUserClients[domain][userId] = clients.map(client => {
+          return client.id;
+        });
+      });
+    });
 
     return qualifiedUserClients;
   }
@@ -243,7 +254,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     function isMLS(params: SendProteusMessageParams | SendMlsMessageParams): params is SendMlsMessageParams {
       return params.protocol === CONVERSATION_PROTOCOL.MLS;
     }
-    return sendMessage(() => (isMLS(params) ? this.sendMLSMessage(params) : this.proteusService.sendMessage(params)));
+    return sendMessage(() => {
+      return isMLS(params) ? this.sendMLSMessage(params) : this.proteusService.sendMessage(params);
+    });
   }
 
   public sendTypingStart(conversationId: QualifiedId): Promise<void> {
@@ -464,7 +477,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     return requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {operationName: OperationName.send, qualifiedConversationId: conversationId, groupId},
-      callBack: () => this.performSendMLSMessageAPI(params),
+      callBack: () => {
+        return this.performSendMLSMessageAPI(params);
+      },
     });
   }
 
@@ -524,14 +539,15 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     return requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
-      callBack: () =>
-        this.performAddUsersToMLSConversationAPI({
+      callBack: () => {
+        return this.performAddUsersToMLSConversationAPI({
           qualifiedUsers,
           groupId,
           conversationId,
           commitPendingFirst,
           updateKeyingMaterialIfEmpty,
-        }),
+        });
+      },
     });
   }
 
@@ -592,7 +608,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     return requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {operationName: OperationName.removeUsers, qualifiedConversationId: conversationId, groupId},
-      callBack: () => this.performRemoveUsersFromMLSConversationAPI({groupId, conversationId, qualifiedUserIds}),
+      callBack: () => {
+        return this.performRemoveUsersFromMLSConversationAPI({groupId, conversationId, qualifiedUserIds});
+      },
     });
   }
 
@@ -629,14 +647,18 @@ export class ConversationService extends TypedEventEmitter<Events> {
     }
     await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute({
       context: {operationName: OperationName.joinExternalCommit, qualifiedConversationId: conversationId},
-      callBack: () => this.performJoinByExternalCommitAPI(conversationId),
+      callBack: () => {
+        return this.performJoinByExternalCommitAPI(conversationId);
+      },
     });
   }
 
   // Low-level API call for joining via external commit (no recovery logic)
   private async performJoinByExternalCommitAPI(conversationId: QualifiedId): Promise<void> {
     this.logger.info('Joining MLS conversation via external commit (low-level)', {conversationId});
-    await this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
+    await this.mlsService.joinByExternalCommit(() => {
+      return this.apiClient.api.conversation.getGroupInfo(conversationId);
+    });
   }
 
   private async refreshGroupIdConversationMap(): Promise<void> {
@@ -688,7 +710,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
         // policy resolution. The callback is the real operation, so it can be re-run once the
         // recovery action has re-synced the epoch.
         seedError: error,
-        callBack: () => this.mlsService.updateKeyingMaterialForConversation(groupId),
+        callBack: () => {
+          return this.mlsService.updateKeyingMaterialForConversation(groupId);
+        },
       });
     } catch (error: unknown) {
       this.logger.error('Failed to react to key material update failure', {error, groupId});
@@ -753,7 +777,13 @@ export class ConversationService extends TypedEventEmitter<Events> {
       throw new Error(`Failed to recover MLS conversation: missing groupId (${newGroupId}), or clientId (${clientId})`);
     }
 
-    const usersToReAdd = members.others.map(member => member.qualified_id).filter(userId => userId !== undefined);
+    const usersToReAdd = members.others
+      .map(member => {
+        return member.qualified_id;
+      })
+      .filter(userId => {
+        return userId !== undefined;
+      });
 
     // STEP 5: Re-establish the conversation by re-adding all members
     return await this.establishMLSGroupConversation(
@@ -892,8 +922,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
     }
 
     const localEpochBeforeRejoin = (await this.mlsService.getSafeEpoch(groupId)).match({
-      Ok: epoch => epoch,
-      Err: () => undefined,
+      Ok: epoch => {
+        return epoch;
+      },
+      Err: () => {
+        return undefined;
+      },
     });
 
     this.logger.warn(
@@ -910,8 +944,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
     try {
       await this.joinByExternalCommit(qualifiedId);
       const localEpochAfterRejoin = (await this.mlsService.getSafeEpoch(groupId)).match({
-        Ok: epoch => epoch,
-        Err: () => undefined,
+        Ok: epoch => {
+          return epoch;
+        },
+        Err: () => {
+          return undefined;
+        },
       });
       this.logger.info('MLS external commit rejoin completed after epoch mismatch', {
         conversationId: qualifiedId,
@@ -1228,7 +1266,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     return this.handleConversationEpochMismatch(
       mlsConversation,
-      () => this.emit('MLSConversationRecovered', {conversationId: mlsConversation.qualified_id}),
+      () => {
+        return this.emit('MLSConversationRecovered', {conversationId: mlsConversation.qualified_id});
+      },
       trigger,
     );
   }
@@ -1252,7 +1292,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
         operationName: OperationName.handleWelcome,
         qualifiedConversationId: event.qualified_conversation,
       },
-      callBack: () => this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId),
+      callBack: () => {
+        return this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId);
+      },
     });
     return null;
   }

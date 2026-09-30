@@ -141,7 +141,9 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     const themeMentions = config.theme.mentions;
     const theme: Record<string, string> =
       typeof themeMentions === 'object' && themeMentions !== null ? themeMentions : {};
-    const entry = Object.entries(theme).find(([trigger]) => new RegExp(trigger).test(this.__trigger));
+    const entry = Object.entries(theme).find(([trigger]) => {
+      return new RegExp(trigger).test(this.__trigger);
+    });
     const className = entry !== undefined ? entry[1] : undefined;
     const classNameFocused = entry !== undefined ? theme[`${entry[0]}Focused`] : undefined;
     return (

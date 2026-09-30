@@ -29,14 +29,16 @@ interface PreferencesSectionProps {
   children: ReactNode;
 }
 
-const PreferencesSection = ({title, className = '', uieName, hasSeparator, children}: PreferencesSectionProps) => (
-  <>
-    {hasSeparator === true && <hr className="preferences-separator" />}
-    <fieldset className={`preferences-section ${className}`} data-uie-name={uieName}>
-      {isNonEmptyString(title) && <legend className="preferences-header">{title}</legend>}
-      {children}
-    </fieldset>
-  </>
-);
+const PreferencesSection = ({title, className = '', uieName, hasSeparator, children}: PreferencesSectionProps) => {
+  return (
+    <>
+      {hasSeparator === true && <hr className="preferences-separator" />}
+      <fieldset className={`preferences-section ${className}`} data-uie-name={uieName}>
+        {isNonEmptyString(title) && <legend className="preferences-header">{title}</legend>}
+        {children}
+      </fieldset>
+    </>
+  );
+};
 
 export {PreferencesSection};

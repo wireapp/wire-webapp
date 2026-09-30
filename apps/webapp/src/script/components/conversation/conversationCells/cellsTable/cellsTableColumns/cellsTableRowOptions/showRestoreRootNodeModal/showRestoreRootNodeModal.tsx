@@ -51,7 +51,9 @@ export const showRestoreRootNodeModal = ({
           [
             {
               exactMatch: '{name}',
-              render: () => <b>{node.name}</b>,
+              render: () => {
+                return <b>{node.name}</b>;
+              },
             },
           ],
         ),

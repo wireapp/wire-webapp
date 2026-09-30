@@ -46,13 +46,12 @@ describe('HistoryExport', () => {
     const clientState = new ClientState();
     const mainViewModel = {content: {repositories: {backup: {}}}} as unknown as MainViewModel;
 
-    jest.spyOn(RootProvider, 'useApplicationContext').mockImplementation(
-      () =>
-        ({
-          mainViewModel,
-          translate: translateForTest,
-        }) as unknown as RootContextValue,
-    );
+    jest.spyOn(RootProvider, 'useApplicationContext').mockImplementation(() => {
+      return {
+        mainViewModel,
+        translate: translateForTest,
+      } as unknown as RootContextValue;
+    });
 
     const {rerender} = render(<HistoryExport switchContent={switchContent} user={user} clientState={clientState} />);
 

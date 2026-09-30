@@ -34,4 +34,6 @@ export const sanitizeUrl = (url: string): string => {
   return url;
 };
 
-export const validateUrl = (url: string): boolean => url === 'https://' || URL_REGEX.test(url);
+export const validateUrl = (url: string): boolean => {
+  return url === 'https://' || URL_REGEX.test(url);
+};

@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const PlusIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M0 7v2h7v7h2V9h7V7H9V0H7v7z" />
-  </SVGIcon>
-);
+export const PlusIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path d="M0 7v2h7v7h2V9h7V7H9V0H7v7z" />
+    </SVGIcon>
+  );
+};

@@ -43,13 +43,13 @@ const FullSearchItem = ({message, onClick, formatText}: FullSearchItemProps) => 
       onClick={onClick}
       role="button"
       tabIndex={TabIndex.FOCUSABLE}
-      onKeyDown={event =>
-        handleKeyDown({
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
           callback: onClick,
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       data-uie-name="full-search-item"
     >
       <div className="full-search__item__avatar">
@@ -57,15 +57,15 @@ const FullSearchItem = ({message, onClick, formatText}: FullSearchItemProps) => 
       </div>
       <div className="full-search__item__content">
         <div className="full-search__item__content__text ellipsis" data-uie-name="full-search-item-text">
-          {parts.map((part, index) =>
-            index % 2 ? (
+          {parts.map((part, index) => {
+            return index % 2 ? (
               <mark key={index} className="full-search__marked" data-uie-name="full-search-item-mark">
                 {part}
               </mark>
             ) : (
               part
-            ),
-          )}
+            );
+          })}
         </div>
         <div className="full-search__item__content__info">
           <span className="font-weight-bold" data-uie-name="full-search-item-sender">

@@ -51,7 +51,9 @@ export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreview
       callToAction={
         canDownload && (
           <Button
-            onClick={() => forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension})}
+            onClick={() => {
+              return forcedDownloadFile({url: fileUrl ?? '', name: fileNameWithExtension});
+            }}
             disabled={fileUrl === undefined || fileUrl.length === 0}
           >
             {translate('fileFullscreenModal.noPreviewAvailable.callToAction')}

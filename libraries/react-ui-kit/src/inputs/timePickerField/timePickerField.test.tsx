@@ -30,12 +30,22 @@ const defaultProps: React.ComponentProps<typeof TimePickerField> = {
   dataUieName: 'time-picker-test',
   ariaLabel: 'Select time',
   value: timeOptions[0],
-  onChange: () => undefined,
+  onChange: () => {
+    return undefined;
+  },
 };
 
 describe('"TimePickerField"', () => {
-  it('renders', () => matchComponent(<TimePickerField {...defaultProps} />));
-  it('renders with label', () => matchComponent(<TimePickerField {...defaultProps} label="Time" />));
-  it('renders as invalid', () => matchComponent(<TimePickerField {...defaultProps} markInvalid />));
-  it('renders as disabled', () => matchComponent(<TimePickerField {...defaultProps} disabled />));
+  it('renders', () => {
+    return matchComponent(<TimePickerField {...defaultProps} />);
+  });
+  it('renders with label', () => {
+    return matchComponent(<TimePickerField {...defaultProps} label="Time" />);
+  });
+  it('renders as invalid', () => {
+    return matchComponent(<TimePickerField {...defaultProps} markInvalid />);
+  });
+  it('renders as disabled', () => {
+    return matchComponent(<TimePickerField {...defaultProps} disabled />);
+  });
 });

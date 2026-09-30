@@ -98,7 +98,9 @@ const GroupVideoGridTile = ({
     processedVideoStream,
   );
 
-  const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
+  const handleTileClick = () => {
+    return onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
+  };
 
   const handleEnterTileClick = (keyboardEvent: KeyboardEvent) => {
     if (isEnterKey(keyboardEvent)) {

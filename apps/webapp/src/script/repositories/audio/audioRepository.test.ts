@@ -31,12 +31,11 @@ describe('AudioRepository', () => {
 
   describe('init', () => {
     it('inits all the sounds with preload', () => {
-      jest.spyOn(window, 'Audio').mockImplementation(
-        () =>
-          ({
-            load: jest.fn(),
-          }) as unknown as HTMLAudioElement,
-      );
+      jest.spyOn(window, 'Audio').mockImplementation(() => {
+        return {
+          load: jest.fn(),
+        } as unknown as HTMLAudioElement;
+      });
 
       audioRepository.init();
 
@@ -50,14 +49,13 @@ describe('AudioRepository', () => {
 
   describe('play', () => {
     beforeEach(() => {
-      jest.spyOn(window, 'Audio').mockImplementation(
-        () =>
-          ({
-            load: jest.fn(),
-            play: jest.fn(),
-            paused: true,
-          }) as unknown as HTMLAudioElement,
-      );
+      jest.spyOn(window, 'Audio').mockImplementation(() => {
+        return {
+          load: jest.fn(),
+          play: jest.fn(),
+          paused: true,
+        } as unknown as HTMLAudioElement;
+      });
       audioRepository.init();
       audioRepository.setMutedState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
     });

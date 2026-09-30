@@ -27,19 +27,25 @@ import {handleMLSWelcomeMessage} from './welcomeMessage';
 import {NotificationSource} from '../../../../../notification';
 import {MLSService, MLSServiceEvents} from '../../../mlsService';
 
-jest.mock('bazinga64', () => ({
-  ...jest.requireActual('bazinga64'),
-  Decoder: {
-    fromBase64: jest.fn().mockImplementation((value: string) => ({
-      asBytes: jest.fn().mockReturnValue(value),
-    })),
-  },
-  Encoder: {
-    toBase64: jest.fn().mockImplementation((value: string) => ({
-      asString: value,
-    })),
-  },
-}));
+jest.mock('bazinga64', () => {
+  return {
+    ...jest.requireActual('bazinga64'),
+    Decoder: {
+      fromBase64: jest.fn().mockImplementation((value: string) => {
+        return {
+          asBytes: jest.fn().mockReturnValue(value),
+        };
+      }),
+    },
+    Encoder: {
+      toBase64: jest.fn().mockImplementation((value: string) => {
+        return {
+          asString: value,
+        };
+      }),
+    },
+  };
+});
 
 const mockParams = {
   event: {

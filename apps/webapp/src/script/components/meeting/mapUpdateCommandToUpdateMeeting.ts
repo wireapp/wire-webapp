@@ -22,9 +22,11 @@ import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting
 import {buildUpdateMeetingRecurrence} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
 import type {UpdateMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
 
-export const mapUpdateCommandToUpdateMeeting = (command: UpdateMeetingCommand): UpdateMeeting => ({
-  title: command.title,
-  start_time: command.start.toISOString(),
-  end_time: command.end.toISOString(),
-  ...buildUpdateMeetingRecurrence(command.recurrence, command.originalRecurrence),
-});
+export const mapUpdateCommandToUpdateMeeting = (command: UpdateMeetingCommand): UpdateMeeting => {
+  return {
+    title: command.title,
+    start_time: command.start.toISOString(),
+    end_time: command.end.toISOString(),
+    ...buildUpdateMeetingRecurrence(command.recurrence, command.originalRecurrence),
+  };
+};

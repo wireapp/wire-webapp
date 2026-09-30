@@ -24,20 +24,28 @@ import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 import {FilePreviews} from './filePreviews';
 
-jest.mock('./imagePreviewCard/imagePreviewCard', () => ({
-  ImagePreviewCard: () => <div data-uie-name="image-preview-card" />,
-}));
+jest.mock('./imagePreviewCard/imagePreviewCard', () => {
+  return {
+    ImagePreviewCard: () => {
+      return <div data-uie-name="image-preview-card" />;
+    },
+  };
+});
 
-jest.mock('./filePreviewCard/filePreviewCard', () => ({
-  FilePreviewCard: () => <div data-uie-name="file-preview-card" />,
-}));
+jest.mock('./filePreviewCard/filePreviewCard', () => {
+  return {
+    FilePreviewCard: () => {
+      return <div data-uie-name="file-preview-card" />;
+    },
+  };
+});
 
 describe('FilePreviews', () => {
   const conversationId = 'local-conversation-id';
   const conversationQualifiedId = {id: 'qualified-conversation-id', domain: 'example.com'};
 
-  const createFileWithPreview = (file: File): FileWithPreview =>
-    Object.assign(file, {
+  const createFileWithPreview = (file: File): FileWithPreview => {
+    return Object.assign(file, {
       id: 'file-id',
       preview: 'blob:preview',
       remoteUuid: '',
@@ -45,6 +53,7 @@ describe('FilePreviews', () => {
       uploadStatus: 'uploading' as const,
       uploadProgress: 0,
     });
+  };
 
   it('renders a file preview card for HEIC images', () => {
     const heicFile = createFileWithPreview(new File(['heic'], 'photo.heic', {type: 'image/heic'}));

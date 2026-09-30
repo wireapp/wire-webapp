@@ -41,7 +41,9 @@ export const Pagination = ({totalPages, currentPage, onChangePage, className}: P
     return Math.min(Math.max(0, page - Math.floor(visibleDots / 2)), Math.max(0, totalPages - visibleDots));
   };
 
-  const [currentStart, setCurrentStart] = useState(() => calculateStartPosition(currentPage));
+  const [currentStart, setCurrentStart] = useState(() => {
+    return calculateStartPosition(currentPage);
+  });
 
   useEffect(() => {
     setCurrentStart(calculateStartPosition(currentPage));
@@ -69,7 +71,9 @@ export const Pagination = ({totalPages, currentPage, onChangePage, className}: P
     }
   };
 
-  const visibleRange = Array.from({length: visibleDots}, (_, index) => currentStart + index);
+  const visibleRange = Array.from({length: visibleDots}, (_, index) => {
+    return currentStart + index;
+  });
 
   return (
     <div id="video-pagination" css={[paginationContainerStyles, className]}>

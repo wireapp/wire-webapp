@@ -53,10 +53,15 @@ const actionsViewModel = {
   saveConversation: jest.fn(),
 } as unknown as ActionsViewModel;
 
-const getAllActions = (queryFunction: (id: string) => HTMLElement | null) =>
-  Object.values(ActionIdentifier)
-    .map(action => queryFunction(action))
-    .filter(action => action !== null);
+const getAllActions = (queryFunction: (id: string) => HTMLElement | null) => {
+  return Object.values(ActionIdentifier)
+    .map(action => {
+      return queryFunction(action);
+    })
+    .filter(action => {
+      return action !== null;
+    });
+};
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -79,8 +84,16 @@ describe('UserActions', () => {
     const user = new User('', '', translateForTest);
     user.isMe = true;
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canLeaveGroup: () => true};
+    jest.spyOn(conversation, 'isGroup').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canLeaveGroup: () => {
+        return true;
+      },
+    };
     const props = {
       actionsViewModel,
       conversation,
@@ -137,10 +150,18 @@ describe('UserActions', () => {
     const selfUser = new User('', '', translateForTest);
     selfUser.teamId = 'teamId2';
 
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.connection(connection);
-    jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(conversation, 'isGroup').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
     jest
       .spyOn(conversation, 'participating_user_ids')
       .mockImplementation(ko.observableArray([new User('', '', translateForTest)]));
@@ -149,7 +170,11 @@ describe('UserActions', () => {
 
     conversationState.conversations.push(conversation);
 
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return true;
+      },
+    };
 
     const props = {
       actionsViewModel,
@@ -182,7 +207,11 @@ describe('UserActions', () => {
     const selfUser = new User('', '', translateForTest);
     selfUser.teamId = 'teamId2';
 
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
     conversation.connection(connection);
@@ -195,7 +224,11 @@ describe('UserActions', () => {
 
     conversationState.conversations.push(conversation);
 
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => false};
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return false;
+      },
+    };
 
     const props = {
       actionsViewModel,
@@ -228,11 +261,19 @@ describe('UserActions', () => {
 
     userState.self(selfUser);
 
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.participating_user_ids([user]);
 
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return true;
+      },
+    };
 
     const props = {
       actionsViewModel,
@@ -268,11 +309,19 @@ describe('UserActions', () => {
 
     userState.self(selfUser);
 
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.participating_user_ids([user]);
 
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return true;
+      },
+    };
 
     const props = {
       actionsViewModel,
@@ -297,7 +346,9 @@ describe('UserActions', () => {
 
     const button = getByTestId(ActionIdentifier[Actions.START_CONVERSATION]);
 
-    await act(async () => button?.click());
+    await act(async () => {
+      return button?.click();
+    });
 
     expect(getByText('modal1To1ConversationCreateErrorNoKeyPackagesHeadline')).toBeDefined();
     expect(getByText('modal1To1ConversationCreateErrorNoKeyPackagesMessage')).toBeDefined();
@@ -317,7 +368,11 @@ describe('UserActions', () => {
 
     userState.self(selfUser);
 
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([user]));
 
@@ -328,7 +383,11 @@ describe('UserActions', () => {
 
     conversationState.conversations.push(one2oneConversation);
 
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return true;
+      },
+    };
 
     const props = {
       actionsViewModel,
@@ -354,12 +413,20 @@ describe('UserActions', () => {
   it('only generates remove participant action for an unavailable user', () => {
     const user = new User('', '', translateForTest);
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(conversation, 'isGroup').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
     jest
       .spyOn(conversation, 'participating_user_ids')
       .mockImplementation(ko.observableArray([new User('', '', translateForTest)]));
     user.connection()?.status(ConnectionStatus.ACCEPTED);
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return true;
+      },
+    };
 
     const props = {
       actionsViewModel,
@@ -384,8 +451,16 @@ describe('UserActions', () => {
     user.connection(connection);
     conversation.connection(connection);
     user.connection()?.status(ConnectionStatus.UNKNOWN);
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => false};
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return false;
+      },
+    };
 
     const props = {
       actionsViewModel,
@@ -414,8 +489,16 @@ describe('UserActions', () => {
     user.connection(connection);
     conversation.connection(connection);
     user.connection()?.status(ConnectionStatus.UNKNOWN);
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => false};
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return false;
+      },
+    };
 
     const props = {
       actionsViewModel,
@@ -441,7 +524,11 @@ describe('UserActions', () => {
     const connection = new ConnectionEntity();
     user.connection(connection);
     user.connection()?.status(ConnectionStatus.UNKNOWN);
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
 
     const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const selfUser = new User('', '', translateForTest);
@@ -486,8 +573,16 @@ describe('UserActions', () => {
     user.connection(connection);
     conversation.connection(connection);
     user.connection()?.status(ConnectionStatus.SENT);
-    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
-    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => false};
+    jest.spyOn(user, 'isAvailable').mockImplementation(
+      ko.pureComputed(() => {
+        return true;
+      }),
+    );
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {
+      canRemoveParticipants: () => {
+        return false;
+      },
+    };
 
     const props = {
       actionsViewModel,

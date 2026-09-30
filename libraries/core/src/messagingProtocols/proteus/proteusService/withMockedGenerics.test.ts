@@ -41,8 +41,8 @@ const prepareProteusService = async () => {
   const [proteusService, {apiClient}] = await buildProteusService();
   apiClients.push(apiClient);
 
-  jest.spyOn(apiClient.api.user, 'postListClients').mockImplementation(() =>
-    Promise.resolve({
+  jest.spyOn(apiClient.api.user, 'postListClients').mockImplementation(() => {
+    return Promise.resolve({
       qualified_user_map: {
         'test-domain': {
           'test-id-1': [{class: ClientClassification.DESKTOP, id: 'test-client-id-1-user-1'}],
@@ -52,11 +52,11 @@ const prepareProteusService = async () => {
           ],
         },
       },
-    }),
-  );
-  jest
-    .spyOn(apiClient.api.conversation, 'postConversation')
-    .mockImplementation(data => Promise.resolve(data as Conversation));
+    });
+  });
+  jest.spyOn(apiClient.api.conversation, 'postConversation').mockImplementation(data => {
+    return Promise.resolve(data as Conversation);
+  });
 
   return proteusService;
 };
@@ -88,7 +88,9 @@ describe('sendGenericMessage', () => {
 describe('createConversation', () => {
   afterAll(() => {
     jest.clearAllTimers();
-    apiClients.forEach(client => client.disconnect());
+    apiClients.forEach(client => {
+      return client.disconnect();
+    });
     cleanupProteusServiceMocks();
   });
 

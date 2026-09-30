@@ -72,10 +72,14 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('create', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     Object.entries(createSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
 
     it('writes into an existing database.', async () => {
@@ -105,50 +109,74 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('delete', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     Object.entries(deleteSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('deleteAll', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     Object.entries(deleteAllSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('purge', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     Object.entries(purgeSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine, initEngine));
+      it(description, () => {
+        return testFunction(engine, initEngine);
+      });
     });
   });
 
   describe('readAllPrimaryKeys', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('readAll', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     Object.entries(readAllSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('read', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     Object.entries(readSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
 
     it('works with typed arrays such as Uint8Array', async () => {
@@ -158,7 +186,11 @@ describe('IndexedDBEngine', () => {
       const entity = {
         conversation: '123',
         data: {
-          content: Uint8Array.from(Array.from(testMessage).map(char => char.charCodeAt(0))),
+          content: Uint8Array.from(
+            Array.from(testMessage).map(char => {
+              return char.charCodeAt(0);
+            }),
+          ),
         },
       };
 
@@ -179,7 +211,9 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('save', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     it('generates primary keys', async () => {
       const TABLE_NAME = 'test-table';
@@ -230,10 +264,14 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('update', () => {
-    beforeEach(async () => (engine = await initEngine()));
+    beforeEach(async () => {
+      return (engine = await initEngine());
+    });
 
     Object.entries(updateSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 });

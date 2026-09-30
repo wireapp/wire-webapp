@@ -70,7 +70,7 @@ export const handleSharedDriveUploadInput = (
     return;
   }
 
-  fireAndForgetInvoker.fireAndForget(() =>
-    sharedDriveUploadController.upload(files, uploadPath, onRefresh, conversationQualifiedId),
-  );
+  fireAndForgetInvoker.fireAndForget(() => {
+    return sharedDriveUploadController.upload(files, uploadPath, onRefresh, conversationQualifiedId);
+  });
 };

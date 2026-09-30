@@ -27,7 +27,9 @@ export const isVideoPlayable = async (url: string): Promise<boolean> => {
       }
       resolve(true);
     };
-    video.onerror = () => resolve(false);
+    video.onerror = () => {
+      return resolve(false);
+    };
     video.src = url;
   });
 };

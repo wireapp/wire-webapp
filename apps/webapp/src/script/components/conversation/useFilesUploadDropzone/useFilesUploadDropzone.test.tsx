@@ -16,18 +16,22 @@ const conversation = {
 };
 const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
-const createRepository = () => ({
-  uploadNodeDraft: jest.fn(),
-  cancelUpload: jest.fn(),
-  deleteNodeDraft: jest.fn(),
-});
+const createRepository = () => {
+  return {
+    uploadNodeDraft: jest.fn(),
+    cancelUpload: jest.fn(),
+    deleteNodeDraft: jest.fn(),
+  };
+};
 
 describe('useFilesUploadDropzone', () => {
   const originalNodeEnvironment = process.env.NODE_ENV;
 
   beforeEach(() => {
     useFileUploadState.getState().clearAll({conversationId: conversation.id});
-    URL.createObjectURL = jest.fn(() => 'blob:preview');
+    URL.createObjectURL = jest.fn(() => {
+      return 'blob:preview';
+    });
   });
 
   afterEach(() => {
@@ -40,10 +44,12 @@ describe('useFilesUploadDropzone', () => {
     }>();
     const cellsRepository = createRepository();
     cellsRepository.uploadNodeDraft.mockResolvedValue({uuid: 'remote-id', versionId: 'version-id'});
-    const buildFileMetadata = jest.fn(() => metadataPromise);
+    const buildFileMetadata = jest.fn(() => {
+      return metadataPromise;
+    });
     const {result} = renderHook(
-      () =>
-        useFilesUploadDropzone({
+      () => {
+        return useFilesUploadDropzone({
           isTeam: false,
           isCellsEnabled: true,
           isDisabled: false,
@@ -52,7 +58,8 @@ describe('useFilesUploadDropzone', () => {
           translate: translateForTest,
           conversation,
           buildFileMetadata,
-        }),
+        });
+      },
       {wrapper},
     );
     const file = new File(['content'], 'image.png', {type: 'image/png'});
@@ -72,7 +79,9 @@ describe('useFilesUploadDropzone', () => {
     expect(cellsRepository.uploadNodeDraft).not.toHaveBeenCalled();
 
     resolveMetadata({image: {width: 640, height: 480}});
-    await act(async () => await completedUploadPromise);
+    await act(async () => {
+      return await completedUploadPromise;
+    });
 
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledTimes(1);
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})[0]).toMatchObject({
@@ -82,7 +91,9 @@ describe('useFilesUploadDropzone', () => {
   });
 
   it('adds a local preview before starting an upload and maps repository progress to percent', async () => {
-    let resolveUpload: (result: {uuid: string; versionId: string}) => void = () => undefined;
+    let resolveUpload: (result: {uuid: string; versionId: string}) => void = () => {
+      return undefined;
+    };
     const uploadPromise = new Promise<{uuid: string; versionId: string}>(resolve => {
       resolveUpload = resolve;
     });
@@ -94,8 +105,8 @@ describe('useFilesUploadDropzone', () => {
       },
     );
     const {result} = renderHook(
-      () =>
-        useFilesUploadDropzone({
+      () => {
+        return useFilesUploadDropzone({
           isTeam: false,
           isCellsEnabled: true,
           isDisabled: false,
@@ -103,7 +114,8 @@ describe('useFilesUploadDropzone', () => {
           cellsRepository: cellsRepository as never,
           translate: translateForTest,
           conversation,
-        }),
+        });
+      },
       {wrapper},
     );
     const file = new File(['content'], 'document.txt', {type: 'text/plain'});
@@ -116,9 +128,9 @@ describe('useFilesUploadDropzone', () => {
       throw new Error('The upload promise was not created');
     }
     const completedUploadPromise = upload;
-    await waitFor(() =>
-      expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})).toHaveLength(1),
-    );
+    await waitFor(() => {
+      return expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})).toHaveLength(1);
+    });
 
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledWith(
       expect.objectContaining({uuid: expect.any(String), file, path: 'qualified-conversation-id@example.com'}),
@@ -132,7 +144,9 @@ describe('useFilesUploadDropzone', () => {
     });
 
     resolveUpload({uuid: 'remote-id', versionId: 'version-id'});
-    await act(async () => await completedUploadPromise);
+    await act(async () => {
+      return await completedUploadPromise;
+    });
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})[0]).toMatchObject({
       remoteUuid: 'remote-id',
       remoteVersionId: 'version-id',
@@ -145,8 +159,8 @@ describe('useFilesUploadDropzone', () => {
     const cellsRepository = createRepository();
     cellsRepository.uploadNodeDraft.mockResolvedValue({uuid: 'remote-id', versionId: 'version-id'});
     const {result} = renderHook(
-      () =>
-        useFilesUploadDropzone({
+      () => {
+        return useFilesUploadDropzone({
           isTeam: false,
           isCellsEnabled: true,
           isDisabled: false,
@@ -154,11 +168,14 @@ describe('useFilesUploadDropzone', () => {
           cellsRepository: cellsRepository as never,
           translate: translateForTest,
           conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
-    await act(async () => result.current.handlePastedFile(new File(['content'], 'document.txt')));
+    await act(async () => {
+      return result.current.handlePastedFile(new File(['content'], 'document.txt'));
+    });
 
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledWith(
       expect.objectContaining({path: expect.stringMatching(/^local-conversation-id@/)}),
@@ -167,8 +184,8 @@ describe('useFilesUploadDropzone', () => {
 
   it('sets directory picker input attributes for folder uploads', () => {
     const {result} = renderHook(
-      () =>
-        useFilesUploadDropzone({
+      () => {
+        return useFilesUploadDropzone({
           isTeam: false,
           isCellsEnabled: true,
           isDisabled: false,
@@ -176,11 +193,14 @@ describe('useFilesUploadDropzone', () => {
           cellsRepository: createRepository() as never,
           translate: translateForTest,
           conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
-    act(() => result.current.openFolderView());
+    act(() => {
+      return result.current.openFolderView();
+    });
     expect(result.current.getInputProps()).toEqual(
       expect.objectContaining({
         directory: '',
@@ -188,7 +208,9 @@ describe('useFilesUploadDropzone', () => {
       }),
     );
 
-    act(() => result.current.openAllFilesView());
+    act(() => {
+      return result.current.openAllFilesView();
+    });
     expect(result.current.getInputProps()).toEqual(
       expect.not.objectContaining({
         directory: '',
@@ -201,8 +223,8 @@ describe('useFilesUploadDropzone', () => {
     const cellsRepository = createRepository();
     cellsRepository.uploadNodeDraft.mockRejectedValue(new Error('network'));
     const {result} = renderHook(
-      () =>
-        useFilesUploadDropzone({
+      () => {
+        return useFilesUploadDropzone({
           isTeam: false,
           isCellsEnabled: true,
           isDisabled: false,
@@ -210,7 +232,8 @@ describe('useFilesUploadDropzone', () => {
           cellsRepository: cellsRepository as never,
           translate: translateForTest,
           conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
@@ -231,8 +254,8 @@ describe('useFilesUploadDropzone', () => {
     const abortError = Object.assign(new Error('cancelled'), {name: 'AbortError'});
     cellsRepository.uploadNodeDraft.mockRejectedValue(abortError);
     const {result} = renderHook(
-      () =>
-        useFilesUploadDropzone({
+      () => {
+        return useFilesUploadDropzone({
           isTeam: false,
           isCellsEnabled: true,
           isDisabled: false,
@@ -240,11 +263,14 @@ describe('useFilesUploadDropzone', () => {
           cellsRepository: cellsRepository as never,
           translate: translateForTest,
           conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
-    await act(async () => result.current.handlePastedFile(new File(['content'], 'document.txt')));
+    await act(async () => {
+      return result.current.handlePastedFile(new File(['content'], 'document.txt'));
+    });
     expect(useFileUploadState.getState().getFiles({conversationId: conversation.id})[0].uploadStatus).toBe('uploading');
   });
 });

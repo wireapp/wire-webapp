@@ -63,14 +63,18 @@ const getConversationActions = ({
   const isSingleUser = is1to1Action || conversationEntity.isRequest();
   const userEntity = conversationEntity.firstUserEntity();
 
-  const getNextConversation = () => conversationRepository.getNextConversation(conversationEntity);
+  const getNextConversation = () => {
+    return conversationRepository.getNextConversation(conversationEntity);
+  };
   const userPermissions = UserPermission.generatePermissionHelpers(teamRole);
 
   const allMenuElements: {item: MenuItem; condition: boolean}[] = [
     {
       condition: userPermissions.canCreateGroupConversation() && is1to1Action && !isServiceMode,
       item: {
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity),
+        click: () => {
+          return amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity);
+        },
         Icon: Icon.GroupIcon,
         identifier: 'go-create-group',
         label: translate('conversationDetailsActionCreateGroup'),
@@ -79,7 +83,9 @@ const getConversationActions = ({
     {
       condition: !conversationEntity.is_archived(),
       item: {
-        click: async () => actionsViewModel.archiveConversation(conversationEntity),
+        click: async () => {
+          return actionsViewModel.archiveConversation(conversationEntity);
+        },
         Icon: Icon.ArchiveIcon,
         identifier: 'do-archive',
         label: translate('conversationDetailsActionArchive'),
@@ -88,7 +94,9 @@ const getConversationActions = ({
     {
       condition: conversationEntity.is_archived(),
       item: {
-        click: async () => actionsViewModel.unarchiveConversation(conversationEntity),
+        click: async () => {
+          return actionsViewModel.unarchiveConversation(conversationEntity);
+        },
         Icon: Icon.ArchiveIcon,
         identifier: 'do-unarchive',
         label: translate('conversationsPopoverUnarchive'),
@@ -111,7 +119,9 @@ const getConversationActions = ({
     {
       condition: conversationEntity.isClearable(),
       item: {
-        click: () => actionsViewModel.clearConversation(conversationEntity),
+        click: () => {
+          return actionsViewModel.clearConversation(conversationEntity);
+        },
         Icon: Icon.EraserIcon,
         identifier: 'do-clear',
         label: translate('conversationDetailsActionClear'),
@@ -148,7 +158,9 @@ const getConversationActions = ({
     {
       condition: conversationEntity.isLeavable() && roleRepository.canLeaveGroup(conversationEntity),
       item: {
-        click: async () => actionsViewModel.leaveConversation(conversationEntity),
+        click: async () => {
+          return actionsViewModel.leaveConversation(conversationEntity);
+        },
         Icon: Icon.LeaveIcon,
         identifier: 'do-leave',
         label: conversationEntity.isChannel()
@@ -164,7 +176,9 @@ const getConversationActions = ({
         !conversationEntity.isSelfUserRemoved() &&
         conversationEntity.inTeam(),
       item: {
-        click: () => actionsViewModel.deleteConversation(conversationEntity),
+        click: () => {
+          return actionsViewModel.deleteConversation(conversationEntity);
+        },
         Icon: Icon.DeleteIcon,
         identifier: 'do-delete',
         label: conversationEntity.isChannel()
@@ -178,7 +192,9 @@ const getConversationActions = ({
         conversationEntity.isSelfUserRemoved() &&
         Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION,
       item: {
-        click: () => actionsViewModel.removeConversation(conversationEntity),
+        click: () => {
+          return actionsViewModel.removeConversation(conversationEntity);
+        },
         Icon: Icon.CloseIcon,
         identifier: 'do-remove',
         label: translate('conversationDetailsActionDeleteForMe'),
@@ -186,7 +202,13 @@ const getConversationActions = ({
     },
   ];
 
-  return allMenuElements.filter(menuElement => menuElement.condition).map(menuElement => menuElement.item);
+  return allMenuElements
+    .filter(menuElement => {
+      return menuElement.condition;
+    })
+    .map(menuElement => {
+      return menuElement.item;
+    });
 };
 
 export {getConversationActions};

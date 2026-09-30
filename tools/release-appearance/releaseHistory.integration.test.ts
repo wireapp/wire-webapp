@@ -213,7 +213,11 @@ describe('release history planning', () => {
       if (actualResult.value.kind !== 'beta') {
         assert.fail('Expected a Beta history plan');
       }
-      expect(actualResult.value.candidateRanges.map(candidateRange => candidateRange.candidateTag)).toEqual([betaTag]);
+      expect(
+        actualResult.value.candidateRanges.map(candidateRange => {
+          return candidateRange.candidateTag;
+        }),
+      ).toEqual([betaTag]);
       expect(actualResult.value.candidateRanges[0]?.commitRange.baseCommit).toBe(productionCommit);
       expect(actualResult.value.candidateRanges[0]?.commitRange.endCommit).toBe(betaCommit);
       expect(actualResult.value.candidateRanges[0]?.commitRange.commits).toEqual([betaCommit]);
@@ -261,10 +265,11 @@ describe('release history planning', () => {
       if (actualResult.value.kind !== 'beta') {
         assert.fail('Expected a Beta history plan');
       }
-      expect(actualResult.value.candidateRanges.map(candidateRange => candidateRange.candidateTag)).toEqual([
-        betaOneTag,
-        betaTwoTag,
-      ]);
+      expect(
+        actualResult.value.candidateRanges.map(candidateRange => {
+          return candidateRange.candidateTag;
+        }),
+      ).toEqual([betaOneTag, betaTwoTag]);
       expect(actualResult.value.candidateRanges[0]?.commitRange.startTag).toBe('2026-01-01.1-production');
       expect(actualResult.value.candidateRanges[0]?.commitRange.endTag).toBe(betaOneTag);
       expect(actualResult.value.candidateRanges[0]?.commitRange.commits).toEqual([betaOneCommit]);

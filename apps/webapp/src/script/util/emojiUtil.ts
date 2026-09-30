@@ -29,7 +29,9 @@ export const EMOJI_RANGES =
     .split(', ')
     .reduce<string[]>((list, codepoint) => {
       const hexBase = 16;
-      const [start, end = start]: number[] = codepoint.split('-').map(code => parseInt(code, hexBase));
+      const [start, end = start]: number[] = codepoint.split('-').map(code => {
+        return parseInt(code, hexBase);
+      });
       for (let code = start; code <= end; code++) {
         list.push(String.fromCodePoint(code));
       }
@@ -37,12 +39,19 @@ export const EMOJI_RANGES =
     }, []);
 
 const UNICODE_RANGE_REGEXP = new RegExp(`[${EMOJI_RANGES.join('')}]`, 'g');
-const removeWhitespace = (string: string) => string.replace(/\s+/g, '');
-const removeEmojis = (string: string) => string.replace(UNICODE_RANGE_REGEXP, '');
-const isValidString = (string: string) => typeof string === 'string' && string.length > 0;
+const removeWhitespace = (string: string) => {
+  return string.replace(/\s+/g, '');
+};
+const removeEmojis = (string: string) => {
+  return string.replace(UNICODE_RANGE_REGEXP, '');
+};
+const isValidString = (string: string) => {
+  return typeof string === 'string' && string.length > 0;
+};
 
-export const includesOnlyEmojis = (text: string) =>
-  isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
+export const includesOnlyEmojis = (text: string) => {
+  return isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
+};
 
 const emojiesFlatten = Object.values(emojies).flat();
 const emojiesList = groupBy(emojiesFlatten, 'u');
@@ -78,7 +87,9 @@ const removeSkinToneModifiers = (emojiUnicode: string): string => {
     return '';
   }
   const emojiUnicodeSplitted = emojiUnicode.split('-');
-  const unicodeWithoutSkinModifier = emojiUnicodeSplitted.filter(part => !skinToneModifiers.has(part));
+  const unicodeWithoutSkinModifier = emojiUnicodeSplitted.filter(part => {
+    return !skinToneModifiers.has(part);
+  });
 
   return unicodeWithoutSkinModifier.join('-');
 };
@@ -96,6 +107,10 @@ export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
 export function getEmojiUnicode(emojis: string) {
   const hexCode = 16;
   const padding = 4;
-  const unicode = [...emojis].map(emoji => emoji.codePointAt(0)?.toString(hexCode).padStart(padding, '0')).join('-');
+  const unicode = [...emojis]
+    .map(emoji => {
+      return emoji.codePointAt(0)?.toString(hexCode).padStart(padding, '0');
+    })
+    .join('-');
   return unicode;
 }

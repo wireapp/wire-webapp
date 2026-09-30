@@ -52,11 +52,16 @@ describe('FileEngine', () => {
     engine = await initEngine();
   });
 
-  afterEach(async () => remove(TEST_DIRECTORY));
+  afterEach(async () => {
+    return remove(TEST_DIRECTORY);
+  });
 
   describe('enforcePathRestrictions', () => {
-    const enforcePathRestrictions = (givenTrustedRoot: string, givenPath: string) => () =>
-      FileEngine.enforcePathRestrictions(givenTrustedRoot, givenPath);
+    const enforcePathRestrictions = (givenTrustedRoot: string, givenPath: string) => {
+      return () => {
+        return FileEngine.enforcePathRestrictions(givenTrustedRoot, givenPath);
+      };
+    };
     const expectedError = StoreEngineError.PathValidationError;
     const unixFolder = '/home/marge/test/';
     const windowsFolder = 'C:\\Users\\bart\\Documents\\Database\\';
@@ -159,7 +164,9 @@ describe('FileEngine', () => {
   describe('create', () => {
     describe('create', () => {
       Object.entries(createSpec).map(([description, testFunction]) => {
-        it(description, () => testFunction(engine));
+        it(description, () => {
+          return testFunction(engine);
+        });
       });
     });
 
@@ -176,49 +183,65 @@ describe('FileEngine', () => {
 
   describe('delete', () => {
     Object.entries(deleteSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('deleteAll', () => {
     Object.entries(deleteAllSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('purge', () => {
     Object.entries(purgeSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine, initEngine));
+      it(description, () => {
+        return testFunction(engine, initEngine);
+      });
     });
   });
 
   describe('readAllPrimaryKeys', () => {
     Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('readAll', () => {
     Object.entries(readAllSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('read', () => {
     Object.entries(readSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('updateOrCreate', () => {
     Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('update', () => {
     Object.entries(updateSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 });

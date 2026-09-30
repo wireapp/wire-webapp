@@ -34,6 +34,8 @@ describe('InviteModal', () => {
     render(<InviteModal translate={translateForTest} selfUser={user} />);
 
     const textarea = await screen.getByTestId('invite-modal-message');
-    await waitFor(() => expect((textarea as HTMLTextAreaElement).value).toBe('inviteMessage'));
+    await waitFor(() => {
+      return expect((textarea as HTMLTextAreaElement).value).toBe('inviteMessage');
+    });
   });
 });

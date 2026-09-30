@@ -50,8 +50,12 @@ jest.mock('./conversation', () => {
   class FakeConversationService {
     constructor(..._args: any[]) {}
     // Return unhandled so NotificationService falls back to generic handling in tests
-    handleEvent = jest.fn(async () => ({status: 'unhandled' as const}));
-    runDeferredEpochRecovery = jest.fn(async () => undefined);
+    handleEvent = jest.fn(async () => {
+      return {status: 'unhandled' as const};
+    });
+    runDeferredEpochRecovery = jest.fn(async () => {
+      return undefined;
+    });
   }
   return {
     ...actual,
@@ -116,7 +120,9 @@ describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
 
   afterAll(() => {
-    apiClients.forEach(client => client.disconnect());
+    apiClients.forEach(client => {
+      return client.disconnect();
+    });
   });
 
   // Fix for node 16, crypto.subtle.decrypt has a type problem
@@ -135,8 +141,12 @@ describe('Account', () => {
 
   beforeEach(() => {
     nock(MOCK_BACKEND.rest)
-      .post(AuthAPI.URL.LOGIN, body => body.email && body.password)
-      .query(() => true)
+      .post(AuthAPI.URL.LOGIN, body => {
+        return body.email && body.password;
+      })
+      .query(() => {
+        return true;
+      })
       .reply((_, body: any) => {
         if (body.password === 'wrong') {
           return [
@@ -306,10 +316,12 @@ describe('Account', () => {
     let server: WS;
 
     const mockNotifications = (size: number) => {
-      const notifications = Array.from(new Array(size)).map(() => ({
-        id: uuidv4(),
-        payload: [{}] as BackendEvent[],
-      }));
+      const notifications = Array.from(new Array(size)).map(() => {
+        return {
+          id: uuidv4(),
+          payload: [{}] as BackendEvent[],
+        };
+      });
       jest.spyOn(dependencies.apiClient.api.notification, 'getAllNotifications').mockResolvedValue({notifications});
     };
 
@@ -345,7 +357,9 @@ describe('Account', () => {
       account['currentClient'] = currentClient;
       jest
         .spyOn(getAccountServiceForTest(dependencies.account).notification, 'handleNotification')
-        .mockImplementation(notif => notif.payload as any);
+        .mockImplementation(notif => {
+          return notif.payload as any;
+        });
       jest
         .spyOn(getAccountServiceForTest(dependencies.account).notification['database'], 'getLastNotificationId')
         .mockResolvedValue('0');
@@ -397,7 +411,9 @@ describe('Account', () => {
                 }),
               );
 
-              await waitFor(() => expect(onEvent).toHaveBeenCalledTimes(1));
+              await waitFor(() => {
+                return expect(onEvent).toHaveBeenCalledTimes(1);
+              });
               expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
               expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.WEBSOCKET);
               resolve();
@@ -435,12 +451,12 @@ describe('Account', () => {
             onConnectionStateChanged,
           });
 
-          await waitFor(() =>
-            expect(onConnectionStateChanged).toHaveBeenCalledWith(
+          await waitFor(() => {
+            return expect(onConnectionStateChanged).toHaveBeenCalledWith(
               ConnectionState.LIVE,
               expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
-            ),
-          );
+            );
+          });
 
           disconnect();
         });
@@ -469,9 +485,9 @@ describe('Account', () => {
             onConnectionStateChanged,
           });
 
-          await waitFor(() =>
-            expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS),
-          );
+          await waitFor(() => {
+            return expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS);
+          });
 
           disconnect();
         });
@@ -563,19 +579,21 @@ describe('Account', () => {
           onConnectionStateChanged,
         });
 
-        await waitFor(() =>
-          expect(onConnectionStateChanged).toHaveBeenCalledWith(
+        await waitFor(() => {
+          return expect(onConnectionStateChanged).toHaveBeenCalledWith(
             ConnectionState.CLOSED,
             expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
-          ),
-        );
+          );
+        });
 
         expect(onConnectionStateChanged).toHaveBeenCalledWith(
           ConnectionState.PROCESSING_NOTIFICATIONS,
           expect.objectContaining({attemptId: expect.any(Number), wrapperGeneration: expect.any(Number)}),
         );
         expect(
-          onConnectionStateChanged.mock.calls.some(([connectionState]) => connectionState === ConnectionState.LIVE),
+          onConnectionStateChanged.mock.calls.some(([connectionState]) => {
+            return connectionState === ConnectionState.LIVE;
+          }),
         ).toBe(false);
         expect(unlock).not.toHaveBeenCalled();
 
@@ -594,10 +612,12 @@ describe('Account', () => {
       initialisePendingProposalsTasks: jest.Mock<Promise<void>, []>;
     };
 
-    const buildMlsServiceStub = (): MlsServiceStub => ({
-      isEnabled: true,
-      initialisePendingProposalsTasks: jest.fn<Promise<void>, []>().mockResolvedValue(undefined),
-    });
+    const buildMlsServiceStub = (): MlsServiceStub => {
+      return {
+        isEnabled: true,
+        initialisePendingProposalsTasks: jest.fn<Promise<void>, []>().mockResolvedValue(undefined),
+      };
+    };
 
     const setup = async (mlsService: MlsServiceStub) => {
       const {account, apiClient} = await createAccount();
@@ -616,8 +636,12 @@ describe('Account', () => {
         .mockResolvedValue({total: 0, error: 0, success: 0});
 
       // Avoid touching the websocket transport during the test.
-      jest.spyOn(apiClient.transport.ws, 'lock').mockImplementation(() => undefined);
-      jest.spyOn(apiClient.transport.ws, 'unlock').mockImplementation(() => undefined);
+      jest.spyOn(apiClient.transport.ws, 'lock').mockImplementation(() => {
+        return undefined;
+      });
+      jest.spyOn(apiClient.transport.ws, 'unlock').mockImplementation(() => {
+        return undefined;
+      });
 
       // The legacy processor pushes its "transition to LIVE" task onto a queue that the
       // production code resumes from `connect()`. Since we invoke the factory directly
@@ -627,8 +651,11 @@ describe('Account', () => {
       return {account};
     };
 
-    const indexOfFirstLiveTransition = (mock: jest.Mock<void, [ConnectionState]>): number =>
-      mock.mock.calls.findIndex(([state]) => state === ConnectionState.LIVE);
+    const indexOfFirstLiveTransition = (mock: jest.Mock<void, [ConnectionState]>): number => {
+      return mock.mock.calls.findIndex(([state]) => {
+        return state === ConnectionState.LIVE;
+      });
+    };
 
     it('rehydrates pending-proposals before emitting the LIVE connection state, after the legacy stream is drained', async () => {
       const mlsService = buildMlsServiceStub();
@@ -645,7 +672,9 @@ describe('Account', () => {
       await processStream();
 
       // The LIVE transition is dispatched via the notificationProcessingQueue (async).
-      await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+      await waitFor(() => {
+        return expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE);
+      });
 
       expect(mlsService.initialisePendingProposalsTasks).toHaveBeenCalledTimes(1);
 
@@ -661,8 +690,11 @@ describe('Account', () => {
       const {account} = await setup(mlsService);
 
       const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
-      const liveTransitionCount = () =>
-        onConnectionStateChanged.mock.calls.filter(([state]) => state === ConnectionState.LIVE).length;
+      const liveTransitionCount = () => {
+        return onConnectionStateChanged.mock.calls.filter(([state]) => {
+          return state === ConnectionState.LIVE;
+        }).length;
+      };
 
       const processStream = account['createLegacyNotificationStreamProcessor']({
         handleLegacyNotification: jest.fn().mockResolvedValue(undefined),
@@ -671,11 +703,15 @@ describe('Account', () => {
       });
 
       await processStream();
-      await waitFor(() => expect(liveTransitionCount()).toBe(1));
+      await waitFor(() => {
+        return expect(liveTransitionCount()).toBe(1);
+      });
       expect(mlsService.initialisePendingProposalsTasks).toHaveBeenCalledTimes(1);
 
       await processStream();
-      await waitFor(() => expect(liveTransitionCount()).toBe(2));
+      await waitFor(() => {
+        return expect(liveTransitionCount()).toBe(2);
+      });
       expect(mlsService.initialisePendingProposalsTasks).toHaveBeenCalledTimes(1);
     });
 
@@ -692,7 +728,9 @@ describe('Account', () => {
       });
 
       await processStream();
-      await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+      await waitFor(() => {
+        return expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE);
+      });
 
       expect(mlsService.initialisePendingProposalsTasks).not.toHaveBeenCalled();
     });

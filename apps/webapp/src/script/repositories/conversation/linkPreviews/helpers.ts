@@ -50,7 +50,9 @@ export const getFirstLinkWithOffset = (text: string): {offset: number; url: stri
 
   const matchedLinks = linkify.match(textWithoutCode);
   const links = isNull(matchedLinks) ? [] : matchedLinks;
-  const [firstLink] = links.filter(link => ['http:', 'https:', ''].includes(link.schema));
+  const [firstLink] = links.filter(link => {
+    return ['http:', 'https:', ''].includes(link.schema);
+  });
 
   return isUndefined(firstLink)
     ? undefined

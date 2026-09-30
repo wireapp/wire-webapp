@@ -40,7 +40,9 @@ export const DetailedDevice = ({
   isProteusVerified,
 }: DeviceProps) => {
   const isE2eiEnabled = E2EIHandler.getInstance().isE2EIEnabled();
-  const getIdentity = () => getDeviceIdentity?.(device.id);
+  const getIdentity = () => {
+    return getDeviceIdentity?.(device.id);
+  };
 
   return (
     <>

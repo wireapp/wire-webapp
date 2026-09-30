@@ -34,7 +34,9 @@ describe('useReadReceipt', () => {
 
   it('batches the read receipt sending per conversation', async () => {
     const sendReadReceipt = jest.fn();
-    const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({sendReadReceipt});
+    });
     const conversation1 = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const conversation2 = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
@@ -64,7 +66,9 @@ describe('useReadReceipt', () => {
 
   it('batches the read receipt sending per sender', async () => {
     const sendReadReceipt = jest.fn();
-    const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({sendReadReceipt});
+    });
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const sender1 = createUuid();
@@ -90,7 +94,9 @@ describe('useReadReceipt', () => {
 
   it('does not add the same message multiple times', async () => {
     const sendReadReceipt = jest.fn();
-    const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({sendReadReceipt});
+    });
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const message = new Message(createUuid(), undefined, translateForTest);

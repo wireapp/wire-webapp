@@ -25,20 +25,21 @@ import {navigate} from './Router';
 
 import {useAppMainState, ViewType} from '../page/state';
 
-export const createNavigate = (link: string) => (event?: React.MouseEvent<Element, MouseEvent>) => {
-  // The order here matters, setting the view before calling navigate() would not save the history
-  navigate(link);
-  setResponsiveView();
-  event?.preventDefault();
+export const createNavigate = (link: string) => {
+  return (event?: React.MouseEvent<Element, MouseEvent>) => {
+    // The order here matters, setting the view before calling navigate() would not save the history
+    navigate(link);
+    setResponsiveView();
+    event?.preventDefault();
+  };
 };
 
-export const createNavigateKeyboard =
-  (
-    link: string,
-    setIsResponsive = false,
-    supportedKeys: string[] = [KEY.ENTER, KEY.SPACE],
-  ): React.KeyboardEventHandler =>
-  (event: React.KeyboardEvent<Element>) => {
+export const createNavigateKeyboard = (
+  link: string,
+  setIsResponsive = false,
+  supportedKeys: string[] = [KEY.ENTER, KEY.SPACE],
+): React.KeyboardEventHandler => {
+  return (event: React.KeyboardEvent<Element>) => {
     if (setIsResponsive) {
       setResponsiveView();
     }
@@ -50,6 +51,7 @@ export const createNavigateKeyboard =
       event.preventDefault();
     }
   };
+};
 
 const setResponsiveView = () => {
   const {responsiveView} = useAppMainState.getState();

@@ -117,25 +117,29 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
         <p css={description}>{translate('qualityFeedback.description')}</p>
 
         <ul css={ratingList}>
-          {ratingListItems.map(ratingItem => (
-            <li key={ratingItem.value}>
-              {isNonEmptyString(ratingItem?.headingTranslationKey) && (
-                // headingTranslationKey has to broad type to specify it
-                // TODO: narrow down the type
-                <div css={ratingItemHeading}>{translate(ratingItem.headingTranslationKey)}</div>
-              )}
-              <Button
-                variant={ButtonVariant.TERTIARY}
-                type="button"
-                onClick={() => sendQualityFeedback(ratingItem.value)}
-                data-uie-name="go-rate-call-quality-feedback"
-                data-uie-value={ratingItem.value}
-                css={ratingItemBubble}
-              >
-                {ratingItem.value}
-              </Button>
-            </li>
-          ))}
+          {ratingListItems.map(ratingItem => {
+            return (
+              <li key={ratingItem.value}>
+                {isNonEmptyString(ratingItem?.headingTranslationKey) && (
+                  // headingTranslationKey has to broad type to specify it
+                  // TODO: narrow down the type
+                  <div css={ratingItemHeading}>{translate(ratingItem.headingTranslationKey)}</div>
+                )}
+                <Button
+                  variant={ButtonVariant.TERTIARY}
+                  type="button"
+                  onClick={() => {
+                    return sendQualityFeedback(ratingItem.value);
+                  }}
+                  data-uie-name="go-rate-call-quality-feedback"
+                  data-uie-value={ratingItem.value}
+                  css={ratingItemBubble}
+                >
+                  {ratingItem.value}
+                </Button>
+              </li>
+            );
+          })}
         </ul>
 
         <div css={buttonWrapper}>
@@ -155,7 +159,9 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
             checked={isChecked}
             data-uie-name="do-not-ask-again-checkbox"
             id="do-not-ask-again-checkbox"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              return setIsChecked(event.target.checked);
+            }}
           >
             <CheckboxLabel className="label-xs" htmlFor="do-not-ask-again-checkbox">
               {translate('qualityFeedback.doNotAskAgain')}

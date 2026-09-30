@@ -27,7 +27,9 @@ const isEqual = (a: Uint8Array, b: Uint8Array): boolean => {
   const arrayB = new Uint32Array(b);
 
   const hasSameLength = arrayA.length === arrayB.length;
-  const hasSameValues = arrayA.every((value, index) => value === arrayB[index]);
+  const hasSameValues = arrayA.every((value, index) => {
+    return value === arrayB[index];
+  });
 
   return hasSameLength && hasSameValues;
 };

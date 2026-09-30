@@ -61,7 +61,9 @@ export class UserGroupAPI {
     })();
 
     return {
-      cancel: () => controller.abort(SyntheticErrorLabel.REQUEST_CANCELLED),
+      cancel: () => {
+        return controller.abort(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
       response,
     };
   }

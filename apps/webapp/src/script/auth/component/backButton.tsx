@@ -30,7 +30,9 @@ export const BackButton = () => {
   return (
     <button
       type="button"
-      onClick={() => navigate(-1)}
+      onClick={() => {
+        return navigate(-1);
+      }}
       aria-label={translate('createPersonalAccount.goBack')}
       data-uie-name="go-index"
       css={{background: 'none', border: 'none', cursor: 'pointer'}}

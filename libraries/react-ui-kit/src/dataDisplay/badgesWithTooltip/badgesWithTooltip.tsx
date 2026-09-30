@@ -46,11 +46,13 @@ const BadgeWithCount = ({item, count}: {item: string; count: number}) => {
 const BadgeList = ({items}: {items: string[]}) => {
   return (
     <ul css={listStyles}>
-      {items.map(item => (
-        <li css={listItemStyles} key={item}>
-          <Badge>{item}</Badge>
-        </li>
-      ))}
+      {items.map(item => {
+        return (
+          <li css={listItemStyles} key={item}>
+            <Badge>{item}</Badge>
+          </li>
+        );
+      })}
     </ul>
   );
 };

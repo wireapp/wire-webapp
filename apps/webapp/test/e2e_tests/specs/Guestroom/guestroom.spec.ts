@@ -176,7 +176,9 @@ test.describe('Guestroom', () => {
       ]);
       await sendConnectionRequest(ownerPage, guestUser);
 
-      const [ownerPages, guestPages] = [ownerPage, guestPage].map(page => PageManager.from(page).webapp.pages);
+      const [ownerPages, guestPages] = [ownerPage, guestPage].map(page => {
+        return PageManager.from(page).webapp.pages;
+      });
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();

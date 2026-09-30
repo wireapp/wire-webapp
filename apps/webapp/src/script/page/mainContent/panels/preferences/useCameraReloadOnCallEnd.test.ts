@@ -38,7 +38,9 @@ describe('useCameraReloadOnCallEnd', () => {
   });
 
   it('should initialize with camera reload state set to false', () => {
-    const {result} = renderHook(() => useCameraReloadOnCallEnd(mockCallingRepository as any));
+    const {result} = renderHook(() => {
+      return useCameraReloadOnCallEnd(mockCallingRepository as any);
+    });
 
     expect(result.current.shouldReloadCamera).toBe(false);
     expect(amplify.subscribe).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, expect.any(Function));
@@ -47,7 +49,9 @@ describe('useCameraReloadOnCallEnd', () => {
   it('should toggle camera reload state when call ends and no active call exists', () => {
     mockCallingRepository.hasActiveCall.mockReturnValue(false);
 
-    const {result} = renderHook(() => useCameraReloadOnCallEnd(mockCallingRepository as any));
+    const {result} = renderHook(() => {
+      return useCameraReloadOnCallEnd(mockCallingRepository as any);
+    });
 
     const subscribeCall = (amplify.subscribe as jest.Mock).mock.calls[0];
     const eventHandler = subscribeCall[1];
@@ -65,7 +69,9 @@ describe('useCameraReloadOnCallEnd', () => {
   it('should not toggle camera reload state when event is not ENDED_CALL', () => {
     mockCallingRepository.hasActiveCall.mockReturnValue(false);
 
-    const {result} = renderHook(() => useCameraReloadOnCallEnd(mockCallingRepository as any));
+    const {result} = renderHook(() => {
+      return useCameraReloadOnCallEnd(mockCallingRepository as any);
+    });
 
     const subscribeCall = (amplify.subscribe as jest.Mock).mock.calls[0];
     const eventHandler = subscribeCall[1];
@@ -81,7 +87,9 @@ describe('useCameraReloadOnCallEnd', () => {
   it('should not toggle camera reload state when there is an active call', () => {
     mockCallingRepository.hasActiveCall.mockReturnValue(true);
 
-    const {result} = renderHook(() => useCameraReloadOnCallEnd(mockCallingRepository as any));
+    const {result} = renderHook(() => {
+      return useCameraReloadOnCallEnd(mockCallingRepository as any);
+    });
 
     const subscribeCall = (amplify.subscribe as jest.Mock).mock.calls[0];
     const eventHandler = subscribeCall[1];
@@ -95,7 +103,9 @@ describe('useCameraReloadOnCallEnd', () => {
   });
 
   it('should unsubscribe from events on unmount', () => {
-    const {unmount} = renderHook(() => useCameraReloadOnCallEnd(mockCallingRepository as any));
+    const {unmount} = renderHook(() => {
+      return useCameraReloadOnCallEnd(mockCallingRepository as any);
+    });
 
     unmount();
 

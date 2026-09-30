@@ -167,7 +167,9 @@ describe('ConversationCellState', () => {
     });
 
     it('uses the injected translate function for generated summary copy', () => {
-      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const translate = jest.fn((translationKey: string) => {
+        return `translated:${translationKey}`;
+      });
 
       conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
       conversationEntity.messages_unordered([callMessage, callMessage]);

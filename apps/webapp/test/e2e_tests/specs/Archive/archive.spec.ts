@@ -68,7 +68,9 @@ test.describe('Archive', () => {
       ]);
       await connectWithUser(memberAPage, memberB);
 
-      const [memberAPages, memberBPages] = [memberAPage, memberBPage].map(page => PageManager.from(page).webapp.pages);
+      const [memberAPages, memberBPages] = [memberAPage, memberBPage].map(page => {
+        return PageManager.from(page).webapp.pages;
+      });
 
       const memberAConversation = await memberAPages
         .conversationList()

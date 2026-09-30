@@ -59,8 +59,9 @@ const avatarGridStyle: <T>(props: Props<T>) => CSSObject = ({
   };
 };
 
-const filteredAvatarGridProps = (props: Props) =>
-  filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
+const filteredAvatarGridProps = (props: Props) => {
+  return filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
+};
 
 type AvatarGridItem = Props['items'][number] | null;
 
@@ -78,8 +79,8 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
       css={avatarGridStyle(allProps)}
       {...filteredAvatarGridProps(allProps)}
     >
-      {slicedItems.map(item =>
-        !isNullOrUndefined(item) ? (
+      {slicedItems.map(item => {
+        return !isNullOrUndefined(item) ? (
           <Avatar
             key={Math.random().toString()}
             backgroundColor={item.backgroundColor ?? COLOR.GRAY_DARKEN_80}
@@ -100,8 +101,8 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
               width: '100%',
             }}
           />
-        ),
-      )}
+        );
+      })}
     </IsInViewport>
   );
 };

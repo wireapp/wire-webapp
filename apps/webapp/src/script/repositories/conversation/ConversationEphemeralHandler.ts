@@ -92,7 +92,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       const shouldSetInterval = messageEntities.length !== 0 && updateIntervalId === null;
       if (shouldSetInterval) {
         const INTERVAL_TIME = ConversationEphemeralHandler.CONFIG.INTERVAL_TIME;
-        updateIntervalId = window.setInterval(() => this._updateTimedMessages(), INTERVAL_TIME);
+        updateIntervalId = window.setInterval(() => {
+          return this._updateTimedMessages();
+        }, INTERVAL_TIME);
         this.logger.info('Started ephemeral message check interval');
       }
     });
@@ -163,9 +165,13 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
   async validateMessages(messageEntities: ContentMessage[]): Promise<Message[]> {
     const validatedMessages = await Promise.all(
-      messageEntities.map(messageEntity => this.validateMessage(messageEntity)),
+      messageEntities.map(messageEntity => {
+        return this.validateMessage(messageEntity);
+      }),
     );
-    return validatedMessages.filter(messageEntity => !!messageEntity) as Message[];
+    return validatedMessages.filter(messageEntity => {
+      return !!messageEntity;
+    }) as Message[];
   }
 
   private _obfuscateAssetMessage(messageEntity: ContentMessage): void {
@@ -301,9 +307,13 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
   async _updateTimedMessages(): Promise<void> {
     const updatedMessages = await Promise.all(
-      this.timedMessages().map(messageEntity => this._updateTimedMessage(messageEntity)),
+      this.timedMessages().map(messageEntity => {
+        return this._updateTimedMessage(messageEntity);
+      }),
     );
-    const expiredMessages = updatedMessages.filter(messageEntity => !!messageEntity) as ContentMessage[];
+    const expiredMessages = updatedMessages.filter(messageEntity => {
+      return !!messageEntity;
+    }) as ContentMessage[];
 
     if (expiredMessages.length !== 0) {
       this.timedMessages.remove(messageEntity => {

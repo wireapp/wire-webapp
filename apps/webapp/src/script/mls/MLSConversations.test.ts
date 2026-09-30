@@ -68,7 +68,9 @@ function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversa
 }
 
 function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYPE) {
-  return Array.from(new Array(nbConversations)).map(() => createMLSConversation(type));
+  return Array.from(new Array(nbConversations)).map(() => {
+    return createMLSConversation(type);
+  });
 }
 
 function mockSafeEpoch(core: {service?: Core['service']}) {
@@ -89,7 +91,9 @@ describe('MLSConversations', () => {
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
       const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
       // Force epoch > 0 to trigger join path instead of establish
-      mlsConversations.forEach(c => (c.epoch = 1));
+      mlsConversations.forEach(c => {
+        return (c.epoch = 1);
+      });
 
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = conversationRepository['core'];
@@ -173,9 +177,9 @@ describe('MLSConversations', () => {
       if (conversationService === undefined) {
         throw new Error('Conversation service is not initialized');
       }
-      jest
-        .spyOn(conversationService, 'mlsGroupExistsLocally')
-        .mockImplementation(async groupId => groupId === established.groupId);
+      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockImplementation(async groupId => {
+        return groupId === established.groupId;
+      });
       const recoverSpy = jest
         .spyOn(conversationRepository, 'safeEnsureConversationExists')
         .mockReturnValue(task.resolve(undefined));
@@ -184,7 +188,9 @@ describe('MLSConversations', () => {
         conversations: [mlsGroup, mlsOneToOne, mixedSelf, established, pastMember, proteus],
         conversationRepository,
         core: repositoryCore,
-        isActive: () => true,
+        isActive: () => {
+          return true;
+        },
         batchSize: 2,
       });
 
@@ -246,7 +252,9 @@ describe('MLSConversations', () => {
         conversations,
         conversationRepository,
         core: repositoryCore,
-        isActive: () => true,
+        isActive: () => {
+          return true;
+        },
       });
 
       expect(result).toEqual({completed: false, failedConversationCount: 1, recoveredConversationCount: 2});
@@ -490,10 +498,11 @@ describe('MLSConversations', () => {
   describe('fetchRemoteEpoch', () => {
     const conversationId: QualifiedId = {id: 'conv-id', domain: 'wire.com'};
 
-    const makeConversationService = (response: ReturnType<typeof result.ok> | ReturnType<typeof result.err>) =>
-      ({
+    const makeConversationService = (response: ReturnType<typeof result.ok> | ReturnType<typeof result.err>) => {
+      return {
         getSafeConversationById: jest.fn().mockResolvedValue(task.fromResult(response)),
-      }) as unknown as ConversationService;
+      } as unknown as ConversationService;
+    };
 
     it('returns an "epoch" reading when the response carries a valid non-negative finite number', async () => {
       const conversationService = makeConversationService(result.ok({epoch: 7}));

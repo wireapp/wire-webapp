@@ -25,23 +25,27 @@ import {getUsersFromNodes} from './getUsersFromNodes';
 
 type FakeUserRepository = jest.Mocked<Pick<UserRepository, 'getUsersById'>>;
 
-const createRestNodeWithOwner = (ownerQualifiedId: string): RestNode => ({
-  Path: 'conversation-id@example.com/file.txt',
-  Type: 'LEAF',
-  Uuid: ownerQualifiedId,
-  UserMetadata: [
-    {
-      Namespace: 'usermeta-owner-uuid',
-      JsonValue: JSON.stringify(ownerQualifiedId),
-    },
-  ],
-});
+const createRestNodeWithOwner = (ownerQualifiedId: string): RestNode => {
+  return {
+    Path: 'conversation-id@example.com/file.txt',
+    Type: 'LEAF',
+    Uuid: ownerQualifiedId,
+    UserMetadata: [
+      {
+        Namespace: 'usermeta-owner-uuid',
+        JsonValue: JSON.stringify(ownerQualifiedId),
+      },
+    ],
+  };
+};
 
-const createRestNodeWithoutOwner = (): RestNode => ({
-  Path: 'conversation-id@example.com/file-without-owner.txt',
-  Type: 'LEAF',
-  Uuid: 'file-without-owner.txt',
-});
+const createRestNodeWithoutOwner = (): RestNode => {
+  return {
+    Path: 'conversation-id@example.com/file-without-owner.txt',
+    Type: 'LEAF',
+    Uuid: 'file-without-owner.txt',
+  };
+};
 
 describe('getUsersFromNodes', () => {
   it('looks up each valid owner id only once', async () => {

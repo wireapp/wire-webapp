@@ -116,7 +116,9 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
 export const INPUT_CLASSNAME = 'wireinput';
 export const INPUT_GROUP = 'input-group';
 
-const filterInputProps = (props: InputProps) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+const filterInputProps = (props: InputProps) => {
+  return filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+};
 
 const centerInputAction: CSSObject = {
   position: 'absolute',
@@ -147,21 +149,27 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
     const isPasswordInput = type === 'password';
     const toggledPasswordType = isPasswordVisible ? 'text' : 'password';
 
-    const toggleSetPassword = () => setTogglePassword(prevState => !prevState);
+    const toggleSetPassword = () => {
+      return setTogglePassword(prevState => {
+        return !prevState;
+      });
+    };
 
     const togglepasswordLabel = isPasswordVisible ? props.hideTogglePasswordLabel : props.showTogglePasswordLabel;
 
     return (
       <div
         className={INPUT_GROUP}
-        css={(theme: Theme) => ({
-          marginBottom: hasError ? '2px' : '20px',
-          width: '100%',
-          '&:focus-within label': {
-            color: theme.general.primaryColor,
-          },
-          ...wrapperCSS,
-        })}
+        css={(theme: Theme) => {
+          return {
+            marginBottom: hasError ? '2px' : '20px',
+            width: '100%',
+            '&:focus-within label': {
+              color: theme.general.primaryColor,
+            },
+            ...wrapperCSS,
+          };
+        }}
       >
         {isNonEmptyString(label) ? (
           <InputLabel htmlFor={props.id} isRequired={props.required} markInvalid={props.markInvalid}>
@@ -174,10 +182,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
 
           <input
             className={INPUT_CLASSNAME}
-            css={(theme: Theme) => ({
-              ...inputStyle(theme, props, hasError),
-              ...inputCSS,
-            })}
+            css={(theme: Theme) => {
+              return {
+                ...inputStyle(theme, props, hasError),
+                ...inputCSS,
+              };
+            }}
             ref={ref}
             type={isPasswordInput ? toggledPasswordType : type}
             aria-required={props.required}
@@ -208,12 +218,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
 
         {!hasError && isNonEmptyString(helperText) ? (
           <p
-            css={(theme: Theme) => ({
-              fontSize: theme.fontSizes.small,
-              fontWeight: 400,
-              color: theme.Input.placeholderColor,
-              marginTop: 8,
-            })}
+            css={(theme: Theme) => {
+              return {
+                fontSize: theme.fontSizes.small,
+                fontWeight: 400,
+                color: theme.Input.placeholderColor,
+                marginTop: 8,
+              };
+            }}
           >
             {helperText}
           </p>

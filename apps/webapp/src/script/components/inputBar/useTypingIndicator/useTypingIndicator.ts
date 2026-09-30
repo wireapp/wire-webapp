@@ -50,7 +50,9 @@ export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndi
         hasHitKeyboard.current = true;
       };
       document.addEventListener('keydown', setHasHitKeyboard);
-      return () => document.removeEventListener('keydown', setHasHitKeyboard);
+      return () => {
+        return document.removeEventListener('keydown', setHasHitKeyboard);
+      };
     }
 
     return noop;
@@ -64,13 +66,21 @@ export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndi
 
     if (text.length > 0) {
       setTyping(true);
-      timerId = window.setTimeout(() => setTyping(false), TYPING_TIMEOUT);
+      timerId = window.setTimeout(() => {
+        return setTyping(false);
+      }, TYPING_TIMEOUT);
     } else {
       setTyping(false);
     }
 
-    return () => window.clearTimeout(timerId);
+    return () => {
+      return window.clearTimeout(timerId);
+    };
   }, [text, setTyping]);
 
-  useEffect(() => () => setTyping(false), [setTyping]);
+  useEffect(() => {
+    return () => {
+      return setTyping(false);
+    };
+  }, [setTyping]);
 }

@@ -177,7 +177,9 @@ export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, op
   };
 
   detachedWindow.document.addEventListener('click', handleClick, true);
-  return () => detachedWindow.document.removeEventListener('click', handleClick, true);
+  return () => {
+    return detachedWindow.document.removeEventListener('click', handleClick, true);
+  };
 };
 
 export class CallingRepository {
@@ -296,10 +298,9 @@ export class CallingRepository {
 
     this.acceptVersionWarning = (conversationId: QualifiedId) => {
       this.callState.acceptedVersionWarnings.push(conversationId);
-      window.setTimeout(
-        () => this.callState.acceptedVersionWarnings.remove(conversationId),
-        TIME_IN_MILLIS.MINUTE * 15,
-      );
+      window.setTimeout(() => {
+        return this.callState.acceptedVersionWarnings.remove(conversationId);
+      }, TIME_IN_MILLIS.MINUTE * 15);
     };
 
     this.subscribeToEvents();
@@ -419,7 +420,9 @@ export class CallingRepository {
       return;
     }
 
-    const hasVideo = stream.getVideoTracks().some(track => track.readyState === 'live');
+    const hasVideo = stream.getVideoTracks().some(track => {
+      return track.readyState === 'live';
+    });
 
     if (!hasVideo) {
       selfParticipant.updateMediaStream(stream, true);
@@ -656,7 +659,9 @@ export class CallingRepository {
 
   private readonly updateMuteState = (isMuted: number) => {
     const activeStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
-    const activeCall = this.callState.calls().find(call => activeStates.includes(call.state()));
+    const activeCall = this.callState.calls().find(call => {
+      return activeStates.includes(call.state());
+    });
     activeCall?.muteState(isMuted !== 0 && !isNan(isMuted) ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
@@ -680,12 +685,14 @@ export class CallingRepository {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
-        qualifiedClients.map(({data, userId}) =>
-          data.map(clientid => ({
-            clientid,
-            userid: this.serializeQualifiedId(userId),
-          })),
-        ),
+        qualifiedClients.map(({data, userId}) => {
+          return data.map(clientid => {
+            return {
+              clientid,
+              userid: this.serializeQualifiedId(userId),
+            };
+          });
+        }),
       );
 
       this.wCall?.setClientsForConv(
@@ -780,9 +787,9 @@ export class CallingRepository {
   }
 
   findCall(conversationId: QualifiedId): Call | undefined {
-    return this.callState
-      .calls()
-      .find((callInstance: Call) => matchQualifiedIds(callInstance.conversation.qualifiedId, conversationId));
+    return this.callState.calls().find((callInstance: Call) => {
+      return matchQualifiedIds(callInstance.conversation.qualifiedId, conversationId);
+    });
   }
 
   private findParticipant(
@@ -825,9 +832,9 @@ export class CallingRepository {
     };
 
     const missingStreams = Object.fromEntries(
-      Object.entries(query).filter(
-        ([type, requested]) => requested === true && isUndefined(currentStreams[type as keyof typeof currentStreams]),
-      ),
+      Object.entries(query).filter(([type, requested]) => {
+        return requested === true && isUndefined(currentStreams[type as keyof typeof currentStreams]);
+      }),
     ) as MediaStreamQuery;
 
     if (Object.keys(missingStreams).length === 0) {
@@ -846,7 +853,9 @@ export class CallingRepository {
         const audioStream = await this.getMediaStream({audio: true}, call.isGroupOrConference);
 
         if (call.state() === CALL_STATE.NONE) {
-          audioStream.getTracks().forEach(track => track.stop());
+          audioStream.getTracks().forEach(track => {
+            return track.stop();
+          });
           return audioStream;
         }
 
@@ -857,7 +866,9 @@ export class CallingRepository {
         const cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
 
         if (call.state() === CALL_STATE.NONE) {
-          cameraStream.getTracks().forEach(track => track.stop());
+          cameraStream.getTracks().forEach(track => {
+            return track.stop();
+          });
           return selfParticipant.getMediaStream();
         }
 
@@ -871,7 +882,9 @@ export class CallingRepository {
       const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
 
       if (call.state() === CALL_STATE.NONE) {
-        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream.getTracks().forEach(track => {
+          return track.stop();
+        });
         return mediaStream;
       }
 
@@ -1020,7 +1033,9 @@ export class CallingRepository {
     PrimaryModal.show(
       PrimaryModal.type.ACKNOWLEDGE,
       {
-        close: restoreFocusCallback(() => this.acceptVersionWarning(conversationId)),
+        close: restoreFocusCallback(() => {
+          return this.acceptVersionWarning(conversationId);
+        }),
         text: {
           message: this.translate('modalCallUpdateClientMessage', {brandName}),
           title: this.translate('modalCallUpdateClientHeadline', {brandName}),
@@ -1145,11 +1160,13 @@ export class CallingRepository {
           return;
         }
 
-        const senderParticipant = currentCall
-          .participants()
-          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+        const senderParticipant = currentCall.participants().find(participant => {
+          return matchQualifiedIds(participant.user.qualifiedId, userId);
+        });
 
-        const emojis: string[] = Object.entries(content.emojis).flatMap(([key, value]) => Array(value).fill(key));
+        const emojis: string[] = Object.entries(content.emojis).flatMap(([key, value]) => {
+          return Array(value).fill(key);
+        });
 
         const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
 
@@ -1167,9 +1184,11 @@ export class CallingRepository {
         this.callState.emojis([...this.callState.emojis(), ...newEmojis]);
 
         setTimeout(() => {
-          const remainingEmojis = this.callState
-            .emojis()
-            .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
+          const remainingEmojis = this.callState.emojis().filter(item => {
+            return !newEmojis.some(newItem => {
+              return newItem.id === item.id;
+            });
+          });
           this.callState.emojis(remainingEmojis);
         }, CallingRepository.EMOJI_TIME_OUT_DURATION);
         break;
@@ -1186,9 +1205,9 @@ export class CallingRepository {
           return;
         }
 
-        const participant = currentCall
-          .participants()
-          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+        const participant = currentCall.participants().find(participant => {
+          return matchQualifiedIds(participant.user.qualifiedId, userId);
+        });
 
         if (isUndefined(participant)) {
           this.logger.info('Ignored hand raise event because no active participant was found');
@@ -1244,7 +1263,9 @@ export class CallingRepository {
     } = event;
     const contentStr = JSON.stringify(content);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
+    const toSecond = (timestamp: number) => {
+      return Math.floor(timestamp / 1000);
+    };
 
     const isFederated =
       this.core.backendFeatures.isFederated &&
@@ -1282,9 +1303,9 @@ export class CallingRepository {
     if (res !== 0) {
       this.logger.warn(`recv_msg failed with code: ${res}`);
       if (
-        this.callState
-          .acceptedVersionWarnings()
-          .every(acceptedId => !matchQualifiedIds(acceptedId, conversation.qualifiedId)) &&
+        this.callState.acceptedVersionWarnings().every(acceptedId => {
+          return !matchQualifiedIds(acceptedId, conversation.qualifiedId);
+        }) &&
         res === ERROR.UNKNOWN_PROTOCOL &&
         event.content.type === 'CONFSTART'
       ) {
@@ -1591,10 +1612,14 @@ export class CallingRepository {
     } catch (error: unknown) {
       this.logger.error('Error in toggleScreenShareWithVideo:', error);
       if (!isNullOrUndefined(screenStream)) {
-        screenStream.getTracks().forEach(track => track.stop());
+        screenStream.getTracks().forEach(track => {
+          return track.stop();
+        });
       }
       if (!isNullOrUndefined(cameraStream)) {
-        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream.getTracks().forEach(track => {
+          return track.stop();
+        });
       }
     }
   };
@@ -1606,7 +1631,9 @@ export class CallingRepository {
 
     const mixedStream = selfParticipant.videoStream();
     if (!isUndefined(mixedStream)) {
-      mixedStream.getTracks().forEach(track => track.stop());
+      mixedStream.getTracks().forEach(track => {
+        return track.stop();
+      });
     }
 
     selfParticipant.releaseVideoStream(true);
@@ -1704,7 +1731,9 @@ export class CallingRepository {
     }
 
     // New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
-    setTimeout(() => copyStyles(window.document, detachedWindow.document), 0);
+    setTimeout(() => {
+      return copyStyles(window.document, detachedWindow.document);
+    }, 0);
 
     detachedWindow.document.title = this.translate('callingPopOutWindowTitle', {
       brandName: Config.getConfig().BRAND_NAME,
@@ -1742,8 +1771,8 @@ export class CallingRepository {
       if (isE2EIDegradedConversation) {
         const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
-        userConsentWithDegradation = await new Promise(resolve =>
-          PrimaryModal.show(
+        userConsentWithDegradation = await new Promise(resolve => {
+          return PrimaryModal.show(
             PrimaryModal.type.CONFIRM,
             {
               primaryAction: {
@@ -1754,7 +1783,9 @@ export class CallingRepository {
                 text: this.translate('conversation.E2EIJoinAnyway'),
               },
               secondaryAction: {
-                action: () => resolve(false),
+                action: () => {
+                  return resolve(false);
+                },
                 text: this.translate('conversation.E2EICancel'),
               },
               text: {
@@ -1766,8 +1797,8 @@ export class CallingRepository {
             },
             undefined,
             this.translate,
-          ),
-        );
+          );
+        });
       }
       const shouldContinueCall = userConsentWithDegradation && (await this.pushClients(call, true));
       if (shouldContinueCall !== true) {
@@ -1859,7 +1890,9 @@ export class CallingRepository {
     const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
       qualifiedId,
       groupId,
-      (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
+      (groupId: string) => {
+        return this.conversationState.findConversationByGroupId(groupId)?.qualifiedId;
+      },
       data => {
         this.logger.info(
           `Call Epoch Info: _update_subscription_trigger, user: ${serializeSelfUser}, conversation: ${serializeConversationId}`,
@@ -2022,7 +2055,9 @@ export class CallingRepository {
       return;
     }
     // Filter myself out and do not request my own stream.
-    const requestParticipants = participants.filter(p => !this.isSelfUser(p));
+    const requestParticipants = participants.filter(p => {
+      return !this.isSelfUser(p);
+    });
     if (requestParticipants.length === 0) {
       return;
     }
@@ -2030,11 +2065,13 @@ export class CallingRepository {
     const convId = this.serializeQualifiedId(conversationId);
 
     const payload = {
-      clients: requestParticipants.map(participant => ({
-        clientid: participant.clientId,
-        userid: this.serializeQualifiedId(participant.user.qualifiedId),
-        quality: videoQuality,
-      })),
+      clients: requestParticipants.map(participant => {
+        return {
+          clientid: participant.clientId,
+          userid: this.serializeQualifiedId(participant.user.qualifiedId),
+          quality: videoQuality,
+        };
+      }),
       convid: convId,
     };
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
@@ -2789,26 +2826,30 @@ export class CallingRepository {
   };
 
   private updateParticipantMutedState(call: Call, members: QualifiedWcallMember[]): void {
-    members.forEach(member =>
-      call.getParticipant(member.userId, member.clientid)?.isMuted(member.muted !== 0 && !isNan(member.muted)),
-    );
+    members.forEach(member => {
+      return call.getParticipant(member.userId, member.clientid)?.isMuted(member.muted !== 0 && !isNan(member.muted));
+    });
   }
 
   private updateParticipantVideoState(call: Call, members: QualifiedWcallMember[]): void {
-    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv));
+    members.forEach(member => {
+      return call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv);
+    });
   }
 
   private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
-    members.forEach(member =>
-      call
+    members.forEach(member => {
+      return call
         .getParticipant(member.userId, member.clientid)
-        ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED),
-    );
+        ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED);
+    });
   }
 
   private updateParticipantList(call: Call, members: QualifiedWcallMember[]): void {
     const newMembers = members
-      .filter(({userId, clientid}) => isUndefined(call.getParticipant(userId, clientid)))
+      .filter(({userId, clientid}) => {
+        return isUndefined(call.getParticipant(userId, clientid));
+      })
       .map(({userId, clientid}) => {
         const user = this.userRepository.findUserById(userId);
         if (isUndefined(user)) {
@@ -2816,16 +2857,24 @@ export class CallingRepository {
         }
         return new Participant(user, clientid);
       })
-      .filter((participant): participant is Participant => !isNullOrUndefined(participant));
+      .filter((participant): participant is Participant => {
+        return !isNullOrUndefined(participant);
+      });
 
-    const removedMembers = call
-      .participants()
-      .filter(participant =>
-        isUndefined(members.find(({userId, clientid}) => participant.doesMatchIds(userId, clientid))),
+    const removedMembers = call.participants().filter(participant => {
+      return isUndefined(
+        members.find(({userId, clientid}) => {
+          return participant.doesMatchIds(userId, clientid);
+        }),
       );
+    });
 
-    newMembers.forEach(participant => call.participants.unshift(participant));
-    removedMembers.forEach(participant => call.participants.remove(participant));
+    newMembers.forEach(participant => {
+      return call.participants.unshift(participant);
+    });
+    removedMembers.forEach(participant => {
+      return call.participants.remove(participant);
+    });
 
     if (call.participants().length > call.analyticsMaximumParticipants) {
       call.analyticsMaximumParticipants = call.participants().length;
@@ -2844,10 +2893,12 @@ export class CallingRepository {
     }
 
     const {members: serializedMembers}: {members: WcallMember[]} = JSON.parse(membersJson);
-    const members: QualifiedWcallMember[] = serializedMembers.map(member => ({
-      ...member,
-      userId: this.parseQualifiedId(member.userid),
-    }));
+    const members: QualifiedWcallMember[] = serializedMembers.map(member => {
+      return {
+        ...member,
+        userId: this.parseQualifiedId(member.userid),
+      };
+    });
 
     this.handleOneToOneMlsCallParticipantLeave(conversationId, members);
     this.updateParticipantList(call, members);
@@ -2875,17 +2926,17 @@ export class CallingRepository {
 
     const selfParticipant = call.getSelfParticipant();
 
-    const nextOtherParticipant = members.find(
-      participant => !matchQualifiedIds(participant.userId, selfParticipant.user.qualifiedId),
-    );
+    const nextOtherParticipant = members.find(participant => {
+      return !matchQualifiedIds(participant.userId, selfParticipant.user.qualifiedId);
+    });
 
     if (isUndefined(nextOtherParticipant)) {
       return;
     }
 
-    const currentOtherParticipant = call
-      .participants()
-      .find(participant => matchQualifiedIds(nextOtherParticipant.userId, participant.user.qualifiedId));
+    const currentOtherParticipant = call.participants().find(participant => {
+      return matchQualifiedIds(nextOtherParticipant.userId, participant.user.qualifiedId);
+    });
 
     if (isUndefined(currentOtherParticipant)) {
       return;
@@ -2975,11 +3026,13 @@ export class CallingRepository {
     const activeSpeakers: ActiveSpeakers = JSON.parse(rawJson);
     if (!isUndefined(call) && isTruthy(activeSpeakers)) {
       call.setActiveSpeakers(
-        activeSpeakers.audio_levels.map(({userid, clientid, audio_level_now}) => ({
-          clientId: clientid,
-          levelNow: audio_level_now,
-          userId: this.parseQualifiedId(userid),
-        })),
+        activeSpeakers.audio_levels.map(({userid, clientid, audio_level_now}) => {
+          return {
+            clientId: clientid,
+            levelNow: audio_level_now,
+            userId: this.parseQualifiedId(userid),
+          };
+        }),
       );
     }
   };
@@ -3101,8 +3154,12 @@ export class CallingRepository {
 
     call
       .participants()
-      .filter(participant => participant.doesMatchIds(userId, clientId))
-      .forEach(participant => participant.videoState(state));
+      .filter(participant => {
+        return participant.doesMatchIds(userId, clientId);
+      })
+      .forEach(participant => {
+        return participant.videoState(state);
+      });
   };
 
   private readonly metricsReceived = (_: string, metrics: string) => {
@@ -3117,11 +3174,15 @@ export class CallingRepository {
     const {conversation} = call;
     const participants = conversation.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
-    const guests = participants.filter(user => user.isGuest()).length;
-    const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
-    const guestsPro = participants.filter(
-      user => isNonEmptyString(user.teamId) && user.teamId !== selfUserTeamId,
-    ).length;
+    const guests = participants.filter(user => {
+      return user.isGuest();
+    }).length;
+    const guestsWireless = participants.filter(user => {
+      return user.isTemporaryGuest();
+    }).length;
+    const guestsPro = participants.filter(user => {
+      return isNonEmptyString(user.teamId) && user.teamId !== selfUserTeamId;
+    }).length;
     const servicesCount = conversation.servicesCount();
     const servicesCountOrZero =
       isNullOrUndefined(servicesCount) || servicesCount === 0 || isNan(servicesCount) ? 0 : servicesCount;
@@ -3143,9 +3204,9 @@ export class CallingRepository {
    * @note Should only used by "window.onbeforeunload".
    */
   destroy(): void {
-    this.callState
-      .calls()
-      .forEach((call: Call) => this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId)));
+    this.callState.calls().forEach((call: Call) => {
+      return this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId));
+    });
 
     AvsDebugger.reset();
     this.wCall?.destroy(this.wUser);
@@ -3167,7 +3228,9 @@ export class CallingRepository {
         text: this.translate('modalAcknowledgeAction'),
       },
       secondaryAction: {
-        action: () => amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV),
+        action: () => {
+          return amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV);
+        },
         text: this.translate('modalNoAudioInputAction'),
       },
       text: {

@@ -87,7 +87,11 @@ export class AssetRepository {
   }
 
   public removeFromProcessQueue(messageId: string) {
-    this.processQueue(this.processQueue().filter(queueItem => queueItem.message.messageId !== messageId));
+    this.processQueue(
+      this.processQueue().filter(queueItem => {
+        return queueItem.message.messageId !== messageId;
+      }),
+    );
   }
 
   async getObjectUrl(asset: AssetRemoteData): Promise<string> {
@@ -228,7 +232,9 @@ export class AssetRepository {
     if (skipCompression) {
       compressedBytes = buffer;
     } else {
-      const worker = new WebWorker(() => new Worker(new URL('./imageWorker', import.meta.url)));
+      const worker = new WebWorker(() => {
+        return new Worker(new URL('./imageWorker', import.meta.url));
+      });
       compressedBytes = await worker.post({buffer, useProfileImageSize});
     }
     const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
@@ -241,9 +247,9 @@ export class AssetRepository {
   getAssetRetention(userEntity: User, conversationEntity: Conversation): AssetRetentionPolicy {
     const isTeamMember = this.teamState.isInTeam(userEntity);
     const isTeamConversation = this.teamState.isInTeam(conversationEntity);
-    const isTeamUserInConversation = conversationEntity
-      .participating_user_ets()
-      .some(conversationParticipant => this.teamState.isInTeam(conversationParticipant));
+    const isTeamUserInConversation = conversationEntity.participating_user_ets().some(conversationParticipant => {
+      return this.teamState.isInTeam(conversationParticipant);
+    });
 
     const isEternalInfrequentAccess = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternalInfrequentAccess ? AssetRetentionPolicy.ETERNAL_INFREQUENT_ACCESS : AssetRetentionPolicy.EXPIRING;
@@ -315,15 +321,23 @@ export class AssetRepository {
   }
 
   getUploadProgress(messageId: string): ko.PureComputed<number> {
-    return ko.pureComputed(() => this.findUploadStatus(messageId)?.progress() ?? -1);
+    return ko.pureComputed(() => {
+      return this.findUploadStatus(messageId)?.progress() ?? -1;
+    });
   }
 
   private findUploadStatus(messageId: string): UploadStatus | undefined {
-    return this.uploadProgressQueue().find(upload => upload.messageId === messageId);
+    return this.uploadProgressQueue().find(upload => {
+      return upload.messageId === messageId;
+    });
   }
 
   private removeFromUploadQueue(messageId: string): void {
-    this.uploadProgressQueue(this.uploadProgressQueue().filter(upload => upload.messageId !== messageId));
+    this.uploadProgressQueue(
+      this.uploadProgressQueue().filter(upload => {
+        return upload.messageId !== messageId;
+      }),
+    );
     this.removeFromProcessQueue(messageId);
     delete this.uploadCancelTokens[messageId];
   }

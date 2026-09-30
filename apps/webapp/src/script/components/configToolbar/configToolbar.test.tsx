@@ -30,7 +30,9 @@ describe('ConfigToolbar', () => {
 
     expect(screen.queryByRole('heading', {name: 'Developer Menu'})).not.toBeInTheDocument();
 
-    act(() => openDebugToolbar());
+    act(() => {
+      return openDebugToolbar();
+    });
 
     expect(screen.getByRole('heading', {name: 'Developer Menu'})).toBeInTheDocument();
   });

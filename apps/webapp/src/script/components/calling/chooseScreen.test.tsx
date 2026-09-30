@@ -31,9 +31,11 @@ import {captureModalFocusContext} from 'Util/modalFocusUtil';
 import {ChooseScreen} from './ChooseScreen';
 import {translateForTest} from 'Util/test/translateForTest';
 
-jest.mock('Util/modalFocusUtil', () => ({
-  captureModalFocusContext: jest.fn(),
-}));
+jest.mock('Util/modalFocusUtil', () => {
+  return {
+    captureModalFocusContext: jest.fn(),
+  };
+});
 
 describe('ChooseScreen', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -43,13 +45,21 @@ describe('ChooseScreen', () => {
     {
       id: 'screen:first',
       name: 'Screen 1',
-      thumbnail: {toDataURL: () => 'first screen'} as HTMLCanvasElement,
+      thumbnail: {
+        toDataURL: () => {
+          return 'first screen';
+        },
+      } as HTMLCanvasElement,
       display_id: '',
     },
     {
       id: 'screen:second',
       name: 'Screen 2',
-      thumbnail: {toDataURL: () => 'second screen'} as HTMLCanvasElement,
+      thumbnail: {
+        toDataURL: () => {
+          return 'second screen';
+        },
+      } as HTMLCanvasElement,
       display_id: '',
     },
   ];
@@ -57,13 +67,21 @@ describe('ChooseScreen', () => {
     {
       id: 'window:first',
       name: 'Window 1',
-      thumbnail: {toDataURL: () => 'first window'} as HTMLCanvasElement,
+      thumbnail: {
+        toDataURL: () => {
+          return 'first window';
+        },
+      } as HTMLCanvasElement,
       display_id: '',
     },
     {
       id: 'window:second',
       name: 'Window 2',
-      thumbnail: {toDataURL: () => 'second window'} as HTMLCanvasElement,
+      thumbnail: {
+        toDataURL: () => {
+          return 'second window';
+        },
+      } as HTMLCanvasElement,
       display_id: '',
     },
   ];
@@ -74,7 +92,9 @@ describe('ChooseScreen', () => {
     const restore = jest.fn();
     return {
       targetDocument: document,
-      createFocusRestorationCallback: () => restore,
+      createFocusRestorationCallback: () => {
+        return restore;
+      },
       restoreMock: restore,
     };
   };
@@ -136,7 +156,9 @@ describe('ChooseScreen', () => {
   it('chooses the correct screens on click', () => {
     const {container, props} = setup();
 
-    const ids = [...screens, ...windows].map(({id}) => id);
+    const ids = [...screens, ...windows].map(({id}) => {
+      return id;
+    });
 
     const screenItems = container.querySelectorAll('[data-uie-name="item-screen"]');
     const windowItems = container.querySelectorAll('[data-uie-name="item-window"]');

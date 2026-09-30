@@ -43,12 +43,18 @@ describe('Permission Handlers', () => {
     });
   };
 
-  const waitForAsync = (ms = DEFAULT_TIMEOUT) => new Promise(resolve => setTimeout(resolve, ms));
+  const waitForAsync = (ms = DEFAULT_TIMEOUT) => {
+    return new Promise(resolve => {
+      return setTimeout(resolve, ms);
+    });
+  };
 
-  const createMockPermissionStatus = (state: BrowserPermissionStatus) => ({
-    state,
-    onchange: null as any,
-  });
+  const createMockPermissionStatus = (state: BrowserPermissionStatus) => {
+    return {
+      state,
+      onchange: null as any,
+    };
+  };
 
   const mockNavigatorPermissions = (queryResponse: any) => {
     return spyOn(navigator.permissions, 'query').and.returnValue(queryResponse);

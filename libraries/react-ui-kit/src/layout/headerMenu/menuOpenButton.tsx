@@ -31,44 +31,48 @@ export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps
   closeMenuLabel?: string;
 }
 
-export const menuOpenButtonStyle: <T>(theme: Theme, props: MenuOpenButtonProps<T>) => CSSObject = (theme, {open}) => ({
-  display: 'block',
-  cursor: 'pointer',
-  width: 40,
-  height: 32,
-  padding: '5px 8px',
+export const menuOpenButtonStyle: <T>(theme: Theme, props: MenuOpenButtonProps<T>) => CSSObject = (theme, {open}) => {
+  return {
+    display: 'block',
+    cursor: 'pointer',
+    width: 40,
+    height: 32,
+    padding: '5px 8px',
 
-  '&:focus-visible': {
-    background: theme.Button?.secondaryActiveBg ?? COLOR_V2.BLUE_LIGHT_50,
-    border: `1px solid ${theme.Button?.secondaryActiveBorder ?? COLOR_V2.BLUE_LIGHT_300}`,
-    borderRadius: 12,
-    boxShadow: `0 0 0 2px ${theme.general?.focusColor ?? COLOR_V2.BLUE_LIGHT_300}`,
-    outline: 'none',
-  },
-  div: {
-    backgroundColor: theme.general.color,
-    height: '2px',
-    margin: '4px',
-    transition: 'all 0.25s ease-in-out',
-    width: '16px',
-  },
-  'div:nth-of-type(1)': {
-    transform: open === true ? 'translateY(6px) rotate(-45deg)' : undefined,
-  },
-  'div:nth-of-type(2)': {
-    opacity: open === true ? 0 : undefined,
-    transform: open === true ? 'scale(0, 1)' : undefined,
-  },
-  'div:nth-of-type(3)': {
-    transform: open === true ? 'translateY(-6px) rotate(45deg)' : undefined,
-  },
-  [media[QueryKeys.DESKTOP]]: {
-    display: 'none',
-  },
-  zIndex: 2,
-});
+    '&:focus-visible': {
+      background: theme.Button?.secondaryActiveBg ?? COLOR_V2.BLUE_LIGHT_50,
+      border: `1px solid ${theme.Button?.secondaryActiveBorder ?? COLOR_V2.BLUE_LIGHT_300}`,
+      borderRadius: 12,
+      boxShadow: `0 0 0 2px ${theme.general?.focusColor ?? COLOR_V2.BLUE_LIGHT_300}`,
+      outline: 'none',
+    },
+    div: {
+      backgroundColor: theme.general.color,
+      height: '2px',
+      margin: '4px',
+      transition: 'all 0.25s ease-in-out',
+      width: '16px',
+    },
+    'div:nth-of-type(1)': {
+      transform: open === true ? 'translateY(6px) rotate(-45deg)' : undefined,
+    },
+    'div:nth-of-type(2)': {
+      opacity: open === true ? 0 : undefined,
+      transform: open === true ? 'scale(0, 1)' : undefined,
+    },
+    'div:nth-of-type(3)': {
+      transform: open === true ? 'translateY(-6px) rotate(45deg)' : undefined,
+    },
+    [media[QueryKeys.DESKTOP]]: {
+      display: 'none',
+    },
+    zIndex: 2,
+  };
+};
 
-const filterMenuOpenButtonProps = (props: MenuOpenButtonProps) => filterProps(props, ['open']);
+const filterMenuOpenButtonProps = (props: MenuOpenButtonProps) => {
+  return filterProps(props, ['open']);
+};
 
 export const MenuOpenButton = ({
   open,
@@ -85,7 +89,9 @@ export const MenuOpenButton = ({
       aria-haspopup="menu"
       aria-expanded={open}
       aria-label={open === true ? closeMenuLabel : openMenuLabel}
-      css={(theme: Theme) => menuOpenButtonStyle(theme, menuBtnProps)}
+      css={(theme: Theme) => {
+        return menuOpenButtonStyle(theme, menuBtnProps);
+      }}
       onKeyDown={onKeyDown}
       onClick={onClick}
       {...filterMenuOpenButtonProps(menuBtnProps)}

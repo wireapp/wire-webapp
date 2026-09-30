@@ -20,8 +20,9 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export type StringifiedQualifiedId = `${string}@${string}`;
-export const stringifyQualifiedId = (qualifiedId: QualifiedId): StringifiedQualifiedId =>
-  `${qualifiedId.id}@${qualifiedId.domain}`;
+export const stringifyQualifiedId = (qualifiedId: QualifiedId): StringifiedQualifiedId => {
+  return `${qualifiedId.id}@${qualifiedId.domain}`;
+};
 
 export const parseQualifiedId = (qualifiedId: string): QualifiedId => {
   const [id, domain] = qualifiedId.split('@');

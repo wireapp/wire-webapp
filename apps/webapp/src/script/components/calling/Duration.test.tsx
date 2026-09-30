@@ -26,7 +26,9 @@ describe('Duration', () => {
     jest.useFakeTimers();
   });
 
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => {
+    return jest.useRealTimers();
+  });
 
   it('shows correct timer', async () => {
     const now = Date.now();

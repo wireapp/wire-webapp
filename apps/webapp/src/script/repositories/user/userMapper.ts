@@ -68,8 +68,12 @@ export class UserMapper {
   mapUsersFromJson(usersData: UserRecord[], localDomain: string): User[] {
     if (isNonEmptyArray(usersData)) {
       return usersData
-        .filter(userData => !isNullOrUndefined(userData))
-        .map(userData => this.mapUserFromJson(userData, localDomain));
+        .filter(userData => {
+          return !isNullOrUndefined(userData);
+        })
+        .map(userData => {
+          return this.mapUserFromJson(userData, localDomain);
+        });
     }
     this.logger.warn('We got no user data from the backend');
     return [];

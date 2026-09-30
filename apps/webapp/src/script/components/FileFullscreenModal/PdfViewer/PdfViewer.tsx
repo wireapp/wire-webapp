@@ -49,7 +49,9 @@ export const PDFViewer = ({src}: PDFViewerProps) => {
     <div css={wrapperStyles}>
       <Document
         file={src}
-        onLoadSuccess={({numPages}) => setPagesCount(numPages)}
+        onLoadSuccess={({numPages}) => {
+          return setPagesCount(numPages);
+        }}
         loading={<PdfLoader />}
         error={<PdfError />}
         noData={<PdfError />}
@@ -75,7 +77,11 @@ export const PDFViewer = ({src}: PDFViewerProps) => {
             />
             <PdfControls
               sidebarOpen={sidebarOpen}
-              onToggleSidebar={() => setSidebarOpen(prev => !prev)}
+              onToggleSidebar={() => {
+                return setSidebarOpen(prev => {
+                  return !prev;
+                });
+              }}
               scale={scale}
               onZoomIn={zoomIn}
               onZoomOut={zoomOut}

@@ -31,11 +31,14 @@ export const isProtocolOption = (option: any): option is ProtocolOption => {
   return typeof option?.value === 'string' && protocols.includes(option.value);
 };
 
-const isFeatureWithConfig = (feature: unknown): feature is {config: {}} =>
-  isObject(feature) && 'config' in feature && isObject(feature.config);
+const isFeatureWithConfig = (feature: unknown): feature is {config: {}} => {
+  return isObject(feature) && 'config' in feature && isObject(feature.config);
+};
 
-export const hasE2EIVerificationExpiration = (feature: unknown): feature is FeatureMLSE2EId =>
-  isFeatureWithConfig(feature) && 'verificationExpiration' in feature.config;
+export const hasE2EIVerificationExpiration = (feature: unknown): feature is FeatureMLSE2EId => {
+  return isFeatureWithConfig(feature) && 'verificationExpiration' in feature.config;
+};
 
-export const hasMLSDefaultProtocol = (feature: unknown): feature is FeatureMLS =>
-  isFeatureWithConfig(feature) && 'defaultProtocol' in feature.config;
+export const hasMLSDefaultProtocol = (feature: unknown): feature is FeatureMLS => {
+  return isFeatureWithConfig(feature) && 'defaultProtocol' in feature.config;
+};

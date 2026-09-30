@@ -42,8 +42,14 @@ describe('linkPreviews', () => {
     title: 'A link to the past',
     type: 'article',
   };
-  beforeEach(() => (window.openGraphAsync = url => Promise.resolve({...mockOgResult, url})));
-  afterEach((): void => (window.openGraphAsync = undefined));
+  beforeEach(() => {
+    return (window.openGraphAsync = url => {
+      return Promise.resolve({...mockOgResult, url});
+    });
+  });
+  afterEach((): void => {
+    return (window.openGraphAsync = undefined);
+  });
 
   describe('getLinkPreviewFromString', () => {
     it('does nothing if openGraphAsync is not defined on window', async () => {
@@ -59,7 +65,9 @@ describe('linkPreviews', () => {
     });
 
     it('catches errors that are raised by the openGraph lib when invalid URIs are parsed', async () => {
-      window.openGraphAsync = () => Promise.reject(new Error('Invalid URI'));
+      window.openGraphAsync = () => {
+        return Promise.reject(new Error('Invalid URI'));
+      };
 
       const res = await getLinkPreviewFromString('test https://test.com');
       expect(res).not.toBeDefined();
@@ -85,7 +93,9 @@ describe('linkPreviews', () => {
     });
 
     it('should work when preview has no image', async () => {
-      window.openGraphAsync = url => Promise.resolve({...mockOgResult, image: undefined, url});
+      window.openGraphAsync = url => {
+        return Promise.resolve({...mockOgResult, image: undefined, url});
+      };
       const url = 'http://test.com';
       const res = await getLinkPreviewFromString(url);
       expect(res).toEqual(
@@ -106,8 +116,9 @@ describe('linkPreviews', () => {
     );
 
     it('detects tweets from url', async () => {
-      window.openGraphAsync = url =>
-        Promise.resolve({...mockOgResult, site_name: 'Twitter', title: 'Jack on Twitter', url});
+      window.openGraphAsync = url => {
+        return Promise.resolve({...mockOgResult, site_name: 'Twitter', title: 'Jack on Twitter', url});
+      };
       const url = 'https://twitter.com/jack/status/20';
       const res = await getLinkPreviewFromString(url);
 

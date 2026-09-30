@@ -28,5 +28,11 @@ export const getMentionNodesFromMessage = (message: ContentMessage): MentionNode
   const newMentions = firstAsset.mentions().slice();
   const nodes = createNodes(newMentions, firstAsset.text);
 
-  return nodes.filter(node => node.type === 'Mention').map(node => $createMentionNode('@', node.data.slice(1)));
+  return nodes
+    .filter(node => {
+      return node.type === 'Mention';
+    })
+    .map(node => {
+      return $createMentionNode('@', node.data.slice(1));
+    });
 };

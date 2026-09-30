@@ -111,7 +111,9 @@ const GroupCreationModal = ({
     });
   }, [defaultProtocol, translate]);
 
-  const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol);
+  const initialProtocol = protocolOptions.find(protocol => {
+    return protocol.value === defaultProtocol;
+  });
   if (isUndefined(initialProtocol)) {
     throw new Error(`No protocol option exists for ${defaultProtocol}`);
   }
@@ -171,7 +173,9 @@ const GroupCreationModal = ({
   }, [isTeam]);
 
   useEffect(() => {
-    const nextProtocol = protocolOptions.find(protocol => protocol.value === selectedProtocol.value);
+    const nextProtocol = protocolOptions.find(protocol => {
+      return protocol.value === selectedProtocol.value;
+    });
     if (isUndefined(nextProtocol)) {
       throw new Error(`No protocol option exists for ${selectedProtocol.value}`);
     }
@@ -204,7 +208,9 @@ const GroupCreationModal = ({
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
-  const filteredContacts = contacts.filter(user => user.isAvailable());
+  const filteredContacts = contacts.filter(user => {
+    return user.isAvailable();
+  });
 
   const handleEscape = useCallback(
     (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent): void => {
@@ -220,7 +226,9 @@ const GroupCreationModal = ({
   useEffect(() => {
     let timerId: number;
     if (stateIsParticipants) {
-      timerId = window.setTimeout(() => setShowContacts(true));
+      timerId = window.setTimeout(() => {
+        return setShowContacts(true);
+      });
     } else {
       setShowContacts(false);
     }
@@ -392,8 +400,12 @@ const GroupCreationModal = ({
     const newAccessState = toggleFeature(feature, accessState);
     setAccessState(newAccessState);
   };
-  const clickOnToggleServicesMode = () => clickOnToggle(ACCESS_TYPES.SERVICE);
-  const clickOnToggleGuestMode = () => clickOnToggle(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES));
+  const clickOnToggleServicesMode = () => {
+    return clickOnToggle(ACCESS_TYPES.SERVICE);
+  };
+  const clickOnToggleGuestMode = () => {
+    return clickOnToggle(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES));
+  };
   const clickOnBack = (): void => {
     setGroupCreationState(GroupCreationModalState.PREFERENCES);
   };
@@ -450,7 +462,9 @@ const GroupCreationModal = ({
             <button
               className="button-reset-default"
               type="button"
-              onClick={() => setIsShown(false)}
+              onClick={() => {
+                return setIsShown(false);
+              }}
               aria-label={translate('accessibility.groupCreationActionCloseModal')}
               data-uie-name="do-close"
             >
@@ -521,7 +535,9 @@ const GroupCreationModal = ({
                 uieName="enter-group-name"
                 name="enter-group-name"
                 errorUieName="error-group-name"
-                onCancel={() => setGroupName('')}
+                onCancel={() => {
+                  return setGroupName('');
+                }}
                 onChange={onGroupNameChange}
                 onBlur={event => {
                   const {value} = event.target as HTMLInputElement;

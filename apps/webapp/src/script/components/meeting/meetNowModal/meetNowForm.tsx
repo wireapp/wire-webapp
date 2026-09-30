@@ -97,7 +97,9 @@ export const MeetNowForm = ({
         label={translate('meetings.scheduleModal.titleLabel')}
         placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
         value={formState.title}
-        onChange={event => onTitleChange(event.currentTarget.value)}
+        onChange={event => {
+          return onTitleChange(event.currentTarget.value);
+        }}
         markInvalid={isNonEmptyString(titleError)}
         error={isNonEmptyString(titleError) ? <ErrorMessage>{titleError}</ErrorMessage> : undefined}
         inputCSS={scheduleMeetingTitleInputStyles}
@@ -106,7 +108,9 @@ export const MeetNowForm = ({
           formState.title.length > 0 && !isNonEmptyString(titleError) ? (
             <button
               type="button"
-              onClick={() => onTitleChange('')}
+              onClick={() => {
+                return onTitleChange('');
+              }}
               css={scheduleMeetingTitleClearButtonStyles}
               aria-label={translate('accessibility.userProfileDeleteEntry')}
             >
@@ -144,10 +148,14 @@ export const MeetNowForm = ({
         passwordValueRef={passwordInputRef}
         passwordError={passwordError}
         passwordConfirmationError={passwordConfirmationError}
-        onPasswordValueChange={password => onPasswordChange?.(password)}
+        onPasswordValueChange={password => {
+          return onPasswordChange?.(password);
+        }}
         isPasswordInputMarkInvalid={isNonEmptyString(passwordError)}
         passwordConfirmationValue={formState.passwordConfirmation}
-        onPasswordConfirmationChange={password => onPasswordConfirmationChange?.(password)}
+        onPasswordConfirmationChange={password => {
+          return onPasswordConfirmationChange?.(password);
+        }}
         isPasswordConfirmationMarkInvalid={isNonEmptyString(passwordConfirmationError)}
         copyDisabled={!isNonEmptyString(formState.password) || isNonEmptyString(passwordError)}
       />

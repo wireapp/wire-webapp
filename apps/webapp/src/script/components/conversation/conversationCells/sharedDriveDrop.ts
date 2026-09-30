@@ -91,9 +91,9 @@ export const handleSharedDriveDroppedFiles = (
     return;
   }
 
-  fireAndForgetInvoker.fireAndForget(() =>
-    sharedDriveUploadController.upload(uploadFiles, uploadPath, onRefresh, conversationQualifiedId),
-  );
+  fireAndForgetInvoker.fireAndForget(() => {
+    return sharedDriveUploadController.upload(uploadFiles, uploadPath, onRefresh, conversationQualifiedId);
+  });
 };
 
 export const getSharedDriveDropRejectionFeedback = (

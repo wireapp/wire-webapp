@@ -28,19 +28,21 @@ const futureNowMilliseconds = Date.parse('2026-06-15T13:00:00.000Z');
 const ongoingNowMilliseconds = Date.parse('2026-06-15T14:30:00.000Z');
 const pastNowMilliseconds = Date.parse('2026-06-15T16:00:00.000Z');
 
-const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
-  series_start_date: '2026-06-15T14:00:00.000Z',
-  series_end_date: '2026-06-15T15:00:00.000Z',
-  duration_ms: 3_600_000,
-  recurrence: 'weekly',
-  conversation_id: 'conv-id',
-  title: 'Weekly sync',
-  qualified_id: {id: 'meeting-id', domain: 'example.com'},
-  qualified_creator: {id: 'host-id', domain: 'example.com'},
-  qualified_conversation: {id: 'conv-id', domain: 'example.com'},
-  tzid: 'Europe/Berlin',
-  ...overrides,
-});
+const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => {
+  return {
+    series_start_date: '2026-06-15T14:00:00.000Z',
+    series_end_date: '2026-06-15T15:00:00.000Z',
+    duration_ms: 3_600_000,
+    recurrence: 'weekly',
+    conversation_id: 'conv-id',
+    title: 'Weekly sync',
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_creator: {id: 'host-id', domain: 'example.com'},
+    qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+    tzid: 'Europe/Berlin',
+    ...overrides,
+  };
+};
 
 const createMeetingInstance = (overrides: Partial<MeetingSeries> = {}): MeetingInstance => {
   const meetingSeries = createSeries(overrides);
@@ -58,23 +60,43 @@ const createSelfUser = (id = 'host-id') => {
   return user;
 };
 
-const translate = (key: string) => key;
+const translate = (key: string) => {
+  return key;
+};
 
-const noop = () => undefined;
+const noop = () => {
+  return undefined;
+};
 
-const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.editMeeting);
+const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+  return entries.find(entry => {
+    return entry.label === MEETING_ACTION_TRANSLATION_KEYS.editMeeting;
+  });
+};
 
-const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe);
+const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+  return entries.find(entry => {
+    return entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe;
+  });
+};
 
-const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll);
+const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+  return entries.find(entry => {
+    return entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll;
+  });
+};
 
-const getJoinEntry = (entries: ReturnType<typeof getMeetingActionEntries>) =>
-  entries.find(entry => entry.label === MEETING_ACTION_TRANSLATION_KEYS.joinNow);
+const getJoinEntry = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+  return entries.find(entry => {
+    return entry.label === MEETING_ACTION_TRANSLATION_KEYS.joinNow;
+  });
+};
 
-const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) => entries.map(entry => entry.label);
+const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+  return entries.map(entry => {
+    return entry.label;
+  });
+};
 
 describe('getMeetingActionEntries', () => {
   it('returns the expected action labels without Start meeting', () => {

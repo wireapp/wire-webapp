@@ -26,7 +26,7 @@ export const filterUsersByQuery = (users: User[], query: string): User[] => {
     return users;
   }
   const lowerQuery = query.toLowerCase();
-  return users.filter(
-    user => user.name().toLowerCase().includes(lowerQuery) || user.username().toLowerCase().includes(lowerQuery),
-  );
+  return users.filter(user => {
+    return user.name().toLowerCase().includes(lowerQuery) || user.username().toLowerCase().includes(lowerQuery);
+  });
 };

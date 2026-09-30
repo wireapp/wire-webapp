@@ -39,6 +39,8 @@ export const useClickOutside = (
     };
     windowDocument.addEventListener('click', handleClick);
 
-    return () => windowDocument.removeEventListener('click', handleClick);
+    return () => {
+      return windowDocument.removeEventListener('click', handleClick);
+    };
   }, [exclude, onClick, ref, windowDocument]);
 };

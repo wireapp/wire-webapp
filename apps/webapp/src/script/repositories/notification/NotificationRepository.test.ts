@@ -82,7 +82,11 @@ function buildNotificationRepository(
   fireAndForgetInvoker: FireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
 ) {
   const userState = container.resolve(UserState);
-  const conversationRepository = {isMessageRead: jest.fn(async () => false)};
+  const conversationRepository = {
+    isMessageRead: jest.fn(async () => {
+      return false;
+    }),
+  };
   const notificationRepository = new NotificationRepository(
     conversationRepository as unknown as ConversationRepository,
     new AudioRepository(),
@@ -91,10 +95,22 @@ function buildNotificationRepository(
     clock,
     notificationApi ??
       ({
-        isSupported: () => true,
-        getPermission: () => 'granted',
-        requestPermission: async () => 'granted',
-        show: () => result.ok({close: () => result.ok(undefined)}),
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted';
+        },
+        requestPermission: async () => {
+          return 'granted';
+        },
+        show: () => {
+          return result.ok({
+            close: () => {
+              return result.ok(undefined);
+            },
+          });
+        },
       } as SystemNotificationApi),
     fireAndForgetInvoker,
     userState,
@@ -123,7 +139,9 @@ describe('NotificationRepository', () => {
   let notification_content: any;
 
   it('uses injected translate for obfuscated notification titles', () => {
-    const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
+    const translate = ((translationKey: string) => {
+      return `translated:${translationKey}`;
+    }) as Translate;
     const [notificationRepository] = buildNotificationRepository(translate);
 
     const actualTitle = notificationRepository['createTitleObfuscated']();
@@ -134,7 +152,9 @@ describe('NotificationRepository', () => {
   it('routes permission checks through the fire-and-forget invoker', () => {
     const fireAndForgetInvoker: FireAndForgetInvoker = {
       fireAndForget: jest.fn(),
-      waitUntilAllSettled: jest.fn(async (): Promise<void> => undefined),
+      waitUntilAllSettled: jest.fn(async (): Promise<void> => {
+        return undefined;
+      }),
     };
     const [notificationRepository] = buildNotificationRepository(
       translateForTest,
@@ -149,12 +169,24 @@ describe('NotificationRepository', () => {
   });
 
   it('requests permission when the platform reports the default permission', async () => {
-    const requestPermission = jest.fn(async () => 'granted' as const);
+    const requestPermission = jest.fn(async () => {
+      return 'granted' as const;
+    });
     const [notificationRepository] = buildNotificationRepository(translateForTest, undefined, {
-      isSupported: () => true,
-      getPermission: () => 'default',
+      isSupported: () => {
+        return true;
+      },
+      getPermission: () => {
+        return 'default';
+      },
       requestPermission,
-      show: () => result.ok({close: () => result.ok(undefined)}),
+      show: () => {
+        return result.ok({
+          close: () => {
+            return result.ok(undefined);
+          },
+        });
+      },
     });
 
     notificationRepository.updatePermissionState(BrowserPermissionStatus.PROMPT);
@@ -184,12 +216,22 @@ describe('NotificationRepository', () => {
       const setTimeoutSpy = jest.spyOn(clock, 'setTimeout');
       let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
       const notificationApi = {
-        isSupported: () => true,
-        getPermission: () => 'granted' as const,
-        requestPermission: async () => 'granted' as const,
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted' as const;
+        },
+        requestPermission: async () => {
+          return 'granted' as const;
+        },
         show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
           request = nextRequest;
-          return result.ok({close: () => result.ok(undefined)});
+          return result.ok({
+            close: () => {
+              return result.ok(undefined);
+            },
+          });
         },
       } as SystemNotificationApi;
       const [repository] = buildNotificationRepository(translateForTest, clock, notificationApi);
@@ -207,12 +249,22 @@ describe('NotificationRepository', () => {
       const clearTimeoutSpy = jest.spyOn(clock, 'clearTimeout');
       let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
       const notificationApi = {
-        isSupported: () => true,
-        getPermission: () => 'granted' as const,
-        requestPermission: async () => 'granted' as const,
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted' as const;
+        },
+        requestPermission: async () => {
+          return 'granted' as const;
+        },
         show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
           request = nextRequest;
-          return result.ok({close: () => result.ok(undefined)});
+          return result.ok({
+            close: () => {
+              return result.ok(undefined);
+            },
+          });
         },
       } as SystemNotificationApi;
       const [repository] = buildNotificationRepository(translateForTest, clock, notificationApi);
@@ -229,12 +281,22 @@ describe('NotificationRepository', () => {
     it('does not queue a notification that closes before it is shown', () => {
       let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
       const notificationApi = {
-        isSupported: () => true,
-        getPermission: () => 'granted' as const,
-        requestPermission: async () => 'granted' as const,
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted' as const;
+        },
+        requestPermission: async () => {
+          return 'granted' as const;
+        },
         show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
           request = nextRequest;
-          return result.ok({close: () => result.ok(undefined)});
+          return result.ok({
+            close: () => {
+              return result.ok(undefined);
+            },
+          });
         },
       } as SystemNotificationApi;
       const [repository] = buildNotificationRepository(translateForTest, undefined, notificationApi);
@@ -248,12 +310,20 @@ describe('NotificationRepository', () => {
     it('closes the platform handle and removes the queue entry on timeout', () => {
       const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
       const setTimeoutSpy = jest.spyOn(clock, 'setTimeout');
-      const close = jest.fn(() => result.ok(undefined));
+      const close = jest.fn(() => {
+        return result.ok(undefined);
+      });
       let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
       const notificationApi = {
-        isSupported: () => true,
-        getPermission: () => 'granted' as const,
-        requestPermission: async () => 'granted' as const,
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted' as const;
+        },
+        requestPermission: async () => {
+          return 'granted' as const;
+        },
         show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
           request = nextRequest;
           return result.ok({close});
@@ -274,12 +344,20 @@ describe('NotificationRepository', () => {
     it('logs a timeout close failure without reporting that the notification closed', () => {
       const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
       const closeError = new Error('notification could not be closed');
-      const close = jest.fn(() => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError}));
+      const close = jest.fn(() => {
+        return result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError});
+      });
       let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
       const notificationApi = {
-        isSupported: () => true,
-        getPermission: () => 'granted' as const,
-        requestPermission: async () => 'granted' as const,
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted' as const;
+        },
+        requestPermission: async () => {
+          return 'granted' as const;
+        },
         show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
           request = nextRequest;
           return result.ok({close});
@@ -307,18 +385,28 @@ describe('NotificationRepository', () => {
       let request: Parameters<SystemNotificationApi['show']>[0] | undefined;
       const closeError = new Error('notification could not be closed');
       const notificationApi = {
-        isSupported: () => true,
-        getPermission: () => 'granted' as const,
-        requestPermission: async () => 'granted' as const,
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted' as const;
+        },
+        requestPermission: async () => {
+          return 'granted' as const;
+        },
         show: (nextRequest: Parameters<SystemNotificationApi['show']>[0]) => {
           request = nextRequest;
           return result.ok({
-            close: () => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError}),
+            close: () => {
+              return result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError});
+            },
           });
         },
       } as SystemNotificationApi;
       const [repository] = buildNotificationRepository(translateForTest, undefined, notificationApi);
-      repository['callingRepository'].setViewModeMinimized = jest.fn(async () => undefined);
+      repository['callingRepository'].setViewModeMinimized = jest.fn(async () => {
+        return undefined;
+      });
       const errorSpy = jest.spyOn(repository['logger'], 'error');
       const infoSpy = jest.spyOn(repository['logger'], 'info');
 
@@ -335,20 +423,37 @@ describe('NotificationRepository', () => {
     it('logs an unload close failure with its cause', () => {
       const closeError = new Error('notification could not be closed');
       const [repository] = buildNotificationRepository(translateForTest, undefined, {
-        isSupported: () => true,
-        getPermission: () => 'granted',
-        requestPermission: async () => 'granted',
-        show: () =>
-          result.ok({close: () => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError})}),
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted';
+        },
+        requestPermission: async () => {
+          return 'granted';
+        },
+        show: () => {
+          return result.ok({
+            close: () => {
+              return result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError});
+            },
+          });
+        },
       });
       const errorSpy = jest.spyOn(repository['logger'], 'error');
       repository.notifications = [
         {
           body: 'A message',
           data: {messageType: 'content'},
-          handle: {close: () => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError})},
+          handle: {
+            close: () => {
+              return result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError});
+            },
+          },
           icon: '/notification.png',
-          onclick: () => undefined,
+          onclick: () => {
+            return undefined;
+          },
           title: 'A conversation',
         },
       ];
@@ -364,10 +469,22 @@ describe('NotificationRepository', () => {
     it('logs a read-notification close failure with its cause', async () => {
       const closeError = new Error('notification could not be closed');
       const [repository, {fireAndForgetInvoker}] = buildNotificationRepository(translateForTest, undefined, {
-        isSupported: () => true,
-        getPermission: () => 'granted',
-        requestPermission: async () => 'granted',
-        show: () => result.ok({close: () => result.ok(undefined)}),
+        isSupported: () => {
+          return true;
+        },
+        getPermission: () => {
+          return 'granted';
+        },
+        requestPermission: async () => {
+          return 'granted';
+        },
+        show: () => {
+          return result.ok({
+            close: () => {
+              return result.ok(undefined);
+            },
+          });
+        },
       });
       jest.spyOn(repository['conversationRepository'], 'isMessageRead').mockResolvedValue(true);
       const errorSpy = jest.spyOn(repository['logger'], 'error');
@@ -375,9 +492,15 @@ describe('NotificationRepository', () => {
         {
           body: 'A message',
           data: {conversationId: {id: 'conversation', domain: ''}, messageId: 'message', messageType: 'content'},
-          handle: {close: () => result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError})},
+          handle: {
+            close: () => {
+              return result.err({kind: systemNotificationErrorKinds.closeFailed, cause: closeError});
+            },
+          },
           icon: '/notification.png',
-          onclick: () => undefined,
+          onclick: () => {
+            return undefined;
+          },
           title: 'A conversation',
         },
       ];
@@ -422,7 +545,9 @@ describe('NotificationRepository', () => {
     };
 
     // Mocks
-    document.hasFocus = () => false;
+    document.hasFocus = () => {
+      return false;
+    };
     notificationRepository.updatePermissionState(BrowserPermissionStatus.GRANTED);
     jest.spyOn(notificationRepository['notificationApi'], 'isSupported').mockReturnValue(true);
     spyOn(notificationRepository['assetRepository'], 'getObjectUrl').and.returnValue(
@@ -536,7 +661,9 @@ describe('NotificationRepository', () => {
       const conversationState = container.resolve(ConversationState);
       const callState = container.resolve(CallState);
       conversationState.activeConversation(conversation);
-      document.hasFocus = () => true;
+      document.hasFocus = () => {
+        return true;
+      };
       spyOn(callState, 'joinedCall').and.returnValue(true);
       jest.spyOn(callState, 'viewMode').mockReturnValueOnce(CallingViewMode.MINIMIZED);
 
@@ -659,8 +786,12 @@ describe('NotificationRepository', () => {
       notificationRepository.updatePermissionState(BrowserPermissionStatus.GRANTED);
 
       const ignoredMessages = Object.entries(allMessageTypes)
-        .filter(([type]) => ['content', 'ping'].includes(type))
-        .map(([, message]) => message);
+        .filter(([type]) => {
+          return ['content', 'ping'].includes(type);
+        })
+        .map(([, message]) => {
+          return message;
+        });
 
       const testPromises = ignoredMessages.map(messageEntity => {
         return notificationRepository.notify(messageEntity, undefined, conversation);
@@ -676,8 +807,12 @@ describe('NotificationRepository', () => {
       notificationRepository.updatePermissionState(BrowserPermissionStatus.GRANTED);
 
       const notifiedMessages = Object.entries(allMessageTypes)
-        .filter(([type]) => ['mention', 'call', 'composite'].includes(type))
-        .map(([, message]) => message);
+        .filter(([type]) => {
+          return ['mention', 'call', 'composite'].includes(type);
+        })
+        .map(([, message]) => {
+          return message;
+        });
 
       const testPromises = notifiedMessages.map(messageEntity => {
         return notificationRepository.notify(messageEntity, undefined, conversation);

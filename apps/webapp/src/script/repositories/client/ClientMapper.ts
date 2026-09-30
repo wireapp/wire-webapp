@@ -46,12 +46,14 @@ export class ClientMapper {
   ): ClientEntity {
     const clientEntity = new ClientEntity(isSelfClient, domain);
 
-    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => ClientMapper._mapMember(clientEntity, clientPayload, name));
+    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => {
+      return ClientMapper._mapMember(clientEntity, clientPayload, name);
+    });
 
     if (isSelfClient) {
-      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name =>
-        ClientMapper._mapMember(clientEntity, clientPayload, name),
-      );
+      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => {
+        return ClientMapper._mapMember(clientEntity, clientPayload, name);
+      });
     }
 
     if (isClientRecord(clientPayload)) {
@@ -86,7 +88,9 @@ export class ClientMapper {
     isSelfClient: boolean,
     domain: string | undefined = undefined,
   ): ClientEntity[] {
-    return clientRecords.map(clientRecord => ClientMapper.mapClient(clientRecord, isSelfClient, domain));
+    return clientRecords.map(clientRecord => {
+      return ClientMapper.mapClient(clientRecord, isSelfClient, domain);
+    });
   }
 
   /**

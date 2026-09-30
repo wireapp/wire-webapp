@@ -141,17 +141,23 @@ export class Message {
 
     this.affect_order = ko.observable(true);
     this.timestamp = ko.observable(Date.now());
-    this.timestamp_affects_order = ko.pureComputed(() => this.visible() && this.affect_order());
+    this.timestamp_affects_order = ko.pureComputed(() => {
+      return this.visible() && this.affect_order();
+    });
 
     // MessageCategory
     this.category = undefined;
 
-    this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), this.translate, undefined, true));
+    this.unsafeSenderName = ko.pureComputed(() => {
+      return getUserName(this.user(), this.translate, undefined, true);
+    });
     this.senderName = ko.pureComputed(() => {
       return this.user().name();
     });
 
-    this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
+    this.accent_color = ko.pureComputed(() => {
+      return `accent-color-${this.user().accent_id()}`;
+    });
   }
 
   public get qualifiedFrom(): QualifiedId {
@@ -173,7 +179,11 @@ export class Message {
    * @returns Message contains any file type asset
    */
   hasAsset(): boolean {
-    return this.isContent() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
+    return this.isContent()
+      ? this.assets().some(assetEntity => {
+          return assetEntity.type === AssetType.FILE;
+        })
+      : false;
   }
 
   /**
@@ -181,7 +191,11 @@ export class Message {
    * @returns Message contains any image
    */
   hasAssetImage(): boolean {
-    return this.isContent() ? this.assets().some(assetEntity => assetEntity.isImage()) : false;
+    return this.isContent()
+      ? this.assets().some(assetEntity => {
+          return assetEntity.isImage();
+        })
+      : false;
   }
 
   /**
@@ -189,7 +203,11 @@ export class Message {
    * @returns Message contains a location
    */
   hasAssetLocation(): boolean {
-    return this.isContent() ? this.assets().some(assetEntity => assetEntity.isLocation()) : false;
+    return this.isContent()
+      ? this.assets().some(assetEntity => {
+          return assetEntity.isLocation();
+        })
+      : false;
   }
 
   /**
@@ -198,7 +216,9 @@ export class Message {
    */
   hasAssetText(): boolean {
     return this.isContent()
-      ? this.assets().some(assetEntity => assetEntity.isText() || assetEntity.isMultipart())
+      ? this.assets().some(assetEntity => {
+          return assetEntity.isText() || assetEntity.isMultipart();
+        })
       : false;
   }
 
@@ -206,7 +226,9 @@ export class Message {
     const contentMessageCandidate = this as unknown as {assets?: () => {type: AssetType}[]};
     const hasAssetsFunction = Object.hasOwn(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
     return this.isContent() && hasAssetsFunction
-      ? this.assets().some(assetEntity => assetEntity.type === AssetType.MULTIPART)
+      ? this.assets().some(assetEntity => {
+          return assetEntity.type === AssetType.MULTIPART;
+        })
       : false;
   }
 
@@ -216,7 +238,9 @@ export class Message {
       return [];
     }
 
-    return this.assets().filter(assetEntity => assetEntity.isMultipart());
+    return this.assets().filter(assetEntity => {
+      return assetEntity.isMultipart();
+    });
   }
 
   /**
@@ -279,9 +303,9 @@ export class Message {
   isLinkPreview(): this is LinkPreview {
     return (
       this.hasAssetText() &&
-      (this as unknown as ContentMessage)
-        .assets()
-        .some(assetEntity => assetEntity.isText() && isNonEmptyArray(assetEntity.previews()))
+      (this as unknown as ContentMessage).assets().some(assetEntity => {
+        return assetEntity.isText() && isNonEmptyArray(assetEntity.previews());
+      })
     );
   }
 
@@ -390,7 +414,9 @@ export class Message {
    * Check if ephemeral message is expired.
    * @returns `true`, if message expired, `false` otherwise.
    */
-  readonly isExpired = (): boolean => this.ephemeral_expires() === true;
+  readonly isExpired = (): boolean => {
+    return this.ephemeral_expires() === true;
+  };
 
   /**
    * Check if message has an unavailable (uploading or failed) asset.

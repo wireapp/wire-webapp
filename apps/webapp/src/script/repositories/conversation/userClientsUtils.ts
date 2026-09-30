@@ -26,7 +26,9 @@ function extractUserIds<T>(
   userClients: UserClientsContainer<T>,
   domain: string,
 ): {clients: T[]; userId: QualifiedId}[] {
-  return Object.entries(userClients).map(([id, clients]) => ({clients, userId: {domain, id}}));
+  return Object.entries(userClients).map(([id, clients]) => {
+    return {clients, userId: {domain, id}};
+  });
 }
 
 /**

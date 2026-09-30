@@ -49,10 +49,12 @@ import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {TaskScheduler} from '../../../util/taskScheduler';
 import * as Helper from '../e2eIdentityService/helper';
 
-jest.mock('../e2eIdentityService/helper', () => ({
-  ...jest.requireActual('../e2eIdentityService/helper'),
-  getMLSDeviceStatus: jest.fn(),
-}));
+jest.mock('../e2eIdentityService/helper', () => {
+  return {
+    ...jest.requireActual('../e2eIdentityService/helper'),
+    getMLSDeviceStatus: jest.fn(),
+  };
+});
 
 jest.createMockFromModule('@wireapp/api-client');
 
@@ -95,7 +97,9 @@ const createMLSService = async () => {
     provideTransport: jest.fn(),
     version: jest.fn(),
     conversationExists: jest.fn(),
-    e2eiIsEnabled: jest.fn(() => false),
+    e2eiIsEnabled: jest.fn(() => {
+      return false;
+    }),
     clientPublicKey: jest.fn(),
     conversationEpoch: jest.fn(),
   } as unknown as jest.Mocked<CoreCrypto>;
@@ -103,8 +107,12 @@ const createMLSService = async () => {
   const mockedDb = await openDB('core-test-db');
   const recurringTaskScheduler = new RecurringTaskScheduler(
     {
-      delete: key => mockedDb.delete('recurringTasks', key),
-      get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
+      delete: key => {
+        return mockedDb.delete('recurringTasks', key);
+      },
+      get: async key => {
+        return (await mockedDb.get('recurringTasks', key))?.firingDate;
+      },
       set: async (key, timestamp) => {
         await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
       },
@@ -127,7 +135,9 @@ describe('MLSService', () => {
   });
 
   afterAll(() => {
-    apiClients.forEach(client => client.disconnect());
+    apiClients.forEach(client => {
+      return client.disconnect();
+    });
   });
 
   describe('registerConversation', () => {
@@ -255,9 +265,11 @@ describe('MLSService', () => {
       const [mlsService, {apiClient}] = await createMLSService();
       const users = [createUserId(), createUserId()];
 
-      jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockImplementation(async userId => ({
-        key_packages: [{client: 'client-1', domain: 'domain-1', key_package: '', key_package_ref: '', user: userId}],
-      }));
+      jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockImplementation(async userId => {
+        return {
+          key_packages: [{client: 'client-1', domain: 'domain-1', key_package: '', key_package_ref: '', user: userId}],
+        };
+      });
 
       const {failures, keyPackages} = await mlsService.getKeyPackagesPayload(users);
 
@@ -714,7 +726,9 @@ describe('MLSService', () => {
       ];
       await mlsService.updatePendingRecoveryConversationIds(initialPendingIds);
 
-      const updatedPendingIds = initialPendingIds.filter(({id}) => id !== 'conv2');
+      const updatedPendingIds = initialPendingIds.filter(({id}) => {
+        return id !== 'conv2';
+      });
       await mlsService.updatePendingRecoveryConversationIds(updatedPendingIds);
 
       expect(await mlsService.getPendingRecoveryConversationIds()).toEqual([
@@ -823,7 +837,9 @@ describe('MLSService', () => {
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
       const mockedNewEpoch = 3;
 
-      const getGroupIdFromConversationId = () => Promise.resolve(mockGroupId);
+      const getGroupIdFromConversationId = () => {
+        return Promise.resolve(mockGroupId);
+      };
 
       const mockedDecryptoedMessage: DecryptedMessage = {
         hasEpochChanged: true,
@@ -854,7 +870,9 @@ describe('MLSService', () => {
       const mockedNewEpoch = 3;
       const commitDelay = 1000;
 
-      const getGroupIdFromConversationId = () => Promise.resolve(mockGroupId);
+      const getGroupIdFromConversationId = () => {
+        return Promise.resolve(mockGroupId);
+      };
 
       const mockedDecryptoedMessage: DecryptedMessage = {
         hasEpochChanged: true,
@@ -886,7 +904,9 @@ describe('MLSService', () => {
       const [mlsService, {transactionContext}] = await createMLSService();
 
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
-      const getGroupIdFromConversationId = () => Promise.resolve(mockGroupId);
+      const getGroupIdFromConversationId = () => {
+        return Promise.resolve(mockGroupId);
+      };
       jest
         .spyOn(transactionContext, 'decryptMessage')
         .mockRejectedValueOnce(new Error(CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch));

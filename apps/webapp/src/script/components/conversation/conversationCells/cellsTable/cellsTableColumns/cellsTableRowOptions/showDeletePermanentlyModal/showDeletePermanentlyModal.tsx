@@ -35,7 +35,9 @@ export const showDeletePermanentlyModal = ({
     PrimaryModal.type.CONFIRM,
     {
       primaryAction: {
-        action: () => onDeletePermanently(node.id),
+        action: () => {
+          return onDeletePermanently(node.id);
+        },
         text: translate('cells.deletePermanentlyModal.button'),
       },
       text: {
@@ -51,7 +53,9 @@ export const showDeletePermanentlyModal = ({
           [
             {
               exactMatch: '{name}',
-              render: () => <b>{node.name}</b>,
+              render: () => {
+                return <b>{node.name}</b>;
+              },
             },
           ],
         ),

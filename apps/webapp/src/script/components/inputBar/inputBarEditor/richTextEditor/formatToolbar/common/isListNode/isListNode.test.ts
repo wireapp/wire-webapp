@@ -23,17 +23,29 @@ import {isListNode} from './isListNode';
 
 const createMockElementNode = (type: string, tag: string, parent: ElementNode | null = null): ElementNode => {
   return {
-    getType: () => type,
-    getTag: () => tag,
-    getParent: () => parent,
+    getType: () => {
+      return type;
+    },
+    getTag: () => {
+      return tag;
+    },
+    getParent: () => {
+      return parent;
+    },
   } as unknown as ElementNode;
 };
 
 const createMockTextNode = (parent: ElementNode | null = null): TextNode => {
   return {
-    getType: () => 'text',
-    getTag: () => '',
-    getParent: () => parent,
+    getType: () => {
+      return 'text';
+    },
+    getTag: () => {
+      return '';
+    },
+    getParent: () => {
+      return parent;
+    },
   } as unknown as TextNode;
 };
 

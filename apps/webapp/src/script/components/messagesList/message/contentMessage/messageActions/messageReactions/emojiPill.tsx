@@ -91,12 +91,16 @@ export const EmojiPill = ({
   // Prefer the already-cached conversation members and resolve departed reactors from IndexedDB only on demand.
   const resolvedReactingUsers = [...reactingUsers, ...storedReactingUsers];
   const tooltipReactorIds = reactorIds.slice(0, MAX_USER_NAMES_TO_SHOW);
-  const missingReactorIds = tooltipReactorIds.filter(
-    reactorId => !resolvedReactingUsers.some(user => matchQualifiedIds(reactorId, user.qualifiedId)),
-  );
+  const missingReactorIds = tooltipReactorIds.filter(reactorId => {
+    return !resolvedReactingUsers.some(user => {
+      return matchQualifiedIds(reactorId, user.qualifiedId);
+    });
+  });
 
   const reactingUserNames = tooltipReactorIds.map(reactorId => {
-    const user = resolvedReactingUsers.find(reactingUser => matchQualifiedIds(reactorId, reactingUser.qualifiedId));
+    const user = resolvedReactingUsers.find(reactingUser => {
+      return matchQualifiedIds(reactorId, reactingUser.qualifiedId);
+    });
     const reactingUserName = user?.name();
     return isNonEmptyString(reactingUserName) ? reactingUserName : translate('deletedUser');
   });
@@ -109,8 +113,12 @@ export const EmojiPill = ({
     isLoadingStoredUsers.current = true;
     try {
       const loadResult = await task.tryOrElse(
-        () => 'failedToLoadReactionUsers' as const,
-        () => loadUsersByIdsFromDb(missingReactorIds),
+        () => {
+          return 'failedToLoadReactionUsers' as const;
+        },
+        () => {
+          return loadUsersByIdsFromDb(missingReactorIds);
+        },
       );
 
       if (loadResult.isErr) {
@@ -118,9 +126,11 @@ export const EmojiPill = ({
       }
 
       setStoredReactingUsers(currentUsers => {
-        const newUsers = loadResult.value.filter(
-          loadedUser => !currentUsers.some(user => matchQualifiedIds(loadedUser.qualifiedId, user.qualifiedId)),
-        );
+        const newUsers = loadResult.value.filter(loadedUser => {
+          return !currentUsers.some(user => {
+            return matchQualifiedIds(loadedUser.qualifiedId, user.qualifiedId);
+          });
+        });
         return [...currentUsers, ...newUsers];
       });
     } finally {
@@ -168,20 +178,24 @@ export const EmojiPill = ({
     {
       start: '<strong>',
       end: '</strong>',
-      render: text => (
-        <strong key={text} css={userBoldStyle}>
-          {text}
-        </strong>
-      ),
+      render: text => {
+        return (
+          <strong key={text} css={userBoldStyle}>
+            {text}
+          </strong>
+        );
+      },
     },
     {
       start: '[showmore]',
       end: '[/showmore]',
-      render: text => (
-        <button key={text} onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
-          {text}
-        </button>
-      ),
+      render: text => {
+        return (
+          <button key={text} onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
+            {text}
+          </button>
+        );
+      },
     },
   ]);
 

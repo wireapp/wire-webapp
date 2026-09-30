@@ -34,16 +34,18 @@ import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {translateForTest} from 'Util/test/translateForTest';
 
-jest.mock('src/script/e2eIdentity', () => ({
-  ...jest.requireActual('src/script/e2eIdentity'),
-  getConversationVerificationState: jest.fn(),
-  getActiveWireIdentity: jest.fn(),
-  E2EIHandler: {
-    getInstance: jest.fn().mockReturnValue({
-      isE2EIEnabled: jest.fn(),
-    }),
-  },
-}));
+jest.mock('src/script/e2eIdentity', () => {
+  return {
+    ...jest.requireActual('src/script/e2eIdentity'),
+    getConversationVerificationState: jest.fn(),
+    getActiveWireIdentity: jest.fn(),
+    E2EIHandler: {
+      getInstance: jest.fn().mockReturnValue({
+        isE2EIEnabled: jest.fn(),
+      }),
+    },
+  };
+});
 
 describe('MLSConversationVerificationStateHandler', () => {
   function getCoreServiceForTest(): NonNullable<Core['service']> {
@@ -65,25 +67,27 @@ describe('MLSConversationVerificationStateHandler', () => {
     typeof e2eIdentity.getConversationVerificationState
   >;
 
-  const createRevokedWireIdentity = (): e2eIdentity.WireIdentity => ({
-    x509Identity: {
-      free: jest.fn(),
-      certificate: '',
-      displayName: 'John Doe',
-      domain: 'wire.com',
-      handle: 'wireapp://%40john.doe@wire.com',
-      notAfter: BigInt(0),
-      notBefore: BigInt(0),
-      serialNumber: '',
-      [Symbol.dispose]: noop,
-    },
-    thumbprint: '',
-    credentialType: CredentialType.X509,
-    status: e2eIdentity.MLSStatuses.REVOKED,
-    clientId: 'client-id',
-    deviceId: 'device-id',
-    qualifiedUserId: {id: 'user-id', domain: 'wire.com'},
-  });
+  const createRevokedWireIdentity = (): e2eIdentity.WireIdentity => {
+    return {
+      x509Identity: {
+        free: jest.fn(),
+        certificate: '',
+        displayName: 'John Doe',
+        domain: 'wire.com',
+        handle: 'wireapp://%40john.doe@wire.com',
+        notAfter: BigInt(0),
+        notBefore: BigInt(0),
+        serialNumber: '',
+        [Symbol.dispose]: noop,
+      },
+      thumbprint: '',
+      credentialType: CredentialType.X509,
+      status: e2eIdentity.MLSStatuses.REVOKED,
+      clientId: 'client-id',
+      deviceId: 'device-id',
+      qualifiedUserId: {id: 'user-id', domain: 'wire.com'},
+    };
+  };
 
   const conversationState = new ConversationState();
   let core: Core;
@@ -119,7 +123,9 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if MLS service is not available', () => {
     getCoreServiceForTest().mls = undefined;
 
-    const t = () => new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+    const t = () => {
+      return new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
+    };
 
     expect(t).not.toThrow();
   });
@@ -204,14 +210,16 @@ describe('MLSConversationVerificationStateHandler', () => {
       conversation.mlsVerificationState(ConversationVerificationState.VERIFIED);
       jest.spyOn(getMlsServiceForTest(), 'conversationExists').mockResolvedValueOnce(false);
 
-      jest
-        .spyOn(getMlsServiceForTest(), 'on')
-        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
+      jest.spyOn(getMlsServiceForTest(), 'on').mockImplementation((_event, listener) => {
+        return (triggerEpochChange = listener) as any;
+      });
 
       new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 0);
+      });
       expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.UNVERIFIED);
     });
 
@@ -221,14 +229,16 @@ describe('MLSConversationVerificationStateHandler', () => {
       jest.spyOn(getMlsServiceForTest(), 'conversationExists').mockResolvedValueOnce(true);
 
       getConversationVerificationStateMock.mockResolvedValue(E2eiConversationState.NotVerified);
-      jest
-        .spyOn(getMlsServiceForTest(), 'on')
-        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
+      jest.spyOn(getMlsServiceForTest(), 'on').mockImplementation((_event, listener) => {
+        return (triggerEpochChange = listener) as any;
+      });
 
       new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 0);
+      });
       expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.DEGRADED);
     });
 
@@ -239,14 +249,16 @@ describe('MLSConversationVerificationStateHandler', () => {
       jest.spyOn(getMlsServiceForTest(), 'conversationExists').mockResolvedValueOnce(true);
 
       getConversationVerificationStateMock.mockResolvedValue(E2eiConversationState.NotVerified);
-      jest
-        .spyOn(getMlsServiceForTest(), 'on')
-        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
+      jest.spyOn(getMlsServiceForTest(), 'on').mockImplementation((_event, listener) => {
+        return (triggerEpochChange = listener) as any;
+      });
 
       new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 0);
+      });
       expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.UNVERIFIED);
     });
 
@@ -257,14 +269,16 @@ describe('MLSConversationVerificationStateHandler', () => {
       jest.spyOn(getMlsServiceForTest(), 'conversationExists').mockResolvedValueOnce(true);
 
       getConversationVerificationStateMock.mockResolvedValue(E2eiConversationState.Verified);
-      jest
-        .spyOn(getMlsServiceForTest(), 'on')
-        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
+      jest.spyOn(getMlsServiceForTest(), 'on').mockImplementation((_event, listener) => {
+        return (triggerEpochChange = listener) as any;
+      });
 
       new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
       triggerEpochChange({groupId});
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 0);
+      });
       expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.VERIFIED);
     });
 
@@ -277,9 +291,9 @@ describe('MLSConversationVerificationStateHandler', () => {
       newConversation.groupId = 'AAEAAAOygT3TL0wljoaNabgK4yIAZWxuYS53aXJlLmxpbms=';
 
       getConversationVerificationStateMock.mockResolvedValue(E2eiConversationState.Verified);
-      jest
-        .spyOn(getMlsServiceForTest(), 'on')
-        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
+      jest.spyOn(getMlsServiceForTest(), 'on').mockImplementation((_event, listener) => {
+        return (triggerEpochChange = listener) as any;
+      });
 
       new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
 
@@ -288,7 +302,9 @@ describe('MLSConversationVerificationStateHandler', () => {
         // adding the conversation after the epoch change event was triggered
         conversationState.conversations.push(newConversation);
       }, 100);
-      await waitFor(() => newConversation.mlsVerificationState() === ConversationVerificationState.VERIFIED);
+      await waitFor(() => {
+        return newConversation.mlsVerificationState() === ConversationVerificationState.VERIFIED;
+      });
       expect(newConversation.mlsVerificationState()).toBe(ConversationVerificationState.VERIFIED);
     });
   });

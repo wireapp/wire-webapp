@@ -52,12 +52,16 @@ function resetPrimaryModalState(): void {
   usePrimaryModalState.setState({
     currentModalContent: {
       checkboxLabel: '',
-      closeFn: () => undefined,
+      closeFn: () => {
+        return undefined;
+      },
       currentType: '',
       inputPlaceholder: '',
       message: '',
       modalUie: '',
-      onBgClick: () => undefined,
+      onBgClick: () => {
+        return undefined;
+      },
       primaryAction: null,
       secondaryAction: null,
       titleText: '',

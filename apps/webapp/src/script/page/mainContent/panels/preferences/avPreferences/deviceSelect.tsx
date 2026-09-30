@@ -47,11 +47,15 @@ const DeviceSelect = ({
   onChange,
   title,
 }: DeviceSelectProps) => {
-  const devicesList = devices.map(({deviceId, label}) => ({
-    label: isNonEmptyString(label) ? label : defaultDeviceName,
-    value: deviceId,
-  }));
-  const currentValue = devicesList.find(device => device.value === value);
+  const devicesList = devices.map(({deviceId, label}) => {
+    return {
+      label: isNonEmptyString(label) ? label : defaultDeviceName,
+      value: deviceId,
+    };
+  });
+  const currentValue = devicesList.find(device => {
+    return device.value === value;
+  });
   const lessThanTwoDevices = devices.length < 2;
   const disabled = lessThanTwoDevices || isRequesting;
 

@@ -82,14 +82,22 @@ function renderPermissionRequestWarningMessage(options: RenderPermissionRequestT
 
 const WarningsContainer = ({onRefresh}: WarningProps) => {
   const {translate} = useApplicationContext();
-  const name = useWarningsState(state => state.name);
-  const warnings = useWarningsState(state => state.warnings);
+  const name = useWarningsState(state => {
+    return state.name;
+  });
+  const warnings = useWarningsState(state => {
+    return state.warnings;
+  });
   const type = TYPE;
   const visibleWarning = warnings[warnings.length - 1];
-  const warningDimmed = warnings.some(warning => CONFIG.DIMMED_MODES.includes(warning));
+  const warningDimmed = warnings.some(warning => {
+    return CONFIG.DIMMED_MODES.includes(warning);
+  });
 
   useEffect(() => {
-    afterRender(() => window.dispatchEvent(new Event('resize')));
+    afterRender(() => {
+      return window.dispatchEvent(new Event('resize'));
+    });
   }, [warnings]);
 
   const brandName = Config.getConfig().BRAND_NAME;
@@ -100,7 +108,9 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       type="button"
       data-uie-name="do-close-warning"
       className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-      onClick={() => closeWarning(translate)}
+      onClick={() => {
+        return closeWarning(translate);
+      }}
     />
   );
 

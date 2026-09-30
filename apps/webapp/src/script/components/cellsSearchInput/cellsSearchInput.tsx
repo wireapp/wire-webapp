@@ -46,23 +46,27 @@ export const CellsSearchInput = ({
   ariaLabel,
   clearAriaLabel,
   uieName,
-}: CellsSearchInputProps) => (
-  <div css={searchFieldStyles}>
-    <SearchIcon css={searchIconStyles} />
-    <input
-      css={searchNativeInputStyles}
-      type="text"
-      value={value}
-      placeholder={placeholder}
-      aria-label={ariaLabel ?? placeholder}
-      onFocus={onFocus}
-      onChange={event => onChange(event.currentTarget.value)}
-      data-uie-name={uieName}
-    />
-    {value.length > 0 && (
-      <button type="button" css={clearButtonStyles} aria-label={clearAriaLabel} onClick={onClear}>
-        <CircleCloseIcon color="currentColor" />
-      </button>
-    )}
-  </div>
-);
+}: CellsSearchInputProps) => {
+  return (
+    <div css={searchFieldStyles}>
+      <SearchIcon css={searchIconStyles} />
+      <input
+        css={searchNativeInputStyles}
+        type="text"
+        value={value}
+        placeholder={placeholder}
+        aria-label={ariaLabel ?? placeholder}
+        onFocus={onFocus}
+        onChange={event => {
+          return onChange(event.currentTarget.value);
+        }}
+        data-uie-name={uieName}
+      />
+      {value.length > 0 && (
+        <button type="button" css={clearButtonStyles} aria-label={clearAriaLabel} onClick={onClear}>
+          <CircleCloseIcon color="currentColor" />
+        </button>
+      )}
+    </div>
+  );
+};

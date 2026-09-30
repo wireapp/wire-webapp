@@ -35,7 +35,11 @@ const resolveObservables = <C extends keyof Subscribables<P>, P extends Partial<
   object: P,
   children?: C[],
 ): UnwrappedValues<P> => {
-  const properties = children ?? (Object.keys(object).filter(key => key !== '$raw') as C[]);
+  const properties =
+    children ??
+    (Object.keys(object).filter(key => {
+      return key !== '$raw';
+    }) as C[]);
   return properties.reduce<UnwrappedValues<P>>((acc, child) => {
     acc[child] = ko.unwrap(object?.[child]);
     return acc;
@@ -54,11 +58,17 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
   onUpdate: (updates: Partial<UnwrappedValues<Pick<P, C>>>) => void,
   children?: C[],
 ) => {
-  const properties = children ?? (Object.keys(object).filter(key => key !== '$raw') as C[]);
+  const properties =
+    children ??
+    (Object.keys(object).filter(key => {
+      return key !== '$raw';
+    }) as C[]);
   onUpdate(resolveObservables(object, children));
 
   const subscriptions = properties
-    .filter(child => ko.isSubscribable(object?.[child]))
+    .filter(child => {
+      return ko.isSubscribable(object?.[child]);
+    })
     .map(child => {
       const subscribable = object[child];
       return subscribable?.subscribe((value: SubscribableValue<typeof subscribable>) => {
@@ -67,7 +77,11 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
     });
 
   return {
-    dispose: () => subscriptions.forEach(subscription => subscription?.dispose()),
+    dispose: () => {
+      return subscriptions.forEach(subscription => {
+        return subscription?.dispose();
+      });
+    },
   };
 };
 
@@ -82,10 +96,16 @@ export const useKoSubscribableChildren = <
   useEffect(() => {
     const subscription = subscribeProperties(
       parent,
-      updates => setState(currentState => ({...currentState, ...updates})),
+      updates => {
+        return setState(currentState => {
+          return {...currentState, ...updates};
+        });
+      },
       children,
     );
-    return () => subscription.dispose();
+    return () => {
+      return subscription.dispose();
+    };
   }, [parent]);
 
   return state;

@@ -39,7 +39,9 @@ export const PasswordForm = ({onSubmit, inputPlaceholder, inputValue, onInputCha
         type="password"
         value={inputValue}
         placeholder={inputPlaceholder}
-        onChange={event => onInputChange(event.target.value)}
+        onChange={event => {
+          return onInputChange(event.target.value);
+        }}
       />
     </form>
   );

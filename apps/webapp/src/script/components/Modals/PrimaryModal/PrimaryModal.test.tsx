@@ -109,7 +109,9 @@ describe('PrimaryModal', () => {
     });
 
     it('uses the provided translate function for default secondary action copy', async () => {
-      const translate = (translationKey: string) => `translated:${translationKey}`;
+      const translate = (translationKey: string) => {
+        return `translated:${translationKey}`;
+      };
       const {getSecondaryActionButton} = renderPrimaryModal({
         hideCloseButton: false,
         primaryAction: jest.fn(),
@@ -232,7 +234,9 @@ describe('PrimaryModal', () => {
 
   describe('SessionReset', () => {
     it('uses the provided translate function for generated modal content', async () => {
-      const translate = (translationKey: string) => `translated:${translationKey}`;
+      const translate = (translationKey: string) => {
+        return `translated:${translationKey}`;
+      };
       const {getByText} = render(withTheme(<PrimaryModalComponent translate={translateForTest} />), {
         wrapper: rootProviderWrapper,
       });
@@ -303,13 +307,29 @@ const renderPrimaryModal = ({
   });
 
   return {
-    getPrimaryActionButton: () => getByTestId('do-action'),
-    getSecondaryActionButton: () => getByTestId('do-secondary'),
-    getCloseButton: () => queryByTestId('do-close'),
-    getErrorMessages: () => getAllByTestId('primary-modals-error-message'),
-    getPasswordInput: () => getByTestId('guest-link-password'),
-    getInput: () => getByLabelText('test-input'),
-    getGeneratePasswordButton: () => getByTestId('do-generate-password'),
-    getConfirmPasswordInput: () => getByTestId('guest-link-password-confirm'),
+    getPrimaryActionButton: () => {
+      return getByTestId('do-action');
+    },
+    getSecondaryActionButton: () => {
+      return getByTestId('do-secondary');
+    },
+    getCloseButton: () => {
+      return queryByTestId('do-close');
+    },
+    getErrorMessages: () => {
+      return getAllByTestId('primary-modals-error-message');
+    },
+    getPasswordInput: () => {
+      return getByTestId('guest-link-password');
+    },
+    getInput: () => {
+      return getByLabelText('test-input');
+    },
+    getGeneratePasswordButton: () => {
+      return getByTestId('do-generate-password');
+    },
+    getConfirmPasswordInput: () => {
+      return getByTestId('guest-link-password-confirm');
+    },
   };
 };

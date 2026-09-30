@@ -119,7 +119,9 @@ async function buildMessageRepository(
   conversationState.conversations([selfConversation]);
   const conversationRepository = {checkMessageTimer: jest.fn()} as unknown as ConversationRepository;
   const dependencies = {
-    conversationRepository: () => conversationRepository,
+    conversationRepository: () => {
+      return conversationRepository;
+    },
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any, translate),
@@ -217,14 +219,20 @@ describe('MessageRepository', () => {
 
   describe('requestUserSendingPermission', () => {
     it('uses injected translate for degraded conversation modal copy', async () => {
-      const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
+      const translate = ((translationKey: string) => {
+        return `translated:${translationKey}`;
+      }) as Translate;
       const [messageRepository] = await buildMessageRepository(translate);
-      const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
+      const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {
+        return undefined;
+      });
       const conversation = generateConversation();
       const unverifiedUser = new User(createUuid(), '', translateForTest);
 
       unverifiedUser.name('Alice');
-      conversation.getUsersWithUnverifiedClients = () => [unverifiedUser];
+      conversation.getUsersWithUnverifiedClients = () => {
+        return [unverifiedUser];
+      };
       conversation.verification_state(ConversationVerificationState.DEGRADED);
 
       const permissionPromise = messageRepository.requestUserSendingPermission(conversation, false);

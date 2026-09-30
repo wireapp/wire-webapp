@@ -305,7 +305,9 @@ export class ConnectionRepository {
    * Get a connection for a user ID.
    */
   private getConnectionByUserId(userId: QualifiedId): ConnectionEntity | undefined {
-    return this.connectionState.connections().find(connection => matchQualifiedIds(connection.userId, userId));
+    return this.connectionState.connections().find(connection => {
+      return matchQualifiedIds(connection.userId, userId);
+    });
   }
 
   /**
@@ -315,9 +317,9 @@ export class ConnectionRepository {
    */
   getConnectionByConversationId(conversationId: QualifiedId): ConnectionEntity | undefined {
     const connectionEntities = Object.values(this.connectionState.connections());
-    return connectionEntities.find(connectionEntity =>
-      matchQualifiedIds(connectionEntity.conversationId, conversationId),
-    );
+    return connectionEntities.find(connectionEntity => {
+      return matchQualifiedIds(connectionEntity.conversationId, conversationId);
+    });
   }
 
   /**
@@ -336,9 +338,9 @@ export class ConnectionRepository {
     const deadConnections: Connection[] = [];
 
     connectionData.forEach(connection => {
-      const isTeamMember = teamMembers.some(teamMemberQualifiedId =>
-        matchQualifiedIds(connection.qualified_to, teamMemberQualifiedId),
-      );
+      const isTeamMember = teamMembers.some(teamMemberQualifiedId => {
+        return matchQualifiedIds(connection.qualified_to, teamMemberQualifiedId);
+      });
 
       if (!isTeamMember || connection.status === ConnectionStatus.ACCEPTED) {
         acceptedConnectionsOrNoneTeamMembersConnections.push(connection);
@@ -497,9 +499,9 @@ export class ConnectionRepository {
   }
 
   public async deleteConnectionWithUser(user: User) {
-    const connection = this.connectionState
-      .connections()
-      .find(connection => matchQualifiedIds(connection.userId, user.qualifiedId));
+    const connection = this.connectionState.connections().find(connection => {
+      return matchQualifiedIds(connection.userId, user.qualifiedId);
+    });
 
     await this.onDeleteConnectionRequestConversation?.(user.qualifiedId);
 
@@ -567,16 +569,22 @@ export class ConnectionRepository {
       return;
     }
 
-    const currentConnectionsUserIds = this.connectionState.connections().map(connection => connection.userId);
+    const currentConnectionsUserIds = this.connectionState.connections().map(connection => {
+      return connection.userId;
+    });
     const currentConnectionsUsers = await this.userRepository.getUsersById(currentConnectionsUserIds);
 
     const teamMembersToDeletePendingConnectionsWith = await this.teamService.getTeamMembersByIds(
       newTeamId,
-      currentConnectionsUsers.map(user => user.qualifiedId.id),
+      currentConnectionsUsers.map(user => {
+        return user.qualifiedId.id;
+      }),
     );
 
     const currentUsersToDeleteConnectionWith = currentConnectionsUsers.filter(user => {
-      return teamMembersToDeletePendingConnectionsWith.some(member => member.user === user.qualifiedId.id);
+      return teamMembersToDeletePendingConnectionsWith.some(member => {
+        return member.user === user.qualifiedId.id;
+      });
     });
 
     for (const user of currentUsersToDeleteConnectionWith) {

@@ -29,19 +29,25 @@ function getLocalStorage() {
 
 const MIGRATION_READY_STATE = '1';
 
-const getQualifiedSessionsReadyKey = (dbName: string) => `${dbName}-qualified-sessions-ready` as const;
-
-const markMigrationReady = (getKey: (dbName: string) => string) => (dbName: string) => {
-  const key = getKey(dbName);
-  const localStorage = getLocalStorage();
-  localStorage.setItem(key, MIGRATION_READY_STATE);
+const getQualifiedSessionsReadyKey = (dbName: string) => {
+  return `${dbName}-qualified-sessions-ready` as const;
 };
 
-const isMigrationReady = (getKey: (dbName: string) => string) => (dbName: string) => {
-  const key = getKey(dbName);
-  const localStorage = getLocalStorage();
-  const value = localStorage.getItem(key);
-  return value !== null && value === MIGRATION_READY_STATE;
+const markMigrationReady = (getKey: (dbName: string) => string) => {
+  return (dbName: string) => {
+    const key = getKey(dbName);
+    const localStorage = getLocalStorage();
+    localStorage.setItem(key, MIGRATION_READY_STATE);
+  };
+};
+
+const isMigrationReady = (getKey: (dbName: string) => string) => {
+  return (dbName: string) => {
+    const key = getKey(dbName);
+    const localStorage = getLocalStorage();
+    const value = localStorage.getItem(key);
+    return value !== null && value === MIGRATION_READY_STATE;
+  };
 };
 
 export const cryptoMigrationStore = {

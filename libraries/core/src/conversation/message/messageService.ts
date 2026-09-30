@@ -180,8 +180,8 @@ export class MessageService {
   ): Promise<EncryptionResult> {
     const deleted = flattenUserMap(mismatch.deleted);
     // remove deleted clients to the recipients
-    deleted.forEach(({userId, data}) =>
-      data.forEach(clientId => {
+    deleted.forEach(({userId, data}) => {
+      return data.forEach(clientId => {
         const payloadsForDomain = initialPayloads.payloads[userId.domain];
         const payloadsForUser = payloadsForDomain?.[userId.id];
 
@@ -190,8 +190,8 @@ export class MessageService {
         }
 
         delete payloadsForUser[clientId];
-      }),
-    );
+      });
+    });
 
     if (Object.keys(mismatch.missing).length === 0) {
       return initialPayloads;

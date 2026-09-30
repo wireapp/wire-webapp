@@ -51,7 +51,9 @@ export const CopyToClipboardButton = ({
       await copyText(textToCopy);
       onCopySuccess?.();
       setIsCopying(true);
-      window.setTimeout(() => setIsCopying(false), COPY_CONFIRM_DURATION);
+      window.setTimeout(() => {
+        return setIsCopying(false);
+      }, COPY_CONFIRM_DURATION);
     }
   };
 

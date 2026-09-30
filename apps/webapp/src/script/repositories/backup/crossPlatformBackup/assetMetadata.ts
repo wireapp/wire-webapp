@@ -24,7 +24,9 @@ import {AudioAsset, ImageAsset} from './CPB.types';
 
 const AssetContentType = {
   Image: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/'],
-  isImage: (contentType: string): boolean => AssetContentType.Image.includes(contentType),
+  isImage: (contentType: string): boolean => {
+    return AssetContentType.Image.includes(contentType);
+  },
   Data: [
     'application/octet-stream',
     'application/zip',
@@ -33,37 +35,57 @@ const AssetContentType = {
     'application/x-zip-compressed',
     'application/',
   ],
-  isData: (contentType: string): boolean => AssetContentType.Data.includes(contentType),
+  isData: (contentType: string): boolean => {
+    return AssetContentType.Data.includes(contentType);
+  },
   Text: ['text/plain', 'text/markdown', 'text/x-log', 'text/'],
-  isText: (contentType: string): boolean => AssetContentType.Text.includes(contentType),
+  isText: (contentType: string): boolean => {
+    return AssetContentType.Text.includes(contentType);
+  },
   Video: ['video/mp4', 'video/quicktime', 'video/'],
-  isVideo: (contentType: string): boolean => AssetContentType.Video.includes(contentType),
+  isVideo: (contentType: string): boolean => {
+    return AssetContentType.Video.includes(contentType);
+  },
   Audio: ['audio/mpeg', 'audio/ogg', 'audio/wav', 'audio/'],
-  isAudio: (contentType: string): boolean => AssetContentType.Audio.includes(contentType),
+  isAudio: (contentType: string): boolean => {
+    return AssetContentType.Audio.includes(contentType);
+  },
   Undefined: '',
-  isUndefined: (contentType: string): boolean => contentType === AssetContentType.Undefined,
-  isOther: (contentType: string): boolean =>
-    !AssetContentType.isImage(contentType) &&
-    !AssetContentType.isData(contentType) &&
-    !AssetContentType.isText(contentType) &&
-    !AssetContentType.isVideo(contentType) &&
-    !AssetContentType.isAudio(contentType) &&
-    !AssetContentType.isUndefined(contentType),
+  isUndefined: (contentType: string): boolean => {
+    return contentType === AssetContentType.Undefined;
+  },
+  isOther: (contentType: string): boolean => {
+    return (
+      !AssetContentType.isImage(contentType) &&
+      !AssetContentType.isData(contentType) &&
+      !AssetContentType.isText(contentType) &&
+      !AssetContentType.isVideo(contentType) &&
+      !AssetContentType.isAudio(contentType) &&
+      !AssetContentType.isUndefined(contentType)
+    );
+  },
 };
 
-const hasNameProperty = (infoObject: unknown): infoObject is {name: string} =>
-  isObject(infoObject) && 'name' in infoObject;
-const isAudioAsset = (contentType: string, metaObject: unknown): metaObject is AudioAsset =>
-  AssetContentType.isAudio(contentType) &&
-  isObject(metaObject) &&
-  'normalization' in metaObject &&
-  'duration' in metaObject;
-const isImageAsset = (contentType: string, infoObject: unknown): infoObject is ImageAsset =>
-  AssetContentType.isImage(contentType) &&
-  isObject(infoObject) &&
-  'height' in infoObject &&
-  'width' in infoObject &&
-  'tag' in infoObject;
+const hasNameProperty = (infoObject: unknown): infoObject is {name: string} => {
+  return isObject(infoObject) && 'name' in infoObject;
+};
+const isAudioAsset = (contentType: string, metaObject: unknown): metaObject is AudioAsset => {
+  return (
+    AssetContentType.isAudio(contentType) &&
+    isObject(metaObject) &&
+    'normalization' in metaObject &&
+    'duration' in metaObject
+  );
+};
+const isImageAsset = (contentType: string, infoObject: unknown): infoObject is ImageAsset => {
+  return (
+    AssetContentType.isImage(contentType) &&
+    isObject(infoObject) &&
+    'height' in infoObject &&
+    'width' in infoObject &&
+    'tag' in infoObject
+  );
+};
 
 /**
  * Build metadata for an asset backup

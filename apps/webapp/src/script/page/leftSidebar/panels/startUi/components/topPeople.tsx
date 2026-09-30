@@ -32,9 +32,9 @@ interface TopPeopleProps {
 const TopPeople = ({clickOnUser, max, users}: TopPeopleProps) => {
   max ??= 9;
   const displayedUsers = users.slice(0, max);
-  const searchListItems = displayedUsers.map(user => (
-    <TopContact clickOnUser={clickOnUser} key={user.id} user={user} />
-  ));
+  const searchListItems = displayedUsers.map(user => {
+    return <TopContact clickOnUser={clickOnUser} key={user.id} user={user} />;
+  });
   return <div className="search-list search-list-sm">{searchListItems}</div>;
 };
 

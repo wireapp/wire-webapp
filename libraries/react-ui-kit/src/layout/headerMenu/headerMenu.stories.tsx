@@ -31,11 +31,13 @@ const meta: Meta<typeof HeaderMenu> = {
   component: HeaderMenu,
   title: 'layout/headerMenu',
   decorators: [
-    Story => (
-      <div style={{height: '400px', position: 'relative', paddingRight: '16px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{height: '400px', position: 'relative', paddingRight: '16px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   parameters: {
     layout: 'fullscreen',
@@ -45,18 +47,20 @@ const meta: Meta<typeof HeaderMenu> = {
 export default meta;
 type Story = StoryObj<typeof HeaderMenu>;
 
-const MenuLink = ({children}: {children: ReactNode}) => (
-  <Text
-    style={{
-      cursor: 'pointer',
-      display: 'block',
-      margin: '16px 16px 0 16px',
-      textDecoration: 'none',
-    }}
-  >
-    {children}
-  </Text>
-);
+const MenuLink = ({children}: {children: ReactNode}) => {
+  return (
+    <Text
+      style={{
+        cursor: 'pointer',
+        display: 'block',
+        margin: '16px 16px 0 16px',
+        textDecoration: 'none',
+      }}
+    >
+      {children}
+    </Text>
+  );
+};
 
 export const Default: Story = {
   args: {

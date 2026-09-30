@@ -30,22 +30,31 @@ type ErrorMessageProps<T = HTMLDivElement> = FlexBoxProps<T>;
 export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) => CSSObject = (
   theme,
   {justify = 'flex-start', align = 'center', ...props},
-) => ({
-  ...flexBoxStyle({align, justify, ...props}),
-  a: {
-    ...linkStyle(theme, {bold: false, fontSize: theme.fontSizes.small, textTransform: 'none', ...props}),
-  },
-  marginBottom: '12px',
-});
+) => {
+  return {
+    ...flexBoxStyle({align, justify, ...props}),
+    a: {
+      ...linkStyle(theme, {bold: false, fontSize: theme.fontSizes.small, textTransform: 'none', ...props}),
+    },
+    marginBottom: '12px',
+  };
+};
 
 export const filterErrorMessageProps = (props: ErrorMessageProps) => {
   return filterProps(filterFlexBoxProps(props) as ErrorMessageProps, []);
 };
 
-export const ErrorMessage = ({children, ...props}: ErrorMessageProps) => (
-  <FlexBox css={(theme: Theme) => errorMessageStyle(theme, props)} {...props}>
-    <Text color={COLOR_V2.RED_LIGHT_500} fontSize={'12px'} css={{fontWeight: 400}}>
-      {children}
-    </Text>
-  </FlexBox>
-);
+export const ErrorMessage = ({children, ...props}: ErrorMessageProps) => {
+  return (
+    <FlexBox
+      css={(theme: Theme) => {
+        return errorMessageStyle(theme, props);
+      }}
+      {...props}
+    >
+      <Text color={COLOR_V2.RED_LIGHT_500} fontSize={'12px'} css={{fontWeight: 400}}>
+        {children}
+      </Text>
+    </FlexBox>
+  );
+};

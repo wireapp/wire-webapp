@@ -30,11 +30,13 @@ const meta: Meta<typeof Logo> = {
     color: {control: 'color'},
   },
   decorators: [
-    Story => (
-      <div style={{padding: '24px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 
@@ -55,84 +57,96 @@ export const CustomColor: Story = {
 };
 
 export const Sizes: Story = {
-  render: () => (
-    <div style={{display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'flex-start'}}>
-      <Logo height={16} />
-      <Logo height={24} />
-      <Logo height={32} />
-      <Logo height={48} />
-      <Logo height={64} />
-    </div>
-  ),
+  render: () => {
+    return (
+      <div style={{display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'flex-start'}}>
+        <Logo height={16} />
+        <Logo height={24} />
+        <Logo height={32} />
+        <Logo height={48} />
+        <Logo height={64} />
+      </div>
+    );
+  },
 };
 
 export const Colors: Story = {
-  render: () => (
-    <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
-      <div style={{padding: '12px'}}>
-        <Logo height={32} color={COLOR.BLUE} />
+  render: () => {
+    return (
+      <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+        <div style={{padding: '12px'}}>
+          <Logo height={32} color={COLOR.BLUE} />
+        </div>
+        <div style={{padding: '12px', backgroundColor: COLOR.BLUE}}>
+          <Logo height={32} color={COLOR.WHITE} />
+        </div>
+        <div style={{padding: '12px', backgroundColor: COLOR.BLACK}}>
+          <Logo height={32} color={COLOR.WHITE} />
+        </div>
+        <div style={{padding: '12px', backgroundColor: COLOR.GRAY}}>
+          <Logo height={32} color={COLOR.WHITE} />
+        </div>
       </div>
-      <div style={{padding: '12px', backgroundColor: COLOR.BLUE}}>
-        <Logo height={32} color={COLOR.WHITE} />
-      </div>
-      <div style={{padding: '12px', backgroundColor: COLOR.BLACK}}>
-        <Logo height={32} color={COLOR.WHITE} />
-      </div>
-      <div style={{padding: '12px', backgroundColor: COLOR.GRAY}}>
-        <Logo height={32} color={COLOR.WHITE} />
-      </div>
-    </div>
-  ),
+    );
+  },
 };
 
 export const OnDifferentBackgrounds: Story = {
-  render: () => (
-    <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
-      {[
-        COLOR.WHITE,
-        COLOR.GRAY_LIGHTEN_48,
-        COLOR.GRAY_LIGHTEN_72,
-        COLOR.GRAY,
-        COLOR.GRAY_DARKEN_48,
-        COLOR.GRAY_DARKEN_72,
-        COLOR.BLACK,
-      ].map(backgroundColor => (
-        <div
-          key={backgroundColor}
-          style={{
-            alignItems: 'center',
-            backgroundColor,
-            display: 'flex',
-            gap: '24px',
-            padding: '24px',
-          }}
-        >
-          <Logo height={32} color={backgroundColor === COLOR.WHITE ? COLOR.BLACK : COLOR.WHITE} />
-          <code style={{color: backgroundColor === COLOR.WHITE ? COLOR.BLACK : COLOR.WHITE}}>{backgroundColor}</code>
-        </div>
-      ))}
-    </div>
-  ),
+  render: () => {
+    return (
+      <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+        {[
+          COLOR.WHITE,
+          COLOR.GRAY_LIGHTEN_48,
+          COLOR.GRAY_LIGHTEN_72,
+          COLOR.GRAY,
+          COLOR.GRAY_DARKEN_48,
+          COLOR.GRAY_DARKEN_72,
+          COLOR.BLACK,
+        ].map(backgroundColor => {
+          return (
+            <div
+              key={backgroundColor}
+              style={{
+                alignItems: 'center',
+                backgroundColor,
+                display: 'flex',
+                gap: '24px',
+                padding: '24px',
+              }}
+            >
+              <Logo height={32} color={backgroundColor === COLOR.WHITE ? COLOR.BLACK : COLOR.WHITE} />
+              <code style={{color: backgroundColor === COLOR.WHITE ? COLOR.BLACK : COLOR.WHITE}}>
+                {backgroundColor}
+              </code>
+            </div>
+          );
+        })}
+      </div>
+    );
+  },
 };
 
 export const InContext: Story = {
-  render: () => (
-    <div
-      style={{
-        alignItems: 'center',
-        backgroundColor: COLOR.GRAY_LIGHTEN_72,
-        display: 'flex',
-        gap: '16px',
-        justifyContent: 'space-between',
-        padding: '16px 24px',
-      }}
-    >
-      <Logo height={24} />
-      <div style={{display: 'flex', gap: '16px'}}>
-        <div style={{height: '24px', width: '24px', backgroundColor: COLOR.GRAY_LIGHTEN_32}} />
-        <div style={{height: '24px', width: '24px', backgroundColor: COLOR.GRAY_LIGHTEN_32}} />
-        <div style={{height: '24px', width: '24px', backgroundColor: COLOR.GRAY_LIGHTEN_32}} />
+  render: () => {
+    return (
+      <div
+        style={{
+          alignItems: 'center',
+          backgroundColor: COLOR.GRAY_LIGHTEN_72,
+          display: 'flex',
+          gap: '16px',
+          justifyContent: 'space-between',
+          padding: '16px 24px',
+        }}
+      >
+        <Logo height={24} />
+        <div style={{display: 'flex', gap: '16px'}}>
+          <div style={{height: '24px', width: '24px', backgroundColor: COLOR.GRAY_LIGHTEN_32}} />
+          <div style={{height: '24px', width: '24px', backgroundColor: COLOR.GRAY_LIGHTEN_32}} />
+          <div style={{height: '24px', width: '24px', backgroundColor: COLOR.GRAY_LIGHTEN_32}} />
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
 };

@@ -224,7 +224,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     );
 
     const task = async (isSnoozable: boolean): Promise<void> => {
-      await this.processEnrollmentUponExpiry(isSnoozable, () => this.enrollmentStore.clear.timer());
+      await this.processEnrollmentUponExpiry(isSnoozable, () => {
+        return this.enrollmentStore.clear.timer();
+      });
     };
 
     const storedFiringDate = this.enrollmentStore.get.timer();
@@ -353,7 +355,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           }
 
           return conversations.found
-            .filter(conversation => isNonEmptyString(conversation.group_id))
+            .filter(conversation => {
+              return isNonEmptyString(conversation.group_id);
+            })
             .map(({group_id}) => {
               if (!isNonEmptyString(group_id)) {
                 throw new Error('An MLS conversation is missing its group id');

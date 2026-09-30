@@ -26,11 +26,21 @@ import {useAllCellsTagsStore} from '../useAllCellsTagsStore/useAllCellsTagsStore
 
 export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
   const {fireAndForgetInvoker} = useApplicationContext();
-  const tags = useAllCellsTagsStore(state => state.tags);
-  const isLoading = useAllCellsTagsStore(state => state.isLoading);
-  const error = useAllCellsTagsStore(state => state.error);
-  const hasFetched = useAllCellsTagsStore(state => state.hasFetched);
-  const fetch = useAllCellsTagsStore(state => state.fetch);
+  const tags = useAllCellsTagsStore(state => {
+    return state.tags;
+  });
+  const isLoading = useAllCellsTagsStore(state => {
+    return state.isLoading;
+  });
+  const error = useAllCellsTagsStore(state => {
+    return state.error;
+  });
+  const hasFetched = useAllCellsTagsStore(state => {
+    return state.hasFetched;
+  });
+  const fetch = useAllCellsTagsStore(state => {
+    return state.fetch;
+  });
 
   useEffect(() => {
     if (hasFetched) {

@@ -36,15 +36,24 @@ const defaultProps: React.ComponentProps<typeof DateTimePickerField> = {
   dataUieName: 'datetime-picker-test',
   labels: defaultLabels,
   value: fixedDateTime,
-  onChange: () => undefined,
+  onChange: () => {
+    return undefined;
+  },
 };
 
 describe('"DateTimePickerField"', () => {
-  it('renders', () => matchComponent(<DateTimePickerField {...defaultProps} />));
-  it('renders with label', () => matchComponent(<DateTimePickerField {...defaultProps} label="Starts at" />));
-  it('renders as invalid', () =>
-    matchComponent(
+  it('renders', () => {
+    return matchComponent(<DateTimePickerField {...defaultProps} />);
+  });
+  it('renders with label', () => {
+    return matchComponent(<DateTimePickerField {...defaultProps} label="Starts at" />);
+  });
+  it('renders as invalid', () => {
+    return matchComponent(
       <DateTimePickerField {...defaultProps} markInvalid errorText="Please select a future date and time." />,
-    ));
-  it('renders as disabled', () => matchComponent(<DateTimePickerField {...defaultProps} disabled />));
+    );
+  });
+  it('renders as disabled', () => {
+    return matchComponent(<DateTimePickerField {...defaultProps} disabled />);
+  });
 });

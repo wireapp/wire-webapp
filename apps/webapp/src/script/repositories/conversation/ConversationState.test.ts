@@ -53,7 +53,9 @@ describe('ConversationState', () => {
   describe('getSelfProteusConversation', () => {
     it('throws if no self conversation are set', () => {
       const conversationState = createConversationState();
-      expect(() => conversationState.getSelfProteusConversation()).toThrow('proteus');
+      expect(() => {
+        return conversationState.getSelfProteusConversation();
+      }).toThrow('proteus');
     });
 
     it('finds the MLS and proteus self conversations', () => {

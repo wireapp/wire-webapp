@@ -44,7 +44,9 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
     }
     const progressSubscribable = assetRepository.getUploadProgress(message?.id);
     setUploadProgress(progressSubscribable());
-    const subscription = progressSubscribable.subscribe(value => setUploadProgress(value));
+    const subscription = progressSubscribable.subscribe(value => {
+      return setUploadProgress(value);
+    });
     return () => {
       subscription.dispose();
     };
@@ -64,20 +66,23 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
       }
       const url = URL.createObjectURL(blob);
       return {
-        dispose: () => URL.revokeObjectURL(url),
+        dispose: () => {
+          return URL.revokeObjectURL(url);
+        },
         url,
       };
     },
     [assetRepository],
   );
 
-  const cancelUpload = useCallback(
-    () => message && assetRepository.cancelUpload(message?.id),
-    [assetRepository, message],
-  );
+  const cancelUpload = useCallback(() => {
+    return message && assetRepository.cancelUpload(message?.id);
+  }, [assetRepository, message]);
 
   const downloadAsset = useCallback(
-    (fileAsset: FileAsset) => assetRepository.downloadFile(fileAsset),
+    (fileAsset: FileAsset) => {
+      return assetRepository.downloadFile(fileAsset);
+    },
     [assetRepository],
   );
 

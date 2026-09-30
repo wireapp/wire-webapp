@@ -28,50 +28,64 @@ import {Theme} from '../../identity/theme';
 import {noop} from '../../utils/util';
 import {InputProps, inputStyle} from '../input';
 
-const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
-  <div
-    css={{
-      display: 'flex',
-      justifyContent: 'center',
-      flexDirection: 'column',
-    }}
-    {...props}
-  />
-);
+const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => {
+  return (
+    <div
+      css={{
+        display: 'flex',
+        justifyContent: 'center',
+        flexDirection: 'column',
+      }}
+      {...props}
+    />
+  );
+};
 
-const codeInputLabelStyle: (theme: Theme) => CSSObject = theme => ({
-  color: COLOR_V2.GRAY_70,
-  textAlign: 'center',
-  marginBottom: '0.5rem',
-  fontSize: theme.fontSizes.base,
-  fontStyle: 'normal',
-  fontWeight: 400,
-  lineHeight: '1.5rem',
-  letterSpacing: '0.003rem',
-});
+const codeInputLabelStyle: (theme: Theme) => CSSObject = theme => {
+  return {
+    color: COLOR_V2.GRAY_70,
+    textAlign: 'center',
+    marginBottom: '0.5rem',
+    fontSize: theme.fontSizes.base,
+    fontStyle: 'normal',
+    fontWeight: 400,
+    lineHeight: '1.5rem',
+    letterSpacing: '0.003rem',
+  };
+};
 
 export type DigitInputProps<T = HTMLInputElement> = InputProps<T>;
 
-const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject = (theme, props) => ({
-  ...inputStyle(theme, props),
-  '& + &': {
-    marginLeft: 'min(19px, 2vw)',
-  },
-  '&:hover': {
-    boxShadow: `0 0 0 1px ${COLOR_V2.GRAY_60}`,
-  },
-  fontSize: theme.fontSizes.extraLarge,
-  lineHeight: '1.75rem',
-  borderRadius: '12px',
-  padding: 0,
-  textAlign: 'center',
-  width: 'min(48px, 13vw)',
-  height: '56px',
-});
+const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject = (theme, props) => {
+  return {
+    ...inputStyle(theme, props),
+    '& + &': {
+      marginLeft: 'min(19px, 2vw)',
+    },
+    '&:hover': {
+      boxShadow: `0 0 0 1px ${COLOR_V2.GRAY_60}`,
+    },
+    fontSize: theme.fontSizes.extraLarge,
+    lineHeight: '1.75rem',
+    borderRadius: '12px',
+    padding: 0,
+    textAlign: 'center',
+    width: 'min(48px, 13vw)',
+    height: '56px',
+  };
+};
 
-const DigitInput = React.forwardRef<HTMLInputElement, DigitInputProps<HTMLInputElement>>((props, ref) => (
-  <input ref={ref} css={(theme: Theme) => digitInputStyle(theme, props)} {...props} />
-));
+const DigitInput = React.forwardRef<HTMLInputElement, DigitInputProps<HTMLInputElement>>((props, ref) => {
+  return (
+    <input
+      ref={ref}
+      css={(theme: Theme) => {
+        return digitInputStyle(theme, props);
+      }}
+      {...props}
+    />
+  );
+});
 DigitInput.displayName = 'DigitInput';
 export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;
@@ -170,7 +184,9 @@ export const CodeInput = ({
   }, [values]);
 
   const labelId = React.useId();
-  const getDigitAriaLabel = (value: string) => (Boolean(value) ? `${codePlaceholder}, ${value}` : `${codePlaceholder}`);
+  const getDigitAriaLabel = (value: string) => {
+    return Boolean(value) ? `${codePlaceholder}, ${value}` : `${codePlaceholder}`;
+  };
 
   return (
     <CodeInputWrapper role="group" aria-labelledby={labelId} style={style}>
@@ -186,29 +202,35 @@ export const CodeInput = ({
           width: '100%',
         }}
       >
-        {Array.from({length: digits}, (_, index) => (
-          <DigitInput
-            key={index}
-            onPaste={event => handlePaste(index, event)}
-            onFocus={forceSelection}
-            onMouseDown={forceSelectionPreventDefault}
-            onTouchStart={forceSelectionPreventDefault}
-            onKeyDown={event => handleKeyDown(index, event)}
-            onKeyUp={forceSelection}
-            markInvalid={markInvalid}
-            ref={(node): void => {
-              inputs[index] = node;
-            }}
-            value={values[index]}
-            disabled={disabled}
-            id={`code-input-digit-${index}`}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            autoComplete="one-time-code"
-            aria-label={getDigitAriaLabel(values[index])}
-            aria-describedby={labelId}
-          />
-        ))}
+        {Array.from({length: digits}, (_, index) => {
+          return (
+            <DigitInput
+              key={index}
+              onPaste={event => {
+                return handlePaste(index, event);
+              }}
+              onFocus={forceSelection}
+              onMouseDown={forceSelectionPreventDefault}
+              onTouchStart={forceSelectionPreventDefault}
+              onKeyDown={event => {
+                return handleKeyDown(index, event);
+              }}
+              onKeyUp={forceSelection}
+              markInvalid={markInvalid}
+              ref={(node): void => {
+                inputs[index] = node;
+              }}
+              value={values[index]}
+              disabled={disabled}
+              id={`code-input-digit-${index}`}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="one-time-code"
+              aria-label={getDigitAriaLabel(values[index])}
+              aria-describedby={labelId}
+            />
+          );
+        })}
       </div>
     </CodeInputWrapper>
   );

@@ -22,8 +22,10 @@ import type {User} from 'Repositories/entity/User';
 
 import {isMeetingHost} from './canEditMeeting';
 
-export const canDeleteMeetingForAll = (meetingInstance: MeetingInstance, selfUser: User): boolean =>
-  isMeetingHost(meetingInstance.meetingSeries, selfUser);
+export const canDeleteMeetingForAll = (meetingInstance: MeetingInstance, selfUser: User): boolean => {
+  return isMeetingHost(meetingInstance.meetingSeries, selfUser);
+};
 
-export const canDeleteMeetingForMe = (meetingInstance: MeetingInstance, selfUser: User): boolean =>
-  !isMeetingHost(meetingInstance.meetingSeries, selfUser);
+export const canDeleteMeetingForMe = (meetingInstance: MeetingInstance, selfUser: User): boolean => {
+  return !isMeetingHost(meetingInstance.meetingSeries, selfUser);
+};

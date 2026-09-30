@@ -60,13 +60,15 @@ const DeviceToggleButton = ({currentDevice, devices, onChooseDevice, styles}: De
             data-uie-name="device-toggle-button-indicator-dot"
             data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
             onClick={selectNextDevice}
-            onKeyDown={event =>
-              handleKeyDown({
+            onKeyDown={event => {
+              return handleKeyDown({
                 event,
-                callback: () => selectNextDevice(event),
+                callback: () => {
+                  return selectNextDevice(event);
+                },
                 keys: [KEY.ENTER, KEY.SPACE],
-              })
-            }
+              });
+            }}
             css={{
               '&:focus-visible': {
                 backgroundColor: isCurrentDevice

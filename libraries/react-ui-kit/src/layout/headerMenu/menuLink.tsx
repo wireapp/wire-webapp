@@ -39,49 +39,56 @@ export const menuLinkStyle: <T>(theme: Theme, props: MenuLinkProps<T>) => CSSObj
     button = false,
     ...props
   },
-) => ({
-  ...linkStyle(theme, {bold, color, fontSize, textTransform, ...props}),
-  [media[QueryKeys.DESKTOP]]: {
-    '&:first-of-type': {
-      marginLeft: 0,
-    },
-    '&:last-of-type': {
-      marginRight: 0,
-    },
-    margin: '0 26px 0 10px',
-    [`.${DESKTOP_HEADER_SUB_MENU_CLASSNAME} &`]: {
+) => {
+  return {
+    ...linkStyle(theme, {bold, color, fontSize, textTransform, ...props}),
+    [media[QueryKeys.DESKTOP]]: {
       '&:first-of-type': {
-        marginLeft: '10px',
+        marginLeft: 0,
       },
       '&:last-of-type': {
-        marginRight: '26px',
+        marginRight: 0,
+      },
+      margin: '0 26px 0 10px',
+      [`.${DESKTOP_HEADER_SUB_MENU_CLASSNAME} &`]: {
+        '&:first-of-type': {
+          marginLeft: '10px',
+        },
+        '&:last-of-type': {
+          marginRight: '26px',
+        },
       },
     },
-  },
-  [media[QueryKeys.TABLET_DOWN]]: {
-    border: 'none',
-    fontSize: '2rem !important',
-    fontWeight: 400,
-    maxWidth: '480px',
-    padding: '8px 24px',
-    textTransform: 'none',
-  },
-  border: button ? '1px solid rgb(219, 226, 231)' : undefined,
-  borderRadius: button ? '4px' : undefined,
-  padding: button ? '10px 16px' : undefined,
-});
+    [media[QueryKeys.TABLET_DOWN]]: {
+      border: 'none',
+      fontSize: '2rem !important',
+      fontWeight: 400,
+      maxWidth: '480px',
+      padding: '8px 24px',
+      textTransform: 'none',
+    },
+    border: button ? '1px solid rgb(219, 226, 231)' : undefined,
+    borderRadius: button ? '4px' : undefined,
+    padding: button ? '10px 16px' : undefined,
+  };
+};
 
 export const MENU_LINK_CLASSNAME = 'menu-link';
 
-export const filterMenuLinkProps = (props: MenuLinkProps) =>
-  filterProps(filterLinkProps(props) as MenuLinkProps, ['button']);
+export const filterMenuLinkProps = (props: MenuLinkProps) => {
+  return filterProps(filterLinkProps(props) as MenuLinkProps, ['button']);
+};
 
-export const MenuLink = ({children, ...props}: MenuLinkProps) => (
-  <a
-    className={MENU_LINK_CLASSNAME}
-    css={(theme: Theme) => menuLinkStyle(theme, props)}
-    {...filterMenuLinkProps(props)}
-  >
-    {children}
-  </a>
-);
+export const MenuLink = ({children, ...props}: MenuLinkProps) => {
+  return (
+    <a
+      className={MENU_LINK_CLASSNAME}
+      css={(theme: Theme) => {
+        return menuLinkStyle(theme, props);
+      }}
+      {...filterMenuLinkProps(props)}
+    >
+      {children}
+    </a>
+  );
+};

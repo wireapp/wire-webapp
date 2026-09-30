@@ -66,7 +66,9 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
         isJoinDisabled,
         onEdit: () => {
           if (canEditMeeting(meetingInstance, selfUser, clock.currentUnixEpochMilliseconds)) {
-            fireAndForgetInvoker.fireAndForget(() => editMeeting(meetingInstance));
+            fireAndForgetInvoker.fireAndForget(() => {
+              return editMeeting(meetingInstance);
+            });
           }
         },
         onDeleteForAll: () => {

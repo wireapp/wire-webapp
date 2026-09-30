@@ -145,7 +145,9 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
       <PanelHeader
         showBackArrow
         goBackUie="go-back-group-participant"
-        onGoBack={() => onBack(activeConversation)}
+        onGoBack={() => {
+          return onBack(activeConversation);
+        }}
         onClose={onClose}
       />
 
@@ -162,7 +164,9 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           <div className="conversation-details__devices">
             <button
               className="panel__action-item"
-              onClick={() => showDevices(currentUser)}
+              onClick={() => {
+                return showDevices(currentUser);
+              }}
               aria-label={translate('accessibility.conversationDetailsActionDevicesLabel')}
               data-uie-name="go-devices"
               type="button"
@@ -189,13 +193,13 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
                 aria-label={translate('accessibility.conversationDetailsActionGroupAdminLabel')}
                 aria-pressed={isAdmin}
                 onClick={toggleAdmin}
-                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) =>
-                  handleKeyDown({
+                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
+                  return handleKeyDown({
                     event,
                     callback: toggleAdmin,
                     keys: [KEY.ENTER, KEY.SPACE],
-                  })
-                }
+                  });
+                }}
               >
                 <span className="panel__action-item__icon">
                   <Icon.GroupAdminIcon />

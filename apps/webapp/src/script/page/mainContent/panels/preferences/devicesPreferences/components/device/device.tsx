@@ -62,19 +62,21 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
     event.stopPropagation();
   };
 
-  const onDeviceSelect = () => onSelect(device);
+  const onDeviceSelect = () => {
+    return onSelect(device);
+  };
 
   return (
     <div
       className="preferences-devices-card"
       onClick={onDeviceSelect}
-      onKeyDown={event =>
-        handleKeyDown({
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
           callback: onDeviceSelect,
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       role="button"
       aria-label={translate('accessibility.headings.preferencesDeviceDetails')}
       tabIndex={TabIndex.FOCUSABLE}

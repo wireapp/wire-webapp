@@ -99,7 +99,9 @@ export const CallingControls = ({
             <li>
               <button
                 className={cx('call-ui__button', {'call-ui__button--active': !isMutedEnabled})}
-                onClick={() => callActions.toggleMute(call, !isMutedEnabled)}
+                onClick={() => {
+                  return callActions.toggleMute(call, !isMutedEnabled);
+                }}
                 data-uie-name="do-toggle-mute"
                 data-uie-value={isMutedEnabled ? 'active' : 'inactive'}
                 title={translate('videoCallOverlayMicrophone')}
@@ -120,7 +122,9 @@ export const CallingControls = ({
               <li>
                 <button
                   className={cx('call-ui__button', {'call-ui__button--active': selfSharesCamera})}
-                  onClick={() => callActions.toggleCamera(call)}
+                  onClick={() => {
+                    return callActions.toggleCamera(call);
+                  }}
                   disabled={disableVideoButton}
                   data-uie-name="do-toggle-video"
                   title={translate('videoCallOverlayCamera')}
@@ -147,7 +151,9 @@ export const CallingControls = ({
                     'with-tooltip with-tooltip--bottom': disableScreenButton,
                   })}
                   data-tooltip={disableScreenButton ? translate('videoCallScreenShareNotSupported') : undefined}
-                  onClick={() => callActions.toggleScreenshare(call, DesktopScreenShareMenu.MAIN_WINDOW)}
+                  onClick={() => {
+                    return callActions.toggleScreenshare(call, DesktopScreenShareMenu.MAIN_WINDOW);
+                  }}
                   type="button"
                   data-uie-name="do-call-controls-toggle-screenshare"
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
@@ -179,8 +185,12 @@ export const CallingControls = ({
                 }
               }}
               className="call-ui__button call-ui__button--red call-ui__button--large"
-              onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
-              onBlur={() => clearShowAlert()}
+              onClick={() => {
+                return isIncoming ? callActions.reject(call) : callActions.leave(call);
+              }}
+              onBlur={() => {
+                return clearShowAlert();
+              }}
               title={translate('videoCallOverlayHangUp')}
               aria-label={translate('videoCallOverlayHangUp')}
               type="button"
@@ -223,7 +233,9 @@ export const CallingControls = ({
           <li>
             <button
               className="call-ui__button call-ui__button--red"
-              onClick={() => callActions.leave(call)}
+              onClick={() => {
+                return callActions.leave(call);
+              }}
               title={translate('videoCallOverlayHangUp')}
               type="button"
               data-uie-name="do-call-controls-call-leave"

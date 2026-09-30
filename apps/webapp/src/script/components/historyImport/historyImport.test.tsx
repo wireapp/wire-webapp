@@ -30,17 +30,20 @@ import * as Util from 'Util/util';
 import {HistoryImport} from './historyImport';
 
 describe('HistoryImport', () => {
-  const createFile = (content = 'backup', name = 'backup.wbu') => new File([content], name);
+  const createFile = (content = 'backup', name = 'backup.wbu') => {
+    return new File([content], name);
+  };
 
   const setup = ({file = createFile(), isEncrypted = false}: {file?: File; isEncrypted?: boolean} = {}) => {
-    const translate = jest.fn((translationKey: string) => translationKey);
+    const translate = jest.fn((translationKey: string) => {
+      return translationKey;
+    });
 
-    jest.spyOn(RootProvider, 'useApplicationContext').mockImplementation(
-      () =>
-        ({
-          translate,
-        }) as unknown as RootContextValue,
-    );
+    jest.spyOn(RootProvider, 'useApplicationContext').mockImplementation(() => {
+      return {
+        translate,
+      } as unknown as RootContextValue;
+    });
 
     jest.spyOn(BackupUtil, 'checkBackupEncryption').mockResolvedValue(isEncrypted);
     jest.spyOn(Util, 'loadFileBuffer').mockResolvedValue(new ArrayBuffer(8));

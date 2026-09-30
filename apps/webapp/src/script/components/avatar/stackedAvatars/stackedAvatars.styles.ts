@@ -26,13 +26,15 @@ export const wrapperStyles: CSSObject = {
   alignItems: 'center',
 };
 
-export const avatarItemStyles = (index: number, avatarRingColor: string): CSSObject => ({
-  display: 'flex',
-  marginLeft: index > 0 ? -AVATAR_OVERLAP_OFFSET : 0,
-  zIndex: index + 1,
-  borderRadius: '50%',
-  boxShadow: `0 0 0 1px ${avatarRingColor}`,
-});
+export const avatarItemStyles = (index: number, avatarRingColor: string): CSSObject => {
+  return {
+    display: 'flex',
+    marginLeft: index > 0 ? -AVATAR_OVERLAP_OFFSET : 0,
+    zIndex: index + 1,
+    borderRadius: '50%',
+    boxShadow: `0 0 0 1px ${avatarRingColor}`,
+  };
+};
 
 export const overflowCountStyles: CSSObject = {
   marginLeft: 8,

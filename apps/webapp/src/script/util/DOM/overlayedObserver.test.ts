@@ -40,7 +40,9 @@ describe('overlayedObserver', () => {
       const element = document.createElement('div');
       element.style.height = '10px';
       document.body.appendChild(element);
-      document.elementFromPoint = () => element;
+      document.elementFromPoint = () => {
+        return element;
+      };
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
@@ -67,7 +69,9 @@ describe('overlayedObserver', () => {
       element.style.width = '10px';
       document.body.appendChild(element);
       document.body.appendChild(overlay);
-      document.elementFromPoint = () => overlay;
+      document.elementFromPoint = () => {
+        return overlay;
+      };
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
@@ -95,14 +99,18 @@ describe('overlayedObserver', () => {
       element.style.width = '10px';
       document.body.appendChild(element);
       document.body.appendChild(overlay);
-      document.elementFromPoint = () => overlay;
+      document.elementFromPoint = () => {
+        return overlay;
+      };
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
       expect(callbackSpy.onVisible).not.toHaveBeenCalled();
 
       document.body.removeChild(overlay);
-      document.elementFromPoint = () => element;
+      document.elementFromPoint = () => {
+        return element;
+      };
       jest.advanceTimersByTime(301);
 
       expect(callbackSpy.onVisible).toHaveBeenCalled();

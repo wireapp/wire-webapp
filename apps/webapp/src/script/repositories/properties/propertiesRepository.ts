@@ -196,12 +196,16 @@ export class PropertiesRepository {
         },
         primaryAction: {
           text: this.translate('dataSharingModalAgree'),
-          action: () => toggleTelemetrySharing(true),
+          action: () => {
+            return toggleTelemetrySharing(true);
+          },
           runActionOnEnterClick: true,
         },
         secondaryAction: {
           text: this.translate('dataSharingModalDecline'),
-          action: () => toggleTelemetrySharing(false),
+          action: () => {
+            return toggleTelemetrySharing(false);
+          },
         },
         closeOnSecondaryAction: true,
       },
@@ -250,7 +254,9 @@ export class PropertiesRepository {
   private fetchPropertySetting({key, defaultValue}: {key: string; defaultValue: any}): Promise<void> {
     return this.propertiesService
       .getPropertiesByKey(key)
-      .then(value => this.setProperty(key, value))
+      .then(value => {
+        return this.setProperty(key, value);
+      })
       .catch(() => {
         const message = `Property "${key}" doesn't exist for this account. Continuing with the default value of "${defaultValue}".`;
         this.logger.warn(message);
@@ -286,7 +292,9 @@ export class PropertiesRepository {
           ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
           : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
-      void savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
+      void savePromise.then(() => {
+        return this.publishPropertyUpdate(propertiesType, updatedPreference);
+      });
     }
   }
 
@@ -352,7 +360,9 @@ export class PropertiesRepository {
   private savePreferenceActivatedAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     return this.propertiesService
       .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
-      .then(() => this.logger.info(`Saved updated preference "${propertiesType}": ${updatedPreference}`));
+      .then(() => {
+        return this.logger.info(`Saved updated preference "${propertiesType}": ${updatedPreference}`);
+      });
   }
 
   private savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: any): Promise<void> {

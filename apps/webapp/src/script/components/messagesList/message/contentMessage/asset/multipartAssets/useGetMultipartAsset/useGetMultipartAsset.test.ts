@@ -78,13 +78,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -100,13 +101,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValue(mockRecycledNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -123,13 +125,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValueOnce(mockNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -155,13 +158,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -183,13 +187,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -230,13 +235,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValueOnce(mockNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -264,13 +270,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
       renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: false,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -287,13 +294,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockRejectedValue(new Error('Network error'));
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -308,13 +316,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockRejectedValueOnce(new Error('Network error'));
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -341,13 +350,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -367,13 +377,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValue(noPreviewNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -402,13 +413,14 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValue(processingNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: false,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -453,14 +465,15 @@ describe('useGetMultipartAsset', () => {
       mockCellsRepository.getNode.mockResolvedValueOnce(processingNode).mockResolvedValueOnce(readyNode);
 
       const {result} = renderHook(
-        () =>
-          useGetMultipartAsset({
+        () => {
+          return useGetMultipartAsset({
             uuid: 'test-uuid',
             cellsRepository: mockCellsRepository,
             isEnabled: true,
             retryPreviewUntilSuccess: true,
             retryDelay: 100,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 

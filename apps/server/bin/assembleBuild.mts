@@ -23,6 +23,8 @@ import {cpSync, existsSync, mkdirSync, readdirSync, rmSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
+const FIRST_USER_ARGUMENT_INDEX = 2;
+
 type BuildVariant = 'development' | 'internal' | 'public';
 type AssemblyScope = 'artifact' | 'webapp';
 
@@ -85,7 +87,7 @@ function assembleBuild(buildVariant: BuildVariant, assemblyScope: AssemblyScope)
 }
 
 function run(): void {
-  const [buildVariant, assemblyScope] = process.argv.slice(2);
+  const [buildVariant, assemblyScope] = process.argv.slice(FIRST_USER_ARGUMENT_INDEX);
 
   if (!isBuildVariant(buildVariant) || !isAssemblyScope(assemblyScope)) {
     console.error('Usage: assembleBuild.mts <development|internal|public> <artifact|webapp>');

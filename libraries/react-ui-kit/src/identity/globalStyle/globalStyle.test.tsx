@@ -22,5 +22,7 @@ import {GlobalStyle} from './globalStyle';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"GlobalStyle"', () => {
-  it('renders', () => matchComponent(<GlobalStyle />));
+  it('renders', () => {
+    return matchComponent(<GlobalStyle />);
+  });
 });

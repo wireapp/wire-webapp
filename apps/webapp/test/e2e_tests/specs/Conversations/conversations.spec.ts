@@ -41,7 +41,9 @@ test.describe('Conversations', () => {
     'I want to see a system message with all group members mentioned on creating a group',
     {tag: ['@TC-2965', '@regression']},
     async ({createPage}) => {
-      const userAPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
+      const userAPages = await PageManager.from(createPage(withLogin(userA))).then(pm => {
+        return pm.webapp.pages;
+      });
 
       await createGroup(userAPages, groupName, [userB, userC]);
       await userAPages.conversationList().getConversation(groupName).open();
@@ -136,7 +138,9 @@ test.describe('Conversations', () => {
       ]);
       await sendConnectionRequest(adminPage, guestUser);
 
-      const [adminPages, guestPages] = [adminPage, guestPage].map(page => PageManager.from(page).webapp.pages);
+      const [adminPages, guestPages] = [adminPage, guestPage].map(page => {
+        return PageManager.from(page).webapp.pages;
+      });
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
@@ -165,7 +169,9 @@ test.describe('Conversations', () => {
       ]);
       await sendConnectionRequest(adminPage, guestUser);
 
-      const [adminPages, guestPages] = [adminPage, guestPage].map(page => PageManager.from(page).webapp.pages);
+      const [adminPages, guestPages] = [adminPage, guestPage].map(page => {
+        return PageManager.from(page).webapp.pages;
+      });
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
@@ -186,7 +192,9 @@ test.describe('Conversations', () => {
     async ({createPage}) => {
       const [adminPagesManager, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       const {pages: adminPages, modals} = adminPagesManager.webapp;
@@ -218,8 +226,12 @@ test.describe('Conversations', () => {
     {tag: ['@TC-432', '@regression']},
     async ({createPage}) => {
       const [adminPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await createGroup(adminPages, groupName, [userB]);
@@ -248,7 +260,9 @@ test.describe('Conversations', () => {
     'I want to see my own profile in the Admin section when I create a conversation',
     {tag: ['@TC-434', '@regression']},
     async ({createPage}) => {
-      const adminPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
+      const adminPages = await PageManager.from(createPage(withLogin(userA))).then(pm => {
+        return pm.webapp.pages;
+      });
       await createGroup(adminPages, groupName, [userB]);
 
       await adminPages.conversationList().getConversation(groupName).open();
@@ -285,8 +299,12 @@ test.describe('Conversations', () => {
     {tag: ['@TC-436', '@regression']},
     async ({createPage}) => {
       const [adminPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
       await createGroup(adminPages, groupName, [userB, userC]);
 
@@ -381,8 +399,12 @@ test.describe('Conversations', () => {
     {tag: ['@TC-492', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await test.step('Setup: Create group and exchange initial messages', async () => {
@@ -489,7 +511,9 @@ test.describe('Conversations', () => {
     'I can see the system message "You renamed the conversation" after renaming conversation',
     {tag: ['@TC-496', '@regression']},
     async ({createPage}) => {
-      const adminPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
+      const adminPages = await PageManager.from(createPage(withLogin(userA))).then(pm => {
+        return pm.webapp.pages;
+      });
       await createGroup(adminPages, groupName, [userB, userC]);
 
       // User A renames the conversation
@@ -527,7 +551,11 @@ test.describe('Conversations', () => {
       await userBPages.conversation().clickConversationInfoButton();
       await expect(userBPages.conversation().adminsList).toContainText(userC.fullName);
       // Verify that User B doesn't receive a push notification
-      await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+      await expect
+        .poll(() => {
+          return getUserBNotifications();
+        })
+        .toHaveLength(0);
     },
   );
 

@@ -89,7 +89,11 @@ export const ACCENT_COLORS: AccentColor[] = [
   VIVID_RED,
 ];
 
-export const getById = (id: number): AccentColor | undefined => ACCENT_COLORS.find(color => color.id === id);
+export const getById = (id: number): AccentColor | undefined => {
+  return ACCENT_COLORS.find(color => {
+    return color.id === id;
+  });
+};
 export const getRandom = (): AccentColor => {
   const randomAccentColor = RandomUtil.randomArrayElement(ACCENT_COLORS);
   if (isUndefined(randomAccentColor)) {
@@ -122,5 +126,8 @@ export const DEPRECATED_ACCENT_COLORS: AccentColor[] = [
  * @param id AccentColor ID
  * @returns AccentColor with given ID | undefined
  */
-export const DEPRECATED_getById = (id: number): AccentColor | undefined =>
-  DEPRECATED_ACCENT_COLORS.find(color => color.id === id);
+export const DEPRECATED_getById = (id: number): AccentColor | undefined => {
+  return DEPRECATED_ACCENT_COLORS.find(color => {
+    return color.id === id;
+  });
+};

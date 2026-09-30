@@ -43,7 +43,9 @@ describe('MediaEmbeds', () => {
     expect(`www.${site}.com/`.match(re)).toBe(null);
   };
 
-  const buildMessageWithAnchor = (link: string) => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
+  const buildMessageWithAnchor = (link: string) => {
+    return `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
+  };
 
   const buildYoutubeIframe = (link: string) => {
     const embed_url = MediaEmbeds.generateYouTubeEmbedUrl(link);

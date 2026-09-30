@@ -108,7 +108,12 @@ export class MeetingsPage {
   async waitForMeetingInList(title: string, minimumCount = 1) {
     await this.openMeetingsTab();
     await expect
-      .poll(() => this.meetingListItem(title).count(), {timeout: MEETINGS_LIST_TIMEOUT_MS})
+      .poll(
+        () => {
+          return this.meetingListItem(title).count();
+        },
+        {timeout: MEETINGS_LIST_TIMEOUT_MS},
+      )
       .toBeGreaterThanOrEqual(minimumCount);
   }
 
@@ -488,7 +493,14 @@ export class MeetingsPage {
   }
 
   async waitForNotificationHost() {
-    await expect.poll(() => this.notificationHost.count(), {timeout: MEETINGS_LIST_TIMEOUT_MS}).toBe(1);
+    await expect
+      .poll(
+        () => {
+          return this.notificationHost.count();
+        },
+        {timeout: MEETINGS_LIST_TIMEOUT_MS},
+      )
+      .toBe(1);
     await expect(this.notificationHost).toBeVisible();
   }
 

@@ -35,10 +35,11 @@ export const useMeetingParticipants = (conversation: Conversation, qualifiedCrea
   const selfUser = userState.self();
   const {participating_user_ets: participants} = useKoSubscribableChildren(conversation, ['participating_user_ets']);
   const {users} = useKoSubscribableChildren(userState, ['users']);
-  const organizerUser = users.find(user => matchQualifiedIds(user.qualifiedId, qualifiedCreator));
+  const organizerUser = users.find(user => {
+    return matchQualifiedIds(user.qualifiedId, qualifiedCreator);
+  });
 
-  return useMemo(
-    () => getMeetingParticipantsForDisplay(participants, selfUser, qualifiedCreator, organizerUser),
-    [participants, selfUser, qualifiedCreator, organizerUser],
-  );
+  return useMemo(() => {
+    return getMeetingParticipantsForDisplay(participants, selfUser, qualifiedCreator, organizerUser);
+  }, [participants, selfUser, qualifiedCreator, organizerUser]);
 };

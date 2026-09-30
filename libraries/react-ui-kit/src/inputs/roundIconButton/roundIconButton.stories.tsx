@@ -56,46 +56,48 @@ export const Default: Story = {
 };
 
 export const IconGallery: Story = {
-  render: () => (
-    <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
-      <RoundIconButton>
-        <ArrowIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <AttachmentIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <CheckIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <CloseIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <GifIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <ImageIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <PingIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <PlaneIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <ProfileIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <TeamIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <TimedIcon />
-      </RoundIconButton>
-      <RoundIconButton>
-        <TrashIcon color={COLOR.RED} />
-      </RoundIconButton>
-    </div>
-  ),
+  render: () => {
+    return (
+      <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
+        <RoundIconButton>
+          <ArrowIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <AttachmentIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <CheckIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <CloseIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <GifIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <ImageIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <PingIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <PlaneIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <ProfileIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <TeamIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <TimedIcon />
+        </RoundIconButton>
+        <RoundIconButton>
+          <TrashIcon color={COLOR.RED} />
+        </RoundIconButton>
+      </div>
+    );
+  },
 };
 
 export const Disabled: Story = {

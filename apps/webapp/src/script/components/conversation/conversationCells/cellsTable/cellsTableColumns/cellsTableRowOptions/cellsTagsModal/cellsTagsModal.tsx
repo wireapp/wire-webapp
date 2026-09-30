@@ -86,7 +86,9 @@ export const CellsTagsModal = ({
             isLoading={isLoadingAllTags}
             onChange={handleChange}
             onCreateOption={handleCreateOption}
-            createOptionLabel={name => translate('cells.tagsModal.createOptionLabel', {name})}
+            createOptionLabel={name => {
+              return translate('cells.tagsModal.createOptionLabel', {name});
+            }}
             noOptionsMessage={translate('cells.tagsModal.noTagsFound')}
             loadingMessage={translate('cells.tagsModal.loading')}
           />

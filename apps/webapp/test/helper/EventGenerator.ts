@@ -117,7 +117,9 @@ export function createMemberLeaveEvent(conversationId: string, userIds: string[]
     conversation: conversationId,
     qualified_conversation: conversationQualifiedId,
     data: {
-      qualified_user_ids: userIds.map(userId => ({id: userId, domain: ''})),
+      qualified_user_ids: userIds.map(userId => {
+        return {id: userId, domain: ''};
+      }),
       reason: MemberLeaveReason.USER_DELETED,
       user_ids: userIds,
     },

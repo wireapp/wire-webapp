@@ -37,7 +37,9 @@ describe('SetEmail', () => {
   it('has disabled submit button as long as there is no input', async () => {
     const {getByTestId} = mountComponent(<SetEmail />, mockStoreFactory()(initialRootState));
 
-    await waitFor(() => getByTestId(emailInputId));
+    await waitFor(() => {
+      return getByTestId(emailInputId);
+    });
     const emailInput = getByTestId(emailInputId);
     const verifyButton = getByTestId(verifyButtonId) as HTMLButtonElement;
 
@@ -50,7 +52,9 @@ describe('SetEmail', () => {
   it('handles invalid email', async () => {
     const {getByTestId, container} = mountComponent(<SetEmail />, mockStoreFactory()(initialRootState));
 
-    await waitFor(() => getByTestId(emailInputId));
+    await waitFor(() => {
+      return getByTestId(emailInputId);
+    });
     const emailInput = getByTestId(emailInputId);
 
     fireEvent.change(emailInput, {target: {value: 'e'}});
@@ -64,14 +68,18 @@ describe('SetEmail', () => {
   });
 
   it('trims the email', async () => {
-    spyOn(actionRoot.selfAction, 'doSetEmail').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.selfAction, 'doSetEmail').and.returnValue(() => {
+      return Promise.resolve();
+    });
     jest.spyOn(ReactRouter, 'useNavigate').mockReturnValue(jest.fn());
 
     const email = 'e@e.com';
 
     const {getByTestId} = mountComponent(<SetEmail />, mockStoreFactory()(initialRootState));
 
-    await waitFor(() => getByTestId(emailInputId));
+    await waitFor(() => {
+      return getByTestId(emailInputId);
+    });
     const emailInput = getByTestId(emailInputId);
     const verifyButton = getByTestId(verifyButtonId) as HTMLButtonElement;
 

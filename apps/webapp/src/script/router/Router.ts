@@ -67,11 +67,22 @@ const parseRoute = () => {
       const paramNames = Object.keys(params);
 
       // Handle wildcard parameter
-      if (paramNames.some(name => name.startsWith('*'))) {
-        const wildcardName = paramNames.find(name => name.startsWith('*'));
+      if (
+        paramNames.some(name => {
+          return name.startsWith('*');
+        })
+      ) {
+        const wildcardName = paramNames.find(name => {
+          return name.startsWith('*');
+        });
         if (isNonEmptyString(wildcardName)) {
           const segments = params[wildcardName];
-          return handler(...Object.values(params).filter(param => param !== segments), segments);
+          return handler(
+            ...Object.values(params).filter(param => {
+              return param !== segments;
+            }),
+            segments,
+          );
         }
       }
 
@@ -80,7 +91,9 @@ const parseRoute = () => {
         return handler(params);
       }
 
-      const paramValues = paramNames.map(name => params[name]);
+      const paramValues = paramNames.map(name => {
+        return params[name];
+      });
       return handler(...paramValues);
     } catch (error: unknown) {
       console.error('Error matching pattern:', pattern, error);

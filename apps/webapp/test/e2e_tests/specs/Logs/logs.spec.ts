@@ -38,8 +38,12 @@ test.describe('Logs', () => {
       // Assert that message content is not present in console logs
       const userALogs = await userAPage.consoleMessages();
       const hasMessageInLogs = userALogs
-        .map(log => log.text())
-        .some(log => log.includes(messageA) || log.includes(messageB));
+        .map(log => {
+          return log.text();
+        })
+        .some(log => {
+          return log.includes(messageA) || log.includes(messageB);
+        });
       expect(hasMessageInLogs).toBe(false);
     },
   );

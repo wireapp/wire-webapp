@@ -34,11 +34,13 @@ const meta = {
     layout: 'centered',
   },
   decorators: [
-    Story => (
-      <div style={{width: '350px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{width: '350px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   tags: ['autodocs'],
 } satisfies Meta<typeof TimePickerField>;
@@ -53,47 +55,63 @@ const ControlledTimePicker = (args: React.ComponentProps<typeof TimePickerField>
 };
 
 export const Default: Story = {
-  render: args => <ControlledTimePicker {...args} />,
+  render: args => {
+    return <ControlledTimePicker {...args} />;
+  },
   args: {
     id: 'time-picker-default',
     dataUieName: 'time-picker-default',
     ariaLabel: 'Select time',
     value: timeOptions[0],
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const WithLabel: Story = {
-  render: args => <ControlledTimePicker {...args} />,
+  render: args => {
+    return <ControlledTimePicker {...args} />;
+  },
   args: {
     id: 'time-picker-with-label',
     dataUieName: 'time-picker-with-label',
     label: 'Time',
     value: timeOptions[0],
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const Invalid: Story = {
-  render: args => <ControlledTimePicker {...args} />,
+  render: args => {
+    return <ControlledTimePicker {...args} />;
+  },
   args: {
     id: 'time-picker-invalid',
     dataUieName: 'time-picker-invalid',
     label: 'Time',
     markInvalid: true,
     value: timeOptions[0],
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const Disabled: Story = {
-  render: args => <ControlledTimePicker {...args} />,
+  render: args => {
+    return <ControlledTimePicker {...args} />;
+  },
   args: {
     id: 'time-picker-disabled',
     dataUieName: 'time-picker-disabled',
     label: 'Time',
     disabled: true,
     value: timeOptions[0],
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };

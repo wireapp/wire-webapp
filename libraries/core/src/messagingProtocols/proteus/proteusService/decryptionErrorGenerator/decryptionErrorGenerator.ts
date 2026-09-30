@@ -42,11 +42,14 @@ export const ProteusErrors = {
 
 type CryptoboxError = Error & {code: number};
 
-const isCryptoboxError = (error: unknown): error is CryptoboxError => typeof (error as any)?.code === 'number';
+const isCryptoboxError = (error: unknown): error is CryptoboxError => {
+  return typeof (error as any)?.code === 'number';
+};
 
 type LegacyProteusError = {proteusErrorCode: number};
-const hasProteusErrorCode = (error: unknown): error is LegacyProteusError =>
-  typeof (error as any)?.proteusErrorCode === 'number';
+const hasProteusErrorCode = (error: unknown): error is LegacyProteusError => {
+  return typeof (error as any)?.proteusErrorCode === 'number';
+};
 
 type SenderInfo = {clientId: string; userId: QualifiedId};
 

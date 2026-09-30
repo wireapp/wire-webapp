@@ -66,12 +66,14 @@ export class ServiceMiddleware implements EventMiddleware {
       ? qualified_conversation
       : {domain: '', id: conversationId};
     const userQualifiedIds = this.extractQualifiedUserIds(eventData);
-    const containsSelfUser = userQualifiedIds.find((user: QualifiedId) => matchQualifiedIds(user, this.selfUser));
+    const containsSelfUser = userQualifiedIds.find((user: QualifiedId) => {
+      return matchQualifiedIds(user, this.selfUser);
+    });
 
     const userIds: QualifiedId[] = !isUndefined(containsSelfUser)
-      ? await this.conversationRepository
-          .getConversationById(qualifiedConversation)
-          .then(conversationEntity => conversationEntity.participating_user_ids())
+      ? await this.conversationRepository.getConversationById(qualifiedConversation).then(conversationEntity => {
+          return conversationEntity.participating_user_ids();
+        })
       : userQualifiedIds;
 
     const hasService = await this.containsService(userIds);
@@ -84,7 +86,9 @@ export class ServiceMiddleware implements EventMiddleware {
       ? users.map(user => {
           return isTruthy(user.qualified_id) ? user.qualified_id : {domain: '', id: user.id};
         })
-      : data.user_ids.map(id => ({domain: '', id}));
+      : data.user_ids.map(id => {
+          return {domain: '', id};
+        });
     return userIds;
   }
 
@@ -96,7 +100,9 @@ export class ServiceMiddleware implements EventMiddleware {
 
   private async containsService(users: QualifiedId[]) {
     const userEntities = await this.userRepository.getUsersById(users);
-    return userEntities.some(userEntity => userEntity.isService || userEntity.type === UserType.APP);
+    return userEntities.some(userEntity => {
+      return userEntity.isService || userEntity.type === UserType.APP;
+    });
   }
 
   private decorateWithHasServiceFlag(event: MemberJoinEvent | ConversationMemberJoinEvent | OneToOneCreationEvent) {

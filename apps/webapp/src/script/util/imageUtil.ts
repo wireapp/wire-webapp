@@ -40,8 +40,12 @@ export const stripImageExifData = async (image: Blob): Promise<Blob> => {
 const createImageElement = (url: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Failed to load image from ${url}`));
+    img.onload = () => {
+      return resolve(img);
+    };
+    img.onerror = () => {
+      return reject(new Error(`Failed to load image from ${url}`));
+    };
     img.src = url;
   });
 };
@@ -103,8 +107,12 @@ export const imageHasExifData = async (image: Blob): Promise<boolean> => {
 const readFileAsArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as ArrayBuffer);
-    reader.onerror = () => reject(new Error(`FileReader error`));
+    reader.onload = () => {
+      return resolve(reader.result as ArrayBuffer);
+    };
+    reader.onerror = () => {
+      return reject(new Error(`FileReader error`));
+    };
     reader.readAsArrayBuffer(blob);
   });
 };

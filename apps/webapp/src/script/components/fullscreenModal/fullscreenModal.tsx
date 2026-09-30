@@ -63,13 +63,21 @@ export const FullscreenModal = ({id, isOpen, children, onClose}: FullscreenModal
   useEffect(() => {
     if (!isOpen) {
       setIsAnimating(false);
-      const timer = setTimeout(() => setIsVisible(false), ANIMATION_CLOSE_TIMEOUT);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        return setIsVisible(false);
+      }, ANIMATION_CLOSE_TIMEOUT);
+      return () => {
+        return clearTimeout(timer);
+      };
     }
 
     setIsVisible(true);
-    const timer = setTimeout(() => setIsAnimating(true), ANIMATION_OPEN_TIMEOUT);
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => {
+      return setIsAnimating(true);
+    }, ANIMATION_OPEN_TIMEOUT);
+    return () => {
+      return clearTimeout(timer);
+    };
   }, [isOpen]);
 
   const handleCloseOnEscape = useCallback(

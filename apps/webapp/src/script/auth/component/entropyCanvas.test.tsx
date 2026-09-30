@@ -34,11 +34,15 @@ describe('EntropyCanvas', () => {
   });
 
   const setStateMock = jest.fn();
-  const useStateMock: any = (useState: any) => [useState, setStateMock];
+  const useStateMock: any = (useState: any) => {
+    return [useState, setStateMock];
+  };
   jest.spyOn(React, 'useState').mockImplementation(useStateMock);
 
   const setErrorMock = jest.fn();
-  const useErrorMock: any = (useState: any) => [useState, setErrorMock];
+  const useErrorMock: any = (useState: any) => {
+    return [useState, setErrorMock];
+  };
   jest.spyOn(React, 'useState').mockImplementation(useErrorMock);
 
   const [, setEntropy] = useStateMock([]);

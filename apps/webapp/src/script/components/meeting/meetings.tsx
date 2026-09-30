@@ -35,16 +35,23 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 export const Meetings = () => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const meetingSeries = useMeetingStore(state => state.meetingSeries);
-  const isLoading = useMeetingStore(state => state.isLoading);
-  const hasLoadError = useMeetingStore(state => state.hasLoadError);
-  const loadMeetings = useMeetingStore(state => state.loadMeetings);
+  const meetingSeries = useMeetingStore(state => {
+    return state.meetingSeries;
+  });
+  const isLoading = useMeetingStore(state => {
+    return state.isLoading;
+  });
+  const hasLoadError = useMeetingStore(state => {
+    return state.hasLoadError;
+  });
+  const loadMeetings = useMeetingStore(state => {
+    return state.loadMeetings;
+  });
   const selfUser = container.resolve(UserState).self();
 
-  const refreshMeetings = useCallback(
-    () => fireAndForgetInvoker.fireAndForget(loadMeetings),
-    [fireAndForgetInvoker, loadMeetings],
-  );
+  const refreshMeetings = useCallback(() => {
+    return fireAndForgetInvoker.fireAndForget(loadMeetings);
+  }, [fireAndForgetInvoker, loadMeetings]);
 
   useEffect(() => {
     refreshMeetings();

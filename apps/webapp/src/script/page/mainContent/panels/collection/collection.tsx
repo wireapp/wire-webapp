@@ -92,14 +92,16 @@ function Collection(props: CollectionProps) {
   const [detailCategory, setDetailCategory] = useState<Category | undefined>(undefined);
 
   useEffect(() => {
-    void conversationRepository
-      .getEventsForCategory(conversation, MessageCategory.LINK_PREVIEW)
-      .then(allMessages => setMessages(allMessages as ContentMessage[]));
+    void conversationRepository.getEventsForCategory(conversation, MessageCategory.LINK_PREVIEW).then(allMessages => {
+      return setMessages(allMessages as ContentMessage[]);
+    });
   }, [conversation, conversationRepository]);
 
   useEffect(() => {
     const addItem = (message: ContentMessage) => {
-      setMessages(oldMessages => [message].concat(oldMessages));
+      setMessages(oldMessages => {
+        return [message].concat(oldMessages);
+      });
     };
 
     const removeItem = (messageId: string, conversationId: string) => {
@@ -107,7 +109,11 @@ function Collection(props: CollectionProps) {
         // A message from a different converation, nothing to do
         return;
       }
-      setMessages(oldMessages => oldMessages.filter(message => message.id !== messageId));
+      setMessages(oldMessages => {
+        return oldMessages.filter(message => {
+          return message.id !== messageId;
+        });
+      });
     };
 
     const removeMessage = (message: ContentMessage) => {
@@ -144,7 +150,9 @@ function Collection(props: CollectionProps) {
       <CollectionDetails
         conversation={conversation}
         messages={categories[detailCategory]}
-        onClose={() => setDetailCategory(undefined)}
+        onClose={() => {
+          return setDetailCategory(undefined);
+        }}
         onImageClick={onImageClick}
       />
     );
@@ -156,7 +164,9 @@ function Collection(props: CollectionProps) {
         messages={images}
         limit={12}
         uieName={'collection-section-image'}
-        onSelect={() => setDetailCategory('images')}
+        onSelect={() => {
+          return setDetailCategory('images');
+        }}
         onImageClick={onImageClick}
         label={translate('collectionSectionImages')}
       >
@@ -166,7 +176,9 @@ function Collection(props: CollectionProps) {
         messages={links}
         limit={4}
         uieName={'collection-section-link'}
-        onSelect={() => setDetailCategory('links')}
+        onSelect={() => {
+          return setDetailCategory('links');
+        }}
         label={translate('collectionSectionLinks')}
       >
         <span className={`collection-header-icon icon-link`}></span>
@@ -175,7 +187,9 @@ function Collection(props: CollectionProps) {
         messages={audio}
         limit={4}
         uieName={'collection-section-audio'}
-        onSelect={() => setDetailCategory('audio')}
+        onSelect={() => {
+          return setDetailCategory('audio');
+        }}
         label={translate('collectionSectionAudio')}
       >
         <Icon.MicOnIcon className="collection-header-icon" />
@@ -184,7 +198,9 @@ function Collection(props: CollectionProps) {
         messages={files}
         limit={4}
         uieName={'collection-section-file'}
-        onSelect={() => setDetailCategory('files')}
+        onSelect={() => {
+          return setDetailCategory('files');
+        }}
         label={translate('collectionSectionFiles')}
       >
         <span className={`collection-header-icon icon-file`}></span>

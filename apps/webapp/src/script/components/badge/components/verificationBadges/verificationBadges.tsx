@@ -66,12 +66,14 @@ const iconStyles: CSSObject = {
   alignItems: 'center',
 };
 
-const title = (isMLSConversation = false): CSSProperties => ({
-  color: isMLSConversation ? 'var(--success-color)' : 'var(--blue-500)',
-  fontSize: '12px',
-  lineHeight: '14px',
-  marginRight: '4px',
-});
+const title = (isMLSConversation = false): CSSProperties => {
+  return {
+    color: isMLSConversation ? 'var(--success-color)' : 'var(--blue-500)',
+    fontSize: '12px',
+    lineHeight: '14px',
+    marginRight: '4px',
+  };
+};
 
 const useConversationVerificationState = (conversation: Conversation) => {
   const {verification_state: proteusVerificationState, mlsVerificationState} = useKoSubscribableChildren(conversation, [
@@ -116,7 +118,13 @@ export const UserVerificationBadges = ({
   });
 
   let status: MLSStatuses | undefined = undefined;
-  if (mlsStatuses && mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)) {
+  if (
+    mlsStatuses &&
+    mlsStatuses.length > 0 &&
+    mlsStatuses.every(status => {
+      return status === MLSStatuses.VALID;
+    })
+  ) {
     status = MLSStatuses.VALID;
   }
 
@@ -134,7 +142,9 @@ export const DeviceVerificationBadges = ({
 }) => {
   const userState = useRef(container.resolve(UserState));
   const {fireAndForgetInvoker} = useApplicationContext();
-  const identity = useMemo(() => getIdentity?.(device.id), [device, getIdentity]);
+  const identity = useMemo(() => {
+    return getIdentity?.(device.id);
+  }, [device, getIdentity]);
   const [user, setUser] = useState<User | undefined>(undefined);
 
   useEffect(() => {
@@ -149,11 +159,11 @@ export const DeviceVerificationBadges = ({
       if (!identity) {
         return;
       }
-      const userEntity = await waitFor(() =>
-        userState.current
-          .users()
-          .find(user => stringifyQualifiedId(user.qualifiedId) === stringifyQualifiedId(identity.qualifiedUserId)),
-      );
+      const userEntity = await waitFor(() => {
+        return userState.current.users().find(user => {
+          return stringifyQualifiedId(user.qualifiedId) === stringifyQualifiedId(identity.qualifiedUserId);
+        });
+      });
       if (!active) {
         return;
       }
@@ -206,14 +216,16 @@ const MLSVerificationBadge = ({
     'data-uie-value': MLSStatus,
   };
 
-  const TooltipIcon = ({children, body, ...props}: {body: string; children: React.ReactNode}) => (
-    <>
-      <div id={tooltipId} role="tooltip" aria-label={body}></div>
-      <Tooltip {...props} body={body}>
-        {children}
-      </Tooltip>
-    </>
-  );
+  const TooltipIcon = ({children, body, ...props}: {body: string; children: React.ReactNode}) => {
+    return (
+      <>
+        <div id={tooltipId} role="tooltip" aria-label={body}></div>
+        <Tooltip {...props} body={body}>
+          {children}
+        </Tooltip>
+      </>
+    );
+  };
 
   switch (MLSStatus) {
     case MLSStatuses.VALID:

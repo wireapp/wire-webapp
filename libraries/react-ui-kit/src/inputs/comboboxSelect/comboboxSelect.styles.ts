@@ -59,92 +59,121 @@ export const selectStyles = ({
   controlCSS = {},
   containerCSS = {},
   menuListCSS = {},
-}: SelectStylesParams): StylesConfig<ComboboxSelectOption, true> => ({
-  indicatorSeparator: () => baseIndicatorSeparatorStyles(),
-  indicatorsContainer: provided => provided,
-  container: provided => ({
-    ...provided,
-    ...baseContainerStyles(containerCSS),
-  }),
-  control: (_, {isDisabled, selectProps}) =>
-    baseControlStyles({theme, isDisabled, markInvalid, selectProps, controlCSS}),
-  dropdownIndicator: (provided, selectProps) => ({
-    ...provided,
-    ...baseDropdownIndicatorStyles({theme, selectProps}),
-  }),
-  menuList: provided => ({
-    ...provided,
-    ...baseMenuListStyles(),
-    ...menuListCSS,
-  }),
-  option: (provided, {isDisabled, isFocused, isSelected, isMulti}) => ({
-    ...provided,
-    ...baseOptionStyles({theme, isDisabled, isFocused, isSelected, isMulti}),
-    padding: '10px 16px',
-    fontWeight: 400,
-    '&:not(:last-of-type)': {
-      borderBottom: `1px solid ${theme.Select.borderColor}`,
+}: SelectStylesParams): StylesConfig<ComboboxSelectOption, true> => {
+  return {
+    indicatorSeparator: () => {
+      return baseIndicatorSeparatorStyles();
     },
-    '&:first-of-type': {
-      borderRadius: '0',
+    indicatorsContainer: provided => {
+      return provided;
     },
-    '&:last-of-type': {
-      borderRadius: '0',
+    container: provided => {
+      return {
+        ...provided,
+        ...baseContainerStyles(containerCSS),
+      };
     },
-  }),
-  singleValue: (provided, selectProps) => ({
-    ...provided,
-    ...baseSingleValueStyles({theme, selectProps}),
-  }),
-  menu: provided => ({
-    ...provided,
-    ...baseMenuStyles({theme, menuPosition: 'absolute'}),
-    width: '100%',
-    zIndex: 'var(--z-index-modal)',
-    position: 'absolute',
-  }),
-  menuPortal: provided => ({
-    ...provided,
-    zIndex: 'var(--z-index-modal)',
-  }),
-  multiValue: provided => ({
-    ...provided,
-    backgroundColor: theme.Select.optionHoverBg,
-    borderRadius: 8,
-    margin: 4,
-    fontSize: '14px',
-    height: '24px',
-  }),
-  multiValueLabel: provided => ({
-    ...provided,
-    color: theme.general.primaryColor,
-    fontWeight: 500,
-    padding: '0 8px 0 0',
-  }),
-  multiValueRemove: provided => ({
-    ...provided,
-    color: theme.general.primaryColor,
-    paddingLeft: 2,
-    paddingRight: 6,
-    ':hover': {
-      backgroundColor: 'transparent',
-      color: theme.general.primaryColor,
+    control: (_, {isDisabled, selectProps}) => {
+      return baseControlStyles({theme, isDisabled, markInvalid, selectProps, controlCSS});
     },
+    dropdownIndicator: (provided, selectProps) => {
+      return {
+        ...provided,
+        ...baseDropdownIndicatorStyles({theme, selectProps}),
+      };
+    },
+    menuList: provided => {
+      return {
+        ...provided,
+        ...baseMenuListStyles(),
+        ...menuListCSS,
+      };
+    },
+    option: (provided, {isDisabled, isFocused, isSelected, isMulti}) => {
+      return {
+        ...provided,
+        ...baseOptionStyles({theme, isDisabled, isFocused, isSelected, isMulti}),
+        padding: '10px 16px',
+        fontWeight: 400,
+        '&:not(:last-of-type)': {
+          borderBottom: `1px solid ${theme.Select.borderColor}`,
+        },
+        '&:first-of-type': {
+          borderRadius: '0',
+        },
+        '&:last-of-type': {
+          borderRadius: '0',
+        },
+      };
+    },
+    singleValue: (provided, selectProps) => {
+      return {
+        ...provided,
+        ...baseSingleValueStyles({theme, selectProps}),
+      };
+    },
+    menu: provided => {
+      return {
+        ...provided,
+        ...baseMenuStyles({theme, menuPosition: 'absolute'}),
+        width: '100%',
+        zIndex: 'var(--z-index-modal)',
+        position: 'absolute',
+      };
+    },
+    menuPortal: provided => {
+      return {
+        ...provided,
+        zIndex: 'var(--z-index-modal)',
+      };
+    },
+    multiValue: provided => {
+      return {
+        ...provided,
+        backgroundColor: theme.Select.optionHoverBg,
+        borderRadius: 8,
+        margin: 4,
+        fontSize: '14px',
+        height: '24px',
+      };
+    },
+    multiValueLabel: provided => {
+      return {
+        ...provided,
+        color: theme.general.primaryColor,
+        fontWeight: 500,
+        padding: '0 8px 0 0',
+      };
+    },
+    multiValueRemove: provided => {
+      return {
+        ...provided,
+        color: theme.general.primaryColor,
+        paddingLeft: 2,
+        paddingRight: 6,
+        ':hover': {
+          backgroundColor: 'transparent',
+          color: theme.general.primaryColor,
+        },
 
-    '& svg': {
-      fill: 'currentColor',
+        '& svg': {
+          fill: 'currentColor',
+        },
+      };
     },
-  }),
-  valueContainer: provided => ({
-    ...provided,
-    padding: 0,
-    width: '100%',
-    display: 'flex',
-    flexWrap: 'wrap',
-    maxHeight: '72px',
-    overflowY: 'auto',
-  }),
-});
+    valueContainer: provided => {
+      return {
+        ...provided,
+        padding: 0,
+        width: '100%',
+        display: 'flex',
+        flexWrap: 'wrap',
+        maxHeight: '72px',
+        overflowY: 'auto',
+      };
+    },
+  };
+};
 
 export const noOptionsMessageStyles = {
   padding: '8px 12px',
@@ -154,4 +183,6 @@ export const loadingMessageStyles = {
   padding: '8px 12px',
 };
 
-export const labelCSS = ({isVisuallyHidden}: {isVisuallyHidden: boolean}) => (isVisuallyHidden ? visuallyHidden() : {});
+export const labelCSS = ({isVisuallyHidden}: {isVisuallyHidden: boolean}) => {
+  return isVisuallyHidden ? visuallyHidden() : {};
+};

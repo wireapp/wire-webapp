@@ -85,7 +85,9 @@ const RadioGroup = <T extends string | number>({
                 id={currentId}
                 name={name}
                 value={value}
-                onChange={() => onChange(value)}
+                onChange={() => {
+                  return onChange(value);
+                }}
                 checked={isChecked}
                 data-uie-name={optionUieName}
                 aria-describedby={isNonEmptyString(description) ? descriptionId : undefined}

@@ -32,17 +32,20 @@ describe('onBackFromSleep', () => {
   beforeEach(() => {
     originalDateNow = Date.now;
     now = Date.now();
-    jest.spyOn(global, 'Date').mockImplementation(
-      () =>
-        ({
-          getTime: () => now,
-        }) as unknown as Date,
-    );
+    jest.spyOn(global, 'Date').mockImplementation(() => {
+      return {
+        getTime: () => {
+          return now;
+        },
+      } as unknown as Date;
+    });
   });
 
   afterEach(() => {
     // Clean up all intervals created during tests
-    stopFunctions.forEach(stop => stop());
+    stopFunctions.forEach(stop => {
+      return stop();
+    });
     stopFunctions.length = 0;
     jest.clearAllTimers();
     global.Date.now = originalDateNow;

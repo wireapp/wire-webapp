@@ -195,9 +195,13 @@ class Server {
       this.app.use(`/${route}`, express.static(path.join(__dirname, `static/${route}`)));
     });
 
-    this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
+    this.app.get('/favicon.ico', (_req, res) => {
+      return res.sendFile(path.join(__dirname, 'static/image/favicon.ico'));
+    });
     if (!this.config.DEVELOPMENT) {
-      this.app.get('/sw.js', (_req, res) => res.sendFile(path.join(__dirname, 'static/sw.js')));
+      this.app.get('/sw.js', (_req, res) => {
+        return res.sendFile(path.join(__dirname, 'static/sw.js'));
+      });
     }
   }
 
@@ -237,16 +241,18 @@ class Server {
 
   private initSiteMap(config: ServerConfig) {
     if (Boolean(config.APP_BASE)) {
-      const pages = () => [
-        {
-          changeFreq: 'weekly',
-          url: '/auth/',
-        },
-        {
-          changeFreq: 'weekly',
-          url: '/',
-        },
-      ];
+      const pages = () => {
+        return [
+          {
+            changeFreq: 'weekly',
+            url: '/auth/',
+          },
+          {
+            changeFreq: 'weekly',
+            url: '/',
+          },
+        ];
+      };
       this.app.use(expressSitemapXml(pages, config.APP_BASE) as unknown as express.RequestHandler);
     }
   }
@@ -261,11 +267,13 @@ class Server {
             cert: fs.readFileSync(this.config.SSL_CERTIFICATE_PATH),
             key: fs.readFileSync(this.config.SSL_CERTIFICATE_KEY_PATH),
           };
-          this.server = https
-            .createServer(options, this.app)
-            .listen(this.config.PORT_HTTP, '0.0.0.0', () => resolve(this.config.PORT_HTTP));
+          this.server = https.createServer(options, this.app).listen(this.config.PORT_HTTP, '0.0.0.0', () => {
+            return resolve(this.config.PORT_HTTP);
+          });
         } else {
-          this.server = this.app.listen(this.config.PORT_HTTP, '0.0.0.0', () => resolve(this.config.PORT_HTTP));
+          this.server = this.app.listen(this.config.PORT_HTTP, '0.0.0.0', () => {
+            return resolve(this.config.PORT_HTTP);
+          });
         }
       } else {
         reject('Server port not specified.');

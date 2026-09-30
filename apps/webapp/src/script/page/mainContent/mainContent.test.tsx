@@ -34,24 +34,40 @@ import {createRootContextValueForTest} from '../testSupport/rootContextTestSuppo
 import {RootProvider} from '../rootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
-jest.mock('./panels/preferences/accountPreferences', () => ({
-  AccountPreferences: () => <span>AccountPreferences</span>,
-  __esModule: true,
-}));
+jest.mock('./panels/preferences/accountPreferences', () => {
+  return {
+    AccountPreferences: () => {
+      return <span>AccountPreferences</span>;
+    },
+    __esModule: true,
+  };
+});
 
-jest.mock('@formkit/auto-animate/react', () => ({
-  __esModule: true,
-  useAutoAnimate: jest.fn(),
-}));
+jest.mock('@formkit/auto-animate/react', () => {
+  return {
+    __esModule: true,
+    useAutoAnimate: jest.fn(),
+  };
+});
 
-jest.mock('react-transition-group', () => ({
-  CSSTransition: ({children}: any) => children,
-  SwitchTransition: ({children}: any) => children,
-}));
+jest.mock('react-transition-group', () => {
+  return {
+    CSSTransition: ({children}: any) => {
+      return children;
+    },
+    SwitchTransition: ({children}: any) => {
+      return children;
+    },
+  };
+});
 
 const mockDevicesHandler = {
-  availableDevices: (): (MediaDeviceInfo | ElectronDesktopCapturerSource)[] => [],
-  currentDeviceId: () => 'mock-device-id',
+  availableDevices: (): (MediaDeviceInfo | ElectronDesktopCapturerSource)[] => {
+    return [];
+  },
+  currentDeviceId: () => {
+    return 'mock-device-id';
+  },
 } as unknown as MediaDevicesHandler;
 
 function isFeatureToggleDisabledForTest(): boolean {
@@ -102,7 +118,9 @@ describe('Preferences', () => {
       setContentState(ContentState.PREFERENCES_ABOUT);
     });
 
-    waitFor(() => screen.getByText('accessibility.headings.preferencesAbout'));
+    waitFor(() => {
+      return screen.getByText('accessibility.headings.preferencesAbout');
+    });
 
     act(() => {
       jest.advanceTimersByTime(1000);

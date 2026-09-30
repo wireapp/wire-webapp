@@ -31,7 +31,11 @@ import {Core} from '../../service/coreSingleton';
 import {translateForTest} from 'Util/test/translateForTest';
 
 function buildSearchRepository() {
-  const userRepository = {getUsersById: jest.fn((): User[] => [])} as unknown as jest.Mocked<UserRepository>;
+  const userRepository = {
+    getUsersById: jest.fn((): User[] => {
+      return [];
+    }),
+  } as unknown as jest.Mocked<UserRepository>;
   const core = {backendFeatures: {isFederated: false}} as unknown as jest.Mocked<Core>;
   const apiClient = {api: {user: {getSearchContacts: jest.fn()}}} as unknown as jest.Mocked<APIClient>;
   const searchRepository = new SearchRepository(userRepository, core, apiClient);
@@ -193,7 +197,9 @@ describe('SearchRepository', () => {
       const localUsers = generateUsers(nbUsers, 'domain');
 
       userRepository.getUsersById.mockResolvedValue(localUsers);
-      const searchResults = localUsers.map(({qualifiedId}) => qualifiedId);
+      const searchResults = localUsers.map(({qualifiedId}) => {
+        return qualifiedId;
+      });
       jest
         .spyOn(apiClient.api.user, 'getSearchContacts')
         .mockResolvedValue({response: {documents: searchResults}} as any);
@@ -208,7 +214,9 @@ describe('SearchRepository', () => {
       const localUsers = [createUser('felix', 'felix'), createUser('notfelix', 'notfelix')];
 
       userRepository.getUsersById.mockResolvedValue(localUsers);
-      const searchResults = localUsers.map(({qualifiedId}) => qualifiedId);
+      const searchResults = localUsers.map(({qualifiedId}) => {
+        return qualifiedId;
+      });
       jest
         .spyOn(apiClient.api.user, 'getSearchContacts')
         .mockResolvedValue({response: {documents: searchResults}} as any);
@@ -226,7 +234,9 @@ describe('SearchRepository', () => {
       const localUsers = [generateUser(), generateUser(), generateUser(), selfUser];
       userRepository.getUsersById.mockResolvedValue(localUsers);
 
-      const searchResults = localUsers.map(({qualifiedId}) => qualifiedId);
+      const searchResults = localUsers.map(({qualifiedId}) => {
+        return qualifiedId;
+      });
       jest
         .spyOn(apiClient.api.user, 'getSearchContacts')
         .mockResolvedValue({response: {documents: searchResults}} as any);
@@ -245,7 +255,9 @@ describe('SearchRepository', () => {
       const allUsers = [...localUsers, ...otherTeamUsers, ...teamUsers];
       userRepository.getUsersById.mockResolvedValue(allUsers);
 
-      const searchResults = allUsers.map(({qualifiedId}) => qualifiedId);
+      const searchResults = allUsers.map(({qualifiedId}) => {
+        return qualifiedId;
+      });
       jest
         .spyOn(apiClient.api.user, 'getSearchContacts')
         .mockResolvedValue({response: {documents: searchResults}} as any);

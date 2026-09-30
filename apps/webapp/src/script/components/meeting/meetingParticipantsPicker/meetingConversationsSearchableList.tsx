@@ -60,7 +60,9 @@ export const MeetingConversationsSearchableList = ({
     <>
       <button
         type="button"
-        onClick={() => onOpenChange(!isOpen)}
+        onClick={() => {
+          return onOpenChange(!isOpen);
+        }}
         css={collapseButton}
         data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
         aria-expanded={isOpen}
@@ -82,7 +84,9 @@ export const MeetingConversationsSearchableList = ({
                 <Checkbox
                   id={checkboxId}
                   checked={selectedConversationIds.has(conversationKey)}
-                  onChange={() => onSelectConversation(conversation)}
+                  onChange={() => {
+                    return onSelectConversation(conversation);
+                  }}
                   labelBeforeCheckbox
                   aligncenter={false}
                   outlineOffset="0"

@@ -28,11 +28,15 @@ export interface LineProps<T = HTMLHRElement> extends React.HTMLProps<T> {
   color?: string;
 }
 
-export const lineStyle: <T>(props: LineProps<T>) => CSSObject = ({color = COLOR.GRAY_LIGHTEN_72}) => ({
-  border: 'none',
-  borderBottom: `1px solid ${color}`,
-  marginBottom: `${GUTTER}px`,
-  marginTop: `${GUTTER}px`,
-});
+export const lineStyle: <T>(props: LineProps<T>) => CSSObject = ({color = COLOR.GRAY_LIGHTEN_72}) => {
+  return {
+    border: 'none',
+    borderBottom: `1px solid ${color}`,
+    marginBottom: `${GUTTER}px`,
+    marginTop: `${GUTTER}px`,
+  };
+};
 
-export const Line = (props: LineProps) => <hr css={lineStyle(props)} {...props} />;
+export const Line = (props: LineProps) => {
+  return <hr css={lineStyle(props)} {...props} />;
+};

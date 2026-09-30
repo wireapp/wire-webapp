@@ -98,7 +98,13 @@ const Avatar = ({
     const parentNode = event.currentTarget.parentNode;
     if (parentNode !== null) {
       if (isKeyboardEvent(event)) {
-        handleKeyDown({event, callback: () => onAvatarClick?.(participant), keys: [KEY.ENTER, KEY.SPACE]});
+        handleKeyDown({
+          event,
+          callback: () => {
+            return onAvatarClick?.(participant);
+          },
+          keys: [KEY.ENTER, KEY.SPACE],
+        });
         return;
       }
       onAvatarClick?.(participant);
@@ -124,7 +130,15 @@ const Avatar = ({
   }
 
   if (!participant.isAvailable()) {
-    return <PlaceholderAvatar {...props} avatarSize={avatarSize} onClick={() => onAvatarClick?.(participant)} />;
+    return (
+      <PlaceholderAvatar
+        {...props}
+        avatarSize={avatarSize}
+        onClick={() => {
+          return onAvatarClick?.(participant);
+        }}
+      />
+    );
   }
 
   const isMe = participant.isMe;

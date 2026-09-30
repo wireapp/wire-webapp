@@ -60,7 +60,9 @@ export const CreateTeamModal = () => {
       id="custom-history-modal"
       isShown={isCreateTeamModalOpen}
       data-uie-name="custom-history-modal"
-      onKeyDown={event => handleEscDown(event, onCancel)}
+      onKeyDown={event => {
+        return handleEscDown(event, onCancel);
+      }}
       onBgClick={onCancel}
     >
       <div css={salesModalBodyCss}>
@@ -77,7 +79,9 @@ export const CreateTeamModal = () => {
           type="button"
           onClick={onSubmit}
           data-uie-name="do-create-team"
-          onKeyDown={event => handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]})}
+          onKeyDown={event => {
+            return handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]});
+          }}
         >
           {translate('createConversationTeamCreationModalButton')}
         </Button>

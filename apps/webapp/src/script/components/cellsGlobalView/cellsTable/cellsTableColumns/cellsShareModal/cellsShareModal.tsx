@@ -116,7 +116,11 @@ export const CellsShareModal = (properties: CellsShareModalProps): ReactElement 
     cellsRepository,
     fireAndForgetInvoker,
   });
-  const node = useCellsStore(state => state.nodes.find(cellNode => cellNode.id === uuid));
+  const node = useCellsStore(state => {
+    return state.nodes.find(cellNode => {
+      return cellNode.id === uuid;
+    });
+  });
   const {
     isEnabled: isPasswordEnabled,
     toggle: togglePassword,

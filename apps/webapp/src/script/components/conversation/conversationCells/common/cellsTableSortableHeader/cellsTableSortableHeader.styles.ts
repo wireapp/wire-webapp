@@ -19,26 +19,28 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const sortableHeaderStyles = (isActive: boolean): CSSObject => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '4px',
-  padding: '0',
-  border: 'none',
-  background: 'none',
-  cursor: 'pointer',
-  color: 'inherit',
-  font: 'inherit',
-  fontWeight: 'inherit',
+export const sortableHeaderStyles = (isActive: boolean): CSSObject => {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '0',
+    border: 'none',
+    background: 'none',
+    cursor: 'pointer',
+    color: 'inherit',
+    font: 'inherit',
+    fontWeight: 'inherit',
 
-  // The sort glyph is only shown on the active column; inactive columns reveal it on
-  // hover/focus to hint that the header is sortable.
-  '& svg': {
-    opacity: isActive ? 1 : 0,
-    transition: 'opacity 0.1s ease-in-out',
-  },
+    // The sort glyph is only shown on the active column; inactive columns reveal it on
+    // hover/focus to hint that the header is sortable.
+    '& svg': {
+      opacity: isActive ? 1 : 0,
+      transition: 'opacity 0.1s ease-in-out',
+    },
 
-  '&:hover svg, &:focus-visible svg': {
-    opacity: 1,
-  },
-});
+    '&:hover svg, &:focus-visible svg': {
+      opacity: 1,
+    },
+  };
+};

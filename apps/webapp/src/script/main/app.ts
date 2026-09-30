@@ -227,9 +227,9 @@ export class App {
   ) {
     this.appOptions = options;
     this.config = config;
-    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
-      this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false),
-    );
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
+      return this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
+    });
     this.logger = getLogger('App');
 
     new WindowHandler();
@@ -307,7 +307,9 @@ export class App {
     repositories.team = new TeamRepository(
       repositories.user,
       repositories.asset,
-      () => this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
+      () => {
+        return this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+      },
       teamService,
       this.translate,
     );
@@ -318,7 +320,9 @@ export class App {
        * MessageRepository should NOT depend upon ConversationRepository.
        * We need to remove all usages of conversationRepository inside the messageRepository
        */
-      () => repositories.conversation,
+      () => {
+        return repositories.conversation;
+      },
       repositories.cryptography,
       repositories.event,
       repositories.properties,
@@ -549,10 +553,9 @@ export class App {
         void userRepository.addClientToUser(userId, newClient, true);
       });
 
-      this.core.service?.mls?.on(
-        MLSServiceEvents.MLS_CLIENT_MISMATCH,
-        async () => await this.showForceLogoutModal(SIGN_OUT_REASON.MLS_CLIENT_MISMATCH),
-      );
+      this.core.service?.mls?.on(MLSServiceEvents.MLS_CLIENT_MISMATCH, async () => {
+        return await this.showForceLogoutModal(SIGN_OUT_REASON.MLS_CLIENT_MISMATCH);
+      });
 
       await this.initiateSelfUser(selfUser);
       eventLogger.log(AppInitializationStep.UserInitialize);
@@ -630,11 +633,11 @@ export class App {
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
-      fireAndForgetInvoker.fireAndForget(() =>
-        bgEffectsHandler.preloadResources().catch((error: unknown) => {
+      fireAndForgetInvoker.fireAndForget(() => {
+        return bgEffectsHandler.preloadResources().catch((error: unknown) => {
           this.logger.warn('[virtual-background] preload failed, starting without resources', error);
-        }),
-      );
+        });
+      });
 
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
@@ -713,8 +716,9 @@ export class App {
           conversationRepository,
           core: this.core,
           onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
-          onError: ({id}, error) =>
-            this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
+          onError: ({id}, error) => {
+            return this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error);
+          },
         });
 
         this.logger.info('Finished joining conversations after migration finalization');
@@ -722,8 +726,9 @@ export class App {
         // join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSGroupConversations(conversations, conversationRepository, {
           core: this.core,
-          onError: ({id}, error) =>
-            this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
+          onError: ({id}, error) => {
+            return this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error);
+          },
         });
 
         this.logger.info('Finished initializing MLS group conversations');
@@ -824,9 +829,9 @@ export class App {
    */
   private async initServiceWorker() {
     if (navigator.serviceWorker) {
-      await navigator.serviceWorker
-        .register(`/sw.js?${Environment.version(false)}`)
-        .then(({scope}) => this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`));
+      await navigator.serviceWorker.register(`/sw.js?${Environment.version(false)}`).then(({scope}) => {
+        return this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`);
+      });
     }
   }
 
@@ -845,9 +850,12 @@ export class App {
     }
 
     let recoveryInProgress = false;
-    const isApplicationActive = () => document.visibilityState === 'visible';
-    const isNotificationSyncLive = () =>
-      eventRepository.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const isApplicationActive = () => {
+      return document.visibilityState === 'visible';
+    };
+    const isNotificationSyncLive = () => {
+      return eventRepository.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    };
 
     const recoverConversations = async (): Promise<void> => {
       // Atomic check-and-set to prevent concurrent recovery attempts
@@ -857,7 +865,9 @@ export class App {
 
       recoveryInProgress = true;
       const recoveryTask = await task.tryOrElse(
-        error => error,
+        error => {
+          return error;
+        },
         async () => {
           if (!(await mlsService.prepareMLSConversationRecovery(this.core.clientId))) {
             return;
@@ -868,7 +878,11 @@ export class App {
 
           // Only process conversations that haven't been recovered yet
           const conversations = isNonEmptyArray(pendingIds)
-            ? allConversations.filter(conv => pendingIds.some(pending => matchQualifiedIds(pending, conv.qualifiedId)))
+            ? allConversations.filter(conv => {
+                return pendingIds.some(pending => {
+                  return matchQualifiedIds(pending, conv.qualifiedId);
+                });
+              })
             : allConversations;
 
           const result = await recoverMLSConversationsInBatches({
@@ -894,7 +908,9 @@ export class App {
       }
     };
 
-    const triggerRecovery = () => fireAndForgetInvoker.fireAndForget(recoverConversations);
+    const triggerRecovery = () => {
+      return fireAndForgetInvoker.fireAndForget(recoverConversations);
+    };
     const handleVisibilityChange = () => {
       if (isApplicationActive()) {
         triggerRecovery();
@@ -1123,7 +1139,9 @@ export class App {
     const {modalOptions, modalType} = getModalOptions(
       {
         type: ModalType.SELF_CERTIFICATE_REVOKED,
-        primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
+        primaryActionFn: () => {
+          return void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false);
+        },
       },
       this.translate,
     );

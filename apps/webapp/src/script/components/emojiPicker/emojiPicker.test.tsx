@@ -70,10 +70,16 @@ describe('EmojiPicker', () => {
             translate={translateForTest}
             posX={100}
             posY={100}
-            onKeyPress={() => undefined}
-            resetActionMenuStates={() => undefined}
+            onKeyPress={() => {
+              return undefined;
+            }}
+            resetActionMenuStates={() => {
+              return undefined;
+            }}
             wrapperRef={wrapperRef}
-            handleReactionClick={() => undefined}
+            handleReactionClick={() => {
+              return undefined;
+            }}
           />
         </div>,
       ),

@@ -43,7 +43,9 @@ export const ErrorFallback = ({error, resetErrorBoundary}: FallbackProps) => {
           text: translate('unknownApplicationErrorTryAgain'),
         },
         primaryAction: {
-          action: () => window.location.reload(),
+          action: () => {
+            return window.location.reload();
+          },
           text: translate('unknownApplicationErrorReload'),
         },
         text: {

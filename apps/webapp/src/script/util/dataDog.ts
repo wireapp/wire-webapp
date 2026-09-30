@@ -46,14 +46,24 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
 
   const {domain, id: userId} = user ?? {};
 
-  const replacer = (_match: string, p1: string) => `${p1}***`;
-  const truncateDomain = (value: string) => `${value.substring(0, 3)}***`;
-  const replaceAllStrings = (string: string) => string.replaceAll(uuidRegex, replacer);
-  const replaceDomains = (string: string) =>
-    isNonEmptyString(domain) ? string.replaceAll(domain, truncateDomain(domain)) : string;
-  const removeColors = (string: string) =>
-    string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
-  const removeTimestamp = (string: string) => string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
+  const replacer = (_match: string, p1: string) => {
+    return `${p1}***`;
+  };
+  const truncateDomain = (value: string) => {
+    return `${value.substring(0, 3)}***`;
+  };
+  const replaceAllStrings = (string: string) => {
+    return string.replaceAll(uuidRegex, replacer);
+  };
+  const replaceDomains = (string: string) => {
+    return isNonEmptyString(domain) ? string.replaceAll(domain, truncateDomain(domain)) : string;
+  };
+  const removeColors = (string: string) => {
+    return string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
+  };
+  const removeTimestamp = (string: string) => {
+    return string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
+  };
 
   const commonConfig = {
     clientToken,

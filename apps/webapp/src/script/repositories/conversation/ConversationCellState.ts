@@ -68,7 +68,9 @@ const _accumulateSummary = (
     [ACTIVITY_TYPE.MESSAGE]: unreadOtherMessages.length,
   };
 
-  const alertCount = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+  const alertCount = Object.values(activities).reduce((accumulator, value) => {
+    return accumulator + value;
+  }, 0);
   const hasSingleAlert = alertCount === 1;
   const hasOnlyReplies = activities[ACTIVITY_TYPE.REPLY] > 0 && alertCount === activities[ACTIVITY_TYPE.REPLY];
 
@@ -154,8 +156,9 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, 
 };
 
 const _getStateAlert: ConversationCellStateDefinition = {
-  description: (conversationEntity: Conversation, translate: Translate) =>
-    _accumulateSummary(conversationEntity, translate, true),
+  description: (conversationEntity: Conversation, translate: Translate) => {
+    return _accumulateSummary(conversationEntity, translate, true);
+  },
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
     const {
       calls: unreadCalls,
@@ -196,9 +199,15 @@ const _getStateAlert: ConversationCellStateDefinition = {
 };
 
 const _getStateDefault: ConversationCellStateDefinition = {
-  description: () => '',
-  icon: () => ConversationStatusIcon.NONE,
-  match: () => false,
+  description: () => {
+    return '';
+  },
+  icon: () => {
+    return ConversationStatusIcon.NONE;
+  },
+  match: () => {
+    return false;
+  },
 };
 
 const _getStateGroupActivity: ConversationCellStateDefinition = {
@@ -304,7 +313,9 @@ const _getStateMuted: ConversationCellStateDefinition = {
 
     return ConversationStatusIcon.MUTED;
   },
-  match: (conversationEntity: Conversation) => !conversationEntity.showNotificationsEverything(),
+  match: (conversationEntity: Conversation) => {
+    return !conversationEntity.showNotificationsEverything();
+  },
 };
 
 const _getStateRemoved: ConversationCellStateDefinition = {
@@ -320,7 +331,9 @@ const _getStateRemoved: ConversationCellStateDefinition = {
       lastMessageEntity !== undefined && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
     const wasSelfRemoved =
       isMemberRemoval &&
-      (lastMessageEntity as MemberMessage).userIds().some(userId => matchQualifiedIds(userId, selfUser));
+      (lastMessageEntity as MemberMessage).userIds().some(userId => {
+        return matchQualifiedIds(userId, selfUser);
+      });
     if (wasSelfRemoved) {
       const selfLeft = lastMessageEntity.user().id === selfUserId;
       return selfLeft
@@ -330,16 +343,24 @@ const _getStateRemoved: ConversationCellStateDefinition = {
 
     return '';
   },
-  icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
-  match: (conversationEntity: Conversation) => conversationEntity.isSelfUserRemoved(),
+  icon: () => {
+    return ConversationStatusIcon.UNREAD_MESSAGES;
+  },
+  match: (conversationEntity: Conversation) => {
+    return conversationEntity.isSelfUserRemoved();
+  },
 };
 
 const _getStateGhostGroup: ConversationCellStateDefinition = {
   description: (conversationEntity: Conversation, translate: Translate) => {
     return conversationEntity.isGhostGroup() ? translate('conversationsSecondaryLineGhostGroup') : '';
   },
-  icon: () => ConversationStatusIcon.GHOST_GROUP,
-  match: (conversationEntity: Conversation) => conversationEntity.isGhostGroup(),
+  icon: () => {
+    return ConversationStatusIcon.GHOST_GROUP;
+  },
+  match: (conversationEntity: Conversation) => {
+    return conversationEntity.isGhostGroup();
+  },
 };
 
 const _getStateUnreadMessage: ConversationCellStateDefinition = {
@@ -401,7 +422,9 @@ const _getStateUnreadMessage: ConversationCellStateDefinition = {
     }
     return '';
   },
-  icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
+  icon: () => {
+    return ConversationStatusIcon.UNREAD_MESSAGES;
+  },
   match: (conversationEntity: Conversation) => {
     const {allMessages, systemMessages} = conversationEntity.unreadState();
     const hasUnreadMessages = [...allMessages, ...systemMessages].length > 0;
@@ -446,7 +469,10 @@ export const generateCellState = (
     _getStateUserName,
   ] satisfies ConversationCellStateDefinition[];
 
-  const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
+  const matchingState =
+    states.find(state => {
+      return state.match(conversationEntity);
+    }) || _getStateDefault;
 
   return {
     description: matchingState.description(conversationEntity, translate),

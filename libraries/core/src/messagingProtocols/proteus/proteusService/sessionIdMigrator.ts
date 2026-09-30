@@ -36,7 +36,9 @@ type Session = {
 export async function migrateToQualifiedSessionIds(storeEngine: CRUDEngine, defaultDomain: string) {
   const isFullyQualified = /^[^@]+@[A-F0-9-]+@/i;
   const updatedSessions = (await storeEngine.readAll<Session>(sessionTableName))
-    .filter(session => !isFullyQualified.test(session.id))
+    .filter(session => {
+      return !isFullyQualified.test(session.id);
+    })
     .reduce<{oldId: string; newSession: Session}[]>((acc, session) => {
       return acc.concat({
         oldId: session.id,

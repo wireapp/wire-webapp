@@ -90,10 +90,9 @@ export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_
   if (prevState === current) {
     return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
   }
-  const featureEntry = Object.entries(ACCESS).find(
-    ([, bitmask]) =>
-      (bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current))) !== 0,
-  );
+  const featureEntry = Object.entries(ACCESS).find(([, bitmask]) => {
+    return (bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current))) !== 0;
+  });
   if (featureEntry === undefined) {
     return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
   }
@@ -121,9 +120,11 @@ const AccessStatesByPerm = [
 
 export function accessFromPermissions(permissions: number): TEAM {
   const invalidRoles = [ACCESS_STATE.TEAM.LEGACY, ACCESS_STATE.TEAM.ONE2ONE];
-  const detectedRole = AccessStatesByPerm.filter(role => !invalidRoles.includes(role)).find(role =>
-    hasPermissionForRole(permissions, role),
-  );
+  const detectedRole = AccessStatesByPerm.filter(role => {
+    return !invalidRoles.includes(role);
+  }).find(role => {
+    return hasPermissionForRole(permissions, role);
+  });
   return detectedRole ?? ACCESS_STATE.TEAM.LEGACY;
 }
 
@@ -157,7 +158,11 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     //reverse so that the index reflects the number of significant figures for finding the feature
     .toReversed()
     //find the name of the feature with the correct sigfigs
-    .map((bit: '1' | '0', i) => Object.entries(ACCESS).find(([, bitmask]) => bitmask === +bit << i)?.[0])
+    .map((bit: '1' | '0', i) => {
+      return Object.entries(ACCESS).find(([, bitmask]) => {
+        return bitmask === +bit << i;
+      })?.[0];
+    })
     .forEach(feature => {
       const accessRole = CONVERSATION_ACCESS_ROLE[feature as keyof typeof CONVERSATION_ACCESS_ROLE];
       const accessModes = CONVERSATION_ACCESS[feature as keyof typeof CONVERSATION_ACCESS];

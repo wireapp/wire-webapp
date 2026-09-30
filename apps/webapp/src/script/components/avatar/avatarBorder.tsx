@@ -29,12 +29,14 @@ interface AvatarBorderProps {
 export const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({
   borderRadius = '50%',
   isTransparent = false,
-}) => (
-  <div
-    css={{
-      ...CSS_FILL_PARENT,
-      border: `1px solid ${isTransparent ? 'rgba(0, 0, 0, 0.08)' : 'var(--border-color)'}`,
-      borderRadius,
-    }}
-  />
-);
+}) => {
+  return (
+    <div
+      css={{
+        ...CSS_FILL_PARENT,
+        border: `1px solid ${isTransparent ? 'rgba(0, 0, 0, 0.08)' : 'var(--border-color)'}`,
+        borderRadius,
+      }}
+    />
+  );
+};

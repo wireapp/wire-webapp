@@ -49,17 +49,19 @@ interface LinkTextProps {
   label: string;
 }
 
-const LinkText = ({dataUieName, onClick, label}: LinkTextProps) => (
-  <Link
-    variant={LinkVariant.PRIMARY}
-    onClick={onClick}
-    textTransform={'none'}
-    css={LinkStyles}
-    data-uie-name={dataUieName}
-  >
-    {label}
-  </Link>
-);
+const LinkText = ({dataUieName, onClick, label}: LinkTextProps) => {
+  return (
+    <Link
+      variant={LinkVariant.PRIMARY}
+      onClick={onClick}
+      textTransform={'none'}
+      css={LinkStyles}
+      data-uie-name={dataUieName}
+    >
+      {label}
+    </Link>
+  );
+};
 
 interface E2EIVerificationMessageProps {
   message: E2EIVerificationMessageEntity;
@@ -161,11 +163,17 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
     })
     .unwrapOr(false);
 
-  const degradedUsers = participatingUserEts.filter(user =>
-    userIds.find(userId => matchQualifiedIds(userId, user.qualifiedId)),
-  );
+  const degradedUsers = participatingUserEts.filter(user => {
+    return userIds.find(userId => {
+      return matchQualifiedIds(userId, user.qualifiedId);
+    });
+  });
 
-  const usersName = degradedUsers?.map(user => user.name()).join(', ');
+  const usersName = degradedUsers
+    ?.map(user => {
+      return user.name();
+    })
+    .join(', ');
 
   const isVerified = messageType === E2EIVerificationMessageType.VERIFIED;
   const isNewDevice = messageType === E2EIVerificationMessageType.NEW_DEVICE;

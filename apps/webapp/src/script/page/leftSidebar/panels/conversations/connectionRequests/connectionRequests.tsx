@@ -35,7 +35,9 @@ interface ConnectionRequestsProps {
 
 export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick}: ConnectionRequestsProps) => {
   const {translate} = useApplicationContext();
-  const contentState = useAppState(state => state.contentState);
+  const contentState = useAppState(state => {
+    return state.contentState;
+  });
   const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
   const connectionRequestsCount = connectionRequests.length;
 
@@ -58,13 +60,13 @@ export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick
             'conversation-list-cell--active': isShowingConnectionRequests,
           })}
           onClick={onConnectionRequestClick}
-          onKeyDown={event =>
-            handleKeyDown({
+          onKeyDown={event => {
+            return handleKeyDown({
               event,
               callback: onConnectionRequestClick,
               keys: [KEY.ENTER, KEY.SPACE],
-            })
-          }
+            });
+          }}
         >
           <div className="conversation-list-cell-left">
             {connectionRequestsCount === 1 ? (

@@ -32,7 +32,11 @@ function isClassified(users: User[], classifiedDomains: string[], conversationDo
     return false;
   }
   // if a conversation has any temporary guests then it is not considered classified
-  if (users.some(user => !classifiedDomains.includes(user.domain) || user.isTemporaryGuest())) {
+  if (
+    users.some(user => {
+      return !classifiedDomains.includes(user.domain) || user.isTemporaryGuest();
+    })
+  ) {
     return false;
   }
   return true;

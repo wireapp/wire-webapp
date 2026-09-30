@@ -30,13 +30,18 @@ const props: React.ComponentProps<typeof Select> = {
 };
 
 describe('"Select"', () => {
-  it('renders', () =>
-    matchComponent(
+  it('renders', () => {
+    return matchComponent(
       <Select {...props}>
         <option>a</option>
         <option>b</option>
       </Select>,
-    ));
-  it('renders as disabled', () => matchComponent(<Select {...props} disabled></Select>));
-  it('renders as invalid', () => matchComponent(<Select {...props} markInvalid></Select>));
+    );
+  });
+  it('renders as disabled', () => {
+    return matchComponent(<Select {...props} disabled></Select>);
+  });
+  it('renders as invalid', () => {
+    return matchComponent(<Select {...props} markInvalid></Select>);
+  });
 });

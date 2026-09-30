@@ -21,8 +21,12 @@ import {EncryptedStore, createCustomEncryptedStore, createEncryptedStore} from '
 import {generateSecretKey} from './secretKeyGenerator';
 
 const customCrypto = {
-  encrypt: async (value: Uint8Array) => value,
-  decrypt: async (value: Uint8Array) => value,
+  encrypt: async (value: Uint8Array) => {
+    return value;
+  },
+  decrypt: async (value: Uint8Array) => {
+    return value;
+  },
   version: 1,
 } as const;
 

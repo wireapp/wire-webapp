@@ -69,7 +69,9 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
 
     const audioInterval = window.setInterval(() => {
       audioAnalyser.getByteFrequencyData(audioDataArray);
-      const volume = audioDataArray.reduce((acc, curr) => acc + curr, 0);
+      const volume = audioDataArray.reduce((acc, curr) => {
+        return acc + curr;
+      }, 0);
       const averageVolume = volume / VOLUME_NORMALIZATION_DIVISOR / audioDataArray.length;
       setLevel(averageVolume);
     }, AUDIO_METER.INTERVAL);
@@ -80,8 +82,12 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
       window.clearInterval(audioInterval);
       audioContext
         ?.close()
-        .then(() => logger.info('Closed existing AudioContext', audioContext))
-        .catch((error: unknown) => logger.error(error));
+        .then(() => {
+          return logger.info('Closed existing AudioContext', audioContext);
+        })
+        .catch((error: unknown) => {
+          return logger.error(error);
+        });
 
       audioSource?.disconnect();
       setLevel(0);
@@ -98,15 +104,17 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
       className={`input-level ${className}`}
       {...rest}
     >
-      {bullets.current.map(bulletIndex => (
-        <div
-          key={bulletIndex}
-          className={cx('input-level__bullet', {
-            'input-level__bullet--active': !disabled && level > bulletIndex / MAX_AUDIO_BULLETS,
-            'input-level__bullet--disabled': disabled,
-          })}
-        />
-      ))}
+      {bullets.current.map(bulletIndex => {
+        return (
+          <div
+            key={bulletIndex}
+            className={cx('input-level__bullet', {
+              'input-level__bullet--active': !disabled && level > bulletIndex / MAX_AUDIO_BULLETS,
+              'input-level__bullet--disabled': disabled,
+            })}
+          />
+        );
+      })}
     </div>
   );
 };

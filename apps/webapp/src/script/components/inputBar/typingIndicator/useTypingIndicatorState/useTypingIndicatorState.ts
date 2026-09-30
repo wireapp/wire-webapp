@@ -37,34 +37,48 @@ type TypingIndicatorState = {
   getTypingUser: (user: User, conversationId: string) => TypingUser | undefined;
 };
 
-export const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
-  typingUsers: [],
-  addTypingUser: ({conversationId, user, timerId}) =>
-    set(state => {
-      if (
-        !isNullOrUndefined(
-          state.typingUsers.find(
-            typingUser => typingUser.conversationId === conversationId && typingUser.user.id === user.id,
-          ),
-        )
-      ) {
-        return state;
-      }
-      return {typingUsers: [...state.typingUsers, {conversationId, user, timerId}]};
-    }),
-  getTypingUser: (user, conversationId) =>
-    get().typingUsers.find(
-      typingUser => typingUser.conversationId === conversationId && typingUser.user.id === user.id,
-    ),
-  removeTypingUser: (user, conversationId) =>
-    set(state => ({
-      typingUsers: state.typingUsers.filter(
-        typingUser => !(typingUser.conversationId === conversationId && typingUser.user.id === user.id),
-      ),
-    })),
-  getTypingUsersInConversation: conversationId =>
-    get()
-      .typingUsers.filter(typingUser => typingUser.conversationId === conversationId)
-      .map(typingUser => typingUser.user),
-  clearTypingUsers: () => set({typingUsers: []}),
-}));
+export const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => {
+  return {
+    typingUsers: [],
+    addTypingUser: ({conversationId, user, timerId}) => {
+      return set(state => {
+        if (
+          !isNullOrUndefined(
+            state.typingUsers.find(typingUser => {
+              return typingUser.conversationId === conversationId && typingUser.user.id === user.id;
+            }),
+          )
+        ) {
+          return state;
+        }
+        return {typingUsers: [...state.typingUsers, {conversationId, user, timerId}]};
+      });
+    },
+    getTypingUser: (user, conversationId) => {
+      return get().typingUsers.find(typingUser => {
+        return typingUser.conversationId === conversationId && typingUser.user.id === user.id;
+      });
+    },
+    removeTypingUser: (user, conversationId) => {
+      return set(state => {
+        return {
+          typingUsers: state.typingUsers.filter(typingUser => {
+            return !(typingUser.conversationId === conversationId && typingUser.user.id === user.id);
+          }),
+        };
+      });
+    },
+    getTypingUsersInConversation: conversationId => {
+      return get()
+        .typingUsers.filter(typingUser => {
+          return typingUser.conversationId === conversationId;
+        })
+        .map(typingUser => {
+          return typingUser.user;
+        });
+    },
+    clearTypingUsers: () => {
+      return set({typingUsers: []});
+    },
+  };
+});

@@ -70,9 +70,11 @@ export const transformCellsNodes = ({
     });
 
     const userQualifiedId = Maybe.of(getUserQualifiedIdFromNode(node));
-    const matchingUser = userQualifiedId.andThen(userQualifiedId =>
-      maybe.find(user => matchQualifiedIds(user.qualifiedId, userQualifiedId), users),
-    );
+    const matchingUser = userQualifiedId.andThen(userQualifiedId => {
+      return maybe.find(user => {
+        return matchQualifiedIds(user.qualifiedId, userQualifiedId);
+      }, users);
+    });
     const user = matchingUser.unwrapOr(null);
     const userName = user?.name();
     const owner = isNonEmptyString(userName) ? userName : getOwner(node);
@@ -130,15 +132,21 @@ const getConversation = (node: RestNode, conversations: Conversation[]): Convers
   }
 
   const conversationQualifiedId = parseQualifiedId(conversationUuid);
-  return conversations.find(conversation => conversation.qualifiedId.id === conversationQualifiedId.id);
+  return conversations.find(conversation => {
+    return conversation.qualifiedId.id === conversationQualifiedId.id;
+  });
 };
 
 const getPreviewImageUrl = (node: RestNode): string | undefined => {
-  return node.Previews?.find(preview => preview.ContentType?.startsWith('image/') === true)?.PreSignedGET?.Url;
+  return node.Previews?.find(preview => {
+    return preview.ContentType?.startsWith('image/') === true;
+  })?.PreSignedGET?.Url;
 };
 
 const getPreviewPdfUrl = (node: RestNode): string | undefined => {
-  return node.Previews?.find(preview => preview.ContentType?.startsWith('application/pdf') === true)?.PreSignedGET?.Url;
+  return node.Previews?.find(preview => {
+    return preview.ContentType?.startsWith('application/pdf') === true;
+  })?.PreSignedGET?.Url;
 };
 
 const getUploadedAtTimestamp = (node: RestNode): number => {
@@ -156,17 +164,23 @@ const getFileSize = (node: RestNode): string => {
 };
 
 const getOwner = (node: RestNode): string => {
-  const name = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-owner')?.JsonValue;
+  const name = node.UserMetadata?.find(meta => {
+    return meta.Namespace === 'usermeta-owner';
+  })?.JsonValue;
   return isNonEmptyString(name) ? JSON.parse(name) : '';
 };
 
 const getTags = (node: RestNode): string[] => {
-  const tags = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-tags')?.JsonValue;
+  const tags = node.UserMetadata?.find(meta => {
+    return meta.Namespace === 'usermeta-tags';
+  })?.JsonValue;
 
   if (!isNonEmptyString(tags)) {
     return [];
   }
 
   const parsedTags = JSON.parse(tags);
-  return parsedTags.split(',').map((tag: string) => tag.trim());
+  return parsedTags.split(',').map((tag: string) => {
+    return tag.trim();
+  });
 };

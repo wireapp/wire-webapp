@@ -179,7 +179,9 @@ export const MeetingParticipantsPicker = ({
           isDisabled={disabled}
           aria-label={fieldLabel ?? searchPlaceholder}
           data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
-          onPress={() => handleOpenChange(!isOpen)}
+          onPress={() => {
+            return handleOpenChange(!isOpen);
+          }}
         >
           <ChevronDownIcon aria-hidden="true" width={16} height={16} css={chevronIconStyles(isOpen)} />
         </Button>

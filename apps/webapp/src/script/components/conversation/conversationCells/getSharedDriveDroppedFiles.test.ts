@@ -39,36 +39,49 @@ interface TestDirectoryEntry {
 
 type TestEntry = TestFileEntry | TestDirectoryEntry;
 
-const createFileEntry = (file: File, fullPath: string): TestFileEntry => ({
-  isDirectory: false,
-  isFile: true,
-  name: file.name,
-  fullPath,
-  file: success => success(file),
-});
+const createFileEntry = (file: File, fullPath: string): TestFileEntry => {
+  return {
+    isDirectory: false,
+    isFile: true,
+    name: file.name,
+    fullPath,
+    file: success => {
+      return success(file);
+    },
+  };
+};
 
-const createDirectoryEntry = (name: string, fullPath: string, batches: TestEntry[][]): TestDirectoryEntry => ({
-  isDirectory: true,
-  isFile: false,
-  name,
-  fullPath,
-  createReader: () => {
-    let batchIndex = 0;
-    return {
-      readEntries: success => {
-        const batch = batches[batchIndex] ?? [];
-        batchIndex += 1;
-        success(batch);
-      },
-    };
-  },
-});
+const createDirectoryEntry = (name: string, fullPath: string, batches: TestEntry[][]): TestDirectoryEntry => {
+  return {
+    isDirectory: true,
+    isFile: false,
+    name,
+    fullPath,
+    createReader: () => {
+      let batchIndex = 0;
+      return {
+        readEntries: success => {
+          const batch = batches[batchIndex] ?? [];
+          batchIndex += 1;
+          success(batch);
+        },
+      };
+    },
+  };
+};
 
-const createDataTransfer = (entries: TestEntry[], fallbackFiles: File[] = []): DataTransfer =>
-  ({
+const createDataTransfer = (entries: TestEntry[], fallbackFiles: File[] = []): DataTransfer => {
+  return {
     files: fallbackFiles,
-    items: entries.map(entry => ({webkitGetAsEntry: () => entry})),
-  }) as unknown as DataTransfer;
+    items: entries.map(entry => {
+      return {
+        webkitGetAsEntry: () => {
+          return entry;
+        },
+      };
+    }),
+  } as unknown as DataTransfer;
+};
 
 describe('getSharedDriveDroppedFiles', () => {
   it('recursively expands a dropped folder and preserves each file relative path', async () => {
@@ -88,8 +101,16 @@ describe('getSharedDriveDroppedFiles', () => {
     const files = result.unwrapOr([]);
 
     expect(files).toHaveLength(2);
-    expect(files.map(file => file.webkitRelativePath)).toEqual(['Marketing/brief.txt', 'Marketing/Assets/logo.png']);
-    expect(files.map(file => file.name)).toEqual(['brief.txt', 'logo.png']);
+    expect(
+      files.map(file => {
+        return file.webkitRelativePath;
+      }),
+    ).toEqual(['Marketing/brief.txt', 'Marketing/Assets/logo.png']);
+    expect(
+      files.map(file => {
+        return file.name;
+      }),
+    ).toEqual(['brief.txt', 'logo.png']);
   });
 
   it('falls back to the regular file list when directory entries are unavailable', async () => {
@@ -119,7 +140,9 @@ describe('getSharedDriveDroppedFiles', () => {
       isFile: true,
       name: 'unreadable.txt',
       fullPath: '/Marketing/unreadable.txt',
-      file: (_success, failure) => failure?.(new DOMException('File unavailable', 'NotFoundError')),
+      file: (_success, failure) => {
+        return failure?.(new DOMException('File unavailable', 'NotFoundError'));
+      },
     };
     const marketing = createDirectoryEntry('Marketing', '/Marketing', [[unreadableFile], []]);
 

@@ -41,34 +41,38 @@ export function validateGetAllTagsResponse(raw: unknown): Result<string[], Error
   const validationResult = getAllTagsResponseSchema.safeParse(raw);
 
   if (validationResult.success) {
-    const tags = validationResult.data.Values.filter(tagName => tagName.trim() !== '');
+    const tags = validationResult.data.Values.filter(tagName => {
+      return tagName.trim() !== '';
+    });
     return Result.ok(sortTagsAlphabetically(tags));
   }
 
   return Result.err(validationResult.error);
 }
 
-export const useAllCellsTagsStore = create<AllCellsTagsState>(set => ({
-  tags: [],
-  isLoading: false,
-  error: null,
-  hasFetched: false,
-  fetch: async cellsRepository => {
-    set({isLoading: true, error: null});
-    try {
-      const raw = await cellsRepository.getAllTags();
-      const validated = validateGetAllTagsResponse(raw);
+export const useAllCellsTagsStore = create<AllCellsTagsState>(set => {
+  return {
+    tags: [],
+    isLoading: false,
+    error: null,
+    hasFetched: false,
+    fetch: async cellsRepository => {
+      set({isLoading: true, error: null});
+      try {
+        const raw = await cellsRepository.getAllTags();
+        const validated = validateGetAllTagsResponse(raw);
 
-      if (result.isErr(validated)) {
-        set({error: validated.error, hasFetched: false});
-        return;
+        if (result.isErr(validated)) {
+          set({error: validated.error, hasFetched: false});
+          return;
+        }
+
+        set({tags: validated.value, hasFetched: true});
+      } catch (error: unknown) {
+        set({error: error instanceof Error ? error : new Error('Failed to load tags'), hasFetched: false});
+      } finally {
+        set({isLoading: false});
       }
-
-      set({tags: validated.value, hasFetched: true});
-    } catch (error: unknown) {
-      set({error: error instanceof Error ? error : new Error('Failed to load tags'), hasFetched: false});
-    } finally {
-      set({isLoading: false});
-    }
-  },
-}));
+    },
+  };
+});

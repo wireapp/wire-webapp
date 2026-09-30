@@ -47,7 +47,9 @@ export const showLegalHoldWarningModal = (
 
     if (conversationDegraded) {
       secondaryAction.push({
-        action: () => amplify.publish(OPEN_CONVERSATION_DETAILS),
+        action: () => {
+          return amplify.publish(OPEN_CONVERSATION_DETAILS);
+        },
         text: translate('legalHoldWarningSecondaryVerify'),
       });
     }

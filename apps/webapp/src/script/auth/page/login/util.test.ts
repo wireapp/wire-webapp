@@ -156,7 +156,9 @@ describe('Login util', () => {
         clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
       });
       jest.spyOn(ROOT_ACTIONS.authAction, 'pushAccountRegistrationData').mockImplementation(() => {
-        return () => Promise.resolve();
+        return () => {
+          return Promise.resolve();
+        };
       });
     });
 

@@ -197,11 +197,13 @@ export class APIClient extends EventEmitter {
     super();
     this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
-    this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) =>
-      this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken),
-    );
+    this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) => {
+      return this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken);
+    });
     // Store the listener reference so we can remove it on disconnect
-    this.cookieRefreshListener = (cookie?: Cookie) => this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie);
+    this.cookieRefreshListener = (cookie?: Cookie) => {
+      return this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie);
+    };
     CookieStore.emitter.on(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
 
     this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
@@ -342,8 +344,12 @@ export class APIClient extends EventEmitter {
    * @returns The highest version in the allowed range, or undefined if none are compatible
    */
   private findHighestCompatibleVersion(versions: number[], min: number, max: number): number | undefined {
-    const inRangeVersions = versions.filter(version => version >= min && version <= max);
-    const [highestVersion] = inRangeVersions.toSorted((a, b) => b - a);
+    const inRangeVersions = versions.filter(version => {
+      return version >= min && version <= max;
+    });
+    const [highestVersion] = inRangeVersions.toSorted((a, b) => {
+      return b - a;
+    });
     return highestVersion;
   }
 

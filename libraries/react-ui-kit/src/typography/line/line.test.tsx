@@ -23,7 +23,13 @@ import {COLOR, THEME_ID} from '../../identity';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"Line"', () => {
-  it('renders', () => matchComponent(<Line />));
-  it('renders (dark theme)', () => matchComponent(<Line />, THEME_ID.DARK));
-  it('renders with color', () => matchComponent(<Line color={COLOR.RED} />));
+  it('renders', () => {
+    return matchComponent(<Line />);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<Line />, THEME_ID.DARK);
+  });
+  it('renders with color', () => {
+    return matchComponent(<Line color={COLOR.RED} />);
+  });
 });

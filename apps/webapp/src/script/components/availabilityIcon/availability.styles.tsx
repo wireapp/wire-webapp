@@ -30,12 +30,14 @@ const availabilityStateColors: Partial<Record<AvailabilityProp.Type, string>> = 
   [AvailabilityProp.Type.BUSY]: 'var(--amber-500)',
 };
 
-const getSquareIconSize = (): Partial<Record<AVATAR_SIZE, number>> => ({
-  [AVATAR_SIZE.X_SMALL]: 6,
-  [AVATAR_SIZE.SMALL]: 7,
-  [AVATAR_SIZE.MEDIUM]: 10,
-  [AVATAR_SIZE.LARGE]: 12,
-});
+const getSquareIconSize = (): Partial<Record<AVATAR_SIZE, number>> => {
+  return {
+    [AVATAR_SIZE.X_SMALL]: 6,
+    [AVATAR_SIZE.SMALL]: 7,
+    [AVATAR_SIZE.MEDIUM]: 10,
+    [AVATAR_SIZE.LARGE]: 12,
+  };
+};
 
 export const iconStyles = (availabilityState: AvailabilityProp.Type, avatarSize: AVATAR_SIZE): CSSObject => {
   const squareIconSize = getSquareIconSize();

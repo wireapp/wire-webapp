@@ -116,7 +116,11 @@ export class SelfAPI {
     traceStates.push({position: 'SelfAPI.getSelf', vendor: 'api-client'});
     const config: AxiosRequestConfig = {
       headers: {
-        tracestate: traceStates.map(state => `${state.vendor}=${state.position}`).join(','),
+        tracestate: traceStates
+          .map(state => {
+            return `${state.vendor}=${state.position}`;
+          })
+          .join(','),
       },
       method: 'get',
       url: SelfAPI.URL.SELF,

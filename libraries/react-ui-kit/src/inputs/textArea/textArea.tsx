@@ -78,14 +78,20 @@ export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => CSSObj
 };
 
 export const TEXTAREA_CLASSNAME = 'textarea';
-const filterTextAreaProps = (props: TextAreaProps) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+const filterTextAreaProps = (props: TextAreaProps) => {
+  return filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+};
 
-export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps<HTMLTextAreaElement>>((props, ref) => (
-  <textarea
-    className={TEXTAREA_CLASSNAME}
-    css={(theme: Theme) => textAreaStyle(theme, props)}
-    ref={ref}
-    {...filterTextAreaProps(props)}
-  />
-));
+export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps<HTMLTextAreaElement>>((props, ref) => {
+  return (
+    <textarea
+      className={TEXTAREA_CLASSNAME}
+      css={(theme: Theme) => {
+        return textAreaStyle(theme, props);
+      }}
+      ref={ref}
+      {...filterTextAreaProps(props)}
+    />
+  );
+});
 TextArea.displayName = 'TextArea';

@@ -104,7 +104,9 @@ const internalizationStrings = {
 const withStore = (
   children: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => <Provider store={store}>{children}</Provider>;
+) => {
+  return <Provider store={store}>{children}</Provider>;
+};
 
 function withRouter(component: React.ReactNode): React.ReactElement {
   return <Router>{component}</Router>;
@@ -141,12 +143,16 @@ export function withThemeAndRootContext(
 const wrapComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => withRouter(withTheme(withStore(withIntl(component), store)));
+) => {
+  return withRouter(withTheme(withStore(withIntl(component), store)));
+};
 
 export const mountComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => render(wrapComponent(component, store));
+) => {
+  return render(wrapComponent(component, store));
+};
 
 export function generateUsers(nbUsers: number, domain: string) {
   const users: User[] = [];
@@ -198,10 +204,18 @@ export const createSelfParticipant = () => {
 };
 
 const mediaDevices = {
-  audioinput: ko.pureComputed(() => 'test'),
-  audiooutput: ko.pureComputed(() => 'test'),
-  screeninput: ko.pureComputed(() => 'test'),
-  videoinput: ko.pureComputed(() => 'test'),
+  audioinput: ko.pureComputed(() => {
+    return 'test';
+  }),
+  audiooutput: ko.pureComputed(() => {
+    return 'test';
+  }),
+  screeninput: ko.pureComputed(() => {
+    return 'test';
+  }),
+  videoinput: ko.pureComputed(() => {
+    return 'test';
+  }),
 };
 
 export const buildMediaDevicesHandler = () => {
@@ -219,7 +233,9 @@ export const buildCallingRepository = () => {
   const backgroundEffectsHandler = new BackgroundEffectsHandler(controller);
 
   return {
-    getBackgroundEffectsHandler: () => backgroundEffectsHandler,
+    getBackgroundEffectsHandler: () => {
+      return backgroundEffectsHandler;
+    },
     isSuperhighQualityTierAllowed: jest.fn(),
   } as unknown as CallingRepository;
 };

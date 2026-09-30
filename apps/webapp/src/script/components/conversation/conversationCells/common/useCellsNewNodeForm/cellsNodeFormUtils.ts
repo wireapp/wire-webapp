@@ -72,7 +72,9 @@ export const isClientSideNodeNameError = (
     validationCopy.invalidCharactersError,
   ]);
 
-  return Maybe.of(error).map(errorMessage => clientSideNameErrors.has(errorMessage));
+  return Maybe.of(error).map(errorMessage => {
+    return clientSideNameErrors.has(errorMessage);
+  });
 };
 
 export const getErrorStatus = (error: unknown): Maybe<number> => {

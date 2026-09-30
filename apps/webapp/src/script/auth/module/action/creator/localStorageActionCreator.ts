@@ -81,39 +81,57 @@ export interface DeleteFailedAction extends AppAction {
 }
 
 export class LocalStorageActionCreator {
-  static startLocalStorageSet = (): SetStartAction => ({
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_START,
-  });
-  static successfulLocalStorageSet = (key: string, value: string | boolean | number): SetSuccessAction => ({
-    payload: {key, value},
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS,
-  });
-  static failedLocalStorageSet = (error: Error): SetFailedAction => ({
-    error,
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED,
-  });
+  static startLocalStorageSet = (): SetStartAction => {
+    return {
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_START,
+    };
+  };
+  static successfulLocalStorageSet = (key: string, value: string | boolean | number): SetSuccessAction => {
+    return {
+      payload: {key, value},
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS,
+    };
+  };
+  static failedLocalStorageSet = (error: Error): SetFailedAction => {
+    return {
+      error,
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED,
+    };
+  };
 
-  static startLocalStorageGet = (): GetStartAction => ({
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_START,
-  });
-  static successfulLocalStorageGet = (key: string, value: string | boolean | number): GetSuccessAction => ({
-    payload: {key, value},
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS,
-  });
-  static failedLocalStorageGet = (error: Error): GetFailedAction => ({
-    error,
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED,
-  });
+  static startLocalStorageGet = (): GetStartAction => {
+    return {
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_START,
+    };
+  };
+  static successfulLocalStorageGet = (key: string, value: string | boolean | number): GetSuccessAction => {
+    return {
+      payload: {key, value},
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS,
+    };
+  };
+  static failedLocalStorageGet = (error: Error): GetFailedAction => {
+    return {
+      error,
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED,
+    };
+  };
 
-  static startLocalStorageDelete = (): DeleteStartAction => ({
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_START,
-  });
-  static successfulLocalStorageDelete = (key: string): DeleteSuccessAction => ({
-    payload: {key},
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_SUCCESS,
-  });
-  static failedLocalStorageDelete = (error: Error): DeleteFailedAction => ({
-    error,
-    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED,
-  });
+  static startLocalStorageDelete = (): DeleteStartAction => {
+    return {
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_START,
+    };
+  };
+  static successfulLocalStorageDelete = (key: string): DeleteSuccessAction => {
+    return {
+      payload: {key},
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_SUCCESS,
+    };
+  };
+  static failedLocalStorageDelete = (error: Error): DeleteFailedAction => {
+    return {
+      error,
+      type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED,
+    };
+  };
 }

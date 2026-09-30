@@ -67,7 +67,9 @@ export const ParticipantsSelection = () => {
     return teamState.teamMembers().toSorted(sortUsersByPriority);
   }, [isGuestsEnabled, isTeam, teamState, userState]);
 
-  const filteredContacts = contacts.filter(user => user.isAvailable());
+  const filteredContacts = contacts.filter(user => {
+    return user.isAvailable();
+  });
 
   if (isUndefined(selfUser)) {
     return null;

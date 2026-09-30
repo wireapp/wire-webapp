@@ -52,13 +52,25 @@ type LeaveGroupAdminModalState = {
   setIsLoading: (loading: boolean) => void;
 };
 
-export const useLeaveGroupAdminModalStore = create<LeaveGroupAdminModalState>(set => ({
-  isOpen: false,
-  params: null,
-  ...INITIAL_UI_STATE,
-  show: params => set({isOpen: true, params, ...INITIAL_UI_STATE}),
-  hide: () => set({isOpen: false, params: null, ...INITIAL_UI_STATE}),
-  setSelectedUser: user => set({selectedUser: user}),
-  setClearContent: clear => set({clearContent: clear}),
-  setIsLoading: loading => set({isLoading: loading}),
-}));
+export const useLeaveGroupAdminModalStore = create<LeaveGroupAdminModalState>(set => {
+  return {
+    isOpen: false,
+    params: null,
+    ...INITIAL_UI_STATE,
+    show: params => {
+      return set({isOpen: true, params, ...INITIAL_UI_STATE});
+    },
+    hide: () => {
+      return set({isOpen: false, params: null, ...INITIAL_UI_STATE});
+    },
+    setSelectedUser: user => {
+      return set({selectedUser: user});
+    },
+    setClearContent: clear => {
+      return set({clearContent: clear});
+    },
+    setIsLoading: loading => {
+      return set({isLoading: loading});
+    },
+  };
+});

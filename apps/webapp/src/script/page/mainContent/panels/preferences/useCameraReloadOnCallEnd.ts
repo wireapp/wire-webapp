@@ -32,7 +32,9 @@ export const useCameraReloadOnCallEnd = (callingRepository: CallingRepository) =
   const handleCallEnd = useCallback(
     (eventName: string) => {
       if (eventName === EventName.CALLING.ENDED_CALL && !callingRepository.hasActiveCall()) {
-        setShouldReloadCamera(prev => !prev);
+        setShouldReloadCamera(prev => {
+          return !prev;
+        });
       }
     },
     [callingRepository],

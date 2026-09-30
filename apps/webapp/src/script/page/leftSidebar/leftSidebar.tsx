@@ -47,7 +47,9 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
-  const listState = useAppState(state => state.listState);
+  const listState = useAppState(state => {
+    return state.listState;
+  });
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
   const {isFeatureToggleEnabled} = useApplicationContext();
   const isConversationListCollapseEnabled = isFeatureToggleEnabled(conversationListCollapseFeatureToggleName);

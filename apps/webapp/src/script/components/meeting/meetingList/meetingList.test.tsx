@@ -55,38 +55,50 @@ const createMeetingListVirtualizerForTest = (
   });
 
   return {
-    getVirtualItems: () => virtualItems,
-    getTotalSize: () => startOffset,
-    measure: () => undefined,
-    measureElement: () => undefined,
-    scrollToIndex: () => undefined,
+    getVirtualItems: () => {
+      return virtualItems;
+    },
+    getTotalSize: () => {
+      return startOffset;
+    },
+    measure: () => {
+      return undefined;
+    },
+    measureElement: () => {
+      return undefined;
+    },
+    scrollToIndex: () => {
+      return undefined;
+    },
     scrollElement: null,
   } as unknown as Virtualizer<HTMLElement, Element>;
 };
 
 const createUseMeetingListVirtualizerForTest = (): UseMeetingListVirtualizer => {
-  return ({itemCount, getEstimatedItemHeight}) =>
-    useMemo(
-      () => createMeetingListVirtualizerForTest(itemCount, getEstimatedItemHeight),
-      [itemCount, getEstimatedItemHeight],
-    );
+  return ({itemCount, getEstimatedItemHeight}) => {
+    return useMemo(() => {
+      return createMeetingListVirtualizerForTest(itemCount, getEstimatedItemHeight);
+    }, [itemCount, getEstimatedItemHeight]);
+  };
 };
 
-const createMeetingSeries = (start: string, end: string, title: string): MeetingSeries => ({
-  series_start_date: start,
-  series_end_date: end,
-  duration_ms: new Date(end).getTime() - new Date(start).getTime(),
-  recurrence: 'doesNotRepeat',
-  conversation_id: title,
-  title,
-  qualified_id: {id: `meeting-${title}`, domain: 'example.com'},
-  qualified_creator: {id: 'creator-id', domain: 'example.com'},
-  qualified_conversation: {id: 'conv-id', domain: 'example.com'},
-  tzid: 'Europe/Berlin',
-});
+const createMeetingSeries = (start: string, end: string, title: string): MeetingSeries => {
+  return {
+    series_start_date: start,
+    series_end_date: end,
+    duration_ms: new Date(end).getTime() - new Date(start).getTime(),
+    recurrence: 'doesNotRepeat',
+    conversation_id: title,
+    title,
+    qualified_id: {id: `meeting-${title}`, domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+    tzid: 'Europe/Berlin',
+  };
+};
 
-const createMainViewModelForTest = (): MainViewModel =>
-  ({
+const createMainViewModelForTest = (): MainViewModel => {
+  return {
     content: {
       repositories: {
         conversation: {},
@@ -94,23 +106,27 @@ const createMainViewModelForTest = (): MainViewModel =>
       },
     },
     calling: {},
-  }) as MainViewModel;
+  } as MainViewModel;
+};
 
-const createMeetingStoreForTest = () =>
-  createStore<MeetingStoreState>(() => ({
-    meetingSeries: [],
-    isLoading: false,
-    hasLoadError: false,
-    loadMeetings: jest.fn(),
-    scheduleMeeting: jest.fn(),
-    meetNowMeeting: jest.fn(),
-    updateMeeting: jest.fn(),
-    deleteMeetingForMe: jest.fn(),
-    deleteMeetingForAll: jest.fn(),
-    removeMeetingByQualifiedId: jest.fn(),
-    loadMeetingForEdit: jest.fn(),
-    syncMeetingByQualifiedId: jest.fn(),
-  }));
+const createMeetingStoreForTest = () => {
+  return createStore<MeetingStoreState>(() => {
+    return {
+      meetingSeries: [],
+      isLoading: false,
+      hasLoadError: false,
+      loadMeetings: jest.fn(),
+      scheduleMeeting: jest.fn(),
+      meetNowMeeting: jest.fn(),
+      updateMeeting: jest.fn(),
+      deleteMeetingForMe: jest.fn(),
+      deleteMeetingForAll: jest.fn(),
+      removeMeetingByQualifiedId: jest.fn(),
+      loadMeetingForEdit: jest.fn(),
+      syncMeetingByQualifiedId: jest.fn(),
+    };
+  });
+};
 
 const renderMeetingList = (
   props: Omit<MeetingListProps, 'useMeetingListVirtualizer' | 'selfUser' | 'onRefresh'> &
@@ -247,8 +263,9 @@ describe('MeetingList', () => {
       createMeetingSeries('2026-06-15T14:00:00.000Z', '2026-06-15T15:00:00.000Z', 'First meeting'),
       createMeetingSeries('2026-06-15T16:00:00.000Z', '2026-06-15T17:00:00.000Z', 'Second meeting'),
     ];
-    const useFirstVirtualEntryOnly: UseMeetingListVirtualizer = ({getEstimatedItemHeight}) =>
-      createMeetingListVirtualizerForTest(1, getEstimatedItemHeight);
+    const useFirstVirtualEntryOnly: UseMeetingListVirtualizer = ({getEstimatedItemHeight}) => {
+      return createMeetingListVirtualizerForTest(1, getEstimatedItemHeight);
+    };
 
     renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, clock, useFirstVirtualEntryOnly);
 
@@ -263,8 +280,9 @@ describe('MeetingList', () => {
     const meetingSeries = [
       createMeetingSeries('2026-06-15T14:00:00.000Z', '2026-06-15T15:00:00.000Z', 'Visible meeting'),
     ];
-    const useMeetingRowOnly: UseMeetingListVirtualizer = ({getEstimatedItemHeight}) =>
-      createMeetingListVirtualizerForTest(1, getEstimatedItemHeight, 1);
+    const useMeetingRowOnly: UseMeetingListVirtualizer = ({getEstimatedItemHeight}) => {
+      return createMeetingListVirtualizerForTest(1, getEstimatedItemHeight, 1);
+    };
 
     renderMeetingList({meetingSeries, isLoading: false, hasLoadError: false}, clock, useMeetingRowOnly);
 

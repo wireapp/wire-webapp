@@ -54,9 +54,9 @@ const resolveConversation = (
     return task.resolve(localConversation.value);
   }
 
-  return deps.conversationRepository
-    .safeGetConversationById(qualifiedConversationId)
-    .mapRejected(() => joinMeetingCallErrors.conversationNotFound);
+  return deps.conversationRepository.safeGetConversationById(qualifiedConversationId).mapRejected(() => {
+    return joinMeetingCallErrors.conversationNotFound;
+  });
 };
 
 /**
@@ -77,8 +77,12 @@ const ensureMlsConversationReady = (
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     })
-    .map(() => conversation)
-    .mapRejected(() => joinMeetingCallErrors.joinFailed);
+    .map(() => {
+      return conversation;
+    })
+    .mapRejected(() => {
+      return joinMeetingCallErrors.joinFailed;
+    });
 };
 
 const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Task<void, JoinMeetingCallError> => {
@@ -86,14 +90,22 @@ const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Tas
 
   if (!isUndefined(call) && call.state() === CALL_STATE.INCOMING) {
     return task.tryOrElse(
-      () => joinMeetingCallErrors.joinFailed,
-      () => deps.callingViewModel.callActions.answer(call),
+      () => {
+        return joinMeetingCallErrors.joinFailed;
+      },
+      () => {
+        return deps.callingViewModel.callActions.answer(call);
+      },
     );
   }
 
   return task.tryOrElse(
-    () => joinMeetingCallErrors.joinFailed,
-    () => deps.callingViewModel.callActions.startAudio(conversation),
+    () => {
+      return joinMeetingCallErrors.joinFailed;
+    },
+    () => {
+      return deps.callingViewModel.callActions.startAudio(conversation);
+    },
   );
 };
 
@@ -104,7 +116,12 @@ const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Tas
 export const joinMeetingCall = (
   deps: JoinMeetingCallDeps,
   qualifiedConversationId: QualifiedId,
-): Task<void, JoinMeetingCallError> =>
-  resolveConversation(deps, qualifiedConversationId)
-    .andThen(conversation => ensureMlsConversationReady(deps, conversation))
-    .andThen(conversation => performJoin(deps, conversation));
+): Task<void, JoinMeetingCallError> => {
+  return resolveConversation(deps, qualifiedConversationId)
+    .andThen(conversation => {
+      return ensureMlsConversationReady(deps, conversation);
+    })
+    .andThen(conversation => {
+      return performJoin(deps, conversation);
+    });
+};

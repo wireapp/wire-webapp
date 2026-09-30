@@ -21,7 +21,9 @@ import {useWarningsState} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';
 
 export const useWarningOffset = () => {
-  const warnings = useWarningsState(state => state.warnings);
+  const warnings = useWarningsState(state => {
+    return state.warnings;
+  });
   const visibleWarning = warnings[warnings.length - 1];
   const hasWarningOffset = warnings.length > 0 && visibleWarning !== TYPE.CONNECTIVITY_RECOVERY;
   const isMiniWarning = CONFIG.MINI_MODES.includes(visibleWarning);

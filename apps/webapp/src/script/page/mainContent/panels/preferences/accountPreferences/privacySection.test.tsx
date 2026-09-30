@@ -46,14 +46,26 @@ const createMockAppLockState = (overrides?: Partial<AppLockState>): AppLockState
   const isAppLockActivatedValue = ko.observable(overrides?.isAppLockActivated?.() ?? false);
 
   return {
-    isAppLockEnabled: ko.pureComputed(() => isAppLockEnabledValue()),
-    isAppLockAvailable: ko.pureComputed(() => isAppLockAvailableValue()),
-    isAppLockEnforced: ko.pureComputed(() => isAppLockEnforcedValue()),
-    appLockInactivityTimeoutSecs: ko.pureComputed(() => appLockInactivityTimeoutSecsValue()),
-    isAppLockActivated: ko.pureComputed(() => isAppLockActivatedValue()),
+    isAppLockEnabled: ko.pureComputed(() => {
+      return isAppLockEnabledValue();
+    }),
+    isAppLockAvailable: ko.pureComputed(() => {
+      return isAppLockAvailableValue();
+    }),
+    isAppLockEnforced: ko.pureComputed(() => {
+      return isAppLockEnforcedValue();
+    }),
+    appLockInactivityTimeoutSecs: ko.pureComputed(() => {
+      return appLockInactivityTimeoutSecsValue();
+    }),
+    isAppLockActivated: ko.pureComputed(() => {
+      return isAppLockActivatedValue();
+    }),
     hasPassphrase,
     isActivatedInPreferences,
-    isAppLockDisabledOnTeam: ko.pureComputed(() => isAppLockDisabledOnTeamValue()),
+    isAppLockDisabledOnTeam: ko.pureComputed(() => {
+      return isAppLockDisabledOnTeamValue();
+    }),
   };
 };
 
@@ -96,7 +108,9 @@ describe('PrivacySection', () => {
   describe('app lock checkbox', () => {
     it('should render the app lock checkbox when available', () => {
       const appLockState = createMockAppLockState({
-        isAppLockAvailable: ko.pureComputed(() => true),
+        isAppLockAvailable: ko.pureComputed(() => {
+          return true;
+        }),
       });
       const propertiesRepository = createMockPropertiesRepository();
       const appLockRepository = createMockAppLockRepository();
@@ -117,7 +131,9 @@ describe('PrivacySection', () => {
 
     it('should not render the app lock checkbox when not available', () => {
       const appLockState = createMockAppLockState({
-        isAppLockAvailable: ko.pureComputed(() => false),
+        isAppLockAvailable: ko.pureComputed(() => {
+          return false;
+        }),
       });
       const propertiesRepository = createMockPropertiesRepository();
       const appLockRepository = createMockAppLockRepository();
@@ -157,8 +173,12 @@ describe('PrivacySection', () => {
 
         it('should disable the app lock checkbox', () => {
           const appLockState = createMockAppLockState({
-            isAppLockAvailable: ko.pureComputed(() => true),
-            isAppLockEnabled: ko.pureComputed(() => true),
+            isAppLockAvailable: ko.pureComputed(() => {
+              return true;
+            }),
+            isAppLockEnabled: ko.pureComputed(() => {
+              return true;
+            }),
           });
           const propertiesRepository = createMockPropertiesRepository();
           const appLockRepository = createMockAppLockRepository();
@@ -180,8 +200,12 @@ describe('PrivacySection', () => {
 
         it('should uncheck the app lock checkbox when MDM override is active', () => {
           const appLockState = createMockAppLockState({
-            isAppLockAvailable: ko.pureComputed(() => true),
-            isAppLockEnabled: ko.pureComputed(() => false),
+            isAppLockAvailable: ko.pureComputed(() => {
+              return true;
+            }),
+            isAppLockEnabled: ko.pureComputed(() => {
+              return false;
+            }),
           });
           const propertiesRepository = createMockPropertiesRepository();
           const appLockRepository = createMockAppLockRepository();
@@ -214,8 +238,12 @@ describe('PrivacySection', () => {
 
         it('should not disable the app lock checkbox', () => {
           const appLockState = createMockAppLockState({
-            isAppLockAvailable: ko.pureComputed(() => true),
-            isAppLockEnabled: ko.pureComputed(() => false),
+            isAppLockAvailable: ko.pureComputed(() => {
+              return true;
+            }),
+            isAppLockEnabled: ko.pureComputed(() => {
+              return false;
+            }),
           });
           const propertiesRepository = createMockPropertiesRepository();
           const appLockRepository = createMockAppLockRepository();
@@ -245,8 +273,12 @@ describe('PrivacySection', () => {
 
         it('should not disable the app lock checkbox', () => {
           const appLockState = createMockAppLockState({
-            isAppLockAvailable: ko.pureComputed(() => true),
-            isAppLockEnabled: ko.pureComputed(() => false),
+            isAppLockAvailable: ko.pureComputed(() => {
+              return true;
+            }),
+            isAppLockEnabled: ko.pureComputed(() => {
+              return false;
+            }),
           });
           const propertiesRepository = createMockPropertiesRepository();
           const appLockRepository = createMockAppLockRepository();
@@ -274,8 +306,12 @@ describe('PrivacySection', () => {
 
         it('should not disable the app lock checkbox', () => {
           const appLockState = createMockAppLockState({
-            isAppLockAvailable: ko.pureComputed(() => true),
-            isAppLockEnabled: ko.pureComputed(() => false),
+            isAppLockAvailable: ko.pureComputed(() => {
+              return true;
+            }),
+            isAppLockEnabled: ko.pureComputed(() => {
+              return false;
+            }),
           });
           const propertiesRepository = createMockPropertiesRepository();
           const appLockRepository = createMockAppLockRepository();
@@ -315,8 +351,12 @@ describe('PrivacySection', () => {
         });
 
         const appLockState = createMockAppLockState({
-          isAppLockAvailable: ko.pureComputed(() => true),
-          isAppLockEnabled: ko.pureComputed(() => true),
+          isAppLockAvailable: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnabled: ko.pureComputed(() => {
+            return true;
+          }),
         });
         const propertiesRepository = createMockPropertiesRepository();
         const appLockRepository = createMockAppLockRepository();
@@ -340,9 +380,15 @@ describe('PrivacySection', () => {
     describe('when app lock is enforced by team', () => {
       it('should disable the app lock checkbox', () => {
         const appLockState = createMockAppLockState({
-          isAppLockAvailable: ko.pureComputed(() => true),
-          isAppLockEnforced: ko.pureComputed(() => true),
-          isAppLockEnabled: ko.pureComputed(() => true),
+          isAppLockAvailable: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnforced: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnabled: ko.pureComputed(() => {
+            return true;
+          }),
         });
         const propertiesRepository = createMockPropertiesRepository();
         const appLockRepository = createMockAppLockRepository();
@@ -376,9 +422,15 @@ describe('PrivacySection', () => {
         });
 
         const appLockState = createMockAppLockState({
-          isAppLockAvailable: ko.pureComputed(() => true),
-          isAppLockEnforced: ko.pureComputed(() => true),
-          isAppLockEnabled: ko.pureComputed(() => true),
+          isAppLockAvailable: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnforced: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnabled: ko.pureComputed(() => {
+            return true;
+          }),
         });
         const propertiesRepository = createMockPropertiesRepository();
         const appLockRepository = createMockAppLockRepository();
@@ -414,8 +466,12 @@ describe('PrivacySection', () => {
         });
 
         const appLockState = createMockAppLockState({
-          isAppLockAvailable: ko.pureComputed(() => true),
-          isAppLockEnabled: ko.pureComputed(() => true),
+          isAppLockAvailable: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnabled: ko.pureComputed(() => {
+            return true;
+          }),
         });
         const propertiesRepository = createMockPropertiesRepository();
         const appLockRepository = createMockAppLockRepository();
@@ -449,8 +505,12 @@ describe('PrivacySection', () => {
         });
 
         const appLockState = createMockAppLockState({
-          isAppLockAvailable: ko.pureComputed(() => true),
-          isAppLockEnabled: ko.pureComputed(() => true),
+          isAppLockAvailable: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnabled: ko.pureComputed(() => {
+            return true;
+          }),
         });
         const propertiesRepository = createMockPropertiesRepository();
         const appLockRepository = createMockAppLockRepository();
@@ -484,8 +544,12 @@ describe('PrivacySection', () => {
         });
 
         const appLockState = createMockAppLockState({
-          isAppLockAvailable: ko.pureComputed(() => true),
-          isAppLockEnabled: ko.pureComputed(() => true),
+          isAppLockAvailable: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnabled: ko.pureComputed(() => {
+            return true;
+          }),
         });
         const propertiesRepository = createMockPropertiesRepository();
         const appLockRepository = createMockAppLockRepository();
@@ -519,8 +583,12 @@ describe('PrivacySection', () => {
         });
 
         const appLockState = createMockAppLockState({
-          isAppLockAvailable: ko.pureComputed(() => true),
-          isAppLockEnabled: ko.pureComputed(() => true),
+          isAppLockAvailable: ko.pureComputed(() => {
+            return true;
+          }),
+          isAppLockEnabled: ko.pureComputed(() => {
+            return true;
+          }),
         });
         const propertiesRepository = createMockPropertiesRepository();
         const appLockRepository = createMockAppLockRepository();

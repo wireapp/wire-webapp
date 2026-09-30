@@ -145,13 +145,17 @@ function ConversationContent({
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
-    const createSource = (file: File) => ({blob: file, name: file.name, contentType: file.type, size: file.size});
+    const createSource = (file: File) => {
+      return {blob: file, name: file.name, contentType: file.type, size: file.size};
+    };
     const uploadManager = createCellsUploadManager({
       gateway: createCellsRepositoryGateway(repositories.cells),
       createResourceUuid: createUuid,
       createVersionUuid: createUuid,
       createAttemptId: createUuid,
-      createAbortController: () => new AbortController(),
+      createAbortController: () => {
+        return new AbortController();
+      },
     });
 
     return createSharedDriveUploadController({
@@ -316,7 +320,9 @@ function ConversationContent({
     setIsGiphyModalOpen(true);
   };
 
-  const closeGiphy = () => setIsGiphyModalOpen(false);
+  const closeGiphy = () => {
+    return setIsGiphyModalOpen(false);
+  };
 
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
     openRightSidebar(PanelState.GUEST_OPTIONS, {entity: conversation});
@@ -450,7 +456,9 @@ function ConversationContent({
       PrimaryModal.type.CONFIRM,
       {
         primaryAction: {
-          action: () => safeWindowOpen(href),
+          action: () => {
+            return safeWindowOpen(href);
+          },
           text: translate('modalOpenLinkAction'),
         },
         text: {
@@ -626,20 +634,36 @@ function ConversationContent({
       }
 
       if (isLastReceivedMessage(messageEntity, conversationEntity)) {
-        callbacks.push(() => updateConversationLastRead(conversationEntity, messageEntity));
+        callbacks.push(() => {
+          return updateConversationLastRead(conversationEntity, messageEntity);
+        });
       }
 
       if (isUnreadMessage && isNotOwnMessage) {
         callbacks.push(updateLastRead);
         if (shouldSendReadReceipt) {
-          callbacks.push(() => addReadReceiptToBatch(conversationEntity, messageEntity));
+          callbacks.push(() => {
+            return addReadReceiptToBatch(conversationEntity, messageEntity);
+          });
         }
       }
 
       return () => {
-        const trigger = () => callbacks.forEach(callback => callback());
+        const trigger = () => {
+          return callbacks.forEach(callback => {
+            return callback();
+          });
+        };
 
-        return document.hasFocus() ? trigger() : window.addEventListener('focus', () => trigger(), {once: true});
+        return document.hasFocus()
+          ? trigger()
+          : window.addEventListener(
+              'focus',
+              () => {
+                return trigger();
+              },
+              {once: true},
+            );
       };
     },
     [
@@ -719,7 +743,9 @@ function ConversationContent({
               isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
               withBottomDivider={!isCellsEnabled || isSharedDriveSearchViewOpen}
               isSharedDriveSearchViewOpen={isSharedDriveSearchViewOpen}
-              onCloseSharedDriveSearchView={() => setIsSharedDriveSearchViewOpen(false)}
+              onCloseSharedDriveSearchView={() => {
+                return setIsSharedDriveSearchViewOpen(false);
+              }}
             />
 
             {isCellsEnabled && (
@@ -756,8 +782,12 @@ function ConversationContent({
                         cellsRepository={repositories.cells}
                         conversationRepository={conversationRepository}
                         isSearchViewOpen={isSharedDriveSearchViewOpen}
-                        onOpenSearchView={() => setIsSharedDriveSearchViewOpen(true)}
-                        onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
+                        onOpenSearchView={() => {
+                          return setIsSharedDriveSearchViewOpen(true);
+                        }}
+                        onCloseSearchView={() => {
+                          return setIsSharedDriveSearchViewOpen(false);
+                        }}
                         isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
                         showViewerPermission={showViewerPermission}
                       />
@@ -807,7 +837,9 @@ function ConversationContent({
                 resetSession={onSessionResetClick}
                 onClickMessage={handleClickOnMessage}
                 isConversationLoaded={isConversationLoaded}
-                onLoading={loading => setIsConversationLoaded(!loading)}
+                onLoading={loading => {
+                  return setIsConversationLoaded(!loading);
+                }}
                 getVisibleCallback={getInViewportCallback}
                 isMsgElementsFocusable={isMsgElementsFocusable}
                 setMsgElementsFocusable={setMsgElementsFocusable}
@@ -836,7 +868,9 @@ function ConversationContent({
                     teamState={teamState}
                     selfUser={selfUser}
                     isCellsEnabled={isCellsEnabled}
-                    onShiftTab={() => setMsgElementsFocusable(false)}
+                    onShiftTab={() => {
+                      return setMsgElementsFocusable(false);
+                    }}
                     uploadDroppedFiles={uploadDroppedFiles}
                     uploadImages={uploadImages}
                     uploadFiles={uploadFiles}

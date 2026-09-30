@@ -33,8 +33,12 @@ export const useMeetNowSubmit = (conversationState: ConversationState) => {
   const {translate} = useApplicationContext();
   const {content, calling: callingViewModel} = useMainViewModel();
   const {conversation: conversationRepository, calling: callingRepository} = content.repositories;
-  const meetNowMeeting = useMeetingStore(state => state.meetNowMeeting);
-  const loadMeetings = useMeetingStore(state => state.loadMeetings);
+  const meetNowMeeting = useMeetingStore(state => {
+    return state.meetNowMeeting;
+  });
+  const loadMeetings = useMeetingStore(state => {
+    return state.loadMeetings;
+  });
 
   const callNotEstablishedCopy = {
     description: translate('callNotEstablishedDescription'),

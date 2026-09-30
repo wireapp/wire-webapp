@@ -78,57 +78,72 @@ export class ConversationState {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.sortedConversations = ko.pureComputed(() =>
-      this.filteredConversations()
-        .filter(conversation => !isMeetingConversation(conversation))
-        .toSorted(sortGroupsByLastEvent),
-    );
-    this.selfProteusConversation = ko.pureComputed(() =>
-      this.conversations().find(conversation => !isMLSConversation(conversation) && isSelfConversation(conversation)),
-    );
-    this.selfMLSConversation = ko.pureComputed(() =>
-      this.conversations().find(
-        (conversation): conversation is MLSConversation =>
-          isMLSConversation(conversation) && isSelfConversation(conversation),
-      ),
-    );
+    this.sortedConversations = ko.pureComputed(() => {
+      return this.filteredConversations()
+        .filter(conversation => {
+          return !isMeetingConversation(conversation);
+        })
+        .toSorted(sortGroupsByLastEvent);
+    });
+    this.selfProteusConversation = ko.pureComputed(() => {
+      return this.conversations().find(conversation => {
+        return !isMLSConversation(conversation) && isSelfConversation(conversation);
+      });
+    });
+    this.selfMLSConversation = ko.pureComputed(() => {
+      return this.conversations().find((conversation): conversation is MLSConversation => {
+        return isMLSConversation(conversation) && isSelfConversation(conversation);
+      });
+    });
 
     this.visibleConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(
-        conversation =>
+      return this.sortedConversations().filter(conversation => {
+        return (
           !conversation.is_archived() &&
           // We filter out 1 on 1 conversation with unavailable users that don't have messages
           (!conversation.is1to1() ||
             conversation.hasContentMessages() ||
-            conversation.firstUserEntity()?.isAvailable() === true),
-      );
+            conversation.firstUserEntity()?.isAvailable() === true)
+        );
+      });
     });
     this.unreadConversations = ko.pureComputed(() => {
-      return this.visibleConversations().filter(conversationEntity => conversationEntity.hasUnread());
+      return this.visibleConversations().filter(conversationEntity => {
+        return conversationEntity.hasUnread();
+      });
     });
 
     this.archivedConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(conversation => conversation.is_archived());
+      return this.sortedConversations().filter(conversation => {
+        return conversation.is_archived();
+      });
     });
 
     this.groupConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(conversation => conversation.isGroup());
+      return this.sortedConversations().filter(conversation => {
+        return conversation.isGroup();
+      });
     });
 
     this.channelConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(conversation => conversation.isChannel());
+      return this.sortedConversations().filter(conversation => {
+        return conversation.isChannel();
+      });
     });
 
     this.channelAndGroupConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(conversation => conversation.isGroupOrChannel());
+      return this.sortedConversations().filter(conversation => {
+        return conversation.isGroupOrChannel();
+      });
     });
 
     this.directConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(
-        conversation =>
+      return this.sortedConversations().filter(conversation => {
+        return (
           conversation.is1to1() &&
-          (conversation.firstUserEntity()?.isAvailable() === true || conversation.hasContentMessages()),
-      );
+          (conversation.firstUserEntity()?.isAvailable() === true || conversation.hasContentMessages())
+        );
+      });
     });
 
     this.filteredConversations = ko.pureComputed(() => {
@@ -139,7 +154,12 @@ export class ConversationState {
       const selfUser = this.userState.self();
       const selfUserId = selfUser?.id;
       const inviterId = selfUserId !== undefined ? this.teamState.memberInviters()[selfUserId] : undefined;
-      const inviter = inviterId !== undefined ? this.userState.users().find(({id}) => id === inviterId) : undefined;
+      const inviter =
+        inviterId !== undefined
+          ? this.userState.users().find(({id}) => {
+              return id === inviterId;
+            })
+          : undefined;
       const connectedUsers = inviter !== undefined ? [inviter] : [];
       const selfTeamId = selfUser?.teamId;
       for (const conversation of this.conversations()) {
@@ -191,7 +211,9 @@ export class ConversationState {
   isVisible(conversation?: Conversation): conversation is Conversation {
     return (
       !isNullOrUndefined(conversation) &&
-      this.visibleConversations().some(conv => matchQualifiedIds(conv.qualifiedId, conversation.qualifiedId))
+      this.visibleConversations().some(conv => {
+        return matchQualifiedIds(conv.qualifiedId, conversation.qualifiedId);
+      })
     );
   }
 
@@ -233,7 +255,9 @@ export class ConversationState {
    * @param user the user to check
    */
   hasConversationWith(user: User) {
-    return this.connectedUsers().some(connectedUser => matchQualifiedIds(connectedUser.qualifiedId, user.qualifiedId));
+    return this.connectedUsers().some(connectedUser => {
+      return matchQualifiedIds(connectedUser.qualifiedId, user.qualifiedId);
+    });
   }
 
   /**
@@ -269,14 +293,22 @@ export class ConversationState {
 
   isSelfConversation(conversationId: QualifiedId): boolean {
     const selfConversationIds: QualifiedId[] = [this.selfProteusConversation(), this.selfMLSConversation()]
-      .filter((conversation): conversation is Conversation => !isNullOrUndefined(conversation))
-      .map(conversation => conversation.qualifiedId);
+      .filter((conversation): conversation is Conversation => {
+        return !isNullOrUndefined(conversation);
+      })
+      .map(conversation => {
+        return conversation.qualifiedId;
+      });
 
-    return selfConversationIds.some(selfConversation => matchQualifiedIds(selfConversation, conversationId));
+    return selfConversationIds.some(selfConversation => {
+      return matchQualifiedIds(selfConversation, conversationId);
+    });
   }
 
   findConversationByGroupId(groupId: string): Conversation | undefined {
-    return this.conversations().find(conversation => conversation.groupId === groupId);
+    return this.conversations().find(conversation => {
+      return conversation.groupId === groupId;
+    });
   }
 
   /**

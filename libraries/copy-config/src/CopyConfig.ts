@@ -84,7 +84,9 @@ export class CopyConfig {
 
     files
       .split(';')
-      .map(fileTuple => String.raw`${fileTuple}`.split(/:(?!\\)/))
+      .map(fileTuple => {
+        return String.raw`${fileTuple}`.split(/:(?!\\)/);
+      })
       .forEach(([source, dest]) => {
         if (source === undefined || source === '' || dest === undefined) {
           return;
@@ -113,7 +115,11 @@ export class CopyConfig {
 
       const joinedSource = path.join(this.options.baseDir, source);
       const resolvedDestination =
-        destination instanceof Array ? destination.map(dest => path.resolve(dest)) : path.resolve(destination);
+        destination instanceof Array
+          ? destination.map(dest => {
+              return path.resolve(dest);
+            })
+          : path.resolve(destination);
 
       delete this.options.files[source];
 
@@ -131,7 +137,9 @@ export class CopyConfig {
       return true;
     };
 
-    const isGlob = (path: string) => /\*$/.test(path);
+    const isGlob = (path: string) => {
+      return /\*$/.test(path);
+    };
 
     if (utils.isFile(destination) && !utils.isFile(source)) {
       throw new Error('Cannot copy a directory into a file.');
@@ -147,7 +155,9 @@ export class CopyConfig {
         this.logger?.debug(`Copying "${copiedFrom}" -> "${copiedTo}"`);
       }
 
-      return copiedFiles.map(file => file.path);
+      return copiedFiles.map(file => {
+        return file.path;
+      });
     }
 
     if (utils.isFile(source) && !utils.isFile(destination)) {
@@ -218,8 +228,14 @@ export class CopyConfig {
         continue;
       }
       if (destination instanceof Array) {
-        const results = await Promise.all(destination.map(dest => this.copyDirOrFile(file, dest)));
-        results.forEach(result => (copiedFiles = copiedFiles.concat(result)));
+        const results = await Promise.all(
+          destination.map(dest => {
+            return this.copyDirOrFile(file, dest);
+          }),
+        );
+        results.forEach(result => {
+          return (copiedFiles = copiedFiles.concat(result));
+        });
       } else if (typeof destination === 'string') {
         const result = await this.copyDirOrFile(file, destination);
         copiedFiles = copiedFiles.concat(result);

@@ -127,8 +127,12 @@ describe('MessageReactionsList', () => {
     expect(loadUsersByIdsFromDb).not.toHaveBeenCalled();
     fireEvent.focus(getByTitle('heart'));
 
-    await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([departedUser.qualifiedId]));
-    await waitFor(() => expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member'));
+    await waitFor(() => {
+      return expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([departedUser.qualifiedId]);
+    });
+    await waitFor(() => {
+      return expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member');
+    });
   });
 
   it('loads only the first two missing reactor names in stored reaction order', async () => {
@@ -166,12 +170,12 @@ describe('MessageReactionsList', () => {
 
     fireEvent.mouseEnter(getByTitle('heart'));
 
-    await waitFor(() =>
-      expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([
+    await waitFor(() => {
+      return expect(loadUsersByIdsFromDb).toHaveBeenCalledWith([
         secondDepartedUser.qualifiedId,
         firstDepartedUser.qualifiedId,
-      ]),
-    );
+      ]);
+    });
     await waitFor(() => {
       expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Second Former Member, First Former Member');
     });
@@ -198,7 +202,9 @@ describe('MessageReactionsList', () => {
     fireEvent.focus(getByTitle('heart'));
     fireEvent.mouseEnter(getByTitle('heart'));
 
-    await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('allows a later tooltip interaction to retry a failed local lookup', async () => {
@@ -232,7 +238,9 @@ describe('MessageReactionsList', () => {
     );
 
     fireEvent.focus(getByTitle('heart'));
-    await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(1);
+    });
 
     const rejectLookup = rejectFirstLookup;
     if (typeof rejectLookup !== 'function') {
@@ -250,8 +258,12 @@ describe('MessageReactionsList', () => {
 
     fireEvent.mouseEnter(getByTitle('heart'));
 
-    await waitFor(() => expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(2));
-    await waitFor(() => expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member'));
+    await waitFor(() => {
+      return expect(loadUsersByIdsFromDb).toHaveBeenCalledTimes(2);
+    });
+    await waitFor(() => {
+      return expect(within(document.body).getByRole('tooltip')).toHaveTextContent('Former Member');
+    });
   });
 
   it('handles click on reaction button', () => {

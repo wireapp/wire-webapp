@@ -45,9 +45,9 @@ export const finaliseMigrationOfMixedConversations = async (
   );
 
   for (const mixedConversation of mixedConversatons) {
-    await checkFinalisationCriteria(mixedConversation, getTeamMLSMigrationStatus, () =>
-      finaliseMigrationOfMixedConversation(mixedConversation, updateConversationProtocol),
-    );
+    await checkFinalisationCriteria(mixedConversation, getTeamMLSMigrationStatus, () => {
+      return finaliseMigrationOfMixedConversation(mixedConversation, updateConversationProtocol);
+    });
   }
 };
 
@@ -66,9 +66,9 @@ const checkFinalisationCriteria = async (
 };
 
 const doAllConversationParticipantsSupportMLS = (mixedConversation: MixedConversation): boolean => {
-  return mixedConversation
-    .participating_user_ets()
-    .every(user => user.supportedProtocols()?.includes(CONVERSATION_PROTOCOL.MLS));
+  return mixedConversation.participating_user_ets().every(user => {
+    return user.supportedProtocols()?.includes(CONVERSATION_PROTOCOL.MLS);
+  });
 };
 
 const finaliseMigrationOfMixedConversation = async (

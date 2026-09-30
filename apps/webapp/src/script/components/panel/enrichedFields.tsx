@@ -128,25 +128,27 @@ const EnrichedFields = ({
       )}
 
       {fields?.length >= 1 &&
-        fields.map(({type, value}) => (
-          <div key={type} className="enriched-fields__entry">
-            <p
-              id={`${enrichedFieldsId}-${type}`}
-              className="enriched-fields__entry__key"
-              data-uie-name="item-enriched-key"
-            >
-              {type}
-            </p>
-            <p
-              aria-labelledby={`${enrichedFieldsId}-${type}`}
-              className="enriched-fields__entry__value"
-              data-uie-name="item-enriched-value"
-              data-uie-value={value}
-            >
-              {value}
-            </p>
-          </div>
-        ))}
+        fields.map(({type, value}) => {
+          return (
+            <div key={type} className="enriched-fields__entry">
+              <p
+                id={`${enrichedFieldsId}-${type}`}
+                className="enriched-fields__entry__key"
+                data-uie-name="item-enriched-key"
+              >
+                {type}
+              </p>
+              <p
+                aria-labelledby={`${enrichedFieldsId}-${type}`}
+                className="enriched-fields__entry__value"
+                data-uie-name="item-enriched-value"
+                data-uie-value={value}
+              >
+                {value}
+              </p>
+            </div>
+          );
+        })}
     </div>
   );
 };

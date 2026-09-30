@@ -62,21 +62,31 @@ export const getGroupParticipantsConversations = ({
     isFolderView && !isNullOrUndefined(currentFolder?.conversations()) ? new Set(currentFolder.conversations()) : null;
 
   if (isFavoritesView) {
-    filteredGroup = filteredGroup.filter(item => favoriteSet.has(item));
+    filteredGroup = filteredGroup.filter(item => {
+      return favoriteSet.has(item);
+    });
   }
 
   if (isArchivesView) {
-    filteredGroup = filteredGroup.filter(item => archivedSet.has(item));
+    filteredGroup = filteredGroup.filter(item => {
+      return archivedSet.has(item);
+    });
   }
 
   if (isFolderView && !isNullOrUndefined(currentFolderConversations)) {
-    filteredGroup = filteredGroup.filter(item => currentFolderConversations.has(item));
+    filteredGroup = filteredGroup.filter(item => {
+      return currentFolderConversations.has(item);
+    });
   }
 
   if (!isArchivesView) {
-    filteredGroup = filteredGroup.filter(item => !archivedSet.has(item));
+    filteredGroup = filteredGroup.filter(item => {
+      return !archivedSet.has(item);
+    });
   }
 
   // Exclude existing conversations
-  return filteredGroup.filter(item => !conversationsSet.has(item));
+  return filteredGroup.filter(item => {
+    return !conversationsSet.has(item);
+  });
 };

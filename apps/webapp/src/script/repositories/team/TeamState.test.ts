@@ -59,7 +59,11 @@ describe('TeamState', () => {
 
       const teamMembers = teamState.teamMembers();
 
-      expect(teamMembers.map(user => user.id)).toEqual([regularMember.id]);
+      expect(
+        teamMembers.map(user => {
+          return user.id;
+        }),
+      ).toEqual([regularMember.id]);
     });
   });
 

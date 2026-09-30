@@ -27,7 +27,9 @@ jest.useFakeTimers();
 describe('FadingScrollbar', () => {
   let step: () => void = noop;
   beforeEach(() => {
-    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: any) => (step = cb));
+    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: any) => {
+      return (step = cb);
+    });
   });
 
   afterEach(() => {

@@ -28,44 +28,60 @@ type TaskExecutor<T> = () => PromiseLike<T>;
 const execute = <T, TOperation extends CellsUploadGatewayError['operation']>(
   operation: TOperation,
   executor: TaskExecutor<T>,
-): Task<T, CellsUploadGatewayError<TOperation>> =>
-  task.tryOrElse(
-    reason => ({kind: 'gatewayError', operation, cause: reason}),
-    () => Promise.resolve().then(executor),
+): Task<T, CellsUploadGatewayError<TOperation>> => {
+  return task.tryOrElse(
+    reason => {
+      return {kind: 'gatewayError', operation, cause: reason};
+    },
+    () => {
+      return Promise.resolve().then(executor);
+    },
   );
+};
 
 /** Adapts the app-side Cells repository to the lifecycle manager contract. */
-export const createCellsRepositoryGateway = (cellsRepository: CellsRepositoryUploadGateway): CellsUploadGateway => ({
-  uploadDraft: request =>
-    execute('upload', () =>
-      cellsRepository
-        .uploadNodeDraft({
-          uuid: request.identity.resourceUuid,
-          file:
-            request.source.blob instanceof File
-              ? request.source.blob
-              : new File([request.source.blob], request.source.name, {type: request.source.contentType}),
-          path: request.path,
-          versionId: request.identity.versionId,
-          abortController: request.abortController,
-          progressCallback: request.onProgress,
-        })
-        .then(result => ({
-          uploadId: request.identity.uploadId,
-          resourceUuid: result.uuid,
-          versionId: result.versionId,
-        })),
-    ),
-  publishDraft: identity =>
-    execute('publish', () =>
-      cellsRepository
-        .promoteNodeDraft({uuid: identity.resourceUuid, versionId: identity.versionId})
-        .then(() => undefined),
-    ),
-  discardDraft: identity =>
-    execute('discard', () =>
-      cellsRepository
-        .deleteNodeDraft({uuid: identity.resourceUuid, versionId: identity.versionId})
-        .then(() => undefined),
-    ),
-});
+export const createCellsRepositoryGateway = (cellsRepository: CellsRepositoryUploadGateway): CellsUploadGateway => {
+  return {
+    uploadDraft: request => {
+      return execute('upload', () => {
+        return cellsRepository
+          .uploadNodeDraft({
+            uuid: request.identity.resourceUuid,
+            file:
+              request.source.blob instanceof File
+                ? request.source.blob
+                : new File([request.source.blob], request.source.name, {type: request.source.contentType}),
+            path: request.path,
+            versionId: request.identity.versionId,
+            abortController: request.abortController,
+            progressCallback: request.onProgress,
+          })
+          .then(result => {
+            return {
+              uploadId: request.identity.uploadId,
+              resourceUuid: result.uuid,
+              versionId: result.versionId,
+            };
+          });
+      });
+    },
+    publishDraft: identity => {
+      return execute('publish', () => {
+        return cellsRepository
+          .promoteNodeDraft({uuid: identity.resourceUuid, versionId: identity.versionId})
+          .then(() => {
+            return undefined;
+          });
+      });
+    },
+    discardDraft: identity => {
+      return execute('discard', () => {
+        return cellsRepository
+          .deleteNodeDraft({uuid: identity.resourceUuid, versionId: identity.versionId})
+          .then(() => {
+            return undefined;
+          });
+      });
+    },
+  };
+};

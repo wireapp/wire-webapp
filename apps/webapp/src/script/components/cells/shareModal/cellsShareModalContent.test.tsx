@@ -31,27 +31,46 @@ import {
 
 import {CellsShareModalContent} from './cellsShareModalContent';
 
-const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+const withTheme = (component: ReactNode) => {
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+};
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
 // Mock child components that have complex dependencies
-jest.mock('Components/cells/shareModal/cellsShareExpirationFields', () => ({
-  CellsShareExpirationFields: () => <div data-uie-name="expiration-fields">Expiration Fields Mock</div>,
-}));
+jest.mock('Components/cells/shareModal/cellsShareExpirationFields', () => {
+  return {
+    CellsShareExpirationFields: () => {
+      return <div data-uie-name="expiration-fields">Expiration Fields Mock</div>;
+    },
+  };
+});
 
-jest.mock('Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader', () => ({
-  CellsTableLoader: () => <div data-uie-name="cells-table-loader">Loading...</div>,
-}));
+jest.mock('Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader', () => {
+  return {
+    CellsTableLoader: () => {
+      return <div data-uie-name="cells-table-loader">Loading...</div>;
+    },
+  };
+});
 
-jest.mock('Components/PasswordGeneratorButton', () => ({
-  PasswordGeneratorButton: ({onGeneratePassword}: {onGeneratePassword: (password: string) => void}) => (
-    <button data-uie-name="do-generate-password" onClick={() => onGeneratePassword('generated-password')}>
-      Generate Password
-    </button>
-  ),
-}));
+jest.mock('Components/PasswordGeneratorButton', () => {
+  return {
+    PasswordGeneratorButton: ({onGeneratePassword}: {onGeneratePassword: (password: string) => void}) => {
+      return (
+        <button
+          data-uie-name="do-generate-password"
+          onClick={() => {
+            return onGeneratePassword('generated-password');
+          }}
+        >
+          Generate Password
+        </button>
+      );
+    },
+  };
+});
 
 const defaultStyles = {
   wrapperStyles: {},

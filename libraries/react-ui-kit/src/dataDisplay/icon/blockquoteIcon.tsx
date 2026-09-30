@@ -19,11 +19,13 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const BlockquoteIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <rect y="5" width="2" height="10" />
-    <rect x="16" y="1" width="2" height="16" transform="rotate(90 16 1)" />
-    <rect x="16" y="7" width="2" height="12" transform="rotate(90 16 7)" />
-    <rect x="16" y="13" width="2" height="12" transform="rotate(90 16 13)" />
-  </SVGIcon>
-);
+export const BlockquoteIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <rect y="5" width="2" height="10" />
+      <rect x="16" y="1" width="2" height="16" transform="rotate(90 16 1)" />
+      <rect x="16" y="7" width="2" height="12" transform="rotate(90 16 7)" />
+      <rect x="16" y="13" width="2" height="12" transform="rotate(90 16 13)" />
+    </SVGIcon>
+  );
+};

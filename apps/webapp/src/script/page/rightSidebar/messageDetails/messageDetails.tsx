@@ -48,12 +48,17 @@ const MESSAGE_STATES = {
   RECEIPTS_OFF: 'receipts-off',
 };
 
-const formatUserCount = (users: User[]): string => (isNonEmptyArray(users) ? ` (${users.length})` : '');
+const formatUserCount = (users: User[]): string => {
+  return isNonEmptyArray(users) ? ` (${users.length})` : '';
+};
 
-const sortUsers = (userA: User, userB: User): number =>
-  userA.name().localeCompare(userB.name(), undefined, {sensitivity: 'base'});
+const sortUsers = (userA: User, userB: User): number => {
+  return userA.name().localeCompare(userB.name(), undefined, {sensitivity: 'base'});
+};
 
-const formatTime = (time: string | number | Date) => formatLocale(time, 'P, p');
+const formatTime = (time: string | number | Date) => {
+  return formatLocale(time, 'P, p');
+};
 
 interface MessageDetailsProps {
   activeConversation: Conversation;
@@ -86,14 +91,18 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     readReceipts,
     edited_timestamp: editedTimestamp,
   } = useKoSubscribableChildren(messageEntity, ['timestamp', 'user', 'reactions', 'readReceipts', 'edited_timestamp']);
-  const totalNbReactions = reactions.reduce((acc, [, users]) => acc + users.length, 0);
+  const totalNbReactions = reactions.reduce((acc, [, users]) => {
+    return acc + users.length;
+  }, 0);
 
   const teamId = activeConversation.teamId;
   const supportsReceipts = messageSender.isMe && teamId;
 
   const receiptUsers = userRepository
     .findUsersByIds(
-      readReceipts.map(({userId, domain}) => ({domain: isNonEmptyString(domain) ? domain : '', id: userId})),
+      readReceipts.map(({userId, domain}) => {
+        return {domain: isNonEmptyString(domain) ? domain : '', id: userId};
+      }),
     )
     .toSorted(sortUsers);
 
@@ -151,11 +160,17 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       ? formatTime(editedTimestamp)
       : '';
 
-  const onReceipts = () => setIsReceiptsOpen(true);
+  const onReceipts = () => {
+    return setIsReceiptsOpen(true);
+  };
 
-  const onReactions = () => setIsReceiptsOpen(false);
+  const onReactions = () => {
+    return setIsReceiptsOpen(false);
+  };
 
-  const onParticipantClick = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
+  const onParticipantClick = (userEntity: User) => {
+    return togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
+  };
 
   return (
     <div id="message-details" className="panel__page panel__message-details">
@@ -204,7 +219,9 @@ const MessageDetails: FC<MessageDetailsProps> = ({
           <UsersReactions
             reactions={reactions}
             selfUser={selfUser}
-            findUsers={ids => userRepository.findUsersByIds(ids)}
+            findUsers={ids => {
+              return userRepository.findUsersByIds(ids);
+            }}
             onParticipantClick={onParticipantClick}
           />
         )}

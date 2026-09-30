@@ -32,4 +32,6 @@ const compareTagsAlphabetically = (tagA: string, tagB: string): number => {
   return 0;
 };
 
-export const sortTagsAlphabetically = (tags: string[]): string[] => tags.toSorted(compareTagsAlphabetically);
+export const sortTagsAlphabetically = (tags: string[]): string[] => {
+  return tags.toSorted(compareTagsAlphabetically);
+};

@@ -77,6 +77,8 @@ export const useFilePaste = ({onFilePasted, isFileNameKept, translate}: UseFileP
 
   useEffect(() => {
     document.addEventListener('paste', handlePasteEvent);
-    return () => document.removeEventListener('paste', handlePasteEvent);
+    return () => {
+      return document.removeEventListener('paste', handlePasteEvent);
+    };
   }, [handlePasteEvent]);
 };

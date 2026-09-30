@@ -107,11 +107,13 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
         {translate('teamCreationConfirmTitle')}
       </h2>
       <ul css={listCss} data-uie-name="team-creation-confirm-list">
-        {confirmationList.map(item => (
-          <li key={item}>
-            <p className="text-regular">{item}</p>
-          </li>
-        ))}
+        {confirmationList.map(item => {
+          return (
+            <li key={item}>
+              <p className="text-regular">{item}</p>
+            </li>
+          );
+        })}
       </ul>
       <div>
         <Checkbox

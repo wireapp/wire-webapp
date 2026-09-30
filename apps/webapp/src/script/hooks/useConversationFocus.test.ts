@@ -26,26 +26,36 @@ import {Conversation} from 'Repositories/entity/Conversation';
 
 import {useConversationFocus} from './useConversationFocus';
 
-const createConversation = (id: string) => ({id}) as Conversation;
+const createConversation = (id: string) => {
+  return {id} as Conversation;
+};
 
-const createEvent = (key: string) => ({key, preventDefault: noop}) as KeyboardEvent;
+const createEvent = (key: string) => {
+  return {key, preventDefault: noop} as KeyboardEvent;
+};
 
 describe('useConversationFocus', () => {
   it('starts with the first conversation focused', () => {
     const conversations = [createConversation('first'), createConversation('second')];
 
-    const {result} = renderHook(() => useConversationFocus(conversations));
+    const {result} = renderHook(() => {
+      return useConversationFocus(conversations);
+    });
 
     expect(result.current.currentFocus).toBe('first');
   });
 
   it('rebases focus to the first conversation when the result list changes', () => {
     const {result, rerender} = renderHook(
-      ({conversations}: {conversations: Conversation[]}) => useConversationFocus(conversations),
+      ({conversations}: {conversations: Conversation[]}) => {
+        return useConversationFocus(conversations);
+      },
       {initialProps: {conversations: [createConversation('first'), createConversation('second')]}},
     );
 
-    act(() => result.current.setCurrentFocus('second'));
+    act(() => {
+      return result.current.setCurrentFocus('second');
+    });
     expect(result.current.currentFocus).toBe('second');
 
     rerender({conversations: [createConversation('filtered-first'), createConversation('filtered-second')]});
@@ -56,11 +66,15 @@ describe('useConversationFocus', () => {
   it('rebases focus when the search query changes even if results stay the same', () => {
     const conversations = [createConversation('first'), createConversation('second')];
     const {result, rerender} = renderHook(
-      ({focusKey}: {focusKey: string}) => useConversationFocus(conversations, focusKey),
+      ({focusKey}: {focusKey: string}) => {
+        return useConversationFocus(conversations, focusKey);
+      },
       {initialProps: {focusKey: 'a'}},
     );
 
-    act(() => result.current.setCurrentFocus('second'));
+    act(() => {
+      return result.current.setCurrentFocus('second');
+    });
     rerender({focusKey: 'b'});
 
     expect(result.current.currentFocus).toBe('first');
@@ -70,7 +84,9 @@ describe('useConversationFocus', () => {
     const conversations = [createConversation('first'), createConversation('second')];
     const searchInput = document.createElement('input');
     const focusableElements = new Map(
-      conversations.map(conversation => [conversation.id, document.createElement('button')]),
+      conversations.map(conversation => {
+        return [conversation.id, document.createElement('button')];
+      }),
     );
     document.body.append(searchInput, ...focusableElements.values());
     const focusConversation = (conversationId: string) => {
@@ -78,22 +94,30 @@ describe('useConversationFocus', () => {
       element?.focus();
       return document.activeElement === element;
     };
-    const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
+    const {result} = renderHook(() => {
+      return useConversationFocus(conversations, '', focusConversation);
+    });
 
     searchInput.focus();
     await userEvent.setup().tab();
     expect(document.activeElement).toBe(focusableElements.get('first'));
 
-    act(() => result.current.handleKeyDown('first')(createEvent('ArrowDown')));
+    act(() => {
+      return result.current.handleKeyDown('first')(createEvent('ArrowDown'));
+    });
 
     expect(document.activeElement).toBe(focusableElements.get('second'));
     expect(result.current.currentFocus).toBe('second');
 
-    act(() => result.current.handleKeyDown('second')(createEvent('ArrowDown')));
+    act(() => {
+      return result.current.handleKeyDown('second')(createEvent('ArrowDown'));
+    });
     expect(document.activeElement).toBe(focusableElements.get('first'));
     expect(result.current.currentFocus).toBe('first');
 
-    act(() => result.current.handleKeyDown('first')(createEvent('ArrowUp')));
+    act(() => {
+      return result.current.handleKeyDown('first')(createEvent('ArrowUp'));
+    });
     expect(document.activeElement).toBe(focusableElements.get('second'));
     expect(result.current.currentFocus).toBe('second');
 
@@ -108,7 +132,9 @@ describe('useConversationFocus', () => {
     const firstElement = document.createElement('button');
     const replacementElement = document.createElement('button');
     document.body.append(firstElement, replacementElement);
-    const {result} = renderHook(() => useConversationFocus(conversations));
+    const {result} = renderHook(() => {
+      return useConversationFocus(conversations);
+    });
 
     let unregisterFirstElement: (() => void) | undefined;
     act(() => {
@@ -132,10 +158,16 @@ describe('useConversationFocus', () => {
     const conversations = [createConversation('first'), createConversation('second')];
     const focusConversation = jest.fn();
     const preventDefault = jest.fn();
-    const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
+    const {result} = renderHook(() => {
+      return useConversationFocus(conversations, '', focusConversation);
+    });
 
-    act(() => result.current.setCurrentFocus('second'));
-    act(() => result.current.handleKeyDown('second')({key: 'Tab', preventDefault} as unknown as KeyboardEvent));
+    act(() => {
+      return result.current.setCurrentFocus('second');
+    });
+    act(() => {
+      return result.current.handleKeyDown('second')({key: 'Tab', preventDefault} as unknown as KeyboardEvent);
+    });
 
     expect(preventDefault).not.toHaveBeenCalled();
     expect(focusConversation).not.toHaveBeenCalled();
@@ -144,11 +176,17 @@ describe('useConversationFocus', () => {
 
   it('does not trap focus when the next conversation is not mounted', () => {
     const conversations = [createConversation('first'), createConversation('second')];
-    const focusConversation = jest.fn(() => false);
+    const focusConversation = jest.fn(() => {
+      return false;
+    });
     const preventDefault = jest.fn();
-    const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
+    const {result} = renderHook(() => {
+      return useConversationFocus(conversations, '', focusConversation);
+    });
 
-    act(() => result.current.handleKeyDown('first')({key: 'ArrowDown', preventDefault} as unknown as KeyboardEvent));
+    act(() => {
+      return result.current.handleKeyDown('first')({key: 'ArrowDown', preventDefault} as unknown as KeyboardEvent);
+    });
 
     expect(focusConversation).toHaveBeenCalledWith('second');
     expect(preventDefault).not.toHaveBeenCalled();
@@ -157,11 +195,17 @@ describe('useConversationFocus', () => {
 
   it('keeps the current tab stop while focus is queued for a virtualized conversation', () => {
     const conversations = [createConversation('first'), createConversation('second')];
-    const focusConversation = jest.fn(() => 'pending' as const);
+    const focusConversation = jest.fn(() => {
+      return 'pending' as const;
+    });
     const preventDefault = jest.fn();
-    const {result} = renderHook(() => useConversationFocus(conversations, '', focusConversation));
+    const {result} = renderHook(() => {
+      return useConversationFocus(conversations, '', focusConversation);
+    });
 
-    act(() => result.current.handleKeyDown('first')({key: 'ArrowDown', preventDefault} as unknown as KeyboardEvent));
+    act(() => {
+      return result.current.handleKeyDown('first')({key: 'ArrowDown', preventDefault} as unknown as KeyboardEvent);
+    });
 
     expect(focusConversation).toHaveBeenCalledWith('second');
     expect(preventDefault).toHaveBeenCalledTimes(1);
@@ -169,10 +213,14 @@ describe('useConversationFocus', () => {
   });
 
   it('does not throw when keyboard events are received with no conversations', () => {
-    const {result} = renderHook(() => useConversationFocus([]));
+    const {result} = renderHook(() => {
+      return useConversationFocus([]);
+    });
 
     expect(() => {
-      act(() => result.current.handleKeyDown('first')(createEvent('ArrowDown')));
+      act(() => {
+        return result.current.handleKeyDown('first')(createEvent('ArrowDown'));
+      });
     }).not.toThrow();
     expect(result.current.currentFocus).toBe('');
   });

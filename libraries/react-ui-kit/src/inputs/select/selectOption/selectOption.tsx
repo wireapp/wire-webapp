@@ -58,7 +58,9 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
           }}
           {...(isNonEmptyString(dataUieName) && {
             'data-uie-name': `option-${dataUieName}`,
-            'data-uie-value': (options as Option[]).find(option => option.label === children)?.value,
+            'data-uie-value': (options as Option[]).find(option => {
+              return option.label === children;
+            })?.value,
             'data-uie-selected': isSelected,
           })}
         >
@@ -66,7 +68,9 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
             <input
               type="checkbox"
               checked={isSelected}
-              onChange={() => null}
+              onChange={() => {
+                return null;
+              }}
               css={{gridArea: 'checkbox', width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}
             />
           )}
@@ -82,12 +86,14 @@ export const SelectOption = <IsMulti extends boolean = false, Group extends Grou
 
           {isNonEmptyString(data.description) && (
             <p
-              css={(theme: Theme) => ({
-                marginBottom: 0,
-                fontSize: theme.fontSizes.medium,
-                color: isSelected ? theme.Select.focusedDescriptionColor : theme.Input.labelColor,
-                gridArea: 'description',
-              })}
+              css={(theme: Theme) => {
+                return {
+                  marginBottom: 0,
+                  fontSize: theme.fontSizes.medium,
+                  color: isSelected ? theme.Select.focusedDescriptionColor : theme.Input.labelColor,
+                  gridArea: 'description',
+                };
+              }}
             >
               {data.description}
             </p>

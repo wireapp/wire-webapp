@@ -188,9 +188,9 @@ const ConversationJoinComponent = ({
       if (isBackendError(error)) {
         switch (error.label) {
           default: {
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType),
-            );
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType => {
+              return error.label.endsWith(errorType);
+            });
             if (!isValidationError) {
               void doLogout();
               console.warn('Unable to create wireless account', error);
@@ -267,7 +267,9 @@ const ConversationJoinComponent = ({
       )}
       <WirelessContainer
         showCookiePolicyBanner={showCookiePolicyBanner}
-        onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
+        onCookiePolicyBannerClose={() => {
+          return setShowCookiePolicyBanner(false);
+        }}
       >
         <AppAlreadyOpen />
         <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
@@ -314,38 +316,53 @@ const ConversationJoinComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  isFetchingAuth: AuthSelector.isFetching(state),
-  hasLoadedClients: ClientSelector.hasLoadedClients(state),
-  isFetchingConversation: ConversationSelector.isFetching(state),
-  isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
-  selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
-  conversationError: ConversationSelector.getError(state),
-  conversationInfo: ConversationSelector.conversationInfo(state),
-  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
-  generalError: AuthSelector.getError(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    isFetchingAuth: AuthSelector.isFetching(state),
+    hasLoadedClients: ClientSelector.hasLoadedClients(state),
+    isFetchingConversation: ConversationSelector.isFetching(state),
+    isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
+    selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
+    conversationError: ConversationSelector.getError(state),
+    conversationInfo: ConversationSelector.conversationInfo(state),
+    conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+    generalError: AuthSelector.getError(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
-  doGetAllClients: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doGetAllClients>) =>
-    dispatch(ROOT_ACTIONS.clientAction.doGetAllClients(...args)),
-  doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) =>
-    dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args)),
-  doGetConversationInfoByCode: (
-    ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode>
-  ) => dispatch(ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode(...args)),
-  doInit: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doInit>) =>
-    dispatch(ROOT_ACTIONS.authAction.doInit(...args)),
-  doJoinConversationByCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doJoinConversationByCode>) =>
-    dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(...args)),
-  doLogout: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doLogout>) =>
-    dispatch(ROOT_ACTIONS.authAction.doLogout(...args)),
-  doRegisterWireless: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doRegisterWireless>) =>
-    dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(...args)),
-  setLastEventDate: (...args: Parameters<typeof ROOT_ACTIONS.notificationAction.setLastEventDate>) =>
-    dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(...args)),
-});
+const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+  return {
+    doGetAllClients: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doGetAllClients>) => {
+      return dispatch(ROOT_ACTIONS.clientAction.doGetAllClients(...args));
+    },
+    doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) => {
+      return dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args));
+    },
+    doGetConversationInfoByCode: (
+      ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode>
+    ) => {
+      return dispatch(ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode(...args));
+    },
+    doInit: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doInit>) => {
+      return dispatch(ROOT_ACTIONS.authAction.doInit(...args));
+    },
+    doJoinConversationByCode: (
+      ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doJoinConversationByCode>
+    ) => {
+      return dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(...args));
+    },
+    doLogout: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doLogout>) => {
+      return dispatch(ROOT_ACTIONS.authAction.doLogout(...args));
+    },
+    doRegisterWireless: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doRegisterWireless>) => {
+      return dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(...args));
+    },
+    setLastEventDate: (...args: Parameters<typeof ROOT_ACTIONS.notificationAction.setLastEventDate>) => {
+      return dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(...args));
+    },
+  };
+};
 
 const ConversationJoin = connect(mapStateToProps, mapDispatchToProps)(ConversationJoinComponent);
 

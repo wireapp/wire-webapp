@@ -54,8 +54,11 @@ const pluralDetailsTranslationKeyByReason = {
   [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantsPluralDetailsNotMlsCapable',
 } as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
 
-const findUser = (users: User[], qualifiedId: QualifiedId): User | undefined =>
-  users.find(user => matchQualifiedIds(qualifiedId, user.qualifiedId));
+const findUser = (users: User[], qualifiedId: QualifiedId): User | undefined => {
+  return users.find(user => {
+    return matchQualifiedIds(qualifiedId, user.qualifiedId);
+  });
+};
 
 const getDisplayName = (users: User[], qualifiedId: QualifiedId, translate: Translate): string => {
   const user = findUser(users, qualifiedId);
@@ -66,8 +69,9 @@ const getDisplayName = (users: User[], qualifiedId: QualifiedId, translate: Tran
   return getUserNameWithTranslate(user, translate);
 };
 
-const getDomainStr = (failure: AddUsersFailure): string | undefined =>
-  'backends' in failure ? Array.from(new Set(failure.backends)).join(', ') : undefined;
+const getDomainStr = (failure: AddUsersFailure): string | undefined => {
+  return 'backends' in failure ? Array.from(new Set(failure.backends)).join(', ') : undefined;
+};
 
 function createMeetingTranslatedValue(placeholder: string, runtimeText: string): PrimaryModalTranslatedValue {
   return {
@@ -130,7 +134,9 @@ function createFailureDetailsTranslation(
       'names',
       failureUsers
         .slice(1)
-        .map(user => getUserNameWithTranslate(user, translate))
+        .map(user => {
+          return getUserNameWithTranslate(user, translate);
+        })
         .join(', '),
     ),
   ];

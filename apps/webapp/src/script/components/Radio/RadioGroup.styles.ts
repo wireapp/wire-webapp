@@ -19,49 +19,53 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const radioInputStyles = (isDisabled: boolean): CSSObject => ({
-  position: 'absolute',
-  opacity: 0,
+export const radioInputStyles = (isDisabled: boolean): CSSObject => {
+  return {
+    position: 'absolute',
+    opacity: 0,
 
-  ['&[type="radio"]:checked + div label::before']: {
-    borderWidth: '6px',
-    borderColor: isDisabled ? 'var(--checkbox-background-disabled-selected)' : 'var(--accent-color-500)',
-  },
+    ['&[type="radio"]:checked + div label::before']: {
+      borderWidth: '6px',
+      borderColor: isDisabled ? 'var(--checkbox-background-disabled-selected)' : 'var(--accent-color-500)',
+    },
 
-  ['&[type="radio"]:hover + div label::before']: {
-    borderColor: isDisabled ? '' : 'var(--accent-color-500)',
-  },
+    ['&[type="radio"]:hover + div label::before']: {
+      borderColor: isDisabled ? '' : 'var(--accent-color-500)',
+    },
 
-  [' &[type="radio"]:focus-visible + div label::before']: {
-    borderColor: isDisabled ? '' : 'var(--accent-color-600)',
-  },
-});
+    [' &[type="radio"]:focus-visible + div label::before']: {
+      borderColor: isDisabled ? '' : 'var(--accent-color-600)',
+    },
+  };
+};
 
-export const radioLabelStyles = (isDisabled: boolean): CSSObject => ({
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  color: isDisabled ? 'var(--text-input-placeholder)' : 'var(--main-color)',
-  cursor: isDisabled ? 'not-allowed' : 'pointer',
-  whiteSpace: 'pre',
-  fontSize: '1rem',
+export const radioLabelStyles = (isDisabled: boolean): CSSObject => {
+  return {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    color: isDisabled ? 'var(--text-input-placeholder)' : 'var(--main-color)',
+    cursor: isDisabled ? 'not-allowed' : 'pointer',
+    whiteSpace: 'pre',
+    fontSize: '1rem',
 
-  ['&::before, &::after']: {
-    boxSizing: 'border-box',
-    borderRadius: '50%',
-    marginRight: '6px',
-    content: '""',
-  },
+    ['&::before, &::after']: {
+      boxSizing: 'border-box',
+      borderRadius: '50%',
+      marginRight: '6px',
+      content: '""',
+    },
 
-  ['&::before']: {
-    width: '22px',
-    height: '22px',
-    border: '2px solid',
-    borderColor: isDisabled ? 'var(--checkbox-background-disabled-selected)' : 'var(--checkbox-border)',
-    background: 'var(--app-bg)',
-    transition: 'all 0.15s',
-  },
-});
+    ['&::before']: {
+      width: '22px',
+      height: '22px',
+      border: '2px solid',
+      borderColor: isDisabled ? 'var(--checkbox-background-disabled-selected)' : 'var(--checkbox-border)',
+      background: 'var(--app-bg)',
+      transition: 'all 0.15s',
+    },
+  };
+};
 
 export const radioOptionStyles: CSSObject = {
   marginBottom: '1rem',

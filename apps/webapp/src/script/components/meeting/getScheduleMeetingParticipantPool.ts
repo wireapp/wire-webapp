@@ -27,5 +27,7 @@ export const getScheduleMeetingParticipantPool = (userState: UserState, teamStat
     ? teamState.teamMembers().toSorted(sortUsersByPriority)
     : userState.connectedUsers();
 
-  return contacts.filter(user => user.isAvailable());
+  return contacts.filter(user => {
+    return user.isAvailable();
+  });
 };

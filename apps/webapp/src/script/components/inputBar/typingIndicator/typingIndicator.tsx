@@ -42,7 +42,9 @@ export interface TypingIndicatorProps {
 
 export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
   const {translate} = useApplicationContext();
-  const users = useTypingIndicatorState(state => state.getTypingUsersInConversation(conversationId));
+  const users = useTypingIndicatorState(state => {
+    return state.getTypingUsersInConversation(conversationId);
+  });
   const usersCount = users.length;
 
   if (usersCount === 0) {
@@ -52,17 +54,19 @@ export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
   return (
     <div css={wrapperStyles} data-uie-name="typing-indicator">
       <div aria-hidden css={{display: 'flex', marginRight: 8}}>
-        {users.slice(0, MAX_VISIBLE_TYPING_USERS).map((user, index) => (
-          <Avatar
-            key={user.id}
-            className="cursor-default"
-            style={index > 0 ? {marginLeft: -8} : {}}
-            participant={user}
-            avatarSize={AVATAR_SIZE.XXX_SMALL}
-            isResponsive
-            hideAvailabilityStatus
-          />
-        ))}
+        {users.slice(0, MAX_VISIBLE_TYPING_USERS).map((user, index) => {
+          return (
+            <Avatar
+              key={user.id}
+              className="cursor-default"
+              style={index > 0 ? {marginLeft: -8} : {}}
+              participant={user}
+              avatarSize={AVATAR_SIZE.XXX_SMALL}
+              isResponsive
+              hideAvailabilityStatus
+            />
+          );
+        })}
       </div>
       <p css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
         {usersCount === 1 &&

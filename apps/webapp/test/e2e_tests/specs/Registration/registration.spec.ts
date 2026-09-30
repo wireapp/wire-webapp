@@ -143,7 +143,9 @@ test.describe('Registration', () => {
       const errorColor = await pages
         .registration()
         .errorLabel.locator('span')
-        .evaluate(el => window.getComputedStyle(el).color);
+        .evaluate(el => {
+          return window.getComputedStyle(el).color;
+        });
       expect(errorColor).toBe('rgb(194, 0, 19)');
     });
   });

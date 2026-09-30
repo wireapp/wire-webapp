@@ -158,7 +158,9 @@ export class ClientService {
    */
   public async synchronizeClients(currentClient: string): Promise<MetaClient[]> {
     const registeredClients = await this.backend.getClients();
-    const filteredClients = registeredClients.filter(client => client.id !== currentClient);
+    const filteredClients = registeredClients.filter(client => {
+      return client.id !== currentClient;
+    });
     const context = this.apiClient.context;
     if (isUndefined(context)) {
       throw new Error('Context is not set.');

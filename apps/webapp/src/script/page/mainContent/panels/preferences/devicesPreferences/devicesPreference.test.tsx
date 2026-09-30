@@ -95,7 +95,9 @@ describe('DevicesPreferences', () => {
       wrapper: rootProviderWrapper,
     });
 
-    await waitFor(() => getByText('preferencesDevicesCurrent'));
+    await waitFor(() => {
+      return getByText('preferencesDevicesCurrent');
+    });
     expect(getByText('preferencesDevicesCurrent')).toBeDefined();
     expect(getAllByText('preferencesDevicesId')).toHaveLength(selfUser.devices().length);
   });

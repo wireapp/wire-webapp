@@ -605,7 +605,9 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
-        user_ids: joiningUserIds.map(({id}) => id),
+        user_ids: joiningUserIds.map(({id}) => {
+          return id;
+        }),
       },
       from: sender.id,
       time: isoDate,
@@ -623,7 +625,9 @@ export const EventBuilder = {
       ...buildQualifiedId(conversationEntity),
       data: {
         qualified_user_ids: userIds,
-        user_ids: userIds.map(({id}) => id),
+        user_ids: userIds.map(({id}) => {
+          return id;
+        }),
       },
       from: from,
       time: conversationEntity.getNextIsoDate(currentTimestamp),

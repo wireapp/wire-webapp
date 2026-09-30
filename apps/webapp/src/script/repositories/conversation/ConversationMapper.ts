@@ -261,18 +261,22 @@ export class ConversationMapper {
     }
 
     if (!isUndefined(conversationData.members?.others)) {
-      return conversationData.members.others.map(other => ({
-        domain: other.qualified_id?.domain ?? '',
-        id: other.id,
-      }));
+      return conversationData.members.others.map(other => {
+        return {
+          domain: other.qualified_id?.domain ?? '',
+          id: other.id,
+        };
+      });
     }
 
     const others = 'others' in conversationData ? conversationData.others : undefined;
     if (!isUndefined(others)) {
-      return others.map(userId => ({
-        domain: '',
-        id: userId,
-      }));
+      return others.map(userId => {
+        return {
+          domain: '',
+          id: userId,
+        };
+      });
     }
 
     return undefined;
@@ -405,7 +409,9 @@ export class ConversationMapper {
     }
     const {members} = conversationData;
 
-    const allMembers = [...(members?.others ?? []), members?.self].filter(member => member !== undefined);
+    const allMembers = [...(members?.others ?? []), members?.self].filter(member => {
+      return member !== undefined;
+    });
     return allMembers.reduce<Record<string, string>>((roles, member) => {
       if (member.conversation_role === undefined) {
         return roles;
@@ -490,17 +496,21 @@ export class ConversationMapper {
     }
 
     if (qualified_others === undefined && otherMembers.length > 0) {
-      participatingUserIds = otherMembers.map(other => ({
-        domain: other.qualified_id?.domain ?? '',
-        id: other.id,
-      }));
+      participatingUserIds = otherMembers.map(other => {
+        return {
+          domain: other.qualified_id?.domain ?? '',
+          id: other.id,
+        };
+      });
     }
 
     if (qualified_others === undefined && otherMembers.length === 0 && others !== undefined) {
-      participatingUserIds = others.map(userId => ({
-        domain: '',
-        id: userId,
-      }));
+      participatingUserIds = others.map(userId => {
+        return {
+          domain: '',
+          id: userId,
+        };
+      });
     }
 
     conversationEntity.participating_user_ids(participatingUserIds);
@@ -636,8 +646,12 @@ export class ConversationMapper {
     };
 
     const qualified_others = othersStates
-      .map(({qualified_id}) => qualified_id)
-      .filter((qualifiedId): qualifiedId is QualifiedId => qualifiedId !== undefined);
+      .map(({qualified_id}) => {
+        return qualified_id;
+      })
+      .filter((qualifiedId): qualifiedId is QualifiedId => {
+        return qualifiedId !== undefined;
+      });
 
     if (isNonEmptyArray(qualified_others)) {
       updates.qualified_others = qualified_others;
@@ -667,8 +681,12 @@ export class ConversationMapper {
     const noOthers = mergedConversation.others === undefined || mergedConversation.others.length === 0;
     if (isGroup || noOthers) {
       mergedConversation.others = othersStates
-        .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
-        .map(otherState => otherState.id);
+        .filter(otherState => {
+          return (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number);
+        })
+        .map(otherState => {
+          return otherState.id;
+        });
     }
 
     // This should ensure a proper order

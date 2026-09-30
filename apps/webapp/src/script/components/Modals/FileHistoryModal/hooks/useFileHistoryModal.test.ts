@@ -23,14 +23,18 @@ import {useFileHistoryModal} from './useFileHistoryModal';
 
 describe('useFileHistoryModal', () => {
   it('should initialize with closed state', () => {
-    const {result} = renderHook(() => useFileHistoryModal());
+    const {result} = renderHook(() => {
+      return useFileHistoryModal();
+    });
 
     expect(result.current.isOpen).toBe(false);
     expect(result.current.nodeUuid).toBeUndefined();
   });
 
   it('should open modal with provided node UUID', () => {
-    const {result} = renderHook(() => useFileHistoryModal());
+    const {result} = renderHook(() => {
+      return useFileHistoryModal();
+    });
     const testUuid = 'test-uuid-123';
 
     act(() => {
@@ -42,7 +46,9 @@ describe('useFileHistoryModal', () => {
   });
 
   it('should close modal and reset state', () => {
-    const {result} = renderHook(() => useFileHistoryModal());
+    const {result} = renderHook(() => {
+      return useFileHistoryModal();
+    });
     const testUuid = 'test-uuid-123';
 
     // First open the modal
@@ -63,7 +69,9 @@ describe('useFileHistoryModal', () => {
   });
 
   it('should update node UUID when opening modal multiple times', () => {
-    const {result} = renderHook(() => useFileHistoryModal());
+    const {result} = renderHook(() => {
+      return useFileHistoryModal();
+    });
     const firstUuid = 'first-uuid';
     const secondUuid = 'second-uuid';
 
@@ -82,7 +90,9 @@ describe('useFileHistoryModal', () => {
   });
 
   it('should persist state across multiple renders', () => {
-    const {result, rerender} = renderHook(() => useFileHistoryModal());
+    const {result, rerender} = renderHook(() => {
+      return useFileHistoryModal();
+    });
     const testUuid = 'test-uuid-123';
 
     act(() => {

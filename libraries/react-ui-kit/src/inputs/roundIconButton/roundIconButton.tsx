@@ -30,19 +30,21 @@ import {buttonStyle} from '../button/button.styles';
 
 export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps<T> {}
 
-export const roundIconButtonStyle: <T>(theme: Theme, props: RoundIconButtonProps<T>) => CSSObject = (theme, props) => ({
-  ...buttonStyle(theme, props),
-  alignItems: 'center',
-  borderRadius: '50%',
-  display: 'flex',
-  height: `${props.size}px`,
-  justifyContent: 'center',
-  lineHeight: 'initial',
-  margin: '0 auto',
-  minWidth: `${props.size}px`,
-  padding: 0,
-  width: `${props.size}px`,
-});
+export const roundIconButtonStyle: <T>(theme: Theme, props: RoundIconButtonProps<T>) => CSSObject = (theme, props) => {
+  return {
+    ...buttonStyle(theme, props),
+    alignItems: 'center',
+    borderRadius: '50%',
+    display: 'flex',
+    height: `${props.size}px`,
+    justifyContent: 'center',
+    lineHeight: 'initial',
+    margin: '0 auto',
+    minWidth: `${props.size}px`,
+    padding: 0,
+    width: `${props.size}px`,
+  };
+};
 
 export function RoundIconButton({
   children,
@@ -53,7 +55,12 @@ export function RoundIconButton({
   const buttonProps = {...props, backgroundColor, size};
 
   return (
-    <button css={(theme: Theme) => roundIconButtonStyle(theme, buttonProps)} {...filterButtonProps(buttonProps)}>
+    <button
+      css={(theme: Theme) => {
+        return roundIconButtonStyle(theme, buttonProps);
+      }}
+      {...filterButtonProps(buttonProps)}
+    >
       {childrenWithDefaultProps<SVGSVGElement, SVGIconProps>({children, defaultProps: {color: COLOR.WHITE}})}
     </button>
   );

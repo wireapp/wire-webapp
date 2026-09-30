@@ -17,4 +17,6 @@
  *
  */
 
-export const isHTMLImageElement = (element: any): element is HTMLImageElement => element.nodeName === 'IMG';
+export const isHTMLImageElement = (element: any): element is HTMLImageElement => {
+  return element.nodeName === 'IMG';
+};

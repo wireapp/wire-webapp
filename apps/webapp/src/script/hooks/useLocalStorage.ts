@@ -35,11 +35,15 @@ export const useLocalStorage = <T>(key: string) => {
     window.dispatchEvent(new StorageEvent('storage', {key, newValue: serializedValue}));
   };
 
-  const getSnapshot = () => localStorage.getItem(key);
+  const getSnapshot = () => {
+    return localStorage.getItem(key);
+  };
 
   const subscribe = (listener: () => void) => {
     window.addEventListener('storage', listener);
-    return () => window.removeEventListener('storage', listener);
+    return () => {
+      return window.removeEventListener('storage', listener);
+    };
   };
 
   const store = useSyncExternalStore(subscribe, getSnapshot);

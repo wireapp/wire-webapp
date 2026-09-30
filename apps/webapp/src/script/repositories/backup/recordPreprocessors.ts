@@ -22,7 +22,9 @@ import {ConversationRecord, EventRecord, UserRecord} from 'Repositories/storage'
 
 export function preprocessEvents(events: EventRecord[]): EventRecord[] {
   // The verification message are not relevant for a new device (no conversation can be verified on a new device).
-  return events.filter(event => event.type !== ClientEvent.CONVERSATION.VERIFICATION);
+  return events.filter(event => {
+    return event.type !== ClientEvent.CONVERSATION.VERIFICATION;
+  });
 }
 
 export function preprocessConversations(conversations: ConversationRecord[]): ConversationRecord[] {

@@ -69,22 +69,26 @@ export const conversationFeatureContainerCss: CSSObject = {
   marginTop: '0.75rem',
 };
 
-export const conversationOptionContainerCss = (isSelected: boolean) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  background: isSelected ? 'var(--accent-color)' : 'none',
-  borderRadius: '12px',
-  padding: isSelected ? '12px' : '11px',
-  border: isSelected ? 'none' : '1px solid var(--border-color)',
-  cursor: 'pointer',
-});
+export const conversationOptionContainerCss = (isSelected: boolean) => {
+  return {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    background: isSelected ? 'var(--accent-color)' : 'none',
+    borderRadius: '12px',
+    padding: isSelected ? '12px' : '11px',
+    border: isSelected ? 'none' : '1px solid var(--border-color)',
+    cursor: 'pointer',
+  };
+};
 
-export const conversationOptionCss = (isSelected: boolean): CSSObject => ({
-  color: isSelected ? 'var(--app-bg-secondary)' : 'var(--text-color)',
-  alignItems: 'center',
-  gap: '12px',
-});
+export const conversationOptionCss = (isSelected: boolean): CSSObject => {
+  return {
+    color: isSelected ? 'var(--app-bg-secondary)' : 'var(--text-color)',
+    alignItems: 'center',
+    gap: '12px',
+  };
+};
 
 export const conversationOptionNotSelectedCss: CSSObject = {
   width: '14px',

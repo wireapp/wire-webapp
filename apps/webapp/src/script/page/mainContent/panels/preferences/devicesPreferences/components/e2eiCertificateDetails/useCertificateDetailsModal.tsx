@@ -29,22 +29,24 @@ const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;
 const CERTIFICATE_NAME = 'certificate.pem';
 const CERTIFICATE_TYPE = 'application/x-pem-file';
 
-const ModalMessageWrapper = ({message}: {message: string}) => (
-  <div
-    css={{
-      overflow: 'auto',
-      maxHeight: '350px',
-      fontSize: 'var(--font-size-small)',
-      letterSpacing: '0.05px',
-      lineHeight: 'var(--line-height-md)',
-      wordBreak: 'break-word',
-      // The margin is set to -30px to compensate for the margin of the modal content
-      marginBottom: '-30px',
-    }}
-  >
-    <p>{message}</p>
-  </div>
-);
+const ModalMessageWrapper = ({message}: {message: string}) => {
+  return (
+    <div
+      css={{
+        overflow: 'auto',
+        maxHeight: '350px',
+        fontSize: 'var(--font-size-small)',
+        letterSpacing: '0.05px',
+        lineHeight: 'var(--line-height-md)',
+        wordBreak: 'break-word',
+        // The margin is set to -30px to compensate for the margin of the modal content
+        marginBottom: '-30px',
+      }}
+    >
+      <p>{message}</p>
+    </div>
+  );
+};
 
 export const useCertificateDetailsModal = (certificate: string) => {
   const {translate} = useApplicationContext();

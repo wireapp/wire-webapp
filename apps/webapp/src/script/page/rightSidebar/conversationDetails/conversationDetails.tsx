@@ -259,14 +259,21 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       });
     }, [integrationRepository, participatingUserEts]);
 
-    const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
+    const toggleMute = () => {
+      return actionsViewModel.toggleMuteConversation(activeConversation);
+    };
 
-    const updateConversationName = (conversationName: string) =>
-      conversationRepository.renameConversation(activeConversation, conversationName);
+    const updateConversationName = (conversationName: string) => {
+      return conversationRepository.renameConversation(activeConversation, conversationName);
+    };
 
-    const openAddParticipants = () => togglePanel(PanelState.ADD_PARTICIPANTS, activeConversation);
+    const openAddParticipants = () => {
+      return togglePanel(PanelState.ADD_PARTICIPANTS, activeConversation);
+    };
 
-    const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
+    const showUser = (userEntity: User) => {
+      return togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
+    };
 
     const showService = async (entity: ServiceEntity) => {
       if (entity.isService) {
@@ -278,7 +285,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         return;
       }
 
-      const user = participatingUserEts.find(participant => participant.id === entity.id);
+      const user = participatingUserEts.find(participant => {
+        return participant.id === entity.id;
+      });
 
       if (!isNullOrUndefined(user)) {
         const serviceEntity = integrationRepository.mapServiceFromUser(user);
@@ -286,10 +295,13 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       }
     };
 
-    const showAllParticipants = () => togglePanel(PanelState.CONVERSATION_PARTICIPANTS, activeConversation);
+    const showAllParticipants = () => {
+      return togglePanel(PanelState.CONVERSATION_PARTICIPANTS, activeConversation);
+    };
 
-    const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE) =>
-      conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
+    const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE) => {
+      return conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
+    };
 
     const isSingleUserMode = is1to1 || isRequest;
     const isServiceMode = isSingleUserMode && !isUndefined(firstParticipant) && firstParticipant.isService;

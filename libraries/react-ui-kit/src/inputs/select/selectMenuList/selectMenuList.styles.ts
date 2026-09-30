@@ -21,14 +21,16 @@ import {CSSObject} from '@emotion/react';
 
 import {Theme} from '../../../identity';
 
-export const headingContainerStyles = (theme: Theme): CSSObject => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  fontSize: theme.fontSizes.medium,
-  fontWeight: 600,
-  padding: '8px 16px',
-});
+export const headingContainerStyles = (theme: Theme): CSSObject => {
+  return {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontSize: theme.fontSizes.medium,
+    fontWeight: 600,
+    padding: '8px 16px',
+  };
+};
 
 export const closeButtonStyles: CSSObject = {
   background: 'transparent',

@@ -99,37 +99,45 @@ export const CellsTable = ({
       <div css={tableWrapperStyles}>
         <table css={tableStyles}>
           <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <CellsTableHeaderCell
-                    key={header.id}
-                    header={header}
-                    getDirectionFor={getDirectionFor}
-                    isSortingEnabled={isSortingEnabled}
-                  />
-                ))}
-              </tr>
-            ))}
+            {table.getHeaderGroups().map(headerGroup => {
+              return (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => {
+                    return (
+                      <CellsTableHeaderCell
+                        key={header.id}
+                        header={header}
+                        getDirectionFor={getDirectionFor}
+                        isSortingEnabled={isSortingEnabled}
+                      />
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </thead>
           {rows.length > 0 && (
             <tbody>
-              {rows.map(row => (
-                <tr key={row.id} css={tableCellRow}>
-                  {row.getVisibleCells().map(cell => (
-                    <td
-                      key={cell.id}
-                      css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cellLabels[cell.column.id]}
-                      style={{
-                        width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {rows.map(row => {
+                return (
+                  <tr key={row.id} css={tableCellRow}>
+                    {row.getVisibleCells().map(cell => {
+                      return (
+                        <td
+                          key={cell.id}
+                          css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                          data-cell={cellLabels[cell.column.id]}
+                          style={{
+                            width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                          }}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
             </tbody>
           )}
         </table>

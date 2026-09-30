@@ -37,10 +37,16 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 
 const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeoutMessageEntity>) => {
   const callMessage: Partial<CallTimeoutMessageEntity> = {
-    displayTimestampLong: () => '',
-    displayTimestampShort: () => '',
+    displayTimestampLong: () => {
+      return '';
+    },
+    displayTimestampShort: () => {
+      return '';
+    },
     timestamp: ko.observable(Date.now()),
-    unsafeSenderName: ko.pureComputed(() => ''),
+    unsafeSenderName: ko.pureComputed(() => {
+      return '';
+    }),
     ...partialCallTimeoutMessage,
   };
   return callMessage as CallTimeoutMessageEntity;

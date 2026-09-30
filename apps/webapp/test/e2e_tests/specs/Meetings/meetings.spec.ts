@@ -503,7 +503,9 @@ test.describe('Meetings', () => {
 
       await meetings.startMeetNow(
         LARGE_MEETING_TITLE,
-        members.map(member => member.fullName),
+        members.map(member => {
+          return member.fullName;
+        }),
       );
 
       await expect(ownerModals.withoutTitle().modal).toBeHidden();

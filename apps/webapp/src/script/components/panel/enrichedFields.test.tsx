@@ -45,9 +45,9 @@ const richInfo: Partial<RichInfo> = {
 
 const createRichProfileRepository = () => {
   const richProfileRepository = new RichProfileRepository();
-  jest
-    .spyOn(richProfileRepository, 'getUserRichProfile')
-    .mockImplementation(() => Promise.resolve(richInfo as RichInfo));
+  jest.spyOn(richProfileRepository, 'getUserRichProfile').mockImplementation(() => {
+    return Promise.resolve(richInfo as RichInfo);
+  });
   return richProfileRepository;
 };
 
@@ -60,7 +60,9 @@ describe('EnrichedFields', () => {
 
     const {getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
-    await waitFor(() => getAllByTestId('item-enriched-key'));
+    await waitFor(() => {
+      return getAllByTestId('item-enriched-key');
+    });
 
     expect(getAllByTestId('item-enriched-key')).toHaveLength(requireValueForTest(richInfo.fields).length);
   });
@@ -74,7 +76,9 @@ describe('EnrichedFields', () => {
 
     const {getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
-    await waitFor(() => getAllByTestId('item-enriched-key'));
+    await waitFor(() => {
+      return getAllByTestId('item-enriched-key');
+    });
 
     expect(getAllByTestId('item-enriched-key')).toHaveLength(3);
   });
@@ -88,7 +92,9 @@ describe('EnrichedFields', () => {
 
     const {container, getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
-    await waitFor(() => getAllByTestId('item-enriched-key'));
+    await waitFor(() => {
+      return getAllByTestId('item-enriched-key');
+    });
 
     const itemEnrichedValues = container.querySelectorAll(
       `[data-uie-name="item-enriched-value"][data-uie-value="${domain}"]`,
@@ -106,7 +112,9 @@ describe('EnrichedFields', () => {
 
     const {container, getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
-    await waitFor(() => getAllByTestId('item-enriched-key'));
+    await waitFor(() => {
+      return getAllByTestId('item-enriched-key');
+    });
 
     const itemEnrichedValues = container.querySelectorAll(
       `[data-uie-name="item-enriched-value"][data-uie-value="${domain}"]`,
@@ -124,7 +132,9 @@ describe('EnrichedFields', () => {
 
     const {getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
-    await waitFor(() => getAllByTestId('item-enriched-key'));
+    await waitFor(() => {
+      return getAllByTestId('item-enriched-key');
+    });
 
     expect(onFieldsLoaded).toHaveBeenCalledWith(richInfo.fields);
   });

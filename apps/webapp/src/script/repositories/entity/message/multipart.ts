@@ -67,7 +67,9 @@ export class Multipart extends Asset {
   }
 
   isUserMentioned(userId: QualifiedId): boolean {
-    return this.mentions().some(MentionEntity => MentionEntity.targetsUser(userId));
+    return this.mentions().some(MentionEntity => {
+      return MentionEntity.targetsUser(userId);
+    });
   }
 
   getCellAssets(): ICellAsset[] {
@@ -78,7 +80,11 @@ export class Multipart extends Asset {
     }
 
     return attachments
-      .map(attachment => (!isNullOrUndefined(attachment.cellAsset) ? {...attachment.cellAsset} : null))
-      .filter((cellAsset): cellAsset is ICellAsset => !isNull(cellAsset));
+      .map(attachment => {
+        return !isNullOrUndefined(attachment.cellAsset) ? {...attachment.cellAsset} : null;
+      })
+      .filter((cellAsset): cellAsset is ICellAsset => {
+        return !isNull(cellAsset);
+      });
   }
 }

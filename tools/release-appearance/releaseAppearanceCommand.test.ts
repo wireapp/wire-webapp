@@ -285,7 +285,11 @@ function createFakeGitCommand(fakeGitCommandOptions: FakeGitCommandOptions = {})
       return bootstrap ? '' : `${previousProductionTag}\n`;
     }
     if (command === 'tag --list -- *-beta.*') {
-      return `${betaTags.map(betaTagDefinition => betaTagDefinition.tagName).join('\n')}\n`;
+      return `${betaTags
+        .map(betaTagDefinition => {
+          return betaTagDefinition.tagName;
+        })
+        .join('\n')}\n`;
     }
     if (command.startsWith('cat-file -t refs/tags/')) {
       return 'tag\n';

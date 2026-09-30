@@ -33,8 +33,12 @@ const getConversationQualifiedMembers = async ({apiClient, conversationId}: Para
    * other clients.
    */
   const filteredConversations = conversation.members.others
-    .filter((member): member is typeof member & {qualified_id: QualifiedId} => member.qualified_id !== undefined)
-    .map(member => member.qualified_id);
+    .filter((member): member is typeof member & {qualified_id: QualifiedId} => {
+      return member.qualified_id !== undefined;
+    })
+    .map(member => {
+      return member.qualified_id;
+    });
 
   if (conversation.members.self?.qualified_id !== undefined) {
     filteredConversations.push(conversation.members.self.qualified_id);

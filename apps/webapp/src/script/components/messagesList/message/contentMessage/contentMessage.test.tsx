@@ -98,7 +98,9 @@ describe('message', () => {
     const quoteAsset = new Text('', textValue);
     spyOn(quoteAsset, 'render').and.returnValue(`<span>${quoteText}</span>`);
     quotedMessage.assets.push(quoteAsset);
-    const findMessage = () => Promise.resolve(quotedMessage);
+    const findMessage = () => {
+      return Promise.resolve(quotedMessage);
+    };
 
     const message = new ContentMessage(undefined, translateForTest);
     message.user(new User(createUuid(), '', translateForTest));
@@ -108,6 +110,10 @@ describe('message', () => {
       <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
       {wrapper: rootProviderWrapper},
     );
-    expect(await waitFor(() => getByText(quoteText))).not.toBe(null);
+    expect(
+      await waitFor(() => {
+        return getByText(quoteText);
+      }),
+    ).not.toBe(null);
   });
 });

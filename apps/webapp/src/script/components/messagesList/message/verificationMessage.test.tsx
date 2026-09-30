@@ -31,8 +31,12 @@ import {VerificationMessage} from './verificationMessage';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
   const verificationMessage: Partial<VerificationMessageEntity> = {
-    isSelfClient: ko.pureComputed(() => false),
-    unsafeSenderName: ko.pureComputed(() => 'senderName'),
+    isSelfClient: ko.pureComputed(() => {
+      return false;
+    }),
+    unsafeSenderName: ko.pureComputed(() => {
+      return 'senderName';
+    }),
     userEntities: ko.observableArray([] as User[]),
     userIds: ko.observableArray([] as QualifiedUserId[]),
     ...partialVerificationMessage,

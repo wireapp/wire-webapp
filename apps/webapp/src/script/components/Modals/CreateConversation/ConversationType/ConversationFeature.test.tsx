@@ -112,11 +112,11 @@ describe('ConversationFeature', () => {
       const featureItems = getFeatureItems(container);
 
       expect(featureItems).toHaveLength(3);
-      expect(featureItems.map(featureItem => featureItem.textContent)).toEqual([
-        'Up to 500 people',
-        'Video conferencing',
-        'Messages and calls are always end-to-end encrypted',
-      ]);
+      expect(
+        featureItems.map(featureItem => {
+          return featureItem.textContent;
+        }),
+      ).toEqual(['Up to 500 people', 'Video conferencing', 'Messages and calls are always end-to-end encrypted']);
       expectFeatureIconCounts({checkIconCount: 2, container, shieldIconCount: 1});
       expectLastFeatureHasShieldIcon(featureItems);
       expect(getFeatureItem(featureItems, 0)).toHaveAttribute('class', 'subline');
@@ -130,7 +130,11 @@ describe('ConversationFeature', () => {
       const featureItems = getFeatureItems(container);
 
       expect(featureItems).toHaveLength(5);
-      expect(featureItems.map(featureItem => featureItem.textContent)).toEqual([
+      expect(
+        featureItems.map(featureItem => {
+          return featureItem.textContent;
+        }),
+      ).toEqual([
         'Up to 2000 people',
         'Public or private channels',
         'Conversation history',
@@ -156,7 +160,11 @@ describe('ConversationFeature', () => {
         const firstFeatureItem = getFeatureItem(featureItems, 0);
 
         expect(featureItems).toHaveLength(3);
-        expect(featureItems.map(featureItem => featureItem.textContent)).toEqual([
+        expect(
+          featureItems.map(featureItem => {
+            return featureItem.textContent;
+          }),
+        ).toEqual([
           '<meta name="example" content="value">Up to 500 people',
           'Video conferencing',
           'Messages and calls are always end-to-end encrypted',
@@ -187,7 +195,11 @@ describe('ConversationFeature', () => {
         const featureItems = getFeatureItems(container);
 
         expect(featureItems).toHaveLength(5);
-        expect(featureItems.map(featureItem => featureItem.textContent)).toEqual([
+        expect(
+          featureItems.map(featureItem => {
+            return featureItem.textContent;
+          }),
+        ).toEqual([
           '2000 participants maximum',
           'Public or private channels',
           'Conversation history',

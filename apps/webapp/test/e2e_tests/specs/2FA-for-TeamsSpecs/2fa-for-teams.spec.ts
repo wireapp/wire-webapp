@@ -84,7 +84,12 @@ test.describe('2FA for teams', () => {
       await pages.emailVerification().resendButton.click();
 
       await expect
-        .poll(async () => await api.inbucket.getVerificationCode(owner.email), {timeout: 30_000, intervals: [3_000]})
+        .poll(
+          async () => {
+            return await api.inbucket.getVerificationCode(owner.email);
+          },
+          {timeout: 30_000, intervals: [3_000]},
+        )
         .not.toEqual(oldCode);
     },
   );

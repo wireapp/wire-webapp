@@ -117,11 +117,13 @@ function FullSearch(props: FullSearchProps) {
         firstPart = `…${firstPart.substring(splitOffset)}`;
       }
       const parts = matches.reduce(
-        (accumulator, match, matchIndex) => [
-          ...accumulator,
-          match[0],
-          text.substring((match.index ?? 0) + match[0].length, matches[matchIndex + 1]?.index ?? text.length),
-        ],
+        (accumulator, match, matchIndex) => {
+          return [
+            ...accumulator,
+            match[0],
+            text.substring((match.index ?? 0) + match[0].length, matches[matchIndex + 1]?.index ?? text.length),
+          ];
+        },
         [firstPart],
       );
 
@@ -168,14 +170,18 @@ function FullSearch(props: FullSearchProps) {
       )}
 
       <div className="full-search__list" data-uie-name="full-search-list">
-        {messages.slice(0, messageCount).map(message => (
-          <FullSearchItem
-            key={message.id}
-            message={message}
-            onClick={() => click(message)}
-            formatText={formatSearchResult}
-          />
-        ))}
+        {messages.slice(0, messageCount).map(message => {
+          return (
+            <FullSearchItem
+              key={message.id}
+              message={message}
+              onClick={() => {
+                return click(message);
+              }}
+              formatText={formatSearchResult}
+            />
+          );
+        })}
       </div>
     </div>
   );

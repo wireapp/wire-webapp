@@ -56,27 +56,37 @@ import {translateForTest} from 'Util/test/translateForTest';
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
     it('throws an error for unexpected parameters', () => {
-      //@ts-expect-error
-      const functionCallUndefinedParam = () => ConversationMapper.mapConversations();
+      const functionCallUndefinedParam = () => {
+        //@ts-expect-error
+        return ConversationMapper.mapConversations();
+      };
 
       expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallEmtpyArray = () => ConversationMapper.mapConversations([], 1, translate);
+      const functionCallEmtpyArray = () => {
+        return ConversationMapper.mapConversations([], 1, translate);
+      };
 
       expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      //@ts-expect-error
-      const functionCallWrongType = () => ConversationMapper.mapConversations('Conversation');
+      const functionCallWrongType = () => {
+        //@ts-expect-error
+        return ConversationMapper.mapConversations('Conversation');
+      };
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      // @ts-expect-error intentionally exercises an invalid array item
-      const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined], 1, translate);
+      const functionCallUndefinedInArray = () => {
+        // @ts-expect-error intentionally exercises an invalid array item
+        return ConversationMapper.mapConversations([undefined], 1, translate);
+      };
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      //@ts-expect-error
-      const functionCallStringInArray = () => ConversationMapper.mapConversations(['Conversation']);
+      const functionCallStringInArray = () => {
+        //@ts-expect-error
+        return ConversationMapper.mapConversations(['Conversation']);
+      };
 
       expect(functionCallStringInArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
     });
@@ -91,7 +101,9 @@ describe('ConversationMapper', () => {
         conversation.members.others[1].id,
         conversation.members.others[2].id,
         conversation.members.others[3].id,
-      ].map(id => ({domain: '', id}));
+      ].map(id => {
+        return {domain: '', id};
+      });
 
       expect(conversationEntity.participating_user_ids()).toEqual(expectedParticipantIds);
       expect(conversationEntity.id).toBe(conversation.id);
@@ -994,7 +1006,11 @@ describe('ConversationMapper', () => {
 
     it('maps roles properly for personal group conversation', () => {
       const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-      jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => true));
+      jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(
+        ko.pureComputed(() => {
+          return true;
+        }),
+      );
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);
       expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.PERSONAL.GROUP);
@@ -1002,7 +1018,11 @@ describe('ConversationMapper', () => {
 
     it('maps roles properly for personal one2one conversation', () => {
       const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-      jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => false));
+      jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(
+        ko.pureComputed(() => {
+          return false;
+        }),
+      );
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);
       expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.PERSONAL.ONE2ONE);

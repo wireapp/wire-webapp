@@ -64,7 +64,9 @@ const showNotification = (
       PrimaryModal.show(
         PrimaryModal.type.ACCOUNT_NEW_DEVICES,
         {
-          data: aggregatedNotifications.map(notification => notification.data) as ClientNotificationData[],
+          data: aggregatedNotifications.map(notification => {
+            return notification.data;
+          }) as ClientNotificationData[],
           preventClose: true,
           secondaryAction: {
             action: () => {
@@ -95,27 +97,29 @@ const showNotification = (
 
 const NEW_DEVICE_NOTIFICATION_STATES = [ContentState.PREFERENCES_ACCOUNT, ContentState.PREFERENCES_DEVICES];
 
-const PreferenceItem = ({onSelect, isSelected, label, uieName, IconComponent}: PreferencesItemProps) => (
-  <li
-    role="tab"
-    aria-selected={isSelected}
-    aria-controls={label}
-    tabIndex={TabIndex.UNFOCUSABLE}
-    className="left-list-item"
-  >
-    <button
-      type="button"
-      className={`left-list-item-button ${isSelected ? 'left-list-item-button--active' : ''}`}
-      onClick={onSelect}
-      data-uie-name={uieName}
+const PreferenceItem = ({onSelect, isSelected, label, uieName, IconComponent}: PreferencesItemProps) => {
+  return (
+    <li
+      role="tab"
+      aria-selected={isSelected}
+      aria-controls={label}
+      tabIndex={TabIndex.UNFOCUSABLE}
+      className="left-list-item"
     >
-      <span className="left-column-icon">
-        <IconComponent />
-      </span>
-      <span className="column-center">{label}</span>
-    </button>
-  </li>
-);
+      <button
+        type="button"
+        className={`left-list-item-button ${isSelected ? 'left-list-item-button--active' : ''}`}
+        onClick={onSelect}
+        data-uie-name={uieName}
+      >
+        <span className="left-column-icon">
+          <IconComponent />
+        </span>
+        <span className="column-center">{label}</span>
+      </button>
+    </li>
+  );
+};
 
 const Preferences = ({
   teamRepository,
@@ -124,7 +128,9 @@ const Preferences = ({
   onClose,
 }: PreferencesProps) => {
   const {translate} = useApplicationContext();
-  const contentState = useAppState(state => state.contentState);
+  const contentState = useAppState(state => {
+    return state.contentState;
+  });
 
   useEffect(() => {
     // Update local team
@@ -133,9 +139,9 @@ const Preferences = ({
 
   useEffect(() => {
     if (NEW_DEVICE_NOTIFICATION_STATES.includes(contentState)) {
-      void preferenceNotificationRepository
-        .getNotifications()
-        .forEach(({type, notification}) => showNotification(type, notification, translate));
+      void preferenceNotificationRepository.getNotifications().forEach(({type, notification}) => {
+        return showNotification(type, notification, translate);
+      });
     }
   }, [contentState, preferenceNotificationRepository, translate]);
 
@@ -188,17 +194,23 @@ const Preferences = ({
         className="left-list-items no-scroll preferences-list-items"
       >
         {preferencesItems
-          .filter(item => item.hidden !== true)
-          .map(item => (
-            <PreferenceItem
-              key={item.id}
-              label={item.label}
-              onSelect={() => onPreferenceItemClick(item.id)}
-              isSelected={contentState === item.id}
-              uieName={item.uieName}
-              IconComponent={item.IconComponent}
-            />
-          ))}
+          .filter(item => {
+            return item.hidden !== true;
+          })
+          .map(item => {
+            return (
+              <PreferenceItem
+                key={item.id}
+                label={item.label}
+                onSelect={() => {
+                  return onPreferenceItemClick(item.id);
+                }}
+                isSelected={contentState === item.id}
+                uieName={item.uieName}
+                IconComponent={item.IconComponent}
+              />
+            );
+          })}
       </ul>
     </ListWrapper>
   );

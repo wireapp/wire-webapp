@@ -173,7 +173,12 @@ export const AccountPreferences = ({
 
         {isActivatedAccount && (
           <div className="preferences-accent-color-picker">
-            <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
+            <AccentColorPicker
+              user={selfUser}
+              doSetAccentColor={id => {
+                return userRepository.changeAccentColor(id);
+              }}
+            />
           </div>
         )}
       </div>
@@ -210,17 +215,19 @@ export const AccountPreferences = ({
               />
             )}
 
-            {richFields.map(({type, value}) => (
-              <AccountInput
-                key={type}
-                labelUie="item-enriched-key"
-                valueUie="item-enriched-value"
-                fieldName={type.replace(' ', '-')}
-                label={type}
-                value={value}
-                readOnly
-              />
-            ))}
+            {richFields.map(({type, value}) => {
+              return (
+                <AccountInput
+                  key={type}
+                  labelUie="item-enriched-key"
+                  valueUie="item-enriched-value"
+                  fieldName={type.replace(' ', '-')}
+                  label={type}
+                  value={value}
+                  readOnly
+                />
+              );
+            })}
           </div>
 
           {isProfileLinkEnabled && (

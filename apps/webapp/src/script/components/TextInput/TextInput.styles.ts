@@ -19,17 +19,19 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const getIconCSS = (fill?: string): CSSObject => ({
-  alignItems: 'center',
-  top: 36,
-  fill: fill,
-  height: 16,
-  margin: 0,
-  padding: 0,
-  position: 'absolute',
-  right: 16,
-  width: 16,
-});
+export const getIconCSS = (fill?: string): CSSObject => {
+  return {
+    alignItems: 'center',
+    top: 36,
+    fill: fill,
+    height: 16,
+    margin: 0,
+    padding: 0,
+    position: 'absolute',
+    right: 16,
+    width: 16,
+  };
+};
 
 export const containerCSS: CSSObject = {
   display: 'flex',
@@ -48,49 +50,53 @@ export const errorMessageCSS: CSSObject = {
   fontWeight: 'normal',
 };
 
-export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject => ({
-  '&::placeholder': {
-    color: 'var(--text-input-placeholder)',
-  },
-  '&:hover': {
-    borderColor: disabled !== true ? 'var(--text-input-border-hover)' : undefined,
-  },
-  '&:focus, &:focus-visible, &:active': {
-    '& + label': {
-      color: disabled !== true ? 'var(--accent-color-500)' : undefined,
+export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject => {
+  return {
+    '&::placeholder': {
+      color: 'var(--text-input-placeholder)',
     },
-    borderColor: disabled !== true ? 'var(--accent-color-500)' : undefined,
-  },
-  ':-ms-input-placeholder': {
-    // Internet Explorer 10-11
-    color: 'var(--text-input-placeholder)',
-  },
-  '::-ms-input-placeholder': {
-    // Microsoft Edge
-    color: 'var(--text-input-placeholder)',
-  },
-  '::placeholder': {
-    // Chrome, Firefox, Opera, Safari 10.1+
-    color: 'var(--text-input-placeholder)',
-    opacity: 1, // Firefox
-  },
-  background: disabled === true ? 'var(--text-input-disabled)' : 'var(--text-input-background)',
-  border: '1px solid',
-  borderColor: borderColor ?? 'var(--text-input-border)',
-  borderRadius: 12,
-  color: 'var(--text-input-color)',
-  outline: 'none',
-  padding: '12px 38px 12px 16px',
-  width: '100%',
-});
+    '&:hover': {
+      borderColor: disabled !== true ? 'var(--text-input-border-hover)' : undefined,
+    },
+    '&:focus, &:focus-visible, &:active': {
+      '& + label': {
+        color: disabled !== true ? 'var(--accent-color-500)' : undefined,
+      },
+      borderColor: disabled !== true ? 'var(--accent-color-500)' : undefined,
+    },
+    ':-ms-input-placeholder': {
+      // Internet Explorer 10-11
+      color: 'var(--text-input-placeholder)',
+    },
+    '::-ms-input-placeholder': {
+      // Microsoft Edge
+      color: 'var(--text-input-placeholder)',
+    },
+    '::placeholder': {
+      // Chrome, Firefox, Opera, Safari 10.1+
+      color: 'var(--text-input-placeholder)',
+      opacity: 1, // Firefox
+    },
+    background: disabled === true ? 'var(--text-input-disabled)' : 'var(--text-input-background)',
+    border: '1px solid',
+    borderColor: borderColor ?? 'var(--text-input-border)',
+    borderRadius: 12,
+    color: 'var(--text-input-color)',
+    outline: 'none',
+    padding: '12px 38px 12px 16px',
+    width: '100%',
+  };
+};
 
-export const getLabelCSS = (color?: string): CSSObject => ({
-  color: color ?? 'var(--text-input-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  display: 'flex',
-  flexDirection: 'column',
-  marginBottom: 2,
-});
+export const getLabelCSS = (color?: string): CSSObject => {
+  return {
+    color: color ?? 'var(--text-input-color)',
+    fontWeight: 'var(--font-weight-semibold)',
+    display: 'flex',
+    flexDirection: 'column',
+    marginBottom: 2,
+  };
+};
 
 export const cancelButtonCSS: CSSObject = {
   alignItems: 'center',

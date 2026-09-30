@@ -42,13 +42,20 @@ const initialState: Omit<FileHistoryModalState, 'showModal' | 'hideModal'> = {
 /**
  * Hook to manage the state of the File History Modal.
  */
-export const useFileHistoryModal = create<FileHistoryModalState>(set => ({
-  ...initialState,
-  showModal: (nodeUuid: string, onRestore?: () => void) =>
-    set({
-      isOpen: true,
-      nodeUuid,
-      onRestore,
-    }),
-  hideModal: () => set(() => ({...initialState})),
-}));
+export const useFileHistoryModal = create<FileHistoryModalState>(set => {
+  return {
+    ...initialState,
+    showModal: (nodeUuid: string, onRestore?: () => void) => {
+      return set({
+        isOpen: true,
+        nodeUuid,
+        onRestore,
+      });
+    },
+    hideModal: () => {
+      return set(() => {
+        return {...initialState};
+      });
+    },
+  };
+});

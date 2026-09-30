@@ -375,6 +375,6 @@ export interface ThemeProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   children: React.ReactNode;
 }
 
-export const ThemeProvider = ({theme = themes[THEME_ID.DEFAULT], ...props}: ThemeProps) => (
-  <EmotionThemeProvider theme={theme} {...props} />
-);
+export const ThemeProvider = ({theme = themes[THEME_ID.DEFAULT], ...props}: ThemeProps) => {
+  return <EmotionThemeProvider theme={theme} {...props} />;
+};

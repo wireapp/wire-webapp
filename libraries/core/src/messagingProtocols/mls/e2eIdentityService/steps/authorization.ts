@@ -55,8 +55,14 @@ export const getAuthorizationChallenges = async ({
     nonce = response.nonce;
   }
 
-  const {challenge: oidcChallenge} = challenges.find(challenge => challenge.type.includes('oidc')) ?? {};
-  const {challenge: dpopChallenge} = challenges.find(challenge => challenge.type.includes('dpop')) ?? {};
+  const {challenge: oidcChallenge} =
+    challenges.find(challenge => {
+      return challenge.type.includes('oidc');
+    }) ?? {};
+  const {challenge: dpopChallenge} =
+    challenges.find(challenge => {
+      return challenge.type.includes('dpop');
+    }) ?? {};
 
   if (dpopChallenge === undefined || oidcChallenge === undefined) {
     throw new Error('missing dpop or oidc challenge');

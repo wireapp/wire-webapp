@@ -19,69 +19,73 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const listWrapper = ({isHighlighted = false, noUnderline = false, noInteraction = false}): CSSObject => ({
-  position: 'relative',
-  display: 'block',
-  margin: '1px',
-  alignItems: 'center',
+export const listWrapper = ({isHighlighted = false, noUnderline = false, noInteraction = false}): CSSObject => {
+  return {
+    position: 'relative',
+    display: 'block',
+    margin: '1px',
+    alignItems: 'center',
 
-  '&:hover, &:focus, &:focus-visible': {
-    background: 'var(--app-bg-secondary)',
-  },
-
-  '&:hover [data-hover-class="chevron-icon"], &:focus, &:focus-visible [data-hover-class="chevron-icon"]': {
-    opacity: 1,
-  },
-
-  ...(!noInteraction && {
-    transition: 'background-color 0.15s ease-in-out',
-    '&:hover': {
-      backgroundColor: 'var(--app-bg-secondary)',
+    '&:hover, &:focus, &:focus-visible': {
+      background: 'var(--app-bg-secondary)',
     },
-    '&:focus-visible': {
-      backgroundColor: 'var(--app-bg-secondary)',
-      outline: '1px solid var(--accent-color-focus)',
+
+    '&:hover [data-hover-class="chevron-icon"], &:focus, &:focus-visible [data-hover-class="chevron-icon"]': {
+      opacity: 1,
     },
-  }),
 
-  'input[type="checkbox"] + label > span': {
-    width: 'calc(100% - 22px - 0.75rem)',
-  },
-
-  ...(!noUnderline && {
-    '&::after': {
-      position: 'absolute',
-      right: 0,
-      bottom: 0,
-      left: 'var(--left-list-item-left-width)',
-      borderBottom: '1px solid var(--gray-40)',
-      content: '""',
-    },
-  }),
-
-  ...(isHighlighted && {
-    animation: 'fadeInUserHighlighting 1s var(--ease-out-quart)',
-    backgroundColor: 'var(--background-fade-8)',
-  }),
-
-  'body.theme-dark &': {
-    ...(!noUnderline && {
-      '&::after': {
-        borderBottomColor: 'var(--gray-90)',
+    ...(!noInteraction && {
+      transition: 'background-color 0.15s ease-in-out',
+      '&:hover': {
+        backgroundColor: 'var(--app-bg-secondary)',
+      },
+      '&:focus-visible': {
+        backgroundColor: 'var(--app-bg-secondary)',
+        outline: '1px solid var(--accent-color-focus)',
       },
     }),
-  },
-});
 
-export const listItem = (noInteraction = false): CSSObject => ({
-  display: 'flex',
-  overflow: 'hidden',
-  height: '56px',
-  alignItems: 'center',
-  paddingRight: '16px',
-  margin: '0',
-  cursor: noInteraction ? 'default' : 'pointer',
-});
+    'input[type="checkbox"] + label > span': {
+      width: 'calc(100% - 22px - 0.75rem)',
+    },
+
+    ...(!noUnderline && {
+      '&::after': {
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        left: 'var(--left-list-item-left-width)',
+        borderBottom: '1px solid var(--gray-40)',
+        content: '""',
+      },
+    }),
+
+    ...(isHighlighted && {
+      animation: 'fadeInUserHighlighting 1s var(--ease-out-quart)',
+      backgroundColor: 'var(--background-fade-8)',
+    }),
+
+    'body.theme-dark &': {
+      ...(!noUnderline && {
+        '&::after': {
+          borderBottomColor: 'var(--gray-90)',
+        },
+      }),
+    },
+  };
+};
+
+export const listItem = (noInteraction = false): CSSObject => {
+  return {
+    display: 'flex',
+    overflow: 'hidden',
+    height: '56px',
+    alignItems: 'center',
+    paddingRight: '16px',
+    margin: '0',
+    cursor: noInteraction ? 'default' : 'pointer',
+  };
+};
 
 export const chevronIcon: CSSObject = {
   border: 'none',
@@ -153,11 +157,13 @@ export const contentInfoWrapper: CSSObject = {
   color: 'var(--background)',
 };
 
-export const contentInfoText = (noPointer = false): CSSObject => ({
-  maxWidth: '100%',
-  whiteSpace: 'nowrap',
-  ...(!noPointer && {
-    cursor: 'text',
-    userSelect: 'initial',
-  }),
-});
+export const contentInfoText = (noPointer = false): CSSObject => {
+  return {
+    maxWidth: '100%',
+    whiteSpace: 'nowrap',
+    ...(!noPointer && {
+      cursor: 'text',
+      userSelect: 'initial',
+    }),
+  };
+};

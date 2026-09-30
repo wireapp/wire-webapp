@@ -150,7 +150,9 @@ test.describe('Localization', () => {
       const menuList = page.getByRole('menu').getByRole('menuitem');
 
       await expect
-        .poll(async () => await menuList.allInnerTexts())
+        .poll(async () => {
+          return await menuList.allInnerTexts();
+        })
         .toEqual(
           expect.arrayContaining([
             deTranslations['conversationsPopoverNotificationSettings'], // notifications button

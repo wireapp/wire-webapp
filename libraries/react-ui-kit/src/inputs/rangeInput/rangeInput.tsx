@@ -67,14 +67,28 @@ export const RangeInput = forwardRef<HTMLInputElement, RangeInputProps<HTMLInput
         {isNonEmptyString(label) && <InputLabel htmlFor={id}>{label}</InputLabel>}
         <div css={rangeInputWrapperStyles}>
           {isNonEmptyString(minValueLabel) && (
-            <span css={(theme: Theme) => getValueLabelStyles(theme, ValueLabelPosition.LEFT)}>{minValueLabel}</span>
+            <span
+              css={(theme: Theme) => {
+                return getValueLabelStyles(theme, ValueLabelPosition.LEFT);
+              }}
+            >
+              {minValueLabel}
+            </span>
           )}
           {isNonEmptyString(maxValueLabel) && (
-            <span css={(theme: Theme) => getValueLabelStyles(theme, ValueLabelPosition.RIGHT)}>{maxValueLabel}</span>
+            <span
+              css={(theme: Theme) => {
+                return getValueLabelStyles(theme, ValueLabelPosition.RIGHT);
+              }}
+            >
+              {maxValueLabel}
+            </span>
           )}
           <input
             ref={ref}
-            css={(theme: Theme) => getImageCropZoomInputStyles(theme, backgroundSize)}
+            css={(theme: Theme) => {
+              return getImageCropZoomInputStyles(theme, backgroundSize);
+            }}
             id={id}
             name={id}
             min={min}

@@ -29,7 +29,15 @@ export const useZoomControls = () => {
 
   return {
     scale,
-    zoomIn: () => setScale(prev => Math.min(prev + ZOOM_STEP, MAX_ZOOM)),
-    zoomOut: () => setScale(prev => Math.max(prev - ZOOM_STEP, MIN_ZOOM)),
+    zoomIn: () => {
+      return setScale(prev => {
+        return Math.min(prev + ZOOM_STEP, MAX_ZOOM);
+      });
+    },
+    zoomOut: () => {
+      return setScale(prev => {
+        return Math.max(prev - ZOOM_STEP, MIN_ZOOM);
+      });
+    },
   };
 };

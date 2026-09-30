@@ -93,7 +93,9 @@ export const FileAssetWithPreview = ({
       <FileCard.Content>
         <button
           css={contentWrapperStyles}
-          onClick={() => showModal()}
+          onClick={() => {
+            return showModal();
+          }}
           aria-label={translate('cells.options.open')}
           aria-controls={id}
           aria-haspopup="dialog"
@@ -105,7 +107,9 @@ export const FileAssetWithPreview = ({
             style={{'--opacity': isImageLoaded && hasImagePreview ? 1 : 0} as CSSProperties}
             alt=""
             css={imageStyles}
-            onLoad={() => setIsImageLoaded(true)}
+            onLoad={() => {
+              return setIsImageLoaded(true);
+            }}
           />
 
           <div css={infoOverlayStyles}>

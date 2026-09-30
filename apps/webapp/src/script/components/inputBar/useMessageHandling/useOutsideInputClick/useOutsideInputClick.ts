@@ -28,14 +28,15 @@ interface UseOutsideInputClickParams {
 
 export const useOutsideInputClick = ({isEditing, callback}: UseOutsideInputClickParams) => {
   useEffect(() => {
-    const onWindowClick = (event: Event): void =>
-      handleClickOutsideOfInputBar(event, () => {
+    const onWindowClick = (event: Event): void => {
+      return handleClickOutsideOfInputBar(event, () => {
         // We want to add a timeout in case the click happens because the user switched conversation and the component is unmounting.
         // In this case we want to keep the edited message for this conversation
         setTimeout(() => {
           callback();
         });
       });
+    };
     if (isEditing) {
       window.addEventListener('click', onWindowClick);
 
@@ -44,6 +45,8 @@ export const useOutsideInputClick = ({isEditing, callback}: UseOutsideInputClick
       };
     }
 
-    return () => undefined;
+    return () => {
+      return undefined;
+    };
   }, [callback, isEditing]);
 };

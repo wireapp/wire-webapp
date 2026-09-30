@@ -59,121 +59,147 @@ export const customStyles = ({
   groupCSS,
   groupHeadingCSS,
   menuPortalCSS,
-}: CustomStylesParams): StylesConfig<Option, boolean, GroupBase<Option>> => ({
-  indicatorSeparator: baseIndicatorSeparatorStyles,
-  indicatorsContainer: provided => provided,
-  control: (_provided, {isDisabled, selectProps}) =>
-    baseControlStyles({theme, isDisabled, markInvalid, selectProps, controlCSS}),
-  dropdownIndicator: (provided, selectProps) => ({
-    ...provided,
-    ...baseDropdownIndicatorStyles({theme, selectProps}),
-  }),
-  container: (_, {options}) =>
-    isGroup(options)
-      ? {
-          '& > div': {
-            display: 'inline',
-            position: 'relative',
-            top: '-10px',
-            ...containerCSS,
-          },
-        }
-      : baseContainerStyles(containerCSS),
-  menu: (provided, {options}) => {
-    const styles: CSSObject = {
-      ...provided,
-      width: provided.width,
-      minWidth: provided.minWidth,
-      ...baseMenuStyles({theme, menuPosition}),
-      ...(isGroup(options) && {
-        minWidth: '400px',
-      }),
-      ...menuCSS,
-    };
-
-    if (menuMatchControlWidth) {
-      styles.minWidth = provided.width;
-      styles.maxWidth = provided.width;
-    }
-
-    return styles;
-  },
-  singleValue: (provided, selectProps) => ({
-    ...provided,
-    ...baseSingleValueStyles({theme, selectProps}),
-    ...(menuMatchControlWidth && {
-      gridArea: 'unset',
-      maxWidth: '100%',
-      overflow: 'visible',
-      textOverflow: 'clip',
-    }),
-  }),
-  input: provided => ({
-    ...provided,
-    color: theme.general.color,
-  }),
-  placeholder: provided => ({
-    ...provided,
-    color: theme.Input.placeholderColor,
-  }),
-  menuList: provided => ({
-    ...provided,
-    ...baseMenuListStyles(),
-  }),
-  option: (provided, {isMulti, isDisabled, isFocused, isSelected, options, data}) => ({
-    ...provided,
-    ...baseOptionStyles({theme, isMulti, isDisabled, isFocused, isSelected}),
-    padding: isGroup(options) ? '6px 16px' : '10px 18px',
-    fontWeight: isSelected && isGroup(options) ? 600 : 400,
-    ...(isGroup(options) && {
-      'div > svg': {
-        fill: theme.general.contrastColor,
-      },
-    }),
-    ...(!isGroup(options) && {
-      '&:not(:last-of-type)': {
-        borderBottom: `1px solid ${theme.Select.borderColor}`,
-      },
-    }),
-    ...(!isGroup(options) && {
-      '&:first-of-type': {
-        borderRadius: '0',
-      },
-    }),
-    ...(isGroup(options) && {
-      textAlign: 'left',
-    }),
-    '&:last-of-type': {
-      ...(!isGroup(options) && {borderRadius: '0'}),
-      ...(isGroup(options) &&
-        !options[options.length - 1].options.includes(data) && {
-          borderBottom: `1px solid ${theme.Select.borderColor}`,
-        }),
+}: CustomStylesParams): StylesConfig<Option, boolean, GroupBase<Option>> => {
+  return {
+    indicatorSeparator: baseIndicatorSeparatorStyles,
+    indicatorsContainer: provided => {
+      return provided;
     },
-  }),
-  valueContainer: (provided, {selectProps}) => ({
-    ...provided,
-    display: selectProps.isMulti ? 'grid' : 'flex',
-    padding: 0,
-    flex: 1,
-    minWidth: 0,
-    ...(selectProps.isMulti && {
-      width: '100%',
-    }),
-  }),
-  groupHeading: base => ({
-    ...base,
-    color: theme.general.color,
-    fontSize: theme.fontSizes.small,
-    lineHeight: 1,
-    padding: '8px 16px 6px',
-    textAlign: 'left',
-    ...groupHeadingCSS,
-  }),
-  group: provided => ({
-    ...provided,
-    backgroundColor: theme.Input.backgroundColor,
-    ...groupCSS,
-  }),
-  menuPortal: provided => ({...provided, ...menuPortalCSS}),
-});
+    control: (_provided, {isDisabled, selectProps}) => {
+      return baseControlStyles({theme, isDisabled, markInvalid, selectProps, controlCSS});
+    },
+    dropdownIndicator: (provided, selectProps) => {
+      return {
+        ...provided,
+        ...baseDropdownIndicatorStyles({theme, selectProps}),
+      };
+    },
+    container: (_, {options}) => {
+      return isGroup(options)
+        ? {
+            '& > div': {
+              display: 'inline',
+              position: 'relative',
+              top: '-10px',
+              ...containerCSS,
+            },
+          }
+        : baseContainerStyles(containerCSS);
+    },
+    menu: (provided, {options}) => {
+      const styles: CSSObject = {
+        ...provided,
+        width: provided.width,
+        minWidth: provided.minWidth,
+        ...baseMenuStyles({theme, menuPosition}),
+        ...(isGroup(options) && {
+          minWidth: '400px',
+        }),
+        ...menuCSS,
+      };
+
+      if (menuMatchControlWidth) {
+        styles.minWidth = provided.width;
+        styles.maxWidth = provided.width;
+      }
+
+      return styles;
+    },
+    singleValue: (provided, selectProps) => {
+      return {
+        ...provided,
+        ...baseSingleValueStyles({theme, selectProps}),
+        ...(menuMatchControlWidth && {
+          gridArea: 'unset',
+          maxWidth: '100%',
+          overflow: 'visible',
+          textOverflow: 'clip',
+        }),
+      };
+    },
+    input: provided => {
+      return {
+        ...provided,
+        color: theme.general.color,
+      };
+    },
+    placeholder: provided => {
+      return {
+        ...provided,
+        color: theme.Input.placeholderColor,
+      };
+    },
+    menuList: provided => {
+      return {
+        ...provided,
+        ...baseMenuListStyles(),
+      };
+    },
+    option: (provided, {isMulti, isDisabled, isFocused, isSelected, options, data}) => {
+      return {
+        ...provided,
+        ...baseOptionStyles({theme, isMulti, isDisabled, isFocused, isSelected}),
+        padding: isGroup(options) ? '6px 16px' : '10px 18px',
+        fontWeight: isSelected && isGroup(options) ? 600 : 400,
+        ...(isGroup(options) && {
+          'div > svg': {
+            fill: theme.general.contrastColor,
+          },
+        }),
+        ...(!isGroup(options) && {
+          '&:not(:last-of-type)': {
+            borderBottom: `1px solid ${theme.Select.borderColor}`,
+          },
+        }),
+        ...(!isGroup(options) && {
+          '&:first-of-type': {
+            borderRadius: '0',
+          },
+        }),
+        ...(isGroup(options) && {
+          textAlign: 'left',
+        }),
+        '&:last-of-type': {
+          ...(!isGroup(options) && {borderRadius: '0'}),
+          ...(isGroup(options) &&
+            !options[options.length - 1].options.includes(data) && {
+              borderBottom: `1px solid ${theme.Select.borderColor}`,
+            }),
+        },
+      };
+    },
+    valueContainer: (provided, {selectProps}) => {
+      return {
+        ...provided,
+        display: selectProps.isMulti ? 'grid' : 'flex',
+        padding: 0,
+        flex: 1,
+        minWidth: 0,
+        ...(selectProps.isMulti && {
+          width: '100%',
+        }),
+      };
+    },
+    groupHeading: base => {
+      return {
+        ...base,
+        color: theme.general.color,
+        fontSize: theme.fontSizes.small,
+        lineHeight: 1,
+        padding: '8px 16px 6px',
+        textAlign: 'left',
+        ...groupHeadingCSS,
+      };
+    },
+    group: provided => {
+      return {
+        ...provided,
+        backgroundColor: theme.Input.backgroundColor,
+        ...groupCSS,
+      };
+    },
+    menuPortal: provided => {
+      return {...provided, ...menuPortalCSS};
+    },
+  };
+};

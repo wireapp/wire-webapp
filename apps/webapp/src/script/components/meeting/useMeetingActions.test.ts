@@ -43,7 +43,12 @@ describe('useMeetingActions', () => {
   });
 
   it('opens the meet-now modal', () => {
-    const {result} = renderHook(() => useMeetingActions(), {wrapper: RootProviderWrapper});
+    const {result} = renderHook(
+      () => {
+        return useMeetingActions();
+      },
+      {wrapper: RootProviderWrapper},
+    );
 
     expect(useMeetNowModal.getState().isOpen).toBe(false);
 

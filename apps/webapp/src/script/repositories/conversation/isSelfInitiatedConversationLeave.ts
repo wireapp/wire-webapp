@@ -17,5 +17,6 @@
  *
  */
 
-export const isSelfInitiatedConversationLeave = (eventFrom: string, selfUserId: string): boolean =>
-  eventFrom === selfUserId;
+export const isSelfInitiatedConversationLeave = (eventFrom: string, selfUserId: string): boolean => {
+  return eventFrom === selfUserId;
+};

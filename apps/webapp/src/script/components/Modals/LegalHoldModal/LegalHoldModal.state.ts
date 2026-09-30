@@ -56,83 +56,109 @@ const legalHoldModalDefaultState: Partial<LegalHoldModalState> = {
   users: [],
 };
 
-const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
-  closeModal: () =>
-    set(state => ({
-      ...state,
-      ...legalHoldModalDefaultState,
-    })),
-  closeRequestModal: (conversationId = '') => {
-    if (conversationId !== get().conversationId) {
-      return;
-    }
+const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => {
+  return {
+    closeModal: () => {
+      return set(state => {
+        return {
+          ...state,
+          ...legalHoldModalDefaultState,
+        };
+      });
+    },
+    closeRequestModal: (conversationId = '') => {
+      if (conversationId !== get().conversationId) {
+        return;
+      }
 
-    return set(state => ({
-      ...state,
-      ...legalHoldModalDefaultState,
-    }));
-  },
-  conversation: null,
-  conversationId: '',
-  fingerprint: '',
-  isInitialized: false,
-  isLoading: false,
-  isOpen: false,
-  isSelfInfo: false,
-  setFingerprint: fingerprint => {
-    const normalizedFingerprint = isUndefined(fingerprint) ? '' : fingerprint;
+      return set(state => {
+        return {
+          ...state,
+          ...legalHoldModalDefaultState,
+        };
+      });
+    },
+    conversation: null,
+    conversationId: '',
+    fingerprint: '',
+    isInitialized: false,
+    isLoading: false,
+    isOpen: false,
+    isSelfInfo: false,
+    setFingerprint: fingerprint => {
+      const normalizedFingerprint = isUndefined(fingerprint) ? '' : fingerprint;
 
-    return set(state => ({
-      ...state,
-      fingerprint: normalizedFingerprint,
-      isOpen: normalizedFingerprint !== '',
-    }));
-  },
-  setIsLoading: isLoading =>
-    set(state => ({
-      ...state,
-      isLoading,
-    })),
-  setIsModalOpen: isOpen =>
-    set(state => ({
-      ...state,
-      isOpen,
-    })),
-  setType: type =>
-    set(state => ({
-      ...state,
-      type,
-    })),
-  setUsers: users =>
-    set(state => ({
-      ...state,
-      users,
-    })),
-  showRequestModal: (initialize = false, showLoading = false, fingerprint) => {
-    const normalizedFingerprint = isUndefined(fingerprint) ? '' : fingerprint;
+      return set(state => {
+        return {
+          ...state,
+          fingerprint: normalizedFingerprint,
+          isOpen: normalizedFingerprint !== '',
+        };
+      });
+    },
+    setIsLoading: isLoading => {
+      return set(state => {
+        return {
+          ...state,
+          isLoading,
+        };
+      });
+    },
+    setIsModalOpen: isOpen => {
+      return set(state => {
+        return {
+          ...state,
+          isOpen,
+        };
+      });
+    },
+    setType: type => {
+      return set(state => {
+        return {
+          ...state,
+          type,
+        };
+      });
+    },
+    setUsers: users => {
+      return set(state => {
+        return {
+          ...state,
+          users,
+        };
+      });
+    },
+    showRequestModal: (initialize = false, showLoading = false, fingerprint) => {
+      const normalizedFingerprint = isUndefined(fingerprint) ? '' : fingerprint;
 
-    return set(state => ({
-      ...state,
-      fingerprint: normalizedFingerprint,
-      isInitialized: initialize,
-      isLoading: showLoading,
-      isOpen: showLoading || normalizedFingerprint !== '',
-      type: LegalHoldModalType.REQUEST,
-    }));
-  },
-  showUsers: (initialize = false, conversation) =>
-    set(state => ({
-      ...state,
-      conversation,
-      conversationId: conversation?.id ?? 'self',
-      isInitialized: initialize,
-      isLoading: true,
-      isOpen: true,
-      isSelfInfo: conversation === null || conversation === undefined,
-      type: LegalHoldModalType.USERS,
-    })),
-  type: null,
-  users: [],
-}));
+      return set(state => {
+        return {
+          ...state,
+          fingerprint: normalizedFingerprint,
+          isInitialized: initialize,
+          isLoading: showLoading,
+          isOpen: showLoading || normalizedFingerprint !== '',
+          type: LegalHoldModalType.REQUEST,
+        };
+      });
+    },
+    showUsers: (initialize = false, conversation) => {
+      return set(state => {
+        return {
+          ...state,
+          conversation,
+          conversationId: conversation?.id ?? 'self',
+          isInitialized: initialize,
+          isLoading: true,
+          isOpen: true,
+          isSelfInfo: conversation === null || conversation === undefined,
+          type: LegalHoldModalType.USERS,
+        };
+      });
+    },
+    type: null,
+    users: [],
+  };
+});
 
 export {useLegalHoldModalState};

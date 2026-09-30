@@ -33,22 +33,30 @@ export const filterColumnsProps = (props: ColumnsProps) => {
   return filterProps(props, ['query']);
 };
 
-const columnsStyle: <T>(props: ColumnsProps<T>) => CSSObject = ({query = QueryKeys.MOBILE}) => ({
-  display: 'flex',
-  marginLeft: `-${GUTTER}px`,
-  [media[query]]: {flexDirection: 'column'},
-});
+const columnsStyle: <T>(props: ColumnsProps<T>) => CSSObject = ({query = QueryKeys.MOBILE}) => {
+  return {
+    display: 'flex',
+    marginLeft: `-${GUTTER}px`,
+    [media[query]]: {flexDirection: 'column'},
+  };
+};
 
-export const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {...filterColumnsProps(props)} />;
+export const Columns = (props: ColumnsProps) => {
+  return <div css={columnsStyle(props)} {...filterColumnsProps(props)} />;
+};
 
 export type ColumnProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const columnStyle: <T>(props: ColumnProps<T>) => CSSObject = _ => ({
-  display: 'block',
-  flexBasis: '0',
-  flexGrow: 1,
-  flexShrink: 1,
-  marginLeft: `${GUTTER}px`,
-});
+const columnStyle: <T>(props: ColumnProps<T>) => CSSObject = _ => {
+  return {
+    display: 'block',
+    flexBasis: '0',
+    flexGrow: 1,
+    flexShrink: 1,
+    marginLeft: `${GUTTER}px`,
+  };
+};
 
-export const Column = (props: ColumnProps) => <div css={columnStyle(props)} {...props} />;
+export const Column = (props: ColumnProps) => {
+  return <div css={columnStyle(props)} {...props} />;
+};

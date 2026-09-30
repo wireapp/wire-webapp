@@ -243,7 +243,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       PrimaryModal.type.CONFIRM,
       {
         primaryAction: {
-          action: () => window.location.reload(),
+          action: () => {
+            return window.location.reload();
+          },
           text: this.translate('mlsWasEnabledReload'),
         },
         text: {
@@ -306,8 +308,12 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     this.updateMemberRoles(teamMembers);
     return teamMembers
-      .filter(({userId}) => userId !== this.userState.self().id)
-      .map(memberEntity => ({domain: this.teamState.teamDomain() ?? '', id: memberEntity.userId}));
+      .filter(({userId}) => {
+        return userId !== this.userState.self().id;
+      })
+      .map(memberEntity => {
+        return {domain: this.teamState.teamDomain() ?? '', id: memberEntity.userId};
+      });
   }
 
   async getTeam(): Promise<TeamEntity> {
@@ -353,10 +359,18 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     if (selfTeamId === undefined || selfTeamId === '') {
       return;
     }
-    const knownMemberIds = this.teamState.teamMembers().map(member => member.id);
-    const teamUsers = users.filter(user => user.teamId === selfTeamId);
-    const newTeamMembers = teamUsers.filter(user => !knownMemberIds.includes(user.id));
-    const newTeamMemberIds = newTeamMembers.map(({id}) => id);
+    const knownMemberIds = this.teamState.teamMembers().map(member => {
+      return member.id;
+    });
+    const teamUsers = users.filter(user => {
+      return user.teamId === selfTeamId;
+    });
+    const newTeamMembers = teamUsers.filter(user => {
+      return !knownMemberIds.includes(user.id);
+    });
+    const newTeamMemberIds = newTeamMembers.map(({id}) => {
+      return id;
+    });
     await this.updateTeamMembersByIds(selfTeamId, newTeamMemberIds, true);
   };
 
@@ -369,7 +383,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
 
     const domain = this.userState.self()?.domain ?? this.teamState.teamDomain();
-    const hasFederatedUsers = users.some(user => user.domain !== domain);
+    const hasFederatedUsers = users.some(user => {
+      return user.domain !== domain;
+    });
 
     if (this.backendSupportsMLS === null) {
       const apiClient = container.resolve(APIClient);
@@ -396,11 +412,19 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     if (teamId === undefined || teamId === '') {
       return users;
     }
-    const userIds = users.map(({id}) => id);
+    const userIds = users.map(({id}) => {
+      return id;
+    });
     const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
     return members
-      .filter(member => roleFromTeamPermissions(member.permissions) !== ROLE.PARTNER)
-      .map(({user}) => users.find(({id}) => id === user))
+      .filter(member => {
+        return roleFromTeamPermissions(member.permissions) !== ROLE.PARTNER;
+      })
+      .map(({user}) => {
+        return users.find(({id}) => {
+          return id === user;
+        });
+      })
       .filter((user): user is User => {
         return user !== undefined;
       });
@@ -441,13 +465,14 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     const teamOwnedApps = this.userRepository.userMapper.mapUsersFromJson(appsData, domain);
 
-    const collaboratorIds: QualifiedId[] = collaborators.map(({user}) => ({domain, id: user}));
+    const collaboratorIds: QualifiedId[] = collaborators.map(({user}) => {
+      return {domain, id: user};
+    });
     const resolvedCollaborators = await this.userRepository.getUsersById(collaboratorIds);
 
-    const [humanCollaborators, appCollaborators] = partition(
-      resolvedCollaborators,
-      collaborator => collaborator.type === UserType.REGULAR,
-    );
+    const [humanCollaborators, appCollaborators] = partition(resolvedCollaborators, collaborator => {
+      return collaborator.type === UserType.REGULAR;
+    });
 
     const mergedApps = [...teamOwnedApps, ...appCollaborators];
 
@@ -536,7 +561,13 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const members = await this.teamService.getTeamMembersByIds(teamId, memberIds);
     const mappedMembers = this.teamMapper.mapMembers(members);
     const selfId = this.userState.self().id;
-    memberIds = mappedMembers.map(member => member.userId).filter(id => id !== selfId);
+    memberIds = mappedMembers
+      .map(member => {
+        return member.userId;
+      })
+      .filter(id => {
+        return id !== selfId;
+      });
 
     if (!append) {
       this.teamState.memberRoles({});
@@ -629,7 +660,10 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }, this.teamState.memberInviters());
 
     const supportsLegalHold =
-      this.teamState.supportsLegalHold() || members.some(member => member.hasOwnProperty('legalholdStatus'));
+      this.teamState.supportsLegalHold() ||
+      members.some(member => {
+        return member.hasOwnProperty('legalholdStatus');
+      });
     this.teamState.supportsLegalHold(supportsLegalHold);
     this.teamState.memberRoles(memberRoles);
     this.teamState.memberInviters(memberInvites);

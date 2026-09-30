@@ -39,7 +39,9 @@ interface CellsPageSizeSelectProps {
 
 export const CellsPageSizeSelect = ({pageSize, onSizeChange}: CellsPageSizeSelectProps) => {
   const {translate} = useApplicationContext();
-  const currentOption = useMemo(() => ({value: `${pageSize}`, label: `${pageSize}`}), [pageSize]);
+  const currentOption = useMemo(() => {
+    return {value: `${pageSize}`, label: `${pageSize}`};
+  }, [pageSize]);
 
   return (
     <div css={wrapperStyles}>

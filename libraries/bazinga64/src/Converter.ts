@@ -57,9 +57,9 @@ export class Converter {
     const chunkSize = 32000;
     const array = Array.from(arrayBufferView);
     const chunkCount = Math.ceil(array.length / chunkSize);
-    return Array.from({length: chunkCount}, (_, index) =>
-      String.fromCharCode.apply(null, array.slice(index * chunkSize, (index + 1) * chunkSize)),
-    ).join('');
+    return Array.from({length: chunkCount}, (_, index) => {
+      return String.fromCharCode.apply(null, array.slice(index * chunkSize, (index + 1) * chunkSize));
+    }).join('');
   }
 
   public static jsonToArrayBufferView(objectSource: Record<number, number>): Uint8Array {

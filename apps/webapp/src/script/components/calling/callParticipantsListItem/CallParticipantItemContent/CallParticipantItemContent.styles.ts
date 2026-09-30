@@ -66,13 +66,15 @@ export const contentText: CSSObject = {
   fontWeight: 'var(--font-weight-medium)',
 };
 
-export const nameWrapper = (isAudioEstablished: boolean): CSSObject => ({
-  color: isAudioEstablished ? 'var(--main-color)' : 'var(--text-input-placeholder)',
-  display: 'flex',
-  overflow: 'hidden',
-  width: '100%',
-  paddingRight: '8px',
-});
+export const nameWrapper = (isAudioEstablished: boolean): CSSObject => {
+  return {
+    color: isAudioEstablished ? 'var(--main-color)' : 'var(--text-input-placeholder)',
+    display: 'flex',
+    overflow: 'hidden',
+    width: '100%',
+    paddingRight: '8px',
+  };
+};
 
 export const selfIndicator: CSSObject = {
   marginLeft: '4px',

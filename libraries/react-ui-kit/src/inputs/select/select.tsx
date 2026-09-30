@@ -107,14 +107,16 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
     <div
       // eslint-disable-next-line jsx-a11y/no-autofocus
       autoFocus={isGroup(options)}
-      css={(theme: Theme) => ({
-        marginBottom: markInvalid ? '2px' : '20px',
-        width: '100%',
-        '&:focus-within label': {
-          color: theme.general.primaryColor,
-        },
-        ...wrapperCSS,
-      })}
+      css={(theme: Theme) => {
+        return {
+          marginBottom: markInvalid ? '2px' : '20px',
+          width: '100%',
+          '&:focus-within label': {
+            color: theme.general.primaryColor,
+          },
+          ...wrapperCSS,
+        };
+      }}
       data-uie-name={dataUieName}
     >
       {isNonEmptyString(label) && (
@@ -146,7 +148,11 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
             Menu: SelectMenu(dataUieName, menuCSS),
             ValueContainer: SelectValueContainer,
             IndicatorsContainer: SelectIndicatorsContainer,
-            ...(hideControl && {Control: () => null}),
+            ...(hideControl && {
+              Control: () => {
+                return null;
+              },
+            }),
             ...(isNonEmptyString(menuListHeading) && {MenuList: SelectMenuList(menuListHeading, dataUieName)}),
           } as Partial<SelectComponentsConfig<Option, IsMulti, Group>>
         }
@@ -164,12 +170,14 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
 
       {!hasError && !isNullOrUndefined(helperText) && (
         <p
-          css={(theme: Theme) => ({
-            fontSize: theme.fontSizes.small,
-            fontWeight: 400,
-            color: theme.Input.labelColor,
-            marginTop: 8,
-          })}
+          css={(theme: Theme) => {
+            return {
+              fontSize: theme.fontSizes.small,
+              fontWeight: 400,
+              color: theme.Input.labelColor,
+              marginTop: 8,
+            };
+          }}
         >
           {helperText}
         </p>

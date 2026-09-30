@@ -34,11 +34,15 @@ type UseLoadMoreMeetingListItemsParams = {
 const LOAD_MORE_DEBOUNCE_MS = 100;
 const SCROLL_BOTTOM_THRESHOLD_PX = 100;
 
-const isScrolledNearBottom = (scrollElement: HTMLElement): boolean =>
-  scrollElement.scrollTop + scrollElement.clientHeight >= scrollElement.scrollHeight - SCROLL_BOTTOM_THRESHOLD_PX;
+const isScrolledNearBottom = (scrollElement: HTMLElement): boolean => {
+  return (
+    scrollElement.scrollTop + scrollElement.clientHeight >= scrollElement.scrollHeight - SCROLL_BOTTOM_THRESHOLD_PX
+  );
+};
 
-const isVirtualizedTailVisible = (virtualizer: Virtualizer<HTMLElement, Element>, itemCount: number): boolean =>
-  virtualizer.getVirtualItems().at(-1)?.index === itemCount - 1;
+const isVirtualizedTailVisible = (virtualizer: Virtualizer<HTMLElement, Element>, itemCount: number): boolean => {
+  return virtualizer.getVirtualItems().at(-1)?.index === itemCount - 1;
+};
 
 export const useLoadMoreMeetingListItems = ({
   scrollElementRef,

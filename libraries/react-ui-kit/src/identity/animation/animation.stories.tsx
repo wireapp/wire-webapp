@@ -36,11 +36,13 @@ import {COLOR} from '../colors/colors';
 const meta: Meta = {
   title: 'identity/animation',
   decorators: [
-    Story => (
-      <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 
@@ -54,7 +56,9 @@ const AnimationDemo = ({
   children: (isAnimating: boolean, toggle: () => void) => ReactNode;
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
-  const toggle = () => setIsAnimating(!isAnimating);
+  const toggle = () => {
+    return setIsAnimating(!isAnimating);
+  };
 
   return (
     <div style={{marginBottom: '32px'}}>
@@ -88,88 +92,110 @@ const AnimationDemo = ({
   );
 };
 
-export const AllAnimations = () => (
-  <div>
-    <AnimationDemo title="Opacity">
-      {isAnimating => (
-        <Opacity in={isAnimating}>
-          <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Fade in/out content</div>
-        </Opacity>
-      )}
-    </AnimationDemo>
-
-    <AnimationDemo title="Top Down Movement">
-      {isAnimating => (
-        <TopDownMovement in={isAnimating}>
-          <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Moving from top</div>
-        </TopDownMovement>
-      )}
-    </AnimationDemo>
-
-    <AnimationDemo title="Bottom Up Movement">
-      {isAnimating => (
-        <BottomUpMovement in={isAnimating}>
-          <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Moving from bottom</div>
-        </BottomUpMovement>
-      )}
-    </AnimationDemo>
-
-    <AnimationDemo title="Y-Axis Movement">
-      {isAnimating => (
-        <YAxisMovement in={isAnimating} startValue="50%" endValue="-50%">
-          <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>
-            Custom vertical movement
-          </div>
-        </YAxisMovement>
-      )}
-    </AnimationDemo>
-
-    <AnimationDemo title="Left Right Movement">
-      {isAnimating => (
-        <LeftRightMovement in={isAnimating}>
-          <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Moving from left</div>
-        </LeftRightMovement>
-      )}
-    </AnimationDemo>
-
-    <AnimationDemo title="Right Left Movement">
-      {isAnimating => (
-        <RightLeftMovement in={isAnimating}>
-          <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Moving from right</div>
-        </RightLeftMovement>
-      )}
-    </AnimationDemo>
-
-    <AnimationDemo title="X-Axis Movement">
-      {isAnimating => (
-        <XAxisMovement in={isAnimating} startValue="10vh" endValue="-10vh">
-          <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>
-            Custom horizontal movement
-          </div>
-        </XAxisMovement>
-      )}
-    </AnimationDemo>
-
-    <AnimationDemo title="Combined Animations">
-      {isAnimating => (
-        <TopDownMovement in={isAnimating}>
-          <Opacity in={isAnimating}>
-            <XAxisMovement in={isAnimating} startValue="40vh" endValue="10vh">
+export const AllAnimations = () => {
+  return (
+    <div>
+      <AnimationDemo title="Opacity">
+        {isAnimating => {
+          return (
+            <Opacity in={isAnimating}>
               <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>
-                Combined fade, vertical and horizontal movement
+                Fade in/out content
+              </div>
+            </Opacity>
+          );
+        }}
+      </AnimationDemo>
+
+      <AnimationDemo title="Top Down Movement">
+        {isAnimating => {
+          return (
+            <TopDownMovement in={isAnimating}>
+              <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Moving from top</div>
+            </TopDownMovement>
+          );
+        }}
+      </AnimationDemo>
+
+      <AnimationDemo title="Bottom Up Movement">
+        {isAnimating => {
+          return (
+            <BottomUpMovement in={isAnimating}>
+              <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Moving from bottom</div>
+            </BottomUpMovement>
+          );
+        }}
+      </AnimationDemo>
+
+      <AnimationDemo title="Y-Axis Movement">
+        {isAnimating => {
+          return (
+            <YAxisMovement in={isAnimating} startValue="50%" endValue="-50%">
+              <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>
+                Custom vertical movement
+              </div>
+            </YAxisMovement>
+          );
+        }}
+      </AnimationDemo>
+
+      <AnimationDemo title="Left Right Movement">
+        {isAnimating => {
+          return (
+            <LeftRightMovement in={isAnimating}>
+              <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Moving from left</div>
+            </LeftRightMovement>
+          );
+        }}
+      </AnimationDemo>
+
+      <AnimationDemo title="Right Left Movement">
+        {isAnimating => {
+          return (
+            <RightLeftMovement in={isAnimating}>
+              <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>Moving from right</div>
+            </RightLeftMovement>
+          );
+        }}
+      </AnimationDemo>
+
+      <AnimationDemo title="X-Axis Movement">
+        {isAnimating => {
+          return (
+            <XAxisMovement in={isAnimating} startValue="10vh" endValue="-10vh">
+              <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>
+                Custom horizontal movement
               </div>
             </XAxisMovement>
-          </Opacity>
-        </TopDownMovement>
-      )}
-    </AnimationDemo>
-  </div>
-);
+          );
+        }}
+      </AnimationDemo>
+
+      <AnimationDemo title="Combined Animations">
+        {isAnimating => {
+          return (
+            <TopDownMovement in={isAnimating}>
+              <Opacity in={isAnimating}>
+                <XAxisMovement in={isAnimating} startValue="40vh" endValue="10vh">
+                  <div style={{padding: '16px', backgroundColor: COLOR.WHITE, borderRadius: '4px'}}>
+                    Combined fade, vertical and horizontal movement
+                  </div>
+                </XAxisMovement>
+              </Opacity>
+            </TopDownMovement>
+          );
+        }}
+      </AnimationDemo>
+    </div>
+  );
+};
 
 export const CustomizableAnimation: StoryObj = {
   render: function Render() {
     const [isAnimating, setIsAnimating] = useState(false);
-    const toggle = () => setIsAnimating(!isAnimating);
+    const toggle = () => {
+      return setIsAnimating(!isAnimating);
+    };
 
     return (
       <div>

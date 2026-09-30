@@ -33,11 +33,15 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
 
   const [ownerPage, ...memberPages] = await Promise.all([
     createPage(withLogin(owner)),
-    ...members.map(member => createPage(withLogin(member))),
+    ...members.map(member => {
+      return createPage(withLogin(member));
+    }),
   ]);
   const [ownerPageManager, ...memberPageManagers] = [
     PageManager.from(ownerPage),
-    ...memberPages.map(page => PageManager.from(page)),
+    ...memberPages.map(page => {
+      return PageManager.from(page);
+    }),
   ];
 
   const conversation = ownerPageManager.webapp.pages.conversationList().getConversation(conversationName);

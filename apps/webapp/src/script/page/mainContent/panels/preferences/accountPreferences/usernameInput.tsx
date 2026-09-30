@@ -120,7 +120,9 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
       <AccountInput
         label={translate('preferencesAccountUsername')}
         value={username}
-        onInput={({target}: FormEvent) => verifyUsername((target as HTMLInputElement).value)}
+        onInput={({target}: FormEvent) => {
+          return verifyUsername((target as HTMLInputElement).value);
+        }}
         readOnly={!canEditProfile}
         prefix="@"
         suffix={isNonEmptyString(domain) ? `@${domain}` : undefined}

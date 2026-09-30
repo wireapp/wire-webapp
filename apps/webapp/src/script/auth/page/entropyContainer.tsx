@@ -85,9 +85,15 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
           </Muted>
           <Button
             css={styles.continueButton}
-            onClick={() => forwardEntropy(entropy.entropyData)}
+            onClick={() => {
+              return forwardEntropy(entropy.entropyData);
+            }}
             data-uie-name="do-entropy-confirm"
-            onKeyDown={event => handleEnterDown(event, () => forwardEntropy(entropy.entropyData))}
+            onKeyDown={event => {
+              return handleEnterDown(event, () => {
+                return forwardEntropy(entropy.entropyData);
+              });
+            }}
           >
             {translate('setEntropy.continue')}
           </Button>

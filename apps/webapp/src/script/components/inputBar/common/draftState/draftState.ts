@@ -33,8 +33,9 @@ export interface DraftState {
   plainMessage?: string;
 }
 
-export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
-  `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+export const generateConversationInputStorageKey = (conversationEntity: Conversation): string => {
+  return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+};
 
 type SaveDraftState = {
   storageRepository: StorageRepository;

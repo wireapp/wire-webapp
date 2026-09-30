@@ -29,8 +29,9 @@ export const normalizeProgress = (progress: number): number => {
   return Math.min(1, Math.max(0, progress));
 };
 
-const invalidTransition = (state: UploadState, action: UploadAction): Result<UploadState, UploadLifecycleError> =>
-  Result.err({kind: 'invalidTransition', from: state.kind, action: action.type});
+const invalidTransition = (state: UploadState, action: UploadAction): Result<UploadState, UploadLifecycleError> => {
+  return Result.err({kind: 'invalidTransition', from: state.kind, action: action.type});
+};
 
 const transitionFromQueued = (state: Extract<UploadState, {kind: 'queued'}>, action: UploadAction) => {
   if (action.type === 'startUpload') {

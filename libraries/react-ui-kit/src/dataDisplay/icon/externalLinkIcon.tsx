@@ -19,9 +19,11 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ExternalLinkIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M7 3H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9h-2v4H3V5h4V3Z" />
-    <path d="M11.71 2.875H8v-1.75h6.875V8h-1.75V4.29l-6.418 6.417-1.414-1.414 6.418-6.418Z" />
-  </SVGIcon>
-);
+export const ExternalLinkIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path d="M7 3H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9h-2v4H3V5h4V3Z" />
+      <path d="M11.71 2.875H8v-1.75h6.875V8h-1.75V4.29l-6.418 6.417-1.414-1.414 6.418-6.418Z" />
+    </SVGIcon>
+  );
+};

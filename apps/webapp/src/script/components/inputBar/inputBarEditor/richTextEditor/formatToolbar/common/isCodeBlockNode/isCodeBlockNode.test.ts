@@ -23,15 +23,23 @@ import {isCodeBlockNode} from './isCodeBlockNode';
 
 const createMockElementNode = (type: string, parent: ElementNode | null = null): ElementNode => {
   return {
-    getType: () => type,
-    getParent: () => parent,
+    getType: () => {
+      return type;
+    },
+    getParent: () => {
+      return parent;
+    },
   } as unknown as ElementNode;
 };
 
 const createMockTextNode = (parent: ElementNode | null = null): TextNode => {
   return {
-    getType: () => 'text',
-    getParent: () => parent,
+    getType: () => {
+      return 'text';
+    },
+    getParent: () => {
+      return parent;
+    },
   } as unknown as TextNode;
 };
 

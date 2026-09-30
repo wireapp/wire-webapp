@@ -49,8 +49,12 @@ export const AppLoader: FC<AppLoaderProps> = ({init, children}) => {
     isFirstRender.current = false;
 
     init(message => {
-      setLoadingState(previousState => ({message: message ?? previousState?.message ?? ''}));
-    }).then(user => setSelfUser(user));
+      setLoadingState(previousState => {
+        return {message: message ?? previousState?.message ?? ''};
+      });
+    }).then(user => {
+      return setSelfUser(user);
+    });
   }, []);
 
   if (selfUser !== undefined) {

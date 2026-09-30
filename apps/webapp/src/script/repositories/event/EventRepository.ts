@@ -378,7 +378,9 @@ export class EventRepository {
       };
 
       window.addEventListener('focus', handleFocus);
-      cleanupHandlers.push(() => window.removeEventListener('focus', handleFocus));
+      cleanupHandlers.push(() => {
+        return window.removeEventListener('focus', handleFocus);
+      });
     } else {
       // In browser, use visibilitychange
       const handleVisibilityChange = () => {
@@ -418,7 +420,9 @@ export class EventRepository {
 
     // Then override disconnect to include cleanup
     this.disconnectWebSocket = () => {
-      cleanupHandlers.forEach(cleanup => cleanup());
+      cleanupHandlers.forEach(cleanup => {
+        return cleanup();
+      });
       actualDisconnect();
     };
   }
@@ -553,7 +557,11 @@ export class EventRepository {
    * @param source Source of notification
    */
   private async distributeEvent(event: IncomingEvent, source: EventSource) {
-    await Promise.all(this.eventProcessors.map(processor => processor.processEvent(event, source)));
+    await Promise.all(
+      this.eventProcessors.map(processor => {
+        return processor.processEvent(event, source);
+      }),
+    );
 
     const {type} = event;
     const [category] = type.split('.');
@@ -578,7 +586,9 @@ export class EventRepository {
         amplify.publish(type, event, source);
     }
     // Wait for the event handlers to have finished their async tasks
-    await new Promise(res => setTimeout(res, 0));
+    await new Promise(res => {
+      return setTimeout(res, 0);
+    });
   }
 
   private distributeMeetingEvent(event: IncomingEvent): void {

@@ -47,7 +47,9 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
               <FormattedMessage
                 id="acceptNewsModal.privacyDescription"
                 values={{
-                  strong: (...chunks: any[]) => <strong>{chunks}</strong>,
+                  strong: (...chunks: any[]) => {
+                    return <strong>{chunks}</strong>;
+                  },
                 }}
               />
             </Text>

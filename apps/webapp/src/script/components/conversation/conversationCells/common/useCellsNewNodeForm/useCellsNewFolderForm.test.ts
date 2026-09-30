@@ -35,7 +35,9 @@ describe('useCellsNewFolderForm', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
-  const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
+  const createEvent = () => {
+    return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -46,17 +48,18 @@ describe('useCellsNewFolderForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFolderForm = () =>
-    renderHook(() =>
-      useCellsNewFolderForm({
+  const renderUseCellsNewFolderForm = () => {
+    return renderHook(() => {
+      return useCellsNewFolderForm({
         cellsRepository: mockCellsRepository,
         conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
         onSuccess,
         currentPath: '/wire-cells-web/path',
         isOpen: true,
         validationCopy,
-      }),
-    );
+      });
+    });
+  };
 
   it('uses createFolder repository method and never calls createFile', async () => {
     const {result} = renderUseCellsNewFolderForm();

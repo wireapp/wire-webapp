@@ -40,8 +40,12 @@ const defaultProps = {
 const renderFilePreviewModal = ({isViewerPermissionFeatureEnabled}: {isViewerPermissionFeatureEnabled: boolean}) => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
-      translate: key => key,
+      isFeatureToggleEnabled: () => {
+        return isViewerPermissionFeatureEnabled;
+      },
+      translate: key => {
+        return key;
+      },
     }),
   );
 

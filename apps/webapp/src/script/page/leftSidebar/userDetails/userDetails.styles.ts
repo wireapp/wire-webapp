@@ -25,27 +25,31 @@ export const textEllipsis: CSSObject = {
   whiteSpace: 'nowrap',
 };
 
-export const wrapper = (isSideBarOpen: boolean): CSSObject => ({
-  marginBottom: '32px',
+export const wrapper = (isSideBarOpen: boolean): CSSObject => {
+  return {
+    marginBottom: '32px',
 
-  ...(isSideBarOpen && {
-    display: 'grid',
-    gridTemplateAreas: '"avatar userName" "avatar userHandle"',
-    gap: '0 8px',
-    gridTemplateColumns: 'auto 1fr',
-  }),
+    ...(isSideBarOpen && {
+      display: 'grid',
+      gridTemplateAreas: '"avatar userName" "avatar userHandle"',
+      gap: '0 8px',
+      gridTemplateColumns: 'auto 1fr',
+    }),
 
-  '.user-details-avatar': {
-    gridArea: 'avatar',
-  },
-});
+    '.user-details-avatar': {
+      gridArea: 'avatar',
+    },
+  };
+};
 
-export const userDetailsWrapper = (isSideBarOpen: boolean): CSSObject => ({
-  ...(!isSideBarOpen && {
-    display: 'none',
-  }),
-  gridArea: 'userName',
-});
+export const userDetailsWrapper = (isSideBarOpen: boolean): CSSObject => {
+  return {
+    ...(!isSideBarOpen && {
+      display: 'none',
+    }),
+    gridArea: 'userName',
+  };
+};
 
 export const userDetails: CSSObject = {
   display: 'flex',
@@ -81,20 +85,22 @@ export const userFullName: CSSObject = {
   alignItems: 'center',
 };
 
-export const userHandle = (isSideBarOpen: boolean): CSSObject => ({
-  ...(!isSideBarOpen && {
-    display: 'none',
-  }),
+export const userHandle = (isSideBarOpen: boolean): CSSObject => {
+  return {
+    ...(!isSideBarOpen && {
+      display: 'none',
+    }),
 
-  color: 'var(--text-input-placeholder)',
-  fontSize: 'var(--font-size-small)',
-  fontWeight: 'var(--font-weight-regular)',
-  lineHeight: 'var(--line-height-md)',
-  gridArea: 'userHandle',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-});
+    color: 'var(--text-input-placeholder)',
+    fontSize: 'var(--font-size-small)',
+    fontWeight: 'var(--font-weight-regular)',
+    lineHeight: 'var(--line-height-md)',
+    gridArea: 'userHandle',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+  };
+};
 
 export const legalHold: CSSObject = {
   flex: '1 0 auto',

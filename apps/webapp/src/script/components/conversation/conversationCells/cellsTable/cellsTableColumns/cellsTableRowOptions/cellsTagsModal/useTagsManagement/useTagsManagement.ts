@@ -44,11 +44,21 @@ export const useTagsManagement = ({
   commaValidationError,
 }: UseTagsManagementProps) => {
   const {fireAndForgetInvoker} = useApplicationContext();
-  const tagNames = useAllCellsTagsStore(state => state.tags);
-  const isLoadingAllTags = useAllCellsTagsStore(state => state.isLoading);
-  const apiError = useAllCellsTagsStore(state => state.error);
-  const hasFetchedTags = useAllCellsTagsStore(state => state.hasFetched);
-  const fetchAllTags = useAllCellsTagsStore(state => state.fetch);
+  const tagNames = useAllCellsTagsStore(state => {
+    return state.tags;
+  });
+  const isLoadingAllTags = useAllCellsTagsStore(state => {
+    return state.isLoading;
+  });
+  const apiError = useAllCellsTagsStore(state => {
+    return state.error;
+  });
+  const hasFetchedTags = useAllCellsTagsStore(state => {
+    return state.hasFetched;
+  });
+  const fetchAllTags = useAllCellsTagsStore(state => {
+    return state.fetch;
+  });
 
   const [createdTags, setCreatedTags] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<ComboboxSelectOption[]>(
@@ -62,7 +72,9 @@ export const useTagsManagement = ({
       return;
     }
 
-    fireAndForgetInvoker.fireAndForget(() => fetchAllTags(cellsRepository));
+    fireAndForgetInvoker.fireAndForget(() => {
+      return fetchAllTags(cellsRepository);
+    });
     // cellsRepository is a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchAllTags, fetchTagsEnabled, hasFetchedTags]);
@@ -88,8 +100,12 @@ export const useTagsManagement = ({
     setValidationError(null);
 
     const newOption = transformTagToSelectOption(inputValue);
-    setCreatedTags(prev => [...prev, inputValue]);
-    setSelectedTags(prev => [...prev, newOption]);
+    setCreatedTags(prev => {
+      return [...prev, inputValue];
+    });
+    setSelectedTags(prev => {
+      return [...prev, newOption];
+    });
   };
 
   const handleChange = (value: ComboboxSelectOption | ComboboxSelectOption[]) => {
@@ -101,10 +117,16 @@ export const useTagsManagement = ({
     setIsUpdatingTags(true);
     await cellsRepository.setNodeTags({
       uuid,
-      tags: selectedTags.map(option => option.value as string).filter(Boolean),
+      tags: selectedTags
+        .map(option => {
+          return option.value as string;
+        })
+        .filter(Boolean),
     });
     // Invalidate the centralized tags cache so the filter bar (and other views) pick up new tags.
-    fireAndForgetInvoker.fireAndForget(() => useAllCellsTagsStore.getState().fetch(cellsRepository));
+    fireAndForgetInvoker.fireAndForget(() => {
+      return useAllCellsTagsStore.getState().fetch(cellsRepository);
+    });
     onSuccess?.();
     setIsUpdatingTags(false);
   };

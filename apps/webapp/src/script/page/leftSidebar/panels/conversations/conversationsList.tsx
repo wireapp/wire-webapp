@@ -117,7 +117,9 @@ export const ConversationsList = ({
   onConversationFocused,
 }: ConversationsListProps) => {
   const {translate} = useApplicationContext();
-  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {setCurrentView} = useAppMainState(state => {
+    return state.responsiveView;
+  });
   const {currentTab} = useSidebarStore();
 
   const [clickedFilteredConversationId, setClickedFilteredConversationId] = useState<string | null>(null);
@@ -125,26 +127,31 @@ export const ConversationsList = ({
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
   const isActiveConversation = useCallback(
-    (conversation: Conversation) => conversationState.isActiveConversation(conversation),
+    (conversation: Conversation) => {
+      return conversationState.isActiveConversation(conversation);
+    },
     [conversationState],
   );
 
   const openContextMenu = useCallback(
-    (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
-      listViewModel.onContextMenu(conversation, event),
+    (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
+      return listViewModel.onContextMenu(conversation, event);
+    },
     [listViewModel],
   );
 
   const answerCall = useCallback(
-    (conversation: Conversation) => listViewModel.answerCall(conversation),
+    (conversation: Conversation) => {
+      return listViewModel.answerCall(conversation);
+    },
     [listViewModel],
   );
 
   const hasJoinableCall = useCallback(
     (conversation: Conversation) => {
-      const call = joinableCalls.find((callInstance: Call) =>
-        matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
-      );
+      const call = joinableCalls.find((callInstance: Call) => {
+        return matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId);
+      });
 
       return !isNullOrUndefined(call) && !conversation.isSelfUserRemoved();
     },
@@ -163,7 +170,9 @@ export const ConversationsList = ({
     currentTab,
   });
   const focusContextKey = `${currentTab}\u0000${conversationsFilter}\u0000${conversationFocusCandidates
-    .map(conversation => conversation.id)
+    .map(conversation => {
+      return conversation.id;
+    })
     .join('\u0000')}`;
 
   const parentRef = useRef(null);
@@ -187,8 +196,12 @@ export const ConversationsList = ({
 
   const rowVirtualizer = useVirtualizer({
     count: conversationsToDisplay.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => CONVERSATION_ROW_HEIGHT,
+    getScrollElement: () => {
+      return parentRef.current;
+    },
+    estimateSize: () => {
+      return CONVERSATION_ROW_HEIGHT;
+    },
     getItemKey,
   });
   const virtualItems = rowVirtualizer.getVirtualItems();
@@ -230,13 +243,15 @@ export const ConversationsList = ({
         return true;
       }
 
-      const conversationIndex = conversationsToDisplay.findIndex(
-        item => isConversationEntity(item) && item.id === conversationId,
-      );
+      const conversationIndex = conversationsToDisplay.findIndex(item => {
+        return isConversationEntity(item) && item.id === conversationId;
+      });
 
       if (
         conversationIndex === -1 ||
-        !conversationFocusCandidates.some(conversation => conversation.id === conversationId)
+        !conversationFocusCandidates.some(conversation => {
+          return conversation.id === conversationId;
+        })
       ) {
         return false;
       }
@@ -257,7 +272,9 @@ export const ConversationsList = ({
 
     return () => {
       if (focusConversationRef.current === focusConversation) {
-        focusConversationRef.current = () => false;
+        focusConversationRef.current = () => {
+          return false;
+        };
       }
     };
   }, [focusConversation, focusConversationRef]);
@@ -273,9 +290,12 @@ export const ConversationsList = ({
     }
 
     const isPendingConversationAvailable =
-      conversationsToDisplay.some(
-        item => isConversationEntity(item) && item.id === pendingFocusRequest.conversationId,
-      ) && conversationFocusCandidates.some(conversation => conversation.id === pendingFocusRequest.conversationId);
+      conversationsToDisplay.some(item => {
+        return isConversationEntity(item) && item.id === pendingFocusRequest.conversationId;
+      }) &&
+      conversationFocusCandidates.some(conversation => {
+        return conversation.id === pendingFocusRequest.conversationId;
+      });
 
     if (!isPendingConversationAvailable) {
       setPendingFocusRequest(null);
@@ -296,9 +316,15 @@ export const ConversationsList = ({
     virtualItems,
   ]);
 
-  useEffect(() => cancelPendingFocus, [cancelPendingFocus, focusContextKey]);
+  useEffect(() => {
+    return cancelPendingFocus;
+  }, [cancelPendingFocus, focusContextKey]);
 
-  useEffect(() => () => cancelPendingFocus(), [cancelPendingFocus]);
+  useEffect(() => {
+    return () => {
+      return cancelPendingFocus();
+    };
+  }, [cancelPendingFocus]);
 
   const debouncedOnConversationClick = useDebouncedCallback(
     (
@@ -327,10 +353,11 @@ export const ConversationsList = ({
   );
 
   const onConversationClick = useCallback(
-    (conversation: Conversation) =>
-      (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+    (conversation: Conversation) => {
+      return (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
         debouncedOnConversationClick(conversation, event);
-      },
+      };
+    },
     [debouncedOnConversationClick],
   );
 
@@ -353,8 +380,12 @@ export const ConversationsList = ({
   useEffect(() => {
     if (!isNonEmptyString(conversationsFilter) && isNonEmptyString(clickedFilteredConversationId)) {
       const conversationIndex = conversationsToDisplay
-        .filter(conv => isConversationEntity(conv))
-        .findIndex(conv => conv.id === clickedFilteredConversationId);
+        .filter(conv => {
+          return isConversationEntity(conv);
+        })
+        .findIndex(conv => {
+          return conv.id === clickedFilteredConversationId;
+        });
       if (conversationIndex !== -1) {
         requestAnimationFrame(() => {
           rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
@@ -380,9 +411,9 @@ export const ConversationsList = ({
           data-uie-name="group-participants-conversations-view"
           className="group-participants-conversations"
         >
-          {groupParticipantsConversations.map(conversation => (
-            <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation)} />
-          ))}
+          {groupParticipantsConversations.map(conversation => {
+            return <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation)} />;
+          })}
         </ul>
       </li>
     );

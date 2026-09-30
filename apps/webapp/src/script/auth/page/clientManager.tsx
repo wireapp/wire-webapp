@@ -117,17 +117,20 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (): RootState extends never ? never : {} => ({});
+const mapStateToProps = (): RootState extends never ? never : {} => {
+  return {};
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
       doLogout: ROOT_ACTIONS.authAction.doLogout,
     },
     dispatch,
   );
+};
 
 const ClientManager = connect(mapStateToProps, mapDispatchToProps)(ClientManagerComponent);
 

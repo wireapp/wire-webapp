@@ -36,25 +36,33 @@ const closeFolder = (state: FolderState): FolderState => {
   return {...state, expandedFolder: ''};
 };
 
-const useFolderStore = create<FolderState>((set, get) => ({
-  expandedFolder: '',
-  isFoldersTabOpen: false,
+const useFolderStore = create<FolderState>((set, get) => {
+  return {
+    expandedFolder: '',
+    isFoldersTabOpen: false,
 
-  isOpen: folderId => {
-    return get().expandedFolder === folderId;
-  },
+    isOpen: folderId => {
+      return get().expandedFolder === folderId;
+    },
 
-  toggleFoldersTab: () => set(state => ({...state, isFoldersTabOpen: !state.isFoldersTabOpen})),
+    toggleFoldersTab: () => {
+      return set(state => {
+        return {...state, isFoldersTabOpen: !state.isFoldersTabOpen};
+      });
+    },
 
-  openFolder: folderId =>
-    set(state => {
-      return openFolder(folderId, state);
-    }),
+    openFolder: folderId => {
+      return set(state => {
+        return openFolder(folderId, state);
+      });
+    },
 
-  closeFolder: () =>
-    set(state => {
-      return closeFolder(state);
-    }),
-}));
+    closeFolder: () => {
+      return set(state => {
+        return closeFolder(state);
+      });
+    },
+  };
+});
 
 export {useFolderStore};

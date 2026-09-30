@@ -25,11 +25,13 @@ const meta: Meta<typeof Pill> = {
   component: Pill,
   title: 'dataDisplay/pill',
   decorators: [
-    Story => (
-      <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   argTypes: {
     type: {
@@ -79,61 +81,80 @@ export const Warning: Story = {
   },
 };
 
-export const AllVariants = () => (
-  <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-    <div>
-      <Pill>Default Pill</Pill>
-      <Pill active>Active Pill</Pill>
+export const AllVariants = () => {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+      <div>
+        <Pill>Default Pill</Pill>
+        <Pill active>Active Pill</Pill>
+      </div>
+      <div>
+        <Pill type={PILL_TYPE.error}>Error Pill</Pill>
+        <Pill type={PILL_TYPE.success}>Success Pill</Pill>
+        <Pill type={PILL_TYPE.warning}>Warning Pill</Pill>
+      </div>
     </div>
-    <div>
-      <Pill type={PILL_TYPE.error}>Error Pill</Pill>
-      <Pill type={PILL_TYPE.success}>Success Pill</Pill>
-      <Pill type={PILL_TYPE.warning}>Warning Pill</Pill>
-    </div>
-  </div>
-);
+  );
+};
 
-export const WithLongText = () => (
-  <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-    <Pill>This is a very long text that should wrap nicely inside the pill component</Pill>
-    <Pill type={PILL_TYPE.success}>This is a very long successful message that should wrap nicely</Pill>
-  </div>
-);
+export const WithLongText = () => {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+      <Pill>This is a very long text that should wrap nicely inside the pill component</Pill>
+      <Pill type={PILL_TYPE.success}>This is a very long successful message that should wrap nicely</Pill>
+    </div>
+  );
+};
 
-export const Interactive = () => (
-  <div style={{display: 'flex', gap: '8px'}}>
-    <Pill onClick={() => alert('Clicked!')} style={{cursor: 'pointer'}}>
-      Clickable Pill
-    </Pill>
-    <Pill active onClick={() => alert('Active pills can be clicked too!')} style={{cursor: 'pointer'}}>
-      Active Clickable
-    </Pill>
-  </div>
-);
-
-export const Combinations = () => (
-  <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-    <div>
-      <Pill type={PILL_TYPE.error} active>
-        Active Error
+export const Interactive = () => {
+  return (
+    <div style={{display: 'flex', gap: '8px'}}>
+      <Pill
+        onClick={() => {
+          return alert('Clicked!');
+        }}
+        style={{cursor: 'pointer'}}
+      >
+        Clickable Pill
       </Pill>
-      <Pill type={PILL_TYPE.success} active>
-        Active Success
-      </Pill>
-      <Pill type={PILL_TYPE.warning} active>
-        Active Warning
+      <Pill
+        active
+        onClick={() => {
+          return alert('Active pills can be clicked too!');
+        }}
+        style={{cursor: 'pointer'}}
+      >
+        Active Clickable
       </Pill>
     </div>
-    <div>
-      <Pill type={PILL_TYPE.error} style={{opacity: 0.7}}>
-        Faded Error
-      </Pill>
-      <Pill type={PILL_TYPE.success} style={{opacity: 0.7}}>
-        Faded Success
-      </Pill>
-      <Pill type={PILL_TYPE.warning} style={{opacity: 0.7}}>
-        Faded Warning
-      </Pill>
+  );
+};
+
+export const Combinations = () => {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+      <div>
+        <Pill type={PILL_TYPE.error} active>
+          Active Error
+        </Pill>
+        <Pill type={PILL_TYPE.success} active>
+          Active Success
+        </Pill>
+        <Pill type={PILL_TYPE.warning} active>
+          Active Warning
+        </Pill>
+      </div>
+      <div>
+        <Pill type={PILL_TYPE.error} style={{opacity: 0.7}}>
+          Faded Error
+        </Pill>
+        <Pill type={PILL_TYPE.success} style={{opacity: 0.7}}>
+          Faded Success
+        </Pill>
+        <Pill type={PILL_TYPE.warning} style={{opacity: 0.7}}>
+          Faded Warning
+        </Pill>
+      </div>
     </div>
-  </div>
-);
+  );
+};

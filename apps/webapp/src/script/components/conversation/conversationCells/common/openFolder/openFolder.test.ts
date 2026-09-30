@@ -52,7 +52,9 @@ describe('openFolder', () => {
 
     it('calls onBeforeNavigate before changing the URL', () => {
       const hashBeforeNavigate: string[] = [];
-      const onBeforeNavigate = () => hashBeforeNavigate.push(currentHash());
+      const onBeforeNavigate = () => {
+        return hashBeforeNavigate.push(currentHash());
+      };
 
       openFolder({path: `${CONV_ID}@${DOMAIN}/Test`, onBeforeNavigate});
 

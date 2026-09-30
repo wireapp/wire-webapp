@@ -60,7 +60,9 @@ export const ImageAssetSmall = ({
     <>
       <button
         css={containerStyles}
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          return setIsOpen(true);
+        }}
         aria-label={translate('accessibility.conversationAssetImageAlt', {
           username: senderName,
           messageDate: timestamp,
@@ -80,7 +82,9 @@ export const ImageAssetSmall = ({
               src={filePreviewUrl}
               alt=""
               css={imageStyles}
-              onLoad={() => setIsLoaded(true)}
+              onLoad={() => {
+                return setIsLoaded(true);
+              }}
               onError={() => {
                 setHasLoadError(true);
                 setIsLoaded(true);
@@ -92,7 +96,9 @@ export const ImageAssetSmall = ({
       <FileFullscreenModal
         id={id}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          return setIsOpen(false);
+        }}
         filePreviewUrl={filePreviewUrl}
         fileExtension={extension}
         fileName={name}

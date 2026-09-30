@@ -39,14 +39,16 @@ export const inputStyles: CSSObject = {
   },
 };
 
-export const labelStyles = (disabled: boolean, showLoading: boolean): CSSObject => ({
-  borderRadius: '20px',
-  cursor: disabled || showLoading ? 'not-allowed' : 'pointer',
-  display: 'block',
-  margin: 0,
-  overflow: 'hidden',
-  opacity: disabled ? 0.5 : 1,
-});
+export const labelStyles = (disabled: boolean, showLoading: boolean): CSSObject => {
+  return {
+    borderRadius: '20px',
+    cursor: disabled || showLoading ? 'not-allowed' : 'pointer',
+    display: 'block',
+    margin: 0,
+    overflow: 'hidden',
+    opacity: disabled ? 0.5 : 1,
+  };
+};
 
 type SwitchStylesProps = {
   disabled: boolean;
@@ -101,18 +103,20 @@ export const loadingStyles: CSSObject = {
   position: 'absolute',
 };
 
-export const switchDotStyles = (disabled: boolean, checked: boolean): CSSObject => ({
-  background: COLOR.WHITE,
-  borderRadius: '100%',
-  bottom: 0,
-  boxShadow: '0px 0px 2px -1px gray',
-  display: 'block',
-  height: '23px',
-  margin: '1px',
-  opacity: disabled ? 0.7 : undefined,
-  position: 'absolute',
-  right: checked ? '0px' : '17px',
-  top: 0,
-  transition: 'all 0.15s ease-in 0s',
-  width: '23px',
-});
+export const switchDotStyles = (disabled: boolean, checked: boolean): CSSObject => {
+  return {
+    background: COLOR.WHITE,
+    borderRadius: '100%',
+    bottom: 0,
+    boxShadow: '0px 0px 2px -1px gray',
+    display: 'block',
+    height: '23px',
+    margin: '1px',
+    opacity: disabled ? 0.7 : undefined,
+    position: 'absolute',
+    right: checked ? '0px' : '17px',
+    top: 0,
+    transition: 'all 0.15s ease-in 0s',
+    width: '23px',
+  };
+};

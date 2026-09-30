@@ -66,7 +66,9 @@ export class ReceiptsMiddleware implements EventMiddleware {
       case ClientEvent.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         const originalEvents = await this.eventService.loadEvents(event.conversation, messageIds);
-        originalEvents.forEach(originalEvent => this.updateConfirmationStatus(originalEvent, event));
+        originalEvents.forEach(originalEvent => {
+          return this.updateConfirmationStatus(originalEvent, event);
+        });
         this.logger.info(
           `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
         );
@@ -96,7 +98,10 @@ export class ReceiptsMiddleware implements EventMiddleware {
     }
 
     const hasReadMessage =
-      status === StatusType.SEEN && currentReceipts.some(({userId}) => confirmationEvent.from === userId);
+      status === StatusType.SEEN &&
+      currentReceipts.some(({userId}) => {
+        return confirmationEvent.from === userId;
+      });
     if (hasReadMessage) {
       // if the user is already among the readers of the message, nothing more to do
       return Promise.resolve();

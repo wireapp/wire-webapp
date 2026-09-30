@@ -29,9 +29,9 @@ export const qualityTierFromModel = (modelPath: string, enhancePerformance: bool
   return enhancePerformance ? 'performance' : 'balanced';
 };
 
-export const deriveModelConfig = (
-  tier: BackgroundEffectsQuality,
-): {modelPath: string; enhancePerformance: boolean} => ({
-  modelPath: tier === 'privacy' ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH,
-  enhancePerformance: tier === 'performance',
-});
+export const deriveModelConfig = (tier: BackgroundEffectsQuality): {modelPath: string; enhancePerformance: boolean} => {
+  return {
+    modelPath: tier === 'privacy' ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH,
+    enhancePerformance: tier === 'performance',
+  };
+};

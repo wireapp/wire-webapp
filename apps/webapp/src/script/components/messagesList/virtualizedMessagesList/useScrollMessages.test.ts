@@ -29,8 +29,12 @@ import {useScrollMessages} from './useScrollMessages';
 function createMessage(messageId: string): Message {
   return {
     id: messageId,
-    status: () => StatusType.SENT,
-    user: () => ({id: 'sender-id'}),
+    status: () => {
+      return StatusType.SENT;
+    },
+    user: () => {
+      return {id: 'sender-id'};
+    },
   } as unknown as Message;
 }
 
@@ -53,9 +57,13 @@ describe('useScrollMessages', () => {
     } as HTMLDivElement;
     const scrollToIndex = jest.fn();
     const virtualizer = {
-      getTotalSize: () => 1000,
+      getTotalSize: () => {
+        return 1000;
+      },
       options: {
-        getScrollElement: () => scrollElement,
+        getScrollElement: () => {
+          return scrollElement;
+        },
       },
       scrollOffset: 500,
       scrollToIndex,
@@ -73,7 +81,9 @@ describe('useScrollMessages', () => {
   });
 
   it('keeps sticking to the bottom for later new messages', () => {
-    let animationFrameCallback: FrameRequestCallback = () => 0;
+    let animationFrameCallback: FrameRequestCallback = () => {
+      return 0;
+    };
     jest.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => {
       animationFrameCallback = callback;
       return 1;
@@ -84,9 +94,13 @@ describe('useScrollMessages', () => {
     } as HTMLDivElement;
     const scrollToIndex = jest.fn();
     const virtualizer = {
-      getTotalSize: () => 1000,
+      getTotalSize: () => {
+        return 1000;
+      },
       options: {
-        getScrollElement: () => scrollElement,
+        getScrollElement: () => {
+          return scrollElement;
+        },
       },
       scrollOffset: 500,
       scrollToIndex,

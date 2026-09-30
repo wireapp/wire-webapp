@@ -28,7 +28,9 @@ export const createSessionResetMessage = (translate: Translate): SystemMessage =
   message.system_message_type = SystemMessageType.SESSION_RESET;
   // The sender is resolved after mapping the event, so determine the caption when it is read.
   Object.defineProperty(message, 'caption', {
-    get: () => translate(message.user().isMe ? 'sessionResetSelf' : 'sessionReset'),
+    get: () => {
+      return translate(message.user().isMe ? 'sessionResetSelf' : 'sessionReset');
+    },
     enumerable: true,
     configurable: true,
   });

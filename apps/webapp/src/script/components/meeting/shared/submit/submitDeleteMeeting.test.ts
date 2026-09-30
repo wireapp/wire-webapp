@@ -34,19 +34,21 @@ import {
 
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 
-const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
-  series_start_date: '2026-06-15T14:00:00.000Z',
-  series_end_date: '2026-06-15T15:00:00.000Z',
-  duration_ms: 3_600_000,
-  recurrence: 'weekly',
-  conversation_id: 'conv-id',
-  title: 'Weekly sync',
-  qualified_id: meetingId,
-  qualified_creator: {id: 'host-id', domain: 'example.com'},
-  qualified_conversation: {id: 'conv-id', domain: 'example.com'},
-  tzid: 'Europe/Berlin',
-  ...overrides,
-});
+const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => {
+  return {
+    series_start_date: '2026-06-15T14:00:00.000Z',
+    series_end_date: '2026-06-15T15:00:00.000Z',
+    duration_ms: 3_600_000,
+    recurrence: 'weekly',
+    conversation_id: 'conv-id',
+    title: 'Weekly sync',
+    qualified_id: meetingId,
+    qualified_creator: {id: 'host-id', domain: 'example.com'},
+    qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+    tzid: 'Europe/Berlin',
+    ...overrides,
+  };
+};
 
 const createMeetingInstance = (overrides: Partial<MeetingSeries> = {}): MeetingInstance => {
   const meetingSeries = createSeries(overrides);
@@ -86,16 +88,18 @@ describe('submitDeleteMeeting', () => {
       loadMeetings?: jest.Mock;
       selfUser?: User | undefined;
     } = {},
-  ) => ({
-    meetingInstance: createMeetingInstance(),
-    mode: 'forAll' as const,
-    selfUser: 'selfUser' in overrides ? overrides.selfUser : createSelfUser(),
-    translate: translateForTest,
-    deleteMeetingForMe: overrides.deleteMeetingForMe ?? jest.fn().mockReturnValue(task.resolve(undefined)),
-    deleteMeetingForAll: overrides.deleteMeetingForAll ?? jest.fn().mockReturnValue(task.resolve(undefined)),
-    removeMeetingByQualifiedId: overrides.removeMeetingByQualifiedId ?? jest.fn(),
-    loadMeetings: overrides.loadMeetings ?? jest.fn().mockResolvedValue(undefined),
-  });
+  ) => {
+    return {
+      meetingInstance: createMeetingInstance(),
+      mode: 'forAll' as const,
+      selfUser: 'selfUser' in overrides ? overrides.selfUser : createSelfUser(),
+      translate: translateForTest,
+      deleteMeetingForMe: overrides.deleteMeetingForMe ?? jest.fn().mockReturnValue(task.resolve(undefined)),
+      deleteMeetingForAll: overrides.deleteMeetingForAll ?? jest.fn().mockReturnValue(task.resolve(undefined)),
+      removeMeetingByQualifiedId: overrides.removeMeetingByQualifiedId ?? jest.fn(),
+      loadMeetings: overrides.loadMeetings ?? jest.fn().mockResolvedValue(undefined),
+    };
+  };
 
   it('removes the meeting from the store after a successful delete for all', async () => {
     const removeMeetingByQualifiedId = jest.fn();
@@ -193,7 +197,9 @@ describe('submitDeleteMeeting', () => {
     const {promise: deleteGate, resolve: releaseDelete} = Promise.withResolvers<void>();
     const deleteMeetingForAll = jest.fn().mockReturnValue(
       task.tryOrElse(
-        () => meetingSubmitErrors.deleteFailed,
+        () => {
+          return meetingSubmitErrors.deleteFailed;
+        },
         async () => {
           await deleteGate;
         },

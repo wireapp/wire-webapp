@@ -238,7 +238,9 @@ export class ContentViewModel {
   ): Promise<boolean> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        await new Promise(resolve => setTimeout(resolve, initialDelayMs * (attempt + 1)));
+        await new Promise(resolve => {
+          return setTimeout(resolve, initialDelayMs * (attempt + 1));
+        });
         await this.conversationRepository.fetchBackendConversationEntityById(conversationId);
         return true;
       } catch (error: unknown) {

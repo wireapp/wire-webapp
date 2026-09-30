@@ -76,7 +76,9 @@ export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties 
     }
     window.addEventListener('resize', updateSize);
     updateSize();
-    return () => window.removeEventListener('resize', updateSize);
+    return () => {
+      return window.removeEventListener('resize', updateSize);
+    };
   }, [posX, posY]);
 
   function onEmojiClick(emojiPickerSelection: EmojiPickerSelection) {

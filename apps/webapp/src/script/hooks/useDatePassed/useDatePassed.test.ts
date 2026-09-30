@@ -37,7 +37,9 @@ describe('useDatePassed', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 2000);
 
-    renderHook(() => useDatePassed({target, callback}));
+    renderHook(() => {
+      return useDatePassed({target, callback});
+    });
 
     jest.advanceTimersByTime(1000);
     expect(callback).not.toHaveBeenCalled();
@@ -47,7 +49,9 @@ describe('useDatePassed', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
-    renderHook(() => useDatePassed({target, callback}));
+    renderHook(() => {
+      return useDatePassed({target, callback});
+    });
 
     jest.advanceTimersByTime(1000);
     expect(callback).toHaveBeenCalledTimes(1);
@@ -57,7 +61,9 @@ describe('useDatePassed', () => {
     const callback = jest.fn();
     const target = new Date(baseDate);
 
-    renderHook(() => useDatePassed({target, callback}));
+    renderHook(() => {
+      return useDatePassed({target, callback});
+    });
 
     jest.advanceTimersByTime(1000);
     expect(callback).toHaveBeenCalledTimes(1);
@@ -67,9 +73,14 @@ describe('useDatePassed', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
-    const {rerender} = renderHook(({enabled, target}) => useDatePassed({target, callback, enabled}), {
-      initialProps: {enabled: false, target},
-    });
+    const {rerender} = renderHook(
+      ({enabled, target}) => {
+        return useDatePassed({target, callback, enabled});
+      },
+      {
+        initialProps: {enabled: false, target},
+      },
+    );
 
     jest.advanceTimersByTime(1000);
     expect(callback).not.toHaveBeenCalled();
@@ -85,9 +96,14 @@ describe('useDatePassed', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
-    const {rerender} = renderHook(({target, enabled}) => useDatePassed({target, callback, enabled}), {
-      initialProps: {target, enabled: true},
-    });
+    const {rerender} = renderHook(
+      ({target, enabled}) => {
+        return useDatePassed({target, callback, enabled});
+      },
+      {
+        initialProps: {target, enabled: true},
+      },
+    );
 
     jest.advanceTimersByTime(1000);
     expect(callback).toHaveBeenCalledTimes(1);

@@ -34,7 +34,9 @@ type MeetingStoreProviderProps = {
 };
 
 export const MeetingStoreProvider = ({store, children}: MeetingStoreProviderProps) => {
-  const value = useMemo(() => Maybe.just(store), [store]);
+  const value = useMemo(() => {
+    return Maybe.just(store);
+  }, [store]);
 
   return <MeetingStoreContext.Provider value={value}>{children}</MeetingStoreContext.Provider>;
 };

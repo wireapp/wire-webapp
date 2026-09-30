@@ -132,7 +132,9 @@ export class AssetAPI {
     };
 
     return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
       response: handleRequest(),
     };
   }
@@ -213,7 +215,9 @@ export class AssetAPI {
     };
 
     return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
       response: handleRequest(),
     };
   }
@@ -229,8 +233,9 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const isValidDomain = (domain: string) =>
-      !!Boolean(domain) && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+    const isValidDomain = (domain: string) => {
+      return !!Boolean(domain) && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+    };
 
     if (!isValidDomain(assetDomain)) {
       throw new TypeError(`Invalid asset domain ${assetDomain}`);

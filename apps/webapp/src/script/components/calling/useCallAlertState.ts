@@ -31,31 +31,45 @@ type CallAlertState = {
   setConversationId: (conversationId?: QualifiedId) => void;
 };
 
-const useCallAlertState = create<CallAlertState>((set, get) => ({
-  showAlert: false,
-  isGroupCall: false,
-  qualityFeedbackModalShown: false,
-  setQualityFeedbackModalShown: isVisible =>
-    set(state => ({
-      ...state,
-      qualityFeedbackModalShown: isVisible,
-    })),
-  setConversationId: conversationId =>
-    set(state => ({
-      ...state,
-      conversationId,
-    })),
-  showStartedCallAlert: (isGroupCall = false, isVideoCall = false) =>
-    set(state => ({
-      ...state,
-      showAlert: true,
-      isGroupCall,
-    })),
-  clearShowAlert: () =>
-    set(state => ({
-      ...state,
-      showAlert: false,
-    })),
-}));
+const useCallAlertState = create<CallAlertState>((set, get) => {
+  return {
+    showAlert: false,
+    isGroupCall: false,
+    qualityFeedbackModalShown: false,
+    setQualityFeedbackModalShown: isVisible => {
+      return set(state => {
+        return {
+          ...state,
+          qualityFeedbackModalShown: isVisible,
+        };
+      });
+    },
+    setConversationId: conversationId => {
+      return set(state => {
+        return {
+          ...state,
+          conversationId,
+        };
+      });
+    },
+    showStartedCallAlert: (isGroupCall = false, isVideoCall = false) => {
+      return set(state => {
+        return {
+          ...state,
+          showAlert: true,
+          isGroupCall,
+        };
+      });
+    },
+    clearShowAlert: () => {
+      return set(state => {
+        return {
+          ...state,
+          showAlert: false,
+        };
+      });
+    },
+  };
+});
 
 export {useCallAlertState};

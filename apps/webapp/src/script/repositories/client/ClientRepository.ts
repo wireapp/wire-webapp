@@ -371,8 +371,8 @@ export class ClientRepository {
     const qualifiedUserClientsMap = await this.clientService.getClientsByUserIds(userIds);
 
     await Promise.all(
-      Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) =>
-        Promise.all(
+      Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) => {
+        return Promise.all(
           Object.entries(userClientMap).map(async ([userId, clients]) => {
             const isSelfClient = matchQualifiedIds({domain, id: userId}, this.selfUser().qualifiedId);
             clientEntityMap[domain] ||= {};
@@ -380,8 +380,8 @@ export class ClientRepository {
               ? await this.updateUserClients({domain, id: userId}, clients, true)
               : ClientMapper.mapClients(clients, isSelfClient, domain);
           }),
-        ),
-      ),
+        );
+      }),
     );
 
     return clientEntityMap;
@@ -407,7 +407,9 @@ export class ClientRepository {
     const {domain, id} = this.selfUser();
     const clientRecords = await this.getClientByUserIdFromDb({domain, id});
     const clientEntities = ClientMapper.mapClients(clientRecords, true, domain);
-    clientEntities.forEach(clientEntity => this.selfUser().addClient(clientEntity));
+    clientEntities.forEach(clientEntity => {
+      return this.selfUser().addClient(clientEntity);
+    });
     return this.selfUser().devices();
   }
 
@@ -522,7 +524,9 @@ export class ClientRepository {
 
         return Promise.all(promises);
       })
-      .then(newRecords => ClientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser, userId.domain))
+      .then(newRecords => {
+        return ClientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser, userId.domain);
+      })
       .then(clientEntities => {
         if (publish) {
           amplify.publish(WebAppEvents.CLIENT.UPDATE, userId, clientEntities);
@@ -605,7 +609,9 @@ export class ClientRepository {
       return;
     }
     const localClients = await this.getClientsForSelf();
-    const removedClient = localClients.find(client => client.id === clientId);
+    const removedClient = localClients.find(client => {
+      return client.id === clientId;
+    });
     if (removedClient?.isLegalHold() === true) {
       PrimaryModal.show(
         PrimaryModal.type.ACKNOWLEDGE,

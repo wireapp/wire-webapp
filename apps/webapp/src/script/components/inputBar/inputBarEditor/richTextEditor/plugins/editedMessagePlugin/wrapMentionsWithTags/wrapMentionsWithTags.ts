@@ -27,9 +27,8 @@ export const wrapMentionsWithTags = (text: string, allMentions: string[]): strin
     return text;
   }
 
-  return allMentions.reduce(
-    (updatedText, mention) => updatedText.split(mention).join(`<mention>${mention}</mention>`),
-    text,
-  );
+  return allMentions.reduce((updatedText, mention) => {
+    return updatedText.split(mention).join(`<mention>${mention}</mention>`);
+  }, text);
 };
 import {isEmptyArray} from '@sindresorhus/is';
