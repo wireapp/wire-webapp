@@ -94,7 +94,7 @@ export const createMeetingNotificationEventHandlers = ({
   const addCancellationNotificationForMeeting = (meetingId: QualifiedId): void => {
     const meetingKey = toMeetingIdKey(meetingId);
     const meeting = getMeeting(meetingId);
-    if (!meeting) {
+    if (meeting === undefined) {
       logger.warn('meeting notification pending because the meeting is not in the store yet', {
         kind: MeetingNotificationKind.CANCELLED,
         meetingId,
@@ -136,7 +136,7 @@ export const createMeetingNotificationEventHandlers = ({
   const retryPendingNotifications = () => {
     for (const [key, meetingId] of pending) {
       const meeting = getMeeting(meetingId);
-      if (!meeting) {
+      if (meeting === undefined) {
         continue;
       }
 
@@ -162,7 +162,7 @@ export const createMeetingNotificationEventHandlers = ({
       }
 
       let kind = MeetingNotificationKind.INVITE;
-      if (getMeetingInstanceAt(meeting, new Date(now))) {
+      if (getMeetingInstanceAt(meeting, new Date(now)) !== undefined) {
         kind = MeetingNotificationKind.ONGOING;
       } else if (notifiedMeetings.has(meetingKey)) {
         kind = MeetingNotificationKind.UPDATE;

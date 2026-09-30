@@ -182,6 +182,18 @@ describe('MeetingNotificationCard', () => {
     }
   });
 
+  it.each(notifications)('omits the metadata separator for an empty organizer in $kind notifications', notification => {
+    renderCard(
+      <MeetingNotificationCard
+        {...notification}
+        qualifiedCreator={{id: '', domain: 'empty-organizer-domain'}}
+        onDismiss={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('listitem')).not.toHaveTextContent('•');
+  });
+
   it('highlights an ongoing time', () => {
     renderCard(
       <MeetingNotificationCard
