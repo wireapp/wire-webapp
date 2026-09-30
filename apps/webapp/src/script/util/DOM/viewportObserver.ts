@@ -55,7 +55,7 @@ const onIntersect: IntersectionObserverCallback = entries => {
       onVisibilityChange(!!isVisible, isIntersecting);
     } else if (isVisible) {
       removeElement(element);
-      return onVisible?.();
+      onVisible?.();
     }
   });
 };

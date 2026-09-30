@@ -408,7 +408,7 @@ export class ClientRepository {
     const clientRecords = await this.getClientByUserIdFromDb({domain, id});
     const clientEntities = ClientMapper.mapClients(clientRecords, true, domain);
     clientEntities.forEach(clientEntity => {
-      return this.selfUser().addClient(clientEntity);
+      this.selfUser().addClient(clientEntity);
     });
     return this.selfUser().devices();
   }

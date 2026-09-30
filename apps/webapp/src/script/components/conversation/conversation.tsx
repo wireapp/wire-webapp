@@ -651,7 +651,7 @@ function ConversationContent({
       return () => {
         const trigger = () => {
           return callbacks.forEach(callback => {
-            return callback();
+            callback();
           });
         };
 

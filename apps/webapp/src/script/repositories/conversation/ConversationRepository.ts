@@ -2650,7 +2650,7 @@ export class ConversationRepository {
 
   private mapGuestStatusSelf() {
     this.conversationState.filteredConversations().forEach(conversationEntity => {
-      return this._mapGuestStatusSelf(conversationEntity);
+      this._mapGuestStatusSelf(conversationEntity);
     });
 
     if (this.teamState.isTeam()) {

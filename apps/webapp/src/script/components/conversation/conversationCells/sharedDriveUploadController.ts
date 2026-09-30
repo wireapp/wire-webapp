@@ -197,7 +197,7 @@ export const createDirectSharedDriveUploadStrategy = ({
   const listeners = new Set<SharedDriveUploadSnapshotListener>();
   const notify = () => {
     return listeners.forEach(listener => {
-      return listener();
+      listener();
     });
   };
 
@@ -305,7 +305,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   let activeWorkCount = 0;
   const notify = () => {
     return listeners.forEach(listener => {
-      return listener();
+      listener();
     });
   };
 

@@ -89,7 +89,7 @@ describe('ConversationAccessPermissions', () => {
       features.forEach(feature =>
         // toggling the feature should mean the current access state no longer has access to it.
         {
-          return expect(hasAccessToFeature(feature, state)).not.toEqual(
+          expect(hasAccessToFeature(feature, state)).not.toEqual(
             hasAccessToFeature(feature, toggleFeature(feature, state)),
           );
         },
@@ -121,9 +121,10 @@ describe('ConversationAccessPermissions', () => {
         const result = featureFromStateChange(prev, team);
 
         if (prev === team) {
-          return Object.values(result).forEach(value => {
-            return expect(value).toBeFalsy();
+          Object.values(result).forEach(value => {
+            expect(value).toBeFalsy();
           });
+          return;
         }
         expect(['guest', 'service']).toContain(result.feature);
         expect(['Guest', 'Service']).toContain(result.featureName);

@@ -1262,6 +1262,14 @@ const config = [
     files: ['**/*.{ts,tsx,mts}'],
     rules: {
       'arrow-body-style': ['error', 'always'],
+      'array-callback-return': [
+        'error',
+        {
+          allowImplicit: false,
+          checkForEach: true,
+          allowVoid: false,
+        },
+      ],
     },
   },
   {

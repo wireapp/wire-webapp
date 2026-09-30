@@ -47,7 +47,7 @@ const removeCall = (conversationId: QualifiedId) => {
   const existingCallbacks = store.get(serializedId);
   if (existingCallbacks !== undefined) {
     existingCallbacks.forEach(unsubscribe => {
-      return unsubscribe();
+      unsubscribe();
     });
   }
   store.delete(serializedId);

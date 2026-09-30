@@ -92,7 +92,7 @@ describe('MLSConversations', () => {
       const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
       // Force epoch > 0 to trigger join path instead of establish
       mlsConversations.forEach(c => {
-        return (c.epoch = 1);
+        c.epoch = 1;
       });
 
       const conversationRepository = await testFactory.exposeConversationActors();

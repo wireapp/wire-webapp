@@ -67,7 +67,8 @@ export class ReceiptsMiddleware implements EventMiddleware {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         const originalEvents = await this.eventService.loadEvents(event.conversation, messageIds);
         originalEvents.forEach(originalEvent => {
-          return this.updateConfirmationStatus(originalEvent, event);
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises -- Receipt updates are intentionally started without awaiting this batch.
+          this.updateConfirmationStatus(originalEvent, event);
         });
         this.logger.info(
           `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,

@@ -119,7 +119,7 @@ const apiClients: APIClient[] = [];
 describe('ConversationService', () => {
   afterAll(() => {
     apiClients.forEach(client => {
-      return client.disconnect();
+      client.disconnect();
     });
   });
 

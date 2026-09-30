@@ -139,6 +139,8 @@ export class EventMapper {
         const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
         this.logger.error(errorMessage, error);
       }
+
+      return undefined;
     });
     return mappedEvents.filter(messageEntity => {
       return !isUndefined(messageEntity);

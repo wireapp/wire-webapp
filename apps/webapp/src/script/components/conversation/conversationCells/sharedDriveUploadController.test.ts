@@ -301,7 +301,7 @@ describe('createSharedDriveUploadController', () => {
     expect(cellsRepository.uploadNode).toHaveBeenNthCalledWith(4, expect.objectContaining({file: files[3]}));
 
     pendingUploads.slice(1).forEach(upload => {
-      return upload.resolve();
+      upload.resolve();
     });
     await Promise.all([firstBatch, secondBatch]);
 
@@ -457,7 +457,7 @@ describe('createSharedDriveUploadController', () => {
     );
 
     pendingUploads.slice(1).forEach(upload => {
-      return upload.resolve();
+      upload.resolve();
     });
     await uploadPromise;
   });
@@ -500,7 +500,7 @@ describe('createSharedDriveUploadController', () => {
     await Promise.resolve();
     expect(cellsRepository.uploadNode).toHaveBeenCalledTimes(4);
     pendingUploads.slice(1).forEach(upload => {
-      return upload.resolve();
+      upload.resolve();
     });
     await Promise.resolve();
     await Promise.resolve();

@@ -40,11 +40,11 @@ export const useUserPropertyChange = <T>(
   useEffect(() => {
     const listenedEvents = [updateEvent, WebAppEvents.PROPERTIES.UPDATED];
     listenedEvents.forEach(event => {
-      return amplify.subscribe(event, updateProperty);
+      amplify.subscribe(event, updateProperty);
     });
     return () => {
       listenedEvents.forEach(event => {
-        return amplify.unsubscribe(event, updateProperty);
+        amplify.unsubscribe(event, updateProperty);
       });
     };
   }, [updateEvent, updateProperty]);

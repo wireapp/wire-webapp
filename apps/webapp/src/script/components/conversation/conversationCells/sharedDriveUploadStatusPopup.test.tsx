@@ -411,7 +411,7 @@ describe('SharedDriveUploadStatusPopup', () => {
 
     expect(screen.getAllByRole('button', {name: 'Cancel'})).toHaveLength(2);
     screen.getAllByRole('button', {name: 'Cancel'}).forEach(cancel => {
-      return expect(cancel).toBeDisabled();
+      expect(cancel).toBeDisabled();
     });
   });
 

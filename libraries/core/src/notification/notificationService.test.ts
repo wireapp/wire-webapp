@@ -40,7 +40,7 @@ const apiClients: APIClient[] = [];
 describe('NotificationService', () => {
   afterAll(() => {
     apiClients.forEach(client => {
-      return client.disconnect();
+      client.disconnect();
     });
   });
 

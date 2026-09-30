@@ -28,7 +28,7 @@ describe('TypePredicatUtil', () => {
       ];
 
       validUserClients.forEach(payload => {
-        return expect(isQualifiedUserClients(payload)).toBeTruthy();
+        expect(isQualifiedUserClients(payload)).toBeTruthy();
       });
     });
 
@@ -41,7 +41,7 @@ describe('TypePredicatUtil', () => {
       ];
 
       invalidUserClients.forEach(payload => {
-        return expect(isQualifiedUserClients(payload)).toBeFalsy();
+        expect(isQualifiedUserClients(payload)).toBeFalsy();
       });
     });
   });

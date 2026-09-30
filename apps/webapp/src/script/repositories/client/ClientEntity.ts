@@ -125,12 +125,12 @@ export class ClientEntity {
     delete jsonObject.isSelfClient;
 
     ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => {
-      return this.removeDefaultValues(jsonObject, name);
+      this.removeDefaultValues(jsonObject, name);
     });
 
     if (this.isSelfClient) {
       ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => {
-        return this.removeDefaultValues(jsonObject, name);
+        this.removeDefaultValues(jsonObject, name);
       });
     }
 

@@ -324,7 +324,7 @@ export class CanvasMediaStreamMixer {
       if (!isNullOrUndefined(video)) {
         const tracks = video.srcObject as MediaStream;
         tracks?.getTracks().forEach(track => {
-          return track.stop();
+          track.stop();
         });
         video.srcObject = null;
         if (document.body.contains(video)) {

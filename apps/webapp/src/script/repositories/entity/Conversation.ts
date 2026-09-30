@@ -765,7 +765,7 @@ export class Conversation {
       this.verification_state,
       this.mlsVerificationState,
     ].forEach(property => {
-      return (property as ko.Observable).subscribe(this.persistState);
+      (property as ko.Observable).subscribe(this.persistState);
     });
   }
 
@@ -1189,7 +1189,7 @@ export class Conversation {
 
   updateGuests(): void {
     this.getTemporaryGuests().forEach(userEntity => {
-      return userEntity.checkGuestExpiration();
+      userEntity.checkGuestExpiration();
     });
   }
 

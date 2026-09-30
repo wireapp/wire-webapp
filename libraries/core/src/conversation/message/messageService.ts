@@ -181,7 +181,7 @@ export class MessageService {
     const deleted = flattenUserMap(mismatch.deleted);
     // remove deleted clients to the recipients
     deleted.forEach(({userId, data}) => {
-      return data.forEach(clientId => {
+      data.forEach(clientId => {
         const payloadsForDomain = initialPayloads.payloads[userId.domain];
         const payloadsForUser = payloadsForDomain?.[userId.id];
 

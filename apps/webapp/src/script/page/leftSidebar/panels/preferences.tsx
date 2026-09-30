@@ -140,7 +140,7 @@ const Preferences = ({
   useEffect(() => {
     if (NEW_DEVICE_NOTIFICATION_STATES.includes(contentState)) {
       void preferenceNotificationRepository.getNotifications().forEach(({type, notification}) => {
-        return showNotification(type, notification, translate);
+        showNotification(type, notification, translate);
       });
     }
   }, [contentState, preferenceNotificationRepository, translate]);

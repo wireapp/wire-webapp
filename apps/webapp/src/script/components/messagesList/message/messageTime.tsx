@@ -37,7 +37,7 @@ const MessageTime = ({timestamp, children, ...props}: MessageTimeProps) => {
   const showAllTimestamps = (show: boolean) => {
     const times = document.querySelectorAll('.time');
     times.forEach(time => {
-      return time.classList.toggle('show-timestamp', show);
+      time.classList.toggle('show-timestamp', show);
     });
   };
 

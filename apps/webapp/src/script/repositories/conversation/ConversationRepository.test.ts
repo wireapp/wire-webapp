@@ -3695,7 +3695,7 @@ describe('ConversationRepository', () => {
 
       const conversationRepo = await testFactory.exposeConversationActors();
       spyOn(requireValueForTest(testFactory.user_repository), 'refreshUsers').and.callFake(() => {
-        unavailableUsers.map(user => {
+        unavailableUsers.forEach(user => {
           user.id = createUuid();
           user.name(faker.person.fullName());
         });
@@ -3735,11 +3735,11 @@ describe('ConversationRepository', () => {
       ]);
 
       spyOn(requireValueForTest(testFactory.user_repository), 'refreshUsers').and.callFake(() => {
-        unavailableUsers1.map(user => {
+        unavailableUsers1.forEach(user => {
           user.id = createUuid();
           user.name(faker.person.fullName());
         });
-        unavailableUsers2.map(user => {
+        unavailableUsers2.forEach(user => {
           user.id = createUuid();
           user.name(faker.person.fullName());
         });

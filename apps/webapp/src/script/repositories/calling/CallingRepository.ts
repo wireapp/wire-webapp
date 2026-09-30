@@ -854,7 +854,7 @@ export class CallingRepository {
 
         if (call.state() === CALL_STATE.NONE) {
           audioStream.getTracks().forEach(track => {
-            return track.stop();
+            track.stop();
           });
           return audioStream;
         }
@@ -867,7 +867,7 @@ export class CallingRepository {
 
         if (call.state() === CALL_STATE.NONE) {
           cameraStream.getTracks().forEach(track => {
-            return track.stop();
+            track.stop();
           });
           return selfParticipant.getMediaStream();
         }
@@ -883,7 +883,7 @@ export class CallingRepository {
 
       if (call.state() === CALL_STATE.NONE) {
         mediaStream.getTracks().forEach(track => {
-          return track.stop();
+          track.stop();
         });
         return mediaStream;
       }
@@ -1613,12 +1613,12 @@ export class CallingRepository {
       this.logger.error('Error in toggleScreenShareWithVideo:', error);
       if (!isNullOrUndefined(screenStream)) {
         screenStream.getTracks().forEach(track => {
-          return track.stop();
+          track.stop();
         });
       }
       if (!isNullOrUndefined(cameraStream)) {
         cameraStream.getTracks().forEach(track => {
-          return track.stop();
+          track.stop();
         });
       }
     }
@@ -1632,7 +1632,7 @@ export class CallingRepository {
     const mixedStream = selfParticipant.videoStream();
     if (!isUndefined(mixedStream)) {
       mixedStream.getTracks().forEach(track => {
-        return track.stop();
+        track.stop();
       });
     }
 
@@ -2827,19 +2827,19 @@ export class CallingRepository {
 
   private updateParticipantMutedState(call: Call, members: QualifiedWcallMember[]): void {
     members.forEach(member => {
-      return call.getParticipant(member.userId, member.clientid)?.isMuted(member.muted !== 0 && !isNan(member.muted));
+      call.getParticipant(member.userId, member.clientid)?.isMuted(member.muted !== 0 && !isNan(member.muted));
     });
   }
 
   private updateParticipantVideoState(call: Call, members: QualifiedWcallMember[]): void {
     members.forEach(member => {
-      return call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv);
+      call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv);
     });
   }
 
   private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
     members.forEach(member => {
-      return call
+      call
         .getParticipant(member.userId, member.clientid)
         ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED);
     });
@@ -2870,10 +2870,10 @@ export class CallingRepository {
     });
 
     newMembers.forEach(participant => {
-      return call.participants.unshift(participant);
+      call.participants.unshift(participant);
     });
     removedMembers.forEach(participant => {
-      return call.participants.remove(participant);
+      call.participants.remove(participant);
     });
 
     if (call.participants().length > call.analyticsMaximumParticipants) {
@@ -3158,7 +3158,7 @@ export class CallingRepository {
         return participant.doesMatchIds(userId, clientId);
       })
       .forEach(participant => {
-        return participant.videoState(state);
+        participant.videoState(state);
       });
   };
 
@@ -3205,7 +3205,7 @@ export class CallingRepository {
    */
   destroy(): void {
     this.callState.calls().forEach((call: Call) => {
-      return this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId));
+      this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId));
     });
 
     AvsDebugger.reset();

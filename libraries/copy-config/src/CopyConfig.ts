@@ -234,7 +234,7 @@ export class CopyConfig {
           }),
         );
         results.forEach(result => {
-          return (copiedFiles = copiedFiles.concat(result));
+          copiedFiles = copiedFiles.concat(result);
         });
       } else if (typeof destination === 'string') {
         const result = await this.copyDirOrFile(file, destination);

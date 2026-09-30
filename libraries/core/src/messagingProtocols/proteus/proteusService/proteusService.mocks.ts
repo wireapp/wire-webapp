@@ -60,7 +60,7 @@ export const buildProteusService = async (): Promise<
 
 export const cleanupProteusServiceMocks = () => {
   createdApiClients.forEach(client => {
-    return client.disconnect();
+    client.disconnect();
   });
   createdApiClients.length = 0;
 };

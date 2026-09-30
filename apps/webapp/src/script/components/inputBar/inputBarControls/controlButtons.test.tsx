@@ -73,7 +73,7 @@ describe('ControlButtons', () => {
     });
     // check that the relevant buttons are present
     buttonTitles.forEach(button => {
-      return expect(getByTitle(button)).not.toBe(null);
+      expect(getByTitle(button)).not.toBe(null);
     });
 
     // check that the relevant buttons are hidden
@@ -82,7 +82,7 @@ describe('ControlButtons', () => {
         return !buttonTitles.includes(button);
       })
       .forEach(button => {
-        return expect(queryByTitle(button)).toBe(null);
+        expect(queryByTitle(button)).toBe(null);
       });
   });
   it.each(['', 'message'])('hides cells upload buttons when cells uploads are disallowed (input: %s)', input => {
@@ -169,7 +169,7 @@ describe('ControlButtons', () => {
 
     // check that the relevant buttons are present
     buttonTitles.forEach(button => {
-      return expect(getByTitle(button)).not.toBe(null);
+      expect(getByTitle(button)).not.toBe(null);
     });
 
     // check that the relevant buttons are hidden
@@ -178,7 +178,7 @@ describe('ControlButtons', () => {
         return !buttonTitles.includes(button);
       })
       .forEach(button => {
-        return expect(queryByTitle(button)).toBe(null);
+        expect(queryByTitle(button)).toBe(null);
       });
   });
 });

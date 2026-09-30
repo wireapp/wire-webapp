@@ -44,7 +44,7 @@ describe('onBackFromSleep', () => {
   afterEach(() => {
     // Clean up all intervals created during tests
     stopFunctions.forEach(stop => {
-      return stop();
+      stop();
     });
     stopFunctions.length = 0;
     jest.clearAllTimers();

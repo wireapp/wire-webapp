@@ -89,7 +89,7 @@ describe('createConversation', () => {
   afterAll(() => {
     jest.clearAllTimers();
     apiClients.forEach(client => {
-      return client.disconnect();
+      client.disconnect();
     });
     cleanupProteusServiceMocks();
   });

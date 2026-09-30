@@ -74,7 +74,7 @@ export async function extractAsync(zipFile: string, destination: string): Promis
 
   await jszip.loadAsync(data, {createFolders: true});
   jszip.forEach((filePath, entry) => {
-    return entries.push([filePath, entry]);
+    entries.push([filePath, entry]);
   });
   const firstEntry = entries[0];
   if (isUndefined(firstEntry)) {

@@ -80,13 +80,13 @@ export const useVideoGrid = (call: Call): Grid => {
     });
     return () => {
       nameSubscriptions?.forEach(s => {
-        return s.dispose();
+        s.dispose();
       });
       videoSubscriptions?.forEach(s => {
-        return s.dispose();
+        s.dispose();
       });
       screenShareSubscriptions?.forEach(s => {
-        return s.dispose();
+        s.dispose();
       });
     };
   }, [participants, participants?.length, call, currentPage, pages?.length]);

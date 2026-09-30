@@ -95,7 +95,7 @@ export const createCellsUploadProcess = (
     }
     state = Maybe.just(next);
     subscribers.forEach(listener => {
-      return listener(next);
+      listener(next);
     });
   };
 

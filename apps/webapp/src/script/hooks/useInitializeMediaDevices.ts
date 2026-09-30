@@ -34,7 +34,7 @@ export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, s
 
       if (stream !== undefined && stream !== null) {
         stream.getTracks().forEach(track => {
-          return track.stop();
+          track.stop();
         });
       }
       await devicesHandler?.initializeMediaDevices(true, true);

@@ -199,7 +199,7 @@ export class DebugUtil {
       return new Participant(new User('', '', translate), `some-client-id-${i}`);
     });
     participants.forEach(participant => {
-      return call.addParticipant(participant);
+      call.addParticipant(participant);
     });
   }
 
@@ -242,7 +242,7 @@ export class DebugUtil {
 
     const removeDebugInfo = (els: NodeListOf<HTMLElement>) => {
       return els.forEach(el => {
-        return el.parentNode?.removeChild(el);
+        el.parentNode?.removeChild(el);
       });
     };
 

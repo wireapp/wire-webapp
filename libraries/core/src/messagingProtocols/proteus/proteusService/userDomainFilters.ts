@@ -26,7 +26,11 @@ export function filterUsersFromDomains(
   const excludedUsers: QualifiedId[] = [];
   const includedUsers: QualifiedId[] = [];
   userIds.forEach(user => {
-    return domainsToExclude.includes(user.domain) ? excludedUsers.push(user) : includedUsers.push(user);
+    if (domainsToExclude.includes(user.domain)) {
+      excludedUsers.push(user);
+    } else {
+      includedUsers.push(user);
+    }
   });
 
   return {

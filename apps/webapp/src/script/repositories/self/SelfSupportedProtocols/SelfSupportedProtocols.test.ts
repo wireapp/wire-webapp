@@ -105,11 +105,11 @@ const generateListOfSelfClients = ({allActiveClientsMLSCapable}: {allActiveClien
   const clients: RegisteredClient[] = [];
 
   new Array(4).fill(0).forEach(() => {
-    return clients.push(createMockClientResponse(true, true));
+    clients.push(createMockClientResponse(true, true));
   });
   if (!allActiveClientsMLSCapable) {
     new Array(2).fill(0).forEach(() => {
-      return clients.push(createMockClientResponse(false, true));
+      clients.push(createMockClientResponse(false, true));
     });
   }
 

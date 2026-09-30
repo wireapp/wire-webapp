@@ -104,7 +104,7 @@ const buildMessageService = async () => {
 describe('MessageService', () => {
   afterAll(() => {
     apiClients.forEach(client => {
-      return client.disconnect();
+      client.disconnect();
     });
     cleanupProteusServiceMocks();
   });

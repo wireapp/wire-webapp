@@ -421,7 +421,7 @@ export class EventRepository {
     // Then override disconnect to include cleanup
     this.disconnectWebSocket = () => {
       cleanupHandlers.forEach(cleanup => {
-        return cleanup();
+        cleanup();
       });
       actualDisconnect();
     };

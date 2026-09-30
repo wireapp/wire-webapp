@@ -50,7 +50,7 @@ describe('CallingEpochCache', () => {
   beforeEach(() => {
     cache = new CallingEpochCache();
     epochData.forEach(d => {
-      return cache.store(d);
+      cache.store(d);
     });
   });
 

@@ -148,6 +148,8 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, 
             throw new ConversationError(ConversationError.TYPE.UNKNOWN_ACTIVITY, `Unknown activity "${activity}"`);
         }
       }
+
+      return undefined;
     })
     .filter((activityString): activityString is string => {
       return typeof activityString === 'string' && activityString.length > 0;

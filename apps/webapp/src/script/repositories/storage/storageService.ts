@@ -104,7 +104,7 @@ export class StorageService {
             return listener.store === table && listener.type === eventType;
           })
           .forEach(({callback}) => {
-            return callback({obj: updatedObj, oldObj: obj});
+            callback({obj: updatedObj, oldObj: obj});
           });
       });
     };
@@ -350,7 +350,7 @@ export class StorageService {
         return dbListener.store === storeName && dbListener.type === eventType;
       })
       .forEach(dbListener => {
-        return dbListener.callback({obj: newRecord, oldObj: oldRecord});
+        dbListener.callback({obj: newRecord, oldObj: oldRecord});
       });
   }
 

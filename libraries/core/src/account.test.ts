@@ -121,7 +121,7 @@ describe('Account', () => {
 
   afterAll(() => {
     apiClients.forEach(client => {
-      return client.disconnect();
+      client.disconnect();
     });
   });
 

@@ -66,7 +66,7 @@ describe('subscribeToMeetingLifecycleEvents', () => {
 
   afterEach(() => {
     activeUnsubscribeCallbacks.splice(0).forEach(unsubscribe => {
-      return unsubscribe();
+      unsubscribe();
     });
   });
 

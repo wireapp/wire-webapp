@@ -79,7 +79,7 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
   return {
     dispose: () => {
       return subscriptions.forEach(subscription => {
-        return subscription?.dispose();
+        subscription?.dispose();
       });
     },
   };

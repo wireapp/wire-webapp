@@ -60,7 +60,7 @@ describe('ProteusConversationVerificationStateHandler', () => {
       selfUserEntity = new User(createUuid(), '', translateForTest);
       selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => {
-        return clientEntity.meta.isVerified(true);
+        clientEntity.meta.isVerified(true);
       });
 
       spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUserEntity);

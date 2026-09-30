@@ -47,12 +47,12 @@ export class ClientMapper {
     const clientEntity = new ClientEntity(isSelfClient, domain);
 
     ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => {
-      return ClientMapper._mapMember(clientEntity, clientPayload, name);
+      ClientMapper._mapMember(clientEntity, clientPayload, name);
     });
 
     if (isSelfClient) {
       ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => {
-        return ClientMapper._mapMember(clientEntity, clientPayload, name);
+        ClientMapper._mapMember(clientEntity, clientPayload, name);
       });
     }
 

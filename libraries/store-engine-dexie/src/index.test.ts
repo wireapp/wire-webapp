@@ -76,7 +76,7 @@ describe('IndexedDBEngine', () => {
       return (engine = await initEngine());
     });
 
-    Object.entries(createSpec).map(([description, testFunction]) => {
+    Object.entries(createSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -113,7 +113,7 @@ describe('IndexedDBEngine', () => {
       return (engine = await initEngine());
     });
 
-    Object.entries(deleteSpec).map(([description, testFunction]) => {
+    Object.entries(deleteSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -125,7 +125,7 @@ describe('IndexedDBEngine', () => {
       return (engine = await initEngine());
     });
 
-    Object.entries(deleteAllSpec).map(([description, testFunction]) => {
+    Object.entries(deleteAllSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -137,7 +137,7 @@ describe('IndexedDBEngine', () => {
       return (engine = await initEngine());
     });
 
-    Object.entries(purgeSpec).map(([description, testFunction]) => {
+    Object.entries(purgeSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine, initEngine);
       });
@@ -149,7 +149,7 @@ describe('IndexedDBEngine', () => {
       return (engine = await initEngine());
     });
 
-    Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
+    Object.entries(readAllPrimaryKeysSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -161,7 +161,7 @@ describe('IndexedDBEngine', () => {
       return (engine = await initEngine());
     });
 
-    Object.entries(readAllSpec).map(([description, testFunction]) => {
+    Object.entries(readAllSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -173,7 +173,7 @@ describe('IndexedDBEngine', () => {
       return (engine = await initEngine());
     });
 
-    Object.entries(readSpec).map(([description, testFunction]) => {
+    Object.entries(readSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -268,7 +268,7 @@ describe('IndexedDBEngine', () => {
       return (engine = await initEngine());
     });
 
-    Object.entries(updateSpec).map(([description, testFunction]) => {
+    Object.entries(updateSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });

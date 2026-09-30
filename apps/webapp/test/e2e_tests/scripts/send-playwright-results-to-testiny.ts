@@ -94,7 +94,7 @@ function extractTcTags(title: string, tags: string[]): string[] {
     String(t)
       .match(/@?TC-\d+/gi)
       ?.forEach(m => {
-        return matches.add(m.replace(/^@/, '').toUpperCase());
+        matches.add(m.replace(/^@/, '').toUpperCase());
       });
   }
   return [...matches];

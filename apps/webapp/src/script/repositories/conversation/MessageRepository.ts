@@ -657,7 +657,8 @@ export class MessageRepository {
   public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean) {
     if (this.canUploadAssetsToConversation(conversationEntity)) {
       Array.from(files).forEach(file => {
-        return this.uploadFile(conversationEntity, file, asImage);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- Uploads are intentionally started without awaiting this batch.
+        this.uploadFile(conversationEntity, file, asImage);
       });
     }
   }

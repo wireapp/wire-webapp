@@ -27,7 +27,7 @@ describe('callingSubscriptions', () => {
     const calls = [call1, call2, call3] as const;
 
     calls.forEach(({conversation, unsubscribe}) => {
-      return callingSubscriptions.addCall(conversation, unsubscribe);
+      callingSubscriptions.addCall(conversation, unsubscribe);
     });
 
     callingSubscriptions.removeCall(call1.conversation);

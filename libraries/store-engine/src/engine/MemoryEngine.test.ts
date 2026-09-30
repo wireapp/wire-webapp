@@ -83,7 +83,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('create', () => {
-    Object.entries(createSpec).map(([description, testFunction]) => {
+    Object.entries(createSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -91,7 +91,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('delete', () => {
-    Object.entries(deleteSpec).map(([description, testFunction]) => {
+    Object.entries(deleteSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -99,7 +99,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('deleteAll', () => {
-    Object.entries(deleteAllSpec).map(([description, testFunction]) => {
+    Object.entries(deleteAllSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -107,7 +107,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('purge', () => {
-    Object.entries(purgeSpec).map(([description, testFunction]) => {
+    Object.entries(purgeSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine, initEngine);
       });
@@ -115,7 +115,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('readAllPrimaryKeys', () => {
-    Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
+    Object.entries(readAllPrimaryKeysSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -123,7 +123,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('readAll', () => {
-    Object.entries(readAllSpec).map(([description, testFunction]) => {
+    Object.entries(readAllSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -131,7 +131,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('read', () => {
-    Object.entries(readSpec).map(([description, testFunction]) => {
+    Object.entries(readSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -139,7 +139,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('updateOrCreate', () => {
-    Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
+    Object.entries(updateOrCreateSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });
@@ -147,7 +147,7 @@ describe('MemoryEngine', () => {
   });
 
   describe('update', () => {
-    Object.entries(updateSpec).map(([description, testFunction]) => {
+    Object.entries(updateSpec).forEach(([description, testFunction]) => {
       it(description, () => {
         return testFunction(engine);
       });

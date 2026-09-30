@@ -202,7 +202,7 @@ describe('WebSocketClient', () => {
 
   afterAll(() => {
     webSocketClients.forEach(client => {
-      return client.disconnect();
+      client.disconnect();
     });
   });
 

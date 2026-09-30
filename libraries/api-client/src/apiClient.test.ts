@@ -35,7 +35,7 @@ const apiClients: APIClient[] = [];
 describe('APIClient', () => {
   afterAll(() => {
     apiClients.forEach(client => {
-      return client.disconnect();
+      client.disconnect();
     });
   });
 

@@ -668,7 +668,7 @@ export class ConversationMapper {
     }
 
     // Add roles for others
-    othersStates.map(other => {
+    othersStates.forEach(other => {
       if (other.conversation_role !== undefined && other.id !== undefined && !(other.conversation_role in roles)) {
         roles[other.id] = other.conversation_role;
       }

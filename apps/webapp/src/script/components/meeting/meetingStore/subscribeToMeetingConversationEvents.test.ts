@@ -47,7 +47,7 @@ describe('subscribeToMeetingConversationEvents', () => {
 
   afterEach(() => {
     activeUnsubscribeCallbacks.splice(0).forEach(unsubscribe => {
-      return unsubscribe();
+      unsubscribe();
     });
   });
 
