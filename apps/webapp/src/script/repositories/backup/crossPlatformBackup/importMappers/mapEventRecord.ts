@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+
 import {ClientEvent} from 'Repositories/event/Client';
 import {EventRecord} from 'Repositories/storage';
 import {MessageCategory} from 'src/script/message/messageCategory';
@@ -61,7 +63,7 @@ const mapCommonMessageFields = ({
     },
     time: creationDate.date.toISOString(),
     primary_key: webPrimaryKey?.toString() ?? '',
-    edited_time: lastEditTime ? lastEditTime.date.toISOString() : undefined,
+    edited_time: isNullOrUndefined(lastEditTime) ? undefined : lastEditTime.date.toISOString(),
   };
   return common;
 };
@@ -109,8 +111,8 @@ const mapMessageContentToCategory = (message: BackupMessage): MessageCategory =>
   if (isAssetContent(message.content)) {
     const name = message.content.name;
     const metadata = message.content.metaData;
-    if (!metadata) {
-      if (name) {
+    if (isNullOrUndefined(metadata)) {
+      if (isNonEmptyString(name)) {
         return MessageCategory.FILE;
       }
       return MessageCategory.UNDEFINED;
