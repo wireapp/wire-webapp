@@ -17,6 +17,7 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
 import type {Dexie, Transaction} from 'dexie';
 
 import {base64ToArray} from 'Util/util';
@@ -164,7 +165,7 @@ export class StorageSchemata {
             .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
             .toCollection()
             .modify(event => {
-              const mappedEvent = event.mapped || event.raw;
+              const mappedEvent = isTruthy(event.mapped) ? event.mapped : event.raw;
               delete event.mapped;
               delete event.raw;
               delete event.meta;
