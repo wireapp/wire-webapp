@@ -27,7 +27,6 @@ type PendingAction = {kind: 'enter' | 'tab'; event: SearchEvent; query: string};
 type ConversationSearchOptions = {
   clock: Clock;
   filter: string;
-  searchContextKey: string;
   setFilter: (value: string) => void;
   onSearch: (value: string) => void;
   onEnter: (event: SearchEvent) => boolean;
@@ -40,7 +39,6 @@ const SEARCH_DELAY_IN_MILLISECONDS = 200;
 export const useConversationSearch = ({
   clock,
   filter,
-  searchContextKey,
   setFilter,
   onSearch,
   onEnter,
@@ -49,26 +47,14 @@ export const useConversationSearch = ({
 }: ConversationSearchOptions) => {
   const [inputValue, setInputValue] = useState(filter);
   const pendingAction = useRef<PendingAction | null>(null);
-  const previousSearchContextKey = useRef(searchContextKey);
-
   useEffect(() => {
-    if (previousSearchContextKey.current === searchContextKey) {
-      return;
-    }
-
-    previousSearchContextKey.current = searchContextKey;
-    pendingAction.current = null;
-    setInputValue(filter);
-  }, [filter, searchContextKey]);
-
-  useEffect(() => {
-    if (previousSearchContextKey.current !== searchContextKey || inputValue.length === 0 || inputValue === filter) {
+    if (inputValue.length === 0 || inputValue === filter) {
       return;
     }
 
     const timeout = clock.setTimeout(() => onSearch(inputValue), SEARCH_DELAY_IN_MILLISECONDS);
     return () => clock.clearTimeout(timeout);
-  }, [clock, filter, inputValue, onSearch, searchContextKey]);
+  }, [clock, filter, inputValue, onSearch]);
 
   const clear = useCallback(() => {
     pendingAction.current = null;
