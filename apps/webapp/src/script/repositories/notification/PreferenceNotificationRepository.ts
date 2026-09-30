@@ -17,6 +17,7 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {UserEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -71,7 +72,7 @@ export class PreferenceNotificationRepository {
   constructor(selfUser: ko.Subscribable<User | undefined>) {
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
     const storedNotifications = loadValue<string>(notificationsStorageKey);
-    this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
+    this.notifications = ko.observableArray(isTruthy(storedNotifications) ? JSON.parse(storedNotifications) : []);
     this.notifications.subscribe(notifications => {
       return notifications.length > 0
         ? storeValue(notificationsStorageKey, JSON.stringify(notifications))
@@ -137,9 +138,9 @@ export class PreferenceNotificationRepository {
   readonly onUserEvent = (event: UserEvent & {value?: string}): void => {
     if (event.type === USER_EVENT.PROPERTIES_DELETE || event.type === USER_EVENT.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
-        const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
+        const defaultValue = isTruthy(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
         this.notifications.push({
-          data: event.value === undefined ? defaultValue : !!event.value,
+          data: event.value === undefined ? defaultValue : isTruthy(event.value),
           type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
         });
       }

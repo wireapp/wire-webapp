@@ -65,6 +65,35 @@ describe('PreferenceNotificationRepository', () => {
     });
   });
 
+  it.each([
+    {value: '', expectedReceiptMode: false},
+    {value: 0, expectedReceiptMode: false},
+    {value: NaN, expectedReceiptMode: false},
+    {value: false, expectedReceiptMode: false},
+    {value: null, expectedReceiptMode: false},
+    {value: 'false', expectedReceiptMode: true},
+    {value: -1, expectedReceiptMode: true},
+    {value: 1, expectedReceiptMode: true},
+    {value: [], expectedReceiptMode: true},
+  ])('preserves receipt-mode coercion for runtime payload $value', options => {
+    const {value, expectedReceiptMode} = options;
+    amplify.unsubscribeAll(WebAppEvents.USER.EVENT_FROM_BACKEND);
+    const repository = new PreferenceNotificationRepository(userObservable);
+
+    amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, {
+      key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
+      type: USER_EVENT.PROPERTIES_SET,
+      value,
+    });
+
+    expect(repository.notifications()).toEqual([
+      {
+        data: expectedReceiptMode,
+        type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
+      },
+    ]);
+  });
+
   it('adds new notification when new device is added for self user', () => {
     amplify.unsubscribeAll(WebAppEvents.USER.CLIENT_ADDED);
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
