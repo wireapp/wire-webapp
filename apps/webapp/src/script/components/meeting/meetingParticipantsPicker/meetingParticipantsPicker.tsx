@@ -108,12 +108,14 @@ export const MeetingParticipantsPicker = ({
     handleOpenChange,
     handleSelectedUsersChange,
     handleSelectConversation,
+    isContactsOpen,
     isConversationsOpen,
     isOpen,
     matchingConversations,
     popoverRef,
     selectedConversationIds,
     setIsConversationsOpen,
+    setIsContactsOpen,
     triggerRef,
   } = useMeetingParticipantsPicker({
     disabled,
@@ -163,13 +165,8 @@ export const MeetingParticipantsPicker = ({
               }
             }}
             onFocus={() => {
-              if (!disabled) {
+              if (!disabled && !isOpen) {
                 handleOpenChange(true);
-              }
-            }}
-            onKeyDown={event => {
-              if (event.key === 'Escape') {
-                handleOpenChange(false);
               }
             }}
           />
@@ -191,7 +188,11 @@ export const MeetingParticipantsPicker = ({
         ref={popoverRef}
         triggerRef={triggerRef}
         isOpen={isOpen}
-        onOpenChange={handleOpenChange}
+        onOpenChange={open => {
+          if (open) {
+            handleOpenChange(true);
+          }
+        }}
         isNonModal
         css={popoverStyles}
         style={popoverOverlayStyles}
@@ -225,6 +226,8 @@ export const MeetingParticipantsPicker = ({
               showAllProvidedUsers
               hideEmptyState={matchingConversations.length > 0}
               showSelectedUsersRegardlessOfFilter
+              isContactsOpen={isContactsOpen}
+              onContactsOpenChange={setIsContactsOpen}
               dataUieName={dataUieName ? `${dataUieName}-list` : undefined}
             />
             <MeetingConversationsSearchableList
