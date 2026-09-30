@@ -19,6 +19,7 @@
 
 import {useEffect} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
@@ -121,7 +122,7 @@ const MeetingNotificationOrganizerAndTimeMetadata = ({
   return (
     <>
       {translate('meetings.notifications.by', {organizer}, undefined, true)}
-      {organizer && meetingTime && <span aria-hidden="true"> • </span>}
+      {isNonEmptyString(organizer) && isNonEmptyString(meetingTime) ? <span aria-hidden="true"> • </span> : ''}
       {meetingTime}
     </>
   );
@@ -158,7 +159,7 @@ const MeetingNotificationMetadata = ({
       return (
         <>
           {translate('meetings.notifications.by', {organizer}, undefined, true)}
-          {organizer && <span aria-hidden="true"> • </span>}
+          {isNonEmptyString(organizer) ? <span aria-hidden="true"> • </span> : organizer}
           <span css={meetingNotificationCardOngoingTimeStyles}>
             {translate('meetings.meetingStatus.startedAt', {time: meetingTime})}
           </span>
@@ -172,7 +173,7 @@ const MeetingNotificationMetadata = ({
       return (
         <>
           {translate('meetings.notifications.by', {organizer}, undefined, true)}
-          {organizer && <span aria-hidden="true"> • </span>}
+          {isNonEmptyString(organizer) ? <span aria-hidden="true"> • </span> : organizer}
           {translate('meetings.notifications.startsAt', {time: meetingTime})}
         </>
       );

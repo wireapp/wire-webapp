@@ -17,6 +17,7 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -51,7 +52,9 @@ export class ReceiptsMiddleware implements EventMiddleware {
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
-        const qualifiedConversation = event.qualified_conversation || {domain: '', id: event.conversation};
+        const qualifiedConversation = isTruthy(event.qualified_conversation)
+          ? event.qualified_conversation
+          : {domain: '', id: event.conversation};
         const conversation = await this.conversationRepository.getConversationById(qualifiedConversation);
         if (conversation?.isGroupOrChannel()) {
           // We only override the value of expects_read_confirmation for group conversations (one to one conversation use the value set by the sender)
@@ -84,7 +87,8 @@ export class ReceiptsMiddleware implements EventMiddleware {
     confirmationEvent: ConfirmationEvent,
   ): Promise<EventRecord | void> {
     const status = confirmationEvent.data.status;
-    const currentReceipts = ('read_receipts' in originalEvent && originalEvent.read_receipts) || [];
+    const currentReceipts =
+      'read_receipts' in originalEvent && isTruthy(originalEvent.read_receipts) ? originalEvent.read_receipts : [];
 
     // I shouldn't receive this read receipt
     if (!this.isMyMessage(originalEvent)) {

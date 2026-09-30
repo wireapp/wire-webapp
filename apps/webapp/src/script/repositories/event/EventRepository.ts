@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {
   CONVERSATION_EVENT,
   MEETING_EVENT,
@@ -254,10 +255,9 @@ export class EventRepository {
           ) => {
             currentConnectionState = connectionState;
             this.updateConnectivityStatus(connectionState);
-            const lifecycleConnectionContext =
-              connectionContext === undefined
-                ? ''
-                : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
+            const lifecycleConnectionContext = isUndefined(connectionContext)
+              ? ''
+              : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
             this.logger.info(
               `[WebSocketLifecycle] layer=event-repository event=connection-state-change connectCycleId=${currentConnectCycleId} state=${connectionState.toUpperCase()}${lifecycleConnectionContext}`,
             );
@@ -432,7 +432,7 @@ export class EventRepository {
   // Notification Stream handling
   //##############################################################################
   private getServerTimeFromAxiosError(errorResponse: unknown): string | undefined {
-    if (!isAxiosError<{time?: string}>(errorResponse) || !errorResponse.response) {
+    if (!isAxiosError<{time?: string}>(errorResponse) || !isTruthy(errorResponse.response)) {
       return undefined;
     }
 
@@ -442,7 +442,7 @@ export class EventRepository {
 
     if (
       'data' in errorResponse.response &&
-      errorResponse.response.data &&
+      isTruthy(errorResponse.response.data) &&
       typeof errorResponse.response.data === 'object' &&
       'time' in errorResponse.response.data &&
       typeof errorResponse.response.data.time === 'string'
@@ -460,14 +460,14 @@ export class EventRepository {
     } catch (errorResponse: unknown) {
       const serverTime = this.getServerTimeFromAxiosError(errorResponse);
 
-      if (serverTime !== undefined) {
+      if (!isUndefined(serverTime)) {
         this.serverTimeHandler.computeTimeOffset(serverTime);
       }
     }
   }
 
   private getIsoDateFromEvent(event: IncomingEvent, defaultValue = false): string | void {
-    if ('time' in event && event.time) {
+    if ('time' in event && isNonEmptyString(event.time)) {
       return event.time;
     }
 
@@ -529,7 +529,7 @@ export class EventRepository {
     event: ClientConversationEvent | IncomingEvent,
     source: EventSource = EventSource.INJECTED,
   ): Promise<void> {
-    if (!event) {
+    if (!isTruthy(event)) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
 
@@ -590,7 +590,7 @@ export class EventRepository {
     };
 
     const webAppEvent = webAppEventByMeetingEvent[event.type as MEETING_EVENT];
-    if (webAppEvent === undefined) {
+    if (isUndefined(webAppEvent)) {
       amplify.publish(event.type, event);
       return;
     }
@@ -598,9 +598,9 @@ export class EventRepository {
     const meetingId = 'qualified_id' in event ? event.qualified_id : undefined;
     const actorId = 'qualified_from' in event ? event.qualified_from : undefined;
     const hasValidQualifiedId =
-      meetingId !== undefined && typeof meetingId.id === 'string' && typeof meetingId.domain === 'string';
+      !isUndefined(meetingId) && typeof meetingId.id === 'string' && typeof meetingId.domain === 'string';
     const hasValidActorId =
-      actorId !== undefined && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
+      !isUndefined(actorId) && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
 
     if (!hasValidQualifiedId || !hasValidActorId) {
       this.logger.warn(`Ignored ${event.type} event without valid qualified IDs`, event);
@@ -636,7 +636,7 @@ export class EventRepository {
         if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD) {
           eventToProcess = await this.mapEncryptedEvent(event, {decryptedData, decryptionError}, source);
         }
-        if (!eventToProcess) {
+        if (!isTruthy(eventToProcess)) {
           return event;
         }
 
@@ -649,7 +649,7 @@ export class EventRepository {
     {decryptedData, decryptionError}: Pick<HandledEventPayload, 'decryptedData' | 'decryptionError'>,
     source: EventSource,
   ): Promise<IncomingEvent | undefined> {
-    if (decryptionError) {
+    if (isTruthy(decryptionError)) {
       this.logger.warn(`Decryption Error: '${event.type}'`, {
         source,
         eventType: event.type,
@@ -663,7 +663,7 @@ export class EventRepository {
         209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
       ];
 
-      if (decryptionError.code && ignoredCodes.includes(decryptionError.code)) {
+      if (isTruthy(decryptionError.code) && ignoredCodes.includes(decryptionError.code)) {
         return undefined;
       }
 
@@ -674,7 +674,7 @@ export class EventRepository {
       return EventBuilder.buildUnableToDecrypt(event, decryptionError);
     }
 
-    if (decryptedData) {
+    if (isTruthy(decryptedData)) {
       return await new CryptographyMapper().mapGenericMessage(decryptedData, event);
     }
 
@@ -714,7 +714,7 @@ export class EventRepository {
   private async handleEventDistribution(event: IncomingEvent, source: EventSource) {
     const eventDate = this.getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
-    const canSetEventDate = !isInjectedEvent && eventDate;
+    const canSetEventDate = !isInjectedEvent && isNonEmptyString(eventDate);
     if (canSetEventDate) {
       /*
        * HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket.

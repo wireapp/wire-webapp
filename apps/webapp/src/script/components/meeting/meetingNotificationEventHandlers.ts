@@ -18,6 +18,7 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
+import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {
@@ -94,7 +95,7 @@ export const createMeetingNotificationEventHandlers = ({
   const addCancellationNotificationForMeeting = (meetingId: QualifiedId): void => {
     const meetingKey = toMeetingIdKey(meetingId);
     const meeting = getMeeting(meetingId);
-    if (!meeting) {
+    if (isUndefined(meeting)) {
       logger.warn('meeting notification pending because the meeting is not in the store yet', {
         kind: MeetingNotificationKind.CANCELLED,
         meetingId,
@@ -136,7 +137,7 @@ export const createMeetingNotificationEventHandlers = ({
   const retryPendingNotifications = () => {
     for (const [key, meetingId] of pending) {
       const meeting = getMeeting(meetingId);
-      if (!meeting) {
+      if (isUndefined(meeting)) {
         continue;
       }
 
@@ -162,7 +163,7 @@ export const createMeetingNotificationEventHandlers = ({
       }
 
       let kind = MeetingNotificationKind.INVITE;
-      if (getMeetingInstanceAt(meeting, new Date(now))) {
+      if (!isUndefined(getMeetingInstanceAt(meeting, new Date(now)))) {
         kind = MeetingNotificationKind.ONGOING;
       } else if (notifiedMeetings.has(meetingKey)) {
         kind = MeetingNotificationKind.UPDATE;

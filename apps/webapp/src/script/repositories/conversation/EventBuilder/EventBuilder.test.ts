@@ -62,6 +62,22 @@ describe('EventBuilder', () => {
     expect(messageEntity.conversation_id).toBe(conversation_et.id);
   });
 
+  it.each([
+    {timestamp: undefined, expectedMilliseconds: 101},
+    {timestamp: 0, expectedMilliseconds: 101},
+    {timestamp: NaN, expectedMilliseconds: 101},
+    {timestamp: -1, expectedMilliseconds: -1},
+    {timestamp: 1, expectedMilliseconds: 1},
+  ])('preserves member-join timestamp fallback for $timestamp', options => {
+    const {timestamp, expectedMilliseconds} = options;
+    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    spyOn(conversation, 'getLastKnownTimestamp').and.returnValue(100);
+
+    const event = EventBuilder.buildMemberJoin(conversation, {id: 'sender-id', domain: ''}, [], timestamp);
+
+    expect(new Date(event.time).getTime()).toBe(expectedMilliseconds);
+  });
+
   it('buildDegraded', () => {
     const users: QualifiedId[] = [{domain: '', id: createUuid()}];
     const event = EventBuilder.buildDegraded(conversation_et, users, VerificationMessageType.NEW_DEVICE);

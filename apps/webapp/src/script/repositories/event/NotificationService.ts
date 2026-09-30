@@ -17,6 +17,7 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
 import type {NotificationList} from '@wireapp/api-client/lib/notification/';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
 import {container} from 'tsyringe';
@@ -69,7 +70,7 @@ export class NotificationService {
     return this.storageService
       .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
       .then(record => {
-        if (record?.value) {
+        if (isTruthy(record?.value)) {
           return record.value;
         }
         return undefined;

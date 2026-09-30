@@ -19,6 +19,7 @@
 
 import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
@@ -261,7 +262,7 @@ export class NotificationRepository {
       return Promise.resolve();
     }
 
-    const notifyInConversation = conversationEntity
+    const notifyInConversation = !isNullOrUndefined(conversationEntity)
       ? NotificationRepository.shouldNotifyInConversation(
           conversationEntity,
           messageEntity,
@@ -282,17 +283,17 @@ export class NotificationRepository {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data;
 
-      if (conversationId && messageId) {
+      if (!isNullOrUndefined(conversationId) && isNonEmptyString(messageId)) {
         this.fireAndForgetInvoker.fireAndForget(async () => {
           const isRead = await this.conversationRepository.isMessageRead(conversationId, messageId);
           if (isRead) {
-            const messageInfo = messageId
+            const messageInfo = isNonEmptyString(messageId)
               ? `message '${messageId}' of type '${messageType}'`
               : `'${messageType}' message`;
             this.closeNotification(
               notification.handle,
-              `Removed read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
-              `Failed to close read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
+              `Removed read notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}'.`,
+              `Failed to close read notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}'.`,
             );
           }
         });
@@ -371,7 +372,7 @@ export class NotificationRepository {
 
     if (messageEntity.hasAsset()) {
       const assetEntity = messageEntity.getFirstAsset();
-      if (assetEntity === undefined) {
+      if (isUndefined(assetEntity)) {
         return undefined;
       }
 
@@ -425,7 +426,7 @@ export class NotificationRepository {
    */
   private createBodyMemberLeave(messageEntity: MemberMessage): string | void {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
-    if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
+    if (updatedOneParticipant && messageEntity.remoteUserEntities().length === 0) {
       return this.translate('notificationMemberLeaveRemovedYou', {user: messageEntity.user().name()}, {}, true);
     }
   }
@@ -437,7 +438,7 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createBodyMemberUpdate(messageEntity?: MemberMessage, conversationEntity?: Conversation): string | void {
-    const isGroupOrChannel = conversationEntity && conversationEntity.isGroupOrChannel();
+    const isGroupOrChannel = !isNullOrUndefined(conversationEntity) && conversationEntity.isGroupOrChannel();
 
     switch (messageEntity?.memberMessageType) {
       case SystemMessageType.NORMAL:
@@ -514,7 +515,7 @@ export class NotificationRepository {
         (messageEntity as MessageTimerUpdateMessage).message_timer,
       );
 
-      if (messageTimer) {
+      if (isTruthy(messageTimer)) {
         const timeString = formatDuration(messageTimer, this.translate).text;
         const substitutions = {time: timeString, user: messageEntity.user().name()};
         return this.translate('notificationConversationMessageTimerUpdate', substitutions, {}, true);
@@ -551,7 +552,7 @@ export class NotificationRepository {
     conversationEntity?: Conversation,
   ): Promise<NotificationContent | undefined> {
     const body = this.createOptionsBody(messageEntity, conversationEntity);
-    if (!body) {
+    if (!isNonEmptyString(body)) {
       return Promise.resolve(undefined);
     }
     const shouldObfuscateSender = this.shouldObfuscateNotificationSender(messageEntity);
@@ -626,7 +627,7 @@ export class NotificationRepository {
    * @returns Resolves with the icon URL
    */
   private async createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
-    const canShowUserImage = userEntity.previewPictureResource() && !shouldObfuscateSender;
+    const canShowUserImage = isTruthy(userEntity.previewPictureResource()) && !shouldObfuscateSender;
     if (canShowUserImage) {
       try {
         return await this.assetRepository.getObjectUrl(userEntity.previewPictureResource());
@@ -648,7 +649,9 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createOptionsTag(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
-    return this.getConversationId(connectionEntity, conversationEntity)?.id || '';
+    const conversationId = this.getConversationId(connectionEntity, conversationEntity)?.id;
+
+    return isTruthy(conversationId) ? conversationId : '';
   }
 
   /**
@@ -667,7 +670,7 @@ export class NotificationRepository {
    * @param Notification message title
    */
   private createTitle(messageEntity: Message, conversationEntity?: Conversation): string {
-    const conversationName = conversationEntity && conversationEntity.display_name();
+    const conversationName = conversationEntity?.display_name();
     const userEntity = messageEntity.user();
 
     const truncatedConversationName = truncate(
@@ -679,7 +682,7 @@ export class NotificationRepository {
     const truncatedName = truncate(userEntity.name(), this.calculatedTitleLength(conversationName ?? ''), false);
 
     let title;
-    if (conversationName) {
+    if (!isNullOrUndefined(conversationEntity) && isNonEmptyString(conversationName)) {
       title = conversationEntity.isGroupOrChannel()
         ? this.translate(
             'notificationTitleGroup',
@@ -729,7 +732,9 @@ export class NotificationRepository {
       };
     }
 
-    return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity || conversationId, {});
+    return () => {
+      return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity ?? conversationId, {});
+    };
   }
 
   /**
@@ -743,7 +748,7 @@ export class NotificationRepository {
     connectionEntity?: ConnectionEntity,
     conversationEntity?: Conversation,
   ): QualifiedId | undefined {
-    if (connectionEntity) {
+    if (!isNullOrUndefined(connectionEntity)) {
       return connectionEntity.conversationId;
     }
     return conversationEntity?.qualifiedId;
@@ -791,9 +796,9 @@ export class NotificationRepository {
       connectionEntity,
       conversationEntity,
     );
-    if (notificationContent) {
+    if (!isUndefined(notificationContent)) {
       const isPermitted = await this.checkPermission();
-      if (isPermitted) {
+      if (isPermitted === true) {
         this.showNotification(notificationContent);
       }
     }
@@ -874,17 +879,17 @@ export class NotificationRepository {
    * @returns Returns `true` if the notification should be shown, `false` otherwise
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
-    if (conversationEntity !== undefined && isMeetingConversation(conversationEntity)) {
+    if (!isUndefined(conversationEntity) && isMeetingConversation(conversationEntity)) {
       return false;
     }
 
-    const inActiveConversation = conversationEntity
+    const inActiveConversation = !isNullOrUndefined(conversationEntity)
       ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
     const {contentState} = useAppState.getState();
     const inConversationView = contentState === ContentState.CONVERSATION;
     const inMaximizedCall =
-      !!this.callState.joinedCall() && this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
+      !isNullOrUndefined(this.callState.joinedCall()) && this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;
@@ -919,24 +924,26 @@ export class NotificationRepository {
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
     this.removeReadNotifications();
     const {conversationId, messageId, messageType} = notificationContent.options.data;
-    const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
+    const messageInfo = isNonEmptyString(messageId)
+      ? `message '${messageId}' of type '${messageType}'`
+      : `'${messageType}' message`;
     let presentationState: PresentationState = {kind: 'pending'};
 
     const scheduleTimeout = () => {
-      if (presentationState.kind !== 'shown' || presentationState.entry === undefined) {
+      if (presentationState.kind !== 'shown' || isUndefined(presentationState.entry)) {
         return;
       }
 
       const {entry: notificationEntry} = presentationState;
-      if (notificationEntry.timeoutIdentifier !== undefined) {
+      if (!isUndefined(notificationEntry.timeoutIdentifier)) {
         return;
       }
 
       notificationEntry.timeoutIdentifier = this.clock.setTimeout(() => {
         this.closeNotification(
           notificationEntry.handle,
-          `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by timeout.`,
-          `Failed to close notification for ${messageInfo} in '${conversationId?.id || conversationId}' by timeout.`,
+          `Notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' closed by timeout.`,
+          `Failed to close notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' by timeout.`,
         );
       }, notificationContent.timeout);
     };
@@ -947,11 +954,11 @@ export class NotificationRepository {
 
       if (presentationState.kind !== 'closed') {
         const notificationEntry = presentationState.entry;
-        if (notificationEntry !== undefined) {
+        if (!isUndefined(notificationEntry)) {
           this.closeNotification(
             notificationEntry.handle,
-            `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`,
-            `Failed to close notification for ${messageInfo} in '${conversationId?.id || conversationId}' by click.`,
+            `Notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' closed by click.`,
+            `Failed to close notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' by click.`,
           );
         }
       }
@@ -970,16 +977,16 @@ export class NotificationRepository {
       onClose: () => {
         if (presentationState.kind !== 'closed') {
           const {entry: notificationEntry} = presentationState;
-          if (notificationEntry?.timeoutIdentifier !== undefined) {
+          if (!isUndefined(notificationEntry?.timeoutIdentifier)) {
             this.clock.clearTimeout(notificationEntry.timeoutIdentifier);
           }
-          if (notificationEntry !== undefined) {
+          if (!isUndefined(notificationEntry)) {
             this.notifications = this.notifications.filter(entry => entry !== notificationEntry);
           }
         }
         presentationState = {kind: 'closed'};
         this.logger.info(
-          `Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`,
+          `Removed notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' locally.`,
         );
       },
     });
@@ -1004,7 +1011,9 @@ export class NotificationRepository {
     presentationState = {...presentationState, entry: notificationEntry};
     this.notifications = this.notifications.concat(notificationEntry);
     scheduleTimeout();
-    this.logger.info(`Added notification for ${messageInfo} in '${conversationId?.id || conversationId}' to queue.`);
+    this.logger.info(
+      `Added notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' to queue.`,
+    );
   }
 
   /**

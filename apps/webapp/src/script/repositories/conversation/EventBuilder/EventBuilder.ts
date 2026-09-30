@@ -17,6 +17,7 @@
  *
  */
 
+import {isNan, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
 import {
   CONVERSATION_EVENT,
@@ -322,12 +323,12 @@ function buildQualifiedId(conversation: QualifiedId | string) {
 
 function getConversationSelfUser(conversationEntity: Conversation): User {
   const conversationSelfUser = conversationEntity.selfUser();
-  if (conversationSelfUser !== undefined) {
+  if (!isUndefined(conversationSelfUser)) {
     return conversationSelfUser;
   }
 
   const firstConversationParticipant = conversationEntity.participating_user_ets()[0];
-  if (firstConversationParticipant !== undefined) {
+  if (!isUndefined(firstConversationParticipant)) {
     return firstConversationParticipant;
   }
 
@@ -558,7 +559,7 @@ export const EventBuilder = {
     const {qualified_conversation: conversationId, conversation, data: eventData, from, time} = event;
 
     return {
-      ...buildQualifiedId(conversationId || conversation),
+      ...buildQualifiedId(isTruthy(conversationId) ? conversationId : conversation),
       data: undefined,
       error: `${messageError.message} (${eventData.sender})`,
       error_code: errorCode,
@@ -585,7 +586,7 @@ export const EventBuilder = {
       id: createUuid(),
       qualified_conversation: conversationId,
       qualified_from: userId,
-      time: new Date(timestamp + (beforeMessage ? -1 : 0)).toISOString(),
+      time: new Date(timestamp + (beforeMessage === true ? -1 : 0)).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },
@@ -596,7 +597,7 @@ export const EventBuilder = {
     joiningUserIds: QualifiedId[],
     timestamp?: number,
   ): MemberJoinEvent {
-    if (!timestamp) {
+    if (isNullOrUndefined(timestamp) || timestamp === 0 || isNan(timestamp)) {
       timestamp = conversationEntity.getLastKnownTimestamp() + 1;
     }
     const isoDate = new Date(timestamp).toISOString();
@@ -743,13 +744,13 @@ export const EventBuilder = {
     const {qualified_conversation: conversationId, qualified_from, conversation, data: eventData, from, time} = event;
 
     return {
-      ...buildQualifiedId(conversationId || conversation),
+      ...buildQualifiedId(isTruthy(conversationId) ? conversationId : conversation),
       error: `${decryptionError.message} (${(eventData as any).sender})`,
       data: undefined,
       error_code: decryptionError.code ?? '',
       from,
       id: createUuid(),
-      qualified_from: qualified_from || {domain: '', id: from},
+      qualified_from: isTruthy(qualified_from) ? qualified_from : {domain: '', id: from},
       time,
       type: ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT,
     };

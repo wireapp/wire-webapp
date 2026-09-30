@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {isOutdatedNotificationStreamEvent} from '@wireapp/core/lib/notification';
 
@@ -28,7 +29,7 @@ export function validateEvent(
   source: EventSource,
   lastEventDateString?: string,
 ): EventValidation {
-  const lastEventDate = lastEventDateString ? new Date(lastEventDateString) : undefined;
+  const lastEventDate = isNonEmptyString(lastEventDateString) ? new Date(lastEventDateString) : undefined;
 
   if (isOutdatedNotificationStreamEvent(event, source, lastEventDate)) {
     return EventValidation.OUTDATED_TIMESTAMP;

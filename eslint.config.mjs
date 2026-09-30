@@ -829,16 +829,30 @@ const productionConfigs = [
       '**/*.d.ts',
       '**/test/**',
       '**/mocks/**',
-      // Backup import/export and event conversion have persistence/event semantics outside this batch.
+      // General backup orchestration and encryption remain outside the event/notification batch.
       'apps/webapp/src/script/repositories/backup/backupRepository.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/CPB.export.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/CPB.import.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/importMappers/mapEventRecord.ts',
       // MLS configuration needs protocol-specific reasoning.
       'apps/webapp/src/script/repositories/client/clientMLSConfig.ts',
-      // Event record validation and persisted schema changes need a separate storage pass.
-      'apps/webapp/src/script/repositories/storage/record/eventRecordGuards.ts',
-      'apps/webapp/src/script/repositories/storage/storageSchemata.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/repositories/event/**/*.{ts,tsx}',
+      'apps/webapp/src/script/repositories/notification/**/*.{ts,tsx}',
+      'apps/webapp/src/script/repositories/conversation/EventBuilder/**/*.{ts,tsx}',
+      'apps/webapp/src/script/repositories/conversation/EventMapper.ts',
+      'apps/webapp/src/script/repositories/conversation/AbstractConversationEventHandler.ts',
+      'apps/webapp/src/script/repositories/conversation/ConversationStateHandler.ts',
+      'apps/webapp/src/script/notification/**/*.{ts,tsx}',
+      'apps/webapp/src/script/error/eventError.ts',
+      'apps/webapp/src/script/components/meeting/meetingNotificationCard/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/meeting/meetingNotificationHost/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/meeting/meetingNotificationStore/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/meeting/meetingNotificationEventHandlers.ts',
+      'apps/webapp/src/script/components/meeting/createMeetingReminderOsNotifier.ts',
     ],
     rules: {
       ...strictBooleanRules,

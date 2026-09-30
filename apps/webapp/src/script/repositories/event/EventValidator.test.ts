@@ -31,6 +31,17 @@ import {validateEvent} from './EventValidator';
 
 describe('EventValidator', () => {
   describe('validateEvent', () => {
+    it.each(['', undefined])('treats last event date %p as absent for replay validation', lastEventDate => {
+      const event = {
+        type: CONVERSATION_EVENT.MEMBER_JOIN,
+        time: '2026-05-28T06:37:31.673Z',
+      };
+
+      const actualValidation = validateEvent(event, EventSource.NOTIFICATION_STREAM, lastEventDate);
+
+      expect(actualValidation).toBe(EventValidation.VALID);
+    });
+
     it('handles "conversation.typing" events', () => {
       const event: ConversationTypingEvent = {
         conversation: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b',

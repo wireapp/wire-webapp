@@ -17,6 +17,7 @@
  *
  */
 
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import {UserType, type QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -61,11 +62,13 @@ export class ServiceMiddleware implements EventMiddleware {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, qualified_conversation, data: eventData} = event;
-    const qualifiedConversation = qualified_conversation || {domain: '', id: conversationId};
+    const qualifiedConversation = isTruthy(qualified_conversation)
+      ? qualified_conversation
+      : {domain: '', id: conversationId};
     const userQualifiedIds = this.extractQualifiedUserIds(eventData);
     const containsSelfUser = userQualifiedIds.find((user: QualifiedId) => matchQualifiedIds(user, this.selfUser));
 
-    const userIds: QualifiedId[] = containsSelfUser
+    const userIds: QualifiedId[] = !isUndefined(containsSelfUser)
       ? await this.conversationRepository
           .getConversationById(qualifiedConversation)
           .then(conversationEntity => conversationEntity.participating_user_ids())
@@ -77,8 +80,10 @@ export class ServiceMiddleware implements EventMiddleware {
 
   private extractQualifiedUserIds(data: MemberJoinEvent['data'] | ConversationMemberJoinEvent['data']): QualifiedId[] {
     const users = 'users' in data ? data.users : undefined;
-    const userIds = users
-      ? users.map(user => user.qualified_id || {domain: '', id: user.id})
+    const userIds = isTruthy(users)
+      ? users.map(user => {
+          return isTruthy(user.qualified_id) ? user.qualified_id : {domain: '', id: user.id};
+        })
       : data.user_ids.map(id => ({domain: '', id}));
     return userIds;
   }

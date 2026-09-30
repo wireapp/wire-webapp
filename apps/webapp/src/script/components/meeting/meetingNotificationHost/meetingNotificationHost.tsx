@@ -56,7 +56,7 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
       const target = event.target;
       const isInsideNotificationHost =
         target instanceof Node &&
-        (hostRef.current?.contains(target) ||
+        (hostRef.current?.contains(target) === true ||
           (target instanceof Element && target.closest('.meeting-notification-host') !== null));
 
       if (!(target instanceof Node) || isInsideNotificationHost) {
