@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy} from '@sindresorhus/is';
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {UserEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -82,9 +82,9 @@ export class PreferenceNotificationRepository {
     amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedId, clientEntity?: ClientEntity) => {
       const currentSelfUser = selfUser();
       const shouldNotifyClientAdded =
-        clientEntity !== undefined &&
+        !isUndefined(clientEntity) &&
         !clientEntity.isLegalHold() &&
-        currentSelfUser !== undefined &&
+        !isUndefined(currentSelfUser) &&
         matchQualifiedIds(user, currentSelfUser);
       if (shouldNotifyClientAdded) {
         const {id, domain, type, time, model} = clientEntity;
@@ -102,7 +102,7 @@ export class PreferenceNotificationRepository {
     });
     amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedId, clientId: string) => {
       const currentSelfUser = selfUser();
-      if (currentSelfUser !== undefined && matchQualifiedIds(user, currentSelfUser)) {
+      if (!isUndefined(currentSelfUser) && matchQualifiedIds(user, currentSelfUser)) {
         this.onClientRemove(user.id, clientId, user.domain ?? null);
       }
     });
@@ -140,7 +140,7 @@ export class PreferenceNotificationRepository {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
         const defaultValue = isTruthy(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
         this.notifications.push({
-          data: event.value === undefined ? defaultValue : isTruthy(event.value),
+          data: isUndefined(event.value) ? defaultValue : isTruthy(event.value),
           type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
         });
       }

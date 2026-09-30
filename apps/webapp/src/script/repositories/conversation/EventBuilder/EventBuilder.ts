@@ -17,7 +17,7 @@
  *
  */
 
-import {isNan, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
+import {isNan, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
 import {
   CONVERSATION_EVENT,
@@ -323,12 +323,12 @@ function buildQualifiedId(conversation: QualifiedId | string) {
 
 function getConversationSelfUser(conversationEntity: Conversation): User {
   const conversationSelfUser = conversationEntity.selfUser();
-  if (conversationSelfUser !== undefined) {
+  if (!isUndefined(conversationSelfUser)) {
     return conversationSelfUser;
   }
 
   const firstConversationParticipant = conversationEntity.participating_user_ets()[0];
-  if (firstConversationParticipant !== undefined) {
+  if (!isUndefined(firstConversationParticipant)) {
     return firstConversationParticipant;
   }
 

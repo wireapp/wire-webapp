@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {StatusType} from 'src/script/message/statusType';
 import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 
@@ -30,7 +31,7 @@ describe('getCommonMessageUpdates', () => {
 
     const updatedEvent = getCommonMessageUpdates(originalEvent, editedEvent);
 
-    expect(updatedEvent.read_receipts).toBe(readReceipts === undefined ? originalReceipts : readReceipts);
+    expect(updatedEvent.read_receipts).toBe(isUndefined(readReceipts) ? originalReceipts : readReceipts);
   });
 
   /** @see https://wearezeta.atlassian.net/browse/SQCORE-732 */

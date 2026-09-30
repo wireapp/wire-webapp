@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {
   CONVERSATION_EVENT,
   MEETING_EVENT,
@@ -255,10 +255,9 @@ export class EventRepository {
           ) => {
             currentConnectionState = connectionState;
             this.updateConnectivityStatus(connectionState);
-            const lifecycleConnectionContext =
-              connectionContext === undefined
-                ? ''
-                : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
+            const lifecycleConnectionContext = isUndefined(connectionContext)
+              ? ''
+              : ` attemptId=${connectionContext.attemptId} wrapperGeneration=${connectionContext.wrapperGeneration}`;
             this.logger.info(
               `[WebSocketLifecycle] layer=event-repository event=connection-state-change connectCycleId=${currentConnectCycleId} state=${connectionState.toUpperCase()}${lifecycleConnectionContext}`,
             );
@@ -461,7 +460,7 @@ export class EventRepository {
     } catch (errorResponse: unknown) {
       const serverTime = this.getServerTimeFromAxiosError(errorResponse);
 
-      if (serverTime !== undefined) {
+      if (!isUndefined(serverTime)) {
         this.serverTimeHandler.computeTimeOffset(serverTime);
       }
     }
@@ -591,7 +590,7 @@ export class EventRepository {
     };
 
     const webAppEvent = webAppEventByMeetingEvent[event.type as MEETING_EVENT];
-    if (webAppEvent === undefined) {
+    if (isUndefined(webAppEvent)) {
       amplify.publish(event.type, event);
       return;
     }
@@ -599,9 +598,9 @@ export class EventRepository {
     const meetingId = 'qualified_id' in event ? event.qualified_id : undefined;
     const actorId = 'qualified_from' in event ? event.qualified_from : undefined;
     const hasValidQualifiedId =
-      meetingId !== undefined && typeof meetingId.id === 'string' && typeof meetingId.domain === 'string';
+      !isUndefined(meetingId) && typeof meetingId.id === 'string' && typeof meetingId.domain === 'string';
     const hasValidActorId =
-      actorId !== undefined && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
+      !isUndefined(actorId) && typeof actorId.id === 'string' && typeof actorId.domain === 'string';
 
     if (!hasValidQualifiedId || !hasValidActorId) {
       this.logger.warn(`Ignored ${event.type} event without valid qualified IDs`, event);

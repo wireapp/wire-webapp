@@ -19,7 +19,7 @@
 
 import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
@@ -372,7 +372,7 @@ export class NotificationRepository {
 
     if (messageEntity.hasAsset()) {
       const assetEntity = messageEntity.getFirstAsset();
-      if (assetEntity === undefined) {
+      if (isUndefined(assetEntity)) {
         return undefined;
       }
 
@@ -796,7 +796,7 @@ export class NotificationRepository {
       connectionEntity,
       conversationEntity,
     );
-    if (notificationContent !== undefined) {
+    if (!isUndefined(notificationContent)) {
       const isPermitted = await this.checkPermission();
       if (isPermitted === true) {
         this.showNotification(notificationContent);
@@ -879,7 +879,7 @@ export class NotificationRepository {
    * @returns Returns `true` if the notification should be shown, `false` otherwise
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
-    if (conversationEntity !== undefined && isMeetingConversation(conversationEntity)) {
+    if (!isUndefined(conversationEntity) && isMeetingConversation(conversationEntity)) {
       return false;
     }
 
@@ -930,12 +930,12 @@ export class NotificationRepository {
     let presentationState: PresentationState = {kind: 'pending'};
 
     const scheduleTimeout = () => {
-      if (presentationState.kind !== 'shown' || presentationState.entry === undefined) {
+      if (presentationState.kind !== 'shown' || isUndefined(presentationState.entry)) {
         return;
       }
 
       const {entry: notificationEntry} = presentationState;
-      if (notificationEntry.timeoutIdentifier !== undefined) {
+      if (!isUndefined(notificationEntry.timeoutIdentifier)) {
         return;
       }
 
@@ -954,7 +954,7 @@ export class NotificationRepository {
 
       if (presentationState.kind !== 'closed') {
         const notificationEntry = presentationState.entry;
-        if (notificationEntry !== undefined) {
+        if (!isUndefined(notificationEntry)) {
           this.closeNotification(
             notificationEntry.handle,
             `Notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' closed by click.`,
@@ -977,10 +977,10 @@ export class NotificationRepository {
       onClose: () => {
         if (presentationState.kind !== 'closed') {
           const {entry: notificationEntry} = presentationState;
-          if (notificationEntry?.timeoutIdentifier !== undefined) {
+          if (!isUndefined(notificationEntry?.timeoutIdentifier)) {
             this.clock.clearTimeout(notificationEntry.timeoutIdentifier);
           }
-          if (notificationEntry !== undefined) {
+          if (!isUndefined(notificationEntry)) {
             this.notifications = this.notifications.filter(entry => entry !== notificationEntry);
           }
         }

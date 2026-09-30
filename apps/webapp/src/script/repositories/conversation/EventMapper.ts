@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isTruthy, isValidDate} from '@sindresorhus/is';
+import {isNonEmptyString, isTruthy, isUndefined, isValidDate} from '@sindresorhus/is';
 import {
   CONVERSATION_EVENT,
   ConversationAdminlessDeleteReminderEvent,
@@ -141,7 +141,7 @@ export class EventMapper {
       }
     });
     return mappedEvents.filter(messageEntity => {
-      return messageEntity !== undefined;
+      return !isUndefined(messageEntity);
     }) as Message[];
   }
 
@@ -205,16 +205,16 @@ export class EventMapper {
       originalEntity.assets.push(textAsset);
     } else if (isTruthy(originalEntity.getFirstAsset)) {
       const asset = originalEntity.getFirstAsset();
-      if (asset === undefined) {
+      if (isUndefined(asset)) {
         return originalEntity;
       }
-      if (eventData.status !== undefined && (asset as FileAsset).status !== undefined) {
+      if (!isUndefined(eventData.status) && !isUndefined((asset as FileAsset).status)) {
         const assetEntity = this._mapAsset(event);
-        if (assetEntity !== undefined) {
+        if (!isUndefined(assetEntity)) {
           originalEntity.assets([assetEntity]);
         }
       }
-      if (eventData.previews !== undefined) {
+      if (!isUndefined(eventData.previews)) {
         if ((asset as TextAsset).previews().length !== eventData.previews.length) {
           const previews = this._mapAssetLinkPreviews(eventData.previews);
           (asset as TextAsset).previews(previews as LinkPreviewEntity[]);
@@ -228,7 +228,7 @@ export class EventMapper {
         preview_sha256,
         preview_token,
       } = eventData as AssetData;
-      if (preview_otr_key !== undefined && preview_key !== undefined && preview_domain !== undefined) {
+      if (!isUndefined(preview_otr_key) && !isUndefined(preview_key) && !isUndefined(preview_domain)) {
         const assetRemoteData = new AssetRemoteData({
           assetKey: preview_key,
           assetDomain: preview_domain,
@@ -241,20 +241,20 @@ export class EventMapper {
       }
     }
 
-    if (event.reactions !== undefined) {
+    if (!isUndefined(event.reactions)) {
       originalEntity.reactions(userReactionMapToReactionMap(event.reactions));
       originalEntity.version = event.version ?? 1;
     }
 
-    if (event.failedToSend !== undefined) {
+    if (!isUndefined(event.failedToSend)) {
       originalEntity.failedToSend(event.failedToSend);
     }
 
-    if (event.fileData !== undefined) {
+    if (!isUndefined(event.fileData)) {
       originalEntity.fileData(event.fileData);
     }
 
-    if (event.selected_button_id !== undefined) {
+    if (!isUndefined(event.selected_button_id)) {
       originalEntity.version = event.version ?? 1;
     }
 
@@ -266,7 +266,7 @@ export class EventMapper {
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
     const editedTimestamp = editedTime ?? eventData.edited_time;
-    if (editedTimestamp !== undefined) {
+    if (!isUndefined(editedTimestamp)) {
       originalEntity.edited_timestamp(new Date(editedTimestamp).getTime());
     }
 
@@ -498,7 +498,7 @@ export class EventMapper {
     messageEntity.type = type;
     messageEntity.version = version ?? 1;
 
-    if (data !== undefined) {
+    if (!isUndefined(data)) {
       messageEntity.legalHoldStatus = data.legal_hold_status;
     }
 
@@ -517,7 +517,7 @@ export class EventMapper {
       );
     }
 
-    if (ephemeral_expires !== undefined) {
+    if (!isUndefined(ephemeral_expires)) {
       messageEntity.ephemeral_expires(ephemeral_expires);
       const ephemeralStartedMilliseconds = Number(ephemeral_started ?? 0);
       messageEntity.ephemeral_started(Number.isNaN(ephemeralStartedMilliseconds) ? 0 : ephemeralStartedMilliseconds);
@@ -566,7 +566,7 @@ export class EventMapper {
     const messageEntity = new ContentMessage(undefined, this.translate);
 
     const assetEntity = this._mapAsset(event);
-    if (assetEntity === undefined) {
+    if (isUndefined(assetEntity)) {
       throw new Error('Asset entity could not be mapped');
     }
     messageEntity.assets.push(assetEntity);
@@ -968,7 +968,7 @@ export class EventMapper {
       this.translate,
     );
 
-    if (typeof eventData.duration !== 'undefined') {
+    if (!isUndefined(eventData.duration)) {
       // new message format, including duration
       messageEntity.visible(!messageEntity.wasCompleted());
     } else {
@@ -1177,7 +1177,7 @@ export class EventMapper {
       .map(encodedLinkPreview => LinkPreview.decode(encodedLinkPreview))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
       .filter(linkPreviewEntity => {
-        return linkPreviewEntity !== undefined;
+        return !isUndefined(linkPreviewEntity);
       });
   }
 
@@ -1201,7 +1201,7 @@ export class EventMapper {
         );
       })
       .filter((MentionEntity, _, allMentions): boolean => {
-        if (MentionEntity !== undefined) {
+        if (!isUndefined(MentionEntity)) {
           try {
             return MentionEntity.validate(messageText, allMentions);
           } catch (error: unknown) {
@@ -1225,11 +1225,11 @@ export class EventMapper {
     const messageText = content ?? message ?? '';
     const assetEntity = new Text(id, messageText);
 
-    if (mentions !== undefined && mentions.length > 0) {
+    if (!isUndefined(mentions) && mentions.length > 0) {
       const mappedMentions = this._mapAssetMentions(mentions, messageText);
       assetEntity.mentions(mappedMentions);
     }
-    if (previews !== undefined && previews.length > 0) {
+    if (!isUndefined(previews) && previews.length > 0) {
       const mappedLinkPreviews = this._mapAssetLinkPreviews(previews) as unknown as LinkPreviewEntity[];
       assetEntity.previews(mappedLinkPreviews);
     }

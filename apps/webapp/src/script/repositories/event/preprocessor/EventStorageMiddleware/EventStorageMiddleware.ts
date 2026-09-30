@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy} from '@sindresorhus/is';
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
@@ -79,7 +79,7 @@ export class EventStorageMiddleware implements EventMiddleware {
         selfUserId: this.selfUser.id,
         findEvent: eventId => this.eventService.loadEvent(event.conversation, eventId),
       });
-      if (operation !== undefined) {
+      if (!isUndefined(operation)) {
         return operation;
       }
     }
@@ -102,7 +102,7 @@ export class EventStorageMiddleware implements EventMiddleware {
 
       const qualifiedUserIds = event.data.qualified_user_ids;
 
-      if (conversation === undefined || !isTruthy(qualifiedUserIds)) {
+      if (isUndefined(conversation) || !isTruthy(qualifiedUserIds)) {
         return;
       }
 

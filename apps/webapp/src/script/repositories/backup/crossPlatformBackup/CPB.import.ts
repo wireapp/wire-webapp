@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {ConversationRecord, EventRecord, UserRecord} from 'Repositories/storage';
 
 import {CPBackupImporter, BackupImportResult, BackupQualifiedId} from './CPB.library';
@@ -63,7 +65,7 @@ export const importCPBHistoryToDatabase = async ({
       const messages = pager.messagesPager.nextPage();
       messages.forEach(message => {
         const eventRecord = mapEventRecord(message);
-        if (eventRecord !== undefined) {
+        if (!isUndefined(eventRecord)) {
           eventRecords.push(eventRecord);
         }
       });

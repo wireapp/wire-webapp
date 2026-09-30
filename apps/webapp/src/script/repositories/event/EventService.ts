@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {Dexie} from 'dexie';
@@ -188,7 +188,7 @@ export class EventService {
     categoryMax = MessageCategory.LIKED,
   ): Promise<DBEvents> {
     const filterExpired = (record: EventRecord) => {
-      if (typeof record.ephemeral_expires !== 'undefined') {
+      if (!isUndefined(record.ephemeral_expires)) {
         return +record.ephemeral_expires - Date.now() > 0;
       }
 

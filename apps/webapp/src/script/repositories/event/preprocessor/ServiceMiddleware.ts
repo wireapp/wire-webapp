@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy} from '@sindresorhus/is';
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import {UserType, type QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -68,12 +68,11 @@ export class ServiceMiddleware implements EventMiddleware {
     const userQualifiedIds = this.extractQualifiedUserIds(eventData);
     const containsSelfUser = userQualifiedIds.find((user: QualifiedId) => matchQualifiedIds(user, this.selfUser));
 
-    const userIds: QualifiedId[] =
-      containsSelfUser !== undefined
-        ? await this.conversationRepository
-            .getConversationById(qualifiedConversation)
-            .then(conversationEntity => conversationEntity.participating_user_ids())
-        : userQualifiedIds;
+    const userIds: QualifiedId[] = !isUndefined(containsSelfUser)
+      ? await this.conversationRepository
+          .getConversationById(qualifiedConversation)
+          .then(conversationEntity => conversationEntity.participating_user_ids())
+      : userQualifiedIds;
 
     const hasService = await this.containsService(userIds);
     return hasService ? this.decorateWithHasServiceFlag(event) : event;
