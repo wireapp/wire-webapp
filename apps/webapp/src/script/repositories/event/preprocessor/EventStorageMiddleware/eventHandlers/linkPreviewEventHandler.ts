@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 import {categoryFromEvent} from 'src/script/message/messageCategorization';
@@ -47,10 +49,10 @@ function validateLinkPreviewEvent(
   editEvent: MessageAddEvent,
 ): originalEvent is StoredEvent<MessageAddEvent> {
   const {previews, content} = editEvent.data;
-  if (!previews?.length) {
+  if (!isTruthy(previews?.length)) {
     return false;
   }
-  if (!originalEvent) {
+  if (!isTruthy(originalEvent)) {
     // It is fine to receive a linkPreview message without the original event
     return false;
   }
@@ -59,7 +61,7 @@ function validateLinkPreviewEvent(
   }
 
   const {previews: originalPreviews, content: originalContent} = originalEvent.data;
-  if (!!originalPreviews?.length) {
+  if (isTruthy(originalPreviews?.length)) {
     throw new EventValidationError('Link preview already existing on original message');
   }
 

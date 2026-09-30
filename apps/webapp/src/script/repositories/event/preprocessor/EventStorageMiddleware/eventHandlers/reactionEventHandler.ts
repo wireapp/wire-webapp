@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {MessageAddEvent, ReactionEvent} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 import {addReaction, userReactionMapToReactionMap} from 'Util/reactionUtil';
@@ -33,7 +35,7 @@ function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent
     qualified_from,
     from,
   } = reactionEvent;
-  const reactionMap = target.reactions ? userReactionMapToReactionMap(target.reactions) : [];
+  const reactionMap = isTruthy(target.reactions) ? userReactionMapToReactionMap(target.reactions) : [];
   return {
     primary_key: target.primary_key,
     reactions: addReaction(reactionMap, reaction, qualified_from ?? {id: from ?? '', domain: ''}),
@@ -46,7 +48,7 @@ export const handleReactionEvent: EventHandler = async (event, {findEvent}) => {
     return undefined;
   }
   const targetEvent = (await findEvent(event.data.message_id)) as StoredEvent<MessageAddEvent>;
-  if (!targetEvent) {
+  if (!isTruthy(targetEvent)) {
     throw new EventValidationError('Reaction event to a non-existing message');
   }
   return {

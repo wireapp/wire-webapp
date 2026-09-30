@@ -66,6 +66,16 @@ function buildEventStorageMiddleware() {
 
 describe('EventStorageMiddleware', () => {
   describe('processEvent', () => {
+    it('persists an empty event ID without querying for a duplicate', async () => {
+      const [middleware, {eventService}] = buildEventStorageMiddleware();
+      const event = createMessageAddEvent({overrides: {id: ''}});
+
+      await middleware.processEvent(event, EventSource.WEBSOCKET);
+
+      expect(eventService.loadEvent).not.toHaveBeenCalled();
+      expect(eventService.saveEvent).toHaveBeenCalledWith(event);
+    });
+
     it('persists a decoded session reset that can be mapped again after reload', async () => {
       const [middleware, {eventService}] = buildEventStorageMiddleware();
       const incomingEvent = {

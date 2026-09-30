@@ -23,6 +23,16 @@ import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
 describe('getCommonMessageUpdates', () => {
+  it.each([undefined, []])('preserves receipt presence semantics for %p', readReceipts => {
+    const originalReceipts = [{time: '2026-09-30T10:00:00.000Z', userId: 'reader-id'}];
+    const originalEvent = toSavedEvent(createMessageAddEvent({overrides: {read_receipts: originalReceipts}}));
+    const editedEvent = createMessageAddEvent({overrides: {read_receipts: readReceipts}});
+
+    const updatedEvent = getCommonMessageUpdates(originalEvent, editedEvent);
+
+    expect(updatedEvent.read_receipts).toBe(readReceipts === undefined ? originalReceipts : readReceipts);
+  });
+
   /** @see https://wearezeta.atlassian.net/browse/SQCORE-732 */
   it('does not overwrite the seen status if a message gets edited', () => {
     const originalEvent = toSavedEvent(createMessageAddEvent({overrides: {status: StatusType.SEEN}}));
