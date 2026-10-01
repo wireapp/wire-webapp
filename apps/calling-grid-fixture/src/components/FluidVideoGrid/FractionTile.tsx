@@ -7,14 +7,14 @@ function avatarGrad(hue: number): string {
   return `linear-gradient(135deg, hsl(${hue} 55% 56%), hsl(${(hue + 28) % 360} 58% 40%))`;
 }
 
-interface SubTileProps {
+interface FractionTileProps {
   participant: GridParticipant;
 }
 
-export function SubTile({participant}: SubTileProps) {
+export function FractionTile({participant}: FractionTileProps) {
   const {name, displayName, initials: initialsOverride, avatarUrl, hue = 200, renderVideo, isMuted} = participant;
   const isActiveSpeaker =
-    participant.tier === 'active-camera' || participant.tier === 'active-no-camera';
+    participant.tier === 'speaking-camera' || participant.tier === 'speaking-no-camera';
   const initials = initialsOverride ?? name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   const label = displayName ?? name;
 

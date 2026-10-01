@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, useEffect, useRef, useState} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
@@ -56,7 +56,6 @@ import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
-import {useToggleState} from 'src/script/hooks/useToggleState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -75,7 +74,7 @@ import {
   paginationWrapperStyles,
   videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
-import {WireFluidVideoGrid} from './WireFluidVideoGrid';
+import {WireFluidVideoGrid, WireFluidVideoGridProvider, useFluidVideoGrid} from './WireFluidVideoGrid';
 import {Pagination} from './Pagination/Pagination';
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
@@ -115,7 +114,7 @@ export interface FullscreenVideoCallProps {
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
 
-const FullscreenVideoCall = ({
+const FullscreenVideoCallContent = ({
   call,
   canShareScreen,
   conversation,
@@ -145,9 +144,8 @@ const FullscreenVideoCall = ({
 }: FullscreenVideoCallProps) => {
   const {translate} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
-  const [isPresenterMode, setIsPresenterMode] = useState(false);
-  const handlePresenterModeRequested = useCallback(() => setIsPresenterMode(true), []);
-  const togglePresenterMode = useCallback(() => setIsPresenterMode(prev => !prev), []);
+  const {isPresenterModeActive, togglePresenterMode, areAllParticipantsShown, toggleAllParticipants} =
+    useFluidVideoGrid();
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
 
@@ -196,7 +194,6 @@ const FullscreenVideoCall = ({
   };
   const openPopup = () => callingRepository.setViewModeDetached();
 
-  const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -401,12 +398,7 @@ const FullscreenVideoCall = ({
         </div>
 
         <div id="video-element-remote" className="video-element-remote">
-          <WireFluidVideoGrid
-            call={call}
-            presenterMode={isPresenterMode}
-            onPresenterModeRequested={handlePresenterModeRequested}
-            onViewAllParticipantsSelected={toggleParticipantsList}
-          />
+          <WireFluidVideoGrid />
           {classifiedDomains && (
             <ConversationClassifiedBar
               conversation={conversation}
@@ -417,7 +409,7 @@ const FullscreenVideoCall = ({
             />
           )}
 
-          {isMobile && isParticipantsListOpen && (
+          {isMobile && areAllParticipantsShown && (
             <CallingParticipantList
               handRaisedParticipants={handRaisedParticipants}
               callingRepository={callingRepository}
@@ -426,7 +418,7 @@ const FullscreenVideoCall = ({
               isModerator={isModerator}
               isSelfVerified={selfUser?.is_verified()}
               showParticipants={true}
-              onClose={toggleParticipantsList}
+              onClose={toggleAllParticipants}
             />
           )}
           {isMobile && isBackgroundSidebarOpen && (
@@ -477,8 +469,8 @@ const FullscreenVideoCall = ({
               call={call}
               propertiesRepository={propertiesRepository}
               isMuted={isMuted}
-              isParticipantsListOpen={isParticipantsListOpen}
-              toggleParticipantsList={toggleParticipantsList}
+              isParticipantsListOpen={areAllParticipantsShown}
+              toggleParticipantsList={toggleAllParticipants}
               canShareScreen={canShareScreen}
               conversation={conversation}
               mediaDevicesHandler={mediaDevicesHandler}
@@ -497,13 +489,13 @@ const FullscreenVideoCall = ({
               sendEmoji={sendEmoji}
               onOpenBackgroundSettings={() => backgroundSidebarHandler(true)}
               isWebGLAvailable={isWebGLAvailable}
-              presenterModeActive={isPresenterMode}
+              presenterModeActive={isPresenterModeActive}
               onPresenterModeToggle={togglePresenterMode}
             />
           </>
         )}
       </div>
-      {!isMobile && isParticipantsListOpen && (
+      {!isMobile && areAllParticipantsShown && (
         <CallingParticipantList
           handRaisedParticipants={handRaisedParticipants}
           callingRepository={callingRepository}
@@ -512,7 +504,7 @@ const FullscreenVideoCall = ({
           isModerator={isModerator}
           isSelfVerified={selfUser?.is_verified()}
           showParticipants={true}
-          onClose={toggleParticipantsList}
+          onClose={toggleAllParticipants}
         />
       )}
       {!isMobile && isBackgroundSidebarOpen && (
@@ -599,5 +591,15 @@ const FullscreenVideoCall = ({
     </div>
   );
 };
+
+/**
+ * Provides the grid state to both the video grid and the call controls, so the
+ * presenter-mode button in the control bar reads and drives the same reducer.
+ */
+const FullscreenVideoCall = (props: FullscreenVideoCallProps) => (
+  <WireFluidVideoGridProvider call={props.call}>
+    <FullscreenVideoCallContent {...props} />
+  </WireFluidVideoGridProvider>
+);
 
 export {FullscreenVideoCall};

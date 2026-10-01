@@ -1,211 +1,138 @@
-import { useEffect, useMemo, useReducer, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import {useRef} from 'react';
+import {AnimatePresence, motion} from 'framer-motion';
 
-import { GridConfig, GridParticipant, TileDescriptor } from './FluidVideoGrid.types';
-import { createGridReducer, createInitialState } from './gridReducer';
-import { FractionalTile } from './FractionalTile';
-import { GridTile } from './GridTile';
-import { OverflowTile } from './OverflowTile';
-import { useContainerSize } from './useContainerSize';
-
-export interface FluidVideoGridProps {
-  participants: GridParticipant[];
-  config: GridConfig;
-  onViewAllParticipantsSelected?: () => void;
-  presenterMode?: boolean;
-  onPresenterModeRequested?: () => void;
-}
+import {TileDescriptor} from './FluidVideoGrid.types';
+import {useFluidVideoGrid} from './FluidVideoGridContext';
+import {FractionalTile} from './FractionalTile';
+import {GridTile} from './GridTile';
+import {OverflowTile} from './OverflowTile';
+import {useContainerSize} from './useContainerSize';
 
 const TILE_MOTION = {
   layout: true,
-  initial: { opacity: 0, scale: 0.9 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.9 },
-  transition: { duration: 0.25, ease: 'easeOut' },
+  initial: {opacity: 0, scale: 0.9},
+  animate: {opacity: 1, scale: 1},
+  exit: {opacity: 0, scale: 0.9},
+  transition: {duration: 0.25, ease: 'easeOut'},
 } as const;
 
-export function FluidVideoGrid({ participants, config, onViewAllParticipantsSelected, presenterMode, onPresenterModeRequested }: FluidVideoGridProps) {
+const CONTAINER_STYLE = {
+  position: 'relative',
+  width: '100%',
+  height: '100%',
+  background: '#111',
+  boxSizing: 'border-box',
+  display: 'flex',
+} as const;
+
+function isActiveSpeaker(tile: Extract<TileDescriptor, {type: 'full'}>): boolean {
+  return tile.participant.tier === 'speaking-camera' || tile.participant.tier === 'speaking-no-camera';
+}
+
+/**
+ * Stable identity for a tile. Full tiles key off their occupant; fractional tiles key
+ * off their first occupant so they survive reflow without remounting.
+ */
+function tileKey(tile: TileDescriptor): string {
+  if (tile.type === 'full') {
+    return `full-${tile.participant.id}`;
+  }
+  if (tile.type === 'overflow') {
+    return 'overflow';
+  }
+  const first = tile.fractions.find(f => f.type === 'participant');
+  return `fractional-${first && first.type === 'participant' ? first.participant.id : 'empty'}`;
+}
+
+export function FluidVideoGrid() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const prevHadScreenShare = useRef(false);
-
-  const reducer = useMemo(() => createGridReducer(config), [config]);
-  const [state, dispatch] = useReducer(reducer, createInitialState({ width: 0, height: 0 }));
-
-  useContainerSize(containerRef, (width, height) => dispatch({type: 'SET_CONTAINER_SIZE', width, height}));
-
-  useEffect(() => {
-    const currentIds = new Set(state.participants.map(p => p.id));
-    const incomingIds = new Set(participants.map(p => p.id));
-
-    for (const p of state.participants) {
-      if (!incomingIds.has(p.id)) {
-        dispatch({ type: 'REMOVE_PARTICIPANT', id: p.id });
-      }
-    }
-
-    for (const p of participants) {
-      if (!currentIds.has(p.id)) {
-        dispatch({ type: 'ADD_PARTICIPANT', participant: p });
-      } else {
-        dispatch({ type: 'UPDATE_PARTICIPANT', id: p.id, changes: p });
-      }
-    }
-  }, [participants]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Auto-activate presenter mode when screen sharing first appears
-  useEffect(() => {
-    const hasScreenShare = state.participants.some(p => p.tier === 'screen-sharing');
-    if (hasScreenShare && !prevHadScreenShare.current) {
-      onPresenterModeRequested?.();
-    }
-    prevHadScreenShare.current = hasScreenShare;
-  }, [state.participants, onPresenterModeRequested]);
-
-  const { layout, slotMap, containerSize } = state;
-  const { rows, tileWidth, tileHeight } = layout;
+  const {layout, config, setContainerSize} = useFluidVideoGrid();
   const gap = config.tileGap;
 
-  // Presenter mode: spotlight + narrow strip
-  if (presenterMode) {
-    const sorted = [...state.participants].sort((a, b) => (slotMap[a.id] ?? 999) - (slotMap[b.id] ?? 999));
-    const spotlight = sorted.find(p => p.tier !== 'you');
+  useContainerSize(containerRef, setContainerSize);
 
-    if (spotlight) {
-      const narrowInnerWidth = Math.ceil(config.minTileHeight * config.minAspectRatio);
-      // Aspect-ratio bounds for a tile of this exact width
-      const minStripTileHeight = narrowInnerWidth / config.maxAspectRatio;
-      const maxStripTileHeight = narrowInnerWidth / config.minAspectRatio; // ≈ config.minTileHeight
-      const gridParticipants = sorted.filter(p => p !== spotlight);
-      const availH = containerSize.height - 2 * gap;
-      // How many tiles fit using the shortest valid tile height
-      const maxTiles = Math.max(1, Math.floor((availH + gap) / (minStripTileHeight + gap)));
-      const hasOverflow = gridParticipants.length > maxTiles;
-      const nVisible = hasOverflow ? maxTiles : gridParticipants.length;
-      // Distribute height evenly, clamped to aspect-ratio bounds
-      const rawHeight = nVisible > 0 ? (availH - gap * (nVisible - 1)) / nVisible : maxStripTileHeight;
-      const stripTileHeight = Math.min(maxStripTileHeight, Math.max(minStripTileHeight, rawHeight));
-      const visibleStripParticipants = gridParticipants.slice(0, hasOverflow ? maxTiles - 1 : nVisible);
-      const overflowCount = hasOverflow ? gridParticipants.length - (maxTiles - 1) : 0;
-      const overflowAvatars = hasOverflow ? gridParticipants.slice(maxTiles - 1) : [];
+  /**
+   * Single render path for every tile in both modes. `width`/`height` are undefined
+   * for the spotlight, which is flex-filled instead of explicitly sized.
+   */
+  const renderTile = (tile: TileDescriptor, width?: number, height?: number) => {
+    const style =
+      width === undefined
+        ? {flex: '1 1 0%', minWidth: 0, overflow: 'hidden' as const}
+        : {width, height, flexShrink: 0};
 
-      return (
-        <div
-          ref={containerRef}
-          style={{
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            background: '#111',
-            display: 'flex',
-            flexDirection: 'row',
-            gap,
-            padding: gap,
-            boxSizing: 'border-box',
-          }}
-        >
-          {/* Spotlight tile — grows to fill all available width */}
-          <div style={{flex: '1 1 0%', minWidth: 0, overflow: 'hidden'}}>
-            <GridTile
-              participant={spotlight}
-              isActiveSpeaker={spotlight.tier === 'active-camera' || spotlight.tier === 'active-no-camera'}
-            />
-          </div>
-
-          {/* Narrow strip — fixed single-column sidebar */}
-          <div style={{width: narrowInnerWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', gap, justifyContent: 'center'}}>
-            {visibleStripParticipants.map(p => (
-              <div key={p.id} style={{height: stripTileHeight, flexShrink: 0, overflow: 'hidden'}}>
-                <GridTile
-                  participant={p}
-                  isActiveSpeaker={p.tier === 'active-camera' || p.tier === 'active-no-camera'}
-                />
-              </div>
-            ))}
-            {overflowCount > 0 && (
-              <div style={{height: stripTileHeight, flexShrink: 0}}>
-                <OverflowTile
-                  count={overflowCount}
-                  avatars={overflowAvatars}
-                  onViewAll={onViewAllParticipantsSelected}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-  }
-
-  const renderTile = (tile: TileDescriptor, key: string) => {
     if (tile.type === 'full') {
       return (
-        <motion.div
-          key={key}
-          {...TILE_MOTION}
-          style={{ width: tileWidth, height: tileHeight, flexShrink: 0 }}
-        >
-          <GridTile
-            participant={tile.participant}
-            isActiveSpeaker={
-              tile.participant.tier === 'active-camera' || tile.participant.tier === 'active-no-camera'
-            }
-          />
+        <motion.div key={tileKey(tile)} {...TILE_MOTION} style={style}>
+          <GridTile participant={tile.participant} isActiveSpeaker={isActiveSpeaker(tile)} />
         </motion.div>
       );
     }
 
     if (tile.type === 'fractional') {
       return (
-        <motion.div
-          key={key}
-          {...TILE_MOTION}
-          style={{ width: tileWidth, height: tileHeight, flexShrink: 0 }}
-        >
+        <motion.div key={tileKey(tile)} {...TILE_MOTION} style={style}>
           <FractionalTile
-            subRows={tile.subRows}
-            subCols={tile.subCols}
-            subtiles={tile.subtiles}
+            fractionRows={tile.fractionRows}
+            fractionCols={tile.fractionCols}
+            fractions={tile.fractions}
             gap={gap}
-            onViewAllParticipantsSelected={onViewAllParticipantsSelected}
           />
         </motion.div>
       );
     }
 
-    return null;
+    return (
+      <motion.div key={tileKey(tile)} {...TILE_MOTION} style={style}>
+        <OverflowTile count={tile.count} avatars={tile.avatars} />
+      </motion.div>
+    );
   };
+
+  if (layout.mode === 'presenter') {
+    return (
+      <div
+        ref={containerRef}
+        style={{...CONTAINER_STYLE, flexDirection: 'row', gap, padding: gap}}
+      >
+        {layout.spotlight && renderTile(layout.spotlight)}
+
+        <div
+          style={{
+            width: layout.stripTileWidth,
+            flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap,
+            justifyContent: 'center',
+          }}
+        >
+          {layout.strip.map(tile => renderTile(tile, layout.stripTileWidth, layout.stripTileHeight))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       ref={containerRef}
       style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        background: '#111',
-        display: 'flex',
+        ...CONTAINER_STYLE,
         flexDirection: 'column',
         gap,
         padding: gap,
-        boxSizing: 'border-box',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
       <AnimatePresence mode="popLayout">
-        {rows.map((row, rowIdx) => (
+        {layout.rows.map((row, rowIdx) => (
           <motion.div
             key={rowIdx}
             layout
-            style={{ display: 'flex', flexDirection: 'row', gap, flexShrink: 0 }}
+            style={{display: 'flex', flexDirection: 'row', gap, flexShrink: 0}}
           >
-            {row.tiles.map((tile, tileIdx) => {
-              const key =
-                tile.type === 'full'
-                  ? `full-${tile.participant.id}`
-                  : `fractional-${rowIdx}-${tileIdx}`;
-              return renderTile(tile, key);
-            })}
+            {row.tiles.map(tile => renderTile(tile, layout.tileWidth, layout.tileHeight))}
           </motion.div>
         ))}
       </AnimatePresence>

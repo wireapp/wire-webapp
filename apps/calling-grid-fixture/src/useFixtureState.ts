@@ -72,7 +72,6 @@ function toGridParticipant(p: ParticipantState, promotedIds: Set<string>): GridP
     hue: p.hue,
     renderVideo: videoSrc ? makeVideoEl(videoSrc) : undefined,
     tier: deriveParticipantTier({
-      isYou: false,
       isSharingScreen: p.isSharingScreen,
       isSpeaking: promotedIds.has(p.id),
       hasCamera: p.hasCamera,
@@ -294,11 +293,17 @@ export function useFixtureState(initialCount = 2): FixtureState {
       id: YOU_ID,
       name: 'You',
       hue: 220,
-      tier: 'you',
+      isSelf: true,
+      // Self is tiered on the same evidence as everyone else — speaking earns the full tile.
+      tier: deriveParticipantTier({
+        isSharingScreen: false,
+        isSpeaking: !youIsMuted,
+        hasCamera: youHasCamera,
+      }),
       isMuted: youIsMuted,
       speakingDuration: 0,
     }),
-    [youIsMuted],
+    [youIsMuted, youHasCamera],
   );
 
   const participants = useMemo(

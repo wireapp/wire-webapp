@@ -1,4 +1,5 @@
 import {GridParticipant} from './FluidVideoGrid.types';
+import {useFluidVideoGrid} from './FluidVideoGridContext';
 
 const TILE_BG = '#34373D';
 
@@ -9,15 +10,15 @@ function avatarGrad(hue: number): string {
 interface OverflowTileProps {
   count: number;
   avatars: GridParticipant[];
-  onViewAll?: () => void;
 }
 
-export function OverflowTile({count, avatars, onViewAll}: OverflowTileProps) {
+export function OverflowTile({count, avatars}: OverflowTileProps) {
+  const {toggleAllParticipants} = useFluidVideoGrid();
   const shown = avatars.slice(0, 3);
 
   return (
     <button
-      onClick={onViewAll}
+      onClick={toggleAllParticipants}
       style={{
         all: 'unset',
         boxSizing: 'border-box',

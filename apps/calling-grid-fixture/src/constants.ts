@@ -9,6 +9,9 @@ export const MAX_ASPECT_RATIO = 1.78; // 16:9
 export const TILE_GAP = 4; // px
 export const TRANSITION_DURATION_MS = 250;
 
+/** At most a third of the rendered tiles may be fractional. */
+export const MAX_FRACTIONAL_TILES_RATIO = 1 / 3;
+
 // ── Speaker promotion / debounce ──────────────────────────────────────────────
 export const SPEAKING_DEBOUNCE_MS = 1500; // ms of continuous speech before promotion
 export const PRIME_HOLD_MS = 10_000; // ms a promoted speaker keeps their prime tile after stopping
@@ -19,6 +22,7 @@ export const GRID_CONFIG: GridConfig = {
   minAspectRatio: MIN_ASPECT_RATIO,
   maxAspectRatio: MAX_ASPECT_RATIO,
   tileGap: TILE_GAP,
+  maxFractionalTilesRatio: MAX_FRACTIONAL_TILES_RATIO,
 };
 
 // ── Viewport configurations shown on the canvas ───────────────────────────────

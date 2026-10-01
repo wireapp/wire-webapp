@@ -1,18 +1,17 @@
-import {SubtileDescriptor} from './FluidVideoGrid.types';
+import {FractionDescriptor} from './FluidVideoGrid.types';
+import {FractionTile} from './FractionTile';
 import {OverflowTile} from './OverflowTile';
-import {SubTile} from './SubTile';
 
 interface FractionalTileProps {
-  subRows: number;
-  subCols: number;
-  subtiles: SubtileDescriptor[];
+  fractionRows: number;
+  fractionCols: number;
+  fractions: FractionDescriptor[];
   gap: number;
-  onViewAllParticipantsSelected?: () => void;
 }
 
-export function FractionalTile({subRows, subCols, subtiles, gap, onViewAllParticipantsSelected}: FractionalTileProps) {
-  const subtileWidth = `calc((100% - ${gap}px * ${subCols - 1}) / ${subCols})`;
-  const subtileHeight = `calc((100% - ${gap}px * ${subRows - 1}) / ${subRows})`;
+export function FractionalTile({fractionRows, fractionCols, fractions, gap}: FractionalTileProps) {
+  const fractionWidth = `calc((100% - ${gap}px * ${fractionCols - 1}) / ${fractionCols})`;
+  const fractionHeight = `calc((100% - ${gap}px * ${fractionRows - 1}) / ${fractionRows})`;
 
   return (
     <div
@@ -24,9 +23,13 @@ export function FractionalTile({subRows, subCols, subtiles, gap, onViewAllPartic
         gap,
       }}
     >
-      {Array.from({length: subRows}, (_, rowIdx) => {
-        const rowStart = rowIdx * subCols;
-        const rowEntries = subtiles.slice(rowStart, rowStart + subCols);
+      {Array.from({length: fractionRows}, (_, rowIdx) => {
+        const rowStart = rowIdx * fractionCols;
+        const rowEntries = fractions.slice(rowStart, rowStart + fractionCols);
+
+        if (rowEntries.length === 0) {
+          return null;
+        }
 
         return (
           <div
@@ -35,23 +38,19 @@ export function FractionalTile({subRows, subCols, subtiles, gap, onViewAllPartic
               display: 'flex',
               flexDirection: 'row',
               gap,
-              height: subtileHeight,
+              height: fractionHeight,
               flexShrink: 0,
             }}
           >
-            {rowEntries.map((entry, colIdx) => (
+            {rowEntries.map(entry => (
               <div
-                key={colIdx}
-                style={{width: subtileWidth, height: '100%', flexShrink: 0, position: 'relative'}}
+                key={entry.type === 'overflow' ? 'overflow' : entry.participant.id}
+                style={{width: fractionWidth, height: '100%', flexShrink: 0, position: 'relative'}}
               >
                 {entry.type === 'overflow' ? (
-                  <OverflowTile
-                    count={entry.count}
-                    avatars={entry.avatars}
-                    onViewAll={onViewAllParticipantsSelected}
-                  />
+                  <OverflowTile count={entry.count} avatars={entry.avatars} />
                 ) : (
-                  <SubTile participant={entry.participant} />
+                  <FractionTile participant={entry.participant} />
                 )}
               </div>
             ))}

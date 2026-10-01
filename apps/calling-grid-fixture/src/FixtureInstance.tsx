@@ -1,6 +1,6 @@
-import {useEffect, useReducer, useState} from 'react';
+import {useEffect, useMemo, useReducer, useState} from 'react';
 
-import {FluidVideoGrid} from './components/FluidVideoGrid';
+import {FluidVideoGrid, FluidVideoGridProvider, useFluidVideoGrid} from './components/FluidVideoGrid';
 import {GRID_CONFIG, VIEWPORT_CONFIGS} from './constants';
 import {MOCK_PEOPLE} from './mockData';
 import {useFixtureState} from './useFixtureState';
@@ -131,7 +131,13 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
   const [vpIndex, setVpIndex] = useState(1); // default 1280×720
   const viewport = VIEWPORT_CONFIGS[vpIndex];
   const [panelOpen, setPanelOpen] = useState(true);
-  const [presenterMode, setPresenterMode] = useState(false);
+  // Experimental: passive participants never get a full tile — always at least a 2-way
+  // (or 4-way) fraction. Remounts the provider on toggle so the layout recomputes clean.
+  const [forcePassiveFractional, setForcePassiveFractional] = useState(false);
+  const gridConfig = useMemo(
+    () => ({...GRID_CONFIG, forcePassiveFractional}),
+    [forcePassiveFractional],
+  );
 
   const {
     participants,
@@ -184,6 +190,11 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
   };
 
   return (
+    <FluidVideoGridProvider
+      key={forcePassiveFractional ? 'force-passive-fractional' : 'default'}
+      participants={participants}
+      config={gridConfig}
+    >
     <div style={{display: 'flex', width: '100%', height: '100%', overflow: 'hidden'}}>
 
       {/* ── Left: stage area (non-scrollable, grid centered) ── */}
@@ -202,13 +213,7 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
             overflow: 'hidden',
           }}
         >
-          <FluidVideoGrid
-            participants={participants}
-            config={GRID_CONFIG}
-            presenterMode={presenterMode}
-            onPresenterModeRequested={() => setPresenterMode(true)}
-            onViewAllParticipantsSelected={() => console.log('[fixture] view all participants')}
-          />
+          <FluidVideoGrid />
         </div>
 
         {/* Show panel button (visible when panel is hidden) */}
@@ -299,7 +304,12 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
               </select>
             </Field>
             <ToggleRow label="Simulate conversation" on={simulationEnabled} onToggle={toggleSimulation} />
-            <ToggleRow label="Presenter mode" on={presenterMode} onToggle={() => setPresenterMode(p => !p)} />
+            <PresenterModeToggleRow />
+            <ToggleRow
+              label="Force passive → fraction (experimental)"
+              on={forcePassiveFractional}
+              onToggle={() => setForcePassiveFractional(v => !v)}
+            />
           </div>
 
           {/* ── Timing logic group ── */}
@@ -580,7 +590,14 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
         </div>
       </aside>
     </div>
+    </FluidVideoGridProvider>
   );
+}
+
+/** Presenter-mode switch. Lives in the control panel, drives the grid reducer. */
+function PresenterModeToggleRow() {
+  const {isPresenterModeActive, togglePresenterMode} = useFluidVideoGrid();
+  return <ToggleRow label="Presenter mode" on={isPresenterModeActive} onToggle={togglePresenterMode} />;
 }
 
 // ── Small helper components ───────────────────────────────────────────────────

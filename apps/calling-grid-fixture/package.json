@@ -7,7 +7,8 @@
     "build": "webpack --config webpack.config.js --mode production"
   },
   "dependencies": {
-    "framer-motion": "^11.0.0"
+    "framer-motion": "^11.0.0",
+    "webpack": "5.111.1"
   },
   "devDependencies": {
     "webpack-dev-server": "^5.0.0"

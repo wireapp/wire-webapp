@@ -17,11 +17,11 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 
 import ko from 'knockout';
 
-import {FluidVideoGrid, deriveParticipantTier} from '@fluid-video-grid/components';
+import {FluidVideoGrid, FluidVideoGridProvider, deriveParticipantTier} from '@fluid-video-grid/components';
 import type {GridConfig, GridParticipant} from '@fluid-video-grid/components';
 
 import type {Call} from 'Repositories/calling/Call';
@@ -35,6 +35,8 @@ const GRID_CONFIG: GridConfig = {
   minAspectRatio: 0.67,
   maxAspectRatio: 1.78,
   tileGap: 4,
+  // At most a third of the rendered tiles may be fractional.
+  maxFractionalTilesRatio: 1 / 3,
 };
 
 function hueFromId(id: string): number {
@@ -66,8 +68,8 @@ function participantToGrid(p: Participant, isYou: boolean): GridParticipant {
         />
       )
       : undefined,
+    isSelf: isYou,
     tier: deriveParticipantTier({
-      isYou,
       isSharingScreen: p.sharesScreen(),
       isSpeaking: p.isActivelySpeaking(),
       hasCamera: p.sharesCamera(),
@@ -106,27 +108,26 @@ function useGridParticipants(call: Call): GridParticipant[] {
   return gridParticipants;
 }
 
-interface WireFluidVideoGridProps {
+interface WireFluidVideoGridProviderProps {
   call: Call;
-  presenterMode?: boolean;
-  onPresenterModeRequested?: () => void;
-  onViewAllParticipantsSelected?: () => void;
+  children: ReactNode;
 }
 
-export function WireFluidVideoGrid({
-  call,
-  presenterMode,
-  onPresenterModeRequested,
-  onViewAllParticipantsSelected,
-}: WireFluidVideoGridProps) {
+/**
+ * Owns the grid state for a call. Wrap anything that needs to read or drive the grid —
+ * the grid itself and the call controls — so they share a single source of truth.
+ */
+export function WireFluidVideoGridProvider({call, children}: WireFluidVideoGridProviderProps) {
   const gridParticipants = useGridParticipants(call);
   return (
-    <FluidVideoGrid
-      participants={gridParticipants}
-      config={GRID_CONFIG}
-      presenterMode={presenterMode}
-      onPresenterModeRequested={onPresenterModeRequested}
-      onViewAllParticipantsSelected={onViewAllParticipantsSelected}
-    />
+    <FluidVideoGridProvider participants={gridParticipants} config={GRID_CONFIG}>
+      {children}
+    </FluidVideoGridProvider>
   );
 }
+
+export function WireFluidVideoGrid() {
+  return <FluidVideoGrid />;
+}
+
+export {useFluidVideoGrid} from '@fluid-video-grid/components';

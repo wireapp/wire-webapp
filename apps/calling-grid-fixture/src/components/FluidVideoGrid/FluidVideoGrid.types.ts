@@ -1,15 +1,19 @@
 import type {ReactNode} from 'react';
 
 export type ParticipantTier =
-  | 'you'              // 0 — current user's own video
-  | 'screen-sharing'   // 1 — shares screen
-  | 'active-camera'    // 2 — speaking + camera on
-  | 'active-no-camera' // 3 — speaking + camera off
-  | 'passive-camera'   // 4 — silent + camera on
-  | 'passive-no-camera'; // 5 — silent + camera off
+  | 'screen-sharing'   // 0 — shares screen
+  | 'speaking-camera'    // 1 — speaking + camera on
+  | 'speaking-no-camera' // 2 — speaking + camera off
+  | 'silent-camera'   // 3 — silent + camera on
+  | 'silent-no-camera'; // 4 — silent + camera off
 
 export interface GridParticipant {
   id: string;
+  /**
+   * The local user. Identity only — it carries no seating privilege, so self is
+   * laid out like anyone else and only earns a full tile by becoming active.
+   */
+  isSelf?: boolean;
   /** Raw name used for identity and fallback initials computation. */
   name: string;
   /** Label shown in the name pill. Falls back to name when absent. */
@@ -28,33 +32,79 @@ export interface GridParticipant {
 
 // ── Layout types ────────────────────────────────────────────────────────────
 
-export type SubtileDescriptor =
+/**
+ * One cell inside a fractional tile. A fractional tile is subdivided into
+ * `fractionRows × fractionCols` fractions; the last one may show the overflow badge.
+ */
+export type FractionDescriptor =
   | {type: 'participant'; participant: GridParticipant}
   | {type: 'overflow'; count: number; avatars: GridParticipant[]};
 
+/**
+ * One grid slot. Either holds a single participant (full), is subdivided into
+ * fractions holding several participants (fractional), or summarises the
+ * participants that did not fit (overflow — used by the presenter-mode strip).
+ */
 export type TileDescriptor =
   | {type: 'full'; participant: GridParticipant}
-  | {type: 'fractional'; subRows: number; subCols: number; subtiles: SubtileDescriptor[]};
+  | {type: 'fractional'; fractionRows: number; fractionCols: number; fractions: FractionDescriptor[]}
+  | {type: 'overflow'; count: number; avatars: GridParticipant[]};
 
 export interface RowLayout {
   tiles: TileDescriptor[];
 }
 
-export interface GridLayout {
-  /** Maximum tiles per row given container width and minTileHeight × minAspectRatio */
+/** Capacity bounds derived from container size alone — independent of participants. */
+export interface LayoutInvariants {
+  /** Maximum rows/columns of full tiles the container can hold at minimum tile size. */
   maxRows: number;
   maxCols: number;
-  /** Full tile pixel dimensions */
+  /** maxRows × maxCols — the ceiling on how many tiles may be rendered. */
+  maxTiles: number;
+  /** How many fractions a single fractional tile can be subdivided into. */
+  maxFractionsPerTile: number;
+}
+
+export interface GridModeLayout extends LayoutInvariants {
+  mode: 'grid';
+  /** Row-based layout: each row is a list of tile descriptors. */
+  rows: RowLayout[];
+  /** Full tile pixel dimensions — shared by every tile in the grid. */
   tileWidth: number;
   tileHeight: number;
   tileAspectRatio: number;
-  /** Subtile pixel dimensions — null when no fractional tile exists */
-  subtileWidth: number | null;
-  subtileHeight: number | null;
-  subtileAspectRatio: number | null;
-  /** Row-based layout: each row is a list of tile descriptors */
-  rows: RowLayout[];
+  /** Fraction pixel dimensions — null when no fractional tile exists. */
+  fractionWidth: number | null;
+  fractionHeight: number | null;
+  fractionAspectRatio: number | null;
 }
+
+export interface PresenterModeLayout extends LayoutInvariants {
+  mode: 'presenter';
+  /** Spotlighted tile — rendered flex-filled, so it carries no explicit size. */
+  spotlight: TileDescriptor | null;
+  /** Fixed-width sidebar tiles beside the spotlight. */
+  strip: TileDescriptor[];
+  /** Strip tile pixel dimensions — shared by every tile in the strip. */
+  stripTileWidth: number;
+  stripTileHeight: number;
+}
+
+export type GridLayout = GridModeLayout | PresenterModeLayout;
+
+// ── Tile assignment ──────────────────────────────────────────────────────────
+
+/** Which kind of seat a participant currently occupies. */
+export type TileKind = 'full' | 'fractional' | 'overflow';
+
+export interface TileAssignment {
+  kind: TileKind;
+  /** Index into the flat seat list (full tiles first, then each fraction, then overflow). */
+  seatIndex: number;
+}
+
+/** participantId → the seat they currently occupy. Drives sticky assignment. */
+export type AssignmentMap = Record<string, TileAssignment>;
 
 // ── Reducer state & actions ──────────────────────────────────────────────────
 
@@ -63,6 +113,12 @@ export interface GridState {
   containerSize: {width: number; height: number};
   /** participantId → stable slot index (lower = rendered earlier) */
   slotMap: Record<string, number>;
+  /** participantId → the seat they occupied on the previous layout pass */
+  assignmentMap: AssignmentMap;
+  /** True when the grid is showing a spotlight + strip instead of the tiled grid. */
+  isPresenterModeActive: boolean;
+  /** True when the full participants list is on screen. */
+  areAllParticipantsShown: boolean;
   layout: GridLayout;
 }
 
@@ -70,49 +126,66 @@ export type GridAction =
   | {type: 'ADD_PARTICIPANT'; participant: GridParticipant; now?: number}
   | {type: 'REMOVE_PARTICIPANT'; id: string}
   | {type: 'UPDATE_PARTICIPANT'; id: string; changes: Partial<GridParticipant>; now?: number}
-  | {type: 'SET_CONTAINER_SIZE'; width: number; height: number};
+  | {type: 'SET_CONTAINER_SIZE'; width: number; height: number}
+  | {type: 'TOGGLE_PRESENTER_MODE'}
+  | {type: 'TOGGLE_ALL_PARTICIPANTS'};
 
 export interface GridConfig {
   minTileHeight: number;
   maxTileHeight: number;
   minAspectRatio: number;
   maxAspectRatio: number;
-  /** Gap in px between tiles and between subtiles */
+  /** Gap in px between tiles and between fractions */
   tileGap: number;
+  /** Upper bound on the share of tiles that may be fractional (e.g. 1/3). */
+  maxFractionalTilesRatio: number;
+  /**
+   * Experimental. When true, a passive (silent, camera-off) participant is never given
+   * a full tile — always at least a 2-way fraction (4-way if 2 doesn't fit the aspect
+   * bounds), even when there's room to spare or nobody in the call is active.
+   */
+  forcePassiveFractional?: boolean;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+/**
+ * Tiers that earn a full tile. A participant is "active" whenever there is something
+ * worth showing — a screen share, speech, or a live camera. Only someone who is both
+ * silent and camera-off has nothing to render, so they are the only ones compressed
+ * into fractions.
+ */
 export const ACTIVE_TIERS: ReadonlySet<ParticipantTier> = new Set([
-  'you',
   'screen-sharing',
-  'active-camera',
-  'active-no-camera',
+  'speaking-camera',
+  'speaking-no-camera',
+  'silent-camera',
 ]);
 
 export const TIER_ORDER: ParticipantTier[] = [
-  'you',
   'screen-sharing',
-  'active-camera',
-  'active-no-camera',
-  'passive-camera',
-  'passive-no-camera',
+  'speaking-camera',
+  'speaking-no-camera',
+  'silent-camera',
+  'silent-no-camera',
 ];
 
 export function isActiveTier(tier: ParticipantTier): boolean {
   return ACTIVE_TIERS.has(tier);
 }
 
+/**
+ * Self is deliberately not special-cased here: the local user is tiered on the same
+ * speaking/camera evidence as everyone else, and only reaches a full tile by being active.
+ */
 export function deriveParticipantTier(p: {
-  isYou: boolean;
   isSharingScreen: boolean;
   isSpeaking: boolean;
   hasCamera: boolean;
 }): ParticipantTier {
-  if (p.isYou) return 'you';
   if (p.isSharingScreen) return 'screen-sharing';
-  if (p.isSpeaking && p.hasCamera) return 'active-camera';
-  if (p.isSpeaking) return 'active-no-camera';
-  if (p.hasCamera) return 'passive-camera';
-  return 'passive-no-camera';
+  if (p.isSpeaking && p.hasCamera) return 'speaking-camera';
+  if (p.isSpeaking) return 'speaking-no-camera';
+  if (p.hasCamera) return 'silent-camera';
+  return 'silent-no-camera';
 }
