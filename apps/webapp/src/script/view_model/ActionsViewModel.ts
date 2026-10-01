@@ -17,7 +17,7 @@
  *
  */
 
-import {isEmptyArray, isNonEmptyString} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -462,7 +462,7 @@ export class ActionsViewModel {
     const conversationEntity = await this.conversationRepository.resolve1To1Conversation(userEntity.qualifiedId, {
       mls: {allowUnestablished: false},
     });
-    if (conversationEntity) {
+    if (!isNull(conversationEntity)) {
       return conversationEntity;
     }
     throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.qualifiedId.id}".`);
@@ -482,7 +482,7 @@ export class ActionsViewModel {
       return this.openConversation(conversationEntity);
     }
 
-    if (!serviceEntity.qualifiedId) {
+    if (isUndefined(serviceEntity.qualifiedId)) {
       throw new Error("Can't create 1on1 conversation for an entity without qualifiedId");
     }
 
@@ -491,7 +491,7 @@ export class ActionsViewModel {
   };
 
   readonly openGroupConversation = async (conversationEntity?: Conversation): Promise<void> => {
-    if (!conversationEntity) {
+    if (isUndefined(conversationEntity)) {
       throw new Error();
     }
     return this.openConversation(conversationEntity);
@@ -582,7 +582,7 @@ export class ActionsViewModel {
                 userEntity.qualifiedId,
               );
               resolve();
-              if (conversationEntity) {
+              if (!isNull(conversationEntity)) {
                 await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
               }
             },

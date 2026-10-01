@@ -19,7 +19,7 @@
 
 import {useCallback, useRef, useState, type ReactElement} from 'react';
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNull, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
@@ -190,7 +190,7 @@ function InputBarContent({
     },
   });
 
-  const inputPlaceholder = messageTimer
+  const inputPlaceholder = isTruthy(messageTimer)
     ? translate('tooltipConversationEphemeral')
     : translate('tooltipConversationInputPlaceholder');
 
@@ -202,7 +202,7 @@ function InputBarContent({
     isCellsEnabled,
     isViewerPermissionFeatureEnabled,
   });
-  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
+  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && isTruthy(localMessageTimer) && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
   const shouldReplaceEmoji = useUserPropertyValue<boolean>(() => {
@@ -279,7 +279,7 @@ function InputBarContent({
     translate,
   });
 
-  if (fileHandling.pastedFile && !!isCellsEnabled) {
+  if (!isNull(fileHandling.pastedFile) && !!isCellsEnabled) {
     uploadPastedFiles(fileHandling.pastedFile);
     fileHandling.clearPastedFile();
   }
@@ -308,18 +308,18 @@ function InputBarContent({
     fireAndForgetInvoker.fireAndForget(sendMessage);
   }, [fireAndForgetInvoker, isSendingDisabled, sendMessage]);
 
-  const showAvatar = !!messageContent.text.length;
+  const showAvatar = messageContent.text.length > 0;
 
   return (
     <div ref={wrapperRef}>
       <InputBarContainer>
         {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
-        {classifiedDomains && !isConnectionRequest && (
+        {!isUndefined(classifiedDomains) && !isConnectionRequest && (
           <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
         )}
 
-        {isReplying && !isEditing && replyMessageEntity && (
+        {isReplying && !isEditing && !isNull(replyMessageEntity) && (
           <ReplyBar
             replyMessageEntity={replyMessageEntity}
             onCancel={() => {
@@ -332,7 +332,7 @@ function InputBarContent({
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && effectiveShowMarkdownPreview,
-            'input-bar-container--with-files': !!files.length,
+            'input-bar-container--with-files': files.length > 0,
           })}
         >
           {!isOutgoingRequest && (
@@ -347,7 +347,7 @@ function InputBarContent({
                   />
                 )}
               </div>
-              {!isSelfUserRemoved && !fileHandling.pastedFile && (
+              {!isSelfUserRemoved && isNull(fileHandling.pastedFile) && (
                 <InputBarEditor
                   editorRef={editorRef}
                   editedMessage={editedMessage}
@@ -376,7 +376,7 @@ function InputBarContent({
                   disableMessagePreprocessing={disableMessagePreprocessing}
                   replaceEmojis={shouldReplaceEmoji}
                 >
-                  {!!files.length && (
+                  {files.length > 0 && (
                     <FilePreviews
                       files={files}
                       conversationId={conversation.id}
@@ -411,7 +411,7 @@ function InputBarContent({
             </>
           )}
 
-          {fileHandling.pastedFile && !isCellsEnabled && (
+          {!isNull(fileHandling.pastedFile) && !isCellsEnabled && (
             <PastedFileControls
               pastedFile={fileHandling.pastedFile}
               onClear={fileHandling.clearPastedFile}

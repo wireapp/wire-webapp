@@ -17,6 +17,7 @@
  *
  */
 
+import {isNull, isUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
@@ -109,7 +110,7 @@ export class ContentViewModel {
 
       const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
       const isOnConversationListTab = isConversationListTab(currentTab);
-      if (isStateRequests && isOnConversationListTab && !requests.length) {
+      if (isStateRequests && isOnConversationListTab && requests.length === 0) {
         showMostRecentConversation();
       }
     });
@@ -267,16 +268,16 @@ export class ContentViewModel {
       openFirstSelfMention = false,
       openNotificationSettings = false,
       filePath,
-    } = options || {};
+    } = options ?? {};
 
-    if (!conversation) {
+    if (isUndefined(conversation)) {
       return this.handleMissingConversation();
     }
 
     try {
       const conversationEntity = await this.getConversationEntity(conversation);
 
-      if (!conversationEntity) {
+      if (isNull(conversationEntity)) {
         this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
@@ -361,7 +362,7 @@ export class ContentViewModel {
   private readonly checkContentAvailability = (newState: ContentState): ContentState => {
     const isStateRequests = newState === ContentState.CONNECTION_REQUESTS;
     if (isStateRequests) {
-      const hasConnectRequests = !!this.userState.connectRequests().length;
+      const hasConnectRequests = this.userState.connectRequests().length > 0;
       if (!hasConnectRequests) {
         return ContentState.WATERMARK;
       }

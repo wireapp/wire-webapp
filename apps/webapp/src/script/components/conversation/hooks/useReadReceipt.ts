@@ -35,7 +35,7 @@ export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sen
 
   const flush = useCallback(() => {
     const readMessages = readMessagesBuffer.current;
-    if (readMessages.length) {
+    if (readMessages.length > 0) {
       const groupedMessages = groupBy(readMessages, ({conversation, message}) => {
         return conversation.id + message.from;
       });
