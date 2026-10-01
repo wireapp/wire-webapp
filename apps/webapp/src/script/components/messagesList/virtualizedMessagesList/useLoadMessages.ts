@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {Virtualizer} from '@tanstack/react-virtual';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -70,7 +71,7 @@ export const useLoadMessages = (
   const loadFollowingMessages = useCallback(async () => {
     const lastMessage = conversation.getNewestMessage();
 
-    if (lastMessage) {
+    if (!isUndefined(lastMessage)) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {
         virtualizer.measure();
         setIsLoadingMessages(true);

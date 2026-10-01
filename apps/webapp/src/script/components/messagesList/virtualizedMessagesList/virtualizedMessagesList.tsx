@@ -20,7 +20,7 @@
 import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isUndefined} from '@sindresorhus/is';
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
@@ -69,7 +69,7 @@ async function loadMessagesForTimestampSelection(options: LoadMessagesForTimesta
 
   const messageIsLoaded = conversation.getMessage(messageId);
 
-  if (messageIsLoaded) {
+  if (!isUndefined(messageIsLoaded)) {
     return;
   }
 
@@ -184,7 +184,7 @@ export const VirtualizedMessagesList = ({
         return element.getBoundingClientRect().height;
       }
 
-      return cachedMeasurement || element.getBoundingClientRect().height;
+      return isTruthy(cachedMeasurement) ? cachedMeasurement : element.getBoundingClientRect().height;
     },
     getItemKey,
   });
@@ -353,7 +353,7 @@ export const VirtualizedMessagesList = ({
                 position: 'absolute',
                 width: '100%',
                 ...(isLast &&
-                  !currentConversationProcessQueue?.length && {
+                  !isTruthy(currentConversationProcessQueue?.length) && {
                     '.message': {
                       paddingBottom: '40px',
                     },

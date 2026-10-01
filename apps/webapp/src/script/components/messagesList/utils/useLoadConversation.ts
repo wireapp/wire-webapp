@@ -19,6 +19,8 @@
 
 import {MutableRefObject, useEffect} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message as MessageEntity} from 'Repositories/entity/message/message';
@@ -46,7 +48,7 @@ export const useLoadConversation = ({
 
       const initialMessage = conversationToLoad.initialMessage();
 
-      return initialMessage
+      return !isUndefined(initialMessage)
         ? await conversationRepository.getMessagesWithOffset(conversationToLoad, initialMessage)
         : await conversationRepository.getPrecedingMessages(conversationToLoad);
     } finally {

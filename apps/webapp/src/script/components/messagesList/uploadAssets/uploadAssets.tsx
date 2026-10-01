@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy, isUndefined} from '@sindresorhus/is';
+
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -35,7 +37,7 @@ export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Pro
     'uploadProgressQueue',
   ]);
 
-  if (!processQueue?.length) {
+  if (!isTruthy(processQueue?.length)) {
     return null;
   }
 
@@ -43,7 +45,7 @@ export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Pro
     return item.conversationId === conversationId;
   });
 
-  if (!currentConversationProcessQueue.length) {
+  if (currentConversationProcessQueue.length === 0) {
     return null;
   }
 
@@ -58,7 +60,7 @@ export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Pro
       {currentConversationProcessQueue.map(processingMessage => {
         const processingAsset = uploadProgressMap.get(processingMessage.message.messageId);
 
-        if (!processingAsset) {
+        if (isUndefined(processingAsset)) {
           return null;
         }
 
