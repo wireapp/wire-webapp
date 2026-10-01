@@ -210,10 +210,10 @@ export const createTeam = async (
     };
   },
 ) => {
-  const owner = await createUser(api);
 
-  const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
-  owner.teamId = teamId;
+  const owner = await api.createTeamOwner(getUser(), teamName);
+  // Disable telemetry for the team owner
+  await api.properties.putProperty({settings: {privacy: {telemetry_data_sharing: false}}}, owner.token);
 
   const addTeamMember: Team['addTeamMember'] = async (member, options) => {
     const invitationId = await api.team.inviteUserToTeam(member.email, owner, Role[options?.role ?? 'MEMBER']);
@@ -234,11 +234,11 @@ export const createTeam = async (
   }
 
   if (options?.features && Object.values(options.features).some(Boolean)) {
-    await api.team.upgradeTeam(teamId, owner);
+    await api.team.upgradeTeam(owner.teamId, owner);
 
     if (options.features.conferenceCalling) {
-      await api.enableConferenceCallingFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
+      await api.enableConferenceCallingFeature(owner.teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId, owner.token);
     }
 
     if (options.features.mls) {
@@ -256,30 +256,30 @@ export const createTeam = async (
         defaultProtocol: 'mls',
         supportedProtocols: ['mls', 'proteus'],
       });
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, owner.teamId, owner.token);
 
-      await api.brig.unlockChannelFeature(teamId);
-      await api.brig.enableChannelsFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
+      await api.brig.unlockChannelFeature(owner.teamId);
+      await api.brig.enableChannelsFeature(owner.teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, owner.teamId, owner.token);
     }
 
     if (options.features.meetings) {
-      await api.brig.unlockMeetingsFeature(teamId);
-      await api.brig.enableMeetingsFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MEETINGS, teamId, owner.token);
+      await api.brig.unlockMeetingsFeature(owner.teamId);
+      await api.brig.enableMeetingsFeature(owner.teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MEETINGS, owner.teamId, owner.token);
     }
 
     if (options.features.cells) {
-      await api.brig.unlockCellsFeature(teamId);
-      await api.brig.enableCells(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, teamId, owner.token);
+      await api.brig.unlockCellsFeature(owner.teamId);
+      await api.brig.enableCells(owner.teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, owner.teamId, owner.token);
     }
 
     if (options.features.sso) {
-      await api.brig.enableSSOFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.SSO, teamId, owner.token);
+      await api.brig.enableSSOFeature(owner.teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.SSO, owner.teamId, owner.token);
     }
   }
 
-  return {teamId, owner, addTeamMember};
+  return {teamId: owner.teamId, owner, addTeamMember};
 };
