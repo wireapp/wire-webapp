@@ -208,7 +208,7 @@ describe('MessageRepository', () => {
       {lastKnownTimestamp: 1, clearedTimestamp: -1, updatesTimestamp: true, sendsClearedMessage: true},
       {lastKnownTimestamp: 1, clearedTimestamp: 1, updatesTimestamp: true, sendsClearedMessage: true},
       {lastKnownTimestamp: -1, clearedTimestamp: -1, updatesTimestamp: true, sendsClearedMessage: true},
-    ])('preserves clear-message sending for timestamps $lastKnownTimestamp / $clearedTimestamp', async options => {
+    ] as const)('preserves clear-message sending for timestamps $lastKnownTimestamp / $clearedTimestamp', async options => {
       const {lastKnownTimestamp, clearedTimestamp, updatesTimestamp, sendsClearedMessage} = options;
       const [messageRepository, {core, conversationState}] = await buildMessageRepository(translateForTest);
       const selfConversation = requireValueForTest(conversationState.conversations().at(0));
