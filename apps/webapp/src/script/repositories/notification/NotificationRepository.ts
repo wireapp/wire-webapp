@@ -979,6 +979,7 @@ export class NotificationRepository {
     const notificationResult = this.notificationApi.show({
       ...notificationContent.options,
       title: notificationContent.title,
+      requireInteraction: false,
       onClick,
       onShow: () => {
         if (presentationState.kind === 'pending') {

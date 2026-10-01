@@ -49,6 +49,7 @@ export type SystemNotificationRequest = {
   icon?: string;
   silent?: boolean;
   data?: unknown;
+  requireInteraction: boolean;
   onClick: () => void;
   /** Called when the platform has displayed the notification. */
   onShow?: () => void;

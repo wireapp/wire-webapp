@@ -147,6 +147,7 @@ const notificationRequestFactory = createFactory<SystemNotificationRequest>(() =
     title: 'Weekly sync',
     body: 'Starts at 12:00 PM',
     tag: 'meeting-reminder:tag',
+    requireInteraction: false,
     onClick: jest.fn(),
     onClose: jest.fn(),
   };
@@ -203,7 +204,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     await expect(api.requestPermission()).resolves.toBe('denied');
   });
 
-  it('constructs a notification carrying the notification options', () => {
+  it.each([true, false])('forwards notification options with requireInteraction: %s', requireInteraction => {
     const {api, createdNotifications} = createApi();
 
     api.show(
@@ -211,6 +212,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
         icon: '/image/logo/notification.png',
         silent: true,
         data: {messageType: 'content'},
+        requireInteraction,
       }),
     );
 
@@ -223,6 +225,7 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
       icon: '/image/logo/notification.png',
       silent: true,
       data: {messageType: 'content'},
+      requireInteraction,
     });
   });
 

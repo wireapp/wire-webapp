@@ -116,6 +116,7 @@ export const createMeetingReminderOsNotifier = ({
         title: payload.meetingTitle,
         body: translate('meetings.notifications.startsAt', {time: formatMeetingTime(payload.meetingStartTime)}),
         tag,
+        requireInteraction: false,
         onClick: () => {
           // WPB-28121 will additionally open the meeting prep modal from here. Until it ships,
           // focusing Wire on the meetings list is the whole click behaviour.

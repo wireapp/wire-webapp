@@ -115,6 +115,7 @@ describe('createMeetingReminderOsNotifier', () => {
     expect(requests).toHaveLength(1);
     expect(firstRequestOf(requests).title).toBe('Weekly sync');
     expect(firstRequestOf(requests).body).toBe('Starts at 12:00 PM');
+    expect(firstRequestOf(requests).requireInteraction).toBe(false);
   });
 
   it('attaches neither action buttons nor a Wire sound file', () => {
@@ -122,7 +123,14 @@ describe('createMeetingReminderOsNotifier', () => {
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
-    expect(Object.keys(firstRequestOf(requests)).sort()).toEqual(['body', 'onClick', 'onClose', 'tag', 'title']);
+    expect(Object.keys(firstRequestOf(requests)).sort()).toEqual([
+      'body',
+      'onClick',
+      'onClose',
+      'requireInteraction',
+      'tag',
+      'title',
+    ]);
   });
 
   it('focuses the meetings list and closes the toast when clicked', () => {
