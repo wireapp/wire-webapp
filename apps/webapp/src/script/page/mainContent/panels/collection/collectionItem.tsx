@@ -19,6 +19,8 @@
 
 import {FC} from 'react';
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {AssetImage} from 'Components/image';
 import {AudioAsset} from 'Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset';
 import {FileAsset} from 'Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset';
@@ -40,7 +42,7 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   const firstAsset = assets[0];
   const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
 
-  if (isOfCategory('images', message) && firstAsset.isImage() && resource) {
+  if (isTruthy(isOfCategory('images', message)) && firstAsset.isImage() && isTruthy(resource)) {
     return (
       <AssetImage
         css={{width: '110px', height: '110px'}}
@@ -54,15 +56,15 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
       />
     );
   }
-  if (isOfCategory('links', message)) {
+  if (isTruthy(isOfCategory('links', message))) {
     return <LinkPreviewAsset message={message} header={true} />;
   }
 
-  if (isOfCategory('files', message)) {
+  if (isTruthy(isOfCategory('files', message))) {
     return <FileAsset message={message} hasHeader={true} />;
   }
 
-  if (isOfCategory('audio', message)) {
+  if (isTruthy(isOfCategory('audio', message))) {
     return <AudioAsset className="collection-file" message={message} hasHeader={true} />;
   }
 
