@@ -353,7 +353,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     try {
       await task();
     } catch (error: unknown) {
-      this.logger.warn(`Recovery failed for key ${key}`, {error});
+      this.logger.warn(`Recovery failed for key ${key}`, {error: extractErrorDetails(error)});
       throw error;
     } finally {
       this.logger.info(`Completed recovery for key ${key}`);
@@ -376,8 +376,22 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   }
 }
 
+function extractErrorDetails(error: unknown): unknown {
+  if (error !== null && typeof error !== 'object') {
+    return '(not an object)';
+  }
+  const details: Record<string, unknown> = {};
+  const err = error as Record<string, unknown>;
+  if (err.status !== undefined) {
+    details.status = err.status;
+  }
+  if (err.response != null && typeof err.response === 'object') {
+    details.response = {data: (err.response as Record<string, unknown>).data};
+  }
+  return Object.keys(details).length > 0 ? details : '(no meaningful data)';
+}
+
 /**
- * Minimal default policies used by the initial integration. These can be extended over time.
  *
  * Highlights:
  * - WrongEpoch: reconcile and retry for typed ops; do not re-run for join.
