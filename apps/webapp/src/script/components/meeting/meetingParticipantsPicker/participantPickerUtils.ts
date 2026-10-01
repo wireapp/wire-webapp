@@ -21,9 +21,10 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-export const getConversationKey = (conversation: Conversation): string => {
-  return `${conversation.qualifiedId.domain}-${conversation.qualifiedId.id}`;
-};
+export const getConversationKey = (conversation: Conversation): string =>
+  `${conversation.qualifiedId.domain}-${conversation.qualifiedId.id}`;
+
+export const isAllowedMeetingParticipant = (user: User): boolean => !user.isGuest() && !user.isTemporaryGuest();
 
 export const searchUsersByQuery = (users: User[], query: string): User[] => {
   const normalizedQuery = query.trim().toLowerCase();
@@ -41,14 +42,10 @@ export const searchUsersByQuery = (users: User[], query: string): User[] => {
 };
 
 export const toggleUserInSelection = (selectedUsers: User[], user: User): User[] => {
-  const isSelected = selectedUsers.some(selectedUser => {
-    return selectedUser.id === user.id;
-  });
+  const isSelected = selectedUsers.some(selectedUser => selectedUser.id === user.id);
 
   if (isSelected) {
-    return selectedUsers.filter(selectedUser => {
-      return selectedUser.id !== user.id;
-    });
+    return selectedUsers.filter(selectedUser => selectedUser.id !== user.id);
   }
 
   return [...selectedUsers, user];
@@ -58,11 +55,7 @@ export const mergeUsersIntoSelection = (selectedUsers: User[], importedUsers: Us
   const mergedUsers = [...selectedUsers];
 
   for (const user of importedUsers) {
-    if (
-      !mergedUsers.some(selectedUser => {
-        return matchQualifiedIds(selectedUser.qualifiedId, user.qualifiedId);
-      })
-    ) {
+    if (!mergedUsers.some(selectedUser => matchQualifiedIds(selectedUser.qualifiedId, user.qualifiedId))) {
       mergedUsers.push(user);
     }
   }
@@ -70,6 +63,5 @@ export const mergeUsersIntoSelection = (selectedUsers: User[], importedUsers: Us
   return mergedUsers;
 };
 
-export const mergeConversationUsersIntoSelection = (selectedUsers: User[], conversation: Conversation): User[] => {
-  return mergeUsersIntoSelection(selectedUsers, conversation.participating_user_ets());
-};
+export const mergeConversationUsersIntoSelection = (selectedUsers: User[], conversation: Conversation): User[] =>
+  mergeUsersIntoSelection(selectedUsers, conversation.participating_user_ets().filter(isAllowedMeetingParticipant));

@@ -28,6 +28,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {
   getConversationKey,
+  isAllowedMeetingParticipant,
   mergeConversationUsersIntoSelection,
   mergeUsersIntoSelection,
 } from './participantPickerUtils';
@@ -116,7 +117,10 @@ export const useMeetingParticipantsPicker = ({
           mergeUsersIntoSelection(manuallySelectedUsers, [...nextSelectedConversations.values()].flat()),
         );
       } else {
-        nextSelectedConversations.set(conversationKey, conversation.participating_user_ets());
+        nextSelectedConversations.set(
+          conversationKey,
+          conversation.participating_user_ets().filter(isAllowedMeetingParticipant),
+        );
         onSelectedUsersChange(mergeConversationUsersIntoSelection(selectedUsers, conversation));
       }
 

@@ -122,10 +122,14 @@ describe('useMeetingParticipantsPicker', () => {
     expect(result.current.isOpen).toBe(false);
   });
 
-  it('imports conversation members and removes only imported users when deselected', () => {
+  it('imports only eligible conversation members and removes only imported users when deselected', () => {
     const manual = createUser('manual', 'Manual');
     const imported = createUser('imported', 'Imported');
-    const conversation = createConversation('conversation', 'Project', [imported]);
+    const guest = createUser('guest', 'Guest');
+    guest.isGuest(true);
+    const temporaryGuest = createUser('temporary-guest', 'Temporary guest');
+    temporaryGuest.isTemporaryGuest(true);
+    const conversation = createConversation('conversation', 'Project', [imported, guest, temporaryGuest]);
     const onSelectedUsersChange = jest.fn();
     const options = createOptions({selectedUsers: [manual], onSelectedUsersChange});
     const {result, rerender} = renderHook(
