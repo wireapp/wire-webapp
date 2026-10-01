@@ -208,26 +208,29 @@ describe('MessageRepository', () => {
       {lastKnownTimestamp: 1, clearedTimestamp: -1, updatesTimestamp: true, sendsClearedMessage: true},
       {lastKnownTimestamp: 1, clearedTimestamp: 1, updatesTimestamp: true, sendsClearedMessage: true},
       {lastKnownTimestamp: -1, clearedTimestamp: -1, updatesTimestamp: true, sendsClearedMessage: true},
-    ] as const)('preserves clear-message sending for timestamps $lastKnownTimestamp / $clearedTimestamp', async options => {
-      const {lastKnownTimestamp, clearedTimestamp, updatesTimestamp, sendsClearedMessage} = options;
-      const [messageRepository, {core, conversationState}] = await buildMessageRepository(translateForTest);
-      const selfConversation = requireValueForTest(conversationState.conversations().at(0));
-      selfConversation.type(CONVERSATION_TYPE.SELF);
-      const send = jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
-      const conversation = generateConversation();
-      jest.spyOn(conversation, 'getLastKnownTimestamp').mockReturnValue(lastKnownTimestamp);
-      const setTimestamp = jest.spyOn(conversation, 'setTimestamp').mockReturnValue(clearedTimestamp);
+    ] as const)(
+      'preserves clear-message sending for timestamps $lastKnownTimestamp / $clearedTimestamp',
+      async options => {
+        const {lastKnownTimestamp, clearedTimestamp, updatesTimestamp, sendsClearedMessage} = options;
+        const [messageRepository, {core, conversationState}] = await buildMessageRepository(translateForTest);
+        const selfConversation = requireValueForTest(conversationState.conversations().at(0));
+        selfConversation.type(CONVERSATION_TYPE.SELF);
+        const send = jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
+        const conversation = generateConversation();
+        jest.spyOn(conversation, 'getLastKnownTimestamp').mockReturnValue(lastKnownTimestamp);
+        const setTimestamp = jest.spyOn(conversation, 'setTimestamp').mockReturnValue(clearedTimestamp);
 
-      await messageRepository.updateClearedTimestamp(conversation);
+        await messageRepository.updateClearedTimestamp(conversation);
 
-      expect(setTimestamp).toHaveBeenCalledTimes(updatesTimestamp ? 1 : 0);
-      expect(send).toHaveBeenCalledTimes(sendsClearedMessage ? 1 : 0);
-      if (sendsClearedMessage) {
-        const [sendOptions] = requireValueForTest(send.mock.calls.at(0));
+        expect(setTimestamp).toHaveBeenCalledTimes(updatesTimestamp ? 1 : 0);
+        expect(send).toHaveBeenCalledTimes(sendsClearedMessage ? 1 : 0);
+        if (sendsClearedMessage) {
+          const [sendOptions] = requireValueForTest(send.mock.calls.at(0));
 
-        expect(sendOptions.payload.content).toBe('cleared');
-      }
-    });
+          expect(sendOptions.payload.content).toBe('cleared');
+        }
+      },
+    );
   });
 
   describe('sendPing', () => {

@@ -805,14 +805,7 @@ const productionConfigs = [
   },
   {
     files: ['apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**/*.{ts,tsx}'],
-    ignores: [
-      '**/*.test.ts',
-      '**/*.test.tsx',
-      '**/*.spec.ts',
-      '**/*.spec.tsx',
-      '**/test/**',
-      '**/mocks/**',
-    ],
+    ignores: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', '**/test/**', '**/mocks/**'],
     rules: {
       ...strictBooleanRules,
     },
