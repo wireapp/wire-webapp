@@ -205,14 +205,15 @@ function InputBarContent({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  const shouldReplaceEmoji = useUserPropertyValue<boolean>(
-    () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
-    WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
-  );
+  const shouldReplaceEmoji = useUserPropertyValue<boolean>(() => {
+    return propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
+  }, WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE);
 
   const getMentionCandidates = useCallback(
     (search?: string | null) => {
-      const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
+      const candidates = conversation.participating_user_ets().filter(userEntity => {
+        return !userEntity.isService;
+      });
       return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : candidates;
     },
     [conversation, searchRepository],
@@ -245,10 +246,9 @@ function InputBarContent({
     translate,
   });
 
-  const showMarkdownPreview = useUserPropertyValue<boolean>(
-    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
-    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
-  );
+  const showMarkdownPreview = useUserPropertyValue<boolean>(() => {
+    return propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW);
+  }, WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW);
   const effectiveShowMarkdownPreview = showMarkdownPreview && !disableMessagePreprocessing;
 
   const {
@@ -320,7 +320,12 @@ function InputBarContent({
         )}
 
         {isReplying && !isEditing && replyMessageEntity && (
-          <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(false)} />
+          <ReplyBar
+            replyMessageEntity={replyMessageEntity}
+            onCancel={() => {
+              return cancelMessageReply(false);
+            }}
+          />
         )}
 
         <div
@@ -360,7 +365,9 @@ function InputBarContent({
                     }
                   }}
                   onShiftTab={onShiftTab}
-                  onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
+                  onBlur={() => {
+                    return isTypingRef.current && conversationRepository.sendTypingStop(conversation);
+                  }}
                   onUpdate={setMessageContent}
                   onSend={handleSendMessage}
                   getMentionCandidates={getMentionCandidates}

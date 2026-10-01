@@ -88,13 +88,15 @@ export const ForcedInitials: Story = {
 };
 
 export const MultipleSizes: Story = {
-  render: () => (
-    <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-      <Avatar name="John Doe" size={24} />
-      <Avatar name="John Doe" size={32} />
-      <Avatar name="John Doe" size={48} />
-      <Avatar name="John Doe" size={64} />
-      <Avatar name="John Doe" size={96} />
-    </div>
-  ),
+  render: () => {
+    return (
+      <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+        <Avatar name="John Doe" size={24} />
+        <Avatar name="John Doe" size={32} />
+        <Avatar name="John Doe" size={48} />
+        <Avatar name="John Doe" size={64} />
+        <Avatar name="John Doe" size={96} />
+      </div>
+    );
+  },
 };

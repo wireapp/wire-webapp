@@ -32,11 +32,13 @@ const meta = {
     layout: 'centered',
   },
   decorators: [
-    Story => (
-      <div style={{minWidth: '600px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{minWidth: '600px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   tags: ['autodocs'],
 } satisfies Meta<typeof Label>;
@@ -51,12 +53,14 @@ export const Default: Story = {
 };
 
 export const WithInput: Story = {
-  render: () => (
-    <Label>
-      <Text style={{marginLeft: '16px', marginBottom: '8px', display: 'block'}}>Input Label</Text>
-      <Input placeholder="Type something..." />
-    </Label>
-  ),
+  render: () => {
+    return (
+      <Label>
+        <Text style={{marginLeft: '16px', marginBottom: '8px', display: 'block'}}>Input Label</Text>
+        <Input placeholder="Type something..." />
+      </Label>
+    );
+  },
 };
 
 export const InvalidLabel: Story = {
@@ -67,5 +71,7 @@ export const InvalidLabel: Story = {
 };
 
 export const LabelLinkStory: Story = {
-  render: () => <LabelLink>Click me</LabelLink>,
+  render: () => {
+    return <LabelLink>Click me</LabelLink>;
+  },
 };

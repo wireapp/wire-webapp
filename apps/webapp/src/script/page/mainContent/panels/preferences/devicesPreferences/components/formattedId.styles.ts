@@ -19,22 +19,24 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const devicePart = (smallPadding = false): CSSObject => ({
-  display: 'inline-block',
-  marginRight: smallPadding ? '4px' : '12px',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap',
+export const devicePart = (smallPadding = false): CSSObject => {
+  return {
+    display: 'inline-block',
+    marginRight: smallPadding ? '4px' : '12px',
+    textTransform: 'uppercase',
+    whiteSpace: 'nowrap',
 
-  ...(!smallPadding && {
-    width: '18px',
+    ...(!smallPadding && {
+      width: '18px',
 
-    '&:nth-of-type(8n)': {
-      marginRight: 0,
+      '&:nth-of-type(8n)': {
+        marginRight: 0,
 
-      '&::after': {
-        display: 'block',
-        content: "' '",
+        '&::after': {
+          display: 'block',
+          content: "' '",
+        },
       },
-    },
-  }),
-});
+    }),
+  };
+};

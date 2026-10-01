@@ -100,10 +100,12 @@ export const useGetMultipartAsset = ({
           return;
         }
 
-        const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/') === true);
-        const pdfPreview = asset.Previews?.find(
-          preview => preview?.ContentType?.startsWith('application/pdf') === true,
-        );
+        const imagePreview = asset.Previews?.find(preview => {
+          return preview?.ContentType?.startsWith('image/') === true;
+        });
+        const pdfPreview = asset.Previews?.find(preview => {
+          return preview?.ContentType?.startsWith('application/pdf') === true;
+        });
         setHasPreview(imagePreview !== undefined || pdfPreview !== undefined);
 
         const shouldReturnImmediately =

@@ -36,15 +36,17 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: () => (
-    <Form
-      onSubmit={event => {
-        event.preventDefault();
-        console.log('Form submitted');
-      }}
-    >
-      <Input placeholder="Email" type="email" required />
-      <Button type="submit">Submit</Button>
-    </Form>
-  ),
+  render: () => {
+    return (
+      <Form
+        onSubmit={event => {
+          event.preventDefault();
+          console.log('Form submitted');
+        }}
+      >
+        <Input placeholder="Email" type="email" required />
+        <Button type="submit">Submit</Button>
+      </Form>
+    );
+  },
 };

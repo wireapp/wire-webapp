@@ -164,7 +164,9 @@ export const Message = (props: MessageParams) => {
       role="list"
       tabIndex={messageFocusedTabIndex}
       onKeyDown={handleDivKeyDown}
-      onClick={() => handleFocus(message.id)}
+      onClick={() => {
+        return handleFocus(message.id);
+      }}
     >
       <MessageWrapper
         {...props}

@@ -30,64 +30,72 @@ import {QUERY} from '../../utils';
 
 export type DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const desktopStyledHeaderSubMenuStyle: (theme: Theme, props: DesktopStyledHeaderSubMenuProps) => CSSObject = theme => ({
-  alignItems: 'left',
-  backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
-  borderRadius: '8px',
-  boxShadow: '0 8px 24px 0 rgba(0, 0, 0, 0.16)',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  minWidth: '200px',
-  padding: '8px 8px',
-  span: {
-    '&:hover': {
-      backgroundColor: theme.general.backgroundColor,
-      borderRadius: '4px',
-    },
-    alignItems: 'center',
+const desktopStyledHeaderSubMenuStyle: (theme: Theme, props: DesktopStyledHeaderSubMenuProps) => CSSObject = theme => {
+  return {
+    alignItems: 'left',
+    backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
+    borderRadius: '8px',
+    boxShadow: '0 8px 24px 0 rgba(0, 0, 0, 0.16)',
     display: 'flex',
-    height: '30px',
-    margin: 0,
-    paddingLeft: '10px !important',
-    paddingRight: '10px !important',
-    whiteSpace: 'nowrap',
-  },
-  [`.${MENU_LINK_CLASSNAME}:nth-of-type(n+2)`]: {
-    marginTop: '8px',
-  },
-});
+    flexDirection: 'column',
+    justifyContent: 'center',
+    minWidth: '200px',
+    padding: '8px 8px',
+    span: {
+      '&:hover': {
+        backgroundColor: theme.general.backgroundColor,
+        borderRadius: '4px',
+      },
+      alignItems: 'center',
+      display: 'flex',
+      height: '30px',
+      margin: 0,
+      paddingLeft: '10px !important',
+      paddingRight: '10px !important',
+      whiteSpace: 'nowrap',
+    },
+    [`.${MENU_LINK_CLASSNAME}:nth-of-type(n+2)`]: {
+      marginTop: '8px',
+    },
+  };
+};
 
 export const DESKTOP_HEADER_SUB_MENU_CLASSNAME = 'desktopStyledHeaderSubMenu';
 
-export const DesktopStyledHeaderSubMenu = (props: DesktopStyledHeaderSubMenuProps) => (
-  <div
-    className={DESKTOP_HEADER_SUB_MENU_CLASSNAME}
-    css={(theme: Theme) => desktopStyledHeaderSubMenuStyle(theme, props)}
-    {...props}
-  />
-);
+export const DesktopStyledHeaderSubMenu = (props: DesktopStyledHeaderSubMenuProps) => {
+  return (
+    <div
+      className={DESKTOP_HEADER_SUB_MENU_CLASSNAME}
+      css={(theme: Theme) => {
+        return desktopStyledHeaderSubMenuStyle(theme, props);
+      }}
+      {...props}
+    />
+  );
+};
 
 export interface MobileStyledHeaderSubMenuProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
   open?: boolean;
 }
 
-const mobileStyledHeaderSubMenuStyle: (props: MobileStyledHeaderSubMenuProps) => CSSObject = _ => ({
-  '*': {
-    fontWeight: 200,
-  },
-  alignItems: 'center',
-  borderTop: `1px solid ${COLOR.GRAY_LIGHTEN_72}`,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  marginTop: '16px',
-  paddingTop: '8px',
-});
+const mobileStyledHeaderSubMenuStyle: (props: MobileStyledHeaderSubMenuProps) => CSSObject = _ => {
+  return {
+    '*': {
+      fontWeight: 200,
+    },
+    alignItems: 'center',
+    borderTop: `1px solid ${COLOR.GRAY_LIGHTEN_72}`,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginTop: '16px',
+    paddingTop: '8px',
+  };
+};
 
-export const MobileStyledHeaderSubMenu = (props: MobileStyledHeaderSubMenuProps) => (
-  <span css={mobileStyledHeaderSubMenuStyle(props)} {...props} />
-);
+export const MobileStyledHeaderSubMenu = (props: MobileStyledHeaderSubMenuProps) => {
+  return <span css={mobileStyledHeaderSubMenuStyle(props)} {...props} />;
+};
 
 export interface HeaderSubMenuProps<T = HTMLParagraphElement> extends React.PropsWithRef<React.HTMLProps<T>> {
   caption: string;

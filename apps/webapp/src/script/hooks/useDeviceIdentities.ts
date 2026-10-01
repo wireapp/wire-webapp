@@ -31,7 +31,9 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   const core = container.resolve(Core);
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
   const getDeviceIdentity = (deviceId: string) => {
-    return deviceIdentities?.find(identity => identity.deviceId === deviceId);
+    return deviceIdentities?.find(identity => {
+      return identity.deviceId === deviceId;
+    });
   };
 
   const refreshDeviceIdentities = useCallback(async () => {
@@ -64,7 +66,12 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   let status: MLSStatuses | undefined;
   if (!deviceIdentities) {
     status = undefined;
-  } else if (deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)) {
+  } else if (
+    deviceIdentities.length > 0 &&
+    deviceIdentities.every(identity => {
+      return identity.status === MLSStatuses.VALID;
+    })
+  ) {
     status = MLSStatuses.VALID;
   } else {
     status = MLSStatuses.NOT_ACTIVATED;

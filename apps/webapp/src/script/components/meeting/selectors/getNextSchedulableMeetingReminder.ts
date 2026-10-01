@@ -35,17 +35,23 @@ export type SchedulableMeetingReminder = {
   fireAt: number;
 };
 
-const hasValidSeriesStart = (meeting: MeetingSeries): boolean => !Number.isNaN(Date.parse(meeting.series_start_date));
+const hasValidSeriesStart = (meeting: MeetingSeries): boolean => {
+  return !Number.isNaN(Date.parse(meeting.series_start_date));
+};
 
-const toReminder = (meetingInstance: MeetingInstance): SchedulableMeetingReminder => ({
-  occurrenceStart: meetingInstance.start,
-  fireAt: meetingInstance.start.getTime() - MEETING_REMINDER_OFFSET_MS,
-});
+const toReminder = (meetingInstance: MeetingInstance): SchedulableMeetingReminder => {
+  return {
+    occurrenceStart: meetingInstance.start,
+    fireAt: meetingInstance.start.getTime() - MEETING_REMINDER_OFFSET_MS,
+  };
+};
 
 export const getNextSchedulableMeetingReminder = (
   meeting: MeetingSeries,
   nowMs: number,
-  hasFiredOccurrence: (occurrenceStartMs: number) => boolean = () => false,
+  hasFiredOccurrence: (occurrenceStartMs: number) => boolean = () => {
+    return false;
+  },
 ): Maybe<SchedulableMeetingReminder> => {
   if (!hasValidSeriesStart(meeting)) {
     return Maybe.nothing();

@@ -23,8 +23,9 @@ import {CallingEvent} from 'Repositories/event/CallingEvent';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
-export const isIncomingSetupOffer = (content: CallingEvent['content']): boolean =>
-  content.type === CALL_MESSAGE_TYPE.SETUP && content.resp === false;
+export const isIncomingSetupOffer = (content: CallingEvent['content']): boolean => {
+  return content.type === CALL_MESSAGE_TYPE.SETUP && content.resp === false;
+};
 
 export const shouldRejectStaleIncomingRing = ({
   shouldRing,
@@ -41,5 +42,7 @@ export const shouldRejectStaleIncomingRing = ({
     return false;
   }
 
-  return incomingSetupReceivedAtMs.mapOr(false, receivedAtMs => nowMs - receivedAtMs > lifetimeMs);
+  return incomingSetupReceivedAtMs.mapOr(false, receivedAtMs => {
+    return nowMs - receivedAtMs > lifetimeMs;
+  });
 };

@@ -112,11 +112,15 @@ describe('AssetAPI', () => {
     });
 
     it('should throw TypeError for invalid asset ID', () => {
-      expect(() => assetAPI.getAsset('invalid id!', validDomain)).toThrow(TypeError);
+      expect(() => {
+        return assetAPI.getAsset('invalid id!', validDomain);
+      }).toThrow(TypeError);
     });
 
     it('should throw TypeError for invalid domain', () => {
-      expect(() => assetAPI.getAsset(validAssetId, 'invalid domain')).toThrow(TypeError);
+      expect(() => {
+        return assetAPI.getAsset(validAssetId, 'invalid domain');
+      }).toThrow(TypeError);
     });
 
     it('should handle cancellation', async () => {
@@ -178,7 +182,9 @@ describe('AssetAPI', () => {
     });
 
     it('should throw TypeError for invalid asset ID', () => {
-      expect(() => assetAPI.getServiceAsset('not valid!')).toThrow(TypeError);
+      expect(() => {
+        return assetAPI.getServiceAsset('not valid!');
+      }).toThrow(TypeError);
     });
   });
 
@@ -356,8 +362,12 @@ describe('AssetAPI', () => {
 
     it('should reject tokens with invalid characters', () => {
       const invalidToken = 'invalid token!';
-      expect(() => assetAPI.getAsset(validAssetId, validDomain, invalidToken)).toThrow(TypeError);
-      expect(() => assetAPI.getAsset(validAssetId, validDomain, invalidToken)).toThrow(/to be base64 encoded string/);
+      expect(() => {
+        return assetAPI.getAsset(validAssetId, validDomain, invalidToken);
+      }).toThrow(TypeError);
+      expect(() => {
+        return assetAPI.getAsset(validAssetId, validDomain, invalidToken);
+      }).toThrow(/to be base64 encoded string/);
     });
   });
 
@@ -396,8 +406,12 @@ describe('AssetAPI', () => {
 
       expect(getRequest.cancel).toBeInstanceOf(Function);
       expect(postRequest.cancel).toBeInstanceOf(Function);
-      expect(() => getRequest.cancel()).not.toThrow();
-      expect(() => postRequest.cancel()).not.toThrow();
+      expect(() => {
+        return getRequest.cancel();
+      }).not.toThrow();
+      expect(() => {
+        return postRequest.cancel();
+      }).not.toThrow();
     });
   });
 

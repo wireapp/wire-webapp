@@ -19,13 +19,15 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const OutlineCheck = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path
-      fill="#676B71"
-      fillRule="evenodd"
-      d="M14 8A6 6 0 1 1 2 8a6 6 0 0 1 12 0Zm2 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0Zm-8.659 3.27 5.128-5.127-1.414-1.415-4.42 4.421-1.69-1.69-1.414 1.415 2.396 2.396.707.708.707-.708Z"
-      clipRule="evenodd"
-    />
-  </SVGIcon>
-);
+export const OutlineCheck = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path
+        fill="#676B71"
+        fillRule="evenodd"
+        d="M14 8A6 6 0 1 1 2 8a6 6 0 0 1 12 0Zm2 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0Zm-8.659 3.27 5.128-5.127-1.414-1.415-4.42 4.421-1.69-1.69-1.414 1.415 2.396 2.396.707.708.707-.708Z"
+        clipRule="evenodd"
+      />
+    </SVGIcon>
+  );
+};

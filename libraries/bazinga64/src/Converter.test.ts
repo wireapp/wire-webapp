@@ -308,14 +308,16 @@ describe('hexStringToArrayBufferView', () => {
 
   it('should throw an error for invalid hex strings (odd length)', () => {
     const invalidHexString = '41d2b36'; // odd length
-    expect(() => bazinga64.Converter.hexStringToArrayBufferView(invalidHexString)).toThrow(
-      'Invalid hexadecimal string',
-    );
+    expect(() => {
+      return bazinga64.Converter.hexStringToArrayBufferView(invalidHexString);
+    }).toThrow('Invalid hexadecimal string');
   });
 
   it('should throw an error for non-hex characters', () => {
     const invalidHexString = '41d2b36zzz'; // contains non-hex characters (z)
-    expect(() => bazinga64.Converter.hexStringToArrayBufferView(invalidHexString)).toThrow();
+    expect(() => {
+      return bazinga64.Converter.hexStringToArrayBufferView(invalidHexString);
+    }).toThrow();
   });
 
   it('should handle an empty string', () => {

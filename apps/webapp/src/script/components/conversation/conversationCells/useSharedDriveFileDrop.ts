@@ -56,13 +56,15 @@ export const useSharedDriveFileDrop = ({
   showFileDropzoneError = showFileDropzoneErrorModal,
   translate,
   uploadPath,
-}: UseSharedDriveFileDropParameters): ((files: readonly File[], targetUploadPath?: string) => void) =>
-  useCallback(
-    (files: readonly File[], targetUploadPath = uploadPath): void =>
-      handleSharedDriveDroppedFiles(files, {
+}: UseSharedDriveFileDropParameters): ((files: readonly File[], targetUploadPath?: string) => void) => {
+  return useCallback(
+    (files: readonly File[], targetUploadPath = uploadPath): void => {
+      return handleSharedDriveDroppedFiles(files, {
         conversationQualifiedId,
         fireAndForgetInvoker,
-        isAcceptedFile: file => allowsAllFiles() || hasAllowedExtension(file.name),
+        isAcceptedFile: file => {
+          return allowsAllFiles() || hasAllowedExtension(file.name);
+        },
         isInRecycleBin,
         isUploadFilesEnabled,
         maxFileSize: CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS,
@@ -78,7 +80,8 @@ export const useSharedDriveFileDrop = ({
         },
         sharedDriveUploadController,
         uploadPath: targetUploadPath,
-      }),
+      });
+    },
     [
       conversationQualifiedId,
       fireAndForgetInvoker,
@@ -91,3 +94,4 @@ export const useSharedDriveFileDrop = ({
       uploadPath,
     ],
   );
+};

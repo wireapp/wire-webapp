@@ -46,24 +46,27 @@ interface SharedDriveDropzoneProps {
   readonly onDropReadError: () => void;
 }
 
-const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean =>
-  Array.from(event.dataTransfer.types).includes('Files');
+const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
+  return Array.from(event.dataTransfer.types).includes('Files');
+};
 
 const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.preventDefault();
   event.stopPropagation();
 };
 
-const UploadFilesIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M0 21L24 21V24L0 24L0 21ZM10.5 16.5H13.5L13.5 6L19.5 6L12 0L4.5 6H10.5L10.5 16.5Z"
-      fill="currentColor"
-    />
-  </svg>
-);
+const UploadFilesIcon = () => {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M0 21L24 21V24L0 24L0 21ZM10.5 16.5H13.5L13.5 6L19.5 6L12 0L4.5 6H10.5L10.5 16.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
 
 export const SharedDriveDropzone = ({
   children,
@@ -107,7 +110,9 @@ export const SharedDriveDropzone = ({
       return undefined;
     }
 
-    const resetActiveDragState = (): void => resetDragState({notifyParent: true});
+    const resetActiveDragState = (): void => {
+      return resetDragState({notifyParent: true});
+    };
 
     window.addEventListener('drop', resetActiveDragState);
     window.addEventListener('dragend', resetActiveDragState);

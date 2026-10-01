@@ -60,7 +60,9 @@ type ClearSearchRefreshOptions = {
 
 const DEBOUNCE_TIME = 300;
 
-const normalizeSearchQuery = (query: string): string => (isNonEmptyStringAndNotWhitespace(query) ? query.trim() : '');
+const normalizeSearchQuery = (query: string): string => {
+  return isNonEmptyStringAndNotWhitespace(query) ? query.trim() : '';
+};
 
 export const useConversationSearchFiles = ({
   cellsRepository,
@@ -83,7 +85,9 @@ export const useConversationSearchFiles = ({
   // Prevents stale in-flight responses from overwriting the store after the search view closes.
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
-  const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
+  const searchParams = useMemo(() => {
+    return toConversationDriveSearchParams(filters);
+  }, [filters]);
   const hasActiveParams = hasActiveSearchParams(searchParams);
   const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
   const hadActiveSearchParamsRef = useRef(hasActiveParams);
@@ -169,7 +173,9 @@ export const useConversationSearchFiles = ({
         }
 
         // filter out draft nodes from results
-        const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
+        const filteredNodes = result.Nodes.filter(node => {
+          return node.IsDraft !== true;
+        });
         const transformedNodes = transformCellsNodes({nodes: filteredNodes, users});
 
         if (append) {

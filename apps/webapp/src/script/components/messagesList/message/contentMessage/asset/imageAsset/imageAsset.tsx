@@ -81,13 +81,15 @@ export const ImageAsset: FunctionComponent<ImageAssetProps> = (properties: Image
           alt={imageAltText}
           data-uie-name="go-image-detail"
           data-uie-visible={visible && !isObfuscated}
-          onClick={event => onClick(message, event)}
+          onClick={event => {
+            return onClick(message, event);
+          }}
           getAssetUrl={getAssetUrl}
           logger={logger}
           retryLabel={retryLabel}
-          onKeyDown={event =>
-            handleKeyDown({event, callback: onClick.bind(null, message, event), keys: [KEY.ENTER, KEY.SPACE]})
-          }
+          onKeyDown={event => {
+            return handleKeyDown({event, callback: onClick.bind(null, message, event), keys: [KEY.ENTER, KEY.SPACE]});
+          }}
           tabIndex={0}
           role="button"
           aria-label={imageAltText}

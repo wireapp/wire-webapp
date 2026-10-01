@@ -95,14 +95,18 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
 
       setTimeout(() => {
         const id = toast.custom(
-          toastId => (
-            <AppNotification
-              message={isNonEmptyString(options?.message) ? options.message : (props?.message ?? '')}
-              icon={props?.icon}
-              withCloseButton={props?.withCloseButton}
-              onClose={() => toast.dismiss(toastId)}
-            />
-          ),
+          toastId => {
+            return (
+              <AppNotification
+                message={isNonEmptyString(options?.message) ? options.message : (props?.message ?? '')}
+                icon={props?.icon}
+                withCloseButton={props?.withCloseButton}
+                onClose={() => {
+                  return toast.dismiss(toastId);
+                }}
+              />
+            );
+          },
           {
             duration: props?.autoClose === false ? Infinity : NOTIFICATION_TIMEOUT_MS,
             position: 'top-center',

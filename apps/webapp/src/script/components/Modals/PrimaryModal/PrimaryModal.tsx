@@ -58,17 +58,29 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
   const [passwordConfirmationValue, setPasswordConfirmationValue] = useState<string>('');
   const [didCopyPassword, setDidCopyPassword] = useState<boolean>(false);
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
-  const content = usePrimaryModalState(state => state.currentModalContent);
-  const errorMessage = usePrimaryModalState(state => state.errorMessage);
-  const updateErrorMessage = usePrimaryModalState(state => state.updateErrorMessage);
-  const updateCurrentModalContent = usePrimaryModalState(state => state.updateCurrentModalContent);
-  const currentId = usePrimaryModalState(state => state.currentModalId);
+  const content = usePrimaryModalState(state => {
+    return state.currentModalContent;
+  });
+  const errorMessage = usePrimaryModalState(state => {
+    return state.errorMessage;
+  });
+  const updateErrorMessage = usePrimaryModalState(state => {
+    return state.updateErrorMessage;
+  });
+  const updateCurrentModalContent = usePrimaryModalState(state => {
+    return state.updateCurrentModalContent;
+  });
+  const currentId = usePrimaryModalState(state => {
+    return state.currentModalId;
+  });
   const primaryActionButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const isModalVisible = currentId !== null;
   const passwordValueRef = useRef<HTMLInputElement>(null);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-  const isBackupPasswordValid = useMemo(() => passwordInput === '' || isValidPassword(passwordInput), [passwordInput]);
+  const isBackupPasswordValid = useMemo(() => {
+    return passwordInput === '' || isValidPassword(passwordInput);
+  }, [passwordInput]);
 
   const {
     checkboxLabel,
@@ -157,9 +169,8 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     return !inputActionEnabled && !actionEnabled;
   };
 
-  const performAction =
-    (action?: Function, closeAfter = true, skipValidation = false) =>
-    (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
+  const performAction = (action?: Function, closeAfter = true, skipValidation = false) => {
+    return (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
 
       if (!skipValidation && !inputActionEnabled) {
@@ -184,6 +195,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         removeCurrentModal();
       }
     };
+  };
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
@@ -191,12 +203,24 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
       return;
     }
     const actions = {
-      [PrimaryModalType.OPTION]: () => action(optionChecked),
-      [PrimaryModalType.INPUT]: () => action(inputValue),
-      [PrimaryModalType.PASSWORD]: () => action(passwordValue),
-      [PrimaryModalType.GUEST_LINK_PASSWORD]: () => action(passwordValue, didCopyPassword),
-      [PrimaryModalType.JOIN_GUEST_LINK_PASSWORD]: () => action(passwordValue),
-      [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput, isFormSubmitted),
+      [PrimaryModalType.OPTION]: () => {
+        return action(optionChecked);
+      },
+      [PrimaryModalType.INPUT]: () => {
+        return action(inputValue);
+      },
+      [PrimaryModalType.PASSWORD]: () => {
+        return action(passwordValue);
+      },
+      [PrimaryModalType.GUEST_LINK_PASSWORD]: () => {
+        return action(passwordValue, didCopyPassword);
+      },
+      [PrimaryModalType.JOIN_GUEST_LINK_PASSWORD]: () => {
+        return action(passwordValue);
+      },
+      [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => {
+        return action(passwordInput, isFormSubmitted);
+      },
     };
 
     if (Object.keys(actions).includes(content?.currentType ?? '')) {
@@ -243,7 +267,9 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
       }
     }, 0);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      return clearTimeout(timeoutId);
+    };
   }, [isModalVisible, primaryBtnFirst]);
 
   const onKeyDown = useCallback(
@@ -268,22 +294,28 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     }
 
     document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => {
+      return document.removeEventListener('keydown', onKeyDown);
+    };
   }, [isModalVisible, primaryAction, closeAction, onKeyDown]);
 
   const secondaryButtons = secondaryActions
-    .filter((action): action is ButtonAction => action !== null && action.text !== undefined && action.text !== '')
-    .map(action => (
-      <SecondaryButton
-        key={`${action.text}-${action.uieName}`}
-        onClick={performAction(action.action, closeOnSecondaryAction ?? false, true)}
-        disabled={action.disabled}
-        fullWidth={hasMultipleSecondary || allButtonsFullWidth}
-        uieName={action.uieName}
-      >
-        {action.text}
-      </SecondaryButton>
-    ));
+    .filter((action): action is ButtonAction => {
+      return action !== null && action.text !== undefined && action.text !== '';
+    })
+    .map(action => {
+      return (
+        <SecondaryButton
+          key={`${action.text}-${action.uieName}`}
+          onClick={performAction(action.action, closeOnSecondaryAction ?? false, true)}
+          disabled={action.disabled}
+          fullWidth={hasMultipleSecondary || allButtonsFullWidth}
+          uieName={action.uieName}
+        >
+          {action.text}
+        </SecondaryButton>
+      );
+    });
 
   const primaryButton = primaryAction?.text !== undefined && primaryAction.text !== '' && (
     <PrimaryButton
@@ -350,7 +382,9 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
             textToCopy={passwordValue}
             displayText={translate('guestOptionsPasswordCopyToClipboard')}
             copySuccessText={translate('guestOptionsPasswordCopyToClipboardSuccess')}
-            onCopySuccess={() => setDidCopyPassword(true)}
+            onCopySuccess={() => {
+              return setDidCopyPassword(true);
+            }}
           />
         )}
 

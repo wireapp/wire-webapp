@@ -323,7 +323,9 @@ export class CanvasMediaStreamMixer {
     [this.screenVideo, this.cameraVideo].forEach(video => {
       if (!isNullOrUndefined(video)) {
         const tracks = video.srcObject as MediaStream;
-        tracks?.getTracks().forEach(track => track.stop());
+        tracks?.getTracks().forEach(track => {
+          track.stop();
+        });
         video.srcObject = null;
         if (document.body.contains(video)) {
           document.body.removeChild(video);

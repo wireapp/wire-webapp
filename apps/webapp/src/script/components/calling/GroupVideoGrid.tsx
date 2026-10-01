@@ -207,27 +207,29 @@ const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndC
   return {'--columns': columns, '--rows': rows};
 };
 
-const GroupVideoThumbnailWrapper = ({children, minimized}: {children?: ReactNode; minimized: boolean}) => (
-  <div
-    className="group-video__thumbnail"
-    css={
-      minimized
-        ? css`
-            bottom: unset;
-            box-shadow: 0 0 0 1px var(--gray-90);
-            height: 40px;
-            right: 8px;
-            top: 8px;
-            width: 70px;
-          `
-        : undefined
-    }
-    data-uie-name="self-video-thumbnail-wrapper"
-    aria-hidden="true"
-  >
-    {children}
-  </div>
-);
+const GroupVideoThumbnailWrapper = ({children, minimized}: {children?: ReactNode; minimized: boolean}) => {
+  return (
+    <div
+      className="group-video__thumbnail"
+      css={
+        minimized
+          ? css`
+              bottom: unset;
+              box-shadow: 0 0 0 1px var(--gray-90);
+              height: 40px;
+              right: 8px;
+              top: 8px;
+              width: 70px;
+            `
+          : undefined
+      }
+      data-uie-name="self-video-thumbnail-wrapper"
+      aria-hidden="true"
+    >
+      {children}
+    </div>
+  );
+};
 
 const HEIGHT_QUERIES = {
   SHORT: 'max-height: 469px',
@@ -272,7 +274,10 @@ const GroupVideoGrid = ({
       return;
     }
 
-    const participant = grid.grid.find(participant => participant.doesMatchIds(userId, clientId)) ?? null;
+    const participant =
+      grid.grid.find(participant => {
+        return participant.doesMatchIds(userId, clientId);
+      }) ?? null;
     setMaximizedParticipant(participant);
   };
 
@@ -359,17 +364,19 @@ const GroupVideoGrid = ({
             </div>
           </div>
         )}
-        {participants.map(participant => (
-          <GroupVideoGridTile
-            minimized={minimized}
-            participant={participant}
-            key={participant.clientId}
-            selfParticipant={selfParticipant}
-            participantCount={participants.length}
-            isMaximized={!isNullOrUndefined(maximizedParticipant)}
-            onTileDoubleClick={doubleClickedOnVideo}
-          />
-        ))}
+        {participants.map(participant => {
+          return (
+            <GroupVideoGridTile
+              minimized={minimized}
+              participant={participant}
+              key={participant.clientId}
+              selfParticipant={selfParticipant}
+              participantCount={participants.length}
+              isMaximized={!isNullOrUndefined(maximizedParticipant)}
+              onTileDoubleClick={doubleClickedOnVideo}
+            />
+          );
+        })}
       </div>
       {!isNullOrUndefined(grid.thumbnail) && (
         <GroupVideoThumbnail

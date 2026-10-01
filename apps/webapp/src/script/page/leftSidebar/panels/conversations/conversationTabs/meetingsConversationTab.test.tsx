@@ -35,21 +35,24 @@ import {MeetingsConversationTab} from './meetingsConversationTab';
 import {SidebarTabs} from '../useSidebarStore';
 
 describe('MeetingsConversationTab', () => {
-  const createMeetingStoreForTest = (loadMeetings: jest.Mock) =>
-    createStore<MeetingStoreState>(() => ({
-      meetingSeries: [],
-      isLoading: false,
-      hasLoadError: false,
-      loadMeetings,
-      scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-      meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-      updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-      deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
-      deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
-      removeMeetingByQualifiedId: jest.fn(),
-      syncMeetingByQualifiedId: jest.fn(),
-      loadMeetingForEdit: jest.fn(),
-    }));
+  const createMeetingStoreForTest = (loadMeetings: jest.Mock) => {
+    return createStore<MeetingStoreState>(() => {
+      return {
+        meetingSeries: [],
+        isLoading: false,
+        hasLoadError: false,
+        loadMeetings,
+        scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+        meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+        updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+        deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+        deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+        removeMeetingByQualifiedId: jest.fn(),
+        syncMeetingByQualifiedId: jest.fn(),
+        loadMeetingForEdit: jest.fn(),
+      };
+    });
+  };
 
   it('refreshes meetings when switching to the tab from another tab', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
@@ -75,7 +78,9 @@ describe('MeetingsConversationTab', () => {
     act(() => {
       screen.getByRole('tab', {name: 'meetings.navigation.label'}).click();
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(onChangeTab).toHaveBeenCalledWith(SidebarTabs.MEETINGS);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
@@ -105,7 +110,9 @@ describe('MeetingsConversationTab', () => {
     act(() => {
       screen.getByRole('tab', {name: 'meetings.navigation.label'}).click();
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(onChangeTab).toHaveBeenCalledWith(SidebarTabs.MEETINGS);
     expect(loadMeetings).not.toHaveBeenCalled();

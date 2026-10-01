@@ -33,10 +33,12 @@ const createTestProps = () => {
   const handleScheduleMeeting = jest.fn();
 
   const props: MeetingMultiActionButtonProps = {
-    useMeetingActionsHook: () => ({
-      handleMeetNow,
-      handleScheduleMeeting,
-    }),
+    useMeetingActionsHook: () => {
+      return {
+        handleMeetNow,
+        handleScheduleMeeting,
+      };
+    },
   };
 
   return {props, handleMeetNow, handleScheduleMeeting};

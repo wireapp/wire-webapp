@@ -341,7 +341,9 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     if (currentConversation) {
       await messageRepository.updateAllClients(currentConversation, false);
       const allUsers = await conversationRepository.getAllUsersInConversation(currentConversation);
-      const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
+      const legalHoldUsers = allUsers.filter(user => {
+        return user.isOnLegalHold();
+      });
 
       if (legalHoldUsers.length === 0) {
         setIsModalOpen(false);
@@ -421,8 +423,12 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                 type="password"
                 value={passwordValue}
                 placeholder={translate('login.passwordPlaceholder')}
-                onChange={ev => setPasswordValue(ev.target.value)}
-                onKeyDown={ev => handleEnterDown(ev, acceptRequest)}
+                onChange={ev => {
+                  return setPasswordValue(ev.target.value);
+                }}
+                onKeyDown={ev => {
+                  return handleEnterDown(ev, acceptRequest);
+                }}
               />
             )}
 

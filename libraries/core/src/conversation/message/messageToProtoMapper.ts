@@ -102,7 +102,9 @@ export class MessageToProtoMapper {
     }
 
     if (mentions !== undefined && mentions.length > 0) {
-      textMessage.mentions = mentions.map(mention => Mention.create(mention));
+      textMessage.mentions = mentions.map(mention => {
+        return Mention.create(mention);
+      });
     }
 
     if (quote !== undefined) {

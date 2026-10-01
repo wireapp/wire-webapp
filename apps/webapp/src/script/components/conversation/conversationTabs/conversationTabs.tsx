@@ -126,11 +126,15 @@ export const ConversationTabs = ({
   useEffect(() => {
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      return window.removeEventListener('hashchange', handleHashChange);
+    };
   }, [handleHashChange]);
 
   useEffect(() => {
-    const updateUploadStatus = () => setUploadStatus(readUploadStatus());
+    const updateUploadStatus = () => {
+      return setUploadStatus(readUploadStatus());
+    };
     updateUploadStatus();
     return sharedDriveUploadController.subscribe(updateUploadStatus);
   }, [readUploadStatus, sharedDriveUploadController]);

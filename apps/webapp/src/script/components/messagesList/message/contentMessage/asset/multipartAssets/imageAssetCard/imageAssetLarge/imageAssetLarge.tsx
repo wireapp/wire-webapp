@@ -82,7 +82,9 @@ export const ImageAssetLarge = ({
     <>
       <button
         css={containerStyles}
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          return setIsOpen(true);
+        }}
         aria-label={translate('accessibility.conversationAssetImageAlt', {
           username: senderName,
           messageDate: timestamp,
@@ -119,7 +121,9 @@ export const ImageAssetLarge = ({
               } as CSSProperties
             }
             width={metadata?.width}
-            onLoad={() => setIsLoaded(true)}
+            onLoad={() => {
+              return setIsLoaded(true);
+            }}
             onError={() => {
               setHasLoadError(true);
               setIsLoaded(true);
@@ -130,7 +134,9 @@ export const ImageAssetLarge = ({
       <FileFullscreenModal
         id={id}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          return setIsOpen(false);
+        }}
         filePreviewUrl={filePreviewUrl}
         fileExtension={extension}
         fileUrl={fileUrl}

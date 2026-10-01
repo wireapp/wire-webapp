@@ -77,18 +77,26 @@ export interface MeetingListProps {
 const filterVisibleMeetingInstances = (
   meetingInstancesByDay: MeetingInstancesByDay[],
   nowMilliseconds: number,
-): MeetingInstancesByDay[] =>
-  meetingInstancesByDay
-    .map(dayGroup => ({
-      ...dayGroup,
-      meetingInstances: dayGroup.meetingInstances.filter(meetingInstance =>
-        isMeetingInstanceVisibleInMeetingList(meetingInstance, nowMilliseconds),
-      ),
-    }))
-    .filter(dayGroup => isNonEmptyArray(dayGroup.meetingInstances));
+): MeetingInstancesByDay[] => {
+  return meetingInstancesByDay
+    .map(dayGroup => {
+      return {
+        ...dayGroup,
+        meetingInstances: dayGroup.meetingInstances.filter(meetingInstance => {
+          return isMeetingInstanceVisibleInMeetingList(meetingInstance, nowMilliseconds);
+        }),
+      };
+    })
+    .filter(dayGroup => {
+      return isNonEmptyArray(dayGroup.meetingInstances);
+    });
+};
 
-const getVisibleDayGroups = (meetingInstancesByDay: MeetingInstancesByDay[]): MeetingInstancesByDay[] =>
-  meetingInstancesByDay.filter(dayGroup => isNonEmptyArray(dayGroup.meetingInstances));
+const getVisibleDayGroups = (meetingInstancesByDay: MeetingInstancesByDay[]): MeetingInstancesByDay[] => {
+  return meetingInstancesByDay.filter(dayGroup => {
+    return isNonEmptyArray(dayGroup.meetingInstances);
+  });
+};
 
 const getMeetingDayDescriptionId = (meetingInstance: MeetingInstance): string => {
   const {meetingSeries, start} = meetingInstance;
@@ -142,27 +150,36 @@ export const MeetingList = ({
   useMeetingListVirtualizer: useMeetingListVirtualizerDependency = useMeetingListVirtualizer,
 }: MeetingListProps) => {
   const {translate, clock} = useApplicationContext();
-  const [nowMilliseconds, setNowMilliseconds] = useState(() => clock.currentUnixEpochMilliseconds);
+  const [nowMilliseconds, setNowMilliseconds] = useState(() => {
+    return clock.currentUnixEpochMilliseconds;
+  });
 
   useEffect(() => {
-    const id = clock.setInterval(() => setNowMilliseconds(clock.currentUnixEpochMilliseconds), TIME_IN_MILLIS.SECOND);
-    return () => clock.clearInterval(id);
+    const id = clock.setInterval(() => {
+      return setNowMilliseconds(clock.currentUnixEpochMilliseconds);
+    }, TIME_IN_MILLIS.SECOND);
+    return () => {
+      return clock.clearInterval(id);
+    };
   }, [clock]);
 
   const visibleDayStartTimestamp = startOfDay(new Date(nowMilliseconds)).getTime();
-  const visibleDayStart = useMemo(() => new Date(visibleDayStartTimestamp), [visibleDayStartTimestamp]);
+  const visibleDayStart = useMemo(() => {
+    return new Date(visibleDayStartTimestamp);
+  }, [visibleDayStartTimestamp]);
 
-  const initialMeetingInstancePage = useMemo(
-    () => getMeetingInstancePage(meetingSeries, visibleDayStart, INITIAL_MEETING_INSTANCE_COUNT),
-    [meetingSeries, visibleDayStart],
-  );
+  const initialMeetingInstancePage = useMemo(() => {
+    return getMeetingInstancePage(meetingSeries, visibleDayStart, INITIAL_MEETING_INSTANCE_COUNT);
+  }, [meetingSeries, visibleDayStart]);
   const [pagingState, setPagingState] = useState<{
     sourcePage: MeetingInstancePage;
     combinedPage: MeetingInstancePage;
-  }>(() => ({
-    sourcePage: initialMeetingInstancePage,
-    combinedPage: initialMeetingInstancePage,
-  }));
+  }>(() => {
+    return {
+      sourcePage: initialMeetingInstancePage,
+      combinedPage: initialMeetingInstancePage,
+    };
+  });
   const meetingInstancePage =
     pagingState.sourcePage === initialMeetingInstancePage ? pagingState.combinedPage : initialMeetingInstancePage;
 
@@ -196,26 +213,31 @@ export const MeetingList = ({
     });
   }, [initialMeetingInstancePage]);
 
-  const expandedMeetingInstancesByDay = useMemo(
-    () => groupMeetingInstancesByDay(meetingInstancePage.meetingInstances),
-    [meetingInstancePage.meetingInstances],
-  );
+  const expandedMeetingInstancesByDay = useMemo(() => {
+    return groupMeetingInstancesByDay(meetingInstancePage.meetingInstances);
+  }, [meetingInstancePage.meetingInstances]);
 
-  const meetingInstancesByDay = useMemo(
-    () => filterVisibleMeetingInstances(expandedMeetingInstancesByDay, nowMilliseconds),
-    [expandedMeetingInstancesByDay, nowMilliseconds],
-  );
+  const meetingInstancesByDay = useMemo(() => {
+    return filterVisibleMeetingInstances(expandedMeetingInstancesByDay, nowMilliseconds);
+  }, [expandedMeetingInstancesByDay, nowMilliseconds]);
 
-  const visibleDayGroups = useMemo(() => getVisibleDayGroups(meetingInstancesByDay), [meetingInstancesByDay]);
-  const timelineItems = useMemo(() => getMeetingListTimelineItems(visibleDayGroups), [visibleDayGroups]);
+  const visibleDayGroups = useMemo(() => {
+    return getVisibleDayGroups(meetingInstancesByDay);
+  }, [meetingInstancesByDay]);
+  const timelineItems = useMemo(() => {
+    return getMeetingListTimelineItems(visibleDayGroups);
+  }, [visibleDayGroups]);
 
-  const getScrollElement = useCallback(() => scrollElementRef?.current ?? null, [scrollElementRef]);
+  const getScrollElement = useCallback(() => {
+    return scrollElementRef?.current ?? null;
+  }, [scrollElementRef]);
 
   const getEstimatedItemHeight = useCallback(
-    (itemIndex: number) =>
-      timelineItems[itemIndex]?.type === 'dayHeader'
+    (itemIndex: number) => {
+      return timelineItems[itemIndex]?.type === 'dayHeader'
         ? MEETING_DAY_GROUP_SECTION_TOP_PADDING + MEETING_DAY_GROUP_HEADER_HEIGHT
-        : MEETING_LIST_ITEM_HEIGHT,
+        : MEETING_LIST_ITEM_HEIGHT;
+    },
     [timelineItems],
   );
 

@@ -64,7 +64,9 @@ describe('LogFactory', () => {
   describe('writeMessage', () => {
     const logDir = path.join(__dirname, '../../.temp');
 
-    afterEach(() => fs.remove(logDir));
+    afterEach(() => {
+      return fs.remove(logDir);
+    });
 
     it('appends text to a log file', async () => {
       const logFile = path.join(logDir, 'test.log');

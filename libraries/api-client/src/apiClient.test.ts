@@ -34,7 +34,9 @@ const apiClients: APIClient[] = [];
 
 describe('APIClient', () => {
   afterAll(() => {
-    apiClients.forEach(client => client.disconnect());
+    apiClients.forEach(client => {
+      client.disconnect();
+    });
   });
 
   const baseUrl = APIClient.BACKEND.PRODUCTION.rest;

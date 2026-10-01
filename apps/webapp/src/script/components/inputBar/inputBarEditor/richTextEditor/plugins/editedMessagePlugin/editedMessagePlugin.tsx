@@ -65,7 +65,13 @@ export function EditedMessagePlugin({message, showMarkdownPreview}: Props): null
 
           const mentionNodes = getMentionNodesFromMessage(message);
 
-          const allowedMentions = [...new Set(mentionNodes.map(node => node.getTextContent()))];
+          const allowedMentions = [
+            ...new Set(
+              mentionNodes.map(node => {
+                return node.getTextContent();
+              }),
+            ),
+          ];
 
           const wrappedWithTags = wrapMentionsWithTags(messageContent, allowedMentions);
 

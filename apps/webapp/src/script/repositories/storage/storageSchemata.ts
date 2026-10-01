@@ -313,7 +313,9 @@ export class StorageSchemata {
             .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
             .toCollection()
             .toArray()
-            .then(items => database.table(StorageSchemata.OBJECT_STORE.EVENTS).bulkPut(items));
+            .then(items => {
+              return database.table(StorageSchemata.OBJECT_STORE.EVENTS).bulkPut(items);
+            });
         },
         version: 13,
       },
@@ -419,13 +421,14 @@ export class StorageSchemata {
       },
       {
         schema: {},
-        upgrade: (transaction: Transaction) =>
-          transaction
+        upgrade: (transaction: Transaction) => {
+          return transaction
             .table(StorageSchemata.OBJECT_STORE.CONVERSATIONS)
             .toCollection()
             .modify((conversation: ConversationRecord) => {
               conversation.initial_protocol = conversation.protocol;
-            }),
+            });
+        },
         version: 20,
       },
       {

@@ -34,7 +34,9 @@ const LogoutSection = ({clientRepository}: LogoutSectionProps) => {
       <Button
         tabIndex={TabIndex.FOCUSABLE}
         type="button"
-        onClick={() => clientRepository.logoutClient()}
+        onClick={() => {
+          return clientRepository.logoutClient();
+        }}
         data-uie-name="do-logout"
         variant={ButtonVariant.TERTIARY}
       >

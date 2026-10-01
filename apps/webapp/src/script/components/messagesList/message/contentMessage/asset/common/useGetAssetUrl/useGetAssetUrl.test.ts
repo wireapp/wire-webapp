@@ -68,13 +68,14 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       const rendered = renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrl,
             onSuccess: mockOnSuccess,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
       result = rendered.result;
@@ -92,12 +93,13 @@ describe('useGetAssetUrl', () => {
   it('does not fetch when disabled', async () => {
     await act(async () => {
       renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: false,
             getAssetUrl: mockGetAssetUrl,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
       await Promise.resolve();
@@ -114,13 +116,14 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       const rendered = renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrlWithError,
             onError: mockOnError,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
       result = rendered.result;
@@ -141,13 +144,14 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       const rendered = renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrlWithCancel,
             onError: mockOnError,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
       result = rendered.result;
@@ -163,12 +167,13 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       const rendered = renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrl,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -189,12 +194,13 @@ describe('useGetAssetUrl', () => {
   it('updates asset status correctly through the lifecycle', async () => {
     await act(async () => {
       renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrl,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
 
@@ -211,12 +217,13 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       const rendered = renderHook(
-        (properties: UseGetAssetUrlEnabledState) =>
-          useGetAssetUrl({
+        (properties: UseGetAssetUrlEnabledState) => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: properties.isEnabled,
             getAssetUrl: mockGetAssetUrl,
-          }),
+          });
+        },
         {initialProps: {isEnabled: false}, wrapper: rootProviderWrapper},
       );
       rerender = rendered.rerender;
@@ -238,13 +245,14 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrl,
             onSuccess: mockOnSuccess,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
       await Promise.resolve();
@@ -261,13 +269,14 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrlWithError,
             onError: mockOnError,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
       await Promise.resolve();
@@ -285,13 +294,14 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrlWithCancel,
             onError: mockOnError,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
       await Promise.resolve();
@@ -304,17 +314,20 @@ describe('useGetAssetUrl', () => {
     let loadingStateBeforeCompletion = false;
     const mockGetAssetUrlSlow = jest.fn(async () => {
       // Delay to allow checking the loading state
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 10);
+      });
       return mockAssetUrl;
     });
 
     const {result} = renderHook(
-      () =>
-        useGetAssetUrl({
+      () => {
+        return useGetAssetUrl({
           asset: mockAsset,
           isEnabled: true,
           getAssetUrl: mockGetAssetUrlSlow,
-        }),
+        });
+      },
       {wrapper: rootProviderWrapper},
     );
 
@@ -326,7 +339,9 @@ describe('useGetAssetUrl', () => {
 
     // Wait for the fetch to complete
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 20);
+      });
     });
 
     expect(loadingStateBeforeCompletion).toBe(true);
@@ -339,12 +354,13 @@ describe('useGetAssetUrl', () => {
 
     await act(async () => {
       renderHook(
-        () =>
-          useGetAssetUrl({
+        () => {
+          return useGetAssetUrl({
             asset: mockAsset,
             isEnabled: true,
             getAssetUrl: mockGetAssetUrlWithError,
-          }),
+          });
+        },
         {wrapper: rootProviderWrapper},
       );
       await Promise.resolve();

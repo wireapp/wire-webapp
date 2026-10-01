@@ -369,7 +369,9 @@ export class ConversationAPI {
   public async getConversationList(conversationIdsToSkip: QualifiedId[] = []): Promise<RemoteConversations> {
     const allConversationIds = await this.getQualifiedConversationIds();
     const filteredConversationIds = allConversationIds.filter(qualifiedId => {
-      return !conversationIdsToSkip.some(({id, domain}) => id === qualifiedId.id && domain === qualifiedId.domain);
+      return !conversationIdsToSkip.some(({id, domain}) => {
+        return id === qualifiedId.id && domain === qualifiedId.domain;
+      });
     });
 
     return this.getConversationsByQualifiedIds(filteredConversationIds);

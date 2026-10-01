@@ -45,10 +45,12 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
 
-jest.mock('@wireapp/react-ui-kit', () => ({
-  ...(jest.requireActual('@wireapp/react-ui-kit') as any),
-  useMatchMedia: jest.fn(),
-}));
+jest.mock('@wireapp/react-ui-kit', () => {
+  return {
+    ...(jest.requireActual('@wireapp/react-ui-kit') as any),
+    useMatchMedia: jest.fn(),
+  };
+});
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -86,7 +88,9 @@ describe('fullscreenVideoCall', () => {
     jest.useFakeTimers();
   });
 
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => {
+    return jest.useRealTimers();
+  });
 
   it('shows the calling timer', async () => {
     const props = createProps();
@@ -101,13 +105,17 @@ describe('fullscreenVideoCall', () => {
       props.call.startedAt(Date.now());
     });
 
-    await waitFor(() => expect(getByText('00:00')).toBeDefined());
+    await waitFor(() => {
+      return expect(getByText('00:00')).toBeDefined();
+    });
 
     act(() => {
       jest.advanceTimersByTime(1001);
     });
 
-    await waitFor(() => expect(getByText('00:01')).toBeDefined());
+    await waitFor(() => {
+      return expect(getByText('00:01')).toBeDefined();
+    });
   });
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
@@ -118,7 +126,9 @@ describe('fullscreenVideoCall', () => {
   });
 
   it('resets the maximized participant on active speaker switch', async () => {
-    useMatchMediaMock.mockImplementation(mediaQuery => mediaQuery === QUERY.desktop);
+    useMatchMediaMock.mockImplementation(mediaQuery => {
+      return mediaQuery === QUERY.desktop;
+    });
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
@@ -137,7 +147,9 @@ describe('fullscreenVideoCall', () => {
       callViewToggleButton.click();
     });
 
-    await waitFor(() => expect(getByText('videoCallOverlayViewModeLabel')).toBeDefined());
+    await waitFor(() => {
+      return expect(getByText('videoCallOverlayViewModeLabel')).toBeDefined();
+    });
 
     const viewModeAllSpeakersOption = getByText('videoCallOverlayViewModeSpeakers');
     act(() => {

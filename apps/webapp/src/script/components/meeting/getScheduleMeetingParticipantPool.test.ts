@@ -38,13 +38,21 @@ describe('getScheduleMeetingParticipantPool', () => {
     const connectedContact = createUser(connectedContactId, 'External Contact');
 
     const teamState = {
-      isTeam: () => true,
-      teamMembers: () => [teamMember],
-      teamUsers: () => [teamMember, connectedContact],
+      isTeam: () => {
+        return true;
+      },
+      teamMembers: () => {
+        return [teamMember];
+      },
+      teamUsers: () => {
+        return [teamMember, connectedContact];
+      },
     } as unknown as TeamState;
 
     const userState = {
-      connectedUsers: () => [connectedContact],
+      connectedUsers: () => {
+        return [connectedContact];
+      },
     } as unknown as UserState;
 
     const participants = getScheduleMeetingParticipantPool(userState, teamState);
@@ -57,12 +65,18 @@ describe('getScheduleMeetingParticipantPool', () => {
     const connectedContact = createUser(connectedContactId, 'Connected Contact');
 
     const teamState = {
-      isTeam: () => false,
-      teamMembers: () => [],
+      isTeam: () => {
+        return false;
+      },
+      teamMembers: () => {
+        return [];
+      },
     } as unknown as TeamState;
 
     const userState = {
-      connectedUsers: () => [connectedContact],
+      connectedUsers: () => {
+        return [connectedContact];
+      },
     } as unknown as UserState;
 
     const participants = getScheduleMeetingParticipantPool(userState, teamState);

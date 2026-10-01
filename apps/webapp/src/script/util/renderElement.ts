@@ -60,13 +60,12 @@ interface RenderElement {
   onClose?: () => void;
 }
 
-const renderElement =
-  <T extends RenderElement>(
-    Component: React.FC<T>,
-    parentElementId = 'wire-main',
-    style?: Partial<CSSStyleDeclaration>,
-  ) =>
-  (props: T) => {
+const renderElement = <T extends RenderElement>(
+  Component: React.FC<T>,
+  parentElementId = 'wire-main',
+  style?: Partial<CSSStyleDeclaration>,
+) => {
+  return (props: T) => {
     cleanUpElement(parentElementId);
 
     const parentElement = document.getElementById(parentElementId);
@@ -99,6 +98,7 @@ const renderElement =
     const element = React.createElement(Component, {...props, onClose}) as RootRenderParam;
     reactRoot.render(element);
   };
+};
 
 /**
  *  Copy styles from one document to another - link, style elements and body element class names.

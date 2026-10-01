@@ -41,8 +41,12 @@ export const PdfSidebar = forwardRef<HTMLDivElement, PdfSidebarProps>(
   ({sidebarOpen, pagesCount, currentPage, onPageChange, onNextPage, onPreviousPage}, ref) => {
     const rowVirtualizer = useVirtualizer({
       count: pagesCount,
-      getScrollElement: () => (ref as RefObject<HTMLDivElement>).current,
-      estimateSize: () => THUMBNAIL_SIZE,
+      getScrollElement: () => {
+        return (ref as RefObject<HTMLDivElement>).current;
+      },
+      estimateSize: () => {
+        return THUMBNAIL_SIZE;
+      },
       overscan: OVERSCAN,
     });
 
@@ -78,7 +82,9 @@ export const PdfSidebar = forwardRef<HTMLDivElement, PdfSidebarProps>(
                   sidebarOpen={sidebarOpen}
                   pageNumber={pageNumber}
                   isActive={pageNumber === currentPage}
-                  onClick={() => onPageChange(pageNumber)}
+                  onClick={() => {
+                    return onPageChange(pageNumber);
+                  }}
                 />
               </li>
             );

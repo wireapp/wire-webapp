@@ -29,7 +29,11 @@ describe('ClientAction', () => {
     const mockedActions = {};
     const mockedApiClient = {
       api: {
-        client: {getClients: () => Promise.resolve([])},
+        client: {
+          getClients: () => {
+            return Promise.resolve([]);
+          },
+        },
       },
     };
     const mockedCore = {};
@@ -54,7 +58,13 @@ describe('ClientAction', () => {
     backendError.message = 'Authentication failed.';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {client: {getClients: () => Promise.reject(backendError)}},
+      api: {
+        client: {
+          getClients: () => {
+            return Promise.reject(backendError);
+          },
+        },
+      },
     };
     const mockedCore = {};
 
@@ -79,7 +89,13 @@ describe('ClientAction', () => {
     const password = 'password';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {client: {deleteClient: () => Promise.resolve()}},
+      api: {
+        client: {
+          deleteClient: () => {
+            return Promise.resolve();
+          },
+        },
+      },
     };
     const mockedCore = {};
 
@@ -105,7 +121,13 @@ describe('ClientAction', () => {
     backendError.message = 'Authentication failed.';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {client: {deleteClient: () => Promise.reject(backendError)}},
+      api: {
+        client: {
+          deleteClient: () => {
+            return Promise.reject(backendError);
+          },
+        },
+      },
     };
     const mockedCore = {};
 

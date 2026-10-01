@@ -42,7 +42,9 @@ export const getConnectionQualityHander = (): ConnectionQualityHandler | null =>
     return null;
   }
 
-  const isConnectionSlow = () => slowConnectionTypes.includes(navigatorConnection.effectiveType);
+  const isConnectionSlow = () => {
+    return slowConnectionTypes.includes(navigatorConnection.effectiveType);
+  };
 
   const onChange = (callback: (isSlow: boolean) => void) => {
     const isSlow = isConnectionSlow();
@@ -56,7 +58,9 @@ export const getConnectionQualityHander = (): ConnectionQualityHandler | null =>
   };
 
   const subscribe = (callback: (isSlow: boolean) => void) => {
-    const handler = () => onChange(callback);
+    const handler = () => {
+      return onChange(callback);
+    };
 
     // Check the connection quality immediately
     handler();
@@ -74,7 +78,9 @@ export const getConnectionQualityHander = (): ConnectionQualityHandler | null =>
   };
 
   return {
-    refresh: (callback: (isSlow: boolean) => void) => onChange(callback),
+    refresh: (callback: (isSlow: boolean) => void) => {
+      return onChange(callback);
+    },
     subscribe,
   };
 };

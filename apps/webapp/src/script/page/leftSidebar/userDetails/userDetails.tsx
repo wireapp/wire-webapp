@@ -47,7 +47,9 @@ const AvailabilityStateButtonWrapper = ({
 }: AvailabilityStateButtonWrapperProps) => {
   return isTeam ? (
     <button
-      onClick={event => showAvailabilityContextMenu(event.nativeEvent)}
+      onClick={event => {
+        return showAvailabilityContextMenu(event.nativeEvent);
+      }}
       className="button-reset-default user-details-avatar"
     >
       {children}
@@ -99,7 +101,12 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
         {isTeam ? (
           <>
             <div css={styles.userDetails} data-uie-name="status-availability">
-              <button css={styles.userFullName} onClick={event => showAvailabilityContextMenu(event.nativeEvent)}>
+              <button
+                css={styles.userFullName}
+                onClick={event => {
+                  return showAvailabilityContextMenu(event.nativeEvent);
+                }}
+              >
                 <span data-uie-name="status-label" css={{...styles.userName, ...styles.textEllipsis}} title={userName}>
                   {userName}
                 </span>

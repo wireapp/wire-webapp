@@ -19,7 +19,9 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-const serializeQualifiedId = ({id, domain}: QualifiedId) => `${id}@${domain}`;
+const serializeQualifiedId = ({id, domain}: QualifiedId) => {
+  return `${id}@${domain}`;
+};
 
 const store = new Map<string, (() => void)[]>();
 
@@ -44,7 +46,9 @@ const removeCall = (conversationId: QualifiedId) => {
 
   const existingCallbacks = store.get(serializedId);
   if (existingCallbacks !== undefined) {
-    existingCallbacks.forEach(unsubscribe => unsubscribe());
+    existingCallbacks.forEach(unsubscribe => {
+      unsubscribe();
+    });
   }
   store.delete(serializedId);
 };

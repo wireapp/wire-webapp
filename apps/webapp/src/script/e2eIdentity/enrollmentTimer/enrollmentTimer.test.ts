@@ -29,25 +29,27 @@ import {MLSStatuses, WireIdentity} from '../e2eIdentityVerification';
 const generateWireIdentity = (
   credentialType: CredentialType = CredentialType.X509,
   status: MLSStatuses = MLSStatuses.NOT_ACTIVATED,
-): WireIdentity => ({
-  x509Identity: {
-    free: jest.fn(),
-    certificate: '',
-    displayName: 'John Doe',
-    domain: 'domain',
-    handle: 'johndoe',
-    notAfter: BigInt(0),
-    notBefore: BigInt(0),
-    serialNumber: '',
-    [Symbol.dispose]: noop,
-  },
-  thumbprint: '',
-  credentialType,
-  status,
-  clientId: 'client-id',
-  deviceId: 'client-id',
-  qualifiedUserId: {id: 'user-id', domain: 'domain'},
-});
+): WireIdentity => {
+  return {
+    x509Identity: {
+      free: jest.fn(),
+      certificate: '',
+      displayName: 'John Doe',
+      domain: 'domain',
+      handle: 'johndoe',
+      notAfter: BigInt(0),
+      notBefore: BigInt(0),
+      serialNumber: '',
+      [Symbol.dispose]: noop,
+    },
+    thumbprint: '',
+    credentialType,
+    status,
+    clientId: 'client-id',
+    deviceId: 'client-id',
+    qualifiedUserId: {id: 'user-id', domain: 'domain'},
+  };
+};
 
 describe('e2ei delays', () => {
   const gracePeriod = 7 * TimeInMillis.DAY;

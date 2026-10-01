@@ -38,6 +38,8 @@ describe('animation', () => {
       </Opacity>,
     );
 
-    await waitFor(() => expect(transitionNode?.className).toMatch(/-enter-done/));
+    await waitFor(() => {
+      return expect(transitionNode?.className).toMatch(/-enter-done/);
+    });
   });
 });

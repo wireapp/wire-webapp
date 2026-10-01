@@ -131,13 +131,13 @@ export const AvatarInput = ({
     <div
       tabIndex={TabIndex.FOCUSABLE}
       role="button"
-      onKeyDown={(event: React.KeyboardEvent<HTMLElement>) =>
-        handleKeyDown({
+      onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
+        return handleKeyDown({
           event,
           callback: inputClick,
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       aria-label={`${translate('tooltipPreferencesPicture')}`}
     >
       <label

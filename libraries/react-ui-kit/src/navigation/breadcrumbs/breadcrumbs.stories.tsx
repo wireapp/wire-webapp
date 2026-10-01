@@ -37,42 +37,52 @@ export default meta;
 type Story = StoryObj<typeof Breadcrumbs>;
 
 export const Default: Story = {
-  render: () => <Breadcrumbs items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder'}]} onItemClick={noop} />,
+  render: () => {
+    return <Breadcrumbs items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder'}]} onItemClick={noop} />;
+  },
 };
 
 export const WithCombinedItems: Story = {
-  render: () => (
-    <Breadcrumbs
-      items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder 1'}, {name: 'Subfolder 2'}, {name: 'Subfolder 3'}]}
-      onItemClick={noop}
-    />
-  ),
+  render: () => {
+    return (
+      <Breadcrumbs
+        items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder 1'}, {name: 'Subfolder 2'}, {name: 'Subfolder 3'}]}
+        onItemClick={noop}
+      />
+    );
+  },
 };
 
 export const WithIcons: Story = {
-  render: () => (
-    <Breadcrumbs
-      items={[{name: 'Home'}, {name: 'Folder', icon: <TrashIcon />}, {name: 'Subfolder'}]}
-      onItemClick={noop}
-    />
-  ),
+  render: () => {
+    return (
+      <Breadcrumbs
+        items={[{name: 'Home'}, {name: 'Folder', icon: <TrashIcon />}, {name: 'Subfolder'}]}
+        onItemClick={noop}
+      />
+    );
+  },
 };
 
 export const WithIconsAndCombinedItems: Story = {
-  render: () => (
-    <Breadcrumbs
-      items={[
-        {name: 'Home'},
-        {name: 'Folder', icon: <TrashIcon />},
-        {name: 'Subfolder 1'},
-        {name: 'Subfolder 2'},
-        {name: 'Subfolder 3'},
-      ]}
-      onItemClick={noop}
-    />
-  ),
+  render: () => {
+    return (
+      <Breadcrumbs
+        items={[
+          {name: 'Home'},
+          {name: 'Folder', icon: <TrashIcon />},
+          {name: 'Subfolder 1'},
+          {name: 'Subfolder 2'},
+          {name: 'Subfolder 3'},
+        ]}
+        onItemClick={noop}
+      />
+    );
+  },
 };
 
 export const OneItem: Story = {
-  render: () => <Breadcrumbs items={[{name: 'Home'}]} onItemClick={noop} />,
+  render: () => {
+    return <Breadcrumbs items={[{name: 'Home'}]} onItemClick={noop} />;
+  },
 };

@@ -42,8 +42,12 @@ const renderFileAssetOptions = (
 ) => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      translate: key => key,
-      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+      translate: key => {
+        return key;
+      },
+      isFeatureToggleEnabled: () => {
+        return isViewerPermissionFeatureEnabled;
+      },
     }),
   );
   const role = isViewer ? CELLS_SELF_USER_DRIVE_ROLE.VIEWER : CELLS_SELF_USER_DRIVE_ROLE.EDITOR;

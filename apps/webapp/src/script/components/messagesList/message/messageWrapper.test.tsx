@@ -46,7 +46,11 @@ function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
   const actor = generateUser();
   message.user(actor);
   if (users) {
-    message.userIds(users.map(user => user.qualifiedId));
+    message.userIds(
+      users.map(user => {
+        return user.qualifiedId;
+      }),
+    );
     message.userEntities(users);
   } else {
     message.userIds([actor.qualifiedId]);
@@ -56,46 +60,48 @@ function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
   return message;
 }
 
-const createBaseProps = (conversation: Conversation, message: MemberMessageEntity) => ({
-  conversation,
-  message,
-  selfId: {id: createUuid(), domain: 'test.wire.link'},
-  isFocused: false,
-  isSelfTemporaryGuest: false,
-  isLastDeliveredMessage: false,
-  shouldShowInvitePeople: false,
-  hideHeader: false,
-  hasReadReceiptsTurnedOn: false,
-  isHighlighted: false,
-  handleFocus: jest.fn(),
-  handleArrowKeyDown: jest.fn(),
-  setMsgElementsFocusable: jest.fn(),
-  onClickAvatar: jest.fn(),
-  onClickImage: jest.fn(),
-  onClickInvitePeople: jest.fn(),
-  onClickReactionDetails: jest.fn(),
-  onClickMessage: jest.fn(),
-  onClickTimestamp: jest.fn(),
-  onClickParticipants: jest.fn(),
-  onClickDetails: jest.fn(),
-  onClickResetSession: jest.fn(),
-  onClickCancelRequest: jest.fn(),
-  messageRepository: {
-    getMessageInConversationById: jest.fn(),
-    getMessageInConversationByReplacementId: jest.fn(),
-    ensureMessageSender: jest.fn(),
-    sendButtonAction: jest.fn(),
-    sendTextWithLinkPreview: jest.fn(),
-    retryUploadFile: jest.fn(),
-    toggleReaction: jest.fn(),
-  } as any,
-  loadUsersByIdsFromDb: jest.fn().mockResolvedValue([]),
-  messageActions: {
-    deleteMessage: jest.fn(),
-    deleteMessageEveryone: jest.fn(),
-  },
-  isMsgElementsFocusable: false,
-});
+const createBaseProps = (conversation: Conversation, message: MemberMessageEntity) => {
+  return {
+    conversation,
+    message,
+    selfId: {id: createUuid(), domain: 'test.wire.link'},
+    isFocused: false,
+    isSelfTemporaryGuest: false,
+    isLastDeliveredMessage: false,
+    shouldShowInvitePeople: false,
+    hideHeader: false,
+    hasReadReceiptsTurnedOn: false,
+    isHighlighted: false,
+    handleFocus: jest.fn(),
+    handleArrowKeyDown: jest.fn(),
+    setMsgElementsFocusable: jest.fn(),
+    onClickAvatar: jest.fn(),
+    onClickImage: jest.fn(),
+    onClickInvitePeople: jest.fn(),
+    onClickReactionDetails: jest.fn(),
+    onClickMessage: jest.fn(),
+    onClickTimestamp: jest.fn(),
+    onClickParticipants: jest.fn(),
+    onClickDetails: jest.fn(),
+    onClickResetSession: jest.fn(),
+    onClickCancelRequest: jest.fn(),
+    messageRepository: {
+      getMessageInConversationById: jest.fn(),
+      getMessageInConversationByReplacementId: jest.fn(),
+      ensureMessageSender: jest.fn(),
+      sendButtonAction: jest.fn(),
+      sendTextWithLinkPreview: jest.fn(),
+      retryUploadFile: jest.fn(),
+      toggleReaction: jest.fn(),
+    } as any,
+    loadUsersByIdsFromDb: jest.fn().mockResolvedValue([]),
+    messageActions: {
+      deleteMessage: jest.fn(),
+      deleteMessageEveryone: jest.fn(),
+    },
+    isMsgElementsFocusable: false,
+  };
+};
 
 describe('MessageWrapper', () => {
   describe('Cells conversation logic', () => {

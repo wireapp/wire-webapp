@@ -26,17 +26,21 @@ export const computeParticipantDiff = (
   originalUsers: User[],
   selectedUsers: User[],
 ): {usersToAdd: User[]; userIdsToRemove: QualifiedId[]} => {
-  const usersToAdd = selectedUsers.filter(
-    selectedUser =>
-      !originalUsers.some(originalUser => matchQualifiedIds(originalUser.qualifiedId, selectedUser.qualifiedId)),
-  );
+  const usersToAdd = selectedUsers.filter(selectedUser => {
+    return !originalUsers.some(originalUser => {
+      return matchQualifiedIds(originalUser.qualifiedId, selectedUser.qualifiedId);
+    });
+  });
 
   const userIdsToRemove = originalUsers
-    .filter(
-      originalUser =>
-        !selectedUsers.some(selectedUser => matchQualifiedIds(originalUser.qualifiedId, selectedUser.qualifiedId)),
-    )
-    .map(user => user.qualifiedId);
+    .filter(originalUser => {
+      return !selectedUsers.some(selectedUser => {
+        return matchQualifiedIds(originalUser.qualifiedId, selectedUser.qualifiedId);
+      });
+    })
+    .map(user => {
+      return user.qualifiedId;
+    });
 
   return {usersToAdd, userIdsToRemove};
 };

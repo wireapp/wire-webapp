@@ -39,31 +39,37 @@ export const groupVideoTileWrapper: CSSObject = {
   width: '100%',
 };
 
-export const groupVideoActiveSpeakerTile = (isActivelySpeaking: boolean): CSSObject => ({
-  borderRadius: '8px',
-  bottom: 0,
-  boxShadow: isActivelySpeaking
-    ? 'inset 0 0 0 3px var(--accent-color), inset 0 0 0 6px var(--app-bg-secondary)'
-    : 'none',
-  left: 0,
-  position: 'absolute',
-  right: 0,
-  top: 0,
-  transition: 'box-shadow 0.3s ease-in-out',
-});
+export const groupVideoActiveSpeakerTile = (isActivelySpeaking: boolean): CSSObject => {
+  return {
+    borderRadius: '8px',
+    bottom: 0,
+    boxShadow: isActivelySpeaking
+      ? 'inset 0 0 0 3px var(--accent-color), inset 0 0 0 6px var(--app-bg-secondary)'
+      : 'none',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    transition: 'box-shadow 0.3s ease-in-out',
+  };
+};
 
-export const groupVideoActiveSpeaker = (isActivelySpeaking: boolean): CSSObject => ({
-  backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
-});
+export const groupVideoActiveSpeaker = (isActivelySpeaking: boolean): CSSObject => {
+  return {
+    backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
+  };
+};
 
 export const groupVideoParticipantNameWrapper = (
   isActivelySpeaking: boolean,
   isAudioEstablished: boolean,
-): CSSObject => ({
-  overflow: 'hidden',
-  display: 'flex',
-  color: participantNameColor(isActivelySpeaking, isAudioEstablished),
-});
+): CSSObject => {
+  return {
+    overflow: 'hidden',
+    display: 'flex',
+    color: participantNameColor(isActivelySpeaking, isAudioEstablished),
+  };
+};
 
 export const groupVideoParticipantName: CSSObject = {
   textOverflow: 'ellipsis',
@@ -86,14 +92,18 @@ export const groupVideoParticipantAudioStatus = (
   };
 };
 
-export const getGroupVideoElementStyles = (fitContain: boolean, mirrorSelf: boolean): CSSObject => ({
-  objectFit: fitContain ? 'contain' : 'cover',
-  transform: mirrorSelf ? 'rotateY(180deg)' : 'initial',
-});
+export const getGroupVideoElementStyles = (fitContain: boolean, mirrorSelf: boolean): CSSObject => {
+  return {
+    objectFit: fitContain ? 'contain' : 'cover',
+    transform: mirrorSelf ? 'rotateY(180deg)' : 'initial',
+  };
+};
 
-export const groupVideoPauseOverlayLabel = (minimized: boolean): CSSObject => ({
-  fontSize: minimized ? '0.6875rem' : '0.875rem',
-});
+export const groupVideoPauseOverlayLabel = (minimized: boolean): CSSObject => {
+  return {
+    fontSize: minimized ? '0.6875rem' : '0.875rem',
+  };
+};
 
 export const groupVideoBackgroundInitializingOverlay: CSSObject = {
   position: 'absolute',

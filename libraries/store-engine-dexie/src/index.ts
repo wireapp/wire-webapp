@@ -44,13 +44,19 @@ export class IndexedDBEngine implements CRUDEngine {
       return new Promise((resolve, reject) => {
         const name = 'test';
         const DBOpenRequest = platform.indexedDB.open(name);
-        DBOpenRequest.onerror = error => reject(error);
+        DBOpenRequest.onerror = error => {
+          return reject(error);
+        };
         DBOpenRequest.onsuccess = () => {
           const db = DBOpenRequest.result;
           db.close();
           const deleteRequest = platform.indexedDB.deleteDatabase(name);
-          deleteRequest.onerror = error => reject(error);
-          deleteRequest.onsuccess = () => resolve();
+          deleteRequest.onerror = error => {
+            return reject(error);
+          };
+          deleteRequest.onsuccess = () => {
+            return resolve();
+          };
         };
       });
     }
@@ -158,8 +164,14 @@ export class IndexedDBEngine implements CRUDEngine {
   }
 
   public async clearTables(): Promise<void> {
-    const tableNames = this.db.tables.map(table => table.name);
-    await Promise.all(tableNames.map(tableName => this.deleteAll(tableName)));
+    const tableNames = this.db.tables.map(table => {
+      return table.name;
+    });
+    await Promise.all(
+      tableNames.map(tableName => {
+        return this.deleteAll(tableName);
+      }),
+    );
   }
 
   public async read<EntityType = Object, PrimaryKey = string>(
@@ -180,7 +192,9 @@ export class IndexedDBEngine implements CRUDEngine {
 
   public async readAllPrimaryKeys<PrimaryKey = string>(tableName: string): Promise<PrimaryKey[]> {
     const keys = await this.db.table<PrimaryKey>(tableName).toCollection().keys();
-    return keys.map(key => key as any as PrimaryKey);
+    return keys.map(key => {
+      return key as any as PrimaryKey;
+    });
   }
 
   /**

@@ -49,7 +49,9 @@ function createDependencies(options: Partial<Parameters<typeof handleSharedDrive
     isUploadFilesEnabled: true,
     isInRecycleBin: false,
     maxFileSize,
-    isAcceptedFile: jest.fn(() => true),
+    isAcceptedFile: jest.fn(() => {
+      return true;
+    }),
     ...options,
   };
 }
@@ -91,7 +93,11 @@ describe('handleSharedDriveDroppedFiles', () => {
 
   it('rejects unsupported input before starting upload', () => {
     const file = new File(['content'], 'blocked.exe', {type: 'application/octet-stream'});
-    const dependencies = createDependencies({isAcceptedFile: jest.fn(() => false)});
+    const dependencies = createDependencies({
+      isAcceptedFile: jest.fn(() => {
+        return false;
+      }),
+    });
 
     handleSharedDriveDroppedFiles([file], dependencies);
 
@@ -184,7 +190,11 @@ describe('handleSharedDriveDroppedFiles', () => {
   it('rejects the whole batch when any dropped file is invalid', () => {
     const validFile = new File(['one'], 'one.txt');
     const invalidFile = new File(['two'], 'two.exe');
-    const dependencies = createDependencies({isAcceptedFile: file => file !== invalidFile});
+    const dependencies = createDependencies({
+      isAcceptedFile: file => {
+        return file !== invalidFile;
+      },
+    });
 
     handleSharedDriveDroppedFiles([validFile, invalidFile], dependencies);
 
@@ -222,7 +232,9 @@ describe('validateSharedDriveUploadFiles', () => {
         isUploadFilesEnabled: true,
         isInRecycleBin: false,
         maxFileSize,
-        isAcceptedFile: () => true,
+        isAcceptedFile: () => {
+          return true;
+        },
       }),
     ).toEqual(expect.objectContaining({isOk: true}));
   });
@@ -230,9 +242,9 @@ describe('validateSharedDriveUploadFiles', () => {
 
 describe('getSharedDriveDropRejectionFeedback', () => {
   it('maps rejection reasons to user-facing feedback', () => {
-    const translate = jest.fn((key: string, replacements?: Record<string, string | number>) =>
-      replacements ? `${key}:${JSON.stringify(replacements)}` : key,
-    );
+    const translate = jest.fn((key: string, replacements?: Record<string, string | number>) => {
+      return replacements ? `${key}:${JSON.stringify(replacements)}` : key;
+    });
     const file = new File(['content'], 'document.txt');
 
     expect(
@@ -245,7 +257,9 @@ describe('getSharedDriveDropRejectionFeedback', () => {
   });
 
   it('maps folder read failures to specific user-facing feedback', () => {
-    const translate = jest.fn((key: string) => key);
+    const translate = jest.fn((key: string) => {
+      return key;
+    });
 
     expect(
       getSharedDriveDropRejectionFeedback({reason: 'readFailed', invalidFiles: []}, translate, maxFileSize),

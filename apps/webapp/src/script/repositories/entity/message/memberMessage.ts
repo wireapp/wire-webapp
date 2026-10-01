@@ -98,7 +98,9 @@ export class MemberMessage extends SystemMessage {
     this.showServicesWarning = false;
 
     this.hash = ko.pureComputed(() => {
-      const users = this.userIds().map(({id}) => id);
+      const users = this.userIds().map(({id}) => {
+        return id;
+      });
       return `${this.timestamp()}${users.join('')}`;
     });
 
@@ -190,6 +192,10 @@ export class MemberMessage extends SystemMessage {
   }
 
   isUserAffected(userId: QualifiedId): boolean {
-    return !isUndefined(this.userIds().find(user => matchQualifiedIds(user, userId)));
+    return !isUndefined(
+      this.userIds().find(user => {
+        return matchQualifiedIds(user, userId);
+      }),
+    );
   }
 }

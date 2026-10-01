@@ -46,7 +46,11 @@ function validateMatchingRuntimeResponses(
 }
 
 function expectValidationError(validationErrors: readonly string[], expectedFieldName: string): void {
-  expect(validationErrors.some(validationError => validationError.startsWith(expectedFieldName))).toBe(true);
+  expect(
+    validationErrors.some(validationError => {
+      return validationError.startsWith(expectedFieldName);
+    }),
+  ).toBe(true);
 }
 
 describe('runtime build metadata verification', () => {

@@ -28,5 +28,7 @@ import {AudioType} from 'Repositories/audio/audioType';
  */
 export const isPlayingAudio = async (page: Page, type: AudioType) => {
   const audioTag = page.locator(`#audio-elements>audio[src*="${type}"]`);
-  return await audioTag.evaluate((el: HTMLAudioElement) => !el.paused);
+  return await audioTag.evaluate((el: HTMLAudioElement) => {
+    return !el.paused;
+  });
 };

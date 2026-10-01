@@ -32,7 +32,9 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  render: args => <IconGallery {...args} />,
+  render: args => {
+    return <IconGallery {...args} />;
+  },
 } satisfies Meta<typeof SVGIcon>;
 
 export default meta;
@@ -51,24 +53,28 @@ const IconGallery = (props: ComponentProps<typeof SVGIcon>) => {
       }}
     >
       {Object.entries(allIcons)
-        .filter(([_, component]) => typeof component === 'function')
-        .map(([name, IconComponent]) => (
-          <div
-            key={name}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '16px',
-              border: '1px solid #e5e5e5',
-              borderRadius: '8px',
-            }}
-          >
-            <IconComponent {...props} data-uie-name={name} />
-            <div style={{fontSize: '12px', textAlign: 'center'}}>{name}</div>
-          </div>
-        ))}
+        .filter(([_, component]) => {
+          return typeof component === 'function';
+        })
+        .map(([name, IconComponent]) => {
+          return (
+            <div
+              key={name}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '16px',
+                border: '1px solid #e5e5e5',
+                borderRadius: '8px',
+              }}
+            >
+              <IconComponent {...props} data-uie-name={name} />
+              <div style={{fontSize: '12px', textAlign: 'center'}}>{name}</div>
+            </div>
+          );
+        })}
     </div>
   );
 };

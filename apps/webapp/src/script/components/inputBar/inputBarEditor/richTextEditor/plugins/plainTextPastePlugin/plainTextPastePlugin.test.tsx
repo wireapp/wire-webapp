@@ -30,7 +30,9 @@ import {PlainTextPastePlugin} from './plainTextPastePlugin';
 const EditorCapturePlugin = ({onReady}: {onReady: (editor: LexicalEditor) => void}) => {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => onReady(editor), [editor, onReady]);
+  useEffect(() => {
+    return onReady(editor);
+  }, [editor, onReady]);
 
   return null;
 };
@@ -54,7 +56,11 @@ const renderPlugin = () => {
 const createPasteEvent = (plainText: string) => {
   const preventDefault = jest.fn();
   const event = {
-    clipboardData: {getData: () => plainText},
+    clipboardData: {
+      getData: () => {
+        return plainText;
+      },
+    },
     preventDefault,
   } as unknown as ClipboardEvent;
 
@@ -90,7 +96,11 @@ describe('PlainTextPastePlugin', () => {
 
     expect(wasHandled).toBe(true);
     expect(preventDefault).toHaveBeenCalledTimes(1);
-    expect(editor.getEditorState().read(() => $getRoot().getTextContent())).toBe('plain text');
+    expect(
+      editor.getEditorState().read(() => {
+        return $getRoot().getTextContent();
+      }),
+    ).toBe('plain text');
     expect(onError).not.toHaveBeenCalled();
   });
 });

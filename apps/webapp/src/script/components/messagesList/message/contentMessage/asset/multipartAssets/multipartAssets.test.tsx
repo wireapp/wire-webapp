@@ -33,12 +33,16 @@ import {
 import {MultipartAssets} from './multipartAssets';
 import {translateForTest} from 'Util/test/translateForTest';
 
-jest.mock('Hooks/useInView/useInView', () => ({
-  useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => ({
-    elementRef: {current: null},
-    hasBeenInView: true,
-  }),
-}));
+jest.mock('Hooks/useInView/useInView', () => {
+  return {
+    useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => {
+      return {
+        elementRef: {current: null},
+        hasBeenInView: true,
+      };
+    },
+  };
+});
 
 const mockNode: RestNode = {
   Path: '/path/to/test.pdf',
@@ -221,7 +225,9 @@ describe('MultipartAssets', () => {
       });
 
       // Wait a bit to ensure no additional calls are made
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 100);
+      });
 
       expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
     });
@@ -244,7 +250,9 @@ describe('MultipartAssets', () => {
       });
 
       // Wait a bit to ensure no additional calls are made
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 100);
+      });
 
       expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
     });
@@ -305,7 +313,9 @@ describe('MultipartAssets', () => {
       });
 
       // Wait a bit to ensure no additional calls are made
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 100);
+      });
 
       // Should not trigger additional fetch after unmount
       expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);

@@ -66,7 +66,9 @@ describe('AvatarImage', () => {
 
     render(<AvatarImage {...props} />);
 
-    await waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource));
+    await waitFor(() => {
+      return expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource);
+    });
   });
 
   it('fetches preview avatar image for low pixel ratio devices', async () => {
@@ -91,7 +93,9 @@ describe('AvatarImage', () => {
 
     render(<AvatarImage {...props} />);
 
-    await waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource));
+    await waitFor(() => {
+      return expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource);
+    });
   });
 
   it('fetches preview avatar image for small avatars', async () => {
@@ -115,7 +119,9 @@ describe('AvatarImage', () => {
 
     render(<AvatarImage {...props} />);
 
-    await waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.previewPictureResource()));
+    await waitFor(() => {
+      return expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.previewPictureResource());
+    });
   });
 
   it('does not try to fetch non-existent avatar', async () => {
@@ -135,7 +141,9 @@ describe('AvatarImage', () => {
 
     render(<AvatarImage {...props} />);
 
-    await waitFor(() => expect(assetRepoSpy.getObjectUrl).not.toHaveBeenCalled());
+    await waitFor(() => {
+      return expect(assetRepoSpy.getObjectUrl).not.toHaveBeenCalled();
+    });
   });
 
   it('clears a previously loaded avatar when the picture resource is removed', async () => {

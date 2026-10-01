@@ -12,15 +12,19 @@ import {useFilePreview} from './useFilePreview';
 const conversationId = 'local-conversation-id';
 const conversation = {id: 'qualified-conversation-id', domain: 'example.com'};
 const fireAndForgetInvoker = {
-  fireAndForget: jest.fn((action: () => Promise<void>) => void action()),
-  waitUntilAllSettled: jest.fn(async () => undefined),
+  fireAndForget: jest.fn((action: () => Promise<void>) => {
+    return void action();
+  }),
+  waitUntilAllSettled: jest.fn(async () => {
+    return undefined;
+  }),
 };
 const wrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest, fireAndForgetInvoker}),
 );
 
-const createFile = (overrides: Partial<FileWithPreview> = {}): FileWithPreview =>
-  Object.assign(new File(['content'], 'document.txt', {type: 'text/plain'}), {
+const createFile = (overrides: Partial<FileWithPreview> = {}): FileWithPreview => {
+  return Object.assign(new File(['content'], 'document.txt', {type: 'text/plain'}), {
     id: 'local-id',
     preview: 'blob:local-id',
     remoteUuid: 'remote-id',
@@ -29,6 +33,7 @@ const createFile = (overrides: Partial<FileWithPreview> = {}): FileWithPreview =
     uploadProgress: 100,
     ...overrides,
   });
+};
 
 describe('useFilePreview', () => {
   const originalNodeEnvironment = process.env.NODE_ENV;
@@ -45,13 +50,14 @@ describe('useFilePreview', () => {
 
   it('exposes display metadata and marks failed uploads', () => {
     const {result} = renderHook(
-      () =>
-        useFilePreview({
+      () => {
+        return useFilePreview({
           file: createFile({uploadStatus: 'error'}),
           cellsRepository: {} as never,
           conversationId,
           conversationQualifiedId: conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
@@ -63,17 +69,20 @@ describe('useFilePreview', () => {
     const file = createFile({uploadStatus: 'uploading'});
     useFileUploadState.getState().addFiles({conversationId, files: [file]});
     const {result} = renderHook(
-      () =>
-        useFilePreview({
+      () => {
+        return useFilePreview({
           file,
           cellsRepository: cellsRepository as never,
           conversationId,
           conversationQualifiedId: conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
-    act(() => result.current.handleDelete());
+    act(() => {
+      return result.current.handleDelete();
+    });
 
     expect(cellsRepository.cancelUpload).toHaveBeenCalledWith('local-id');
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:local-id');
@@ -86,18 +95,23 @@ describe('useFilePreview', () => {
     const file = createFile();
     useFileUploadState.getState().addFiles({conversationId, files: [file]});
     const {result} = renderHook(
-      () =>
-        useFilePreview({
+      () => {
+        return useFilePreview({
           file,
           cellsRepository: cellsRepository as never,
           conversationId,
           conversationQualifiedId: conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
-    act(() => result.current.handleDelete());
-    await act(async () => await fireAndForgetInvoker.waitUntilAllSettled());
+    act(() => {
+      return result.current.handleDelete();
+    });
+    await act(async () => {
+      return await fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:local-id');
     expect(cellsRepository.deleteNodeDraft).toHaveBeenCalledWith({uuid: 'remote-id', versionId: 'old-version-id'});
@@ -111,17 +125,20 @@ describe('useFilePreview', () => {
     const file = createFile({uploadStatus: 'error', remoteUuid: 'remote-id', remoteVersionId: 'old-version-id'});
     useFileUploadState.getState().addFiles({conversationId, files: [file]});
     const {result} = renderHook(
-      () =>
-        useFilePreview({
+      () => {
+        return useFilePreview({
           file,
           cellsRepository: cellsRepository as never,
           conversationId,
           conversationQualifiedId: conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
-    await act(async () => result.current.handleRetry());
+    await act(async () => {
+      return result.current.handleRetry();
+    });
 
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledWith(
       expect.objectContaining({uuid: 'local-id', file, path: 'qualified-conversation-id@example.com'}),
@@ -141,17 +158,20 @@ describe('useFilePreview', () => {
     const file = createFile({uploadStatus: 'error'});
     useFileUploadState.getState().addFiles({conversationId, files: [file]});
     const {result} = renderHook(
-      () =>
-        useFilePreview({
+      () => {
+        return useFilePreview({
           file,
           cellsRepository: cellsRepository as never,
           conversationId,
           conversationQualifiedId: conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
-    await act(async () => result.current.handleRetry());
+    await act(async () => {
+      return result.current.handleRetry();
+    });
 
     expect(cellsRepository.uploadNodeDraft).toHaveBeenCalledWith(
       expect.objectContaining({path: expect.stringMatching(/^local-conversation-id@/)}),
@@ -163,17 +183,20 @@ describe('useFilePreview', () => {
     const file = createFile({uploadStatus: 'error'});
     useFileUploadState.getState().addFiles({conversationId, files: [file]});
     const {result} = renderHook(
-      () =>
-        useFilePreview({
+      () => {
+        return useFilePreview({
           file,
           cellsRepository: cellsRepository as never,
           conversationId,
           conversationQualifiedId: conversation,
-        }),
+        });
+      },
       {wrapper},
     );
 
-    await act(async () => result.current.handleRetry());
+    await act(async () => {
+      return result.current.handleRetry();
+    });
 
     expect(useFileUploadState.getState().getFiles({conversationId})[0].uploadStatus).toBe('error');
   });

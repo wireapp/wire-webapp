@@ -37,10 +37,12 @@ export const getBreadcrumbsFromPath = ({
       name: baseCrumb,
       path: '',
     },
-    ...segments.map((segment, index) => ({
-      name: segment === RECYCLE_BIN_PATH ? recycleBinLabel : segment,
-      path: segments.slice(0, index + 1).join('/'),
-      icon: segment === RECYCLE_BIN_PATH ? <TrashIcon width={12} height={12} /> : undefined,
-    })),
+    ...segments.map((segment, index) => {
+      return {
+        name: segment === RECYCLE_BIN_PATH ? recycleBinLabel : segment,
+        path: segments.slice(0, index + 1).join('/'),
+        icon: segment === RECYCLE_BIN_PATH ? <TrashIcon width={12} height={12} /> : undefined,
+      };
+    }),
   ];
 };

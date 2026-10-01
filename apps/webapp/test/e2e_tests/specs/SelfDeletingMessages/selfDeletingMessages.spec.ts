@@ -125,7 +125,9 @@ test.describe('Self Deleting Messages', () => {
       await expect(pages.conversation().getMessage({sender: userA})).toBeVisible(); // Ensure message was sent before closing the page
 
       await page.close();
-      await new Promise(res => setTimeout(res, 10_000)); // Wait 10s before logging in again to ensure the message has been deleted by now
+      await new Promise(res => {
+        return setTimeout(res, 10_000);
+      }); // Wait 10s before logging in again to ensure the message has been deleted by now
 
       // Re-open page reusing the same context so the login is not happening on a new device
       page = await createPage(context, withLogin(userA));
@@ -147,7 +149,9 @@ test.describe('Self Deleting Messages', () => {
       const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 
-      const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
+      const [userAPages, userBPages] = [userAPage, userBPage].map(page => {
+        return PageManager.from(page).webapp.pages;
+      });
       await createGroup(userAPages, 'Test Group', [userB]);
 
       await userAPages.conversationList().getConversation('Test Group').open();
@@ -170,8 +174,12 @@ test.describe('Self Deleting Messages', () => {
 
     test.beforeEach(async ({createPage}) => {
       [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
       await createGroup(userAPages, 'Test Group', [userB]);
 
@@ -188,7 +196,9 @@ test.describe('Self Deleting Messages', () => {
       const message = userBPages.conversation().getMessage({content: 'Test Message'});
       await expect(message).toBeAttached();
 
-      await new Promise(res => setTimeout(res, 10_000));
+      await new Promise(res => {
+        return setTimeout(res, 10_000);
+      });
       await expect(message).not.toBeAttached();
     });
 
@@ -261,7 +271,9 @@ test.describe('Self Deleting Messages', () => {
       async () => {
         await expect(searchResults).toHaveCount(1);
 
-        await new Promise(res => setTimeout(res, 10_000)); // Wait 10s for the message to expire
+        await new Promise(res => {
+          return setTimeout(res, 10_000);
+        }); // Wait 10s for the message to expire
 
         await expect(searchResults).toHaveCount(0);
       },

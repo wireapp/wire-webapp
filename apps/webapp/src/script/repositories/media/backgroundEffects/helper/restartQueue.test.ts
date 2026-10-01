@@ -19,7 +19,9 @@
 
 import {createRestartQueue} from './restartQueue';
 
-const flushPromises = () => Promise.resolve();
+const flushPromises = () => {
+  return Promise.resolve();
+};
 
 describe('createRestartQueue', () => {
   it('runs restarts sequentially', async () => {

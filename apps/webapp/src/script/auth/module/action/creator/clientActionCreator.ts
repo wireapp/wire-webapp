@@ -82,39 +82,55 @@ export interface ResetClientErrorsAction extends AppAction {
 }
 
 export class ClientActionCreator {
-  static startGetAllClients = (): GetAllClientsStartAction => ({
-    type: CLIENT_ACTION.CLIENTS_FETCH_START,
-  });
-  static successfulGetAllClients = (clients: RegisteredClient[]): GetAllClientsSuccessAction => ({
-    payload: clients,
-    type: CLIENT_ACTION.CLIENTS_FETCH_SUCCESS,
-  });
-  static failedGetAllClients = (error: Error): GetAllClientsFailedAction => ({
-    error,
-    type: CLIENT_ACTION.CLIENTS_FETCH_FAILED,
-  });
+  static startGetAllClients = (): GetAllClientsStartAction => {
+    return {
+      type: CLIENT_ACTION.CLIENTS_FETCH_START,
+    };
+  };
+  static successfulGetAllClients = (clients: RegisteredClient[]): GetAllClientsSuccessAction => {
+    return {
+      payload: clients,
+      type: CLIENT_ACTION.CLIENTS_FETCH_SUCCESS,
+    };
+  };
+  static failedGetAllClients = (error: Error): GetAllClientsFailedAction => {
+    return {
+      error,
+      type: CLIENT_ACTION.CLIENTS_FETCH_FAILED,
+    };
+  };
 
-  static startRemoveClient = (): RemoveClientStartAction => ({
-    type: CLIENT_ACTION.CLIENT_REMOVE_START,
-  });
-  static successfulRemoveClient = (deletedClientId: string): RemoveClientSuccessAction => ({
-    payload: deletedClientId,
-    type: CLIENT_ACTION.CLIENT_REMOVE_SUCCESS,
-  });
-  static failedRemoveClient = (error: Error): RemoveClientFailedAction => ({
-    error,
-    type: CLIENT_ACTION.CLIENT_REMOVE_FAILED,
-  });
+  static startRemoveClient = (): RemoveClientStartAction => {
+    return {
+      type: CLIENT_ACTION.CLIENT_REMOVE_START,
+    };
+  };
+  static successfulRemoveClient = (deletedClientId: string): RemoveClientSuccessAction => {
+    return {
+      payload: deletedClientId,
+      type: CLIENT_ACTION.CLIENT_REMOVE_SUCCESS,
+    };
+  };
+  static failedRemoveClient = (error: Error): RemoveClientFailedAction => {
+    return {
+      error,
+      type: CLIENT_ACTION.CLIENT_REMOVE_FAILED,
+    };
+  };
 
   static successfulInitializeClient = (creationStatus: {
     isNew: boolean;
     client: RegisteredClient;
-  }): InitializeClientSuccessAction => ({
-    payload: creationStatus,
-    type: CLIENT_ACTION.CLIENT_INIT_SUCCESS,
-  });
+  }): InitializeClientSuccessAction => {
+    return {
+      payload: creationStatus,
+      type: CLIENT_ACTION.CLIENT_INIT_SUCCESS,
+    };
+  };
 
-  static resetError = (): ResetClientErrorsAction => ({
-    type: CLIENT_ACTION.CLIENT_RESET_ERROR,
-  });
+  static resetError = (): ResetClientErrorsAction => {
+    return {
+      type: CLIENT_ACTION.CLIENT_RESET_ERROR,
+    };
+  };
 }

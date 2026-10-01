@@ -62,7 +62,9 @@ export const VideoAssetSmall = ({
       >
         <button
           css={hollowWrapperButtonStyles}
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            return setIsOpen(true);
+          }}
           aria-label={translate('accessibility.conversationAssetImageAlt', {
             username: senderName,
             messageDate: timestamp,
@@ -84,7 +86,9 @@ export const VideoAssetSmall = ({
       <FileFullscreenModal
         id={id}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          return setIsOpen(false);
+        }}
         filePreviewUrl={src}
         fileExtension={extension}
         fileName={fileName}

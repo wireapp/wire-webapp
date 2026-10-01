@@ -54,7 +54,9 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUpl
         aria-label={translate('tooltipConversationAddImage')}
         title={translate('tooltipConversationAddImage')}
         className="input-bar-control file-button"
-        onClick={() => imageRef.current?.click()}
+        onClick={() => {
+          return imageRef.current?.click();
+        }}
         data-uie-name="do-share-image"
       >
         <Icon.ImageIcon />

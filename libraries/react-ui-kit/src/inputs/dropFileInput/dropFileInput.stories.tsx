@@ -39,7 +39,11 @@ export const Default: Story = {
     labelText: 'select one from your device',
     accept: 'image/png, image/jpeg',
     description: 'Image (JPG/PNG) size up to 1 MB, minimum 200 x 600 px',
-    onFilesUploaded: files => console.log('Files uploaded:', files),
-    onInvalidFilesDropError: () => console.log('Invalid file type'),
+    onFilesUploaded: files => {
+      return console.log('Files uploaded:', files);
+    },
+    onInvalidFilesDropError: () => {
+      return console.log('Invalid file type');
+    },
   },
 };

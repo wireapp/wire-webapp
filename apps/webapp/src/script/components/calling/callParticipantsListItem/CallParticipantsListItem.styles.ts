@@ -21,13 +21,15 @@ import {CSSObject} from '@emotion/react';
 
 import {listWrapper} from '../../participantItemContent/participantItem.styles';
 
-export const callParticipantListItemWrapper = (isLast = false): CSSObject => ({
-  ...listWrapper({noUnderline: true, noInteraction: true}),
-  '&:hover, &:focus, &:focus-visible': {
-    backgroundColor: 'var(--disabled-call-button-bg)',
-  },
-  borderBottom: isLast ? 'none' : '1px solid var(--border-color)',
-});
+export const callParticipantListItemWrapper = (isLast = false): CSSObject => {
+  return {
+    ...listWrapper({noUnderline: true, noInteraction: true}),
+    '&:hover, &:focus, &:focus-visible': {
+      backgroundColor: 'var(--disabled-call-button-bg)',
+    },
+    borderBottom: isLast ? 'none' : '1px solid var(--border-color)',
+  };
+};
 
 const commonIconStyles = {
   display: 'flex',
@@ -36,10 +38,12 @@ const commonIconStyles = {
   width: '12px',
 };
 
-export const callParticipantAvatar = (isAudioEstablished = false): CSSObject => ({
-  margin: '0 10px',
-  opacity: isAudioEstablished ? '1' : '0.5',
-});
+export const callParticipantAvatar = (isAudioEstablished = false): CSSObject => {
+  return {
+    margin: '0 10px',
+    opacity: isAudioEstablished ? '1' : '0.5',
+  };
+};
 
 export const callParticipantConnecting: CSSObject = {
   color: 'var(--danger-color)',
@@ -47,28 +51,32 @@ export const callParticipantConnecting: CSSObject = {
   flexShrink: 0,
 };
 
-export const callParticipantListItem = (noInteraction = false): CSSObject => ({
-  display: 'flex',
-  overflow: 'hidden',
-  height: '56px',
-  alignItems: 'center',
-  paddingRight: '16px',
-  margin: '0',
-  cursor: noInteraction ? 'default' : 'pointer',
-});
+export const callParticipantListItem = (noInteraction = false): CSSObject => {
+  return {
+    display: 'flex',
+    overflow: 'hidden',
+    height: '56px',
+    alignItems: 'center',
+    paddingRight: '16px',
+    margin: '0',
+    cursor: noInteraction ? 'default' : 'pointer',
+  };
+};
 
-export const callStatusIcons = (activeIconsCount: number): CSSObject => ({
-  display: 'grid',
-  fill: 'currentColor',
-  gap: '8px',
-  gridTemplateColumns: `repeat(${activeIconsCount}, 1fr)`,
-  placeItems: 'center',
-  margin: '0 8px',
+export const callStatusIcons = (activeIconsCount: number): CSSObject => {
+  return {
+    display: 'grid',
+    fill: 'currentColor',
+    gap: '8px',
+    gridTemplateColumns: `repeat(${activeIconsCount}, 1fr)`,
+    placeItems: 'center',
+    margin: '0 8px',
 
-  '.participant-mic-on-icon svg': {
-    ...commonIconStyles,
-  },
-});
+    '.participant-mic-on-icon svg': {
+      ...commonIconStyles,
+    },
+  };
+};
 
 export const cameraIcon: CSSObject = {
   ...commonIconStyles,

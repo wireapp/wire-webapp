@@ -105,7 +105,9 @@ export const ContentMessageComponent = ({
   const {translate} = useApplicationContext();
 
   // check if current message is focused and its elements focusable
-  const msgFocusState = useMemo(() => isMsgElementsFocusable && isFocused, [isMsgElementsFocusable, isFocused]);
+  const msgFocusState = useMemo(() => {
+    return isMsgElementsFocusable && isFocused;
+  }, [isMsgElementsFocusable, isFocused]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
   const {
     senderName,
@@ -149,7 +151,9 @@ export const ContentMessageComponent = ({
   });
 
   const [isActionMenuVisible, setActionMenuVisibility] = useState(false);
-  const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
+  const isMenuOpen = useMessageActionsState(state => {
+    return state.isMenuOpen;
+  });
   useEffect(() => {
     setActionMenuVisibility(isFocused || msgFocusState);
   }, [msgFocusState, isFocused]);
@@ -254,21 +258,25 @@ export const ContentMessageComponent = ({
               />
             )}
 
-            {assets.map(asset => (
-              <ContentAsset
-                key={asset.type}
-                asset={asset}
-                message={message}
-                selfId={selfId}
-                onClickButton={onClickButton}
-                onClickImage={onClickImage}
-                onClickMessage={onClickMessage}
-                isMessageFocused={msgFocusState}
-                is1to1Conversation={conversation.is1to1()}
-                isFileShareRestricted={isFileShareRestricted}
-                onClickDetails={() => onClickDetails(message)}
-              />
-            ))}
+            {assets.map(asset => {
+              return (
+                <ContentAsset
+                  key={asset.type}
+                  asset={asset}
+                  message={message}
+                  selfId={selfId}
+                  onClickButton={onClickButton}
+                  onClickImage={onClickImage}
+                  onClickMessage={onClickMessage}
+                  isMessageFocused={msgFocusState}
+                  is1to1Conversation={conversation.is1to1()}
+                  isFileShareRestricted={isFileShareRestricted}
+                  onClickDetails={() => {
+                    return onClickDetails(message);
+                  }}
+                />
+              );
+            })}
 
             {isAssetMessage && (
               <ReadIndicator message={message} is1to1Conversation={conversation.is1to1()} onClick={onClickDetails} />
@@ -308,7 +316,9 @@ export const ContentMessageComponent = ({
         <CompleteFailureToSendWarning
           {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
           isMessageFocused={msgFocusState}
-          onRetry={() => onRetry(message)}
+          onRetry={() => {
+            return onRetry(message);
+          }}
         />
       )}
 
@@ -329,8 +339,12 @@ export const ContentMessageComponent = ({
           selfUserId={selfId}
           handleReactionClick={onClickReaction}
           isMessageFocused={msgFocusState}
-          onTooltipReactionCountClick={() => onClickReactionDetails(message)}
-          onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
+          onTooltipReactionCountClick={() => {
+            return onClickReactionDetails(message);
+          }}
+          onLastReactionKeyEvent={() => {
+            return setActionMenuVisibility(false);
+          }}
           isRemovedFromConversation={conversation.isSelfUserRemoved()}
           users={conversation.allUserEntities()}
           loadUsersByIdsFromDb={loadUsersByIdsFromDb}

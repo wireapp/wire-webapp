@@ -36,53 +36,61 @@ export default meta;
 type Story = StoryObj<typeof ButtonsGroup>;
 
 export const TwoButtons: Story = {
-  render: () => (
-    <ButtonsGroup>
-      <ButtonsGroup.Button>Button 1</ButtonsGroup.Button>
-      <ButtonsGroup.Button>Button 2</ButtonsGroup.Button>
-    </ButtonsGroup>
-  ),
+  render: () => {
+    return (
+      <ButtonsGroup>
+        <ButtonsGroup.Button>Button 1</ButtonsGroup.Button>
+        <ButtonsGroup.Button>Button 2</ButtonsGroup.Button>
+      </ButtonsGroup>
+    );
+  },
 };
 
 export const MultipleButtons: Story = {
-  render: () => (
-    <ButtonsGroup>
-      <ButtonsGroup.Button>Button 1</ButtonsGroup.Button>
-      <ButtonsGroup.Button>Button 2</ButtonsGroup.Button>
-      <ButtonsGroup.Button>Button 3</ButtonsGroup.Button>
-      <ButtonsGroup.Button>Button 3</ButtonsGroup.Button>
-    </ButtonsGroup>
-  ),
+  render: () => {
+    return (
+      <ButtonsGroup>
+        <ButtonsGroup.Button>Button 1</ButtonsGroup.Button>
+        <ButtonsGroup.Button>Button 2</ButtonsGroup.Button>
+        <ButtonsGroup.Button>Button 3</ButtonsGroup.Button>
+        <ButtonsGroup.Button>Button 3</ButtonsGroup.Button>
+      </ButtonsGroup>
+    );
+  },
 };
 
 export const TwoIconButtons: Story = {
-  render: () => (
-    <ButtonsGroup>
-      <ButtonsGroup.IconButton>
-        <FileIcon />
-      </ButtonsGroup.IconButton>
-      <ButtonsGroup.IconButton>
-        <DownloadIcon />
-      </ButtonsGroup.IconButton>
-    </ButtonsGroup>
-  ),
+  render: () => {
+    return (
+      <ButtonsGroup>
+        <ButtonsGroup.IconButton>
+          <FileIcon />
+        </ButtonsGroup.IconButton>
+        <ButtonsGroup.IconButton>
+          <DownloadIcon />
+        </ButtonsGroup.IconButton>
+      </ButtonsGroup>
+    );
+  },
 };
 
 export const MultipleIconButtons: Story = {
-  render: () => (
-    <ButtonsGroup>
-      <ButtonsGroup.IconButton>
-        <FileIcon />
-      </ButtonsGroup.IconButton>
-      <ButtonsGroup.IconButton>
-        <DownloadIcon />
-      </ButtonsGroup.IconButton>
-      <ButtonsGroup.IconButton>
-        <MoreIcon />
-      </ButtonsGroup.IconButton>
-      <ButtonsGroup.IconButton>
-        <GifIcon />
-      </ButtonsGroup.IconButton>
-    </ButtonsGroup>
-  ),
+  render: () => {
+    return (
+      <ButtonsGroup>
+        <ButtonsGroup.IconButton>
+          <FileIcon />
+        </ButtonsGroup.IconButton>
+        <ButtonsGroup.IconButton>
+          <DownloadIcon />
+        </ButtonsGroup.IconButton>
+        <ButtonsGroup.IconButton>
+          <MoreIcon />
+        </ButtonsGroup.IconButton>
+        <ButtonsGroup.IconButton>
+          <GifIcon />
+        </ButtonsGroup.IconButton>
+      </ButtonsGroup>
+    );
+  },
 };

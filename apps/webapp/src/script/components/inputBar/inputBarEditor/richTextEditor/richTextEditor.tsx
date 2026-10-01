@@ -181,7 +181,9 @@ export const RichTextEditor = ({
           />
           <ClearEditorPlugin />
           <MentionsPlugin
-            onSearch={search => (typeof search === 'string' ? getMentionCandidates(search) : [])}
+            onSearch={search => {
+              return typeof search === 'string' ? getMentionCandidates(search) : [];
+            }}
             openStateRef={mentionsOpen}
           />
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange />

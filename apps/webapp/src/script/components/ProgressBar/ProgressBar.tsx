@@ -28,13 +28,15 @@ interface ProgressBarProps {
   progress?: number;
 }
 
-const ProgressBar: FC<ProgressBarProps> = ({message, progress = 0, className = '', centerText = true}) => (
-  <div className={cx('loading-bar', {'text-center': centerText}, className)}>
-    {message !== undefined && message !== '' && <div className="progress-console">{message}</div>}
-    <div className="progress-bar">
-      <div data-uie-name="progress-bar-progress" style={{width: `${progress}%`}}></div>
+const ProgressBar: FC<ProgressBarProps> = ({message, progress = 0, className = '', centerText = true}) => {
+  return (
+    <div className={cx('loading-bar', {'text-center': centerText}, className)}>
+      {message !== undefined && message !== '' && <div className="progress-console">{message}</div>}
+      <div className="progress-bar">
+        <div data-uie-name="progress-bar-progress" style={{width: `${progress}%`}}></div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export {ProgressBar};

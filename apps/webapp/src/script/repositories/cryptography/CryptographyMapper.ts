@@ -700,10 +700,12 @@ export class CryptographyMapper {
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 
-    const mentions = protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish()));
-    const previews = protoLinkPreviews.map(protoLinkPreview =>
-      arrayToBase64(LinkPreview.encode(protoLinkPreview).finish()),
-    );
+    const mentions = protoMentions.map(protoMention => {
+      return arrayToBase64(Mention.encode(protoMention).finish());
+    });
+    const previews = protoLinkPreviews.map(protoLinkPreview => {
+      return arrayToBase64(LinkPreview.encode(protoLinkPreview).finish());
+    });
 
     const mappedText: MappedText = {
       data: {

@@ -53,13 +53,15 @@ export const SelectText = ({text, className = '', dataUieName = 'select-text'}: 
       css={{wordBreak: 'break-all'}}
       className={cx('select-text', className)}
       onClick={onClick}
-      onKeyDown={event =>
-        handleKeyDown({
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
-          callback: () => onClick(event),
+          callback: () => {
+            return onClick(event);
+          },
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
     >
       {text}
     </div>

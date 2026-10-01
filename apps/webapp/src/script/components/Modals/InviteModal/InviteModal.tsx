@@ -51,8 +51,12 @@ const InviteModal = ({translate, selfUser, onClose}: InviteModalProps) => {
     ? translate('inviteHintSelected', {metaKey})
     : translate('inviteHintUnselected', {metaKey});
 
-  const onTextClick = () => setIsInviteMessageSelected(true);
-  const onBlur = () => setIsInviteMessageSelected(false);
+  const onTextClick = () => {
+    return setIsInviteMessageSelected(true);
+  };
+  const onBlur = () => {
+    return setIsInviteMessageSelected(false);
+  };
 
   const onClick = (ev: React.MouseEvent<HTMLTextAreaElement, MouseEvent>) => {
     (ev.target as HTMLTextAreaElement).select();

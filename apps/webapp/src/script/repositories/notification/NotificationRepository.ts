@@ -172,7 +172,9 @@ export class NotificationRepository {
     this.notificationsPreference.subscribe(notificationsPreference => {
       const preferenceIsNone = notificationsPreference === NotificationPreference.NONE;
       if (!preferenceIsNone) {
-        this.fireAndForgetInvoker.fireAndForget(() => this.checkPermission());
+        this.fireAndForgetInvoker.fireAndForget(() => {
+          return this.checkPermission();
+        });
       }
     });
   }
@@ -211,9 +213,15 @@ export class NotificationRepository {
     }
 
     const currentPermission = match(this.notificationApi.getPermission())
-      .with('default', () => BrowserPermissionStatus.PROMPT)
-      .with('denied', () => BrowserPermissionStatus.DENIED)
-      .with('granted', () => BrowserPermissionStatus.GRANTED)
+      .with('default', () => {
+        return BrowserPermissionStatus.PROMPT;
+      })
+      .with('denied', () => {
+        return BrowserPermissionStatus.DENIED;
+      })
+      .with('granted', () => {
+        return BrowserPermissionStatus.GRANTED;
+      })
       .exhaustive();
     const shouldRequestPermission = currentPermission === BrowserPermissionStatus.PROMPT;
     return shouldRequestPermission ? this.requestPermission() : this.updatePermissionState(currentPermission);
@@ -722,7 +730,9 @@ export class NotificationRepository {
       messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.userState.self().qualifiedId);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
-      return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
+      return () => {
+        return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
+      };
     }
 
     const isConnectionRequest = messageEntity.isMember() && (messageEntity as MemberMessage).isConnectionRequest();
@@ -963,7 +973,9 @@ export class NotificationRepository {
         }
       }
     };
-    const isClosed = (): boolean => presentationState.kind === 'closed';
+    const isClosed = (): boolean => {
+      return presentationState.kind === 'closed';
+    };
     const notificationResult = this.notificationApi.show({
       ...notificationContent.options,
       title: notificationContent.title,
@@ -981,7 +993,9 @@ export class NotificationRepository {
             this.clock.clearTimeout(notificationEntry.timeoutIdentifier);
           }
           if (!isUndefined(notificationEntry)) {
-            this.notifications = this.notifications.filter(entry => entry !== notificationEntry);
+            this.notifications = this.notifications.filter(entry => {
+              return entry !== notificationEntry;
+            });
           }
         }
         presentationState = {kind: 'closed'};

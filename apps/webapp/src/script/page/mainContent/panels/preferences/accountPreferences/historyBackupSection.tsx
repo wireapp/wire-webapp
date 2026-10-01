@@ -55,7 +55,9 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
     >
       <Button
         variant={ButtonVariant.TERTIARY}
-        onClick={() => switchContent(ContentState.HISTORY_EXPORT)}
+        onClick={() => {
+          return switchContent(ContentState.HISTORY_EXPORT);
+        }}
         data-uie-name="do-backup-export"
         aria-describedby="preferences-history-describe-1"
         type="button"

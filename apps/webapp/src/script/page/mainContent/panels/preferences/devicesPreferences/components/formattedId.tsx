@@ -27,11 +27,13 @@ interface FormattedIdProps {
 export const FormattedId = ({idSlices, smallPadding = false}: FormattedIdProps) => {
   return (
     <>
-      {idSlices.map((slice, index) => (
-        <span css={devicePart(smallPadding)} key={slice + index} data-uie-name="element-device-id-part">
-          {slice}
-        </span>
-      ))}
+      {idSlices.map((slice, index) => {
+        return (
+          <span css={devicePart(smallPadding)} key={slice + index} data-uie-name="element-device-id-part">
+            {slice}
+          </span>
+        );
+      })}
     </>
   );
 };

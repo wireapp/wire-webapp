@@ -213,7 +213,9 @@ export function selectHelmChartVersion(
     .filter(publishedChart => {
       return publishedChart.appVersion === immutableImageTag;
     })
-    .map(publishedChart => publishedChart.version);
+    .map(publishedChart => {
+      return publishedChart.version;
+    });
 
   if (matchingChartVersions.length > 1) {
     return Result.err(new Error(`More than one Helm chart matches image tag ${immutableImageTag}`));

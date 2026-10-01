@@ -114,12 +114,20 @@ export class PreferenceNotificationRepository {
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
     ];
-    const prio = (item: GroupedNotifications) => notificationPriorities.indexOf(item.type);
+    const prio = (item: GroupedNotifications) => {
+      return notificationPriorities.indexOf(item.type);
+    };
     const notifications = this.notifications.removeAll();
-    const groupedNotifications = groupBy(notifications, notification => notification.type);
+    const groupedNotifications = groupBy(notifications, notification => {
+      return notification.type;
+    });
     return Object.entries(groupedNotifications)
-      .map(([type, notification]) => ({notification, type}))
-      .toSorted((a, b) => prio(a) - prio(b));
+      .map(([type, notification]) => {
+        return {notification, type};
+      })
+      .toSorted((a, b) => {
+        return prio(a) - prio(b);
+      });
   }
 
   onClientRemove(_userId: string, clientId: string, domain: string | null): void {

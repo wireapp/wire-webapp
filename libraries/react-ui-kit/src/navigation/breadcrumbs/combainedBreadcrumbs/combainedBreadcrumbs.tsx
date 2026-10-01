@@ -39,14 +39,21 @@ export const CombainedBreadcrumbs = ({items, onItemClick}: CombainedBreadcrumbsP
         </li>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        {items.map(crumb => (
-          <DropdownMenu.Item key={crumb.name} onClick={() => onItemClick(crumb)}>
-            <div css={itemStyles}>
-              {crumb.icon}
-              {crumb.name}
-            </div>
-          </DropdownMenu.Item>
-        ))}
+        {items.map(crumb => {
+          return (
+            <DropdownMenu.Item
+              key={crumb.name}
+              onClick={() => {
+                return onItemClick(crumb);
+              }}
+            >
+              <div css={itemStyles}>
+                {crumb.icon}
+                {crumb.name}
+              </div>
+            </DropdownMenu.Item>
+          );
+        })}
       </DropdownMenu.Content>
     </DropdownMenu>
   );

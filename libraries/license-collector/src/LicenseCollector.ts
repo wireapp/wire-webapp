@@ -93,7 +93,9 @@ export class LicenseCollector {
     }
 
     this.dependencies = [];
-    this.repositories = this.options.repositories.map(url => ({dir: '', name: '', url}));
+    this.repositories = this.options.repositories.map(url => {
+      return {dir: '', name: '', url};
+    });
     this.TMP_DIR = '';
   }
 
@@ -141,7 +143,13 @@ export class LicenseCollector {
     dir = path.resolve(dir);
 
     const fileNames = await fs.readdir(dir);
-    const files = fileNames.filter(file => !['node_modules', '.git'].includes(file)).map(file => path.join(dir, file));
+    const files = fileNames
+      .filter(file => {
+        return !['node_modules', '.git'].includes(file);
+      })
+      .map(file => {
+        return path.join(dir, file);
+      });
 
     for (const file of files) {
       const lstat = await fs.lstat(file);
@@ -163,7 +171,9 @@ export class LicenseCollector {
       this.logger.info(`${name}: Discovering "package.json" files ...`);
 
       const packageFiles = await this.findPackageJson(cloneDir);
-      const packageFileNames = packageFiles.map(fileName => fileName.replace(new RegExp(cloneDir, 'gm'), ''));
+      const packageFileNames = packageFiles.map(fileName => {
+        return fileName.replace(new RegExp(cloneDir, 'gm'), '');
+      });
 
       this.logger.info(`${name}: Found "${packageFileNames.join('", "')}"`);
       this.logger.info(`${name}: Discovering direct dependencies ...`);
@@ -188,7 +198,9 @@ export class LicenseCollector {
           packageJson.devDependencies !== undefined ? packageJson.devDependencies : {},
         ).filter(Boolean);
 
-        const plural = (length: number) => (length === 1 ? 'y' : 'ies');
+        const plural = (length: number) => {
+          return length === 1 ? 'y' : 'ies';
+        };
         const packageFileName = packageFile.replace(new RegExp(cloneDir, 'gm'), '');
 
         this.logger.info(

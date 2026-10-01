@@ -33,15 +33,19 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-jest.mock('Components/meeting/useJoinMeetingCall', () => ({
-  useJoinMeetingCall: jest.fn(() => ({
-    joinMeeting: jest.fn(),
-    isJoinDisabled: false,
-    isCallActive: false,
-    isCallConnecting: false,
-    isJoining: false,
-  })),
-}));
+jest.mock('Components/meeting/useJoinMeetingCall', () => {
+  return {
+    useJoinMeetingCall: jest.fn(() => {
+      return {
+        joinMeeting: jest.fn(),
+        isJoinDisabled: false,
+        isCallActive: false,
+        isCallConnecting: false,
+        isJoining: false,
+      };
+    }),
+  };
+});
 
 const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
@@ -59,15 +63,18 @@ const translateForCountTest: Translate = (_key, substitutions) => {
 const getHost = () => {
   return document.querySelector('.meeting-notification-host');
 };
-const getList = () => document.getElementById('meeting-notification-list');
+const getList = () => {
+  return document.getElementById('meeting-notification-list');
+};
 
-const renderHost = (isStandalone = true, translate: Translate = translateForTest) =>
-  render(
+const renderHost = (isStandalone = true, translate: Translate = translateForTest) => {
+  return render(
     <ThemeProvider>
       <MeetingNotificationHost isStandalone={isStandalone} />
     </ThemeProvider>,
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
   );
+};
 
 describe('MeetingNotificationHost', () => {
   beforeEach(() => {
@@ -183,7 +190,11 @@ describe('MeetingNotificationHost', () => {
     fireEvent.click(screen.getByRole('button', {name: 'meetings.notifications.showAll'}));
 
     expect(screen.getAllByRole('listitem')).toHaveLength(5);
-    expect(screen.getAllByRole('listitem').map(item => item.getAttribute('data-uie-name'))).toEqual([
+    expect(
+      screen.getAllByRole('listitem').map(item => {
+        return item.getAttribute('data-uie-name');
+      }),
+    ).toEqual([
       'meeting-notification-card-meeting-notification-4',
       'meeting-notification-card-meeting-notification-3',
       'meeting-notification-card-meeting-notification-2',

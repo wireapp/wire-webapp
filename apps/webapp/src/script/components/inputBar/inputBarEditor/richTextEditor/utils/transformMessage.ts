@@ -28,6 +28,8 @@ export const transformMessage = ({replaceEmojis, markdown}: {replaceEmojis: bool
 export const getRawMessageText = () => {
   return $getRoot()
     .getChildren()
-    .map(node => node.getTextContent())
+    .map(node => {
+      return node.getTextContent();
+    })
     .join('\n');
 };

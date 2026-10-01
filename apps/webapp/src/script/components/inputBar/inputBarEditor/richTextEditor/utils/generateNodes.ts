@@ -19,26 +19,37 @@
 
 import {MentionEntity} from '../../../../../message/mentionEntity';
 
-const intoPairs = (xs: number[]) => xs.slice(1).map((x, index) => [xs[index], x]);
+const intoPairs = (xs: number[]) => {
+  return xs.slice(1).map((x, index) => {
+    return [xs[index], x];
+  });
+};
 
-const breakAt = (places: number[], str: string) =>
-  intoPairs([0, ...places, str.length]).map(([a, b]) => str.substring(a, b));
+const breakAt = (places: number[], str: string) => {
+  return intoPairs([0, ...places, str.length]).map(([a, b]) => {
+    return str.substring(a, b);
+  });
+};
 
-const breakWhere = (words: MentionEntity[], str: string) =>
-  breakAt(
-    words.reduce(
-      (accumulator: number[], {startIndex, length}) => [...accumulator, startIndex, startIndex + length],
-      [],
-    ),
+const breakWhere = (words: MentionEntity[], str: string) => {
+  return breakAt(
+    words.reduce((accumulator: number[], {startIndex, length}) => {
+      return [...accumulator, startIndex, startIndex + length];
+    }, []),
     str,
   );
+};
 
 export const createNodes = (mentions: MentionEntity[], str: string) => {
-  const sortedMentions = mentions.toSorted(({startIndex: o1}, {startIndex: o2}) => o1 - o2);
+  const sortedMentions = mentions.toSorted(({startIndex: o1}, {startIndex: o2}) => {
+    return o1 - o2;
+  });
 
   return breakWhere(sortedMentions, str)
-    .map((string: string, index: number) =>
-      index % 2 == 0 ? {data: string, type: 'text'} : {data: string, type: 'Mention'},
-    )
-    .filter(({data}) => data.length > 0);
+    .map((string: string, index: number) => {
+      return index % 2 == 0 ? {data: string, type: 'text'} : {data: string, type: 'Mention'};
+    })
+    .filter(({data}) => {
+      return data.length > 0;
+    });
 };

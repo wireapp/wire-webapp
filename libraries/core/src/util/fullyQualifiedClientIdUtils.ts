@@ -29,7 +29,9 @@ export const constructFullyQualifiedClientId = (
   userId: UserId,
   clientId: ClientId,
   domain: Domain,
-): ClientIdStringType => `${userId}:${clientId}@${domain}`;
+): ClientIdStringType => {
+  return `${userId}:${clientId}@${domain}`;
+};
 
 export const parseFullQualifiedClientId = (qualifiedId: string): ParsedFullyQualifiedId => {
   const regexp = /([a-zA-Z0-9\-]+):([a-zA-Z0-9\-]+)@([a-zA-Z0-9\-.]+)/;
@@ -43,8 +45,10 @@ export const parseFullQualifiedClientId = (qualifiedId: string): ParsedFullyQual
 export const mapQualifiedUserClientIdsToFullyQualifiedClientIds = (qualifiedUserMap: QualifiedUserClientMap) => {
   return Object.entries(qualifiedUserMap).flatMap(([domain, users]) => {
     const clients = Object.entries(users);
-    return clients.flatMap(([userId, clients]) =>
-      clients.map(client => constructFullyQualifiedClientId(userId, client.id, domain)),
-    );
+    return clients.flatMap(([userId, clients]) => {
+      return clients.map(client => {
+        return constructFullyQualifiedClientId(userId, client.id, domain);
+      });
+    });
   });
 };

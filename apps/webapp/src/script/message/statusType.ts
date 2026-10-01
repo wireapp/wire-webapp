@@ -37,7 +37,9 @@ type EventRecordWithFederationError = Omit<EventRecord, 'status'> & {
   status: StatusType.FEDERATION_ERROR;
 };
 
-export const isEventRecordFailed = (event: any): event is FailedEventRecord =>
-  'status' in event && event.status === StatusType.FAILED;
-export const isEventRecordWithFederationError = (event: any): event is EventRecordWithFederationError =>
-  'status' in event && event.status === StatusType.FEDERATION_ERROR;
+export const isEventRecordFailed = (event: any): event is FailedEventRecord => {
+  return 'status' in event && event.status === StatusType.FAILED;
+};
+export const isEventRecordWithFederationError = (event: any): event is EventRecordWithFederationError => {
+  return 'status' in event && event.status === StatusType.FEDERATION_ERROR;
+};

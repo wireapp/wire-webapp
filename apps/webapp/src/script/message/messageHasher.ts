@@ -34,7 +34,9 @@ const createSha256Hash = async (bytes: number[]): Promise<ArrayBuffer> => {
 /**
  * @returns Array of assetId bytes
  */
-const getAssetBytes = (event: any): number[] => utf8ToUtf16BE(event.data.key);
+const getAssetBytes = (event: any): number[] => {
+  return utf8ToUtf16BE(event.data.key);
+};
 
 /**
  * @returns Array of longitude bytes
@@ -59,7 +61,9 @@ const getTimestampBytes = (event: any): number[] => {
   return Long.fromInt(timestampSeconds).toBytesBE();
 };
 
-const getTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.content);
+const getTextBytes = (event: any): number[] => {
+  return utf8ToUtf16BE(event.data.content);
+};
 
 /**
  * Gets bytes for multipart message including text content and attachment UUIDs.
@@ -74,7 +78,9 @@ const getMultipartTextBytes = (event: any): number[] => {
 
   const attachments = event.data?.attachments ?? [];
   const uuidString = attachments
-    .map((attachment: any) => attachment?.cellAsset?.uuid)
+    .map((attachment: any) => {
+      return attachment?.cellAsset?.uuid;
+    })
     .filter(Boolean)
     .join(', ');
 

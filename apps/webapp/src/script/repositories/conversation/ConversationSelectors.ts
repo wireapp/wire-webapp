@@ -111,12 +111,11 @@ interface ProtocolToConversationType {
   [CONVERSATION_PROTOCOL.MLS]: MLSConversation;
 }
 
-const is1to1ConversationWithUser =
-  <Protocol extends CONVERSATION_PROTOCOL.PROTEUS | CONVERSATION_PROTOCOL.MLS>(
-    userId: QualifiedId,
-    protocol: Protocol,
-  ) =>
-  (conversation: Conversation): conversation is ProtocolToConversationType[Protocol] => {
+const is1to1ConversationWithUser = <Protocol extends CONVERSATION_PROTOCOL.PROTEUS | CONVERSATION_PROTOCOL.MLS>(
+  userId: QualifiedId,
+  protocol: Protocol,
+) => {
+  return (conversation: Conversation): conversation is ProtocolToConversationType[Protocol] => {
     const doesProtocolMatch =
       protocol === CONVERSATION_PROTOCOL.PROTEUS
         ? isProteusConversation(conversation)
@@ -144,12 +143,15 @@ const is1to1ConversationWithUser =
 
     return doesUserIdMatch;
   };
+};
 
-export const isProteus1to1ConversationWithUser = (userId: QualifiedId) =>
-  is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.PROTEUS);
+export const isProteus1to1ConversationWithUser = (userId: QualifiedId) => {
+  return is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.PROTEUS);
+};
 
-export const isMLS1to1ConversationWithUser = (userId: QualifiedId) =>
-  is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.MLS);
+export const isMLS1to1ConversationWithUser = (userId: QualifiedId) => {
+  return is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.MLS);
+};
 
 export const isMeetingConversation = (conversation: Conversation): boolean => {
   return conversation.groupConversationType() === GROUP_CONVERSATION_TYPE.MEETING;

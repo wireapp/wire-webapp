@@ -46,19 +46,33 @@ export class ConnectionEntity {
     this.status = ko.observable(ConnectionStatus.UNKNOWN);
     this.userId = {domain: '', id: ''};
 
-    this.isBlocked = ko.pureComputed(() => this.status() === ConnectionStatus.BLOCKED);
-    this.isMissingLegalHoldConsent = ko.pureComputed(
-      () => this.status() === ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
-    );
-    this.isCanceled = ko.pureComputed(() => this.status() === ConnectionStatus.CANCELLED);
-    this.isConnected = ko.pureComputed(() => this.status() === ConnectionStatus.ACCEPTED);
-    this.isIgnored = ko.pureComputed(() => this.status() === ConnectionStatus.IGNORED);
-    this.isIncomingRequest = ko.pureComputed(() => this.status() === ConnectionStatus.PENDING);
-    this.isOutgoingRequest = ko.pureComputed(() => this.status() === ConnectionStatus.SENT);
-    this.isUnknown = ko.pureComputed(() =>
-      [ConnectionStatus.CANCELLED, ConnectionStatus.UNKNOWN].includes(this.status()),
-    );
+    this.isBlocked = ko.pureComputed(() => {
+      return this.status() === ConnectionStatus.BLOCKED;
+    });
+    this.isMissingLegalHoldConsent = ko.pureComputed(() => {
+      return this.status() === ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT;
+    });
+    this.isCanceled = ko.pureComputed(() => {
+      return this.status() === ConnectionStatus.CANCELLED;
+    });
+    this.isConnected = ko.pureComputed(() => {
+      return this.status() === ConnectionStatus.ACCEPTED;
+    });
+    this.isIgnored = ko.pureComputed(() => {
+      return this.status() === ConnectionStatus.IGNORED;
+    });
+    this.isIncomingRequest = ko.pureComputed(() => {
+      return this.status() === ConnectionStatus.PENDING;
+    });
+    this.isOutgoingRequest = ko.pureComputed(() => {
+      return this.status() === ConnectionStatus.SENT;
+    });
+    this.isUnknown = ko.pureComputed(() => {
+      return [ConnectionStatus.CANCELLED, ConnectionStatus.UNKNOWN].includes(this.status());
+    });
 
-    this.isRequest = ko.pureComputed(() => this.isIncomingRequest() || this.isOutgoingRequest());
+    this.isRequest = ko.pureComputed(() => {
+      return this.isIncomingRequest() || this.isOutgoingRequest();
+    });
   }
 }

@@ -48,7 +48,9 @@ export const TeamCreationBanner = () => {
           type="button"
           onClick={navigateToUpgradePlan}
           data-uie-name="do-submit"
-          onKeyDown={event => handleKeyDown({event, callback: navigateToUpgradePlan, keys: [KEY.ENTER, KEY.SPACE]})}
+          onKeyDown={event => {
+            return handleKeyDown({event, callback: navigateToUpgradePlan, keys: [KEY.ENTER, KEY.SPACE]});
+          }}
         >
           {translate('createConversationUpgradePlanModalButton')}
         </Button>

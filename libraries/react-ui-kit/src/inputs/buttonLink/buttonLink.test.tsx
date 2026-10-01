@@ -23,7 +23,13 @@ import {THEME_ID} from '../../identity';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"ButtonLink"', () => {
-  it('renders', () => matchComponent(<ButtonLink>Submit</ButtonLink>));
-  it('renders (dark theme)', () => matchComponent(<ButtonLink>ButtonLink</ButtonLink>, THEME_ID.DARK));
-  it('renders in loading state', () => matchComponent(<ButtonLink showLoading>Submit</ButtonLink>));
+  it('renders', () => {
+    return matchComponent(<ButtonLink>Submit</ButtonLink>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<ButtonLink>ButtonLink</ButtonLink>, THEME_ID.DARK);
+  });
+  it('renders in loading state', () => {
+    return matchComponent(<ButtonLink showLoading>Submit</ButtonLink>);
+  });
 });

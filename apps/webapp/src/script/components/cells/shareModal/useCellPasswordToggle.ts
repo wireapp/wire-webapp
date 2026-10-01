@@ -23,7 +23,9 @@ export const useCellPasswordToggle = () => {
   const [isEnabled, setIsEnabled] = useState(false);
 
   const toggle = useCallback(() => {
-    setIsEnabled(prev => !prev);
+    setIsEnabled(prev => {
+      return !prev;
+    });
   }, []);
 
   return {isEnabled, toggle, setIsEnabled};

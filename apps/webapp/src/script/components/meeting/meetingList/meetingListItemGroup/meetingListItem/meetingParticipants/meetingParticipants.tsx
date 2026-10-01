@@ -45,8 +45,8 @@ const MeetingParticipantsContent = ({conversation, qualifiedCreator, isOngoing}:
   const {translate} = useApplicationContext();
   const participants = useMeetingParticipants(conversation, qualifiedCreator);
   const avatarRingColor = isOngoing ? 'var(--accent-color-highlight)' : 'var(--text-input-background)';
-  const getParticipantLabel = (participant: User, name: string) =>
-    matchQualifiedIds(participant.qualifiedId, qualifiedCreator)
+  const getParticipantLabel = (participant: User, name: string) => {
+    return matchQualifiedIds(participant.qualifiedId, qualifiedCreator)
       ? translate(
           'meetings.participant.nameWithOrganizer',
           {
@@ -57,6 +57,7 @@ const MeetingParticipantsContent = ({conversation, qualifiedCreator, isOngoing}:
           true,
         )
       : name;
+  };
 
   if (participants.length === 0) {
     return null;

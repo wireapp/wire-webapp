@@ -32,18 +32,24 @@ export function getDeduplicatedUnion<T>(array1: T[], array2: T[]): T[] {
 }
 
 export function getDifference<T>(array1: T[], array2: T[]): T[] {
-  return array1.filter(value => !array2.includes(value));
+  return array1.filter(value => {
+    return !array2.includes(value);
+  });
 }
 
 export function getIntersection<T>(array1: T[], array2: T[]): T[] {
-  return array1.filter(value => array2.includes(value));
+  return array1.filter(value => {
+    return array2.includes(value);
+  });
 }
 
 export function removeDuplicates<T>(array: T[]): T[] {
   return Array.from(new Set(array));
 }
 
-export const flatten = <T>(arrays: T[][]): T[] => ([] as T[]).concat(...arrays);
+export const flatten = <T>(arrays: T[][]): T[] => {
+  return ([] as T[]).concat(...arrays);
+};
 
 export function filterFalsy<T>(value: T): value is Exclude<T, TypeUtil.FalsyType> {
   return Boolean(value);

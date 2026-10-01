@@ -21,9 +21,16 @@ import {matchComponent} from '../../utils/testUtil';
 import {Input} from '../input';
 
 describe('"Input"', () => {
-  it('renders', () => matchComponent(<Input />));
-  it('renders as invalid', () => matchComponent(<Input markInvalid />));
-  it('renders as disabled', () => matchComponent(<Input disabled />));
-  it('renders with placeholderTextTransform', () =>
-    matchComponent(<Input placeholderTextTransform="uppercase" placeholder="Input" />));
+  it('renders', () => {
+    return matchComponent(<Input />);
+  });
+  it('renders as invalid', () => {
+    return matchComponent(<Input markInvalid />);
+  });
+  it('renders as disabled', () => {
+    return matchComponent(<Input disabled />);
+  });
+  it('renders with placeholderTextTransform', () => {
+    return matchComponent(<Input placeholderTextTransform="uppercase" placeholder="Input" />);
+  });
 });

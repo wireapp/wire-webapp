@@ -40,30 +40,32 @@ import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import * as browserLocationModule from '../../navigation/browserLocation';
 
-const createMockDependencies = (): LifeCycleDependencies => ({
-  clientRepository: {
-    isCurrentClientPermanent: jest.fn(),
-    constructCookieLabelKey: jest.fn(),
-  } as unknown as ClientRepository,
-  conversationRepository: {
-    getActiveConversation: jest.fn(),
-    sendTypingStop: jest.fn(),
-  } as unknown as ConversationRepository,
-  eventRepository: {
-    disconnectWebSocket: jest.fn(),
-  } as unknown as EventRepository,
-  storageRepository: {
-    deleteDatabase: jest.fn(),
-  } as unknown as StorageRepository,
-  userRepository: {
-    userState: {
-      self: jest.fn(),
-    },
-  } as unknown as UserRepository,
-  core: {
-    logout: jest.fn(),
-  } as any,
-});
+const createMockDependencies = (): LifeCycleDependencies => {
+  return {
+    clientRepository: {
+      isCurrentClientPermanent: jest.fn(),
+      constructCookieLabelKey: jest.fn(),
+    } as unknown as ClientRepository,
+    conversationRepository: {
+      getActiveConversation: jest.fn(),
+      sendTypingStop: jest.fn(),
+    } as unknown as ConversationRepository,
+    eventRepository: {
+      disconnectWebSocket: jest.fn(),
+    } as unknown as EventRepository,
+    storageRepository: {
+      deleteDatabase: jest.fn(),
+    } as unknown as StorageRepository,
+    userRepository: {
+      userState: {
+        self: jest.fn(),
+      },
+    } as unknown as UserRepository,
+    core: {
+      logout: jest.fn(),
+    } as any,
+  };
+};
 
 describe('LifeCycleRepository', () => {
   let lifeCycleRepository: LifeCycleRepository;
@@ -93,9 +95,9 @@ describe('LifeCycleRepository', () => {
     };
 
     setWindowLocation('/?param=value#/test');
-    replaceLocationMock = jest
-      .spyOn(browserLocationModule, 'replaceBrowserLocation')
-      .mockImplementation(() => undefined);
+    replaceLocationMock = jest.spyOn(browserLocationModule, 'replaceBrowserLocation').mockImplementation(() => {
+      return undefined;
+    });
 
     Object.defineProperty(window, 'navigator', {
       writable: true,

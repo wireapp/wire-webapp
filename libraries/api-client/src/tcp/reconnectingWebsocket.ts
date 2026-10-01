@@ -682,7 +682,9 @@ export class ReconnectingWebsocket {
   }
 
   private resolvePendingHealthChecks(isHealthy: boolean) {
-    this.pendingHealthChecks.forEach(resolve => resolve(isHealthy));
+    this.pendingHealthChecks.forEach(resolve => {
+      resolve(isHealthy);
+    });
     this.pendingHealthChecks.clear();
   }
 

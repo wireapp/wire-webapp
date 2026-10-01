@@ -29,8 +29,12 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useEditMeeting = () => {
   const {translate} = useApplicationContext();
-  const loadMeetingForEdit = useMeetingStore(state => state.loadMeetingForEdit);
-  const openEdit = useScheduleMeetingModal(state => state.openEdit);
+  const loadMeetingForEdit = useMeetingStore(state => {
+    return state.loadMeetingForEdit;
+  });
+  const openEdit = useScheduleMeetingModal(state => {
+    return state.openEdit;
+  });
 
   const editMeeting = useCallback(
     async (meetingInstance: MeetingInstance) => {

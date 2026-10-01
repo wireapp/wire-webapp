@@ -279,17 +279,21 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
           recoveryKey,
           trigger,
         });
-        await this.runOnceWithKey(recoveryKey, () =>
-          this.deps.recoverFromEpochMismatch(id, context.subconvId, trigger),
-        );
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.recoverFromEpochMismatch(id, context.subconvId, trigger);
+        });
         break;
       }
       case 'JoinViaExternalCommit': {
-        await this.runOnceWithKey(recoveryKey, () => this.deps.joinViaExternalCommit(id));
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.joinViaExternalCommit(id);
+        });
         break;
       }
       case 'ResetAndReestablish': {
-        await this.runOnceWithKey(recoveryKey, () => this.deps.resetAndReestablish(id));
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.resetAndReestablish(id);
+        });
         break;
       }
       case 'AddMissingUsers': {
@@ -301,7 +305,9 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
         if (groupId === undefined || groupId.length === 0) {
           throw new Error('Missing groupId for AddMissingUsers');
         }
-        await this.runOnceWithKey(recoveryKey, () => this.deps.addMissingUsers(id, groupId, missing));
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.addMissingUsers(id, groupId, missing);
+        });
         break;
       }
       case 'WipeAndReprocessWelcome': {
@@ -311,7 +317,9 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
           this.logger.warn('Could not determine groupId for WipeAndReprocessWelcome; skipping wipe');
           break;
         }
-        await this.runOnceWithKey(recoveryKey, () => this.deps.wipeMLSConversation(groupId));
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.wipeMLSConversation(groupId);
+        });
         break;
       }
       default:
@@ -362,7 +370,9 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => {
+      return setTimeout(resolve, ms);
+    });
   }
 }
 

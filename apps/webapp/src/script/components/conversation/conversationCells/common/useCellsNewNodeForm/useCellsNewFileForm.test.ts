@@ -36,7 +36,9 @@ describe('useCellsNewFileForm', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
-  const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
+  const createEvent = () => {
+    return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -47,9 +49,9 @@ describe('useCellsNewFileForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document') =>
-    renderHook(() =>
-      useCellsNewFileForm({
+  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document') => {
+    return renderHook(() => {
+      return useCellsNewFileForm({
         fileType,
         cellsRepository: mockCellsRepository,
         conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
@@ -57,8 +59,9 @@ describe('useCellsNewFileForm', () => {
         currentPath: '/wire-cells-web/path',
         isOpen: true,
         validationCopy,
-      }),
-    );
+      });
+    });
+  };
 
   it('adds extension and template UUID for document files', async () => {
     const {result} = renderUseCellsNewFileForm();

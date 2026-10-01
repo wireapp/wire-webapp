@@ -39,22 +39,30 @@ type QuoteAccessor<T> = {
 };
 
 const messageAddQuoteAccessor: QuoteAccessor<MessageAddEvent> = {
-  get: event => event.data.quote,
-  set: (event, quote) => ({
-    ...event,
-    data: {...event.data, quote},
-  }),
+  get: event => {
+    return event.data.quote;
+  },
+  set: (event, quote) => {
+    return {
+      ...event,
+      data: {...event.data, quote},
+    };
+  },
 };
 
 const multipartMessageAddQuoteAccessor: QuoteAccessor<MultipartMessageAddEvent> = {
-  get: event => event.data.text?.quote,
-  set: (event, quote) => ({
-    ...event,
-    data: {
-      ...event.data,
-      text: {...event.data.text, quote},
-    },
-  }),
+  get: event => {
+    return event.data.text?.quote;
+  },
+  set: (event, quote) => {
+    return {
+      ...event,
+      data: {
+        ...event.data,
+        text: {...event.data.text, quote},
+      },
+    };
+  },
 };
 
 export class QuotedMessageMiddleware implements EventMiddleware {

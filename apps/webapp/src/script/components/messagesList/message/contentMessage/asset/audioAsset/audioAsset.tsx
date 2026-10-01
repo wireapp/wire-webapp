@@ -72,7 +72,9 @@ export const AudioAsset = ({
     }
   };
   const showLoudnessPreview = (asset.meta?.loudness?.length ?? 0) > 0;
-  const onPauseButtonClicked = () => audioElement?.pause();
+  const onPauseButtonClicked = () => {
+    return audioElement?.pause();
+  };
 
   const onPlayButtonClicked = async () => {
     if (!isUndefined(audioSrc)) {
@@ -99,7 +101,11 @@ export const AudioAsset = ({
     }
   }, [audioElement, audioSrc]);
 
-  useEffect(() => () => audioSrc?.dispose(), []);
+  useEffect(() => {
+    return () => {
+      return audioSrc?.dispose();
+    };
+  }, []);
 
   return (
     <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>

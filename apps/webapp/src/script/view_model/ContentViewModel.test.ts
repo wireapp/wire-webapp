@@ -34,8 +34,11 @@ import {ContentState, useAppState} from '../page/useAppState';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
-const buildConversation = () =>
-  new Conversation('conversation-id', 'example.com', CONVERSATION_PROTOCOL.PROTEUS, (text: string) => text);
+const buildConversation = () => {
+  return new Conversation('conversation-id', 'example.com', CONVERSATION_PROTOCOL.PROTEUS, (text: string) => {
+    return text;
+  });
+};
 
 const buildContentViewModel = () => {
   const conversationRepository = {
@@ -54,7 +57,9 @@ const buildContentViewModel = () => {
     message: {} as unknown as MessageRepository,
   } as unknown as ViewModelRepositories;
 
-  return new ContentViewModel(mainViewModel, repositories, (text: string) => text);
+  return new ContentViewModel(mainViewModel, repositories, (text: string) => {
+    return text;
+  });
 };
 
 describe('ContentViewModel', () => {

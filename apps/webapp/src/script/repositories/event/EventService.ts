@@ -86,14 +86,18 @@ export class EventService {
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('id')
           .anyOf(eventIds)
-          .filter(record => record.conversation === conversationId)
+          .filter(record => {
+            return record.conversation === conversationId;
+          })
           .toArray();
         return events;
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
-        .filter(record => record.conversation === conversationId && eventIds.includes(record.id ?? ''))
+        .filter(record => {
+          return record.conversation === conversationId && eventIds.includes(record.id ?? '');
+        })
         .toSorted(compareEventsById);
     } catch (error: unknown) {
       const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
@@ -159,13 +163,17 @@ export class EventService {
             eventStore
               .where('conversation')
               .equals(conversationId)
-              .filter(item => item.data?.replacing_message_id === eventId || item.id === eventId)
+              .filter(item => {
+                return item.data?.replacing_message_id === eventId || item.id === eventId;
+              })
               .first();
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
-        .filter(record => record.id === eventId && record.conversation === conversationId)
+        .filter(record => {
+          return record.id === eventId && record.conversation === conversationId;
+        })
         .toSorted(compareEventsById)
         .shift();
     } catch (error: unknown) {
@@ -207,10 +215,11 @@ export class EventService {
 
     const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
-      .filter(
-        record =>
-          record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax,
-      )
+      .filter(record => {
+        return (
+          record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax
+        );
+      })
       .filter(filterExpired)
       .toSorted(compareEventsByTime);
   }
@@ -221,7 +230,9 @@ export class EventService {
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where(['conversation', 'time'])
         .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
-        .filter(event => hasQuoteForMessage(event, quotedMessageId))
+        .filter(event => {
+          return hasQuoteForMessage(event, quotedMessageId);
+        })
         .toArray();
       return events;
     }
@@ -235,7 +246,9 @@ export class EventService {
           record.time <= new Date().toISOString()
         );
       })
-      .filter(event => hasQuoteForMessage(event, quotedMessageId))
+      .filter(event => {
+        return hasQuoteForMessage(event, quotedMessageId);
+      })
       .toSorted(compareEventsByConversation);
   }
 
@@ -504,11 +517,13 @@ export class EventService {
 
     const events = await this.loadAllConversationEvents(conversationId.id, eventsToSkip);
 
-    const eventsToMove = events.map(event => ({
-      ...event,
-      conversation: newConversationId.id,
-      qualified_conversation: newConversationId,
-    }));
+    const eventsToMove = events.map(event => {
+      return {
+        ...event,
+        conversation: newConversationId.id,
+        qualified_conversation: newConversationId,
+      };
+    });
 
     return Promise.all(
       eventsToMove.map(event => {
@@ -531,7 +546,9 @@ export class EventService {
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('conversation')
           .equals(conversationId)
-          .and(record => !eventTypesToSkip.includes(record.type))
+          .and(record => {
+            return !eventTypesToSkip.includes(record.type);
+          })
           .toArray();
         return events;
       }

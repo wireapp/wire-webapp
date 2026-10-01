@@ -95,7 +95,9 @@ export const getConversationIconType = ({
 }: {
   isChannel: boolean;
   isChannelsEnabled: boolean;
-}): ConversationIconType => (isChannel && isChannelsEnabled ? 'channel' : 'group');
+}): ConversationIconType => {
+  return isChannel && isChannelsEnabled ? 'channel' : 'group';
+};
 
 export const FileHeader = ({
   id,
@@ -170,7 +172,9 @@ export const FileHeader = ({
             title="Viewing"
             aria-label="Viewing"
             className={isInEditMode !== true ? 'active' : ''}
-            onClick={() => onEditModeChange(false)}
+            onClick={() => {
+              return onEditModeChange(false);
+            }}
           >
             <ShowIcon width={16} height={16} />
             Viewing
@@ -180,7 +184,9 @@ export const FileHeader = ({
               title="Editing"
               aria-label="Editing"
               className={isInEditMode === true ? 'active' : ''}
-              onClick={() => onEditModeChange(true)}
+              onClick={() => {
+                return onEditModeChange(true);
+              }}
             >
               <EditIcon width={14} height={14} />
               Editing
@@ -221,7 +227,13 @@ export const FileHeader = ({
                 </Button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Content>
-                <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
+                <DropdownMenu.Item
+                  onClick={() => {
+                    return showModal(id, () => {
+                      return onFileContentRefresh();
+                    });
+                  }}
+                >
                   {translate('cells.options.versionHistory')}
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
@@ -240,14 +252,16 @@ const ConversationLabel = ({conversation, fallbackName}: {conversation?: Convers
   return <ConversationEntityLabel conversation={conversation} fallbackName={fallbackName} />;
 };
 
-const FallbackConversationLabel = ({fallbackName}: {fallbackName: string}) => (
-  <span css={sourceConversationMetadataStyles}>
-    <span css={sourceConversationIconStyles} aria-hidden="true">
-      <GroupAvatar size="small" />
+const FallbackConversationLabel = ({fallbackName}: {fallbackName: string}) => {
+  return (
+    <span css={sourceConversationMetadataStyles}>
+      <span css={sourceConversationIconStyles} aria-hidden="true">
+        <GroupAvatar size="small" />
+      </span>
+      <span css={textStyles}>{fallbackName}</span>
     </span>
-    <span css={textStyles}>{fallbackName}</span>
-  </span>
-);
+  );
+};
 
 const ConversationEntityLabel = ({conversation, fallbackName}: {conversation: Conversation; fallbackName: string}) => {
   const {isChannelsEnabled} = useChannelsFeatureFlag();

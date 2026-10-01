@@ -101,32 +101,34 @@ export const SingleItem: Story = {
 };
 
 export const MultipleSizes: Story = {
-  render: () => (
-    <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-      <AvatarGrid
-        size={32}
-        items={[
-          {color: COLOR.RED, name: 'Joe'},
-          {color: COLOR.BLUE, name: 'Bon'},
-        ]}
-      />
-      <AvatarGrid
-        size={64}
-        items={[
-          {color: COLOR.RED, name: 'Joe'},
-          {color: COLOR.BLUE, name: 'Bon'},
-          {color: COLOR.GREEN, name: 'Fred'},
-        ]}
-      />
-      <AvatarGrid
-        size={96}
-        items={[
-          {color: COLOR.RED, name: 'Joe'},
-          {color: COLOR.BLUE, name: 'Bon'},
-          {color: COLOR.GREEN, name: 'Fred'},
-          {color: COLOR.ORANGE, name: 'Mick'},
-        ]}
-      />
-    </div>
-  ),
+  render: () => {
+    return (
+      <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+        <AvatarGrid
+          size={32}
+          items={[
+            {color: COLOR.RED, name: 'Joe'},
+            {color: COLOR.BLUE, name: 'Bon'},
+          ]}
+        />
+        <AvatarGrid
+          size={64}
+          items={[
+            {color: COLOR.RED, name: 'Joe'},
+            {color: COLOR.BLUE, name: 'Bon'},
+            {color: COLOR.GREEN, name: 'Fred'},
+          ]}
+        />
+        <AvatarGrid
+          size={96}
+          items={[
+            {color: COLOR.RED, name: 'Joe'},
+            {color: COLOR.BLUE, name: 'Bon'},
+            {color: COLOR.GREEN, name: 'Fred'},
+            {color: COLOR.ORANGE, name: 'Mick'},
+          ]}
+        />
+      </div>
+    );
+  },
 };

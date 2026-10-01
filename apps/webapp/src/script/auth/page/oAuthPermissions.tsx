@@ -185,26 +185,30 @@ const OAuthPermissionsComponent = ({
             {oauthParams.scope.length > 1 && (
               <Box css={boxCSS}>
                 <ul css={listCSS} data-uie-name="oauth-permissions-list">
-                  {oauthScope.map((scope, index) => (
-                    <li key={index} css={{textAlign: 'start'}}>
-                      <Text>{scopeText[scope]}</Text>
-                    </li>
-                  ))}
+                  {oauthScope.map((scope, index) => {
+                    return (
+                      <li key={index} css={{textAlign: 'start'}}>
+                        <Text>{scopeText[scope]}</Text>
+                      </li>
+                    );
+                  })}
                 </ul>
                 <Text data-uie-name="oauth-learn-more" css={textCSS}>
                   <FormattedMessage
                     id="oauth.learnMore"
                     values={{
-                      learnMore: (...chunks: string[] | React.ReactNode[]) => (
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-uie-name="go-learn-more"
-                          href={Config.getConfig().URL.SUPPORT.OAUTH_LEARN_MORE}
-                        >
-                          {chunks}
-                        </a>
-                      ),
+                      learnMore: (...chunks: string[] | React.ReactNode[]) => {
+                        return (
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-uie-name="go-learn-more"
+                            href={Config.getConfig().URL.SUPPORT.OAUTH_LEARN_MORE}
+                          >
+                            {chunks}
+                          </a>
+                        );
+                      },
                     }}
                   />
                 </Text>
@@ -220,7 +224,9 @@ const OAuthPermissionsComponent = ({
                 type="button"
                 onClick={onCancel}
                 data-uie-name="do-oauth-cancel"
-                onKeyDown={event => handleEscDown(event, onCancel)}
+                onKeyDown={event => {
+                  return handleEscDown(event, onCancel);
+                }}
               >
                 {translate('oauth.cancel')}
               </Button>
@@ -229,7 +235,9 @@ const OAuthPermissionsComponent = ({
                 type="button"
                 onClick={onContinue}
                 data-uie-name="do-oauth-allow"
-                onKeyDown={event => handleKeyDown({event, callback: onContinue, keys: [KEY.ENTER, KEY.SPACE]})}
+                onKeyDown={event => {
+                  return handleKeyDown({event, callback: onContinue, keys: [KEY.ENTER, KEY.SPACE]});
+                }}
               >
                 {translate('oauth.allow')}
               </Button>
@@ -238,16 +246,18 @@ const OAuthPermissionsComponent = ({
               <FormattedMessage
                 id="oauth.privacypolicy"
                 values={{
-                  privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-uie-name="go-privacy-policy"
-                      href={Config.getConfig().URL.PRIVACY_POLICY}
-                    >
-                      {chunks}
-                    </a>
-                  ),
+                  privacypolicy: (...chunks: string[] | React.ReactNode[]) => {
+                    return (
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-uie-name="go-privacy-policy"
+                        href={Config.getConfig().URL.PRIVACY_POLICY}
+                      >
+                        {chunks}
+                      </a>
+                    );
+                  },
                 }}
               />
             </Paragraph>
@@ -259,24 +269,33 @@ const OAuthPermissionsComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  selfUser: SelfSelector.getSelf(state),
-  selfTeamId: SelfSelector.getSelfTeamId(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    selfUser: SelfSelector.getSelf(state),
+    selfTeamId: SelfSelector.getSelfTeamId(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
-  getSelf: (...args: Parameters<typeof actionRoot.selfAction.fetchSelf>) =>
-    dispatch(actionRoot.selfAction.fetchSelf(...args)),
-  getOAuthApp: (...args: Parameters<typeof actionRoot.authAction.doGetOAuthApplication>) =>
-    dispatch(actionRoot.authAction.doGetOAuthApplication(...args)),
-  doLogout: (...args: Parameters<typeof actionRoot.authAction.doLogout>) =>
-    dispatch(actionRoot.authAction.doLogout(...args)),
-  getTeam: (...args: Parameters<typeof actionRoot.authAction.doGetTeamData>) =>
-    dispatch(actionRoot.authAction.doGetTeamData(...args)),
-  postOauthCode: (...args: Parameters<typeof actionRoot.authAction.doPostOAuthCode>) =>
-    dispatch(actionRoot.authAction.doPostOAuthCode(...args)),
-});
+const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+  return {
+    getSelf: (...args: Parameters<typeof actionRoot.selfAction.fetchSelf>) => {
+      return dispatch(actionRoot.selfAction.fetchSelf(...args));
+    },
+    getOAuthApp: (...args: Parameters<typeof actionRoot.authAction.doGetOAuthApplication>) => {
+      return dispatch(actionRoot.authAction.doGetOAuthApplication(...args));
+    },
+    doLogout: (...args: Parameters<typeof actionRoot.authAction.doLogout>) => {
+      return dispatch(actionRoot.authAction.doLogout(...args));
+    },
+    getTeam: (...args: Parameters<typeof actionRoot.authAction.doGetTeamData>) => {
+      return dispatch(actionRoot.authAction.doGetTeamData(...args));
+    },
+    postOauthCode: (...args: Parameters<typeof actionRoot.authAction.doPostOAuthCode>) => {
+      return dispatch(actionRoot.authAction.doPostOAuthCode(...args));
+    },
+  };
+};
 
 const OAuthPermissions = connect(mapStateToProps, mapDispatchToProps)(OAuthPermissionsComponent);
 

@@ -31,19 +31,37 @@ describe('AppLoader', () => {
     let nextStep: (message: string) => void = noop;
     let done: () => void = noop;
     const init = jest.fn(async (onProgress: (m: string) => void) => {
-      nextStep = (message: string) => onProgress(message);
-      return new Promise<User>(resolve => (done = () => resolve(new User('', '', translateForTest))));
+      nextStep = (message: string) => {
+        return onProgress(message);
+      };
+      return new Promise<User>(resolve => {
+        return (done = () => {
+          return resolve(new User('', '', translateForTest));
+        });
+      });
     });
 
-    const {queryByText, getByText} = render(<AppLoader init={init}>{() => <div>LoadedApp</div>}</AppLoader>);
+    const {queryByText, getByText} = render(
+      <AppLoader init={init}>
+        {() => {
+          return <div>LoadedApp</div>;
+        }}
+      </AppLoader>,
+    );
 
-    act(() => nextStep('first'));
+    act(() => {
+      return nextStep('first');
+    });
     expect(getByText('first')).not.toBe(null);
     expect(queryByText('LoadedApp')).toBe(null);
-    act(() => nextStep('second'));
+    act(() => {
+      return nextStep('second');
+    });
     expect(getByText('second')).not.toBe(null);
     expect(queryByText('LoadedApp')).toBe(null);
     done();
-    await waitFor(() => expect(getByText('LoadedApp')).not.toBe(null));
+    await waitFor(() => {
+      return expect(getByText('LoadedApp')).not.toBe(null);
+    });
   });
 });

@@ -63,16 +63,18 @@ interface GuestLoginColumnProps {
 
 const Separator = () => {
   const isMobile = useMatchMedia(QUERY.mobile);
-  const Line = () => (
-    <div
-      style={{
-        flex: 1,
-        height: '1px',
-        backgroundColor: '#696c6e',
-        minWidth: '20rem',
-      }}
-    ></div>
-  );
+  const Line = () => {
+    return (
+      <div
+        style={{
+          flex: 1,
+          height: '1px',
+          backgroundColor: '#696c6e',
+          minWidth: '20rem',
+        }}
+      ></div>
+    );
+  };
   return (
     <div
       style={{
@@ -114,7 +116,9 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
                 block
                 type="submit"
                 formNoValidate
-                onClick={() => handleSubmit()}
+                onClick={() => {
+                  return handleSubmit();
+                }}
                 aria-label={translate('conversationJoin.join')}
                 data-uie-name="do-join-as-member"
               >

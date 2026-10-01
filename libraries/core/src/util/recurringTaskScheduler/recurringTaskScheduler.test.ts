@@ -144,7 +144,9 @@ describe('RecurringTaskScheduler', () => {
     let originalWindow: typeof globalThis.window | undefined;
 
     const getFocusHandler = (): (() => void) => {
-      const focusCalls = addEventListenerSpy.mock.calls.filter(([eventName]) => eventName === 'focus');
+      const focusCalls = addEventListenerSpy.mock.calls.filter(([eventName]) => {
+        return eventName === 'focus';
+      });
       expect(focusCalls.length).toBeGreaterThan(0);
       return focusCalls[focusCalls.length - 1]?.[1] as () => void;
     };
@@ -192,7 +194,9 @@ describe('RecurringTaskScheduler', () => {
       expect(task).toHaveBeenCalledTimes(1);
       expect(removeEventListenerSpy).toHaveBeenCalledWith('focus', initialFocusHandler);
 
-      const focusAddCalls = addEventListenerSpy.mock.calls.filter(([eventName]) => eventName === 'focus');
+      const focusAddCalls = addEventListenerSpy.mock.calls.filter(([eventName]) => {
+        return eventName === 'focus';
+      });
       expect(focusAddCalls).toHaveLength(2);
     });
 
@@ -218,13 +222,14 @@ describe('RecurringTaskScheduler', () => {
     });
 
     it('does not run a focus task while it is already executing', async () => {
-      let resolveTask: () => void = () => undefined;
-      const task = jest.fn().mockImplementation(
-        () =>
-          new Promise<void>(resolve => {
-            resolveTask = resolve;
-          }),
-      );
+      let resolveTask: () => void = () => {
+        return undefined;
+      };
+      const task = jest.fn().mockImplementation(() => {
+        return new Promise<void>(resolve => {
+          resolveTask = resolve;
+        });
+      });
 
       await focusTaskScheduler.registerTask({
         every: TimeUtil.TimeInMillis.DAY,

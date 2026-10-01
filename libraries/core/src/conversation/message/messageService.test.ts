@@ -103,16 +103,22 @@ const buildMessageService = async () => {
 
 describe('MessageService', () => {
   afterAll(() => {
-    apiClients.forEach(client => client.disconnect());
+    apiClients.forEach(client => {
+      client.disconnect();
+    });
     cleanupProteusServiceMocks();
   });
   describe('sendMessage', () => {
     const generateUsers = (userCount: number, clientsPerUser: number): TestUser[] => {
-      return Array.from(Array(userCount)).map<TestUser>((_, i) => ({
-        id: `user${i}`,
-        domain: `${i}.domain`,
-        clients: Array.from(Array(clientsPerUser)).map((_, j) => `client${i}${j}`),
-      }));
+      return Array.from(Array(userCount)).map<TestUser>((_, i) => {
+        return {
+          id: `user${i}`,
+          domain: `${i}.domain`,
+          clients: Array.from(Array(clientsPerUser)).map((_, j) => {
+            return `client${i}${j}`;
+          }),
+        };
+      });
     };
 
     const clientId = 'sendingClient';

@@ -282,18 +282,30 @@ export class ConversationRepository {
 
       // Remove clients that are not needed anymore
       await Promise.all(
-        deletedClients.map(({userId, clients}) =>
-          Promise.all(clients.map(client => this.userRepository.removeClientFromUser(userId, client))),
-        ),
+        deletedClients.map(({userId, clients}) => {
+          return Promise.all(
+            clients.map(client => {
+              return this.userRepository.removeClientFromUser(userId, client);
+            }),
+          );
+        }),
       );
-      const removedTeamUserIds = emptyUsers.filter(user => teamState.isInTeam(user)).map(user => user.qualifiedId);
+      const removedTeamUserIds = emptyUsers
+        .filter(user => {
+          return teamState.isInTeam(user);
+        })
+        .map(user => {
+          return user.qualifiedId;
+        });
 
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
         const {found: usersWithoutClients} = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
         await Promise.all(
           usersWithoutClients
-            .filter(user => user.deleted)
+            .filter(user => {
+              return user.deleted;
+            })
             .map(user => {
               const teamId = this.teamState.team().id;
               if (teamId === undefined) {
@@ -316,7 +328,9 @@ export class ConversationRepository {
         const wasVerified = conversation?.is_verified();
         const legalHoldStatus = conversation?.legalHoldStatus();
         const newDevices = await this.userRepository.updateMissingUsersClients(
-          missingClients.map(({userId}) => userId),
+          missingClients.map(({userId}) => {
+            return userId;
+          }),
         );
         if (wasVerified && newDevices.length) {
           // if the conversation is verified but some clients were missing, it means the conversation will degrade.
@@ -325,7 +339,11 @@ export class ConversationRepository {
         }
         if (conversation) {
           const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
-          shouldWarnLegalHold = hasChangedLegalHoldStatus && newDevices.some(device => device.isLegalHold());
+          shouldWarnLegalHold =
+            hasChangedLegalHoldStatus &&
+            newDevices.some(device => {
+              return device.isLegalHold();
+            });
         }
       }
       if (!conversation) {
@@ -352,7 +370,9 @@ export class ConversationRepository {
 
     this.isBlockingNotificationHandling = true;
 
-    this.teamState.isTeam.subscribe(() => this.mapGuestStatusSelf());
+    this.teamState.isTeam.subscribe(() => {
+      return this.mapGuestStatusSelf();
+    });
 
     this.initSubscriptions();
 
@@ -482,7 +502,9 @@ export class ConversationRepository {
     accessState?: ACCESS_STATE,
     options: Partial<NewConversation> = {},
   ): Promise<Conversation> {
-    const userIds = userEntities.map(user => user.qualifiedId);
+    const userIds = userEntities.map(user => {
+      return user.qualifiedId;
+    });
     const usersPayload = {
       qualified_users: userIds,
       users: [] as string[],
@@ -579,7 +601,11 @@ export class ConversationRepository {
             this.handleTooManyMembersError();
             break;
           case BackendErrorLabel.NOT_CONNECTED:
-            await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
+            await this.handleUsersNotConnected(
+              userEntities.map(user => {
+                return user.qualifiedId;
+              }),
+            );
             break;
           case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
             this.showLegalHoldConsentError();
@@ -593,22 +619,34 @@ export class ConversationRepository {
   }
 
   public async refreshUnavailableParticipants(conversation: Conversation): Promise<void> {
-    const unavailableUsers = conversation.allUserEntities().filter(user => !user.isAvailable());
+    const unavailableUsers = conversation.allUserEntities().filter(user => {
+      return !user.isAvailable();
+    });
     if (!unavailableUsers.length) {
       return;
     }
-    await this.userRepository.refreshUsers(unavailableUsers.map(user => user.qualifiedId));
+    await this.userRepository.refreshUsers(
+      unavailableUsers.map(user => {
+        return user.qualifiedId;
+      }),
+    );
   }
 
   private async refreshAllConversationsUnavailableParticipants(): Promise<void> {
-    const allUnavailableUsers = this.conversationState
-      .conversations()
-      .flatMap(conversation => conversation.allUserEntities().filter(user => !user.isAvailable()));
+    const allUnavailableUsers = this.conversationState.conversations().flatMap(conversation => {
+      return conversation.allUserEntities().filter(user => {
+        return !user.isAvailable();
+      });
+    });
 
     if (!allUnavailableUsers.length) {
       return;
     }
-    await this.userRepository.refreshUsers(allUnavailableUsers.map(user => user.qualifiedId));
+    await this.userRepository.refreshUsers(
+      allUnavailableUsers.map(user => {
+        return user.qualifiedId;
+      }),
+    );
   }
 
   /**
@@ -761,9 +799,9 @@ export class ConversationRepository {
     // If we can find a mls 1:1 conversation with the same user (it means mls 1:1 conversation was established),
     // we will blacklist proteus 1:1 (so it's never refetched) conversation and remove it from the list of remote conversations
 
-    const mls1to1Conversations = remoteConversations.found.filter(
-      ({protocol, type}) => protocol === CONVERSATION_PROTOCOL.MLS && type === CONVERSATION_TYPE.ONE_TO_ONE,
-    );
+    const mls1to1Conversations = remoteConversations.found.filter(({protocol, type}) => {
+      return protocol === CONVERSATION_PROTOCOL.MLS && type === CONVERSATION_TYPE.ONE_TO_ONE;
+    });
 
     const {abandonedProteus1to1Conversations, allConversations} = remoteConversations.found.reduce(
       (acc, conversation) => {
@@ -792,11 +830,11 @@ export class ConversationRepository {
           return acc;
         }
 
-        const mls1to1Conversation = mls1to1Conversations.find(mlsConversation =>
-          mlsConversation.members.others.find(
-            ({qualified_id}) => qualified_id && matchQualifiedIds(qualified_id, userQualifiedId),
-          ),
-        );
+        const mls1to1Conversation = mls1to1Conversations.find(mlsConversation => {
+          return mlsConversation.members.others.find(({qualified_id}) => {
+            return qualified_id && matchQualifiedIds(qualified_id, userQualifiedId);
+          });
+        });
 
         if (mls1to1Conversation) {
           abandonedProteus1to1Conversations.push(conversation);
@@ -811,9 +849,9 @@ export class ConversationRepository {
 
     // We blacklist all the abandoned proteus 1:1 conversations so they are never refetched from the backend
     await Promise.all(
-      abandonedProteus1to1Conversations.map(
-        ({qualified_id}) => qualified_id && this.blacklistConversation(qualified_id),
-      ),
+      abandonedProteus1to1Conversations.map(({qualified_id}) => {
+        return qualified_id && this.blacklistConversation(qualified_id);
+      }),
     );
 
     return {...remoteConversations, found: allConversations};
@@ -836,7 +874,9 @@ export class ConversationRepository {
 
       const isDeletedConnectionRequest =
         type === CONVERSATION_TYPE.CONNECT &&
-        !connections.find(connection => matchQualifiedIds(connection.conversationId, qualified_id || {id, domain}));
+        !connections.find(connection => {
+          return matchQualifiedIds(connection.conversationId, qualified_id || {id, domain});
+        });
 
       if (isDeletedConnectionRequest) {
         deletedConnectionRequests.push(conversation);
@@ -846,23 +886,24 @@ export class ConversationRepository {
     }
 
     const filteredRemoteConversations = remoteConversations.found?.filter(remoteConversation => {
-      const isNotDeletedConnection = !deletedConnectionRequests.find(({qualified_id, id, domain}) =>
-        matchQualifiedIds(qualified_id || {id, domain}, remoteConversation.qualified_id),
-      );
+      const isNotDeletedConnection = !deletedConnectionRequests.find(({qualified_id, id, domain}) => {
+        return matchQualifiedIds(qualified_id || {id, domain}, remoteConversation.qualified_id);
+      });
 
-      const isNotDeadConnection = !deadConnections.some(deadConnection =>
-        matchQualifiedIds(remoteConversation.qualified_id, deadConnection.conversationId),
-      );
+      const isNotDeadConnection = !deadConnections.some(deadConnection => {
+        return matchQualifiedIds(remoteConversation.qualified_id, deadConnection.conversationId);
+      });
 
       return isNotDeletedConnection && isNotDeadConnection;
     });
 
-    const deletedConnectionIds = deletedConnectionRequests.map(
-      deletedConnection =>
-        deletedConnection.qualified_id || {id: deletedConnection.id, domain: deletedConnection.domain ?? ''},
-    );
+    const deletedConnectionIds = deletedConnectionRequests.map(deletedConnection => {
+      return deletedConnection.qualified_id || {id: deletedConnection.id, domain: deletedConnection.domain ?? ''};
+    });
 
-    const deadConnectionIds = deadConnections.map(deadConnection => deadConnection.conversationId);
+    const deadConnectionIds = deadConnections.map(deadConnection => {
+      return deadConnection.conversationId;
+    });
 
     await this.deleteAndBlockConversations(deletedConnectionIds);
     await this.deleteAndBlockConversations(deadConnectionIds);
@@ -926,12 +967,11 @@ export class ConversationRepository {
     }
 
     const allConversationEntities = conversationsData.length ? this.mapConversations(conversationsData) : [];
-    const newConversationEntities = allConversationEntities.filter(
-      allConversations =>
-        !this.conversationState
-          .conversations()
-          .some(storedConversations => storedConversations.id === allConversations.id),
-    );
+    const newConversationEntities = allConversationEntities.filter(allConversations => {
+      return !this.conversationState.conversations().some(storedConversations => {
+        return storedConversations.id === allConversations.id;
+      });
+    });
     if (newConversationEntities.length) {
       this.saveConversations(newConversationEntities);
     }
@@ -946,9 +986,9 @@ export class ConversationRepository {
     const unknownConversations: ConversationRecord[] = [];
 
     conversationsDataArray.forEach(conversationData => {
-      const localEntity = this.conversationState
-        .conversations()
-        .find(conversation => matchQualifiedIds(conversation, conversationData));
+      const localEntity = this.conversationState.conversations().find(conversation => {
+        return matchQualifiedIds(conversation, conversationData);
+      });
 
       if (localEntity) {
         const entity = ConversationMapper.updateSelfStatus(localEntity, conversationData as any, true);
@@ -967,7 +1007,9 @@ export class ConversationRepository {
     }
 
     conversationEntities = conversationEntities.concat(handledConversationEntities);
-    const handledConversationData = conversationEntities.map(conversationEntity => conversationEntity.serialize());
+    const handledConversationData = conversationEntities.map(conversationEntity => {
+      return conversationEntity.serialize();
+    });
     this.conversationService.saveConversationsInDb(handledConversationData);
     return conversationEntities;
   }
@@ -1042,12 +1084,11 @@ export class ConversationRepository {
 
     if (conversationEntity.inTeam()) {
       const allTeamMembersParticipate = this.teamState.teamMembers().length
-        ? this.teamState
-            .teamMembers()
-            .every(
-              teamMember =>
-                !!conversationEntity.participating_user_ids().find(user => matchQualifiedIds(user, teamMember)),
-            )
+        ? this.teamState.teamMembers().every(teamMember => {
+            return !!conversationEntity.participating_user_ids().find(user => {
+              return matchQualifiedIds(user, teamMember);
+            });
+          })
         : false;
 
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
@@ -1219,10 +1260,16 @@ export class ConversationRepository {
    * @param conversationEntities Array of conversation entities to be updated
    */
   public async updateConversations(conversationEntities: Conversation[]): Promise<void> {
-    const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
+    const mapOfUserIds = conversationEntities.map(conversationEntity => {
+      return conversationEntity.participating_user_ids();
+    });
     const userIds = flatten(mapOfUserIds);
     await this.userRepository.getUsersById(userIds);
-    await Promise.all(conversationEntities.map(conversationEntity => this.fetchUsersAndEvents(conversationEntity)));
+    await Promise.all(
+      conversationEntities.map(conversationEntity => {
+        return this.fetchUsersAndEvents(conversationEntity);
+      }),
+    );
   }
 
   //##############################################################################
@@ -1360,8 +1407,12 @@ export class ConversationRepository {
    */
   safeGetConversationById(conversationId: QualifiedId, searchInLocalDB = false): Task<Conversation, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.getConversationById(conversationId, searchInLocalDB),
+      error => {
+        return error;
+      },
+      () => {
+        return this.getConversationById(conversationId, searchInLocalDB);
+      },
     );
   }
 
@@ -1370,7 +1421,9 @@ export class ConversationRepository {
    */
   saveMeetingConversationFromBackend(conversationData: ValidatedMeetingConversation): Task<void, unknown> {
     return task.tryOrElse(
-      error => error,
+      error => {
+        return error;
+      },
       async () => {
         const [conversationEntity] = this.mapConversations([conversationData]);
         await this.updateParticipatingUserEntities(conversationEntity);
@@ -1384,7 +1437,9 @@ export class ConversationRepository {
 
   requestMeetingConversationCode(conversationId: QualifiedId, password?: string): Task<void, unknown> {
     return task.tryOrElse(
-      error => error,
+      error => {
+        return error;
+      },
       async () => {
         await this.conversationService.postConversationCode(conversationId.id, password);
       },
@@ -1410,20 +1465,21 @@ export class ConversationRepository {
    * Get all the group conversations owned by self user's team from the local state.
    */
   public readonly getAllGroupConversations = (): Conversation[] => {
-    return this.conversationState.conversations().filter(conversation => conversation.isGroupOrChannel());
+    return this.conversationState.conversations().filter(conversation => {
+      return conversation.isGroupOrChannel();
+    });
   };
 
   /**
    * Get all the group conversations with Cells enabled.
    */
   public readonly getAllCellEnabledGroupConversations = (): Conversation[] => {
-    return this.conversationState
-      .conversations()
-      .filter(
-        conversation =>
-          conversation.cellsState() === CONVERSATION_CELLS_STATE.READY ||
-          conversation.cellsState() === CONVERSATION_CELLS_STATE.PENDING,
+    return this.conversationState.conversations().filter(conversation => {
+      return (
+        conversation.cellsState() === CONVERSATION_CELLS_STATE.READY ||
+        conversation.cellsState() === CONVERSATION_CELLS_STATE.PENDING
       );
+    });
   };
 
   /**
@@ -1496,8 +1552,12 @@ export class ConversationRepository {
   getMostActiveConversations() {
     return this.conversationService.getActiveConversationsFromDb().then(conversation_ids => {
       return conversation_ids
-        .map(conversation_id => this.conversationState.findConversation(conversation_id))
-        .filter((conversationEntity): conversationEntity is Conversation => !!conversationEntity);
+        .map(conversation_id => {
+          return this.conversationState.findConversation(conversation_id);
+        })
+        .filter((conversationEntity): conversationEntity is Conversation => {
+          return !!conversationEntity;
+        });
     });
   }
 
@@ -1803,9 +1863,9 @@ export class ConversationRepository {
     const isMLSSupportedByTheOtherUser = otherUserSupportedProtocols.includes(CONVERSATION_PROTOCOL.MLS);
     const isProteusSupportedByTheOtherUser = otherUserSupportedProtocols.includes(CONVERSATION_PROTOCOL.PROTEUS);
 
-    const commonProtocols = otherUserSupportedProtocols.filter(protocol =>
-      selfUserSupportedProtocols.includes(protocol),
-    );
+    const commonProtocols = otherUserSupportedProtocols.filter(protocol => {
+      return selfUserSupportedProtocols.includes(protocol);
+    });
 
     if (commonProtocols.includes(CONVERSATION_PROTOCOL.MLS)) {
       return {protocol: CONVERSATION_PROTOCOL.MLS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
@@ -1888,16 +1948,16 @@ export class ConversationRepository {
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
 
     await Promise.allSettled(
-      proteusConversations.map(proteusConversation =>
-        this.eventService.moveEventsToConversation(proteusConversation.qualifiedId, mlsConversation.qualifiedId),
-      ),
+      proteusConversations.map(proteusConversation => {
+        return this.eventService.moveEventsToConversation(proteusConversation.qualifiedId, mlsConversation.qualifiedId);
+      }),
     );
 
     // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
     // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
-    const proteusConversationToBeKept = proteusConversations.toSorted((a, b) =>
-      a.qualifiedId.id.localeCompare(b.qualifiedId.id),
-    )[0];
+    const proteusConversationToBeKept = proteusConversations.toSorted((a, b) => {
+      return a.qualifiedId.id.localeCompare(b.qualifiedId.id);
+    })[0];
 
     // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
     try {
@@ -1925,9 +1985,9 @@ export class ConversationRepository {
     // since unread counts are derived from messages in memory, not just the persisted read timestamp.
     await this.getUnreadEvents(mlsConversation);
 
-    const wasProteus1to1ActiveConversation = proteusConversations.some(conversation =>
-      this.conversationState.isActiveConversation(conversation),
-    );
+    const wasProteus1to1ActiveConversation = proteusConversations.some(conversation => {
+      return this.conversationState.isActiveConversation(conversation);
+    });
 
     const wasProteusConnectionIncomingRequest = proteusConversations.some(isConnectionRequestConversation);
 
@@ -1996,7 +2056,9 @@ export class ConversationRepository {
 
     this.logger.debug(`MLS 1:1 conversation with user ${otherUserId.id} was established.`);
 
-    const otherMembers = members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}));
+    const otherMembers = members.others.map(other => {
+      return {domain: other.qualified_id?.domain || '', id: other.id};
+    });
 
     ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: otherMembers, epoch});
     await this.updateParticipatingUserEntities(mlsConversation);
@@ -2027,9 +2089,12 @@ export class ConversationRepository {
     // It's very likely that this user will receive a welcome message after the user that has accepted a connection request, establishes an MLS group without any delay.
     if (shouldDelayGroupEstablishment) {
       this.logger.debug(`Delaying MLS 1:1 conversation with user ${otherUserId.id}...`);
-      await new Promise(resolve =>
-        setTimeout(resolve, ConversationRepository.CONFIG.ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY),
-      );
+      await new Promise(resolve => {
+        return setTimeout(
+          resolve,
+          ConversationRepository.CONFIG.ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY,
+        );
+      });
     }
 
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
@@ -2039,9 +2104,9 @@ export class ConversationRepository {
     );
 
     if (
-      this.initiatingMlsConversationQualifiedIds.some(qualifiedId =>
-        matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
-      )
+      this.initiatingMlsConversationQualifiedIds.some(qualifiedId => {
+        return matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId);
+      })
     ) {
       this.logger.debug(
         `Skipped initialising MLS 1:1 conversation with user ${otherUserId.id} for mls conversation ${mlsConversation.id}`,
@@ -2089,9 +2154,9 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
       }
 
-      this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId =>
-        matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
-      );
+      this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId => {
+        return matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId);
+      });
       return mlsConversation;
     }
 
@@ -2125,9 +2190,9 @@ export class ConversationRepository {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
     }
 
-    this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId =>
-      matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
-    );
+    this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId => {
+      return matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId);
+    });
 
     if (shouldInjectMigrationMessage) {
       await this.inject1to1MigratedToMLS(initialisedMLSConversation);
@@ -2413,8 +2478,12 @@ export class ConversationRepository {
     core?: Account;
   }): Task<void, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.ensureConversationExists({conversationId, groupId, core}),
+      error => {
+        return error;
+      },
+      () => {
+        return this.ensureConversationExists({conversationId, groupId, core});
+      },
     );
   }
 
@@ -2439,7 +2508,9 @@ export class ConversationRepository {
     conversationQualifiedId: QualifiedId;
   }): Task<{failedToAdd: AddUsersFailure[]}, unknown> {
     return task.tryOrElse(
-      error => error,
+      error => {
+        return error;
+      },
       async () => {
         const selfUser = this.userState.self();
         if (selfUser === undefined) {
@@ -2463,7 +2534,9 @@ export class ConversationRepository {
    * will locally delete conversations that no longer exist on backend side
    */
   async syncDeletedConversations() {
-    const conversationIds = this.conversationState.conversations().map(conversation => conversation.qualifiedId);
+    const conversationIds = this.conversationState.conversations().map(conversation => {
+      return conversation.qualifiedId;
+    });
     const {not_found = []} = await this.conversationService.getConversationByIds(conversationIds);
     for (const inccessibleConversation of not_found) {
       // a conversation marked `not_found` could be either non existing on backend or it could mean the self user is not part of it
@@ -2521,9 +2594,9 @@ export class ConversationRepository {
 
   private readonly initTeam1To1Conversations = async (conversations: Conversation[]) => {
     // Team owned 1:1 conversations are: legacy group conversations with only 1 other user and mls 1:1 conversations between two users without connection.
-    const team1To1Conversations = conversations.filter(
-      conversation => conversation.is1to1() && !conversation.connection(),
-    );
+    const team1To1Conversations = conversations.filter(conversation => {
+      return conversation.is1to1() && !conversation.connection();
+    });
 
     // Sort conversations so mls 1:1 conversations are initialised first
     const sortedConverstions = team1To1Conversations.toSorted((a, b) => {
@@ -2576,9 +2649,9 @@ export class ConversationRepository {
   }
 
   private mapGuestStatusSelf() {
-    this.conversationState
-      .filteredConversations()
-      .forEach(conversationEntity => this._mapGuestStatusSelf(conversationEntity));
+    this.conversationState.filteredConversations().forEach(conversationEntity => {
+      this._mapGuestStatusSelf(conversationEntity);
+    });
 
     if (this.teamState.isTeam()) {
       this.userState.self()?.isTeamMember(true);
@@ -2750,7 +2823,9 @@ export class ConversationRepository {
      * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
      */
 
-    const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
+    const qualifiedUsers = userEntities.map(userEntity => {
+      return userEntity.qualifiedId;
+    });
 
     const {qualifiedId: conversationId} = conversation;
 
@@ -2818,9 +2893,13 @@ export class ConversationRepository {
     userEntities: Pick<User, 'qualifiedId'>[],
   ): Task<{failedToAdd: AddUsersFailure[]}, unknown> {
     return task.tryOrElse(
-      error => error,
+      error => {
+        return error;
+      },
       async () => {
-        const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
+        const qualifiedUsers = userEntities.map(userEntity => {
+          return userEntity.qualifiedId;
+        });
 
         if (qualifiedUsers.length === 0) {
           return {failedToAdd: []};
@@ -2942,9 +3021,9 @@ export class ConversationRepository {
   }
 
   private deleteConnectionRequestConversation = async (userId: QualifiedId) => {
-    const connection = this.connectionState
-      .connections()
-      .find(connection => matchQualifiedIds(connection.userId, userId));
+    const connection = this.connectionState.connections().find(connection => {
+      return matchQualifiedIds(connection.userId, userId);
+    });
 
     if (!connection) {
       return;
@@ -3111,8 +3190,12 @@ export class ConversationRepository {
    */
   safeRemoveMembers(conversationEntity: Conversation, userIds: QualifiedId[]): Task<void, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.removeMembers(conversationEntity, userIds),
+      error => {
+        return error;
+      },
+      () => {
+        return this.removeMembers(conversationEntity, userIds);
+      },
     );
   }
 
@@ -3309,8 +3392,12 @@ export class ConversationRepository {
 
     // Clear user from all conversations they participate in
     const userCleanup = allConversations
-      .filter(conversation => UserFilter.isParticipant(conversation, userId))
-      .map(conversation => this.clearUsersFromConversation(conversation, [userEntity]));
+      .filter(conversation => {
+        return UserFilter.isParticipant(conversation, userId);
+      })
+      .map(conversation => {
+        return this.clearUsersFromConversation(conversation, [userEntity]);
+      });
 
     await Promise.all([...eventInjections, ...userCleanup]);
   };
@@ -3323,7 +3410,9 @@ export class ConversationRepository {
    */
   private async clearUsersFromConversation(conversation: Conversation, users: User[]) {
     users.forEach(user => {
-      conversation.participating_user_ids.remove(userId => matchQualifiedIds(userId, user));
+      conversation.participating_user_ids.remove(userId => {
+        return matchQualifiedIds(userId, user);
+      });
       if (user.isTemporaryGuest()) {
         user.clearExpirationTimeout();
       }
@@ -3729,16 +3818,21 @@ export class ConversationRepository {
         }
         return conversationEntity;
       })
-      .then(conversationEntity => this.checkLegalHoldStatus(conversationEntity, eventJson))
-      .then(conversationEntity => this.checkConversationParticipants(conversationEntity, eventJson, eventSource))
-      .then(conversationEntity => this.triggerFeatureEventHandlers(conversationEntity, eventJson))
-      .then(
-        conversationEntity =>
-          this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>,
-      )
-      .then((entityObject = {} as EntityObject) =>
-        this.handleConversationNotification(entityObject as EntityObject, eventSource, type),
-      )
+      .then(conversationEntity => {
+        return this.checkLegalHoldStatus(conversationEntity, eventJson);
+      })
+      .then(conversationEntity => {
+        return this.checkConversationParticipants(conversationEntity, eventJson, eventSource);
+      })
+      .then(conversationEntity => {
+        return this.triggerFeatureEventHandlers(conversationEntity, eventJson);
+      })
+      .then(conversationEntity => {
+        return this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>;
+      })
+      .then((entityObject = {} as EntityObject) => {
+        return this.handleConversationNotification(entityObject as EntityObject, eventSource, type);
+      })
       .catch((error: unknown) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
@@ -3779,7 +3873,9 @@ export class ConversationRepository {
       }
 
       const allParticipants = conversationEntity.participating_user_ids().concat(selfUser.qualifiedId);
-      const isFromUnknownUser = allParticipants.every(participant => participant.id !== senderId);
+      const isFromUnknownUser = allParticipants.every(participant => {
+        return participant.id !== senderId;
+      });
 
       if (isFromUnknownUser) {
         switch (eventJson.type) {
@@ -3811,7 +3907,9 @@ export class ConversationRepository {
         const qualifiedSender: QualifiedId = {domain: '', id: senderId};
 
         const timestamp = new Date(time).getTime() - 1;
-        return this.addMissingMember(conversationEntity, [qualifiedSender], timestamp).then(() => conversationEntity);
+        return this.addMissingMember(conversationEntity, [qualifiedSender], timestamp).then(() => {
+          return conversationEntity;
+        });
       }
     }
 
@@ -3921,7 +4019,9 @@ export class ConversationRepository {
           const deletedUsers = eventJson.data.qualified_user_ids ?? [];
           return Promise.all(
             deletedUsers.map(async qualifiedUserId => {
-              const user = this.userState.users().find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId));
+              const user = this.userState.users().find(user => {
+                return matchQualifiedIds(user.qualifiedId, qualifiedUserId);
+              });
               if (user === undefined) {
                 return this.onMemberLeave(conversationEntity, eventJson);
               }
@@ -4047,9 +4147,9 @@ export class ConversationRepository {
     }
 
     const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
-    const handlePromises = conversationEventHandlers.map(handler =>
-      handler.handleConversationEvent(conversationEntity, eventJson),
-    );
+    const handlePromises = conversationEventHandlers.map(handler => {
+      return handler.handleConversationEvent(conversationEntity, eventJson);
+    });
     await Promise.all(handlePromises);
     return conversationEntity;
   }
@@ -4105,7 +4205,9 @@ export class ConversationRepository {
   private readonly onMissedEvents = (): void => {
     this.conversationState
       .filteredConversations()
-      .filter(conversationEntity => !conversationEntity.isSelfUserRemoved() && !conversationEntity.isRequest())
+      .filter(conversationEntity => {
+        return !conversationEntity.isSelfUserRemoved() && !conversationEntity.isRequest();
+      })
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
@@ -4233,9 +4335,9 @@ export class ConversationRepository {
     }
     const creatorId = conversationEntity.creator;
     const creatorDomain = conversationEntity.domain;
-    const createdByParticipant = !!conversationEntity
-      .participating_user_ids()
-      .find(userId => matchQualifiedIds(userId, {domain: creatorDomain, id: creatorId}));
+    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => {
+      return matchQualifiedIds(userId, {domain: creatorDomain, id: creatorId});
+    });
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -4304,11 +4406,9 @@ export class ConversationRepository {
       eventData.users.forEach(otherMember => {
         const otherId = otherMember.qualified_id ?? {domain: '', id: otherMember.id};
         const isSelfUser = matchQualifiedIds(otherId, selfUser);
-        const isParticipatingUser = conversationEntity
-          .participating_user_ids()
-          .some(participatingUser =>
-            matchQualifiedIds(participatingUser, otherMember.qualified_id ?? {domain: '', id: otherMember.id}),
-          );
+        const isParticipatingUser = conversationEntity.participating_user_ids().some(participatingUser => {
+          return matchQualifiedIds(participatingUser, otherMember.qualified_id ?? {domain: '', id: otherMember.id});
+        });
         if (!isSelfUser && !isParticipatingUser) {
           conversationEntity.participating_user_ids.push({
             domain: otherMember.qualified_id?.domain ?? '',
@@ -4320,7 +4420,9 @@ export class ConversationRepository {
       const eventUserIds = eventData.user_ids ?? [];
       eventUserIds.forEach(userId => {
         const isSelfUser = userId === selfUser.id;
-        const isParticipatingUser = conversationEntity.participating_user_ids().some(user => user.id === userId);
+        const isParticipatingUser = conversationEntity.participating_user_ids().some(user => {
+          return user.id === userId;
+        });
         if (!isSelfUser && !isParticipatingUser) {
           conversationEntity.participating_user_ids.push({domain: '', id: userId});
         }
@@ -4357,7 +4459,9 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users !== undefined
         ? eventData.users
-            .map(user => user.qualified_id)
+            .map(user => {
+              return user.qualified_id;
+            })
             .filter((qualifiedId): qualifiedId is QualifiedId => {
               return qualifiedId !== undefined;
             })
@@ -4366,8 +4470,12 @@ export class ConversationRepository {
           });
 
     return updateSequence
-      .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
-      .then(() => this.addEventToConversation(conversationEntity, eventJson))
+      .then(() => {
+        return this.updateParticipatingUserEntities(conversationEntity, false, true);
+      })
+      .then(() => {
+        return this.addEventToConversation(conversationEntity, eventJson);
+      })
       .then(({messageEntity}) => {
         this.proteusVerificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
@@ -4421,7 +4529,9 @@ export class ConversationRepository {
 
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
 
-    const usersToRemove = (messageEntity as MemberMessage).userEntities().filter(userEntity => !userEntity.isMe);
+    const usersToRemove = (messageEntity as MemberMessage).userEntities().filter(userEntity => {
+      return !userEntity.isMe;
+    });
 
     await this.clearUsersFromConversation(conversationEntity, usersToRemove);
 
@@ -4507,9 +4617,9 @@ export class ConversationRepository {
   ) {
     const {target, qualified_target, conversation_role} = eventData;
     const userId = qualified_target ?? (target ? {domain: '', id: target} : undefined);
-    const conversation = this.conversationState
-      .conversations()
-      .find(conversation => matchQualifiedIds(conversation, conversationId));
+    const conversation = this.conversationState.conversations().find(conversation => {
+      return matchQualifiedIds(conversation, conversationId);
+    });
 
     if (isNullOrUndefined(conversation) || isNullOrUndefined(userId) || isNullOrUndefined(conversation_role)) {
       return;
@@ -4846,9 +4956,9 @@ export class ConversationRepository {
    */
   private async onTyping(conversationEntity: Conversation, eventJson: ConversationTypingEvent) {
     const qualifiedUserId = eventJson.qualified_from || {domain: '', id: eventJson.from};
-    const qualifiedUser = conversationEntity
-      .participating_user_ets()
-      .find(user => matchQualifiedIds(user, qualifiedUserId));
+    const qualifiedUser = conversationEntity.participating_user_ets().find(user => {
+      return matchQualifiedIds(user, qualifiedUserId);
+    });
 
     if (!qualifiedUser) {
       this.logger.warn(`No sender user found for event of type ${eventJson.type}`);
@@ -5041,7 +5151,11 @@ export class ConversationRepository {
   }
 
   private updateMessagesUserEntities(messageEntities: Message[], options: {localOnly?: boolean} = {}) {
-    return Promise.all(messageEntities.map(messageEntity => this.updateMessageUserEntities(messageEntity, options)));
+    return Promise.all(
+      messageEntities.map(messageEntity => {
+        return this.updateMessageUserEntities(messageEntity, options);
+      }),
+    );
   }
 
   /**

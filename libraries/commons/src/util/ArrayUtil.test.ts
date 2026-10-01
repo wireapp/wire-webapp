@@ -92,7 +92,9 @@ describe('ArrayUtil', () => {
     it('breaks if being used with non-array types.', () => {
       const array = [1, 3, 3, 7];
       const notAnArray = 1447;
-      expect(() => ArrayUtil.getIntersection(array, notAnArray as unknown as number[])).toThrow();
+      expect(() => {
+        return ArrayUtil.getIntersection(array, notAnArray as unknown as number[]);
+      }).toThrow();
     });
   });
 

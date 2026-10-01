@@ -66,7 +66,9 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
     selfUser,
   } = useKoSubscribableChildren(activeConversation, ['participating_user_ets', 'isSelfUserRemoved', 'selfUser']);
 
-  const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
+  const showUser = (userEntity: User) => {
+    return togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
+  };
 
   const participants = useMemo(() => {
     const users: User[] = participatingUserEts.flatMap(user => {

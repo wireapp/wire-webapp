@@ -80,10 +80,9 @@ export async function recoverMLSConversationsInBatches({
     return {completed: false, failedConversationCount: 1, recoveredConversationCount: 0};
   }
 
-  const eligibleConversations = conversations.filter(
-    (conversation): conversation is MLSCapableConversation =>
-      isMLSCapableConversation(conversation) && !conversation.isSelfUserRemoved(),
-  );
+  const eligibleConversations = conversations.filter((conversation): conversation is MLSCapableConversation => {
+    return isMLSCapableConversation(conversation) && !conversation.isSelfUserRemoved();
+  });
   const boundedBatchSize = Math.max(1, batchSize);
   let failedConversationCount = 0;
   let recoveredConversationCount = 0;
@@ -92,7 +91,9 @@ export async function recoverMLSConversationsInBatches({
   if (mlsService && eligibleConversations.length > 0) {
     const pendingIds = await mlsService.getPendingRecoveryConversationIds();
     if (!isNonEmptyArray(pendingIds)) {
-      const allPendingIds = eligibleConversations.map(conv => conv.qualifiedId);
+      const allPendingIds = eligibleConversations.map(conv => {
+        return conv.qualifiedId;
+      });
       await mlsService.updatePendingRecoveryConversationIds(allPendingIds);
     }
   }
@@ -109,8 +110,12 @@ export async function recoverMLSConversationsInBatches({
     const batch = eligibleConversations.slice(offset, offset + boundedBatchSize);
     for (const conversation of batch) {
       const localGroupResult = await task.tryOrElse(
-        error => error,
-        () => conversationService.mlsGroupExistsLocally(conversation.groupId),
+        error => {
+          return error;
+        },
+        () => {
+          return conversationService.mlsGroupExistsLocally(conversation.groupId);
+        },
       );
 
       if (localGroupResult.isErr) {
@@ -146,7 +151,9 @@ export async function recoverMLSConversationsInBatches({
       // Remove successfully recovered conversation from pending list
       if (mlsService !== undefined) {
         const pendingIds = (await mlsService.getPendingRecoveryConversationIds()) ?? [];
-        const updatedPending = pendingIds.filter(id => !matchQualifiedIds(id, conversation.qualifiedId));
+        const updatedPending = pendingIds.filter(id => {
+          return !matchQualifiedIds(id, conversation.qualifiedId);
+        });
         await mlsService.updatePendingRecoveryConversationIds(updatedPending);
       }
     }
@@ -190,12 +197,13 @@ export async function initMLSGroupConversations(
     throw new Error('MLS or Conversation service is not available!');
   }
 
-  const mlsGroupConversations = conversations.filter(
-    (conversation): conversation is MLSCapableConversation =>
+  const mlsGroupConversations = conversations.filter((conversation): conversation is MLSCapableConversation => {
+    return (
       (conversation.isGroupOrChannel() || conversation.isMeeting()) &&
       isMLSCapableConversation(conversation) &&
-      !conversation.isSelfUserRemoved(),
-  );
+      !conversation.isSelfUserRemoved()
+    );
+  });
 
   for (const mlsConversation of mlsGroupConversations) {
     await initMLSGroupConversation(mlsConversation, conversationRepository, {
@@ -281,10 +289,9 @@ export async function initialiseSelfAndTeamConversations(
     throw new Error('MLS or Conversation service is not available!');
   }
 
-  const conversationsToEstablish = conversations.filter(
-    (conversation): conversation is MLSConversation =>
-      isMLSConversation(conversation) && (isSelfConversation(conversation) || isTeamConversation(conversation)),
-  );
+  const conversationsToEstablish = conversations.filter((conversation): conversation is MLSConversation => {
+    return isMLSConversation(conversation) && (isSelfConversation(conversation) || isTeamConversation(conversation));
+  });
 
   await Promise.all(
     conversationsToEstablish.map(async conversation => {
@@ -362,19 +369,32 @@ export const classifyLocal = ({existsLocally, epoch}: LocalMLSState): LocalDecis
 
   return match(epoch)
     .returnType<LocalDecision>()
-    .with({kind: 'unreadable'}, ({error}) => ({kind: 'epochUnreadable', error}))
-    .with({kind: 'epoch', value: P.number.gt(0)}, () => ({kind: 'alreadyEstablished'}))
-    .with({kind: 'epoch'}, () => ({kind: 'staleNeedsWipe'}))
+    .with({kind: 'unreadable'}, ({error}) => {
+      return {kind: 'epochUnreadable', error};
+    })
+    .with({kind: 'epoch', value: P.number.gt(0)}, () => {
+      return {kind: 'alreadyEstablished'};
+    })
+    .with({kind: 'epoch'}, () => {
+      return {kind: 'staleNeedsWipe'};
+    })
     .exhaustive();
 };
 
-export const classifyRemote = (reading: EpochReading): RemoteDecision =>
-  match(reading)
+export const classifyRemote = (reading: EpochReading): RemoteDecision => {
+  return match(reading)
     .returnType<RemoteDecision>()
-    .with({kind: 'unreadable'}, ({error}) => ({kind: 'unreadable', error}))
-    .with({kind: 'epoch', value: 0}, () => ({kind: 'establish', epoch: 0}))
-    .with({kind: 'epoch'}, ({value}) => ({kind: 'joinExisting', epoch: value}))
+    .with({kind: 'unreadable'}, ({error}) => {
+      return {kind: 'unreadable', error};
+    })
+    .with({kind: 'epoch', value: 0}, () => {
+      return {kind: 'establish', epoch: 0};
+    })
+    .with({kind: 'epoch'}, ({value}) => {
+      return {kind: 'joinExisting', epoch: value};
+    })
     .exhaustive();
+};
 
 export async function readLocalMLSState(
   groupId: string,
@@ -384,7 +404,9 @@ export async function readLocalMLSState(
   const existsLocally = await conversationService.mlsGroupExistsLocally(groupId);
   const epochResult = await mlsService.getSafeEpoch(groupId);
   const epoch = epochResult.match<EpochReading>({
-    Ok: value => ({kind: 'epoch', value}),
+    Ok: value => {
+      return {kind: 'epoch', value};
+    },
     Err: error => {
       logger.warn('Failed to read local MLS epoch', {error});
       return {kind: 'unreadable', error};
@@ -454,7 +476,9 @@ export async function ensureMLSGroupIsEstablished(
       logger.info('MLS group is already established, no action needed');
       return false;
     })
-    .with({kind: 'missing'}, async () => true)
+    .with({kind: 'missing'}, async () => {
+      return true;
+    })
     .with({kind: 'staleNeedsWipe'}, async () => {
       logger.info('MLS group exists locally but epoch is 0, wiping it');
       await wipeLocalMLSGroup(groupId, core);

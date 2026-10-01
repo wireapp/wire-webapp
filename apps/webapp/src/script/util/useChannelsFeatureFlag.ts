@@ -97,7 +97,11 @@ export const useChannelsFeatureFlag = () => {
 
   // Determine if the channel tab should be shown based on the same logic used in ConversationTabs
   const shouldShowChannelTab =
-    isChannelsEnabled && (channelConversations.some(channel => !channel.is_archived()) || isChannelsFeatureEnabled);
+    isChannelsEnabled &&
+    (channelConversations.some(channel => {
+      return !channel.is_archived();
+    }) ||
+      isChannelsFeatureEnabled);
 
   return {
     canCreateChannels,

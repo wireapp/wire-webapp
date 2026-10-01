@@ -27,22 +27,26 @@ export interface MenuContentProps<T = HTMLDivElement> extends TextProps<T> {
   open?: boolean;
 }
 
-export const menuContentStyle: <T>(props: MenuContentProps<T>) => CSSObject = props => ({
-  ...contentStyle(props),
-  alignItems: 'center',
-  display: 'grid',
-  gridColumnGap: '8px',
-  gridTemplateColumns: '1fr auto 1fr',
-  height: '64px',
-  justifyContent: 'space-between',
-  left: props.open === true ? 0 : undefined,
-  position: props.open === true ? 'fixed' : undefined,
-  width: props.open === true ? '100%' : undefined,
-  zIndex: props.open === true ? 10000 : undefined,
-});
+export const menuContentStyle: <T>(props: MenuContentProps<T>) => CSSObject = props => {
+  return {
+    ...contentStyle(props),
+    alignItems: 'center',
+    display: 'grid',
+    gridColumnGap: '8px',
+    gridTemplateColumns: '1fr auto 1fr',
+    height: '64px',
+    justifyContent: 'space-between',
+    left: props.open === true ? 0 : undefined,
+    position: props.open === true ? 'fixed' : undefined,
+    width: props.open === true ? '100%' : undefined,
+    zIndex: props.open === true ? 10000 : undefined,
+  };
+};
 
-const filterMenuContentProps = (props: MenuContentProps) => filterProps(props, ['open']);
+const filterMenuContentProps = (props: MenuContentProps) => {
+  return filterProps(props, ['open']);
+};
 
-export const MenuContent = (props: MenuContentProps) => (
-  <div css={menuContentStyle(props)} {...filterMenuContentProps(props)} />
-);
+export const MenuContent = (props: MenuContentProps) => {
+  return <div css={menuContentStyle(props)} {...filterMenuContentProps(props)} />;
+};

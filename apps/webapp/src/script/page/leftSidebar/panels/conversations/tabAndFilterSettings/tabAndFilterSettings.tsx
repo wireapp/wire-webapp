@@ -85,10 +85,14 @@ export const TabAndFilterSettings = () => {
       // Handle arrow navigation
       if (isKey(event, KEY.ARROW_DOWN)) {
         event.preventDefault();
-        setFocusedIndex(prev => (prev + 1) % availableTabs.length);
+        setFocusedIndex(prev => {
+          return (prev + 1) % availableTabs.length;
+        });
       } else if (isKey(event, KEY.ARROW_UP)) {
         event.preventDefault();
-        setFocusedIndex(prev => (prev - 1 + availableTabs.length) % availableTabs.length);
+        setFocusedIndex(prev => {
+          return (prev - 1 + availableTabs.length) % availableTabs.length;
+        });
       }
     },
     [availableTabs],
@@ -151,7 +155,9 @@ export const TabAndFilterSettings = () => {
     <div css={filterButtonWrapper}>
       <button
         ref={buttonRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          return setIsOpen(!isOpen);
+        }}
         data-uie-name="tabs-filter-button"
         title={translate('tabsFilterTooltip')}
         css={filterButton(isOpen)}
@@ -175,34 +181,38 @@ export const TabAndFilterSettings = () => {
         >
           <div css={dropdownHeader}>{translate('tabsFilterHeader')}</div>
           <div css={dropdownDivider} />
-          {availableTabs.map((tab, index) => (
-            <div key={tab.type}>
-              <div
-                ref={el => {
-                  itemRefs.current[index] = el;
-                }}
-                css={dropdownCheckboxItem}
-                role="menuitemcheckbox"
-                aria-checked={visibleTabs.includes(tab.type)}
-                tabIndex={index === focusedIndex ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
-                onKeyDown={event => {
-                  if (isEnterKey(event) || isSpaceKey(event)) {
-                    event.preventDefault();
-                    toggleTabVisibility(tab.type);
-                  }
-                }}
-              >
-                <Checkbox
-                  wrapperCSS={roundCheckbox}
-                  checked={visibleTabs.includes(tab.type)}
-                  onChange={() => toggleTabVisibility(tab.type)}
+          {availableTabs.map((tab, index) => {
+            return (
+              <div key={tab.type}>
+                <div
+                  ref={el => {
+                    itemRefs.current[index] = el;
+                  }}
+                  css={dropdownCheckboxItem}
+                  role="menuitemcheckbox"
+                  aria-checked={visibleTabs.includes(tab.type)}
+                  tabIndex={index === focusedIndex ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
+                  onKeyDown={event => {
+                    if (isEnterKey(event) || isSpaceKey(event)) {
+                      event.preventDefault();
+                      toggleTabVisibility(tab.type);
+                    }
+                  }}
                 >
-                  <CheckboxLabel css={checkboxLabel}>{tab.label}</CheckboxLabel>
-                </Checkbox>
+                  <Checkbox
+                    wrapperCSS={roundCheckbox}
+                    checked={visibleTabs.includes(tab.type)}
+                    onChange={() => {
+                      return toggleTabVisibility(tab.type);
+                    }}
+                  >
+                    <CheckboxLabel css={checkboxLabel}>{tab.label}</CheckboxLabel>
+                  </Checkbox>
+                </div>
+                {index < availableTabs.length - 1 && <div css={dropdownDivider} />}
               </div>
-              {index < availableTabs.length - 1 && <div css={dropdownDivider} />}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

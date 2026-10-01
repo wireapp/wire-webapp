@@ -31,10 +31,13 @@ export const dateValueFromDate = (date: Date): DateValue => {
   });
 };
 
-export const isSameLocalCalendarDay = (left: Date, right: Date): boolean =>
-  left.getFullYear() === right.getFullYear() &&
-  left.getMonth() === right.getMonth() &&
-  left.getDate() === right.getDate();
+export const isSameLocalCalendarDay = (left: Date, right: Date): boolean => {
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
+  );
+};
 
 export const combineDateAndTime = (date: DateValue | null, time: Option | null): Date | null => {
   if (date === null || time === null || typeof time.value !== 'string' || time.value.length === 0) {
@@ -46,10 +49,12 @@ export const combineDateAndTime = (date: DateValue | null, time: Option | null):
   return new Date(datePart.getFullYear(), datePart.getMonth(), datePart.getDate(), hour24, minutes, 0, 0);
 };
 
-export const splitDateTime = (dateTime: Date): {date: DateValue; time: Option} => ({
-  date: dateValueFromDate(dateTime),
-  time: timeOptionFromDate(dateTime),
-});
+export const splitDateTime = (dateTime: Date): {date: DateValue; time: Option} => {
+  return {
+    date: dateValueFromDate(dateTime),
+    time: timeOptionFromDate(dateTime),
+  };
+};
 
 export const getNextHourDateTime = (): Date => {
   const now = new Date();

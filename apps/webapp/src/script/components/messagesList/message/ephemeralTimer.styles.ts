@@ -28,10 +28,12 @@ export const ephemeralTimerBackgroundStyle: CSSObject = {
   strokeWidth: '1px',
 };
 
-export const ephemeralTimerDialStyle: (offset: number) => CSSObject = (offset = 1) => ({
-  fill: 'none',
-  stroke: 'var(--foreground)',
-  strokeDasharray: strokelength,
-  strokeDashoffset: `${strokelength * (1 + offset)}`,
-  strokeWidth: strokewidth,
-});
+export const ephemeralTimerDialStyle: (offset: number) => CSSObject = (offset = 1) => {
+  return {
+    fill: 'none',
+    stroke: 'var(--foreground)',
+    strokeDasharray: strokelength,
+    strokeDashoffset: `${strokelength * (1 + offset)}`,
+    strokeWidth: strokewidth,
+  };
+};

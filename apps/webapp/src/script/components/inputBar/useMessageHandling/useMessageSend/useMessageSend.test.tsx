@@ -26,8 +26,8 @@ const createFile = (
   id: string,
   uploadStatus: 'success' | 'uploading' = 'success',
   media: Pick<FileWithPreview, 'audio' | 'video'> = {},
-): FileWithPreview =>
-  Object.assign(new File(['content'], `${id}.png`, {type: 'image/png'}), {
+): FileWithPreview => {
+  return Object.assign(new File(['content'], `${id}.png`, {type: 'image/png'}), {
     id,
     preview: `blob:${id}`,
     remoteUuid: `remote-${id}`,
@@ -37,26 +37,36 @@ const createFile = (
     image: {width: 10, height: 20},
     ...media,
   });
+};
 
-const createProps = (overrides: Record<string, unknown> = {}) => ({
-  replyMessageEntity: null,
-  eventRepository: {eventService: {loadEvent: jest.fn()}} as never,
-  messageRepository: {sendTextWithLinkPreview: jest.fn()} as never,
-  conversation: {id: conversationId, mlsVerificationState: () => 'unverified'} as never,
-  conversationRepository: {refreshMLSConversationVerificationState: jest.fn()} as never,
-  cellsRepository: {promoteNodeDraft: jest.fn().mockResolvedValue(undefined)} as never,
-  draftState: {reset: jest.fn()},
-  cancelMessageEditing: jest.fn(),
-  cancelMessageReply: jest.fn(),
-  editedMessage: undefined,
-  replyMessageCallback: jest.fn(),
-  editorRef: {current: null},
-  pastedFile: null,
-  sendPastedFile: jest.fn(),
-  messageContent: {text: 'hello', mentions: []},
-  translate: ((key: string) => key) as never,
-  ...overrides,
-});
+const createProps = (overrides: Record<string, unknown> = {}) => {
+  return {
+    replyMessageEntity: null,
+    eventRepository: {eventService: {loadEvent: jest.fn()}} as never,
+    messageRepository: {sendTextWithLinkPreview: jest.fn()} as never,
+    conversation: {
+      id: conversationId,
+      mlsVerificationState: () => {
+        return 'unverified';
+      },
+    } as never,
+    conversationRepository: {refreshMLSConversationVerificationState: jest.fn()} as never,
+    cellsRepository: {promoteNodeDraft: jest.fn().mockResolvedValue(undefined)} as never,
+    draftState: {reset: jest.fn()},
+    cancelMessageEditing: jest.fn(),
+    cancelMessageReply: jest.fn(),
+    editedMessage: undefined,
+    replyMessageCallback: jest.fn(),
+    editorRef: {current: null},
+    pastedFile: null,
+    sendPastedFile: jest.fn(),
+    messageContent: {text: 'hello', mentions: []},
+    translate: ((key: string) => {
+      return key;
+    }) as never,
+    ...overrides,
+  };
+};
 
 describe('useMessageSend', () => {
   let configSpy: jest.SpyInstance;
@@ -83,7 +93,9 @@ describe('useMessageSend', () => {
       .getState()
       .addFiles({conversationId, files: [createFile('ready'), createFile('loading', 'uploading')]});
 
-    const {result} = renderHook(() => useMessageSend(createProps()));
+    const {result} = renderHook(() => {
+      return useMessageSend(createProps());
+    });
 
     expect(result.current.isSendingDisabled).toBe(true);
   });
@@ -98,19 +110,27 @@ describe('useMessageSend', () => {
       cellsRepository: {promoteNodeDraft} as never,
       messageRepository: {sendTextWithLinkPreview} as never,
     });
-    const {result} = renderHook(() => useMessageSend(props));
+    const {result} = renderHook(() => {
+      return useMessageSend(props);
+    });
 
     let sendPromise: Promise<void>;
     act(() => {
       sendPromise = result.current.sendMessage();
     });
-    await act(async () => Promise.resolve());
+    await act(async () => {
+      return Promise.resolve();
+    });
 
     expect(promoteNodeDraft).toHaveBeenCalledWith({uuid: 'remote-image', versionId: 'version-image'});
     expect(sendTextWithLinkPreview).not.toHaveBeenCalled();
     publication.resolve();
-    await act(async () => requireValueForTest(sendPromise));
-    await act(async () => Promise.resolve());
+    await act(async () => {
+      return requireValueForTest(sendPromise);
+    });
+    await act(async () => {
+      return Promise.resolve();
+    });
 
     expect(sendTextWithLinkPreview).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -138,14 +158,14 @@ describe('useMessageSend', () => {
     const promoteNodeDraft = jest.fn().mockRejectedValue(new Error('publication failed'));
     const file = createFile('failed');
     useFileUploadState.getState().addFiles({conversationId, files: [file]});
-    const {result} = renderHook(() =>
-      useMessageSend(
+    const {result} = renderHook(() => {
+      return useMessageSend(
         createProps({
           cellsRepository: {promoteNodeDraft} as never,
           messageRepository: {sendTextWithLinkPreview} as never,
         }),
-      ),
-    );
+      );
+    });
 
     await act(async () => {
       await expect(result.current.sendMessage()).rejects.toThrow('publication failed');
@@ -163,12 +183,16 @@ describe('useMessageSend', () => {
       video: {width: 1920, height: 1080},
     });
     useFileUploadState.getState().addFiles({conversationId, files: [file]});
-    const {result} = renderHook(() =>
-      useMessageSend(createProps({messageRepository: {sendTextWithLinkPreview} as never})),
-    );
+    const {result} = renderHook(() => {
+      return useMessageSend(createProps({messageRepository: {sendTextWithLinkPreview} as never}));
+    });
 
-    await act(async () => result.current.sendMessage());
-    await act(async () => Promise.resolve());
+    await act(async () => {
+      return result.current.sendMessage();
+    });
+    await act(async () => {
+      return Promise.resolve();
+    });
 
     expect(sendTextWithLinkPreview).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -187,12 +211,16 @@ describe('useMessageSend', () => {
 
   it('sends text without attachments when no files are selected', async () => {
     const sendTextWithLinkPreview = jest.fn();
-    const {result} = renderHook(() =>
-      useMessageSend(createProps({messageRepository: {sendTextWithLinkPreview} as never})),
-    );
+    const {result} = renderHook(() => {
+      return useMessageSend(createProps({messageRepository: {sendTextWithLinkPreview} as never}));
+    });
 
-    await act(async () => result.current.sendMessage());
-    await act(async () => Promise.resolve());
+    await act(async () => {
+      return result.current.sendMessage();
+    });
+    await act(async () => {
+      return Promise.resolve();
+    });
 
     expect(sendTextWithLinkPreview).toHaveBeenCalledWith(
       expect.objectContaining({textMessage: 'hello', attachments: []}),

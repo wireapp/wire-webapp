@@ -57,7 +57,9 @@ export const CreateConversationModal = () => {
         isShown={isOpen}
         onClosed={hideModal}
         data-uie-name="group-creation-label"
-        onKeyDown={event => handleEscDown(event, hideModal)}
+        onKeyDown={event => {
+          return handleEscDown(event, hideModal);
+        }}
       >
         <CreateConversationHeader />
         <CreateConversationSteps />

@@ -71,9 +71,9 @@ export class MentionEntity {
     if (allMentions.includes(this)) {
       const mentionIndex = allMentions.indexOf(this);
       const otherMentions = allMentions.slice(0, mentionIndex);
-      const isOverlapping = otherMentions.some(
-        mention => this.endIndex > mention.startIndex && this.startIndex < mention.endIndex,
-      );
+      const isOverlapping = otherMentions.some(mention => {
+        return this.endIndex > mention.startIndex && this.startIndex < mention.endIndex;
+      });
       if (isOverlapping) {
         throw new Error(MentionEntity.ERROR.OVERLAPPING);
       }

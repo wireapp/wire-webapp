@@ -64,7 +64,9 @@ export function getFederationDeleteEventUpdates(
     } else if (is1to1 && firstUserEntity?.qualifiedId.domain === deletedDomain) {
       result.conversationsToDisable.push(conversation);
     } else {
-      const usersToDelete = allUserEntities.filter(user => user.domain === deletedDomain);
+      const usersToDelete = allUserEntities.filter(user => {
+        return user.domain === deletedDomain;
+      });
       if (usersToDelete.length > 0) {
         result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
       }
@@ -87,7 +89,9 @@ export function getUsersToDeleteFromFederatedConversations(
   conversations.forEach(conversation => {
     if (conversation.domain === domainOne || conversation.domain === domainTwo) {
       const targetDomain = conversation.domain === domainOne ? domainTwo : domainOne;
-      const usersToDelete = conversation.allUserEntities().filter(user => user.domain === targetDomain);
+      const usersToDelete = conversation.allUserEntities().filter(user => {
+        return user.domain === targetDomain;
+      });
 
       if (usersToDelete.length > 0) {
         result.push({conversation, usersToRemove: usersToDelete});
@@ -101,10 +105,16 @@ export function getUsersToDeleteFromFederatedConversations(
     }
 
     const allUserEntities = conversation.allUserEntities();
-    const userDomains = new Set(allUserEntities.map(user => user.qualifiedId.domain));
+    const userDomains = new Set(
+      allUserEntities.map(user => {
+        return user.qualifiedId.domain;
+      }),
+    );
 
     if (userDomains.has(domainOne) && userDomains.has(domainTwo)) {
-      const usersToDelete = allUserEntities.filter(user => [domainOne, domainTwo].includes(user.domain));
+      const usersToDelete = allUserEntities.filter(user => {
+        return [domainOne, domainTwo].includes(user.domain);
+      });
       if (usersToDelete.length > 0) {
         result.push({conversation, usersToRemove: usersToDelete});
       }

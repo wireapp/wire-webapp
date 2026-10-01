@@ -60,11 +60,13 @@ const meetingReminderFirePayloadFactory = createFactory<MeetingReminderFirePaylo
   };
 });
 
-const translate: Translate = (identifier, substitutions) =>
-  identifier === 'meetings.notifications.startsAt' ? `Starts at ${substitutions?.time}` : identifier;
+const translate: Translate = (identifier, substitutions) => {
+  return identifier === 'meetings.notifications.startsAt' ? `Starts at ${substitutions?.time}` : identifier;
+};
 
-const formatMeetingTime = (meetingStartTime: string): string =>
-  meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
+const formatMeetingTime = (meetingStartTime: string): string => {
+  return meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
+};
 
 const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotificationApi> = {}) => {
   const requests: SystemNotificationRequest[] = [];
@@ -74,9 +76,15 @@ const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotif
 
   const notifier = createMeetingReminderOsNotifier({
     notificationApi: {
-      isSupported: () => true,
-      getPermission: () => 'granted',
-      requestPermission: async () => 'granted',
+      isSupported: () => {
+        return true;
+      },
+      getPermission: () => {
+        return 'granted';
+      },
+      requestPermission: async () => {
+        return 'granted';
+      },
       show: request => {
         requests.push(request);
 
@@ -140,7 +148,11 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it.each(['denied', 'default'] as const)('presents nothing when permission is %s', permission => {
-    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({getPermission: () => permission});
+    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({
+      getPermission: () => {
+        return permission;
+      },
+    });
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
@@ -149,7 +161,11 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('presents nothing when notifications are unsupported', () => {
-    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({isSupported: () => false});
+    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({
+      isSupported: () => {
+        return false;
+      },
+    });
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
@@ -159,11 +175,12 @@ describe('createMeetingReminderOsNotifier', () => {
 
   it('logs and drops a failure to present the toast', () => {
     const {logger, notifier} = createNotifierWithFakeNotificationApi({
-      show: () =>
-        result.err({
+      show: () => {
+        return result.err({
           kind: systemNotificationErrorKinds.presentationFailed,
           cause: new Error('notification could not be constructed'),
-        }),
+        });
+      },
     });
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
@@ -182,11 +199,12 @@ describe('createMeetingReminderOsNotifier', () => {
         requests.push(request);
 
         return result.ok({
-          close: () =>
-            result.err({
+          close: () => {
+            return result.err({
               kind: systemNotificationErrorKinds.closeFailed,
               cause: new Error('notification could not be closed'),
-            }),
+            });
+          },
         });
       },
     });

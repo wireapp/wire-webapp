@@ -68,13 +68,15 @@ describe('createMeetingNotificationEventHandlers', () => {
   };
 
   const createHandlers = ({
-    getMeetingSeries = () => [meetingSeries],
+    getMeetingSeries = () => {
+      return [meetingSeries];
+    },
     clock = defaultClock,
     notifications = [] as AddNotificationInput[],
     dismissedMeetings = [] as {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[],
     warnings = [] as {message: string; context?: unknown}[],
-  } = {}) =>
-    createMeetingNotificationEventHandlers({
+  } = {}) => {
+    return createMeetingNotificationEventHandlers({
       getMeetingSeries,
       clock,
       addNotification: notification => {
@@ -90,6 +92,7 @@ describe('createMeetingNotificationEventHandlers', () => {
         },
       },
     });
+  };
 
   it('creates meeting notifications from the current meeting series snapshot', () => {
     const notifications: AddNotificationInput[] = [];
@@ -125,7 +128,9 @@ describe('createMeetingNotificationEventHandlers', () => {
     const warnings: {message: string; context?: unknown}[] = [];
 
     const {onMeetingCancelled} = createHandlers({
-      getMeetingSeries: () => [],
+      getMeetingSeries: () => {
+        return [];
+      },
       notifications,
       warnings,
     });
@@ -146,7 +151,12 @@ describe('createMeetingNotificationEventHandlers', () => {
 
   it('notifies using the meeting passed by the successful sync', () => {
     const notifications: AddNotificationInput[] = [];
-    const {notifyUpdate} = createHandlers({getMeetingSeries: () => [], notifications});
+    const {notifyUpdate} = createHandlers({
+      getMeetingSeries: () => {
+        return [];
+      },
+      notifications,
+    });
 
     notifyUpdate({...meetingSeries, title: 'Fresh title'});
 
@@ -216,10 +226,11 @@ describe('createMeetingNotificationEventHandlers', () => {
     notifyMeetingChange(meetingSeries);
     notifyMeetingChange(meetingSeries);
 
-    expect(notifications.map(notification => notification.kind)).toEqual([
-      MeetingNotificationKind.ONGOING,
-      MeetingNotificationKind.ONGOING,
-    ]);
+    expect(
+      notifications.map(notification => {
+        return notification.kind;
+      }),
+    ).toEqual([MeetingNotificationKind.ONGOING, MeetingNotificationKind.ONGOING]);
   });
 
   it('notifies with ONGOING for the current instance of a recurring meeting', () => {
@@ -305,10 +316,11 @@ describe('createMeetingNotificationEventHandlers', () => {
     onMeetingCancelled(meetingId);
     notifyMeetingChange(meetingSeries);
 
-    expect(notifications.map(notification => notification.kind)).toEqual([
-      MeetingNotificationKind.CANCELLED,
-      MeetingNotificationKind.INVITE,
-    ]);
+    expect(
+      notifications.map(notification => {
+        return notification.kind;
+      }),
+    ).toEqual([MeetingNotificationKind.CANCELLED, MeetingNotificationKind.INVITE]);
   });
 
   it('dismisses stale notifications before creating a cancellation for involuntary self-removal', () => {
@@ -375,7 +387,9 @@ describe('createMeetingNotificationEventHandlers', () => {
     const notifications: AddNotificationInput[] = [];
     const dismissedMeetings: {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[] = [];
     const {onMeetingCancelled} = createMeetingNotificationEventHandlers({
-      getMeetingSeries: () => [meetingSeries],
+      getMeetingSeries: () => {
+        return [meetingSeries];
+      },
       clock: defaultClock,
       addNotification: notification => {
         notifications.push(notification);
@@ -416,7 +430,9 @@ describe('createMeetingNotificationEventHandlers', () => {
     let meetingSeriesSnapshot: MeetingSeries[] = [];
 
     const {onMeetingCancelled, retryPendingNotifications} = createHandlers({
-      getMeetingSeries: () => meetingSeriesSnapshot,
+      getMeetingSeries: () => {
+        return meetingSeriesSnapshot;
+      },
       notifications,
       dismissedMeetings,
     });

@@ -93,7 +93,9 @@ export const useLoadMessages = (
   // Load previous messages when scrolling to the top
   useEffect(() => {
     if (isLoadingMessages) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     const timeout = setTimeout(() => {
@@ -111,13 +113,17 @@ export const useLoadMessages = (
       }
     }, 100);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      return clearTimeout(timeout);
+    };
   }, [fireAndForgetInvoker, isConversationLoaded, isLoadingMessages, loadPrecedingMessages, virtualItems]);
 
   // Load new messages when scrolling to the down
   useEffect(() => {
     if (isLoadingMessages) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     const timeout = setTimeout(() => {
@@ -135,7 +141,9 @@ export const useLoadMessages = (
       }
     }, 100);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      return clearTimeout(timeout);
+    };
   }, [
     fireAndForgetInvoker,
     isConversationLoaded,
@@ -152,7 +160,9 @@ export const useLoadMessages = (
   // Load more messages on mount if the list doesn't fill the viewport
   useEffect(() => {
     if (itemsLength === 0 || fillContainerByMessagesRef.current) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     const frame = requestAnimationFrame(() => {
@@ -166,6 +176,8 @@ export const useLoadMessages = (
       fillContainerByMessagesRef.current = true;
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      return cancelAnimationFrame(frame);
+    };
   }, [fireAndForgetInvoker, itemsLength, loadPrecedingMessages, virtualizer]);
 };

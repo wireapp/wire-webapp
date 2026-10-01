@@ -62,13 +62,14 @@ export const showCallNotEstablishedModal = (noInternetCallGuardCopy: NoInternetC
 export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
   const {description, descriptionPoints, title, translate} = noInternetCallGuardCopy;
   const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] = descriptionPoints;
-  const warnings = useWarningsState(state => state.warnings);
+  const warnings = useWarningsState(state => {
+    return state.warnings;
+  });
   const visibleWarning = warnings[warnings.length - 1];
 
-  const showCallNotEstablishedMessage = useCallback(
-    () => showCallNotEstablishedModal(noInternetCallGuardCopy),
-    [description, firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint, title, translate],
-  );
+  const showCallNotEstablishedMessage = useCallback(() => {
+    return showCallNotEstablishedModal(noInternetCallGuardCopy);
+  }, [description, firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint, title, translate]);
 
   return useCallback(
     (startCall: () => void) => {

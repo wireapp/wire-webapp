@@ -29,9 +29,15 @@ import {mountComponent} from '../util/test/testUtil';
 describe('when entering account data', () => {
   let wrapper: RenderResult;
 
-  const nameInput = () => wrapper.getByTestId('enter-name') as HTMLInputElement;
-  const doNextButton = () => wrapper.getByTestId('do-next') as HTMLButtonElement;
-  const validationErrorMessage = () => wrapper.getByTestId('error-message');
+  const nameInput = () => {
+    return wrapper.getByTestId('enter-name') as HTMLInputElement;
+  };
+  const doNextButton = () => {
+    return wrapper.getByTestId('do-next') as HTMLButtonElement;
+  };
+  const validationErrorMessage = () => {
+    return wrapper.getByTestId('error-message');
+  };
 
   describe('the submit button', () => {
     it('is disabled if input is insufficient', () => {

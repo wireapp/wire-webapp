@@ -24,19 +24,21 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {createMeetingReminderScheduler, MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS} from './createMeetingReminderScheduler';
 
-const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
-  series_start_date: '2026-06-01T10:00:00.000Z',
-  series_end_date: '2026-06-01T11:00:00.000Z',
-  duration_ms: TIME_IN_MILLIS.HOUR,
-  recurrence: 'doesNotRepeat',
-  conversation_id: 'conversation-id',
-  qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-  qualified_id: {id: 'meeting-id', domain: 'example.com'},
-  qualified_creator: {id: 'creator-id', domain: 'example.com'},
-  title: 'Weekly sync',
-  tzid: 'UTC',
-  ...overrides,
-});
+const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => {
+  return {
+    series_start_date: '2026-06-01T10:00:00.000Z',
+    series_end_date: '2026-06-01T11:00:00.000Z',
+    duration_ms: TIME_IN_MILLIS.HOUR,
+    recurrence: 'doesNotRepeat',
+    conversation_id: 'conversation-id',
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    title: 'Weekly sync',
+    tzid: 'UTC',
+    ...overrides,
+  };
+};
 
 describe('createMeetingReminderScheduler', () => {
   it('fires one reminder at T-10 for a scheduled meeting', () => {

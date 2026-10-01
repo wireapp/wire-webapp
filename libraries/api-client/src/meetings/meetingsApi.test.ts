@@ -203,31 +203,42 @@ describe('MeetingsAPI', () => {
   it.each([
     [
       'createMeeting',
-      async (meetings: APIClient['api']['meetings']) =>
-        meetings.createMeeting({
+      async (meetings: APIClient['api']['meetings']) => {
+        return meetings.createMeeting({
           title: validMeeting.title,
           start_time: validMeeting.start_time,
           end_time: validMeeting.end_time,
           tzid: validMeeting.tzid,
-        }),
+        });
+      },
       validMeetingWithConversation,
     ],
     [
       'updateMeeting',
-      async (meetings: APIClient['api']['meetings']) =>
-        meetings.updateMeeting({id: 'meeting-id', domain: 'example.com'}, {title: 'Updated title'}),
+      async (meetings: APIClient['api']['meetings']) => {
+        return meetings.updateMeeting({id: 'meeting-id', domain: 'example.com'}, {title: 'Updated title'});
+      },
       validMeetingWithConversation,
     ],
     [
       'deleteMeeting',
-      async (meetings: APIClient['api']['meetings']) =>
-        meetings.deleteMeeting({id: 'meeting-id', domain: 'example.com'}),
+      async (meetings: APIClient['api']['meetings']) => {
+        return meetings.deleteMeeting({id: 'meeting-id', domain: 'example.com'});
+      },
       undefined,
     ],
-    ['getMeetingsList', async (meetings: APIClient['api']['meetings']) => meetings.getMeetingsList(), [validMeeting]],
+    [
+      'getMeetingsList',
+      async (meetings: APIClient['api']['meetings']) => {
+        return meetings.getMeetingsList();
+      },
+      [validMeeting],
+    ],
     [
       'getMeeting',
-      async (meetings: APIClient['api']['meetings']) => meetings.getMeeting({id: 'meeting-id', domain: 'example.com'}),
+      async (meetings: APIClient['api']['meetings']) => {
+        return meetings.getMeeting({id: 'meeting-id', domain: 'example.com'});
+      },
       validMeeting,
     ],
   ] as const)('disables infinite network retries for %s', async (_name, callMeetingsApi, responseData) => {

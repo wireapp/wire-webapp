@@ -26,12 +26,15 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-export const getCreatedByFilterId = (user: User): string => stringifyQualifiedId(user.qualifiedId);
+export const getCreatedByFilterId = (user: User): string => {
+  return stringifyQualifiedId(user.qualifiedId);
+};
 
-const sortConversationsByRecentFirst = (conversations: Conversation[]): Conversation[] =>
-  conversations.toSorted(
-    (conversationA, conversationB) => conversationB.last_event_timestamp() - conversationA.last_event_timestamp(),
-  );
+const sortConversationsByRecentFirst = (conversations: Conversation[]): Conversation[] => {
+  return conversations.toSorted((conversationA, conversationB) => {
+    return conversationB.last_event_timestamp() - conversationA.last_event_timestamp();
+  });
+};
 
 export const getDriveEnabledParticipants = (conversationRepository: ConversationRepository): User[] => {
   const participants: User[] = [];
@@ -42,9 +45,9 @@ export const getDriveEnabledParticipants = (conversationRepository: Conversation
         return;
       }
 
-      const alreadyAdded = participants.some(participant =>
-        matchQualifiedIds(participant.qualifiedId, user.qualifiedId),
-      );
+      const alreadyAdded = participants.some(participant => {
+        return matchQualifiedIds(participant.qualifiedId, user.qualifiedId);
+      });
 
       if (!alreadyAdded) {
         participants.push(user);
@@ -59,10 +62,13 @@ export const useDriveEnabledParticipantFilterItems = ({
   conversationRepository,
 }: {
   conversationRepository: ConversationRepository;
-}): FilterItem[] =>
-  getDriveEnabledParticipants(conversationRepository).map(user => ({
-    id: getCreatedByFilterId(user),
-    label: user.name(),
-    subLabel: user.handle,
-    startContent: <Avatar participant={user} avatarSize={AVATAR_SIZE.SMALL} />,
-  }));
+}): FilterItem[] => {
+  return getDriveEnabledParticipants(conversationRepository).map(user => {
+    return {
+      id: getCreatedByFilterId(user),
+      label: user.name(),
+      subLabel: user.handle,
+      startContent: <Avatar participant={user} avatarSize={AVATAR_SIZE.SMALL} />,
+    };
+  });
+};

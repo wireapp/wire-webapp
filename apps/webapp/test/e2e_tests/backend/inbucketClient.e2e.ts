@@ -51,7 +51,9 @@ export class InbucketClientE2E {
         verificationCode = response.data.subject.match(/\d{6}/)?.[0];
         if (verificationCode !== undefined) break;
       }
-      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for 500 ms
+      await new Promise(resolve => {
+        return setTimeout(resolve, 500);
+      }); // Wait for 500 ms
       timeout++;
     }
 
@@ -86,7 +88,9 @@ export class InbucketClientE2E {
           return true;
         }
       }
-      await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
+      await new Promise(resolve => {
+        return setTimeout(resolve, delayBetweenAttempts);
+      });
       attempt++;
     }
 
@@ -110,12 +114,13 @@ export class InbucketClientE2E {
 
         const attachments = (message.attachments as any) ?? [];
 
-        const hasPdfAttachment = attachments.some(
-          (attachment: {filename: string; 'content-type': string}) =>
+        const hasPdfAttachment = attachments.some((attachment: {filename: string; 'content-type': string}) => {
+          return (
             attachment['content-type'] === 'application/pdf' ||
             attachment.filename?.toLowerCase().startsWith('wire_invoice') ||
-            attachment.filename?.toLowerCase().endsWith('.pdf'),
-        );
+            attachment.filename?.toLowerCase().endsWith('.pdf')
+          );
+        });
 
         if (
           message.body.text.includes(`Team ID: ${teamOwner.teamId}`) &&
@@ -126,7 +131,9 @@ export class InbucketClientE2E {
           return true;
         }
       }
-      await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
+      await new Promise(resolve => {
+        return setTimeout(resolve, delayBetweenAttempts);
+      });
       attempt++;
     }
 
@@ -146,7 +153,9 @@ export class InbucketClientE2E {
           break;
         }
       }
-      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for 500 ms
+      await new Promise(resolve => {
+        return setTimeout(resolve, 500);
+      }); // Wait for 500 ms
       timeout++;
     }
 
@@ -162,7 +171,9 @@ export class InbucketClientE2E {
       headers: {
         Authorization: this.authHeader,
       },
-      validateStatus: () => true,
+      validateStatus: () => {
+        return true;
+      },
     });
   }
 

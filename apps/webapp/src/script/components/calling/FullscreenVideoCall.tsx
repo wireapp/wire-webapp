@@ -152,7 +152,9 @@ const FullscreenVideoCall = ({
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
 
   // Warnings banner
-  const warnings = useWarningsState(state => state.warnings);
+  const warnings = useWarningsState(state => {
+    return state.warnings;
+  });
   const visibleWarning = warnings[warnings.length - 1];
   const isConnectivityRecovery = visibleWarning === TYPE.CONNECTIVITY_RECOVERY;
   const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
@@ -196,7 +198,9 @@ const FullscreenVideoCall = ({
 
     callingRepository.setViewModeMinimized();
   };
-  const openPopup = () => callingRepository.setViewModeDetached();
+  const openPopup = () => {
+    return callingRepository.setViewModeDetached();
+  };
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
@@ -308,8 +312,12 @@ const FullscreenVideoCall = ({
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
   const isWebGLAvailable = detectCapabilities().webgl2;
 
-  const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
-  const backgroundEffectsQuality = useBackgroundEffectsStore(state => state.effectiveQualityTier);
+  const selectedBackgroundEffect = useBackgroundEffectsStore(state => {
+    return state.preferredEffect;
+  });
+  const backgroundEffectsQuality = useBackgroundEffectsStore(state => {
+    return state.effectiveQualityTier;
+  });
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -345,7 +353,9 @@ const FullscreenVideoCall = ({
                   element?.focus();
                 }
               }}
-              onBlur={() => clearShowAlert()}
+              onBlur={() => {
+                return clearShowAlert();
+              }}
             >
               <h2 className="video-remote-title">{conversationName}</h2>
 
@@ -359,7 +369,9 @@ const FullscreenVideoCall = ({
               <Pagination
                 totalPages={totalPages}
                 currentPage={currentPage}
-                onChangePage={newPage => changePage(newPage, call)}
+                onChangePage={newPage => {
+                  return changePage(newPage, call);
+                }}
               />
             )}
 
@@ -368,13 +380,13 @@ const FullscreenVideoCall = ({
                 variant={IconButtonVariant.PRIMARY}
                 css={minimizeButtonStyles}
                 onClick={minimize}
-                onKeyDown={event =>
-                  handleKeyDown({
+                onKeyDown={event => {
+                  return handleKeyDown({
                     event,
                     callback: minimize,
                     keys: [KEY.ENTER, KEY.SPACE],
-                  })
-                }
+                  });
+                }}
                 type="button"
                 data-uie-name="do-call-controls-video-minimize"
                 title={translate('videoCallOverlayCloseFullScreen')}
@@ -388,13 +400,13 @@ const FullscreenVideoCall = ({
                 variant={IconButtonVariant.PRIMARY}
                 css={openDetachedWindowButtonStyles}
                 onClick={openPopup}
-                onKeyDown={event =>
-                  handleKeyDown({
+                onKeyDown={event => {
+                  return handleKeyDown({
                     event,
                     callback: openPopup,
                     keys: [KEY.ENTER, KEY.SPACE],
-                  })
-                }
+                  });
+                }}
                 type="button"
                 data-uie-name="do-call-controls-video-maximize"
                 title={translate('videoCallOverlayOpenPopupWindow')}
@@ -418,7 +430,9 @@ const FullscreenVideoCall = ({
                 : videoGrid
             }
             call={call}
-            setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
+            setMaximizedParticipant={participant => {
+              return setMaximizedParticipant(call, participant);
+            }}
           />
           {classifiedDomains !== undefined && (
             <ConversationClassifiedBar
@@ -449,7 +463,9 @@ const FullscreenVideoCall = ({
               onSelectEffect={handleBackgroundSidebarSelect}
               backgroundEffectsQuality={backgroundEffectsQuality}
               onBackgroundEffectsQualityChange={handleBackgroundEffectsQualityChange}
-              onClose={() => backgroundSidebarHandler(false)}
+              onClose={() => {
+                return backgroundSidebarHandler(false);
+              }}
               isWebGLAvailable={isWebGLAvailable}
             />
           )}
@@ -460,7 +476,9 @@ const FullscreenVideoCall = ({
             <Pagination
               totalPages={totalPages}
               currentPage={currentPage}
-              onChangePage={newPage => changePage(newPage, call)}
+              onChangePage={newPage => {
+                return changePage(newPage, call);
+              }}
               className={paginationStyles}
             />
           </div>
@@ -468,23 +486,25 @@ const FullscreenVideoCall = ({
 
         {!isChoosingScreen && (
           <>
-            {emojis.map(({id, emoji, left, from}) => (
-              <div
-                key={id}
-                role="img"
-                className="emoji"
-                aria-label={translate('callReactionsAriaLabel', {from, emoji})}
-                style={{left}}
-                data-uie-from={from}
-                data-uie-value={emoji}
-                data-uie-name="flying-emoji"
-              >
-                <span aria-hidden="true">{emoji}</span>
-                <span className="emoji-text" aria-hidden="true">
-                  {from}
-                </span>
-              </div>
-            ))}
+            {emojis.map(({id, emoji, left, from}) => {
+              return (
+                <div
+                  key={id}
+                  role="img"
+                  className="emoji"
+                  aria-label={translate('callReactionsAriaLabel', {from, emoji})}
+                  style={{left}}
+                  data-uie-from={from}
+                  data-uie-value={emoji}
+                  data-uie-name="flying-emoji"
+                >
+                  <span aria-hidden="true">{emoji}</span>
+                  <span className="emoji-text" aria-hidden="true">
+                    {from}
+                  </span>
+                </div>
+              );
+            })}
             <VideoControls
               activeCallViewTab={activeCallViewTab}
               call={call}
@@ -508,7 +528,9 @@ const FullscreenVideoCall = ({
               setActiveCallViewTab={setActiveCallViewTab}
               setMaximizedParticipant={setMaximizedParticipant}
               sendEmoji={sendEmoji}
-              onOpenBackgroundSettings={() => backgroundSidebarHandler(true)}
+              onOpenBackgroundSettings={() => {
+                return backgroundSidebarHandler(true);
+              }}
               isWebGLAvailable={isWebGLAvailable}
             />
           </>
@@ -533,14 +555,20 @@ const FullscreenVideoCall = ({
           onSelectEffect={handleBackgroundSidebarSelect}
           backgroundEffectsQuality={backgroundEffectsQuality}
           onBackgroundEffectsQualityChange={handleBackgroundEffectsQualityChange}
-          onClose={() => backgroundSidebarHandler(false)}
+          onClose={() => {
+            return backgroundSidebarHandler(false);
+          }}
           isWebGLAvailable={isWebGLAvailable}
         />
       )}
       <ModalComponent
         isShown={isConfirmCloseModalOpen}
-        onClosed={() => setIsConfirmCloseModalOpen(false)}
-        onBgClick={() => setIsConfirmCloseModalOpen(false)}
+        onClosed={() => {
+          return setIsConfirmCloseModalOpen(false);
+        }}
+        onBgClick={() => {
+          return setIsConfirmCloseModalOpen(false);
+        }}
         data-uie-name="confirm-close-with-active-screen-share-modal"
         wrapperCSS={{borderRadius: 10, width: 328}}
         container={
@@ -563,12 +591,12 @@ const FullscreenVideoCall = ({
                 wrapperCSS={{marginTop: 16}}
                 data-uie-name="do-not-ask-again-checkbox"
                 id="do-not-ask-again-checkbox"
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  localStorage.setItem(
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  return localStorage.setItem(
                     LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL,
                     event.target.checked.toString(),
-                  )
-                }
+                  );
+                }}
               >
                 <CheckboxLabel className="label-xs" htmlFor="do-not-ask-again-checkbox">
                   {translate('qualityFeedback.doNotAskAgain')}
@@ -578,7 +606,9 @@ const FullscreenVideoCall = ({
                 <button
                   key="cancel"
                   type="button"
-                  onClick={() => setIsConfirmCloseModalOpen(false)}
+                  onClick={() => {
+                    return setIsConfirmCloseModalOpen(false);
+                  }}
                   data-uie-name="do-close"
                   className="modal__button modal__button--secondary"
                 >
@@ -586,7 +616,9 @@ const FullscreenVideoCall = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => callingRepository.setViewModeMinimized()}
+                  onClick={() => {
+                    return callingRepository.setViewModeMinimized();
+                  }}
                   className="modal__button modal__button--primary"
                   data-uie-name="do-action"
                   key="modal-primary-button"
@@ -599,7 +631,9 @@ const FullscreenVideoCall = ({
             <button
               type="button"
               className="modal__header__button"
-              onClick={() => setIsConfirmCloseModalOpen(false)}
+              onClick={() => {
+                return setIsConfirmCloseModalOpen(false);
+              }}
               aria-label={'closeBtnTitle'}
               data-uie-name="do-close"
             >

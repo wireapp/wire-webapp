@@ -55,6 +55,8 @@ export const safeMailOpen = (email: string): void => {
 
   const newWindow = window.open(`mailto:${pureEmail}`);
   if (!isNull(newWindow)) {
-    window.setTimeout(() => newWindow.close(), 10);
+    window.setTimeout(() => {
+      return newWindow.close();
+    }, 10);
   }
 };

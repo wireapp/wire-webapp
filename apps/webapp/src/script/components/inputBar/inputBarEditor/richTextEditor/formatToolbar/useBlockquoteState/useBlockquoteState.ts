@@ -39,11 +39,15 @@ export const useBlockquoteState = () => {
       const isBlockquote = $isQuoteNode(anchorNode) || $isQuoteNode(parent);
 
       if (isBlockquote) {
-        $setBlocksType(selection, () => $createParagraphNode());
+        $setBlocksType(selection, () => {
+          return $createParagraphNode();
+        });
         return;
       }
 
-      $setBlocksType(selection, () => $createQuoteNode());
+      $setBlocksType(selection, () => {
+        return $createQuoteNode();
+      });
     });
   };
 

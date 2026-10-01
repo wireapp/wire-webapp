@@ -99,8 +99,8 @@ export class Call {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
-    this.handRaisedParticipants = ko.pureComputed(() =>
-      this.participants()
+    this.handRaisedParticipants = ko.pureComputed(() => {
+      return this.participants()
         .filter(participant => {
           const handRaisedAt = participant.handRaisedAt();
           return !isNullOrUndefined(handRaisedAt) && handRaisedAt !== 0 && !isNan(handRaisedAt);
@@ -113,16 +113,16 @@ export class Call {
           }
 
           return firstHandRaisedAt - secondHandRaisedAt;
-        }),
-    );
+        });
+    });
     this.canvasMixer = new CanvasMediaStreamMixer();
     this.maximizedParticipant = ko.observable(null);
     this.muteState(isMuted ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
     this.isConference = [CONV_TYPE.CONFERENCE, CONV_TYPE.CONFERENCE_MLS].includes(this.conversationType);
     this.isGroupOrConference = this.isConference || this.conversationType === CONV_TYPE.GROUP;
-    this.isActive = ko.pureComputed(() =>
-      [CALL_STATE.OUTGOING, CALL_STATE.ANSWERED, CALL_STATE.MEDIA_ESTAB].includes(this.state()),
-    );
+    this.isActive = ko.pureComputed(() => {
+      return [CALL_STATE.OUTGOING, CALL_STATE.ANSWERED, CALL_STATE.MEDIA_ESTAB].includes(this.state());
+    });
   }
 
   get hasWorkingAudioInput(): boolean {
@@ -130,7 +130,9 @@ export class Call {
   }
 
   getSelfParticipant(): Participant {
-    const selfParticipant = this.participants().find(({user, clientId}) => user.isMe && this.selfClientId === clientId);
+    const selfParticipant = this.participants().find(({user, clientId}) => {
+      return user.isMe && this.selfClientId === clientId;
+    });
     return selfParticipant ?? this.selfParticipant;
   }
 
@@ -199,7 +201,11 @@ export class Call {
   setActiveSpeakers(audioLevels: ActiveSpeaker[]): void {
     // Make sure that every participant only has one entry in the list.
     const uniqueAudioLevels = audioLevels.reduce((acc, curr) => {
-      if (!acc.some(({clientId, userId}) => matchQualifiedIds(userId, curr.userId) && clientId === curr.clientId)) {
+      if (
+        !acc.some(({clientId, userId}) => {
+          return matchQualifiedIds(userId, curr.userId) && clientId === curr.clientId;
+        })
+      ) {
         acc.push(curr);
       }
       return acc;
@@ -207,7 +213,9 @@ export class Call {
 
     // Update activeSpeaking status on the participants based on their `audio_level_now`.
     this.participants().forEach(participant => {
-      const match = uniqueAudioLevels.find(({userId, clientId}) => participant.doesMatchIds(userId, clientId));
+      const match = uniqueAudioLevels.find(({userId, clientId}) => {
+        return participant.doesMatchIds(userId, clientId);
+      });
       const audioLevelNow = match?.levelNow ?? 0;
       participant.isActivelySpeaking(audioLevelNow > 0);
     });
@@ -215,12 +223,18 @@ export class Call {
     // Get the corresponding participants for the entries in ActiveSpeakers in the incoming order.
     const activeSpeakers = uniqueAudioLevels
       // Get the participants.
-      .map(({userId, clientId}) => this.getParticipant(userId, clientId))
-      .filter((participant): participant is Participant => participant !== undefined)
+      .map(({userId, clientId}) => {
+        return this.getParticipant(userId, clientId);
+      })
+      .filter((participant): participant is Participant => {
+        return participant !== undefined;
+      })
       // Limit them to 4.
       .slice(0, 4)
       // Sort them by name
-      .toSorted((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+      .toSorted((participantA, participantB) => {
+        return sortUsersByPriority(participantA.user, participantB.user);
+      });
 
     // Set the new active speakers.
     const isSameSpeakers =
@@ -237,11 +251,15 @@ export class Call {
   }
 
   getParticipant(userId: QualifiedId, clientId: ClientId): Participant | undefined {
-    return this.participants().find(participant => participant.doesMatchIds(userId, clientId));
+    return this.participants().find(participant => {
+      return participant.doesMatchIds(userId, clientId);
+    });
   }
 
   getRemoteParticipants(): Participant[] {
-    return this.participants().filter(({user, clientId}) => !user.isMe || this.selfClientId !== clientId);
+    return this.participants().filter(({user, clientId}) => {
+      return !user.isMe || this.selfClientId !== clientId;
+    });
   }
 
   setNumberOfParticipantsInOnePage(participantsInOnePage: number): void {
@@ -251,12 +269,16 @@ export class Call {
 
   updatePages() {
     const selfParticipant = this.getSelfParticipant();
-    const remoteParticipants = this.getRemoteParticipants().toSorted((p1, p2) => sortUsersByPriority(p1.user, p2.user));
+    const remoteParticipants = this.getRemoteParticipants().toSorted((p1, p2) => {
+      return sortUsersByPriority(p1.user, p2.user);
+    });
 
-    const [withVideoAndScreenShare, withoutVideo] = partition(remoteParticipants, participant =>
-      participant.isSendingVideo(),
-    );
-    const [withScreenShare, withVideo] = partition(withVideoAndScreenShare, participant => participant.sharesScreen());
+    const [withVideoAndScreenShare, withoutVideo] = partition(remoteParticipants, participant => {
+      return participant.isSendingVideo();
+    });
+    const [withScreenShare, withVideo] = partition(withVideoAndScreenShare, participant => {
+      return participant.sharesScreen();
+    });
 
     const newPages = chunk<Participant>(
       [selfParticipant, ...withScreenShare, ...withVideo, ...withoutVideo],

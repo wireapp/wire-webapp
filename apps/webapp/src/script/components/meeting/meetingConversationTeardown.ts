@@ -32,22 +32,34 @@ export type LeaveMeetingConversationError =
 export const safeLeaveMeetingConversation = (
   conversationRepository: ConversationRepository,
   qualifiedConversationId: QualifiedId,
-): Task<void, LeaveMeetingConversationError> =>
-  conversationRepository
+): Task<void, LeaveMeetingConversationError> => {
+  return conversationRepository
     .safeGetConversationById(qualifiedConversationId)
-    .mapRejected(() => meetingConversationSyncErrors.conversationNotFound)
-    .andThen(conversation =>
-      task.tryOrElse(
-        () => meetingConversationSyncErrors.leaveFailed,
-        () => conversationRepository.leaveConversation(conversation),
-      ),
-    );
+    .mapRejected(() => {
+      return meetingConversationSyncErrors.conversationNotFound;
+    })
+    .andThen(conversation => {
+      return task.tryOrElse(
+        () => {
+          return meetingConversationSyncErrors.leaveFailed;
+        },
+        () => {
+          return conversationRepository.leaveConversation(conversation);
+        },
+      );
+    });
+};
 
 export const removeMeetingConversationLocally = (
   conversationRepository: ConversationRepository,
   qualifiedConversationId: QualifiedId,
-): Task<void, MeetingConversationSyncError> =>
-  task.tryOrElse(
-    () => meetingConversationSyncErrors.leaveFailed,
-    () => conversationRepository.deleteConversationLocally(qualifiedConversationId, true),
+): Task<void, MeetingConversationSyncError> => {
+  return task.tryOrElse(
+    () => {
+      return meetingConversationSyncErrors.leaveFailed;
+    },
+    () => {
+      return conversationRepository.deleteConversationLocally(qualifiedConversationId, true);
+    },
   );
+};

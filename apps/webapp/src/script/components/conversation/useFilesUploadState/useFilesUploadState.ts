@@ -80,63 +80,77 @@ interface FileUploadState {
 
 type FileUploadStore = FileUploadState;
 
-export const useFileUploadState = create<FileUploadStore>()((set, get) => ({
-  filesByConversation: {},
-  addFiles: ({conversationId, files}) =>
-    set(state => ({
-      filesByConversation: {
-        ...state.filesByConversation,
-        [conversationId]: [...(state.filesByConversation[conversationId] ?? []), ...files],
-      },
-    })),
-  deleteFile: ({conversationId, fileId}) =>
-    set(state => ({
-      filesByConversation: {
-        ...state.filesByConversation,
-        [conversationId]: state.filesByConversation[conversationId]?.filter(file => file.id !== fileId) ?? [],
-      },
-    })),
-  updateFile: ({conversationId, fileId, data}) =>
-    set(state => ({
-      filesByConversation: {
-        ...state.filesByConversation,
-        [conversationId]:
-          state.filesByConversation[conversationId]?.map(file => {
-            if (file.id === fileId) {
-              if (data.remoteUuid !== undefined) {
-                file.remoteUuid = data.remoteUuid;
-              }
-              if (data.remoteVersionId !== undefined) {
-                file.remoteVersionId = data.remoteVersionId;
-              }
-              if (data.uploadStatus !== undefined) {
-                file.uploadStatus = data.uploadStatus;
-              }
-              if (data.image !== undefined) {
-                file.image = data.image;
-              }
-              if (data.audio !== undefined) {
-                file.audio = data.audio;
-              }
-              if (data.video !== undefined) {
-                file.video = data.video;
-              }
-              if (data.uploadProgress !== undefined) {
-                file.uploadProgress = data.uploadProgress;
-              }
-            }
-            return file;
-          }) ?? [],
-      },
-    })),
-  clearAll: ({conversationId}) => {
-    const state = get();
-    const updatedFilesByConversation = {...state.filesByConversation};
-    delete updatedFilesByConversation[conversationId];
-    set({filesByConversation: updatedFilesByConversation});
-  },
-  getFiles: ({conversationId}) => {
-    const state = get().filesByConversation;
-    return state[conversationId] ?? [];
-  },
-}));
+export const useFileUploadState = create<FileUploadStore>()((set, get) => {
+  return {
+    filesByConversation: {},
+    addFiles: ({conversationId, files}) => {
+      return set(state => {
+        return {
+          filesByConversation: {
+            ...state.filesByConversation,
+            [conversationId]: [...(state.filesByConversation[conversationId] ?? []), ...files],
+          },
+        };
+      });
+    },
+    deleteFile: ({conversationId, fileId}) => {
+      return set(state => {
+        return {
+          filesByConversation: {
+            ...state.filesByConversation,
+            [conversationId]:
+              state.filesByConversation[conversationId]?.filter(file => {
+                return file.id !== fileId;
+              }) ?? [],
+          },
+        };
+      });
+    },
+    updateFile: ({conversationId, fileId, data}) => {
+      return set(state => {
+        return {
+          filesByConversation: {
+            ...state.filesByConversation,
+            [conversationId]:
+              state.filesByConversation[conversationId]?.map(file => {
+                if (file.id === fileId) {
+                  if (data.remoteUuid !== undefined) {
+                    file.remoteUuid = data.remoteUuid;
+                  }
+                  if (data.remoteVersionId !== undefined) {
+                    file.remoteVersionId = data.remoteVersionId;
+                  }
+                  if (data.uploadStatus !== undefined) {
+                    file.uploadStatus = data.uploadStatus;
+                  }
+                  if (data.image !== undefined) {
+                    file.image = data.image;
+                  }
+                  if (data.audio !== undefined) {
+                    file.audio = data.audio;
+                  }
+                  if (data.video !== undefined) {
+                    file.video = data.video;
+                  }
+                  if (data.uploadProgress !== undefined) {
+                    file.uploadProgress = data.uploadProgress;
+                  }
+                }
+                return file;
+              }) ?? [],
+          },
+        };
+      });
+    },
+    clearAll: ({conversationId}) => {
+      const state = get();
+      const updatedFilesByConversation = {...state.filesByConversation};
+      delete updatedFilesByConversation[conversationId];
+      set({filesByConversation: updatedFilesByConversation});
+    },
+    getFiles: ({conversationId}) => {
+      const state = get().filesByConversation;
+      return state[conversationId] ?? [];
+    },
+  };
+});

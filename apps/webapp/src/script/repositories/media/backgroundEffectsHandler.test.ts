@@ -27,20 +27,26 @@ import {
 import {detectCapabilities} from 'Repositories/media/backgroundEffects';
 
 // Mocks
-jest.mock('Util/localStorage', () => ({
-  getStorage: jest.fn(),
-}));
+jest.mock('Util/localStorage', () => {
+  return {
+    getStorage: jest.fn(),
+  };
+});
 
-jest.mock('Repositories/media/VideoBackgroundEffects', () => ({
-  BLUR_STRENGTHS: {high: 10},
-  DEFAULT_BACKGROUND_EFFECT: {type: 'none'},
-  DEFAULT_BUILTIN_BACKGROUND_ID: 'default-id',
-  loadBackgroundSource: jest.fn(),
-}));
+jest.mock('Repositories/media/VideoBackgroundEffects', () => {
+  return {
+    BLUR_STRENGTHS: {high: 10},
+    DEFAULT_BACKGROUND_EFFECT: {type: 'none'},
+    DEFAULT_BUILTIN_BACKGROUND_ID: 'default-id',
+    loadBackgroundSource: jest.fn(),
+  };
+});
 
-jest.mock('Repositories/media/backgroundEffects', () => ({
-  detectCapabilities: jest.fn(),
-}));
+jest.mock('Repositories/media/backgroundEffects', () => {
+  return {
+    detectCapabilities: jest.fn(),
+  };
+});
 
 describe('BackgroundEffectsHandler', () => {
   let mockController: any;
@@ -78,14 +84,15 @@ describe('BackgroundEffectsHandler', () => {
 
   function createMockStream(withTrack = true): MediaStream {
     return {
-      getVideoTracks: () =>
-        withTrack
+      getVideoTracks: () => {
+        return withTrack
           ? [
               {
                 stop: jest.fn(),
               },
             ]
-          : [],
+          : [];
+      },
     } as unknown as MediaStream;
   }
 
@@ -236,10 +243,16 @@ describe('BackgroundEffectsHandler', () => {
     handler.setQualityTier('performance');
 
     let isProcessing = false;
-    mockController.isProcessing.mockImplementation(() => isProcessing);
+    mockController.isProcessing.mockImplementation(() => {
+      return isProcessing;
+    });
     mockController.start.mockImplementation(async () => {
       isProcessing = true;
-      return {stop: jest.fn(() => (isProcessing = false))};
+      return {
+        stop: jest.fn(() => {
+          return (isProcessing = false);
+        }),
+      };
     });
 
     const stream = createMockStream();
@@ -349,9 +362,9 @@ describe('BackgroundEffectsHandler', () => {
     expect(backgroundEffectsStore.getState().lastVirtualBackgroundId).toBe('office-2');
 
     // setItem for the virtual ID key should have been called exactly once — only for the virtual selection, not for blur
-    const virtualIdCalls = (mockStorage.setItem as jest.Mock).mock.calls.filter(
-      ([key]) => key === 'video-background-effects-last-virtual-id',
-    );
+    const virtualIdCalls = (mockStorage.setItem as jest.Mock).mock.calls.filter(([key]) => {
+      return key === 'video-background-effects-last-virtual-id';
+    });
     expect(virtualIdCalls).toHaveLength(1);
     expect(virtualIdCalls[0][1]).toBe('office-2');
   });
@@ -362,7 +375,9 @@ describe('BackgroundEffectsHandler', () => {
       throw new Error('controller failed');
     });
 
-    expect(() => handler.setQualityTier('performance')).toThrow('controller failed');
+    expect(() => {
+      return handler.setQualityTier('performance');
+    }).toThrow('controller failed');
     expect(backgroundEffectsStore.getState().qualityTier).toBe('performance');
   });
 
@@ -443,9 +458,9 @@ describe('BackgroundEffectsHandler', () => {
 
     expect(backgroundEffectsStore.getState().preferredEffect).toEqual({type: 'none'});
 
-    const preferredEffectWrites = (mockStorage.setItem as jest.Mock).mock.calls.filter(
-      ([key]) => key === 'video-background-effects',
-    );
+    const preferredEffectWrites = (mockStorage.setItem as jest.Mock).mock.calls.filter(([key]) => {
+      return key === 'video-background-effects';
+    });
 
     expect(preferredEffectWrites).toHaveLength(0);
   });

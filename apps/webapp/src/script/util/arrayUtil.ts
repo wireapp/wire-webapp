@@ -39,9 +39,15 @@ export function chunk<T>(array: T[] | Float32Array, size: number) {
  */
 export const getDifference = <T>(array1: T[] = [], array2: T[] = [], matcher?: (t1: T, t2: T) => boolean): T[] => {
   if (!isUndefined(matcher)) {
-    return array2.filter(el1 => !array1.some(el2 => matcher(el1, el2)));
+    return array2.filter(el1 => {
+      return !array1.some(el2 => {
+        return matcher(el1, el2);
+      });
+    });
   }
-  return array2.filter(element => !array1.includes(element));
+  return array2.filter(element => {
+    return !array1.includes(element);
+  });
 };
 
 export const getNextItem = <T>(array: T[], currentItem: T): T | undefined => {
@@ -87,7 +93,9 @@ export const interpolate = (array: number[], length: number) => {
   return newArray;
 };
 
-export const isLastItem = <T>(array: T[], item: T) => array.indexOf(item) === array.length - 1;
+export const isLastItem = <T>(array: T[], item: T) => {
+  return array.indexOf(item) === array.length - 1;
+};
 
 export const iterateIndex = <T>(array: T, currentIndex: number, reverse = false): number | undefined => {
   if (isNonEmptyArray(array) && isFiniteNumber(currentIndex)) {
@@ -118,13 +126,21 @@ export const iterateItem = <T>(array: T[], currentItem: T, reverse = false): T |
  * @param array source
  * @returns random element
  */
-export const randomElement = <T>(array: T[] = []) => array[Math.floor(Math.random() * array.length)];
+export const randomElement = <T>(array: T[] = []) => {
+  return array[Math.floor(Math.random() * array.length)];
+};
 
-export const deArrayify = <T>(value: T[] | T): T => (value instanceof Array ? value[0] : value);
+export const deArrayify = <T>(value: T[] | T): T => {
+  return value instanceof Array ? value[0] : value;
+};
 
-export const uniquify = <T>(elements: T[]): T[] => Array.from(new Set<T>(elements));
+export const uniquify = <T>(elements: T[]): T[] => {
+  return Array.from(new Set<T>(elements));
+};
 
-export const flatten = <T>(arrays: T[][]): T[] => ([] as T[]).concat(...arrays);
+export const flatten = <T>(arrays: T[][]): T[] => {
+  return ([] as T[]).concat(...arrays);
+};
 
 export const partition = <T>(array: T[], condition: (element: T) => boolean): [T[], T[]] => {
   const matching: T[] = [];

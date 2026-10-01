@@ -25,12 +25,17 @@ export type MeetingListTimelineItem =
 
 export const getMeetingListTimelineItems = (
   meetingInstancesByDay: MeetingInstancesByDay[],
-): MeetingListTimelineItem[] =>
-  meetingInstancesByDay.flatMap(({day, meetingInstances}) => [
-    {type: 'dayHeader' as const, day},
-    ...meetingInstances.map(meetingInstance => ({
-      type: 'meetingInstance' as const,
-      day,
-      meetingInstance,
-    })),
-  ]);
+): MeetingListTimelineItem[] => {
+  return meetingInstancesByDay.flatMap(({day, meetingInstances}) => {
+    return [
+      {type: 'dayHeader' as const, day},
+      ...meetingInstances.map(meetingInstance => {
+        return {
+          type: 'meetingInstance' as const,
+          day,
+          meetingInstance,
+        };
+      }),
+    ];
+  });
+};

@@ -266,9 +266,9 @@ test.describe('Status', () => {
 
       for (const {type, targetForUserA, targetForUserB, options} of scenarios) {
         await test.step(`Verify notifications in ${type}`, async () => {
-          const filteredCases = commonTestCases.filter(
-            tc => config.status === UserStatus.Away || !['Mention', 'Reply'].includes(tc.name),
-          );
+          const filteredCases = commonTestCases.filter(tc => {
+            return config.status === UserStatus.Away || !['Mention', 'Reply'].includes(tc.name);
+          });
           await userAPages.conversationList().getConversation(targetForUserA, options).open();
 
           for (const testCase of filteredCases) {
@@ -281,7 +281,11 @@ test.describe('Status', () => {
           await expect(userBPages.conversationList().getConversation(targetForUserB, options)).toContainText(
             /\d+ ping, \d+ messages/,
           );
-          await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+          await expect
+            .poll(() => {
+              return getUserBNotifications();
+            })
+            .toHaveLength(0);
         });
       }
 
@@ -291,14 +295,20 @@ test.describe('Status', () => {
         for (const systemTestCase of systemTestCases) {
           await systemTestCase.sendAction({userAPageManager});
         }
-        await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+        await expect
+          .poll(() => {
+            return getUserBNotifications();
+          })
+          .toHaveLength(0);
       });
 
       // Handle the "Special" Notifications (Calls/Mentions/Replies)
       if (config.expectSpecialNotifications) {
         await test.step('User B should receive mentions, replies, and calls (Busy status)', async () => {
           const specialTestCases = [
-            ...commonTestCases.filter(tc => tc.name === 'Mention' || tc.name === 'Reply'),
+            ...commonTestCases.filter(tc => {
+              return tc.name === 'Mention' || tc.name === 'Reply';
+            }),
             {
               name: 'Call',
               sendAction: async ({pageA}: {pageA: Page}) => {
@@ -314,14 +324,22 @@ test.describe('Status', () => {
               await testCase.sendAction({pageA: userAPage, api});
             });
           }
-          await expect.poll(() => getUserBNotifications()).toHaveLength(specialTestCases.length);
+          await expect
+            .poll(() => {
+              return getUserBNotifications();
+            })
+            .toHaveLength(specialTestCases.length);
         });
       } else {
         await test.step('User B should not receive calls notification (Away status)', async () => {
           await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
           await userAPages.conversation().startCall();
           await expect(userBPages.calling().callCell).toBeVisible();
-          await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+          await expect
+            .poll(() => {
+              return getUserBNotifications();
+            })
+            .toHaveLength(0);
         });
       }
     });
@@ -401,7 +419,11 @@ test.describe('Status', () => {
               notificationCount++;
             });
           }
-          await expect.poll(() => getUserBNotifications()).toHaveLength(notificationCount);
+          await expect
+            .poll(() => {
+              return getUserBNotifications();
+            })
+            .toHaveLength(notificationCount);
         });
       }
 
@@ -416,7 +438,11 @@ test.describe('Status', () => {
           });
         }
 
-        await expect.poll(() => getUserBNotifications()).toHaveLength(notificationCount);
+        await expect
+          .poll(() => {
+            return getUserBNotifications();
+          })
+          .toHaveLength(notificationCount);
       });
     },
   );
@@ -461,7 +487,9 @@ test.describe('Status', () => {
     async ({createPage}) => {
       const [adminPageManager, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       const {components, pages: adminPages} = adminPageManager.webapp;

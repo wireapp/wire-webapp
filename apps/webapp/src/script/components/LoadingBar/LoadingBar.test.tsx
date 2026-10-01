@@ -25,7 +25,9 @@ jest.mock('@wireapp/react-ui-kit', () => {
   const originalModule = jest.requireActual('@wireapp/react-ui-kit');
   return {
     ...originalModule,
-    Loading: (properties: Record<string, unknown>) => <div {...properties} />,
+    Loading: (properties: Record<string, unknown>) => {
+      return <div {...properties} />;
+    },
   };
 });
 

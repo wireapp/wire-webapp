@@ -19,13 +19,15 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const CirclePlusIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M0 8C0 12.4183 3.58172 16 8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8ZM7 9H3V7H7V3H9V7H13V9H9V13H7V9Z"
-      fill="currentColor"
-    />
-  </SVGIcon>
-);
+export const CirclePlusIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M0 8C0 12.4183 3.58172 16 8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8ZM7 9H3V7H7V3H9V7H13V9H9V13H7V9Z"
+        fill="currentColor"
+      />
+    </SVGIcon>
+  );
+};

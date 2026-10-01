@@ -194,7 +194,11 @@ export const useMessageSend = ({
   const isSendingDisabled = useMemo(() => {
     const hasText = messageContent.text.length > 0;
     const hasFiles = files.length > 0;
-    const hasSuccessfullyUploadedFiles = hasFiles && files.every(file => file.uploadStatus === 'success');
+    const hasSuccessfullyUploadedFiles =
+      hasFiles &&
+      files.every(file => {
+        return file.uploadStatus === 'success';
+      });
 
     if (cellsEnabled) {
       return hasFiles ? !hasSuccessfullyUploadedFiles : !hasText;

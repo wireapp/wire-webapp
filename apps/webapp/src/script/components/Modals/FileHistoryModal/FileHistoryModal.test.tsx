@@ -39,17 +39,27 @@ import {useFileVersions} from './hooks/useFileVersions';
 
 jest.mock('./hooks/useFileHistoryModal');
 jest.mock('./hooks/useFileVersions');
-jest.mock('./FileHistoryHeader', () => ({
-  FileHistoryHeader: ({file}: {file?: {name: string; extension: string}}) => (
-    <div data-uie-name="file-history-header">{file?.name}</div>
-  ),
-}));
-jest.mock('./FileHistoryContent', () => ({
-  FileHistoryContent: () => <div data-uie-name="file-history-content">Content</div>,
-}));
-jest.mock('Components/FileFullscreenModal/FileLoader/FileLoader', () => ({
-  FileLoader: () => <div data-uie-name="file-loader">Loading...</div>,
-}));
+jest.mock('./FileHistoryHeader', () => {
+  return {
+    FileHistoryHeader: ({file}: {file?: {name: string; extension: string}}) => {
+      return <div data-uie-name="file-history-header">{file?.name}</div>;
+    },
+  };
+});
+jest.mock('./FileHistoryContent', () => {
+  return {
+    FileHistoryContent: () => {
+      return <div data-uie-name="file-history-content">Content</div>;
+    },
+  };
+});
+jest.mock('Components/FileFullscreenModal/FileLoader/FileLoader', () => {
+  return {
+    FileLoader: () => {
+      return <div data-uie-name="file-loader">Loading...</div>;
+    },
+  };
+});
 
 const mockedUseFileHistoryModal = jest.mocked(useFileHistoryModal);
 const mockedUseFileVersions = jest.mocked(useFileVersions);

@@ -73,7 +73,9 @@ describe('Conversation', () => {
   });
 
   describe('type checks', () => {
-    beforeEach(() => (conversation_et = createLocalizedConversationForTest()));
+    beforeEach(() => {
+      return (conversation_et = createLocalizedConversationForTest());
+    });
 
     it('should return the expected value for personal conversations', () => {
       conversation_et.type(CONVERSATION_TYPE.CONNECT);
@@ -156,7 +158,9 @@ describe('Conversation', () => {
 
   describe('translation injection', () => {
     it('uses the injected translate function for unavailable 1:1 display names', () => {
-      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const translate = jest.fn((translationKey: string) => {
+        return `translated:${translationKey}`;
+      });
       const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translate);
 
       conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -175,7 +179,9 @@ describe('Conversation', () => {
       conversation_et.addMessage(initial_message_et);
     });
 
-    afterEach(() => conversation_et.removeMessages());
+    afterEach(() => {
+      return conversation_et.removeMessages();
+    });
 
     it('should not add message with an exisiting id', () => {
       conversation_et.addMessage(initial_message_et);
@@ -191,7 +197,11 @@ describe('Conversation', () => {
       conversation_et.addMessage(newMessageEntity);
 
       expect(conversation_et.messages().length).toBe(initialLength);
-      expect(conversation_et.messages().some(message => message == newMessageEntity)).toBe(false);
+      expect(
+        conversation_et.messages().some(message => {
+          return message == newMessageEntity;
+        }),
+      ).toBe(false);
     });
 
     it('should add message with a newer timestamp', () => {
@@ -392,7 +402,9 @@ describe('Conversation', () => {
       self_user_et.isMe = true;
     });
 
-    afterEach(() => conversation_et.removeMessages());
+    afterEach(() => {
+      return conversation_et.removeMessages();
+    });
 
     it('returns undefined if conversation has no messages', () => {
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
@@ -830,7 +842,9 @@ describe('Conversation', () => {
       message_id = message_et.id;
     });
 
-    afterEach(() => conversation_et.removeMessages());
+    afterEach(() => {
+      return conversation_et.removeMessages();
+    });
 
     it('should remove message by id', () => {
       expect(conversation_et.messages().length).toBe(1);
@@ -869,7 +883,9 @@ describe('Conversation', () => {
       conversation_et.addMessage(message_et);
     });
 
-    afterEach(() => conversation_et.removeMessages());
+    afterEach(() => {
+      return conversation_et.removeMessages();
+    });
 
     it('should remove all messages', () => {
       expect(conversation_et.messages().length).toBe(2);

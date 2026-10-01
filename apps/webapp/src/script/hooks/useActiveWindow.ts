@@ -26,10 +26,14 @@ export type ActiveWindowState = {
   setActiveWindow: (newWindow: Window) => void;
 };
 
-export const useActiveWindowState = create<ActiveWindowState>((set, get) => ({
-  activeWindow: window,
-  setActiveWindow: (newWindow: Window) => set({activeWindow: newWindow}),
-}));
+export const useActiveWindowState = create<ActiveWindowState>((set, get) => {
+  return {
+    activeWindow: window,
+    setActiveWindow: (newWindow: Window) => {
+      return set({activeWindow: newWindow});
+    },
+  };
+});
 
 export const useActiveWindow = (windowObj: Window | null) => {
   const {setActiveWindow} = useActiveWindowState();
@@ -37,7 +41,9 @@ export const useActiveWindow = (windowObj: Window | null) => {
   const windowRef = windowObj !== null ? windowObj : window;
 
   useEffect(() => {
-    const handleFocus = () => setActiveWindow(windowRef);
+    const handleFocus = () => {
+      return setActiveWindow(windowRef);
+    };
 
     windowRef.addEventListener('focus', handleFocus);
 

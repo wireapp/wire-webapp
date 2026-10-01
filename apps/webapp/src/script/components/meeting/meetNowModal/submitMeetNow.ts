@@ -85,8 +85,12 @@ const joinCreatedMeeting = async ({
 
   if (result.isErr) {
     handleJoinMeetingCallResult(result, {
-      showConversationNotFoundModal: () => showConversationNotFoundModal(translate),
-      showJoinFailedModal: () => showCallNotEstablishedModal(callNotEstablishedCopy),
+      showConversationNotFoundModal: () => {
+        return showConversationNotFoundModal(translate);
+      },
+      showJoinFailedModal: () => {
+        return showCallNotEstablishedModal(callNotEstablishedCopy);
+      },
     });
     return meetNowSubmitResults.joinFailed;
   }
@@ -123,7 +127,9 @@ export const submitMeetNow = async ({
 
   if (submitResult.isErr) {
     if (shouldRefreshMeetingsListAfterSubmitError(submitResult.error)) {
-      await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
+      await task.tryOrElse(() => {
+        return meetingSubmitErrors.refreshFailed;
+      }, loadMeetings);
     }
 
     showMeetingSubmitError(translate, submitResult.error, MEET_NOW_ERROR_TRANSLATION_KEYS);

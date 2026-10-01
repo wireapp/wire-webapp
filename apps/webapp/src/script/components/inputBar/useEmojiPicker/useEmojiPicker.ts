@@ -46,9 +46,12 @@ export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) =
 
   const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
+
     // eslint-disable-next-line id-length
     emojiPickerPosition.current = {x: rect.x + TRIGGER_WIDTH, y: rect.y - TRIGGER_HEIGHT - Y_OFFSET};
-    setOpen(prev => !prev);
+    setOpen(prev => {
+      return !prev;
+    });
   };
 
   useClickOutside(wrapperRef, handleClose);

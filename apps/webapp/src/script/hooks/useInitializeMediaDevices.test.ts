@@ -24,15 +24,17 @@ import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 
 import {useInitializeMediaDevices} from './useInitializeMediaDevices';
 
-const createDevicesHandler = (initializeMediaDevices = jest.fn().mockResolvedValue(undefined)) =>
-  ({
+const createDevicesHandler = (initializeMediaDevices = jest.fn().mockResolvedValue(undefined)) => {
+  return {
     initializeMediaDevices,
-  }) as unknown as MediaDevicesHandler;
+  } as unknown as MediaDevicesHandler;
+};
 
-const createStreamHandler = (requestMediaStreamAccess = jest.fn().mockResolvedValue(undefined)) =>
-  ({
+const createStreamHandler = (requestMediaStreamAccess = jest.fn().mockResolvedValue(undefined)) => {
+  return {
     requestMediaStreamAccess,
-  }) as unknown as MediaStreamHandler;
+  } as unknown as MediaStreamHandler;
+};
 
 describe('useInitializeMediaDevices', () => {
   it('requests media access, stops received tracks and initializes media devices', async () => {
@@ -44,7 +46,9 @@ describe('useInitializeMediaDevices', () => {
     const devicesHandler = createDevicesHandler();
     const streamHandler = createStreamHandler(jest.fn().mockResolvedValue(stream));
 
-    const {result} = renderHook(() => useInitializeMediaDevices(devicesHandler, streamHandler));
+    const {result} = renderHook(() => {
+      return useInitializeMediaDevices(devicesHandler, streamHandler);
+    });
 
     expect(result.current.areMediaDevicesInitialized).toBe(false);
 
@@ -62,7 +66,9 @@ describe('useInitializeMediaDevices', () => {
     const devicesHandler = createDevicesHandler();
     const streamHandler = createStreamHandler(jest.fn().mockRejectedValue(new Error('Permission denied')));
 
-    const {result} = renderHook(() => useInitializeMediaDevices(devicesHandler, streamHandler));
+    const {result} = renderHook(() => {
+      return useInitializeMediaDevices(devicesHandler, streamHandler);
+    });
 
     expect(result.current.areMediaDevicesInitialized).toBe(false);
 
@@ -77,7 +83,9 @@ describe('useInitializeMediaDevices', () => {
     const devicesHandler = createDevicesHandler(jest.fn().mockRejectedValue(new Error('Initialization failed')));
     const streamHandler = createStreamHandler();
 
-    const {result} = renderHook(() => useInitializeMediaDevices(devicesHandler, streamHandler));
+    const {result} = renderHook(() => {
+      return useInitializeMediaDevices(devicesHandler, streamHandler);
+    });
 
     expect(result.current.areMediaDevicesInitialized).toBe(false);
 

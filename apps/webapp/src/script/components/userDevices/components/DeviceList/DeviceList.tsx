@@ -58,22 +58,26 @@ export const DeviceList = ({user, getDeviceIdentity, noPadding, clients, clickOn
       </div>
 
       <ul className="participant-devices__device-list">
-        {clients.map(client => (
-          <li
-            key={client.id}
-            className={cx('participant-devices__device-item', {
-              'participant-devices__device-item--padding': !noPadding,
-            })}
-            data-uie-name="item-device"
-          >
-            <DeviceCard
-              getDeviceIdentity={getDeviceIdentity}
-              device={client}
-              click={() => clickOnDevice(client)}
-              showIcon
-            />
-          </li>
-        ))}
+        {clients.map(client => {
+          return (
+            <li
+              key={client.id}
+              className={cx('participant-devices__device-item', {
+                'participant-devices__device-item--padding': !noPadding,
+              })}
+              data-uie-name="item-device"
+            >
+              <DeviceCard
+                getDeviceIdentity={getDeviceIdentity}
+                device={client}
+                click={() => {
+                  return clickOnDevice(client);
+                }}
+                showIcon
+              />
+            </li>
+          );
+        })}
       </ul>
     </>
   );

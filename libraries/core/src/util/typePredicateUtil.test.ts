@@ -27,7 +27,9 @@ describe('TypePredicatUtil', () => {
         {domain1: {user1: []}}, // When a user has no clients
       ];
 
-      validUserClients.forEach(payload => expect(isQualifiedUserClients(payload)).toBeTruthy());
+      validUserClients.forEach(payload => {
+        expect(isQualifiedUserClients(payload)).toBeTruthy();
+      });
     });
 
     it('rejects non QualifiedUserClients', () => {
@@ -38,7 +40,9 @@ describe('TypePredicatUtil', () => {
         {domain1: {user1: [{}]}},
       ];
 
-      invalidUserClients.forEach(payload => expect(isQualifiedUserClients(payload)).toBeFalsy());
+      invalidUserClients.forEach(payload => {
+        expect(isQualifiedUserClients(payload)).toBeFalsy();
+      });
     });
   });
 });

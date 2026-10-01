@@ -23,11 +23,15 @@ import {CSSObject} from '@emotion/react';
 
 export type HeaderProps<T = HTMLHeadingElement> = React.HTMLProps<T>;
 
-export const headerStyle: <T>(props: HeaderProps<T>) => CSSObject = _ => ({
-  alignItems: 'center',
-  display: 'flex',
-  height: '64px',
-  justifyContent: 'space-between',
-});
+export const headerStyle: <T>(props: HeaderProps<T>) => CSSObject = _ => {
+  return {
+    alignItems: 'center',
+    display: 'flex',
+    height: '64px',
+    justifyContent: 'space-between',
+  };
+};
 
-export const Header = (props: HeaderProps) => <header css={headerStyle(props)} {...props} />;
+export const Header = (props: HeaderProps) => {
+  return <header css={headerStyle(props)} {...props} />;
+};

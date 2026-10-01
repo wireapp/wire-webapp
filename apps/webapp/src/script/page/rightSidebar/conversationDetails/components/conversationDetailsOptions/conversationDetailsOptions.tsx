@@ -174,21 +174,37 @@ function ConversationDetailsOptionsContent({
   const canEditTimeout = roleRepository.canToggleTimeout(activeConversation) && !isCellsConversation;
   const canEditReadReceipts = roleRepository.canToggleReadReceipts(activeConversation);
 
-  const openNotificationsPanel = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+  const openNotificationsPanel = () => {
+    return togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+  };
 
-  const openTimedMessagePanel = () => togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
+  const openTimedMessagePanel = () => {
+    return togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
+  };
 
-  const openSharedDrivePanel = () => togglePanel(PanelState.SHARED_DRIVE, activeConversation);
+  const openSharedDrivePanel = () => {
+    return togglePanel(PanelState.SHARED_DRIVE, activeConversation);
+  };
 
-  const openGuestPanel = () => togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
+  const openGuestPanel = () => {
+    return togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
+  };
 
-  const openServicePanel = () => togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
+  const openServicePanel = () => {
+    return togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
+  };
 
-  const showNotifications = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+  const showNotifications = () => {
+    return togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+  };
 
-  const openAccessPanel = () => togglePanel(PanelState.ACCESS, activeConversation);
+  const openAccessPanel = () => {
+    return togglePanel(PanelState.ACCESS, activeConversation);
+  };
 
-  const openConversationHistoryPanel = () => togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
+  const openConversationHistoryPanel = () => {
+    return togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
+  };
 
   const openParticipantDevices = () => {
     if (isUndefined(firstParticipant)) {
@@ -352,18 +368,22 @@ function ConversationDetailsOptionsContent({
                       {
                         start: '[button]',
                         end: '[/button]',
-                        render: text => (
-                          <button
-                            className="button-reset-default"
-                            css={{
-                              textDecoration: 'underline',
-                            }}
-                            key={text}
-                            onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT)}
-                          >
-                            {text}
-                          </button>
-                        ),
+                        render: text => {
+                          return (
+                            <button
+                              className="button-reset-default"
+                              css={{
+                                textDecoration: 'underline',
+                              }}
+                              key={text}
+                              onClick={() => {
+                                return amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
+                              }}
+                            >
+                              {text}
+                            </button>
+                          );
+                        },
                       },
                     ])}
                   </p>

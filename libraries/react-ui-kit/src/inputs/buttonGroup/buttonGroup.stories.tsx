@@ -27,11 +27,13 @@ const meta: Meta<typeof ButtonGroup> = {
   component: ButtonGroup,
   title: 'inputs/buttonGroup',
   decorators: [
-    Story => (
-      <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 
@@ -56,32 +58,36 @@ export const SingleButton: Story = {
   },
 };
 
-export const WithIcons = () => (
-  <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-    <ButtonGroup>
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
-    </ButtonGroup>
-    <ButtonGroup>
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />}>Add</ButtonGroup.Button>
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />}>Create</ButtonGroup.Button>
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />}>New</ButtonGroup.Button>
-    </ButtonGroup>
-  </div>
-);
+export const WithIcons = () => {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
+      <ButtonGroup>
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
+      </ButtonGroup>
+      <ButtonGroup>
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />}>Add</ButtonGroup.Button>
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />}>Create</ButtonGroup.Button>
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />}>New</ButtonGroup.Button>
+      </ButtonGroup>
+    </div>
+  );
+};
 
-export const MixedContent = () => (
-  <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-    <ButtonGroup>
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
-      <ButtonGroup.Button>Middle</ButtonGroup.Button>
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />}>End</ButtonGroup.Button>
-    </ButtonGroup>
-    <ButtonGroup>
-      <ButtonGroup.Button>Start</ButtonGroup.Button>
-      <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
-      <ButtonGroup.Button>End</ButtonGroup.Button>
-    </ButtonGroup>
-  </div>
-);
+export const MixedContent = () => {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
+      <ButtonGroup>
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
+        <ButtonGroup.Button>Middle</ButtonGroup.Button>
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />}>End</ButtonGroup.Button>
+      </ButtonGroup>
+      <ButtonGroup>
+        <ButtonGroup.Button>Start</ButtonGroup.Button>
+        <ButtonGroup.Button icon={<PlusIcon height={12} width={12} />} />
+        <ButtonGroup.Button>End</ButtonGroup.Button>
+      </ButtonGroup>
+    </div>
+  );
+};

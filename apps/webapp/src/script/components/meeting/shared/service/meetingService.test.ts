@@ -52,21 +52,23 @@ const scheduleCommand: ScheduleMeetingCommand = {
   selectedUsers: [],
 };
 
-const updateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMeetingCommand => ({
-  meetingId,
-  title: 'Weekly sync',
-  start: futureStartDate,
-  end: futureEndDate,
-  recurrence: 'doesNotRepeat',
-  originalTitle: 'Weekly sync',
-  originalStart: futureStartDate,
-  originalEnd: futureEndDate,
-  originalRecurrence: 'doesNotRepeat',
-  selectedUsers: [],
-  originalSelectedUsers: [],
-  qualifiedConversation: maybe.just(qualifiedConversation),
-  ...overrides,
-});
+const updateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMeetingCommand => {
+  return {
+    meetingId,
+    title: 'Weekly sync',
+    start: futureStartDate,
+    end: futureEndDate,
+    recurrence: 'doesNotRepeat',
+    originalTitle: 'Weekly sync',
+    originalStart: futureStartDate,
+    originalEnd: futureEndDate,
+    originalRecurrence: 'doesNotRepeat',
+    selectedUsers: [],
+    originalSelectedUsers: [],
+    qualifiedConversation: maybe.just(qualifiedConversation),
+    ...overrides,
+  };
+};
 
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
@@ -189,7 +191,16 @@ describe('scheduleMeeting', () => {
     const result = await scheduleMeeting(scheduleCommand, deps);
 
     expect(result.isOk).toBe(true);
-    expect(result.match({Ok: value => value, Err: () => null})).toEqual({
+    expect(
+      result.match({
+        Ok: value => {
+          return value;
+        },
+        Err: () => {
+          return null;
+        },
+      }),
+    ).toEqual({
       failedToAdd: [],
       qualifiedMeetingId: meetingId,
     });
@@ -346,7 +357,16 @@ describe('meetNowMeeting', () => {
     );
 
     expect(result.isOk).toBe(true);
-    expect(result.match({Ok: value => value, Err: () => null})).toEqual({
+    expect(
+      result.match({
+        Ok: value => {
+          return value;
+        },
+        Err: () => {
+          return null;
+        },
+      }),
+    ).toEqual({
       failedToAdd: [],
       qualifiedConversation,
       qualifiedMeetingId: meetingId,

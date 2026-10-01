@@ -22,5 +22,15 @@ import {useMemo, useState} from 'react';
 export const useModalState = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  return useMemo(() => ({isOpen, open: () => setIsOpen(true), close: () => setIsOpen(false)}), [isOpen]);
+  return useMemo(() => {
+    return {
+      isOpen,
+      open: () => {
+        return setIsOpen(true);
+      },
+      close: () => {
+        return setIsOpen(false);
+      },
+    };
+  }, [isOpen]);
 };

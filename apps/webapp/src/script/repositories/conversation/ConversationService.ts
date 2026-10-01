@@ -88,7 +88,9 @@ type SearchableConversationEvent = EventRecord & {
 type ConversationSearchEventLoader = Pick<EventService, 'loadEventsWithCategory'>;
 
 function waitForNextSearchBatch() {
-  return new Promise<void>(resolve => setTimeout(resolve, 0));
+  return new Promise<void>(resolve => {
+    return setTimeout(resolve, 0);
+  });
 }
 
 function createSearchAbortError() {
@@ -104,8 +106,12 @@ function throwIfSearchAborted(abortSignal?: AbortSignal) {
 }
 
 const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent) => string>> = {
-  [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => event.data?.content || event.data?.message || '',
-  [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => event.data?.text?.content || '',
+  [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => {
+    return event.data?.content || event.data?.message || '';
+  },
+  [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => {
+    return event.data?.text?.content || '';
+  },
   [ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD]: event => {
     const items: CompositeMessageItem[] = isArray(event.data?.items) ? event.data.items : [];
     return items
@@ -118,7 +124,9 @@ const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent
         }
         return [];
       })
-      .filter((text: string) => text.length > 0)
+      .filter((text: string) => {
+        return text.length > 0;
+      })
       .join(' ');
   },
 };
@@ -215,8 +223,12 @@ export class ConversationService {
    */
   getSafeConversationById(conversationId: QualifiedId): Task<BackendConversation, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.apiClient.api.conversation.getConversation(conversationId),
+      error => {
+        return error;
+      },
+      () => {
+        return this.apiClient.api.conversation.getConversation(conversationId);
+      },
     );
   }
 
@@ -483,8 +495,12 @@ export class ConversationService {
     } else {
       const records = await this.storageService.getAll<{time: number}>(StorageSchemata.OBJECT_STORE.EVENTS);
       events = records
-        .filter(record => record.time.toString() >= min_date.toISOString())
-        .toSorted((a, b) => a.time - b.time);
+        .filter(record => {
+          return record.time.toString() >= min_date.toISOString();
+        })
+        .toSorted((a, b) => {
+          return a.time - b.time;
+        });
     }
 
     const conversations = events.reduce((accumulated, event) => {
@@ -494,8 +510,12 @@ export class ConversationService {
     }, {});
 
     return Object.keys(conversations)
-      .toSorted((id_a, id_b) => conversations[id_b] - conversations[id_a])
-      .map(id => ({domain: '', id}));
+      .toSorted((id_a, id_b) => {
+        return conversations[id_b] - conversations[id_a];
+      })
+      .map(id => {
+        return {domain: '', id};
+      });
   }
 
   /**
@@ -513,7 +533,9 @@ export class ConversationService {
    */
   async saveConversationsInDb(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
     if (this.storageService.db) {
-      const keys = conversations.map(conversation => conversation.id);
+      const keys = conversations.map(conversation => {
+        return conversation.id;
+      });
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {
@@ -534,7 +556,9 @@ export class ConversationService {
 
     return this.storageService
       .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
-      .then(() => conversation_et);
+      .then(() => {
+        return conversation_et;
+      });
   }
 
   /**
@@ -596,14 +620,16 @@ export class ConversationService {
   }
 
   public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
-    this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => onRecovered(conversationId));
+    this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => {
+      return onRecovered(conversationId);
+    });
   }
 
   public addMLSEventDistributedListener(onDistributed: (events: any, time: string) => void) {
     // Listen to the MLS distributed event to handle events that were distributed
-    this.coreConversationService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, ({events, time}) =>
-      onDistributed(events, time),
-    );
+    this.coreConversationService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, ({events, time}) => {
+      return onDistributed(events, time);
+    });
   }
 
   /**

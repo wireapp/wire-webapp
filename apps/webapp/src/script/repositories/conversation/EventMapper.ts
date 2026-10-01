@@ -139,6 +139,8 @@ export class EventMapper {
         const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
         this.logger.error(errorMessage, error);
       }
+
+      return undefined;
     });
     return mappedEvents.filter(messageEntity => {
       return !isUndefined(messageEntity);
@@ -665,7 +667,9 @@ export class EventMapper {
 
     if (conversationEntity.isGroupOrChannel()) {
       const messageFromCreator = sender === conversationEntity.creator;
-      const creatorIndex = messageUserIds.findIndex(user => user.id === sender);
+      const creatorIndex = messageUserIds.findIndex(user => {
+        return user.id === sender;
+      });
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {
@@ -1172,10 +1176,16 @@ export class EventMapper {
    * @returns Array of mapped link previews
    */
   private _mapAssetLinkPreviews(linkPreviews: string[]) {
-    const encodedLinkPreviews = linkPreviews.map(base64 => base64ToArray(base64));
+    const encodedLinkPreviews = linkPreviews.map(base64 => {
+      return base64ToArray(base64);
+    });
     return encodedLinkPreviews
-      .map(encodedLinkPreview => LinkPreview.decode(encodedLinkPreview))
-      .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
+      .map(encodedLinkPreview => {
+        return LinkPreview.decode(encodedLinkPreview);
+      })
+      .map(linkPreview => {
+        return this._mapAssetLinkPreview(linkPreview);
+      })
       .filter(linkPreviewEntity => {
         return !isUndefined(linkPreviewEntity);
       });
@@ -1189,7 +1199,9 @@ export class EventMapper {
    * @returns Array of mapped mentions
    */
   private _mapAssetMentions(mentions: string[], messageText: string) {
-    const encodedMentions = mentions.map(base64 => base64ToArray(base64));
+    const encodedMentions = mentions.map(base64 => {
+      return base64ToArray(base64);
+    });
     return encodedMentions
       .map(encodedMention => {
         const protoMention = Mention.decode(encodedMention);

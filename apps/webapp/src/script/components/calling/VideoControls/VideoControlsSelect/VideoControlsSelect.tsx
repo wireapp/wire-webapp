@@ -154,7 +154,11 @@ export const VideoControlsSelect = ({
         selectGroupCSS={selectGroupStyles}
         isOptionSelected={isOptionSelected}
         formatOptionLabel={
-          isInlineMenu ? option => <VideoOptionLabel option={option as VideoOptionLabelProps['option']} /> : undefined
+          isInlineMenu
+            ? option => {
+                return <VideoOptionLabel option={option as VideoOptionLabelProps['option']} />;
+              }
+            : undefined
         }
       />
     </>

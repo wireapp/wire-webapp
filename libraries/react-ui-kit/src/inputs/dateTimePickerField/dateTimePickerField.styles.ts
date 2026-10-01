@@ -73,7 +73,9 @@ export const dateTimePickerTimeFieldWrapperStyles: CSSObject = {
   },
 };
 
-export const dateTimePickerErrorTextStyles = (theme: Theme): CSSObject => ({
-  fontSize: theme.fontSizes.small,
-  color: theme.general.dangerColor,
-});
+export const dateTimePickerErrorTextStyles = (theme: Theme): CSSObject => {
+  return {
+    fontSize: theme.fontSizes.small,
+    color: theme.general.dangerColor,
+  };
+};

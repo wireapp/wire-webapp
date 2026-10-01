@@ -141,7 +141,11 @@ const TextMessage: FC<TextMessageRendererProps> = ({
 
   const extraClasses = showFullText ? 'message-quote__text--full' : '';
 
-  const toggleShowMore = () => setShowFullText(prev => !prev);
+  const toggleShowMore = () => {
+    return setShowFullText(prev => {
+      return !prev;
+    });
+  };
 
   return (
     <>

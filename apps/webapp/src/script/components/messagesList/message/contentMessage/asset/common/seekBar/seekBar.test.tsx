@@ -23,13 +23,18 @@ import {SeekBar} from './seekBar';
 
 const createAudioElement = (currentTime: number, maxTime: number) => {
   const audioElement = document.createElement('audio');
-  Object.defineProperty(audioElement, 'duration', {get: () => maxTime});
+  Object.defineProperty(audioElement, 'duration', {
+    get: () => {
+      return maxTime;
+    },
+  });
   audioElement.currentTime = currentTime;
   return audioElement;
 };
 
-const getProgress = (element: HTMLElement) =>
-  element.getAttribute('style')?.replace(/--seek-bar-progress: (.*);/, '$1');
+const getProgress = (element: HTMLElement) => {
+  return element.getAttribute('style')?.replace(/--seek-bar-progress: (.*);/, '$1');
+};
 
 describe('SeekBar', () => {
   it('shows how much of an audio asset has been already played', async () => {

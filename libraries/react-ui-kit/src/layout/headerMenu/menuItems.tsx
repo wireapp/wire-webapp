@@ -28,26 +28,37 @@ export interface MenuItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;
 }
 
-export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => CSSObject = (theme, props) => ({
-  alignSelf: 'center',
-  display: 'flex',
-  justifySelf: 'stretch',
-  [media[QueryKeys.TABLET_DOWN]]: {
-    backgroundColor: theme.general.backgroundColor,
-    bottom: 0,
-    left: 0,
-    overflowY: 'auto',
-    position: 'fixed',
-    right: 0,
-    top: 0,
-    transform: props.open === true ? 'translateX(0)' : 'translateX(110%)',
-    transition: 'transform 0.25s ease',
-    zIndex: 1,
-  },
-});
+export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => CSSObject = (theme, props) => {
+  return {
+    alignSelf: 'center',
+    display: 'flex',
+    justifySelf: 'stretch',
+    [media[QueryKeys.TABLET_DOWN]]: {
+      backgroundColor: theme.general.backgroundColor,
+      bottom: 0,
+      left: 0,
+      overflowY: 'auto',
+      position: 'fixed',
+      right: 0,
+      top: 0,
+      transform: props.open === true ? 'translateX(0)' : 'translateX(110%)',
+      transition: 'transform 0.25s ease',
+      zIndex: 1,
+    },
+  };
+};
 
-const filterMenuItemProps = (props: MenuItemsProps) => filterProps(props, ['open']);
+const filterMenuItemProps = (props: MenuItemsProps) => {
+  return filterProps(props, ['open']);
+};
 
-export const MenuItems = (props: MenuItemsProps) => (
-  <div css={(theme: Theme) => menuItemsStyle(theme, props)} {...filterMenuItemProps(props)} />
-);
+export const MenuItems = (props: MenuItemsProps) => {
+  return (
+    <div
+      css={(theme: Theme) => {
+        return menuItemsStyle(theme, props);
+      }}
+      {...filterMenuItemProps(props)}
+    />
+  );
+};

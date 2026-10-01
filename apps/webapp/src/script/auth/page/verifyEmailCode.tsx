@@ -122,21 +122,24 @@ const VerifyEmailCodeComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  account: AuthSelector.getAccount(state),
-  authError: AuthSelector.getError(state),
-  entropyData: AuthSelector.getEntropy(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    account: AuthSelector.getAccount(state),
+    authError: AuthSelector.getError(state),
+    entropyData: AuthSelector.getEntropy(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       doRegisterPersonal: ROOT_ACTIONS.authAction.doRegisterPersonal,
       doSendActivationCode: ROOT_ACTIONS.userAction.doSendActivationCode,
     },
     dispatch,
   );
+};
 
 const VerifyEmailCode = connect(mapStateToProps, mapDispatchToProps)(VerifyEmailCodeComponent);
 

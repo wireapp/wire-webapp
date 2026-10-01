@@ -29,53 +29,83 @@ function createEvent(key: string) {
 
 describe('useRoveFocus', () => {
   it('should set the initial focus to the default value', () => {
-    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
+    const {result} = renderHook(() => {
+      return useRoveFocus(['0', '1', '2']);
+    });
     expect(result.current.focusedId).toBe(undefined);
   });
 
   it('should allow manually setting the focused index and navigate using the down/up arrow keys', () => {
-    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
-    act(() => result.current.setFocusedId('1'));
+    const {result} = renderHook(() => {
+      return useRoveFocus(['0', '1', '2']);
+    });
+    act(() => {
+      return result.current.setFocusedId('1');
+    });
     expect(result.current.focusedId).toBe('1');
 
-    act(() => result.current.handleKeyDown(createEvent('ArrowDown')));
+    act(() => {
+      return result.current.handleKeyDown(createEvent('ArrowDown'));
+    });
     expect(result.current.focusedId).toBe('2');
 
-    act(() => result.current.handleKeyDown(createEvent('ArrowUp')));
+    act(() => {
+      return result.current.handleKeyDown(createEvent('ArrowUp'));
+    });
     expect(result.current.focusedId).toBe('1');
 
-    act(() => result.current.handleKeyDown(createEvent('ArrowUp')));
+    act(() => {
+      return result.current.handleKeyDown(createEvent('ArrowUp'));
+    });
     expect(result.current.focusedId).toBe('0');
   });
 
   it('should set the focus to the next item when the arrow down key is pressed', () => {
-    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
-    act(() => result.current.handleKeyDown(createEvent('ArrowDown')));
+    const {result} = renderHook(() => {
+      return useRoveFocus(['0', '1', '2']);
+    });
+    act(() => {
+      return result.current.handleKeyDown(createEvent('ArrowDown'));
+    });
     expect(result.current.focusedId).toBe('0');
   });
 
   it('should set the focus to the previous item when the arrow up key is pressed', () => {
-    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
-    act(() => result.current.handleKeyDown(createEvent('ArrowUp')));
+    const {result} = renderHook(() => {
+      return useRoveFocus(['0', '1', '2']);
+    });
+    act(() => {
+      return result.current.handleKeyDown(createEvent('ArrowUp'));
+    });
     expect(result.current.focusedId).toBe('2');
   });
 
   it('should set the focus to the first item when the tab key is pressed', () => {
-    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
-    act(() => result.current.handleKeyDown(createEvent('Tab')));
+    const {result} = renderHook(() => {
+      return useRoveFocus(['0', '1', '2']);
+    });
+    act(() => {
+      return result.current.handleKeyDown(createEvent('Tab'));
+    });
     expect(result.current.focusedId).toBe('2');
   });
 
   it('should not change the focus when an unsupported key is pressed', () => {
-    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
-    act(() => result.current.handleKeyDown(createEvent('Enter')));
+    const {result} = renderHook(() => {
+      return useRoveFocus(['0', '1', '2']);
+    });
+    act(() => {
+      return result.current.handleKeyDown(createEvent('Enter'));
+    });
     expect(result.current.focusedId).toBe(undefined);
   });
 
   it('should keep focused element stable as the array changes', () => {
     const {result, rerender} = renderHook(useRoveFocus, {initialProps: ['0', '1', '2']});
 
-    act(() => result.current.setFocusedId('1'));
+    act(() => {
+      return result.current.setFocusedId('1');
+    });
     expect(result.current.focusedId).toBe('1');
 
     // Adding one element at the end

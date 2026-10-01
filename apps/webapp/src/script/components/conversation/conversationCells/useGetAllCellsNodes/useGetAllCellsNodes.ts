@@ -125,7 +125,9 @@ export const useGetAllCellsNodes = ({
       }
 
       // filter out draft nodes from results
-      const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
+      const filteredNodes = result.Nodes.filter(node => {
+        return node.IsDraft !== true;
+      });
 
       const transformedNodes = transformCellsNodes({nodes: filteredNodes, users});
       setNodes({conversationId: id, nodes: transformedNodes});
@@ -168,7 +170,9 @@ export const useGetAllCellsNodes = ({
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      return window.removeEventListener('hashchange', handleHashChange);
+    };
   }, [handleHashChange]);
 
   return {

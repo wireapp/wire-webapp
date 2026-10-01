@@ -31,18 +31,24 @@ type MeetingLifecycleDispatcherDouble = {
   [Key in keyof MeetingLifecycleDispatcher]: jest.Mock;
 };
 
-const createDispatcherDouble = (): MeetingLifecycleDispatcherDouble => ({
-  enqueueInitialLoad: jest.fn(),
-  enqueueMeetingSync: jest.fn(),
-  enqueueMeetingRemoval: jest.fn(),
-  waitUntilAllSettled: jest.fn(async () => undefined),
-});
+const createDispatcherDouble = (): MeetingLifecycleDispatcherDouble => {
+  return {
+    enqueueInitialLoad: jest.fn(),
+    enqueueMeetingSync: jest.fn(),
+    enqueueMeetingRemoval: jest.fn(),
+    waitUntilAllSettled: jest.fn(async () => {
+      return undefined;
+    }),
+  };
+};
 
 describe('subscribeToMeetingConversationEvents', () => {
   const activeUnsubscribeCallbacks: (() => void)[] = [];
 
   afterEach(() => {
-    activeUnsubscribeCallbacks.splice(0).forEach(unsubscribe => unsubscribe());
+    activeUnsubscribeCallbacks.splice(0).forEach(unsubscribe => {
+      unsubscribe();
+    });
   });
 
   it('cancels and removes the meeting when self is involuntarily removed from its MLS conversation', () => {
@@ -51,20 +57,22 @@ describe('subscribeToMeetingConversationEvents', () => {
 
     const unsubscribe = subscribeToMeetingConversationEvents({
       dispatcher,
-      getMeetingSeries: () => [
-        {
-          conversation_id: '',
-          recurrence: 'weekly',
-          duration_ms: 60 * 60 * 1000,
-          qualified_conversation: conversationId,
-          qualified_creator: {id: 'creator-id', domain: 'example.com'},
-          qualified_id: meetingId,
-          series_end_date: '2026-06-01T11:00:00.000Z',
-          series_start_date: '2026-06-01T10:00:00.000Z',
-          title: 'Weekly sync',
-          tzid: 'Europe/Berlin',
-        },
-      ],
+      getMeetingSeries: () => {
+        return [
+          {
+            conversation_id: '',
+            recurrence: 'weekly',
+            duration_ms: 60 * 60 * 1000,
+            qualified_conversation: conversationId,
+            qualified_creator: {id: 'creator-id', domain: 'example.com'},
+            qualified_id: meetingId,
+            series_end_date: '2026-06-01T11:00:00.000Z',
+            series_start_date: '2026-06-01T10:00:00.000Z',
+            title: 'Weekly sync',
+            tzid: 'Europe/Berlin',
+          },
+        ];
+      },
       onMeetingCancelled,
     });
     activeUnsubscribeCallbacks.push(unsubscribe);
@@ -84,20 +92,22 @@ describe('subscribeToMeetingConversationEvents', () => {
 
     const unsubscribe = subscribeToMeetingConversationEvents({
       dispatcher,
-      getMeetingSeries: () => [
-        {
-          conversation_id: '',
-          recurrence: 'weekly',
-          duration_ms: 60 * 60 * 1000,
-          qualified_conversation: conversationId,
-          qualified_creator: {id: 'creator-id', domain: 'example.com'},
-          qualified_id: meetingId,
-          series_end_date: '2026-06-01T11:00:00.000Z',
-          series_start_date: '2026-06-01T10:00:00.000Z',
-          title: 'Weekly sync',
-          tzid: 'Europe/Berlin',
-        },
-      ],
+      getMeetingSeries: () => {
+        return [
+          {
+            conversation_id: '',
+            recurrence: 'weekly',
+            duration_ms: 60 * 60 * 1000,
+            qualified_conversation: conversationId,
+            qualified_creator: {id: 'creator-id', domain: 'example.com'},
+            qualified_id: meetingId,
+            series_end_date: '2026-06-01T11:00:00.000Z',
+            series_start_date: '2026-06-01T10:00:00.000Z',
+            title: 'Weekly sync',
+            tzid: 'Europe/Berlin',
+          },
+        ];
+      },
       onMeetingCancelled,
     });
     activeUnsubscribeCallbacks.push(unsubscribe);
@@ -117,7 +127,9 @@ describe('subscribeToMeetingConversationEvents', () => {
 
     const unsubscribe = subscribeToMeetingConversationEvents({
       dispatcher,
-      getMeetingSeries: () => [],
+      getMeetingSeries: () => {
+        return [];
+      },
       onMeetingCancelled,
     });
     activeUnsubscribeCallbacks.push(unsubscribe);

@@ -39,28 +39,30 @@ import {generateAPIConversation} from 'test/helper/ConversationGenerator';
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
-  status,
-  x509Identity: {
-    free: jest.fn(),
-    certificate: 'certificate',
-    displayName: '',
-    domain: '',
-    handle: '',
-    notAfter: BigInt(0),
-    notBefore: BigInt(0),
-    serialNumber: '',
-    [Symbol.dispose]: noop,
-  },
-  credentialType,
-  deviceId: '',
-  clientId: '',
-  thumbprint: '',
-  qualifiedUserId: {
-    domain: '',
-    id: '',
-  },
-});
+const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => {
+  return {
+    status,
+    x509Identity: {
+      free: jest.fn(),
+      certificate: 'certificate',
+      displayName: '',
+      domain: '',
+      handle: '',
+      notAfter: BigInt(0),
+      notBefore: BigInt(0),
+      serialNumber: '',
+      [Symbol.dispose]: noop,
+    },
+    credentialType,
+    deviceId: '',
+    clientId: '',
+    thumbprint: '',
+    qualifiedUserId: {
+      domain: '',
+      id: '',
+    },
+  };
+};
 
 const core = container.resolve(Core);
 

@@ -45,7 +45,12 @@ const ConversationAvatar = ({conversation}: {conversation: Conversation}) => {
   const {isChannelsEnabled} = useChannelsFeatureFlag();
 
   return (
-    <button css={wrapperStyles} onClick={() => openConversation(conversation.qualifiedId)}>
+    <button
+      css={wrapperStyles}
+      onClick={() => {
+        return openConversation(conversation.qualifiedId);
+      }}
+    >
       <div css={avatarWrapperStyles}>
         {isChannel && isChannelsEnabled ? (
           <ChannelAvatar conversationID={conversation.id} isLocked={false} size="small" />

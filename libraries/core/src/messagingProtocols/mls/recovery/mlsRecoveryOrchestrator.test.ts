@@ -39,13 +39,15 @@ function makeMapperReturning(err: DomainMlsError): MlsErrorMapper {
 }
 
 describe('MlsRecoveryOrchestrator', () => {
-  const baseDeps = () => ({
-    joinViaExternalCommit: jest.fn().mockResolvedValue(undefined),
-    resetAndReestablish: jest.fn().mockResolvedValue(undefined),
-    recoverFromEpochMismatch: jest.fn().mockResolvedValue(undefined),
-    addMissingUsers: jest.fn().mockResolvedValue(undefined),
-    wipeMLSConversation: jest.fn().mockResolvedValue(undefined),
-  });
+  const baseDeps = () => {
+    return {
+      joinViaExternalCommit: jest.fn().mockResolvedValue(undefined),
+      resetAndReestablish: jest.fn().mockResolvedValue(undefined),
+      recoverFromEpochMismatch: jest.fn().mockResolvedValue(undefined),
+      addMissingUsers: jest.fn().mockResolvedValue(undefined),
+      wipeMLSConversation: jest.fn().mockResolvedValue(undefined),
+    };
+  };
 
   it('does nothing when callback succeeds', async () => {
     const deps = baseDeps();
@@ -248,19 +250,25 @@ describe('MlsRecoveryOrchestrator', () => {
     const joinPromise = new Promise<void>(resolve => {
       resolveJoin = resolve;
     });
-    deps.joinViaExternalCommit.mockImplementation(() => joinPromise);
+    deps.joinViaExternalCommit.mockImplementation(() => {
+      return joinPromise;
+    });
 
     const ctx = {
       operationName: OperationName.handleWelcome,
       qualifiedConversationId: qid('same') as QualifiedId,
     } as const;
-    const callBack = () => Promise.reject(new Error('orphan'));
+    const callBack = () => {
+      return Promise.reject(new Error('orphan'));
+    };
 
     const p1 = orch.execute({context: ctx, callBack});
     const p2 = orch.execute({context: ctx, callBack});
 
     // Let both catch handlers run and start recovery
-    await new Promise(r => setImmediate(r));
+    await new Promise(r => {
+      return setImmediate(r);
+    });
     // Release the recovery
     resolveJoin();
 

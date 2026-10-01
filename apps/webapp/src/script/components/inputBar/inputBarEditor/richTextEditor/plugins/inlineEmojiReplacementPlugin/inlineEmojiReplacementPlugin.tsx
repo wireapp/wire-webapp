@@ -25,14 +25,18 @@ import {$getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, KEY_SPACE_COMMAN
 
 import {inlineReplacements} from './inlineReplacements';
 
-const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+const escapeRegexp = (string: string): string => {
+  return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+};
 
 const emojiList = inlineReplacements.map(emoji => {
   const emoticons = emoji.emoticons ?? [];
 
   return {
     ...emoji,
-    regexes: emoticons.map(emojiIcon => new RegExp(`(^|\\s)${escapeRegexp(emojiIcon)}(?=\\s|$)`)),
+    regexes: emoticons.map(emojiIcon => {
+      return new RegExp(`(^|\\s)${escapeRegexp(emojiIcon)}(?=\\s|$)`);
+    }),
   };
 });
 

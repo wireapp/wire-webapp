@@ -50,8 +50,9 @@ const createReliableXhrHttpHandler = (abortSignal?: AbortSignal): XhrHttpHandler
   return requestHandler;
 };
 
-export const createAbortableXhrHttpHandler = (abortSignal: AbortSignal): XhrHttpHandler =>
-  createReliableXhrHttpHandler(abortSignal);
+export const createAbortableXhrHttpHandler = (abortSignal: AbortSignal): XhrHttpHandler => {
+  return createReliableXhrHttpHandler(abortSignal);
+};
 
 export class S3Service implements CellsStorage {
   private config: S3ServiceConfig;

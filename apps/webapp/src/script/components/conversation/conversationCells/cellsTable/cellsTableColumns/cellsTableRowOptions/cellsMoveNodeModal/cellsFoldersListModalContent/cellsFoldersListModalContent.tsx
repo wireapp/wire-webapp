@@ -63,7 +63,10 @@ export const CellsFoldersListModalContent = ({
   };
 
   const handleBreadcrumbClick = (item: {name: string}) => {
-    const path = breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '';
+    const path =
+      breadcrumbs.find(crumb => {
+        return crumb.name === item.name;
+      })?.path ?? '';
     onPathChange(path);
   };
 
@@ -79,7 +82,11 @@ export const CellsFoldersListModalContent = ({
           <CellsFolderList items={items} onNavigate={handleFolderNavigate} />
         )}
       </div>
-      <CellsCreateNewFolderHint onCreate={() => onChangeModalContent('create')} />
+      <CellsCreateNewFolderHint
+        onCreate={() => {
+          return onChangeModalContent('create');
+        }}
+      />
     </>
   );
 };

@@ -36,6 +36,10 @@ export const getUsersFromNodes = async ({
   }
 
   return userRepository.getUsersById(
-    nodes.map(node => getUserQualifiedIdFromNode(node)).filter(Boolean) as QualifiedId[],
+    nodes
+      .map(node => {
+        return getUserQualifiedIdFromNode(node);
+      })
+      .filter(Boolean) as QualifiedId[],
   );
 };

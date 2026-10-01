@@ -42,12 +42,14 @@ export const Default: Story = {
 };
 
 export const WithLabel: Story = {
-  render: () => (
-    <div>
-      <InputLabel htmlFor="textarea-example">Message</InputLabel>
-      <TextArea id="textarea-example" placeholder="Type your message here..." />
-    </div>
-  ),
+  render: () => {
+    return (
+      <div>
+        <InputLabel htmlFor="textarea-example">Message</InputLabel>
+        <TextArea id="textarea-example" placeholder="Type your message here..." />
+      </div>
+    );
+  },
 };
 
 export const Invalid: Story = {

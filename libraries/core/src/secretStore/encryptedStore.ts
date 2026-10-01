@@ -128,8 +128,12 @@ export async function createEncryptedStore(dbName: string): Promise<EncryptedSto
     await db.put('key', key, keyPrimaryKey);
   }
   return new EncryptedStore(db, {
-    encrypt: value => defaultEncrypt(value, key as CryptoKey),
-    decrypt: payload => defaultDecrypt(payload, key as CryptoKey),
+    encrypt: value => {
+      return defaultEncrypt(value, key as CryptoKey);
+    },
+    decrypt: payload => {
+      return defaultDecrypt(payload, key as CryptoKey);
+    },
   });
 }
 

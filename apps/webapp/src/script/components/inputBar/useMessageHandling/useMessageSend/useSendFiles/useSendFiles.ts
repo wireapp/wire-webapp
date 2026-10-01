@@ -56,7 +56,9 @@ export const useSendFiles = ({
     try {
       setStatus('loading');
       await Promise.all(files.map(sendFile));
-      files.map(file => file.preview && URL.revokeObjectURL(file.preview));
+      files.map(file => {
+        return file.preview && URL.revokeObjectURL(file.preview);
+      });
       setStatus('success');
     } catch (error: unknown) {
       errorNotification.show();

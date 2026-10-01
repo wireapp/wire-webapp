@@ -28,8 +28,9 @@ interface CellsFiltersBarProps {
   filters: FilterConfig[];
 }
 
-const isFilterActive = (filter: FilterConfig): boolean =>
-  filter.type === 'popover' ? filter.selectedIds.length > 0 : filter.isActive;
+const isFilterActive = (filter: FilterConfig): boolean => {
+  return filter.type === 'popover' ? filter.selectedIds.length > 0 : filter.isActive;
+};
 
 const clearFilter = (filter: FilterConfig): void => {
   if (filter.type === 'popover') {
@@ -42,12 +43,14 @@ const clearFilter = (filter: FilterConfig): void => {
 export const CellsFiltersBar = ({filters}: CellsFiltersBarProps) => {
   const {translate} = useApplicationContext();
   const hasActiveFilters = filters.some(isFilterActive);
-  const clearAll = () => filters.forEach(clearFilter);
+  const clearAll = () => {
+    return filters.forEach(clearFilter);
+  };
 
   return (
     <div css={filterGroupStyles}>
-      {filters.map(filter =>
-        filter.type === 'popover' ? (
+      {filters.map(filter => {
+        return filter.type === 'popover' ? (
           <FilterPopover
             key={filter.id}
             triggerLabel={filter.label}
@@ -74,8 +77,8 @@ export const CellsFiltersBar = ({filters}: CellsFiltersBarProps) => {
           >
             {filter.label}
           </button>
-        ),
-      )}
+        );
+      })}
       {hasActiveFilters && (
         <button type="button" css={clearAllButtonStyles} onClick={clearAll} data-uie-name="filters-clear-all">
           {translate('cells.clearFilters.button')}

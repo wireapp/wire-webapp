@@ -66,7 +66,9 @@ describe('CallingViewModel', () => {
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
 
-      jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => payload.primaryAction?.action?.());
+      jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => {
+        return payload.primaryAction?.action?.();
+      });
       const newCall = buildCall(new Conversation('conversation2', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
       Promise.resolve().then(() => {
         jest.runAllTimers();
@@ -121,7 +123,9 @@ describe('CallingViewModel', () => {
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
 
-      jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => payload.primaryAction?.action?.());
+      jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => {
+        return payload.primaryAction?.action?.();
+      });
       const conversation = new Conversation('conversation2', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       Promise.resolve().then(() => {
         jest.runAllTimers();
@@ -141,9 +145,9 @@ describe('CallingViewModel', () => {
     });
 
     it('uses the injected translate function for second-call warning copy', () => {
-      const translate = jest.fn(
-        (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
-      ) as Translate;
+      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => {
+        return `translated:${translationKey}`;
+      }) as Translate;
       const [callingViewModel] = buildCallingViewModel(translate);
       const joinedCall = buildCall(
         new Conversation('conversation1', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),

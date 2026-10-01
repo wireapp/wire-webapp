@@ -32,7 +32,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildRepliesUpdaterMiddleware() {
   const eventService = {
-    loadEvent: jest.fn((): never[] => []),
+    loadEvent: jest.fn((): never[] => {
+      return [];
+    }),
     loadEventsReplyingToMessage: jest.fn(),
     loadReplacingEvent: jest.fn(),
     replaceEvent: jest.fn(),

@@ -44,14 +44,22 @@ import {Collection} from './collection';
 import {FullSearch} from './fullSearch';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('./collectionDetails', () => ({
-  CollectionDetails: () => <div>CollectionDetails</div>,
-  __esModule: true,
-}));
-jest.mock('./collectionItem', () => ({
-  CollectionItem: () => <div>CollectionItem</div>,
-  __esModule: true,
-}));
+jest.mock('./collectionDetails', () => {
+  return {
+    CollectionDetails: () => {
+      return <div>CollectionDetails</div>;
+    },
+    __esModule: true,
+  };
+});
+jest.mock('./collectionItem', () => {
+  return {
+    CollectionItem: () => {
+      return <div>CollectionItem</div>;
+    },
+    __esModule: true,
+  };
+});
 
 const createImageMessage = (timestamp: number = Date.now()) => {
   const message = new ContentMessage(createUuid(), translateForTest);
@@ -89,7 +97,9 @@ function createTextMessage(text: string) {
 const createAudioMessage = () => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const audio = new FileAsset(createUuid());
-  audio.isAudio = () => true;
+  audio.isAudio = () => {
+    return true;
+  };
   message.assets.push(audio);
   message.category = MessageCategory.FILE;
   return message;
@@ -136,7 +146,9 @@ describe('Collection', () => {
       {wrapper: rootProviderWrapper},
     );
 
-    await waitFor(() => getAllByText('CollectionItem'));
+    await waitFor(() => {
+      return getAllByText('CollectionItem');
+    });
     expect(getAllByText('CollectionItem')).toHaveLength(messages.length);
     expect(getByText('collectionSectionAudio')).toBeDefined();
     expect(getByText('collectionSectionImages')).toBeDefined();
@@ -163,7 +175,9 @@ describe('Collection', () => {
       {wrapper: rootProviderWrapper},
     );
 
-    await waitFor(() => getAllByText('CollectionItem'));
+    await waitFor(() => {
+      return getAllByText('CollectionItem');
+    });
     act(() => {
       getAllByText('collectionShowAll')[0].click();
     });
@@ -185,7 +199,9 @@ describe('Collection', () => {
       {wrapper: rootProviderWrapper},
     );
 
-    await waitFor(() => getAllByText('CollectionItem'));
+    await waitFor(() => {
+      return getAllByText('CollectionItem');
+    });
     await act(async () => {
       const input = getByTestId('full-search-header-input');
       fireEvent.change(input, {target: {value: 'term'}});
@@ -221,7 +237,9 @@ describe('Collection', () => {
       {wrapper: rootProviderWrapper},
     );
 
-    await waitFor(() => getAllByText('CollectionItem'));
+    await waitFor(() => {
+      return getAllByText('CollectionItem');
+    });
     const input = getByTestId('full-search-header-input');
 
     await act(async () => {
@@ -266,7 +284,9 @@ describe('FullSearch', () => {
       jest.advanceTimersByTime(1);
     });
 
-    await waitFor(() => expect(searchProvider).toHaveBeenCalledWith('term', expect.any(AbortSignal)));
+    await waitFor(() => {
+      return expect(searchProvider).toHaveBeenCalledWith('term', expect.any(AbortSignal));
+    });
   });
 
   it('clears no-results state immediately when the input is cleared', async () => {
@@ -282,7 +302,9 @@ describe('FullSearch', () => {
       jest.advanceTimersByTime(500);
     });
 
-    await waitFor(() => getByText('fullsearchNoResults'));
+    await waitFor(() => {
+      return getByText('fullsearchNoResults');
+    });
 
     await act(async () => {
       fireEvent.change(getByTestId('full-search-header-input'), {target: {value: ''}});
@@ -317,13 +339,17 @@ describe('FullSearch', () => {
       fireEvent.change(input, {target: {value: 'term'}});
       jest.advanceTimersByTime(500);
     });
-    await waitFor(() => expect(searchProvider).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(searchProvider).toHaveBeenCalledTimes(1);
+    });
 
     await act(async () => {
       fireEvent.change(input, {target: {value: 'terms'}});
       jest.advanceTimersByTime(500);
     });
-    await waitFor(() => expect(searchProvider).toHaveBeenCalledTimes(2));
+    await waitFor(() => {
+      return expect(searchProvider).toHaveBeenCalledTimes(2);
+    });
     expect(searchProvider).toHaveBeenLastCalledWith('terms', expect.any(AbortSignal));
 
     await act(async () => {

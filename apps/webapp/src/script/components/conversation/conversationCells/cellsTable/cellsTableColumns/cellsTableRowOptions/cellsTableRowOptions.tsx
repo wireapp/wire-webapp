@@ -161,19 +161,19 @@ const CellsTableRowOptionsContent = ({
     return (
       <DropdownMenu.Content>
         <DropdownMenu.Item
-          onClick={() =>
-            node.type === CellNodeType.FOLDER
+          onClick={() => {
+            return node.type === CellNodeType.FOLDER
               ? openFolder({path: node.path, onBeforeNavigate: onCloseSearchView})
-              : handleOpenFile(node)
-          }
+              : handleOpenFile(node);
+          }}
         >
           {translate('cells.options.open')}
         </DropdownMenu.Item>
         <>
           {canRestore && (
             <DropdownMenu.Item
-              onClick={() =>
-                isRootRecycleBin
+              onClick={() => {
+                return isRootRecycleBin
                   ? showRestoreRootNodeModal({
                       node,
                       onRestoreNode: restoreNestedNode,
@@ -184,21 +184,23 @@ const CellsTableRowOptionsContent = ({
                       onRestoreNode: restoreParentNode,
                       parentNodeName: rootParentName,
                       translate,
-                    })
-              }
+                    });
+              }}
             >
               {translate('cells.options.restore')}
             </DropdownMenu.Item>
           )}
           {canDelete && (
             <DropdownMenu.Item
-              onClick={() =>
-                showDeletePermanentlyModal({
+              onClick={() => {
+                return showDeletePermanentlyModal({
                   node,
-                  onDeletePermanently: () => deleteNode({uuid: node.id, permanently: true}),
+                  onDeletePermanently: () => {
+                    return deleteNode({uuid: node.id, permanently: true});
+                  },
                   translate,
-                })
-              }
+                });
+              }}
             >
               {translate('cells.options.deletePermanently')}
             </DropdownMenu.Item>
@@ -212,11 +214,11 @@ const CellsTableRowOptionsContent = ({
     <>
       <DropdownMenu.Content>
         <DropdownMenu.Item
-          onClick={() =>
-            node.type === CellNodeType.FOLDER
+          onClick={() => {
+            return node.type === CellNodeType.FOLDER
               ? openFolder({path: node.path, onBeforeNavigate: onCloseSearchView})
-              : handleOpenFile(node)
-          }
+              : handleOpenFile(node);
+          }}
         >
           {translate('cells.options.open')}
         </DropdownMenu.Item>
@@ -224,60 +226,86 @@ const CellsTableRowOptionsContent = ({
           <>
             {canShare && (
               <DropdownMenu.Item
-                onClick={() =>
-                  showShareModal({
+                onClick={() => {
+                  return showShareModal({
                     type: node.type,
                     uuid: node.id,
                     conversationId: conversationQualifiedId.id,
                     cellsRepository,
                     fireAndForgetInvoker,
                     translate,
-                  })
-                }
+                  });
+                }}
               >
                 {translate('cells.options.share')}
               </DropdownMenu.Item>
             )}
 
             {canDownload && url !== undefined && url.length > 0 && (
-              <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
+              <DropdownMenu.Item
+                onClick={() => {
+                  return forcedDownloadFile({url, name});
+                }}
+              >
                 {translate('cells.options.download')}
               </DropdownMenu.Item>
             )}
             {canRename && (
-              <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>
+              <DropdownMenu.Item
+                onClick={() => {
+                  return setIsRenameNodeModalOpen(true);
+                }}
+              >
                 {translate('cells.options.rename')}
               </DropdownMenu.Item>
             )}
             {canMove && (
-              <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>
+              <DropdownMenu.Item
+                onClick={() => {
+                  return setIsMoveNodeModalOpen(true);
+                }}
+              >
                 {translate('cells.options.move')}
               </DropdownMenu.Item>
             )}
             {canTag && (
-              <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>
+              <DropdownMenu.Item
+                onClick={() => {
+                  return setIsTagsModalOpen(true);
+                }}
+              >
                 {translate('cells.options.tags')}
               </DropdownMenu.Item>
             )}
             {isEditable && canEdit && (
-              <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>
+              <DropdownMenu.Item
+                onClick={() => {
+                  return handleOpenFile(node, true);
+                }}
+              >
                 {translate('cells.options.edit')}
               </DropdownMenu.Item>
             )}
             {isEditable && canViewVersionHistory && (
-              <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore)}>
+              <DropdownMenu.Item
+                onClick={() => {
+                  return showModal(node.id, onConfirmRestore);
+                }}
+              >
                 {translate('cells.options.versionHistory')}
               </DropdownMenu.Item>
             )}
             {canDelete && (
               <DropdownMenu.Item
-                onClick={() =>
-                  showMoveToRecycleBinModal({
+                onClick={() => {
+                  return showMoveToRecycleBinModal({
                     node,
-                    onMoveToRecycleBin: () => deleteNode({uuid: node.id, permanently: false}),
+                    onMoveToRecycleBin: () => {
+                      return deleteNode({uuid: node.id, permanently: false});
+                    },
                     translate,
-                  })
-                }
+                  });
+                }}
               >
                 {translate('cells.options.delete')}
               </DropdownMenu.Item>
@@ -288,7 +316,9 @@ const CellsTableRowOptionsContent = ({
       <CellsMoveNodeModal
         nodeToMove={node}
         isOpen={isMoveNodeModalOpen}
-        onClose={() => setIsMoveNodeModalOpen(false)}
+        onClose={() => {
+          return setIsMoveNodeModalOpen(false);
+        }}
         cellsRepository={cellsRepository}
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
@@ -296,14 +326,18 @@ const CellsTableRowOptionsContent = ({
       <CellsTagsModal
         uuid={node.id}
         isOpen={isTagsModalOpen}
-        onClose={() => setIsTagsModalOpen(false)}
+        onClose={() => {
+          return setIsTagsModalOpen(false);
+        }}
         cellsRepository={cellsRepository}
         selectedTags={node.tags}
         onRefresh={onRefresh}
       />
       <CellsRenameNodeModal
         isOpen={isRenameNodeModalOpen}
-        onClose={() => setIsRenameNodeModalOpen(false)}
+        onClose={() => {
+          return setIsRenameNodeModalOpen(false);
+        }}
         node={node}
         cellsRepository={cellsRepository}
         onRefresh={onRefresh}

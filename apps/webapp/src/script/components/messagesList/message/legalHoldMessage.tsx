@@ -35,8 +35,12 @@ const LegalHoldMessage = ({
   conversationState = container.resolve(ConversationState),
 }: LegalHoldMessageProps) => {
   const {translate} = useApplicationContext();
-  const {showUsers} = useLegalHoldModalState(state => state);
-  const showLegalHold = () => showUsers(false, conversationState.activeConversation());
+  const {showUsers} = useLegalHoldModalState(state => {
+    return state;
+  });
+  const showLegalHold = () => {
+    return showUsers(false, conversationState.activeConversation());
+  };
 
   return (
     <div className="message-header">

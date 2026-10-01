@@ -80,7 +80,11 @@ export class MemoryEngine implements CRUDEngine {
 
   public async clearTables(): Promise<void> {
     const tableNames = Object.keys(this.stores);
-    await Promise.all(tableNames.map(tableName => this.deleteAll(tableName)));
+    await Promise.all(
+      tableNames.map(tableName => {
+        return this.deleteAll(tableName);
+      }),
+    );
   }
 
   public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {

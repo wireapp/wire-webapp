@@ -23,11 +23,19 @@ import {THEME_ID} from '../../identity';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"InputLabel"', () => {
-  it('renders', () => matchComponent(<Label>Label</Label>));
-  it('renders (dark theme)', () => matchComponent(<Label>Label</Label>, THEME_ID.DARK));
+  it('renders', () => {
+    return matchComponent(<Label>Label</Label>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<Label>Label</Label>, THEME_ID.DARK);
+  });
 });
 
 describe('"LabelLink"', () => {
-  it('renders', () => matchComponent(<LabelLink>LabelLink</LabelLink>));
-  it('renders (dark theme)', () => matchComponent(<LabelLink>LabelLink</LabelLink>, THEME_ID.DARK));
+  it('renders', () => {
+    return matchComponent(<LabelLink>LabelLink</LabelLink>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<LabelLink>LabelLink</LabelLink>, THEME_ID.DARK);
+  });
 });

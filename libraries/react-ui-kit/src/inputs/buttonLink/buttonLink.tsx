@@ -27,10 +27,12 @@ import {filterProps} from '../../utils/util';
 import {ButtonProps} from '../button';
 import {buttonStyle} from '../button/button.styles';
 
-export const buttonLinkStyle: (theme: Theme, props: ButtonProps<HTMLAnchorElement>) => CSSObject = (theme, props) => ({
-  ...buttonStyle(theme, props),
-  display: 'inline-flex !important',
-});
+export const buttonLinkStyle: (theme: Theme, props: ButtonProps<HTMLAnchorElement>) => CSSObject = (theme, props) => {
+  return {
+    ...buttonStyle(theme, props),
+    display: 'inline-flex !important',
+  };
+};
 
 const filterButtonLinkProps = (props: ButtonProps<HTMLAnchorElement>) => {
   return filterProps(filterTextProps(props) as ButtonProps<HTMLAnchorElement>, [
@@ -45,12 +47,19 @@ export const ButtonLink = ({
   showLoading,
   loadingColor = COLOR.WHITE,
   ...props
-}: ButtonProps<HTMLAnchorElement>) => (
-  <a css={(theme: Theme) => buttonLinkStyle(theme, props)} {...filterButtonLinkProps(props)}>
-    {showLoading === true ? (
-      <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} />
-    ) : (
-      children
-    )}
-  </a>
-);
+}: ButtonProps<HTMLAnchorElement>) => {
+  return (
+    <a
+      css={(theme: Theme) => {
+        return buttonLinkStyle(theme, props);
+      }}
+      {...filterButtonLinkProps(props)}
+    >
+      {showLoading === true ? (
+        <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} />
+      ) : (
+        children
+      )}
+    </a>
+  );
+};

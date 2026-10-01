@@ -24,25 +24,36 @@ import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {AudioSeekBar} from './audioSeekBar';
 
 describe('AudioSeekBar', () => {
-  const getAudioAsset = () =>
-    ({
+  const getAudioAsset = () => {
+    return {
       meta: {
-        loudness: new Uint8Array(Array.from({length: 200}, (item, index) => index)),
+        loudness: new Uint8Array(
+          Array.from({length: 200}, (item, index) => {
+            return index;
+          }),
+        ),
       },
-    }) as unknown as FileAsset;
+    } as unknown as FileAsset;
+  };
 
   const createAudioElement = (currentTime = 0) => {
     const audioElement = document.createElement('audio');
-    Object.defineProperty(audioElement, 'duration', {get: () => 1000});
+    Object.defineProperty(audioElement, 'duration', {
+      get: () => {
+        return 1000;
+      },
+    });
     audioElement.currentTime = currentTime;
     return audioElement;
   };
 
-  const getDefaultProps = () => ({
-    asset: getAudioAsset(),
-    audioElement: createAudioElement(),
-    disabled: false,
-  });
+  const getDefaultProps = () => {
+    return {
+      asset: getAudioAsset(),
+      audioElement: createAudioElement(),
+      disabled: false,
+    };
+  };
 
   it('renders level indicators for the audio asset', () => {
     const {container} = render(<AudioSeekBar {...getDefaultProps()} />);
@@ -53,7 +64,9 @@ describe('AudioSeekBar', () => {
     const audioElement = createAudioElement(500);
     const {container} = render(<AudioSeekBar {...getDefaultProps()} audioElement={audioElement} />);
 
-    const clipPathWidth = () => container.querySelector('svg rect')?.getAttribute('width');
+    const clipPathWidth = () => {
+      return container.querySelector('svg rect')?.getAttribute('width');
+    };
 
     act(() => {
       audioElement.dispatchEvent(new Event('timeupdate'));
@@ -72,7 +85,11 @@ describe('AudioSeekBar', () => {
     const props = getDefaultProps();
     const {container} = render(<AudioSeekBar {...props} />);
     const svg = container.querySelector('svg') as SVGElement;
-    Object.defineProperty(svg, 'clientWidth', {get: () => 100});
+    Object.defineProperty(svg, 'clientWidth', {
+      get: () => {
+        return 100;
+      },
+    });
 
     const expected = 500;
     act(() => {

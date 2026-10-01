@@ -138,7 +138,9 @@ export const UserListItem = ({
         >
           <Checkbox
             checked={isSelected}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => onClick(user, event)}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              return onClick(user, event);
+            }}
             id={checkboxId}
             labelBeforeCheckbox
             aligncenter={false}
@@ -156,8 +158,12 @@ export const UserListItem = ({
           aria-label={translate('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline})}
           {...(!noInteraction && {
-            onClick: event => onClick(user, event.nativeEvent),
-            onKeyDown: event => onKeyDown(user, event.nativeEvent),
+            onClick: event => {
+              return onClick(user, event.nativeEvent);
+            },
+            onKeyDown: event => {
+              return onKeyDown(user, event.nativeEvent);
+            },
           })}
           {...dataUieValues}
         >

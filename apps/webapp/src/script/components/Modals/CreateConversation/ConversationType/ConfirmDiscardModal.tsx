@@ -48,7 +48,9 @@ export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalPro
       id="custom-history-modal"
       isShown={isConfirmDiscardModalOpen}
       data-uie-name="custom-history-modal"
-      onKeyDown={event => handleEscDown(event, onCancel)}
+      onKeyDown={event => {
+        return handleEscDown(event, onCancel);
+      }}
     >
       <p css={confirmConversationHeaderCss} className="heading-h2">
         {translate('createConversationConfirmDiscardModalHeader')}
@@ -61,7 +63,9 @@ export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalPro
           type="button"
           onClick={onCancel}
           data-uie-name="do-cancel"
-          onKeyDown={event => handleEscDown(event, onCancel)}
+          onKeyDown={event => {
+            return handleEscDown(event, onCancel);
+          }}
         >
           {translate('createConversationConfirmDiscardModalCancel')}
         </Button>
@@ -70,7 +74,9 @@ export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalPro
           type="button"
           onClick={onSubmit}
           data-uie-name="do-submit"
-          onKeyDown={event => handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]})}
+          onKeyDown={event => {
+            return handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]});
+          }}
         >
           {translate('createConversationConfirmDiscardModalContinue')}
         </Button>

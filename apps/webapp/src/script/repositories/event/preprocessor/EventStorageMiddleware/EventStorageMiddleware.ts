@@ -77,7 +77,9 @@ export class EventStorageMiddleware implements EventMiddleware {
       const operation = await handler(event, {
         duplicateEvent,
         selfUserId: this.selfUser.id,
-        findEvent: eventId => this.eventService.loadEvent(event.conversation, eventId),
+        findEvent: eventId => {
+          return this.eventService.loadEvent(event.conversation, eventId);
+        },
       });
       if (!isUndefined(operation)) {
         return operation;
@@ -107,9 +109,9 @@ export class EventStorageMiddleware implements EventMiddleware {
       }
 
       const usersNotPartofConversation = qualifiedUserIds.reduce((acc, qualifiedUserId) => {
-        const isDeleted = conversation
-          .allUserEntities()
-          .find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId))?.isDeleted;
+        const isDeleted = conversation.allUserEntities().find(user => {
+          return matchQualifiedIds(user.qualifiedId, qualifiedUserId);
+        })?.isDeleted;
 
         const isParticipant = UserFilter.isParticipant(conversation, qualifiedUserId);
 

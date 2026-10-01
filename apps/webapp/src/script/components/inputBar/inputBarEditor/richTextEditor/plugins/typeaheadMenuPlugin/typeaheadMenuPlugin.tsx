@@ -296,7 +296,9 @@ function useDynamicPositioning(
       };
     }
 
-    return () => null;
+    return () => {
+      return null;
+    };
   }, [targetElement, editor, onVisibilityChange, onReposition, resolution]);
 }
 
@@ -460,15 +462,14 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
     );
   }, [selectOptionAndCleanUp, close, editor, options, selectedIndex, updateSelectedIndex]);
 
-  const listItemProps = useMemo(
-    () => ({
+  const listItemProps = useMemo(() => {
+    return {
       options,
       selectOptionAndCleanUp,
       selectedIndex,
       setHighlightedIndex,
-    }),
-    [selectOptionAndCleanUp, selectedIndex, options],
-  );
+    };
+  }, [selectOptionAndCleanUp, selectedIndex, options]);
 
   const menu = menuRenderFn(anchorElementRef, listItemProps, resolution.match.matchingString);
 
@@ -648,12 +649,14 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
         if (match !== null && !isSelectionOnEntityBoundary(editor, match.leadOffset)) {
           const isRangePositioned = tryToPositionRange(match.leadOffset, range);
           if (isRangePositioned !== null) {
-            startTransition(() =>
-              openTypeahead({
-                getRect: () => range.getBoundingClientRect(),
+            startTransition(() => {
+              return openTypeahead({
+                getRect: () => {
+                  return range.getBoundingClientRect();
+                },
                 match,
-              }),
-            );
+              });
+            });
             return;
           }
         }

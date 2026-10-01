@@ -60,14 +60,16 @@ export const Default: Story = {
 };
 
 export const AllHeadingLevels: Story = {
-  render: () => (
-    <div>
-      <H1>Heading Level 1</H1>
-      <H2>Heading Level 2</H2>
-      <H3>Heading Level 3</H3>
-      <H4>Heading Level 4</H4>
-    </div>
-  ),
+  render: () => {
+    return (
+      <div>
+        <H1>Heading Level 1</H1>
+        <H2>Heading Level 2</H2>
+        <H3>Heading Level 3</H3>
+        <H4>Heading Level 4</H4>
+      </div>
+    );
+  },
 };
 
 export const WithCustomColor: Story = {

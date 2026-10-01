@@ -38,9 +38,12 @@ const createAppLockRepository = (translate: Translate): AppLockRepository => {
     cryptoPwhashMemLimitInteractive: 1,
     cryptoPwhashOpsLimitInteractive: 1,
     ready: Promise.resolve(),
-    cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number) =>
-      mockCryptoPwhashStr(code, opsLimit, memLimit),
-    cryptoPwhashStrVerify: (hashedCode: string, code: string) => mockCryptoPwhashStrVerify(hashedCode, code),
+    cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number) => {
+      return mockCryptoPwhashStr(code, opsLimit, memLimit);
+    },
+    cryptoPwhashStrVerify: (hashedCode: string, code: string) => {
+      return mockCryptoPwhashStrVerify(hashedCode, code);
+    },
   };
 
   userState.self(new User(createUuid(), '', translateForTest));
@@ -76,7 +79,9 @@ describe('AppLockRepository', () => {
   });
 
   it('uses the injected translate function for the disable confirmation modal copy', async () => {
-    const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+    const translate = jest.fn((translationKey: string) => {
+      return `translated:${translationKey}`;
+    });
     const repository = createAppLockRepository(translate);
     mockCryptoPwhashStr.mockReturnValue('$argon2id$mocked');
 

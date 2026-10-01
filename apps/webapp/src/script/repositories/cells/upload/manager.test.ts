@@ -43,7 +43,9 @@ function createDeferredUploadTask(): DeferredUploadTask {
   let resolve: ((value?: DraftIdentity) => void) | undefined;
   let reject: ((error: CellsUploadGatewayError<'upload'>) => void) | undefined;
   const task = new Task<DraftIdentity, CellsUploadGatewayError<'upload'>>((resolveTask, rejectTask) => {
-    resolve = value => resolveTask(value ?? {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'});
+    resolve = value => {
+      return resolveTask(value ?? {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'});
+    };
     reject = rejectTask;
   });
 
@@ -64,15 +66,27 @@ const deferredManager = () => {
       tasks.push(result);
       return result.task;
     },
-    publishDraft: () => Task.resolve<void, never>(undefined),
-    discardDraft: () => Task.resolve<void, never>(undefined),
+    publishDraft: () => {
+      return Task.resolve<void, never>(undefined);
+    },
+    discardDraft: () => {
+      return Task.resolve<void, never>(undefined);
+    },
   };
   const instance = createCellsUploadManager({
     gateway,
-    createResourceUuid: () => 'resource-1',
-    createVersionUuid: () => 'version-1',
-    createAttemptId: () => 'attempt-1',
-    createAbortController: () => new AbortController(),
+    createResourceUuid: () => {
+      return 'resource-1';
+    },
+    createVersionUuid: () => {
+      return 'version-1';
+    },
+    createAttemptId: () => {
+      return 'attempt-1';
+    },
+    createAbortController: () => {
+      return new AbortController();
+    },
   });
   return {instance, requests, tasks};
 };
@@ -89,15 +103,27 @@ describe('createCellsUploadManager', () => {
           versionId: request.identity.versionId,
         });
       },
-      publishDraft: () => Task.resolve<void, never>(undefined),
-      discardDraft: () => Task.resolve<void, never>(undefined),
+      publishDraft: () => {
+        return Task.resolve<void, never>(undefined);
+      },
+      discardDraft: () => {
+        return Task.resolve<void, never>(undefined);
+      },
     };
     const instance = createCellsUploadManager({
       gateway,
-      createResourceUuid: () => 'resource-1',
-      createVersionUuid: () => 'version-1',
-      createAttemptId: () => 'attempt-1',
-      createAbortController: () => new AbortController(),
+      createResourceUuid: () => {
+        return 'resource-1';
+      },
+      createVersionUuid: () => {
+        return 'version-1';
+      },
+      createAttemptId: () => {
+        return 'attempt-1';
+      },
+      createAbortController: () => {
+        return new AbortController();
+      },
     });
     return {instance, requests};
   };
@@ -149,7 +175,9 @@ describe('createCellsUploadManager', () => {
 
     fixture.instance.register('upload-1', source, path);
     const events: string[] = [];
-    fixture.instance.subscribe('upload-1', snapshot => events.push(snapshot.kind));
+    fixture.instance.subscribe('upload-1', snapshot => {
+      return events.push(snapshot.kind);
+    });
     const newStart = fixture.instance.start('upload-1');
     const beforeOldSettlement = fixture.instance.snapshot('upload-1');
     oldTask.resolve(undefined);
@@ -171,7 +199,9 @@ describe('createCellsUploadManager', () => {
 
     fixture.instance.register('upload-1', source, path);
     const events: string[] = [];
-    fixture.instance.subscribe('upload-1', snapshot => events.push(snapshot.kind));
+    fixture.instance.subscribe('upload-1', snapshot => {
+      return events.push(snapshot.kind);
+    });
     const newStart = fixture.instance.start('upload-1');
     const beforeOldSettlement = fixture.instance.snapshot('upload-1');
     oldTask.reject({kind: 'gatewayError', operation: 'upload', cause: 'stale'});

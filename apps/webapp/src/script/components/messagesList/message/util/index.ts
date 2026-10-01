@@ -22,7 +22,9 @@ import {useMemo} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 const useMessageFocusedTabIndex = (isMessageFocused: boolean) => {
-  const tabIndex = useMemo(() => (isMessageFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE), [isMessageFocused]);
+  const tabIndex = useMemo(() => {
+    return isMessageFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE;
+  }, [isMessageFocused]);
 
   return tabIndex;
 };

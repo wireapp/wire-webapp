@@ -37,7 +37,9 @@ describe('showMeetingConversationRenameFailedModal', () => {
   it('shows a confirm modal with retry copy', () => {
     showMeetingConversationRenameFailedModal({
       translate: translateForTest,
-      retryRename: () => task.resolve(undefined),
+      retryRename: () => {
+        return task.resolve(undefined);
+      },
     });
 
     expect(PrimaryModal.show).toHaveBeenCalledWith(

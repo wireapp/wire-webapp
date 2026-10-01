@@ -166,7 +166,9 @@ export class Account extends TypedEventEmitter<Events> {
   private coreCallbacks?: CoreCallbacks;
   private connectionState: ConnectionState = ConnectionState.CLOSED;
 
-  private readonly isConnectionLive = (): boolean => this.connectionState === ConnectionState.LIVE;
+  private readonly isConnectionLive = (): boolean => {
+    return this.connectionState === ConnectionState.LIVE;
+  };
 
   /**
    * {@link once}-wrapped {@link MLSService.initialisePendingProposalsTasks}; recreated in
@@ -180,7 +182,9 @@ export class Account extends TypedEventEmitter<Events> {
     ...sequentialQueueOptions,
   });
 
-  public setMaxCoreCryptoLogLevel: (level: CoreCryptoLogLevel) => void = () => undefined;
+  public setMaxCoreCryptoLogLevel: (level: CoreCryptoLogLevel) => void = () => {
+    return undefined;
+  };
 
   public service?: {
     mls?: MLSService;
@@ -483,7 +487,9 @@ export class Account extends TypedEventEmitter<Events> {
         storeEngine,
         {
           ...baseConfig,
-          generateSecretKey: (keyId, keySize) => generateSecretKey({keyId, keySize, secretsDb: encryptedStore}),
+          generateSecretKey: (keyId, keySize) => {
+            return generateSecretKey({keyId, keySize, secretsDb: encryptedStore});
+          },
         },
         this.options.coreCryptoConfig,
       );
@@ -529,7 +535,9 @@ export class Account extends TypedEventEmitter<Events> {
       this.apiClient,
       cryptoClient,
       {
-        onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
+        onNewClient: payload => {
+          return this.emit(EVENTS.NEW_SESSION, payload);
+        },
         nbPrekeys: this.options.nbPrekeys,
       },
       this.storeEngine,
@@ -996,27 +1004,27 @@ export class Account extends TypedEventEmitter<Events> {
 
         if (notification.type === ConsumableEvent.SYNCHRONIZATION) {
           this.notificationProcessingQueue
-            .add(() =>
-              this.handleSynchronizationNotification(
+            .add(() => {
+              return this.handleSynchronizationNotification(
                 notification,
                 onConnectionStateChanged,
                 getCurrentWebSocketConnectionContext(),
-              ),
-            )
+              );
+            })
             .catch(this.handleNotificationQueueError);
           return;
         }
 
         this.notificationProcessingQueue
-          .add(() =>
-            this.decryptAckEmitNotification(
+          .add(() => {
+            return this.decryptAckEmitNotification(
               notification,
               handleEvent,
               source,
               onNotificationStreamProgress,
               getCurrentWebSocketConnectionContext(),
-            ),
-          )
+            );
+          })
           .catch(this.handleNotificationQueueError);
       } catch (error: unknown) {
         const {errorMessage, errorName} = StringUtil.getSafeErrorDetails(error);
@@ -1201,7 +1209,9 @@ export class Account extends TypedEventEmitter<Events> {
     handleLegacyNotification,
     handleMissedNotifications,
     onConnectionStateChanged,
-    getCurrentWebSocketConnectionContext = () => undefined,
+    getCurrentWebSocketConnectionContext = () => {
+      return undefined;
+    },
   }: {
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>;
     handleMissedNotifications: (notificationId: string) => Promise<void>;

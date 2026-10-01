@@ -71,8 +71,8 @@ const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
   };
 };
 
-const filteredAvatarProps = (props: AvatarProps) =>
-  filterProps(props, [
+const filteredAvatarProps = (props: AvatarProps) => {
+  return filterProps(props, [
     'size',
     'forceInitials',
     'name',
@@ -82,22 +82,28 @@ const filteredAvatarProps = (props: AvatarProps) =>
     'fetchImage',
     'isAvatarGridItem',
   ]);
+};
 
 export const Avatar = (props: AvatarProps) => {
   const {url, forceInitials, name, fetchImage, isAvatarGridItem} = props;
   const [scale, setScale] = useState(0);
   useEffect(() => {
     if (isNonEmptyString(url)) {
-      requestAnimationFrame(() => setScale(1));
+      requestAnimationFrame(() => {
+        return setScale(1);
+      });
     }
   }, [url]);
-  const getInitials = (name: string = '') =>
-    name
+  const getInitials = (name: string = '') => {
+    return name
       .split(' ')
       .filter(Boolean)
-      .map(([initial]) => initial.toUpperCase())
+      .map(([initial]) => {
+        return initial.toUpperCase();
+      })
       .join('')
       .substring(0, isAvatarGridItem === true ? 1 : 2);
+  };
 
   return (
     <IsInViewport

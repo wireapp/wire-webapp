@@ -58,12 +58,16 @@ export const FileHistoryModal = () => {
       isShown={isOpen}
       onClosed={hideModal}
       data-uie-name="file-history-modal"
-      onKeyDown={event => handleEscDown(event, hideModal)}
+      onKeyDown={event => {
+        return handleEscDown(event, hideModal);
+      }}
     >
       {toBeRestoredVersionId !== undefined && toBeRestoredVersionId !== '' ? (
         <FileRestoreConfirmContent
           isLoading={isLoading}
-          onClose={() => setToBeRestoredVersionId(undefined)}
+          onClose={() => {
+            return setToBeRestoredVersionId(undefined);
+          }}
           onConfirm={handleRestore}
         />
       ) : (

@@ -115,9 +115,15 @@ export const UserSearchableList = ({
   const fetchMembersFromBackend = useDebouncedCallback(async (query: string, ignoreMembers: User[]) => {
     const resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
     const selfTeamId = selfUser.teamId;
-    const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
-    const ignoreIds = ignoreMembers.map(member => member.id);
-    const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
+    const foundMembers = resultUsers.filter(user => {
+      return user.teamId === selfTeamId;
+    });
+    const ignoreIds = ignoreMembers.map(member => {
+      return member.id;
+    });
+    const uniqueMembers = foundMembers.filter(member => {
+      return !ignoreIds.includes(member.id);
+    });
 
     // We shouldn't show any members that have the 'external' role and are not already locally known.
     const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
@@ -142,13 +148,14 @@ export const UserSearchableList = ({
     const searchResults = searchRepository.searchUserInSet(filter, users);
     const results = showAllProvidedUsers
       ? searchResults
-      : searchResults.filter(
-          user =>
+      : searchResults.filter(user => {
+          return (
             user.isMe ||
             conversationState.hasConversationWith(user) ||
             teamRepository.isSelfConnectedTo(user.id) ||
-            user.username() === normalizedQuery,
-        );
+            user.username() === normalizedQuery
+          );
+        });
 
     if (isNonEmptyString(normalizedQuery) && selfInTeam && allowRemoteSearch === true) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -164,7 +171,9 @@ export const UserSearchableList = ({
     }
 
     // make sure the self user is the first one in the list
-    const [selfUser, otherUsers] = partition(results, user => user.isMe);
+    const [selfUser, otherUsers] = partition(results, user => {
+      return user.isMe;
+    });
 
     const concatUsers = selfUser.concat(otherUsers);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -190,27 +199,37 @@ export const UserSearchableList = ({
       return filteredUsers;
     }
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
-    return [...filteredUsers, ...remoteTeamMembers].toSorted((userA, userB) =>
-      sortByPriority(userA.name(), userB.name(), normalizedQuery),
-    );
+    return [...filteredUsers, ...remoteTeamMembers].toSorted((userA, userB) => {
+      return sortByPriority(userA.name(), userB.name(), normalizedQuery);
+    });
   };
 
   const toggleUserSelection =
     selectedUsers !== undefined
       ? (user: User) => {
-          if (selectedUsers.find(selectedUser => selectedUser.id === user.id) !== undefined) {
-            onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
+          if (
+            selectedUsers.find(selectedUser => {
+              return selectedUser.id === user.id;
+            }) !== undefined
+          ) {
+            onUpdateSelectedUsers?.(
+              [...selectedUsers].filter(selectedUser => {
+                return selectedUser.id !== user.id;
+              }),
+            );
           } else {
             onUpdateSelectedUsers?.([...selectedUsers, user]);
           }
         }
       : undefined;
 
-  const userList = foundUserEntities().filter(
-    user =>
-      props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)) !== true &&
-      user.type === UserType.REGULAR,
-  );
+  const userList = foundUserEntities().filter(user => {
+    return (
+      props.excludeUsers?.some(excludeId => {
+        return matchQualifiedIds(user.qualifiedId, excludeId);
+      }) !== true && user.type === UserType.REGULAR
+    );
+  });
   const isEmptyUserList = userList.length === 0 && (filteredSelectedUsers?.length ?? 0) === 0;
   const isSearching = isNonEmptyString(filter);
   const noResultsDataUieName = !isSearching ? 'status-all-added' : 'status-no-matches';

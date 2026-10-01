@@ -94,7 +94,9 @@ export class E2EIServiceInternal {
     const challengeData = {challenge: oidcChallenge, keyAuth: keyauth};
 
     // store auth data for continuing the flow later on (in case we are redirected to the identity provider)
-    const handle = await this.coreCryptoClient.transaction(cx => cx.e2eiEnrollmentStash(identity));
+    const handle = await this.coreCryptoClient.transaction(cx => {
+      return cx.e2eiEnrollmentStash(identity);
+    });
 
     const enrollmentData = {
       handle: toBufferSource(handle),
@@ -117,7 +119,9 @@ export class E2EIServiceInternal {
     cipherSuite: Ciphersuite,
   ) {
     const handle = enrollmentData.handle;
-    const identity = await this.coreCryptoClient.transaction(cx => cx.e2eiEnrollmentStashPop(handle));
+    const identity = await this.coreCryptoClient.transaction(cx => {
+      return cx.e2eiEnrollmentStashPop(handle);
+    });
     return this.getKeyPackages(identity, oAuthToken, enrollmentData, getAllConversations, cipherSuite);
   }
 
@@ -127,12 +131,24 @@ export class E2EIServiceInternal {
     const {user} = this.initialData;
 
     return hasActiveCertificate
-      ? this.coreCryptoClient.transaction(cx =>
-          cx.e2eiNewRotateEnrollment(this.certificateTtl, ciphersuite, user.displayName, user.handle, user.teamId),
-        )
-      : this.coreCryptoClient.transaction(cx =>
-          cx.e2eiNewActivationEnrollment(user.displayName, user.handle, this.certificateTtl, ciphersuite, user.teamId),
-        );
+      ? this.coreCryptoClient.transaction(cx => {
+          return cx.e2eiNewRotateEnrollment(
+            this.certificateTtl,
+            ciphersuite,
+            user.displayName,
+            user.handle,
+            user.teamId,
+          );
+        })
+      : this.coreCryptoClient.transaction(cx => {
+          return cx.e2eiNewActivationEnrollment(
+            user.displayName,
+            user.handle,
+            this.certificateTtl,
+            ciphersuite,
+            user.teamId,
+          );
+        });
   }
 
   private async getDirectory(identity: E2eiEnrollment, connection: AcmeService): Promise<AcmeDirectory | undefined> {

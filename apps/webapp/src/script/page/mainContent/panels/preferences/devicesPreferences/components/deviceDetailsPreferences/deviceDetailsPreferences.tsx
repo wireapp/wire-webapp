@@ -69,8 +69,12 @@ export const DeviceDetailsPreferences = ({
   const resetSession = async () => {
     setResetState(SessionResetState.ONGOING);
     await onResetSession(device);
-    setTimeout(() => setResetState(SessionResetState.CONFIRMATION), MotionDuration.LONG);
-    setTimeout(() => setResetState(SessionResetState.RESET), RESET_CONFIRMATION_TIMEOUT_MILLISECONDS);
+    setTimeout(() => {
+      return setResetState(SessionResetState.CONFIRMATION);
+    }, MotionDuration.LONG);
+    setTimeout(() => {
+      return setResetState(SessionResetState.RESET);
+    }, RESET_CONFIRMATION_TIMEOUT_MILLISECONDS);
   };
 
   useEffect(() => {
@@ -114,7 +118,9 @@ export const DeviceDetailsPreferences = ({
               name="preferences_device_verification_toggle"
               id="preferences_device_verification"
               checked={isVerified}
-              onChange={event => onVerify(device, event.target.checked)}
+              onChange={event => {
+                return onVerify(device, event.target.checked);
+              }}
             />
 
             <label className="button-label" htmlFor="preferences_device_verification" data-uie-name="do-verify">
@@ -166,7 +172,9 @@ export const DeviceDetailsPreferences = ({
               variant={ButtonVariant.TERTIARY}
               type="button"
               className="preferences-button"
-              onClick={() => onRemove(device)}
+              onClick={() => {
+                return onRemove(device);
+              }}
               data-uie-name="go-remove-device"
             >
               {translate('preferencesDevicesRemove')}

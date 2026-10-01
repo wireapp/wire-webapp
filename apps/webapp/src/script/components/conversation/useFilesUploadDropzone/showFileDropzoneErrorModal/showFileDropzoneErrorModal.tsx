@@ -63,12 +63,14 @@ export const showFileDropzoneErrorModal = ({
 const InvalidFilesList = ({invalidFiles}: {invalidFiles: File[]}) => {
   return (
     <ul css={listStyles}>
-      {invalidFiles.map(file => (
-        <li key={file.name} css={itemStyles}>
-          <FileTypeIcon extension={getFileExtension(file.name)} />
-          <span css={fileNameStyles}>{file.name}</span>
-        </li>
-      ))}
+      {invalidFiles.map(file => {
+        return (
+          <li key={file.name} css={itemStyles}>
+            <FileTypeIcon extension={getFileExtension(file.name)} />
+            <span css={fileNameStyles}>{file.name}</span>
+          </li>
+        );
+      })}
     </ul>
   );
 };

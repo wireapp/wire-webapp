@@ -71,33 +71,40 @@ const saveMeetingConversationFromResponse = (
   conversationRepository: MeetingServiceDeps['conversationRepository'],
   conversation: MeetingWithConversation['conversation'] | undefined,
   onFailure: MeetingSubmitErrors,
-): Task<void, MeetingSubmitErrors> =>
-  conversation
-    ? conversationRepository.saveMeetingConversationFromBackend(conversation).mapRejected(() => onFailure)
+): Task<void, MeetingSubmitErrors> => {
+  return conversation
+    ? conversationRepository.saveMeetingConversationFromBackend(conversation).mapRejected(() => {
+        return onFailure;
+      })
     : task.resolve(undefined);
+};
 
 const createMeetingAndSyncParticipants = (
   createPayload: CreateMeeting,
   password: string | undefined,
   selectedUsers: User[],
   deps: MeetingServiceDeps,
-): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
-  deps.meetingsRepository
+): Task<CreateMeetingSuccess, MeetingSubmitErrors> => {
+  return deps.meetingsRepository
     .createMeeting(createPayload)
-    .mapRejected(() => meetingSubmitErrors.createFailed)
-    .andThen(createdMeeting =>
-      saveMeetingConversationFromResponse(
+    .mapRejected(() => {
+      return meetingSubmitErrors.createFailed;
+    })
+    .andThen(createdMeeting => {
+      return saveMeetingConversationFromResponse(
         deps.conversationRepository,
         createdMeeting.conversation,
         meetingSubmitErrors.conversationSetupFailed,
       )
-        .andThen(() =>
-          deps.conversationRepository
+        .andThen(() => {
+          return deps.conversationRepository
             .requestMeetingConversationCode(createdMeeting.qualified_conversation, password)
-            .orElse(() => task.resolve(undefined)),
-        )
-        .andThen(() =>
-          syncMeetingConversationParticipants(deps.conversationRepository, {
+            .orElse(() => {
+              return task.resolve(undefined);
+            });
+        })
+        .andThen(() => {
+          return syncMeetingConversationParticipants(deps.conversationRepository, {
             qualifiedConversationId: createdMeeting.qualified_conversation,
             selectedUsers,
             usersToAdd: selectedUsers,
@@ -105,13 +112,16 @@ const createMeetingAndSyncParticipants = (
             isCreate: true,
           })
             .mapRejected(mapSyncErrorToSubmitError)
-            .map(syncResult => ({
-              ...syncResult,
-              qualifiedConversation: createdMeeting.qualified_conversation,
-              qualifiedMeetingId: createdMeeting.qualified_id,
-            })),
-        ),
-    );
+            .map(syncResult => {
+              return {
+                ...syncResult,
+                qualifiedConversation: createdMeeting.qualified_conversation,
+                qualifiedMeetingId: createdMeeting.qualified_id,
+              };
+            });
+        });
+    });
+};
 
 /**
  * Schedules a meeting and establishes the MLS conversation with selected participants.
@@ -119,16 +129,19 @@ const createMeetingAndSyncParticipants = (
 export const scheduleMeeting = (
   command: ScheduleMeetingCommand,
   deps: MeetingServiceDeps,
-): Task<ScheduleMeetingSuccess, MeetingSubmitErrors> =>
-  createMeetingAndSyncParticipants(
+): Task<ScheduleMeetingSuccess, MeetingSubmitErrors> => {
+  return createMeetingAndSyncParticipants(
     mapScheduleCommandToCreateMeeting(command, deps.deviceTimeZone),
     command.password,
     command.selectedUsers,
     deps,
-  ).map(({failedToAdd, qualifiedMeetingId}) => ({
-    failedToAdd,
-    qualifiedMeetingId,
-  }));
+  ).map(({failedToAdd, qualifiedMeetingId}) => {
+    return {
+      failedToAdd,
+      qualifiedMeetingId,
+    };
+  });
+};
 
 /**
  * Creates an instant meeting and establishes the MLS conversation with selected participants.
@@ -136,13 +149,14 @@ export const scheduleMeeting = (
 export const meetNowMeeting = (
   command: MeetNowMeetingCommand,
   deps: MeetingServiceDeps,
-): Task<CreateMeetingSuccess, MeetingSubmitErrors> =>
-  createMeetingAndSyncParticipants(
+): Task<CreateMeetingSuccess, MeetingSubmitErrors> => {
+  return createMeetingAndSyncParticipants(
     mapMeetNowCommandToCreateMeeting(command, deps.clock, deps.deviceTimeZone),
     command.password,
     command.selectedUsers,
     deps,
   );
+};
 
 const syncParticipantsAfterMeetingUpdate = (
   command: UpdateMeetingCommand,
@@ -167,11 +181,14 @@ const syncParticipantsAfterMeetingUpdate = (
   }).mapRejected(mapSyncErrorToSubmitError);
 };
 
-const hasMeetingMetadataChanged = (command: UpdateMeetingCommand): boolean =>
-  command.title.trim() !== command.originalTitle.trim() ||
-  command.start.getTime() !== command.originalStart.getTime() ||
-  command.end.getTime() !== command.originalEnd.getTime() ||
-  command.recurrence !== command.originalRecurrence;
+const hasMeetingMetadataChanged = (command: UpdateMeetingCommand): boolean => {
+  return (
+    command.title.trim() !== command.originalTitle.trim() ||
+    command.start.getTime() !== command.originalStart.getTime() ||
+    command.end.getTime() !== command.originalEnd.getTime() ||
+    command.recurrence !== command.originalRecurrence
+  );
+};
 
 /**
  * Updates meeting metadata, syncs conversation participants, then heals the
@@ -192,25 +209,33 @@ export const updateMeeting = (
       return syncMeetingConversationName(deps.conversationRepository, {
         qualifiedConversationId: command.qualifiedConversation.value,
         title: command.title,
-      }).map(() => submitSuccess);
+      }).map(() => {
+        return submitSuccess;
+      });
     });
   }
 
   return deps.meetingsRepository
     .updateMeeting(command.meetingId, mapUpdateCommandToUpdateMeeting(command))
-    .mapRejected(() => meetingSubmitErrors.updateFailed)
-    .andThen(updatedMeeting =>
-      saveMeetingConversationFromResponse(
+    .mapRejected(() => {
+      return meetingSubmitErrors.updateFailed;
+    })
+    .andThen(updatedMeeting => {
+      return saveMeetingConversationFromResponse(
         deps.conversationRepository,
         updatedMeeting.conversation,
         meetingSubmitErrors.conversationSetupFailed,
       )
-        .andThen(() => syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove))
-        .andThen(submitSuccess =>
-          syncMeetingConversationName(deps.conversationRepository, {
+        .andThen(() => {
+          return syncParticipantsAfterMeetingUpdate(command, deps, usersToAdd, userIdsToRemove);
+        })
+        .andThen(submitSuccess => {
+          return syncMeetingConversationName(deps.conversationRepository, {
             qualifiedConversationId: updatedMeeting.qualified_conversation,
             title: updatedMeeting.title,
-          }).map(() => submitSuccess),
-        ),
-    );
+          }).map(() => {
+            return submitSuccess;
+          });
+        });
+    });
 };

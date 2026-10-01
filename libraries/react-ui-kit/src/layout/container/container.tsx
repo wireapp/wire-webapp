@@ -50,51 +50,53 @@ const containerStyle: (props: ContainerProps) => CSSObject = ({
   centerText = false,
   level = undefined,
   verticalCenter = false,
-}) => ({
-  margin: verticalCenter ? 'auto' : '0 auto',
-  maxWidth: level !== undefined && Boolean(level) ? `${LEVEL[level]}px` : undefined,
-  position: 'relative',
-  textAlign: centerText ? 'center' : 'left',
-  width: '100%',
-  [media[QueryKeys.DESKTOP]]:
-    level !== undefined && Boolean(level)
-      ? undefined
-      : {
-          padding: 0,
-          width: `${WIDTH.DESKTOP_MIN - GUTTER * 2}px`,
-        },
-});
+}) => {
+  return {
+    margin: verticalCenter ? 'auto' : '0 auto',
+    maxWidth: level !== undefined && Boolean(level) ? `${LEVEL[level]}px` : undefined,
+    position: 'relative',
+    textAlign: centerText ? 'center' : 'left',
+    width: '100%',
+    [media[QueryKeys.DESKTOP]]:
+      level !== undefined && Boolean(level)
+        ? undefined
+        : {
+            padding: 0,
+            width: `${WIDTH.DESKTOP_MIN - GUTTER * 2}px`,
+          },
+  };
+};
 
 export const Container: FC<ContainerProps> = forwardRef<HTMLDivElement, ContainerProps>(
-  ({centerText, level, verticalCenter, ...props}, ref) => (
-    <div ref={ref} css={containerStyle({centerText, level, verticalCenter})} {...props} />
-  ),
+  ({centerText, level, verticalCenter, ...props}, ref) => {
+    return <div ref={ref} css={containerStyle({centerText, level, verticalCenter})} {...props} />;
+  },
 );
 Container.displayName = 'Container';
 
 export type LevelContainerProps = Omit<ContainerProps, 'level'>;
 
-export const ContainerLG: FC<ContainerProps> = forwardRef((props, ref) => (
-  <Container ref={ref} level={'lg'} {...props} />
-));
+export const ContainerLG: FC<ContainerProps> = forwardRef((props, ref) => {
+  return <Container ref={ref} level={'lg'} {...props} />;
+});
 ContainerLG.displayName = 'ContainerLG';
 
-export const ContainerMD: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
-  <Container ref={ref} level={'md'} {...props} />
-));
+export const ContainerMD: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => {
+  return <Container ref={ref} level={'md'} {...props} />;
+});
 ContainerMD.displayName = 'ContainerMD';
 
-export const ContainerSM: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
-  <Container ref={ref} level={'sm'} {...props} />
-));
+export const ContainerSM: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => {
+  return <Container ref={ref} level={'sm'} {...props} />;
+});
 ContainerSM.displayName = 'ContainerSM';
 
-export const ContainerXS: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
-  <Container ref={ref} level={'xs'} {...props} />
-));
+export const ContainerXS: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => {
+  return <Container ref={ref} level={'xs'} {...props} />;
+});
 ContainerXS.displayName = 'ContainerXS';
 
-export const ContainerXXS: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
-  <Container ref={ref} level={'xxs'} {...props} />
-));
+export const ContainerXXS: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => {
+  return <Container ref={ref} level={'xxs'} {...props} />;
+});
 ContainerXXS.displayName = 'ContainerXXS';

@@ -103,7 +103,9 @@ export const DetailViewModal = ({
 
     // The event above will make react to render the conversation view,
     // so we need to wait for the text input to be ready before inserting the reply.
-    const isTextInputReady = await waitFor(() => conversation.isTextInputReady());
+    const isTextInputReady = await waitFor(() => {
+      return conversation.isTextInputReady();
+    });
     if (isTextInputReady === true) {
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
     }
@@ -111,7 +113,9 @@ export const DetailViewModal = ({
     onCloseClick();
   };
 
-  const onDownloadClick = (message: ContentMessage) => message.download(assetRepository);
+  const onDownloadClick = (message: ContentMessage) => {
+    return message.download(assetRepository);
+  };
 
   const loadImage = (contentMessage: ContentMessage) => {
     setIsImageVisible(false);
@@ -125,7 +129,9 @@ export const DetailViewModal = ({
   };
 
   const iterateImage = (reverse = false) => {
-    const currentIndex = items.findIndex(item => item.id === currentMessageEntityId.current);
+    const currentIndex = items.findIndex(item => {
+      return item.id === currentMessageEntityId.current;
+    });
 
     if (currentIndex === -1) {
       return;
@@ -188,7 +194,11 @@ export const DetailViewModal = ({
         return;
       }
 
-      setItems(prevState => prevState.filter(message => message.id !== messageId));
+      setItems(prevState => {
+        return prevState.filter(message => {
+          return message.id !== messageId;
+        });
+      });
     }
   };
 
@@ -197,11 +207,15 @@ export const DetailViewModal = ({
     const isImage = isOfCategory('images', message) === true;
 
     if (isCurrentConversation && isImage) {
-      setItems(prevState => [...prevState, message]);
+      setItems(prevState => {
+        return [...prevState, message];
+      });
     }
   };
 
-  const messageExpired = (message: ContentMessage) => messageRemoved(message.id, message.conversation_id);
+  const messageExpired = (message: ContentMessage) => {
+    return messageRemoved(message.id, message.conversation_id);
+  };
 
   const getAllImages = async (conversation: Conversation) => {
     const conversationItems = await conversationRepository.getEventsForCategory(conversation, MessageCategory.IMAGE);
@@ -209,10 +223,9 @@ export const DetailViewModal = ({
       return isContentMessage(message) && isOfCategory('images', message) === true;
     });
 
-    const contentMessages = filteredImages.reduce<ContentMessage[]>(
-      (contentMessages, message) => (isContentMessage(message) ? [...contentMessages, message] : contentMessages),
-      [],
-    );
+    const contentMessages = filteredImages.reduce<ContentMessage[]>((contentMessages, message) => {
+      return isContentMessage(message) ? [...contentMessages, message] : contentMessages;
+    }, []);
 
     setItems(contentMessages);
   };
@@ -234,7 +247,9 @@ export const DetailViewModal = ({
   useEffect(() => {
     document.addEventListener('keydown', onKeyDownLightBox);
 
-    return () => document.removeEventListener('keydown', onKeyDownLightBox);
+    return () => {
+      return document.removeEventListener('keydown', onKeyDownLightBox);
+    };
   }, [items]);
 
   useEffect(() => {

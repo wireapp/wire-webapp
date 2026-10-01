@@ -33,9 +33,11 @@ export type SystemNotificationError = {
   cause: unknown;
 };
 
-export const toSystemNotificationError =
-  (kind: SystemNotificationErrorKind) =>
-  (cause: unknown): SystemNotificationError => ({kind, cause});
+export const toSystemNotificationError = (kind: SystemNotificationErrorKind) => {
+  return (cause: unknown): SystemNotificationError => {
+    return {kind, cause};
+  };
+};
 
 /** The three permission states, owned here so the port carries no DOM type. */
 export type SystemNotificationPermission = 'default' | 'denied' | 'granted';

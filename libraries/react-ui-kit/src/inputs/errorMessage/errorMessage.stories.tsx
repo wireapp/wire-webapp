@@ -42,9 +42,11 @@ export const Default: Story = {
 };
 
 export const WithLink: Story = {
-  render: () => (
-    <ErrorMessage>
-      This is an error message with a <Link href="#">link</Link>
-    </ErrorMessage>
-  ),
+  render: () => {
+    return (
+      <ErrorMessage>
+        This is an error message with a <Link href="#">link</Link>
+      </ErrorMessage>
+    );
+  },
 };

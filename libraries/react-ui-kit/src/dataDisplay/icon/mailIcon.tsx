@@ -19,13 +19,15 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const MailIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M15.9899 14H0.010139V4.0681L8 10.9252L15.9899 4.0681V14ZM8.0097 8.85752L16 2H0L8.0097 8.85752Z"
-      fill="black"
-    />
-  </SVGIcon>
-);
+export const MailIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M15.9899 14H0.010139V4.0681L8 10.9252L15.9899 4.0681V14ZM8.0097 8.85752L16 2H0L8.0097 8.85752Z"
+        fill="black"
+      />
+    </SVGIcon>
+  );
+};

@@ -23,16 +23,22 @@ import {MemberMessage} from 'Repositories/entity/message/memberMessage';
 
 import {SuperType} from '../message/superType';
 
-export const isReadableMessage = (message: any): message is ContentMessage =>
-  message &&
-  'super_type' in message &&
-  (message.super_type === SuperType.CONTENT || message.super_type === SuperType.PING);
+export const isReadableMessage = (message: any): message is ContentMessage => {
+  return (
+    message &&
+    'super_type' in message &&
+    (message.super_type === SuperType.CONTENT || message.super_type === SuperType.PING)
+  );
+};
 
-export const isContentMessage = (message: any): message is ContentMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.CONTENT;
+export const isContentMessage = (message: any): message is ContentMessage => {
+  return message && 'super_type' in message && message.super_type === SuperType.CONTENT;
+};
 
-export const isDeleteMessage = (message: any): message is DeleteMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.DELETE;
+export const isDeleteMessage = (message: any): message is DeleteMessage => {
+  return message && 'super_type' in message && message.super_type === SuperType.DELETE;
+};
 
-export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.MEMBER;
+export const isMemberMessage = (message: any | undefined | null): message is MemberMessage => {
+  return message && 'super_type' in message && message.super_type === SuperType.MEMBER;
+};

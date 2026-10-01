@@ -71,9 +71,9 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
   } = useKoSubscribableChildren(activeConversation, ['isSelfUserRemoved', 'participating_user_ets', 'selfUser']);
 
   const participants = useMemo(() => {
-    const users = participatingUsers.filter(
-      (participant): participant is User => participant.type === UserType.REGULAR,
-    );
+    const users = participatingUsers.filter((participant): participant is User => {
+      return participant.type === UserType.REGULAR;
+    });
 
     if (!isSelfUserRemoved && !isNullOrUndefined(selfUser)) {
       return [...users, selfUser].toSorted(sortUsersByPriority);

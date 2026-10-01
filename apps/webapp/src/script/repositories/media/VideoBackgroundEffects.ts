@@ -103,7 +103,9 @@ export type BuiltinBackground = BuiltinBackgroundDefinition & {
  * @param colors - Array of CSS color strings (hex, rgb, named colors, etc.).
  * @returns CSS linear-gradient() function string.
  */
-const buildGradient = (colors: string[]) => `linear-gradient(135deg, ${colors.join(', ')})`;
+const buildGradient = (colors: string[]) => {
+  return `linear-gradient(135deg, ${colors.join(', ')})`;
+};
 export const DEFAULT_BUILTIN_BACKGROUND_ID = 'wire-1';
 const BUILTIN_BACKGROUND_DEFINITIONS: BuiltinBackgroundDefinition[] = [
   {
@@ -126,10 +128,12 @@ const BUILTIN_BACKGROUND_DEFINITIONS: BuiltinBackgroundDefinition[] = [
   },
 ];
 
-export const BUILTIN_BACKGROUNDS: BuiltinBackground[] = BUILTIN_BACKGROUND_DEFINITIONS.map(definition => ({
-  ...definition,
-  previewGradient: buildGradient(definition.previewColors),
-}));
+export const BUILTIN_BACKGROUNDS: BuiltinBackground[] = BUILTIN_BACKGROUND_DEFINITIONS.map(definition => {
+  return {
+    ...definition,
+    previewGradient: buildGradient(definition.previewColors),
+  };
+});
 
 /** Maximum number of cached background images before evicting oldest entries. */
 const MAX_BACKGROUND_CACHE_ENTRIES = 8;
@@ -187,14 +191,19 @@ const setCachedImage = (backgroundId: string, image: HTMLImageElement): void => 
  * @returns Promise resolving to the loaded HTMLImageElement.
  * @throws Error if the image fails to load.
  */
-const loadImage = (src: string): Promise<HTMLImageElement> =>
-  new Promise((resolve, reject) => {
+const loadImage = (src: string): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
     const image = new Image();
     image.crossOrigin = 'anonymous';
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error(`Failed to load background image: ${src}`));
+    image.onload = () => {
+      return resolve(image);
+    };
+    image.onerror = () => {
+      return reject(new Error(`Failed to load background image: ${src}`));
+    };
     image.src = src;
   });
+};
 
 /**
  * Creates an ImageBitmap from a linear gradient defined by color stops.
@@ -240,8 +249,11 @@ const createGradientBitmap = async (colors: string[]): Promise<ImageBitmap> => {
  * @param backgroundId - Unique identifier for the background to find.
  * @returns BuiltinBackground object if found, undefined otherwise.
  */
-export const getBuiltinBackground = (backgroundId: string): BuiltinBackground | undefined =>
-  BUILTIN_BACKGROUNDS.find(background => background.id === backgroundId);
+export const getBuiltinBackground = (backgroundId: string): BuiltinBackground | undefined => {
+  return BUILTIN_BACKGROUNDS.find(background => {
+    return background.id === backgroundId;
+  });
+};
 
 /**
  * Loads a background source for virtual background mode.

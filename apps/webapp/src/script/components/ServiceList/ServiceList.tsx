@@ -51,13 +51,15 @@ export const ServiceList = ({
         className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}
         data-uie-name={dataUieName}
       >
-        {services.map(service => (
-          <li key={service.id}>
-            <div className="search-list-button" data-uie-name={`service-list-service-${service.id}`}>
-              <ServiceListItem service={service} onClick={onServiceClick} />
-            </div>
-          </li>
-        ))}
+        {services.map(service => {
+          return (
+            <li key={service.id}>
+              <div className="search-list-button" data-uie-name={`service-list-service-${service.id}`}>
+                <ServiceListItem service={service} onClick={onServiceClick} />
+              </div>
+            </li>
+          );
+        })}
       </ul>
 
       {isSearching && services.length === 0 && (

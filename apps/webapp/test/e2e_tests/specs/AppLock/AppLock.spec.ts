@@ -158,7 +158,13 @@ test.describe('AppLock', () => {
 
         // After redirect to login page verify the whole indexDB was cleared
         await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
-        await expect.poll(() => page.evaluate(() => indexedDB.databases())).toHaveLength(0);
+        await expect
+          .poll(() => {
+            return page.evaluate(() => {
+              return indexedDB.databases();
+            });
+          })
+          .toHaveLength(0);
       },
     );
 
@@ -179,7 +185,13 @@ test.describe('AppLock', () => {
         await modals.appLock().clickReset();
 
         // The database should not be wiped when the checkbox was not checked
-        await expect.poll(() => page.evaluate(() => indexedDB.databases())).not.toHaveLength(0);
+        await expect
+          .poll(() => {
+            return page.evaluate(() => {
+              return indexedDB.databases();
+            });
+          })
+          .not.toHaveLength(0);
 
         // Log back in with the same user and verify the existing session is intact
         await loginUser(memberA, pageManager);
@@ -188,7 +200,13 @@ test.describe('AppLock', () => {
         await expect(modals.appLock().appLockModal).toBeVisible({timeout: LOGIN_TIMEOUT});
         await expect(modals.appLock().lockPasscodeInput).toBeVisible();
 
-        await expect.poll(() => page.evaluate(() => indexedDB.databases())).not.toHaveLength(0);
+        await expect
+          .poll(() => {
+            return page.evaluate(() => {
+              return indexedDB.databases();
+            });
+          })
+          .not.toHaveLength(0);
       },
     );
 

@@ -41,13 +41,15 @@ describe('MessagesGroup', () => {
     const nbOtherMessages = getRandomNumber(1, 10);
 
     // those are messages from different senders. They should not be grouped
-    const otherSenderMessages = [...Array(nbOtherMessages)].map(() => createMessageAddEvent());
+    const otherSenderMessages = [...Array(nbOtherMessages)].map(() => {
+      return createMessageAddEvent();
+    });
 
     const sameSenderMessages = Array(sizeGroup).fill(createMessageAddEvent({overrides: {from: sender}}));
 
-    const allMessages = [...otherSenderMessages, ...sameSenderMessages].map(
-      event => eventMapper.mapJsonEvent(event, conversation) as Message,
-    );
+    const allMessages = [...otherSenderMessages, ...sameSenderMessages].map(event => {
+      return eventMapper.mapJsonEvent(event, conversation) as Message;
+    });
 
     const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
     // We expect the number of groups to be the number of different senders + the group that contains all the message from user1
@@ -64,9 +66,9 @@ describe('MessagesGroup', () => {
     const groupCreationMessage = createGroupCreationEvent({from: sender});
     const contentMessage = createMessageAddEvent({overrides: {from: sender}});
 
-    const allMessages = [groupCreationMessage, contentMessage].map(
-      event => eventMapper.mapJsonEvent(event, conversation) as Message,
-    );
+    const allMessages = [groupCreationMessage, contentMessage].map(event => {
+      return eventMapper.mapJsonEvent(event, conversation) as Message;
+    });
 
     const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
     expect(groupedMessages).toHaveLength(2);
@@ -77,40 +79,46 @@ describe('MessagesGroup', () => {
     const nbUnreadMessages = getRandomNumber(1, 10);
     const lastReadTimestamp = 10;
 
-    const readMessages = [...Array(nbReadMessages)].map((_, index) =>
-      createMessageAddEvent({overrides: {time: new Date(index).toISOString()}}),
-    );
-    const unreadMessages = [...Array(nbUnreadMessages)].map((_, index) =>
-      createMessageAddEvent({overrides: {time: new Date(lastReadTimestamp + 1 + index).toISOString()}}),
-    );
+    const readMessages = [...Array(nbReadMessages)].map((_, index) => {
+      return createMessageAddEvent({overrides: {time: new Date(index).toISOString()}});
+    });
+    const unreadMessages = [...Array(nbUnreadMessages)].map((_, index) => {
+      return createMessageAddEvent({overrides: {time: new Date(lastReadTimestamp + 1 + index).toISOString()}});
+    });
 
-    const allMessages = [...readMessages, ...unreadMessages].map(
-      event => eventMapper.mapJsonEvent(event, conversation) as Message,
-    );
+    const allMessages = [...readMessages, ...unreadMessages].map(event => {
+      return eventMapper.mapJsonEvent(event, conversation) as Message;
+    });
 
     const groupedMessages = groupMessagesBySenderAndTime(allMessages, lastReadTimestamp);
-    expect(groupedMessages.findIndex(group => isMarker(group))).toBe(nbReadMessages);
+    expect(
+      groupedMessages.findIndex(group => {
+        return isMarker(group);
+      }),
+    ).toBe(nbReadMessages);
   });
 
   it('adds markers for messages sent on different days', () => {
     const nbPrevHourMessages = getRandomNumber(1, 10);
     const nbNextHourMessages = getRandomNumber(1, 10);
 
-    const previousMessages = [...Array(nbPrevHourMessages)].map((_, index) =>
-      createMessageAddEvent({overrides: {time: new Date(index).toISOString()}}),
-    );
-    const nextMessages = [...Array(nbNextHourMessages)].map((_, index) =>
-      createMessageAddEvent({
+    const previousMessages = [...Array(nbPrevHourMessages)].map((_, index) => {
+      return createMessageAddEvent({overrides: {time: new Date(index).toISOString()}});
+    });
+    const nextMessages = [...Array(nbNextHourMessages)].map((_, index) => {
+      return createMessageAddEvent({
         overrides: {time: new Date(TimeInMillis.DAY + 10 * TimeInMillis.MINUTE + index).toISOString()},
-      }),
-    );
+      });
+    });
 
-    const allMessages = [...previousMessages, ...nextMessages].map(
-      event => eventMapper.mapJsonEvent(event, conversation) as Message,
-    );
+    const allMessages = [...previousMessages, ...nextMessages].map(event => {
+      return eventMapper.mapJsonEvent(event, conversation) as Message;
+    });
 
     const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
-    const firstMarkerIndex = groupedMessages.findIndex(group => isMarker(group));
+    const firstMarkerIndex = groupedMessages.findIndex(group => {
+      return isMarker(group);
+    });
     const marker = groupedMessages[firstMarkerIndex] as any;
     expect(firstMarkerIndex).toBe(nbPrevHourMessages);
     expect(marker.type).toBe('day');
@@ -122,18 +130,18 @@ describe('MessagesGroup', () => {
     const lastReadTimestamp = 10;
     const senderId = 'same-sender';
 
-    const readMessages = [...Array(nbReadMessages)].map((_, index) =>
-      createMessageAddEvent({overrides: {from: senderId, time: new Date(index).toISOString()}}),
-    );
-    const unreadMessages = [...Array(nbUnreadMessages)].map((_, index) =>
-      createMessageAddEvent({
+    const readMessages = [...Array(nbReadMessages)].map((_, index) => {
+      return createMessageAddEvent({overrides: {from: senderId, time: new Date(index).toISOString()}});
+    });
+    const unreadMessages = [...Array(nbUnreadMessages)].map((_, index) => {
+      return createMessageAddEvent({
         overrides: {from: senderId, time: new Date(lastReadTimestamp + 1 + index).toISOString()},
-      }),
-    );
+      });
+    });
 
-    const allMessages = [...readMessages, ...unreadMessages].map(
-      event => eventMapper.mapJsonEvent(event, conversation) as Message,
-    );
+    const allMessages = [...readMessages, ...unreadMessages].map(event => {
+      return eventMapper.mapJsonEvent(event, conversation) as Message;
+    });
 
     const groupedMessages = groupMessagesBySenderAndTime(allMessages, lastReadTimestamp);
     /* There should be :

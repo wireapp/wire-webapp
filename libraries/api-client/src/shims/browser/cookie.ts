@@ -22,8 +22,10 @@ import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {AccessTokenData} from '../../auth/';
 import {HttpClient} from '../../http/';
 
-export const retrieveCookie = (response: AxiosResponse<AccessTokenData>): Promise<AccessTokenData> =>
-  Promise.resolve(response.data);
+export const retrieveCookie = (response: AxiosResponse<AccessTokenData>): Promise<AccessTokenData> => {
+  return Promise.resolve(response.data);
+};
 
-export const sendRequestWithCookie = <T>(client: HttpClient, config: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
-  client._sendRequest<T>({config});
+export const sendRequestWithCookie = <T>(client: HttpClient, config: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
+  return client._sendRequest<T>({config});
+};

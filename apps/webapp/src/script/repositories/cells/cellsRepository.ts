@@ -217,7 +217,11 @@ export class CellsRepository {
     const versionId = createUuid();
     const result = await this.apiClient.api.cells.checkNodeCreation({path: filePath, uuid, versionId, type: 'LEAF'});
 
-    return result.Results?.some(checkResult => isTruthy(checkResult.Exists)) ?? false;
+    return (
+      result.Results?.some(checkResult => {
+        return isTruthy(checkResult.Exists);
+      }) ?? false
+    );
   }
 
   async createPublicLink({

@@ -39,12 +39,12 @@ const mockedAccessTokenStore: Partial<AccessTokenStore> = {
 
 const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
 
-jest.spyOn(client, 'sendJSON').mockImplementation(() =>
-  Promise.resolve<AxiosResponse>({
+jest.spyOn(client, 'sendJSON').mockImplementation(() => {
+  return Promise.resolve<AxiosResponse>({
     status: 200,
     data: {},
-  } as AxiosResponse),
-);
+  } as AxiosResponse);
+});
 
 const conversationApi = new ConversationAPI(client, {
   domain,
@@ -55,7 +55,9 @@ const conversationApi = new ConversationAPI(client, {
   supportsMLS: true,
 });
 
-const generateQualifiedId = () => ({domain, id: randomUUID()});
+const generateQualifiedId = () => {
+  return {domain, id: randomUUID()};
+};
 
 describe('ConversationAPI', () => {
   describe('getConversationList', () => {

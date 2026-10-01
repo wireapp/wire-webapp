@@ -33,7 +33,9 @@ describe('MediaStreamHandler', () => {
   };
 
   const userState = {
-    self: () => ({id: ''}),
+    self: () => {
+      return {id: ''};
+    },
   } as UserState;
 
   const mediaConstraintsHandler = new MediaConstraintsHandler(userState);

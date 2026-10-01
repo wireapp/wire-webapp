@@ -135,12 +135,13 @@ export const useCellsActionPermissions = () => {
   const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
 
   return useCallback(
-    (action: CellsAction) =>
-      canPerformCellsAction({
+    (action: CellsAction) => {
+      return canPerformCellsAction({
         action,
         isViewerPermissionFeatureEnabled,
         selfUserDriveRole,
-      }),
+      });
+    },
     [isViewerPermissionFeatureEnabled, selfUserDriveRole],
   );
 };

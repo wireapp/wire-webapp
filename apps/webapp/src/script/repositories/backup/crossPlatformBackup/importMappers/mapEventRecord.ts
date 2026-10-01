@@ -78,28 +78,35 @@ const transformArrayToObject = (array: Int8Array): {[key: number]: number} => {
 };
 
 // Type guards for BackupMessageContent
-const isTextContent = (content: BackupMessageContent): content is BackupMessageContent.Text =>
-  content instanceof BackupMessageContent.Text;
-const isAssetContent = (content: BackupMessageContent): content is BackupMessageContent.Asset =>
-  content instanceof BackupMessageContent.Asset;
-const isLocationContent = (content: BackupMessageContent): content is BackupMessageContent.Location =>
-  content instanceof BackupMessageContent.Location;
+const isTextContent = (content: BackupMessageContent): content is BackupMessageContent.Text => {
+  return content instanceof BackupMessageContent.Text;
+};
+const isAssetContent = (content: BackupMessageContent): content is BackupMessageContent.Asset => {
+  return content instanceof BackupMessageContent.Asset;
+};
+const isLocationContent = (content: BackupMessageContent): content is BackupMessageContent.Location => {
+  return content instanceof BackupMessageContent.Location;
+};
 const isImageContent = (
   metadata: BackupMessageContent.Asset.AssetMetadata,
-): metadata is BackupMessageContent.Asset.AssetMetadata.Image =>
-  metadata instanceof BackupMessageContent.Asset.AssetMetadata.Image;
+): metadata is BackupMessageContent.Asset.AssetMetadata.Image => {
+  return metadata instanceof BackupMessageContent.Asset.AssetMetadata.Image;
+};
 const isVideoContent = (
   metadata: BackupMessageContent.Asset.AssetMetadata,
-): metadata is BackupMessageContent.Asset.AssetMetadata.Video =>
-  metadata instanceof BackupMessageContent.Asset.AssetMetadata.Video;
+): metadata is BackupMessageContent.Asset.AssetMetadata.Video => {
+  return metadata instanceof BackupMessageContent.Asset.AssetMetadata.Video;
+};
 const isAudioContent = (
   metadata: BackupMessageContent.Asset.AssetMetadata,
-): metadata is BackupMessageContent.Asset.AssetMetadata.Audio =>
-  metadata instanceof BackupMessageContent.Asset.AssetMetadata.Audio;
+): metadata is BackupMessageContent.Asset.AssetMetadata.Audio => {
+  return metadata instanceof BackupMessageContent.Asset.AssetMetadata.Audio;
+};
 const isFileContent = (
   metadata: BackupMessageContent.Asset.AssetMetadata,
-): metadata is BackupMessageContent.Asset.AssetMetadata.Generic =>
-  metadata instanceof BackupMessageContent.Asset.AssetMetadata.Generic;
+): metadata is BackupMessageContent.Asset.AssetMetadata.Generic => {
+  return metadata instanceof BackupMessageContent.Asset.AssetMetadata.Generic;
+};
 
 const mapMessageContentToCategory = (message: BackupMessage): MessageCategory => {
   if (isTextContent(message.content)) {
@@ -138,51 +145,57 @@ const mapMessageContentToCategory = (message: BackupMessage): MessageCategory =>
 };
 
 type TextBackupMessage = BackupMessage & {content: BackupMessageContent.Text};
-const mapTextMessageToEventRecord = (message: TextBackupMessage): EventRecord => ({
-  ...mapCommonMessageFields(message),
-  data: {
-    content: isTextContent(message.content) ? message.content.text : '',
-  },
-  // there is a type mismatch here, but it is not relevant for the import
-  type: ClientEvent.CONVERSATION.MESSAGE_ADD as any,
-  category: mapMessageContentToCategory(message),
-});
+const mapTextMessageToEventRecord = (message: TextBackupMessage): EventRecord => {
+  return {
+    ...mapCommonMessageFields(message),
+    data: {
+      content: isTextContent(message.content) ? message.content.text : '',
+    },
+    // there is a type mismatch here, but it is not relevant for the import
+    type: ClientEvent.CONVERSATION.MESSAGE_ADD as any,
+    category: mapMessageContentToCategory(message),
+  };
+};
 
 type AssetBackupMessage = BackupMessage & {content: BackupMessageContent.Asset};
 // Maps an AssetBackupMessage to an EventRecord
-const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord => ({
-  ...mapCommonMessageFields(message),
-  data: {
-    content_length: message.content.size.toString(),
-    content_type: message.content.mimeType.toString(),
-    info: {...message.content.metaData, name: message.content.name?.toString() ?? null},
-    domain: message.content.assetDomain?.toString(),
-    key: message.content.assetId?.toString(),
-    otr_key: transformArrayToObject(message.content.otrKey),
-    sha256: transformArrayToObject(message.content.sha256),
-    status: 'uploaded',
-    token: message.content.assetToken?.toString(),
-  },
-  // there is a type mismatch here, but it is not relevant for the import
-  type: ClientEvent.CONVERSATION.ASSET_ADD as any,
-  category: mapMessageContentToCategory(message),
-});
+const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord => {
+  return {
+    ...mapCommonMessageFields(message),
+    data: {
+      content_length: message.content.size.toString(),
+      content_type: message.content.mimeType.toString(),
+      info: {...message.content.metaData, name: message.content.name?.toString() ?? null},
+      domain: message.content.assetDomain?.toString(),
+      key: message.content.assetId?.toString(),
+      otr_key: transformArrayToObject(message.content.otrKey),
+      sha256: transformArrayToObject(message.content.sha256),
+      status: 'uploaded',
+      token: message.content.assetToken?.toString(),
+    },
+    // there is a type mismatch here, but it is not relevant for the import
+    type: ClientEvent.CONVERSATION.ASSET_ADD as any,
+    category: mapMessageContentToCategory(message),
+  };
+};
 
 type LocationBackupMessage = BackupMessage & {content: BackupMessageContent.Location};
 // Maps a LocationBackupMessage to an EventRecord
-const mapLocationMessageToEventRecord = (message: LocationBackupMessage): EventRecord => ({
-  ...mapCommonMessageFields(message),
-  data: {
-    location: {
-      latitude: message.content.latitude,
-      longitude: message.content.longitude,
-      name: message.content.name,
-      zoom: message.content.zoom,
+const mapLocationMessageToEventRecord = (message: LocationBackupMessage): EventRecord => {
+  return {
+    ...mapCommonMessageFields(message),
+    data: {
+      location: {
+        latitude: message.content.latitude,
+        longitude: message.content.longitude,
+        name: message.content.name,
+        zoom: message.content.zoom,
+      },
     },
-  },
-  type: ClientEvent.CONVERSATION.LOCATION as any,
-  category: mapMessageContentToCategory(message),
-});
+    type: ClientEvent.CONVERSATION.LOCATION as any,
+    category: mapMessageContentToCategory(message),
+  };
+};
 
 /**
  * Maps a BackupMessage to an EventRecord

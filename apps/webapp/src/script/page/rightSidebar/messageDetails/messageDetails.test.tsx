@@ -53,8 +53,12 @@ const getDefaultParams = (showReactions: boolean = false) => {
     searchRepository,
     showReactions,
     teamRepository: {
-      conversationHasGuestLinkEnabled: async (conversationId: string) => true,
-      isSelfConnectedTo: () => false,
+      conversationHasGuestLinkEnabled: async (conversationId: string) => {
+        return true;
+      },
+      isSelfConnectedTo: () => {
+        return false;
+      },
     } as unknown as TeamRepository,
     updateEntity: jest.fn(),
   };
@@ -81,7 +85,9 @@ describe('MessageDetails', () => {
     message.user(user);
 
     const findUsersByIds = jest.fn((ids: QualifiedId[]) => {
-      return ids.map(id => new User(id.id, 'test-domain.mock', translateForTest));
+      return ids.map(id => {
+        return new User(id.id, 'test-domain.mock', translateForTest);
+      });
     });
 
     const userRepository = {
@@ -93,7 +99,9 @@ describe('MessageDetails', () => {
       <MessageDetails
         {...defaultProps}
         selfUser={new User('', '', translateForTest)}
-        togglePanel={() => undefined}
+        togglePanel={() => {
+          return undefined;
+        }}
         activeConversation={conversation}
         messageEntity={message}
         userRepository={userRepository}

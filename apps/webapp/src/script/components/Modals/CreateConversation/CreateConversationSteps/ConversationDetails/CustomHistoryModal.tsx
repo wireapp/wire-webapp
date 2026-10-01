@@ -68,16 +68,18 @@ export const CustomHistoryModal = () => {
       id="custom-history-modal"
       isShown={isCustomHistoryModalOpen}
       data-uie-name="custom-history-modal"
-      onKeyDown={event => handleEscDown(event, onCancel)}
+      onKeyDown={event => {
+        return handleEscDown(event, onCancel);
+      }}
     >
       <Text>{translate('conversationHistoryModalText')}</Text>
       <FlexBox css={customHistorySharingFormContainerCss}>
         <Input
           wrapperCSS={customHistorySharingInputCss}
           value={historySharingQuantity !== 0 && !isNan(historySharingQuantity) ? historySharingQuantity : ''}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setHistorySharingQuantity(Number(event.target.value))
-          }
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            return setHistorySharingQuantity(Number(event.target.value));
+          }}
         />
 
         <Select
@@ -85,8 +87,12 @@ export const CustomHistoryModal = () => {
           id="history-sharing-unit-select"
           dataUieName="history-sharing-unit-select"
           options={chatHistorySharingUnitOptions}
-          value={chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)}
-          onChange={option => setHistorySharingUnit(option?.value as HistorySharingUnit)}
+          value={chatHistorySharingUnitOptions.find(option => {
+            return option.value === historySharingUnit;
+          })}
+          onChange={option => {
+            return setHistorySharingUnit(option?.value as HistorySharingUnit);
+          }}
         />
       </FlexBox>
 
@@ -97,7 +103,9 @@ export const CustomHistoryModal = () => {
           type="button"
           onClick={onCancel}
           data-uie-name="do-cancel"
-          onKeyDown={event => handleEscDown(event, onCancel)}
+          onKeyDown={event => {
+            return handleEscDown(event, onCancel);
+          }}
         >
           {translate('conversationHistoryModalCancel')}
         </Button>
@@ -107,7 +115,9 @@ export const CustomHistoryModal = () => {
           type="button"
           onClick={onSubmit}
           data-uie-name="do-submit"
-          onKeyDown={event => handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]})}
+          onKeyDown={event => {
+            return handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]});
+          }}
         >
           {translate('conversationHistoryModalApply')}
         </Button>

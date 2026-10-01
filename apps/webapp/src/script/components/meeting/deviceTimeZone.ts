@@ -21,8 +21,10 @@ export type DeviceTimeZone = {
   readonly ianaTimeZoneId: string;
 };
 
-export const createBrowserDeviceTimeZone = (): DeviceTimeZone => ({
-  get ianaTimeZoneId() {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
-  },
-});
+export const createBrowserDeviceTimeZone = (): DeviceTimeZone => {
+  return {
+    get ianaTimeZoneId() {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    },
+  };
+};

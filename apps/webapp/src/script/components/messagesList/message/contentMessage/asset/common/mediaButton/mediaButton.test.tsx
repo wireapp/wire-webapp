@@ -40,7 +40,11 @@ describe('MediaButton', () => {
     const videoElement = document.createElement('video');
 
     return {
-      asset: {downloadProgress: ko.pureComputed(() => 0)} as FileAsset,
+      asset: {
+        downloadProgress: ko.pureComputed(() => {
+          return 0;
+        }),
+      } as FileAsset,
       cancel: noop,
       large: false,
       mediaElement: videoElement,

@@ -39,8 +39,9 @@ export const isMeetingPersistedDespiteSubmitError = (error: MeetingSubmitErrors)
  * Returns whether the meeting was already deleted on the server before the delete flow failed.
  * Callers should refresh / remove the meeting from the list and must not invite a full retry.
  */
-export const isMeetingDeletedDespiteSubmitError = (error: MeetingSubmitErrors): boolean =>
-  error === meetingSubmitErrors.deleteSucceededButLocalCleanupFailed;
+export const isMeetingDeletedDespiteSubmitError = (error: MeetingSubmitErrors): boolean => {
+  return error === meetingSubmitErrors.deleteSucceededButLocalCleanupFailed;
+};
 
 /**
  * Returns whether the meetings list should be refreshed after a failed submit.

@@ -246,7 +246,9 @@ export class Conversation {
 
     this.hasCreationMessage = false;
 
-    this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
+    this.firstUserEntity = ko.pureComputed(() => {
+      return this.participating_user_ets()[0];
+    });
 
     this.isGuest = ko.observable(false);
 
@@ -255,39 +257,52 @@ export class Conversation {
       const isSameDomain = this.domain === this.selfUser()?.domain;
       return !!this.teamId && isSameTeam && !this.isGuest() && isSameDomain;
     });
-    this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
-    this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
-    this.isServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.SERVICES);
-    this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
+    this.isGuestRoom = ko.pureComputed(() => {
+      return this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM;
+    });
+    this.isGuestAndServicesRoom = ko.pureComputed(() => {
+      return this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES;
+    });
+    this.isServicesRoom = ko.pureComputed(() => {
+      return this.accessState() === ACCESS_STATE.TEAM.SERVICES;
+    });
+    this.isTeamOnly = ko.pureComputed(() => {
+      return this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY;
+    });
     this.withAllTeamMembers = ko.observable(false);
 
-    this.isProteusTeam1to1 = ko.pureComputed(() =>
-      isProteusTeam1to1Conversation({
+    this.isProteusTeam1to1 = ko.pureComputed(() => {
+      return isProteusTeam1to1Conversation({
         name: this.name(),
         type: this.type(),
         inTeam: !!this.teamId,
         otherMembersLength: this.participating_user_ids().length,
-      }),
-    );
+      });
+    });
 
-    this.isConversationWithBlockedUser = ko.pureComputed(() => !!this.connection()?.isBlocked());
+    this.isConversationWithBlockedUser = ko.pureComputed(() => {
+      return !!this.connection()?.isBlocked();
+    });
 
     this.isConversationWithDeletedUser = ko.pureComputed(() => {
-      const hasDeletedUser = this.participating_user_ets().some(userEntity => userEntity.isDeleted);
+      const hasDeletedUser = this.participating_user_ets().some(userEntity => {
+        return userEntity.isDeleted;
+      });
       return hasDeletedUser;
     });
 
-    this.is1to1ConversationWithDeletedUser = ko.pureComputed(
-      () => !!this.is1to1() && this.isConversationWithDeletedUser(),
-    );
+    this.is1to1ConversationWithDeletedUser = ko.pureComputed(() => {
+      return !!this.is1to1() && this.isConversationWithDeletedUser();
+    });
 
-    this.isReadOnlyConversation = ko.pureComputed(
-      () =>
+    this.isReadOnlyConversation = ko.pureComputed(() => {
+      return (
         this.isConversationWithBlockedUser() ||
         this.is1to1ConversationWithDeletedUser() ||
         this.readOnlyState() !== null ||
-        this.accessState() === undefined,
-    );
+        this.accessState() === undefined
+      );
+    });
 
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation =
@@ -312,37 +327,63 @@ export class Conversation {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
       return is1to1Conversation || this.isProteusTeam1to1();
     });
-    this.isRequest = ko.pureComputed(
-      () =>
-        this.type() === CONVERSATION_TYPE.CONNECT || (this.is1to1() && this.participating_user_ets()[0]?.isRequest()),
-    );
-    this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
+    this.isRequest = ko.pureComputed(() => {
+      return (
+        this.type() === CONVERSATION_TYPE.CONNECT || (this.is1to1() && this.participating_user_ets()[0]?.isRequest())
+      );
+    });
+    this.isSelf = ko.pureComputed(() => {
+      return this.type() === CONVERSATION_TYPE.SELF;
+    });
 
     this.hasDirectGuest = ko.pureComputed(() => {
-      const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isDirectGuest());
+      const hasGuestUser = this.participating_user_ets().some(userEntity => {
+        return userEntity.isDirectGuest();
+      });
       return hasGuestUser && this.isGroupOrChannel();
     });
     this.hasGuest = ko.pureComputed(() => {
-      const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
+      const hasGuestUser = this.participating_user_ets().some(userEntity => {
+        return userEntity.isGuest();
+      });
       return hasGuestUser && this.isGroupOrChannel();
     });
-    this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
-    this.hasApps = ko.pureComputed(() =>
-      this.participating_user_ets().some(userEntity => userEntity.type === UserType.APP),
-    );
-    this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
-    this.hasFederatedUsers = ko.pureComputed(() =>
-      this.participating_user_ets().some(userEntity => userEntity.isFederated),
-    );
-    this.servicesCount = ko.pureComputed(
-      () => this.participating_user_ets().filter(userEntity => userEntity.isService).length,
-    );
+    this.hasService = ko.pureComputed(() => {
+      return this.participating_user_ets().some(userEntity => {
+        return userEntity.isService;
+      });
+    });
+    this.hasApps = ko.pureComputed(() => {
+      return this.participating_user_ets().some(userEntity => {
+        return userEntity.type === UserType.APP;
+      });
+    });
+    this.hasExternal = ko.pureComputed(() => {
+      return this.participating_user_ets().some(userEntity => {
+        return userEntity.isExternal();
+      });
+    });
+    this.hasFederatedUsers = ko.pureComputed(() => {
+      return this.participating_user_ets().some(userEntity => {
+        return userEntity.isFederated;
+      });
+    });
+    this.servicesCount = ko.pureComputed(() => {
+      return this.participating_user_ets().filter(userEntity => {
+        return userEntity.isService;
+      }).length;
+    });
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(null);
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
-      if (connectedUserId && this.participating_user_ids().every(user => !matchQualifiedIds(user, connectedUserId))) {
+      if (
+        connectedUserId &&
+        this.participating_user_ids().every(user => {
+          return !matchQualifiedIds(user, connectedUserId);
+        })
+      ) {
         this.participating_user_ids.push(connectedUserId);
       }
     });
@@ -370,13 +411,17 @@ export class Conversation {
     });
 
     this.is_archived = this.archivedState;
-    this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
+    this.is_cleared = ko.pureComputed(() => {
+      return this.last_event_timestamp() <= this.cleared_timestamp();
+    });
     this.is_verified = ko.pureComputed(() => {
       if (!this.hasInitializedUsers()) {
         return undefined;
       }
 
-      return this.allUserEntities().every(userEntity => userEntity.is_verified());
+      return this.allUserEntities().every(userEntity => {
+        return userEntity.is_verified();
+      });
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
@@ -384,7 +429,11 @@ export class Conversation {
 
     this.hasLegalHold = ko.computed(() => {
       const isInitialized = this.hasInitializedUsers();
-      const hasLegalHold = isInitialized && this.allUserEntities().some(userEntity => userEntity.isOnLegalHold());
+      const hasLegalHold =
+        isInitialized &&
+        this.allUserEntities().some(userEntity => {
+          return userEntity.isOnLegalHold();
+        });
 
       if (isInitialized) {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
@@ -414,7 +463,9 @@ export class Conversation {
       }
     });
 
-    this.isCreatedBySelf = ko.pureComputed(() => this.selfUser()?.id === this.creator && !this.isSelfUserRemoved());
+    this.isCreatedBySelf = ko.pureComputed(() => {
+      return this.selfUser()?.id === this.creator && !this.isSelfUserRemoved();
+    });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
@@ -430,10 +481,18 @@ export class Conversation {
     this.isSelfUserRemoved = ko.pureComputed(() => {
       return this.status() === ConversationStatus.PAST_MEMBER;
     });
-    this.isActiveParticipant = ko.pureComputed(() => !this.isSelfUserRemoved() && !this.isGuest());
-    this.isClearable = ko.pureComputed(() => !this.isRequest() && !this.is_cleared());
-    this.isLeavable = ko.pureComputed(() => this.isGroupOrChannel() && !this.isSelfUserRemoved());
-    this.isMutable = ko.pureComputed(() => !this.isRequest() && !this.isSelfUserRemoved());
+    this.isActiveParticipant = ko.pureComputed(() => {
+      return !this.isSelfUserRemoved() && !this.isGuest();
+    });
+    this.isClearable = ko.pureComputed(() => {
+      return !this.isRequest() && !this.is_cleared();
+    });
+    this.isLeavable = ko.pureComputed(() => {
+      return this.isGroupOrChannel() && !this.isSelfUserRemoved();
+    });
+    this.isMutable = ko.pureComputed(() => {
+      return !this.isRequest() && !this.isSelfUserRemoved();
+    });
 
     // Messages
     this.localMessageTimer = ko.observable(0);
@@ -482,13 +541,15 @@ export class Conversation {
     });
 
     this.messages_unordered = ko.observableArray();
-    this.messages = ko.pureComputed(() =>
-      this.messages_unordered().toSorted((message_a, message_b) => {
+    this.messages = ko.pureComputed(() => {
+      return this.messages_unordered().toSorted((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
-      }),
-    );
+      });
+    });
 
-    this.lastDeliveredMessage = ko.pureComputed(() => this.getLastDeliveredMessage());
+    this.lastDeliveredMessage = ko.pureComputed(() => {
+      return this.getLastDeliveredMessage();
+    });
 
     this.incomingMessages = ko.observableArray();
 
@@ -496,7 +557,9 @@ export class Conversation {
 
     // Since we release messages from memory when the conversation is not active, we use an observable to keep track of conversations with messages
     this.hasContentMessages = ko.observable(
-      [...this.messages(), ...this.incomingMessages()].some(message => message.isContent()),
+      [...this.messages(), ...this.incomingMessages()].some(message => {
+        return message.isContent();
+      }),
     );
 
     // Calling
@@ -609,10 +672,16 @@ export class Conversation {
 
         const hasUserEntities = isNonEmptyArray(this.participating_user_ets());
         if (hasUserEntities) {
-          const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
+          const isJustServices = this.participating_user_ets().every(userEntity => {
+            return userEntity.isService;
+          });
           const joinedNames = this.participating_user_ets()
-            .filter(userEntity => isJustServices || !userEntity.isService)
-            .map(userEntity => userEntity.name())
+            .filter(userEntity => {
+              return isJustServices || !userEntity.isService;
+            })
+            .map(userEntity => {
+              return userEntity.name();
+            })
             .join(', ');
 
           const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
@@ -632,10 +701,16 @@ export class Conversation {
 
         const hasUserEntities = !!this.participating_user_ets().length;
         if (hasUserEntities) {
-          const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
+          const isJustServices = this.participating_user_ets().every(userEntity => {
+            return userEntity.isService;
+          });
           const joinedNames = this.participating_user_ets()
-            .filter(userEntity => isJustServices || !userEntity.isService)
-            .map(userEntity => userEntity.name())
+            .filter(userEntity => {
+              return isJustServices || !userEntity.isService;
+            })
+            .map(userEntity => {
+              return userEntity.name();
+            })
             .join(', ');
 
           const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
@@ -689,7 +764,9 @@ export class Conversation {
       this.type,
       this.verification_state,
       this.mlsVerificationState,
-    ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
+    ].forEach(property => {
+      (property as ko.Observable).subscribe(this.persistState);
+    });
   }
 
   readonly persistState = (): void => {
@@ -820,7 +897,9 @@ export class Conversation {
       this.updateTimestamps(messageEntity);
     } else if (this.hasLastReceivedMessageLoaded()) {
       this.updateTimestamps(messageEntity);
-      this.incomingMessages.remove(({id}) => messageEntity.id === id);
+      this.incomingMessages.remove(({id}) => {
+        return messageEntity.id === id;
+      });
       // If the last received message is currently in memory, we can add this message to the displayed messages
       this.messages_unordered.push(messageEntity);
     } else {
@@ -837,8 +916,12 @@ export class Conversation {
    */
   addMessages(message_ets: ContentMessage[]): void {
     message_ets = message_ets
-      .map(message_et => this._checkForDuplicate(message_et))
-      .filter(message_et => !!message_et) as ContentMessage[];
+      .map(message_et => {
+        return this._checkForDuplicate(message_et);
+      })
+      .filter(message_et => {
+        return !!message_et;
+      }) as ContentMessage[];
 
     // in order to avoid multiple db writes check the messages from the end and stop once
     // we found a message from self user
@@ -849,8 +932,12 @@ export class Conversation {
         break;
       }
     }
-    const messageIds = message_ets.map(({id}) => id);
-    this.incomingMessages.remove(({id}) => messageIds.includes(id));
+    const messageIds = message_ets.map(({id}) => {
+      return id;
+    });
+    this.incomingMessages.remove(({id}) => {
+      return messageIds.includes(id);
+    });
     this.messages_unordered.push(...message_ets);
   }
 
@@ -867,7 +954,9 @@ export class Conversation {
    * Return the next timestamp that can be used to inject a message right after the last message that is not a message currently being sent
    */
   getNextTimestamp(): number {
-    const sentMessages = this.messages().filter(message => message?.status() !== StatusType.SENDING);
+    const sentMessages = this.messages().filter(message => {
+      return message?.status() !== StatusType.SENDING;
+    });
     if (sentMessages.length === 0) {
       return this.getLastKnownTimestamp() + 1;
     }
@@ -889,7 +978,9 @@ export class Conversation {
   }
 
   getNumberOfServices(): number {
-    return this.participating_user_ets().filter(userEntity => userEntity.isService).length;
+    return this.participating_user_ets().filter(userEntity => {
+      return userEntity.isService;
+    }).length;
   }
 
   getNumberOfParticipants(countSelf: boolean = true, countServices: boolean = true): number {
@@ -918,7 +1009,9 @@ export class Conversation {
    */
   prependMessages(message_ets: ContentMessage[]): void {
     message_ets = message_ets
-      .map(message_et => this._checkForDuplicate(message_et))
+      .map(message_et => {
+        return this._checkForDuplicate(message_et);
+      })
       .filter((messageEntity): messageEntity is ContentMessage => {
         return messageEntity !== undefined;
       });
@@ -942,7 +1035,9 @@ export class Conversation {
    */
   removeMessages(timestamp?: number): void {
     if (timestamp && typeof timestamp === 'number') {
-      this.messages_unordered.remove(message_et => timestamp >= message_et.timestamp());
+      this.messages_unordered.remove(message_et => {
+        return timestamp >= message_et.timestamp();
+      });
       return;
     }
     this.messages_unordered.removeAll();
@@ -1018,10 +1113,11 @@ export class Conversation {
    * Get the oldest loaded message of the conversation.
    */
   getOldestMessage(): Message | undefined {
-    return this.messages().find(
-      message =>
-        // Deleted message should be ignored since they might have a timestamp in the past (the timestamp of a delete message is the timestamp of the message that was deleted)
-        !isDeleteMessage(message),
+    return this.messages().find(message =>
+      // Deleted message should be ignored since they might have a timestamp in the past (the timestamp of a delete message is the timestamp of the message that was deleted)
+      {
+        return !isDeleteMessage(message);
+      },
     );
   }
 
@@ -1030,7 +1126,9 @@ export class Conversation {
    * Variant for getOldestMessage() which checks timestamp too.
    */
   getOldestMessageWithTimestamp(): Message | undefined {
-    return this.messages().find(message => !isDeleteMessage(message) && message.timestamp());
+    return this.messages().find(message => {
+      return !isDeleteMessage(message) && message.timestamp();
+    });
   }
 
   /**
@@ -1073,7 +1171,9 @@ export class Conversation {
    * @param messageId ID of message to be retrieved
    */
   getMessage(messageId: string): Message | undefined {
-    return this.messages().find(messageEntity => messageEntity.id === messageId);
+    return this.messages().find(messageEntity => {
+      return messageEntity.id === messageId;
+    });
   }
   /**
    * Get a message by its replacing message id. Useful if the message in question is an edit and has replaced the original message.
@@ -1082,20 +1182,24 @@ export class Conversation {
    * @param messageId ID of message to be retrieved
    */
   getMessageByReplacementId(messageId: string): Message | undefined {
-    return this.messages().find(
-      messageEntity => isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId,
-    );
+    return this.messages().find(messageEntity => {
+      return isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId;
+    });
   }
 
   updateGuests(): void {
-    this.getTemporaryGuests().forEach(userEntity => userEntity.checkGuestExpiration());
+    this.getTemporaryGuests().forEach(userEntity => {
+      userEntity.checkGuestExpiration();
+    });
   }
 
   getTemporaryGuests(): User[] {
     const selfUser = this.selfUser();
     const userEntities =
       selfUser !== undefined ? this.participating_user_ets().concat(selfUser) : this.participating_user_ets();
-    return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
+    return userEntities.filter(userEntity => {
+      return userEntity.isTemporaryGuest();
+    });
   }
 
   getUsersWithUnverifiedClients(): User[] {
@@ -1147,7 +1251,9 @@ export class Conversation {
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
-      others: this.participating_user_ids().map(user => user.id),
+      others: this.participating_user_ids().map(user => {
+        return user.id;
+      }),
       protocol: this.protocol,
       qualified_others: this.participating_user_ids(),
       receipt_mode: this.receiptMode(),

@@ -19,4 +19,6 @@
 
 import type {RootState} from '../reducer';
 
-export const getLanguage = (state: RootState) => state.languageState.language;
+export const getLanguage = (state: RootState) => {
+  return state.languageState.language;
+};

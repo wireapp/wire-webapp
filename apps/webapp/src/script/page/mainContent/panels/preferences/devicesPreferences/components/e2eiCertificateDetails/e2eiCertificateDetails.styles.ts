@@ -60,10 +60,12 @@ export const styles: stylesProps = {
       marginLeft: '4px',
     },
   },
-  e2eiStatus: (MLSStatus?: MLSStatuses) => ({
-    color: !isNullOrUndefined(MLSStatus) ? MLSStatusColor[MLSStatus] : 'var(--green-500)',
-    marginLeft: '4px',
-  }),
+  e2eiStatus: (MLSStatus?: MLSStatuses) => {
+    return {
+      color: !isNullOrUndefined(MLSStatus) ? MLSStatusColor[MLSStatus] : 'var(--green-500)',
+      marginLeft: '4px',
+    };
+  },
   serialNumberWrapper: {
     marginBlock: '6px',
   },
@@ -77,18 +79,20 @@ export const styles: stylesProps = {
     width: '217px',
     textAlign: 'justify',
   },
-  delimiter: position => ({
-    marginInline: '2px',
+  delimiter: position => {
+    return {
+      marginInline: '2px',
 
-    [`:nth-of-type(${position})`]: {
-      marginRight: 0,
+      [`:nth-of-type(${position})`]: {
+        marginRight: 0,
 
-      '&::after': {
-        content: '""',
-        display: 'block',
+        '&::after': {
+          content: '""',
+          display: 'block',
+        },
       },
-    },
-  }),
+    };
+  },
   buttonsGroup: {
     display: 'flex',
     alignItems: 'center',

@@ -36,11 +36,13 @@ const meta = {
     layout: 'centered',
   },
   decorators: [
-    Story => (
-      <div style={{width: '350px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{width: '350px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   tags: ['autodocs'],
 } satisfies Meta<typeof DatePickerField>;
@@ -55,31 +57,41 @@ const ControlledDatePicker = (args: React.ComponentProps<typeof DatePickerField>
 };
 
 export const Default: Story = {
-  render: args => <ControlledDatePicker {...args} />,
+  render: args => {
+    return <ControlledDatePicker {...args} />;
+  },
   args: {
     dataUieName: 'date-picker-default',
     id: 'date-picker-default',
     labels: defaultLabels,
     ariaLabel: 'Select date',
     value: today(getLocalTimeZone()),
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const WithLabel: Story = {
-  render: args => <ControlledDatePicker {...args} />,
+  render: args => {
+    return <ControlledDatePicker {...args} />;
+  },
   args: {
     dataUieName: 'date-picker-with-label',
     id: 'date-picker-with-label',
     label: 'Date',
     labels: defaultLabels,
     value: today(getLocalTimeZone()),
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const Invalid: Story = {
-  render: args => <ControlledDatePicker {...args} />,
+  render: args => {
+    return <ControlledDatePicker {...args} />;
+  },
   args: {
     dataUieName: 'date-picker-invalid',
     id: 'date-picker-invalid',
@@ -87,12 +99,16 @@ export const Invalid: Story = {
     labels: defaultLabels,
     markInvalid: true,
     value: today(getLocalTimeZone()),
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const Disabled: Story = {
-  render: args => <ControlledDatePicker {...args} />,
+  render: args => {
+    return <ControlledDatePicker {...args} />;
+  },
   args: {
     dataUieName: 'date-picker-disabled',
     id: 'date-picker-disabled',
@@ -100,6 +116,8 @@ export const Disabled: Story = {
     labels: defaultLabels,
     disabled: true,
     value: today(getLocalTimeZone()),
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };

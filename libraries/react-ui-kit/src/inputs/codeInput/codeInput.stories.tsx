@@ -35,20 +35,26 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    onCodeComplete: code => console.log('Code entered:', code),
+    onCodeComplete: code => {
+      return console.log('Code entered:', code);
+    },
   },
 };
 
 export const Invalid: Story = {
   args: {
     markInvalid: true,
-    onCodeComplete: code => console.log('Code entered:', code),
+    onCodeComplete: code => {
+      return console.log('Code entered:', code);
+    },
   },
 };
 
 export const CustomLength: Story = {
   args: {
     digits: 4,
-    onCodeComplete: code => console.log('Code entered:', code),
+    onCodeComplete: code => {
+      return console.log('Code entered:', code);
+    },
   },
 };

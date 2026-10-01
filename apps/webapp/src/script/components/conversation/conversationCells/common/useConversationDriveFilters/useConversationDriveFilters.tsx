@@ -56,16 +56,19 @@ export const useConversationDriveFilters = ({
   const [selectedCreatorIds, setSelectedCreatorIds] = useState<string[]>([]);
   const [isSharedViaLink, setIsSharedViaLink] = useState(false);
 
-  const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
-  const filterState = useMemo<ConversationDriveFiltersState>(
-    () => ({
+  const toggleSharedViaLink = useCallback(() => {
+    return setIsSharedViaLink(prev => {
+      return !prev;
+    });
+  }, []);
+  const filterState = useMemo<ConversationDriveFiltersState>(() => {
+    return {
       selectedTagIds,
       selectedFileTypeIds,
       selectedCreatorIds,
       isSharedViaLink,
-    }),
-    [isSharedViaLink, selectedCreatorIds, selectedFileTypeIds, selectedTagIds],
-  );
+    };
+  }, [isSharedViaLink, selectedCreatorIds, selectedFileTypeIds, selectedTagIds]);
   const clearAllFilters = useCallback(() => {
     setSelectedTagIds([]);
     setSelectedFileTypeIds([]);
@@ -73,21 +76,27 @@ export const useConversationDriveFilters = ({
     setIsSharedViaLink(false);
   }, []);
 
-  const tagItems = useMemo<FilterItem[]>(() => allTags.map(tag => ({id: tag, label: tag})), [allTags]);
-  const activeFilterType = useMemo(() => getActiveConversationDriveFilterType(filterState), [filterState]);
+  const tagItems = useMemo<FilterItem[]>(() => {
+    return allTags.map(tag => {
+      return {id: tag, label: tag};
+    });
+  }, [allTags]);
+  const activeFilterType = useMemo(() => {
+    return getActiveConversationDriveFilterType(filterState);
+  }, [filterState]);
 
-  const fileTypes = useMemo<FilterItem[]>(
-    () =>
-      FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => ({
+  const fileTypes = useMemo<FilterItem[]>(() => {
+    return FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => {
+      return {
         id,
         label: translate(labelKey),
         startContent: <Icon />,
-      })),
-    [translate],
-  );
+      };
+    });
+  }, [translate]);
 
-  const filters = useMemo<FilterConfig[]>(
-    () => [
+  const filters = useMemo<FilterConfig[]>(() => {
+    return [
       {
         type: 'popover',
         id: 'tags',
@@ -126,20 +135,19 @@ export const useConversationDriveFilters = ({
         onToggle: toggleSharedViaLink,
         disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
       },
-    ],
-    [
-      activeFilterType,
-      creatorItems,
-      fileTypes,
-      tagItems,
-      selectedTagIds,
-      selectedFileTypeIds,
-      selectedCreatorIds,
-      isSharedViaLink,
-      toggleSharedViaLink,
-      translate,
-    ],
-  );
+    ];
+  }, [
+    activeFilterType,
+    creatorItems,
+    fileTypes,
+    tagItems,
+    selectedTagIds,
+    selectedFileTypeIds,
+    selectedCreatorIds,
+    isSharedViaLink,
+    toggleSharedViaLink,
+    translate,
+  ]);
 
   return {
     filters,

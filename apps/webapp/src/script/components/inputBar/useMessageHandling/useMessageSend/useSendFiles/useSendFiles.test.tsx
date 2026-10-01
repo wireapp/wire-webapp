@@ -22,8 +22,8 @@ function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
 }
 
-const createFile = (id: string, preview = `blob:${id}`): FileWithPreview =>
-  Object.assign(new File(['content'], `${id}.png`, {type: 'image/png'}), {
+const createFile = (id: string, preview = `blob:${id}`): FileWithPreview => {
+  return Object.assign(new File(['content'], `${id}.png`, {type: 'image/png'}), {
     id,
     preview,
     remoteUuid: `remote-${id}`,
@@ -31,23 +31,28 @@ const createFile = (id: string, preview = `blob:${id}`): FileWithPreview =>
     uploadStatus: 'success' as const,
     uploadProgress: 100,
   });
+};
 
 describe('useSendFiles', () => {
   it('promotes every draft before completing and revokes previews', async () => {
     const repository: Repository = {promoteNodeDraft: jest.fn().mockResolvedValue(undefined)};
-    const revoke = jest.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+    const revoke = jest.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {
+      return undefined;
+    });
     revoke.mockClear();
-    const {result} = renderHook(() =>
-      useSendFiles({
+    const {result} = renderHook(() => {
+      return useSendFiles({
         files: [createFile('one'), createFile('two')],
         cellsRepository: repository as never,
         clearAllFiles: jest.fn(),
         conversationId: 'conversation',
         sendFilesErrorMessage: 'send failed',
-      }),
-    );
+      });
+    });
 
-    await act(async () => result.current.sendFiles());
+    await act(async () => {
+      return result.current.sendFiles();
+    });
 
     expect(repository.promoteNodeDraft).toHaveBeenNthCalledWith(1, {uuid: 'remote-one', versionId: 'version-one'});
     expect(repository.promoteNodeDraft).toHaveBeenNthCalledWith(2, {uuid: 'remote-two', versionId: 'version-two'});
@@ -66,15 +71,15 @@ describe('useSendFiles', () => {
         .mockReturnValueOnce(secondPublication.promise),
     };
     const files = [createFile('one'), createFile('two')];
-    const {result} = renderHook(() =>
-      useSendFiles({
+    const {result} = renderHook(() => {
+      return useSendFiles({
         files,
         cellsRepository: repository as never,
         clearAllFiles: jest.fn(),
         conversationId: 'conversation',
         sendFilesErrorMessage: 'send failed',
-      }),
-    );
+      });
+    });
 
     let sending: Promise<void> | undefined;
     await act(async () => {
@@ -86,7 +91,9 @@ describe('useSendFiles', () => {
     expect(result.current.isLoading).toBe(true);
     secondPublication.resolve();
     firstPublication.resolve();
-    await act(async () => sending);
+    await act(async () => {
+      return sending;
+    });
     expect(result.current.isLoading).toBe(false);
   });
 
@@ -102,17 +109,19 @@ describe('useSendFiles', () => {
       cancelUpload,
     };
     const files = [createFile('one'), createFile('two')];
-    const revoke = jest.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+    const revoke = jest.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {
+      return undefined;
+    });
     revoke.mockClear();
-    const {result} = renderHook(() =>
-      useSendFiles({
+    const {result} = renderHook(() => {
+      return useSendFiles({
         files,
         cellsRepository: repository as never,
         clearAllFiles: jest.fn(),
         conversationId: 'conversation',
         sendFilesErrorMessage: 'send failed',
-      }),
-    );
+      });
+    });
 
     let sending: Promise<void> | undefined;
     await act(async () => {
@@ -123,7 +132,11 @@ describe('useSendFiles', () => {
 
     firstPublication.resolve();
     secondPublication.reject(new Error('second publication failed'));
-    await expect(act(async () => sending)).rejects.toThrow();
+    await expect(
+      act(async () => {
+        return sending;
+      }),
+    ).rejects.toThrow();
 
     expect(revoke).not.toHaveBeenCalled();
     expect(cancelUpload).not.toHaveBeenCalled();

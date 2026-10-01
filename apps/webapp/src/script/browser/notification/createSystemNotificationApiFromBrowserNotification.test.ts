@@ -120,14 +120,20 @@ const createApi = ({
   const {createNotification, createdNotifications} = createPlatformFake(fakeOptions);
   const focusWindow = jest.fn();
   const publishNotificationClick = jest.fn();
-  const requestPermission = jest.fn(async () => permission);
+  const requestPermission = jest.fn(async () => {
+    return permission;
+  });
   const logger = {warn: jest.fn()};
 
   const api = createSystemNotificationApiFromBrowserNotification({
     createNotification,
-    getPermission: () => permission,
+    getPermission: () => {
+      return permission;
+    },
     requestPermission,
-    isSupported: () => true,
+    isSupported: () => {
+      return true;
+    },
     focusWindow,
     publishNotificationClick,
     logger,
@@ -150,9 +156,15 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('reports support from the injected predicate', () => {
     const api = createSystemNotificationApiFromBrowserNotification({
       createNotification: createPlatformFake().createNotification,
-      getPermission: () => 'granted',
-      requestPermission: async () => 'granted',
-      isSupported: () => false,
+      getPermission: () => {
+        return 'granted';
+      },
+      requestPermission: async () => {
+        return 'granted';
+      },
+      isSupported: () => {
+        return false;
+      },
       focusWindow: jest.fn(),
       publishNotificationClick: jest.fn(),
       logger: {warn: jest.fn()},
@@ -177,8 +189,12 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     const {createNotification} = createPlatformFake();
     const api = createSystemNotificationApiFromBrowserNotification({
       createNotification,
-      getPermission: () => 'denied',
-      isSupported: () => false,
+      getPermission: () => {
+        return 'denied';
+      },
+      isSupported: () => {
+        return false;
+      },
       focusWindow: jest.fn(),
       publishNotificationClick: jest.fn(),
       logger: {warn: jest.fn()},

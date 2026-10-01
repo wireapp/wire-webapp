@@ -35,12 +35,19 @@ export const useMeetingListVirtualizer: UseMeetingListVirtualizer = ({
   getScrollElement,
   getEstimatedItemHeight,
   getItemKey,
-}) =>
-  useVirtualizer({
+}) => {
+  return useVirtualizer({
     count: itemCount,
     getScrollElement,
-    estimateSize: itemIndex => getEstimatedItemHeight(itemIndex),
-    getItemKey: itemIndex => getItemKey(itemIndex),
-    measureElement: element => element.getBoundingClientRect().height,
+    estimateSize: itemIndex => {
+      return getEstimatedItemHeight(itemIndex);
+    },
+    getItemKey: itemIndex => {
+      return getItemKey(itemIndex);
+    },
+    measureElement: element => {
+      return element.getBoundingClientRect().height;
+    },
     overscan: MEETING_LIST_OVERSCAN,
   });
+};

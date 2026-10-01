@@ -37,7 +37,9 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 describe('AccountLink', () => {
   it('copies correct text', async () => {
     const mockCopy: any = jest.spyOn(utils, 'copyText');
-    mockCopy.mockImplementation((text: string) => text);
+    mockCopy.mockImplementation((text: string) => {
+      return text;
+    });
 
     render(withTheme(<AccountLink label="test" value="test-value" />), {wrapper: rootProviderWrapper});
 

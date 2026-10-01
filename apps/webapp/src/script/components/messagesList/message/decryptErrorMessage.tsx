@@ -163,7 +163,9 @@ const DecryptErrorMessage: FunctionComponent<DecryptErrorMessageProps> = functio
                   onClick={() => {
                     setIsResettingSession(true);
                     onClickResetSession(message);
-                    setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
+                    setTimeout(() => {
+                      return setIsResettingSession(false);
+                    }, MotionDuration.LONG);
                   }}
                   data-uie-name="do-reset-encryption-session"
                 >

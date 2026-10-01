@@ -141,7 +141,11 @@ export class ConversationRoleRepository {
   private readonly getUserPermissions = (conversation: Conversation, user: User): ConversationRole => {
     const conversationRoles = this.getConversationRoles(conversation);
     const userRole: string = this.getUserRole(conversation, user);
-    return conversationRoles.find(({conversation_role}) => conversation_role === userRole) ?? defaultMemberRole;
+    return (
+      conversationRoles.find(({conversation_role}) => {
+        return conversation_role === userRole;
+      }) ?? defaultMemberRole
+    );
   };
 
   readonly hasPermission = (conversation: Conversation, user: User, permissionName: Permissions): boolean => {

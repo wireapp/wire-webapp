@@ -42,29 +42,40 @@ export interface DriveSearchParams {
 }
 
 const FILE_TYPE_MIME_TERMS: Record<string, readonly string[]> = Object.fromEntries(
-  FILE_TYPE_CATALOG.map(entry => [entry.id, entry.mimeTerms]),
+  FILE_TYPE_CATALOG.map(entry => {
+    return [entry.id, entry.mimeTerms];
+  }),
 );
 
-export const hasActiveConversationDriveFilters = (filters: ConversationDriveFiltersState): boolean =>
-  filters.selectedTagIds.length > 0 ||
-  filters.selectedFileTypeIds.length > 0 ||
-  filters.selectedCreatorIds.length > 0 ||
-  filters.isSharedViaLink;
+export const hasActiveConversationDriveFilters = (filters: ConversationDriveFiltersState): boolean => {
+  return (
+    filters.selectedTagIds.length > 0 ||
+    filters.selectedFileTypeIds.length > 0 ||
+    filters.selectedCreatorIds.length > 0 ||
+    filters.isSharedViaLink
+  );
+};
 
 // True when at least one search-param field is set, i.e. the search call will
 // actually be filtered. Each view runs its own `to…SearchParams` mapper first,
 // then asks this predicate.
-export const hasActiveSearchParams = (params: DriveSearchParams): boolean =>
-  params.tags !== undefined ||
-  params.mimeTypes !== undefined ||
-  params.hasPublicLink !== undefined ||
-  params.creatorIds !== undefined ||
-  params.path !== undefined;
+export const hasActiveSearchParams = (params: DriveSearchParams): boolean => {
+  return (
+    params.tags !== undefined ||
+    params.mimeTypes !== undefined ||
+    params.hasPublicLink !== undefined ||
+    params.creatorIds !== undefined ||
+    params.path !== undefined
+  );
+};
 
-export const hasActiveGlobalDriveFilters = (filters: GlobalDriveFiltersState): boolean =>
-  hasActiveConversationDriveFilters(filters) ||
-  filters.selectedConversationIds.length > 0 ||
-  isNonEmptyString(filters.path);
+export const hasActiveGlobalDriveFilters = (filters: GlobalDriveFiltersState): boolean => {
+  return (
+    hasActiveConversationDriveFilters(filters) ||
+    filters.selectedConversationIds.length > 0 ||
+    isNonEmptyString(filters.path)
+  );
+};
 
 export type ActiveFilterType = 'tags' | 'fileType' | 'createdBy' | 'sharedViaLink' | 'conversation';
 
@@ -86,17 +97,25 @@ export const getActiveConversationDriveFilterType = (
   return null;
 };
 
-export const getActiveGlobalDriveFilterType = (filters: GlobalDriveFiltersState): ActiveFilterType | null =>
-  filters.selectedConversationIds.length > 0 ? 'conversation' : getActiveConversationDriveFilterType(filters);
+export const getActiveGlobalDriveFilterType = (filters: GlobalDriveFiltersState): ActiveFilterType | null => {
+  return filters.selectedConversationIds.length > 0 ? 'conversation' : getActiveConversationDriveFilterType(filters);
+};
 
-export const isFilterTypeDisabled = (filterType: ActiveFilterType, active: ActiveFilterType | null): boolean =>
-  active !== null && active !== filterType;
+export const isFilterTypeDisabled = (filterType: ActiveFilterType, active: ActiveFilterType | null): boolean => {
+  return active !== null && active !== filterType;
+};
 
 const toMimeTypes = (selectedFileTypeIds: string[]): string[] | undefined => {
   if (selectedFileTypeIds.length === 0) {
     return undefined;
   }
-  const mimeTerms = [...new Set(selectedFileTypeIds.flatMap(id => FILE_TYPE_MIME_TERMS[id] ?? []))];
+  const mimeTerms = [
+    ...new Set(
+      selectedFileTypeIds.flatMap(id => {
+        return FILE_TYPE_MIME_TERMS[id] ?? [];
+      }),
+    ),
+  ];
   return mimeTerms.length > 0 ? mimeTerms : undefined;
 };
 
@@ -116,17 +135,21 @@ const toGlobalSearchRootPath = ({
   return conversationPath ?? (isNonEmptyString(path) ? path : undefined);
 };
 
-export const toConversationDriveSearchParams = (filters: ConversationDriveFiltersState): DriveSearchParams => ({
-  tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
-  mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
-  hasPublicLink: filters.isSharedViaLink ? true : undefined,
-  creatorIds: filters.selectedCreatorIds.length > 0 ? filters.selectedCreatorIds : undefined,
-});
+export const toConversationDriveSearchParams = (filters: ConversationDriveFiltersState): DriveSearchParams => {
+  return {
+    tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
+    mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
+    hasPublicLink: filters.isSharedViaLink ? true : undefined,
+    creatorIds: filters.selectedCreatorIds.length > 0 ? filters.selectedCreatorIds : undefined,
+  };
+};
 
-export const toGlobalDriveSearchParams = (filters: GlobalDriveFiltersState): DriveSearchParams => ({
-  tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
-  mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
-  hasPublicLink: filters.isSharedViaLink ? true : undefined,
-  creatorIds: filters.selectedCreatorIds.length > 0 ? filters.selectedCreatorIds : undefined,
-  path: toGlobalSearchRootPath(filters),
-});
+export const toGlobalDriveSearchParams = (filters: GlobalDriveFiltersState): DriveSearchParams => {
+  return {
+    tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
+    mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
+    hasPublicLink: filters.isSharedViaLink ? true : undefined,
+    creatorIds: filters.selectedCreatorIds.length > 0 ? filters.selectedCreatorIds : undefined,
+    path: toGlobalSearchRootPath(filters),
+  };
+};

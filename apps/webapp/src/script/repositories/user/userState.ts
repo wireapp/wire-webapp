@@ -36,13 +36,19 @@ export class UserState {
 
   constructor() {
     this.connectRequests = ko
-      .pureComputed(() => this.users().filter(userEntity => userEntity.isIncomingRequest()))
+      .pureComputed(() => {
+        return this.users().filter(userEntity => {
+          return userEntity.isIncomingRequest();
+        });
+      })
       .extend({rateLimit: 50});
 
     this.connectedUsers = ko
       .pureComputed(() => {
         return this.users()
-          .filter(userEntity => userEntity.isConnected())
+          .filter(userEntity => {
+            return userEntity.isConnected();
+          })
           .toSorted(sortUsersByPriority);
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});

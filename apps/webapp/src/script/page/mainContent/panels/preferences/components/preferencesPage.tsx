@@ -35,7 +35,9 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia(QUERY.tabletSMDown);
 
-  const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {currentView, setCurrentView} = useAppMainState(state => {
+    return state.responsiveView;
+  });
   const isCentralColumn = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
   return (
@@ -46,7 +48,9 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={buttonsStyle}
-            onClick={() => setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR)}
+            onClick={() => {
+              return setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+            }}
           />
         )}
         <h2 className="preferences-titlebar" css={titleStyle(smBreakpoint && isCentralColumn)}>

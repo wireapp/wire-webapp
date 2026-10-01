@@ -29,15 +29,17 @@ interface AvatarBackgroundProps {
 const AvatarBackground: React.FunctionComponent<AvatarBackgroundProps> = ({
   borderRadius = '50%',
   backgroundColor = 'currentColor',
-}) => (
-  <div
-    css={{
-      ...CSS_FILL_PARENT,
-      backgroundColor,
-      borderRadius,
-      transform: 'scale(0.9916)',
-    }}
-  />
-);
+}) => {
+  return (
+    <div
+      css={{
+        ...CSS_FILL_PARENT,
+        backgroundColor,
+        borderRadius,
+        transform: 'scale(0.9916)',
+      }}
+    />
+  );
+};
 
 export {AvatarBackground};

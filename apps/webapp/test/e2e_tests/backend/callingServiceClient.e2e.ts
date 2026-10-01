@@ -65,7 +65,9 @@ export class CallingServiceClientE2E {
     const isActive = instanceStatus === 'ACTIVE';
 
     if (!isActive) {
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 5000);
+      });
       return this.waitForInstanceToBeActive(instanceId);
     }
 
@@ -142,7 +144,9 @@ export class CallingServiceClientE2E {
         return true;
       }
 
-      await new Promise(resolve => setTimeout(resolve, delayBetweenChecks));
+      await new Promise(resolve => {
+        return setTimeout(resolve, delayBetweenChecks);
+      });
     }
 
     throw new Error(`Expected flow data has not changed after timeout of ${timeout}ms.`);

@@ -77,7 +77,9 @@ interface Props {
 export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamState, repository}: Props) => {
   const {translate} = useApplicationContext();
   const [dialogState, setDialogState] = useState<MigrationDialogState>({phase: 'closed'});
-  const isPending = useManualMigrationStore(state => state.pendingConversationIds.has(conversation.qualifiedId.id));
+  const isPending = useManualMigrationStore(state => {
+    return state.pendingConversationIds.has(conversation.qualifiedId.id);
+  });
   const isBusy = isPending || dialogState.phase === 'running';
   const isMounted = useIsMounted();
   const titleId = useId();
@@ -92,7 +94,9 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
     elementRef: wrapper,
     elementSelector: '[data-uie-name="manual-migration-protocol"]',
     enabled: eligible && !isBusy && dialogState.phase === 'closed',
-    onActivate: () => setDialogState({phase: 'confirmation'}),
+    onActivate: () => {
+      return setDialogState({phase: 'confirmation'});
+    },
   });
 
   useEffect(() => {
@@ -130,7 +134,9 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
       conversation,
       selfUser,
       repository,
-      getFeature: () => Maybe.of(teamState.teamFeatures()?.mlsMigration),
+      getFeature: () => {
+        return Maybe.of(teamState.teamFeatures()?.mlsMigration);
+      },
     });
 
     if (!isMounted()) {
@@ -140,7 +146,9 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
     setDialogState({
       phase: 'feedback',
       message: outcome.match({
-        Ok: () => translate('manualMlsMigrationSuccess'),
+        Ok: () => {
+          return translate('manualMlsMigrationSuccess');
+        },
         Err: error => {
           const cause = error.cause;
           if (cause.isJust) {
@@ -165,7 +173,9 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
       {dialogState.phase !== 'closed' && (
         <ModalComponent
           isShown
-          onOpened={() => cancelButton.current?.focus()}
+          onOpened={() => {
+            return cancelButton.current?.focus();
+          }}
           aria-labelledby={titleId}
           aria-busy={dialogState.phase === 'running'}
           wrapperCSS={modalWrapperStyles}

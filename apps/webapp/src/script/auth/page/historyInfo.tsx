@@ -96,7 +96,9 @@ const HistoryInfoComponent = ({
           type="button"
           onClick={onContinue}
           data-uie-name="do-history-confirm"
-          onKeyDown={event => handleEnterDown(event, onContinue)}
+          onKeyDown={event => {
+            return handleEnterDown(event, onContinue);
+          }}
         >
           {translate('historyInfo.ok')}
         </Button>
@@ -111,22 +113,25 @@ const HistoryInfoComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  clients: ClientSelector.getClients(state),
-  isFeching: ClientSelector.isFetching(state),
-  currentSelfClient: ClientSelector.getCurrentSelfClient(state),
-  hasLoadedClients: ClientSelector.hasLoadedClients(state),
-  isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    clients: ClientSelector.getClients(state),
+    isFeching: ClientSelector.isFetching(state),
+    currentSelfClient: ClientSelector.getCurrentSelfClient(state),
+    hasLoadedClients: ClientSelector.hasLoadedClients(state),
+    isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       doGetAllClients: actionRoot.clientAction.doGetAllClients,
     },
     dispatch,
   );
+};
 
 const HistoryInfo = connect(mapStateToProps, mapDispatchToProps)(HistoryInfoComponent);
 

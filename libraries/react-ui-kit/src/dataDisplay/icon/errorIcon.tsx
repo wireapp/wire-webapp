@@ -19,15 +19,17 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ErrorIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={13} realHeight={12} {...props}>
-    <g transform="translate(.5 .333)" fill="none" fillRule="evenodd">
-      <circle fill="#E02020" cx="6" cy="6" r="6" />
-      <text fontFamily="SFProText-Heavy, SF Pro Text" fontSize="9" fontWeight="600" fill="#FFF">
-        <tspan x="4.291" y="9">
-          !
-        </tspan>
-      </text>
-    </g>
-  </SVGIcon>
-);
+export const ErrorIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={13} realHeight={12} {...props}>
+      <g transform="translate(.5 .333)" fill="none" fillRule="evenodd">
+        <circle fill="#E02020" cx="6" cy="6" r="6" />
+        <text fontFamily="SFProText-Heavy, SF Pro Text" fontSize="9" fontWeight="600" fill="#FFF">
+          <tspan x="4.291" y="9">
+            !
+          </tspan>
+        </text>
+      </g>
+    </SVGIcon>
+  );
+};

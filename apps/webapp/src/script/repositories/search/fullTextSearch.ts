@@ -27,8 +27,12 @@ export const getSearchRegex = (query: string): RegExp => {
   const regex = query
     .trim()
     .split(delimiter)
-    .filter(word => isNonEmptyString(word))
-    .map(word => `(${escapeRegex(word)})`)
+    .filter(word => {
+      return isNonEmptyString(word);
+    })
+    .map(word => {
+      return `(${escapeRegex(word)})`;
+    })
     .join('(?:.*)');
 
   return new RegExp(regex, flags);

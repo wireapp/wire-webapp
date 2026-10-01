@@ -30,10 +30,14 @@ import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './userDetails';
 
-jest.mock('Components/avatar', () => ({
-  Avatar: () => <div data-testid="mock-avatar" />,
-  AVATAR_SIZE: {X_LARGE: 'x-large'},
-}));
+jest.mock('Components/avatar', () => {
+  return {
+    Avatar: () => {
+      return <div data-testid="mock-avatar" />;
+    },
+    AVATAR_SIZE: {X_LARGE: 'x-large'},
+  };
+});
 
 function renderWithRootProvider(element: ReactElement) {
   return render(

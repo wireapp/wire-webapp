@@ -57,7 +57,9 @@ const WirelessContainer = ({showCookiePolicyBanner, onCookiePolicyBannerClose, c
         >
           <div style={{margin: '16px 40px', textAlign: 'center', width: '100%'}}>
             <Link
-              onClick={(event: React.MouseEvent<HTMLAnchorElement>) => onCookiePolicyBannerClose?.(event)}
+              onClick={(event: React.MouseEvent<HTMLAnchorElement>) => {
+                return onCookiePolicyBannerClose?.(event);
+              }}
               href={Config.getConfig().URL.PRIVACY_POLICY}
               style={{fontSize: '1rem'}}
               target="_blank"
@@ -69,14 +71,18 @@ const WirelessContainer = ({showCookiePolicyBanner, onCookiePolicyBannerClose, c
                 id="cookiePolicyStrings.bannerText"
                 values={{
                   newline: <br />,
-                  strong: (...chunks: any[]) => <strong>{chunks}</strong>,
+                  strong: (...chunks: any[]) => {
+                    return <strong>{chunks}</strong>;
+                  },
                 }}
               />
             </Link>
           </div>
           <button
             type="button"
-            onClick={(event: React.MouseEvent<HTMLButtonElement>) => onCookiePolicyBannerClose?.(event)}
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+              return onCookiePolicyBannerClose?.(event);
+            }}
             style={{
               background: 'none',
               border: 'none',

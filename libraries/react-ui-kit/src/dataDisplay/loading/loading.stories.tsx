@@ -27,11 +27,13 @@ const meta: Meta<typeof Loading> = {
   component: Loading,
   title: 'dataDisplay/loading',
   decorators: [
-    Story => (
-      <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   argTypes: {
     color: {control: 'color'},
@@ -65,61 +67,71 @@ export const CustomColor: Story = {
   },
 };
 
-export const Variants = () => (
-  <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
-    <Loading />
-    <Loading progress={0.33} />
-    <Loading progress={0.66} size={100} />
-  </div>
-);
-
-export const ColorVariants = () => (
-  <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
-    <Loading color={COLOR.BLUE} />
-    <Loading color={COLOR.GREEN} />
-    <Loading color={COLOR.RED} />
-    <Loading color={COLOR.ORANGE} />
-  </div>
-);
-
-export const SizeVariants = () => (
-  <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
-    <Loading size={24} />
-    <Loading size={48} />
-    <Loading size={72} />
-    <Loading size={96} />
-  </div>
-);
-
-export const ProgressStages = () => (
-  <div style={{display: 'flex', flexDirection: 'column', gap: '32px'}}>
+export const Variants = () => {
+  return (
     <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
-      <Loading progress={0} />
-      <Loading progress={0.25} />
-      <Loading progress={0.5} />
-      <Loading progress={0.75} />
-      <Loading progress={1} />
-    </div>
-    <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
-      <Loading size={72} progress={0} />
-      <Loading size={72} progress={0.25} />
-      <Loading size={72} progress={0.5} />
-      <Loading size={72} progress={0.75} />
-      <Loading size={72} progress={1} />
-    </div>
-  </div>
-);
-
-export const OnDifferentBackgrounds = () => (
-  <div style={{display: 'flex', gap: '32px'}}>
-    <div style={{padding: '24px', backgroundColor: COLOR.WHITE}}>
       <Loading />
+      <Loading progress={0.33} />
+      <Loading progress={0.66} size={100} />
     </div>
-    <div style={{padding: '24px', backgroundColor: COLOR.GRAY}}>
-      <Loading color={COLOR.WHITE} />
+  );
+};
+
+export const ColorVariants = () => {
+  return (
+    <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
+      <Loading color={COLOR.BLUE} />
+      <Loading color={COLOR.GREEN} />
+      <Loading color={COLOR.RED} />
+      <Loading color={COLOR.ORANGE} />
     </div>
-    <div style={{padding: '24px', backgroundColor: COLOR.BLACK}}>
-      <Loading color={COLOR.WHITE} />
+  );
+};
+
+export const SizeVariants = () => {
+  return (
+    <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
+      <Loading size={24} />
+      <Loading size={48} />
+      <Loading size={72} />
+      <Loading size={96} />
     </div>
-  </div>
-);
+  );
+};
+
+export const ProgressStages = () => {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '32px'}}>
+      <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
+        <Loading progress={0} />
+        <Loading progress={0.25} />
+        <Loading progress={0.5} />
+        <Loading progress={0.75} />
+        <Loading progress={1} />
+      </div>
+      <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
+        <Loading size={72} progress={0} />
+        <Loading size={72} progress={0.25} />
+        <Loading size={72} progress={0.5} />
+        <Loading size={72} progress={0.75} />
+        <Loading size={72} progress={1} />
+      </div>
+    </div>
+  );
+};
+
+export const OnDifferentBackgrounds = () => {
+  return (
+    <div style={{display: 'flex', gap: '32px'}}>
+      <div style={{padding: '24px', backgroundColor: COLOR.WHITE}}>
+        <Loading />
+      </div>
+      <div style={{padding: '24px', backgroundColor: COLOR.GRAY}}>
+        <Loading color={COLOR.WHITE} />
+      </div>
+      <div style={{padding: '24px', backgroundColor: COLOR.BLACK}}>
+        <Loading color={COLOR.WHITE} />
+      </div>
+    </div>
+  );
+};

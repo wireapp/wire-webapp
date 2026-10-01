@@ -22,7 +22,9 @@ const stubNotifications = () => {
 
   Object.defineProperty(notificationRepository, 'notifications', {
     configurable: true,
-    get: () => currentNotifications,
+    get: () => {
+      return currentNotifications;
+    },
     set: nextNotifications => {
       const newNotifications = nextNotifications.slice(currentNotifications.length);
       window.__wireNotifications = window.__wireNotifications.concat(newNotifications);
@@ -41,12 +43,16 @@ const getNotifications = async (page: Page) => {
      * It's necessary to construct a new object containing the important properties of the notification
      * since the class would otherwise be serialized as empty object.
      */
-    window.__wireNotifications.map(notification => ({
-      title: notification.title,
-      body: notification.body,
-      data: notification.data,
-      icon: notification.icon,
-    })),
+    {
+      return window.__wireNotifications.map(notification => {
+        return {
+          title: notification.title,
+          body: notification.body,
+          data: notification.data,
+          icon: notification.icon,
+        };
+      });
+    },
   );
 };
 
@@ -65,11 +71,14 @@ const clickNotification = async (
         const notifications = await getNotifications(page);
 
         // Find a notification matching the given properties
-        const index = notifications.findIndex(
-          n =>
-            // Ignore the property if it's undefined
-            (notification.title !== undefined ? n.title === notification.title : true) &&
-            (notification.body !== undefined ? n.body === notification.body : true),
+        const index = notifications.findIndex(n =>
+          // Ignore the property if it's undefined
+          {
+            return (
+              (notification.title !== undefined ? n.title === notification.title : true) &&
+              (notification.body !== undefined ? n.body === notification.body : true)
+            );
+          },
         );
 
         if (index < 0)
@@ -78,7 +87,9 @@ const clickNotification = async (
           );
 
         // If found trigger its "onclick" callback
-        await page.evaluate(index => window.__wireNotifications.at(index)?.onclick?.(new Event('click')), index);
+        await page.evaluate(index => {
+          return window.__wireNotifications.at(index)?.onclick?.(new Event('click'));
+        }, index);
       }).toPass({timeout: options?.timeout, intervals: [1_000]});
     },
     {box: true},

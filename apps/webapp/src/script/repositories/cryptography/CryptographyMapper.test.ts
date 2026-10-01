@@ -53,7 +53,9 @@ describe('CryptographyMapper', () => {
   const coreMock = {
     service: {
       asset: {
-        decryptAsset: jest.fn(payload => Promise.resolve(payload.cipherText)),
+        decryptAsset: jest.fn(payload => {
+          return Promise.resolve(payload.cipherText);
+        }),
       },
     },
   };

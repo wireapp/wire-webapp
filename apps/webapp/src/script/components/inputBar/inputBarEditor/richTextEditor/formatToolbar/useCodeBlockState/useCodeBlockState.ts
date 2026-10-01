@@ -39,11 +39,15 @@ export const useCodeBlockState = () => {
       const isCodeBlock = isCodeBlockNode(anchorNode);
 
       if (isCodeBlock) {
-        $setBlocksType(selection, () => $createParagraphNode());
+        $setBlocksType(selection, () => {
+          return $createParagraphNode();
+        });
         return;
       }
 
-      $setBlocksType(selection, () => $createCodeNode());
+      $setBlocksType(selection, () => {
+        return $createCodeNode();
+      });
     });
   };
 

@@ -76,11 +76,17 @@ const createController = (state: UploadState | readonly UploadState[] = uploadSt
   const dismissedUploadIdsByConversation = new Map<string, Set<string>>();
 
   return {
-    snapshots: jest.fn(scope => (scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [])),
-    subscribe: jest.fn((_listener: () => void) => jest.fn()),
+    snapshots: jest.fn(scope => {
+      return scope === conversationQualifiedId ? (Array.isArray(state) ? state : [state]) : [];
+    }),
+    subscribe: jest.fn((_listener: () => void) => {
+      return jest.fn();
+    }),
     upload: jest.fn(),
     updateRefresh: jest.fn(),
-    cancel: jest.fn(async (_uploadId: string): Promise<void> => undefined),
+    cancel: jest.fn(async (_uploadId: string): Promise<void> => {
+      return undefined;
+    }),
     retryUpload: jest.fn(),
     retryPublish: jest.fn(),
     discard: jest.fn(),
@@ -90,7 +96,9 @@ const createController = (state: UploadState | readonly UploadState[] = uploadSt
       dismissedUploadIds.add(uploadId);
       dismissedUploadIdsByConversation.set(scope, dismissedUploadIds);
     }),
-    isDismissed: jest.fn((scope, uploadId) => dismissedUploadIdsByConversation.get(scope)?.has(uploadId) ?? false),
+    isDismissed: jest.fn((scope, uploadId) => {
+      return dismissedUploadIdsByConversation.get(scope)?.has(uploadId) ?? false;
+    }),
   };
 };
 
@@ -100,8 +108,8 @@ const renderHost = (
   isEnabled = true,
   isFileTabActive = true,
   translate = translateForTest,
-) =>
-  render(
+) => {
+  return render(
     <SharedDriveUploadStatusPopupHost
       controller={controller}
       conversationQualifiedId={scope}
@@ -110,6 +118,7 @@ const renderHost = (
     />,
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
   );
+};
 
 describe('SharedDriveUploadStatusPopupHost', () => {
   it('does not render when direct upload is disabled', () => {
@@ -122,7 +131,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const controller = createController();
     let state: UploadState | null = null;
     let notify: () => void = jest.fn();
-    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId && state ? [state] : []));
+    controller.snapshots.mockImplementation(scope => {
+      return scope === conversationQualifiedId && state ? [state] : [];
+    });
     controller.subscribe.mockImplementation(listener => {
       notify = listener;
       return jest.fn();
@@ -132,7 +143,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).not.toBeInTheDocument();
 
     state = uploadState;
-    act(() => notify());
+    act(() => {
+      return notify();
+    });
 
     expect(document.querySelector('[data-uie-name="shared-drive-upload-status-popup"]')).toBeInTheDocument();
   });
@@ -143,15 +156,17 @@ describe('SharedDriveUploadStatusPopupHost', () => {
       uploadState,
       {...uploadState, identity: {uploadId: 'upload-2'}, source: {...uploadSource, name: 'second.jpg'}},
       {...failedState, identity: {uploadId: 'upload-3'}},
-      ...Array.from({length: 4}, (_, index) => ({
-        ...uploadedState,
-        identity: {
-          uploadId: `upload-${index + 4}`,
-          resourceUuid: `resource-${index + 4}`,
-          versionId: `version-${index + 4}`,
-        },
-        source: {...uploadSource, name: `uploaded-${index + 4}.txt`},
-      })),
+      ...Array.from({length: 4}, (_, index) => {
+        return {
+          ...uploadedState,
+          identity: {
+            uploadId: `upload-${index + 4}`,
+            resourceUuid: `resource-${index + 4}`,
+            versionId: `version-${index + 4}`,
+          },
+          source: {...uploadSource, name: `uploaded-${index + 4}.txt`},
+        };
+      }),
     ];
     const controller = createController(statuses);
     const translateAggregate: Translate = (key, substitutions) => {
@@ -172,7 +187,11 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(
       within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {name: 'Cancel all'}),
     ).toBeInTheDocument();
-    expect(Array.from(rows).map(row => row.querySelector('strong')?.textContent)).toEqual([
+    expect(
+      Array.from(rows).map(row => {
+        return row.querySelector('strong')?.textContent;
+      }),
+    ).toEqual([
       'report.pdf',
       'second.jpg',
       'report.pdf',
@@ -348,19 +367,24 @@ describe('SharedDriveUploadStatusPopupHost', () => {
   it('keeps each row cancel disabled until its own batch cancellation settles', async () => {
     const user = userEvent.setup();
     const secondUploadState = {...uploadState, identity: {...uploadState.identity, uploadId: 'upload-2'}};
-    let rejectFirst: () => void = () => undefined;
-    let resolveSecond: () => void = () => undefined;
+    let rejectFirst: () => void = () => {
+      return undefined;
+    };
+    let resolveSecond: () => void = () => {
+      return undefined;
+    };
     const controller = createController([uploadState, secondUploadState]);
-    controller.cancel.mockImplementation(
-      uploadId =>
-        new Promise<void>((resolve, reject) => {
-          if (uploadId === 'upload-1') {
-            rejectFirst = () => reject(new Error('first cancellation failed'));
-          } else {
-            resolveSecond = resolve;
-          }
-        }),
-    );
+    controller.cancel.mockImplementation(uploadId => {
+      return new Promise<void>((resolve, reject) => {
+        if (uploadId === 'upload-1') {
+          rejectFirst = () => {
+            return reject(new Error('first cancellation failed'));
+          };
+        } else {
+          resolveSecond = resolve;
+        }
+      });
+    });
     const view = renderHost(controller, conversationQualifiedId);
 
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
@@ -369,19 +393,23 @@ describe('SharedDriveUploadStatusPopupHost', () => {
         name: 'cells.uploadStatus.cancelAll',
       }),
     );
-    const rowCancels = view
-      .getAllByTestId('shared-drive-upload-status-row')
-      .map(row => within(row).getByRole('button', {name: 'conversationAssetUploadCancel'}));
+    const rowCancels = view.getAllByTestId('shared-drive-upload-status-row').map(row => {
+      return within(row).getByRole('button', {name: 'conversationAssetUploadCancel'});
+    });
     expect(rowCancels).toHaveLength(2);
     expect(rowCancels[0]).toBeDisabled();
     expect(rowCancels[1]).toBeDisabled();
 
     rejectFirst();
-    await waitFor(() => expect(rowCancels[0]).not.toBeDisabled());
+    await waitFor(() => {
+      return expect(rowCancels[0]).not.toBeDisabled();
+    });
     expect(rowCancels[1]).toBeDisabled();
 
     resolveSecond();
-    await waitFor(() => expect(rowCancels[1]).not.toBeDisabled());
+    await waitFor(() => {
+      return expect(rowCancels[1]).not.toBeDisabled();
+    });
   });
 
   it('keeps the popup visible when row cancellation fails', async () => {
@@ -396,7 +424,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(cancel);
 
     expect(controller.cancel).toHaveBeenCalledWith('upload-1');
-    await waitFor(() => expect(view.queryByRole('status')).toBeInTheDocument());
+    await waitFor(() => {
+      return expect(view.queryByRole('status')).toBeInTheDocument();
+    });
   });
 
   it('dismisses a successful upload from the header close action', async () => {
@@ -444,7 +474,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const dismissedUploadIds = new Set<string>();
     const queriedUploadIds: string[] = [];
     const controller = createController(states);
-    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? states : []));
+    controller.snapshots.mockImplementation(scope => {
+      return scope === conversationQualifiedId ? states : [];
+    });
     controller.dismiss.mockImplementation((scope, uploadId) => {
       if (scope === conversationQualifiedId) {
         dismissedUploadIds.add(uploadId);
@@ -474,7 +506,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
         source: {...uploadSource, relativePath: 'Marketing/report.pdf'},
       },
     ];
-    act(() => notify());
+    act(() => {
+      return notify();
+    });
 
     expect(view.getByRole('status')).toBeInTheDocument();
     expect(queriedUploadIds).toContain('folder:second-marketing-upload');
@@ -495,9 +529,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
       ...uploadedState,
       identity: {...uploadedState.identity, uploadId: 'upload-2'},
     };
-    controller.snapshots.mockImplementation(scope =>
-      scope === conversationQualifiedId ? [failedState, secondUploadedState] : [],
-    );
+    controller.snapshots.mockImplementation(scope => {
+      return scope === conversationQualifiedId ? [failedState, secondUploadedState] : [];
+    });
 
     const view = renderHost(controller, conversationQualifiedId);
 
@@ -530,18 +564,17 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     };
     const controller = createController([failedState, secondFailedState]);
     const retrySettlements = new Map<string, {resolve: () => void; reject: (reason?: unknown) => void}>();
-    controller.retryUpload.mockImplementation(
-      uploadId =>
-        new Promise<void>((resolve, reject) => {
-          retrySettlements.set(uploadId, {resolve, reject});
-        }),
-    );
+    controller.retryUpload.mockImplementation(uploadId => {
+      return new Promise<void>((resolve, reject) => {
+        retrySettlements.set(uploadId, {resolve, reject});
+      });
+    });
     const view = renderHost(controller, conversationQualifiedId);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
-    const retryButtons = view
-      .getAllByTestId('shared-drive-upload-status-row')
-      .map(row => within(row).getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
+    const retryButtons = view.getAllByTestId('shared-drive-upload-status-row').map(row => {
+      return within(row).getByRole('button', {name: 'conversationFilePreviewErrorRetry'});
+    });
     await user.click(retryButtons[0]);
     await user.click(retryButtons[1]);
 
@@ -551,11 +584,15 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(retryButtons[1]).toBeDisabled();
 
     retrySettlements.get('upload-1')?.resolve();
-    await waitFor(() => expect(retryButtons[0]).not.toBeDisabled());
+    await waitFor(() => {
+      return expect(retryButtons[0]).not.toBeDisabled();
+    });
     expect(retryButtons[1]).toBeDisabled();
 
     retrySettlements.get('upload-2')?.reject(new Error('retry failed'));
-    await waitFor(() => expect(retryButtons[1]).not.toBeDisabled());
+    await waitFor(() => {
+      return expect(retryButtons[1]).not.toBeDisabled();
+    });
   });
 
   it('keeps retry available when a retry fails', async () => {
@@ -567,9 +604,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     await user.click(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'}));
 
-    await waitFor(() =>
-      expect(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'})).not.toBeDisabled(),
-    );
+    await waitFor(() => {
+      return expect(view.getByRole('button', {name: 'conversationFilePreviewErrorRetry'})).not.toBeDisabled();
+    });
   });
 
   it('retries publication when the upload succeeded but promotion failed', async () => {
@@ -621,7 +658,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const controller = createController(uploadState);
     let state: UploadState = uploadState;
     let notify: () => void = jest.fn();
-    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? [state] : []));
+    controller.snapshots.mockImplementation(scope => {
+      return scope === conversationQualifiedId ? [state] : [];
+    });
     controller.subscribe.mockImplementation(listener => {
       notify = listener;
       return jest.fn();
@@ -634,7 +673,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     for (const [index, nextProgress] of [0.1, 0.45, 0.8].entries()) {
       state = {...uploadState, progress: nextProgress};
-      act(() => notify());
+      act(() => {
+        return notify();
+      });
       expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
       expect(screen.getAllByTestId('shared-drive-upload-progress')).toHaveLength(1);
       expect(screen.getAllByTestId('shared-drive-upload-uploading')).toHaveLength(1);
@@ -655,14 +696,18 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const controller = createController(failedState);
     let state: UploadState = failedState;
     let notify: () => void = jest.fn();
-    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? [state] : []));
+    controller.snapshots.mockImplementation(scope => {
+      return scope === conversationQualifiedId ? [state] : [];
+    });
     controller.subscribe.mockImplementation(listener => {
       notify = listener;
       return jest.fn();
     });
     controller.retryUpload.mockImplementation(async () => {
       state = uploadState;
-      act(() => notify());
+      act(() => {
+        return notify();
+      });
     });
     const view = renderHost(controller, conversationQualifiedId);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
@@ -675,8 +720,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
   it('formats the source size in the expanded status copy', async () => {
     const user = userEvent.setup();
     const controller = createController();
-    const translate = (key: string, substitutions?: Record<string, string | number>) =>
-      substitutions?.size ? `${key} ${substitutions.size}` : key;
+    const translate = (key: string, substitutions?: Record<string, string | number>) => {
+      return substitutions?.size ? `${key} ${substitutions.size}` : key;
+    };
 
     const view = renderHost(controller, conversationQualifiedId, true, true, translate);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
@@ -711,7 +757,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const controller = createController();
     let state: UploadState = uploadState;
     let notify: () => void = jest.fn();
-    controller.snapshots.mockImplementation(scope => (scope === conversationQualifiedId ? [state] : []));
+    controller.snapshots.mockImplementation(scope => {
+      return scope === conversationQualifiedId ? [state] : [];
+    });
     controller.subscribe.mockImplementation(listener => {
       notify = listener;
       return jest.fn();
@@ -721,7 +769,9 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(screen.getByRole('button', {name: 'cells.uploadStatus.expand'})).toHaveAttribute('aria-expanded', 'false');
 
     state = uploadedState;
-    act(() => notify());
+    act(() => {
+      return notify();
+    });
 
     expect(screen.getByText('cells.uploadStatus.uploaded')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'cells.uploadStatus.expand'})).toHaveAttribute('aria-expanded', 'false');

@@ -100,8 +100,12 @@ export class StorageService {
     ) => {
       transaction.on('complete', () => {
         this.dbListeners
-          .filter(listener => listener.store === table && listener.type === eventType)
-          .forEach(({callback}) => callback({obj: updatedObj, oldObj: obj}));
+          .filter(listener => {
+            return listener.store === table && listener.type === eventType;
+          })
+          .forEach(({callback}) => {
+            callback({obj: updatedObj, oldObj: obj});
+          });
       });
     };
 
@@ -111,14 +115,18 @@ export class StorageService {
       db.table(table).hook(
         DEXIE_CRUD_EVENT.UPDATING,
         function (modifications: Object, primaryKey: string, obj: Object, transaction: Transaction): void {
-          this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
+          this.onsuccess = updatedObj => {
+            return callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
+          };
         },
       );
 
       db.table(table).hook(
         DEXIE_CRUD_EVENT.DELETING,
         function (primaryKey: string, obj: Object, transaction: Transaction): void {
-          this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, {}, transaction);
+          this.onsuccess = (): void => {
+            return callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, {}, transaction);
+          };
         },
       );
     });
@@ -144,8 +152,12 @@ export class StorageService {
   async clearStores(): Promise<void[]> {
     const deleteStorePromises = Object.keys(this.db?._dbSchema ?? [])
       // avoid clearing tables needed by third parties (dexie-observable for eg)
-      .filter(table => !table.startsWith('_'))
-      .map(storeName => this.deleteStore(storeName));
+      .filter(table => {
+        return !table.startsWith('_');
+      })
+      .map(storeName => {
+        return this.deleteStore(storeName);
+      });
     return Promise.all(deleteStorePromises);
   }
 
@@ -193,7 +205,9 @@ export class StorageService {
    * @returns Resolves when the stores have been deleted
    */
   async deleteStores(storeNames: string[]): Promise<void> {
-    const deleteStorePromises = storeNames.map(storeName => this.deleteStore(storeName));
+    const deleteStorePromises = storeNames.map(storeName => {
+      return this.deleteStore(storeName);
+    });
     await Promise.all(deleteStorePromises);
   }
 
@@ -206,7 +220,9 @@ export class StorageService {
       .table(storeName)
       .where('id')
       .equals(eventId)
-      .and(record => record.conversation === conversationId)
+      .and(record => {
+        return record.conversation === conversationId;
+      })
       .delete();
   }
 
@@ -219,7 +235,9 @@ export class StorageService {
       .table(storeName)
       .where('conversation')
       .equals(conversationId)
-      .filter(record => !isNonEmptyString(isoDate) || isoDate >= record.time)
+      .filter(record => {
+        return !isNonEmptyString(isoDate) || isoDate >= record.time;
+      })
       .delete();
   }
 
@@ -248,7 +266,9 @@ export class StorageService {
       return [];
     }
     const database = this.db;
-    return tableNames.map(tableName => database.table(tableName));
+    return tableNames.map(tableName => {
+      return database.table(tableName);
+    });
   }
 
   /**
@@ -326,8 +346,12 @@ export class StorageService {
 
   private notifyListeners<T, U>(storeName: string, eventType: DEXIE_CRUD_EVENT, oldRecord: T, newRecord: U): void {
     this.dbListeners
-      .filter(dbListener => dbListener.store === storeName && dbListener.type === eventType)
-      .forEach(dbListener => dbListener.callback({obj: newRecord, oldObj: oldRecord}));
+      .filter(dbListener => {
+        return dbListener.store === storeName && dbListener.type === eventType;
+      })
+      .forEach(dbListener => {
+        dbListener.callback({obj: newRecord, oldObj: oldRecord});
+      });
   }
 
   /**

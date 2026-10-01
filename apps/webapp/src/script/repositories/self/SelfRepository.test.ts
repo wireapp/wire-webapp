@@ -162,7 +162,9 @@ describe('SelfRepository', () => {
       jest.spyOn(requireValueForTest(container.resolve(Core).service?.client), 'deleteClient');
       jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
 
-      const expectedClients = [...initialClients].filter(client => client.id !== clientToDelete.id);
+      const expectedClients = [...initialClients].filter(client => {
+        return client.id !== clientToDelete.id;
+      });
 
       await selfRepository.deleteSelfUserClient(clientToDelete.id);
 

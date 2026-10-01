@@ -22,11 +22,13 @@ const source: UploadSource = {
   size: 7,
 };
 
-const createRepository = () => ({
-  uploadNodeDraft: jest.fn().mockResolvedValue({uuid: identity.resourceUuid, versionId: identity.versionId}),
-  promoteNodeDraft: jest.fn().mockResolvedValue(undefined),
-  deleteNodeDraft: jest.fn().mockResolvedValue(undefined),
-});
+const createRepository = () => {
+  return {
+    uploadNodeDraft: jest.fn().mockResolvedValue({uuid: identity.resourceUuid, versionId: identity.versionId}),
+    promoteNodeDraft: jest.fn().mockResolvedValue(undefined),
+    deleteNodeDraft: jest.fn().mockResolvedValue(undefined),
+  };
+};
 
 describe('createCellsRepositoryGateway', () => {
   it('forwards the manager identity, path, abort controller, and progress callback', async () => {
@@ -113,8 +115,12 @@ describe('createCellsRepositoryGateway', () => {
     expect(forwardedFile.size).toBe(7);
     const content = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => reject(reader.error);
+      reader.onload = () => {
+        return resolve(String(reader.result));
+      };
+      reader.onerror = () => {
+        return reject(reader.error);
+      };
       reader.readAsText(forwardedFile);
     });
     expect(content).toBe('payload');
@@ -204,13 +210,23 @@ describe('createCellsRepositoryGateway', () => {
   it('lets manager cancellation abort the controller forwarded to the repository', async () => {
     const {promise: uploadPromise, resolve: resolveUpload} = Promise.withResolvers<void>();
     const repository = createRepository();
-    repository.uploadNodeDraft.mockImplementation(() => uploadPromise);
+    repository.uploadNodeDraft.mockImplementation(() => {
+      return uploadPromise;
+    });
     const manager = createCellsUploadManager({
       gateway: createCellsRepositoryGateway(repository),
-      createResourceUuid: () => identity.resourceUuid,
-      createVersionUuid: () => identity.versionId,
-      createAttemptId: () => 'attempt-1',
-      createAbortController: () => new AbortController(),
+      createResourceUuid: () => {
+        return identity.resourceUuid;
+      },
+      createVersionUuid: () => {
+        return identity.versionId;
+      },
+      createAttemptId: () => {
+        return 'attempt-1';
+      },
+      createAbortController: () => {
+        return new AbortController();
+      },
     });
 
     manager.register(identity.uploadId, source, 'conversation-path');

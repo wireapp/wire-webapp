@@ -32,8 +32,9 @@ const timeFormatterOptions: Intl.DateTimeFormatOptions = {
   minute: '2-digit',
 };
 
-const getTimeFormatter = (locale: string = navigator.language): Intl.DateTimeFormat =>
-  new Intl.DateTimeFormat(locale, timeFormatterOptions);
+const getTimeFormatter = (locale: string = navigator.language): Intl.DateTimeFormat => {
+  return new Intl.DateTimeFormat(locale, timeFormatterOptions);
+};
 
 export const parseTimeLabel = (value: string | number): {hour24: number; minutes: number} => {
   const [timePart, periodPart] = `${value}`.trim().split(/\s+/);
@@ -61,14 +62,15 @@ export const formatTimeLabel = (hour24: number, minutes: number, locale?: string
     .replace(/[\u00a0\u202f]/g, ' ');
 };
 
-export const buildTimeOptions = (locale?: string): Option[] =>
-  Array.from({length: TIME_OPTIONS_COUNT}, (_value, index) => {
+export const buildTimeOptions = (locale?: string): Option[] => {
+  return Array.from({length: TIME_OPTIONS_COUNT}, (_value, index) => {
     const totalMinutes = index * TIME_INTERVAL_MINUTES;
     const hour24 = Math.floor(totalMinutes / MINUTES_PER_HOUR);
     const minutes = totalMinutes % MINUTES_PER_HOUR;
     const value = `${String(hour24).padStart(TIME_LABEL_DIGITS, '0')}:${String(minutes).padStart(TIME_LABEL_DIGITS, '0')}`;
     return {value, label: formatTimeLabel(hour24, minutes, locale)};
   });
+};
 
 export const getTimeOptionTotalMinutes = (option: Option): number => {
   const {hour24, minutes} = parseTimeLabel(option.value);
@@ -78,7 +80,9 @@ export const getTimeOptionTotalMinutes = (option: Option): number => {
 export const filterTimeOptionsAfter = (options: Option[], minTime: Date): Option[] => {
   const minTotalMinutes = minTime.getHours() * MINUTES_PER_HOUR + minTime.getMinutes();
 
-  return options.filter(option => getTimeOptionTotalMinutes(option) > minTotalMinutes);
+  return options.filter(option => {
+    return getTimeOptionTotalMinutes(option) > minTotalMinutes;
+  });
 };
 
 export const timeOptionFromDate = (date: Date, locale?: string): Option => {

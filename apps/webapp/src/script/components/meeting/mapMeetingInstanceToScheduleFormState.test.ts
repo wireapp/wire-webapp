@@ -39,23 +39,25 @@ const createMeetingInstance = (
   seriesOverrides: Partial<MeetingSeries> = {},
   start = '2026-06-15T10:00:00.000Z',
   end = '2026-06-15T11:00:00.000Z',
-): MeetingInstance => ({
-  meetingSeries: {
-    series_start_date: '2026-06-01T10:00:00.000Z',
-    series_end_date: '2026-06-01T11:00:00.000Z',
-    duration_ms: 3_600_000,
-    recurrence: 'weekly',
-    conversation_id: 'conv-id',
-    qualified_conversation: {id: 'conv-id', domain: 'example.com'},
-    title: 'Weekly sync',
-    qualified_id: {id: 'meeting-id', domain: 'example.com'},
-    qualified_creator: {id: 'creator-id', domain: 'example.com'},
-    tzid: 'Europe/Berlin',
-    ...seriesOverrides,
-  },
-  start: new Date(start),
-  end: new Date(end),
-});
+): MeetingInstance => {
+  return {
+    meetingSeries: {
+      series_start_date: '2026-06-01T10:00:00.000Z',
+      series_end_date: '2026-06-01T11:00:00.000Z',
+      duration_ms: 3_600_000,
+      recurrence: 'weekly',
+      conversation_id: 'conv-id',
+      qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+      title: 'Weekly sync',
+      qualified_id: {id: 'meeting-id', domain: 'example.com'},
+      qualified_creator: {id: 'creator-id', domain: 'example.com'},
+      tzid: 'Europe/Berlin',
+      ...seriesOverrides,
+    },
+    start: new Date(start),
+    end: new Date(end),
+  };
+};
 
 describe('mapMeetingInstanceToScheduleFormState', () => {
   it('maps the edit anchor start/end for recurring meetings when today’s slot has ended', () => {

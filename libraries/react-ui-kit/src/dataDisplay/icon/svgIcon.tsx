@@ -37,13 +37,12 @@ export interface SVGIconProps<T = SVGSVGElement> extends React.SVGProps<T> {
   width?: number;
 }
 
-const svgIconStyle: <T>(theme: Theme, props: SVGIconProps<T>) => CSSObject = (
-  theme,
-  {color = theme.general.color},
-) => ({
-  fill: color,
-  overflow: 'visible',
-});
+const svgIconStyle: <T>(theme: Theme, props: SVGIconProps<T>) => CSSObject = (theme, {color = theme.general.color}) => {
+  return {
+    fill: color,
+    overflow: 'visible',
+  };
+};
 
 export const SVGIcon = ({
   realWidth,
@@ -67,7 +66,9 @@ export const SVGIcon = ({
   const shadowId = shadow === true ? Math.random().toString() : undefined;
   return (
     <svg
-      css={(theme: Theme) => svgIconStyle(theme, fill === 'none' ? {color: 'transparent'} : props)}
+      css={(theme: Theme) => {
+        return svgIconStyle(theme, fill === 'none' ? {color: 'transparent'} : props);
+      }}
       viewBox={`0 0 ${realWidth} ${realHeight}`}
       width={newWidth}
       height={newHeight}

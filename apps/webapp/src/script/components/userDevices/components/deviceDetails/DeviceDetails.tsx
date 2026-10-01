@@ -139,27 +139,33 @@ export const DeviceDetails = ({
   const [fingerprintRemote, setFingerprintRemote] = useState<string>();
   const [isResettingSession, setIsResettingSession] = useState(false);
 
-  const clientMeta = useMemo(() => device?.meta, [device]);
+  const clientMeta = useMemo(() => {
+    return device?.meta;
+  }, [device]);
 
   const {isVerified} = useKoSubscribableChildren(clientMeta, ['isVerified']);
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 
   useEffect(() => {
     setFingerprintRemote(undefined);
-    void cryptographyRepository
-      .getRemoteFingerprint(user.qualifiedId, device.id)
-      .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
+    void cryptographyRepository.getRemoteFingerprint(user.qualifiedId, device.id).then(remoteFingerprint => {
+      return setFingerprintRemote(remoteFingerprint);
+    });
   }, [cryptographyRepository, device, user.qualifiedId]);
 
   const clickToToggleDeviceVerification = () => {
     const toggleVerified = !isVerified;
-    clientRepository
-      .verifyClient(user.qualifiedId, device, toggleVerified)
-      .catch((error: unknown) => logger.warn(`Failed to toggle client verification: ${toError(error).message}`));
+    clientRepository.verifyClient(user.qualifiedId, device, toggleVerified).catch((error: unknown) => {
+      return logger.warn(`Failed to toggle client verification: ${toError(error).message}`);
+    });
   };
 
   const clickToResetSession = () => {
-    const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
+    const _resetProgress = () => {
+      return window.setTimeout(() => {
+        return setIsResettingSession(false);
+      }, MotionDuration.LONG);
+    };
     const conversation = user.isMe
       ? conversationState.getSelfProteusConversation()
       : conversationState.activeConversation();

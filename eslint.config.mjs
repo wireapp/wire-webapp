@@ -47,7 +47,7 @@ const ignores = [
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/webapp/src/sw.js',
-  'apps/server/bin/',
+  'apps/server/bin/copy_server_assets.js',
   'apps/server/coverage/',
   'apps/server/dist/',
   'apps/server/node_modules/',
@@ -356,6 +356,22 @@ const productionConfigs = [
     },
   },
   {
+    files: ['**/*.mts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}', 'tools/release-cli/webappVersionSynchronization.mts'],
     languageOptions: {
       parser: tsParser,
@@ -465,10 +481,19 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/release-cli/webappVersionSynchronization.mts'],
+    files: ['tools/release-cli/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.release-cli.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: ['tools/build-artifact/**/*.mts', 'tools/runtime-verification/**/*.mts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.tools.json',
         projectService: false,
       },
     },
@@ -1233,6 +1258,20 @@ const config = [
   {ignores},
   {linterOptions: repositoryLinterOptions},
   ...productionConfigs,
+  {
+    files: ['**/*.{ts,tsx,mts}'],
+    rules: {
+      'arrow-body-style': ['error', 'always'],
+      'array-callback-return': [
+        'error',
+        {
+          allowImplicit: false,
+          checkForEach: true,
+          allowVoid: false,
+        },
+      ],
+    },
+  },
   {
     files: testTypeScriptFilePatterns,
     linterOptions: testLinterOptions,

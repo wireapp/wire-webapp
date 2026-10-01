@@ -37,12 +37,24 @@ describe('PriorityQueue', () => {
       queue = new PriorityQueue();
 
       const results = await Promise.all([
-        queue.add(() => Promise.resolve('ape')),
-        queue.add(() => Promise.resolve('bear')),
-        queue.add(() => Promise.resolve('cat')),
-        queue.add(() => Promise.resolve('dog')),
-        queue.add(() => Promise.resolve('eagle')),
-        queue.add(() => Promise.resolve('falcon')),
+        queue.add(() => {
+          return Promise.resolve('ape');
+        }),
+        queue.add(() => {
+          return Promise.resolve('bear');
+        }),
+        queue.add(() => {
+          return Promise.resolve('cat');
+        }),
+        queue.add(() => {
+          return Promise.resolve('dog');
+        }),
+        queue.add(() => {
+          return Promise.resolve('eagle');
+        }),
+        queue.add(() => {
+          return Promise.resolve('falcon');
+        }),
       ]);
 
       expect(results[0]).toBe('ape');
@@ -59,7 +71,9 @@ describe('PriorityQueue', () => {
       }
 
       queue = new PriorityQueue();
-      const value = await queue.add(() => happyFn());
+      const value = await queue.add(() => {
+        return happyFn();
+      });
 
       expect(value).toBe('happy');
     });
@@ -68,10 +82,18 @@ describe('PriorityQueue', () => {
       queue = new PriorityQueue();
 
       const results = await Promise.all([
-        queue.add(() => 'ape'),
-        queue.add(() => 'cat'),
-        queue.add(() => 'dog'),
-        queue.add(() => 'zebra'),
+        queue.add(() => {
+          return 'ape';
+        }),
+        queue.add(() => {
+          return 'cat';
+        }),
+        queue.add(() => {
+          return 'dog';
+        }),
+        queue.add(() => {
+          return 'zebra';
+        }),
       ]);
 
       expect(results[0]).toBe('ape');
@@ -87,21 +109,51 @@ describe('PriorityQueue', () => {
 
       queue = new PriorityQueue({maxRetries: 3, retryDelay: 100});
       try {
-        await queue.add(() => notHappyFn());
+        await queue.add(() => {
+          return notHappyFn();
+        });
       } catch (error) {
         expect((error as Error).message).toBe('not so happy');
       }
     });
 
     it('supports adding a label', async () => {
-      const promise = new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
+      const promise = new Promise<void>(resolve => {
+        return setTimeout(() => {
+          return resolve();
+        }, 10000);
+      });
 
       queue = new PriorityQueue();
 
-      void queue.add(() => promise, Priority.LOW, 'get request');
-      void queue.add(() => promise, Priority.LOW, 'put request');
-      void queue.add(() => promise, Priority.MEDIUM, 'access token refresh');
-      void queue.add(() => promise, Priority.LOW, 'another get request');
+      void queue.add(
+        () => {
+          return promise;
+        },
+        Priority.LOW,
+        'get request',
+      );
+      void queue.add(
+        () => {
+          return promise;
+        },
+        Priority.LOW,
+        'put request',
+      );
+      void queue.add(
+        () => {
+          return promise;
+        },
+        Priority.MEDIUM,
+        'access token refresh',
+      );
+      void queue.add(
+        () => {
+          return promise;
+        },
+        Priority.LOW,
+        'another get request',
+      );
 
       const promisesByPriority = queue.all;
       expect(promisesByPriority[0].label).toBe('access token refresh');
@@ -134,13 +186,29 @@ describe('PriorityQueue', () => {
 
   describe('"delete"', () => {
     it("deletes a Promise from the queue by it's UUID", () => {
-      const promise = new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
+      const promise = new Promise<void>(resolve => {
+        return setTimeout(() => {
+          return resolve();
+        }, 10000);
+      });
 
       queue = new PriorityQueue();
-      void queue.add(() => promise, Priority.LOW);
-      void queue.add(() => promise, Priority.LOW);
-      void queue.add(() => promise, Priority.LOW, 'delete-me');
-      void queue.add(() => promise, Priority.LOW);
+      void queue.add(() => {
+        return promise;
+      }, Priority.LOW);
+      void queue.add(() => {
+        return promise;
+      }, Priority.LOW);
+      void queue.add(
+        () => {
+          return promise;
+        },
+        Priority.LOW,
+        'delete-me',
+      );
+      void queue.add(() => {
+        return promise;
+      }, Priority.LOW);
 
       // When adding four items, three are in the queue and one is in progress.
       expect(queue.all.length).toBe(3);
@@ -154,12 +222,22 @@ describe('PriorityQueue', () => {
 
   describe('"deleteAll"', () => {
     it('deletes all queued Promises', () => {
-      const promise = new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
+      const promise = new Promise<void>(resolve => {
+        return setTimeout(() => {
+          return resolve();
+        }, 10000);
+      });
 
       queue = new PriorityQueue();
-      void queue.add(() => promise);
-      void queue.add(() => promise);
-      void queue.add(() => promise);
+      void queue.add(() => {
+        return promise;
+      });
+      void queue.add(() => {
+        return promise;
+      });
+      void queue.add(() => {
+        return promise;
+      });
 
       // When adding three items, two are in the queue and one is in progress.
       expect(queue.all.length).toBe(2);

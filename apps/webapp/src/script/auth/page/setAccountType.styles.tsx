@@ -23,7 +23,9 @@ import {COLOR_V2, WIDTH} from '@wireapp/react-ui-kit';
 
 const breakpoints = [WIDTH.TABLET_MAX, WIDTH.DESKTOP_MAX];
 
-const [mediaQueryTablet, mediaQueryDesktop] = breakpoints.map(bp => `@media (max-width: ${bp}px)`);
+const [mediaQueryTablet, mediaQueryDesktop] = breakpoints.map(bp => {
+  return `@media (max-width: ${bp}px)`;
+});
 
 export const styles: {
   container: CSSObject;
@@ -97,19 +99,21 @@ export const styles: {
       width: '100%',
     },
   },
-  optionContainer: (isHighlighted?: boolean) => ({
-    padding: '24px',
-    borderRadius: 12,
-    border: '1px solid',
-    borderColor: isHighlighted === true ? 'var(--accent-color)' : 'var(--text-input-border)',
-    flex: 1,
-    height: 360,
-    position: 'relative',
-    background: COLOR_V2.WHITE,
-    [mediaQueryDesktop]: {
-      margin: '16px 0',
-    },
-  }),
+  optionContainer: (isHighlighted?: boolean) => {
+    return {
+      padding: '24px',
+      borderRadius: 12,
+      border: '1px solid',
+      borderColor: isHighlighted === true ? 'var(--accent-color)' : 'var(--text-input-border)',
+      flex: 1,
+      height: 360,
+      position: 'relative',
+      background: COLOR_V2.WHITE,
+      [mediaQueryDesktop]: {
+        margin: '16px 0',
+      },
+    };
+  },
   optionFeatureContainer: {
     gap: '8px',
   },

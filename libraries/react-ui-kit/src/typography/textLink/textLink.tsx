@@ -28,12 +28,22 @@ export type TextLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 export const textLinkStyle: <T>(theme: Theme, props: TextLinkProps<T>) => CSSObject = (
   theme,
   {color = COLOR_V2.BLUE, fontSize = theme.fontSizes.base, bold = false, textTransform = 'none', ...props},
-) => ({
-  ...linkStyle(theme, {bold, color, fontSize, textTransform, ...props}),
-});
+) => {
+  return {
+    ...linkStyle(theme, {bold, color, fontSize, textTransform, ...props}),
+  };
+};
 
-export const TextLink = ({children, ...props}: TextLinkProps<HTMLAnchorElement>) => (
-  <a css={(theme: Theme) => textLinkStyle(theme, props)} rel="noopener noreferrer" {...filterLinkProps(props)}>
-    {children}
-  </a>
-);
+export const TextLink = ({children, ...props}: TextLinkProps<HTMLAnchorElement>) => {
+  return (
+    <a
+      css={(theme: Theme) => {
+        return textLinkStyle(theme, props);
+      }}
+      rel="noopener noreferrer"
+      {...filterLinkProps(props)}
+    >
+      {children}
+    </a>
+  );
+};

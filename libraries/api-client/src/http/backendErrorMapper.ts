@@ -87,45 +87,63 @@ const INVALID_TOKEN_MESSAGES = new Set<string>([
  */
 const defaultHandlers: StatusCodeToLabelMap = {
   [StatusCode.BAD_REQUEST]: {
-    [BackendErrorLabel.CLIENT_ERROR]: e => new BackendError('Wrong set of parameters.', e.label, e.code),
+    [BackendErrorLabel.CLIENT_ERROR]: e => {
+      return new BackendError('Wrong set of parameters.', e.label, e.code);
+    },
 
-    [BackendErrorLabel.INVALID_INVITATION_CODE]: e =>
-      new InvalidInvitationCodeError('Invalid invitation code.', e.label, e.code),
-    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE]: e =>
-      new MLSInvalidLeafNodeSignatureError('Invalid leaf node signature', e.label, e.code),
+    [BackendErrorLabel.INVALID_INVITATION_CODE]: e => {
+      return new InvalidInvitationCodeError('Invalid invitation code.', e.label, e.code);
+    },
+    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE]: e => {
+      return new MLSInvalidLeafNodeSignatureError('Invalid leaf node signature', e.label, e.code);
+    },
 
-    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX]: e =>
-      new MLSInvalidLeafNodeIndexError('Invalid leaf node index', e.label, e.code),
+    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX]: e => {
+      return new MLSInvalidLeafNodeIndexError('Invalid leaf node index', e.label, e.code);
+    },
   },
 
   [StatusCode.FORBIDDEN]: {
     [BackendErrorLabel.INVALID_CREDENTIALS]: e =>
       // default to logout-safe type for unknown messages
-      new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code),
+      {
+        return new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code);
+      },
 
-    [BackendErrorLabel.CLIENT_ERROR]: e => new BackendError('Operation not permitted.', e.label, e.code),
+    [BackendErrorLabel.CLIENT_ERROR]: e => {
+      return new BackendError('Operation not permitted.', e.label, e.code);
+    },
 
-    [BackendErrorLabel.NOT_CONNECTED]: e => new UnconnectedUserError('Users are not connected.', e.label, e.code),
+    [BackendErrorLabel.NOT_CONNECTED]: e => {
+      return new UnconnectedUserError('Users are not connected.', e.label, e.code);
+    },
 
-    [BackendErrorLabel.INVALID_OPERATION]: e =>
-      new ConversationOperationError('Cannot perform this operation.', e.label, e.code),
+    [BackendErrorLabel.INVALID_OPERATION]: e => {
+      return new ConversationOperationError('Cannot perform this operation.', e.label, e.code);
+    },
 
-    [BackendErrorLabel.SUSPENDED_ACCOUNT]: e => new SuspendedAccountError('Account suspended.', e.label, e.code),
+    [BackendErrorLabel.SUSPENDED_ACCOUNT]: e => {
+      return new SuspendedAccountError('Account suspended.', e.label, e.code);
+    },
   },
 
   [StatusCode.TOO_MANY_REQUESTS]: {
-    [BackendErrorLabel.CLIENT_ERROR]: e =>
-      new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.', e.label, e.code),
+    [BackendErrorLabel.CLIENT_ERROR]: e => {
+      return new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.', e.label, e.code);
+    },
   },
 
   [StatusCode.CONFLICT]: {
-    [BackendErrorLabel.INVITE_EMAIL_EXISTS]: e =>
-      new InviteEmailInUseError('The given e-mail address is in use.', e.label, e.code),
+    [BackendErrorLabel.INVITE_EMAIL_EXISTS]: e => {
+      return new InviteEmailInUseError('The given e-mail address is in use.', e.label, e.code);
+    },
 
-    [BackendErrorLabel.KEY_EXISTS]: e =>
-      new IdentifierExistsError('The given e-mail address is in use.', e.label, e.code),
-    [BackendErrorLabel.MLS_STALE_MESSAGE]: e =>
-      new MLSStaleMessageError('The conversation epoch in a message is too old', e.label, e.code),
+    [BackendErrorLabel.KEY_EXISTS]: e => {
+      return new IdentifierExistsError('The given e-mail address is in use.', e.label, e.code);
+    },
+    [BackendErrorLabel.MLS_STALE_MESSAGE]: e => {
+      return new MLSStaleMessageError('The conversation epoch in a message is too old', e.label, e.code);
+    },
     [BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC]: error => {
       const missingUsers = getMlsGroupOutOfSyncMissingUsers(error);
       if (missingUsers !== undefined) {
@@ -140,7 +158,9 @@ const defaultHandlers: StatusCodeToLabelMap = {
     },
   },
   [StatusCode.NOT_FOUND]: {
-    [BackendErrorLabel.NOT_FOUND]: e => new ServiceNotFoundError('Service not found', e.label, e.code),
+    [BackendErrorLabel.NOT_FOUND]: e => {
+      return new ServiceNotFoundError('Service not found', e.label, e.code);
+    },
   },
 };
 
@@ -151,38 +171,51 @@ const defaultHandlers: StatusCodeToLabelMap = {
 const messageVariantHandlers: StatusCodeToMessageVariantMap = {
   [StatusCode.BAD_REQUEST]: {
     [BackendErrorLabel.CLIENT_ERROR]: {
-      [MESSAGE_BAD_REQUEST_SATISFY]: e => new BackendError('Wrong set of parameters.', e.label, e.code),
-      [MESSAGE_INVALID_CONVERSATION_UUID]: e =>
-        new ConversationIsUnknownError('Conversation ID is unknown.', e.label, e.code),
-      [MESSAGE_INVALID_USER_UUID]: e => new UserIsUnknownError('User ID is unknown.', e.label, e.code),
+      [MESSAGE_BAD_REQUEST_SATISFY]: e => {
+        return new BackendError('Wrong set of parameters.', e.label, e.code);
+      },
+      [MESSAGE_INVALID_CONVERSATION_UUID]: e => {
+        return new ConversationIsUnknownError('Conversation ID is unknown.', e.label, e.code);
+      },
+      [MESSAGE_INVALID_USER_UUID]: e => {
+        return new UserIsUnknownError('User ID is unknown.', e.label, e.code);
+      },
     },
   },
   [StatusCode.FORBIDDEN]: {
     [BackendErrorLabel.INVALID_CREDENTIALS]: {
-      [MESSAGE_INVALID_ZAUTH_TOKEN]: e =>
-        new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code),
-      [MESSAGE_INVALID_TOKEN]: e =>
-        new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code),
-      [MESSAGE_AUTHENTICATION_FAILED]: e =>
-        new InvalidCredentialsError('Authentication failed because of invalid credentials.', e.label, e.code),
-      [MESSAGE_MISSING_COOKIE]: e =>
-        new MissingCookieError('Authentication failed because the cookie is missing.', e.label, e.code),
-      [MESSAGE_TOKEN_EXPIRED]: e =>
-        new TokenExpiredError('Authentication failed because the token is expired.', e.label, e.code),
-      [MESSAGE_MISSING_COOKIE_AND_TOKEN]: e =>
-        new MissingCookieAndTokenError(
+      [MESSAGE_INVALID_ZAUTH_TOKEN]: e => {
+        return new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code);
+      },
+      [MESSAGE_INVALID_TOKEN]: e => {
+        return new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code);
+      },
+      [MESSAGE_AUTHENTICATION_FAILED]: e => {
+        return new InvalidCredentialsError('Authentication failed because of invalid credentials.', e.label, e.code);
+      },
+      [MESSAGE_MISSING_COOKIE]: e => {
+        return new MissingCookieError('Authentication failed because the cookie is missing.', e.label, e.code);
+      },
+      [MESSAGE_TOKEN_EXPIRED]: e => {
+        return new TokenExpiredError('Authentication failed because the token is expired.', e.label, e.code);
+      },
+      [MESSAGE_MISSING_COOKIE_AND_TOKEN]: e => {
+        return new MissingCookieAndTokenError(
           'Authentication failed because both cookie and token are missing.',
           e.label,
           e.code,
-        ),
+        );
+      },
     },
     [BackendErrorLabel.INVALID_OPERATION]: {
-      [MESSAGE_INVALID_OPERATION_FOR_ONE_TO_ONE]: e =>
-        new ConversationOperationError('Cannot leave 1:1 conversation.', e.label, e.code),
+      [MESSAGE_INVALID_OPERATION_FOR_ONE_TO_ONE]: e => {
+        return new ConversationOperationError('Cannot leave 1:1 conversation.', e.label, e.code);
+      },
     },
     [BackendErrorLabel.CLIENT_ERROR]: {
-      [MESSAGE_FAILED_READING_INVALID_ZAUTH_TOKEN]: e =>
-        new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code),
+      [MESSAGE_FAILED_READING_INVALID_ZAUTH_TOKEN]: e => {
+        return new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code);
+      },
     },
   },
 };

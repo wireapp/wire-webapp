@@ -29,16 +29,18 @@ const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 
-const baseFormState = (): ScheduleMeetingFormState => ({
-  title: 'Weekly sync',
-  start: maybe.just(futureStartDate),
-  end: maybe.just(futureEndDate),
-  recurrence: 'weekly',
-  selectedUsers: [],
-  participantsFilter: '',
-  password: '',
-  passwordConfirmation: '',
-});
+const baseFormState = (): ScheduleMeetingFormState => {
+  return {
+    title: 'Weekly sync',
+    start: maybe.just(futureStartDate),
+    end: maybe.just(futureEndDate),
+    recurrence: 'weekly',
+    selectedUsers: [],
+    participantsFilter: '',
+    password: '',
+    passwordConfirmation: '',
+  };
+};
 
 describe('mapScheduleFormToUpdateMeetingCommand', () => {
   it('maps form state and edit context to an update command', () => {

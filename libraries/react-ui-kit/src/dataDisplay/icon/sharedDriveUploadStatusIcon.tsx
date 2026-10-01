@@ -34,19 +34,21 @@ const spinnerStyles: CSSObject = {
   },
 };
 
-export const SharedDriveUploadStatusIcon = (props: SVGIconProps) => (
-  <svg width="24" height="25" viewBox="0 0 24 25" fill="none" {...props}>
-    <circle cx="12" cy="12" r="11.25" fill="none" stroke="var(--accent-color-highlight, #e7f0fa)" strokeWidth="1.5" />
-    <g css={spinnerStyles}>
+export const SharedDriveUploadStatusIcon = (props: SVGIconProps) => {
+  return (
+    <svg width="24" height="25" viewBox="0 0 24 25" fill="none" {...props}>
+      <circle cx="12" cy="12" r="11.25" fill="none" stroke="var(--accent-color-highlight, #e7f0fa)" strokeWidth="1.5" />
+      <g css={spinnerStyles}>
+        <path
+          d="M12.2792 0.88967C18.4591 1.03197 23.3536 6.15716 23.2113 12.3371C23.069 18.517 17.9438 23.4115 11.7639 23.2692C9.49701 23.217 7.40313 22.4944 5.66734 21.2952"
+          stroke="var(--accent-color, #0667c8)"
+          strokeWidth="1.5"
+        />
+      </g>
       <path
-        d="M12.2792 0.88967C18.4591 1.03197 23.3536 6.15716 23.2113 12.3371C23.069 18.517 17.9438 23.4115 11.7639 23.2692C9.49701 23.217 7.40313 22.4944 5.66734 21.2952"
-        stroke="var(--accent-color, #0667c8)"
-        strokeWidth="1.5"
+        d="M11.3418 9.91852L7.90336 13.3569L6.97528 12.4289L12.0001 7.40405L17.0249 12.4289L16.0968 13.3569L12.6543 9.91439L12.6543 16.5916L11.3418 16.5916L11.3418 9.91852Z"
+        fill="var(--accent-color, #0667c8)"
       />
-    </g>
-    <path
-      d="M11.3418 9.91852L7.90336 13.3569L6.97528 12.4289L12.0001 7.40405L17.0249 12.4289L16.0968 13.3569L12.6543 9.91439L12.6543 16.5916L11.3418 16.5916L11.3418 9.91852Z"
-      fill="var(--accent-color, #0667c8)"
-    />
-  </svg>
-);
+    </svg>
+  );
+};

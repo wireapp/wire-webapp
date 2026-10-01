@@ -147,9 +147,9 @@ export const useMessageHandling = ({
 
         const quote = messageEntity.quote();
         if (quote != null) {
-          void messageRepository
-            .getMessageInConversationById(conversation, quote.messageId)
-            .then(quotedMessage => replyMessageCallback(quotedMessage));
+          void messageRepository.getMessageInConversationById(conversation, quote.messageId).then(quotedMessage => {
+            return replyMessageCallback(quotedMessage);
+          });
         }
       }
     },

@@ -43,7 +43,9 @@ describe('Login', () => {
     const email = 'email@mail.com';
     const password = 'password';
 
-    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => {
+      return Promise.resolve();
+    });
 
     const {getByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 
@@ -71,9 +73,11 @@ describe('Login', () => {
     const email = 'email@mail.com';
     const password = 'password';
 
-    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() =>
-      Promise.reject(new BackendError('Too many clients', BackendErrorLabel.TOO_MANY_CLIENTS, StatusCodes.NOT_FOUND)),
-    );
+    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => {
+      return Promise.reject(
+        new BackendError('Too many clients', BackendErrorLabel.TOO_MANY_CLIENTS, StatusCodes.NOT_FOUND),
+      );
+    });
 
     const {getByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 
@@ -101,7 +105,9 @@ describe('Login', () => {
     const handle = 'extra-long-handle-with-special-characters...';
     const password = 'password';
 
-    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => {
+      return Promise.resolve();
+    });
 
     const {getByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 

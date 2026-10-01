@@ -110,35 +110,94 @@ const initialState = {
 /**
  * Hook to manage the state of the Create Conversation Modal.
  */
-export const useCreateConversationModal = create<CreateConversationModalState>(set => ({
-  ...initialState,
-  showModal: () => set(state => ({...state, isOpen: true})),
-  hideModal: () => set({...initialState}),
-  setConversationName: (name: string) => set({conversationName: name}),
-  setAccess: (access: ConversationAccess) =>
-    set(state => ({
-      access,
-      manager: access === ConversationAccess.Public ? ADD_PERMISSION.EVERYONE : state.moderator,
-    })),
-  setModerator: (moderator: ADD_PERMISSION) => set({moderator}),
-  setChatHistory: (history?: ChatHistory) => set({chatHistory: history ?? ChatHistory.Off}),
-  setConversationType: (conversationType: ConversationType) => set({conversationType}),
-  setConversationCreationStep: (step: ConversationCreationStep) => set({conversationCreationStep: step}),
-  gotoNextStep: () => set(state => ({...state, conversationCreationStep: state.conversationCreationStep + 1})),
-  gotoLastStep: () => set({conversationCreationStep: ConversationCreationStep.ParticipantsSelection}),
-  gotoPreviousStep: () => set(state => ({...state, conversationCreationStep: state.conversationCreationStep - 1})),
-  setError: (error: string) => set({error}),
-  setIsCellsEnabled: (isCellsEnabled: boolean) => set({isCellsEnabled}),
-  setIsReadReceiptsEnabled: (isReadReceiptsEnabled: boolean) => set({isReadReceiptsEnabled}),
-  setIsGuestsEnabled: (isGuestsEnabled: boolean) => set({isGuestsEnabled}),
-  setSelectedContacts: (contacts: User[]) => set({selectedContacts: contacts}),
-  setHistorySharingQuantity: (quantity: number) => set({historySharingQuantity: quantity}),
-  setHistorySharingUnit: (unit: HistorySharingUnit) => set({historySharingUnit: unit}),
-  setIsCustomHistoryModalOpen: (isOpen: boolean) => set({isCustomHistoryModalOpen: isOpen}),
-  setIsConfirmDiscardModalOpen: (isOpen: boolean) => set({isConfirmDiscardModalOpen: isOpen}),
-  setIsCreateTeamModalOpen: (isOpen: boolean) => set({isCreateTeamModalOpen: isOpen}),
-  setIsUpgradeTeamModalOpen: (isOpen: boolean) => set({isUpgradeTeamModalOpen: isOpen}),
-  setIsServicesEnabled: (isServicesEnabled: boolean) => set({isServicesEnabled}),
-  gotoFirstStep: () => set({conversationCreationStep: ConversationCreationStep.ConversationDetails}),
-  setDiscardTrigger: (trigger: 'modalClose' | 'conversationTypeChange') => set({discardTrigger: trigger}),
-}));
+export const useCreateConversationModal = create<CreateConversationModalState>(set => {
+  return {
+    ...initialState,
+    showModal: () => {
+      return set(state => {
+        return {...state, isOpen: true};
+      });
+    },
+    hideModal: () => {
+      return set({...initialState});
+    },
+    setConversationName: (name: string) => {
+      return set({conversationName: name});
+    },
+    setAccess: (access: ConversationAccess) => {
+      return set(state => {
+        return {
+          access,
+          manager: access === ConversationAccess.Public ? ADD_PERMISSION.EVERYONE : state.moderator,
+        };
+      });
+    },
+    setModerator: (moderator: ADD_PERMISSION) => {
+      return set({moderator});
+    },
+    setChatHistory: (history?: ChatHistory) => {
+      return set({chatHistory: history ?? ChatHistory.Off});
+    },
+    setConversationType: (conversationType: ConversationType) => {
+      return set({conversationType});
+    },
+    setConversationCreationStep: (step: ConversationCreationStep) => {
+      return set({conversationCreationStep: step});
+    },
+    gotoNextStep: () => {
+      return set(state => {
+        return {...state, conversationCreationStep: state.conversationCreationStep + 1};
+      });
+    },
+    gotoLastStep: () => {
+      return set({conversationCreationStep: ConversationCreationStep.ParticipantsSelection});
+    },
+    gotoPreviousStep: () => {
+      return set(state => {
+        return {...state, conversationCreationStep: state.conversationCreationStep - 1};
+      });
+    },
+    setError: (error: string) => {
+      return set({error});
+    },
+    setIsCellsEnabled: (isCellsEnabled: boolean) => {
+      return set({isCellsEnabled});
+    },
+    setIsReadReceiptsEnabled: (isReadReceiptsEnabled: boolean) => {
+      return set({isReadReceiptsEnabled});
+    },
+    setIsGuestsEnabled: (isGuestsEnabled: boolean) => {
+      return set({isGuestsEnabled});
+    },
+    setSelectedContacts: (contacts: User[]) => {
+      return set({selectedContacts: contacts});
+    },
+    setHistorySharingQuantity: (quantity: number) => {
+      return set({historySharingQuantity: quantity});
+    },
+    setHistorySharingUnit: (unit: HistorySharingUnit) => {
+      return set({historySharingUnit: unit});
+    },
+    setIsCustomHistoryModalOpen: (isOpen: boolean) => {
+      return set({isCustomHistoryModalOpen: isOpen});
+    },
+    setIsConfirmDiscardModalOpen: (isOpen: boolean) => {
+      return set({isConfirmDiscardModalOpen: isOpen});
+    },
+    setIsCreateTeamModalOpen: (isOpen: boolean) => {
+      return set({isCreateTeamModalOpen: isOpen});
+    },
+    setIsUpgradeTeamModalOpen: (isOpen: boolean) => {
+      return set({isUpgradeTeamModalOpen: isOpen});
+    },
+    setIsServicesEnabled: (isServicesEnabled: boolean) => {
+      return set({isServicesEnabled});
+    },
+    gotoFirstStep: () => {
+      return set({conversationCreationStep: ConversationCreationStep.ConversationDetails});
+    },
+    setDiscardTrigger: (trigger: 'modalClose' | 'conversationTypeChange') => {
+      return set({discardTrigger: trigger});
+    },
+  };
+});

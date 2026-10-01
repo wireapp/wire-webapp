@@ -86,15 +86,22 @@ export const SharedDriveUploadStatusPopupHost = ({
     dismissUpload: onDismissUpload,
     isProvided,
   } = useSharedDriveUploadStatus();
-  const readStatuses = useCallback(
-    () => getSharedDriveUploadStatuses(controller, conversationQualifiedId),
-    [controller, conversationQualifiedId],
-  );
-  const [uploadSnapshot, setUploadSnapshot] = useState(() => ({conversationQualifiedId, uploads: readStatuses()}));
+  const readStatuses = useCallback(() => {
+    return getSharedDriveUploadStatuses(controller, conversationQualifiedId);
+  }, [controller, conversationQualifiedId]);
+  const [uploadSnapshot, setUploadSnapshot] = useState(() => {
+    return {conversationQualifiedId, uploads: readStatuses()};
+  });
   const [isExpanded, setIsExpanded] = useState(false);
-  const [cancellingUploadIds, setCancellingUploadIds] = useState<ReadonlySet<string>>(() => new Set());
-  const [retryingUploadIds, setRetryingUploadIds] = useState<ReadonlySet<string>>(() => new Set());
-  const [dismissedRowIds, setDismissedRowIds] = useState<ReadonlySet<string>>(() => new Set());
+  const [cancellingUploadIds, setCancellingUploadIds] = useState<ReadonlySet<string>>(() => {
+    return new Set();
+  });
+  const [retryingUploadIds, setRetryingUploadIds] = useState<ReadonlySet<string>>(() => {
+    return new Set();
+  });
+  const [dismissedRowIds, setDismissedRowIds] = useState<ReadonlySet<string>>(() => {
+    return new Set();
+  });
   const [localDismissedUpload, setLocalDismissedUpload] = useState<Maybe<DismissedUpload>>(Maybe.nothing());
   const dismissedUpload = isProvided ? contextDismissedUpload : localDismissedUpload;
   const dismissUpload = useCallback(
@@ -108,12 +115,18 @@ export const SharedDriveUploadStatusPopupHost = ({
   const rawUploads =
     uploadSnapshot.conversationQualifiedId === conversationQualifiedId ? uploadSnapshot.uploads : readStatuses();
   const uploads = getSharedDriveUploadDisplayStatuses(rawUploads);
-  const visibleUploads = uploads.filter(({uploadId}) => !dismissedRowIds.has(uploadId));
+  const visibleUploads = uploads.filter(({uploadId}) => {
+    return !dismissedRowIds.has(uploadId);
+  });
   const aggregateKind = getSharedDriveUploadAggregateKind(visibleUploads);
   const representativeUpload = !isNull(aggregateKind)
     ? getRepresentativeSharedDriveUploadStatus(visibleUploads, aggregateKind)
     : null;
-  const canDismissUploadStatus = visibleUploads.length > 0 && visibleUploads.every(({kind}) => kind === 'uploaded');
+  const canDismissUploadStatus =
+    visibleUploads.length > 0 &&
+    visibleUploads.every(({kind}) => {
+      return kind === 'uploaded';
+    });
   const isUploadDismissed =
     (maybe.isJust(dismissedUpload) &&
       dismissedUpload.value.conversationQualifiedId === conversationQualifiedId &&
@@ -123,76 +136,132 @@ export const SharedDriveUploadStatusPopupHost = ({
 
   const isCancelling = useCallback(
     (uploadId: string): boolean => {
-      const row = visibleUploads.find(upload => upload.uploadId === uploadId);
-      return row?.cancellableUploadIds.some(childUploadId => cancellingUploadIds.has(childUploadId)) ?? false;
+      const row = visibleUploads.find(upload => {
+        return upload.uploadId === uploadId;
+      });
+      return (
+        row?.cancellableUploadIds.some(childUploadId => {
+          return cancellingUploadIds.has(childUploadId);
+        }) ?? false
+      );
     },
     [cancellingUploadIds, visibleUploads],
   );
   const cancellableUploadIds = useCallback(
-    (uploadId: string): readonly string[] =>
-      visibleUploads.find(upload => upload.uploadId === uploadId)?.cancellableUploadIds ?? [],
+    (uploadId: string): readonly string[] => {
+      return (
+        visibleUploads.find(upload => {
+          return upload.uploadId === uploadId;
+        })?.cancellableUploadIds ?? []
+      );
+    },
     [visibleUploads],
   );
   const retryableUploads = useCallback(
-    (uploadId: string) => visibleUploads.find(upload => upload.uploadId === uploadId)?.retryableUploads ?? [],
+    (uploadId: string) => {
+      return (
+        visibleUploads.find(upload => {
+          return upload.uploadId === uploadId;
+        })?.retryableUploads ?? []
+      );
+    },
     [visibleUploads],
   );
   const cancelUploadIds = useCallback(
     (uploadIds: readonly string[]): void => {
       const pendingIds = uploadIds
-        .flatMap(uploadId => cancellableUploadIds(uploadId))
-        .filter(uploadId => !cancellingUploadIds.has(uploadId));
+        .flatMap(uploadId => {
+          return cancellableUploadIds(uploadId);
+        })
+        .filter(uploadId => {
+          return !cancellingUploadIds.has(uploadId);
+        });
       if (pendingIds.length === 0) {
         return;
       }
 
-      setCancellingUploadIds(current => new Set([...current, ...pendingIds]));
-      const finishCancellation = (uploadId: string) =>
-        setCancellingUploadIds(current => {
+      setCancellingUploadIds(current => {
+        return new Set([...current, ...pendingIds]);
+      });
+      const finishCancellation = (uploadId: string) => {
+        return setCancellingUploadIds(current => {
           const next = new Set(current);
           next.delete(uploadId);
           return next;
         });
+      };
       pendingIds.forEach(uploadId => {
         void Promise.resolve()
-          .then(() => controller.cancel(uploadId))
+          .then(() => {
+            return controller.cancel(uploadId);
+          })
           .then(
-            () => finishCancellation(uploadId),
-            () => finishCancellation(uploadId),
+            () => {
+              return finishCancellation(uploadId);
+            },
+            () => {
+              return finishCancellation(uploadId);
+            },
           );
       });
     },
     [cancellableUploadIds, cancellingUploadIds, controller],
   );
-  const cancelAllUploads = useCallback(
-    (): void => cancelUploadIds(visibleUploads.map(({uploadId}) => uploadId)),
-    [cancelUploadIds, visibleUploads],
+  const cancelAllUploads = useCallback((): void => {
+    return cancelUploadIds(
+      visibleUploads.map(({uploadId}) => {
+        return uploadId;
+      }),
+    );
+  }, [cancelUploadIds, visibleUploads]);
+  const cancelUpload = useCallback(
+    (uploadId: string): void => {
+      return cancelUploadIds([uploadId]);
+    },
+    [cancelUploadIds],
   );
-  const cancelUpload = useCallback((uploadId: string): void => cancelUploadIds([uploadId]), [cancelUploadIds]);
 
   const dismissRow = useCallback((uploadId: string): void => {
-    setDismissedRowIds(current => new Set([...current, uploadId]));
+    setDismissedRowIds(current => {
+      return new Set([...current, uploadId]);
+    });
   }, []);
 
   const retryUpload = useCallback(
     (uploadId: string): void => {
       const uploadsToRetry = retryableUploads(uploadId);
-      if (uploadsToRetry.some(upload => retryingUploadIds.has(upload.uploadId))) {
+      if (
+        uploadsToRetry.some(upload => {
+          return retryingUploadIds.has(upload.uploadId);
+        })
+      ) {
         return;
       }
 
-      setRetryingUploadIds(current => new Set([...current, ...uploadsToRetry.map(upload => upload.uploadId)]));
-      const finishRetry = (id: string) =>
-        setRetryingUploadIds(current => {
+      setRetryingUploadIds(current => {
+        return new Set([
+          ...current,
+          ...uploadsToRetry.map(upload => {
+            return upload.uploadId;
+          }),
+        ]);
+      });
+      const finishRetry = (id: string) => {
+        return setRetryingUploadIds(current => {
           const next = new Set(current);
           next.delete(id);
           return next;
         });
+      };
       uploadsToRetry.forEach(upload => {
         const retry = upload.action === 'publish' ? controller.retryPublish : controller.retryUpload;
         void retry(upload.uploadId).then(
-          () => finishRetry(upload.uploadId),
-          () => finishRetry(upload.uploadId),
+          () => {
+            return finishRetry(upload.uploadId);
+          },
+          () => {
+            return finishRetry(upload.uploadId);
+          },
         );
       });
     },
@@ -200,7 +269,9 @@ export const SharedDriveUploadStatusPopupHost = ({
   );
 
   useEffect(() => {
-    const updateStatus = () => setUploadSnapshot({conversationQualifiedId, uploads: readStatuses()});
+    const updateStatus = () => {
+      return setUploadSnapshot({conversationQualifiedId, uploads: readStatuses()});
+    };
     updateStatus();
     return controller.subscribe(updateStatus);
   }, [controller, conversationQualifiedId, readStatuses]);
@@ -229,7 +300,9 @@ export const SharedDriveUploadStatusPopupHost = ({
   } as const;
   const displayName = representativeUpload.fileName;
   const statusLabels = new Map(
-    visibleUploads.map(row => [row.uploadId, getRowStatusLabel(row, translate, statusLabelKey)]),
+    visibleUploads.map(row => {
+      return [row.uploadId, getRowStatusLabel(row, translate, statusLabelKey)];
+    }),
   );
   const statusLabel = statusLabels.get(representativeUpload.uploadId) ?? '';
 
@@ -256,14 +329,22 @@ export const SharedDriveUploadStatusPopupHost = ({
       canDismiss={canDismissUploadStatus}
       retryLabel={translate('conversationFilePreviewErrorRetry')}
       isCancelling={isCancelling}
-      isRetrying={(uploadId: string) =>
-        retryableUploads(uploadId).some(upload => retryingUploadIds.has(upload.uploadId))
-      }
-      onToggle={() => setIsExpanded(expanded => !expanded)}
+      isRetrying={(uploadId: string) => {
+        return retryableUploads(uploadId).some(upload => {
+          return retryingUploadIds.has(upload.uploadId);
+        });
+      }}
+      onToggle={() => {
+        return setIsExpanded(expanded => {
+          return !expanded;
+        });
+      }}
       onCancelAll={cancelAllUploads}
       onCancelUpload={cancelUpload}
       onRetry={retryUpload}
-      onDismissAll={() => dismissUpload({conversationQualifiedId, uploadId: representativeUpload.uploadId})}
+      onDismissAll={() => {
+        return dismissUpload({conversationQualifiedId, uploadId: representativeUpload.uploadId});
+      }}
       onDismissRow={dismissRow}
     />
   );

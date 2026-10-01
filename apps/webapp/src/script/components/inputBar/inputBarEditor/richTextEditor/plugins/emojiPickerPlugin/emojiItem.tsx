@@ -34,20 +34,22 @@ interface EmojiItemProps {
 const EmojiItemComponent: ForwardRefRenderFunction<HTMLButtonElement, EmojiItemProps> = (
   {emoji, onClick, onMouseEnter, selectedEmoji = false},
   ref,
-) => (
-  <button
-    type="button"
-    className={cx('button-reset-default', 'emoji', {selected: selectedEmoji})}
-    css={itemStyle}
-    onMouseEnter={onMouseEnter}
-    onClick={onClick}
-    aria-label={emoji.title}
-    ref={ref}
-  >
-    <span css={symbolStyle}>{emoji.emoji}</span>
-    <span css={nameStyle}>{emoji.title}</span>
-  </button>
-);
+) => {
+  return (
+    <button
+      type="button"
+      className={cx('button-reset-default', 'emoji', {selected: selectedEmoji})}
+      css={itemStyle}
+      onMouseEnter={onMouseEnter}
+      onClick={onClick}
+      aria-label={emoji.title}
+      ref={ref}
+    >
+      <span css={symbolStyle}>{emoji.emoji}</span>
+      <span css={nameStyle}>{emoji.title}</span>
+    </button>
+  );
+};
 
 const EmojiItem = forwardRef(EmojiItemComponent);
 

@@ -34,14 +34,18 @@ export const removeClientFromUserClientMap = (
       userId in userMap[domain] &&
       userMap[domain][userId] !== undefined
     ) {
-      userMap[domain][userId] = userMap[domain][userId].filter(clientId => clientId !== clientToExclude.clientId);
+      userMap[domain][userId] = userMap[domain][userId].filter(clientId => {
+        return clientId !== clientToExclude.clientId;
+      });
     }
     return userMap;
   }
 
   const {userId} = clientToExclude;
   if (userId in userMap && userMap[userId] !== undefined) {
-    userMap[userId] = userMap[userId].filter(clientId => clientId !== clientToExclude.clientId);
+    userMap[userId] = userMap[userId].filter(clientId => {
+      return clientId !== clientToExclude.clientId;
+    });
   }
 
   return userMap;

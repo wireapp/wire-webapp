@@ -42,16 +42,20 @@ describe('trackingUtil', () => {
   const ORIGINAL_LOCAL_STORAGE = global.localStorage;
 
   let localStorageMock: any;
-  const configFactory = (overrides = {}) => ({
-    ...CONFIG_DEFAULTS,
-    ...overrides,
-  });
+  const configFactory = (overrides = {}) => {
+    return {
+      ...CONFIG_DEFAULTS,
+      ...overrides,
+    };
+  };
 
   beforeEach(() => {
     localStorageMock = (() => {
       let store: Record<string, string> = {};
       return {
-        getItem: jest.fn((key: string) => store[key] || null),
+        getItem: jest.fn((key: string) => {
+          return store[key] || null;
+        }),
         setItem: jest.fn((key: string, value: string) => {
           store[key] = value;
         }),

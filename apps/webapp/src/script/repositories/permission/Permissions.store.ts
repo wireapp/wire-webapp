@@ -38,33 +38,40 @@ export type PermissionsState = {
 };
 
 export const permissionsStore = createStore<PermissionsState>()(
-  immer<PermissionsState>((set, get) => ({
-    permissions: {
-      [PermissionType.CAMERA]: BrowserPermissionStatus.PROMPT,
-      [PermissionType.GEO_LOCATION]: BrowserPermissionStatus.PROMPT,
-      [PermissionType.MICROPHONE]: BrowserPermissionStatus.PROMPT,
-      [PermissionType.NOTIFICATIONS]: BrowserPermissionStatus.PROMPT,
-    },
+  immer<PermissionsState>((set, get) => {
+    return {
+      permissions: {
+        [PermissionType.CAMERA]: BrowserPermissionStatus.PROMPT,
+        [PermissionType.GEO_LOCATION]: BrowserPermissionStatus.PROMPT,
+        [PermissionType.MICROPHONE]: BrowserPermissionStatus.PROMPT,
+        [PermissionType.NOTIFICATIONS]: BrowserPermissionStatus.PROMPT,
+      },
 
-    // getters
-    getPermissionState: (permissionType: PermissionType) => {
-      return get().permissions[permissionType];
-    },
+      // getters
+      getPermissionState: (permissionType: PermissionType) => {
+        return get().permissions[permissionType];
+      },
 
-    getPermissionStates: (permissionTypes: PermissionType[]) => {
-      const state = get();
-      return permissionTypes
-        .filter(permissionType => Object.values(PermissionType).includes(permissionType))
-        .map(permissionType => ({
-          state: state.permissions[permissionType],
-          type: permissionType,
-        }));
-    },
+      getPermissionStates: (permissionTypes: PermissionType[]) => {
+        const state = get();
+        return permissionTypes
+          .filter(permissionType => {
+            return Object.values(PermissionType).includes(permissionType);
+          })
+          .map(permissionType => {
+            return {
+              state: state.permissions[permissionType],
+              type: permissionType,
+            };
+          });
+      },
 
-    // setters
-    setPermissionState: (permissionType: PermissionType, state: AppPermissionState | BrowserPermissionStatus) =>
-      set(draft => {
-        draft.permissions[permissionType] = normalizePermissionState(state);
-      }),
-  })),
+      // setters
+      setPermissionState: (permissionType: PermissionType, state: AppPermissionState | BrowserPermissionStatus) => {
+        return set(draft => {
+          draft.permissions[permissionType] = normalizePermissionState(state);
+        });
+      },
+    };
+  }),
 );

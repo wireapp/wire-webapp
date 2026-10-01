@@ -454,11 +454,11 @@ export class MediaDevicesHandler {
       return window.desktopCapturer.getSources(options);
     }
     // Electron <= 4
-    return new Promise((resolve, reject) =>
-      window.desktopCapturer?.getSources(options, (error, screenSources) =>
-        !isNullOrUndefined(error) ? reject(error) : resolve(screenSources),
-      ),
-    );
+    return new Promise((resolve, reject) => {
+      return window.desktopCapturer?.getSources(options, (error, screenSources) => {
+        return !isNullOrUndefined(error) ? reject(error) : resolve(screenSources);
+      });
+    });
   }
 
   /**

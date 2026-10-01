@@ -33,31 +33,37 @@ export interface InputLabelProps {
   labelCSS?: CSSObject;
 }
 
-const InputLabel: FC<InputLabelProps> = ({htmlFor, id, markInvalid, isRequired, children, labelCSS, ...props}) => (
-  <label
-    htmlFor={htmlFor}
-    id={id}
-    css={(theme: Theme) => ({
-      fontSize: theme.fontSizes.medium,
-      fontWeight: 400,
-      lineHeight: '1rem',
-      color: markInvalid === true ? COLOR_V2.RED_LIGHT_500 : theme.Input.labelColor,
-      marginBottom: '2px',
-      display: 'block',
-      ...labelCSS,
-    })}
-    {...props}
-  >
-    {children}
+const InputLabel: FC<InputLabelProps> = ({htmlFor, id, markInvalid, isRequired, children, labelCSS, ...props}) => {
+  return (
+    <label
+      htmlFor={htmlFor}
+      id={id}
+      css={(theme: Theme) => {
+        return {
+          fontSize: theme.fontSizes.medium,
+          fontWeight: 400,
+          lineHeight: '1rem',
+          color: markInvalid === true ? COLOR_V2.RED_LIGHT_500 : theme.Input.labelColor,
+          marginBottom: '2px',
+          display: 'block',
+          ...labelCSS,
+        };
+      }}
+      {...props}
+    >
+      {children}
 
-    {isRequired === true && (
-      <span
-        css={(theme: Theme) => ({fontSize: theme.fontSizes.base, marginLeft: '4px', color: COLOR_V2.RED_LIGHT_500})}
-      >
-        *
-      </span>
-    )}
-  </label>
-);
+      {isRequired === true && (
+        <span
+          css={(theme: Theme) => {
+            return {fontSize: theme.fontSizes.base, marginLeft: '4px', color: COLOR_V2.RED_LIGHT_500};
+          }}
+        >
+          *
+        </span>
+      )}
+    </label>
+  );
+};
 
 export {InputLabel};

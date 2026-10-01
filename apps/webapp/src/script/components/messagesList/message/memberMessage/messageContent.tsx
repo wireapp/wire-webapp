@@ -98,7 +98,9 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
       if (isNonEmptyString(message.name())) {
         const exceedsMaxTeam = targetedUsers.length > CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
         if (!isNullOrUndefined(message.allTeamMembers) && exceedsMaxTeam) {
-          const guestCount = targetedUsers.filter(userEntity => userEntity.isGuest()).length;
+          const guestCount = targetedUsers.filter(userEntity => {
+            return userEntity.isGuest();
+          }).length;
           if (guestCount === 0) {
             return translate('conversationCreateTeam');
           }
@@ -154,7 +156,11 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
 
     case CONVERSATION_EVENT.MEMBER_LEAVE: {
       if (message.reason === MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT) {
-        if (message.userEntities().some(user => user.isMe)) {
+        if (
+          message.userEntities().some(user => {
+            return user.isMe;
+          })
+        ) {
           return translate(
             'conversationYouRemovedMissingLegalHoldConsent',
             undefined,
@@ -243,15 +249,28 @@ export function MessageContent({
         );
       },
     },
-    {start: '<strong>', end: '</strong>', render: text => <strong key={text}>{text}</strong>},
+    {
+      start: '<strong>',
+      end: '</strong>',
+      render: text => {
+        return <strong key={text}>{text}</strong>;
+      },
+    },
     {
       start: '[showmore]',
       end: '[/showmore]',
-      render: text => (
-        <ShowMoreButton key={text} onClick={() => onClickParticipants(message.targetedUsers())}>
-          {text}
-        </ShowMoreButton>
-      ),
+      render: text => {
+        return (
+          <ShowMoreButton
+            key={text}
+            onClick={() => {
+              return onClickParticipants(message.targetedUsers());
+            }}
+          >
+            {text}
+          </ShowMoreButton>
+        );
+      },
     },
   ]);
   return <p className="message-header-caption">{content}</p>;

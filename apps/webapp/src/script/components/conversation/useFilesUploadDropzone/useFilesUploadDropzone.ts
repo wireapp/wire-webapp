@@ -136,7 +136,12 @@ export const useFilesUploadDropzone = ({
     maxFiles: number,
     conversationId: string,
   ) => {
-    const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
+    const newFiles = [
+      ...acceptedFiles,
+      ...rejectedFiles.map(file => {
+        return file.file;
+      }),
+    ];
 
     const validationResult = validateFiles({
       newFiles,

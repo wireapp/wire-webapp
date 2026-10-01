@@ -77,14 +77,17 @@ export const getScheduleMeetingFormErrors = ({
   };
 };
 
-export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean =>
-  !isUndefined(errors.title) ||
-  !isUndefined(errors.missingTimes) ||
-  !isUndefined(errors.startInPast) ||
-  !isUndefined(errors.endInPast) ||
-  !isUndefined(errors.endBeforeStart) ||
-  !isUndefined(errors.password) ||
-  !isUndefined(errors.passwordConfirmation);
+export const hasScheduleMeetingFormErrors = (errors: ScheduleMeetingFormErrors): boolean => {
+  return (
+    !isUndefined(errors.title) ||
+    !isUndefined(errors.missingTimes) ||
+    !isUndefined(errors.startInPast) ||
+    !isUndefined(errors.endInPast) ||
+    !isUndefined(errors.endBeforeStart) ||
+    !isUndefined(errors.password) ||
+    !isUndefined(errors.passwordConfirmation)
+  );
+};
 
 export const validateScheduleMeetingForm = (
   input: ScheduleMeetingValidationInput,

@@ -56,16 +56,32 @@ export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOp
         <DropdownMenu.Item onClick={onOpen}>{translate('cells.options.open')}</DropdownMenu.Item>
         {isEditable && canPerformCellsAction(CELLS_ACTION.EDIT) && (
           <>
-            <DropdownMenu.Item onClick={() => onOpen(true)}>{translate('cells.options.edit')}</DropdownMenu.Item>
+            <DropdownMenu.Item
+              onClick={() => {
+                return onOpen(true);
+              }}
+            >
+              {translate('cells.options.edit')}
+            </DropdownMenu.Item>
           </>
         )}
         {isEditable && canPerformCellsAction(CELLS_ACTION.VIEW_VERSION_HISTORY) && (
-          <DropdownMenu.Item onClick={() => showModal(id, () => onOpen(false))}>
+          <DropdownMenu.Item
+            onClick={() => {
+              return showModal(id, () => {
+                return onOpen(false);
+              });
+            }}
+          >
             {translate('cells.options.versionHistory')}
           </DropdownMenu.Item>
         )}
         {canPerformCellsAction(CELLS_ACTION.DOWNLOAD) && src !== undefined && src !== '' && (
-          <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: fileNameWithExtension})}>
+          <DropdownMenu.Item
+            onClick={() => {
+              return forcedDownloadFile({url: src, name: fileNameWithExtension});
+            }}
+          >
             {translate('cells.options.download')}
           </DropdownMenu.Item>
         )}

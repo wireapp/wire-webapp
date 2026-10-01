@@ -30,7 +30,9 @@ test.describe('Notifications', () => {
 
     // Check the notifications B received to contain the message from A
     await expect
-      .poll(() => getUserBNotifications())
+      .poll(() => {
+        return getUserBNotifications();
+      })
       .toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -73,7 +75,11 @@ test.describe('Notifications', () => {
       await expect(userBPages.conversation().getMessage({sender: userA})).toBeVisible();
 
       // Check that B did not receive any more notifications
-      await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+      await expect
+        .poll(() => {
+          return getUserBNotifications();
+        })
+        .toHaveLength(0);
     },
   );
 
@@ -158,7 +164,11 @@ test.describe('Notifications', () => {
           .getConversation(conversationType === 'group' ? 'Test Group' : userB.fullName)
           .open();
         await userAPages.conversation().sendMessage('Test Message');
-        await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+        await expect
+          .poll(() => {
+            return getUserBNotifications();
+          })
+          .toHaveLength(0);
       },
     );
   });
@@ -229,7 +239,11 @@ test.describe('Notifications', () => {
       await expect(userBConversation).toContainText('1 message');
 
       // Verify User B did not receive any notifications for the second message
-      await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+      await expect
+        .poll(() => {
+          return getUserBNotifications();
+        })
+        .toHaveLength(0);
     },
   );
 
@@ -252,7 +266,9 @@ test.describe('Notifications', () => {
 
       // Verify User B receives a notification, but it does not contain the message or sender's name
       await expect
-        .poll(() => getUserBNotifications())
+        .poll(() => {
+          return getUserBNotifications();
+        })
         .toEqual([expect.objectContaining({title: 'Someone', body: 'Sent a message'})]);
     },
   );
@@ -305,22 +321,26 @@ test.describe('Notifications', () => {
         title:
           "No sender name, profile image or message content is written on notification when choose 'Hide details' in preferences",
         notificationPreference: 'Hide details',
-        getExpectedNotifications: (): ExpectedNotification[] => [
-          // The default wire icon is called "notification.png", if it is set the users profile picture isn't shown
-          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
-          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
-          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
-          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
-          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
-          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
-          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
-        ],
+        getExpectedNotifications: (): ExpectedNotification[] => {
+          return [
+            // The default wire icon is called "notification.png", if it is set the users profile picture isn't shown
+            {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+            {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+            {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+            {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+            {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+            {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+            {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+          ];
+        },
       },
       {
         testId: '@TC-1453',
         title: "No notification shown when selecting 'Off' in preferences",
         notificationPreference: 'Off',
-        getExpectedNotifications: (): ExpectedNotification[] => [],
+        getExpectedNotifications: (): ExpectedNotification[] => {
+          return [];
+        },
       },
     ] as const
   ).forEach(({testId, title, notificationPreference, getExpectedNotifications}) => {
@@ -368,11 +388,13 @@ test.describe('Notifications', () => {
         });
 
         await test.step('UserB should have received a notification for each message', async () => {
-          const expectedNotifications = getExpectedNotifications(conversation).map(notification =>
-            expect.objectContaining(notification),
-          );
+          const expectedNotifications = getExpectedNotifications(conversation).map(notification => {
+            return expect.objectContaining(notification);
+          });
           await expect
-            .poll(() => getUserBNotifications())
+            .poll(() => {
+              return getUserBNotifications();
+            })
             .toEqual(expectedNotifications.length ? expect.arrayContaining(expectedNotifications) : []);
         });
       }
@@ -482,7 +504,9 @@ test.describe('Notifications', () => {
 
       // Verify User B receives a notification about the new group
       await expect
-        .poll(() => getNotifications())
+        .poll(() => {
+          return getNotifications();
+        })
         .toEqual(
           expect.arrayContaining([
             expect.objectContaining({
@@ -521,7 +545,9 @@ test.describe('Notifications', () => {
 
       // Verify User B receives a notification about the group name change
       await expect
-        .poll(() => getUserBNotifications())
+        .poll(() => {
+          return getUserBNotifications();
+        })
         .toEqual(
           expect.arrayContaining([
             expect.objectContaining({
@@ -552,7 +578,9 @@ test.describe('Notifications', () => {
 
       // Verify User C receives a notification about the connection request
       await expect
-        .poll(() => getNotifications())
+        .poll(() => {
+          return getNotifications();
+        })
         .toEqual(
           expect.arrayContaining([
             expect.objectContaining({
@@ -586,7 +614,9 @@ test.describe('Notifications', () => {
       await shareAssetHelper(getImageFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add picture'}));
 
       await expect
-        .poll(() => getNotifications())
+        .poll(() => {
+          return getNotifications();
+        })
         .toEqual(
           expect.arrayContaining([
             expect.objectContaining({
@@ -620,7 +650,9 @@ test.describe('Notifications', () => {
 
       // Verify User B receives a notification about the timer change
       await expect
-        .poll(() => getNotifications())
+        .poll(() => {
+          return getNotifications();
+        })
         .toEqual(
           expect.arrayContaining([
             expect.objectContaining({

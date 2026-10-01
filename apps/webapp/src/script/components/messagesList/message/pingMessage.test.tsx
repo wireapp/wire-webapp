@@ -36,10 +36,14 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 
 const createPingMessage = (partialPingMessage: Partial<PingMessageEntity>) => {
   const callMessage: Partial<PingMessageEntity> = {
-    caption: ko.pureComputed(() => ''),
+    caption: ko.pureComputed(() => {
+      return '';
+    }),
     readReceipts: ko.observableArray([] as ReadReceipt[]),
     timestamp: ko.observable(Date.now()),
-    unsafeSenderName: ko.pureComputed(() => ''),
+    unsafeSenderName: ko.pureComputed(() => {
+      return '';
+    }),
     ...partialPingMessage,
   };
   return callMessage as PingMessageEntity;
@@ -56,8 +60,12 @@ describe('PingMessage', () => {
       isLastDeliveredMessage: false,
       onClickDetails: jest.fn(),
       message: createPingMessage({
-        caption: ko.pureComputed(() => 'caption'),
-        unsafeSenderName: ko.pureComputed(() => 'sender'),
+        caption: ko.pureComputed(() => {
+          return 'caption';
+        }),
+        unsafeSenderName: ko.pureComputed(() => {
+          return 'sender';
+        }),
       }),
     };
 

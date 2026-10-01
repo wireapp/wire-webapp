@@ -65,7 +65,9 @@ export class ConversationPage {
   readonly statusIndicator: Locator;
   readonly replyQuoteBoxAboveMessageInputField: Locator;
 
-  readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
+  readonly getImageAltText = (user: User) => {
+    return `Image from ${user.fullName}`;
+  };
 
   readonly emojiTitleMap: Record<EmojiReaction, string> = {
     'plus-one': '+1',

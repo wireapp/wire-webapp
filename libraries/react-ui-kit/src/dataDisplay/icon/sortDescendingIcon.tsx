@@ -19,12 +19,14 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const SortDescendingIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={14} realHeight={14} {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M11.1562 9.7373L12.6611 8.2334L13.5889 9.16113L10.5 12.25L7.41113 9.16113L8.33887 8.2334L9.84375 9.7373V2.13477H11.1562V9.7373ZM2.625 11.375H0.694336L0 11.3711V9.84766L0.694336 9.84375H2.625V11.375ZM4.375 7.875H0V6.34375H4.375V7.875ZM6.125 4.375H0V2.84375H6.125V4.375Z"
-    />
-  </SVGIcon>
-);
+export const SortDescendingIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={14} realHeight={14} {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M11.1562 9.7373L12.6611 8.2334L13.5889 9.16113L10.5 12.25L7.41113 9.16113L8.33887 8.2334L9.84375 9.7373V2.13477H11.1562V9.7373ZM2.625 11.375H0.694336L0 11.3711V9.84766L0.694336 9.84375H2.625V11.375ZM4.375 7.875H0V6.34375H4.375V7.875ZM6.125 4.375H0V2.84375H6.125V4.375Z"
+      />
+    </SVGIcon>
+  );
+};

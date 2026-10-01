@@ -26,7 +26,9 @@ import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatch
 import type {MeetingLifecycleDispatcherDependencies} from './createMeetingLifecycleDispatcher';
 import {syncMeetingErrors} from './createMeetingStore';
 
-const flushPendingWork = () => Promise.resolve();
+const flushPendingWork = () => {
+  return Promise.resolve();
+};
 
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const otherMeetingId: QualifiedId = {id: 'other-meeting-id', domain: 'example.com'};
@@ -50,7 +52,9 @@ type Deferred = {
 };
 
 const createDeferred = (): Deferred => {
-  let resolveDeferred: () => void = () => undefined;
+  let resolveDeferred: () => void = () => {
+    return undefined;
+  };
 
   const promise = new Promise<void>(resolve => {
     resolveDeferred = resolve;
@@ -58,19 +62,29 @@ const createDeferred = (): Deferred => {
 
   return {
     promise,
-    resolve: () => resolveDeferred(),
+    resolve: () => {
+      return resolveDeferred();
+    },
   };
 };
 
 const createDependencies = (
   overrides: Partial<MeetingLifecycleDispatcherDependencies> = {},
-): MeetingLifecycleDispatcherDependencies => ({
-  loadMeetings: async () => undefined,
-  syncMeeting: () => task.resolve({meeting: meetingSeries, applied: true}),
-  removeMeeting: () => undefined,
-  reportOperationFailure: jest.fn(),
-  ...overrides,
-});
+): MeetingLifecycleDispatcherDependencies => {
+  return {
+    loadMeetings: async () => {
+      return undefined;
+    },
+    syncMeeting: () => {
+      return task.resolve({meeting: meetingSeries, applied: true});
+    },
+    removeMeeting: () => {
+      return undefined;
+    },
+    reportOperationFailure: jest.fn(),
+    ...overrides,
+  };
+};
 
 describe('createMeetingLifecycleDispatcher', () => {
   it('finishes the initial meetings load before running lifecycle work queued after it', async () => {
@@ -108,9 +122,11 @@ describe('createMeetingLifecycleDispatcher', () => {
     const pendingSync = createDeferred();
     const dispatcher = createMeetingLifecycleDispatcher(
       createDependencies({
-        syncMeeting: id =>
-          task.tryOrElse(
-            () => syncMeetingErrors.fetchFailed,
+        syncMeeting: id => {
+          return task.tryOrElse(
+            () => {
+              return syncMeetingErrors.fetchFailed;
+            },
             async () => {
               completedSteps.push(`sync:${id.id}:started`);
               await pendingSync.promise;
@@ -118,7 +134,8 @@ describe('createMeetingLifecycleDispatcher', () => {
 
               return {meeting: meetingSeries, applied: true};
             },
-          ),
+          );
+        },
         removeMeeting: id => {
           completedSteps.push(`remove:${id.id}`);
         },
@@ -147,9 +164,11 @@ describe('createMeetingLifecycleDispatcher', () => {
     const pendingCreateSync = createDeferred();
     const dispatcher = createMeetingLifecycleDispatcher(
       createDependencies({
-        syncMeeting: id =>
-          task.tryOrElse(
-            () => syncMeetingErrors.fetchFailed,
+        syncMeeting: id => {
+          return task.tryOrElse(
+            () => {
+              return syncMeetingErrors.fetchFailed;
+            },
             async () => {
               completedSteps.push(`sync:${id.id}:started`);
 
@@ -161,7 +180,8 @@ describe('createMeetingLifecycleDispatcher', () => {
 
               return {meeting: meetingSeries, applied: true};
             },
-          ),
+          );
+        },
       }),
     );
 
@@ -187,7 +207,9 @@ describe('createMeetingLifecycleDispatcher', () => {
     const removeMeeting = jest.fn();
     const dispatcher = createMeetingLifecycleDispatcher(
       createDependencies({
-        syncMeeting: () => task.reject(syncMeetingErrors.fetchFailed),
+        syncMeeting: () => {
+          return task.reject(syncMeetingErrors.fetchFailed);
+        },
         removeMeeting,
       }),
     );
@@ -204,7 +226,9 @@ describe('createMeetingLifecycleDispatcher', () => {
     const reportOperationFailure = jest.fn();
     const dispatcher = createMeetingLifecycleDispatcher(
       createDependencies({
-        syncMeeting: () => task.reject(syncMeetingErrors.fetchFailed),
+        syncMeeting: () => {
+          return task.reject(syncMeetingErrors.fetchFailed);
+        },
         reportOperationFailure,
       }),
     );
@@ -229,7 +253,11 @@ describe('createMeetingLifecycleDispatcher', () => {
   it('does not invoke the sync success callback when syncing fails', async () => {
     const onSuccess = jest.fn();
     const dispatcher = createMeetingLifecycleDispatcher(
-      createDependencies({syncMeeting: () => task.reject(syncMeetingErrors.fetchFailed)}),
+      createDependencies({
+        syncMeeting: () => {
+          return task.reject(syncMeetingErrors.fetchFailed);
+        },
+      }),
     );
 
     dispatcher.enqueueMeetingSync(meetingId, onSuccess);
@@ -241,7 +269,11 @@ describe('createMeetingLifecycleDispatcher', () => {
   it('does not invoke the sync success callback when the store did not apply the result', async () => {
     const onSuccess = jest.fn();
     const dispatcher = createMeetingLifecycleDispatcher(
-      createDependencies({syncMeeting: () => task.resolve({meeting: meetingSeries, applied: false})}),
+      createDependencies({
+        syncMeeting: () => {
+          return task.resolve({meeting: meetingSeries, applied: false});
+        },
+      }),
     );
 
     dispatcher.enqueueMeetingSync(meetingId, onSuccess);
@@ -255,14 +287,17 @@ describe('createMeetingLifecycleDispatcher', () => {
     const pendingSync = createDeferred();
     const dispatcher = createMeetingLifecycleDispatcher(
       createDependencies({
-        syncMeeting: () =>
-          task.tryOrElse(
-            () => syncMeetingErrors.fetchFailed,
+        syncMeeting: () => {
+          return task.tryOrElse(
+            () => {
+              return syncMeetingErrors.fetchFailed;
+            },
             async () => {
               await pendingSync.promise;
               return {meeting: meetingSeries, applied: true};
             },
-          ),
+          );
+        },
       }),
     );
 
@@ -294,7 +329,9 @@ describe('createMeetingLifecycleDispatcher', () => {
   });
 
   it('keeps running queued work after a removal throws', async () => {
-    const loadMeetings = jest.fn(async () => undefined);
+    const loadMeetings = jest.fn(async () => {
+      return undefined;
+    });
     const dispatcher = createMeetingLifecycleDispatcher(
       createDependencies({
         loadMeetings,

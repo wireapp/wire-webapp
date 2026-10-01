@@ -34,7 +34,11 @@ describe('InvitationAction', () => {
     const mockedApiClient = {
       api: {
         teams: {
-          invitation: {postInvitation: () => Promise.resolve('invite')},
+          invitation: {
+            postInvitation: () => {
+              return Promise.resolve('invite');
+            },
+          },
         },
       },
     };
@@ -62,7 +66,11 @@ describe('InvitationAction', () => {
     const mockedApiClient = {
       api: {
         teams: {
-          invitation: {postInvitation: () => Promise.reject(error)},
+          invitation: {
+            postInvitation: () => {
+              return Promise.reject(error);
+            },
+          },
         },
       },
     };

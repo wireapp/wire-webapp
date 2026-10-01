@@ -74,14 +74,16 @@ interface SlateLink {
 function collectTests(suites: JSONReportSuite[] | undefined, parentPath = ''): FlatTest[] {
   return (suites ?? []).flatMap(suite => {
     const suitePath = parentPath ? `${parentPath} > ${suite.title}` : suite.title;
-    const specTests = (suite.specs ?? []).flatMap(spec =>
-      (spec.tests ?? []).map(test => ({
-        title: spec.title,
-        fullTitle: `${suitePath} > ${spec.title}`,
-        tags: spec.tags ?? [],
-        results: test.results ?? [],
-      })),
-    );
+    const specTests = (suite.specs ?? []).flatMap(spec => {
+      return (spec.tests ?? []).map(test => {
+        return {
+          title: spec.title,
+          fullTitle: `${suitePath} > ${spec.title}`,
+          tags: spec.tags ?? [],
+          results: test.results ?? [],
+        };
+      });
+    });
     return [...specTests, ...collectTests(suite.suites, suitePath)];
   });
 }
@@ -91,7 +93,9 @@ function extractTcTags(title: string, tags: string[]): string[] {
   for (const t of [title, ...tags]) {
     String(t)
       .match(/@?TC-\d+/gi)
-      ?.forEach(m => matches.add(m.replace(/^@/, '').toUpperCase()));
+      ?.forEach(m => {
+        matches.add(m.replace(/^@/, '').toUpperCase());
+      });
   }
   return [...matches];
 }
@@ -144,7 +148,9 @@ async function testinyRequest<T>(method: string, endpoint: string, body?: Body):
     headers: {'Content-Type': 'application/json', 'X-Api-Key': API_KEY},
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  const json = await res.json().catch(() => res.text());
+  const json = await res.json().catch(() => {
+    return res.text();
+  });
   if (!res.ok) throw new Error(`Testiny ${method} ${endpoint} → ${res.status}: ${JSON.stringify(json)}`);
   return json as T;
 }
@@ -176,10 +182,12 @@ async function bulkAddResults(results: Result[]): Promise<void> {
   await testinyRequest(
     'POST',
     '/testrun/mapping/bulk/testcase:testrun?op=add_or_update',
-    results.map(({runId, testCaseId, status}) => ({
-      ids: {testcase_id: testCaseId, testrun_id: runId},
-      mapped: {result_status: status, assigned_to: 'OWNER'},
-    })),
+    results.map(({runId, testCaseId, status}) => {
+      return {
+        ids: {testcase_id: testCaseId, testrun_id: runId},
+        mapped: {result_status: status, assigned_to: 'OWNER'},
+      };
+    }),
   );
 }
 
@@ -278,7 +286,11 @@ async function main(): Promise<void> {
   const {pending, skippedNoTag, skippedNotFound, resolveErrors} = await resolveTestCases(allTests, runId);
 
   // Phase 2 - deduplicate (keeping the last status per TC)
-  const deduped = new Map(pending.map(r => [`${r.testCaseId}:${r.runId}`, r]));
+  const deduped = new Map(
+    pending.map(r => {
+      return [`${r.testCaseId}:${r.runId}`, r];
+    }),
+  );
   const dedupedResults = [...deduped.values()];
   const dupes = pending.length - dedupedResults.length;
   if (dupes > 0) console.log(`\nℹ️   Removed ${dupes} duplicate(s) (kept last status per TC)`);
@@ -311,9 +323,9 @@ async function main(): Promise<void> {
   if (resolveErrors > 0 || sendError > 0) process.exitCode = 1;
 
   // Phase 4 (optional) - append CI link to run description
-  appendCiDescription(runId).catch((err: unknown) =>
-    console.warn(`  ⚠️  Could not update run description: ${err instanceof Error ? err.message : String(err)}`),
-  );
+  appendCiDescription(runId).catch((err: unknown) => {
+    return console.warn(`  ⚠️  Could not update run description: ${err instanceof Error ? err.message : String(err)}`);
+  });
 }
 
 function crash(err: unknown): void {

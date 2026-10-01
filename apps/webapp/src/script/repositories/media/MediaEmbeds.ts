@@ -94,7 +94,9 @@ const _appendIFrame = (link: HTMLAnchorElement, message: string, iFrame: string)
  *
  * @param params String where we should find the parameters
  */
-const _getParameters = (params: string): string => params.slice(params.indexOf('?')).replace(/^\?/, '');
+const _getParameters = (params: string): string => {
+  return params.slice(params.indexOf('?')).replace(/^\?/, '');
+};
 
 /**
  * Generate embedded YouTube URL to use as source in iFrames
@@ -270,7 +272,9 @@ export const MediaEmbeds = {
       });
 
       let embed = '';
-      linkSrc.replace(MediaEmbeds.regex.vimeo, (match, group1) => (embed = iFrame.replace('$1', group1)));
+      linkSrc.replace(MediaEmbeds.regex.vimeo, (match, group1) => {
+        return (embed = iFrame.replace('$1', group1));
+      });
 
       message = _appendIFrame(link, message, embed);
     }

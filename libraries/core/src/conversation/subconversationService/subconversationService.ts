@@ -320,7 +320,9 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     await forwardNewEpoch({groupId: subconversationGroupId, epoch: initialEpoch});
 
     this.logger.info('Subscribed to MLS NEW_EPOCH events for subconversation', {subconversationGroupId});
-    return () => this.mlsService.off(MLSServiceEvents.NEW_EPOCH, forwardNewEpoch);
+    return () => {
+      return this.mlsService.off(MLSServiceEvents.NEW_EPOCH, forwardNewEpoch);
+    };
   }
 
   public async removeClientFromConferenceSubconversation(
@@ -356,10 +358,9 @@ export class SubconversationService extends TypedEventEmitter<Events> {
 
     const subconversationMembers = await this.mlsService.getClientIds(subconversationGroupId);
 
-    const isSubconversationMember = subconversationMembers.some(
-      ({userId, clientId, domain}) =>
-        constructFullyQualifiedClientId(userId, clientId, domain) === clientToRemoveQualifiedId,
-    );
+    const isSubconversationMember = subconversationMembers.some(({userId, clientId, domain}) => {
+      return constructFullyQualifiedClientId(userId, clientId, domain) === clientToRemoveQualifiedId;
+    });
 
     if (!isSubconversationMember) {
       this.logger.info('Client is not a member of the subconversation; nothing to remove', {
@@ -388,9 +389,9 @@ export class SubconversationService extends TypedEventEmitter<Events> {
   private async joinSubconversationByExternalCommit(conversationId: QualifiedId, subconversation: SUBCONVERSATION_ID) {
     try {
       this.logger.info('Joining subconversation by external commit', {conversationId, subconversation});
-      await this.mlsService.joinByExternalCommit(() =>
-        this.apiClient.api.conversation.getSubconversationGroupInfo(conversationId, subconversation),
-      );
+      await this.mlsService.joinByExternalCommit(() => {
+        return this.apiClient.api.conversation.getSubconversationGroupInfo(conversationId, subconversation);
+      });
     } catch (error: unknown) {
       this.logger.error('Failed to join subconversation by external commit', {
         conversationId,
@@ -440,11 +441,12 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     const parentMemberIds = await this.mlsService.getClientIds(parentGroupId);
 
     const members = parentMemberIds.map(parentMember => {
-      const isSubconversationMember = subconversationMemberIds.some(
-        ({userId, clientId, domain}) =>
+      const isSubconversationMember = subconversationMemberIds.some(({userId, clientId, domain}) => {
+        return (
           constructFullyQualifiedClientId(userId, clientId, domain) ===
-          constructFullyQualifiedClientId(parentMember.userId, parentMember.clientId, parentMember.domain),
-      );
+          constructFullyQualifiedClientId(parentMember.userId, parentMember.clientId, parentMember.domain)
+        );
+      });
 
       return {
         userid: this.apiClient.backendFeatures.isFederated
@@ -489,9 +491,9 @@ export class SubconversationService extends TypedEventEmitter<Events> {
   > => {
     this.logger.debug('Retrieving all subconversations by subconversationId', {subconversationId});
     const allSubconversations = await this.coreDatabase.getAll('subconversations');
-    const foundSubconversations = allSubconversations.filter(
-      subconversation => subconversation.subconversationId === subconversationId,
-    );
+    const foundSubconversations = allSubconversations.filter(subconversation => {
+      return subconversation.subconversationId === subconversationId;
+    });
     this.logger.debug('Found subconversations by id', {
       subconversationId,
       count: foundSubconversations.length,

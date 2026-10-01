@@ -44,7 +44,9 @@ describe('DeviceDetailsPreferences', () => {
     onClose: jest.fn(),
     onRemove: jest.fn(),
     onResetSession: jest.fn().mockResolvedValue(undefined),
-    onVerify: jest.fn((_, isVerified) => device.meta?.isVerified(isVerified)),
+    onVerify: jest.fn((_, isVerified) => {
+      return device.meta?.isVerified(isVerified);
+    }),
   };
   function renderDeviceDetailsPreferences(): ReturnType<typeof render> {
     return render(withTheme(<DeviceDetailsPreferences {...defaultParams} />), {
@@ -54,7 +56,9 @@ describe('DeviceDetailsPreferences', () => {
 
   it('shows device details', async () => {
     const {getByText, getAllByText} = renderDeviceDetailsPreferences();
-    await waitFor(() => getAllByText('00'));
+    await waitFor(() => {
+      return getAllByText('00');
+    });
 
     assertNotNullOrUndefined(device.model);
     expect(getByText(device.model)).toBeDefined();
@@ -62,7 +66,9 @@ describe('DeviceDetailsPreferences', () => {
 
   it('resets session with device', async () => {
     const {getByText, getAllByText, queryByText} = renderDeviceDetailsPreferences();
-    await waitFor(() => getAllByText('00'));
+    await waitFor(() => {
+      return getAllByText('00');
+    });
     jest.useFakeTimers();
     act(() => {
       getByText('preferencesDevicesSessionReset').click();
@@ -72,14 +78,18 @@ describe('DeviceDetailsPreferences', () => {
     act(() => {
       jest.advanceTimersToNextTimer();
     });
-    await waitFor(() => getAllByText('preferencesDevicesSessionConfirmation'));
+    await waitFor(() => {
+      return getAllByText('preferencesDevicesSessionConfirmation');
+    });
     expect(getByText('preferencesDevicesSessionConfirmation')).toBeDefined();
 
     act(() => {
       jest.advanceTimersToNextTimer();
       jest.advanceTimersToNextTimer();
     });
-    await waitFor(() => getAllByText('preferencesDevicesSessionReset'));
+    await waitFor(() => {
+      return getAllByText('preferencesDevicesSessionReset');
+    });
     expect(queryByText('preferencesDevicesSessionConfirmation')).toBeNull();
     expect(queryByText('preferencesDevicesSessionOngoing')).toBeNull();
     expect(getByText('preferencesDevicesSessionReset')).toBeDefined();
@@ -87,7 +97,9 @@ describe('DeviceDetailsPreferences', () => {
 
   it('toggles verification', async () => {
     const {getByText, getAllByText} = renderDeviceDetailsPreferences();
-    await waitFor(() => getAllByText('00'));
+    await waitFor(() => {
+      return getAllByText('00');
+    });
 
     act(() => {
       getByText('preferencesDevicesVerification').click();

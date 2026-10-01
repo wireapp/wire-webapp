@@ -41,13 +41,13 @@ export const PaginationArrow = ({onClick, disabled, direction, 'data-uie-name': 
       variant={IconButtonVariant.SECONDARY}
       css={iconButtonStyles}
       onClick={onClick}
-      onKeyDown={event =>
-        handleKeyDown({
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
           callback: onClick,
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       disabled={disabled}
       data-uie-name={uieName}
       type="button"

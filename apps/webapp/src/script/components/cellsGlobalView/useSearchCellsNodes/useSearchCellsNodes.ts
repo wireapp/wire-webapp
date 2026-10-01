@@ -146,7 +146,10 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
         }
 
         // filter out draft nodes from results
-        const filteredNodes = result.Nodes?.filter(node => node.IsDraft !== true) ?? [];
+        const filteredNodes =
+          result.Nodes?.filter(node => {
+            return node.IsDraft !== true;
+          }) ?? [];
 
         const transformedNodes = transformCellsNodes({
           nodes: filteredNodes,

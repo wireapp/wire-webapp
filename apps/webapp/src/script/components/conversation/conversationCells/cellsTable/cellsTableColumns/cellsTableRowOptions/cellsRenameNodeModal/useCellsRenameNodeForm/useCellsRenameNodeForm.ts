@@ -45,7 +45,9 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNode
 
   const originalBaseName = trimFileExtension(node.name);
   const normalizedName = name.trim();
-  const hasInvalidCharacters = INVALID_CHARACTERS.some(char => normalizedName.includes(char));
+  const hasInvalidCharacters = INVALID_CHARACTERS.some(char => {
+    return normalizedName.includes(char);
+  });
   const isDisabled = isSubmitting || normalizedName === originalBaseName || normalizedName.length === 0;
 
   const buildNewName = (baseName: string) => {

@@ -58,7 +58,9 @@ function mapUserIdentities(
   for (const [stringifiedQualifiedId, identities] of userVerifications.entries()) {
     mappedUsers.set(
       stringifiedQualifiedId,
-      identities.map(identity => ({...identity, status: mapMLSStatus(identity.status)})),
+      identities.map(identity => {
+        return {...identity, status: mapMLSStatus(identity.status)};
+      }),
     );
   }
 
@@ -103,9 +105,9 @@ const getSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
   const userId = {id: core.userId, domain: core.backendFeatures.domain};
 
   if (currentClientId !== undefined) {
-    const identity = userIdentities
-      .get(stringifyQualifiedId(userId))
-      ?.find(identity => identity.deviceId === currentClientId);
+    const identity = userIdentities.get(stringifyQualifiedId(userId))?.find(identity => {
+      return identity.deviceId === currentClientId;
+    });
     return identity;
   }
   return undefined;

@@ -76,104 +76,125 @@ type MeetingNotificationStore = {
 
 let nextNotificationId = 0;
 
-export const useMeetingNotificationStore = create<MeetingNotificationStore>(set => ({
-  notifications: [],
-  isExpanded: false,
-  addNotification: input =>
-    set(state => ({
-      notifications: [
-        match(input)
-          .with(
-            {kind: MeetingNotificationKind.INVITE},
-            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
-              kind,
-              qualifiedId,
-              qualifiedConversationId,
-              meetingTitle,
-              id: `meeting-notification-${nextNotificationId++}`,
-              qualifiedCreator,
-              meetingStartTime,
-            }),
-          )
-          .with(
-            {kind: MeetingNotificationKind.UPDATE},
-            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
-              kind,
-              qualifiedId,
-              qualifiedConversationId,
-              meetingTitle,
-              id: `meeting-notification-${nextNotificationId++}`,
-              qualifiedCreator,
-              meetingStartTime,
-            }),
-          )
-          .with(
-            {kind: MeetingNotificationKind.CANCELLED},
-            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
-              kind,
-              qualifiedId,
-              qualifiedConversationId,
-              meetingTitle,
-              id: `meeting-notification-${nextNotificationId++}`,
-              qualifiedCreator,
-              meetingStartTime,
-            }),
-          )
-          .with(
-            {kind: MeetingNotificationKind.ONGOING},
-            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
-              kind,
-              qualifiedId,
-              qualifiedConversationId,
-              meetingTitle,
-              id: `meeting-notification-${nextNotificationId++}`,
-              qualifiedCreator,
-              meetingStartTime,
-            }),
-          )
-          .with(
-            {kind: MeetingNotificationKind.REMINDER},
-            ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => ({
-              kind,
-              qualifiedId,
-              qualifiedConversationId,
-              meetingTitle,
-              id: `meeting-notification-${nextNotificationId++}`,
-              qualifiedCreator,
-              meetingStartTime,
-            }),
-          )
-          .exhaustive(),
-        ...state.notifications,
-      ],
-    })),
-  dismissNotification: id =>
-    set(state => {
-      const notifications = state.notifications.filter(notification => notification.id !== id);
-
-      return {
-        notifications,
-        isExpanded: notifications.length === 0 ? false : state.isExpanded,
-      };
-    }),
-  dismissNotificationsForMeeting: (meetingId, kinds) =>
-    set(state => {
-      const notifications = state.notifications.filter(notification => {
-        if (!matchQualifiedIds(notification.qualifiedId, meetingId)) {
-          return true;
-        }
-
-        return kinds !== undefined && !kinds.includes(notification.kind);
+export const useMeetingNotificationStore = create<MeetingNotificationStore>(set => {
+  return {
+    notifications: [],
+    isExpanded: false,
+    addNotification: input => {
+      return set(state => {
+        return {
+          notifications: [
+            match(input)
+              .with(
+                {kind: MeetingNotificationKind.INVITE},
+                ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => {
+                  return {
+                    kind,
+                    qualifiedId,
+                    qualifiedConversationId,
+                    meetingTitle,
+                    id: `meeting-notification-${nextNotificationId++}`,
+                    qualifiedCreator,
+                    meetingStartTime,
+                  };
+                },
+              )
+              .with(
+                {kind: MeetingNotificationKind.UPDATE},
+                ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => {
+                  return {
+                    kind,
+                    qualifiedId,
+                    qualifiedConversationId,
+                    meetingTitle,
+                    id: `meeting-notification-${nextNotificationId++}`,
+                    qualifiedCreator,
+                    meetingStartTime,
+                  };
+                },
+              )
+              .with(
+                {kind: MeetingNotificationKind.CANCELLED},
+                ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => {
+                  return {
+                    kind,
+                    qualifiedId,
+                    qualifiedConversationId,
+                    meetingTitle,
+                    id: `meeting-notification-${nextNotificationId++}`,
+                    qualifiedCreator,
+                    meetingStartTime,
+                  };
+                },
+              )
+              .with(
+                {kind: MeetingNotificationKind.ONGOING},
+                ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => {
+                  return {
+                    kind,
+                    qualifiedId,
+                    qualifiedConversationId,
+                    meetingTitle,
+                    id: `meeting-notification-${nextNotificationId++}`,
+                    qualifiedCreator,
+                    meetingStartTime,
+                  };
+                },
+              )
+              .with(
+                {kind: MeetingNotificationKind.REMINDER},
+                ({kind, qualifiedId, qualifiedConversationId, meetingTitle, qualifiedCreator, meetingStartTime}) => {
+                  return {
+                    kind,
+                    qualifiedId,
+                    qualifiedConversationId,
+                    meetingTitle,
+                    id: `meeting-notification-${nextNotificationId++}`,
+                    qualifiedCreator,
+                    meetingStartTime,
+                  };
+                },
+              )
+              .exhaustive(),
+            ...state.notifications,
+          ],
+        };
       });
+    },
+    dismissNotification: id => {
+      return set(state => {
+        const notifications = state.notifications.filter(notification => {
+          return notification.id !== id;
+        });
 
-      return {
-        notifications,
-        ...(state.notifications.length > 0 && notifications.length === 0 ? {isExpanded: false} : {}),
-      };
-    }),
-  clearNotifications: () => {
-    nextNotificationId = 0;
-    set({notifications: [], isExpanded: false});
-  },
-  setIsExpanded: isExpanded => set({isExpanded}),
-}));
+        return {
+          notifications,
+          isExpanded: notifications.length === 0 ? false : state.isExpanded,
+        };
+      });
+    },
+    dismissNotificationsForMeeting: (meetingId, kinds) => {
+      return set(state => {
+        const notifications = state.notifications.filter(notification => {
+          if (!matchQualifiedIds(notification.qualifiedId, meetingId)) {
+            return true;
+          }
+
+          return kinds !== undefined && !kinds.includes(notification.kind);
+        });
+
+        return {
+          notifications,
+          ...(state.notifications.length > 0 && notifications.length === 0 ? {isExpanded: false} : {}),
+        };
+      });
+    },
+    clearNotifications: () => {
+      nextNotificationId = 0;
+      set({notifications: [], isExpanded: false});
+    },
+    setIsExpanded: isExpanded => {
+      return set({isExpanded});
+    },
+  };
+});

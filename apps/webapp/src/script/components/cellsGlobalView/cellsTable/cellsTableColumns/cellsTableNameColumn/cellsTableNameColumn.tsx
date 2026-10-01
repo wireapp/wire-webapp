@@ -85,7 +85,9 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
         <button
           type="button"
           css={desktopNameStyles}
-          onClick={() => handleOpenFile(file)}
+          onClick={() => {
+            return handleOpenFile(file);
+          }}
           aria-controls={id}
           aria-expanded={selectedFile !== null}
           aria-haspopup="dialog"
@@ -113,7 +115,13 @@ const FolderNameColumn = ({name, path}: {name: string; path: string}) => {
   return (
     <>
       <FolderIcon width={24} height={24} />
-      <button type="button" css={desktopNameStyles} onClick={event => openFolder({path, event})}>
+      <button
+        type="button"
+        css={desktopNameStyles}
+        onClick={event => {
+          return openFolder({path, event});
+        }}
+      >
         {name}
       </button>
     </>

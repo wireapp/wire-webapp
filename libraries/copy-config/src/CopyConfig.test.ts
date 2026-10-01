@@ -30,13 +30,17 @@ const LIB_ROOT = path.resolve(__dirname, '..');
 const TEMP_DIR = path.resolve(LIB_ROOT, '.temp');
 const SPEC_HELPERS = './spec/helpers';
 
-jest.mock('./utils', () => ({
-  ...jest.requireActual('./utils'),
-  downloadFileAsync: jest.fn().mockReturnValue(Promise.resolve()),
-}));
+jest.mock('./utils', () => {
+  return {
+    ...jest.requireActual('./utils'),
+    downloadFileAsync: jest.fn().mockReturnValue(Promise.resolve()),
+  };
+});
 
 describe('CopyConfig', () => {
-  afterEach(() => remove(TEMP_DIR));
+  afterEach(() => {
+    return remove(TEMP_DIR);
+  });
 
   describe('constructor', () => {
     it('can be configured using environment variables', async () => {

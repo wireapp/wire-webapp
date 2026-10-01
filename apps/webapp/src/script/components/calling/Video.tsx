@@ -34,14 +34,15 @@ const Video = ({srcObject, ...props}: VideoProps) => {
     refVideo.current.srcObject = srcObject;
   }, [srcObject]);
 
-  useEffect(
-    () => () => {
-      if (refVideo.current !== null) {
-        refVideo.current.srcObject = null;
+  useEffect(() => {
+    const videoElement = refVideo.current;
+
+    return () => {
+      if (videoElement !== null) {
+        videoElement.srcObject = null;
       }
-    },
-    [],
-  );
+    };
+  }, []);
 
   return <video ref={refVideo} {...props} />;
 };

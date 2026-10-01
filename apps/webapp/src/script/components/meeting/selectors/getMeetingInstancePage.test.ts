@@ -21,19 +21,21 @@ import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 
 import {getMeetingInstancePage, getNextMeetingInstancePage} from './getMeetingInstancePage';
 
-const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
-  series_start_date: '2026-06-15T10:00:00.000Z',
-  series_end_date: '2026-06-15T10:30:00.000Z',
-  duration_ms: 30 * 60 * 1000,
-  recurrence: 'doesNotRepeat',
-  conversation_id: 'conversation-id',
-  qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-  qualified_id: {id: 'meeting-id', domain: 'example.com'},
-  qualified_creator: {id: 'creator-id', domain: 'example.com'},
-  title: 'Meeting',
-  tzid: 'Europe/Berlin',
-  ...overrides,
-});
+const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => {
+  return {
+    series_start_date: '2026-06-15T10:00:00.000Z',
+    series_end_date: '2026-06-15T10:30:00.000Z',
+    duration_ms: 30 * 60 * 1000,
+    recurrence: 'doesNotRepeat',
+    conversation_id: 'conversation-id',
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    title: 'Meeting',
+    tzid: 'Europe/Berlin',
+    ...overrides,
+  };
+};
 
 describe('getMeetingInstancePage', () => {
   const from = new Date('2026-06-15T00:00:00.000Z');
@@ -56,11 +58,11 @@ describe('getMeetingInstancePage', () => {
       3,
     );
 
-    expect(page.meetingInstances.map(({meetingSeries}) => meetingSeries.title)).toEqual([
-      'Daily meeting',
-      'Daily meeting',
-      'Daily meeting',
-    ]);
+    expect(
+      page.meetingInstances.map(({meetingSeries}) => {
+        return meetingSeries.title;
+      }),
+    ).toEqual(['Daily meeting', 'Daily meeting', 'Daily meeting']);
     expect(page.hasMore).toBe(true);
   });
 
@@ -91,10 +93,11 @@ describe('getMeetingInstancePage', () => {
       10,
     );
 
-    expect(page.meetingInstances.map(({start}) => start.toISOString())).toEqual([
-      '2026-06-15T10:00:00.000Z',
-      '2026-06-16T10:00:00.000Z',
-    ]);
+    expect(
+      page.meetingInstances.map(({start}) => {
+        return start.toISOString();
+      }),
+    ).toEqual(['2026-06-15T10:00:00.000Z', '2026-06-16T10:00:00.000Z']);
     expect(page.hasMore).toBe(false);
   });
 
@@ -102,14 +105,16 @@ describe('getMeetingInstancePage', () => {
     const firstPage = getMeetingInstancePage([createMeetingSeries({recurrence: 'weekly'})], from, 2);
     const secondPage = getNextMeetingInstancePage(firstPage.cursor, 2);
 
-    expect(firstPage.meetingInstances.map(({start}) => start.toISOString())).toEqual([
-      '2026-06-15T10:00:00.000Z',
-      '2026-06-22T10:00:00.000Z',
-    ]);
-    expect(secondPage.meetingInstances.map(({start}) => start.toISOString())).toEqual([
-      '2026-06-29T10:00:00.000Z',
-      '2026-07-06T10:00:00.000Z',
-    ]);
+    expect(
+      firstPage.meetingInstances.map(({start}) => {
+        return start.toISOString();
+      }),
+    ).toEqual(['2026-06-15T10:00:00.000Z', '2026-06-22T10:00:00.000Z']);
+    expect(
+      secondPage.meetingInstances.map(({start}) => {
+        return start.toISOString();
+      }),
+    ).toEqual(['2026-06-29T10:00:00.000Z', '2026-07-06T10:00:00.000Z']);
     expect(secondPage.hasMore).toBe(true);
   });
 });

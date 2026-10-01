@@ -104,7 +104,9 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
   const onProgress = useCallback((processedNumber: number) => {
     setHistoryState(ExportState.EXPORTING);
-    setNumberOfProcessedRecords(prevState => prevState + processedNumber);
+    setNumberOfProcessedRecords(prevState => {
+      return prevState + processedNumber;
+    });
   }, []);
 
   const onSuccess = useCallback((archiveBlob: Blob) => {
@@ -217,7 +219,9 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         },
         secondaryAction: [
           {
-            action: () => onClose(),
+            action: () => {
+              return onClose();
+            },
             text: translate('backupEncryptionModalCloseBtn'),
           },
         ],

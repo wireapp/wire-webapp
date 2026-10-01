@@ -51,16 +51,20 @@ export const StackedAvatars = ({
 
   return (
     <div css={wrapperStyles} className={className} data-uie-name={dataUieName}>
-      {visibleParticipants.map((participant, index) => (
-        <ParticipantAvatarTooltip
-          key={`${participant.id}-${participant.domain}`}
-          participant={participant}
-          getLabel={name => getParticipantLabel?.(participant, name) ?? name}
-          index={index}
-          avatarSize={avatarSize}
-          avatarRingColor={avatarRingColor}
-        />
-      ))}
+      {visibleParticipants.map((participant, index) => {
+        return (
+          <ParticipantAvatarTooltip
+            key={`${participant.id}-${participant.domain}`}
+            participant={participant}
+            getLabel={name => {
+              return getParticipantLabel?.(participant, name) ?? name;
+            }}
+            index={index}
+            avatarSize={avatarSize}
+            avatarRingColor={avatarRingColor}
+          />
+        );
+      })}
       {overflowCount > 0 && <span css={overflowCountStyles}>+{overflowCount}</span>}
     </div>
   );

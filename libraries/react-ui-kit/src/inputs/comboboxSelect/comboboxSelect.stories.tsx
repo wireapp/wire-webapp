@@ -38,11 +38,13 @@ const meta = {
     layout: 'centered',
   },
   decorators: [
-    Story => (
-      <div style={{width: '476px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{width: '476px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   tags: ['autodocs'],
 } satisfies Meta<typeof ComboboxSelect>;
@@ -91,8 +93,12 @@ const CreatableSelectWrapper = (args: ComboboxSelectProps) => {
       value: inputValue.toLowerCase().replace(/\W/g, ''),
       label: inputValue,
     };
-    setOptions(prev => [...prev, newOption]);
-    setSelectedValue(prev => [...prev, newOption]);
+    setOptions(prev => {
+      return [...prev, newOption];
+    });
+    setSelectedValue(prev => {
+      return [...prev, newOption];
+    });
   };
 
   const handleChange = (value: Option | Option[]) => {
@@ -119,7 +125,9 @@ export const Creatable: Story = {
     noOptionsMessage: 'No options available',
     required: true,
   },
-  render: args => <CreatableSelectWrapper {...args} />,
+  render: args => {
+    return <CreatableSelectWrapper {...args} />;
+  },
 };
 
 export const WithLabel: Story = {

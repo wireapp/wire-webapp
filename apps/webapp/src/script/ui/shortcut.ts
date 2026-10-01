@@ -198,7 +198,9 @@ export const Shortcut = {
       .replace('up', '↑')
       .replace('down', '↓')
       .replace('graveaccent', 'n')
-      .replace(/\w+/g, string => capitalizeFirstChar(string));
+      .replace(/\w+/g, string => {
+        return capitalizeFirstChar(string);
+      });
   },
 
   getShortcut: (shortcutName: string): string => {

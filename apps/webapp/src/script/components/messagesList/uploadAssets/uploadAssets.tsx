@@ -39,13 +39,19 @@ export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Pro
     return null;
   }
 
-  const currentConversationProcessQueue = processQueue.filter(item => item.conversationId === conversationId);
+  const currentConversationProcessQueue = processQueue.filter(item => {
+    return item.conversationId === conversationId;
+  });
 
   if (!currentConversationProcessQueue.length) {
     return null;
   }
 
-  const uploadProgressMap = new Map(uploadProgressQueue.map(item => [item.messageId, item]));
+  const uploadProgressMap = new Map(
+    uploadProgressQueue.map(item => {
+      return [item.messageId, item];
+    }),
+  );
 
   return (
     <div css={uploadAssetsContainer} data-uie-name="upload-assets">

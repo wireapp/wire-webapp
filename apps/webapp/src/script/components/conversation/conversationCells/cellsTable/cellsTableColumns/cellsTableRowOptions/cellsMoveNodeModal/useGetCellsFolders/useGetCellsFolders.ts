@@ -78,7 +78,9 @@ export const useGetCellsFolders = ({
       }
 
       const transformedFolders = transformNodesToCellsFolders(result.Nodes);
-      const filteredFolders = transformedFolders.filter(folder => folder.path !== nodeToMove.path);
+      const filteredFolders = transformedFolders.filter(folder => {
+        return folder.path !== nodeToMove.path;
+      });
 
       setFolders(filteredFolders);
       setStatus('success');
@@ -105,7 +107,9 @@ export const useGetCellsFolders = ({
       setShouldShowLoadingSpinner(true);
     }, SHOW_LOADING_SPINNER_DELAY_MS);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      return clearTimeout(timeout);
+    };
   }, [status]);
 
   return {

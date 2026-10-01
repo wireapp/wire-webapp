@@ -103,7 +103,9 @@ export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadat
   router.get('/oidc?', (_req, res) => {
     const {query} = _req;
     const queryString = Object.keys(query)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as string)}`)
+      .map(key => {
+        return `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as string)}`;
+      })
       .join('&');
     return res.redirect(
       HTTP_STATUS.MOVED_TEMPORARILY,

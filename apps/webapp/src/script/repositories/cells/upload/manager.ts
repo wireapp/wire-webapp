@@ -53,8 +53,9 @@ export type CellsUploadManager = {
 
 export const createCellsUploadManager = (dependencies: CellsUploadProcessDependencies): CellsUploadManager => {
   const processes = new Map<string, CellsUploadProcess>();
-  const unknown = <T>(uploadId: string): Result<T, CellsUploadManagerError> =>
-    Result.err({kind: 'unknownUpload', uploadId});
+  const unknown = <T>(uploadId: string): Result<T, CellsUploadManagerError> => {
+    return Result.err({kind: 'unknownUpload', uploadId});
+  };
   const processFor = (uploadId: string): Result<CellsUploadProcess, CellsUploadManagerError> => {
     const process = Maybe.of(processes.get(uploadId));
     return maybe.isJust(process) ? Result.ok(process.value) : unknown(uploadId);
@@ -97,13 +98,27 @@ export const createCellsUploadManager = (dependencies: CellsUploadProcessDepende
       const process = processFor(uploadId);
       return process.isErr ? Result.err(process.error) : process.value.subscribe(listener);
     },
-    start: uploadId => command(uploadId, 'start'),
-    cancel: uploadId => command(uploadId, 'cancel'),
-    retryUpload: uploadId => command(uploadId, 'retryUpload'),
-    publish: uploadId => command(uploadId, 'publish'),
-    retryPublish: uploadId => command(uploadId, 'retryPublish'),
-    discard: uploadId => command(uploadId, 'discard'),
-    retryDiscard: uploadId => command(uploadId, 'retryDiscard'),
+    start: uploadId => {
+      return command(uploadId, 'start');
+    },
+    cancel: uploadId => {
+      return command(uploadId, 'cancel');
+    },
+    retryUpload: uploadId => {
+      return command(uploadId, 'retryUpload');
+    },
+    publish: uploadId => {
+      return command(uploadId, 'publish');
+    },
+    retryPublish: uploadId => {
+      return command(uploadId, 'retryPublish');
+    },
+    discard: uploadId => {
+      return command(uploadId, 'discard');
+    },
+    retryDiscard: uploadId => {
+      return command(uploadId, 'retryDiscard');
+    },
     release,
   };
 };

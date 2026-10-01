@@ -31,13 +31,15 @@ const rotation: Rotation = {
   right: 270,
 };
 
-export const DropdownFilledIcon = ({direction = 'down', ...props}: DropdownFilledIconProps) => (
-  <SVGIcon realWidth={10} realHeight={5} {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      transform={`rotate(${rotation[direction]} 5 2.5)`}
-      d="M0.853553 0.853553C0.53857 0.53857 0.761654 0 1.20711 0H8.79289C9.23835 0 9.46143 0.538571 9.14645 0.853553L5.35355 4.64645C5.15829 4.84171 4.84171 4.84171 4.64645 4.64645L0.853553 0.853553Z"
-    />
-  </SVGIcon>
-);
+export const DropdownFilledIcon = ({direction = 'down', ...props}: DropdownFilledIconProps) => {
+  return (
+    <SVGIcon realWidth={10} realHeight={5} {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        transform={`rotate(${rotation[direction]} 5 2.5)`}
+        d="M0.853553 0.853553C0.53857 0.53857 0.761654 0 1.20711 0H8.79289C9.23835 0 9.46143 0.538571 9.14645 0.853553L5.35355 4.64645C5.15829 4.84171 4.84171 4.84171 4.64645 4.64645L0.853553 0.853553Z"
+      />
+    </SVGIcon>
+  );
+};

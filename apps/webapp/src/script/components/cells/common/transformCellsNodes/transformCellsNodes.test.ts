@@ -26,14 +26,15 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {transformCellsNodes} from './transformCellsNodes';
 
-const createStubNode = (properties: Partial<RestNode> = {}): RestNode =>
-  ({
+const createStubNode = (properties: Partial<RestNode> = {}): RestNode => {
+  return {
     Path: 'conversation@example.com/report.pdf',
     Type: 'LEAF',
     Uuid: 'node-id',
     ContextWorkspace: {Uuid: 'conversation@example.com'},
     ...properties,
-  }) as RestNode;
+  } as RestNode;
+};
 
 describe('transformCellsNodes', () => {
   it('preserves backend tag order in the cell model', () => {

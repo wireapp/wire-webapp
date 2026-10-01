@@ -57,7 +57,9 @@ describe('IncrementalRetryBackoffRunner', () => {
       incrementalRetryBackoffPolicy,
     });
     let incrementalRetryBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
-    const runRequestAttempt = jest.fn(async () => 'response');
+    const runRequestAttempt = jest.fn(async () => {
+      return 'response';
+    });
 
     const response = await incrementalRetryBackoffRunner.runWithIncrementalRetryBackoff({
       abortSignal: Maybe.nothing(),

@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const SpeakerIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M.5 12c-.3 0-.5-.3-.5-.6V4.6c0-.3.2-.6.5-.6H5l5-4v16l-5-4H.5zM12 10a2 2 0 1 0 0-4V4a4 4 0 1 1 0 8v-2z" />
-  </SVGIcon>
-);
+export const SpeakerIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path d="M.5 12c-.3 0-.5-.3-.5-.6V4.6c0-.3.2-.6.5-.6H5l5-4v16l-5-4H.5zM12 10a2 2 0 1 0 0-4V4a4 4 0 1 1 0 8v-2z" />
+    </SVGIcon>
+  );
+};

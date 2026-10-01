@@ -36,22 +36,32 @@ try {
 
 const getTests = (suite: JSONReportSuite): (JSONReportTest & {file: string; title: string; tags: string[]})[] => {
   return [
-    ...(suite.specs.flatMap(spec =>
-      spec.tests.map(test => ({
-        ...test,
-        file: spec.file,
-        // If no title is provided the file would be used which is redundant
-        title: spec.file !== suite.title ? `${suite.title} > ${spec.title}` : spec.title,
-        tags: spec.tags,
-      })),
-    ) ?? []),
-    ...(suite.suites?.flatMap(suite => getTests(suite)) ?? []),
+    ...(suite.specs.flatMap(spec => {
+      return spec.tests.map(test => {
+        return {
+          ...test,
+          file: spec.file,
+          // If no title is provided the file would be used which is redundant
+          title: spec.file !== suite.title ? `${suite.title} > ${spec.title}` : spec.title,
+          tags: spec.tags,
+        };
+      });
+    }) ?? []),
+    ...(suite.suites?.flatMap(suite => {
+      return getTests(suite);
+    }) ?? []),
   ];
 };
 
-const tests = report.suites.flatMap(suite => getTests(suite));
-const failedOrFlakyTests = tests.filter(test => test.status === 'unexpected' || test.status === 'flaky');
-const testFilesToReport = Object.groupBy(failedOrFlakyTests, test => test.file);
+const tests = report.suites.flatMap(suite => {
+  return getTests(suite);
+});
+const failedOrFlakyTests = tests.filter(test => {
+  return test.status === 'unexpected' || test.status === 'flaky';
+});
+const testFilesToReport = Object.groupBy(failedOrFlakyTests, test => {
+  return test.file;
+});
 
 const testDetails = Object.values(testFilesToReport).reduce((acc, testFile) => {
   if (!testFile?.length) {
@@ -59,19 +69,31 @@ const testDetails = Object.values(testFilesToReport).reduce((acc, testFile) => {
   }
 
   const failedTests = testFile
-    .filter(test => test.status === 'unexpected')
-    .map(({title, tags}) => `❌ ${title} (tags: ${tags.join(', ')})`);
+    .filter(test => {
+      return test.status === 'unexpected';
+    })
+    .map(({title, tags}) => {
+      return `❌ ${title} (tags: ${tags.join(', ')})`;
+    });
 
   const flakyTests = testFile
-    .filter(test => test.status === 'flaky')
-    .map(({title, tags}) => `⚠️ ${title} (tags: ${tags.join(', ')})`);
+    .filter(test => {
+      return test.status === 'flaky';
+    })
+    .map(({title, tags}) => {
+      return `⚠️ ${title} (tags: ${tags.join(', ')})`;
+    });
 
   acc += `
 <details>
   <summary>${testFile[0].file} (❌ ${failedTests.length} failed, ⚠️ ${flakyTests.length} flaky)</summary>
 
   <ul>
-    ${[...failedTests, ...flakyTests].map(s => `<li>${s}</li>`).join('\n  ')}
+    ${[...failedTests, ...flakyTests]
+      .map(s => {
+        return `<li>${s}</li>`;
+      })
+      .join('\n  ')}
   </ul>
 </details>
 `;

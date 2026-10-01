@@ -458,12 +458,14 @@ export class MessageRepository {
 
     return new TextContentBuilder(baseMessage)
       .withMentions(
-        mentions.map(mention => ({
-          length: mention.length,
-          qualifiedUserId: mention.userQualifiedId,
-          start: mention.startIndex,
-          userId: mention.userId,
-        })),
+        mentions.map(mention => {
+          return {
+            length: mention.length,
+            qualifiedUserId: mention.userQualifiedId,
+            start: mention.startIndex,
+            userId: mention.userId,
+          };
+        }),
       )
       .withQuote(quoteData)
       .withLinkPreviews(linkPreview ? [linkPreview] : [])
@@ -548,7 +550,9 @@ export class MessageRepository {
     const messagePayload = {
       attachments: originalMessage
         .getMultipartAssets()
-        .map(multipart => multipart.attachments?.() || [])
+        .map(multipart => {
+          return multipart.attachments?.() || [];
+        })
         .flat()
         .filter(Boolean),
       conversation,
@@ -652,7 +656,10 @@ export class MessageRepository {
    */
   public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean) {
     if (this.canUploadAssetsToConversation(conversationEntity)) {
-      Array.from(files).forEach(file => this.uploadFile(conversationEntity, file, asImage));
+      Array.from(files).forEach(file => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- Uploads are intentionally started without awaiting this batch.
+        this.uploadFile(conversationEntity, file, asImage);
+      });
     }
   }
 
@@ -809,9 +816,9 @@ export class MessageRepository {
     }
 
     const attachments = multipartAsset.attachments?.() ?? [];
-    const cellsAttachmentsIds = attachments.flatMap(attachment =>
-      attachment.cellAsset?.uuid ? [attachment.cellAsset.uuid] : [],
-    );
+    const cellsAttachmentsIds = attachments.flatMap(attachment => {
+      return attachment.cellAsset?.uuid ? [attachment.cellAsset.uuid] : [];
+    });
 
     return cellsAttachmentsIds;
   }
@@ -935,8 +942,12 @@ export class MessageRepository {
     const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
     if (showLegalHoldWarning) {
       return showLegalHoldWarningModal(conversation, conversationDegraded, this.translate)
-        .then(() => true)
-        .catch(() => false);
+        .then(() => {
+          return true;
+        })
+        .catch(() => {
+          return false;
+        });
     }
     if (!conversationDegraded) {
       return true;
@@ -971,7 +982,9 @@ export class MessageRepository {
 
     return new Promise(resolve => {
       const options = {
-        close: () => resolve(false),
+        close: () => {
+          return resolve(false);
+        },
         primaryAction: {
           action: () => {
             conversation.verification_state(ConversationVerificationState.UNVERIFIED);
@@ -1089,7 +1102,9 @@ export class MessageRepository {
       : {
           conversationId: conversation.qualifiedId,
           nativePush,
-          onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
+          onClientMismatch: mismatch => {
+            return this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning);
+          },
           payload,
           protocol: CONVERSATION_PROTOCOL.PROTEUS,
           targetMode,
@@ -1124,10 +1139,18 @@ export class MessageRepository {
 
   public updateUserReactions(reactions: ReactionMap, userId: QualifiedId, reaction: ReactionType) {
     const userReactions = reactions
-      .filter(([, users]) => users.some(user => matchQualifiedIds(user, userId)))
-      .map(([reaction]) => reaction);
+      .filter(([, users]) => {
+        return users.some(user => {
+          return matchQualifiedIds(user, userId);
+        });
+      })
+      .map(([reaction]) => {
+        return reaction;
+      });
     const updatedReactions = userReactions.includes(reaction)
-      ? userReactions.filter(r => r !== reaction)
+      ? userReactions.filter(r => {
+          return r !== reaction;
+        })
       : [...userReactions, reaction];
     return updatedReactions.join(',');
   }
@@ -1160,7 +1183,9 @@ export class MessageRepository {
         const device = this.userRepository
           .findUserById(userId)
           ?.devices()
-          .find(device => device.id === clientId);
+          .find(device => {
+            return device.id === clientId;
+          });
 
         device?.meta.isVerified(false);
         // Will trigger the conversation verification handler
@@ -1240,7 +1265,11 @@ export class MessageRepository {
         return;
       }
     }
-    const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
+    const moreMessageIds = moreMessageEntities.length
+      ? moreMessageEntities.map(entity => {
+          return entity.id;
+        })
+      : undefined;
     const confirmationMessage = MessageBuilder.buildConfirmationMessage({
       firstMessageId: messageEntity.id,
       moreMessageIds,
@@ -1400,11 +1429,11 @@ export class MessageRepository {
       supportsMLS() && this.teamState.isMLSEnabled(),
     );
     await Promise.all(
-      selfConversations.map(selfConversation =>
-        this.sendAndInjectMessage(payload, selfConversation, {
+      selfConversations.map(selfConversation => {
+        return this.sendAndInjectMessage(payload, selfConversation, {
           skipInjection: true,
-        }),
-      ),
+        });
+      }),
     );
   }
 
@@ -1437,9 +1466,9 @@ export class MessageRepository {
     }
 
     const senderId = message.qualifiedFrom;
-    const senderInConversation = conversation
-      .participating_user_ets()
-      .some(user => matchQualifiedIds(senderId, user.qualifiedId));
+    const senderInConversation = conversation.participating_user_ets().some(user => {
+      return matchQualifiedIds(senderId, user.qualifiedId);
+    });
 
     if (!senderInConversation) {
       message.setButtonError(buttonId, this.translate('buttonActionError'));
@@ -1501,8 +1530,12 @@ export class MessageRepository {
       .filter(user => {
         return !user.isFederated;
       })
-      .toSorted(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
-    const [members, other] = partition(sortedUsers, user => this.teamState.isInTeam(user));
+      .toSorted(({id: idA}, {id: idB}) => {
+        return idA.localeCompare(idB, undefined, {sensitivity: 'base'});
+      });
+    const [members, other] = partition(sortedUsers, user => {
+      return this.teamState.isInTeam(user);
+    });
     const selfUser = this.userState.self();
     if (selfUser === undefined) {
       throw new Error('Self user is not available');
@@ -1590,7 +1623,9 @@ export class MessageRepository {
   private createRecipients(users: User[]): QualifiedUserClients {
     return users.reduce((userClients, user) => {
       userClients[user.domain] ||= {};
-      userClients[user.domain][user.id] = user.devices().map(client => client.id);
+      userClients[user.domain][user.id] = user.devices().map(client => {
+        return client.id;
+      });
       return userClients;
     }, {} as QualifiedUserClients);
   }
@@ -1607,14 +1642,29 @@ export class MessageRepository {
     const filteredUsers = conversation
       .allUserEntities()
       // filter possible undefined values
-      .flatMap(user => (user ? [user] : []))
+      .flatMap(user => {
+        return user ? [user] : [];
+      })
       // if users are given by the caller, we filter to only keep those users
-      .filter(user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)))
+      .filter(user => {
+        return (
+          !recipients ||
+          recipients.some(userId => {
+            return matchQualifiedIds(user, userId);
+          })
+        );
+      })
       // we filter the self user if skipSelf is true
-      .filter(user => !skipSelf || !user.isMe);
+      .filter(user => {
+        return !skipSelf || !user.isMe;
+      });
 
     // Check if we have users without assigned clients and assign them from local database if possible
-    if (filteredUsers.some(user => user?.devices().length === 0)) {
+    if (
+      filteredUsers.some(user => {
+        return user?.devices().length === 0;
+      })
+    ) {
       await this.userRepository.assignAllClients();
     }
 
@@ -1830,13 +1880,19 @@ export class MessageRepository {
     if (actionType !== undefined) {
       const selfUserTeamId = this.userState.self()?.teamId;
       const participants = conversationEntity.participating_user_ets();
-      const guests = participants.filter(user => user.isGuest()).length;
-      const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+      const guests = participants.filter(user => {
+        return user.isGuest();
+      }).length;
+      const guestsWireless = participants.filter(user => {
+        return user.isTemporaryGuest();
+      }).length;
       // guests that are from a different team
       const guestsPro = participants.filter(user => {
         return user.teamId !== undefined && user.teamId !== '' && user.teamId !== selfUserTeamId;
       }).length;
-      const services = participants.filter(user => user.isService).length;
+      const services = participants.filter(user => {
+        return user.isService;
+      }).length;
 
       let segmentations: ContributedSegmentations = {
         [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),

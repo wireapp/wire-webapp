@@ -267,171 +267,245 @@ export interface PushLoginDataAction extends AppAction {
   readonly type: AUTH_ACTION.PUSH_LOGIN_DATA;
 }
 export class AuthActionCreator {
-  static startLogin = (): LoginStartAction => ({
-    type: AUTH_ACTION.LOGIN_START,
-  });
+  static startLogin = (): LoginStartAction => {
+    return {
+      type: AUTH_ACTION.LOGIN_START,
+    };
+  };
 
-  static successfulLogin = (): LoginSuccessAction => ({
-    type: AUTH_ACTION.LOGIN_SUCCESS,
-  });
+  static successfulLogin = (): LoginSuccessAction => {
+    return {
+      type: AUTH_ACTION.LOGIN_SUCCESS,
+    };
+  };
 
-  static failedLogin = (error: Error): LoginFailedAction => ({
-    error,
-    type: AUTH_ACTION.LOGIN_FAILED,
-  });
+  static failedLogin = (error: Error): LoginFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.LOGIN_FAILED,
+    };
+  };
 
-  static startSendOAuthCode = (): SendOAuthCodeStartAction => ({
-    type: AUTH_ACTION.SEND_OAUTH_CODE_START,
-  });
+  static startSendOAuthCode = (): SendOAuthCodeStartAction => {
+    return {
+      type: AUTH_ACTION.SEND_OAUTH_CODE_START,
+    };
+  };
 
-  static successfulSendOAuthCode = (): SendOAuthCodeSuccessAction => ({
-    type: AUTH_ACTION.SEND_OAUTH_CODE_SUCCESS,
-  });
+  static successfulSendOAuthCode = (): SendOAuthCodeSuccessAction => {
+    return {
+      type: AUTH_ACTION.SEND_OAUTH_CODE_SUCCESS,
+    };
+  };
 
-  static failedSendOAuthCode = (error: Error): SendOAuthCodeFailedAction => ({
-    error,
-    type: AUTH_ACTION.SEND_OAUTH_CODE_FAILED,
-  });
+  static failedSendOAuthCode = (error: Error): SendOAuthCodeFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.SEND_OAUTH_CODE_FAILED,
+    };
+  };
 
-  static startSendTwoFactorCode = (): SendTwoFactorCodeStartAction => ({
-    type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_START,
-  });
+  static startSendTwoFactorCode = (): SendTwoFactorCodeStartAction => {
+    return {
+      type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_START,
+    };
+  };
 
-  static successfulSendTwoFactorCode = (): SendTwoFactorCodeSuccessAction => ({
-    type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS,
-  });
+  static successfulSendTwoFactorCode = (): SendTwoFactorCodeSuccessAction => {
+    return {
+      type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS,
+    };
+  };
 
-  static failedSendTwoFactorCode = (error: Error): SendTwoFactorCodeFailedAction => ({
-    error,
-    type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED,
-  });
+  static failedSendTwoFactorCode = (error: Error): SendTwoFactorCodeFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED,
+    };
+  };
 
-  static startFetchTeam = (): FetchTeamStartAction => ({
-    type: AUTH_ACTION.FETCH_TEAM_START,
-  });
+  static startFetchTeam = (): FetchTeamStartAction => {
+    return {
+      type: AUTH_ACTION.FETCH_TEAM_START,
+    };
+  };
 
-  static successfulFetchTeam = (teamData: TeamData): FetchTeamSuccessAction => ({
-    payload: teamData,
-    type: AUTH_ACTION.FETCH_TEAM_SUCCESS,
-  });
+  static successfulFetchTeam = (teamData: TeamData): FetchTeamSuccessAction => {
+    return {
+      payload: teamData,
+      type: AUTH_ACTION.FETCH_TEAM_SUCCESS,
+    };
+  };
 
-  static failedFetchTeam = (error: Error): FetchTeamFailedAction => ({
-    error,
-    type: AUTH_ACTION.FETCH_TEAM_FAILED,
-  });
-  static startFetchOAuth = (): FetchApplicationStartAction => ({
-    type: AUTH_ACTION.FETCH_OAUTH_APP_START,
-  });
+  static failedFetchTeam = (error: Error): FetchTeamFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.FETCH_TEAM_FAILED,
+    };
+  };
+  static startFetchOAuth = (): FetchApplicationStartAction => {
+    return {
+      type: AUTH_ACTION.FETCH_OAUTH_APP_START,
+    };
+  };
 
-  static successfulFetchOAuth = (application: OAuthClient): FetchApplicationSuccessAction => ({
-    payload: application,
-    type: AUTH_ACTION.FETCH_OAUTH_APP_SUCCESS,
-  });
+  static successfulFetchOAuth = (application: OAuthClient): FetchApplicationSuccessAction => {
+    return {
+      payload: application,
+      type: AUTH_ACTION.FETCH_OAUTH_APP_SUCCESS,
+    };
+  };
 
-  static failedFetchOAuth = (error: Error): FetchApplicationFailedAction => ({
-    error,
-    type: AUTH_ACTION.FETCH_OAUTH_APP_FAILED,
-  });
+  static failedFetchOAuth = (error: Error): FetchApplicationFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.FETCH_OAUTH_APP_FAILED,
+    };
+  };
 
-  static startRegisterPersonal = (): RegisterPersonalStartAction => ({
-    type: AUTH_ACTION.REGISTER_PERSONAL_START,
-  });
+  static startRegisterPersonal = (): RegisterPersonalStartAction => {
+    return {
+      type: AUTH_ACTION.REGISTER_PERSONAL_START,
+    };
+  };
 
-  static successfulRegisterPersonal = (authData: RegisterData): RegisterPersonalSuccessAction => ({
-    payload: authData,
-    type: AUTH_ACTION.REGISTER_PERSONAL_SUCCESS,
-  });
+  static successfulRegisterPersonal = (authData: RegisterData): RegisterPersonalSuccessAction => {
+    return {
+      payload: authData,
+      type: AUTH_ACTION.REGISTER_PERSONAL_SUCCESS,
+    };
+  };
 
-  static failedRegisterPersonal = (error: Error): RegisterPersonalFailedAction => ({
-    error,
-    type: AUTH_ACTION.REGISTER_PERSONAL_FAILED,
-  });
+  static failedRegisterPersonal = (error: Error): RegisterPersonalFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.REGISTER_PERSONAL_FAILED,
+    };
+  };
 
-  static startRegisterWireless = (): RegisterWirelessStartAction => ({
-    type: AUTH_ACTION.REGISTER_WIRELESS_START,
-  });
+  static startRegisterWireless = (): RegisterWirelessStartAction => {
+    return {
+      type: AUTH_ACTION.REGISTER_WIRELESS_START,
+    };
+  };
 
-  static successfulRegisterWireless = (authData: RegisterData): RegisterWirelessSuccessAction => ({
-    payload: authData,
-    type: AUTH_ACTION.REGISTER_WIRELESS_SUCCESS,
-  });
+  static successfulRegisterWireless = (authData: RegisterData): RegisterWirelessSuccessAction => {
+    return {
+      payload: authData,
+      type: AUTH_ACTION.REGISTER_WIRELESS_SUCCESS,
+    };
+  };
 
-  static failedRegisterWireless = (error: Error): RegisterWirelessFailedAction => ({
-    error,
-    type: AUTH_ACTION.REGISTER_WIRELESS_FAILED,
-  });
+  static failedRegisterWireless = (error: Error): RegisterWirelessFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.REGISTER_WIRELESS_FAILED,
+    };
+  };
 
-  static startRegisterJoin = (): RegisterJoinStartAction => ({
-    type: AUTH_ACTION.REGISTER_JOIN_START,
-  });
+  static startRegisterJoin = (): RegisterJoinStartAction => {
+    return {
+      type: AUTH_ACTION.REGISTER_JOIN_START,
+    };
+  };
 
-  static successfulRegisterJoin = (authData: RegisterData): RegisterJoinSuccessAction => ({
-    payload: authData,
-    type: AUTH_ACTION.REGISTER_JOIN_SUCCESS,
-  });
+  static successfulRegisterJoin = (authData: RegisterData): RegisterJoinSuccessAction => {
+    return {
+      payload: authData,
+      type: AUTH_ACTION.REGISTER_JOIN_SUCCESS,
+    };
+  };
 
-  static failedRegisterJoin = (error: Error): RegisterJoinFailedAction => ({
-    error,
-    type: AUTH_ACTION.REGISTER_JOIN_FAILED,
-  });
+  static failedRegisterJoin = (error: Error): RegisterJoinFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.REGISTER_JOIN_FAILED,
+    };
+  };
 
-  static startRefresh = (): RefreshStartAction => ({
-    type: AUTH_ACTION.REFRESH_START,
-  });
+  static startRefresh = (): RefreshStartAction => {
+    return {
+      type: AUTH_ACTION.REFRESH_START,
+    };
+  };
 
-  static successfulRefresh = (): RefreshSuccessAction => ({
-    type: AUTH_ACTION.REFRESH_SUCCESS,
-  });
+  static successfulRefresh = (): RefreshSuccessAction => {
+    return {
+      type: AUTH_ACTION.REFRESH_SUCCESS,
+    };
+  };
 
-  static failedRefresh = (error: Error): RefreshFailedAction => ({
-    error,
-    type: AUTH_ACTION.REFRESH_FAILED,
-  });
+  static failedRefresh = (error: Error): RefreshFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.REFRESH_FAILED,
+    };
+  };
 
-  static startGetSSOSettings = (): GetSSOSettingsStartAction => ({
-    type: AUTH_ACTION.GET_SSO_SETTINGS_START,
-  });
+  static startGetSSOSettings = (): GetSSOSettingsStartAction => {
+    return {
+      type: AUTH_ACTION.GET_SSO_SETTINGS_START,
+    };
+  };
 
-  static successfulGetSSOSettings = (ssoSettings: SSOSettings): GetSSOSettingsSuccessAction => ({
-    payload: ssoSettings,
-    type: AUTH_ACTION.GET_SSO_SETTINGS_SUCCESS,
-  });
+  static successfulGetSSOSettings = (ssoSettings: SSOSettings): GetSSOSettingsSuccessAction => {
+    return {
+      payload: ssoSettings,
+      type: AUTH_ACTION.GET_SSO_SETTINGS_SUCCESS,
+    };
+  };
 
-  static failedGetSSOSettings = (error: Error): GetSSOSettingsFailedAction => ({
-    error,
-    type: AUTH_ACTION.GET_SSO_SETTINGS_FAILED,
-  });
+  static failedGetSSOSettings = (error: Error): GetSSOSettingsFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.GET_SSO_SETTINGS_FAILED,
+    };
+  };
 
-  static successfulLogout = (): LogoutSuccessAction => ({
-    type: AUTH_ACTION.LOGOUT_SUCCESS,
-  });
+  static successfulLogout = (): LogoutSuccessAction => {
+    return {
+      type: AUTH_ACTION.LOGOUT_SUCCESS,
+    };
+  };
 
-  static failedLogout = (error: Error): LogoutFailedAction => ({
-    error,
-    type: AUTH_ACTION.LOGOUT_FAILED,
-  });
+  static failedLogout = (error: Error): LogoutFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.LOGOUT_FAILED,
+    };
+  };
 
-  static successfulSilentLogout = (): LogoutSilentSuccessAction => ({
-    type: AUTH_ACTION.SILENT_LOGOUT_SUCCESS,
-  });
+  static successfulSilentLogout = (): LogoutSilentSuccessAction => {
+    return {
+      type: AUTH_ACTION.SILENT_LOGOUT_SUCCESS,
+    };
+  };
 
-  static failedSilentLogout = (error: Error): LogoutSilentFailedAction => ({
-    error,
-    type: AUTH_ACTION.SILENT_LOGOUT_FAILED,
-  });
+  static failedSilentLogout = (error: Error): LogoutSilentFailedAction => {
+    return {
+      error,
+      type: AUTH_ACTION.SILENT_LOGOUT_FAILED,
+    };
+  };
 
-  static resetError = (): ResetAuthErrorsAction => ({
-    type: AUTH_ACTION.AUTH_RESET_ERROR,
-  });
+  static resetError = (): ResetAuthErrorsAction => {
+    return {
+      type: AUTH_ACTION.AUTH_RESET_ERROR,
+    };
+  };
 
-  static resetAccountData = (): ResetRegistrationDataAction => ({
-    type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
-  });
+  static resetAccountData = (): ResetRegistrationDataAction => {
+    return {
+      type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
+    };
+  };
 
-  static pushAccountRegistrationData = (accountData: Partial<RegistrationDataState>): PushRegistrationDataAction => ({
-    payload: accountData,
-    type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
-  });
+  static pushAccountRegistrationData = (accountData: Partial<RegistrationDataState>): PushRegistrationDataAction => {
+    return {
+      payload: accountData,
+      type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
+    };
+  };
 
   static pushEntropyData = (entropy: Uint8Array): PushEntropyDataAction => {
     return {
@@ -440,12 +514,16 @@ export class AuthActionCreator {
     };
   };
 
-  static pushLoginData = (loginData: Partial<LoginDataState>): PushLoginDataAction => ({
-    payload: loginData,
-    type: AUTH_ACTION.PUSH_LOGIN_DATA,
-  });
+  static pushLoginData = (loginData: Partial<LoginDataState>): PushLoginDataAction => {
+    return {
+      payload: loginData,
+      type: AUTH_ACTION.PUSH_LOGIN_DATA,
+    };
+  };
 
-  static resetLoginData = (): ResetLoginDataAction => ({
-    type: AUTH_ACTION.RESET_LOGIN_DATA,
-  });
+  static resetLoginData = (): ResetLoginDataAction => {
+    return {
+      type: AUTH_ACTION.RESET_LOGIN_DATA,
+    };
+  };
 }

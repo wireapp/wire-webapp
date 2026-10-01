@@ -48,8 +48,8 @@ describe('AudioSpeakerFactory', () => {
     jest.resetModules();
     AudioSpeakerFactory = require('./AudioSpeakerFactory').AudioSpeakerFactory;
 
-    expect(() => AudioSpeakerFactory.createNewCallingAudioSpeaker(mockStream)).toThrow(
-      'Audio element could not be crated!',
-    );
+    expect(() => {
+      return AudioSpeakerFactory.createNewCallingAudioSpeaker(mockStream);
+    }).toThrow('Audio element could not be crated!');
   });
 });

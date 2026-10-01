@@ -50,24 +50,31 @@ const expectedFileTypeFilterItemIds = [
   'text',
 ];
 
-const isFileTypePopoverFilter = (filter: FilterConfig): filter is PopoverFilterConfig =>
-  filter.id === 'fileType' && filter.type === 'popover';
+const isFileTypePopoverFilter = (filter: FilterConfig): filter is PopoverFilterConfig => {
+  return filter.id === 'fileType' && filter.type === 'popover';
+};
 
 const cellsRepository = {} as CellsRepository;
 
 const conversationRepository = {
-  getAllCellEnabledGroupConversations: () => [],
+  getAllCellEnabledGroupConversations: () => {
+    return [];
+  },
 } as unknown as ConversationRepository;
 
 describe('useGlobalDriveFilters', () => {
   beforeEach(() => {
     container.clearInstances();
     container.registerInstance(TeamState, {
-      selfRole: ko.pureComputed(() => undefined),
+      selfRole: ko.pureComputed(() => {
+        return undefined;
+      }),
       teamFeatures: ko.observable(undefined),
     } as unknown as TeamState);
     container.registerInstance(ConversationState, {
-      channelConversations: ko.pureComputed(() => []),
+      channelConversations: ko.pureComputed(() => {
+        return [];
+      }),
     } as unknown as ConversationState);
     container.registerInstance(Core, {
       backendFeatures: {version: 0},
@@ -76,7 +83,9 @@ describe('useGlobalDriveFilters', () => {
 
   it('exposes file type filter items in the required display order', () => {
     const {result} = renderHook(
-      () => useGlobalDriveFilters({cellsRepository, conversationRepository, translate: translateForTest}),
+      () => {
+        return useGlobalDriveFilters({cellsRepository, conversationRepository, translate: translateForTest});
+      },
       {
         wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest})),
       },
@@ -84,6 +93,10 @@ describe('useGlobalDriveFilters', () => {
 
     const fileTypeFilter = result.current.filters.find(isFileTypePopoverFilter);
 
-    expect(fileTypeFilter?.items.map(({id}) => id)).toEqual(expectedFileTypeFilterItemIds);
+    expect(
+      fileTypeFilter?.items.map(({id}) => {
+        return id;
+      }),
+    ).toEqual(expectedFileTypeFilterItemIds);
   });
 });

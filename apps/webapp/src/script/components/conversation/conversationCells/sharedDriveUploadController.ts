@@ -48,10 +48,12 @@ export type SharedDriveUploadRequest = {
   readonly path: string;
 };
 
-const addUploadMetadata = (source: UploadSource, file: File): UploadSource => ({
-  ...source,
-  ...(isNonEmptyString(file.webkitRelativePath) ? {relativePath: file.webkitRelativePath} : {}),
-});
+const addUploadMetadata = (source: UploadSource, file: File): UploadSource => {
+  return {
+    ...source,
+    ...(isNonEmptyString(file.webkitRelativePath) ? {relativePath: file.webkitRelativePath} : {}),
+  };
+};
 
 type SharedDriveUploadSnapshotListener = () => void;
 
@@ -88,10 +90,15 @@ export type SharedDriveUploadStrategy = {
 const isTerminalBatch = (
   currentBatchUploadIds: Set<string> | undefined,
   uploadStrategy: SharedDriveUploadStrategy,
-): boolean =>
-  currentBatchUploadIds !== undefined &&
-  currentBatchUploadIds.size > 0 &&
-  [...currentBatchUploadIds].every(uploadId => isTerminalUploadState(uploadStrategy.snapshot(uploadId)));
+): boolean => {
+  return (
+    currentBatchUploadIds !== undefined &&
+    currentBatchUploadIds.size > 0 &&
+    [...currentBatchUploadIds].every(uploadId => {
+      return isTerminalUploadState(uploadStrategy.snapshot(uploadId));
+    })
+  );
+};
 
 type DirectUploadStrategyDependencies = {
   readonly cellsRepository: Pick<CellsRepository, 'uploadNode'>;
@@ -117,7 +124,9 @@ export const createDraftSharedDriveUploadStrategy = ({
 
   const attach = (uploadId: string, listener: SharedDriveUploadSnapshotListener): void => {
     listenersByUploadId.set(uploadId, listener);
-    const subscription = manager.subscribe(uploadId, () => listener());
+    const subscription = manager.subscribe(uploadId, () => {
+      return listener();
+    });
     if (subscription.isOk) {
       subscriptions.set(uploadId, subscription.value);
     }
@@ -153,15 +162,27 @@ export const createDraftSharedDriveUploadStrategy = ({
   };
 
   return {
-    register: (uploadId, source, path) => manager.register(uploadId, source, path),
+    register: (uploadId, source, path) => {
+      return manager.register(uploadId, source, path);
+    },
     attach,
     run: startAndPublishFile,
-    snapshot: uploadId => manager.snapshot(uploadId).unwrapOr(undefined),
-    cancel: uploadId => command(uploadId, manager.cancel),
+    snapshot: uploadId => {
+      return manager.snapshot(uploadId).unwrapOr(undefined);
+    },
+    cancel: uploadId => {
+      return command(uploadId, manager.cancel);
+    },
     retryUpload,
-    retryPublish: uploadId => command(uploadId, manager.retryPublish),
-    discard: uploadId => command(uploadId, manager.discard),
-    retryDiscard: uploadId => command(uploadId, manager.retryDiscard),
+    retryPublish: uploadId => {
+      return command(uploadId, manager.retryPublish);
+    },
+    discard: uploadId => {
+      return command(uploadId, manager.discard);
+    },
+    retryDiscard: uploadId => {
+      return command(uploadId, manager.retryDiscard);
+    },
   };
 };
 
@@ -174,7 +195,11 @@ export const createDirectSharedDriveUploadStrategy = ({
   const requestsByUploadId = new Map<string, SharedDriveUploadRequest>();
   const abortControllersByUploadId = new Map<string, AbortController>();
   const listeners = new Set<SharedDriveUploadSnapshotListener>();
-  const notify = () => listeners.forEach(listener => listener());
+  const notify = () => {
+    return listeners.forEach(listener => {
+      listener();
+    });
+  };
 
   const setState = (uploadId: string, state: UploadState): void => {
     statesByUploadId.set(uploadId, state);
@@ -244,7 +269,9 @@ export const createDirectSharedDriveUploadStrategy = ({
       requestsByUploadId.set(uploadId, request);
       return uploadDirectFile(uploadId, request);
     },
-    snapshot: uploadId => statesByUploadId.get(uploadId),
+    snapshot: uploadId => {
+      return statesByUploadId.get(uploadId);
+    },
     cancel: async uploadId => {
       const state = statesByUploadId.get(uploadId);
       if (state?.kind === 'queued') {
@@ -253,9 +280,15 @@ export const createDirectSharedDriveUploadStrategy = ({
       abortControllersByUploadId.get(uploadId)?.abort();
     },
     retryUpload,
-    retryPublish: async () => undefined,
-    discard: async () => undefined,
-    retryDiscard: async () => undefined,
+    retryPublish: async () => {
+      return undefined;
+    },
+    discard: async () => {
+      return undefined;
+    },
+    retryDiscard: async () => {
+      return undefined;
+    },
   };
 };
 
@@ -270,7 +303,11 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const dismissedUploadIdsByConversation = new Map<string, Set<string>>();
   const queuedWork: UploadWork[] = [];
   let activeWorkCount = 0;
-  const notify = () => listeners.forEach(listener => listener());
+  const notify = () => {
+    return listeners.forEach(listener => {
+      listener();
+    });
+  };
 
   const createDeferredWork = (uploadId: string, execute: () => Promise<boolean>): UploadWork => {
     let resolvePromise: ((succeeded: boolean) => void) | undefined;
@@ -312,8 +349,12 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
       return;
     }
     void execution.then(
-      succeeded => settleWork(work, succeeded),
-      () => settleWork(work, false),
+      succeeded => {
+        return settleWork(work, succeeded);
+      },
+      () => {
+        return settleWork(work, false);
+      },
     );
   };
 
@@ -392,7 +433,9 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
         continue;
       }
 
-      const work = createDeferredWork(uploadId, () => uploadStrategy.run(uploadId, request));
+      const work = createDeferredWork(uploadId, () => {
+        return uploadStrategy.run(uploadId, request);
+      });
       enqueueWork(work);
       works.push(work);
     }
@@ -401,7 +444,11 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     notify();
     pumpQueue();
 
-    const results = await Promise.all(works.map(work => work.promise));
+    const results = await Promise.all(
+      works.map(work => {
+        return work.promise;
+      }),
+    );
     if (results.some(Boolean)) {
       refreshByConversationId.get(conversationQualifiedId)?.();
     }
@@ -439,7 +486,9 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
       return;
     }
 
-    const work = createDeferredWork(id, () => uploadStrategy.retryUpload(id));
+    const work = createDeferredWork(id, () => {
+      return uploadStrategy.retryUpload(id);
+    });
     enqueueWork(work);
     notify();
     pumpQueue();
@@ -450,11 +499,12 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     notify();
   };
 
-  const snapshots = (conversationQualifiedId: string): readonly UploadState[] =>
-    [...(currentBatchUploadIdsByConversation.get(conversationQualifiedId) ?? [])].flatMap(uploadId => {
+  const snapshots = (conversationQualifiedId: string): readonly UploadState[] => {
+    return [...(currentBatchUploadIdsByConversation.get(conversationQualifiedId) ?? [])].flatMap(uploadId => {
       const snapshot = uploadStrategy.snapshot(uploadId);
       return !isUndefined(snapshot) ? [snapshot] : [];
     });
+  };
 
   return {
     upload,
@@ -462,7 +512,9 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
     snapshots,
     subscribe: (listener: () => void) => {
       listeners.add(listener);
-      return () => listeners.delete(listener);
+      return () => {
+        return listeners.delete(listener);
+      };
     },
     cancel,
     retryUpload,
@@ -474,7 +526,8 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
       dismissedUploadIds.add(uploadId);
       dismissedUploadIdsByConversation.set(conversationQualifiedId, dismissedUploadIds);
     },
-    isDismissed: (conversationQualifiedId: string, uploadId: string): boolean =>
-      dismissedUploadIdsByConversation.get(conversationQualifiedId)?.has(uploadId) ?? false,
+    isDismissed: (conversationQualifiedId: string, uploadId: string): boolean => {
+      return dismissedUploadIdsByConversation.get(conversationQualifiedId)?.has(uploadId) ?? false;
+    },
   } satisfies SharedDriveUploadController;
 };

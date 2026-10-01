@@ -37,14 +37,26 @@ export const useIsDragging = () => {
       return undefined;
     }
 
-    element.addEventListener('dragenter', () => setIsDragging(true));
-    element.addEventListener('dragover', () => setIsDragging(true));
-    element.addEventListener('dragleave', () => setIsDragging(false));
+    element.addEventListener('dragenter', () => {
+      return setIsDragging(true);
+    });
+    element.addEventListener('dragover', () => {
+      return setIsDragging(true);
+    });
+    element.addEventListener('dragleave', () => {
+      return setIsDragging(false);
+    });
 
     return () => {
-      element.removeEventListener('dragenter', () => setIsDragging(false));
-      element.removeEventListener('dragover', () => setIsDragging(false));
-      element.removeEventListener('dragleave', () => setIsDragging(false));
+      element.removeEventListener('dragenter', () => {
+        return setIsDragging(false);
+      });
+      element.removeEventListener('dragover', () => {
+        return setIsDragging(false);
+      });
+      element.removeEventListener('dragleave', () => {
+        return setIsDragging(false);
+      });
     };
   }, []);
 

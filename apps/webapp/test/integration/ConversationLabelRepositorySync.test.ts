@@ -63,7 +63,9 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
     // Create repository instance
     conversationLabelRepository = new ConversationLabelRepository(
       allConversations,
-      ko.pureComputed(() => conversations()),
+      ko.pureComputed(() => {
+        return conversations();
+      }),
       propertiesService,
       translate,
     );

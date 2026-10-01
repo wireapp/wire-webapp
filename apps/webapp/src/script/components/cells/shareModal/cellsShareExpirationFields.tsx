@@ -124,14 +124,15 @@ export const getNextHourDateTime = (): Date => {
   return plusOneHour;
 };
 
-const buildTimeOptions = (): Option[] =>
-  Array.from({length: 96}, (_, index) => {
+const buildTimeOptions = (): Option[] => {
+  return Array.from({length: 96}, (_, index) => {
     const totalMinutes = index * 15;
     const hour24 = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     const label = formatTimeLabel(hour24, minutes);
     return {value: label, label};
   });
+};
 
 const getInitialState = (dateTime: Date | null | undefined): {time: Option; date: DateValue} => {
   const effectiveDateTime = dateTime ?? getNextHourDateTime();
@@ -156,8 +157,12 @@ export const CellsShareExpirationFields = ({
   dateTime,
   onChange,
 }: CellsShareExpirationFieldsProps) => {
-  const timeOptions = useMemo(() => buildTimeOptions(), []);
-  const [initialState] = useState(() => getInitialState(dateTime));
+  const timeOptions = useMemo(() => {
+    return buildTimeOptions();
+  }, []);
+  const [initialState] = useState(() => {
+    return getInitialState(dateTime);
+  });
   const [selectedTime, setSelectedTime] = useState<Option>(initialState.time);
   const [selectedDate, setSelectedDate] = useState<DateValue | null>(initialState.date);
   const menuMaxHeight = 200;
@@ -173,10 +178,9 @@ export const CellsShareExpirationFields = ({
     const date = selectedDate.toDate(getLocalTimeZone());
     return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour24, minutes, 0, 0);
   }, [selectedDate, selectedTime]);
-  const isExpirationInvalid = useMemo(
-    () => !isNull(selectedDateTime) && selectedDateTime.getTime() < Date.now(),
-    [selectedDateTime],
-  );
+  const isExpirationInvalid = useMemo(() => {
+    return !isNull(selectedDateTime) && selectedDateTime.getTime() < Date.now();
+  }, [selectedDateTime]);
   const dateGroupStyles = isExpirationInvalid
     ? {...datePickerGroupStyles, ...expirationErrorBorderStyles}
     : {...datePickerGroupStyles, ...datePickerGroupFocusStyles};
@@ -204,11 +208,13 @@ export const CellsShareExpirationFields = ({
           <DatePicker aria-label={labels.dateAriaLabel} value={selectedDate} onChange={setSelectedDate}>
             <Group css={dateGroupStyles} data-uie-name="cells-share-expiration-date">
               <DateInput css={dateInputStyles}>
-                {segment => (
-                  <DateSegment segment={segment} css={dateSegmentStyles}>
-                    {segment.type === 'literal' ? '.' : segment.text}
-                  </DateSegment>
-                )}
+                {segment => {
+                  return (
+                    <DateSegment segment={segment} css={dateSegmentStyles}>
+                      {segment.type === 'literal' ? '.' : segment.text}
+                    </DateSegment>
+                  );
+                }}
               </DateInput>
               <Button css={calendarButtonStyles} aria-label={labels.openCalendarLabel}>
                 <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false" css={calendarIconStyles}>
@@ -271,9 +277,15 @@ export const CellsShareExpirationFields = ({
                   </div>
                   <CalendarGrid css={calendarGridStyles}>
                     <CalendarGridHeader css={calendarGridHeaderStyles}>
-                      {day => <CalendarHeaderCell css={calendarHeaderCellStyles}>{day}</CalendarHeaderCell>}
+                      {day => {
+                        return <CalendarHeaderCell css={calendarHeaderCellStyles}>{day}</CalendarHeaderCell>;
+                      }}
                     </CalendarGridHeader>
-                    <CalendarGridBody>{date => <CalendarCell date={date} css={calendarCellStyles} />}</CalendarGridBody>
+                    <CalendarGridBody>
+                      {date => {
+                        return <CalendarCell date={date} css={calendarCellStyles} />;
+                      }}
+                    </CalendarGridBody>
                   </CalendarGrid>
                 </Calendar>
               </Dialog>

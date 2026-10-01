@@ -50,8 +50,9 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
   const shouldDisableRestrictedActions = useShouldRestrictGlobalDriveNodeActions(node);
   // DropdownMenu.Item disabled state is visual/ARIA only for native onClick handlers.
   // Keep restricted actions without a handler so viewer access cannot activate them.
-  const restrictedActionClickHandler = <ClickHandler extends () => void>(clickHandler: ClickHandler) =>
-    shouldDisableRestrictedActions ? undefined : clickHandler;
+  const restrictedActionClickHandler = <ClickHandler extends () => void>(clickHandler: ClickHandler) => {
+    return shouldDisableRestrictedActions ? undefined : clickHandler;
+  };
 
   return (
     <DropdownMenu>
@@ -63,27 +64,29 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item
-          onClick={() => (node.type === CellNodeType.FOLDER ? openFolder({path: node.path}) : handleOpenFile(node))}
+          onClick={() => {
+            return node.type === CellNodeType.FOLDER ? openFolder({path: node.path}) : handleOpenFile(node);
+          }}
         >
           {translate('cells.options.open')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           disabled={shouldDisableRestrictedActions}
-          onClick={restrictedActionClickHandler(() =>
-            showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate}),
-          )}
+          onClick={restrictedActionClickHandler(() => {
+            return showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker, translate});
+          })}
         >
           {translate('cells.options.share')}
         </DropdownMenu.Item>
         {isNonEmptyString(url) && (
           <DropdownMenu.Item
             disabled={shouldDisableRestrictedActions}
-            onClick={restrictedActionClickHandler(() =>
-              forcedDownloadFile({
+            onClick={restrictedActionClickHandler(() => {
+              return forcedDownloadFile({
                 url,
                 name,
-              }),
-            )}
+              });
+            })}
           >
             {translate('cells.options.download')}
           </DropdownMenu.Item>

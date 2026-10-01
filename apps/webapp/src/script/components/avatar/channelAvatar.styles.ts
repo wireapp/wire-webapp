@@ -23,16 +23,18 @@ import {CSS_SQUARE} from 'Util/cssMixin';
 
 import {ChannelAvatarSize} from './channelAvatar';
 
-export const channelAvatarContainerCss = ({border, size}: {border: string; size: ChannelAvatarSize}): CSSObject => ({
-  ...CSS_SQUARE(size === 'small' ? 16 : 28),
-  border: `${size === 'small' ? 0.5 : 1}px solid var(--${border})`,
-  borderRadius: size === 'small' ? 4 : 8,
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  overflow: size === 'small' ? 'hidden' : 'visible',
-});
+export const channelAvatarContainerCss = ({border, size}: {border: string; size: ChannelAvatarSize}): CSSObject => {
+  return {
+    ...CSS_SQUARE(size === 'small' ? 16 : 28),
+    border: `${size === 'small' ? 0.5 : 1}px solid var(--${border})`,
+    borderRadius: size === 'small' ? 4 : 8,
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: size === 'small' ? 'hidden' : 'visible',
+  };
+};
 
 export const channelAvatarIconCss = ({
   color,
@@ -42,17 +44,19 @@ export const channelAvatarIconCss = ({
   color: string;
   background: string;
   size: ChannelAvatarSize;
-}): CSSObject => ({
-  ...CSS_SQUARE(size === 'small' ? '100%' : 26),
-  backgroundColor: `var(--${background})`,
-  color: `var(--${color})`,
-  display: 'flex',
-  flexWrap: 'wrap',
-  overflow: 'hidden',
-  borderRadius: size === 'small' ? 0 : 7,
-  justifyContent: 'center',
-  alignContent: 'center',
-});
+}): CSSObject => {
+  return {
+    ...CSS_SQUARE(size === 'small' ? '100%' : 26),
+    backgroundColor: `var(--${background})`,
+    color: `var(--${color})`,
+    display: 'flex',
+    flexWrap: 'wrap',
+    overflow: 'hidden',
+    borderRadius: size === 'small' ? 0 : 7,
+    justifyContent: 'center',
+    alignContent: 'center',
+  };
+};
 
 export const channelAvatarLockIconCss: CSSObject = {
   color: 'var(--app-bg-secondary)',

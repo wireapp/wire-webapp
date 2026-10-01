@@ -86,7 +86,9 @@ export const useScrollMessages = (
       });
     } else if (lastMessage.status() === StatusType.SENDING && lastMessage.user().id === userId) {
       // The self user just sent a message, we scroll straight to the bottom
-      const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);
+      const index = messages.findIndex(message => {
+        return !isMarker(message) && message.message.id === lastMessage.id;
+      });
       if (index !== -1) {
         requestAnimationFrame(() => {
           virtualizer.scrollToIndex(index, {align: 'end'});

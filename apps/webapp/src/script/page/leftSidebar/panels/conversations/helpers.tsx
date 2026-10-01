@@ -28,11 +28,21 @@ import {isConversationEntity} from 'Util/typePredicateUtil';
 import {SidebarTabs} from './useSidebarStore';
 
 export const conversationFilters = {
-  hasUnread: (conv: Conversation) => conv.hasUnread(),
-  hasMentions: (conv: Conversation) => conv.unreadState().selfMentions.length > 0,
-  hasReplies: (conv: Conversation) => conv.unreadState().selfReplies.length > 0,
-  hasPings: (conv: Conversation) => conv.unreadState().pings.length > 0,
-  notArchived: (conv: Conversation) => !conv.is_archived(),
+  hasUnread: (conv: Conversation) => {
+    return conv.hasUnread();
+  },
+  hasMentions: (conv: Conversation) => {
+    return conv.unreadState().selfMentions.length > 0;
+  },
+  hasReplies: (conv: Conversation) => {
+    return conv.unreadState().selfReplies.length > 0;
+  },
+  hasPings: (conv: Conversation) => {
+    return conv.unreadState().pings.length > 0;
+  },
+  notArchived: (conv: Conversation) => {
+    return !conv.is_archived();
+  },
 };
 
 interface GetTabConversationsProps {
@@ -91,7 +101,9 @@ export function getTabConversations({
     return conversationDisplayName.includes(filterWord);
   };
 
-  const conversationArchivedFilter = (conversation: Conversation) => !archivedConversations.includes(conversation);
+  const conversationArchivedFilter = (conversation: Conversation) => {
+    return !archivedConversations.includes(conversation);
+  };
 
   if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
     if (isEmptyString(conversationsFilter)) {
@@ -248,11 +260,13 @@ export function getTabConversations({
   };
 }
 
-export const conversationSearchFilter = (filter: string) => (conversation: Conversation) => {
-  const filterWord = replaceAccents(filter.toLowerCase());
-  const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
+export const conversationSearchFilter = (filter: string) => {
+  return (conversation: Conversation) => {
+    const filterWord = replaceAccents(filter.toLowerCase());
+    const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
 
-  return conversationDisplayName.includes(filterWord);
+    return conversationDisplayName.includes(filterWord);
+  };
 };
 
 type ConversationListDisplayParams = {

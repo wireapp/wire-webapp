@@ -53,7 +53,9 @@ const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}
       {
         preventClose: true,
         primaryAction: {
-          action: () => window.location.replace(`/auth/${location.search}`),
+          action: () => {
+            return window.location.replace(`/auth/${location.search}`);
+          },
           text: translate('modalAccountCreateAction'),
         },
         text: {

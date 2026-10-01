@@ -93,8 +93,9 @@ export class Participant {
     this.processedVideoStream(undefined);
   }
 
-  readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>
-    matchQualifiedIds(userId, this.user.qualifiedId) && clientId === this.clientId;
+  readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean => {
+    return matchQualifiedIds(userId, this.user.qualifiedId) && clientId === this.clientId;
+  };
 
   setAudioStream(audioStream: MediaStream, stopTracks: boolean): void {
     this.releaseStream(this.audioStream(), stopTracks);

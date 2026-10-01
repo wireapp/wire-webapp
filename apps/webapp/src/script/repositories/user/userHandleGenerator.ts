@@ -51,7 +51,9 @@ const RANDOM_WORDS_2 = [
   ...['wasp', 'weasel', 'whale', 'wolf', 'wombat', 'yak', 'zebra'],
 ];
 
-const getRandomWordCombination = () => `${randomElement(RANDOM_WORDS_1)}${randomElement(RANDOM_WORDS_2)}`;
+const getRandomWordCombination = () => {
+  return `${randomElement(RANDOM_WORDS_1)}${randomElement(RANDOM_WORDS_2)}`;
+};
 
 /**
  * Validates that a character can be used for a handle.
@@ -75,11 +77,12 @@ export const appendRandomDigits = (handle: string, additionalNumbers?: number): 
 /**
  * Creates a handle based on the users name.
  */
-export const normalizeName = (name: string): string =>
-  getSlug(name, {custom: ['.', '-']})
+export const normalizeName = (name: string): string => {
+  return getSlug(name, {custom: ['.', '-']})
     .toLowerCase()
     .replace(/[^a-z0-9_.-]/g, '')
     .substring(0, MAX_HANDLE_LENGTH);
+};
 
 /**
  * Validates that an input is a valid handle.

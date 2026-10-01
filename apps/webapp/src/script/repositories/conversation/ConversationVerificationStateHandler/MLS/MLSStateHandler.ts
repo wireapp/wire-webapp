@@ -65,7 +65,9 @@ export class MLSConversationVerificationStateHandler {
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
     this.core.service?.mls?.on(MLSServiceEvents.NEW_EPOCH, this.onEpochChanged);
-    this.core.service.e2eIdentity.on('crlChanged', ({domain}) => this.handleNewRevocationList(domain));
+    this.core.service.e2eIdentity.on('crlChanged', ({domain}) => {
+      return this.handleNewRevocationList(domain);
+    });
   }
 
   /**
@@ -85,7 +87,12 @@ export class MLSConversationVerificationStateHandler {
     const degradedUsers: QualifiedId[] = [];
 
     for (const [, identities] of userIdentities.entries()) {
-      if (identities.length > 0 && identities.some(identity => identity.status !== MLSStatuses.VALID)) {
+      if (
+        identities.length > 0 &&
+        identities.some(identity => {
+          return identity.status !== MLSStatuses.VALID;
+        })
+      ) {
         degradedUsers.push(identities[0].qualifiedUserId);
       }
     }
@@ -147,11 +154,11 @@ export class MLSConversationVerificationStateHandler {
          * We need to wait for the user entity to be available
          * There is a race condition when adding a new user to a conversation, the host will receive the epoch update before the user entity is available
          */
-        const user = await waitFor(() =>
-          conversation
-            .allUserEntities()
-            .find(user => stringifyQualifiedId(user.qualifiedId) === stringifiedQualifiedId),
-        );
+        const user = await waitFor(() => {
+          return conversation.allUserEntities().find(user => {
+            return stringifyQualifiedId(user.qualifiedId) === stringifiedQualifiedId;
+          });
+        });
         const identity = identities.at(0);
 
         if (!identity || !user) {
@@ -181,14 +188,18 @@ export class MLSConversationVerificationStateHandler {
    */
   private checkAllConversationsVerificationState = async (): Promise<void> => {
     const conversations = this.conversationState.conversations();
-    await Promise.all(conversations.map(conversation => this.checkConversationVerificationState(conversation)));
+    await Promise.all(
+      conversations.map(conversation => {
+        return this.checkConversationVerificationState(conversation);
+      }),
+    );
   };
   private onEpochChanged = async ({groupId, epoch: newEpoch}: {groupId: string; epoch: number}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
-    const conversation = await waitFor(() =>
-      getConversationByGroupId({conversationState: this.conversationState, groupId}),
-    );
+    const conversation = await waitFor(() => {
+      return getConversationByGroupId({conversationState: this.conversationState, groupId});
+    });
 
     if (!conversation) {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);

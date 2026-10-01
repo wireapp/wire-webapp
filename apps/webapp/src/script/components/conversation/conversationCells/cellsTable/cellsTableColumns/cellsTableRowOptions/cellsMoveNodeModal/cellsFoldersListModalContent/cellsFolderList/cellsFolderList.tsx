@@ -38,17 +38,25 @@ interface CellsFolderListProps {
 export const CellsFolderList = ({items, onNavigate}: CellsFolderListProps) => {
   return (
     <ul css={listStyles}>
-      {items.map(item => (
-        <li key={item.id} css={listItemStyles}>
-          <button type="button" css={buttonStyles} onClick={() => onNavigate(item.path)}>
-            <div css={nameWrapperStyles}>
-              <FolderIcon width={24} height={24} />
-              <span css={nameStyles}>{item.name}</span>
-            </div>
-            <ChevronRight width={16} height={16} css={arrowIconStyles} />
-          </button>
-        </li>
-      ))}
+      {items.map(item => {
+        return (
+          <li key={item.id} css={listItemStyles}>
+            <button
+              type="button"
+              css={buttonStyles}
+              onClick={() => {
+                return onNavigate(item.path);
+              }}
+            >
+              <div css={nameWrapperStyles}>
+                <FolderIcon width={24} height={24} />
+                <span css={nameStyles}>{item.name}</span>
+              </div>
+              <ChevronRight width={16} height={16} css={arrowIconStyles} />
+            </button>
+          </li>
+        );
+      })}
     </ul>
   );
 };

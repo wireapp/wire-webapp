@@ -39,7 +39,9 @@ jest.mock('@wireapp/react-ui-kit', () => {
 
   return {
     ...actualModule,
-    Loading: () => null,
+    Loading: () => {
+      return null;
+    },
   };
 });
 
@@ -56,11 +58,17 @@ describe('SingleSignOnForm', () => {
       },
     });
 
-    const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
+    const doLogin = jasmine.createSpy().and.returnValue((code: string) => {
+      return Promise.resolve();
+    });
     const initialCode = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
 
-    spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => {
+      return Promise.resolve();
+    });
+    spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => {
+      return Promise.resolve();
+    });
 
     const {getByTestId} = mountComponent(
       <SingleSignOnForm {...{doLogin, initialCode}} />,
@@ -85,11 +93,17 @@ describe('SingleSignOnForm', () => {
     });
 
     const historyPushSpy = spyOn(history, 'pushState');
-    const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
+    const doLogin = jasmine.createSpy().and.returnValue((code: string) => {
+      return Promise.resolve();
+    });
     const code = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
 
-    spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => {
+      return Promise.resolve();
+    });
+    spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => {
+      return Promise.resolve();
+    });
 
     const {getByTestId} = mountComponent(<SingleSignOnForm {...{doLogin}} />, mockStoreFactory()(initialRootState));
 
@@ -119,7 +133,13 @@ describe('SingleSignOnForm', () => {
     const code = 'invalid-code';
 
     const {getByTestId, container} = mountComponent(
-      <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
+      <SingleSignOnForm
+        {...{
+          doLogin: () => {
+            return Promise.reject();
+          },
+        }}
+      />,
       mockStoreFactory()(initialRootState),
     );
 
@@ -147,7 +167,13 @@ describe('SingleSignOnForm', () => {
     const email = 'email@mail.com';
 
     const {getByTestId, container} = mountComponent(
-      <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
+      <SingleSignOnForm
+        {...{
+          doLogin: () => {
+            return Promise.reject();
+          },
+        }}
+      />,
       mockStoreFactory()(initialRootState),
     );
 
@@ -178,13 +204,19 @@ describe('SingleSignOnForm', () => {
       `${inputHost}&clienttype=permanent&sso_auto_login=true`,
     )}#${ROUTE.CUSTOM_ENV_REDIRECT}`;
 
-    spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
-      Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
-    );
+    spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() => {
+      return Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost});
+    });
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(noop);
 
     const {getByTestId, container} = mountComponent(
-      <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
+      <SingleSignOnForm
+        {...{
+          doLogin: () => {
+            return Promise.reject();
+          },
+        }}
+      />,
       mockStoreFactory()(initialRootState),
     );
 
@@ -217,13 +249,19 @@ describe('SingleSignOnForm', () => {
       `${inputHost}&clienttype=temporary&sso_auto_login=true`,
     )}#${ROUTE.CUSTOM_ENV_REDIRECT}`;
 
-    spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
-      Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
-    );
+    spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() => {
+      return Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost});
+    });
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(noop);
 
     const {getByTestId, container} = mountComponent(
-      <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
+      <SingleSignOnForm
+        {...{
+          doLogin: () => {
+            return Promise.reject();
+          },
+        }}
+      />,
       mockStoreFactory()(initialRootState),
     );
 

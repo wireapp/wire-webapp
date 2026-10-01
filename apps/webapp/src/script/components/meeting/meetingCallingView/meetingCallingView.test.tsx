@@ -59,18 +59,21 @@ const createCall = (type: CONVERSATION_TYPE, groupConversationType?: GROUP_CONVE
   return call;
 };
 
-const createMainViewModel = (): MainViewModel =>
-  ({
+const createMainViewModel = (): MainViewModel => {
+  return {
     calling: {
       callActions: {
         answer: jest.fn(),
         reject: jest.fn(),
       },
       callingRepository: {},
-      hasAccessToCamera: jest.fn(() => true),
+      hasAccessToCamera: jest.fn(() => {
+        return true;
+      }),
     },
     content: {repositories: {properties: {getPreference: jest.fn()}}},
-  }) as unknown as MainViewModel;
+  } as unknown as MainViewModel;
+};
 
 describe('MeetingCallingView', () => {
   const callState = container.resolve(CallState);

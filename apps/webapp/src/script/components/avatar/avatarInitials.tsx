@@ -31,20 +31,22 @@ interface AvatarInitialsProps {
   isResponsive?: boolean;
 }
 
-const AvatarInitials: FC<AvatarInitialsProps> = ({avatarSize, initials, color = '#fff', isResponsive = false}) => (
-  <div
-    css={{
-      ...CSS_FILL_PARENT,
-      color,
-      fontSize: isResponsive ? `${INITIALS_SIZE[avatarSize] / 16}rem` : `${INITIALS_SIZE[avatarSize]}px`,
-      lineHeight: isResponsive ? `${DIAMETER[avatarSize] / 16}rem` : `${DIAMETER[avatarSize]}px`,
-      textAlign: 'center',
-      userSelect: 'none',
-    }}
-    data-uie-name="element-avatar-initials"
-  >
-    {avatarSize === AVATAR_SIZE.X_SMALL ? getFirstChar(initials) : initials}
-  </div>
-);
+const AvatarInitials: FC<AvatarInitialsProps> = ({avatarSize, initials, color = '#fff', isResponsive = false}) => {
+  return (
+    <div
+      css={{
+        ...CSS_FILL_PARENT,
+        color,
+        fontSize: isResponsive ? `${INITIALS_SIZE[avatarSize] / 16}rem` : `${INITIALS_SIZE[avatarSize]}px`,
+        lineHeight: isResponsive ? `${DIAMETER[avatarSize] / 16}rem` : `${DIAMETER[avatarSize]}px`,
+        textAlign: 'center',
+        userSelect: 'none',
+      }}
+      data-uie-name="element-avatar-initials"
+    >
+      {avatarSize === AVATAR_SIZE.X_SMALL ? getFirstChar(initials) : initials}
+    </div>
+  );
+};
 
 export {AvatarInitials};

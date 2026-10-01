@@ -43,7 +43,11 @@ export function normalizeLanguage(language: string = DEFAULT_LANGUAGE): string {
 
 export function findLanguage(language: string = DEFAULT_LANGUAGE): SupportedLocale {
   language = normalizeLanguage(language);
-  return Locales.find(locale => locale.startsWith(language)) ?? DEFAULT_LANGUAGE;
+  return (
+    Locales.find(locale => {
+      return locale.startsWith(language);
+    }) ?? DEFAULT_LANGUAGE
+  );
 }
 
 export function mapLanguage(language: string = DEFAULT_LANGUAGE): SupportedLocale {

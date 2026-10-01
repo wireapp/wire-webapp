@@ -185,4 +185,6 @@ describe('transition', () => {
   });
 });
 
-const publishedState = (): UploadState => ({...draftReady, kind: 'published'}) as UploadState;
+const publishedState = (): UploadState => {
+  return {...draftReady, kind: 'published'} as UploadState;
+};

@@ -60,14 +60,15 @@ export const initialiseMLSMigrationFlow = async ({
   return periodicallyCheckMigrationConfig(
     selfUser,
     getTeamMLSMigrationStatus,
-    () =>
-      migrateConversationsToMLS({
+    () => {
+      return migrateConversationsToMLS({
         core,
         selfUserId: selfUser.qualifiedId,
         conversationRepository,
         getTeamMLSMigrationStatus,
         refreshAllKnownUsers,
-      }),
+      });
+    },
     core,
   );
 };
@@ -78,8 +79,9 @@ const periodicallyCheckMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
   core: Account,
 ) => {
-  const checkMigrationConfigTask = () =>
-    checkMigrationConfig(selfUser, getTeamMLSMigrationStatus, onMigrationStartTimeArrived);
+  const checkMigrationConfigTask = () => {
+    return checkMigrationConfig(selfUser, getTeamMLSMigrationStatus, onMigrationStartTimeArrived);
+  };
 
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();

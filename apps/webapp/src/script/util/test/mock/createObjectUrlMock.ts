@@ -18,6 +18,8 @@
  */
 
 Object.defineProperty(window.URL, 'createObjectURL', {
-  value: jest.fn().mockImplementation(() => 'mocked createObjectURL'),
+  value: jest.fn().mockImplementation(() => {
+    return 'mocked createObjectURL';
+  }),
   writable: true,
 });

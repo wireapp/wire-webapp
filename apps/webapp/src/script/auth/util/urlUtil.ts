@@ -28,7 +28,9 @@ export function getSearchParams(
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
-    .filter(searchParam => searchParam.length > 0)
+    .filter(searchParam => {
+      return searchParam.length > 0;
+    })
     .filter(searchParam => {
       const paramName = searchParam.split('=')[0];
       return whitelistParams.includes(paramName);
@@ -52,7 +54,9 @@ export function pathWithParams(
 export function hasURLParameter(parameterName: string): boolean {
   return window.location.search
     .split(/\?|&/)
-    .map(parameter => parameter.split('=')[0])
+    .map(parameter => {
+      return parameter.split('=')[0];
+    })
     .includes(parameterName);
 }
 

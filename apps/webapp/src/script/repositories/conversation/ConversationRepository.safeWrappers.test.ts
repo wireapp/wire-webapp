@@ -52,7 +52,16 @@ describe('ConversationRepository safe* wrappers', () => {
       const settled = await conversationRepository.safeGetConversationById(conversation.qualifiedId);
 
       expect(settled.isOk).toBe(true);
-      expect(settled.match({Ok: value => value, Err: () => null})).toBe(conversation);
+      expect(
+        settled.match({
+          Ok: value => {
+            return value;
+          },
+          Err: () => {
+            return null;
+          },
+        }),
+      ).toBe(conversation);
     });
 
     it('resolves to Err when getConversationById throws', async () => {
@@ -64,7 +73,16 @@ describe('ConversationRepository safe* wrappers', () => {
       const settled = await conversationRepository.safeGetConversationById(conversationId);
 
       expect(settled.isErr).toBe(true);
-      expect(settled.match({Ok: () => null, Err: value => value})).toBe(error);
+      expect(
+        settled.match({
+          Ok: () => {
+            return null;
+          },
+          Err: value => {
+            return value;
+          },
+        }),
+      ).toBe(error);
     });
   });
 
@@ -86,7 +104,16 @@ describe('ConversationRepository safe* wrappers', () => {
       });
 
       expect(settled.isOk).toBe(true);
-      expect(settled.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual(failedToAdd);
+      expect(
+        settled.match({
+          Ok: value => {
+            return value.failedToAdd;
+          },
+          Err: () => {
+            return null;
+          },
+        }),
+      ).toEqual(failedToAdd);
     });
 
     it('resolves to Err when establishment throws', async () => {
@@ -106,7 +133,16 @@ describe('ConversationRepository safe* wrappers', () => {
       });
 
       expect(settled.isErr).toBe(true);
-      expect(settled.match({Ok: () => null, Err: value => value})).toBe(error);
+      expect(
+        settled.match({
+          Ok: () => {
+            return null;
+          },
+          Err: value => {
+            return value;
+          },
+        }),
+      ).toBe(error);
     });
   });
 
@@ -124,7 +160,16 @@ describe('ConversationRepository safe* wrappers', () => {
       const settled = await conversationRepository.safeAddUsers(conversation, [user]);
 
       expect(settled.isOk).toBe(true);
-      expect(settled.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual(failedToAdd);
+      expect(
+        settled.match({
+          Ok: value => {
+            return value.failedToAdd;
+          },
+          Err: () => {
+            return null;
+          },
+        }),
+      ).toEqual(failedToAdd);
       expect(getConversationServiceForTest(conversationRepository).addUsersToMLSConversation).toHaveBeenCalledWith({
         conversationId: conversation.qualifiedId,
         groupId: conversation.groupId,
@@ -141,7 +186,16 @@ describe('ConversationRepository safe* wrappers', () => {
       const settled = await conversationRepository.safeAddUsers(conversation, []);
 
       expect(settled.isOk).toBe(true);
-      expect(settled.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual([]);
+      expect(
+        settled.match({
+          Ok: value => {
+            return value.failedToAdd;
+          },
+          Err: () => {
+            return null;
+          },
+        }),
+      ).toEqual([]);
       expect(getConversationServiceForTest(conversationRepository).addUsersToMLSConversation).not.toHaveBeenCalled();
     });
 
@@ -158,7 +212,16 @@ describe('ConversationRepository safe* wrappers', () => {
       const settled = await conversationRepository.safeAddUsers(conversation, [user]);
 
       expect(settled.isErr).toBe(true);
-      expect(settled.match({Ok: () => null, Err: value => value})).toBe(error);
+      expect(
+        settled.match({
+          Ok: () => {
+            return null;
+          },
+          Err: value => {
+            return value;
+          },
+        }),
+      ).toBe(error);
     });
 
     it('resolves to Err when the conversation has no group id', async () => {
@@ -170,9 +233,16 @@ describe('ConversationRepository safe* wrappers', () => {
       const settled = await conversationRepository.safeAddUsers(conversation, [user]);
 
       expect(settled.isErr).toBe(true);
-      expect(settled.match({Ok: () => null, Err: value => (value as Error).message})).toBe(
-        'Cannot add users to MLS conversation without group id',
-      );
+      expect(
+        settled.match({
+          Ok: () => {
+            return null;
+          },
+          Err: value => {
+            return (value as Error).message;
+          },
+        }),
+      ).toBe('Cannot add users to MLS conversation without group id');
     });
   });
 });

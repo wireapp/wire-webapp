@@ -25,11 +25,15 @@ import {GUTTER} from '../sizes/sizes';
 
 export type ContentProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-export const contentStyle: <T>(props: ContentProps<T>) => CSSObject = _ => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flexGrow: 1,
-  padding: `0 ${GUTTER}px`,
-});
+export const contentStyle: <T>(props: ContentProps<T>) => CSSObject = _ => {
+  return {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    padding: `0 ${GUTTER}px`,
+  };
+};
 
-export const Content = (props: ContentProps) => <div css={contentStyle(props)} {...props} />;
+export const Content = (props: ContentProps) => {
+  return <div css={contentStyle(props)} {...props} />;
+};

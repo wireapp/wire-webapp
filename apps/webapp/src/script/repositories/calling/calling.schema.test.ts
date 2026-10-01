@@ -29,9 +29,9 @@ describe('NetworkQualityInfoSchema', () => {
 
   it('accepts all AVS network quality values', () => {
     expect(
-      [QUALITY.NORMAL, QUALITY.MEDIUM, QUALITY.POOR, QUALITY.NETWORK_PROBLEM, QUALITY.RECONNECTING].map(
-        quality => NetworkQualityInfoSchema.parse({quality}).quality,
-      ),
+      [QUALITY.NORMAL, QUALITY.MEDIUM, QUALITY.POOR, QUALITY.NETWORK_PROBLEM, QUALITY.RECONNECTING].map(quality => {
+        return NetworkQualityInfoSchema.parse({quality}).quality;
+      }),
     ).toEqual([1, 2, 3, 4, 5]);
   });
 });

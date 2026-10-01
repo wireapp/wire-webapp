@@ -190,7 +190,9 @@ export class LifeCycleRepository {
 
     // Wait for connectivity before attempting backend logout
     this.logger.warn('No internet access. Continuing when internet connectivity regained.');
-    window.addEventListener('online', () => performBackendLogout());
+    window.addEventListener('online', () => {
+      return performBackendLogout();
+    });
   };
 
   /**
@@ -364,7 +366,9 @@ export class LifeCycleRepository {
   /**
    * Returns the current logout state.
    */
-  getIsLoggingOut = (): boolean => this.isCurrentlyLoggingOut;
+  getIsLoggingOut = (): boolean => {
+    return this.isCurrentlyLoggingOut;
+  };
 
   /**
    * Resets the logout state.

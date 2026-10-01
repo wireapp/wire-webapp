@@ -57,8 +57,12 @@ async function buildE2EIService(dbName = 'core-test-db') {
 
   const recurringTaskScheduler = new RecurringTaskScheduler(
     {
-      delete: key => mockedDb.delete('recurringTasks', key),
-      get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
+      delete: key => {
+        return mockedDb.delete('recurringTasks', key);
+      },
+      get: async key => {
+        return (await mockedDb.get('recurringTasks', key))?.firingDate;
+      },
       set: async (key, timestamp) => {
         await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
       },
@@ -147,11 +151,17 @@ describe('E2EIServiceExternal', () => {
       coreCrypto.getUserIdentities.mockResolvedValue(new Map([[user1.id, user1Identities]]));
 
       const allClients = [
-        ...user1Identities.map(identity => identity.clientId),
+        ...user1Identities.map(identity => {
+          return identity.clientId;
+        }),
         `${user1.id}:74a50c1f4352b41f@elna.wire.link`,
         `${user2.id}:452cb4c65f0369a8@elna.wire.link`,
       ];
-      coreCrypto.getClientIds.mockResolvedValue(allClients.map(clientId => new ClientId(encoder.encode(clientId))));
+      coreCrypto.getClientIds.mockResolvedValue(
+        allClients.map(clientId => {
+          return new ClientId(encoder.encode(clientId));
+        }),
+      );
 
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
 
@@ -235,7 +245,9 @@ describe('E2EIServiceExternal', () => {
 
       return {data: null};
     });
-    axios.create = jest.fn(() => axiosMock);
+    axios.create = jest.fn(() => {
+      return axiosMock;
+    });
 
     const mockDiscoveryUrl = 'https://some.crl.discovery.url';
 

@@ -44,7 +44,9 @@ export const CellsModal = ({size = 'small', isOpen, onClose, children}: CellsMod
       isShown={isOpen}
       onClosed={onClose}
       onBgClick={onClose}
-      onKeyDown={event => handleEscDown(event, onClose)}
+      onKeyDown={event => {
+        return handleEscDown(event, onClose);
+      }}
       wrapperCSS={size === 'large' ? largeModalStyles : undefined}
     >
       <CellsModalProvider onClose={onClose}>

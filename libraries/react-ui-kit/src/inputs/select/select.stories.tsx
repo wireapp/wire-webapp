@@ -34,11 +34,13 @@ const meta = {
     layout: 'centered',
   },
   decorators: [
-    Story => (
-      <div style={{width: '350px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{width: '350px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   tags: ['autodocs'],
 } satisfies Meta<typeof Select>;

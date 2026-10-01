@@ -110,9 +110,13 @@ export const ChannelSettings = () => {
           <Select
             id="chat-history-select"
             dataUieName="chat-history-select"
-            value={chatHistoryOptions.find(option => option.value === chatHistory)}
+            value={chatHistoryOptions.find(option => {
+              return option.value === chatHistory;
+            })}
             onChange={onChatHistoryChange}
-            formatOptionLabel={option => <CustomHistorySharingOption isPremiumUser={isPremiumUser} option={option} />}
+            formatOptionLabel={option => {
+              return <CustomHistorySharingOption isPremiumUser={isPremiumUser} option={option} />;
+            }}
             options={chatHistoryOptions}
           />
         </>

@@ -88,7 +88,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const [isOpen, setIsOpen] = useState(requirePassword && (isSelected || isAnimating));
 
-  const formatId = (id = '?') => splitFingerprint(id).join(' ');
+  const formatId = (id = '?') => {
+    return splitFingerprint(id).join(' ');
+  };
 
   const executeAnimateIn = useCallback((): void => {
     setAnimationStep(step => {
@@ -117,12 +119,16 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       setIsAnimating(true);
       setIsSelected(false);
       setIsOpen(false);
-      requestAnimationFrame(() => executeAnimateOut());
+      requestAnimationFrame(() => {
+        executeAnimateOut();
+      });
     } else if (selected && !isSelected) {
       setIsAnimating(true);
       setIsSelected(true);
       setIsOpen(true);
-      requestAnimationFrame(() => executeAnimateIn());
+      requestAnimationFrame(() => {
+        executeAnimateIn();
+      });
     } else if (selected && isSelected) {
       setIsOpen(true);
     } else {
@@ -131,8 +137,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     }
   }, [executeAnimateIn, executeAnimateOut, isSelected, selected]);
 
-  const formatDate = (dateString: string): string =>
-    isNonEmptyString(dateString)
+  const formatDate = (dateString: string): string => {
+    return isNonEmptyString(dateString)
       ? new Date(dateString).toLocaleString('en-US', {
           day: 'numeric',
           hour: 'numeric',
@@ -143,6 +149,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           year: 'numeric',
         })
       : '?';
+  };
 
   const formatName = (model: string, clazz: string): string | ReactElement => {
     if (isNonEmptyString(model)) {
@@ -179,7 +186,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     event.preventDefault();
 
     return Promise.resolve()
-      .then(() => onClientRemoval())
+      .then(() => {
+        return onClientRemoval();
+      })
       .catch((error: unknown) => {
         if (!isBackendError(error)) {
           throw error;
@@ -208,14 +217,16 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           throw error;
         }
       })
-      .then(() => onClientRemoval(password))
+      .then(() => {
+        return onClientRemoval(password);
+      })
       .catch((error: unknown) => {
         if (isBackendError(error)) {
           switch (error.label) {
             default: {
-              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                error.label.endsWith(errorType),
-              );
+              const isValidationError = Object.values(ValidationError.ERROR).some(errorType => {
+                return error.label.endsWith(errorType);
+              });
               if (!isValidationError) {
                 throw error;
               }
@@ -266,8 +277,12 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         data-uie-value={client.model}
       >
         <ContainerXS
-          onClick={(event: MouseEvent<HTMLDivElement>) => requirePassword && handleWrapperClick(event)}
-          onKeyDown={(event: KeyboardEvent) => requirePassword && onWrapperEnter(event)}
+          onClick={(event: MouseEvent<HTMLDivElement>) => {
+            return requirePassword && handleWrapperClick(event);
+          }}
+          onKeyDown={(event: KeyboardEvent) => {
+            return requirePassword && onWrapperEnter(event);
+          }}
           css={{
             ['&:focus-visible']: {
               outline: `none`,

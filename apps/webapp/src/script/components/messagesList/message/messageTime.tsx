@@ -36,14 +36,20 @@ const MessageTime = ({timestamp, children, ...props}: MessageTimeProps) => {
   // Equivalent for `ko.bindingHandlers.showAllTimestamps`
   const showAllTimestamps = (show: boolean) => {
     const times = document.querySelectorAll('.time');
-    times.forEach(time => time.classList.toggle('show-timestamp', show));
+    times.forEach(time => {
+      time.classList.toggle('show-timestamp', show);
+    });
   };
 
   return (
     <time
       className="time with-tooltip with-tooltip--top with-tooltip--time"
-      onMouseEnter={() => showAllTimestamps(true)}
-      onMouseLeave={() => showAllTimestamps(false)}
+      onMouseEnter={() => {
+        return showAllTimestamps(true);
+      }}
+      onMouseLeave={() => {
+        return showAllTimestamps(false);
+      }}
       dateTime={dateTimeFormat}
       data-timestamp={timestamp}
       data-tooltip={formattedDate}

@@ -63,13 +63,14 @@ describe('syncMeetingConversationParticipants', () => {
     safeAddUsers?: jest.Mock;
     safeRemoveMembers?: jest.Mock;
     safeGetConversationById?: jest.Mock;
-  } = {}) =>
-    ({
+  } = {}) => {
+    return {
       safeGetConversationById,
       establishMeetingConversation,
       safeAddUsers,
       safeRemoveMembers,
-    }) as unknown as ConversationRepository;
+    } as unknown as ConversationRepository;
+  };
 
   it('establishes the meeting conversation on create even with zero participants', async () => {
     const establishMeetingConversation = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
@@ -133,7 +134,16 @@ describe('syncMeetingConversationParticipants', () => {
     });
 
     expect(result.isOk).toBe(true);
-    expect(result.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual(failedToAdd);
+    expect(
+      result.match({
+        Ok: value => {
+          return value.failedToAdd;
+        },
+        Err: () => {
+          return null;
+        },
+      }),
+    ).toEqual(failedToAdd);
   });
 
   it('adds members before removing on update', async () => {
@@ -204,7 +214,16 @@ describe('syncMeetingConversationParticipants', () => {
     });
 
     expect(result.isOk).toBe(true);
-    expect(result.match({Ok: value => value.failedToAdd, Err: () => null})).toEqual(failedToAdd);
+    expect(
+      result.match({
+        Ok: value => {
+          return value.failedToAdd;
+        },
+        Err: () => {
+          return null;
+        },
+      }),
+    ).toEqual(failedToAdd);
   });
 
   it('returns addFailed when safeAddUsers rejects on update', async () => {

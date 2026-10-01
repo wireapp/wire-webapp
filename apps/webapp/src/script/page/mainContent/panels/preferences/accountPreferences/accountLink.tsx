@@ -71,7 +71,9 @@ const AccountLink = ({label, value, ...rest}: AccountLinkProps) => {
           type="button"
           role="button"
           data-uie-name="do-copy-profile-link"
-          onClick={() => copyText(value)}
+          onClick={() => {
+            return copyText(value);
+          }}
           className="text-bold-small"
         >
           <Icon.CopyIcon width="16" height="16" css={{marginRight: '8px'}} />
