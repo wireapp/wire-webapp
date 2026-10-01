@@ -17,7 +17,16 @@
  *
  */
 
-import {isNonEmptyString, isNull, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
+import {
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNull,
+  isNullOrUndefined,
+  isNumber,
+  isObject,
+  isTruthy,
+  isUndefined,
+} from '@sindresorhus/is';
 import {
   ADD_PERMISSION,
   Conversation as BackendConversation,
@@ -530,7 +539,7 @@ export class ConversationRepository {
         teamid: teamId,
       };
 
-      if (isTruthy(accessState)) {
+      if (isNonEmptyString(accessState)) {
         const {accessModes: access, accessRole} = updateAccessRights(accessState);
 
         const accessRoleField = this.core.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
@@ -586,7 +595,7 @@ export class ConversationRepository {
 
       const {failedToAdd} = response;
 
-      if (!isUndefined(failedToAdd) && failedToAdd.length > 0) {
+      if (isNonEmptyArray(failedToAdd)) {
         const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
           failedToAdd,
           conversationEntity,
@@ -701,10 +710,7 @@ export class ConversationRepository {
       return conversationEntity;
     } catch (originalError: unknown) {
       if (isError(originalError)) {
-        const code =
-          isTruthy(originalError) && typeof originalError === 'object' && 'code' in originalError
-            ? originalError.code
-            : null;
+        const code = typeof originalError === 'object' && 'code' in originalError ? originalError.code : null;
         this.logger.error(originalError.message);
         if (code === HTTP_STATUS.NOT_FOUND) {
           await this.deleteConversationLocally(qualifiedId, false);
@@ -795,7 +801,7 @@ export class ConversationRepository {
     remoteConversations: RemoteConversations,
     localConverstions: ConversationDatabaseData[],
   ): Promise<RemoteConversations> {
-    if (!isTruthy(remoteConversations.found?.length)) {
+    if (!isNonEmptyArray(remoteConversations.found)) {
       return remoteConversations;
     }
     // We loop through all the remote conversations
@@ -856,7 +862,7 @@ export class ConversationRepository {
     // We blacklist all the abandoned proteus 1:1 conversations so they are never refetched from the backend
     await Promise.all(
       abandonedProteus1to1Conversations.map(({qualified_id}) => {
-        if (!isTruthy(qualified_id)) {
+        if (isNullOrUndefined(qualified_id)) {
           return qualified_id;
         }
 
@@ -973,7 +979,7 @@ export class ConversationRepository {
     const {localConversations: filteredLocalConversations, remoteConversations: filteredRemoteConversations} =
       await this.filterLoadedConversations(localConversations, remoteConversations, connections, deadConnections);
 
-    if (!isTruthy(remoteConversations.found?.length)) {
+    if (!isNonEmptyArray(remoteConversations.found)) {
       conversationsData = filteredLocalConversations;
     } else {
       const data = ConversationMapper.mergeConversations(filteredLocalConversations, filteredRemoteConversations);
@@ -1037,8 +1043,11 @@ export class ConversationRepository {
     conversationEntity.isLoadingMessages(true);
 
     const firstMessageEntity = conversationEntity.getOldestMessageWithTimestamp();
+    const firstMessageTimestampMilliseconds = firstMessageEntity?.timestamp();
     const upperBound =
-      !isUndefined(firstMessageEntity) && isTruthy(firstMessageEntity.timestamp())
+      !isUndefined(firstMessageEntity) &&
+      isNumber(firstMessageTimestampMilliseconds) &&
+      firstMessageTimestampMilliseconds !== 0
         ? new Date(firstMessageEntity.timestamp())
         : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
@@ -1189,7 +1198,7 @@ export class ConversationRepository {
     query: string,
     abortSignal?: AbortSignal,
   ): Promise<{messageEntities: Message[]; query: string}> {
-    if (!isTruthy(conversationEntity) || query.length === 0) {
+    if (isNullOrUndefined(conversationEntity) || query.length === 0) {
       return {messageEntities: [], query};
     }
 
@@ -1468,7 +1477,7 @@ export class ConversationRepository {
    */
   public readonly getAllTeamGroupConversations = (): Conversation[] => {
     const selfUser = this.userState.self();
-    if (!isTruthy(selfUser)) {
+    if (isNullOrUndefined(selfUser)) {
       this.logger.error('Failed to get self user');
       return [];
     }
@@ -1636,7 +1645,8 @@ export class ConversationRepository {
 
     // There's no connection so it's a proteus conversation with a team member
     const selfUser = this.userState.self();
-    const inCurrentTeam = isTruthy(selfUser) && isNonEmptyString(selfUser.teamId) && user.teamId === selfUser.teamId;
+    const inCurrentTeam =
+      !isNullOrUndefined(selfUser) && isNonEmptyString(selfUser.teamId) && user.teamId === selfUser.teamId;
 
     if (!inCurrentTeam) {
       // It's not possible to create a 1:1 conversation with a user from another team without a connection
@@ -1704,7 +1714,7 @@ export class ConversationRepository {
    * @returns Resolves with `true` if message is marked as read
    */
   async isMessageRead(conversation_id: QualifiedId, message_id: string): Promise<boolean> {
-    if (!isTruthy(conversation_id) || !isNonEmptyString(message_id)) {
+    if (isNullOrUndefined(conversation_id) || !isNonEmptyString(message_id)) {
       return false;
     }
 
@@ -1772,7 +1782,7 @@ export class ConversationRepository {
                   domain: resolvedDomain,
                   id: conversationId,
                 });
-                if (isTruthy(response)) {
+                if (!isNullOrUndefined(response)) {
                   await this.onMemberJoin(conversationEntity, response);
                   await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
                   amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
@@ -1844,7 +1854,7 @@ export class ConversationRepository {
 
     const selfUserQualifiedId = this.userState.self()?.qualifiedId;
 
-    if (!isTruthy(selfUserQualifiedId)) {
+    if (isNullOrUndefined(selfUserQualifiedId)) {
       this.logger.error('Self user qualified ID is not available for MLS invite-link join');
       throw new Error('Self user qualified ID is not available for MLS invite-link join');
     }
@@ -2054,7 +2064,7 @@ export class ConversationRepository {
   ): Promise<MLSConversation> => {
     const selfUser = this.userState.self();
 
-    if (!isTruthy(selfUser)) {
+    if (isNullOrUndefined(selfUser)) {
       throw new Error('Self user is not available!');
     }
 
@@ -2184,7 +2194,7 @@ export class ConversationRepository {
     }
 
     const selfUser = this.userState.self();
-    if (!isTruthy(selfUser)) {
+    if (isNullOrUndefined(selfUser)) {
       throw new Error('Self user is not available!');
     }
 
@@ -2285,7 +2295,7 @@ export class ConversationRepository {
     const conversationMembersIds = conversation.participating_user_ids();
     const otherUserId = conversationMembersIds.length === 1 && conversationMembersIds[0];
 
-    if (isTruthy(otherUserId)) {
+    if (isObject(otherUserId)) {
       return otherUserId;
     }
 
@@ -2686,10 +2696,8 @@ export class ConversationRepository {
   private _mapGuestStatusSelf(conversationEntity: Conversation) {
     const conversationTeamId = conversationEntity.teamId;
     const selfTeamId = this.teamState.team()?.id;
-    const isConversationGuest = !!(
-      isNonEmptyString(conversationTeamId) &&
-      (!isNonEmptyString(selfTeamId) || selfTeamId !== conversationTeamId)
-    );
+    const isConversationGuest =
+      isNonEmptyString(conversationTeamId) && (!isNonEmptyString(selfTeamId) || selfTeamId !== conversationTeamId);
     conversationEntity.isGuest(isConversationGuest);
   }
 
@@ -2825,7 +2833,7 @@ export class ConversationRepository {
         await this.eventRepository.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
-        if (isTruthy(VerificationMessageType)) {
+        if (isNonEmptyString(VerificationMessageType)) {
           const event = EventBuilder.buildDegraded(conversationEntity, userIds, VerificationMessageType);
           await this.eventRepository.injectEvent(event);
         } else {
@@ -2867,7 +2875,7 @@ export class ConversationRepository {
         if (!isUndefined(memberJoinEvent)) {
           await this.eventRepository.injectEvent(memberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
-        if (!isUndefined(failedToAdd) && failedToAdd.length > 0) {
+        if (isNonEmptyArray(failedToAdd)) {
           const selfUser = this.userState.self();
           if (selfUser === undefined) {
             throw new Error('Cannot build failed-to-add-users event before self user is available');
@@ -2887,7 +2895,7 @@ export class ConversationRepository {
         });
 
         if (isMLSConversation(conversation)) {
-          if (!isUndefined(failedToAdd) && failedToAdd.length > 0) {
+          if (isNonEmptyArray(failedToAdd)) {
             const selfUser = this.userState.self();
             if (selfUser === undefined) {
               throw new Error('Cannot build failed-to-add-users event before self user is available');
@@ -2974,7 +2982,7 @@ export class ConversationRepository {
     try {
       const conversationEntity = await this.createGroupConversation([], undefined, ACCESS_STATE.TEAM.GUESTS_SERVICES);
 
-      if (!isTruthy(conversationEntity)) {
+      if (isNullOrUndefined(conversationEntity)) {
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
@@ -3264,7 +3272,7 @@ export class ConversationRepository {
     name: string,
   ): Promise<ConversationRenameEvent | undefined> {
     const response = await this.conversationService.updateConversationName(conversationEntity.qualifiedId, name);
-    if (isTruthy(response)) {
+    if (!isNullOrUndefined(response)) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       return response;
     }
@@ -3366,7 +3374,7 @@ export class ConversationRepository {
       conversationEntity.qualifiedId,
       messageTimer,
     );
-    if (isTruthy(response)) {
+    if (!isNullOrUndefined(response)) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
     return response;
@@ -3380,7 +3388,7 @@ export class ConversationRepository {
       conversationEntity.qualifiedId,
       receiptMode,
     );
-    if (isTruthy(response)) {
+    if (!isNullOrUndefined(response)) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
     return response;
@@ -3388,7 +3396,7 @@ export class ConversationRepository {
 
   public async updateAddPermission(conversationId: QualifiedId, addPermission: ADD_PERMISSION) {
     const response = await this.conversationService.putAddPermission(conversationId, addPermission);
-    if (isTruthy(response)) {
+    if (!isNullOrUndefined(response)) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
     return response;
@@ -3456,7 +3464,7 @@ export class ConversationRepository {
    * @returns Resolves when the notification stated was change
    */
   public async setNotificationState(conversationEntity: Conversation, notificationState: number) {
-    if (!isTruthy(conversationEntity) || notificationState === undefined) {
+    if (isNullOrUndefined(conversationEntity) || notificationState === undefined) {
       return Promise.reject(
         new ConversationError(BaseError.TYPE.MISSING_PARAMETER as BASE_ERROR_TYPE, BaseError.MESSAGE.MISSING_PARAMETER),
       );
@@ -3547,7 +3555,7 @@ export class ConversationRepository {
     newState: boolean,
     forceChange: boolean = false,
   ) {
-    if (!isTruthy(conversationEntity)) {
+    if (isNullOrUndefined(conversationEntity)) {
       const error = new ConversationError(
         ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
@@ -4196,7 +4204,7 @@ export class ConversationRepository {
   ) {
     const {conversationEntity, messageEntity} = entityObject;
 
-    if (!isTruthy(conversationEntity)) {
+    if (isNullOrUndefined(conversationEntity)) {
       return;
     }
 
@@ -4209,7 +4217,7 @@ export class ConversationRepository {
       const eventFromWebSocket = eventSource === EventRepository.SOURCE.WEB_SOCKET;
       const eventFromStream = eventSource === EventRepository.SOURCE.STREAM;
 
-      if (isTruthy(messageEntity)) {
+      if (!isNullOrUndefined(messageEntity)) {
         const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
         if (isRemoteEvent) {
@@ -4329,13 +4337,13 @@ export class ConversationRepository {
     };
 
     try {
-      const conversationData = !isTruthy(eventSource)
+      const conversationData = !isNonEmptyString(eventSource)
         ? // If there is no source, it means its a conversation created locally, no need to fetch it again
           eventData
         : await this.conversationService.getConversationById(conversationId);
 
       const [conversationEntity] = this.mapConversations([conversationData], initialTimestamp);
-      if (isTruthy(conversationEntity)) {
+      if (!isNullOrUndefined(conversationEntity)) {
         if (conversationEntity.participating_user_ids().length > 0) {
           await this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
@@ -4377,7 +4385,7 @@ export class ConversationRepository {
     }
 
     const updatedMessageEntity = await this.updateMessageUserEntities(messageEntity);
-    if (isTruthy(conversationEntity) && isTruthy(updatedMessageEntity)) {
+    if (!isNullOrUndefined(conversationEntity) && !isNullOrUndefined(updatedMessageEntity)) {
       conversationEntity.addMessage(updatedMessageEntity);
     }
 
@@ -4395,7 +4403,7 @@ export class ConversationRepository {
 
       const selfUser = this.userState.self();
 
-      if (!isTruthy(selfUser?.qualifiedId)) {
+      if (isNullOrUndefined(selfUser?.qualifiedId)) {
         throw new Error('Self user qualified ID is not defined');
       }
 
@@ -4463,7 +4471,7 @@ export class ConversationRepository {
 
     if (is1to1Conversation) {
       const otherUserId = conversationEntity.participating_user_ids()[0];
-      if (isTruthy(otherUserId)) {
+      if (!isNullOrUndefined(otherUserId)) {
         await this.resolve1To1Conversation(otherUserId, {isLiveUpdate: true});
       }
     }
@@ -4663,7 +4671,7 @@ export class ConversationRepository {
     // Show a system message to the user who just got promoted to group admin.
     // Only the promoted user receives this message (by design).
     const selfUser = this.userState.self();
-    const isSelfTarget = isTruthy(selfUser) && matchQualifiedIds(userId, selfUser.qualifiedId);
+    const isSelfTarget = !isNullOrUndefined(selfUser) && matchQualifiedIds(userId, selfUser.qualifiedId);
     const isPromotedToAdmin = conversation_role === DefaultRole.WIRE_ADMIN && previousRole !== DefaultRole.WIRE_ADMIN;
     if (isSelfTarget && isPromotedToAdmin) {
       const roleUpdateEvent = EventBuilder.buildMemberRoleUpdate(conversation, conversation_role, userId, from);
@@ -4817,8 +4825,8 @@ export class ConversationRepository {
   private async handleButtonSelection(conversationEntity: Conversation, messageId: string, buttonId: string) {
     try {
       const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
-      if (!isTruthy(messageEntity) || !messageEntity.isComposite()) {
-        const type = isTruthy(messageEntity) ? messageEntity.type : 'unknown';
+      if (isNullOrUndefined(messageEntity) || !messageEntity.isComposite()) {
+        const type = !isNullOrUndefined(messageEntity) ? messageEntity.type : 'unknown';
 
         this.logger.error(
           `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`,
@@ -4826,7 +4834,7 @@ export class ConversationRepository {
         throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
       const changes = messageEntity.getSelectionChange(buttonId);
-      if (isTruthy(changes)) {
+      if (isObject(changes)) {
         await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
       }
     } catch (error: unknown) {
@@ -4916,7 +4924,7 @@ export class ConversationRepository {
 
     const [otherUserId] = conversationEntity.participating_user_ids();
 
-    if (!isTruthy(otherUserId)) {
+    if (isNullOrUndefined(otherUserId)) {
       return;
     }
 
@@ -5223,7 +5231,7 @@ export class ConversationRepository {
   private deleteMessages(conversationEntity: Conversation, timestamp?: number) {
     conversationEntity.hasCreationMessage = false;
 
-    const iso_date = isTruthy(timestamp) ? new Date(timestamp).toISOString() : undefined;
+    const iso_date = isNumber(timestamp) && timestamp !== 0 ? new Date(timestamp).toISOString() : undefined;
     conversationEntity.removeMessages();
     return this.eventService.deleteEvents(conversationEntity.id, iso_date);
   }

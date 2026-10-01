@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 
@@ -64,13 +64,13 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
         return categories;
       }
 
-      if (isTruthy(isOfCategory('images', message))) {
+      if (isOfCategory('images', message) === true) {
         categories.images.push(message);
-      } else if (isTruthy(isOfCategory('audio', message))) {
+      } else if (isOfCategory('audio', message) === true) {
         categories.audio.push(message);
-      } else if (isTruthy(isOfCategory('files', message))) {
+      } else if (isOfCategory('files', message) === true) {
         categories.files.push(message);
-      } else if (isTruthy(isOfCategory('links', message))) {
+      } else if (isOfCategory('links', message) === MessageCategory.LINK_PREVIEW) {
         categories.links.push(message);
       }
       return categories;
@@ -146,7 +146,7 @@ function Collection(props: CollectionProps) {
     });
   };
 
-  if (isTruthy(detailCategory) && categories[detailCategory].length > 0) {
+  if (!isUndefined(detailCategory) && categories[detailCategory].length > 0) {
     return (
       <CollectionDetails
         conversation={conversation}

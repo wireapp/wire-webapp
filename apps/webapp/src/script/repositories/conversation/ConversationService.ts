@@ -609,7 +609,7 @@ export class ConversationService {
       const contentOrLegacyText = isNonEmptyString(messageTextContent)
         ? messageTextContent
         : (event.data?.message ?? '');
-      const extractor = isTruthy(event.type) ? TextExtractors[event.type] : undefined;
+      const extractor = isNonEmptyString(event.type) ? TextExtractors[event.type] : undefined;
       const extractedText = extractor?.(event) ?? '';
       return extractedText.length > 0 ? extractedText : contentOrLegacyText;
     } catch (err) {

@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy} from '@sindresorhus/is';
+import {isOddInteger} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -60,7 +60,7 @@ const FullSearchItem = ({message, onClick, formatText}: FullSearchItemProps) => 
       <div className="full-search__item__content">
         <div className="full-search__item__content__text ellipsis" data-uie-name="full-search-item-text">
           {parts.map((part, index) => {
-            return isTruthy(index % 2) ? (
+            return isOddInteger(index) ? (
               <mark key={index} className="full-search__marked" data-uie-name="full-search-item-mark">
                 {part}
               </mark>

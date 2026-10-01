@@ -17,7 +17,14 @@
  *
  */
 
-import {isNonEmptyArray, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
+import {
+  isFunction,
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNullOrUndefined,
+  isNumber,
+  isUndefined,
+} from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
@@ -513,7 +520,7 @@ export class Conversation {
     // setting of the conversation.
     this.messageTimer = ko.pureComputed(() => {
       // If cells is enabled for a conversation, always return 0
-      if (isTruthy(this.cellsState) && this.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED) {
+      if (isFunction(this.cellsState) && this.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED) {
         return 0;
       }
       // If team does not allow self-deleting messages, return 0
@@ -522,7 +529,7 @@ export class Conversation {
       }
       // If team enforces a timeout, use it
       const enforcedTimeout = this.teamState.getEnforcedSelfDeletingMessagesTimeout();
-      if (isTruthy(enforcedTimeout)) {
+      if (isNumber(enforcedTimeout) && enforcedTimeout !== 0) {
         return enforcedTimeout;
       }
       // Otherwise, use global or local timer if available
@@ -530,7 +537,8 @@ export class Conversation {
       if (globalMessageTimer !== null) {
         return globalMessageTimer;
       }
-      if (isTruthy(this.localMessageTimer())) {
+      const localMessageTimer = this.localMessageTimer();
+      if (isNumber(localMessageTimer) && localMessageTimer !== 0) {
         return this.localMessageTimer();
       }
       return 0;
@@ -836,7 +844,7 @@ export class Conversation {
         break;
     }
 
-    if (!isTruthy(entityTimestamp)) {
+    if (!isFunction(entityTimestamp)) {
       throw new ConversationError(
         ConversationError.TYPE.INVALID_PARAMETER,
         ConversationError.MESSAGE.INVALID_PARAMETER,
@@ -885,7 +893,7 @@ export class Conversation {
     if (messageEntity.isContent()) {
       this.hasContentMessages(true);
     }
-    if (isTruthy(alreadyAdded)) {
+    if (!isNullOrUndefined(alreadyAdded)) {
       return false;
     }
 
@@ -1034,7 +1042,7 @@ export class Conversation {
    * @param timestamp Optional timestamp which messages should be removed
    */
   removeMessages(timestamp?: number): void {
-    if (isTruthy(timestamp) && typeof timestamp === 'number') {
+    if (isNumber(timestamp) && timestamp !== 0) {
       this.messages_unordered.remove(message_et => {
         return timestamp >= message_et.timestamp();
       });
@@ -1050,9 +1058,9 @@ export class Conversation {
    * @returns Message if it is not a duplicate
    */
   private _checkForDuplicate(messageEntity: ContentMessage): ContentMessage | undefined {
-    if (isTruthy(messageEntity)) {
+    if (!isNullOrUndefined(messageEntity)) {
       const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
-      if (isTruthy(existingMessageEntity)) {
+      if (!isNullOrUndefined(existingMessageEntity)) {
         this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`);
         return undefined;
       }
@@ -1127,7 +1135,12 @@ export class Conversation {
    */
   getOldestMessageWithTimestamp(): Message | undefined {
     return this.messages().find(message => {
-      return !isDeleteMessage(message) && isTruthy(message.timestamp());
+      if (isDeleteMessage(message)) {
+        return false;
+      }
+      const messageTimestampMilliseconds = message.timestamp();
+
+      return isNumber(messageTimestampMilliseconds) && messageTimestampMilliseconds !== 0;
     });
   }
 
@@ -1222,7 +1235,13 @@ export class Conversation {
 
   readonly hasLastReceivedMessageLoaded = (): boolean => {
     const newestMessage = this.getNewestMessage();
-    return isTruthy(newestMessage?.timestamp()) ? newestMessage.timestamp() >= this.last_event_timestamp() : true;
+    const newestMessageTimestampMilliseconds = newestMessage?.timestamp();
+
+    return !isUndefined(newestMessage) &&
+      isNumber(newestMessageTimestampMilliseconds) &&
+      newestMessageTimestampMilliseconds !== 0
+      ? newestMessage.timestamp() >= this.last_event_timestamp()
+      : true;
   };
 
   serialize(): ConversationRecord {

@@ -17,7 +17,17 @@
  *
  */
 
-import {isNonEmptyString, isNull, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
+import {
+  isFunction,
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNull,
+  isNullOrUndefined,
+  isNumber,
+  isObject,
+  isTruthy,
+  isUndefined,
+} from '@sindresorhus/is';
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -511,7 +521,7 @@ export class MessageRepository {
     };
 
     let state;
-    if (!isNullOrUndefined(attachments) && attachments.length > 0) {
+    if (isNonEmptyArray(attachments)) {
       state = (await this.sendMultipartText({...textPayload, attachments})).state;
     } else {
       state = (await this.sendText(textPayload, undefined, isUndefined(messageId))).state;
@@ -671,7 +681,11 @@ export class MessageRepository {
    * @returns Can assets be uploaded
    */
   private canUploadAssetsToConversation(conversationEntity: Conversation) {
-    return isTruthy(conversationEntity) && !conversationEntity.isRequest() && !conversationEntity.isSelfUserRemoved();
+    return (
+      !isNullOrUndefined(conversationEntity) &&
+      !conversationEntity.isRequest() &&
+      !conversationEntity.isSelfUserRemoved()
+    );
   }
 
   /**
@@ -790,7 +804,7 @@ export class MessageRepository {
     }
 
     const asset_et = message_et.getFirstAsset() as FileAsset;
-    if (isTruthy(asset_et)) {
+    if (!isNullOrUndefined(asset_et)) {
       if (!asset_et.isDownloadable()) {
         throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
       }
@@ -808,7 +822,7 @@ export class MessageRepository {
    * @returns Array of attachment ids
    */
   public getCellsAssetAttachmentIds(messageEntity: Message): string[] {
-    if (!isTruthy(messageEntity.hasMultipartAsset) || !messageEntity.isContent()) {
+    if (!isFunction(messageEntity.hasMultipartAsset) || !messageEntity.isContent()) {
       return [];
     }
 
@@ -1043,7 +1057,9 @@ export class MessageRepository {
   ): Promise<SendAndInjectResult> {
     const messageTimer = conversation.messageTimer();
     const payload =
-      enableEphemeral && isTruthy(messageTimer) ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
+      enableEphemeral && isNumber(messageTimer) && messageTimer !== 0
+        ? MessageBuilder.wrapInEphemeral(message, messageTimer)
+        : message;
 
     const injectOptimisticEvent = async () => {
       if (skipInjection !== true) {
@@ -1330,11 +1346,15 @@ export class MessageRepository {
     }
 
     if (conversationEntity.is1to1()) {
-      return isTruthy(this.propertyRepository.receiptMode());
+      const receiptMode = this.propertyRepository.receiptMode();
+
+      return isNumber(receiptMode) && receiptMode !== 0;
     }
 
     if (isNonEmptyString(conversationEntity.teamId) && conversationEntity.isGroupOrChannel()) {
-      return isTruthy(conversationEntity.receiptMode());
+      const receiptMode = conversationEntity.receiptMode();
+
+      return isNumber(receiptMode) && receiptMode !== 0;
     }
 
     return false;
@@ -1386,7 +1406,7 @@ export class MessageRepository {
         // if we want optimistic removal, we can rely on the injection system that will handle the event and remove the message even before the message is sent
         skipInjection: options.optimisticRemoval !== true,
         // If there are recipients to the message, we only want to target those users (case of ephemeral messages that should be deleted in the sender's client and the user's own clients)
-        targetMode: isTruthy(userIds) ? MessageTargetMode.USERS : undefined,
+        targetMode: !isNullOrUndefined(userIds) ? MessageTargetMode.USERS : undefined,
       });
       if (options.optimisticRemoval !== true) {
         this.deleteMessageById(conversation, message.id);
@@ -1448,7 +1468,12 @@ export class MessageRepository {
    */
   public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
-    if (isTruthy(timestamp) && isTruthy(conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED))) {
+    if (!isNumber(timestamp) || timestamp === 0) {
+      return;
+    }
+    const clearedTimestampMilliseconds = conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
+
+    if (isNumber(clearedTimestampMilliseconds) && clearedTimestampMilliseconds !== 0) {
       const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
       await this.sendToSelfConversations(payload);
     }
@@ -1467,7 +1492,7 @@ export class MessageRepository {
     }
 
     const changes = message.getSelectionChange(buttonId);
-    if (!isTruthy(changes)) {
+    if (!isObject(changes)) {
       return;
     }
 
@@ -1515,7 +1540,8 @@ export class MessageRepository {
 
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    if (isLastDeleted && isTruthy(previousMessage?.timestamp())) {
+    const previousMessageTimestampMilliseconds = isLastDeleted ? previousMessage?.timestamp() : undefined;
+    if (isNumber(previousMessageTimestampMilliseconds) && previousMessageTimestampMilliseconds !== 0) {
       conversationEntity.updateTimestamps(previousMessage, true);
     }
 
@@ -1645,7 +1671,7 @@ export class MessageRepository {
       .allUserEntities()
       // filter possible undefined values
       .flatMap(user => {
-        return isTruthy(user) ? [user] : [];
+        return !isNullOrUndefined(user) ? [user] : [];
       })
       // if users are given by the caller, we filter to only keep those users
       .filter(user => {
@@ -1870,8 +1896,8 @@ export class MessageRepository {
 
       case 'text': {
         const protoText = genericMessage.text;
-        const length = protoText?.[PROTO_MESSAGE_TYPE.LINK_PREVIEWS]?.length;
-        if (!isTruthy(length)) {
+        const linkPreviews = protoText?.[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
+        if (!isNonEmptyArray(linkPreviews)) {
           actionType = 'text';
         }
         if (!isNullOrUndefined(protoText)) {

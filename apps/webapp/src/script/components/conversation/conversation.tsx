@@ -19,7 +19,7 @@
 
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
-import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
@@ -209,7 +209,7 @@ function ConversationContent({
 
   const uploadImages = useCallback(
     (images: File[]) => {
-      if (!isTruthy(activeConversation) || isHittingUploadLimit(images, repositories.asset, translate)) {
+      if (isNullOrUndefined(activeConversation) || isHittingUploadLimit(images, repositories.asset, translate)) {
         return;
       }
 
@@ -236,7 +236,7 @@ function ConversationContent({
 
   const uploadFiles = useCallback(
     (files: File[]) => {
-      if (!isTruthy(activeConversation)) {
+      if (isNullOrUndefined(activeConversation)) {
         return;
       }
 
@@ -329,7 +329,7 @@ function ConversationContent({
   };
 
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
-    if (isTruthy(activeConversation)) {
+    if (!isNullOrUndefined(activeConversation)) {
       const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
@@ -343,7 +343,7 @@ function ConversationContent({
     const isUserEntity = !isServiceEntity(userEntity);
 
     if (
-      isTruthy(activeConversation) &&
+      !isNullOrUndefined(activeConversation) &&
       isUserEntity &&
       (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))
     ) {
@@ -362,7 +362,7 @@ function ConversationContent({
   };
 
   const showParticipants = (participants: User[]) => {
-    if (isTruthy(activeConversation)) {
+    if (!isNullOrUndefined(activeConversation)) {
       openRightSidebar(PanelState.CONVERSATION_PARTICIPANTS, {entity: activeConversation, highlighted: participants});
     }
   };
@@ -490,7 +490,7 @@ function ConversationContent({
     const userId = messageDetails.userId;
     const domain = messageDetails.userDomain;
 
-    if (userId !== undefined && userId.length > 0) {
+    if (isNonEmptyString(userId)) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         try {
           const userEntity = await repositories.user.getUserById({domain: domain ?? '', id: userId});
@@ -558,11 +558,7 @@ function ConversationContent({
     };
 
     try {
-      if (
-        messageEntity.fromDomain !== undefined &&
-        messageEntity.fromDomain.length > 0 &&
-        isTruthy(activeConversation)
-      ) {
+      if (isNonEmptyString(messageEntity.fromDomain) && !isNullOrUndefined(activeConversation)) {
         await repositories.message.resetSession(
           {domain: messageEntity.fromDomain, id: messageEntity.from},
           messageEntity.clientId,
@@ -734,7 +730,7 @@ function ConversationContent({
         rootProps={getRootProps()}
         inputProps={getInputProps()}
       >
-        {isTruthy(activeConversation) && (
+        {!isNullOrUndefined(activeConversation) && (
           <SharedDriveUploadStatusProvider>
             <TitleBar
               repositories={repositories}

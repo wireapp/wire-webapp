@@ -19,7 +19,7 @@
 
 import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState} from 'react';
 
-import {isNull, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {maybe} from 'true-myth';
@@ -74,7 +74,7 @@ export const ConversationTabs = ({
       getSharedDriveUploadStatuses(sharedDriveUploadController, conversationQualifiedIdString),
     );
     const aggregateKind = getSharedDriveUploadAggregateKind(statuses);
-    if (!isTruthy(aggregateKind)) {
+    if (!isNonEmptyString(aggregateKind)) {
       return null;
     }
 

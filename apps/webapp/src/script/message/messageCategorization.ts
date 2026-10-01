@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy} from '@sindresorhus/is';
+import {isNumber, isTruthy} from '@sindresorhus/is';
 import {isObject} from 'underscore';
 
 import {ClientEvent} from 'Repositories/event/Client';
@@ -90,7 +90,7 @@ export const categoryFromEvent = (event: Partial<EventRecord>): MessageCategory 
     const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation, _checkComposite];
     for (const check of categoryChecks) {
       const matchedCategory = check(event);
-      if (matchedCategory !== undefined && isTruthy(matchedCategory)) {
+      if (isNumber(matchedCategory) && matchedCategory !== 0) {
         category = matchedCategory;
         break;
       }

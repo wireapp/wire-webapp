@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy, isUndefined} from '@sindresorhus/is';
+import {isNumber, isUndefined} from '@sindresorhus/is';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -112,7 +112,7 @@ const _accumulateSummary = (
 const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, translate: Translate): string => {
   return Object.entries(activities)
     .map(([activity, activityCount]): string | void => {
-      if (isTruthy(activityCount)) {
+      if (isNumber(activityCount) && activityCount !== 0) {
         const activityCountIsOne = activityCount === 1;
 
         switch (activity) {

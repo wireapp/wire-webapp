@@ -20,7 +20,7 @@
 import {useEffect, useMemo, useRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isNonEmptyString, isNull, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNull, isNumber} from '@sindresorhus/is';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
@@ -84,8 +84,8 @@ function FullSearch(props: FullSearchProps) {
   useEffect(() => {
     const parent = element?.closest('.collection-list') as HTMLDivElement;
     const onScroll = () => {
-      const showAdditionalMessages = isScrolledBottom(parent) && messages.length;
-      if (isTruthy(showAdditionalMessages)) {
+      const showAdditionalMessages = isScrolledBottom(parent) && isNonEmptyArray(messages);
+      if (showAdditionalMessages) {
         setMessageCount(currentCount => {
           return currentCount + MAX_VISIBLE_MESSAGES;
         });
@@ -111,7 +111,7 @@ function FullSearch(props: FullSearchProps) {
       const matches = [...text.matchAll(regex)];
       const firstIndex = matches[0]?.index;
       let firstPart = text.substring(0, firstIndex ?? text.length);
-      if (isTruthy(firstIndex) && firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
+      if (isNumber(firstIndex) && firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
         let splitOffset = firstIndex - 1;
         const firstSpace = firstPart.indexOf(' ', splitOffset - PRE_MARKED_OFFSET);
         splitOffset = firstSpace > -1 ? firstSpace : splitOffset;

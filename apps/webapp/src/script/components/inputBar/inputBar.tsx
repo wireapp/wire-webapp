@@ -19,7 +19,7 @@
 
 import {useCallback, useRef, useState, type ReactElement} from 'react';
 
-import {isNull, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
+import {isNull, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
@@ -190,9 +190,10 @@ function InputBarContent({
     },
   });
 
-  const inputPlaceholder = isTruthy(messageTimer)
-    ? translate('tooltipConversationEphemeral')
-    : translate('tooltipConversationInputPlaceholder');
+  const inputPlaceholder =
+    isNumber(messageTimer) && messageTimer !== 0
+      ? translate('tooltipConversationEphemeral')
+      : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
@@ -202,7 +203,8 @@ function InputBarContent({
     isCellsEnabled,
     isViewerPermissionFeatureEnabled,
   });
-  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && isTruthy(localMessageTimer) && !hasGlobalMessageTimer;
+  const hasLocalEphemeralTimer =
+    isSelfDeletingMessagesEnabled && isNumber(localMessageTimer) && localMessageTimer !== 0 && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
   const shouldReplaceEmoji = useUserPropertyValue<boolean>(() => {
