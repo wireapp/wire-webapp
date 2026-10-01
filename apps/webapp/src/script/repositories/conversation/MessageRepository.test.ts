@@ -199,6 +199,29 @@ describe('MessageRepository', () => {
   });
 
   describe('sendPing', () => {
+    it.each([
+      {timerMilliseconds: 0, wrapsInEphemeral: false},
+      {timerMilliseconds: Number.NaN, wrapsInEphemeral: false},
+      {timerMilliseconds: -1, wrapsInEphemeral: true},
+      {timerMilliseconds: 1, wrapsInEphemeral: true},
+    ])('preserves timer truthiness for $timerMilliseconds milliseconds', async options => {
+      const {timerMilliseconds, wrapsInEphemeral} = options;
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
+      const send = jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+      const conversation = generateConversation();
+      jest.spyOn(conversation, 'messageTimer').mockReturnValue(timerMilliseconds);
+
+      await messageRepository.sendPing(conversation);
+
+      const [sendOptions] = requireValueForTest(send.mock.calls.at(0));
+      const actualPayload = sendOptions.payload;
+      expect(actualPayload.content).toBe(wrapsInEphemeral ? 'ephemeral' : 'knock');
+      if (wrapsInEphemeral) {
+        expect(actualPayload.ephemeral?.expireAfterMillis).toBe(timerMilliseconds);
+      }
+    });
+
     it('sends a ping', async () => {
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
