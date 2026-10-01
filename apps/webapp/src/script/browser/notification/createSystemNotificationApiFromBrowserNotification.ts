@@ -52,6 +52,7 @@ export type PlatformNotificationRequest = {
   icon?: string;
   silent?: boolean;
   data?: unknown;
+  requireInteraction: boolean;
 };
 
 export type BrowserNotificationDependencies = {
@@ -89,9 +90,9 @@ export const createSystemNotificationApiFromBrowserNotification = ({
       (() => {
         return Promise.resolve(getPermission());
       }),
-    show: ({title, body, tag, icon, silent, data, onClick, onShow, onClose}) => {
+    show: ({title, body, tag, icon, silent, data, requireInteraction, onClick, onShow, onClose}) => {
       return result.tryOrElse(toSystemNotificationError(systemNotificationErrorKinds.presentationFailed), () => {
-        const notification = createNotification({title, body, tag, icon, silent, data});
+        const notification = createNotification({title, body, tag, icon, silent, data, requireInteraction});
         // The platform fires its close event for a programmatic close too, so without this guard a
         // close we asked for would be reported twice.
         let closeReported = false;
@@ -166,8 +167,9 @@ const createBrowserNotification = ({
   icon,
   silent,
   data,
+  requireInteraction,
 }: PlatformNotificationRequest): PlatformNotification => {
-  const notification = new window.Notification(title, {body, tag, icon, silent, data});
+  const notification = new window.Notification(title, {body, tag, icon, silent, data, requireInteraction});
 
   return {
     onClick: listener => {

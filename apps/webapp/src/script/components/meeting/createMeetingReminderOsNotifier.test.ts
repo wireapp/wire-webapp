@@ -107,7 +107,7 @@ const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotif
 };
 
 describe('createMeetingReminderOsNotifier', () => {
-  it('presents a notification naming the meeting and its start time', () => {
+  it('presents a notification requiring interaction and naming the meeting and its start time', () => {
     const {requests, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
@@ -115,6 +115,7 @@ describe('createMeetingReminderOsNotifier', () => {
     expect(requests).toHaveLength(1);
     expect(firstRequestOf(requests).title).toBe('Weekly sync');
     expect(firstRequestOf(requests).body).toBe('Starts at 12:00 PM');
+    expect(firstRequestOf(requests).requireInteraction).toBe(true);
   });
 
   it('attaches neither action buttons nor a Wire sound file', () => {
@@ -122,7 +123,14 @@ describe('createMeetingReminderOsNotifier', () => {
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
-    expect(Object.keys(firstRequestOf(requests)).sort()).toEqual(['body', 'onClick', 'onClose', 'tag', 'title']);
+    expect(Object.keys(firstRequestOf(requests)).sort()).toEqual([
+      'body',
+      'onClick',
+      'onClose',
+      'requireInteraction',
+      'tag',
+      'title',
+    ]);
   });
 
   it('focuses the meetings list and closes the toast when clicked', () => {

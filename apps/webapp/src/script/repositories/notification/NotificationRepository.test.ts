@@ -238,6 +238,7 @@ describe('NotificationRepository', () => {
 
       repository['showNotificationInBrowser'](notificationContent);
 
+      expect(request?.requireInteraction).toBe(false);
       expect(setTimeoutSpy).not.toHaveBeenCalled();
       request?.onShow?.();
       expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
