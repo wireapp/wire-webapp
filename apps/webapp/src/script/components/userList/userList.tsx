@@ -228,14 +228,20 @@ export const UserList = ({
       }
       onContactsOpenChange?.(open);
     };
-    const unselectedUsers = truncatedUsers.slice(0, maxShownUsers).filter(user => !isSelected(user));
+    const unselectedUsers = truncatedUsers.slice(0, maxShownUsers).filter(user => {
+      return !isSelected(user);
+    });
 
     content = (
       <Fragment>
         {isSelectable && hasSelectedUsers && (
           <Fragment>
             <button
-              onClick={() => setIsSelectedContactsOpen(prevState => !prevState)}
+              onClick={() => {
+                return setIsSelectedContactsOpen(prevState => {
+                  return !prevState;
+                });
+              }}
               css={collapseButton}
               data-uie-name="do-toggle-selected-search-list"
             >
@@ -263,7 +269,9 @@ export const UserList = ({
 
         {isSelectable && (
           <button
-            onClick={() => handleContactsOpenChange(!isContactsOpen)}
+            onClick={() => {
+              return handleContactsOpenChange(!isContactsOpen);
+            }}
             css={collapseButton}
             data-uie-name="do-toggle-search-list"
             aria-expanded={isContactsOpen}

@@ -72,7 +72,9 @@ export const useMeetingParticipantsPicker = ({
       );
     });
   }, [conversationRepository, filter]);
-  const selectedConversationIds = useMemo(() => new Set(selectedConversations.keys()), [selectedConversations]);
+  const selectedConversationIds = useMemo(() => {
+    return new Set(selectedConversations.keys());
+  }, [selectedConversations]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {

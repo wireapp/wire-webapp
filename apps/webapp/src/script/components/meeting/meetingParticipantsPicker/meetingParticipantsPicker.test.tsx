@@ -370,7 +370,13 @@ describe('MeetingParticipantsPicker', () => {
 
     render(
       withThemeAndRootContext(
-        <ControlledPicker conversationRepository={{getAllGroupConversations: () => [conversation]}} />,
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
+        />,
         rootProviderWrapper,
       ),
     );
@@ -733,7 +739,9 @@ describe('MeetingParticipantsPicker', () => {
       withThemeAndRootContext(
         <ControlledPicker
           conversationRepository={{
-            getAllGroupConversations: () => [createConversation('group', 'Engineering', [users[0]])],
+            getAllGroupConversations: () => {
+              return [createConversation('group', 'Engineering', [users[0]])];
+            },
           }}
         />,
         rootProviderWrapper,
