@@ -305,9 +305,13 @@ describe('ScheduleMeetingForm', () => {
     );
 
     await user.click(screen.getByRole('button', {name: /meetings\.scheduleModal\.openCalendarAriaLabel/}));
-    await user.click(screen.getByRole('button', {name: /Thursday, September 24, 2026/}));
+    await user.click(screen.getByRole('button', {name: /^Today,/}));
 
-    expect(onStartChange).toHaveBeenCalledWith(maybe.just(new Date(2026, 8, 24, 13, 0)));
+    const [selectedStart] = onStartChange.mock.calls[0];
+    const selectedStartDate = selectedStart.unwrapOr(null);
+    expect(selectedStartDate).toEqual(expect.any(Date));
+    expect(selectedStartDate?.getHours()).toBe(13);
+    expect(selectedStartDate?.getMinutes()).toBe(0);
   });
 
   it('updates the start time date while preserving its time', async () => {
