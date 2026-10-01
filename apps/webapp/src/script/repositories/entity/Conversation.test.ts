@@ -871,6 +871,20 @@ describe('Conversation', () => {
   });
 
   describe('removeMessages', () => {
+    it.each([
+      {timestampMilliseconds: undefined, expectedRemainingMessageCount: 0},
+      {timestampMilliseconds: 0, expectedRemainingMessageCount: 0},
+      {timestampMilliseconds: Number.NaN, expectedRemainingMessageCount: 0},
+      {timestampMilliseconds: -1, expectedRemainingMessageCount: 2},
+      {timestampMilliseconds: 1, expectedRemainingMessageCount: 2},
+    ])('preserves removal boundaries for timestamp $timestampMilliseconds', options => {
+      const {timestampMilliseconds, expectedRemainingMessageCount} = options;
+
+      conversation_et.removeMessages(timestampMilliseconds);
+
+      expect(conversation_et.messages()).toHaveLength(expectedRemainingMessageCount);
+    });
+
     let message_et: Message = createMessageForTest();
 
     beforeEach(() => {
