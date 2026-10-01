@@ -812,7 +812,6 @@ const productionConfigs = [
       '**/*.spec.tsx',
       '**/test/**',
       '**/mocks/**',
-      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer.ts',
     ],
     rules: {
       ...strictBooleanRules,
@@ -867,10 +866,6 @@ const productionConfigs = [
     files: [
       'apps/webapp/src/script/repositories/event/**/*.{ts,tsx}',
       'apps/webapp/src/script/repositories/notification/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/conversation/EventBuilder/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/conversation/EventMapper.ts',
-      'apps/webapp/src/script/repositories/conversation/AbstractConversationEventHandler.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationStateHandler.ts',
       'apps/webapp/src/script/notification/**/*.{ts,tsx}',
       'apps/webapp/src/script/error/eventError.ts',
       'apps/webapp/src/script/components/meeting/meetingNotificationCard/**/*.{ts,tsx}',
@@ -885,16 +880,6 @@ const productionConfigs = [
   },
   {
     files: ['apps/webapp/src/script/components/conversation/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/components/conversation/conversation.tsx',
-      'apps/webapp/src/script/components/conversation/conversationCells/**',
-      'apps/webapp/src/script/components/conversation/conversationTabs/conversationTabs.tsx',
-      'apps/webapp/src/script/components/conversation/hooks/useReadReceipt.ts',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/buildCellFileMetadata/**',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/createFileDropHandler/**',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/transformAcceptedFiles/**',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/useFilesUploadDropzone.ts',
-    ],
     rules: {
       ...strictBooleanRules,
     },
@@ -922,12 +907,6 @@ const productionConfigs = [
     ignores: [
       'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**',
       'apps/webapp/src/script/components/messagesList/message/e2eiVerificationMessage/**',
-      'apps/webapp/src/script/components/messagesList/message/messageWrapper.tsx',
-      'apps/webapp/src/script/components/messagesList/uploadAssets/**',
-      'apps/webapp/src/script/components/messagesList/utils/messagesFilter.ts',
-      'apps/webapp/src/script/components/messagesList/utils/useLoadConversation.ts',
-      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/useLoadMessages.ts',
-      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/virtualizedMessagesList.tsx',
     ],
     rules: {
       ...strictBooleanRules,
@@ -935,23 +914,6 @@ const productionConfigs = [
   },
   {
     files: ['apps/webapp/src/script/components/inputBar/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/components/inputBar/inputBar.tsx',
-      'apps/webapp/src/script/components/inputBar/filePreviews/useFilePreview/useFilePreview.ts',
-      'apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/sendPlugin/sendPlugin.tsx',
-      'apps/webapp/src/script/components/inputBar/useFileHandling/**',
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/**',
-      'apps/webapp/src/script/components/inputBar/usePing/usePing.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/useDraftState/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/useOutsideInputClick/**/*.{ts,tsx}',
-    ],
     rules: {
       ...strictBooleanRules,
     },
@@ -980,21 +942,30 @@ const productionConfigs = [
     },
   },
   {
+    files: ['apps/webapp/src/script/repositories/conversation/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/repositories/conversation/ConversationVerificationStateHandler/MLS/**',
+      'apps/webapp/src/script/repositories/conversation/ConversationVerificationStateHandler/Proteus/**',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
     files: [
-      'apps/webapp/src/script/repositories/conversation/AccessState.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationAccessPermission.ts',
-      'apps/webapp/src/script/repositories/conversation/ClientMismatchUtil.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationFilter.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationLabelRepository.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationMapper.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationRoleRepository.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationState.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationStatus.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationStatusIcon.ts',
-      'apps/webapp/src/script/repositories/conversation/NotificationSetting.ts',
-      'apps/webapp/src/script/repositories/conversation/isSelfInitiatedConversationLeave.ts',
-      'apps/webapp/src/script/repositories/conversation/linkPreviews/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/conversation/userClientsUtils.ts',
+      'apps/webapp/src/script/repositories/entity/Conversation.ts',
+      'apps/webapp/src/script/guards/Message.ts',
+      'apps/webapp/src/script/ephemeral/**/*.{ts,tsx}',
+      'apps/webapp/src/script/message/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/mainContent/panels/collection/**/*.{ts,tsx}',
+      'apps/webapp/src/script/util/conversationMessages.ts',
+      'apps/webapp/src/script/view_model/ActionsViewModel.ts',
+      'apps/webapp/src/script/view_model/ContentViewModel.ts',
+      'apps/webapp/src/script/view_model/ListViewModel.ts',
+    ],
+    ignores: [
+      'apps/webapp/src/script/message/messageHasher.ts',
+      'apps/webapp/src/script/message/e2eiVerificationMessageType.ts',
     ],
     rules: {
       ...strictBooleanRules,
