@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy, isUndefined} from '@sindresorhus/is';
+
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {FileAsset} from 'Repositories/entity/message/fileAsset';
@@ -110,7 +112,7 @@ const _accumulateSummary = (
 const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, translate: Translate): string => {
   return Object.entries(activities)
     .map(([activity, activityCount]): string | void => {
-      if (activityCount) {
+      if (isTruthy(activityCount)) {
         const activityCountIsOne = activityCount === 1;
 
         switch (activity) {
@@ -169,19 +171,19 @@ const _getStateAlert: ConversationCellStateDefinition = {
       selfReplies: unreadSelfReplies,
     } = conversationEntity.unreadState();
 
-    if (unreadSelfMentions.length) {
+    if (unreadSelfMentions.length > 0) {
       return ConversationStatusIcon.UNREAD_MENTION;
     }
 
-    if (unreadSelfReplies.length) {
+    if (unreadSelfReplies.length > 0) {
       return ConversationStatusIcon.UNREAD_REPLY;
     }
 
-    if (unreadCalls.length) {
+    if (unreadCalls.length > 0) {
       return ConversationStatusIcon.MISSED_CALL;
     }
 
-    if (unreadPings.length) {
+    if (unreadPings.length > 0) {
       return ConversationStatusIcon.UNREAD_PING;
     }
   },
@@ -228,7 +230,7 @@ const _getStateGroupActivity: ConversationCellStateDefinition = {
 
         if ((lastMessageEntity as MemberMessage).isMemberJoin()) {
           if (userCountIsOne) {
-            if (!(lastMessageEntity as MemberMessage).remoteUserEntities().length) {
+            if ((lastMessageEntity as MemberMessage).remoteUserEntities().length === 0) {
               return translate('conversationsSecondaryLinePersonAddedYou', {
                 user: (lastMessageEntity as MemberMessage).user().name(),
               });
@@ -288,7 +290,9 @@ const _getStateGroupActivity: ConversationCellStateDefinition = {
   },
   match: (conversationEntity: Conversation) => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
-    const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.isSystem() : false;
+    const isExpectedType = !isUndefined(lastMessageEntity)
+      ? lastMessageEntity.isMember() || lastMessageEntity.isSystem()
+      : false;
     const unreadEvents = conversationEntity.unreadState().allEvents;
 
     return conversationEntity.isGroupOrChannel() && unreadEvents.length > 0 && isExpectedType;
@@ -474,7 +478,7 @@ export const generateCellState = (
   const matchingState =
     states.find(state => {
       return state.match(conversationEntity);
-    }) || _getStateDefault;
+    }) ?? _getStateDefault;
 
   return {
     description: matchingState.description(conversationEntity, translate),

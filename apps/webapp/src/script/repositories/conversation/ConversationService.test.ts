@@ -88,6 +88,29 @@ describe('ConversationService', () => {
       expect(await conversationService.searchInConversation('conversation-id', 'unrelated')).toEqual([]);
     });
 
+    it.each([
+      {content: '', matchesLegacyText: true},
+      {content: undefined, matchesLegacyText: true},
+      {content: ' ', matchesLegacyText: false},
+    ])('preserves legacy text fallback for content "$content"', async options => {
+      const {content, matchesLegacyText} = options;
+      const event = createMessageEvent('legacy-text-event', '', {data: {content, message: 'legacy caption'}});
+      const eventService: EventServiceLike = {
+        loadEventsWithCategory: jest.fn().mockResolvedValue([event]),
+      };
+      const conversationService = new ConversationService(
+        eventService,
+        {} as unknown as StorageService,
+        {} as unknown as APIClient,
+        {} as unknown as Core,
+      );
+
+      const actualMatches = await conversationService.searchInConversation('conversation-id', 'legacy');
+      const expectedMatches = matchesLegacyText ? [event] : [];
+
+      expect(actualMatches).toEqual(expectedMatches);
+    });
+
     it('matches composite message text items', async () => {
       const compositeEvent = {
         primary_key: 'primary-key',

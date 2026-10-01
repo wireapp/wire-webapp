@@ -17,7 +17,7 @@
  *
  */
 
-import {isArray} from '@sindresorhus/is';
+import {isArray, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import type {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
@@ -100,27 +100,31 @@ function createSearchAbortError() {
 }
 
 function throwIfSearchAborted(abortSignal?: AbortSignal) {
-  if (abortSignal?.aborted) {
+  if (abortSignal?.aborted === true) {
     throw createSearchAbortError();
   }
 }
 
 const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent) => string>> = {
   [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => {
-    return event.data?.content || event.data?.message || '';
+    const messageTextContent = event.data?.content;
+
+    return isNonEmptyString(messageTextContent) ? messageTextContent : (event.data?.message ?? '');
   },
   [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => {
-    return event.data?.text?.content || '';
+    return event.data?.text?.content ?? '';
   },
   [ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD]: event => {
     const items: CompositeMessageItem[] = isArray(event.data?.items) ? event.data.items : [];
     return items
       .flatMap(item => {
-        if (item?.text) {
-          return [item.text.content || item.text.message || ''];
+        if (!isUndefined(item?.text)) {
+          const messageTextContent = item.text.content;
+
+          return [isNonEmptyString(messageTextContent) ? messageTextContent : (item.text.message ?? '')];
         }
-        if (item?.button) {
-          return [item.button.text || ''];
+        if (!isUndefined(item?.button)) {
+          return [item.button.text ?? ''];
         }
         return [];
       })
@@ -159,7 +163,7 @@ async function findMatchingConversationEvents(
 
     const searchableText = getSearchableText(event);
     searchRegex.lastIndex = 0;
-    if (searchableText && searchRegex.test(searchableText)) {
+    if (isNonEmptyString(searchableText) && searchRegex.test(searchableText)) {
       matchingEvents.push(event);
     }
   }
@@ -182,7 +186,7 @@ export class ConversationService {
   private get coreConversationService() {
     const conversationService = this.core.service?.conversation;
 
-    if (!conversationService) {
+    if (isUndefined(conversationService)) {
       throw new Error('Conversation service not available');
     }
 
@@ -486,7 +490,7 @@ export class ConversationService {
 
     let events;
 
-    if (this.storageService.db) {
+    if (!isUndefined(this.storageService.db)) {
       events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('time')
@@ -505,7 +509,8 @@ export class ConversationService {
 
     const conversations = events.reduce((accumulated, event) => {
       // TODO(federation): generate fully qualified ids
-      accumulated[event.conversation] = (accumulated[event.conversation] || 0) + 1;
+      const eventCount = accumulated[event.conversation];
+      accumulated[event.conversation] = (isTruthy(eventCount) ? eventCount : 0) + 1;
       return accumulated;
     }, {});
 
@@ -532,7 +537,7 @@ export class ConversationService {
    * @returns Resolves with a list of conversation records
    */
   async saveConversationsInDb(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
-    if (this.storageService.db) {
+    if (!isUndefined(this.storageService.db)) {
       const keys = conversations.map(conversation => {
         return conversation.id;
       });
@@ -574,7 +579,7 @@ export class ConversationService {
     abortSignal?: AbortSignal,
   ): Promise<SearchableConversationEvent[]> {
     const trimmedQuery = query.trim();
-    if (!trimmedQuery.length) {
+    if (trimmedQuery.length === 0) {
       return [];
     }
 
@@ -600,10 +605,13 @@ export class ConversationService {
 
   private getEventSearchableText(event: SearchableConversationEvent): string {
     try {
-      const contentOrLegacyText = event.data?.content || event.data?.message || '';
-      const extractor = event.type ? TextExtractors[event.type] : undefined;
-      const extractedText = extractor?.(event) || '';
-      return extractedText.length ? extractedText : contentOrLegacyText;
+      const messageTextContent = event.data?.content;
+      const contentOrLegacyText = isNonEmptyString(messageTextContent)
+        ? messageTextContent
+        : (event.data?.message ?? '');
+      const extractor = isTruthy(event.type) ? TextExtractors[event.type] : undefined;
+      const extractedText = extractor?.(event) ?? '';
+      return extractedText.length > 0 ? extractedText : contentOrLegacyText;
     } catch (err) {
       logger.error('Error extracting searchable text from event', {event, error: err});
       return '';
