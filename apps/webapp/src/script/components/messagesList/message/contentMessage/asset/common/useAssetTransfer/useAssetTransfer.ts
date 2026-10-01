@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
@@ -39,7 +40,7 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
-    if (!message) {
+    if (isUndefined(message)) {
       return noop;
     }
     const progressSubscribable = assetRepository.getUploadProgress(message?.id);
@@ -58,10 +59,10 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
   const getAssetUrl = useCallback(
     async (resource: AssetRemoteData, acceptedMimeTypes?: string[]): Promise<AssetUrl> => {
       const blob = await assetRepository.load(resource);
-      if (!blob) {
+      if (isUndefined(blob)) {
         throw new Error(`Asset could not be loaded`);
       }
-      if (acceptedMimeTypes && !acceptedMimeTypes?.includes(blob.type)) {
+      if (!isUndefined(acceptedMimeTypes) && !acceptedMimeTypes?.includes(blob.type)) {
         throw new Error(`Mime type not accepted "${blob.type}"`);
       }
       const url = URL.createObjectURL(blob);
@@ -76,7 +77,11 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
   );
 
   const cancelUpload = useCallback(() => {
-    return message && assetRepository.cancelUpload(message?.id);
+    if (isUndefined(message)) {
+      return undefined;
+    }
+
+    return assetRepository.cancelUpload(message?.id);
   }, [assetRepository, message]);
 
   const downloadAsset = useCallback(

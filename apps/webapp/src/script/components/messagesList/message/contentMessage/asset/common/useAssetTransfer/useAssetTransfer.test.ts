@@ -101,6 +101,26 @@ describe('useAssetTransfer', () => {
       );
     });
 
+    it('rejects every MIME type when the supplied allowlist is empty', async () => {
+      const {result} = renderHook(() => {
+        return useAssetTransfer(message, assetRepository);
+      });
+
+      await expect(result.current.getAssetUrl(asset, [])).rejects.toThrow('Mime type not accepted "image/png"');
+    });
+
+    it('accepts a zero-byte blob with an empty MIME type when no allowlist is supplied', async () => {
+      assetRepository.load.mockResolvedValueOnce(new Blob([]));
+      const {result} = renderHook(() => {
+        return useAssetTransfer(message, assetRepository);
+      });
+
+      await expect(result.current.getAssetUrl(asset)).resolves.toEqual({
+        url: 'assetUrl',
+        dispose: expect.any(Function),
+      });
+    });
+
     it('should revoke object URL when dispose is called', async () => {
       const {result} = renderHook(() => {
         return useAssetTransfer(message, assetRepository);
@@ -199,6 +219,28 @@ describe('useAssetTransfer', () => {
   });
 
   describe('cancelUpload', () => {
+    it('preserves the cancellation promise returned by the repository', async () => {
+      const cancellation = Promise.resolve();
+      assetRepository.cancelUpload.mockImplementationOnce(() => {
+        return cancellation;
+      });
+      const {result} = renderHook(() => {
+        return useAssetTransfer(message, assetRepository);
+      });
+
+      expect(result.current.cancelUpload()).toBe(cancellation);
+      await cancellation;
+    });
+
+    it('returns undefined without cancellation or progress subscriptions when the message is absent', () => {
+      const {result} = renderHook(() => {
+        return useAssetTransfer(undefined, assetRepository);
+      });
+
+      expect(result.current.cancelUpload()).toBeUndefined();
+      expect(assetRepository.cancelUpload).not.toHaveBeenCalled();
+      expect(assetRepository.getUploadProgress).not.toHaveBeenCalled();
+    });
     it('should call assetRepository.cancelUpload with message id', () => {
       const {result} = renderHook(() => {
         return useAssetTransfer(message, assetRepository);
