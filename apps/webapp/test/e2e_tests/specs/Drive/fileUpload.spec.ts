@@ -20,33 +20,69 @@
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getTextFilePath, TextFileName} from 'test/e2e_tests/utils/asset.util';
 
-import {test, expect, withLogin} from '../../test.fixtures';
+import {test, expect, type PagePlugin, withLogin} from '../../test.fixtures';
+import {connectWithUser, createGroup} from '../../utils/userActions';
+
+const withSharedDriveDirectUpload: PagePlugin = async page => {
+  await page.addInitScript(() => {
+    if (window.top !== window || !['http:', 'https:'].includes(window.location.protocol)) {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    const enabledFeatures = new Set(
+      (url.searchParams.get('enabled-features') ?? '')
+        .split(',')
+        .map(feature => {
+          return feature.trim();
+        })
+        .filter(feature => {
+          return feature.length > 0;
+        }),
+    );
+    enabledFeatures.add('shared-drive-direct-upload');
+    url.searchParams.set('enabled-features', [...enabledFeatures].join(','));
+    window.history.replaceState(null, '', url.toString());
+  });
+};
 
 test.describe('Drive file uploads', () => {
-  test(
-    'I want to upload a single file to Drive',
-    {tag: ['@TC-12131', '@functional']},
-    async ({createTeam, createPage}) => {
-      const team = await createTeam('Drive upload team', {features: {cells: true}});
-      const pageManager = await PageManager.from(createPage(withLogin(team.owner)));
-      const {page} = pageManager;
+  let pageManager: PageManager;
 
-      await test.step('User opens Drive', async () => {
-        await pageManager.webapp.pages.sidebar().clickCellsButton();
-        await expect(page.getByRole('button', {name: 'New', exact: true})).toBeVisible();
-      });
+  test.beforeEach(async ({createTeam, createPage, createUser}) => {
+    const teamMember = await createUser();
+    const team = await createTeam('Drive upload team', {
+      users: [teamMember],
+      features: {cells: true},
+    });
+    pageManager = await PageManager.from(createPage(withSharedDriveDirectUpload, withLogin(team.owner)));
+    const {pages} = pageManager.webapp;
 
-      await test.step('User uploads one file', async () => {
-        await page.locator('input[type="file"]').first().setInputFiles(getTextFilePath());
-      });
+    await test.step('Preconditions: Create and open a conversation with Shared Drive enabled', async () => {
+      const conversationName = 'Drive upload conversation';
+      await connectWithUser(pageManager, teamMember);
+      await createGroup(pages, conversationName, [teamMember], {cells: true});
+      await pages.conversationList().getConversation(conversationName).open();
+      await pages.conversation().clickFilesTab();
+      await expect(pages.cellsSharedDrive().newButton).toBeVisible();
+    });
+  });
 
-      await test.step('Uploaded file is visible in Drive', async () => {
-        const uploadedFile = page
-          .locator('[data-uie-name="cells-table-row"]')
-          .getByRole('button', {name: TextFileName, exact: true});
+  test('I want to upload a single file to Drive', {tag: ['@TC-12131', '@functional']}, async () => {
+    const {pages} = pageManager.webapp;
+    const sharedDrive = pages.cellsSharedDrive();
 
-        await expect(uploadedFile).toBeVisible();
-      });
-    },
-  );
+    await test.step('User uploads one file', async () => {
+      await sharedDrive.uploadFile(getTextFilePath());
+    });
+
+    await test.step('Uploaded file is visible in Drive', async () => {
+      await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+
+      await expect(async () => {
+        await sharedDrive.refresh();
+        await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
+      }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+    });
+  });
 });

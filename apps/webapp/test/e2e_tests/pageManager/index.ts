@@ -24,6 +24,7 @@ import {MarketingConsentModal} from './webapp/modals/marketingConsent.modal';
 import {SetUsernamePage} from './webapp/pages/setUsername.page';
 import {CellsConversationFilesPage} from './webapp/cells/cellsConversationFiles.page';
 import {CellsFileDetailViewModal} from './webapp/cells/cellsFileDetailView.modal';
+import {CellsSharedDrivePage} from './webapp/cells/cellsSharedDrive.page';
 import {ContactList} from './webapp/components/conversationList.component';
 import {ConversationSidebar} from './webapp/components/conversationSidebar.component';
 import {InputBarControls} from './webapp/components/inputBarControls.component';
@@ -238,6 +239,11 @@ export class PageManager {
       cellsConversationFiles: () => {
         return this.getOrCreate('webapp.pages.cellsConversationFiles', () => {
           return new CellsConversationFilesPage(this.page);
+        });
+      },
+      cellsSharedDrive: () => {
+        return this.getOrCreate('webapp.pages.cellsSharedDrive', () => {
+          return new CellsSharedDrivePage(this.page);
         });
       },
       connectRequest: () => {
