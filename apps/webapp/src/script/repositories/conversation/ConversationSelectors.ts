@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
   Conversation as BackendConversation,
@@ -35,15 +36,15 @@ export type MLSConversation = Conversation & {groupId: string; protocol: CONVERS
 export type MLSCapableConversation = MixedConversation | MLSConversation;
 
 export function isProteusConversation(conversation: Conversation): conversation is ProteusConversation {
-  return !conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.PROTEUS;
+  return !isNonEmptyString(conversation.groupId) && conversation.protocol === CONVERSATION_PROTOCOL.PROTEUS;
 }
 
 export function isMixedConversation(conversation: Conversation): conversation is MixedConversation {
-  return !!conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.MIXED;
+  return isNonEmptyString(conversation.groupId) && conversation.protocol === CONVERSATION_PROTOCOL.MIXED;
 }
 
 export function isMLSConversation(conversation: Conversation): conversation is MLSConversation {
-  return !!conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.MLS;
+  return isNonEmptyString(conversation.groupId) && conversation.protocol === CONVERSATION_PROTOCOL.MLS;
 }
 
 export function isMLSCapableConversation(conversation: Conversation): conversation is MLSCapableConversation {
@@ -83,7 +84,7 @@ export function isProteusTeam1to1Conversation({
 }): boolean {
   const isGroupConversation = type === CONVERSATION_TYPE.REGULAR;
   const hasOneParticipant = otherMembersLength === 1;
-  return isGroupConversation && hasOneParticipant && inTeam && !name;
+  return isGroupConversation && hasOneParticipant && inTeam && !isNonEmptyString(name);
 }
 
 export function isBackendProteus1to1Conversation(conversation: BackendConversation): boolean {
@@ -96,7 +97,7 @@ export function isBackendProteus1to1Conversation(conversation: BackendConversati
     isProteusTeam1to1Conversation({
       name,
       type,
-      inTeam: !!team,
+      inTeam: isNonEmptyString(team),
       otherMembersLength: members.others.length,
     }) || isProteus1to1
   );
@@ -126,7 +127,7 @@ const is1to1ConversationWithUser = <Protocol extends CONVERSATION_PROTOCOL.PROTE
     }
 
     const connection = conversation.connection();
-    if (connection?.userId) {
+    if (!isUndefined(connection?.userId)) {
       return matchQualifiedIds(connection.userId, userId);
     }
 
@@ -139,7 +140,7 @@ const is1to1ConversationWithUser = <Protocol extends CONVERSATION_PROTOCOL.PROTE
 
     const conversationMembersIds = conversation.participating_user_ids();
     const otherUserQualifiedId = conversationMembersIds.length === 1 ? conversationMembersIds[0] : null;
-    const doesUserIdMatch = !!otherUserQualifiedId && matchQualifiedIds(otherUserQualifiedId, userId);
+    const doesUserIdMatch = !isNullOrUndefined(otherUserQualifiedId) && matchQualifiedIds(otherUserQualifiedId, userId);
 
     return doesUserIdMatch;
   };
@@ -166,5 +167,5 @@ export const isReadableConversation = (conversation: Conversation): boolean => {
 
   const connection = conversation.connection();
 
-  return !(isSelfConversation(conversation) || (connection && states_to_filter.includes(connection.status())));
+  return !(isSelfConversation(conversation) || (!isNull(connection) && states_to_filter.includes(connection.status())));
 };

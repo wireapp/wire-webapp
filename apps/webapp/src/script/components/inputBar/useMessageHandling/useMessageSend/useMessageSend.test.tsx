@@ -12,6 +12,7 @@ import {act, renderHook} from '@testing-library/react';
 
 import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {Config} from 'src/script/Config';
+import {MessageHasher} from 'src/script/message/messageHasher';
 
 import {useMessageSend} from './useMessageSend';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
@@ -225,5 +226,87 @@ describe('useMessageSend', () => {
     expect(sendTextWithLinkPreview).toHaveBeenCalledWith(
       expect.objectContaining({textMessage: 'hello', attachments: []}),
     );
+  });
+
+  it('deletes an edited message when existing whitespace normalization produces empty text', async () => {
+    const editedMessage = {id: 'edited-message'};
+    const deleteMessageForEveryone = jest.fn().mockResolvedValue(undefined);
+    const sendMessageEdit = jest.fn().mockResolvedValue(undefined);
+    const {result} = renderHook(() => {
+      return useMessageSend(
+        createProps({
+          editedMessage,
+          messageContent: {text: '   ', mentions: []},
+          messageRepository: {deleteMessageForEveryone, sendMessageEdit} as never,
+        }),
+      );
+    });
+
+    await act(async () => {
+      return result.current.sendMessage();
+    });
+
+    expect(deleteMessageForEveryone).toHaveBeenCalledWith(expect.objectContaining({id: conversationId}), editedMessage);
+    expect(sendMessageEdit).not.toHaveBeenCalled();
+  });
+
+  it('keeps message edits fire-and-forget while resetting the composer', async () => {
+    const editCompletion = createDeferred<void>();
+    const sendMessageEdit = jest.fn().mockReturnValue(editCompletion.promise);
+    const draftReset = jest.fn();
+    const cancelMessageReply = jest.fn();
+    const {result} = renderHook(() => {
+      return useMessageSend(
+        createProps({
+          editedMessage: {id: 'edited-message'},
+          messageRepository: {sendMessageEdit} as never,
+          draftState: {reset: draftReset},
+          cancelMessageReply,
+        }),
+      );
+    });
+
+    await act(async () => {
+      return result.current.sendMessage();
+    });
+
+    expect(sendMessageEdit).toHaveBeenCalledWith(
+      expect.objectContaining({id: conversationId}),
+      'hello',
+      {id: 'edited-message'},
+      [],
+    );
+    expect(cancelMessageReply).toHaveBeenCalledTimes(1);
+    expect(draftReset).toHaveBeenCalledTimes(1);
+    editCompletion.resolve();
+    await editCompletion.promise;
+  });
+
+  it('keeps empty reply identifiers when creating the outgoing quote', async () => {
+    const loadEvent = jest.fn().mockResolvedValue({id: ''});
+    const sendTextWithLinkPreview = jest.fn();
+    const hashEvent = jest.spyOn(MessageHasher, 'hashEvent').mockResolvedValue(new ArrayBuffer(0));
+    const {result} = renderHook(() => {
+      return useMessageSend(
+        createProps({
+          replyMessageEntity: {id: '', conversation_id: '', from: ''},
+          eventRepository: {eventService: {loadEvent}} as never,
+          messageRepository: {sendTextWithLinkPreview} as never,
+        }),
+      );
+    });
+
+    try {
+      await act(async () => {
+        await result.current.sendMessage();
+      });
+
+      expect(loadEvent).toHaveBeenCalledWith('', '');
+      expect(sendTextWithLinkPreview).toHaveBeenCalledWith(
+        expect.objectContaining({QuoteEntity: expect.objectContaining({messageId: '', userId: ''})}),
+      );
+    } finally {
+      hashEvent.mockRestore();
+    }
   });
 });

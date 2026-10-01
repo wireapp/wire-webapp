@@ -18,6 +18,7 @@
  */
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -136,7 +137,7 @@ export class ListViewModel {
         return preferenceItems;
       }
 
-      const hasConnectRequests = !!this.userState.connectRequests().length;
+      const hasConnectRequests = isNonEmptyArray(this.userState.connectRequests());
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
 
       return states.concat(this.conversationState.visibleConversations());
@@ -164,7 +165,7 @@ export class ListViewModel {
   readonly answerCall = async (conversationEntity: Conversation): Promise<void> => {
     const call = this.callingRepository.findCall(conversationEntity.qualifiedId);
 
-    if (!call) {
+    if (isUndefined(call)) {
       return;
     }
 
@@ -289,7 +290,7 @@ export class ListViewModel {
     };
 
     const preferencePath = preferencePaths[contentState];
-    if (preferencePath) {
+    if (isNonEmptyString(preferencePath)) {
       setHistoryParam(preferencePath);
     }
 
@@ -442,7 +443,7 @@ export class ListViewModel {
 
       const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
 
-      if (customLabel) {
+      if (!isUndefined(customLabel)) {
         entries.push({
           click: () => {
             return conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity);
@@ -608,7 +609,7 @@ export class ListViewModel {
 
   readonly clickToUnarchive = (conversationEntity: Conversation): void => {
     void this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
-      if (!this.conversationState.archivedConversations().length) {
+      if (isEmptyArray(this.conversationState.archivedConversations())) {
         this.switchList(ListState.CONVERSATIONS);
       }
     });

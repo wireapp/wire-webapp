@@ -19,12 +19,15 @@
 
 import {FC} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {AssetImage} from 'Components/image';
 import {AudioAsset} from 'Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset';
 import {FileAsset} from 'Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset';
 import {LinkPreviewAsset} from 'Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {MessageCategory} from 'src/script/message/messageCategory';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {isOfCategory} from './utils';
@@ -40,7 +43,7 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   const firstAsset = assets[0];
   const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
 
-  if (isOfCategory('images', message) && firstAsset.isImage() && resource) {
+  if (isOfCategory('images', message) === true && firstAsset.isImage() && !isNullOrUndefined(resource)) {
     return (
       <AssetImage
         css={{width: '110px', height: '110px'}}
@@ -54,15 +57,15 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
       />
     );
   }
-  if (isOfCategory('links', message)) {
+  if (isOfCategory('links', message) === MessageCategory.LINK_PREVIEW) {
     return <LinkPreviewAsset message={message} header={true} />;
   }
 
-  if (isOfCategory('files', message)) {
+  if (isOfCategory('files', message) === true) {
     return <FileAsset message={message} hasHeader={true} />;
   }
 
-  if (isOfCategory('audio', message)) {
+  if (isOfCategory('audio', message) === true) {
     return <AudioAsset className="collection-file" message={message} hasHeader={true} />;
   }
 

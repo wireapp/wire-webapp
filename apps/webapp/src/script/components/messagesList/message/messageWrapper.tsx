@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
@@ -110,7 +111,7 @@ export const MessageWrapper = ({
       const mentions = firstAsset.mentions();
       const incomingQuote = message.quote();
       const quote: OutgoingQuote | undefined =
-        incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
+        !isUndefined(incomingQuote) && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
 
       await messageRepository.sendTextWithLinkPreview({
         conversation,

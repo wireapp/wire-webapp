@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {isNull} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -55,7 +56,7 @@ export const useFileHandling = ({
   };
 
   const sendPastedFile = () => {
-    if (pastedFile) {
+    if (!isNull(pastedFile)) {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
@@ -68,7 +69,7 @@ export const useFileHandling = ({
   };
 
   useEffect(() => {
-    if (!pastedFile) {
+    if (isNull(pastedFile)) {
       return () => {
         return undefined;
       };

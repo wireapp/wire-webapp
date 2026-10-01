@@ -29,17 +29,28 @@ export const isOfCategory = (category: Category, message: ContentMessage) => {
     return false;
   }
   switch (category) {
-    case 'images':
-      return messageCategory & MessageCategory.IMAGE && !(messageCategory & MessageCategory.GIF);
+    case 'images': {
+      const imageCategory = messageCategory & MessageCategory.IMAGE;
+
+      return imageCategory === 0 ? 0 : (messageCategory & MessageCategory.GIF) === 0;
+    }
     case 'links':
       return messageCategory & MessageCategory.LINK_PREVIEW;
-    case 'audio':
-      return messageCategory & MessageCategory.FILE && message.getFirstAsset()?.isAudio();
-    case 'files':
-      return (
-        messageCategory & MessageCategory.FILE &&
-        (message.getFirstAsset()?.isFile() || message.getFirstAsset()?.isVideo())
-      );
+    case 'audio': {
+      const fileCategory = messageCategory & MessageCategory.FILE;
+
+      return fileCategory === 0 ? 0 : message.getFirstAsset()?.isAudio();
+    }
+    case 'files': {
+      const fileCategory = messageCategory & MessageCategory.FILE;
+      if (fileCategory === 0) {
+        return 0;
+      }
+
+      const isFile = message.getFirstAsset()?.isFile();
+
+      return isFile === true ? true : message.getFirstAsset()?.isVideo();
+    }
     default:
       return false;
   }

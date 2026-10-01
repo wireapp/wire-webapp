@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {ConversationMessageTimerUpdateEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 
@@ -145,7 +146,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       return messageEntity;
     }
 
-    const isExpired = !!(await this._updateTimedMessage(messageEntity));
+    const isExpired = !isUndefined(await this._updateTimedMessage(messageEntity));
     if (!isExpired) {
       const {id, conversation_id: conversationId} = messageEntity;
       const matchingMessageEntity = this.timedMessages().find(timedMessageEntity => {
@@ -153,7 +154,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         return timedMessageId === id && timedConversationId === conversationId;
       });
 
-      if (matchingMessageEntity) {
+      if (!isUndefined(matchingMessageEntity)) {
         this.timedMessages.replace(matchingMessageEntity, messageEntity);
       } else {
         this.timedMessages.push(messageEntity);
@@ -170,7 +171,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       }),
     );
     return validatedMessages.filter(messageEntity => {
-      return !!messageEntity;
+      return !isUndefined(messageEntity);
     }) as Message[];
   }
 
@@ -312,7 +313,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       }),
     );
     const expiredMessages = updatedMessages.filter(messageEntity => {
-      return !!messageEntity;
+      return !isUndefined(messageEntity);
     }) as ContentMessage[];
 
     if (expiredMessages.length !== 0) {

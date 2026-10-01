@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
@@ -52,7 +53,7 @@ export const useFilePreview = ({file, cellsRepository, conversationId, conversat
   };
 
   const handleDelete = () => {
-    if (file.preview) {
+    if (isNonEmptyString(file.preview)) {
       URL.revokeObjectURL(file.preview);
     }
 

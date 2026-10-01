@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 
@@ -63,13 +64,13 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
         return categories;
       }
 
-      if (isOfCategory('images', message)) {
+      if (isOfCategory('images', message) === true) {
         categories.images.push(message);
-      } else if (isOfCategory('audio', message)) {
+      } else if (isOfCategory('audio', message) === true) {
         categories.audio.push(message);
-      } else if (isOfCategory('files', message)) {
+      } else if (isOfCategory('files', message) === true) {
         categories.files.push(message);
-      } else if (isOfCategory('links', message)) {
+      } else if (isOfCategory('links', message) === MessageCategory.LINK_PREVIEW) {
         categories.links.push(message);
       }
       return categories;
@@ -145,7 +146,7 @@ function Collection(props: CollectionProps) {
     });
   };
 
-  if (detailCategory && categories[detailCategory].length > 0) {
+  if (!isUndefined(detailCategory) && isNonEmptyArray(categories[detailCategory])) {
     return (
       <CollectionDetails
         conversation={conversation}
@@ -158,7 +159,7 @@ function Collection(props: CollectionProps) {
     );
   }
 
-  const content = searchTerm ? null : (
+  const content = isNonEmptyString(searchTerm) ? null : (
     <>
       <CollectionSection
         messages={images}

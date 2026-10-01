@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {isNull} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -61,7 +62,7 @@ export const useMessageReply = () => {
   }, [handleRepliedMessageDeleted, handleRepliedMessageUpdated, replyMessage]);
 
   return {
-    isReplying: !!replyMessageEntity,
+    isReplying: !isNull(replyMessageEntity),
     replyMessageEntity,
     replyMessage,
   };

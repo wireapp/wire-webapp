@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect} from 'react';
 
+import {isNull, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {LexicalEditor} from 'lexical';
 
@@ -193,9 +194,9 @@ export const useMessageHandling = ({
   );
 
   const cancelSending = useCallback(() => {
-    if (editedMessage) {
+    if (!isUndefined(editedMessage)) {
       cancelMesssageEditingWithDraftReset();
-    } else if (replyMessageEntity) {
+    } else if (!isNull(replyMessageEntity)) {
       cancelMessageReply();
     }
   }, [editedMessage, replyMessageEntity, cancelMesssageEditingWithDraftReset, cancelMessageReply]);

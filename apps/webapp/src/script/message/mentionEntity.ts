@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {IMention, Mention} from '@wireapp/protocol-messaging';
@@ -59,7 +60,7 @@ export class MentionEntity {
   }
 
   get userQualifiedId(): QualifiedId {
-    return {domain: this.domain || '', id: this.userId};
+    return {domain: this.domain ?? '', id: this.userId};
   }
 
   // Index of first char outside of mention
@@ -104,7 +105,7 @@ export class MentionEntity {
       throw new Error(MentionEntity.ERROR.INVALID_LENGTH);
     }
 
-    const isValidEnd = messageText.length && this.endIndex <= messageText.length;
+    const isValidEnd = isNonEmptyString(messageText) && this.endIndex <= messageText.length;
     if (!isValidEnd) {
       throw new Error(MentionEntity.ERROR.OUT_OF_BOUNDS);
     }
@@ -127,7 +128,7 @@ export class MentionEntity {
       length: this.length,
       startIndex: this.startIndex,
       userId: this.userId,
-      userQualifiedId: this.domain ? this.userQualifiedId : undefined,
+      userQualifiedId: isNonEmptyString(this.domain) ? this.userQualifiedId : undefined,
     };
   }
 
@@ -136,7 +137,7 @@ export class MentionEntity {
     const isUserIdMention = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     if (isUserIdMention) {
       options.userId = this.userId;
-      if (this.domain) {
+      if (isNonEmptyString(this.domain)) {
         options.qualifiedUserId = this.userQualifiedId;
       }
     }

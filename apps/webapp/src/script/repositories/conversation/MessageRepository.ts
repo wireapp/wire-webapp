@@ -17,7 +17,17 @@
  *
  */
 
-import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {
+  isFunction,
+  isNonEmptyArray,
+  isNonEmptyString,
+  isNull,
+  isNullOrUndefined,
+  isNumber,
+  isObject,
+  isTruthy,
+  isUndefined,
+} from '@sindresorhus/is';
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -454,7 +464,9 @@ export class MessageRepository {
       quote?: OutgoingQuote;
     },
   ): T {
-    const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
+    const quoteData = isUndefined(quote)
+      ? undefined
+      : {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
     return new TextContentBuilder(baseMessage)
       .withMentions(
@@ -468,7 +480,7 @@ export class MessageRepository {
         }),
       )
       .withQuote(quoteData)
-      .withLinkPreviews(linkPreview ? [linkPreview] : [])
+      .withLinkPreviews(!isUndefined(linkPreview) ? [linkPreview] : [])
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .withLegalHoldStatus(conversation.legalHoldStatus())
       .build();
@@ -509,7 +521,7 @@ export class MessageRepository {
     };
 
     let state;
-    if (attachments && attachments.length > 0) {
+    if (isNonEmptyArray(attachments)) {
       state = (await this.sendMultipartText({...textPayload, attachments})).state;
     } else {
       state = (await this.sendText(textPayload, undefined, isUndefined(messageId))).state;
@@ -551,7 +563,7 @@ export class MessageRepository {
       attachments: originalMessage
         .getMultipartAssets()
         .map(multipart => {
-          return multipart.attachments?.() || [];
+          return multipart.attachments?.() ?? [];
         })
         .flat()
         .filter(Boolean),
@@ -580,7 +592,7 @@ export class MessageRepository {
   private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}, conversationId: QualifiedId) {
     // check if the user actually wants to send link previews
     if (
-      !this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) ||
+      !isTruthy(this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) ||
       !Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS
     ) {
       return;
@@ -593,14 +605,14 @@ export class MessageRepository {
     }
 
     const linkPreview = await getLinkPreviewFromString(textPayload.message);
-    if (linkPreview) {
+    if (!isUndefined(linkPreview)) {
       const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
       // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
       await this.sendText(
         {
           ...textPayload,
-          linkPreview: linkPreview.image
+          linkPreview: !isUndefined(linkPreview.image)
             ? await this.coreServices.linkPreview.uploadLinkPreviewImage(
                 linkPreview as LinkPreviewContent,
                 conversationId,
@@ -628,7 +640,7 @@ export class MessageRepository {
     tag: string | number | Record<string, string>,
     QuoteEntity?: OutgoingQuote,
   ): Promise<void> {
-    if (!tag) {
+    if (!isTruthy(tag)) {
       tag = this.translate('extensionsGiphyRandom');
     }
 
@@ -669,7 +681,11 @@ export class MessageRepository {
    * @returns Can assets be uploaded
    */
   private canUploadAssetsToConversation(conversationEntity: Conversation) {
-    return !!conversationEntity && !conversationEntity.isRequest() && !conversationEntity.isSelfUserRemoved();
+    return (
+      !isNullOrUndefined(conversationEntity) &&
+      !conversationEntity.isRequest() &&
+      !conversationEntity.isSelfUserRemoved()
+    );
   }
 
   /**
@@ -695,7 +711,7 @@ export class MessageRepository {
     window.addEventListener('beforeunload', beforeUnload);
     const assetMetadata = await this.createAssetMetadata(conversation, file, asImage, originalId);
 
-    if (!assetMetadata) {
+    if (isNull(assetMetadata)) {
       window.removeEventListener('beforeunload', beforeUnload);
       return;
     }
@@ -788,7 +804,7 @@ export class MessageRepository {
     }
 
     const asset_et = message_et.getFirstAsset() as FileAsset;
-    if (asset_et) {
+    if (!isNullOrUndefined(asset_et)) {
       if (!asset_et.isDownloadable()) {
         throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
       }
@@ -806,18 +822,18 @@ export class MessageRepository {
    * @returns Array of attachment ids
    */
   public getCellsAssetAttachmentIds(messageEntity: Message): string[] {
-    if (!messageEntity.hasMultipartAsset || !messageEntity.isContent()) {
+    if (!isFunction(messageEntity.hasMultipartAsset) || !messageEntity.isContent()) {
       return [];
     }
 
     const multipartAsset = messageEntity.getFirstAsset();
-    if (!multipartAsset || !multipartAsset.isMultipart()) {
+    if (isUndefined(multipartAsset) || !multipartAsset.isMultipart()) {
       return [];
     }
 
     const attachments = multipartAsset.attachments?.() ?? [];
     const cellsAttachmentsIds = attachments.flatMap(attachment => {
-      return attachment.cellAsset?.uuid ? [attachment.cellAsset.uuid] : [];
+      return isNonEmptyString(attachment.cellAsset?.uuid) ? [attachment.cellAsset.uuid] : [];
     });
 
     return cellsAttachmentsIds;
@@ -835,9 +851,9 @@ export class MessageRepository {
     try {
       const metadata = await buildMetadata(file);
       const meta = {
-        audio: (isAudio(file) && metadata) || null,
-        video: (isVideo(file) && metadata) || null,
-        image: (allowImageDetection && isImage(file) && metadata) || null,
+        audio: isAudio(file) && !isUndefined(metadata) ? metadata : null,
+        video: isVideo(file) && !isUndefined(metadata) ? metadata : null,
+        image: allowImageDetection === true && isImage(file) && !isUndefined(metadata) ? metadata : null,
         length: file.size,
         name: (file as File).name,
         type: file.type,
@@ -894,7 +910,7 @@ export class MessageRepository {
       expectsReadConfirmation: this.expectReadReceipt(conversation),
     };
 
-    const assetMessage = metadata
+    const assetMessage = !isUndefined(metadata)
       ? MessageBuilder.buildImageMessage(
           {
             ...commonMessageData,
@@ -1040,13 +1056,16 @@ export class MessageRepository {
     },
   ): Promise<SendAndInjectResult> {
     const messageTimer = conversation.messageTimer();
-    const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
+    const payload =
+      enableEphemeral && isNumber(messageTimer) && messageTimer !== 0
+        ? MessageBuilder.wrapInEphemeral(message, messageTimer)
+        : message;
 
     const injectOptimisticEvent = async () => {
-      if (!skipInjection) {
+      if (skipInjection !== true) {
         const clientId = this.clientState.currentClient?.id;
 
-        if (!clientId) {
+        if (!isNonEmptyString(clientId)) {
           this.logger.error('No current client id found, cannot send message optimistically');
           return true;
         }
@@ -1069,7 +1088,9 @@ export class MessageRepository {
         );
         await this.eventRepository.injectEvent(mappedEvent);
       }
-      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
+      return silentDegradationWarning === true
+        ? true
+        : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
     const handleSuccess = async ({sentAt, failedToSend}: SendResult) => {
@@ -1078,7 +1099,7 @@ export class MessageRepository {
       const preMessageTimestamp = new Date(sentTimestamp).toISOString();
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-      if (!skipInjection) {
+      if (skipInjection !== true) {
         await this.updateMessageAsSent(
           conversation,
           payload.messageId,
@@ -1265,7 +1286,7 @@ export class MessageRepository {
         return;
       }
     }
-    const moreMessageIds = moreMessageEntities.length
+    const moreMessageIds = isNonEmptyArray(moreMessageEntities)
       ? moreMessageEntities.map(entity => {
           return entity.id;
         })
@@ -1324,11 +1345,15 @@ export class MessageRepository {
     }
 
     if (conversationEntity.is1to1()) {
-      return !!this.propertyRepository.receiptMode();
+      const receiptMode = this.propertyRepository.receiptMode();
+
+      return isNumber(receiptMode) && receiptMode !== 0;
     }
 
-    if (conversationEntity.teamId && conversationEntity.isGroupOrChannel()) {
-      return !!conversationEntity.receiptMode();
+    if (isNonEmptyString(conversationEntity.teamId) && conversationEntity.isGroupOrChannel()) {
+      const receiptMode = conversationEntity.receiptMode();
+
+      return isNumber(receiptMode) && receiptMode !== 0;
     }
 
     return false;
@@ -1360,7 +1385,7 @@ export class MessageRepository {
     }
 
     try {
-      if (!message.user().isMe && !message.ephemeral_expires()) {
+      if (!message.user().isMe && !isTruthy(message.ephemeral_expires())) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
       const userIds =
@@ -1378,11 +1403,11 @@ export class MessageRepository {
       await this.sendAndInjectMessage(payload, conversation, {
         recipients: userIds,
         // if we want optimistic removal, we can rely on the injection system that will handle the event and remove the message even before the message is sent
-        skipInjection: !options.optimisticRemoval,
+        skipInjection: options.optimisticRemoval !== true,
         // If there are recipients to the message, we only want to target those users (case of ephemeral messages that should be deleted in the sender's client and the user's own clients)
-        targetMode: userIds ? MessageTargetMode.USERS : undefined,
+        targetMode: !isNullOrUndefined(userIds) ? MessageTargetMode.USERS : undefined,
       });
-      if (!options.optimisticRemoval) {
+      if (options.optimisticRemoval !== true) {
         this.deleteMessageById(conversation, message.id);
       }
     } catch (error: unknown) {
@@ -1442,7 +1467,12 @@ export class MessageRepository {
    */
   public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
-    if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
+    if (!isNumber(timestamp) || timestamp === 0) {
+      return;
+    }
+    const clearedTimestampMilliseconds = conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
+
+    if (isNumber(clearedTimestampMilliseconds) && clearedTimestampMilliseconds !== 0) {
       const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
       await this.sendToSelfConversations(payload);
     }
@@ -1461,7 +1491,7 @@ export class MessageRepository {
     }
 
     const changes = message.getSelectionChange(buttonId);
-    if (!changes) {
+    if (!isObject(changes)) {
       return;
     }
 
@@ -1509,7 +1539,8 @@ export class MessageRepository {
 
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    if (isLastDeleted && previousMessage?.timestamp()) {
+    const previousMessageTimestampMilliseconds = isLastDeleted ? previousMessage?.timestamp() : undefined;
+    if (isNumber(previousMessageTimestampMilliseconds) && previousMessageTimestampMilliseconds !== 0) {
       conversationEntity.updateTimestamps(previousMessage, true);
     }
 
@@ -1571,14 +1602,14 @@ export class MessageRepository {
   ) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
-      const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
+      const updatedStatus = isNonEmptyArray(messageEntity.readReceipts()) ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
         status: updatedStatus,
         failedToSend,
         fileData: undefined,
       };
-      if (isoDate) {
+      if (isNonEmptyString(isoDate)) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {
           changes.time = isoDate;
@@ -1603,11 +1634,7 @@ export class MessageRepository {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const errorStatus =
-        isBackendError(error) &&
-        error.label ===
-          (BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
-            BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
-            BackendErrorLabel.SERVER_ERROR)
+        isBackendError(error) && error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR
           ? StatusType.FEDERATION_ERROR
           : StatusType.FAILED;
       messageEntity.status(errorStatus);
@@ -1643,12 +1670,12 @@ export class MessageRepository {
       .allUserEntities()
       // filter possible undefined values
       .flatMap(user => {
-        return user ? [user] : [];
+        return !isNullOrUndefined(user) ? [user] : [];
       })
       // if users are given by the caller, we filter to only keep those users
       .filter(user => {
         return (
-          !recipients ||
+          isUndefined(recipients) ||
           recipients.some(userId => {
             return matchQualifiedIds(user, userId);
           })
@@ -1656,7 +1683,7 @@ export class MessageRepository {
       })
       // we filter the self user if skipSelf is true
       .filter(user => {
-        return !skipSelf || !user.isMe;
+        return skipSelf !== true || !user.isMe;
       });
 
     // Check if we have users without assigned clients and assign them from local database if possible
@@ -1681,12 +1708,16 @@ export class MessageRepository {
   async getMessageInConversationById(conversation: Conversation, messageId: string): Promise<StoredContentMessage> {
     const messageEntity = conversation.getMessage(messageId);
     const message =
-      messageEntity ||
+      messageEntity ??
       (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
-        return event && this.event_mapper.mapJsonEvent(event, conversation);
+        if (isUndefined(event)) {
+          return undefined;
+        }
+
+        return this.event_mapper.mapJsonEvent(event, conversation);
       }));
 
-    if (!message) {
+    if (isUndefined(message)) {
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
         ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
@@ -1708,7 +1739,7 @@ export class MessageRepository {
     messageId: string,
   ): Promise<StoredContentMessage> {
     const message = conversation.getMessageByReplacementId(messageId);
-    if (!message) {
+    if (isUndefined(message)) {
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
         ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
@@ -1719,7 +1750,7 @@ export class MessageRepository {
   }
 
   async ensureMessageSender(message: Message) {
-    if (message.from && !message.user().id) {
+    if (isNonEmptyString(message.from) && !isNonEmptyString(message.user().id)) {
       const user = await this.userRepository.getUserById({domain: message.user().domain, id: message.from});
       message.user(user);
       return message as StoredContentMessage;
@@ -1799,11 +1830,11 @@ export class MessageRepository {
       ...options,
       consentType: CONSENT_TYPE.OUTGOING_CALL,
       // We want to show the degradation warning only when message should be sent to all participants
-      silentDegradationWarning: !!options?.recipients,
+      silentDegradationWarning: !isUndefined(options?.recipients),
 
       skipInjection: true,
 
-      targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
+      targetMode: !isUndefined(options?.recipients) ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
   }
 
@@ -1833,12 +1864,12 @@ export class MessageRepository {
     switch (messageContentType) {
       case 'asset': {
         const protoAsset = genericMessage.asset;
-        if (protoAsset?.original) {
-          if (!!protoAsset.original.image) {
+        if (!isNullOrUndefined(protoAsset?.original)) {
+          if (!isNullOrUndefined(protoAsset.original.image)) {
             actionType = 'photo';
-          } else if (!!protoAsset.original.audio) {
+          } else if (!isNullOrUndefined(protoAsset.original.audio)) {
             actionType = 'audio';
-          } else if (!!protoAsset.original.video) {
+          } else if (!isNullOrUndefined(protoAsset.original.video)) {
             actionType = 'video';
           } else {
             actionType = 'file';
@@ -1864,11 +1895,11 @@ export class MessageRepository {
 
       case 'text': {
         const protoText = genericMessage.text;
-        const length = protoText?.[PROTO_MESSAGE_TYPE.LINK_PREVIEWS]?.length;
-        if (!length) {
+        const linkPreviews = protoText?.[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
+        if (!isNonEmptyArray(linkPreviews)) {
           actionType = 'text';
         }
-        if (protoText) {
+        if (!isNullOrUndefined(protoText)) {
           isRichText = isMarkdownText(protoText.content);
         }
         break;
@@ -1907,7 +1938,7 @@ export class MessageRepository {
         }),
       };
 
-      const isTeamConversation = !!conversationEntity.teamId;
+      const isTeamConversation = isNonEmptyString(conversationEntity.teamId);
       if (isTeamConversation) {
         segmentations = {
           ...segmentations,
