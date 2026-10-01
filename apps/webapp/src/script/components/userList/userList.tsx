@@ -245,6 +245,7 @@ export const UserList = ({
               }}
               css={collapseButton}
               data-uie-name="do-toggle-selected-search-list"
+              aria-expanded={isSelectedContactsOpen}
             >
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
                 <ChevronDownIcon width={16} height={16} />

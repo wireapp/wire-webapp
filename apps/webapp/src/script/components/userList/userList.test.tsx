@@ -70,9 +70,15 @@ describe('UserList', () => {
       isSelectable: true,
     };
 
-    const {getByTestId} = render(withTheme(<UserList {...props} />), {wrapper: rootProviderWrapper});
+    const {getByRole, getByTestId} = render(withTheme(<UserList {...props} />), {wrapper: rootProviderWrapper});
     const selectedSearchList = getByTestId('selected-search-list');
     expect(selectedSearchList.getAttribute('data-uie-value')).toEqual('4');
+    const selectedToggle = getByRole('button', {name: 'userListSelectedContacts'});
+    expect(selectedToggle).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(selectedToggle);
+
+    expect(selectedToggle).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('counts all unselected users before the contact list is expanded', () => {

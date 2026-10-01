@@ -129,7 +129,9 @@ describe('useMeetingParticipantsPicker', () => {
     guest.isGuest(true);
     const temporaryGuest = createUser('temporary-guest', 'Temporary guest');
     temporaryGuest.isTemporaryGuest(true);
-    const conversation = createConversation('conversation', 'Project', [imported, guest, temporaryGuest]);
+    const service = createUser('service', 'Service');
+    service.isService = true;
+    const conversation = createConversation('conversation', 'Project', [imported, guest, temporaryGuest, service]);
     const onSelectedUsersChange = jest.fn();
     const options = createOptions({selectedUsers: [manual], onSelectedUsersChange});
     const {result, rerender} = renderHook(

@@ -264,6 +264,22 @@ describe('MeetingParticipantsPicker', () => {
     });
   });
 
+  it('does not show services in Contacts', async () => {
+    const service = createUser('service', 'Service User', 'service');
+    service.isService = true;
+    const user = userEvent.setup();
+
+    render(withThemeAndRootContext(<ControlledPicker availableUsers={[...users, service]} />, rootProviderWrapper));
+
+    await user.click(getSearchInput());
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
+
+    await waitFor(() => {
+      expect(screen.getByText('Thomas Goodwin')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Service User')).not.toBeInTheDocument();
+  });
+
   it('shows local groups and channels below contacts and filters them with the same input', async () => {
     const group = createConversation('group', 'Engineering', [users[0]]);
     const channel = createConversation('channel', 'Announcements', [users[1]], true);

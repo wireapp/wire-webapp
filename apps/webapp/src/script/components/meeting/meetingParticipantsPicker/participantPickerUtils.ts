@@ -26,7 +26,7 @@ export const getConversationKey = (conversation: Conversation): string => {
 };
 
 export const isAllowedMeetingParticipant = (user: User): boolean => {
-  return !user.isGuest() && !user.isTemporaryGuest();
+  return !user.isService && !user.isGuest() && !user.isTemporaryGuest();
 };
 
 export const searchUsersByQuery = (users: User[], query: string): User[] => {

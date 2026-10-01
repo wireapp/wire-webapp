@@ -48,6 +48,7 @@ import {
   valueContainerStyles,
   wrapperStyles,
 } from './meetingParticipantsPicker.styles';
+import {isAllowedMeetingParticipant} from './participantPickerUtils';
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 
 export interface MeetingParticipantsPickerProps {
@@ -98,6 +99,7 @@ export const MeetingParticipantsPicker = ({
   const {translate} = useApplicationContext();
   const listboxId = useId();
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
+  const allowedUsers = users.filter(isAllowedMeetingParticipant);
 
   const fieldLabel = isNonEmptyString(label)
     ? formatParticipantsFieldLabel(label, selectedUsers.length, translate)
@@ -210,7 +212,7 @@ export const MeetingParticipantsPicker = ({
           >
             <UserSearchableList
               selfUser={selfUser}
-              users={users}
+              users={allowedUsers}
               filter={filter}
               selected={selectedUsers}
               isSelectable
