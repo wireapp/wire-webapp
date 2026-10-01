@@ -171,4 +171,27 @@ describe('useMeetingParticipantsPicker', () => {
     expect(result.current.isOpen).toBe(false);
     expect(onFilterChange).toHaveBeenCalledWith('');
   });
+
+  it('stops Escape from propagating to the meeting dialog', () => {
+    const dialogKeyDown = jest.fn();
+    window.addEventListener('keydown', dialogKeyDown);
+    const {result} = renderHook(() => {
+      return useMeetingParticipantsPicker(createOptions());
+    });
+
+    act(() => {
+      return result.current.handleOpenChange(true);
+    });
+
+    const event = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Escape'});
+    act(() => {
+      document.dispatchEvent(event);
+    });
+
+    expect(result.current.isOpen).toBe(false);
+    expect(event.defaultPrevented).toBe(true);
+    expect(dialogKeyDown).not.toHaveBeenCalled();
+
+    window.removeEventListener('keydown', dialogKeyDown);
+  });
 });

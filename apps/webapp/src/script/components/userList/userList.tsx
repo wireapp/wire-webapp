@@ -228,9 +228,10 @@ export const UserList = ({
       }
       onContactsOpenChange?.(open);
     };
-    const unselectedUsers = truncatedUsers.slice(0, maxShownUsers).filter(user => {
+    const unselectedUsers = truncatedUsers.filter(user => {
       return !isSelected(user);
     });
+    const visibleUnselectedUsers = unselectedUsers.slice(0, maxShownUsers);
 
     content = (
       <Fragment>
@@ -286,8 +287,8 @@ export const UserList = ({
 
         <ul className={cx('search-list', cssClasses)} data-uie-name="search-list">
           {isContactsOpen &&
-            unselectedUsers.map((user, index) => {
-              const isLastItem = index === unselectedUsers.length - 1;
+            visibleUnselectedUsers.map((user, index) => {
+              const isLastItem = index === visibleUnselectedUsers.length - 1;
 
               return renderListItem(user, isLastItem);
             })}

@@ -27,6 +27,7 @@ import {UserList} from 'Components/userList/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
@@ -34,7 +35,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {withTheme} from '../../auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -72,6 +73,26 @@ describe('UserList', () => {
     const {getByTestId} = render(withTheme(<UserList {...props} />), {wrapper: rootProviderWrapper});
     const selectedSearchList = getByTestId('selected-search-list');
     expect(selectedSearchList.getAttribute('data-uie-value')).toEqual('4');
+  });
+
+  it('counts all unselected users before the contact list is expanded', () => {
+    const selfUser = new User('self-id', '', translateForTest);
+    selfUser.isMe = true;
+    const users = Array.from({length: 70}, (_, index) => {
+      return new User(`user-${index}`, '', translateForTest);
+    });
+
+    const translateWithCount: Translate = (key, substitutions) => {
+      return `${key}:${substitutions?.count ?? ''}`;
+    };
+    const {getByRole} = render(
+      withThemeAndRootContext(
+        <UserList conversationRepository={conversationRepository} isSelectable selfUser={selfUser} users={users} />,
+        createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateWithCount})),
+      ),
+    );
+
+    expect(getByRole('button', {name: 'userListContactsWithCount:70'})).toBeInTheDocument();
   });
 
   it('select user', async () => {

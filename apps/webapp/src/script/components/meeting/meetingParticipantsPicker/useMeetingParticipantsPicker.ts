@@ -153,6 +153,8 @@ export const useMeetingParticipantsPicker = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
         handleOpenChange(false);
       }
     };
