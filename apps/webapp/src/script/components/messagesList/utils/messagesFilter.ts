@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {Message as MessageEntity} from 'Repositories/entity/message/message';
@@ -43,7 +44,7 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
 
       const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
 
-      if (uniqMemberMessages.length > 0 && typesToFilter.includes(currentMessage.type)) {
+      if (isNonEmptyArray(uniqMemberMessages) && typesToFilter.includes(currentMessage.type)) {
         switch (currentMessage.type) {
           case ClientEvent.CONVERSATION.GROUP_CREATION:
             // Dont show duplicated group creation messages

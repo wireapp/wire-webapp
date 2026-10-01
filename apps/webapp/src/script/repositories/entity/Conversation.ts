@@ -18,6 +18,7 @@
  */
 
 import {
+  isEmptyArray,
   isFunction,
   isNonEmptyArray,
   isNonEmptyString,
@@ -696,7 +697,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = this.participating_user_ids().length > 0;
+        const hasUserIds = isNonEmptyArray(this.participating_user_ids());
         if (!hasUserIds) {
           return this.translate('conversationsEmptyConversation');
         }
@@ -707,7 +708,7 @@ export class Conversation {
           return this.name();
         }
 
-        const hasUserEntities = this.participating_user_ets().length > 0;
+        const hasUserEntities = isNonEmptyArray(this.participating_user_ets());
         if (hasUserEntities) {
           const isJustServices = this.participating_user_ets().every(userEntity => {
             return userEntity.isService;
@@ -725,7 +726,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = this.participating_user_ids().length > 0;
+        const hasUserIds = isNonEmptyArray(this.participating_user_ids());
         if (!hasUserIds) {
           return this.translate('conversationsEmptyConversation');
         }
@@ -747,7 +748,8 @@ export class Conversation {
   }
 
   private hasInitializedUsers() {
-    const hasMappedUsers = this.participating_user_ets().length > 0 || this.participating_user_ids().length === 0;
+    const hasMappedUsers =
+      isNonEmptyArray(this.participating_user_ets()) || isEmptyArray(this.participating_user_ids());
     return !isUndefined(this.selfUser()) && hasMappedUsers;
   }
 
@@ -793,12 +795,12 @@ export class Conversation {
    */
   release(): void {
     // If there are no unread messages, we can remove all messages from memory (we will keep the unread messages)
-    if (this.unreadState().allEvents.length === 0) {
+    if (isEmptyArray(this.unreadState().allEvents)) {
       this.removeMessages();
       this.hasAdditionalMessages(true);
     }
 
-    if (this.incomingMessages().length > 0) {
+    if (isNonEmptyArray(this.incomingMessages())) {
       this.messages_unordered.push(...this.incomingMessages());
       this.incomingMessages.removeAll();
     }

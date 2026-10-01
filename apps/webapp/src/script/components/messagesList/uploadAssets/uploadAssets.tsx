@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyArray, isUndefined} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -45,7 +45,7 @@ export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Pro
     return item.conversationId === conversationId;
   });
 
-  if (currentConversationProcessQueue.length === 0) {
+  if (isEmptyArray(currentConversationProcessQueue)) {
     return null;
   }
 

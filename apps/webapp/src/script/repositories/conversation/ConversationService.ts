@@ -17,7 +17,7 @@
  *
  */
 
-import {isArray, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
+import {isArray, isEmptyString, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import type {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
@@ -579,7 +579,7 @@ export class ConversationService {
     abortSignal?: AbortSignal,
   ): Promise<SearchableConversationEvent[]> {
     const trimmedQuery = query.trim();
-    if (trimmedQuery.length === 0) {
+    if (isEmptyString(trimmedQuery)) {
       return [];
     }
 
@@ -611,7 +611,7 @@ export class ConversationService {
         : (event.data?.message ?? '');
       const extractor = isNonEmptyString(event.type) ? TextExtractors[event.type] : undefined;
       const extractedText = extractor?.(event) ?? '';
-      return extractedText.length > 0 ? extractedText : contentOrLegacyText;
+      return isNonEmptyString(extractedText) ? extractedText : contentOrLegacyText;
     } catch (err) {
       logger.error('Error extracting searchable text from event', {event, error: err});
       return '';

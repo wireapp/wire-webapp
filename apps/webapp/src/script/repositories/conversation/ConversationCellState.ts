@@ -17,7 +17,7 @@
  *
  */
 
-import {isNumber, isUndefined} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -171,19 +171,19 @@ const _getStateAlert: ConversationCellStateDefinition = {
       selfReplies: unreadSelfReplies,
     } = conversationEntity.unreadState();
 
-    if (unreadSelfMentions.length > 0) {
+    if (isNonEmptyArray(unreadSelfMentions)) {
       return ConversationStatusIcon.UNREAD_MENTION;
     }
 
-    if (unreadSelfReplies.length > 0) {
+    if (isNonEmptyArray(unreadSelfReplies)) {
       return ConversationStatusIcon.UNREAD_REPLY;
     }
 
-    if (unreadCalls.length > 0) {
+    if (isNonEmptyArray(unreadCalls)) {
       return ConversationStatusIcon.MISSED_CALL;
     }
 
-    if (unreadPings.length > 0) {
+    if (isNonEmptyArray(unreadPings)) {
       return ConversationStatusIcon.UNREAD_PING;
     }
   },
@@ -230,7 +230,7 @@ const _getStateGroupActivity: ConversationCellStateDefinition = {
 
         if ((lastMessageEntity as MemberMessage).isMemberJoin()) {
           if (userCountIsOne) {
-            if ((lastMessageEntity as MemberMessage).remoteUserEntities().length === 0) {
+            if (isEmptyArray((lastMessageEntity as MemberMessage).remoteUserEntities())) {
               return translate('conversationsSecondaryLinePersonAddedYou', {
                 user: (lastMessageEntity as MemberMessage).user().name(),
               });

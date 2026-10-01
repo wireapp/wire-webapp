@@ -19,7 +19,7 @@
 
 import {useCallback, useMemo} from 'react';
 
-import {isNull, isUndefined} from '@sindresorhus/is';
+import {isEmptyString, isNull, isUndefined} from '@sindresorhus/is';
 import {LexicalEditor} from 'lexical';
 import {noop} from 'noop-esm';
 
@@ -125,7 +125,7 @@ export const useMessageSend = ({
         draftState.reset();
       });
 
-      if (messageText.length === 0 && !isUndefined(editedMessage)) {
+      if (isEmptyString(messageText) && !isUndefined(editedMessage)) {
         return messageRepository.deleteMessageForEveryone(conversation, editedMessage);
       }
 

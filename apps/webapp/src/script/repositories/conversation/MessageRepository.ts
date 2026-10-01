@@ -1286,12 +1286,11 @@ export class MessageRepository {
         return;
       }
     }
-    const moreMessageIds =
-      moreMessageEntities.length > 0
-        ? moreMessageEntities.map(entity => {
-            return entity.id;
-          })
-        : undefined;
+    const moreMessageIds = isNonEmptyArray(moreMessageEntities)
+      ? moreMessageEntities.map(entity => {
+          return entity.id;
+        })
+      : undefined;
     const confirmationMessage = MessageBuilder.buildConfirmationMessage({
       firstMessageId: messageEntity.id,
       moreMessageIds,
@@ -1603,7 +1602,7 @@ export class MessageRepository {
   ) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
-      const updatedStatus = messageEntity.readReceipts().length > 0 ? StatusType.SEEN : StatusType.SENT;
+      const updatedStatus = isNonEmptyArray(messageEntity.readReceipts()) ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
         status: updatedStatus,

@@ -19,6 +19,7 @@
 
 import {useCallback, useRef} from 'react';
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {groupBy} from 'underscore';
 
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -35,7 +36,7 @@ export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sen
 
   const flush = useCallback(() => {
     const readMessages = readMessagesBuffer.current;
-    if (readMessages.length > 0) {
+    if (isNonEmptyArray(readMessages)) {
       const groupedMessages = groupBy(readMessages, ({conversation, message}) => {
         return conversation.id + message.from;
       });

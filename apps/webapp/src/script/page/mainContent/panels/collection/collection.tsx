@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 
@@ -146,7 +146,7 @@ function Collection(props: CollectionProps) {
     });
   };
 
-  if (!isUndefined(detailCategory) && categories[detailCategory].length > 0) {
+  if (!isUndefined(detailCategory) && isNonEmptyArray(categories[detailCategory])) {
     return (
       <CollectionDetails
         conversation={conversation}

@@ -18,6 +18,8 @@
  */
 
 import {
+  isEmptyArray,
+  isEmptyString,
   isNonEmptyArray,
   isNonEmptyString,
   isNull,
@@ -286,7 +288,7 @@ export class ConversationRepository {
       );
       const mismatchTimestamp = mismatch.time !== undefined ? new Date(mismatch.time).getTime() : Date.now();
 
-      if (!isUndefined(conversation) && missingUserIds.length > 0) {
+      if (!isUndefined(conversation) && isNonEmptyArray(missingUserIds)) {
         // add/remove users from the conversation (if any)
         await this.addMissingMember(conversation, missingUserIds, mismatchTimestamp - 1);
       }
@@ -309,7 +311,7 @@ export class ConversationRepository {
           return user.qualifiedId;
         });
 
-      if (removedTeamUserIds.length > 0) {
+      if (isNonEmptyArray(removedTeamUserIds)) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
         const {found: usersWithoutClients} = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
         await Promise.all(
@@ -335,7 +337,7 @@ export class ConversationRepository {
       }
 
       let shouldWarnLegalHold = false;
-      if (missingClients.length > 0) {
+      if (isNonEmptyArray(missingClients)) {
         const wasVerified = conversation?.is_verified();
         const legalHoldStatus = conversation?.legalHoldStatus();
         const newDevices = await this.userRepository.updateMissingUsersClients(
@@ -343,7 +345,7 @@ export class ConversationRepository {
             return userId;
           }),
         );
-        if (wasVerified === true && newDevices.length > 0) {
+        if (wasVerified === true && isNonEmptyArray(newDevices)) {
           // if the conversation is verified but some clients were missing, it means the conversation will degrade.
           // We need to warn the user of the degradation and ask his permission to actually send the message
           conversation?.verification_state(ConversationVerificationState.DEGRADED);
@@ -633,7 +635,7 @@ export class ConversationRepository {
     const unavailableUsers = conversation.allUserEntities().filter(user => {
       return !user.isAvailable();
     });
-    if (unavailableUsers.length === 0) {
+    if (isEmptyArray(unavailableUsers)) {
       return;
     }
     await this.userRepository.refreshUsers(
@@ -650,7 +652,7 @@ export class ConversationRepository {
       });
     });
 
-    if (allUnavailableUsers.length === 0) {
+    if (isEmptyArray(allUnavailableUsers)) {
       return;
     }
     await this.userRepository.refreshUsers(
@@ -777,7 +779,7 @@ export class ConversationRepository {
    */
   public async loadMissingConversations(): Promise<Conversation[]> {
     const missingConversations = this.conversationState.missingConversations;
-    if (missingConversations.length === 0) {
+    if (isEmptyArray(missingConversations)) {
       return this.conversationState.conversations();
     }
     const remoteConversations = await this.conversationService
@@ -986,13 +988,13 @@ export class ConversationRepository {
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
 
-    const allConversationEntities = conversationsData.length > 0 ? this.mapConversations(conversationsData) : [];
+    const allConversationEntities = isNonEmptyArray(conversationsData) ? this.mapConversations(conversationsData) : [];
     const newConversationEntities = allConversationEntities.filter(allConversations => {
       return !this.conversationState.conversations().some(storedConversations => {
         return storedConversations.id === allConversations.id;
       });
     });
-    if (newConversationEntities.length > 0) {
+    if (isNonEmptyArray(newConversationEntities)) {
       this.saveConversations(newConversationEntities);
     }
 
@@ -1021,7 +1023,7 @@ export class ConversationRepository {
 
     let conversationEntities: Conversation[] = [];
 
-    if (unknownConversations.length > 0) {
+    if (isNonEmptyArray(unknownConversations)) {
       conversationEntities = conversationEntities.concat(this.mapConversations(unknownConversations as any[]));
       this.saveConversations(conversationEntities);
     }
@@ -1106,16 +1108,15 @@ export class ConversationRepository {
     conversationEntity.hasCreationMessage = true;
 
     if (conversationEntity.inTeam()) {
-      const allTeamMembersParticipate =
-        this.teamState.teamMembers().length > 0
-          ? this.teamState.teamMembers().every(teamMember => {
-              return !isUndefined(
-                conversationEntity.participating_user_ids().find(user => {
-                  return matchQualifiedIds(user, teamMember);
-                }),
-              );
-            })
-          : false;
+      const allTeamMembersParticipate = isNonEmptyArray(this.teamState.teamMembers())
+        ? this.teamState.teamMembers().every(teamMember => {
+            return !isUndefined(
+              conversationEntity.participating_user_ids().find(user => {
+                return matchQualifiedIds(user, teamMember);
+              }),
+            );
+          })
+        : false;
 
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
     }
@@ -1198,7 +1199,7 @@ export class ConversationRepository {
     query: string,
     abortSignal?: AbortSignal,
   ): Promise<{messageEntities: Message[]; query: string}> {
-    if (isNullOrUndefined(conversationEntity) || query.length === 0) {
+    if (isNullOrUndefined(conversationEntity) || isEmptyString(query)) {
       return {messageEntities: [], query};
     }
 
@@ -1230,7 +1231,7 @@ export class ConversationRepository {
           lower_bound,
           upper_bound,
         )) as EventRecord[];
-        if (events.length > 0) {
+        if (isNonEmptyArray(events)) {
           // To prevent firing a ton of potential backend calls for missing users, we use an optimistic approach and do an offline update of those events
           // In case a user is missing in the local state, then they will be considered an `unavailable` user
           await this.addEventsToConversation(events, conversationEntity, {offline: true});
@@ -2617,7 +2618,7 @@ export class ConversationRepository {
 
   public readonly init1To1Conversations = async (connections: ConnectionEntity[], conversations: Conversation[]) => {
     // It's important to map connections first, so connection entities get attached to the conversation entities.
-    if (connections.length > 0) {
+    if (isNonEmptyArray(connections)) {
       await this.mapConnections(connections);
     }
     await this.initTeam1To1Conversations(conversations);
@@ -4344,7 +4345,7 @@ export class ConversationRepository {
 
       const [conversationEntity] = this.mapConversations([conversationData], initialTimestamp);
       if (!isNullOrUndefined(conversationEntity)) {
-        if (conversationEntity.participating_user_ids().length > 0) {
+        if (isNonEmptyArray(conversationEntity.participating_user_ids())) {
           await this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
@@ -5168,7 +5169,7 @@ export class ConversationRepository {
     {prepend = true, offline}: {prepend?: boolean; offline?: boolean} = {},
   ) {
     const validatedMessages = await this.validateMessages(events, conversationEntity, {offline});
-    if (prepend && conversationEntity.messages().length > 0) {
+    if (prepend && isNonEmptyArray(conversationEntity.messages())) {
       conversationEntity.prependMessages(validatedMessages);
     } else {
       conversationEntity.addMessages(validatedMessages);

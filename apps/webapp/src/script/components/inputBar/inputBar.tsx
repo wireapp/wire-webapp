@@ -19,7 +19,7 @@
 
 import {useCallback, useRef, useState, type ReactElement} from 'react';
 
-import {isNull, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNull, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
@@ -310,7 +310,7 @@ function InputBarContent({
     fireAndForgetInvoker.fireAndForget(sendMessage);
   }, [fireAndForgetInvoker, isSendingDisabled, sendMessage]);
 
-  const showAvatar = messageContent.text.length > 0;
+  const showAvatar = isNonEmptyString(messageContent.text);
 
   return (
     <div ref={wrapperRef}>
@@ -334,7 +334,7 @@ function InputBarContent({
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && effectiveShowMarkdownPreview,
-            'input-bar-container--with-files': files.length > 0,
+            'input-bar-container--with-files': isNonEmptyArray(files),
           })}
         >
           {!isOutgoingRequest && (
@@ -378,7 +378,7 @@ function InputBarContent({
                   disableMessagePreprocessing={disableMessagePreprocessing}
                   replaceEmojis={shouldReplaceEmoji}
                 >
-                  {files.length > 0 && (
+                  {isNonEmptyArray(files) && (
                     <FilePreviews
                       files={files}
                       conversationId={conversation.id}

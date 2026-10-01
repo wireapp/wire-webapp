@@ -105,7 +105,7 @@ export class MentionEntity {
       throw new Error(MentionEntity.ERROR.INVALID_LENGTH);
     }
 
-    const isValidEnd = messageText.length > 0 && this.endIndex <= messageText.length;
+    const isValidEnd = isNonEmptyString(messageText) && this.endIndex <= messageText.length;
     if (!isValidEnd) {
       throw new Error(MentionEntity.ERROR.OUT_OF_BOUNDS);
     }

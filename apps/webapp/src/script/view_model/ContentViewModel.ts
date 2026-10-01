@@ -17,7 +17,7 @@
  *
  */
 
-import {isNull, isUndefined} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyArray, isNull, isUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
@@ -110,7 +110,7 @@ export class ContentViewModel {
 
       const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
       const isOnConversationListTab = isConversationListTab(currentTab);
-      if (isStateRequests && isOnConversationListTab && requests.length === 0) {
+      if (isStateRequests && isOnConversationListTab && isEmptyArray(requests)) {
         showMostRecentConversation();
       }
     });
@@ -362,7 +362,7 @@ export class ContentViewModel {
   private readonly checkContentAvailability = (newState: ContentState): ContentState => {
     const isStateRequests = newState === ContentState.CONNECTION_REQUESTS;
     if (isStateRequests) {
-      const hasConnectRequests = this.userState.connectRequests().length > 0;
+      const hasConnectRequests = isNonEmptyArray(this.userState.connectRequests());
       if (!hasConnectRequests) {
         return ContentState.WATERMARK;
       }

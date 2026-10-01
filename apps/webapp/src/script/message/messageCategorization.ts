@@ -17,7 +17,7 @@
  *
  */
 
-import {isNumber, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyArray, isNumber, isTruthy} from '@sindresorhus/is';
 import {isObject} from 'underscore';
 
 import {ClientEvent} from 'Repositories/event/Client';
@@ -96,7 +96,7 @@ export const categoryFromEvent = (event: Partial<EventRecord>): MessageCategory 
       }
     }
 
-    const isReaction = isObject(eventReactions) && Object.keys(eventReactions).length > 0;
+    const isReaction = isObject(eventReactions) && isNonEmptyArray(Object.keys(eventReactions));
     if (isReaction) {
       category = category | MessageCategory.LIKED;
     }
