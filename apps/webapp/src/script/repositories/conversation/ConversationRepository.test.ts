@@ -1698,6 +1698,42 @@ describe('ConversationRepository', () => {
   });
 
   describe('getPrecedingMessages', () => {
+    it.each([
+      {messageTimestampMilliseconds: 0, expectedUpperBoundMilliseconds: 101},
+      {messageTimestampMilliseconds: Number.NaN, expectedUpperBoundMilliseconds: 101},
+      {messageTimestampMilliseconds: -1, expectedUpperBoundMilliseconds: -1},
+      {messageTimestampMilliseconds: 1, expectedUpperBoundMilliseconds: 1},
+    ])('preserves pagination fallback for timestamp $messageTimestampMilliseconds', async options => {
+      const {messageTimestampMilliseconds, expectedUpperBoundMilliseconds} = options;
+      const conversationRepository = requireValueForTest(testFactory.conversation_repository);
+      const conversation = new Conversation(
+        'pagination-conversation',
+        '',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
+      const message = new ContentMessage('pagination-message', translateForTest);
+      message.timestamp(messageTimestampMilliseconds);
+      jest.spyOn(conversation, 'getOldestMessageWithTimestamp').mockReturnValue(message);
+      jest.spyOn(conversation, 'getLatestTimestamp').mockReturnValue(100);
+      const eventRepository = requireValueForTest(testFactory.event_repository);
+      const loadPrecedingEvents = jest.spyOn(eventRepository.eventService, 'loadPrecedingEvents').mockResolvedValue([]);
+
+      try {
+        await conversationRepository.getPrecedingMessages(conversation);
+
+        expect(loadPrecedingEvents).toHaveBeenCalledWith(
+          conversation.id,
+          new Date(0),
+          new Date(expectedUpperBoundMilliseconds),
+          Config.getConfig().MESSAGES_FETCH_LIMIT,
+        );
+        expect(conversation.isLoadingMessages()).toBe(false);
+      } finally {
+        loadPrecedingEvents.mockRestore();
+      }
+    });
+
     it('gets messages which are not broken by design', async () => {
       spyOn(testFactory.user_repository, 'getUserById').and.returnValue(
         Promise.resolve(new User('id', null as unknown as string, translateForTest)),
