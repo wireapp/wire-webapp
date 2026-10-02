@@ -22,8 +22,10 @@ import {
   DefaultConversationRoleName,
   GROUP_CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation';
+import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
+import type axios from 'axios';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
 import {noop} from 'noop-esm';
@@ -105,6 +107,7 @@ function createCallingRepositoryForTest({
   translate = translateWithPrefixForTest,
   userRepository = {} as UserRepository,
   apiClient = {} as APIClient,
+  sftHttpClient,
 }: {
   backgroundEffectsHandler?: BackgroundEffectsHandler;
   callState?: CallState;
@@ -117,6 +120,7 @@ function createCallingRepositoryForTest({
   translate?: typeof translateWithPrefixForTest;
   userRepository?: UserRepository;
   apiClient?: APIClient;
+  sftHttpClient?: Pick<typeof axios, 'post'>;
 } = {}) {
   return {
     callState,
@@ -133,6 +137,9 @@ function createCallingRepositoryForTest({
       apiClient,
       conversationState,
       callState,
+      undefined,
+      undefined,
+      sftHttpClient,
     ),
   };
 }
@@ -150,6 +157,91 @@ function getSubconversationServiceForTest(): NonNullable<NonNullable<Core['servi
   const service = requireValueForTest(container.resolve(Core).service);
 
   return requireValueForTest(service.subconversation);
+}
+
+type SftCallingFixture = {
+  readonly repository: CallingRepository;
+  readonly backendConfig: CallConfigData;
+  readonly avsUser: number;
+  readonly requestContext: number;
+  readonly postSftRequest: jest.MockedFunction<typeof axios.post>;
+  readonly fetchConfig: jest.SpiedFunction<CallingRepository['fetchConfig']>;
+  readonly configUpdate: jest.MockedFunction<Wcall['configUpdate']>;
+  readonly sftResponse: jest.MockedFunction<Wcall['sftResp']>;
+  readonly requestConfig: () => Promise<void>;
+  readonly sendRequest: (requestedUrl: string) => Promise<void>;
+};
+
+function createCallingRepositoryWithoutEventSubscriptions(
+  sftHttpClient: Pick<typeof axios, 'post'>,
+): CallingRepository {
+  const eventSubscriptionSpy = jest.spyOn(CallingRepository.prototype, 'subscribeToEvents').mockImplementation(noop);
+  try {
+    return createCallingRepositoryForTest({sftHttpClient}).repository;
+  } finally {
+    eventSubscriptionSpy.mockRestore();
+  }
+}
+
+function createSftCallingFixture(): SftCallingFixture {
+  const backendConfig: CallConfigData = {
+    ice_servers: [],
+    ttl: 3600,
+    sft_servers: [{urls: ['https://initial.example.com']}],
+    sft_servers_all: [{urls: ['https://joinable.example.com:8443']}],
+    is_federating: true,
+  };
+  const avsUser = 1;
+  const requestContext = 42;
+  const requestBody = '{"type":"CONF_CONN"}';
+  const postSftRequest: jest.MockedFunction<typeof axios.post> = jest.fn();
+  postSftRequest.mockResolvedValue({status: 200, data: {type: 'CONF_CONN'}});
+  const configUpdate: jest.MockedFunction<Wcall['configUpdate']> = jest.fn();
+  const sftResponse: jest.MockedFunction<Wcall['sftResp']> = jest.fn();
+  const sftAvs: Pick<Wcall, 'configUpdate' | 'sftResp'> = {configUpdate, sftResp: sftResponse};
+  const repository = createCallingRepositoryWithoutEventSubscriptions({post: postSftRequest});
+  repository['wCall'] = sftAvs as Wcall;
+  repository['wUser'] = avsUser;
+  const fetchConfig = jest.spyOn(repository, 'fetchConfig').mockResolvedValue(backendConfig);
+
+  function requestConfig(): Promise<void> {
+    return new Promise(resolve => {
+      configUpdate.mockImplementation(() => {
+        resolve();
+      });
+      repository['requestConfig']();
+    });
+  }
+
+  function sendRequest(requestedUrl: string): Promise<void> {
+    return new Promise(resolve => {
+      sftResponse.mockImplementation(() => {
+        resolve();
+      });
+      const callbackResult = repository['sendSFTRequest'](
+        requestContext,
+        requestedUrl,
+        requestBody,
+        requestBody.length,
+        0,
+      );
+
+      expect(callbackResult).toBe(0);
+    });
+  }
+
+  return {
+    repository,
+    backendConfig,
+    avsUser,
+    requestContext,
+    postSftRequest,
+    fetchConfig,
+    configUpdate,
+    sftResponse,
+    requestConfig,
+    sendRequest,
+  };
 }
 
 describe('CallingRepository', () => {
@@ -180,6 +272,147 @@ describe('CallingRepository', () => {
 
   afterAll(() => {
     return wCall && wCall.destroy(wUser);
+  });
+
+  describe('SFT request destinations', () => {
+    it('rejects an untrusted callback before POST and returns the existing AVS failure response', async () => {
+      const {repository, requestConfig, sendRequest, postSftRequest, sftResponse, avsUser, requestContext} =
+        createSftCallingFixture();
+      await requestConfig();
+      const rejectedUrl = 'https://169.254.169.254/attacker-controlled';
+      await sendRequest(rejectedUrl);
+      const actualCallLog = repository.getCallLog();
+
+      expect(postSftRequest).not.toHaveBeenCalled();
+      expect(sftResponse).toHaveBeenCalledWith(avsUser, 1000, '', 0, requestContext);
+      expect(actualCallLog).toEqual([
+        expect.stringContaining('Request to sft server failed with error: SFT request destination is not allowed'),
+      ]);
+      expect(JSON.stringify(actualCallLog)).not.toContain(rejectedUrl);
+    });
+
+    it('fails closed before the first successful config', async () => {
+      const {sendRequest, postSftRequest, sftResponse, avsUser, requestContext} = createSftCallingFixture();
+      await sendRequest('https://initial.example.com/sft/conversation-id');
+
+      expect(postSftRequest).not.toHaveBeenCalled();
+      expect(sftResponse).toHaveBeenCalledWith(avsUser, 1000, '', 0, requestContext);
+    });
+
+    it.each(['https://initial.example.com', 'https://joinable.example.com:8443'])(
+      'posts callbacks from the effective configuration: %s',
+      async configuredUrl => {
+        const {requestConfig, sendRequest, postSftRequest, sftResponse, avsUser, requestContext} =
+          createSftCallingFixture();
+        await requestConfig();
+        const requestedUrl = `${configuredUrl}/sft/conversation-id`;
+        await sendRequest(requestedUrl);
+        const responseBody = JSON.stringify({type: 'CONF_CONN'});
+
+        expect(postSftRequest).toHaveBeenCalledWith(requestedUrl, '{"type":"CONF_CONN"}');
+        expect(sftResponse).toHaveBeenCalledWith(avsUser, 200, responseBody, responseBody.length, requestContext);
+      },
+    );
+
+    it('replaces previous origins on a successful config refresh', async () => {
+      const {requestConfig, sendRequest, postSftRequest, fetchConfig, backendConfig} = createSftCallingFixture();
+      await requestConfig();
+      fetchConfig.mockResolvedValue({
+        ...backendConfig,
+        sft_servers: [{urls: ['https://replacement.example.com']}],
+        sft_servers_all: [],
+      });
+      await requestConfig();
+      await sendRequest('https://initial.example.com/sft/conversation-id');
+      await sendRequest('https://joinable.example.com:8443/sft/conversation-id');
+
+      expect(postSftRequest).not.toHaveBeenCalled();
+
+      await sendRequest('https://replacement.example.com/sft/conversation-id');
+
+      expect(postSftRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the last successful SFT origins when a config refresh fails', async () => {
+      const {
+        requestConfig,
+        sendRequest,
+        postSftRequest,
+        fetchConfig,
+        configUpdate,
+        sftResponse,
+        avsUser,
+        requestContext,
+      } = createSftCallingFixture();
+      const requestedUrl = 'https://initial.example.com/sft/conversation-id';
+      const requestBody = '{"type":"CONF_CONN"}';
+      const responseBody = JSON.stringify({type: 'CONF_CONN'});
+      await requestConfig();
+      await sendRequest(requestedUrl);
+
+      expect(postSftRequest).toHaveBeenCalledTimes(1);
+      expect(postSftRequest).toHaveBeenLastCalledWith(requestedUrl, requestBody);
+      expect(sftResponse).toHaveBeenLastCalledWith(avsUser, 200, responseBody, responseBody.length, requestContext);
+
+      fetchConfig.mockRejectedValue(new Error('Config unavailable'));
+      await requestConfig();
+
+      expect(configUpdate).toHaveBeenLastCalledWith(avsUser, 1, '');
+
+      await sendRequest(requestedUrl);
+
+      expect(postSftRequest).toHaveBeenCalledTimes(2);
+      expect(postSftRequest).toHaveBeenLastCalledWith(requestedUrl, requestBody);
+      expect(sftResponse).toHaveBeenLastCalledWith(avsUser, 200, responseBody, responseBody.length, requestContext);
+    });
+
+    it('trusts the Rust override instead of the original backend SFT lists without mutating the response', async () => {
+      const {repository, requestConfig, sendRequest, postSftRequest, configUpdate, backendConfig, avsUser} =
+        createSftCallingFixture();
+      repository['isOnAvsRustSft'] = true;
+      await requestConfig();
+      const rustSftServers = [{urls: ['https://rust-sft.stars.wire.link']}];
+
+      expect(configUpdate).toHaveBeenLastCalledWith(
+        avsUser,
+        0,
+        JSON.stringify({...backendConfig, sft_servers: rustSftServers, sft_servers_all: rustSftServers}),
+      );
+      expect(backendConfig.sft_servers).toEqual([{urls: ['https://initial.example.com']}]);
+      expect(backendConfig.sft_servers_all).toEqual([{urls: ['https://joinable.example.com:8443']}]);
+
+      await sendRequest('https://initial.example.com/sft/conversation-id');
+      await sendRequest('https://joinable.example.com:8443/sft/conversation-id');
+
+      expect(postSftRequest).not.toHaveBeenCalled();
+
+      await sendRequest('https://rust-sft.stars.wire.link/sft/conversation-id');
+
+      expect(postSftRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('updates trust before AVS can issue a callback from configUpdate', async () => {
+      const {repository, configUpdate, sftResponse, postSftRequest, avsUser, requestContext} =
+        createSftCallingFixture();
+      await new Promise<void>(resolve => {
+        sftResponse.mockImplementation(() => {
+          resolve();
+        });
+        configUpdate.mockImplementation(() => {
+          repository['sendSFTRequest'](
+            requestContext,
+            'https://joinable.example.com:8443/sft/conversation-id',
+            '{"type":"CONF_CONN"}',
+            '{"type":"CONF_CONN"}'.length,
+            0,
+          );
+        });
+        repository['requestConfig']();
+      });
+
+      expect(postSftRequest).toHaveBeenCalledTimes(1);
+      expect(sftResponse).toHaveBeenCalledWith(avsUser, 200, expect.any(String), expect.any(Number), requestContext);
+    });
   });
 
   describe('onCallEvent', () => {
