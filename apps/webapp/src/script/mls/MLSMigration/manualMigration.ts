@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureMLSMigration} from '@wireapp/api-client/lib/team';
 import {Maybe, Task, task} from 'true-myth';
 
@@ -37,7 +38,7 @@ export const canManuallyMigrateConversation = (
     conversation.isGroupOrChannel() &&
     !conversation.isSelfUserRemoved() &&
     conversation.isAdmin(selfUser.qualifiedId) &&
-    !!conversation.teamId &&
+    isNonEmptyString(conversation.teamId) &&
     conversation.teamId === selfUser.teamId &&
     [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED].includes(conversation.protocol) &&
     feature.isJust &&
