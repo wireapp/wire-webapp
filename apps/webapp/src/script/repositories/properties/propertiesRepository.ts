@@ -17,7 +17,8 @@
  *
  */
 
-import {isNan} from '@sindresorhus/is';
+import createDeepmerge from '@fastify/deepmerge';
+import {isNan, isPlainObject} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConsentType} from '@wireapp/api-client/lib/self/';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
@@ -35,7 +36,6 @@ import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/tele
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
-import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -44,6 +44,7 @@ import {loadValue} from 'Util/storageUtil';
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
+const mergeWebappProperties = createDeepmerge();
 const nestedPreferencePathDepth = 2;
 const deeplyNestedPreferencePathDepth = 3;
 
@@ -243,9 +244,14 @@ export class PropertiesRepository {
 
   private fetchWebAppAccountSettings(): Promise<void> {
     return this.propertiesService
-      .getPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
+      .getPropertiesByKey<unknown>(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
       .then(properties => {
-        deepMerge(this.properties, properties);
+        if (isPlainObject(properties)) {
+          this.properties = mergeWebappProperties(
+            this.properties,
+            properties as Partial<WebappProperties>,
+          ) as WebappProperties;
+        }
       })
       .catch(() => {
         this.logger.warn(
