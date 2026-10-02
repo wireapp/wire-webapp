@@ -38,6 +38,7 @@ export type CreateMeetingReminderOsNotifierDependencies = {
   notificationApi: SystemNotificationApi;
   openMeetingsList: () => void;
   openMeetingPrep: (payload: MeetingReminderFirePayload) => void;
+  currentReminderPayload: (payload: MeetingReminderFirePayload) => Maybe<MeetingReminderFirePayload>;
   formatMeetingTime: (meetingStartTime: string) => string;
   translate: Translate;
   logger: MeetingReminderOsNotifierLogger;
@@ -66,6 +67,7 @@ export const createMeetingReminderOsNotifier = ({
   notificationApi,
   openMeetingsList,
   openMeetingPrep,
+  currentReminderPayload,
   formatMeetingTime,
   translate,
   logger,
@@ -121,7 +123,10 @@ export const createMeetingReminderOsNotifier = ({
         requireInteraction: true,
         onClick: () => {
           openMeetingsList();
-          openMeetingPrep(payload);
+          const currentPayload = currentReminderPayload(payload);
+          if (maybe.isJust(currentPayload)) {
+            openMeetingPrep(currentPayload.value);
+          }
           closeAndForget(tag);
         },
         onClose: () => {

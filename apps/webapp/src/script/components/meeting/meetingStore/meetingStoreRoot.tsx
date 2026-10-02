@@ -32,6 +32,7 @@ import {
 import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
+import {resolveCurrentMeetingReminderPayload} from 'Components/meeting/resolveCurrentMeetingReminderPayload';
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/meeting/shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/meeting/shared/service/meetingService';
 import {UserState} from 'Repositories/user/userState';
@@ -140,6 +141,9 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
           qualifiedMeetingId: payload.qualifiedId,
           qualifiedConversationId: payload.qualifiedConversationId,
         });
+      },
+      currentReminderPayload: payload => {
+        return resolveCurrentMeetingReminderPayload(store.getState().meetingSeries, payload);
       },
       formatMeetingTime: formatTimeShort,
       translate,
