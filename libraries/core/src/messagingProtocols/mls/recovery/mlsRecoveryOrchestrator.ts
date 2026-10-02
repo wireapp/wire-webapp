@@ -17,6 +17,7 @@
  *
  */
 
+import {isEmptyObject, isFunction, isObject, isUndefined} from '@sindresorhus/is';
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -353,7 +354,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     try {
       await task();
     } catch (error: unknown) {
-      this.logger.warn(`Recovery failed for key ${key}`, {error});
+      this.logger.warn(`Recovery failed for key ${key}`, {error: extractErrorDetails(error)});
       throw error;
     } finally {
       this.logger.info(`Completed recovery for key ${key}`);
@@ -376,8 +377,25 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   }
 }
 
+function extractErrorDetails(error: unknown): unknown {
+  if (!isObject(error) || isFunction(error)) {
+    return '(not an object)';
+  }
+
+  const {status, response} = error as Record<string, unknown>;
+  const details: Record<string, unknown> = {};
+
+  if (!isUndefined(status)) {
+    details.status = status;
+  }
+  if (isObject(response) && !isFunction(response)) {
+    details.response = {data: (response as Record<string, unknown>).data};
+  }
+
+  return isEmptyObject(details) ? '(no meaningful data)' : details;
+}
+
 /**
- * Minimal default policies used by the initial integration. These can be extended over time.
  *
  * Highlights:
  * - WrongEpoch: reconcile and retry for typed ops; do not re-run for join.
