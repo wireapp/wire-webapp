@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DeviceIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
@@ -36,7 +37,7 @@ export type WireIdentity = Omit<DeviceIdentity, 'status'> & {
 
 export function getE2EIdentityService() {
   const e2eIdentityService = container.resolve(Core).service?.e2eIdentity;
-  if (!e2eIdentityService) {
+  if (isUndefined(e2eIdentityService)) {
     throw new Error('trying to query E2EIdentity data in an non-e2eidentity environment');
   }
   return e2eIdentityService;
@@ -44,7 +45,7 @@ export function getE2EIdentityService() {
 
 export function getCoreConversationService() {
   const conversationService = container.resolve(Core).service?.conversation;
-  if (!conversationService) {
+  if (isUndefined(conversationService)) {
     throw new Error('Conversation service not available');
   }
   return conversationService;
@@ -95,7 +96,7 @@ const getSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
 
   const userIdentities = await getAllGroupUsersIdentities(selfMLSConversationGroupId);
 
-  if (!userIdentities) {
+  if (isUndefined(userIdentities)) {
     return undefined;
   }
 
@@ -121,7 +122,7 @@ export async function hasActiveCertificate(): Promise<boolean> {
 export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {
   const selfDeviceIdentity = await getSelfDeviceIdentity();
 
-  if (!selfDeviceIdentity) {
+  if (isUndefined(selfDeviceIdentity)) {
     return undefined;
   }
 

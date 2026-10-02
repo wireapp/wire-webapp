@@ -18,7 +18,7 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {isArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isArray, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
@@ -79,7 +79,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
 
-    if (!e2eiService) {
+    if (isUndefined(e2eiService)) {
       throw new Error('E2EI Service not available');
     }
 
@@ -119,7 +119,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private get config() {
-    if (!this.#config) {
+    if (isUndefined(this.#config)) {
       throw new Error('Trying to access config without initializing the E2EIHandler');
     }
     return this.#config;
@@ -145,7 +145,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns
    */
   public isE2EIEnabled() {
-    return this.#config !== undefined;
+    return !isUndefined(this.#config);
   }
 
   /** will initialize the e2ei enrollment handler eventually triggering an enrollment flow if the device is a fresh new one */
@@ -208,7 +208,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const clock = this.clock;
     // We store the first time the user was prompted with the enrollment modal
     const storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
-    const e2eActivatedAt = storedE2eActivatedAt || clock.currentUnixEpochMilliseconds;
+    const e2eActivatedAt = isTruthy(storedE2eActivatedAt) ? storedE2eActivatedAt : clock.currentUnixEpochMilliseconds;
     this.enrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
@@ -216,7 +216,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const isNotActivated = identity?.status === MLSStatuses.NOT_ACTIVATED;
     const isBasicDevice = identity?.credentialType === CredentialType.Basic;
-    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || isNotActivated || isBasicDevice);
+    const isFirstE2EIActivation =
+      !isTruthy(storedE2eActivatedAt) && (isUndefined(identity) || isNotActivated || isBasicDevice);
 
     const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
       identity,
@@ -232,9 +233,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     };
 
     const storedFiringDate = this.enrollmentStore.get.timer();
-    const firingDate = isFirstE2EIActivation
-      ? clock.currentUnixEpochMilliseconds
-      : storedFiringDate || computedFiringDate;
+    let firingDate = computedFiringDate;
+    if (isFirstE2EIActivation) {
+      firingDate = clock.currentUnixEpochMilliseconds;
+    } else if (isTruthy(storedFiringDate)) {
+      firingDate = storedFiringDate;
+    }
     this.enrollmentStore.store.timer(firingDate);
 
     if (firingDate <= clock.currentUnixEpochMilliseconds) {
@@ -287,7 +291,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     silent: boolean,
     challengeData?: {keyAuth: string; challenge: {url: string; target: string}},
   ) {
-    if (challengeData) {
+    if (!isUndefined(challengeData)) {
       // If a challengeData is provided, that means we are at the beginning of the enrollment process
       // We need to first authenticate the user (either silently if we are renewing the certificate, or by redirection if it an initial enrollment)
       const {challenge, keyAuth} = challengeData;
