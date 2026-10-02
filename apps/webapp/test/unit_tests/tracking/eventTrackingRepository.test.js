@@ -19,6 +19,9 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
+import {resetStoreValue, storeValue} from 'Util/storageUtil';
+
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('EventTrackingRepository', () => {
@@ -31,6 +34,44 @@ describe('EventTrackingRepository', () => {
   });
 
   describe('Initialization', () => {
+    afterEach(() => {
+      for (const storageKey of [
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
+      ]) {
+        resetStoreValue(storageKey);
+      }
+      jest.restoreAllMocks();
+    });
+
+    it.each([
+      [undefined, 1],
+      [null, 1],
+      [false, 1],
+      [0, 1],
+      ['', 1],
+      [true, 0],
+      [1, 0],
+      [[], 0],
+      [{}, 0],
+    ])('preserves the truthiness of persisted synchronization marker %p', async (storedMarker, expectedSyncs) => {
+      storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, 'existing-device');
+      storeValue(
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
+        storedMarker,
+      );
+      resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID);
+      resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
+      const synchronize = jest.spyOn(testFactory.message_repository, 'sendCountlySync').mockResolvedValue(undefined);
+      jest.spyOn(testFactory.tracking_repository, 'toggleTelemetry').mockResolvedValue(undefined);
+
+      await testFactory.tracking_repository.init(false);
+
+      expect(synchronize).toHaveBeenCalledTimes(expectedSyncs);
+    });
+
     it.skip('enables error reporting, user analytics and subscribes to analytics events', () => {
       spyOn(testFactory.tracking_repository, 'startErrorReporting').and.callThrough();
       spyOn(testFactory.tracking_repository, 'subscribeToProductEvents').and.callThrough();
