@@ -49,7 +49,7 @@ type JoinMeetingCallResultHandlers = {
 };
 
 export const handleJoinMeetingCallResult = (
-  result: Result<void, JoinMeetingCallError>,
+  result: Result<boolean, JoinMeetingCallError>,
   {showConversationNotFoundModal, showJoinFailedModal}: JoinMeetingCallResultHandlers,
 ): void => {
   if (!result.isErr) {
