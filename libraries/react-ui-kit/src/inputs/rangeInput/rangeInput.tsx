@@ -33,6 +33,8 @@ import {Theme} from '../../identity/theme';
 import {TextProps} from '../../typography';
 import {InputLabel} from '../inputLabel';
 
+const percentageScale = 100;
+
 export interface RangeInputProps<T = HTMLInputElement> extends TextProps<T> {
   label?: string;
   minValueLabel?: string;
@@ -60,7 +62,7 @@ export const RangeInput = forwardRef<HTMLInputElement, RangeInputProps<HTMLInput
     const maxNum = Number(max);
     const valueNum = Number(value);
 
-    const backgroundSize = `${((valueNum - minNum) * 100) / (maxNum - minNum)}% 100%` as const;
+    const backgroundSize = `${((valueNum - minNum) * percentageScale) / (maxNum - minNum)}% 100%` as const;
 
     return (
       <div css={wrapperCSS}>

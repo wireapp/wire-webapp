@@ -24,6 +24,8 @@ import {Theme} from '../../identity/theme';
 import {Text, TextProps, textStyle} from '../../typography';
 import {INPUT_CLASSNAME, InputProps} from '../input';
 
+const disabledCheckboxOpacity = 0.56;
+
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
   disabled?: boolean;
   markInvalid?: boolean;
@@ -100,7 +102,7 @@ const StyledLabel = ({
           width: aligncenter ? 'auto' : '100%',
           lineHeight: '1.4rem',
           display: 'flex',
-          opacity: disabled === true ? 0.56 : 1,
+          opacity: disabled === true ? disabledCheckboxOpacity : 1,
           cursor: disabled === true ? 'not-allowed' : 'pointer',
           borderRadius: '4px',
         };

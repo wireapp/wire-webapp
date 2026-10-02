@@ -27,6 +27,8 @@ import {containerStyles, dataListOption, headingStyle, rangeStyles} from './indi
 import {Theme} from '../../identity/theme';
 import {InputLabel} from '../inputLabel';
 
+const percentageScale = 100;
+
 type DataListOptions = {
   value: number;
   label: string;
@@ -72,7 +74,7 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
         return `${firstOptionThumbPosition} 100%`;
       }
 
-      return `${((valueNum - minNum) * 100) / (maxNum - minNum)}% 100%`;
+      return `${((valueNum - minNum) * percentageScale) / (maxNum - minNum)}% 100%`;
     }, [isCustomSlider, valueNum, minNum, maxNum, listLength]);
 
     const valueText = !isUndefined(dataListOptions[valueNum]?.heading)

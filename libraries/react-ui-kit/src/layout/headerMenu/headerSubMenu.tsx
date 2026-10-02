@@ -28,12 +28,14 @@ import {COLOR, Opacity, Slide, YAxisMovement, Theme} from '../../identity';
 import {DURATION} from '../../identity/motions/motions';
 import {QUERY} from '../../utils';
 
+const submenuBackgroundTint = 0.16;
+
 export type DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const desktopStyledHeaderSubMenuStyle: (theme: Theme, props: DesktopStyledHeaderSubMenuProps) => CSSObject = theme => {
   return {
     alignItems: 'left',
-    backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
+    backgroundColor: COLOR.tint(theme.general.backgroundColor, submenuBackgroundTint),
     borderRadius: '8px',
     boxShadow: '0 8px 24px 0 rgba(0, 0, 0, 0.16)',
     display: 'flex',

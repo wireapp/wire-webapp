@@ -362,6 +362,7 @@ const productionConfigs = [
       'libraries/commons/**/*.{ts,tsx,mts,cts}',
       'libraries/core/**/*.{ts,tsx,mts,cts}',
       'libraries/priority-queue/**/*.{ts,tsx,mts,cts}',
+      'libraries/react-ui-kit/**/*.{ts,tsx,mts,cts}',
     ],
     rules: {
       'no-magic-numbers': 'off',

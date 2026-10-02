@@ -26,6 +26,9 @@ import {createPortal} from 'react-dom';
 import {Theme} from '../../identity';
 import {filterProps} from '../../utils';
 
+const centeredWidthDivisor = 2;
+const paddingSideCount = 2;
+
 const paddingDistance = 8;
 
 const tooltipStyle: (theme: Theme) => CSSObject = theme => {
@@ -93,8 +96,11 @@ const TooltipArrow = ({wrapperRect}: TooltipArrowProps) => {
 
     const tooltipRect = parentElement.getBoundingClientRect();
 
-    const isTouchingLeftEdge = wrapperRect.x <= tooltipRect.width / 2 + paddingDistance * 2;
-    const isTouchingRightEdge = wrapperRect.left + tooltipRect.width / 2 + paddingDistance * 2 >= window.innerWidth;
+    const isTouchingLeftEdge =
+      wrapperRect.x <= tooltipRect.width / centeredWidthDivisor + paddingDistance * paddingSideCount;
+    const isTouchingRightEdge =
+      wrapperRect.left + tooltipRect.width / centeredWidthDivisor + paddingDistance * paddingSideCount >=
+      window.innerWidth;
 
     if (isTouchingLeftEdge) {
       element.style.left = `${wrapperRect.left - paddingDistance}px`;
@@ -130,18 +136,21 @@ const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: Portal
     }
 
     const tooltipRect = element.getBoundingClientRect();
-    const isTouchingTopEdge = wrapperRect.y <= tooltipRect.height + paddingDistance * 2;
+    const isTouchingTopEdge = wrapperRect.y <= tooltipRect.height + paddingDistance * paddingSideCount;
     setIsTouchingTop(isTouchingTopEdge);
 
-    const isTouchingLeftEdge = wrapperRect.x <= tooltipRect.width / 2 + paddingDistance * 2;
-    const isTouchingRightEdge = wrapperRect.left + tooltipRect.width / 2 + paddingDistance * 2 >= window.innerWidth;
+    const isTouchingLeftEdge =
+      wrapperRect.x <= tooltipRect.width / centeredWidthDivisor + paddingDistance * paddingSideCount;
+    const isTouchingRightEdge =
+      wrapperRect.left + tooltipRect.width / centeredWidthDivisor + paddingDistance * paddingSideCount >=
+      window.innerWidth;
 
     if (isTouchingLeftEdge) {
       element.style.left = `${paddingDistance}px`;
     } else if (isTouchingRightEdge) {
       element.style.right = `${paddingDistance}px`;
     } else {
-      const elementWidth = (element.scrollWidth - wrapperRect.width) / 2;
+      const elementWidth = (element.scrollWidth - wrapperRect.width) / centeredWidthDivisor;
       element.style.left = `${wrapperRect.x - elementWidth}px`;
     }
 

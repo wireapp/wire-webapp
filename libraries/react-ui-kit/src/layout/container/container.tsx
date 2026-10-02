@@ -24,6 +24,8 @@ import {CSSObject} from '@emotion/react';
 import {QueryKeys, media} from '../../utils';
 import {GUTTER, WIDTH} from '../sizes/sizes';
 
+const horizontalGutterCount = 2;
+
 export interface ContainerProps extends HTMLProps<HTMLDivElement> {
   centerText?: boolean;
   level?: keyof Level;
@@ -62,7 +64,7 @@ const containerStyle: (props: ContainerProps) => CSSObject = ({
         ? undefined
         : {
             padding: 0,
-            width: `${WIDTH.DESKTOP_MIN - GUTTER * 2}px`,
+            width: `${WIDTH.DESKTOP_MIN - GUTTER * horizontalGutterCount}px`,
           },
   };
 };

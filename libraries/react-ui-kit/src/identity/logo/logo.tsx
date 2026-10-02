@@ -24,6 +24,8 @@ import {COLOR} from '../colors';
 import {defaultTransition} from '../motions/motions';
 import {Theme} from '../theme';
 
+const logoHoverShade = 0.06;
+
 export interface LogoProps<T = SVGSVGElement> extends SVGIconProps<T> {
   hover?: boolean;
   ariaLabel?: string;
@@ -35,7 +37,7 @@ const logoStyle: <T>(theme: Theme, props: LogoProps<T>) => CSSObject = (
 ) => {
   return {
     '&:hover path': {
-      fill: hover === true ? COLOR.shade(color, 0.06) : undefined,
+      fill: hover === true ? COLOR.shade(color, logoHoverShade) : undefined,
     },
     path: {
       fill: color,

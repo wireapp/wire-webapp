@@ -19,12 +19,15 @@
 
 import Color from 'color';
 
+const colorShadeStepPercentage = 8;
+const disabledColorOpacity = 0.16;
+
 export type ColorParam = Color | string | ArrayLike<number> | number | Record<string, any>;
 
 const steps: number[] = [];
 const percent = 100;
 
-for (let index = 8; index < percent; index += 8) {
+for (let index = colorShadeStepPercentage; index < percent; index += colorShadeStepPercentage) {
   steps.push(index);
 }
 
@@ -77,7 +80,7 @@ Object.entries(BASE_COLOR).forEach(([key, value]) => {
 });
 
 const COMPONENT_COLOR = {
-  DISABLED: opaque(DARK_COLOR.GRAY_DARKEN_32, 0.16),
+  DISABLED: opaque(DARK_COLOR.GRAY_DARKEN_32, disabledColorOpacity),
   ICON: DARK_COLOR.GRAY_DARKEN_72,
   LINK: DARK_COLOR.GRAY_DARKEN_72,
   TEXT: DARK_COLOR.GRAY_DARKEN_72,
