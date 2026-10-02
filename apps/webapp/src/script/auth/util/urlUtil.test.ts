@@ -19,7 +19,7 @@
 
 import {pathWithParams} from './urlUtil';
 
-import {testOnlyFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
+import {forTestsOnlyFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {startupFeatureToggleQueryParameterName} from '../../featureToggles/startupFeatureToggles';
 import {QUERY_KEY} from '../route';
 
@@ -46,7 +46,7 @@ function createAuthRedirectTest({authPath, expectedMainAppPath}: AuthRedirectTes
 
 describe('pathWithParams', () => {
   const startupFeatureToggleQueryString = new URLSearchParams({
-    [startupFeatureToggleQueryParameterName]: testOnlyFeatureToggleName,
+    [startupFeatureToggleQueryParameterName]: forTestsOnlyFeatureToggleName,
   }).toString();
 
   it(
@@ -74,7 +74,7 @@ describe('pathWithParams', () => {
     authuser: 'account-id',
     prompt: 'login',
     hd: 'example.com',
-    [startupFeatureToggleQueryParameterName]: testOnlyFeatureToggleName,
+    [startupFeatureToggleQueryParameterName]: forTestsOnlyFeatureToggleName,
   }).toString();
 
   it(
