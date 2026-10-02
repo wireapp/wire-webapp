@@ -46,7 +46,6 @@ import {useTheme} from './hooks/useTheme';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {Config, Configuration} from '../../Config';
-import {preferredMediaDevicePersistenceFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
@@ -89,20 +88,16 @@ export const AppContainer = (properties: AppProps) => {
     translate,
   } = properties;
   setAppLocale();
-  const isPreferredMediaDevicePersistenceEnabled = isFeatureToggleEnabled(
-    preferredMediaDevicePersistenceFeatureToggleName,
-  );
   const app = useMemo(() => {
     return new App(
       container.resolve(Core),
       container.resolve(APIClient),
       config,
       translate,
-      {isPreferredMediaDevicePersistenceEnabled},
       clock,
       fireAndForgetInvoker,
     );
-  }, [config, fireAndForgetInvoker, isPreferredMediaDevicePersistenceEnabled, translate, clock]);
+  }, [config, fireAndForgetInvoker, translate, clock]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;

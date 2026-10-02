@@ -26,7 +26,6 @@ import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
-  preferredMediaDevicePersistenceFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
   viewerPermissionFeatureToggleName,
@@ -38,7 +37,6 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   viewerPermissionFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
-  preferredMediaDevicePersistenceFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -46,7 +44,6 @@ describe('startupFeatureToggles', function () {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
-    expect(startupFeatureToggles.isFeatureToggleEnabled(preferredMediaDevicePersistenceFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
   });
 
@@ -67,13 +64,13 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.enabledFeatureToggleNames).not.toContain('unknown-feature');
   });
 
-  it('enables preferred media device persistence alongside another startup feature toggle', () => {
+  it('enables multiple startup feature toggles', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${conversationListCollapseFeatureToggleName},${preferredMediaDevicePersistenceFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${conversationListCollapseFeatureToggleName},${applockRefactoredFeatureToggleName}`,
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(conversationListCollapseFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.isFeatureToggleEnabled(preferredMediaDevicePersistenceFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
   });
 
   it('ignores unknown feature toggles from the query parameter', () => {
@@ -133,14 +130,6 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName)).toBe(true);
   });
 
-  it('enables the preferred media device persistence feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${preferredMediaDevicePersistenceFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(preferredMediaDevicePersistenceFeatureToggleName)).toBe(true);
-  });
-
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -184,7 +173,6 @@ describe('startupFeatureToggles', function () {
       viewerPermissionFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       sharedDriveDirectUploadFeatureToggleName,
-      preferredMediaDevicePersistenceFeatureToggleName,
     ]);
   });
 

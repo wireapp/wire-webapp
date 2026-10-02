@@ -18,7 +18,6 @@
  */
 
 import {isArray, isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
-import {maybe as Maybe} from 'true-myth';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -28,7 +27,6 @@ import {loadValue, storeValue} from 'Util/storageUtil';
 import {MediaDeviceType} from './MediaDeviceType';
 import {resolveActiveDeviceId} from './resolveActiveDeviceId';
 import {mediaDevicesStore} from './useMediaDevicesStore';
-import type {MediaDevicesState} from './useMediaDevicesStore';
 
 export type ElectronDesktopCapturerSource = {
   readonly display_id: string;
@@ -76,8 +74,6 @@ type PersistDevicePreferenceOptions = {
   readonly previousPreferredId: string;
 };
 
-type PreviousDeviceSupport = Partial<Record<MediaDeviceType, number>>;
-
 type ResolveMediaDeviceIdOptions = {
   readonly deviceType: MediaDeviceType;
   readonly devices: readonly MediaDeviceInfo[];
@@ -85,27 +81,10 @@ type ResolveMediaDeviceIdOptions = {
   readonly preferredId: string;
 };
 
-type PickDeviceIdOptions = {
-  readonly deviceType: MediaDeviceType;
-  readonly devices: readonly MediaDeviceInfo[];
-  readonly currentId: string;
-};
-
 type UpdateFavoriteListOptions = {
   readonly deviceType: MediaDeviceType;
   readonly currentActiveId: string;
   readonly previousActiveId: string;
-  readonly state: MediaDevicesState;
-};
-
-type OrderFavoriteDevicesOptions = {
-  readonly favoriteIds: readonly string[];
-  readonly currentActiveId: string;
-  readonly deviceDisconnected: boolean;
-};
-
-export type MediaDevicesHandlerOptions = {
-  readonly isPreferredMediaDevicePersistenceEnabled: boolean;
 };
 
 function loadStoredDeviceId(storageKey: string, defaultId: string): string {
@@ -128,8 +107,6 @@ function getMediaDeviceIds(devices: readonly MediaDeviceInfo[]): string[] {
 
 export class MediaDevicesHandler {
   private readonly logger: Logger;
-  private readonly isPreferredMediaDevicePersistenceEnabled: boolean;
-  private previousDeviceSupport: PreviousDeviceSupport = {};
   private onMediaDevicesRefresh?: () => void;
   private devicesAreInit = false;
 
@@ -148,11 +125,8 @@ export class MediaDevicesHandler {
   /**
    * Construct a new MediaDevices handler.
    */
-  constructor(options: MediaDevicesHandlerOptions) {
-    const {isPreferredMediaDevicePersistenceEnabled} = options;
-
+  constructor() {
     this.logger = getLogger('MediaDevicesHandler');
-    this.isPreferredMediaDevicePersistenceEnabled = isPreferredMediaDevicePersistenceEnabled;
 
     const supportsUserMedia = Runtime.isSupportingUserMedia();
     this.initializeDeviceState(supportsUserMedia);
@@ -163,15 +137,15 @@ export class MediaDevicesHandler {
   }
 
   private initializeDeviceState(supportsUserMedia: boolean): void {
-    const preferredAudioInputId = this.loadInitialDeviceId(
+    const preferredAudioInputId = loadStoredDeviceId(
       MediaDeviceType.AUDIO_INPUT,
       MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioinput,
     );
-    const preferredAudioOutputId = this.loadInitialDeviceId(
+    const preferredAudioOutputId = loadStoredDeviceId(
       MediaDeviceType.AUDIO_OUTPUT,
       MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audiooutput,
     );
-    const preferredVideoInputId = this.loadInitialDeviceId(
+    const preferredVideoInputId = loadStoredDeviceId(
       MediaDeviceType.VIDEO_INPUT,
       MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.videoinput,
     );
@@ -209,14 +183,6 @@ export class MediaDevicesHandler {
     });
   }
 
-  private loadInitialDeviceId(storageKey: string, defaultId: string): string {
-    if (this.isPreferredMediaDevicePersistenceEnabled) {
-      return loadStoredDeviceId(storageKey, defaultId);
-    }
-
-    return this.loadLegacyDeviceId(storageKey, defaultId);
-  }
-
   private loadLegacyDeviceId(storageKey: string, defaultId: string): string {
     const storedId = loadValue<string>(storageKey);
 
@@ -225,48 +191,26 @@ export class MediaDevicesHandler {
 
   private subscribeToDevicePersistence(): void {
     mediaDevicesStore.subscribe((state, previousState) => {
-      if (this.isPreferredMediaDevicePersistenceEnabled) {
-        this.persistDevicePreference({
-          deviceType: MediaDeviceType.AUDIO_INPUT,
-          preferredId: state.audio.input.preferredId,
-          previousPreferredId: previousState.audio.input.preferredId,
-        });
-        this.persistDevicePreference({
-          deviceType: MediaDeviceType.AUDIO_OUTPUT,
-          preferredId: state.audio.output.preferredId,
-          previousPreferredId: previousState.audio.output.preferredId,
-        });
-        this.persistDevicePreference({
-          deviceType: MediaDeviceType.VIDEO_INPUT,
-          preferredId: state.video.input.preferredId,
-          previousPreferredId: previousState.video.input.preferredId,
-        });
-      } else {
-        this.updateFavoriteList({
-          deviceType: MediaDeviceType.AUDIO_INPUT,
-          currentActiveId: state.audio.input.activeId,
-          previousActiveId: previousState.audio.input.activeId,
-          state,
-        });
-        this.updateFavoriteList({
-          deviceType: MediaDeviceType.AUDIO_OUTPUT,
-          currentActiveId: state.audio.output.activeId,
-          previousActiveId: previousState.audio.output.activeId,
-          state,
-        });
-        this.updateFavoriteList({
-          deviceType: MediaDeviceType.VIDEO_INPUT,
-          currentActiveId: state.video.input.activeId,
-          previousActiveId: previousState.video.input.activeId,
-          state,
-        });
-      }
+      this.persistDevicePreference({
+        deviceType: MediaDeviceType.AUDIO_INPUT,
+        preferredId: state.audio.input.preferredId,
+        previousPreferredId: previousState.audio.input.preferredId,
+      });
+      this.persistDevicePreference({
+        deviceType: MediaDeviceType.AUDIO_OUTPUT,
+        preferredId: state.audio.output.preferredId,
+        previousPreferredId: previousState.audio.output.preferredId,
+      });
+      this.persistDevicePreference({
+        deviceType: MediaDeviceType.VIDEO_INPUT,
+        preferredId: state.video.input.preferredId,
+        previousPreferredId: previousState.video.input.preferredId,
+      });
 
       this.updateFavoriteList({
         deviceType: MediaDeviceType.SCREEN_INPUT,
         currentActiveId: state.screen.input.activeId,
         previousActiveId: previousState.screen.input.activeId,
-        state,
       });
     });
   }
@@ -393,14 +337,6 @@ export class MediaDevicesHandler {
         },
       });
 
-      if (!this.isPreferredMediaDevicePersistenceEnabled) {
-        this.previousDeviceSupport = {
-          [MediaDeviceType.AUDIO_INPUT]: microphones.length,
-          [MediaDeviceType.AUDIO_OUTPUT]: speakers.length,
-          [MediaDeviceType.VIDEO_INPUT]: cameras.length,
-        };
-      }
-
       if (refreshMediaStreams) {
         this.onMediaDevicesRefresh?.();
       }
@@ -471,10 +407,6 @@ export class MediaDevicesHandler {
   private resolveMediaDeviceId(options: ResolveMediaDeviceIdOptions): string {
     const {deviceType, devices, previousActiveId, preferredId} = options;
 
-    if (!this.isPreferredMediaDevicePersistenceEnabled) {
-      return this.pickDeviceId({deviceType, devices, currentId: previousActiveId});
-    }
-
     return resolveActiveDeviceId({
       availableIds: getMediaDeviceIds(devices),
       defaultId: MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType],
@@ -483,87 +415,22 @@ export class MediaDevicesHandler {
     });
   }
 
-  private pickDeviceId(options: PickDeviceIdOptions): string {
-    const {deviceType, devices, currentId} = options;
-    const defaultId = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
-
-    const currentDeviceIsAvailable = devices.some(device => {
-      return device.deviceId === currentId;
-    });
-    if (currentDeviceIsAvailable) {
-      return currentId;
-    }
-
-    const favoriteIds = loadStoredDeviceIds(this.favoriteKeyFor(deviceType));
-    const availableFavoriteId = Maybe.find(favoriteId => {
-      return devices.some(device => {
-        return device.deviceId === favoriteId;
-      });
-    }, favoriteIds);
-
-    return availableFavoriteId.match({
-      Just: favoriteId => {
-        return favoriteId;
-      },
-      Nothing: () => {
-        return Maybe.find(isNonEmptyString, getMediaDeviceIds(devices)).unwrapOr(defaultId);
-      },
-    });
-  }
-
   private updateFavoriteList(options: UpdateFavoriteListOptions): void {
-    const {deviceType, currentActiveId, previousActiveId, state} = options;
+    const {deviceType, currentActiveId, previousActiveId} = options;
     if (currentActiveId === previousActiveId) {
       return;
     }
 
-    const availableDeviceCount = this.getAvailableDeviceCount({deviceType, state});
-    const previousDeviceCount = this.previousDeviceSupport[deviceType] ?? 0;
-    const deviceDisconnected = previousDeviceCount > availableDeviceCount;
     storeValue(deviceType, currentActiveId);
 
     const favoriteIds = loadStoredDeviceIds(this.favoriteKeyFor(deviceType));
-    const updatedFavoriteIds = this.orderFavoriteDevices({
-      favoriteIds,
-      currentActiveId,
-      deviceDisconnected,
-    });
-    storeValue(this.favoriteKeyFor(deviceType), updatedFavoriteIds);
-  }
-
-  private getAvailableDeviceCount(options: {
-    readonly deviceType: MediaDeviceType;
-    readonly state: MediaDevicesState;
-  }): number {
-    const {deviceType, state} = options;
-
-    switch (deviceType) {
-      case MediaDeviceType.AUDIO_INPUT:
-        return state.audio.input.devices.length;
-      case MediaDeviceType.AUDIO_OUTPUT:
-        return state.audio.output.devices.length;
-      case MediaDeviceType.VIDEO_INPUT:
-        return state.video.input.devices.length;
-      case MediaDeviceType.SCREEN_INPUT:
-        return state.screen.input.devices.length;
-      default:
-        return 0;
-    }
-  }
-
-  private orderFavoriteDevices(options: OrderFavoriteDevicesOptions): string[] {
-    const {favoriteIds, currentActiveId, deviceDisconnected} = options;
-
-    if (deviceDisconnected) {
-      return [...favoriteIds];
-    }
-
-    return [
+    const updatedFavoriteIds = [
       currentActiveId,
       ...favoriteIds.filter(favoriteId => {
         return favoriteId !== currentActiveId;
       }),
     ];
+    storeValue(this.favoriteKeyFor(deviceType), updatedFavoriteIds);
   }
 
   private favoriteKeyFor(type: MediaDeviceType) {

@@ -378,7 +378,7 @@ export class TestFactory {
     }
     const mediaConstraintsHandler = new MediaConstraintsHandler();
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
-    const mediaDevicesHandler = new MediaDevicesHandler({isPreferredMediaDevicePersistenceEnabled: false});
+    const mediaDevicesHandler = new MediaDevicesHandler();
     /** @type {BackgroundEffectsHandler} */
     const backgroundEffectsHandler = Object.create(BackgroundEffectsHandler.prototype);
 
