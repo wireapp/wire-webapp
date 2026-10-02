@@ -31,6 +31,9 @@ import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
 import {AVATAR_SIZE} from '.';
 
+const completedDownloadPercentage = 100;
+const avatarTransitionDurationInMilliseconds = 700;
+
 interface AvatarImageProps {
   assetRepository?: AssetRepository;
   avatarAlt: string;
@@ -74,7 +77,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
     }
 
     let cancelled = false;
-    const isCached = pictureResource.downloadProgress === 100;
+    const isCached = pictureResource.downloadProgress === completedDownloadPercentage;
     setShowTransition(!isCached && !isSmall);
 
     void (async () => {
@@ -104,7 +107,11 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
         return setIsVisible(true);
       }}
     >
-      <Transition in={isNonEmptyString(avatarImage)} nodeRef={imageRef} timeout={showTransition ? 700 : 0}>
+      <Transition
+        in={isNonEmptyString(avatarImage)}
+        nodeRef={imageRef}
+        timeout={showTransition ? avatarTransitionDurationInMilliseconds : 0}
+      >
         {(state: string) => {
           return (
             <img

@@ -27,6 +27,8 @@ import {User} from 'Repositories/entity/User';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
+const screenShareEndedDelayInMilliseconds = 1000;
+
 export type UserId = string;
 export type ClientId = string;
 
@@ -147,7 +149,7 @@ export class Participant {
     this.isSwitchingVideoResolution(true);
     window.setTimeout(() => {
       this.isSwitchingVideoResolution(false);
-    }, 1000);
+    }, screenShareEndedDelayInMilliseconds);
   }
 
   private releaseStream(mediaStream: MediaStream | undefined, stopTracks: boolean): void {

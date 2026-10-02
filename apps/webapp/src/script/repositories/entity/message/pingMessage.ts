@@ -26,6 +26,8 @@ import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
 
+const pingAnimationDurationInMilliseconds = 2000;
+
 export class PingMessage extends Message {
   public readonly caption: ko.PureComputed<string>;
   public readonly iconClasses: ko.PureComputed<string>;
@@ -40,7 +42,7 @@ export class PingMessage extends Message {
     });
 
     this.iconClasses = ko.pureComputed(() => {
-      const showPingAnimation = Date.now() - this.timestamp() < 2000;
+      const showPingAnimation = Date.now() - this.timestamp() < pingAnimationDurationInMilliseconds;
       const cssClasses = this.accent_color();
       return showPingAnimation ? `${cssClasses} ping-animation ping-animation-soft` : cssClasses;
     });

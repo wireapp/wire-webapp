@@ -51,6 +51,10 @@ import {UploadAssets} from './uploadAssets';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
+const messageScrollDelayInMilliseconds = 10;
+const messageFocusDelayInMilliseconds = 1000;
+const messageHighlightDurationInMilliseconds = 5000;
+
 interface MessagesListParams {
   assetRepository: AssetRepository;
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -214,7 +218,7 @@ export const MessagesList: FC<MessagesListParams> = ({
         if (!conversation.hasLastReceivedMessageLoaded()) {
           conversation.isLastMessageVisible(false);
         }
-      }, 10);
+      }, messageScrollDelayInMilliseconds);
     });
     return () => {
       return conversation.release();
@@ -259,7 +263,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     focusedElement.current = {center, element};
     setTimeout(() => {
       return (focusedElement.current = null);
-    }, 1000);
+    }, messageFocusDelayInMilliseconds);
     syncScrollPosition();
   };
 
@@ -360,7 +364,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                     setHighlightedMessage(messageId);
                     setTimeout(() => {
                       return setHighlightedMessage(undefined);
-                    }, 5000);
+                    }, messageHighlightDurationInMilliseconds);
                     const messageIsLoaded = conversation.getMessage(messageId);
 
                     if (isNullOrUndefined(messageIsLoaded)) {

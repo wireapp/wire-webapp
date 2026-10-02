@@ -32,6 +32,10 @@ import {Theme} from '../../identity/theme';
 import {QueryKeys, media} from '../../utils';
 import {filterProps, noop} from '../../utils/util';
 
+const modalBackgroundOpacity = 0.04;
+const modalBorderOpacity = 0.08;
+const modalPrimaryButtonBlackMix = 0.16;
+
 export interface ModalBodyProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   fullscreen?: boolean;
 }
@@ -133,10 +137,10 @@ const modalActionsWrapperStyles: () => CSSObject = () => {
     display: 'flex',
     div: {
       '&:hover': {
-        backgroundColor: COLOR.opaque(COLOR.GRAY_DARKEN_72, 0.04),
+        backgroundColor: COLOR.opaque(COLOR.GRAY_DARKEN_72, modalBackgroundOpacity),
       },
       '&:active': {
-        backgroundColor: COLOR.opaque(COLOR.GRAY_DARKEN_72, 0.08),
+        backgroundColor: COLOR.opaque(COLOR.GRAY_DARKEN_72, modalBorderOpacity),
       },
       borderRight: `1px solid ${COLOR.GRAY_LIGHTEN_72}`,
     },
@@ -155,7 +159,7 @@ const modalActionsWrapperStyles: () => CSSObject = () => {
 const modalActionStyles: ({bold}: {bold: boolean}) => CSSObject = ({bold}) => {
   return {
     '&:hover': {
-      color: Color(COLOR.BLUE).mix(Color(COLOR.BLACK), 0.16).toString(),
+      color: Color(COLOR.BLUE).mix(Color(COLOR.BLACK), modalPrimaryButtonBlackMix).toString(),
     },
     color: COLOR.BLUE,
     cursor: 'pointer',

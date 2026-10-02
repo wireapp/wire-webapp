@@ -23,6 +23,10 @@ import * as Long from 'long';
 
 import {AssetContent, ContentType, ConversationContent, LocationContent, TextContent} from '../conversation/content';
 
+const millisecondsPerSecond = 1000;
+const bytesPerUtf16CodeUnit = 2;
+const locationCoordinatePrecisionScale = 1000;
+
 export type AvailableMessageContent = AssetContent | LocationContent | TextContent;
 
 export class MessageHashService {
@@ -32,7 +36,7 @@ export class MessageHashService {
   constructor(messageContent: AvailableMessageContent, timestamp: number = Date.now()) {
     this.messageContent = messageContent;
     const unixTimestamp = new Date(timestamp).getTime();
-    this.timestamp = Math.floor(unixTimestamp / 1e3);
+    this.timestamp = Math.floor(unixTimestamp / millisecondsPerSecond);
   }
 
   private createSha256Hash(buffer: Buffer): Buffer {
@@ -47,7 +51,7 @@ export class MessageHashService {
 
     const buffer = Buffer.from(str, 'ucs2');
 
-    for (let index = 0; index < buffer.length; index += 2) {
+    for (let index = 0; index < buffer.length; index += bytesPerUtf16CodeUnit) {
       const tempValue = buffer[index];
       const nextValue = buffer[index + 1];
 
@@ -76,8 +80,8 @@ export class MessageHashService {
   }
 
   private getLocationBytes(content: LocationContent): Buffer {
-    const latitudeApproximate = Math.round(content.latitude * 1000);
-    const longitudeApproximate = Math.round(content.longitude * 1000);
+    const latitudeApproximate = Math.round(content.latitude * locationCoordinatePrecisionScale);
+    const longitudeApproximate = Math.round(content.longitude * locationCoordinatePrecisionScale);
 
     const latitudeLong = Long.fromInt(latitudeApproximate).toBytesBE();
     const longitudeLong = Long.fromInt(longitudeApproximate).toBytesBE();

@@ -31,8 +31,10 @@ import {
   PaymentStripePlan,
 } from './';
 
+const defaultInvoicesChunkSize = 10;
+
 export class PaymentAPI {
-  public static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
+  public static readonly DEFAULT_INVOICES_CHUNK_SIZE = defaultInvoicesChunkSize;
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {

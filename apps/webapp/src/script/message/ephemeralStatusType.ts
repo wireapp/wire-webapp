@@ -17,9 +17,11 @@
  *
  */
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Status members define persisted ephemeral-message values inline. */
 export enum EphemeralStatusType {
   ACTIVE = 1,
   INACTIVE = 2,
   NONE = 0,
   TIMED_OUT = 3,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */

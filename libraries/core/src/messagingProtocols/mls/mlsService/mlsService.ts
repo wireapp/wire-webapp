@@ -82,6 +82,9 @@ import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/even
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {generateMLSDeviceId} from '../utils/mlsId';
 
+const keyingMaterialLifetimeInDays = 30;
+const keyPackageReplenishmentDivisor = 2;
+
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 interface MLSConfig {
@@ -109,7 +112,7 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
 };
 
 const defaultConfig = {
-  keyingMaterialUpdateThreshold: TimeUtil.TimeInMillis.DAY * 30,
+  keyingMaterialUpdateThreshold: TimeUtil.TimeInMillis.DAY * keyingMaterialLifetimeInDays,
   nbKeyPackages: 100,
 };
 
@@ -187,7 +190,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   private get minRequiredKeyPackages() {
-    return Math.floor(this.config.nbKeyPackages / 2);
+    return Math.floor(this.config.nbKeyPackages / keyPackageReplenishmentDivisor);
   }
 
   /**

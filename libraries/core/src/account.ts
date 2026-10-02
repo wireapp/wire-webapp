@@ -101,6 +101,8 @@ import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
 
+const defaultCertificateLifetimeInDays = 90;
+
 export type ProcessedEventPayload = HandledEventPayload;
 export type WebSocketConnectionContext = Pick<WebSocketReconnectContext, 'attemptId' | 'wrapperGeneration'>;
 
@@ -297,7 +299,7 @@ export class Account extends TypedEventEmitter<Events> {
     discoveryUrl,
     getOAuthToken,
     getAllConversations,
-    certificateTtl = 90 * (TimeInMillis.DAY / 1000),
+    certificateTtl = defaultCertificateLifetimeInDays * (TimeInMillis.DAY / TimeInMillis.SECOND),
   }: {
     /** display name of the user (should match the identity provider) */
     displayName: string;

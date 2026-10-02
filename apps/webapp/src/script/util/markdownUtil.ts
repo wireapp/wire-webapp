@@ -19,6 +19,9 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
+const pairedMarkdownDelimiterEndOffset = -2;
+const pairedMarkdownDelimiterLength = 2;
+
 // Basic markdown patterns (used for both detection and sanitization)
 const HEADER_PATTERN = /^#{1,6}\s+/m;
 const BOLD_PATTERN_1 = /\*\*[^*]+\*\*/;
@@ -130,13 +133,13 @@ const markdownSanitizers: MarkdownSanitizer[] = [
   {
     pattern: BOLD_PATTERN_1,
     transform: (match: string) => {
-      return match.slice(2, -2);
+      return match.slice(pairedMarkdownDelimiterLength, pairedMarkdownDelimiterEndOffset);
     },
   },
   {
     pattern: BOLD_PATTERN_2,
     transform: (match: string) => {
-      return match.slice(2, -2);
+      return match.slice(pairedMarkdownDelimiterLength, pairedMarkdownDelimiterEndOffset);
     },
   },
   {
@@ -224,7 +227,7 @@ const markdownSanitizers: MarkdownSanitizer[] = [
   {
     pattern: STRIKETHROUGH_PATTERN,
     transform: (match: string) => {
-      return match.slice(2, -2);
+      return match.slice(pairedMarkdownDelimiterLength, pairedMarkdownDelimiterEndOffset);
     },
   },
 ];

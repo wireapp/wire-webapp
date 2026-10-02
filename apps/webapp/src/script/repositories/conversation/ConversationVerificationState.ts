@@ -17,8 +17,10 @@
  *
  */
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Verification states define their persisted values inline. */
 export enum ConversationVerificationState {
   DEGRADED = 2,
   UNVERIFIED = 0,
   VERIFIED = 1,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */

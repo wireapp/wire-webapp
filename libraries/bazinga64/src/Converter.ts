@@ -21,6 +21,10 @@ import {isUndefined} from '@sindresorhus/is';
 
 import {UnsupportedInputError} from './UnsupportedInputError';
 
+const utf16CodeUnitSizeInBytes = 2;
+const hexadecimalCharactersPerByte = 2;
+const hexadecimalRadix = 16;
+
 export class Converter {
   public static arrayBufferViewToStringUTF8(arrayBufferView: Uint8Array): string {
     try {
@@ -95,7 +99,7 @@ export class Converter {
   }
 
   public static stringToArrayBufferViewUTF16(data: string): Uint16Array {
-    const arrayBuffer = new ArrayBuffer(data.length * 2);
+    const arrayBuffer = new ArrayBuffer(data.length * utf16CodeUnitSizeInBytes);
     const arrayBufferView = new Uint16Array(arrayBuffer);
 
     for (let i = 0, strLen = data.length; i < strLen; i++) {
@@ -142,21 +146,21 @@ export class Converter {
   }
 
   public static hexStringToArrayBufferView(data: string): Uint8Array {
-    if (data.length % 2 !== 0) {
+    if (data.length % hexadecimalCharactersPerByte !== 0) {
       throw new Error('Invalid hexadecimal string');
     }
 
-    const arrayBufferView = new Uint8Array(data.length / 2);
+    const arrayBufferView = new Uint8Array(data.length / hexadecimalCharactersPerByte);
 
-    for (let i = 0; i < data.length; i += 2) {
-      const hexByte = data.substr(i, 2);
+    for (let i = 0; i < data.length; i += hexadecimalCharactersPerByte) {
+      const hexByte = data.substr(i, hexadecimalCharactersPerByte);
       const value = parseInt(hexByte, 16);
 
       if (isNaN(value)) {
         throw new Error(`Invalid hexadecimal string at position ${i}: "${hexByte}"`);
       }
 
-      arrayBufferView[i / 2] = value;
+      arrayBufferView[i / hexadecimalCharactersPerByte] = value;
     }
 
     return arrayBufferView;
@@ -166,9 +170,9 @@ export class Converter {
     const binaryString = Converter.arrayBufferViewToBaselineString(arrayBufferView);
 
     const escapedString = binaryString.replace(/(.)/g, (match: string) => {
-      const code = match.charCodeAt(0).toString(16).toUpperCase();
+      const code = match.charCodeAt(0).toString(hexadecimalRadix).toUpperCase();
 
-      if (code.length < 2) {
+      if (code.length < hexadecimalCharactersPerByte) {
         return `0${code}`;
       }
 

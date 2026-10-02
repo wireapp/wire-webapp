@@ -26,6 +26,8 @@ import {Select} from '@wireapp/react-ui-kit';
 
 import {containerStyles, selectWrapperStyles} from './deviceSelect.styles';
 
+const minimumDeviceCountForSelection = 2;
+
 interface DeviceSelectProps {
   defaultDeviceName?: string;
   devices: MediaDeviceInfo[];
@@ -56,7 +58,7 @@ const DeviceSelect = ({
   const currentValue = devicesList.find(device => {
     return device.value === value;
   });
-  const lessThanTwoDevices = devices.length < 2;
+  const lessThanTwoDevices = devices.length < minimumDeviceCountForSelection;
   const disabled = lessThanTwoDevices || isRequesting;
 
   return (

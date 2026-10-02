@@ -23,6 +23,8 @@ import {User} from 'Repositories/entity/User';
 
 import {TopContact} from './topPeople/topContact';
 
+const defaultTopPeopleLimit = 9;
+
 interface TopPeopleProps {
   clickOnUser: (user: User, event: React.UIEvent) => void;
   max?: number;
@@ -30,7 +32,7 @@ interface TopPeopleProps {
 }
 
 const TopPeople = ({clickOnUser, max, users}: TopPeopleProps) => {
-  max ??= 9;
+  max ??= defaultTopPeopleLimit;
   const displayedUsers = users.slice(0, max);
   const searchListItems = displayedUsers.map(user => {
     return <TopContact clickOnUser={clickOnUser} key={user.id} user={user} />;

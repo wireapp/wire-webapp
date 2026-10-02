@@ -25,6 +25,11 @@ import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {interpolate} from 'Util/arrayUtil';
 import {clamp} from 'Util/numberUtil';
 
+const audioBarWidthUnits = 2;
+const audioBarSlotWidth = 3;
+const amplitudeCenterDivisor = 2;
+const normalizedAmplitudeCenter = 0.5;
+
 interface UseAudioSeekBarProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
@@ -98,13 +103,13 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
     const numberOfLevelsFitOnScreen = Math.floor(svgWidth / LEVELS_PER_WIDTH);
     const singleWidth = 1 / numberOfLevelsFitOnScreen;
-    const barWidth = (singleWidth / 3) * 2;
+    const barWidth = (singleWidth / audioBarSlotWidth) * audioBarWidthUnits;
     const scaledLoudness = interpolate(loudness, numberOfLevelsFitOnScreen);
 
     return scaledLoudness
       .map((level, index) => {
         const x = index * singleWidth;
-        const y = 0.5 - level / 2;
+        const y = normalizedAmplitudeCenter - level / amplitudeCenterDivisor;
         return `M${x},${y}h${barWidth}V${1 - y}H${x}z`;
       })
       .join('');

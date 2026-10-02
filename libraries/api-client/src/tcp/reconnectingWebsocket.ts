@@ -28,19 +28,31 @@ import * as buffer from '../shims/node/buffer';
 import {WebSocketNode} from '../shims/node/websocket';
 import {BackFromSleepDetails, onBackFromSleep} from '../utils/backFromSleepHandler/backFromSleepHandler';
 
+const connectingTimeoutInSeconds = 20;
+const connectionTimeoutInSeconds = 4;
+const maximumReconnectionDelayInSeconds = 10;
+const minimumReconnectionDelayInSeconds = 4;
+const pingIntervalInSeconds = 20;
+const healthCheckTimeoutInSeconds = 10;
+const recentMessageThresholdInSeconds = 5;
+
+/* eslint-disable @typescript-eslint/no-magic-numbers -- WebSocket close codes define standard protocol values inline. */
 export enum CloseEventCode {
   NORMAL_CLOSURE = 1000,
   GOING_AWAY = 1001,
   PROTOCOL_ERROR = 1002,
   UNSUPPORTED_DATA = 1003,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- WebSocket states define standard browser values inline. */
 export enum WEBSOCKET_STATE {
   CONNECTING = 0,
   OPEN = 1,
   CLOSING = 2,
   CLOSED = 3,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export enum PingMessage {
   PING = 'ping',
@@ -64,7 +76,7 @@ export type WebSocketErrorHandler = (error: ErrorEvent, reconnectContext: WebSoc
 type IntervalIdentifier = ReturnType<typeof globalThis.setInterval>;
 
 const longRunningRetryThresholdInMilliseconds = TimeUtil.TimeInMillis.MINUTE;
-const connectingTimeoutInMilliseconds = TimeUtil.TimeInMillis.SECOND * 20;
+const connectingTimeoutInMilliseconds = TimeUtil.TimeInMillis.SECOND * connectingTimeoutInSeconds;
 
 type BackFromSleepHandler = typeof onBackFromSleep;
 
@@ -173,11 +185,11 @@ export function createPartysocketCompatibleWebSocketConstructor(
 export class ReconnectingWebsocket {
   private static readonly RECONNECTING_OPTIONS: Options = {
     WebSocket: createPartysocketCompatibleWebSocketConstructor(WebSocketNode),
-    connectionTimeout: TimeUtil.TimeInMillis.SECOND * 4,
+    connectionTimeout: TimeUtil.TimeInMillis.SECOND * connectionTimeoutInSeconds,
     debug: false,
-    maxReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 10,
+    maxReconnectionDelay: TimeUtil.TimeInMillis.SECOND * maximumReconnectionDelayInSeconds,
     maxRetries: Infinity,
-    minReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 4,
+    minReconnectionDelay: TimeUtil.TimeInMillis.SECOND * minimumReconnectionDelayInSeconds,
     reconnectionDelayGrowFactor: 1.3,
   };
 
@@ -185,7 +197,7 @@ export class ReconnectingWebsocket {
   private socket?: ReconnectingWebsocketWrapper;
   private pingerId?: IntervalIdentifier;
   private connectingTimeoutId?: TimeoutIdentifier;
-  private PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * 20;
+  private PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * pingIntervalInSeconds;
   private hasUnansweredPing: boolean;
   private onOpen?: (event: Event, reconnectContext: WebSocketReconnectContext) => void;
   private onMessage?: (data: string) => void;
@@ -579,7 +591,7 @@ export class ReconnectingWebsocket {
    *
    * Does not close or reconnect the socket; callers can decide how to react to failures.
    */
-  public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * 10): Promise<boolean> {
+  public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * healthCheckTimeoutInSeconds): Promise<boolean> {
     const state = this.getState();
     if (isUndefined(this.socket)) {
       this.logger.debug(
@@ -606,7 +618,7 @@ export class ReconnectingWebsocket {
     const timeSinceLastMessage = now - this.lastMessageTimestamp;
 
     // If we're actively processing messages during the last 5 seconds, consider the connection healthy
-    if (timeSinceLastMessage < TimeUtil.TimeInMillis.SECOND * 5) {
+    if (timeSinceLastMessage < TimeUtil.TimeInMillis.SECOND * recentMessageThresholdInSeconds) {
       this.logger.debug(
         `[WebSocketLifecycle] event=health-check-active-messages state=${getWebSocketStateName(state)} ${this.getActiveLifecycleContext()} lastMessageAgeMs=${timeSinceLastMessage}`,
       );

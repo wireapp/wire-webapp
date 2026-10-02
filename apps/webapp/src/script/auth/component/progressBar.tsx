@@ -19,6 +19,8 @@
 
 import type {CSSProperties} from 'react';
 
+const percentageScale = 100;
+
 interface ProgressProps {
   ariaLabel?: string;
   width: number;
@@ -28,8 +30,8 @@ interface ProgressProps {
 }
 
 export const ProgressBar = ({ariaLabel, width, percent, error, style}: ProgressProps) => {
-  const normalizedPercent = Math.min(100, Math.max(0, Math.floor(percent)));
-  const progress = (percent / 100) * width;
+  const normalizedPercent = Math.min(percentageScale, Math.max(0, Math.floor(percent)));
+  const progress = (percent / percentageScale) * width;
 
   return (
     <div

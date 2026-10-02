@@ -30,6 +30,9 @@ import {getLogger} from './logger';
 
 import {AuthError} from '../error/authError';
 
+const decimalRadix = 10;
+const environmentPollingIntervalInMilliseconds = 100;
+
 export const checkIndexedDb = (): Promise<void> => {
   if (!Runtime.isSupportingIndexedDb()) {
     const errorType = Runtime.isEdge() ? AuthError.TYPE.PRIVATE_MODE : AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
@@ -106,7 +109,7 @@ const loadUrlBuffer = (
       const isStatusOK = xhr.status === HTTP_STATUS.OK;
       return isStatusOK
         ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type') ?? ''})
-        : reject(new Error(xhr.status.toString(10)));
+        : reject(new Error(xhr.status.toString(decimalRadix)));
     };
 
     xhr.onerror = reject;
@@ -286,7 +289,7 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
     const objectURL = anchor.href;
     document.body.removeChild(anchor);
     window.URL.revokeObjectURL(objectURL);
-  }, 100);
+  }, environmentPollingIntervalInMilliseconds);
 };
 
 /**

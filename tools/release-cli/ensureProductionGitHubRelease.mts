@@ -177,7 +177,8 @@ async function executeRuntimeCommand(productionTagName: string): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  process.exitCode = await runEnsureProductionGitHubReleaseCommand(process.argv.slice(2), {
+  const runtimeArgumentPrefixLength = 2;
+  process.exitCode = await runEnsureProductionGitHubReleaseCommand(process.argv.slice(runtimeArgumentPrefixLength), {
     executeCommand: executeRuntimeCommand,
     writeError: writeRuntimeError,
     writeOutput: writeRuntimeOutput,

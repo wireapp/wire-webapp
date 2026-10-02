@@ -75,6 +75,12 @@ import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
+const debugDumpIndentationSpaces = 2;
+const debugFrameRectangleSizeInPixels = 10;
+const debugFrameUpdateIntervalInMilliseconds = 500;
+const debugCaptureFramesPerSecond = 25;
+
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Log levels define the external logging API values inline. */
 export enum CoreCryptoLogLevel {
   Off = 1,
   Trace = 2,
@@ -83,6 +89,7 @@ export enum CoreCryptoLogLevel {
   Warn = 5,
   Error = 6,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export type NotificationBackendDumpEvent = {
   notificationId: string;
@@ -700,7 +707,7 @@ export class DebugUtil {
 
   async downloadNotificationsDump(from: Date, to: Date): Promise<void> {
     const dump = await this.dumpNotificationsFromBackend(from, to);
-    const blob = new Blob([JSON.stringify(dump, null, 2)], {type: 'application/json'});
+    const blob = new Blob([JSON.stringify(dump, null, debugDumpIndentationSpaces)], {type: 'application/json'});
     const filename = `wire-notifications-${from.toISOString()}-${to.toISOString()}.json`.replaceAll(':', '-');
     downloadBlob(blob, filename, 'application/json');
   }
@@ -854,10 +861,15 @@ export class DebugUtil {
         ctx.fillStyle = `#${color}`;
         ctx.fillRect(0, 0, width, height);
         ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, Math.random() * 10, Math.random() * 10);
-      }, 500);
+        ctx.fillRect(
+          0,
+          0,
+          Math.random() * debugFrameRectangleSizeInPixels,
+          Math.random() * debugFrameRectangleSizeInPixels,
+        );
+      }, debugFrameUpdateIntervalInMilliseconds);
       // Typings missing for: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream
-      const stream = (canvas as any).captureStream(25);
+      const stream = (canvas as any).captureStream(debugCaptureFramesPerSecond);
       return stream.getVideoTracks();
     }
 

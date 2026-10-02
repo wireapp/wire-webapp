@@ -17,9 +17,11 @@
  *
  */
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Duration members already name each animation duration in milliseconds. */
 export enum MotionDuration {
   LONG = 550,
   MEDIUM = 350,
   SHORT = 150,
   X_LONG = 700,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */

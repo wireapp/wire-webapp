@@ -26,6 +26,9 @@ import {COLOR} from '../../identity';
 import {Theme} from '../../identity/theme';
 import {filterProps} from '../../utils/util';
 
+const boldTextFontWeight = 600;
+const thinTextFontWeight = 200;
+
 export interface TextProps<T = HTMLSpanElement> extends React.PropsWithRef<React.HTMLProps<T>> {
   block?: boolean;
   bold?: boolean;
@@ -71,9 +74,9 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
 ) => {
   let fontWeight = 400;
   if (bold) {
-    fontWeight = 600;
+    fontWeight = boldTextFontWeight;
   } else if (light) {
-    fontWeight = 200;
+    fontWeight = thinTextFontWeight;
   }
 
   return {

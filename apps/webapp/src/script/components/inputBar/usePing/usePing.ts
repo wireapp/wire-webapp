@@ -26,6 +26,8 @@ import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
+const pingTimeoutInSeconds = 2;
+
 interface UsePingProps {
   conversation: Conversation;
   messageRepository: MessageRepository;
@@ -45,7 +47,7 @@ export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps)
       await messageRepository.sendPing(conversation);
       window.setTimeout(() => {
         return setIsPingDisabled(false);
-      }, TIME_IN_MILLIS.SECOND * 2);
+      }, TIME_IN_MILLIS.SECOND * pingTimeoutInSeconds);
     });
   };
 

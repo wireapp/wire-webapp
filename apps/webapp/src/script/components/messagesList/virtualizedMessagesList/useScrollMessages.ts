@@ -25,6 +25,8 @@ import {Virtualizer} from '@tanstack/react-virtual';
 import {StatusType} from '../../../message/statusType';
 import {GroupedMessage, isMarker, Marker} from '../utils/virtualizedMessagesGroup';
 
+const bottomStickThresholdInPixels = 100;
+
 interface Props {
   messages: (Marker | GroupedMessage)[];
   userId: string;
@@ -70,7 +72,11 @@ export const useScrollMessages = (
 
     const lastMessage = lastMessageItem?.message;
 
-    const shouldStickToBottom = shouldStickToBottomFromPrev(virtualizer, prevTotalSizeRef.current, 100);
+    const shouldStickToBottom = shouldStickToBottomFromPrev(
+      virtualizer,
+      prevTotalSizeRef.current,
+      bottomStickThresholdInPixels,
+    );
     const nbNewMessages = messages.length - prevNbMessages.current;
 
     if (prevNbMessages.current === 0 || nbNewMessages <= 0) {

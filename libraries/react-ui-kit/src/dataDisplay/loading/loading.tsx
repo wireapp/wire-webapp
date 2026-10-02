@@ -25,6 +25,8 @@ import {isUndefined} from '@sindresorhus/is';
 import {COLOR} from '../../identity';
 import {ANIMATION, DURATION} from '../../identity/motions/motions';
 
+const loadingTrackOpacity = 0.08;
+
 export interface LoadingProps<T = SVGSVGElement> extends React.SVGProps<T> {
   color?: string;
   progress?: number;
@@ -46,7 +48,7 @@ export const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...
 
   return (
     <svg width={size} height={size} viewBox="0 0 43 43" strokeWidth="3" fill="none" {...props}>
-      <circle cx="21.5" cy="21.5" r="20" stroke={COLOR.opaque(color, 0.08)} />
+      <circle cx="21.5" cy="21.5" r="20" stroke={COLOR.opaque(color, loadingTrackOpacity)} />
       <circle
         css={
           isUndefined(progress)

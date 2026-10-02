@@ -27,6 +27,12 @@ import {interpolate} from 'Util/arrayUtil';
 import {clamp} from 'Util/numberUtil';
 import {createUuid} from 'Util/uuid';
 
+const audioLevelValueCount = 256;
+const audioBarSlotWidth = 3;
+const audioBarWidthUnits = 2;
+const amplitudeCenterDivisor = 2;
+const normalizedAmplitudeCenter = 0.5;
+
 interface AudioSeekBarProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
@@ -54,7 +60,7 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
     if (!isUndefined(loudness)) {
       setLoudness(
         Array.from(loudness).map(level => {
-          return level / 256;
+          return level / audioLevelValueCount;
         }),
       );
     }
@@ -78,14 +84,14 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
       return setPath('');
     }
 
-    const numberOfLevelsFitOnScreen = Math.floor(svgWidth / 3);
+    const numberOfLevelsFitOnScreen = Math.floor(svgWidth / audioBarSlotWidth);
     const singleWidth = 1 / numberOfLevelsFitOnScreen;
-    const barWidth = (singleWidth / 3) * 2;
+    const barWidth = (singleWidth / audioBarSlotWidth) * audioBarWidthUnits;
     const scaledLoudness = interpolate(loudness, numberOfLevelsFitOnScreen);
     const newPath = scaledLoudness
       .map((loudness, index) => {
         const x = index * singleWidth;
-        const y = 0.5 - loudness / 2;
+        const y = normalizedAmplitudeCenter - loudness / amplitudeCenterDivisor;
         return `M${x},${y}h${barWidth}V${1 - y}H${x}z`;
       })
       .join('');

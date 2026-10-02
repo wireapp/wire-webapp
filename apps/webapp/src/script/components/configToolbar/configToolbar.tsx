@@ -37,6 +37,8 @@ import {getLogger} from 'Util/logger';
 import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
 
+const timeComponentDigitCount = 2;
+
 const logger = getLogger('ConfigToolbar');
 
 export function createLocationUrl(pathname: string, search: string, hash: string): string {
@@ -51,7 +53,7 @@ function getStartOfToday(): Date {
 
 function toDateInputValue(date: Date): string {
   const pad = (value: number) => {
-    return String(value).padStart(2, '0');
+    return String(value).padStart(timeComponentDigitCount, '0');
   };
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }

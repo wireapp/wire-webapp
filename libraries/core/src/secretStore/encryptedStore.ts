@@ -21,6 +21,8 @@ import {DBSchema, IDBPDatabase, openDB, deleteDB} from 'idb';
 
 import {toBufferSource} from '../util/bufferUtils';
 
+const initializationVectorLengthInBytes = 12;
+
 interface DefaultEncryptedPayload {
   iv: Uint8Array | ArrayBuffer;
   value: Uint8Array | ArrayBuffer;
@@ -100,7 +102,7 @@ async function defaultDecrypt({value, iv}: DefaultEncryptedPayload, key: CryptoK
 }
 
 async function defaultEncrypt(data: Uint8Array, key: CryptoKey): Promise<DefaultEncryptedPayload> {
-  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const iv = crypto.getRandomValues(new Uint8Array(initializationVectorLengthInBytes));
   return {
     iv,
     value: await crypto.subtle.encrypt({name: 'AES-GCM', iv}, key, toBufferSource(data)),

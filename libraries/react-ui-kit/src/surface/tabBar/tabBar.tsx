@@ -26,6 +26,8 @@ import {Theme} from '../../identity/theme';
 import {TextProps, textStyle} from '../../typography';
 import {filterProps} from '../../utils/util';
 
+const inactiveTabOpacity = 0.56;
+
 export type TabBarProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const tabBarStyle: <T>(props: TabBarProps<T>) => CSSObject = ({}) => {
@@ -71,7 +73,7 @@ const tabBarItemStyle: <T>(theme: Theme, props: TabBarItemProps<T>) => CSSObject
     display: 'flex',
     flexGrow: 1,
     justifyContent: 'center',
-    opacity: active ? 1 : 0.56,
+    opacity: active ? 1 : inactiveTabOpacity,
     padding: '8px 0',
   };
 };

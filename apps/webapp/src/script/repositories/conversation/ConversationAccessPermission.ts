@@ -23,17 +23,24 @@ import {combinePermissions, hasPermissions} from 'Repositories/user/userPermissi
 
 import {ACCESS_STATE, TEAM} from './AccessState';
 
+const teamMemberPermissionBitPosition = 2;
+const servicePermissionBitPosition = 3;
+const invitePermissionBitPosition = 4;
+const codePermissionBitPosition = 5;
+const linkPermissionBitPosition = 6;
+const binaryRadix = 2;
+
 export const ACCESS_TYPES = {
   GUEST: 1 << 0,
   NON_TEAM_MEMBER: 1 << 1,
-  TEAM_MEMBER: 1 << 2,
-  SERVICE: 1 << 3,
+  TEAM_MEMBER: 1 << teamMemberPermissionBitPosition,
+  SERVICE: 1 << servicePermissionBitPosition,
 };
 
 export const ACCESS_MODES = {
-  INVITE: 1 << 4,
-  CODE: 1 << 5,
-  LINK: 1 << 6,
+  INVITE: 1 << invitePermissionBitPosition,
+  CODE: 1 << codePermissionBitPosition,
+  LINK: 1 << linkPermissionBitPosition,
 };
 
 const ACCESS = {...ACCESS_TYPES, ...ACCESS_MODES};
@@ -153,7 +160,7 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
 
   teamPermissionsForAccessState(accessState)
     //turn the permissions into a bitwise value ie. 11011
-    .toString(2)
+    .toString(binaryRadix)
     .split('')
     //reverse so that the index reflects the number of significant figures for finding the feature
     .toReversed()

@@ -21,6 +21,9 @@ import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 
 import {Config, Configuration} from '../Config';
 
+const redactedValuePrefixLength = 3;
+const loggedUserIdentifierPrefixLength = 8;
+
 const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
 
 let isDataDogInitialized = false;
@@ -50,7 +53,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     return `${p1}***`;
   };
   const truncateDomain = (value: string) => {
-    return `${value.substring(0, 3)}***`;
+    return `${value.substring(0, redactedValuePrefixLength)}***`;
   };
   const replaceAllStrings = (string: string) => {
     return string.replaceAll(uuidRegex, replacer);
@@ -119,7 +122,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
   });
 
   if (isNonEmptyString(userId)) {
-    const id = userId.substring(0, 8);
+    const id = userId.substring(0, loggedUserIdentifierPrefixLength);
     datadogRum.setUser({id});
     datadogLogs.setUser({id});
   }

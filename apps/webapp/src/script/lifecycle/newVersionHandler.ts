@@ -26,10 +26,12 @@ import {isBuildMetadata, type BuildMetadata} from '@wireapp/config';
 import {getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
+const newVersionPollingIntervalInMinutes = 15;
+
 const logger = getLogger('newVersionHandler');
 const buildMetadataUrl = '/version/';
 
-export const NEW_VERSION_POLLING_INTERVAL_MILLISECONDS = TIME_IN_MILLIS.MINUTE * 15;
+export const NEW_VERSION_POLLING_INTERVAL_MILLISECONDS = TIME_IN_MILLIS.MINUTE * newVersionPollingIntervalInMinutes;
 
 export type FetchLatestBuildMetadata = () => Task<BuildMetadata, Error>;
 

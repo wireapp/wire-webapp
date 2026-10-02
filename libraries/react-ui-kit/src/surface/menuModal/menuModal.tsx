@@ -28,6 +28,8 @@ import {QueryKeys, media} from '../../utils';
 import {noop} from '../../utils/util';
 import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyle} from '../modal/overlay';
 
+const menuModalBackgroundTint = 0.16;
+
 const menuModalWrapperStyle: CSSObject = {
   ...overlayBackgroundStyle,
   alignItems: 'flex-end',
@@ -47,7 +49,7 @@ const MenuModalBody = (props: React.HTMLProps<HTMLDivElement>) => {
       css={(theme: Theme) => {
         return {
           animation: `${ANIMATION.bottomUpMovement} ${DURATION.DEFAULT}ms ${EASE.EXPONENTIAL}`,
-          backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
+          backgroundColor: COLOR.tint(theme.general.backgroundColor, menuModalBackgroundTint),
           boxShadow: '0 16px 64px 0 rgba(0, 0, 0, 0.16)',
           display: 'flex',
           flexDirection: 'column',

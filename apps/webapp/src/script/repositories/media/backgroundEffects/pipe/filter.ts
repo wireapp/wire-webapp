@@ -21,6 +21,9 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
+const vertexCoordinateComponentCount = 2;
+const rectangleVertexCount = 6;
+
 type QuadBuffers = {
   positionBuffer: WebGLBuffer;
   texCoordBuffer: WebGLBuffer;
@@ -359,10 +362,10 @@ export class VideoFilter {
       gl.useProgram(this.blurProgram);
       gl.enableVertexAttribArray(this.blurLocations.position);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffers.positionBuffer);
-      gl.vertexAttribPointer(this.blurLocations.position, 2, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(this.blurLocations.position, vertexCoordinateComponentCount, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(this.blurLocations.texCoord);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffers.texCoordBuffer);
-      gl.vertexAttribPointer(this.blurLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(this.blurLocations.texCoord, vertexCoordinateComponentCount, gl.FLOAT, false, 0, 0);
       gl.uniform1i(this.blurLocations.image, 0);
       gl.uniform1f(this.blurLocations.blur, blur);
       gl.viewport(0, 0, outputWidth, outputHeight);
@@ -373,14 +376,14 @@ export class VideoFilter {
       gl.uniform2f(this.blurLocations.direction, 1, 0);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, sourceTexture); // Initial source
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount);
 
       // Vertical Pass (FBO1/Texture1 -> FBO2/Texture2)
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo2);
       gl.uniform2f(this.blurLocations.direction, 0, 1);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.texture1);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount);
 
       currentTexture = this.texture2; // Blurred result is in texture2
     }
@@ -441,12 +444,12 @@ export class VideoFilter {
 
       gl.enableVertexAttribArray(this.colorAdjustLocations.position);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffers.positionBuffer);
-      gl.vertexAttribPointer(this.colorAdjustLocations.position, 2, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(this.colorAdjustLocations.position, vertexCoordinateComponentCount, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(this.colorAdjustLocations.texCoord);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffers.texCoordBuffer);
-      gl.vertexAttribPointer(this.colorAdjustLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(this.colorAdjustLocations.texCoord, vertexCoordinateComponentCount, gl.FLOAT, false, 0, 0);
 
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount);
 
       currentTexture = finalPassOutputToTexture1 ? this.texture1 : this.texture2;
     }
@@ -563,13 +566,13 @@ export class VideoFilter {
 
     gl.enableVertexAttribArray(posLoc);
     gl.bindBuffer(gl.ARRAY_BUFFER, pBuf);
-    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(posLoc, vertexCoordinateComponentCount, gl.FLOAT, false, 0, 0);
 
     gl.enableVertexAttribArray(tcLoc);
     gl.bindBuffer(gl.ARRAY_BUFFER, tcBuf);
-    gl.vertexAttribPointer(tcLoc, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(tcLoc, vertexCoordinateComponentCount, gl.FLOAT, false, 0, 0);
 
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount);
 
     gl.deleteTexture(sourceTexture);
     gl.deleteProgram(finalDrawProgram);

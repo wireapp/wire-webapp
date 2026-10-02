@@ -20,6 +20,7 @@
 import {EventRecord} from 'Repositories/storage/record/eventRecord';
 
 /** Enum for different confirmation types */
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Status members define persisted message values inline. */
 export enum StatusType {
   DELIVERED = 3,
   FAILED = 0,
@@ -29,6 +30,7 @@ export enum StatusType {
   SENT = 2,
   UNSPECIFIED = -1,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 type FailedEventRecord = Omit<EventRecord, 'status'> & {
   status: StatusType.FAILED;

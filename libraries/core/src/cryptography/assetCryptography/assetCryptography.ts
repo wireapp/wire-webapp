@@ -22,6 +22,9 @@ import {CipherOptions} from '@wireapp/api-client/lib/asset';
 import {crypto} from './crypto.node';
 import {EncryptedAsset} from './encryptedAsset';
 
+const initializationVectorLengthInBytes = 16;
+const encryptionKeyLengthInBytes = 32;
+
 const isEqual = (a: Uint8Array, b: Uint8Array): boolean => {
   const arrayA = new Uint32Array(a);
   const arrayB = new Uint32Array(b);
@@ -53,8 +56,8 @@ export const decryptAsset = async ({
 };
 
 export const encryptAsset = async ({plainText, algorithm = 'AES-256-CBC'}: EncryptOptions): Promise<EncryptedAsset> => {
-  const initializationVector = crypto.getRandomValues(16);
-  const rawKeyBytes = crypto.getRandomValues(32);
+  const initializationVector = crypto.getRandomValues(initializationVectorLengthInBytes);
+  const rawKeyBytes = crypto.getRandomValues(encryptionKeyLengthInBytes);
 
   const {key, cipher} = await crypto.encrypt(plainText, rawKeyBytes, initializationVector, algorithm);
 

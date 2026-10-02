@@ -36,6 +36,8 @@ import Cookies from 'js-cookie';
 
 import {QUERY_KEY} from '../auth/route';
 
+const browserCompatibilityCheckTimeoutInMilliseconds = 10000;
+
 const isOauth = (): boolean => {
   return location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
 };
@@ -94,7 +96,7 @@ const supportsIndexDB = (): Promise<boolean> => {
 
     const connectionTimeout = setTimeout(() => {
       return resolve(false);
-    }, 10000);
+    }, browserCompatibilityCheckTimeoutInMilliseconds);
 
     dbOpenRequest.onerror = event => {
       clearTimeout(connectionTimeout);

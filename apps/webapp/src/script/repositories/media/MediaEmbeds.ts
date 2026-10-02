@@ -23,6 +23,12 @@ import {Runtime} from '@wireapp/commons';
 
 import {formatString} from 'Util/stringUtil';
 
+const secondsPerMinute = 60;
+const secondsPerHour = 3600;
+const singleTrackUrlSlashCount = 3;
+const playlistEmbedHeightInPixels = 465;
+const singleTrackEmbedHeightInPixels = 164;
+
 interface IFrameOptions {
   allowfullscreen: string;
   class: string;
@@ -159,7 +165,7 @@ const convertYouTubeTimestampToSeconds = (timestamp: string): number => {
       return parseInt(extracted, 10);
     };
 
-    return _extractUnit('h') * 3600 + _extractUnit('m') * 60 + _extractUnit('s');
+    return _extractUnit('h') * secondsPerHour + _extractUnit('m') * secondsPerMinute + _extractUnit('s');
   }
   return 0;
 };
@@ -198,14 +204,14 @@ export const MediaEmbeds = {
       let isSingleTrack = false;
       const slashesInLink = linkPathName.split('/').length;
 
-      if (slashesInLink === 3) {
+      if (slashesInLink === singleTrackUrlSlashCount) {
         isSingleTrack = true;
-      } else if (slashesInLink > 3 && linkPathName.indexOf('sets') === -1) {
+      } else if (slashesInLink > singleTrackUrlSlashCount && linkPathName.indexOf('sets') === -1) {
         // Fix for WEBAPP-1137
         return message;
       }
 
-      const height = isSingleTrack ? 164 : 465;
+      const height = isSingleTrack ? singleTrackEmbedHeightInPixels : playlistEmbedHeightInPixels;
 
       const iFrame = _createIFrameContainer({
         height: height.toString(),

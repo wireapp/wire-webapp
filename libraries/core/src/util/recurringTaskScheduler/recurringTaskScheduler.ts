@@ -24,6 +24,9 @@ import {TimeUtil} from '@wireapp/commons';
 import {LowPrecisionTaskScheduler} from '../lowPrecisionTaskScheduler';
 import {TaskScheduler} from '../taskScheduler';
 
+const windowFocusMinimumIntervalInMinutes = 15;
+const maximumRecurringIntervalInDays = 20;
+
 interface RecurringTaskSchedulerStorage {
   set: (key: string, timestamp: number) => Promise<void>;
   get: (key: string) => Promise<number | undefined>;
@@ -37,7 +40,7 @@ export interface TaskParams {
   addTaskOnWindowFocusEvent?: boolean;
 }
 
-const WINDOW_FOCUS_MIN_INTERVAL_MS = 15 * TimeUtil.TimeInMillis.MINUTE;
+const WINDOW_FOCUS_MIN_INTERVAL_MS = windowFocusMinimumIntervalInMinutes * TimeUtil.TimeInMillis.MINUTE;
 
 export class RecurringTaskScheduler {
   private readonly focusListeners = new Map<string, () => void>();
@@ -91,7 +94,7 @@ export class RecurringTaskScheduler {
       task: executeTask,
     };
 
-    if (every > TimeUtil.TimeInMillis.DAY * 20) {
+    if (every > TimeUtil.TimeInMillis.DAY * maximumRecurringIntervalInDays) {
       // If the firing date is in more that 20 days, we could switch to a lowPrecision scheduler that will avoid hitting the limit of setTimeout
       // (see https://developer.mozilla.org/en-US/docs/Web/API/setTimeout#maximum_delay_value)
       LowPrecisionTaskScheduler.addTask({...taskConfig, intervalDelay: TimeUtil.TimeInMillis.MINUTE});

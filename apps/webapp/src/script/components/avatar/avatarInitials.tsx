@@ -24,6 +24,8 @@ import {getFirstChar} from 'Util/stringUtil';
 
 import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '.';
 
+const pixelsPerRem = 16;
+
 interface AvatarInitialsProps {
   avatarSize: AVATAR_SIZE;
   initials: string;
@@ -37,8 +39,8 @@ const AvatarInitials: FC<AvatarInitialsProps> = ({avatarSize, initials, color = 
       css={{
         ...CSS_FILL_PARENT,
         color,
-        fontSize: isResponsive ? `${INITIALS_SIZE[avatarSize] / 16}rem` : `${INITIALS_SIZE[avatarSize]}px`,
-        lineHeight: isResponsive ? `${DIAMETER[avatarSize] / 16}rem` : `${DIAMETER[avatarSize]}px`,
+        fontSize: isResponsive ? `${INITIALS_SIZE[avatarSize] / pixelsPerRem}rem` : `${INITIALS_SIZE[avatarSize]}px`,
+        lineHeight: isResponsive ? `${DIAMETER[avatarSize] / pixelsPerRem}rem` : `${DIAMETER[avatarSize]}px`,
         textAlign: 'center',
         userSelect: 'none',
       }}

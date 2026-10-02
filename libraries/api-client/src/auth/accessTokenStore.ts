@@ -26,6 +26,8 @@ import {LogFactory} from '@wireapp/commons';
 
 import {AccessTokenData} from '../auth/';
 
+const millisecondsPerSecond = 1000;
+
 enum TOPIC {
   ACCESS_TOKEN_REFRESH = 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',
 }
@@ -70,7 +72,7 @@ export class AccessTokenStore extends EventEmitter {
   public updateToken = async (accessToken: AccessTokenData): Promise<AccessTokenData> => {
     if (this.accessTokenData !== accessToken) {
       this.logger.log('Saving local access token');
-      this.tokenExpirationDate = Date.now() + accessToken.expires_in * 1000;
+      this.tokenExpirationDate = Date.now() + accessToken.expires_in * millisecondsPerSecond;
       this.accessTokenData = accessToken;
       this.emit(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, this.accessTokenData);
     }

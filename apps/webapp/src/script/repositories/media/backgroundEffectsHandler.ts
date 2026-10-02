@@ -37,6 +37,10 @@ import {getLogger, Logger} from 'Util/logger';
 
 import {BackgroundEffectsQuality, backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
 
+const millisecondsPerSecond = 1000;
+const percentageScale = 100;
+const maximumDisplayedUtilizationPercentage = 999;
+
 export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
 
@@ -53,11 +57,12 @@ const getBlurStrength = (effect: BackgroundEffectSelection) => {
 };
 
 const computeRenderMetrics = (metrics: Metrics): RenderMetrics => {
-  const budget = 1000 / TARGET_FPS;
+  const budget = millisecondsPerSecond / TARGET_FPS;
   const total = metrics.avgTotalMs !== 0 && !isNan(metrics.avgTotalMs) ? metrics.avgTotalMs : 0;
-  const utilShare = budget > 0 ? Math.min(999, (total / budget) * 100) : 0;
-  const mlShare = total > 0 ? (metrics.avgSegmentationMs / total) * 100 : 0;
-  const webglShare = total > 0 ? (metrics.avgGpuMs / total) * 100 : 0;
+  const utilShare =
+    budget > 0 ? Math.min(maximumDisplayedUtilizationPercentage, (total / budget) * percentageScale) : 0;
+  const mlShare = total > 0 ? (metrics.avgSegmentationMs / total) * percentageScale : 0;
+  const webglShare = total > 0 ? (metrics.avgGpuMs / total) * percentageScale : 0;
   const ml = isNonEmptyString(metrics.segmentationDelegate) ? `ML(${metrics.segmentationDelegate})` : 'ML';
 
   return {

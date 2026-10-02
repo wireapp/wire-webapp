@@ -66,6 +66,10 @@ import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/u
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
 
+const teamRefreshIntervalInMinutes = 5;
+const minimumDesktopDownloadPathMinorVersion = 20;
+const minimumDesktopDownloadPathMajorVersion = 3;
+
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 
 interface AccountInfo {
@@ -285,7 +289,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly scheduleReloadAppModal = async (): Promise<void> => {
     // We want to encourage the user to reload every 5 minutes
     await scheduleRecurringTask({
-      every: TIME_IN_MILLIS.MINUTE * 5,
+      every: TIME_IN_MILLIS.MINUTE * teamRefreshIntervalInMinutes,
       task: this.showReloadAppModal,
       key: 'reload-app-modal',
     });
@@ -547,7 +551,10 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       const version = Environment.version(true);
       const [majorVersion, minorVersion] = (isNonEmptyString(version) ? version : '').split('.');
 
-      if (Number(majorVersion) >= 3 && Number(minorVersion) >= 20) {
+      if (
+        Number(majorVersion) >= minimumDesktopDownloadPathMajorVersion &&
+        Number(minorVersion) >= minimumDesktopDownloadPathMinorVersion
+      ) {
         accountInfo.availability = this.userState.self().availability();
       }
 

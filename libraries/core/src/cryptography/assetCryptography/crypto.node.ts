@@ -21,14 +21,16 @@ import * as cryptoLib from 'crypto';
 
 import {Crypto} from './interfaces';
 
+const initializationVectorLengthInBytes = 16;
+
 export const crypto: Crypto = {
   async digest(cipherText: Uint8Array): Promise<Uint8Array> {
     return cryptoLib.createHash('SHA256').update(cipherText).digest();
   },
 
   async decrypt(cipherText: Uint8Array, keyBytes: Uint8Array): Promise<Uint8Array> {
-    const initializationVector = cipherText.slice(0, 16);
-    const assetCipherText = cipherText.slice(16);
+    const initializationVector = cipherText.slice(0, initializationVectorLengthInBytes);
+    const assetCipherText = cipherText.slice(initializationVectorLengthInBytes);
 
     const decipher = cryptoLib.createDecipheriv('AES-256-CBC', keyBytes, initializationVector);
     const decipherUpdated = decipher.update(assetCipherText);

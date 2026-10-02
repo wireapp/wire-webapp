@@ -142,6 +142,12 @@ import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
+const notificationCheckIntervalInSeconds = 10;
+const connectionStatisticsRoundingFactor = 50;
+const conversationStatisticsRoundingFactor = 50;
+const notificationStatisticsRoundingFactor = 100;
+const clientStatisticsRoundingFactor = 5;
+
 // Initialize PDF.js worker for react-pdf package
 pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';
 
@@ -199,7 +205,7 @@ export class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * 10,
+      NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * notificationCheckIntervalInSeconds,
     };
   }
 
@@ -618,7 +624,11 @@ export class App {
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
-      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
+      telemetry.addStatistic(
+        AppInitStatisticsValue.CONNECTIONS,
+        connections.length,
+        connectionStatisticsRoundingFactor,
+      );
 
       const conversations = await conversationRepository.loadConversations(connections, deadConnections);
       eventLogger.log(AppInitializationStep.ConversationsLoaded);
@@ -643,7 +653,11 @@ export class App {
       }
 
       onProgress(this.translate('initReceivedUserData'));
-      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
+      telemetry.addStatistic(
+        AppInitStatisticsValue.CONVERSATIONS,
+        conversations.length,
+        conversationStatisticsRoundingFactor,
+      );
       this._subscribeToUnloadEvents(selfUser);
       this._subscribeToBeforeUnload();
       eventLogger.log(AppInitializationStep.UserDataLoaded);
@@ -728,7 +742,11 @@ export class App {
 
       eventLogger.log(AppInitializationStep.SetupMLS);
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
+      telemetry.addStatistic(
+        AppInitStatisticsValue.NOTIFICATIONS,
+        totalNotifications,
+        notificationStatisticsRoundingFactor,
+      );
       onProgress(this.translate('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
@@ -737,7 +755,7 @@ export class App {
       void eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
 
       eventLogger.log(AppInitializationStep.ClientsUpdated, {count: clientEntities.length});
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length, 5);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length, clientStatisticsRoundingFactor);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       selfUser.devices(clientEntities);

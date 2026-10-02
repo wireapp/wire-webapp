@@ -42,6 +42,8 @@ import {getAssetUrl, setAssetUrl} from './assetUrlCache';
 
 import {Core} from '../../service/coreSingleton';
 
+const percentageScale = 100;
+
 interface CompressedImage {
   compressedBytes: Uint8Array;
   compressedImage: HTMLImageElement;
@@ -135,7 +137,7 @@ export class AssetRepository {
 
   private loadBuffer(asset: AssetRemoteData) {
     const progressCallback = (fraction: number) => {
-      asset.updateProgress(fraction * 100);
+      asset.updateProgress(fraction * percentageScale);
     };
 
     if (isNullOrUndefined(asset.otrKey) || isNullOrUndefined(asset.sha256)) {
@@ -294,7 +296,7 @@ export class AssetRepository {
     }
 
     const request = await this.assetCoreService.uploadAsset(Buffer.from(bytes), {...assetOptions}, fraction => {
-      const percentage = fraction * 100;
+      const percentage = fraction * percentageScale;
       progressObservable(percentage);
     });
 

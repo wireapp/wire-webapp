@@ -31,6 +31,15 @@ const runtimeGlobals = {
   ...globals.node,
 };
 
+const magicNumberOptions = {
+  ignoreDefaultValues: true,
+  ignoreArrayIndexes: false,
+  detectObjects: false,
+  enforceConst: false,
+  ignoreClassFieldInitialValues: false,
+  ignore: [-1, 0, 1],
+};
+
 const ignores = [
   '.git/',
   'docs/',
@@ -121,14 +130,7 @@ const legacyRules = {
   'no-else-return': 'error',
   'no-inner-declarations': 'error',
   'no-lonely-if': 'error',
-  'no-magic-numbers': [
-    'warn',
-    {
-      ignore: [-1, 0, 1],
-      ignoreArrayIndexes: true,
-      ignoreDefaultValues: true,
-    },
-  ],
+  'no-magic-numbers': ['error', magicNumberOptions],
   'no-restricted-globals': [
     'warn',
     {
@@ -347,6 +349,22 @@ const productionConfigs = [
     },
   },
   {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    rules: {
+      'no-magic-numbers': 'off',
+      '@typescript-eslint/no-magic-numbers': [
+        'error',
+        {
+          ignoreEnums: false,
+          ignoreNumericLiteralTypes: true,
+          ignoreReadonlyClassProperties: false,
+          ignoreTypeIndexes: false,
+          ...magicNumberOptions,
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs}'],
     plugins: {
       '@stylistic': stylisticPlugin,
@@ -553,6 +571,7 @@ const productionConfigs = [
     files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts', '**/test/**/*', '**/mocks/**/*'],
     rules: {
       'no-magic-numbers': 'off',
+      '@typescript-eslint/no-magic-numbers': 'off',
       'id-length': 'off',
     },
   },
@@ -1302,6 +1321,8 @@ const config = [
     ],
     rules: {
       'no-restricted-syntax': testRestrictedSyntaxRule,
+      'no-magic-numbers': 'off',
+      '@typescript-eslint/no-magic-numbers': 'off',
     },
   },
   {

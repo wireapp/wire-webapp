@@ -27,6 +27,8 @@ import {replaceInRange} from './stringUtil';
 
 import type {MentionEntity} from '../message/mentionEntity';
 
+const linkClosingTokenOffset = 2;
+
 interface MentionText {
   domain: string | null | undefined;
   isSelfMentioned: boolean;
@@ -271,7 +273,11 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
       return token.type === 'link_close';
     });
 
-    if (href == '' || closeToken == nextToken || (isEmptyString(text.trim()) && closeToken == tokens[idx + 2])) {
+    if (
+      href == '' ||
+      closeToken == nextToken ||
+      (isEmptyString(text.trim()) && closeToken == tokens[idx + linkClosingTokenOffset])
+    ) {
       if (!isNullOrUndefined(closeToken)) {
         closeToken.type = 'text';
         closeToken.content = `](${cleanString(href)})`;

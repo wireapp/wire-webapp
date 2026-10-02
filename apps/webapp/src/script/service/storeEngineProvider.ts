@@ -26,6 +26,8 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {DexieDatabase} from 'Repositories/storage/dexieDatabase';
 import {getLogger} from 'Util/logger';
 
+const storageEncryptionKeyLengthInBytes = 32;
+
 const logger = getLogger('StoreEngineProvider');
 
 export enum DatabaseTypes {
@@ -45,7 +47,7 @@ const providePermanentEngine = async (
   // In case the encryption key is empty, we just give an empty config to the encryption middleware.
   // We still need to set it up, even if encryption at rest is disabled, as we need to upgrade the DB version for the middleware to install its config table
   const encryptionConfig = key ? {events: NON_INDEXED_FIELDS} : {};
-  const encryptionKey = key ? key : new Uint8Array(32).fill(0);
+  const encryptionKey = key ? key : new Uint8Array(storageEncryptionKeyLengthInBytes).fill(0);
   applyEncryptionMiddleware(db, encryptionKey, encryptionConfig, async () => {
     return logger.info('DB encyption config has changed');
   });

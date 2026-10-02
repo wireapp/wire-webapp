@@ -23,11 +23,19 @@ import {CSS_SQUARE} from 'Util/cssMixin';
 
 import {ChannelAvatarSize} from './channelAvatar';
 
+const channelAvatarSizeInPixels = 28;
+const smallChannelAvatarSizeInPixels = 16;
+const smallChannelAvatarBorderWidthInPixels = 0.5;
+const channelAvatarBorderRadiusInPixels = 8;
+const smallChannelAvatarBorderRadiusInPixels = 4;
+const channelAvatarContentSizeInPixels = 26;
+const channelAvatarContentBorderRadiusInPixels = 7;
+
 export const channelAvatarContainerCss = ({border, size}: {border: string; size: ChannelAvatarSize}): CSSObject => {
   return {
-    ...CSS_SQUARE(size === 'small' ? 16 : 28),
-    border: `${size === 'small' ? 0.5 : 1}px solid var(--${border})`,
-    borderRadius: size === 'small' ? 4 : 8,
+    ...CSS_SQUARE(size === 'small' ? smallChannelAvatarSizeInPixels : channelAvatarSizeInPixels),
+    border: `${size === 'small' ? smallChannelAvatarBorderWidthInPixels : 1}px solid var(--${border})`,
+    borderRadius: size === 'small' ? smallChannelAvatarBorderRadiusInPixels : channelAvatarBorderRadiusInPixels,
     position: 'relative',
     display: 'flex',
     alignItems: 'center',
@@ -46,13 +54,13 @@ export const channelAvatarIconCss = ({
   size: ChannelAvatarSize;
 }): CSSObject => {
   return {
-    ...CSS_SQUARE(size === 'small' ? '100%' : 26),
+    ...CSS_SQUARE(size === 'small' ? '100%' : channelAvatarContentSizeInPixels),
     backgroundColor: `var(--${background})`,
     color: `var(--${color})`,
     display: 'flex',
     flexWrap: 'wrap',
     overflow: 'hidden',
-    borderRadius: size === 'small' ? 0 : 7,
+    borderRadius: size === 'small' ? 0 : channelAvatarContentBorderRadiusInPixels,
     justifyContent: 'center',
     alignContent: 'center',
   };

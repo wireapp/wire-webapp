@@ -156,7 +156,8 @@ async function executeRuntimeCommand(targetMainCommit: string): Promise<number> 
 }
 
 async function main(): Promise<void> {
-  process.exitCode = await runPreviewNextBetaCommand(process.argv.slice(2), {
+  const runtimeArgumentPrefixLength = 2;
+  process.exitCode = await runPreviewNextBetaCommand(process.argv.slice(runtimeArgumentPrefixLength), {
     executeCommand: executeRuntimeCommand,
     writeError: writeRuntimeError,
     writeOutput: writeRuntimeOutput,

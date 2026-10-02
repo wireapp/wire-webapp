@@ -22,6 +22,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DBSchema, deleteDB as idbDeleteDB, IDBPDatabase, openDB as idbOpenDb} from 'idb';
 
 import {EnrollmentFlowData} from '../messagingProtocols/mls/e2eIdentityService/storage/e2eiStorage.schema';
+
+const recurringTasksMigrationVersion = 2;
+const conversationBlacklistMigrationVersion = 3;
+const subconversationsMigrationVersion = 4;
+const enrollmentMigrationVersion = 5;
+const mlsRecoveryMigrationVersion = 6;
 const VERSION = 7;
 
 interface CoreDBSchema extends DBSchema {
@@ -70,16 +76,16 @@ export async function openDB(dbName: string): Promise<CoreDatabase> {
         case 1:
           db.deleteObjectStore('prekeys');
           db.createObjectStore('pendingProposals');
-        case 2:
+        case recurringTasksMigrationVersion:
           db.createObjectStore('recurringTasks');
-        case 3:
+        case conversationBlacklistMigrationVersion:
           db.createObjectStore('conversationBlacklist');
-        case 4:
+        case subconversationsMigrationVersion:
           db.createObjectStore('subconversations');
-        case 5:
+        case enrollmentMigrationVersion:
           db.createObjectStore('crls');
           db.createObjectStore('pendingEnrollmentData');
-        case 6:
+        case mlsRecoveryMigrationVersion:
           db.createObjectStore('mlsConversationRecovery');
       }
     },

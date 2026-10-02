@@ -21,6 +21,8 @@ import {User} from 'Repositories/entity/User';
 
 import {ACCENT_ID} from '../Config';
 
+const avatarHashMultiplier = 31;
+
 // calculation of hash code for string based on this doc:
 // https://wearezeta.atlassian.net/wiki/spaces/AR/pages/1696858160/Consistent+Conversation+Colors+A+Hash-Based+Approach+for+Conversation+id
 function getHashCode(str: string) {
@@ -28,8 +30,7 @@ function getHashCode(str: string) {
   for (let counter = 0; counter < str.length; counter++) {
     // charCodeAt provides the UTF-16 code unit.
     // "| 0" ensures we keep it 32-bit integer.
-    // eslint-disable-next-line no-magic-numbers
-    hash = (31 * hash + str.charCodeAt(counter)) | 0;
+    hash = (avatarHashMultiplier * hash + str.charCodeAt(counter)) | 0;
   }
   return hash;
 }

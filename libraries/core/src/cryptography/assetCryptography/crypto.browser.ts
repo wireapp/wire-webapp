@@ -21,6 +21,8 @@ import {Crypto} from './interfaces';
 
 import {toBufferSource} from '../../util/bufferUtils';
 
+const initializationVectorLengthInBytes = 16;
+
 function getBrowserCrypto(): globalThis.Crypto {
   const browserCrypto = globalThis.crypto;
 
@@ -43,8 +45,8 @@ export const crypto: Crypto = {
     const browserCrypto = getBrowserCrypto();
     const key = await browserCrypto.subtle.importKey('raw', toBufferSource(keyBytes), 'AES-CBC', false, ['decrypt']);
 
-    const initializationVector = cipherText.slice(0, 16);
-    const assetCipherText = cipherText.slice(16);
+    const initializationVector = cipherText.slice(0, initializationVectorLengthInBytes);
+    const assetCipherText = cipherText.slice(initializationVectorLengthInBytes);
     const decipher = await browserCrypto.subtle.decrypt(
       {iv: toBufferSource(initializationVector), name: 'AES-CBC'},
       key,

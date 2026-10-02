@@ -27,6 +27,9 @@ import {IsInViewport} from '../../utils';
 import {filterProps} from '../../utils/util';
 import {Avatar, AvatarProps, DEFAULT_AVATAR_SIZE} from '../avatar';
 
+const maximumAvatarGridItems = 4;
+const avatarGridColumnCount = 2;
+
 interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
   backgroundColor?: string;
   borderColor?: string;
@@ -67,8 +70,8 @@ type AvatarGridItem = Props['items'][number] | null;
 
 export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, fetchImages, ...props}: Props) => {
   const allProps = {borderWidth, items, size, ...props};
-  const slicedItems: AvatarGridItem[] = items.slice(0, 4);
-  const missing = 4 - slicedItems.length;
+  const slicedItems: AvatarGridItem[] = items.slice(0, maximumAvatarGridItems);
+  const missing = maximumAvatarGridItems - slicedItems.length;
   for (let index = 0; index < missing; index++) {
     slicedItems.push(null);
   }
@@ -89,7 +92,7 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
             forceInitials={item.forceInitials}
             isAvatarGridItem
             name={item.name}
-            size={size / 2 - borderWidth}
+            size={size / avatarGridColumnCount - borderWidth}
             style={{height: '100%', width: '100%'}}
           />
         ) : (

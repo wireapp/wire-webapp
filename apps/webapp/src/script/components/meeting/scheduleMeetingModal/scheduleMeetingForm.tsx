@@ -71,6 +71,9 @@ import {
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
 
+const millisecondsPerSecond = 1000;
+const secondsPerMinute = 60;
+
 const firstNonEmptyError = (...errorMessages: (string | undefined)[]): string | undefined => {
   return errorMessages.find(message => {
     return isNonEmptyString(message);
@@ -202,7 +205,7 @@ export const ScheduleMeetingForm = ({
     }
 
     const currentStart = formState.start.unwrapOr(
-      new Date(clock.currentUnixEpochMilliseconds + TIME_INTERVAL_MINUTES * 60 * 1000),
+      new Date(clock.currentUnixEpochMilliseconds + TIME_INTERVAL_MINUTES * secondsPerMinute * millisecondsPerSecond),
     );
     const nextStart = combineDateAndTime(date, nearestTimeOptionFromDate(currentStart, regionalLocale));
     const adjustedStart =

@@ -27,6 +27,14 @@ import packageJson from '../../package.json';
 
 const env = window.wire.env;
 
+const bytesPerKibibyte = 1024;
+const kibibytesPerMebibyte = 1024;
+const bytesPerMebibyte = bytesPerKibibyte * kibibytesPerMebibyte;
+const personalAssetLimitInMebibytes = 25;
+const teamAssetLimitInMebibytes = 100;
+const cellsAssetLimitInMebibytes = 500;
+const imageLimitInMebibytes = 15;
+
 export const ACCENT_ID = {
   AMBER: 5,
   BLUE: 1,
@@ -45,17 +53,17 @@ const config = {
       env.FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (Runtime.isWindows() || env.FEATURE.FORCE_EXTRA_CLIENT_ENTROPY),
   },
 
-  /** 25 megabyte upload limit for personal use (private users & guests) */
-  MAXIMUM_ASSET_FILE_SIZE_PERSONAL: 25 * 1024 * 1024,
+  /** 25 mebibyte upload limit for personal use (private users & guests) */
+  MAXIMUM_ASSET_FILE_SIZE_PERSONAL: personalAssetLimitInMebibytes * bytesPerMebibyte,
 
-  /** 100 megabyte upload limit for organizations (team members) */
-  MAXIMUM_ASSET_FILE_SIZE_TEAM: 100 * 1024 * 1024,
+  /** 100 mebibyte upload limit for organizations (team members) */
+  MAXIMUM_ASSET_FILE_SIZE_TEAM: teamAssetLimitInMebibytes * bytesPerMebibyte,
 
-  /** 500 megabyte upload limit when Cells is enabled */
-  MAXIMUM_ASSET_FILE_SIZE_CELLS: 500 * 1024 * 1024,
+  /** 500 mebibyte upload limit when Cells is enabled */
+  MAXIMUM_ASSET_FILE_SIZE_CELLS: cellsAssetLimitInMebibytes * bytesPerMebibyte,
 
-  /** 15 megabyte image upload limit */
-  MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
+  /** 15 mebibyte image upload limit */
+  MAXIMUM_IMAGE_FILE_SIZE: imageLimitInMebibytes * bytesPerMebibyte,
 
   /** maximum chars for link preview titles and descriptions */
   MAXIMUM_LINK_PREVIEW_CHARS: 200,
@@ -67,7 +75,7 @@ const config = {
    * Maximum characters per received message
    * Encryption is approx. +40% of the original payload so let's round it at +50%
    */
-  MAXIMUM_MESSAGE_LENGTH_RECEIVING: 12000 * 1.5,
+  MAXIMUM_MESSAGE_LENGTH_RECEIVING: 18_000,
 
   /** bigger requests will be split in chunks with a maximum size as defined */
   MAXIMUM_USERS_PER_REQUEST: 200,

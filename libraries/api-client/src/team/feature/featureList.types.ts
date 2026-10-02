@@ -109,6 +109,7 @@ export enum ACCESS_TYPE {
   ADMINS = 'admins',
 }
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Expiration options define their serialized durations in seconds inline. */
 export enum SELF_DELETING_TIMEOUT {
   OFF = 0,
   SECONDS_10 = 10,
@@ -118,6 +119,7 @@ export enum SELF_DELETING_TIMEOUT {
   WEEKS_1 = 604_800,
   WEEKS_4 = 2_419_200,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export enum CONVERSATION_PROTOCOL {
   MLS = 'mls',

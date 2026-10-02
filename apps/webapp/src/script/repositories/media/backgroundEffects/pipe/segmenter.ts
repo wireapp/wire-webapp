@@ -35,6 +35,12 @@ import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
+const segmentationInitializationRetryDelayInMilliseconds = 1000;
+const metricsWindowFrameCount = 60;
+const statisticsReportingIntervalInMilliseconds = 2000;
+const gpuQueryPollingIntervalInMilliseconds = 2;
+const microsecondsPerMillisecond = 1000;
+
 let segmenterOptions: WorkerProcessVideoTrackOptions = {} as WorkerProcessVideoTrackOptions;
 
 const DEFAULT_SEGMENTATION_FRAME_INTERVAL = 1;
@@ -151,7 +157,7 @@ export async function runSegmenter(
 
         restartSegmenter();
         attachCanvasEvents();
-      }, 1000);
+      }, segmentationInitializationRetryDelayInMilliseconds);
     }
   }
 
@@ -236,7 +242,7 @@ export async function runSegmenter(
 
   const videoFilter = new VideoFilter(effectsCanvas);
 
-  const metricsWindow = createMetricsWindow(60);
+  const metricsWindow = createMetricsWindow(metricsWindowFrameCount);
 
   let lastStatsTime = performance.now();
 
@@ -363,7 +369,7 @@ export async function runSegmenter(
     }
 
     const now = performance.now();
-    if (now - lastStatsTime > 2000) {
+    if (now - lastStatsTime > statisticsReportingIntervalInMilliseconds) {
       // Only log/reset if data was present at all in the last 2 seconds
       if (frames > 0) {
         totalMsSum = 0;
@@ -379,7 +385,7 @@ export async function runSegmenter(
 
     // If there are still open measurements, check again in the next frame
     if (activeGpuQueries.size > 0) {
-      setTimeout(checkGpuQueries, 2);
+      setTimeout(checkGpuQueries, gpuQueryPollingIntervalInMilliseconds);
     }
   }
 
@@ -476,7 +482,7 @@ export async function runSegmenter(
               await new Promise<void>(resolve => {
                 segmenter.segmentForVideo(
                   segmenterOptions.enableFilters ? effectsCanvas : videoFrame,
-                  timestamp * 1000,
+                  timestamp * microsecondsPerMillisecond,
                   result => {
                     // Stop pure segmentation time immediately (before textures are processed)
                     segmentationMs = performance.now() - segmentationStart;

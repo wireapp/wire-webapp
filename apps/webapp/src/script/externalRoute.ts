@@ -22,6 +22,8 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {currentLanguage} from './auth/localeConfig';
 import {Config} from './Config';
 
+const languageCodeLength = 2;
+
 const {URL, TERMS_OF_USE_URL_DE, PRIVACY_POLICY_URL_DE} = Config.getConfig();
 
 const isProductionWebsite = isNonEmptyString(URL.WEBSITE_BASE) && URL.WEBSITE_BASE === 'https://wire.com';
@@ -100,7 +102,7 @@ const addLocaleToUrl = (url?: string): string | undefined => {
   if (!isProductionWebsite) {
     return url;
   }
-  const language = currentLanguage().slice(0, 2);
+  const language = currentLanguage().slice(0, languageCodeLength);
   const websiteLanguage = language == 'de' ? language : 'en';
   return url.replace(Config.getConfig().URL.WEBSITE_BASE, `${Config.getConfig().URL.WEBSITE_BASE}/${websiteLanguage}`);
 };

@@ -24,6 +24,8 @@ import {BreadcrumbLeaf} from './breadcrumbLeaf/breadcrumbLeaf';
 import {listStyles} from './breadcrumbs.styles';
 import {CombainedBreadcrumbs} from './combainedBreadcrumbs/combainedBreadcrumbs';
 
+const trailingBreadcrumbCount = 2;
+
 const DEFAULT_MAX_VISIBLE_BREADCRUMBS = 4;
 
 interface BreadcrumbsProps {
@@ -79,10 +81,8 @@ export const Breadcrumbs = ({
 
   const firstCrumb = items[0];
 
-  // eslint-disable-next-line no-magic-numbers
-  const lastTwoCrumbs = items.slice(-2);
-  // eslint-disable-next-line no-magic-numbers
-  const middleCrumbs = items.slice(1, -2);
+  const lastTwoCrumbs = items.slice(-trailingBreadcrumbCount);
+  const middleCrumbs = items.slice(1, -trailingBreadcrumbCount);
 
   return (
     <ol css={listStyles}>

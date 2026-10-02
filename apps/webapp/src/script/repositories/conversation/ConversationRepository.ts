@@ -190,6 +190,14 @@ import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 
+const bytesPerKibibyte = 1024;
+const externalMessageThresholdInKibibytes = 200;
+const minimumLegacyAccessRoleBackendVersion = 3;
+const conversationRetentionCheckIntervalInHours = 3;
+const paddingSideCount = 2;
+const decimalRadix = 10;
+const typingTimeoutMultiplier = 6;
+
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
 type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
@@ -237,7 +245,7 @@ export class ConversationRepository {
   static get CONFIG() {
     return {
       CONFIRMATION_THRESHOLD: TIME_IN_MILLIS.WEEK,
-      EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
+      EXTERNAL_MESSAGE_THRESHOLD: externalMessageThresholdInKibibytes * bytesPerKibibyte,
       ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY: 3000,
       GROUP: {
         MAX_NAME_LENGTH: 64,
@@ -544,7 +552,8 @@ export class ConversationRepository {
       if (isNonEmptyString(accessState)) {
         const {accessModes: access, accessRole} = updateAccessRights(accessState);
 
-        const accessRoleField = this.core.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+        const accessRoleField =
+          this.core.backendFeatures.version >= minimumLegacyAccessRoleBackendVersion ? 'access_role' : 'access_role_v2';
 
         payload = {
           ...payload,
@@ -674,7 +683,7 @@ export class ConversationRepository {
       } catch (error: unknown) {
         this.logger.warn(`failed to refresh missing users & conversations metat data`, error);
       }
-    }, TIME_IN_MILLIS.HOUR * 3);
+    }, TIME_IN_MILLIS.HOUR * conversationRetentionCheckIntervalInHours);
   };
 
   /**
@@ -1151,7 +1160,7 @@ export class ConversationRepository {
       conversationId,
       new Date(0),
       messageDate,
-      Math.floor(padding / 2),
+      Math.floor(padding / paddingSideCount),
     )) as EventRecord[];
     const followingMessages = (await this.eventService.loadFollowingEvents(
       conversationEntity.id,
@@ -3611,8 +3620,8 @@ export class ConversationRepository {
   private handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     const substitutions = {
-      number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE.toString(10),
-      number2: Math.max(0, openSpots).toString(10),
+      number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE.toString(decimalRadix),
+      number2: Math.max(0, openSpots).toString(decimalRadix),
     };
 
     const messageText = this.translate('modalConversationTooManyMembersMessage', substitutions);
@@ -5015,7 +5024,7 @@ export class ConversationRepository {
     if (eventJson.data.status === CONVERSATION_TYPING.STARTED) {
       const timerId = window.setTimeout(() => {
         removeTypingUser(qualifiedUser, conversationId);
-      }, TYPING_TIMEOUT * 6); // 10000 * 6 => 1 minute
+      }, TYPING_TIMEOUT * typingTimeoutMultiplier); // 10000 * 6 => 1 minute
 
       const typingUser = {conversationId, user: qualifiedUser, timerId};
 

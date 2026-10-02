@@ -23,6 +23,9 @@ import {getChannelAvatarColors} from 'Util/avatarUtil';
 
 import {channelAvatarContainerCss, channelAvatarIconCss, channelAvatarLockIconCss} from './channelAvatar.styles';
 
+const channelIconWidthInPixels = 16;
+const smallChannelIconWidthInPixels = 10;
+
 export type ChannelAvatarSize = 'small' | 'large';
 
 interface ChannelAvatarProps {
@@ -40,7 +43,7 @@ export const ChannelAvatar = ({conversationID, className, isLocked = true, size 
         css={channelAvatarIconCss({color: colorPalette.color, background: colorPalette.background, size})}
         data-uie-name="group-avatar-box-wrapper"
       >
-        <ChannelIcon width={size === 'small' ? 10 : 16} />
+        <ChannelIcon width={size === 'small' ? smallChannelIconWidthInPixels : channelIconWidthInPixels} />
       </div>
       {isLocked && (
         <div css={channelAvatarLockIconCss}>

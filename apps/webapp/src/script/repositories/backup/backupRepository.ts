@@ -51,6 +51,8 @@ import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './leg
 
 import {Config} from '../../Config';
 
+const backupMetadataIndentationSpaces = 2;
+
 const UINT8ARRAY_FIELDS = ['otr_key', 'sha256'];
 
 export class BackupRepository {
@@ -142,7 +144,7 @@ export class BackupRepository {
 
     const metaData = createMetaData(user, clientId, this.backupService);
 
-    const stringifiedMetadata = JSON.stringify(metaData, null, 2);
+    const stringifiedMetadata = JSON.stringify(metaData, null, backupMetadataIndentationSpaces);
     const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
 
     for (const tableName in exportedData) {

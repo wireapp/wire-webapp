@@ -17,7 +17,9 @@
  *
  */
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Consent types define backend wire values inline. */
 export enum ConsentType {
   TERMS_OF_USE = 1,
   MARKETING = 2,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */

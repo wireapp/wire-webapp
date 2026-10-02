@@ -35,6 +35,9 @@ import {isGroup} from './selectOption/selectOption';
 
 import {Theme} from '../../identity/theme';
 
+const selectedGroupFontWeight = 600;
+const optionFontWeight = 400;
+
 interface CustomStylesParams {
   theme: Theme;
   markInvalid?: boolean;
@@ -140,7 +143,7 @@ export const customStyles = ({
         ...provided,
         ...baseOptionStyles({theme, isMulti, isDisabled, isFocused, isSelected}),
         padding: isGroup(options) ? '6px 16px' : '10px 18px',
-        fontWeight: isSelected && isGroup(options) ? 600 : 400,
+        fontWeight: isSelected && isGroup(options) ? selectedGroupFontWeight : optionFontWeight,
         ...(isGroup(options) && {
           'div > svg': {
             fill: theme.general.contrastColor,

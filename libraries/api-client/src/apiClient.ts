@@ -74,6 +74,9 @@ import {SSOAPI} from './team/sso';
 import {UserAPI} from './user/';
 import {UserGroupAPI} from './userGroups/';
 
+const minimumMlsBackendVersion = 5;
+const minimumGuestLinkPasswordBackendVersion = 4;
+
 const {version}: {version: string} = require('../package.json');
 
 enum TOPIC {
@@ -293,8 +296,8 @@ export class APIClient extends EventEmitter {
       domain: responsePayload?.domain ?? '',
       federationEndpoints: backendVersion > 0,
       isFederated: responsePayload?.federation ?? false,
-      supportsMLS: backendVersion >= 5,
-      supportsGuestLinksWithPassword: backendVersion >= 4,
+      supportsMLS: backendVersion >= minimumMlsBackendVersion,
+      supportsGuestLinksWithPassword: backendVersion >= minimumGuestLinkPasswordBackendVersion,
     };
   }
 

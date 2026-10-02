@@ -20,6 +20,8 @@
 import {getGroupAvatarColors} from 'Util/avatarUtil';
 import {CSS_SQUARE} from 'Util/cssMixin';
 
+const thirdAvatarColorIndex = 2;
+
 type GroupAvatarSize = 'small' | 'medium' | 'large';
 
 interface GroupAvatarProps {
@@ -78,7 +80,7 @@ export const GroupAvatar = ({conversationID, className, size = 'large'}: GroupAv
           />
           <path
             d="M15.877 4.98438C14.9346 4.98438 14.1484 4.14941 14.1484 3.08984C14.1484 2.04492 14.9443 1.23926 15.877 1.23926C16.8096 1.23926 17.6055 2.05957 17.6006 3.09473C17.6006 4.14941 16.8145 4.98438 15.877 4.98438ZM18.5479 9.43262H14.9248C15.4521 8.68066 14.915 7.21094 13.7822 6.3125C14.3145 5.97559 15.0176 5.72656 15.877 5.72656C18.0449 5.72656 19.4805 7.32324 19.4805 8.62695C19.4805 9.13965 19.2314 9.43262 18.5479 9.43262Z"
-            fill={colors[2]}
+            fill={colors[thirdAvatarColorIndex]}
           />
         </svg>
       </div>

@@ -23,6 +23,8 @@ import {TextProps} from '../../typography';
 import {filterProps} from '../../utils/util';
 import {contentStyle} from '../content/content';
 
+const openMenuStackingOrder = 10000;
+
 export interface MenuContentProps<T = HTMLDivElement> extends TextProps<T> {
   open?: boolean;
 }
@@ -39,7 +41,7 @@ export const menuContentStyle: <T>(props: MenuContentProps<T>) => CSSObject = pr
     left: props.open === true ? 0 : undefined,
     position: props.open === true ? 'fixed' : undefined,
     width: props.open === true ? '100%' : undefined,
-    zIndex: props.open === true ? 10000 : undefined,
+    zIndex: props.open === true ? openMenuStackingOrder : undefined,
   };
 };
 

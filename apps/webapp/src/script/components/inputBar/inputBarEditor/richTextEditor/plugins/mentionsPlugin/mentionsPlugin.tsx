@@ -35,6 +35,8 @@ import {$createMentionNode} from '../../nodes/mentionNode';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
 import {TypeaheadMenuPlugin} from '../typeaheadMenuPlugin/typeaheadMenuPlugin';
 
+const mentionMenuVerticalOffsetInPixels = 24;
+
 const TRIGGER = '@';
 const triggerRegexp = new RegExp(`(^| )(${TRIGGER}(\\S*))$`);
 
@@ -164,7 +166,10 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps): R
 
     const boundingClientRect = rootElement.getBoundingClientRect();
 
-    return {bottom: window.innerHeight - boundingClientRect.top + 24, left: boundingClientRect.left};
+    return {
+      bottom: window.innerHeight - boundingClientRect.top + mentionMenuVerticalOffsetInPixels,
+      left: boundingClientRect.left,
+    };
   };
 
   const menuRenderFn: MenuRenderFn<MenuOption> = (anchorElementRef, params) => {

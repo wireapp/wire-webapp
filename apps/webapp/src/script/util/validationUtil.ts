@@ -21,6 +21,8 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {ValidationError} from '../auth/module/action/validationError';
 
+const assetRetentionPolicyUpperBound = 6;
+
 export class ValidationUtilError extends Error {
   constructor(message = 'Unknown ValidationUtilError') {
     super();
@@ -80,7 +82,7 @@ export const legacyAsset = (assetId: string, conversationId: string): true => {
 // Asset retention policy validation
 // Reference: https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
 export const assetRetentionPolicy = (policyId: number): boolean => {
-  return policyId > 0 && policyId < 6;
+  return policyId > 0 && policyId < assetRetentionPolicyUpperBound;
 };
 
 export const isValidAsset = (assetKey: string, assetToken?: string): true => {

@@ -19,6 +19,8 @@
 
 import {MentionEntity} from '../../../../../message/mentionEntity';
 
+const mentionSegmentCycleLength = 2;
+
 const intoPairs = (xs: number[]) => {
   return xs.slice(1).map((x, index) => {
     return [xs[index], x];
@@ -47,7 +49,7 @@ export const createNodes = (mentions: MentionEntity[], str: string) => {
 
   return breakWhere(sortedMentions, str)
     .map((string: string, index: number) => {
-      return index % 2 == 0 ? {data: string, type: 'text'} : {data: string, type: 'Mention'};
+      return index % mentionSegmentCycleLength == 0 ? {data: string, type: 'text'} : {data: string, type: 'Mention'};
     })
     .filter(({data}) => {
       return data.length > 0;

@@ -47,6 +47,9 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {VirtualizedJumpToLastMessageButton} from '../virtualizedJumpToLastMessageButton';
 
+const messageHighlightDurationInMilliseconds = 5000;
+const scrollUpdateDelayInMilliseconds = 100;
+
 const ESTIMATED_ELEMENT_SIZE = 70;
 const MARKER_ESTIMATE = 56;
 
@@ -246,7 +249,7 @@ export const VirtualizedMessagesList = ({
       setHighlightedMessage(undefined);
       scrolledToHighlightedMessage.current = false;
       clearTimeout(clearHighlightedMessage);
-    }, 5000);
+    }, messageHighlightDurationInMilliseconds);
 
     await loadMessagesForTimestampSelection({
       conversation,
@@ -269,7 +272,7 @@ export const VirtualizedMessagesList = ({
 
         const setScrolledToHighlightedMessageTimeout = setTimeout(() => {
           clearTimeout(setScrolledToHighlightedMessageTimeout);
-        }, 100);
+        }, scrollUpdateDelayInMilliseconds);
       }
     }
   }, [groupedMessages, highlightedMessage]);
@@ -290,7 +293,7 @@ export const VirtualizedMessagesList = ({
     const scrollTimeout = setTimeout(() => {
       virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
       clearTimeout(scrollTimeout);
-    }, 100);
+    }, scrollUpdateDelayInMilliseconds);
   };
 
   const virtualItems = virtualizer.getVirtualItems();
@@ -312,7 +315,7 @@ export const VirtualizedMessagesList = ({
           getVisibleCallback(conversation, item.message)?.();
         }
       });
-    }, 100);
+    }, scrollUpdateDelayInMilliseconds);
 
     return () => {
       return clearTimeout(timeout);

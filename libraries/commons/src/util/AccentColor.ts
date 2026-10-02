@@ -21,6 +21,7 @@ import {isUndefined} from '@sindresorhus/is';
 
 import * as RandomUtil from './RandomUtil';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Accent colors define backend palette identifiers inline. */
 export enum AccentColorID {
   BRIGHT_ORANGE = 5,
   SOFT_PINK = 6,
@@ -31,6 +32,7 @@ export enum AccentColorID {
   /** @deprecated */
   YELLOW = 3,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export interface AccentColor {
   color: string;
