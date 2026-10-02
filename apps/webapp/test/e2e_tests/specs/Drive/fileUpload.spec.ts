@@ -24,6 +24,41 @@ import {getTextFilePath, TextFileName} from 'test/e2e_tests/utils/asset.util';
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';
 
+test.describe('Drive file uploads with direct upload disabled', () => {
+  let pageManager: PageManager;
+
+  test.beforeEach(async ({createTeam, createPage, createUser}) => {
+    const teamMember = await createUser();
+    const team = await createTeam('Drive upload team', {
+      users: [teamMember],
+      features: {cells: true},
+    });
+    pageManager = await PageManager.from(
+      createPage(
+        withLogin(team.owner, {
+          startupFeatureToggles: {
+            [sharedDriveDirectUploadFeatureToggleName]: false,
+          },
+        }),
+      ),
+    );
+    const {pages} = pageManager.webapp;
+
+    await connectWithUser(pageManager, teamMember);
+    await createGroup(pages, 'Drive upload conversation', [teamMember], {cells: true});
+    await pages.conversationList().getConversation('Drive upload conversation').open();
+    await pages.conversation().clickFilesTab();
+    await expect(pages.cellsSharedDrive().newButton).toBeVisible();
+  });
+
+  test('does not expose file upload', {tag: ['@functional']}, async () => {
+    const sharedDrive = pageManager.webapp.pages.cellsSharedDrive();
+
+    await sharedDrive.newButton.click();
+    await expect(sharedDrive.uploadFileMenuItem).not.toBeVisible();
+  });
+});
+
 test.describe('Drive file uploads', () => {
   let pageManager: PageManager;
 
