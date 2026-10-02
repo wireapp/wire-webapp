@@ -17,6 +17,8 @@
  *
  */
 
+const hexadecimalRadix = 16;
+
 export const numberToHex = (number: number): string => {
-  return `0x${number.toString(16).toUpperCase()}`;
+  return `0x${number.toString(hexadecimalRadix).toUpperCase()}`;
 };

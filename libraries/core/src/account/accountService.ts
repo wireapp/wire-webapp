@@ -22,11 +22,13 @@ import {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {APIClient} from '@wireapp/api-client';
 import {Runtime} from '@wireapp/commons';
 
+const firefoxIceCandidateLimit = 3;
+
 export class AccountService {
   constructor(private readonly apiClient: APIClient) {}
 
   getCallConfig(): Promise<CallConfigData> {
-    const iceCandidateLimit = Runtime.isFirefox() ? 3 : undefined;
+    const iceCandidateLimit = Runtime.isFirefox() ? firefoxIceCandidateLimit : undefined;
     return this.apiClient.api.account.getCallConfig(iceCandidateLimit);
   }
 }

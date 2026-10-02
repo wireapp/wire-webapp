@@ -40,8 +40,12 @@ import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secret
 import {CoreCryptoConfig} from '../../../../common.types';
 import {CryptoClient} from '../cryptoClient.types';
 
+type SecretKeySizeInBytes = 16 | 32;
+const legacySecretKeySizeInBytes = 16;
+const secretKeySizeInBytes = 32;
+
 type Config = {
-  generateSecretKey: (keyId: string, keySize: 16 | 32) => Promise<GeneratedKey>;
+  generateSecretKey: (keyId: string, keySize: SecretKeySizeInBytes) => Promise<GeneratedKey>;
   nbPrekeys: number;
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
@@ -67,7 +71,11 @@ const coreCryptoLogger = {
   },
 };
 
-const getKey = async (generateSecretKey: Config['generateSecretKey'], keyName: string, keySize: 16 | 32) => {
+const getKey = async (
+  generateSecretKey: Config['generateSecretKey'],
+  keyName: string,
+  keySize: SecretKeySizeInBytes,
+) => {
   return await generateSecretKey(keyName, keySize);
 };
 
@@ -83,9 +91,9 @@ const migrateOnceAndGetKey = async (
   const coreCryptoKeyId = 'corecrypto-key';
 
   // We retrieve the old key if it exists or generate a new one
-  const keyOld = await getKey(generateSecretKey, coreCryptoKeyId, 16);
+  const keyOld = await getKey(generateSecretKey, coreCryptoKeyId, legacySecretKeySizeInBytes);
   // We retrieve the new key if it exists or generate a new one
-  const keyNew = await getKey(generateSecretKey, coreCryptoNewKeyId, 32);
+  const keyNew = await getKey(generateSecretKey, coreCryptoNewKeyId, secretKeySizeInBytes);
 
   if (keyNew === undefined || keyOld === undefined) {
     // If we dont retreive any key, we throw an error
@@ -290,12 +298,14 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   async debugBreakSession(sessionId: string) {
+    /* eslint-disable @typescript-eslint/no-magic-numbers -- Encoded prekey bytes are clearer as an exact wire-format sequence. */
     const fakePrekey = [
       165, 0, 1, 1, 24, 57, 2, 161, 0, 88, 32, 212, 202, 30, 83, 242, 93, 67, 164, 202, 137, 214, 167, 166, 183, 236,
       249, 32, 21, 117, 247, 56, 223, 135, 170, 3, 151, 16, 228, 165, 186, 124, 208, 3, 161, 0, 161, 0, 88, 32, 123,
       200, 16, 166, 184, 70, 21, 81, 43, 80, 21, 231, 182, 142, 51, 220, 131, 162, 11, 255, 162, 74, 78, 162, 95, 156,
       131, 48, 203, 5, 77, 122, 4, 246,
     ];
+    /* eslint-enable @typescript-eslint/no-magic-numbers */
     await this.coreCrypto.transaction(cx => {
       return cx.proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey));
     });

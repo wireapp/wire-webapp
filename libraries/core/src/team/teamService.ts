@@ -29,6 +29,8 @@ import {
 
 import {APIClient} from '@wireapp/api-client';
 
+const teamCacheDurationInMilliseconds = 86_400_000;
+
 export class TeamService {
   constructor(private readonly apiClient: APIClient) {}
 
@@ -70,7 +72,7 @@ export class TeamService {
 
   private commonConfig: FeatureList | null = null;
   private commonConfigFetchedAt: number | null = null;
-  private readonly CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+  private readonly CACHE_DURATION_MS = teamCacheDurationInMilliseconds; // 24 hours
   public async getCommonFeatureConfig() {
     const now = Date.now();
 
