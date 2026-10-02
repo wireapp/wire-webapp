@@ -20,7 +20,7 @@
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
 export const viewerPermissionFeatureToggleName = 'viewer-permission';
-export const testOnlyFeatureToggleName = 'test-only';
+export const testOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upload';
 
