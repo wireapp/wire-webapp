@@ -104,20 +104,13 @@ jest.mock('./PdfViewer/PdfViewer', () => {
 });
 
 interface CreateWrapperOptions {
-  isViewerPermissionFeatureEnabled?: boolean;
   selfUserDriveRole?: CellsSelfUserDriveRole;
 }
 
 describe('FileFullscreenModal - File Version Restore', () => {
-  const createWrapper = ({
-    isViewerPermissionFeatureEnabled = false,
-    selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-  }: CreateWrapperOptions = {}) => {
+  const createWrapper = ({selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR}: CreateWrapperOptions = {}) => {
     const RootProviderWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
-        isFeatureToggleEnabled: () => {
-          return isViewerPermissionFeatureEnabled;
-        },
         translate: key => {
           return key;
         },
@@ -244,7 +237,6 @@ describe('FileFullscreenModal - File Version Restore', () => {
     it('should pass viewer access state to header for restricted viewers when preview url is available', () => {
       render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.xlsx" fileExtension="xlsx" />, {
         wrapper: createWrapper({
-          isViewerPermissionFeatureEnabled: true,
           selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
         }),
       });
@@ -255,7 +247,6 @@ describe('FileFullscreenModal - File Version Restore', () => {
     it('should pass viewer access state to header for restricted viewers when preview is unavailable', () => {
       render(<FileFullscreenModal {...defaultProps} status="unavailable" />, {
         wrapper: createWrapper({
-          isViewerPermissionFeatureEnabled: true,
           selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
         }),
       });
@@ -274,7 +265,6 @@ describe('FileFullscreenModal - File Version Restore', () => {
         />,
         {
           wrapper: createWrapper({
-            isViewerPermissionFeatureEnabled: true,
             selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
           }),
         },

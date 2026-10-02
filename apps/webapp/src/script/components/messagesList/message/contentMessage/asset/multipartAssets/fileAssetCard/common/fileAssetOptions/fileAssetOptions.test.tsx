@@ -36,17 +36,11 @@ import {isFileEditable} from 'Util/fileTypeUtil';
 
 import {FileAssetOptions} from './fileAssetOptions';
 
-const renderFileAssetOptions = (
-  properties: ComponentProps<typeof FileAssetOptions>,
-  {isViewerPermissionFeatureEnabled = false, isViewer = false} = {},
-) => {
+const renderFileAssetOptions = (properties: ComponentProps<typeof FileAssetOptions>, {isViewer = false} = {}) => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: key => {
         return key;
-      },
-      isFeatureToggleEnabled: () => {
-        return isViewerPermissionFeatureEnabled;
       },
     }),
   );

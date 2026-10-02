@@ -82,13 +82,10 @@ describe('InputBar', () => {
   });
 
   let propertiesRepository: PropertiesRepository;
-  const createRootProviderWrapper = (isViewerPermissionFeatureEnabled = false) => {
+  const createRootProviderWrapper = () => {
     return createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
-        isFeatureToggleEnabled: () => {
-          return isViewerPermissionFeatureEnabled;
-        },
       }),
     );
   };
@@ -136,16 +133,8 @@ describe('InputBar', () => {
   const testMessage = 'text';
   const pngFile = new File(['(⌐□_□)'], 'wire-example-image.png', {type: 'image/png'});
 
-  function renderInputBar(
-    properties: ReturnType<typeof getDefaultProps>,
-    isViewerPermissionFeatureEnabled = false,
-  ): ReturnType<typeof render> {
-    return render(
-      withThemeAndRootContext(
-        <InputBar {...properties} />,
-        createRootProviderWrapper(isViewerPermissionFeatureEnabled),
-      ),
-    );
+  function renderInputBar(properties: ReturnType<typeof getDefaultProps>): ReturnType<typeof render> {
+    return render(withThemeAndRootContext(<InputBar {...properties} />, createRootProviderWrapper()));
   }
 
   it('hides cells upload buttons for viewers', () => {

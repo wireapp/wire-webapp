@@ -49,37 +49,34 @@ const defaultProps = {
   fileUrl: 'https://example.com/archive.zip',
 };
 
-const createWrapper = (isViewerPermissionFeatureEnabled: boolean) => {
+const createWrapper = () => {
   return createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      isFeatureToggleEnabled: () => {
-        return isViewerPermissionFeatureEnabled;
-      },
       translate,
     }),
   );
 };
 
 describe('NoPreviewAvailable', () => {
-  const renderPlaceholder = (isViewerPermissionFeatureEnabled: boolean) => {
+  const renderPlaceholder = (selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE) => {
     return render(
       withThemeAndRootContext(
-        <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
+        <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
           <NoPreviewAvailable {...defaultProps} />
         </CellsSelfUserDriveRoleProvider>,
-        createWrapper(isViewerPermissionFeatureEnabled),
+        createWrapper(),
       ),
     );
   };
 
   it('hides download action when download is restricted', () => {
-    renderPlaceholder(true);
+    renderPlaceholder(CELLS_SELF_USER_DRIVE_ROLE.VIEWER);
 
     expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
   });
 
   it('shows viewer-specific message when download is restricted', () => {
-    renderPlaceholder(true);
+    renderPlaceholder(CELLS_SELF_USER_DRIVE_ROLE.VIEWER);
 
     expect(
       screen.getByText("Previews aren't available for this file type, and viewers can't download files."),
@@ -87,7 +84,7 @@ describe('NoPreviewAvailable', () => {
   });
 
   it('shows download action when download is allowed', () => {
-    renderPlaceholder(false);
+    renderPlaceholder(CELLS_SELF_USER_DRIVE_ROLE.EDITOR);
 
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
     expect(screen.getByText('Download this file to view it.')).toBeInTheDocument();
