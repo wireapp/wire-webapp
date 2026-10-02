@@ -196,6 +196,18 @@ export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, op
   };
 };
 
+function getEffectiveCallingConfig(callingConfig: CallConfigData, useRustSft: boolean): CallConfigData {
+  if (!useRustSft) {
+    return callingConfig;
+  }
+
+  return {
+    ...callingConfig,
+    sft_servers: [{urls: ['https://rust-sft.stars.wire.link']}],
+    sft_servers_all: [{urls: ['https://rust-sft.stars.wire.link']}],
+  };
+}
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -2603,12 +2615,9 @@ export class CallingRepository {
     const _requestConfig = async () => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
       const config = await this.fetchConfig(limit);
-      if (useRustSft) {
-        (config as any).sft_servers = [{urls: ['https://rust-sft.stars.wire.link']}];
-        (config as any).sft_servers_all = [{urls: ['https://rust-sft.stars.wire.link']}];
-      }
+      const effectiveConfig = getEffectiveCallingConfig(config, useRustSft);
 
-      this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
+      this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(effectiveConfig));
     };
     _requestConfig().catch((error: unknown) => {
       this.logger.warn('Failed fetching calling config', error);
