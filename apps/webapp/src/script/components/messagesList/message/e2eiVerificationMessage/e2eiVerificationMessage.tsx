@@ -164,7 +164,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
     .unwrapOr(false);
 
   const degradedUsers = participatingUserEts.filter(user => {
-    return userIds.find(userId => {
+    return userIds.some(userId => {
       return matchQualifiedIds(userId, user.qualifiedId);
     });
   });

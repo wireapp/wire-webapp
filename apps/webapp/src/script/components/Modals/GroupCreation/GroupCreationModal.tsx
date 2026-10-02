@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {isUndefined} from '@sindresorhus/is';
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
@@ -354,7 +354,7 @@ const GroupCreationModal = ({
 
     const trimmedNameInput = value.trim();
     const nameTooLong = trimmedNameInput.length > maxNameLength;
-    const nameTooShort = !trimmedNameInput.length;
+    const nameTooShort = trimmedNameInput.length === 0;
 
     setGroupName(value);
     if (nameTooLong) {
@@ -389,7 +389,7 @@ const GroupCreationModal = ({
   const clickOnNext = (): void => {
     const nameTooLong = groupNameLength > maxNameLength;
 
-    if (groupNameLength && !nameTooLong) {
+    if (groupNameLength > 0 && !nameTooLong) {
       setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
     }
   };
@@ -408,10 +408,11 @@ const GroupCreationModal = ({
     setGroupCreationState(GroupCreationModalState.PREFERENCES);
   };
 
-  const participantsActionText = selectedContacts.length
-    ? translate('groupCreationParticipantsActionCreate')
-    : translate('groupCreationParticipantsActionSkip');
-  const isInputValid = groupNameLength && !nameError.length;
+  const participantsActionText =
+    selectedContacts.length > 0
+      ? translate('groupCreationParticipantsActionCreate')
+      : translate('groupCreationParticipantsActionSkip');
+  const isInputValid = isTruthy(groupNameLength) ? nameError.length === 0 : groupNameLength;
 
   return (
     <ModalComponent
@@ -437,7 +438,7 @@ const GroupCreationModal = ({
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
-              {selectedContacts.length
+              {selectedContacts.length > 0
                 ? translate('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
                 : translate('groupCreationParticipantsHeader')}
             </h2>
@@ -480,7 +481,7 @@ const GroupCreationModal = ({
                 enabled: isInputValid,
               })}
               css={{marginBottom: 0}}
-              disabled={isInputValid !== true}
+              disabled={!isInputValid}
               type="button"
               onClick={clickOnNext}
               aria-label={translate('groupCreationPreferencesAction')}

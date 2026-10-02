@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {isNonEmptyObject} from '@sindresorhus/is';
+import {isNonEmptyObject, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -48,7 +48,7 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
   const {isOpen, params, selectedUser, clearContent, isLoading, hide, setSelectedUser, setClearContent, setIsLoading} =
     useLeaveGroupAdminModalStore();
 
-  if (!params) {
+  if (isNullOrUndefined(params)) {
     return null;
   }
 

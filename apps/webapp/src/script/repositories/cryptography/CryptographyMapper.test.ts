@@ -21,6 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {isObject} from 'underscore';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
+import Long from 'long';
 
 import {
   Asset,
@@ -77,6 +78,30 @@ describe('CryptographyMapper', () => {
   });
 
   describe('"mapGenericMessage"', () => {
+    it.each([
+      [0, 0],
+      [NaN, 0],
+      [-1000, -1],
+      [1000, 1],
+      [Infinity, Infinity],
+      [Long.fromInt(0), 0],
+    ])('preserves audio duration %p and empty loudness bytes', async (durationInMillis, expectedDuration) => {
+      const message = new GenericMessage({
+        messageId: 'audio-characterization',
+        asset: new Asset({
+          original: new Asset.Original({
+            mimeType: 'audio/mp3',
+            size: 0,
+            audio: new Asset.AudioMetaData({durationInMillis, normalizedLoudness: new Uint8Array(0)}),
+          }),
+        }),
+      });
+      const mappedEvent = await mapper.mapGenericMessage(message, event);
+
+      expect(mappedEvent.data.meta.duration).toBe(expectedDuration);
+      expect(mappedEvent.data.meta.loudness).toEqual(new Uint8Array(0));
+    });
+
     it('maps a decoded Proteus session reset with its original metadata', async () => {
       const reset = GenericMessage.decode(
         GenericMessage.encode(

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {StackedAvatars} from 'Components/avatar';
@@ -82,7 +83,7 @@ export const MeetingParticipants = ({
 }: MeetingParticipantsProps) => {
   const conversation = useMeetingConversation(qualifiedConversation);
 
-  if (!conversation) {
+  if (isNullOrUndefined(conversation)) {
     return null;
   }
 

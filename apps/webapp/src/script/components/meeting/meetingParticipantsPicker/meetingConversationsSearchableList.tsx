@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Checkbox, CheckboxLabel, ChevronDownIcon} from '@wireapp/react-ui-kit';
 
 import {ChannelAvatar} from 'Components/avatar/channelAvatar';
@@ -64,7 +66,7 @@ export const MeetingConversationsSearchableList = ({
           return onOpenChange(!isOpen);
         }}
         css={collapseButton}
-        data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
+        data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-toggle` : undefined}
         aria-expanded={isOpen}
         aria-controls={`${id}-conversation-list`}
       >

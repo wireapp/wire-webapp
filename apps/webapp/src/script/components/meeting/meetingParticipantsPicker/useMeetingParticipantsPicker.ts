@@ -58,7 +58,7 @@ export const useMeetingParticipantsPicker = ({
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const matchingConversations = useMemo(() => {
-    if (!conversationRepository) {
+    if (isNullOrUndefined(conversationRepository)) {
       return [];
     }
 

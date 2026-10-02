@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
 import Long from 'long';
 
 import {ClientEvent} from 'Repositories/event/Client';
@@ -84,10 +85,10 @@ const getMultipartTextBytes = (event: any): number[] => {
     .map((attachment: any) => {
       return attachment?.cellAsset?.uuid;
     })
-    .filter(Boolean)
+    .filter(isTruthy)
     .join(', ');
 
-  const attachmentBytes = uuidString ? stringToUtf16BE(uuidString) : [];
+  const attachmentBytes = isNonEmptyString(uuidString) ? stringToUtf16BE(uuidString) : [];
 
   return textBytes.concat(attachmentBytes);
 };

@@ -21,6 +21,7 @@ import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isNull} from '@sindresorhus/is';
 
 import type {Translate} from 'Util/localizerUtil';
 
@@ -64,7 +65,7 @@ export function RootProvider(properties: RootProviderProps): ReactElement {
 export function useApplicationContext(): RootContextValue {
   const applicationContextOrNull = useContext(RootContext);
 
-  if (!applicationContextOrNull) {
+  if (isNull(applicationContextOrNull)) {
     throw new Error('RootContext has not been set');
   }
 

@@ -21,6 +21,7 @@ import {useEffect, useLayoutEffect, useMemo} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -113,7 +114,7 @@ export const AppMain = (properties: AppMainProps) => {
 
   useInitializeRootFontSize();
 
-  if (!apiContext) {
+  if (isNullOrUndefined(apiContext)) {
     throw new Error('API Context has not been set');
   }
 
@@ -188,14 +189,14 @@ export const AppMain = (properties: AppMainProps) => {
       if (selfUser.isTemporaryGuest()) {
         return mainView.list.showTemporaryGuest();
       }
-      if (activeConversation) {
+      if (!isNullOrUndefined(activeConversation)) {
         // There is already an active conversation, keeping state as is
         return;
       }
       const mostRecentConversation = conversationState.getMostRecentConversation();
-      if (mostRecentConversation) {
+      if (!isNullOrUndefined(mostRecentConversation)) {
         navigate(generateConversationUrl(mostRecentConversation.qualifiedId));
-      } else if (repositories.user['userState'].connectRequests().length) {
+      } else if (repositories.user['userState'].connectRequests().length > 0) {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
       }
     };
@@ -203,7 +204,7 @@ export const AppMain = (properties: AppMainProps) => {
     // on app load reset last message focus to ensure last message is focused
     // only when user enters a new conversation using keyboard(press enter)
     const historyState = window.history.state;
-    if (historyState && !!historyState.eventKey) {
+    if (isTruthy(historyState) && isTruthy(historyState.eventKey)) {
       historyState.eventKey = '';
       window.history.replaceState(historyState, '', window.location.hash);
     }
@@ -221,16 +222,23 @@ export const AppMain = (properties: AppMainProps) => {
 
       await mainView.content.showConversation(
         {id: conversationId, domain},
-        {filePath: `files${pathString ? `/${pathString}` : ''}`},
+        {filePath: `files${isNonEmptyString(pathString) ? `/${pathString}` : ''}`},
       );
     };
 
     const showUserProfile = (param1: string, param2?: string) => {
       // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
       const userId = isUUID(param1) ? param1 : param2;
-      const domain = isUUID(param1) ? param2 || apiContext.domain || '' : param1;
+      let domain = param1;
+      if (isUUID(param1)) {
+        if (isNonEmptyString(param2)) {
+          domain = param2;
+        } else {
+          domain = isNonEmptyString(apiContext.domain) ? apiContext.domain : '';
+        }
+      }
 
-      if (!userId) {
+      if (!isNonEmptyString(userId)) {
         navigate('/');
         return;
       }
@@ -296,17 +304,17 @@ export const AppMain = (properties: AppMainProps) => {
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
 
-    if (redirect) {
+    if (isNonEmptyString(redirect)) {
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
       window.location.replace(redirect);
     }
 
     const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
 
-    if (conversationRedirect) {
+    if (isNonEmptyString(conversationRedirect)) {
       const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
+      window.location.replace(`#/conversation/${conversation}${isTruthy(domain) ? `/${domain}` : ''}`);
     }
 
     repositories.properties.checkTelemetrySharingPermission();
@@ -376,14 +384,14 @@ export const AppMain = (properties: AppMainProps) => {
             {showMainContent && (
               <MainContent
                 selfUser={selfUser}
-                isRightSidebarOpen={!!currentState}
+                isRightSidebarOpen={isTruthy(currentState)}
                 openRightSidebar={toggleRightSidebar}
                 reloadApp={app.refresh}
                 appLockRepository={appLockRepository}
               />
             )}
 
-            {currentState && (
+            {isTruthy(currentState) ? (
               <RightSidebar
                 lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
                 currentEntity={currentEntity}
@@ -394,6 +402,8 @@ export const AppMain = (properties: AppMainProps) => {
                 selfUser={selfUser}
                 userState={userState}
               />
+            ) : (
+              currentState
             )}
           </div>
         )}

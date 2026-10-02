@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {getWebEnvironment} from 'Util/environment';
 import {getLogger, Logger} from 'Util/logger';
 
@@ -58,8 +60,9 @@ export function isTelemetryEnabledAtCurrentEnvironment(): boolean {
   const allowedBackendUrls =
     COUNTLY_ALLOWED_BACKEND?.split(',').map(url => {
       return url.trim();
-    }) || [];
-  const isEnabled = !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
+    }) ?? [];
+  const isEnabled =
+    isNonEmptyString(COUNTLY_API_KEY) && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
 
   return isEnabled;
 }

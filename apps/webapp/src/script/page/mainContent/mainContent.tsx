@@ -19,6 +19,7 @@
 
 import {ReactNode, useEffect, useRef, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
@@ -109,7 +110,7 @@ const MainContent = ({
   });
 
   useEffect(() => {
-    if (!isShowingConversation() && conversationState.activeConversation()) {
+    if (!isShowingConversation() && !isNullOrUndefined(conversationState.activeConversation())) {
       // Reset active conversation for all states that do not require a loaded conversation
       conversationState.activeConversation(undefined);
     }
@@ -167,15 +168,18 @@ const MainContent = ({
       <SwitchTransition>
         <Animated key={contentState}>
           <>
-            {contentState === ContentState.COLLECTION && activeConversation && (
-              <Collection
-                conversation={activeConversation}
-                conversationRepository={repositories.conversation}
-                assetRepository={repositories.asset}
-                messageRepository={repositories.message}
-                selfUser={selfUser}
-              />
-            )}
+            {contentState === ContentState.COLLECTION &&
+              (isNullOrUndefined(activeConversation) ? (
+                activeConversation
+              ) : (
+                <Collection
+                  conversation={activeConversation}
+                  conversationRepository={repositories.conversation}
+                  assetRepository={repositories.asset}
+                  messageRepository={repositories.message}
+                  selfUser={selfUser}
+                />
+              ))}
 
             {contentState === ContentState.PREFERENCES_ABOUT && (
               <div
@@ -280,14 +284,17 @@ const MainContent = ({
               <HistoryExport user={selfUser} switchContent={switchContent} />
             )}
 
-            {contentState === ContentState.HISTORY_IMPORT && uploadedFile && (
-              <HistoryImport
-                user={selfUser}
-                file={uploadedFile}
-                backupRepository={repositories.backup}
-                switchContent={switchContent}
-              />
-            )}
+            {contentState === ContentState.HISTORY_IMPORT &&
+              (isNullOrUndefined(uploadedFile) ? (
+                uploadedFile
+              ) : (
+                <HistoryImport
+                  user={selfUser}
+                  file={uploadedFile}
+                  backupRepository={repositories.backup}
+                  switchContent={switchContent}
+                />
+              ))}
 
             {contentState === ContentState.CELLS && (
               <CellsGlobalView

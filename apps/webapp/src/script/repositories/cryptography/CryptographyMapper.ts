@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
@@ -152,14 +152,14 @@ export class CryptographyMapper {
    * @returns Resolves with the mapped event
    */
   async mapGenericMessage(genericMessage: GenericMessage, event: EncryptedEvent) {
-    if (!genericMessage) {
+    if (!isTruthy(genericMessage)) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
         CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
       );
     }
 
-    if (genericMessage.external) {
+    if (!isNullOrUndefined(genericMessage.external)) {
       genericMessage = await this._unwrapExternal(genericMessage.external as External, event);
     }
 
@@ -281,7 +281,7 @@ export class CryptographyMapper {
       }
 
       case GenericMessageType.MULTIPART: {
-        if (!genericMessage.multipart) {
+        if (isNullOrUndefined(genericMessage.multipart)) {
           const logMessage = `Skipped event '${genericMessage.messageId}' of type '${genericMessage.content}', no data found`;
           this.logger.debug(logMessage, {event, generic_message: genericMessage});
           return undefined;
@@ -327,7 +327,7 @@ export class CryptographyMapper {
         return item;
       }
 
-      if (item.text === null || item.text === undefined) {
+      if (isNullOrUndefined(item.text)) {
         return item;
       }
       const {content} = item.text;
@@ -382,7 +382,7 @@ export class CryptographyMapper {
     // Initializing this with empty values breaks rendering of images of services
     let data = {} as AssetData;
 
-    if (original !== null && original !== undefined) {
+    if (!isNullOrUndefined(original)) {
       data = {
         content_length: original.size as number,
         content_type: original.mimeType ?? '',
@@ -391,7 +391,7 @@ export class CryptographyMapper {
         },
       };
 
-      if (original.image !== null && original.image !== undefined) {
+      if (!isNullOrUndefined(original.image)) {
         data.info.height = original.image.height;
         data.info.width = original.image.width;
       } else {
@@ -399,9 +399,9 @@ export class CryptographyMapper {
       }
     }
 
-    if (preview !== null && preview !== undefined) {
+    if (!isNullOrUndefined(preview)) {
       const remote = preview.remote;
-      if (remote !== null && remote !== undefined) {
+      if (!isNullOrUndefined(remote)) {
         data = {
           ...data,
           preview_domain: remote.assetDomain ?? undefined,
@@ -413,13 +413,12 @@ export class CryptographyMapper {
       }
     }
 
-    const isImage =
-      original !== null && original !== undefined && original.image !== null && original.image !== undefined;
+    const isImage = !isNullOrUndefined(original) && !isNullOrUndefined(original.image);
     if (isImage) {
       data.info.tag = 'medium';
     }
 
-    if (asset.hasOwnProperty('uploaded') && uploaded !== null && uploaded !== undefined) {
+    if (asset.hasOwnProperty('uploaded') && !isNullOrUndefined(uploaded)) {
       data = {
         ...data,
         domain: uploaded.assetDomain ?? undefined,
@@ -429,7 +428,7 @@ export class CryptographyMapper {
         status: AssetTransferState.UPLOADED,
         token: uploaded.assetToken ?? undefined,
       };
-    } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null && notUploaded !== undefined) {
+    } else if (asset.hasOwnProperty('notUploaded') && !isNullOrUndefined(notUploaded)) {
       data = {...data, reason: notUploaded, status: AssetTransferState.UPLOAD_FAILED};
     }
 
@@ -438,9 +437,9 @@ export class CryptographyMapper {
 
   private _mapAssetMetaData(original: Asset.IOriginal): MappedAssetMetaData | undefined {
     const audioData = original.audio;
-    if (audioData) {
-      const loudnessArray = audioData.normalizedLoudness || new ArrayBuffer(0);
-      const durationInSeconds = audioData.durationInMillis
+    if (!isNullOrUndefined(audioData)) {
+      const loudnessArray = audioData.normalizedLoudness ?? new ArrayBuffer(0);
+      const durationInSeconds = isTruthy(audioData.durationInMillis)
         ? Number(audioData.durationInMillis) / TIME_IN_MILLIS.SECOND
         : 0;
 
@@ -497,7 +496,7 @@ export class CryptographyMapper {
     return {
       data: {
         message_id: confirmation.firstMessageId,
-        more_message_ids: confirmation.moreMessageIds || [],
+        more_message_ids: isTruthy(confirmation.moreMessageIds) ? confirmation.moreMessageIds : [],
         status: (() => {
           switch (confirmation.type) {
             case Confirmation.Type.DELIVERED:
@@ -524,15 +523,15 @@ export class CryptographyMapper {
   }
 
   private _mapEdited(edited: MessageEdit) {
-    if (edited.multipart) {
-      if (!edited.multipart.text) {
+    if (!isNullOrUndefined(edited.multipart)) {
+      if (isNullOrUndefined(edited.multipart.text)) {
         const message = 'Edited multipart message is missing required text content.';
         throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
       }
       const mappedMultipart = this._mapMultipart(edited.multipart.text as Text, edited.multipart.attachments);
       mappedMultipart.data.replacing_message_id = edited.replacingMessageId;
       return mappedMultipart;
-    } else if (edited.composite) {
+    } else if (!isNullOrUndefined(edited.composite)) {
       const mappedComposite = this._mapComposite(edited.composite as Composite);
       mappedComposite.data.replacing_message_id = edited.replacingMessageId;
       return mappedComposite;
@@ -544,7 +543,7 @@ export class CryptographyMapper {
   }
 
   private _mapEphemeral(genericMessage: GenericMessage, event: EncryptedEvent) {
-    if (genericMessage.ephemeral === null || genericMessage.ephemeral === undefined) {
+    if (isNullOrUndefined(genericMessage.ephemeral)) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
         CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
@@ -572,7 +571,7 @@ export class CryptographyMapper {
     try {
       // Only OTR proteus messages can be sent as external, MLS message should throw an error at this point
       const eventData = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data : undefined;
-      if (!eventData?.data || !otrKey || !sha256) {
+      if (!isNonEmptyString(eventData?.data) || !isTruthy(otrKey) || !isTruthy(sha256)) {
         throw new Error('Not all expected properties defined');
       }
       const cipherTextArray = base64ToArray(eventData.data);
@@ -621,7 +620,7 @@ export class CryptographyMapper {
   }
 
   private _mapDataTransfer(dataTransfer: DataTransfer) {
-    if (dataTransfer.trackingIdentifier === null || dataTransfer.trackingIdentifier === undefined) {
+    if (isNullOrUndefined(dataTransfer.trackingIdentifier)) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
         CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
@@ -695,7 +694,7 @@ export class CryptographyMapper {
 
     const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
 
-    if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
+    if (isTruthy(protoMentions) && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
       this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`);
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
@@ -716,7 +715,7 @@ export class CryptographyMapper {
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
 
-    if (protoQuote) {
+    if (!isNullOrUndefined(protoQuote)) {
       const quote = arrayToBase64(Quote.encode(protoQuote).finish());
       mappedText.data.quote = quote;
     }
@@ -729,7 +728,7 @@ function addMetadata<MappedEventWithData extends {data: object}>(
   mappedEvent: MappedEventWithData,
   asset: unknown,
 ): MappedEventWithData {
-  if (asset === null || asset === undefined || typeof asset !== 'object') {
+  if (isNullOrUndefined(asset) || typeof asset !== 'object') {
     return mappedEvent;
   }
   const metadata = asset as Partial<{expectsReadConfirmation: boolean; legalHoldStatus: LegalHoldStatus}>;

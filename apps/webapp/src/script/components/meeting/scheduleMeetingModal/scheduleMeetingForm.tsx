@@ -20,7 +20,7 @@
 import type {ComponentProps} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
 
 import {
@@ -388,7 +388,7 @@ export const ScheduleMeetingForm = ({
           options={recurrenceSelectOptions}
           value={selectedRecurrenceOption}
           onChange={option => {
-            if (option) {
+            if (!isNullOrUndefined(option)) {
               onRecurrenceChange(option.value as ScheduleMeetingRecurrenceOption);
             }
           }}

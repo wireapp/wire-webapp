@@ -17,7 +17,7 @@
  *
  */
 
-import {isString} from '@sindresorhus/is';
+import {isString, isUndefined} from '@sindresorhus/is';
 import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
@@ -41,7 +41,7 @@ const useChannelFeature = () => {
   const {teamFeatures} = useKoSubscribableChildren(teamState as any, ['teamFeatures']) as {
     teamFeatures?: Record<string, any>;
   };
-  return teamFeatures ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
+  return !isUndefined(teamFeatures) ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
 };
 
 const useCanCreateChannels = () => {

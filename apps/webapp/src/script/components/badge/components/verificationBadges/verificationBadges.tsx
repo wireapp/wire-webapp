@@ -20,6 +20,7 @@
 import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
@@ -85,7 +86,7 @@ const useConversationVerificationState = (conversation: Conversation) => {
 };
 
 const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?: User}): MLSStatuses[] | undefined => {
-  if (!identities || !user) {
+  if (isNullOrUndefined(identities) || isNullOrUndefined(user)) {
     return undefined;
   }
 
@@ -119,7 +120,7 @@ export const UserVerificationBadges = ({
 
   let status: MLSStatuses | undefined = undefined;
   if (
-    mlsStatuses &&
+    !isNullOrUndefined(mlsStatuses) &&
     mlsStatuses.length > 0 &&
     mlsStatuses.every(status => {
       return status === MLSStatuses.VALID;
@@ -156,7 +157,7 @@ export const DeviceVerificationBadges = ({
     };
 
     async function loadUser() {
-      if (!identity) {
+      if (isNullOrUndefined(identity)) {
         return;
       }
       const userEntity = await waitFor(() => {
@@ -172,7 +173,7 @@ export const DeviceVerificationBadges = ({
   }, [fireAndForgetInvoker, identity]);
 
   let status: MLSStatuses | undefined = undefined;
-  if (isE2EIEnabled && identity && user) {
+  if (isE2EIEnabled && !isNullOrUndefined(identity) && !isNullOrUndefined(user)) {
     const mlsStatuses = getMLSStatuses({identities: [identity], user});
     status = mlsStatuses?.[0];
   }

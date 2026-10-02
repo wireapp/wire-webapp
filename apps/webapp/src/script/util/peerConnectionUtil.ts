@@ -17,14 +17,17 @@
  *
  */
 
+import {isNull, isTruthy} from '@sindresorhus/is';
+
 export function getIceCandidatesTypes(iceCandidates: string[]): Record<string, number> {
   return iceCandidates.reduce<Record<string, number>>((types, candidateStr) => {
     const typeMatches = candidateStr.match(/typ (\w+)/);
-    if (!typeMatches) {
+    if (isNull(typeMatches)) {
       return types;
     }
     const candidateType = typeMatches[1];
-    types[candidateType] = types[candidateType] + 1 || 1;
+    const candidateTypeCount = types[candidateType] + 1;
+    types[candidateType] = isTruthy(candidateTypeCount) ? candidateTypeCount : 1;
     return types;
   }, {});
 }
@@ -48,7 +51,7 @@ export function isValidIceCandidatesGathering(
   const numberOfRelays = iceCandidates.filter(candidate => {
     return candidate.toLowerCase().includes('relay');
   }).length;
-  const numberOfIceServers = (peerConnectionConfig.iceServers || []).length;
+  const numberOfIceServers = (peerConnectionConfig.iceServers ?? []).length;
   if (numberOfIceServers <= 0) {
     return true;
   }

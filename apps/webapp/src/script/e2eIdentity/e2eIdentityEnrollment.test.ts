@@ -370,6 +370,45 @@ describe('E2EIHandler', () => {
   });
 
   describe('startTimers()', () => {
+    it.each([0, NaN, -1, 1])(
+      'preserves persisted activation timestamp truthiness for %p',
+      async storedActivationMilliseconds => {
+        jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(e2eIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
+        const instance = await E2EIHandler.getInstance().initialize(params);
+        const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
+        enrollmentStore.store.e2eiActivatedAt(storedActivationMilliseconds);
+
+        await instance.startTimers();
+
+        const expectedActivationMilliseconds = [0, NaN].includes(storedActivationMilliseconds)
+          ? clock.currentUnixEpochMilliseconds
+          : storedActivationMilliseconds;
+        expect(enrollmentStore.get.e2eiActivatedAt()).toBe(expectedActivationMilliseconds);
+      },
+    );
+
+    it.each([0, NaN, -1, 1])(
+      'preserves persisted firing timestamp truthiness for %p',
+      async storedFiringMilliseconds => {
+        jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(e2eIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
+        const instance = await E2EIHandler.getInstance().initialize(params);
+        const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
+        enrollmentStore.store.e2eiActivatedAt(clock.currentUnixEpochMilliseconds);
+        enrollmentStore.store.timer(storedFiringMilliseconds);
+
+        const actualTimer = await instance.startTimers();
+
+        const expectedReminderDelayMilliseconds = [0, NaN].includes(storedFiringMilliseconds)
+          ? params.gracePeriodInSeconds * 1000
+          : storedFiringMilliseconds - clock.currentUnixEpochMilliseconds;
+        expect(actualTimer.nextReminderDelay).toBe(expectedReminderDelayMilliseconds);
+      },
+    );
+
     it('should reset the timer after user interaction with modal', async () => {
       jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
       jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);

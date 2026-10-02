@@ -17,6 +17,7 @@
  *
  */
 
+import {isUint8Array, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
@@ -178,6 +179,59 @@ describe('BackupRepository', () => {
   });
 
   describe('importHistory', () => {
+    it.each([
+      [undefined, undefined],
+      [null, null],
+      [false, false],
+      [0, 0],
+      ['', ''],
+      [[], []],
+      [{}, {}],
+      [
+        {otr_key: null, sha256: ''},
+        {otr_key: null, sha256: ''},
+      ],
+      [
+        {otr_key: false, sha256: 0},
+        {otr_key: false, sha256: 0},
+      ],
+      [
+        {otr_key: {}, sha256: []},
+        {otr_key: new Uint8Array(0), sha256: new Uint8Array(0)},
+      ],
+      [{otr_key: {'0': 1, '1': 2}}, {otr_key: new Uint8Array([1, 2])}],
+    ])('preserves legacy JSON record truthiness for %p', async (eventContent, expectedEventContent) => {
+      const [backupRepository, {backupService}] = await buildBackupRepository();
+      const user = new User('user1', '', translateForTest);
+      const importEntities = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
+      const restoredEvent = {
+        conversation: conversationId,
+        from: 'sender',
+        id: 'runtime-characterization',
+        time: '2016-08-04T13:27:55.182Z',
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        data: eventContent,
+      };
+      const files = {
+        [Filename.METADATA]: JSON.stringify(createMetaData(user, 'client1', backupService)),
+        [Filename.EVENTS]: JSON.stringify([restoredEvent]),
+      };
+      const archive = await handleZipEvent({type: 'zip', files});
+      if (!isUint8Array(archive)) {
+        throw new Error('Expected ZIP bytes for the legacy backup fixture');
+      }
+
+      await backupRepository.importHistory(user, createBlobFromUint8Array(archive), noop, noop, '');
+
+      const expectedEvent = {...restoredEvent, data: expectedEventContent};
+      if (isUndefined(expectedEventContent)) {
+        delete expectedEvent.data;
+      }
+      expect(importEntities).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.EVENTS, [expectedEvent], {
+        generateId: expect.any(Function),
+      });
+    });
+
     it.each([
       [
         {

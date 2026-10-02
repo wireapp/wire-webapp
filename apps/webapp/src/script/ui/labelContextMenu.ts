@@ -50,19 +50,20 @@ export const showLabelContextMenu = (
 
   const conversationLabel = labelRepository.getConversationCustomLabel(conversation);
   const labels = labelRepository.getLabels().filter(label => {
-    return !!labelRepository.getLabelConversations(label).length;
+    return labelRepository.getLabelConversations(label).length > 0;
   });
-  const namedLabels: ContextMenuEntry[] = labels.length
-    ? labels.map(label => {
-        return {
-          click: () => {
-            return labelRepository.addConversationToLabel(label, conversation);
-          },
-          isChecked: label === conversationLabel,
-          label: label.name,
-        };
-      })
-    : [noLabels];
+  const namedLabels: ContextMenuEntry[] =
+    labels.length > 0
+      ? labels.map(label => {
+          return {
+            click: () => {
+              return labelRepository.addConversationToLabel(label, conversation);
+            },
+            isChecked: label === conversationLabel,
+            label: label.name,
+          };
+        })
+      : [noLabels];
 
   const entries: ContextMenuEntry[] = [newLabel, separator, ...namedLabels];
   showContextMenu({event, entries, identifier: 'conversation-label-context-menu'});

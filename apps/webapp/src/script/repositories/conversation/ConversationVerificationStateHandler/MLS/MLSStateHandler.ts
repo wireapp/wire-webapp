@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState, MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -59,7 +60,7 @@ export class MLSConversationVerificationStateHandler {
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
     // We need to check if the core account has a valid MLS device and that e2ei is enabled
-    if (!this.core.hasMLSDevice || !this.core.service?.e2eIdentity) {
+    if (!this.core.hasMLSDevice || isUndefined(this.core.service?.e2eIdentity)) {
       return;
     }
 
@@ -78,7 +79,7 @@ export class MLSConversationVerificationStateHandler {
     conversation: MLSConversation,
     userIdentities: Map<string, WireIdentity[]> | undefined,
   ) {
-    if (!userIdentities) {
+    if (isUndefined(userIdentities)) {
       return;
     }
 
@@ -143,7 +144,7 @@ export class MLSConversationVerificationStateHandler {
     const processedUserIds: Set<StringifiedQualifiedId> = new Set();
     let userVerificationState = UserVerificationState.ALL_VALID;
 
-    if (userIdentities) {
+    if (!isUndefined(userIdentities)) {
       for (const [stringifiedQualifiedId, identities] of userIdentities.entries()) {
         if (processedUserIds.has(stringifiedQualifiedId)) {
           continue;
@@ -161,7 +162,7 @@ export class MLSConversationVerificationStateHandler {
         });
         const identity = identities.at(0);
 
-        if (!identity || !user) {
+        if (isUndefined(identity) || isUndefined(user)) {
           this.logger.warn(`Could not find user or identity for userId: ${stringifiedQualifiedId}`);
           userVerificationState = UserVerificationState.SOME_INVALID;
           break;
@@ -201,7 +202,7 @@ export class MLSConversationVerificationStateHandler {
       return getConversationByGroupId({conversationState: this.conversationState, groupId});
     });
 
-    if (!conversation) {
+    if (isUndefined(conversation)) {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
@@ -227,7 +228,7 @@ export class MLSConversationVerificationStateHandler {
     }
 
     const conversationExists = await this.core.service?.mls?.conversationExists(conversation.groupId);
-    if (!conversationExists) {
+    if (conversationExists !== true) {
       conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
       return;
     }
@@ -253,7 +254,7 @@ export class MLSConversationVerificationStateHandler {
 }
 
 export const checkUserHandle = (identity: WireIdentity, user: User): boolean => {
-  if (!identity.x509Identity) {
+  if (isUndefined(identity.x509Identity)) {
     return false;
   }
   // WireIdentity handle format is "{scheme}%40{username}@{domain}"
