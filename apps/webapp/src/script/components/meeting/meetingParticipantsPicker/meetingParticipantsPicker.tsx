@@ -48,6 +48,7 @@ import {
   valueContainerStyles,
   wrapperStyles,
 } from './meetingParticipantsPicker.styles';
+import {isAllowedMeetingParticipant} from './participantPickerUtils';
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 
 export interface MeetingParticipantsPickerProps {
@@ -98,6 +99,7 @@ export const MeetingParticipantsPicker = ({
   const {translate} = useApplicationContext();
   const listboxId = useId();
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
+  const allowedUsers = users.filter(isAllowedMeetingParticipant);
 
   const fieldLabel = isNonEmptyString(label)
     ? formatParticipantsFieldLabel(label, selectedUsers.length, translate)
@@ -108,12 +110,14 @@ export const MeetingParticipantsPicker = ({
     handleOpenChange,
     handleSelectedUsersChange,
     handleSelectConversation,
+    isContactsOpen,
     isConversationsOpen,
     isOpen,
     matchingConversations,
     popoverRef,
     selectedConversationIds,
     setIsConversationsOpen,
+    setIsContactsOpen,
     triggerRef,
   } = useMeetingParticipantsPicker({
     disabled,
@@ -163,13 +167,8 @@ export const MeetingParticipantsPicker = ({
               }
             }}
             onFocus={() => {
-              if (!disabled) {
+              if (!disabled && !isOpen) {
                 handleOpenChange(true);
-              }
-            }}
-            onKeyDown={event => {
-              if (event.key === 'Escape') {
-                handleOpenChange(false);
               }
             }}
           />
@@ -191,7 +190,11 @@ export const MeetingParticipantsPicker = ({
         ref={popoverRef}
         triggerRef={triggerRef}
         isOpen={isOpen}
-        onOpenChange={handleOpenChange}
+        onOpenChange={open => {
+          if (open) {
+            handleOpenChange(true);
+          }
+        }}
         isNonModal
         css={popoverStyles}
         style={popoverOverlayStyles}
@@ -209,7 +212,7 @@ export const MeetingParticipantsPicker = ({
           >
             <UserSearchableList
               selfUser={selfUser}
-              users={users}
+              users={allowedUsers}
               filter={filter}
               selected={selectedUsers}
               isSelectable
@@ -225,6 +228,8 @@ export const MeetingParticipantsPicker = ({
               showAllProvidedUsers
               hideEmptyState={matchingConversations.length > 0}
               showSelectedUsersRegardlessOfFilter
+              isContactsOpen={isContactsOpen}
+              onContactsOpenChange={setIsContactsOpen}
               dataUieName={dataUieName ? `${dataUieName}-list` : undefined}
             />
             <MeetingConversationsSearchableList

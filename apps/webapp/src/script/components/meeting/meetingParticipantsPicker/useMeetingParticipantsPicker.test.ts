@@ -122,10 +122,16 @@ describe('useMeetingParticipantsPicker', () => {
     expect(result.current.isOpen).toBe(false);
   });
 
-  it('imports conversation members and removes only imported users when deselected', () => {
+  it('imports only eligible conversation members and removes only imported users when deselected', () => {
     const manual = createUser('manual', 'Manual');
     const imported = createUser('imported', 'Imported');
-    const conversation = createConversation('conversation', 'Project', [imported]);
+    const guest = createUser('guest', 'Guest');
+    guest.isGuest(true);
+    const temporaryGuest = createUser('temporary-guest', 'Temporary guest');
+    temporaryGuest.isTemporaryGuest(true);
+    const service = createUser('service', 'Service');
+    service.isService = true;
+    const conversation = createConversation('conversation', 'Project', [imported, guest, temporaryGuest, service]);
     const onSelectedUsersChange = jest.fn();
     const options = createOptions({selectedUsers: [manual], onSelectedUsersChange});
     const {result, rerender} = renderHook(
@@ -166,5 +172,28 @@ describe('useMeetingParticipantsPicker', () => {
 
     expect(result.current.isOpen).toBe(false);
     expect(onFilterChange).toHaveBeenCalledWith('');
+  });
+
+  it('stops Escape from propagating to the meeting dialog', () => {
+    const dialogKeyDown = jest.fn();
+    window.addEventListener('keydown', dialogKeyDown);
+    const {result} = renderHook(() => {
+      return useMeetingParticipantsPicker(createOptions());
+    });
+
+    act(() => {
+      return result.current.handleOpenChange(true);
+    });
+
+    const event = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Escape'});
+    act(() => {
+      document.dispatchEvent(event);
+    });
+
+    expect(result.current.isOpen).toBe(false);
+    expect(event.defaultPrevented).toBe(true);
+    expect(dialogKeyDown).not.toHaveBeenCalled();
+
+    window.removeEventListener('keydown', dialogKeyDown);
   });
 });

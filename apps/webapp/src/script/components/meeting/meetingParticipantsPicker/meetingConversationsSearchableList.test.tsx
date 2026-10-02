@@ -76,6 +76,7 @@ describe('MeetingConversationsSearchableList', () => {
 
     expect(screen.getByText('Project group')).toBeInTheDocument();
     expect(screen.getByText('Project channel')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'meetings.scheduleModal.groupsAndChannelsWithCount'})).toBeInTheDocument();
     expect(screen.getByRole('checkbox', {name: 'Project group'})).toBeChecked();
     expect(screen.getByRole('checkbox', {name: 'Project channel'})).not.toBeChecked();
 

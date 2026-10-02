@@ -44,8 +44,8 @@ import {mergeUsersIntoSelection, searchUsersByQuery} from './participantPickerUt
 const SEARCH_PLACEHOLDER = 'meetings.scheduleModal.participantsPlaceholder';
 const PARTICIPANTS_LABEL = 'Participants';
 const PARTICIPANTS_LABEL_WITH_COUNT = 'meetings.scheduleModal.participantsLabelWithCount';
-const GROUPS_AND_CHANNELS_LABEL = 'meetings.scheduleModal.groupsAndChannels';
-const CONTACTS_LABEL = 'userListContacts';
+const GROUPS_AND_CHANNELS_LABEL = 'meetings.scheduleModal.groupsAndChannelsWithCount';
+const CONTACTS_LABEL = 'userListContactsWithCount';
 const SELECTED_CONTACTS_LABEL = 'userListSelectedContacts';
 const NO_MATCHES_LABEL = 'searchListNoMatches';
 
@@ -219,6 +219,7 @@ describe('MeetingParticipantsPicker', () => {
     expect(screen.queryByText('Carol Chen')).not.toBeInTheDocument();
 
     await user.click(input);
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
     await user.type(input, 'carol');
 
     expect(input).toHaveValue('carol');
@@ -234,9 +235,14 @@ describe('MeetingParticipantsPicker', () => {
   });
 
   it('opens the menu and filters users locally', async () => {
+    const user = userEvent.setup();
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
     fireEvent.change(getSearchInput(), {target: {value: 'alice'}});
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: CONTACTS_LABEL})).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
 
     await waitFor(() => {
       expect(screen.getByText('Alice Anderson')).toBeInTheDocument();
@@ -249,12 +255,29 @@ describe('MeetingParticipantsPicker', () => {
     render(withThemeAndRootContext(<ControlledPicker />, rootProviderWrapper));
 
     await user.click(getSearchInput());
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
 
     await waitFor(() => {
       expect(screen.getByText('Thomas Goodwin')).toBeInTheDocument();
       expect(screen.getByText('Alice Anderson')).toBeInTheDocument();
       expect(screen.getByText('Bob Baker')).toBeInTheDocument();
     });
+  });
+
+  it('does not show services in Contacts', async () => {
+    const service = createUser('service', 'Service User', 'service');
+    service.isService = true;
+    const user = userEvent.setup();
+
+    render(withThemeAndRootContext(<ControlledPicker availableUsers={[...users, service]} />, rootProviderWrapper));
+
+    await user.click(getSearchInput());
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
+
+    await waitFor(() => {
+      expect(screen.getByText('Thomas Goodwin')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Service User')).not.toBeInTheDocument();
   });
 
   it('shows local groups and channels below contacts and filters them with the same input', async () => {
@@ -275,6 +298,10 @@ describe('MeetingParticipantsPicker', () => {
     await user.click(getSearchInput());
     expect(screen.getByText(CONTACTS_LABEL)).toBeInTheDocument();
     expect(screen.getByText(GROUPS_AND_CHANNELS_LABEL)).toBeInTheDocument();
+    expect(screen.queryByText('Engineering')).not.toBeInTheDocument();
+    expect(screen.queryByText('Announcements')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
     expect(screen.getByText('Engineering')).toBeInTheDocument();
     expect(screen.getByText('Announcements')).toBeInTheDocument();
     expect(screen.getByText('Announcements').parentElement?.querySelector('svg')).toBeInTheDocument();
@@ -308,6 +335,8 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     await user.click(getSearchInput());
+    await user.type(getSearchInput(), 'active');
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
 
     expect(screen.getByText('Active group')).toBeInTheDocument();
     expect(screen.queryByText('Removed group')).not.toBeInTheDocument();
@@ -315,7 +344,7 @@ describe('MeetingParticipantsPicker', () => {
     expect(screen.queryByText('Cleared group')).not.toBeInTheDocument();
   });
 
-  it('allows groups and channels to be collapsed until the search input is focused again', async () => {
+  it('allows groups and channels to be manually collapsed and expanded', async () => {
     const conversation = createConversation('group', 'Engineering', [users[0]]);
     const user = userEvent.setup();
 
@@ -335,16 +364,60 @@ describe('MeetingParticipantsPicker', () => {
     const input = getSearchInput();
     await user.click(input);
 
+    expect(screen.queryByText('Engineering')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
+    expect(screen.getByText('Engineering')).toBeInTheDocument();
+
+    await user.click(input);
     expect(screen.getByText('Engineering')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
     expect(screen.queryByText('Engineering')).not.toBeInTheDocument();
 
-    await user.click(input);
+    await user.type(input, 'eng');
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
     expect(screen.getByText('Engineering')).toBeInTheDocument();
   });
 
-  it('opens groups and channels when the picker is opened with the chevron or by typing', async () => {
+  it('starts both result sections collapsed and preserves manual expansion on input clicks', async () => {
+    const conversation = createConversation('group', 'Engineering', [users[0]]);
+    const user = userEvent.setup();
+
+    render(
+      withThemeAndRootContext(
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [conversation];
+            },
+          }}
+        />,
+        rootProviderWrapper,
+      ),
+    );
+
+    const input = getSearchInput();
+    await user.click(input);
+
+    expect(screen.getByRole('button', {name: CONTACTS_LABEL})).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL})).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
+
+    await user.click(input);
+    expect(screen.getByRole('button', {name: CONTACTS_LABEL})).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL})).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(screen.getByRole('button', {name: PARTICIPANTS_LABEL}));
+    await user.click(input);
+
+    expect(screen.getByRole('button', {name: CONTACTS_LABEL})).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL})).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('keeps groups and channels collapsed when opened with the chevron', async () => {
     const conversation = createConversation('group', 'Engineering', [users[0]]);
     const user = userEvent.setup();
 
@@ -362,7 +435,7 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     await user.click(screen.getByRole('button', {name: PARTICIPANTS_LABEL}));
-    expect(screen.getByText('Engineering')).toBeInTheDocument();
+    expect(screen.queryByText('Engineering')).not.toBeInTheDocument();
 
     unmount();
     render(
@@ -379,7 +452,7 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     fireEvent.change(getSearchInput(), {target: {value: 'eng'}});
-    expect(screen.getByText('Engineering')).toBeInTheDocument();
+    expect(screen.queryByText('Engineering')).not.toBeInTheDocument();
   });
 
   it('imports all conversation members additively and keeps the dropdown open', async () => {
@@ -399,6 +472,7 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     await user.click(getSearchInput(PARTICIPANTS_LABEL_WITH_COUNT));
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
     await user.click(screen.getByText('Project'));
 
     expect(screen.getByText(PARTICIPANTS_LABEL_WITH_COUNT)).toBeInTheDocument();
@@ -423,6 +497,7 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     await user.click(getSearchInput());
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
     await user.click(screen.getByText('First group'));
     await user.click(getSearchInput(PARTICIPANTS_LABEL_WITH_COUNT));
     await user.click(screen.getByText('Second group'));
@@ -453,6 +528,7 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     await user.click(getSearchInput(PARTICIPANTS_LABEL_WITH_COUNT));
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
     await user.click(screen.getByText('Engineering'));
     await user.click(screen.getByText('Engineering'));
 
@@ -504,7 +580,9 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     await user.click(getSearchInput());
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
     await user.type(getSearchInput(), 'test');
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
 
     expect(screen.getByText('Test WPB-21813')).toBeInTheDocument();
     expect(screen.queryByText(NO_MATCHES_LABEL)).not.toBeInTheDocument();
@@ -529,6 +607,7 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     await user.click(getSearchInput());
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
     await user.click(screen.getByText('Test channel'));
 
     await user.click(getSearchInput(PARTICIPANTS_LABEL_WITH_COUNT));
@@ -551,6 +630,7 @@ describe('MeetingParticipantsPicker', () => {
     render(withThemeAndRootContext(<ControlledPicker availableUsers={manyUsers} />, rootProviderWrapper));
 
     await user.click(getSearchInput());
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
 
     await waitFor(() => {
       expect(screen.getByText('User 0')).toBeInTheDocument();
@@ -564,6 +644,7 @@ describe('MeetingParticipantsPicker', () => {
 
     const input = getSearchInput();
     await user.click(input);
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
     await user.type(input, 'bob');
 
     expect(input).toHaveValue('bob');
@@ -580,6 +661,7 @@ describe('MeetingParticipantsPicker', () => {
 
     const input = getSearchInput();
     await user.click(input);
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
 
     await waitFor(() => {
       expect(screen.getByText('Alice Anderson')).toBeInTheDocument();
@@ -599,6 +681,7 @@ describe('MeetingParticipantsPicker', () => {
 
     const input = getSearchInput();
     await user.click(input);
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
     await user.type(input, 'alice');
 
     expect(input).toHaveValue('alice');
@@ -617,6 +700,7 @@ describe('MeetingParticipantsPicker', () => {
   it('includes remote team search results when filtering', async () => {
     const remoteUser = createUser('remote-1', 'Remote Member', 'remote');
     remoteUser.teamId = users[0].teamId;
+    const user = userEvent.setup();
 
     render(
       withThemeAndRootContext(
@@ -630,6 +714,11 @@ describe('MeetingParticipantsPicker', () => {
     );
 
     fireEvent.change(getSearchInput(), {target: {value: 'remote'}});
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: CONTACTS_LABEL})).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole('button', {name: CONTACTS_LABEL}));
 
     await waitFor(() => {
       expect(screen.getByText('Remote Member')).toBeInTheDocument();
@@ -654,6 +743,30 @@ describe('MeetingParticipantsPicker', () => {
     expect(screen.getByTestId('dropdown-meeting-participants-picker')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', {name: 'Outside'}));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('dropdown-meeting-participants-picker')).not.toBeInTheDocument();
+    });
+  });
+
+  it('closes the menu when Escape is pressed from a result section toggle', async () => {
+    const user = userEvent.setup();
+    render(
+      withThemeAndRootContext(
+        <ControlledPicker
+          conversationRepository={{
+            getAllGroupConversations: () => {
+              return [createConversation('group', 'Engineering', [users[0]])];
+            },
+          }}
+        />,
+        rootProviderWrapper,
+      ),
+    );
+
+    await user.click(getSearchInput());
+    await user.click(screen.getByRole('button', {name: GROUPS_AND_CHANNELS_LABEL}));
+    await user.keyboard('{Escape}');
 
     await waitFor(() => {
       expect(screen.queryByTestId('dropdown-meeting-participants-picker')).not.toBeInTheDocument();

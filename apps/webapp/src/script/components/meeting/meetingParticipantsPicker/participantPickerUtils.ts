@@ -25,6 +25,10 @@ export const getConversationKey = (conversation: Conversation): string => {
   return `${conversation.qualifiedId.domain}-${conversation.qualifiedId.id}`;
 };
 
+export const isAllowedMeetingParticipant = (user: User): boolean => {
+  return !user.isService && !user.isGuest() && !user.isTemporaryGuest();
+};
+
 export const searchUsersByQuery = (users: User[], query: string): User[] => {
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -71,5 +75,8 @@ export const mergeUsersIntoSelection = (selectedUsers: User[], importedUsers: Us
 };
 
 export const mergeConversationUsersIntoSelection = (selectedUsers: User[], conversation: Conversation): User[] => {
-  return mergeUsersIntoSelection(selectedUsers, conversation.participating_user_ets());
+  return mergeUsersIntoSelection(
+    selectedUsers,
+    conversation.participating_user_ets().filter(isAllowedMeetingParticipant),
+  );
 };

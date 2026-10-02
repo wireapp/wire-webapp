@@ -71,7 +71,7 @@ export const MeetingConversationsSearchableList = ({
         <span css={collapseIcon(isOpen)} aria-hidden="true">
           <ChevronDownIcon width={16} height={16} />
         </span>
-        {translate('meetings.scheduleModal.groupsAndChannels')}
+        {translate('meetings.scheduleModal.groupsAndChannelsWithCount', {count: conversations.length})}
       </button>
       <div id={`${id}-conversation-list`} css={conversationListStyles} role="list">
         {isOpen &&
