@@ -311,7 +311,7 @@ export const MeetingPrepSurface = ({
                 type="button"
                 css={meetingPrepMenuButtonStyles}
                 aria-expanded={microphoneMenuOpen}
-                aria-label={translate('meetings.prepModal.openMicrophoneDevices')}
+                aria-label={translate('videoCallOverlayOpenMicrophoneAndSpeakerOptions')}
                 onClick={() => {
                   setCameraMenuOpen(false);
                   setMicrophoneMenuOpen(open => {
@@ -356,7 +356,7 @@ export const MeetingPrepSurface = ({
                 type="button"
                 css={meetingPrepMenuButtonStyles}
                 aria-expanded={cameraMenuOpen}
-                aria-label={translate('meetings.prepModal.openCameraDevices')}
+                aria-label={translate('videoCallOverlayOpenCameraOptions')}
                 onClick={() => {
                   setMicrophoneMenuOpen(false);
                   setCameraMenuOpen(open => {
