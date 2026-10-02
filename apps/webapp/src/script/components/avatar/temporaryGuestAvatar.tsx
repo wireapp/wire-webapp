@@ -31,6 +31,12 @@ import {shouldShowBadge} from './userAvatar';
 
 import {AVATAR_SIZE, STATE, DIAMETER} from '.';
 
+const extraLargeAvatarBorderWidthInPixels = 4;
+const timerViewBoxSize = 32;
+const diameterToRadiusDivisor = 2;
+const timerViewBoxRadius = 16;
+const circleRadiusToDiameterMultiplier = 2;
+
 interface TemporaryGuestAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
   noBadge?: boolean;
@@ -50,13 +56,13 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
   ...props
 }) => {
   const borderScale = 0.9916;
-  const finalBorderWidth = avatarSize === AVATAR_SIZE.X_LARGE ? 4 : 1;
+  const finalBorderWidth = avatarSize === AVATAR_SIZE.X_LARGE ? extraLargeAvatarBorderWidthInPixels : 1;
   const remainingTime = participant.expirationRemaining();
   const normalizedRemainingTime = remainingTime / User.CONFIG.TEMPORARY_GUEST.LIFETIME;
 
-  const borderWidth = (finalBorderWidth / DIAMETER[avatarSize]) * 32;
-  const borderRadius = (16 - borderWidth / 2) * borderScale;
-  const timerLength = borderRadius * Math.PI * 2;
+  const borderWidth = (finalBorderWidth / DIAMETER[avatarSize]) * timerViewBoxSize;
+  const borderRadius = (timerViewBoxRadius - borderWidth / diameterToRadiusDivisor) * borderScale;
+  const timerLength = borderRadius * Math.PI * circleRadiusToDiameterMultiplier;
   const timerOffset = timerLength * (normalizedRemainingTime - 1);
 
   return (

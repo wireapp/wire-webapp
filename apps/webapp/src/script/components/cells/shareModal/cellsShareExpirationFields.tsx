@@ -69,6 +69,12 @@ import {
   timeSelectMenuPortalStyles,
 } from './cellsShareExpirationStyles';
 
+const hoursPerHalfDay = 12;
+const twelveHourClockOffset = 11;
+const timeComponentDigitCount = 2;
+const timeOptionIntervalInMinutes = 15;
+const minutesPerHour = 60;
+
 interface CellsShareExpirationFieldsLabels {
   expiresLabel: string;
   dateAriaLabel: string;
@@ -101,9 +107,9 @@ const parseTimeLabel = (value: string | number) => {
   let hour24 = 0;
   if (Number.isFinite(hour)) {
     if (isPm) {
-      hour24 = (hour % 12) + 12;
+      hour24 = (hour % hoursPerHalfDay) + hoursPerHalfDay;
     } else {
-      hour24 = hour % 12;
+      hour24 = hour % hoursPerHalfDay;
     }
   }
   const safeMinutes = Number.isFinite(minutes) ? minutes : 0;
@@ -112,9 +118,9 @@ const parseTimeLabel = (value: string | number) => {
 };
 
 const formatTimeLabel = (hour24: number, minutes: number): string => {
-  const hour12 = ((hour24 + 11) % 12) + 1;
-  const period = hour24 < 12 ? 'AM' : 'PM';
-  return `${hour12}:${String(minutes).padStart(2, '0')} ${period}`;
+  const hour12 = ((hour24 + twelveHourClockOffset) % hoursPerHalfDay) + 1;
+  const period = hour24 < hoursPerHalfDay ? 'AM' : 'PM';
+  return `${hour12}:${String(minutes).padStart(timeComponentDigitCount, '0')} ${period}`;
 };
 
 export const getNextHourDateTime = (): Date => {
@@ -126,9 +132,9 @@ export const getNextHourDateTime = (): Date => {
 
 const buildTimeOptions = (): Option[] => {
   return Array.from({length: 96}, (_, index) => {
-    const totalMinutes = index * 15;
-    const hour24 = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+    const totalMinutes = index * timeOptionIntervalInMinutes;
+    const hour24 = Math.floor(totalMinutes / minutesPerHour);
+    const minutes = totalMinutes % minutesPerHour;
     const label = formatTimeLabel(hour24, minutes);
     return {value: label, label};
   });

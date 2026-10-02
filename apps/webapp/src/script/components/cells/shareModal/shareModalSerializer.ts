@@ -19,6 +19,8 @@
 
 import {isNull} from '@sindresorhus/is';
 
+const millisecondsPerSecond = 1000;
+
 interface ShareModalInput {
   passwordEnabled: boolean;
   passwordValue: string;
@@ -54,7 +56,7 @@ export const serializeShareModalInput = ({
   if (!expirationEnabled) {
     accessEnd = null;
   } else if (!isNull(expirationDateTime) && !expirationInvalid) {
-    accessEnd = Math.floor(expirationDateTime.getTime() / 1000).toString();
+    accessEnd = Math.floor(expirationDateTime.getTime() / millisecondsPerSecond).toString();
   } else {
     accessEnd = undefined;
   }

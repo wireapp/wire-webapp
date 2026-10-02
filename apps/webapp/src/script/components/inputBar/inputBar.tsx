@@ -73,9 +73,11 @@ import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 
+const pingTimeoutInSeconds = 2;
+
 const CONFIG = {
   ...Config.getConfig(),
-  PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+  PING_TIMEOUT: TIME_IN_MILLIS.SECOND * pingTimeoutInSeconds,
   GIPHY_TEXT_LENGTH: 256,
 };
 

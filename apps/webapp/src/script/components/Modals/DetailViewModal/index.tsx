@@ -47,6 +47,8 @@ import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/messageCategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 
+const detailModalScrollDelayInMilliseconds = 150;
+
 interface DetailViewModalProps {
   readonly assetRepository: AssetRepository;
   readonly conversationRepository: ConversationRepository;
@@ -87,7 +89,7 @@ export const DetailViewModal = ({
     setTimeout(() => {
       setImageSrc('');
       onClose?.();
-    }, 150);
+    }, detailModalScrollDelayInMilliseconds);
   };
 
   const handleOnClosePress = (event: KeyboardEvent | ReactKeyboardEvent<HTMLButtonElement>) => {

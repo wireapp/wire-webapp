@@ -27,6 +27,9 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 
+const viewportCenterDivisor = 2;
+const messageLoadDebounceInMilliseconds = 100;
+
 type UseLoadMessagesProps = {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
@@ -79,7 +82,7 @@ export const useLoadMessages = (
         await conversationRepository.getSubsequentMessages(conversation, lastMessage).finally(() => {
           requestAnimationFrame(() => {
             const clientHeight = parentElement.clientHeight;
-            const diff = clientHeight / 2;
+            const diff = clientHeight / viewportCenterDivisor;
 
             parentElement.scrollTop += diff;
             setIsLoadingMessages(false);
@@ -112,7 +115,7 @@ export const useLoadMessages = (
       if (firstItem.index === 0) {
         fireAndForgetInvoker.fireAndForget(loadPrecedingMessages);
       }
-    }, 100);
+    }, messageLoadDebounceInMilliseconds);
 
     return () => {
       return clearTimeout(timeout);
@@ -140,7 +143,7 @@ export const useLoadMessages = (
       if (lastItem.index >= itemsLength - 1) {
         fireAndForgetInvoker.fireAndForget(loadFollowingMessages);
       }
-    }, 100);
+    }, messageLoadDebounceInMilliseconds);
 
     return () => {
       return clearTimeout(timeout);
