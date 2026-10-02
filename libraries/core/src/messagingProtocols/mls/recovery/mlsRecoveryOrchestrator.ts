@@ -17,6 +17,7 @@
  *
  */
 
+import {isEmptyObject, isFunction, isObject, isUndefined} from '@sindresorhus/is';
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -377,18 +378,19 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
 }
 
 function extractErrorDetails(error: unknown): unknown {
-  if (error !== null && typeof error !== 'object') {
+  if (!isObject(error) || isFunction(error)) {
     return '(not an object)';
   }
   const details: Record<string, unknown> = {};
-  const err = error as Record<string, unknown>;
-  if (err.status !== undefined) {
-    details.status = err.status;
+  const errorRecord = error as Record<string, unknown>;
+  if (!isUndefined(errorRecord.status)) {
+    details.status = errorRecord.status;
   }
-  if (err.response != null && typeof err.response === 'object') {
-    details.response = {data: (err.response as Record<string, unknown>).data};
+  if (isObject(errorRecord.response) && !isFunction(errorRecord.response)) {
+    details.response = {data: (errorRecord.response as Record<string, unknown>).data};
   }
-  return Object.keys(details).length > 0 ? details : '(no meaningful data)';
+
+  return isEmptyObject(details) ? '(no meaningful data)' : details;
 }
 
 /**
