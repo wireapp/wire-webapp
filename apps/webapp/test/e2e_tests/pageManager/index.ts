@@ -81,7 +81,17 @@ import {ParticipantDevicesPage} from './webapp/pages/participantDevices.page';
 import {NewDeviceModal} from './webapp/modals/newDevice.modal';
 import {ReadReceiptModal} from './webapp/modals/readReceipt.modal';
 
+import {
+  applyStartupFeatureToggleOverridesToUrl,
+  StartupFeatureToggleOverrides,
+} from '../utils/startupFeatureToggleOverrides';
+
 export const webAppPath = process.env.WEBAPP_URL ?? '';
+
+export type WebAppNavigationOptions = {
+  readonly baseUrl?: string;
+  readonly startupFeatureToggles?: StartupFeatureToggleOverrides;
+};
 
 export class PageManager {
   private readonly cache = new Map<string, any>();
@@ -111,20 +121,26 @@ export class PageManager {
     }
   };
 
-  openMainPage = (baseUrl: string = webAppPath) => {
-    return this.page.goto(new URL('/', baseUrl).toString(), {waitUntil: 'networkidle'});
+  private createNavigationUrl(path: string, options: WebAppNavigationOptions): string {
+    const {baseUrl = webAppPath, startupFeatureToggles = {}} = options;
+    const navigationUrl = new URL(path, baseUrl);
+    return applyStartupFeatureToggleOverridesToUrl(navigationUrl, startupFeatureToggles).toString();
+  }
+
+  openMainPage = (options: WebAppNavigationOptions = {}) => {
+    return this.page.goto(this.createNavigationUrl('/', options), {waitUntil: 'networkidle'});
   };
 
-  openLoginPage = async (baseUrl: string = webAppPath) => {
-    await this.page.goto(new URL(`/auth/#/login`, baseUrl).toString());
+  openLoginPage = async (options: WebAppNavigationOptions = {}) => {
+    await this.page.goto(this.createNavigationUrl('/auth/#/login', options));
   };
 
-  openRegistrationPage = async (baseUrl: string = webAppPath) => {
-    await this.page.goto(new URL(`/auth/#/createaccount`, baseUrl).toString());
+  openRegistrationPage = async (options: WebAppNavigationOptions = {}) => {
+    await this.page.goto(this.createNavigationUrl('/auth/#/createaccount', options));
   };
 
-  openSSOPage = async (baseUrl: string = webAppPath) => {
-    await this.page.goto(new URL(`/auth/#/sso`, baseUrl).toString(), {waitUntil: 'commit', timeout: 120_000});
+  openSSOPage = async (options: WebAppNavigationOptions = {}) => {
+    await this.page.goto(this.createNavigationUrl('/auth/#/sso', options), {waitUntil: 'commit', timeout: 120_000});
   };
 
   openUrl = (url: string) => {

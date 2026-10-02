@@ -17,6 +17,8 @@
  *
  */
 
+import {startupFeatureToggleQueryParameterName} from '../featureToggles/startupFeatureToggles';
+
 export const QUERY_KEY = {
   ACCOUNT_ID: 'id', // account ID passed from the wrapper to the webview
   CLIENT_TYPE: 'clienttype',
@@ -57,6 +59,7 @@ export const FORWARDED_QUERY_KEYS = [
   QUERY_KEY.ENVIRONMENT,
   QUERY_KEY.LOCALE,
   QUERY_KEY.TRACKING,
+  startupFeatureToggleQueryParameterName,
   ...Object.values(OAUTH_QUERY_KEYS),
 ];
 
