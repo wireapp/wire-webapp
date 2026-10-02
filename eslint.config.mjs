@@ -358,6 +358,7 @@ const productionConfigs = [
   {
     files: [
       'libraries/api-client/**/*.{ts,tsx,mts,cts}',
+      'libraries/bazinga64/**/*.{ts,tsx,mts,cts}',
     ],
     rules: {
       'no-magic-numbers': 'off',

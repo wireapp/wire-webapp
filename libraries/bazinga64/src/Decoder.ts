@@ -20,6 +20,8 @@
 import {Converter} from './Converter';
 import {DecodedData} from './DecodedData';
 
+const base64BlockLength = 4;
+
 export class Decoder {
   public static fromBase64(data: string | number[]): DecodedData {
     /**
@@ -36,7 +38,7 @@ export class Decoder {
   }
 
   private static toByteArray(encoded: string): Uint8Array {
-    if (encoded.length % 4 !== 0) {
+    if (encoded.length % base64BlockLength !== 0) {
       throw new Error('Invalid string. Length must be a multiple of 4.');
     }
 
