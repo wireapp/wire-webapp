@@ -17,11 +17,18 @@
  *
  */
 
+const millisecondsPerSecond = 1000;
+const secondsPerMinute = 60;
+const minutesPerHour = 60;
+const hoursPerDay = 24;
+const daysPerWeek = 7;
+const daysPerYear = 365;
+
 export enum TimeInMillis {
-  SECOND = 1000,
-  MINUTE = SECOND * 60,
-  HOUR = MINUTE * 60,
-  DAY = HOUR * 24,
-  WEEK = DAY * 7,
-  YEAR = DAY * 365,
+  SECOND = millisecondsPerSecond,
+  MINUTE = SECOND * secondsPerMinute,
+  HOUR = MINUTE * minutesPerHour,
+  DAY = HOUR * hoursPerDay,
+  WEEK = DAY * daysPerWeek,
+  YEAR = DAY * daysPerYear,
 }
