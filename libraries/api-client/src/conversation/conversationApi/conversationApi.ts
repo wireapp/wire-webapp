@@ -72,6 +72,11 @@ import {
 import {handleFederationErrors} from '../federatedBackendsError';
 import {Subconversation, SUBCONVERSATION_ID} from '../subconversation';
 
+const maximumConversationChunkSize = 500;
+const minimumQualifiedConversationBackendVersion = 3;
+const minimumConversationAccessRolesBackendVersion = 2;
+const noContentStatusCode = 204;
+
 export type PostMlsMessageResponse = {
   failed_to_send?: QualifiedId[];
   failed?: QualifiedId[];
@@ -89,7 +94,7 @@ const apiBreakpoint = {
 };
 
 export class ConversationAPI {
-  public static readonly MAX_CHUNK_SIZE = 500;
+  public static readonly MAX_CHUNK_SIZE = maximumConversationChunkSize;
   public static readonly URL = {
     ACCESS: 'access',
     BOT: 'bot',
@@ -762,7 +767,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: typingData,
       method: 'post',
-      url: `${this.generateBaseConversationUrl(conversationId, this.backendFeatures.version >= 3)}/${
+      url: `${this.generateBaseConversationUrl(conversationId, this.backendFeatures.version >= minimumQualifiedConversationBackendVersion)}/${
         ConversationAPI.URL.TYPING
       }`,
     };
@@ -868,7 +873,7 @@ export class ConversationAPI {
       },
       method: 'post',
       url:
-        this.backendFeatures.version >= 2
+        this.backendFeatures.version >= minimumConversationAccessRolesBackendVersion
           ? `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.MEMBERS}`
           : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${ConversationAPI.URL.V2}`,
     };
@@ -996,7 +1001,7 @@ export class ConversationAPI {
     const response = await this.client.sendJSON<ConversationProtocolUpdateEvent>(config);
 
     //if the protocol was not changed (it already was the same), the response will be 204, response data is empty
-    if (response.status === 204) {
+    if (response.status === noContentStatusCode) {
       return null;
     }
 

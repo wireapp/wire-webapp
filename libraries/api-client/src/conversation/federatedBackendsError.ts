@@ -25,10 +25,12 @@ export enum FederatedBackendsErrorLabel {
   NON_FEDERATING_BACKENDS = 'NonFederatingBackendsError',
 }
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Federation error codes define backend wire values inline. */
 enum FederatedBackendsErrorCode {
   NON_FEDERATING = 409, // When 2 users' backend are not connected to each others
   UNREACHABLE = 533, // When a backend is not reachable for the current user
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export class FederatedBackendsError extends Error {
   constructor(

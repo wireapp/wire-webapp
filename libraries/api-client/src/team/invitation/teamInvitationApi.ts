@@ -32,8 +32,10 @@ import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
 import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
 import {TeamAPI} from '../team/';
 
+const maximumInvitationsChunkSize = 100;
+
 export class TeamInvitationAPI {
-  public static readonly MAX_CHUNK_SIZE = 100;
+  public static readonly MAX_CHUNK_SIZE = maximumInvitationsChunkSize;
   public static readonly URL = {
     INFO: 'info',
     INVITATIONS: 'invitations',

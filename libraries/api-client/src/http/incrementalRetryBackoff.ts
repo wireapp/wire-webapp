@@ -19,6 +19,8 @@
 
 import {Maybe} from 'true-myth';
 
+const retryDelayGrowthFactor = 2;
+
 export type IncrementalRetryBackoffState = {
   readonly delayInMilliseconds: number;
   readonly retryCount: number;
@@ -32,7 +34,7 @@ export type IncrementalRetryBackoffPolicy = {
 };
 
 const initialRetryDelayInMilliseconds = 100;
-const maximumRetryDelayInMilliseconds = 10 * 60 * 1000;
+const maximumRetryDelayInMilliseconds = 600_000;
 const nonStandardRetryableStatusCode = 420;
 const tooManyRequestsStatusCode = 429;
 const serverErrorStatusCodeRangeStart = 500;
@@ -44,7 +46,9 @@ export function createIncrementalRetryBackoffPolicy(): IncrementalRetryBackoffPo
     advanceState(incrementalRetryBackoffState) {
       const currentDelayInMilliseconds = incrementalRetryBackoffState.delayInMilliseconds;
       const nextDelayInMilliseconds =
-        currentDelayInMilliseconds === 0 ? initialRetryDelayInMilliseconds : currentDelayInMilliseconds * 2;
+        currentDelayInMilliseconds === 0
+          ? initialRetryDelayInMilliseconds
+          : currentDelayInMilliseconds * retryDelayGrowthFactor;
       const boundedDelayInMilliseconds = Math.min(nextDelayInMilliseconds, maximumRetryDelayInMilliseconds);
 
       return {

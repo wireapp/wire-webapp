@@ -49,6 +49,9 @@ import {
   VerifyDelete,
 } from '../user/';
 
+const defaultUsersChunkSize = 50;
+const defaultUsersPrekeyBundleChunkSize = 128;
+
 type PrekeysResponse = {
   qualified_user_client_prekeys: QualifiedUserPreKeyBundleMap;
   failed_to_list?: QualifiedId[];
@@ -74,8 +77,8 @@ const apiBreakpoint = {
 };
 
 export class UserAPI {
-  public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
-  public static readonly DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE = 128;
+  public static readonly DEFAULT_USERS_CHUNK_SIZE = defaultUsersChunkSize;
+  public static readonly DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE = defaultUsersPrekeyBundleChunkSize;
   public static readonly URL = {
     ACTIVATE: 'activate',
     BY_HANDLE: 'by-handle',

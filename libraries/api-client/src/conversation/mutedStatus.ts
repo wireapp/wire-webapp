@@ -17,8 +17,10 @@
  *
  */
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Notification modes define their protocol bit masks inline. */
 export enum MutedStatus {
   ALL_NOTIFICATIONS = 0b00,
   ONLY_MENTIONS = 0b01,
   NO_NOTIFICATIONS = 0b11,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */

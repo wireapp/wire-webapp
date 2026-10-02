@@ -17,6 +17,8 @@
  *
  */
 
+const millisecondsPerSecond = 1000;
+
 export enum AccessTokenType {
   ACCESS_DATA = 'access-data',
   USER_DATA = 'user-data',
@@ -53,7 +55,7 @@ export function parseAccessToken(accessToken: string): AccessTokenInfo {
     throw new Error(`Unsupported access token version "${tokenVersion}".`);
   }
 
-  const expirationDateInMillis = Number(parseValue(accessToken, 'd')) * 1000;
+  const expirationDateInMillis = Number(parseValue(accessToken, 'd')) * millisecondsPerSecond;
   const tokenSections = accessToken.split('.');
   const token = tokenSections[0] ?? '';
 

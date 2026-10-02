@@ -27,6 +27,8 @@ import {PreKeyBundle} from '../auth/';
 import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '../client/';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 
+const clientCacheDurationInMilliseconds = 86_400_000;
+
 export type ClaimedKeyPackages = {
   key_packages: {
     client: string;
@@ -268,7 +270,7 @@ export class ClientAPI {
    */
   private publicKeys: GetMLSPublicKeysResponseData | null = null;
   private publicKeysFetchedAt: number | null = null;
-  private readonly CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+  private readonly CACHE_DURATION_MS = clientCacheDurationInMilliseconds; // 24 hours
   public async getPublicKeys(): Promise<GetMLSPublicKeysResponseData> {
     const now = Date.now();
     if (

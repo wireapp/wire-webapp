@@ -23,13 +23,15 @@ import {Runtime} from '@wireapp/commons';
 
 import {Cookie} from './cookie';
 
+const maximumCookieStoreListeners = 20;
+
 enum TOPIC {
   COOKIE_REFRESH = 'CookieStore.TOPIC.COOKIE_REFRESH',
 }
 
 export class CookieStore {
   private static cookie?: Cookie;
-  public static emitter = new EventEmitter().setMaxListeners(20);
+  public static emitter = new EventEmitter().setMaxListeners(maximumCookieStoreListeners);
 
   public static readonly TOPIC = TOPIC;
 

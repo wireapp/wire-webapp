@@ -25,6 +25,7 @@ import {QualifiedId} from '../user';
 
 import {ConversationMembers} from './';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Conversation types define backend wire values inline. */
 export enum CONVERSATION_TYPE {
   REGULAR = 0,
   SELF = 1,
@@ -32,6 +33,7 @@ export enum CONVERSATION_TYPE {
   CONNECT = 3,
   GLOBAL_TEAM = 4,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export enum CONVERSATION_LEGACY_ACCESS_ROLE {
   ACTIVATED = 'activated',

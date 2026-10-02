@@ -30,8 +30,10 @@ import {SupportedCurrency} from './supportedCurrency';
 import {HttpClient} from '../../http';
 import {Subscription} from '../payment';
 
+const defaultInvoicesChunkSize = 10;
+
 export class BillingAPI {
-  public static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
+  public static readonly DEFAULT_INVOICES_CHUNK_SIZE = defaultInvoicesChunkSize;
   constructor(private readonly client: HttpClient) {}
 
   public async getBilling(teamId: string): Promise<any> {
