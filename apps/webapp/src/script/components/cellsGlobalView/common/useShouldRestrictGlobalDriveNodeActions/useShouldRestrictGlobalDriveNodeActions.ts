@@ -18,15 +18,10 @@
  */
 
 import {shouldRestrictCellsViewerActions} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
 export const useShouldRestrictGlobalDriveNodeActions = (node: CellNode): boolean => {
-  const {isFeatureToggleEnabled} = useApplicationContext();
-
   return shouldRestrictCellsViewerActions({
-    isViewerPermissionFeatureEnabled: isFeatureToggleEnabled(viewerPermissionFeatureToggleName),
     selfUserDriveRole: node.selfUserDriveRole,
   });
 };

@@ -21,38 +21,25 @@ import {isConversationFileDropAllowed} from './isConversationFileDropAllowed';
 
 describe('isConversationFileDropAllowed', () => {
   it('allows file drops when Cells is disabled', () => {
-    expect(isConversationFileDropAllowed({isCellsEnabled: false, isViewerPermissionFeatureEnabled: true})).toBe(true);
+    expect(isConversationFileDropAllowed({isCellsEnabled: false})).toBe(true);
   });
 
-  it('allows viewer file drops when the viewer permission feature is disabled', () => {
-    expect(
-      isConversationFileDropAllowed({
-        conversationTeamId: 'team-a',
-        selfUserTeamId: 'team-b',
-        isCellsEnabled: true,
-        isViewerPermissionFeatureEnabled: false,
-      }),
-    ).toBe(true);
-  });
-
-  it('allows editor file drops when the viewer permission feature is enabled', () => {
+  it('allows editor file drops', () => {
     expect(
       isConversationFileDropAllowed({
         conversationTeamId: 'team-a',
         selfUserTeamId: 'team-a',
         isCellsEnabled: true,
-        isViewerPermissionFeatureEnabled: true,
       }),
     ).toBe(true);
   });
 
-  it('prevents viewer file drops when the viewer permission feature is enabled', () => {
+  it('prevents viewer file drops', () => {
     expect(
       isConversationFileDropAllowed({
         conversationTeamId: 'team-a',
         selfUserTeamId: 'team-b',
         isCellsEnabled: true,
-        isViewerPermissionFeatureEnabled: true,
       }),
     ).toBe(false);
   });

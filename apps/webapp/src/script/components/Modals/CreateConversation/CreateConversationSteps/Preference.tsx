@@ -26,7 +26,6 @@ import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNot
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
@@ -35,7 +34,7 @@ import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {getSharedDrivePermissionHint} from '../utils';
 
 export const Preference = () => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const {
     isCellsEnabled,
     isGuestsEnabled,
@@ -56,7 +55,6 @@ export const Preference = () => {
   } = useKoSubscribableChildren(teamState, ['isCellsEnabled', 'isMLSEnabled', 'isAppsEnabled']);
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
-  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
 
   const defaultProtocol = isMLSEnabled
     ? (teamState.teamFeatures()?.mls?.config.defaultProtocol ?? CONVERSATION_PROTOCOL.PROTEUS)
@@ -120,7 +118,7 @@ export const Preference = () => {
           isDisabled={false}
           name={translate('modalCreateGroupCellsToggleHeading')}
           info={translate('modalCreateGroupCellsToggleInfo')}
-          adminHintForShareDrive={getSharedDrivePermissionHint(translate, isViewerPermissionFeatureEnabled)}
+          adminHintForShareDrive={getSharedDrivePermissionHint(translate)}
         />
       )}
     </>

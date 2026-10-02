@@ -47,10 +47,7 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
-import {
-  disableMessagePreprocessingFeatureToggleName,
-  viewerPermissionFeatureToggleName,
-} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -198,12 +195,10 @@ function InputBarContent({
       : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
-  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
   const isCellsUploadAllowed = isConversationFileDropAllowed({
     conversationTeamId: conversation.teamId,
     selfUserTeamId: selfUser.teamId,
     isCellsEnabled,
-    isViewerPermissionFeatureEnabled,
   });
   const hasLocalEphemeralTimer =
     isSelfDeletingMessagesEnabled && isNumber(localMessageTimer) && localMessageTimer !== 0 && !hasGlobalMessageTimer;

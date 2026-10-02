@@ -48,7 +48,6 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
@@ -77,7 +76,7 @@ const GroupCreationModal = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }: GroupCreationModalProps) => {
-  const {isFeatureToggleEnabled, mainViewModel, translate} = useApplicationContext();
+  const {mainViewModel, translate} = useApplicationContext();
   const {
     isTeam,
     isMLSEnabled: isMLSEnabledForTeam,
@@ -124,7 +123,6 @@ const GroupCreationModal = ({
   //both environment feature flag and team feature flag must be enabled to create conversations with cells
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
-  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
   const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(false);
   const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
 
@@ -603,7 +601,7 @@ const GroupCreationModal = ({
                     isDisabled={false}
                     name={translate('modalCreateGroupCellsToggleHeading')}
                     info={translate('modalCreateGroupCellsToggleInfo')}
-                    adminHintForShareDrive={getSharedDrivePermissionHint(translate, isViewerPermissionFeatureEnabled)}
+                    adminHintForShareDrive={getSharedDrivePermissionHint(translate)}
                   />
                 )}
                 {enableMLSToggle && (

@@ -112,12 +112,6 @@ describe('FileHeader', () => {
     expect(screen.queryByRole('button', {name: 'More options'})).not.toBeInTheDocument();
   });
 
-  it('shows download action when download is allowed', () => {
-    renderHeader({isViewerPermissionFeatureEnabled: false});
-
-    expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
-  });
-
   it('shows file metadata beside the file name', () => {
     const {container: renderContainer} = renderHeader({
       props: {

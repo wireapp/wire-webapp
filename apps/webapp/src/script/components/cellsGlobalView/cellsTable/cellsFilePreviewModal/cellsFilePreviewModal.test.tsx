@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createExecutingFireAndForgetInvokerForTest,
@@ -53,17 +52,12 @@ const translate = (key: string) => {
 
 const createRootProviderWrapper = ({
   fireAndForgetInvoker,
-  isViewerPermissionFeatureEnabled,
 }: {
   fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
-  isViewerPermissionFeatureEnabled: boolean;
 }) => {
   return createRootProviderWrapperForTest(
     createRootContextValueForTest({
       fireAndForgetInvoker,
-      isFeatureToggleEnabled: featureName => {
-        return featureName === viewerPermissionFeatureToggleName && isViewerPermissionFeatureEnabled;
-      },
       translate,
     }),
   );
@@ -128,11 +122,9 @@ describe('CellsFilePreviewModal', () => {
   });
 
   const renderModal = ({
-    isViewerPermissionFeatureEnabled = true,
     selfUserDriveRole,
     selectedFile,
   }: {
-    isViewerPermissionFeatureEnabled?: boolean;
     selfUserDriveRole: CellFile['selfUserDriveRole'];
     selectedFile?: CellFile;
   }) => {
@@ -143,7 +135,7 @@ describe('CellsFilePreviewModal', () => {
         <FakeFilePreviewProvider selfUserDriveRole={selfUserDriveRole} selectedFile={selectedFile}>
           <CellsFilePreviewModal />
         </FakeFilePreviewProvider>,
-        createRootProviderWrapper({fireAndForgetInvoker, isViewerPermissionFeatureEnabled}),
+        createRootProviderWrapper({fireAndForgetInvoker}),
       ),
     );
 

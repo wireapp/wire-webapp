@@ -29,13 +29,11 @@ import {
   sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
-  viewerPermissionFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
-  viewerPermissionFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
@@ -108,7 +106,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(conversationListCollapseFeatureToggleName)).toBe(true);
   });
 
-  it('enables the viewer permission feature toggle when present in the query parameter', () => {
+  it('enables the for-tests-only feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName}`,
     );
@@ -172,7 +170,6 @@ describe('startupFeatureToggles', function () {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
       conversationListCollapseFeatureToggleName,
-      viewerPermissionFeatureToggleName,
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       sharedDriveDirectUploadFeatureToggleName,

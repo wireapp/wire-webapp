@@ -76,9 +76,4 @@ describe('FilePreviewModal', () => {
     expect(screen.queryByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).not.toBeInTheDocument();
   });
 
-  it('shows download when viewer permissions are disabled', async () => {
-    renderFilePreviewModal({isViewerPermissionFeatureEnabled: false});
-
-    expect(await screen.findByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).toBeInTheDocument();
-  });
 });
