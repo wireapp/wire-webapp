@@ -167,9 +167,10 @@ function ConversationContent({
   const [isSharedDriveSearchViewOpen, setIsSharedDriveSearchViewOpen] = useState<boolean>(false);
 
   const callState = container.resolve(CallState);
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, [
+  const {classifiedDomains, isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isFileSharingSendingEnabled',
+    'isCellsEnabled',
   ]);
 
   const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(activeConversation, [
@@ -782,7 +783,7 @@ function ConversationContent({
                         onCloseSearchView={() => {
                           return setIsSharedDriveSearchViewOpen(false);
                         }}
-                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
+                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled && isCellsUploadEnabled}
                         showViewerPermission={showViewerPermission}
                       />
                     </SharedDriveUploadProvider>
@@ -862,6 +863,7 @@ function ConversationContent({
                     teamState={teamState}
                     selfUser={selfUser}
                     isCellsEnabled={isCellsEnabled}
+                    isCellsUploadEnabled={isCellsUploadEnabled}
                     onShiftTab={() => {
                       return setMsgElementsFocusable(false);
                     }}

@@ -110,6 +110,7 @@ describe('InputBar', () => {
       searchRepository,
       storageRepository,
       isCellsEnabled: false,
+      isCellsUploadEnabled: false,
       teamState: new TeamState(),
       selfUser: new User('id', '', translateForTest),
       onShiftTab: jest.fn(),
@@ -151,6 +152,7 @@ describe('InputBar', () => {
   it('hides cells upload buttons for viewers', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
+    props.isCellsUploadEnabled = true;
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'guest-team';
@@ -164,6 +166,7 @@ describe('InputBar', () => {
   it('shows cells upload buttons for editors', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
+    props.isCellsUploadEnabled = true;
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'conversation-team';
@@ -172,6 +175,20 @@ describe('InputBar', () => {
 
     expect(getByTitle('tooltipConversationAddImage')).not.toBe(null);
     expect(getByTitle('tooltipConversationFile')).not.toBe(null);
+  });
+
+  it('hides all Cells upload buttons when the team feature is disabled', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.isCellsUploadEnabled = false;
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'conversation-team';
+
+    const {queryByTitle} = renderInputBar(props);
+
+    expect(queryByTitle('tooltipConversationAddImage')).toBe(null);
+    expect(queryByTitle('tooltipConversationFile')).toBe(null);
   });
 
   it('has passed value', async () => {
