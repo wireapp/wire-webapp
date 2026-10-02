@@ -18,7 +18,7 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {E2EIHandler} from 'src/script/e2eIdentity';
@@ -48,7 +48,7 @@ export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE
     return undefined;
   }
   // Check if E2EIdentity feature has a server discoveryUrl
-  if (!e2eiConfig.config || !e2eiConfig.config.acmeDiscoveryUrl || e2eiConfig.config.acmeDiscoveryUrl.length <= 0) {
+  if (!isTruthy(e2eiConfig.config) || !isNonEmptyString(e2eiConfig.config.acmeDiscoveryUrl)) {
     return undefined;
   }
   return e2eiConfig;
@@ -57,7 +57,7 @@ export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE
 export const configureE2EI = (config: FeatureList, clock: Clock): undefined | Promise<E2EIHandler> => {
   // Either get the current E2EIdentity handler instance or create a new one
   const e2eiConfig = getE2EIConfig(config);
-  if (!e2eiConfig) {
+  if (isUndefined(e2eiConfig)) {
     return undefined;
   }
   const discoveryUrl = e2eiConfig.config.acmeDiscoveryUrl;
