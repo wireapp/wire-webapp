@@ -28,6 +28,7 @@ import {
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
+  forTestsOnlyFeatureToggleName,
   viewerPermissionFeatureToggleName,
 } from './startupFeatureToggleNames';
 
@@ -35,6 +36,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   viewerPermissionFeatureToggleName,
+  forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
 ] as const;
@@ -108,10 +110,10 @@ describe('startupFeatureToggles', function () {
 
   it('enables the viewer permission feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(viewerPermissionFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(forTestsOnlyFeatureToggleName)).toBe(true);
   });
 
   it('enables the disable message preprocessing feature toggle when present in the query parameter', () => {
@@ -171,6 +173,7 @@ describe('startupFeatureToggles', function () {
       applockRefactoredFeatureToggleName,
       conversationListCollapseFeatureToggleName,
       viewerPermissionFeatureToggleName,
+      forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       sharedDriveDirectUploadFeatureToggleName,
     ]);

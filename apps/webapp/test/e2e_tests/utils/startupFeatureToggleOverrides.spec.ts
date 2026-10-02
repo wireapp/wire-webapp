@@ -22,7 +22,7 @@ import {expect, test} from '@playwright/test';
 import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
-  viewerPermissionFeatureToggleName,
+  forTestsOnlyFeatureToggleName,
 } from 'src/script/featureToggles/startupFeatureToggleNames';
 import {startupFeatureToggleQueryParameterName} from 'src/script/featureToggles/startupFeatureToggles';
 
@@ -33,10 +33,10 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
     const originalUrl = new URL('https://example.com/auth/#/login');
 
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [viewerPermissionFeatureToggleName]: true,
+      [forTestsOnlyFeatureToggleName]: true,
     });
 
-    expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(viewerPermissionFeatureToggleName);
+    expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(forTestsOnlyFeatureToggleName);
     expect(updatedUrl).not.toBe(originalUrl);
     expect(originalUrl.href).toBe('https://example.com/auth/#/login');
   });
@@ -44,27 +44,27 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
   test('enables multiple features in canonical order regardless of override insertion order', () => {
     const originalUrl = new URL('https://example.com/');
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [viewerPermissionFeatureToggleName]: true,
+      [forTestsOnlyFeatureToggleName]: true,
       [applockRefactoredFeatureToggleName]: true,
     });
     const reorderedOverridesUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
       [applockRefactoredFeatureToggleName]: true,
-      [viewerPermissionFeatureToggleName]: true,
+      [forTestsOnlyFeatureToggleName]: true,
     });
 
     expect(updatedUrl.search).toBe(
-      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}%2C${viewerPermissionFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}%2C${forTestsOnlyFeatureToggleName}`,
     );
     expect(updatedUrl.href).toBe(reorderedOverridesUrl.href);
   });
 
   test('disables only the specified feature', () => {
     const originalUrl = new URL(
-      `https://example.com/?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${viewerPermissionFeatureToggleName}`,
+      `https://example.com/?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${forTestsOnlyFeatureToggleName}`,
     );
 
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [viewerPermissionFeatureToggleName]: false,
+      [forTestsOnlyFeatureToggleName]: false,
     });
 
     expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(
@@ -74,11 +74,11 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
 
   test('removes the query parameter when disabling the last enabled feature', () => {
     const originalUrl = new URL(
-      `https://example.com/?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName}`,
+      `https://example.com/?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName}`,
     );
 
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [viewerPermissionFeatureToggleName]: false,
+      [forTestsOnlyFeatureToggleName]: false,
     });
 
     expect(updatedUrl.searchParams.has(startupFeatureToggleQueryParameterName)).toBe(false);
@@ -89,7 +89,7 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
     const originalUrl = new URL('https://example.com/auth/?return=conversation%2F123&filter=one&filter=two');
 
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [viewerPermissionFeatureToggleName]: true,
+      [forTestsOnlyFeatureToggleName]: true,
     });
 
     expect(updatedUrl.searchParams.get('return')).toBe('conversation/123');
@@ -102,7 +102,7 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
     const originalUrl = new URL('https://example.com/auth/#/login');
 
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [viewerPermissionFeatureToggleName]: true,
+      [forTestsOnlyFeatureToggleName]: true,
     });
 
     expect(updatedUrl.hash).toBe('#/login');
@@ -110,7 +110,7 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
 
   test('leaves the URL unchanged when overrides are omitted', () => {
     const originalUrl = new URL(
-      `https://example.com/auth/?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName},${applockRefactoredFeatureToggleName}&return=a%20b#/login`,
+      `https://example.com/auth/?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName},${applockRefactoredFeatureToggleName}&return=a%20b#/login`,
     );
 
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {});
@@ -120,11 +120,11 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
 
   test('leaves feature state unchanged when an override is undefined', () => {
     const originalUrl = new URL(
-      `https://example.com/?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName}`,
+      `https://example.com/?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName}`,
     );
 
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [viewerPermissionFeatureToggleName]: undefined,
+      [forTestsOnlyFeatureToggleName]: undefined,
       [applockRefactoredFeatureToggleName]: undefined,
     });
 
@@ -137,13 +137,13 @@ test.describe('applyStartupFeatureToggleOverridesToUrl', () => {
     );
 
     const updatedUrl = applyStartupFeatureToggleOverridesToUrl(originalUrl, {
-      [viewerPermissionFeatureToggleName]: true,
+      [forTestsOnlyFeatureToggleName]: true,
       [applockRefactoredFeatureToggleName]: false,
       [conversationListCollapseFeatureToggleName]: undefined,
     });
 
     expect(updatedUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(
-      `${conversationListCollapseFeatureToggleName},${viewerPermissionFeatureToggleName}`,
+      `${conversationListCollapseFeatureToggleName},${forTestsOnlyFeatureToggleName}`,
     );
     expect(updatedUrl.searchParams.get('return')).toBe('home');
     expect(updatedUrl.hash).toBe('#/login');

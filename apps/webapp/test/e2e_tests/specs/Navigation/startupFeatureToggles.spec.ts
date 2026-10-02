@@ -17,7 +17,7 @@
  *
  */
 
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {forTestsOnlyFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {startupFeatureToggleQueryParameterName} from 'src/script/featureToggles/startupFeatureToggles';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {expect, test, withLogin} from 'test/e2e_tests/test.fixtures';
@@ -30,7 +30,7 @@ test.describe('Startup feature toggles on navigation', () => {
       const user = await createUser();
       const page = await createPage(
         withLogin(user, {
-          startupFeatureToggles: {[viewerPermissionFeatureToggleName]: true},
+          startupFeatureToggles: {[forTestsOnlyFeatureToggleName]: true},
         }),
       );
 
@@ -38,9 +38,7 @@ test.describe('Startup feature toggles on navigation', () => {
 
       const mainAppUrl = new URL(page.url());
       expect(mainAppUrl.pathname).toBe('/');
-      expect(mainAppUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(
-        viewerPermissionFeatureToggleName,
-      );
+      expect(mainAppUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(forTestsOnlyFeatureToggleName);
     },
   );
 });
