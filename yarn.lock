@@ -4452,6 +4452,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/deepmerge@npm:3.2.1":
+  version: 3.2.1
+  resolution: "@fastify/deepmerge@npm:3.2.1"
+  checksum: 10/e35db0525b2cbb45ba5c0ca8b6f40f80016f4d1b89c8428ed17d181e69b2a7262cdaabeb9cd8033684ca9b2771c037ae2749f02519928f1407c118014248033b
+  languageName: node
+  linkType: hard
+
 "@floating-ui/core@npm:^1.7.3":
   version: 1.7.3
   resolution: "@floating-ui/core@npm:1.7.3"
@@ -12261,6 +12268,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@enormora/clock": "npm:0.0.3"
     "@enormora/fire-and-forget": "npm:0.0.4"
+    "@fastify/deepmerge": "npm:3.2.1"
     "@formatjs/cli": "npm:6.16.32"
     "@formkit/auto-animate": "npm:0.10.0"
     "@lexical/code": "npm:0.27.2"

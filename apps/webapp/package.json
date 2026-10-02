@@ -27,6 +27,7 @@
     "@emotion/react": "11.14.0",
     "@enormora/clock": "0.0.3",
     "@enormora/fire-and-forget": "0.0.4",
+    "@fastify/deepmerge": "3.2.1",
     "@formkit/auto-animate": "0.10.0",
     "@lexical/code": "0.27.2",
     "@lexical/history": "0.27.2",
