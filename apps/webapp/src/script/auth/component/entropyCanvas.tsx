@@ -25,6 +25,10 @@ import {isNull} from '@sindresorhus/is';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 import {EntropyData} from '../../util/entropy';
 
+const percentageScale = 100;
+const entropyProgressUpdateIntervalInMilliseconds = 100;
+const maximumEntropyCoordinate = 255;
+
 interface CanvasProps {
   ariaLabel?: string;
   css?: CSSObject;
@@ -54,12 +58,14 @@ const EntropyCanvas = (props: CanvasProps) => {
   const [lastPoint, setLastPoint] = useState<Point | null>(null);
 
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
-    setPercent(Math.floor(100 * Math.min(entropy.entropyBits / minEntropyBits, entropy.length / minFrames)));
+    setPercent(
+      Math.floor(percentageScale * Math.min(entropy.entropyBits / minEntropyBits, entropy.length / minFrames)),
+    );
     onProgress(entropy, percent, false);
-  }, 100);
+  }, entropyProgressUpdateIntervalInMilliseconds);
 
   useEffect(() => {
-    if (percent >= 100) {
+    if (percent >= percentageScale) {
       clearInterval();
       onProgress(entropy, percent, false);
     }
@@ -108,8 +114,8 @@ const EntropyCanvas = (props: CanvasProps) => {
     };
     entropy.addFrame({
       t: Date.now(),
-      x: (255 * drawPoint.x) / boundingRect.width,
-      y: (255 * drawPoint.y) / boundingRect.height,
+      x: (maximumEntropyCoordinate * drawPoint.x) / boundingRect.width,
+      y: (maximumEntropyCoordinate * drawPoint.y) / boundingRect.height,
     });
     setPreviousPoint(lastPoint);
     setLastPoint(drawPoint);

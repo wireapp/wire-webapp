@@ -30,6 +30,8 @@ import {useIsMounted} from 'Util/useIsMounted';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
 import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 
+const inputFeedbackDurationMultiplier = 2;
+
 interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
   'data-uie-name'?: string;
@@ -61,7 +63,7 @@ export const useInputDone = () => {
       if (isMounted()) {
         setIsDone(false);
       }
-    }, MotionDuration.X_LONG * 2);
+    }, MotionDuration.X_LONG * inputFeedbackDurationMultiplier);
   };
 
   return {done, isDone};

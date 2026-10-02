@@ -18,6 +18,7 @@
  */
 
 /** Enum for different message categories */
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Message categories document their persisted bit positions inline. */
 export enum MessageCategory {
   AUDIO = 1 << 10,
   COMPOSITE = 1 << 14,
@@ -36,3 +37,4 @@ export enum MessageCategory {
   UNDEFINED = 1 << 0,
   VIDEO = 1 << 11,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */

@@ -29,6 +29,8 @@ import {
 } from './webappVersion.ts';
 import type {WebAppVersion, WebAppVersionSynchronizationMarker} from './webappVersion.ts';
 
+const webappVersionCaptureIndex = 2;
+
 declare const webAppVersionSynchronizationBranchNameBrand: unique symbol;
 
 export type WebAppVersionSynchronizationBranchName = string & {
@@ -188,7 +190,7 @@ export function validateWebAppVersionSynchronizationBranchName(
   }
 
   const releaseIdentifier = branchNameMatch[1];
-  const webAppVersion = branchNameMatch[2];
+  const webAppVersion = branchNameMatch[webappVersionCaptureIndex];
 
   if (!isString(releaseIdentifier) || !isString(webAppVersion)) {
     return Result.err(new Error(`Invalid WebApp version synchronization branch name: ${branchName}`));

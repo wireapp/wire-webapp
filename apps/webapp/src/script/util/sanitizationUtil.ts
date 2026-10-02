@@ -22,6 +22,8 @@ import {isNull} from '@sindresorhus/is';
 import {prependProtocol} from './urlUtil';
 import {isValidEmail} from './validationUtil';
 
+const downloadCleanupDelayInMilliseconds = 10;
+
 export const escapeRegex = (string: string): string => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
@@ -57,6 +59,6 @@ export const safeMailOpen = (email: string): void => {
   if (!isNull(newWindow)) {
     window.setTimeout(() => {
       return newWindow.close();
-    }, 10);
+    }, downloadCleanupDelayInMilliseconds);
   }
 };

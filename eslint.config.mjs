@@ -130,14 +130,7 @@ const legacyRules = {
   'no-else-return': 'error',
   'no-inner-declarations': 'error',
   'no-lonely-if': 'error',
-  'no-magic-numbers': [
-    'warn',
-    {
-      ignore: [-1, 0, 1],
-      ignoreArrayIndexes: true,
-      ignoreDefaultValues: true,
-    },
-  ],
+  'no-magic-numbers': ['error', magicNumberOptions],
   'no-restricted-globals': [
     'warn',
     {
@@ -356,18 +349,7 @@ const productionConfigs = [
     },
   },
   {
-    files: [
-      'libraries/api-client/**/*.{ts,tsx,mts,cts}',
-      'libraries/bazinga64/**/*.{ts,tsx,mts,cts}',
-      'libraries/commons/**/*.{ts,tsx,mts,cts}',
-      'libraries/core/**/*.{ts,tsx,mts,cts}',
-      'libraries/priority-queue/**/*.{ts,tsx,mts,cts}',
-      'libraries/react-ui-kit/**/*.{ts,tsx,mts,cts}',
-      'apps/webapp/src/script/components/**/*.{ts,tsx,mts,cts}',
-      'apps/webapp/src/script/repositories/**/*.{ts,tsx,mts,cts}',
-      'apps/webapp/src/script/service/**/*.{ts,tsx,mts,cts}',
-      'apps/webapp/src/script/view_model/**/*.{ts,tsx,mts,cts}',
-    ],
+    files: ['**/*.{ts,tsx,mts,cts}'],
     rules: {
       'no-magic-numbers': 'off',
       '@typescript-eslint/no-magic-numbers': [

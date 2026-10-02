@@ -20,6 +20,8 @@
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
+const jpegStartOfImageMarker = 0xffd8;
+
 export const stripImageExifData = async (image: Blob): Promise<Blob> => {
   const url = URL.createObjectURL(image);
   try {
@@ -118,7 +120,7 @@ const readFileAsArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
 };
 
 const isJPEG = (view: DataView): boolean => {
-  return view.getUint16(0, false) === 0xffd8;
+  return view.getUint16(0, false) === jpegStartOfImageMarker;
 };
 
 const containsExifData = (view: DataView): boolean => {

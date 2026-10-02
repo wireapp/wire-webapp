@@ -57,7 +57,8 @@ if (packageJson.dependencies) {
 
 // Write modified package.json to a temp file
 const tempPackageJsonPath = path.join(DIST_PATH, 'package.json.tmp');
-fs.writeFileSync(tempPackageJsonPath, JSON.stringify(packageJson, null, 2));
+const packageJsonIndentationSpaces = 2;
+fs.writeFileSync(tempPackageJsonPath, JSON.stringify(packageJson, null, packageJsonIndentationSpaces));
 archive.file(tempPackageJsonPath, {name: 'package.json'});
 archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
 archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});

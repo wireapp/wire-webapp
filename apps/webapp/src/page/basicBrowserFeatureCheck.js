@@ -70,7 +70,9 @@ function isMinimumSupported() {
     'replaceAll' in String.prototype &&
     'sticky' in RegExp.prototype &&
     'toString' in RegExp &&
+    // eslint-disable-next-line no-magic-numbers -- Explicit decimal samples keep this legacy-browser guard free of newer syntax.
     parseFloat('1.23') === 1.23 &&
+    // eslint-disable-next-line no-magic-numbers -- The sample and precision directly specify the formatting capability being checked.
     (1.23456789).toFixed(2) === '1.23'
   );
 }

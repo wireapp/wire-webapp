@@ -17,6 +17,8 @@
  *
  */
 
+const entropySampleComponentCount = 3;
+
 interface EntropyFrame {
   x: number;
   y: number;
@@ -45,7 +47,7 @@ export function shannonEntropy(entropyData: Uint8Array): number {
  * @param n The number of different elements representing one flattened object
  */
 export function calculateDeltaValues(data: Uint8Array, n: number): Uint8Array {
-  const prev = Array<number | null>(3);
+  const prev = Array<number | null>(entropySampleComponentCount);
   const result = new Array<number>();
 
   data.forEach((value, index) => {

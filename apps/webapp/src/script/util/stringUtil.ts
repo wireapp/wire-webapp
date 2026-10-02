@@ -23,6 +23,14 @@ import getSlug from 'speakingurl';
 import type {User} from 'Repositories/entity/User';
 import {randomElement} from 'Util/arrayUtil';
 
+const obfuscationExtraCharacterRange = 10;
+const wordBoundarySearchLength = 25;
+const bitsPerByte = 8;
+const utf16HighByteMask = 0xff00;
+const utf16LowByteMask = 0xff;
+const paddedFingerprintLength = 16;
+const randomSortOutcomeCount = 2;
+
 export const startsWith = (string = '', query: string): boolean => {
   return string.toLowerCase().startsWith(query.toLowerCase());
 };
@@ -62,9 +70,12 @@ export const getRandomChar = (): string => {
 export const obfuscate = (text: string): string => {
   const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz ');
 
-  const obfuscatedText = Array.from({length: text.length + Math.floor((1 + Math.random()) * 10)}, () => {
-    return randomElement(alphabet);
-  }).join('');
+  const obfuscatedText = Array.from(
+    {length: text.length + Math.floor((1 + Math.random()) * obfuscationExtraCharacterRange)},
+    () => {
+      return randomElement(alphabet);
+    },
+  ).join('');
 
   return obfuscatedText;
 };
@@ -96,7 +107,7 @@ export const transliterationIndex = (nameSlug: string, querySlug: string): numbe
 export const truncate = (string: string, outputLength: number, wordBoundary = true): string => {
   if (string.length > outputLength) {
     let truncateIndex = outputLength - 1;
-    if (wordBoundary && string.lastIndexOf(' ', outputLength - 1) > outputLength - 25) {
+    if (wordBoundary && string.lastIndexOf(' ', outputLength - 1) > outputLength - wordBoundarySearchLength) {
       truncateIndex = string.lastIndexOf(' ', outputLength - 1);
     }
     string = `${string.slice(0, truncateIndex)}…`;
@@ -163,8 +174,8 @@ export const stringToUtf16BE = (str = ''): number[] => {
       return char.charCodeAt(0);
     })
     .forEach(charCode => {
-      bytes.push((charCode & 0xff00) >> 8);
-      bytes.push(charCode & 0xff);
+      bytes.push((charCode & utf16HighByteMask) >> bitsPerByte);
+      bytes.push(charCode & utf16LowByteMask);
     });
 
   return bytes;
@@ -190,7 +201,7 @@ export const utf8ToUtf16BE = (str = ''): number[] => {
 };
 
 export const splitFingerprint = (fingerprint: string): string[] => {
-  return fingerprint?.padStart(16, '0').match(/(..?)/g) ?? [];
+  return fingerprint?.padStart(paddedFingerprintLength, '0').match(/(..?)/g) ?? [];
 };
 
 // When we receive strings via Websocket, it will have been converted to utf-8,
@@ -303,7 +314,7 @@ export const generateRandomPassword = (passwordLength: number = 8): string => {
   password = password
     .split('')
     .toSorted(() => {
-      return getRandomIndex(2) - 1;
+      return getRandomIndex(randomSortOutcomeCount) - 1;
     }) // Generates either -1 or 1 for shuffling
     .join('');
 

@@ -36,6 +36,7 @@ export function inRange(value: number, lowerBound: number, upperBound: number): 
 
 export const rootMeanSquare = (floatArray: number[] | Float32Array): number => {
   const sum = (floatArray as number[]).reduce((power, number) => {
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- Squaring is clearer with its conventional exponent inline.
     return power + number ** 2;
   }, 0);
   return Math.sqrt(sum) / floatArray.length;
@@ -49,5 +50,6 @@ export const rootMeanSquare = (floatArray: number[] | Float32Array): number => {
  * @param factor determines by how much the value is rounded
  */
 export const roundLogarithmic = (exactValue: number, factor: number): number => {
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- The base explicitly matches the base-two logarithm.
   return Math.ceil(2 ** (Math.floor(factor * Math.log2(exactValue)) / factor));
 };

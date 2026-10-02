@@ -48,6 +48,8 @@ import {getModalOptions, ModalType} from './modals';
 import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
+const enrollmentProgressPollingIntervalInSeconds = 10;
+
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
@@ -247,7 +249,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           return task(isSnoozable);
         },
         firingDate: firingDate,
-        intervalDelay: TIME_IN_MILLIS.SECOND * 10,
+        intervalDelay: TIME_IN_MILLIS.SECOND * enrollmentProgressPollingIntervalInSeconds,
       });
     }
     return {

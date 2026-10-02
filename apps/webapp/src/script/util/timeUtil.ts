@@ -61,6 +61,16 @@ import {
 import type {Translate} from './localizerUtil';
 import {zeroPadding} from './util';
 
+const millisecondsPerSecond = 1000;
+const secondsPerMinute = 60;
+const fiveMinuteDurationInMinutes = 5;
+const minutesPerHour = 60;
+const hoursPerDay = 24;
+const daysPerWeek = 7;
+const daysPerYear = 365;
+const maximumDisplayedDurationUnits = 2;
+const isoDatePrefixLength = 10;
+
 export type FnDate = number | Date;
 
 interface DiscreteTimeUnit {
@@ -76,13 +86,13 @@ export interface DurationUnit {
 }
 
 export enum TIME_IN_MILLIS {
-  SECOND = 1000,
-  MINUTE = SECOND * 60,
-  FIVE_MINUTES = MINUTE * 5,
-  HOUR = MINUTE * 60,
-  DAY = HOUR * 24,
-  WEEK = DAY * 7,
-  YEAR = DAY * 365,
+  SECOND = millisecondsPerSecond,
+  MINUTE = SECOND * secondsPerMinute,
+  FIVE_MINUTES = MINUTE * fiveMinuteDurationInMinutes,
+  HOUR = MINUTE * minutesPerHour,
+  DAY = HOUR * hoursPerDay,
+  WEEK = DAY * daysPerWeek,
+  YEAR = DAY * daysPerYear,
 }
 const dateFnsLocales = {
   cs,
@@ -322,7 +332,7 @@ export const formatDurationCaption = (duration: number, translate: Translate): s
     if (unit.value > 0) {
       validUnitStrings.push(`${unit.value} ${unit.longUnit}`);
     }
-    if (validUnitStrings.length === 2) {
+    if (validUnitStrings.length === maximumDisplayedDurationUnits) {
       break;
     }
     const nextUnit = mappedUnits[index + 1];
@@ -342,12 +352,12 @@ export const formatDurationCaption = (duration: number, translate: Translate): s
 export const formatSeconds = (duration: number): string => {
   duration = Math.round(duration !== 0 && !isNan(duration) ? duration : 0);
 
-  const hours = Math.floor(duration / (60 * 60));
+  const hours = Math.floor(duration / (minutesPerHour * secondsPerMinute));
 
-  const divisorForMinutes = duration % (60 * 60);
-  const minutes = Math.floor(divisorForMinutes / 60);
+  const divisorForMinutes = duration % (minutesPerHour * secondsPerMinute);
+  const minutes = Math.floor(divisorForMinutes / secondsPerMinute);
 
-  const divisor_for_seconds = divisorForMinutes % 60;
+  const divisor_for_seconds = divisorForMinutes % secondsPerMinute;
   const seconds = Math.ceil(divisor_for_seconds);
 
   const components = [zeroPadding(minutes), zeroPadding(seconds)];
@@ -378,7 +388,7 @@ export const formatTimestamp = (timestamp: number | string, longFormat: boolean 
 };
 
 export const getCurrentDate = () => {
-  return new Date().toISOString().substring(0, 10);
+  return new Date().toISOString().substring(0, isoDatePrefixLength);
 };
 export const getUnixTimestamp = () => {
   return Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
@@ -393,7 +403,7 @@ export const isYoungerThan1Hour = (date: FnDate) => {
   return differenceInHours(new Date(), date) < 1;
 };
 export const isYoungerThan7Days = (date: FnDate) => {
-  return differenceInDays(new Date(), date) < 7;
+  return differenceInDays(new Date(), date) < daysPerWeek;
 };
 
 export const fromNowLocale = (date: FnDate) => {

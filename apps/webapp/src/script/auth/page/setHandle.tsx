@@ -48,6 +48,8 @@ import {createSuggestions} from '../util/handleUtil';
 import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/trackingUtil';
 import {pathWithParams} from '../util/urlUtil';
 
+const minimumHandleLength = 2;
+
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const SetHandleComponent = ({
@@ -106,7 +108,11 @@ const SetHandleComponent = ({
         navigate(ROUTE.SUCCESS);
       }
     } catch (error: unknown) {
-      if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_HANDLE && handle.trim().length < 2) {
+      if (
+        isBackendError(error) &&
+        error.label === BackendErrorLabel.INVALID_HANDLE &&
+        handle.trim().length < minimumHandleLength
+      ) {
         error.label = SyntheticErrorLabel.HANDLE_TOO_SHORT;
       }
       setError(error);

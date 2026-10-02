@@ -44,6 +44,8 @@ import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {applockStyles} from './appLock.styles';
 
+const millisecondsPerSecond = 1000;
+
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
   LOCKED = 'applock.locked',
@@ -204,7 +206,7 @@ const AppLock = ({
 
   const startAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
-    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * 1000);
+    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * millisecondsPerSecond);
     setInactivityTimeoutId(id);
   }, [inactivityTimeoutId]);
 
@@ -283,7 +285,7 @@ const AppLock = ({
       if (scheduledAppLockTimeoutInSeconds === null) {
         return;
       }
-      setScheduledTimeoutId(window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * 1000));
+      setScheduledTimeoutId(window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * millisecondsPerSecond));
     }
   };
 
