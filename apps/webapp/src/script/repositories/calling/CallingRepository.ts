@@ -115,6 +115,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCallInvite';
 import {ClientId, Participant, UserId} from './Participant';
+import {getAllowedSftOrigins, isAllowedSftUrl} from './sftUrl';
 
 import {Config} from '../../Config';
 import {NoAudioInputError} from '../../error/noAudioInputError';
@@ -224,6 +225,7 @@ export class CallingRepository {
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
   private isOnAvsRustSft = false;
+  private allowedSftOrigins: ReadonlySet<string> = new Set();
   private readonly incomingSetupReceivedAtByConversation = new Map<SerializedConversationId, number>();
 
   static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * emojiTimeoutInSeconds;
@@ -257,6 +259,7 @@ export class CallingRepository {
     private readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
+    private readonly sftHttpClient: Pick<typeof axios, 'post'> = axios,
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = noop;
@@ -2587,7 +2590,11 @@ export class CallingRepository {
     __: number,
   ): number => {
     const _sendSFTRequest = async () => {
-      const response = await axios.post(url, data);
+      if (!isAllowedSftUrl(url, this.allowedSftOrigins)) {
+        throw new Error('SFT request destination is not allowed');
+      }
+
+      const response = await this.sftHttpClient.post(url, data);
       const {status, data: axiosData} = response;
       const jsonData = JSON.stringify(axiosData);
       const user = this.wUser;
@@ -2617,7 +2624,9 @@ export class CallingRepository {
       const config = await this.fetchConfig(limit);
       const effectiveConfig = getEffectiveCallingConfig(config, useRustSft);
 
-      this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(effectiveConfig));
+      const serializedConfig = JSON.stringify(effectiveConfig);
+      this.allowedSftOrigins = getAllowedSftOrigins(effectiveConfig);
+      this.wCall?.configUpdate(this.wUser, 0, serializedConfig);
     };
     _requestConfig().catch((error: unknown) => {
       this.logger.warn('Failed fetching calling config', error);
