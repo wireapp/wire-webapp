@@ -261,16 +261,6 @@ const strictBooleanExpressionsRule = [
   },
 ];
 
-const strictBooleanRules = {
-  '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
-  '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
-};
-
-const strictBooleanRulesWithUnnecessaryCondition = {
-  ...strictBooleanRules,
-  '@typescript-eslint/no-unnecessary-condition': 'error',
-};
-
 const emptyArrowFunctionRestrictions = [
   {
     selector: "ArrowFunctionExpression[async=false][body.type='BlockStatement'][body.body.length=0]",
@@ -541,7 +531,8 @@ const productionConfigs = [
       'libraries/react-ui-kit/**/*.{ts,tsx}',
     ],
     rules: {
-      ...strictBooleanRules,
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
     },
   },
   {
@@ -595,13 +586,14 @@ const productionConfigs = [
   {
     files: ['apps/webapp/src/script/page/rightSidebar/groupParticipantService/groupParticipantService.tsx'],
     rules: {
-      ...strictBooleanRulesWithUnnecessaryCondition,
+      '@typescript-eslint/no-unnecessary-condition': 'error',
     },
   },
   {
     files: ['apps/webapp/src/script/**/*.{ts,tsx}'],
     rules: {
-      ...strictBooleanRules,
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
     },
   },
   {
