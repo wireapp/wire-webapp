@@ -21,7 +21,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNonEmptyArray} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
@@ -558,14 +558,14 @@ export class App {
       await this.initiateSelfUser(selfUser);
       eventLogger.log(AppInitializationStep.UserInitialize);
       const localClient = await this.core.getLocalClient();
-      if (!localClient) {
+      if (isNullOrUndefined(localClient)) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
       let teamFeatures: FeatureList = {};
       let teamMembers: QualifiedId[] = [];
 
-      if (selfUser.teamId) {
+      if (isNonEmptyString(selfUser.teamId)) {
         const {features, members} = await teamRepository.initTeam(selfUser.teamId);
         teamFeatures = features;
         teamMembers = members;
@@ -838,7 +838,7 @@ export class App {
    * Initialize ServiceWorker if supported.
    */
   private async initServiceWorker() {
-    if (navigator.serviceWorker) {
+    if (isTruthy(navigator.serviceWorker)) {
       await navigator.serviceWorker.register(`/sw.js?${Environment.version(false)}`).then(({scope}) => {
         return this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`);
       });
@@ -982,7 +982,7 @@ export class App {
         }
 
         default: {
-          this.logger.error(`Caused by: ${message || error}`, error);
+          this.logger.error(`Caused by: ${isNonEmptyString(message) ? message : error}`, error);
 
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
@@ -1133,7 +1133,7 @@ export class App {
         await this.repository.event.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
-        if (VerificationMessageType) {
+        if (isTruthy(VerificationMessageType)) {
           const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, VerificationMessageType, userIds);
           await this.repository.event.injectEvent(degradedEvent);
         } else {

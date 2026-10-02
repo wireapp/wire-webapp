@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -114,7 +115,7 @@ export class LifeCycleRepository {
     const isTemporaryGuestUser = currentUser?.isTemporaryGuest();
 
     // Redirect temporary guests to main website instead of login page
-    if (isTemporaryGuestSignOut && isTemporaryGuestUser && externalUrl.website) {
+    if (isTemporaryGuestSignOut && isTemporaryGuestUser && isNonEmptyString(externalUrl.website)) {
       this.logger.info('User is a temporary guest. Redirecting to main website instead of login page.');
       return replaceBrowserLocation(externalUrl.website);
     }
@@ -205,7 +206,7 @@ export class LifeCycleRepository {
     const activeConversation = this.dependencies.conversationRepository.getActiveConversation();
 
     // Send typing stop notification for active conversation
-    if (activeConversation) {
+    if (!isNullOrUndefined(activeConversation)) {
       try {
         await this.dependencies.conversationRepository.sendTypingStop(activeConversation);
         this.logger.debug('Sent typing stop notification for active conversation during logout.');
@@ -245,7 +246,7 @@ export class LifeCycleRepository {
 
     // Handle cookie label preservation
     const currentUser = this.dependencies.userRepository['userState'].self();
-    if (currentUser) {
+    if (isTruthy(currentUser)) {
       const cookieLabelsToPreserve = this.determineCookieLabelsToPreserve(currentUser, shouldClearAllData);
       storageKeysToPreserve.push(...cookieLabelsToPreserve);
 

@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {getLogger, Logger} from 'Util/logger';
 
 import {ConversationError} from '../error/conversationError';
@@ -32,7 +34,8 @@ export class WindowHandler {
 
   private _listenToUnhandledPromiseRejection(): void {
     window.addEventListener('unhandledrejection', (promiseRejectionEvent: any): void | false => {
-      const error = promiseRejectionEvent.reason || {};
+      const rejectionReason = promiseRejectionEvent.reason;
+      const error = isTruthy(rejectionReason) ? rejectionReason : {};
 
       const isLegalHoldReject = error.type === ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
       if (isLegalHoldReject) {

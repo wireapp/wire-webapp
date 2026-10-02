@@ -17,6 +17,7 @@
  *
  */
 
+import {isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
@@ -46,7 +47,7 @@ export const checkIndexedDb = (): Promise<void> => {
     try {
       dbOpenRequest = window.indexedDB.open('test');
       dbOpenRequest.onerror = event => {
-        if (dbOpenRequest.error) {
+        if (!isNull(dbOpenRequest.error)) {
           event.preventDefault();
           return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
         }
@@ -407,7 +408,7 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
 };
 
 const supportsSecretStorage = () => {
-  return !Runtime.isDesktopApp() || !!window.systemCrypto;
+  return !Runtime.isDesktopApp() || !isUndefined(window.systemCrypto);
 };
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
@@ -418,7 +419,7 @@ export const supportsMLS = () => {
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
 export const removeAnimationsClass = (element: HTMLElement | null) => {
-  if (element) {
+  if (!isNullOrUndefined(element)) {
     element.addEventListener('animationend', () => {
       if (element.classList.contains(incomingCssClass)) {
         element.classList.remove(incomingCssClass);

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {ReactionMap, UserReactionMap} from 'Repositories/storage';
@@ -41,7 +42,7 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
         return r === reaction;
       });
       const qualifiedId = {id: userId, domain: ''};
-      if (existingReaction) {
+      if (!isUndefined(existingReaction)) {
         existingReaction[1].push(qualifiedId);
       } else {
         acc.push([reaction, [qualifiedId]]);
@@ -66,13 +67,13 @@ export function addReaction(reactions: ReactionMap, reactionsStr: string, userId
 
   userReactions
     .filter(([reaction]) => {
-      return !!reaction;
+      return isNonEmptyString(reaction);
     })
     .forEach(reaction => {
       const existingEntry = filteredReactions.find(([r]) => {
         return r === reaction;
       });
-      if (existingEntry) {
+      if (!isUndefined(existingEntry)) {
         existingEntry[1].push(userId);
       } else {
         filteredReactions.push([reaction, [userId]]);
