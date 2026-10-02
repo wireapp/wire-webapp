@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
 import {omit} from 'underscore';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -155,7 +156,7 @@ export class BackupRepository {
     }
     files[Filename.METADATA] = encodedMetadata;
 
-    if (password) {
+    if (isNonEmptyString(password)) {
       return this.createEncryptedBackup(files, user, password);
     }
 
@@ -266,7 +267,7 @@ export class BackupRepository {
       archiveVersion = cpbData.archiveVersion;
     } else {
       // Decrypt and unzip the legacy backup
-      if (password) {
+      if (isNonEmptyString(password)) {
         files = await this.createDecryptedBackup(data, user, password);
       } else {
         files = await this.worker.post<Record<string, Uint8Array>>({
@@ -312,7 +313,7 @@ export class BackupRepository {
     const {decodingError, decodedHeader, headerSize} = await backupCoder.decodeHeader(dataArray);
 
     // error decoding the header
-    if (decodingError) {
+    if (isNonEmptyString(decodingError)) {
       this.mapDecodingError(decodingError);
     }
     // We need to read the ChaCha20 generated header prior to the encrypted backup file data to run some sanity checks
@@ -408,7 +409,7 @@ export class BackupRepository {
   private async importUsers(users: UserRecord[], progressCallback: ProgressCallback) {
     /* we want to remove users that don't have qualified ids (has we cannot generate primary keys for them) */
     const qualifiedUsers = users.filter(user => {
-      return !!user.qualified_id;
+      return isTruthy(user.qualified_id);
     });
 
     const importEventChunk = async (usersChunk: UserRecord[]) => {
@@ -448,10 +449,10 @@ export class BackupRepository {
 
   private prepareEvents(entity: EventRecord) {
     const data = entity.data as any;
-    if (data) {
+    if (isTruthy(data)) {
       UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = data[field];
-        if (dataField) {
+        if (isTruthy(dataField)) {
           data[field] = new Uint8Array(Object.values(dataField));
         }
       });
