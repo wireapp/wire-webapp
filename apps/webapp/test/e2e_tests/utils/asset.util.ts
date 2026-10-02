@@ -74,7 +74,7 @@ export const isAssetDownloaded = async (filePath: string): Promise<boolean> => {
   }
 };
 
-export const shareAssetHelper = async (filePath: string | string[], page: Page, buttonLocator: Locator) => {
+export const shareAssetHelper = async (filePath: string | readonly string[], page: Page, buttonLocator: Locator) => {
   const fileChooserPromise = page.waitForEvent('filechooser');
   await buttonLocator.click();
   const fileChooser = await fileChooserPromise;
