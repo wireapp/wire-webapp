@@ -146,6 +146,69 @@ describe('MeetingPrepModal', () => {
     await expectClosed();
   });
 
+  it('ignores Cancel, Escape, and the overlay while the join is still running', async () => {
+    let finishJoin: (joined: boolean) => void = () => {
+      return undefined;
+    };
+    const joinMeeting = jest.fn(() => {
+      return new Promise<boolean>(resolve => {
+        finishJoin = resolve;
+      });
+    });
+    renderModal(joinMeeting);
+    act(() => {
+      useMeetingPrepModal.getState().open(session);
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
+    await waitFor(() => {
+      expect(joinMeeting).toHaveBeenCalledTimes(1);
+    });
+
+    expect(screen.getByRole('button', {name: 'modalConfirmSecondary'})).toBeDisabled();
+    expect(screen.getByRole('button', {name: 'meetings.meetNowModal.closeAriaLabel'})).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
+    const content = screen.getByRole('dialog').firstElementChild;
+    if (content === null) {
+      throw new Error('Expected modal content element');
+    }
+    fireEvent.keyDown(content, {key: KEY.ESC});
+    fireEvent.click(screen.getByRole('dialog'));
+
+    expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
+    expect(joinMeeting).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      finishJoin(true);
+    });
+    await expectClosed();
+  });
+
+  it('allows Cancel again after the join does not start', async () => {
+    let finishJoin: (joined: boolean) => void = () => {
+      return undefined;
+    };
+    const joinMeeting = jest.fn(() => {
+      return new Promise<boolean>(resolve => {
+        finishJoin = resolve;
+      });
+    });
+    renderModal(joinMeeting);
+    act(() => {
+      useMeetingPrepModal.getState().open(session);
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
+    await act(async () => {
+      finishJoin(false);
+    });
+
+    expect(screen.getByRole('button', {name: 'modalConfirmSecondary'})).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', {name: 'modalConfirmSecondary'}));
+    await expectClosed();
+  });
+
   it('stays open when the join does not start', async () => {
     const joinMeeting = jest.fn().mockResolvedValue(false);
     renderModal(joinMeeting);

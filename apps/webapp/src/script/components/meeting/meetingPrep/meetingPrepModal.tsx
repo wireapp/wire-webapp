@@ -17,6 +17,8 @@
  *
  */
 
+import {useRef} from 'react';
+
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
@@ -48,6 +50,14 @@ export const MeetingPrepModal = ({
   const close = useMeetingPrepModal(state => {
     return state.close;
   });
+  const isJoiningRef = useRef(false);
+
+  const requestClose = () => {
+    if (isJoiningRef.current) {
+      return;
+    }
+    close();
+  };
 
   return (
     <ModalComponent
@@ -55,9 +65,9 @@ export const MeetingPrepModal = ({
       data-uie-name="meeting-prep-modal"
       wrapperCSS={modalWrapperStyles}
       isShown={maybe.isJust(session)}
-      onBgClick={close}
+      onBgClick={requestClose}
       onKeyDown={event => {
-        return handleEscDown(event, close);
+        return handleEscDown(event, requestClose);
       }}
     >
       {maybe.isJust(session) && (
@@ -65,11 +75,16 @@ export const MeetingPrepModal = ({
           meetingTitle={session.value.meetingTitle}
           meetingStartTime={session.value.meetingStartTime}
           participantName={participantName}
-          onCancel={close}
+          onCancel={requestClose}
           onJoin={async choice => {
-            const joined = await joinMeeting(session.value.qualifiedConversationId, choice);
-            if (joined) {
-              close();
+            isJoiningRef.current = true;
+            try {
+              const joined = await joinMeeting(session.value.qualifiedConversationId, choice);
+              if (joined) {
+                close();
+              }
+            } finally {
+              isJoiningRef.current = false;
             }
           }}
           requestPreviewStream={requestPreviewStream}

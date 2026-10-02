@@ -268,6 +268,7 @@ export const MeetingPrepSurface = ({
           type="button"
           css={meetingPrepCloseButtonStyles}
           onClick={onCancel}
+          disabled={isJoining}
           aria-label={translate('meetings.meetNowModal.closeAriaLabel')}
         >
           <CloseIcon aria-hidden="true" />
@@ -381,7 +382,7 @@ export const MeetingPrepSurface = ({
       </div>
 
       <footer css={meetingPrepFooterStyles}>
-        <Button type="button" variant={ButtonVariant.TERTIARY} onClick={onCancel}>
+        <Button type="button" variant={ButtonVariant.TERTIARY} disabled={isJoining} onClick={onCancel}>
           {translate('modalConfirmSecondary')}
         </Button>
         <Button type="button" variant={ButtonVariant.PRIMARY} disabled={isJoining} onClick={join}>
