@@ -2097,7 +2097,7 @@ describe('central acquire call media flow', () => {
       camera: true,
     });
 
-    expect(applyBackgroundEffectSpy).toHaveBeenCalledWith(stream);
+    expect(applyBackgroundEffectSpy).toHaveBeenCalledWith(stream, false, activeCall);
     videoTrack.stop();
   });
 
@@ -2265,6 +2265,7 @@ describe('central acquire call media flow', () => {
 
   it('requests only camera when audio is already available', async () => {
     activeCall.state(CALL_STATE.INCOMING);
+    jest.spyOn(backgroundEffectsHandler, 'isBackgroundEffectEnabled').mockReturnValue(false);
 
     const audioSource = new window.RTCAudioSource();
     const audioTrack = audioSource.createTrack();
@@ -2359,6 +2360,7 @@ describe('central acquire call media flow', () => {
 
   it('requests only missing media after waiting for an ongoing acquisition', async () => {
     activeCall.state(CALL_STATE.INCOMING);
+    jest.spyOn(backgroundEffectsHandler, 'isBackgroundEffectEnabled').mockReturnValue(false);
 
     const audioSource = new window.RTCAudioSource();
     const audioTrack = audioSource.createTrack();
@@ -2514,6 +2516,42 @@ describe('central acquire call media flow', () => {
     expect(getMediaStreamSpy).toHaveBeenNthCalledWith(1, {audio: true}, activeCall.isGroupOrConference);
 
     expect(getMediaStreamSpy).toHaveBeenNthCalledWith(2, {camera: true}, activeCall.isGroupOrConference);
+  });
+
+  it('keeps the camera stream when joining before the call is connected', async () => {
+    activeCall.state(CALL_STATE.OUTGOING);
+    jest.spyOn(backgroundEffectsHandler, 'isBackgroundEffectEnabled').mockReturnValue(false);
+
+    const audioTrack = new window.RTCAudioSource().createTrack();
+    const videoTrack = new window.RTCVideoSource().createTrack();
+    const audioStream = new MediaStream([audioTrack]);
+    const cameraStream = new MediaStream([videoTrack]);
+
+    jest
+      .spyOn(callingRepository as any, 'getMediaStream')
+      .mockResolvedValueOnce(audioStream)
+      .mockResolvedValueOnce(cameraStream);
+
+    selfParticipant.updateMediaStream = jest.fn((stream: MediaStream) => {
+      if (stream.getAudioTracks().length > 0) {
+        selfParticipant.audioStream(new MediaStream(stream.getAudioTracks()));
+      }
+      if (stream.getVideoTracks().length > 0) {
+        selfParticipant.videoStream(new MediaStream(stream.getVideoTracks()));
+      }
+      return new MediaStream();
+    });
+
+    await callingRepository['acquireCallMedia'](activeCall, {
+      audio: true,
+      camera: true,
+    });
+
+    expect(selfParticipant.audioStream()?.getAudioTracks()[0]).toBe(audioTrack);
+    expect(selfParticipant.videoStream()?.getVideoTracks()[0]).toBe(videoTrack);
+
+    audioTrack.stop();
+    videoTrack.stop();
   });
 
   it('keeps acquired audio when camera acquisition fails', async () => {
@@ -2736,7 +2774,7 @@ describe('set background effect', () => {
 
       expect((callingRepository as any).getMediaStream).toHaveBeenCalledWith({camera: true}, false);
 
-      expect(applySpy).toHaveBeenCalledWith(originalStream);
+      expect(applySpy).toHaveBeenCalledWith(originalStream, false, activeCall);
       expect(selfParticipant.updateMediaStream).not.toHaveBeenCalled();
     });
 
@@ -2818,7 +2856,7 @@ describe('set background effect', () => {
         expect(getMediaStreamSpy).toHaveBeenNthCalledWith(1, {audio: true}, false);
         expect(getMediaStreamSpy).toHaveBeenNthCalledWith(2, {camera: true}, false);
 
-        expect(applySpy).toHaveBeenCalledWith(cameraStream);
+        expect(applySpy).toHaveBeenCalledWith(cameraStream, false, activeCall);
 
         expect(selfParticipant.videoState).toHaveBeenCalledWith(VIDEO_STATE.STARTED);
       });
@@ -2841,7 +2879,7 @@ describe('set background effect', () => {
 
       expect(result).toBe(true);
 
-      expect(applySpy).toHaveBeenCalledWith(originalStream);
+      expect(applySpy).toHaveBeenCalledWith(originalStream, false, activeCall);
 
       expect(selfParticipant.updateMediaStream).toHaveBeenCalledWith(originalStream, true);
 
