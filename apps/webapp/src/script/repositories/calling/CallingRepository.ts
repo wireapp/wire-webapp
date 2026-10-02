@@ -420,8 +420,10 @@ export class CallingRepository {
   private async applyCurrentBackgroundEffectOnSelfParticipant(
     stream: MediaStream,
     changeAvsSendingMediaSource = false,
+    call?: Call,
   ): Promise<MediaStream | void> {
-    const activeCall = this.callState.joinedCall();
+    // joinedCall() only exists once media is established. Join can request the camera earlier.
+    const activeCall = call ?? this.callState.joinedCall();
 
     if (isUndefined(activeCall)) {
       this.logger.warn('No active call exists to apply background effects');
@@ -888,7 +890,7 @@ export class CallingRepository {
         }
 
         if (cameraStream.getVideoTracks().length > 0) {
-          await this.applyCurrentBackgroundEffectOnSelfParticipant(cameraStream);
+          await this.applyCurrentBackgroundEffectOnSelfParticipant(cameraStream, false, call);
         }
 
         return selfParticipant.getMediaStream();
@@ -904,7 +906,7 @@ export class CallingRepository {
       }
 
       if (missingStreams.camera === true && mediaStream.getVideoTracks().length > 0) {
-        await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream);
+        await this.applyCurrentBackgroundEffectOnSelfParticipant(mediaStream, false, call);
       } else {
         selfParticipant.updateMediaStream(mediaStream, true);
       }
