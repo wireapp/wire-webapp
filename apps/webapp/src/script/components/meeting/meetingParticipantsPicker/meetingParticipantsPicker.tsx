@@ -139,7 +139,7 @@ export const MeetingParticipantsPicker = ({
       <div
         ref={triggerRef}
         css={controlStyles({isDisabled: disabled, isOpen, markInvalid})}
-        data-uie-name={dataUieName ? `${dataUieName}-control` : undefined}
+        data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-control` : undefined}
         data-disabled={disabled || undefined}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
@@ -159,7 +159,7 @@ export const MeetingParticipantsPicker = ({
             disabled={disabled}
             placeholder={showPlaceholder ? searchPlaceholder : ''}
             aria-label={isNonEmptyString(fieldLabel) ? undefined : searchPlaceholder}
-            data-uie-name={dataUieName ? `${dataUieName}-input` : undefined}
+            data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-input` : undefined}
             onChange={event => {
               onFilterChange(event.target.value);
               if (!isOpen) {
@@ -177,7 +177,7 @@ export const MeetingParticipantsPicker = ({
           css={chevronButtonStyles}
           isDisabled={disabled}
           aria-label={fieldLabel ?? searchPlaceholder}
-          data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
+          data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-toggle` : undefined}
           onPress={() => {
             return handleOpenChange(!isOpen);
           }}
@@ -206,7 +206,7 @@ export const MeetingParticipantsPicker = ({
           <div
             id={listboxId}
             css={listContainerStyles}
-            data-uie-name={dataUieName ? `dropdown-${dataUieName}` : undefined}
+            data-uie-name={isNonEmptyString(dataUieName) ? `dropdown-${dataUieName}` : undefined}
             role="listbox"
             aria-multiselectable="true"
           >
@@ -230,7 +230,7 @@ export const MeetingParticipantsPicker = ({
               showSelectedUsersRegardlessOfFilter
               isContactsOpen={isContactsOpen}
               onContactsOpenChange={setIsContactsOpen}
-              dataUieName={dataUieName ? `${dataUieName}-list` : undefined}
+              dataUieName={isNonEmptyString(dataUieName) ? `${dataUieName}-list` : undefined}
             />
             <MeetingConversationsSearchableList
               id={id}
@@ -240,7 +240,7 @@ export const MeetingParticipantsPicker = ({
               isOpen={isConversationsOpen}
               onOpenChange={setIsConversationsOpen}
               noUnderline={noUnderline}
-              dataUieName={dataUieName ? `${dataUieName}-conversation-dropdown` : undefined}
+              dataUieName={isNonEmptyString(dataUieName) ? `${dataUieName}-conversation-dropdown` : undefined}
             />
           </div>
         </div>

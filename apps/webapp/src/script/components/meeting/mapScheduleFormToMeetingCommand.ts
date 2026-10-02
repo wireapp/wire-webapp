@@ -18,6 +18,7 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
+import {isNonEmptyString} from '@sindresorhus/is';
 import {result, Result} from 'true-myth';
 
 import {ScheduleFormErrors, scheduleFormErrors} from 'Components/meeting/scheduleFormErrors';
@@ -74,6 +75,6 @@ export const mapScheduleFormToMeetingCommand = (
     end,
     recurrence: formState.recurrence,
     selectedUsers: formState.selectedUsers,
-    ...(formState.password?.trim() ? {password: formState.password} : {}),
+    ...(isNonEmptyString(formState.password?.trim()) ? {password: formState.password} : {}),
   });
 };

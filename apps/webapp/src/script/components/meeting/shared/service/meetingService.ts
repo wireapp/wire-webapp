@@ -17,7 +17,7 @@
  *
  */
 
-import {isEmptyArray} from '@sindresorhus/is';
+import {isEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -72,7 +72,7 @@ const saveMeetingConversationFromResponse = (
   conversation: MeetingWithConversation['conversation'] | undefined,
   onFailure: MeetingSubmitErrors,
 ): Task<void, MeetingSubmitErrors> => {
-  return conversation
+  return !isNullOrUndefined(conversation)
     ? conversationRepository.saveMeetingConversationFromBackend(conversation).mapRejected(() => {
         return onFailure;
       })

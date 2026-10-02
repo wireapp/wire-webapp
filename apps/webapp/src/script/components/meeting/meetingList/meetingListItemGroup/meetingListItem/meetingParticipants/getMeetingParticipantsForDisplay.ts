@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import type {User} from 'Repositories/entity/User';
@@ -40,8 +41,8 @@ export const getMeetingParticipantsForDisplay = (
   });
 
   return [
-    ...(organizer ? [organizer] : []),
-    ...(!organizer || !matchQualifiedIds(selfUser.qualifiedId, qualifiedCreator) ? [selfUser] : []),
+    ...(!isNullOrUndefined(organizer) ? [organizer] : []),
+    ...(isNullOrUndefined(organizer) || !matchQualifiedIds(selfUser.qualifiedId, qualifiedCreator) ? [selfUser] : []),
     ...otherParticipants,
   ];
 };
