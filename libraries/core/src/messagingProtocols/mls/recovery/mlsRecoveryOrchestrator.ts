@@ -381,13 +381,15 @@ function extractErrorDetails(error: unknown): unknown {
   if (!isObject(error) || isFunction(error)) {
     return '(not an object)';
   }
+
+  const {status, response} = error as Record<string, unknown>;
   const details: Record<string, unknown> = {};
-  const errorRecord = error as Record<string, unknown>;
-  if (!isUndefined(errorRecord.status)) {
-    details.status = errorRecord.status;
+
+  if (!isUndefined(status)) {
+    details.status = status;
   }
-  if (isObject(errorRecord.response) && !isFunction(errorRecord.response)) {
-    details.response = {data: (errorRecord.response as Record<string, unknown>).data};
+  if (isObject(response) && !isFunction(response)) {
+    details.response = {data: (response as Record<string, unknown>).data};
   }
 
   return isEmptyObject(details) ? '(no meaningful data)' : details;
