@@ -25,7 +25,7 @@ import path from 'path';
 const e2eRootDir = path.join(__dirname, '../');
 const fileTransferAssetsDir = path.join(e2eRootDir, 'assets/filetransfer');
 export const VideoFileName = 'example.mp4';
-const AudioFileName = 'example.mp3';
+export const AudioFileName = 'example.mp3';
 export const TextFileName = 'example.txt';
 
 export const readLocalFile = (filePath: string): Promise<Buffer> => {
@@ -74,7 +74,7 @@ export const isAssetDownloaded = async (filePath: string): Promise<boolean> => {
   }
 };
 
-export const shareAssetHelper = async (filePath: string, page: Page, buttonLocator: Locator) => {
+export const shareAssetHelper = async (filePath: string | string[], page: Page, buttonLocator: Locator) => {
   const fileChooserPromise = page.waitForEvent('filechooser');
   await buttonLocator.click();
   const fileChooser = await fileChooserPromise;
