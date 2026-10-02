@@ -327,7 +327,7 @@ export class CryptographyMapper {
         return item;
       }
 
-      if (item.text === null || item.text === undefined) {
+      if (isNullOrUndefined(item.text)) {
         return item;
       }
       const {content} = item.text;
@@ -382,7 +382,7 @@ export class CryptographyMapper {
     // Initializing this with empty values breaks rendering of images of services
     let data = {} as AssetData;
 
-    if (original !== null && original !== undefined) {
+    if (!isNullOrUndefined(original)) {
       data = {
         content_length: original.size as number,
         content_type: original.mimeType ?? '',
@@ -391,7 +391,7 @@ export class CryptographyMapper {
         },
       };
 
-      if (original.image !== null && original.image !== undefined) {
+      if (!isNullOrUndefined(original.image)) {
         data.info.height = original.image.height;
         data.info.width = original.image.width;
       } else {
@@ -399,9 +399,9 @@ export class CryptographyMapper {
       }
     }
 
-    if (preview !== null && preview !== undefined) {
+    if (!isNullOrUndefined(preview)) {
       const remote = preview.remote;
-      if (remote !== null && remote !== undefined) {
+      if (!isNullOrUndefined(remote)) {
         data = {
           ...data,
           preview_domain: remote.assetDomain ?? undefined,
@@ -413,13 +413,12 @@ export class CryptographyMapper {
       }
     }
 
-    const isImage =
-      original !== null && original !== undefined && original.image !== null && original.image !== undefined;
+    const isImage = !isNullOrUndefined(original) && !isNullOrUndefined(original.image);
     if (isImage) {
       data.info.tag = 'medium';
     }
 
-    if (asset.hasOwnProperty('uploaded') && uploaded !== null && uploaded !== undefined) {
+    if (asset.hasOwnProperty('uploaded') && !isNullOrUndefined(uploaded)) {
       data = {
         ...data,
         domain: uploaded.assetDomain ?? undefined,
@@ -429,7 +428,7 @@ export class CryptographyMapper {
         status: AssetTransferState.UPLOADED,
         token: uploaded.assetToken ?? undefined,
       };
-    } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null && notUploaded !== undefined) {
+    } else if (asset.hasOwnProperty('notUploaded') && !isNullOrUndefined(notUploaded)) {
       data = {...data, reason: notUploaded, status: AssetTransferState.UPLOAD_FAILED};
     }
 
@@ -544,7 +543,7 @@ export class CryptographyMapper {
   }
 
   private _mapEphemeral(genericMessage: GenericMessage, event: EncryptedEvent) {
-    if (genericMessage.ephemeral === null || genericMessage.ephemeral === undefined) {
+    if (isNullOrUndefined(genericMessage.ephemeral)) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
         CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
@@ -621,7 +620,7 @@ export class CryptographyMapper {
   }
 
   private _mapDataTransfer(dataTransfer: DataTransfer) {
-    if (dataTransfer.trackingIdentifier === null || dataTransfer.trackingIdentifier === undefined) {
+    if (isNullOrUndefined(dataTransfer.trackingIdentifier)) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
         CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
@@ -729,7 +728,7 @@ function addMetadata<MappedEventWithData extends {data: object}>(
   mappedEvent: MappedEventWithData,
   asset: unknown,
 ): MappedEventWithData {
-  if (asset === null || asset === undefined || typeof asset !== 'object') {
+  if (isNullOrUndefined(asset) || typeof asset !== 'object') {
     return mappedEvent;
   }
   const metadata = asset as Partial<{expectsReadConfirmation: boolean; legalHoldStatus: LegalHoldStatus}>;

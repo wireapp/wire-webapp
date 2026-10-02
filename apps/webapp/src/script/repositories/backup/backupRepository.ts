@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
+import {isNonEmptyString, isNull, isTruthy} from '@sindresorhus/is';
 import {omit} from 'underscore';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -118,7 +118,7 @@ export class BackupRepository {
       // If the feature flag is disabled, export the history as a legacy backup
       exportedData = await exportHistory(progressCallback, this.backupService, checkCancelStatus);
 
-      if (exportedData === null) {
+      if (isNull(exportedData)) {
         throw new Error('Exported data is null');
       }
 

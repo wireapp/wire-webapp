@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy} from '@sindresorhus/is';
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -189,7 +189,7 @@ export class ProteusConversationVerificationStateHandler {
         logger: this.logger,
       });
 
-      if (conversationVerificationState !== undefined) {
+      if (!isUndefined(conversationVerificationState)) {
         /**
          * TEMPORARY DEBUGGING FIX:
          * We have seen conversations in a degraded state without an unverified device in there.

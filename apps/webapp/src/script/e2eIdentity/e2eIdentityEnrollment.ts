@@ -89,7 +89,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private get enrollmentStore() {
     const selfUserId = this.userState.self()?.qualifiedId;
 
-    if (selfUserId === undefined) {
+    if (isUndefined(selfUserId)) {
       throw new Error('Self user not found');
     }
 
@@ -100,7 +100,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private createOIDCService() {
     const key = this.core.key;
     const targetURL = OIDCServiceStore.get.targetURL();
-    if (key === undefined || !isNonEmptyString(targetURL)) {
+    if (isUndefined(key) || !isNonEmptyString(targetURL)) {
       throw new Error('encryption key or targetURL not set');
     }
     return new OIDCService(key, targetURL);
@@ -126,7 +126,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private get clock(): Clock {
-    if (this.applicationClock === undefined) {
+    if (isUndefined(this.applicationClock)) {
       throw new Error('Trying to access the clock without initializing the E2EIHandler');
     }
 
