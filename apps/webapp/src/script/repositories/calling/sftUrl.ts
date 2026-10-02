@@ -17,8 +17,10 @@
  *
  */
 
-import {isArray, isPlainObject, isString} from '@sindresorhus/is';
+import {isString} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
+
+import {sftConfigurationListsSchema, sftServerUrlsSchema} from './sftConfig.schema';
 
 function getHttpsSftOrigin(sftUrl: unknown): Maybe<string> {
   if (!isString(sftUrl)) {
@@ -39,24 +41,25 @@ function getHttpsSftOrigin(sftUrl: unknown): Maybe<string> {
 }
 
 export function getAllowedSftOrigins(callingConfig: unknown): ReadonlySet<string> {
-  if (!isPlainObject(callingConfig)) {
+  const validatedCallingConfig = sftConfigurationListsSchema.safeParse(callingConfig);
+
+  if (!validatedCallingConfig.success) {
     return new Set();
   }
 
-  const allowedSftOrigins = [callingConfig.sft_servers, callingConfig.sft_servers_all]
+  const {sft_servers, sft_servers_all} = validatedCallingConfig.data;
+  const allowedSftOrigins = [sft_servers, sft_servers_all]
     .flatMap(sftServers => {
-      if (!isArray(sftServers)) {
-        return [];
-      }
-
-      return sftServers;
+      return sftServers ?? [];
     })
     .flatMap(sftServer => {
-      if (!isPlainObject(sftServer) || !isArray(sftServer.urls)) {
+      const validatedSftServer = sftServerUrlsSchema.safeParse(sftServer);
+
+      if (!validatedSftServer.success) {
         return [];
       }
 
-      return sftServer.urls;
+      return validatedSftServer.data.urls;
     })
     .flatMap(sftUrl => {
       return getHttpsSftOrigin(sftUrl).mapOr<string[]>([], origin => {

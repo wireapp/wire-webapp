@@ -106,6 +106,8 @@ describe('getAllowedSftOrigins', () => {
         'https://evil.example.com',
         {},
         {urls: 'https://evil.example.com'},
+        {urls: null},
+        {urls: {}},
         {urls: [undefined, null, {}, 123, '', 'not-a-url', 'http://insecure.example.com', '//relative.example.com']},
         {urls: ['https://valid.example.com']},
       ],
@@ -114,9 +116,62 @@ describe('getAllowedSftOrigins', () => {
     expect(actualOrigins).toEqual(new Set(['https://valid.example.com']));
   });
 
+  it.each(['sft_servers', 'sft_servers_all'])(
+    'preserves valid servers and URLs beside malformed values in %s',
+    sftListName => {
+      const callingConfig = {
+        [sftListName]: [
+          {urls: ['https://first.example.com']},
+          {urls: null},
+          {
+            urls: [
+              'https://second.example.com:8443/path',
+              undefined,
+              null,
+              {},
+              123,
+              'not-a-url',
+              'http://insecure.example.com',
+              'https://third.example.com',
+            ],
+          },
+        ],
+      };
+      const originalCallingConfig = structuredClone(callingConfig);
+      const actualOrigins = getAllowedSftOrigins(callingConfig);
+
+      expect(actualOrigins).toEqual(
+        new Set(['https://first.example.com', 'https://second.example.com:8443', 'https://third.example.com']),
+      );
+      expect(callingConfig).toEqual(originalCallingConfig);
+    },
+  );
+
+  it.each([
+    {sft_servers: [{urls: ['https://valid.example.com']}]},
+    {sft_servers_all: [{urls: ['https://valid.example.com']}]},
+    {sft_servers: [{urls: ['https://valid.example.com']}], sft_servers_all: 'invalid'},
+    {sft_servers: 'invalid', sft_servers_all: [{urls: ['https://valid.example.com']}]},
+  ])('preserves a valid list when the other is missing or malformed: %p', callingConfig => {
+    expect(getAllowedSftOrigins(callingConfig)).toEqual(new Set(['https://valid.example.com']));
+  });
+
+  it('ignores credentials and unrelated calling fields when deriving trusted origins', () => {
+    const callingConfig = {
+      sft_servers_all: [{urls: ['https://valid.example.com'], username: 123, credential: null}],
+      ice_servers: null,
+      ttl: 'invalid',
+      is_federating: 'invalid',
+    };
+
+    expect(getAllowedSftOrigins(callingConfig)).toEqual(new Set(['https://valid.example.com']));
+  });
+
   it.each([
     undefined,
     null,
+    false,
+    123,
     {},
     [],
     'https://sft.example.com',
