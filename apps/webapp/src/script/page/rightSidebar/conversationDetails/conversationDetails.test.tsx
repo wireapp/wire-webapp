@@ -214,19 +214,6 @@ describe('ConversationDetails', () => {
     expect(togglePanel).toHaveBeenCalledWith(PanelState.SHARED_DRIVE, conversation);
   });
 
-  it('keeps Shared Drive settings disabled when viewer permissions are disabled', () => {
-    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
-
-    const defaultProps = getDefaultParams();
-    const {getByTestId, getByText} = render(
-      withTheme(<ConversationDetails {...defaultProps} activeConversation={conversation} />),
-    );
-
-    expect(getByText('conversationDetailsActionCellsOption')).toBeInTheDocument();
-    expect(getByTestId('cells-info')).toBeDisabled();
-  });
-
   it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
     'shows legacy bots and apps in %s groups',
     protocol => {

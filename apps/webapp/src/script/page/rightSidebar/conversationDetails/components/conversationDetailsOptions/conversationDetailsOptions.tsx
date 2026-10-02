@@ -40,7 +40,6 @@ import {supportsReadReceipts} from 'Repositories/conversation/ConversationSelect
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -120,7 +119,7 @@ function ConversationDetailsOptionsContent({
   firstParticipant,
   isParticipantBlocked,
 }: ConversationDetailsOptionsContentProps): ReactElement {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const {isMutable, receiptMode, is1to1, isRequest, isSelfUserRemoved, isChannel, isGroupOrChannel, cellsState} =
     useKoSubscribableChildren(activeConversation, [
       'isMutable',
@@ -158,7 +157,6 @@ function ConversationDetailsOptionsContent({
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = isNonEmptyString(teamId);
   const isCellsConversation = isNonEmptyString(cellsState) && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
-  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
   const selfUserDriveRole = getSelfUserDriveRole({conversationTeamId: teamId, selfUserTeamId: selfUser.teamId});
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
@@ -214,10 +212,6 @@ function ConversationDetailsOptionsContent({
   };
 
   const getSharedDriveStatusTranslationKey = () => {
-    if (!isViewerPermissionFeatureEnabled) {
-      return 'conversationDetailsActionCellsOption';
-    }
-
     return selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
       ? 'cells.sharedDriveAccess.editorAccess'
       : 'cells.sharedDriveAccess.viewerAccess';
@@ -275,13 +269,12 @@ function ConversationDetailsOptionsContent({
         {isCellsConversation && (
           <ConversationDetailsOption
             className="conversation-details__cells-info"
-            dataUieName={isViewerPermissionFeatureEnabled ? 'go-shared-drive' : 'cells-info'}
+            dataUieName="go-shared-drive"
             icon={<CollectionIcon />}
-            onClick={isViewerPermissionFeatureEnabled ? openSharedDrivePanel : undefined}
+            onClick={openSharedDrivePanel}
             title={translate('conversationDetailsActionCellsTitle')}
             statusUieName="status-cells-info"
             statusText={translate(getSharedDriveStatusTranslationKey())}
-            disabled={!isViewerPermissionFeatureEnabled}
           />
         )}
 

@@ -57,12 +57,9 @@ const defaultProps = {
   onFileContentRefresh: jest.fn(),
 };
 
-const createWrapper = (isViewerPermissionFeatureEnabled: boolean) => {
+const createWrapper = () => {
   return createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      isFeatureToggleEnabled: () => {
-        return isViewerPermissionFeatureEnabled;
-      },
       translate,
     }),
   );
@@ -77,32 +74,25 @@ describe('FileHeader', () => {
     container.reset();
   });
 
-  const renderHeader = ({
-    isViewerPermissionFeatureEnabled = false,
-    props = {},
-  }: {
-    isViewerPermissionFeatureEnabled?: boolean;
-    props?: Partial<Parameters<typeof FileHeader>[0]>;
-  } = {}) => {
+  const renderHeader = ({props = {}}: {props?: Partial<Parameters<typeof FileHeader>[0]>} = {}) => {
     return render(
       withThemeAndRootContext(
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
           <FileHeader {...defaultProps} {...props} />
         </CellsSelfUserDriveRoleProvider>,
-        createWrapper(isViewerPermissionFeatureEnabled),
+        createWrapper(),
       ),
     );
   };
 
   it('hides download action when download is restricted', () => {
-    renderHeader({isViewerPermissionFeatureEnabled: true});
+    renderHeader();
 
     expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
   });
 
   it('hides edit and version history actions for restricted viewers on editable files', () => {
     renderHeader({
-      isViewerPermissionFeatureEnabled: true,
       props: {
         isEditable: true,
       },
@@ -110,12 +100,6 @@ describe('FileHeader', () => {
 
     expect(screen.queryByRole('button', {name: 'Editing'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'More options'})).not.toBeInTheDocument();
-  });
-
-  it('shows download action when download is allowed', () => {
-    renderHeader({isViewerPermissionFeatureEnabled: false});
-
-    expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
   });
 
   it('shows file metadata beside the file name', () => {
@@ -145,7 +129,6 @@ describe('FileHeader', () => {
 
   it('shows viewer access state and removes other action buttons', () => {
     const {container: renderContainer} = renderHeader({
-      isViewerPermissionFeatureEnabled: true,
       props: {isEditable: true, showViewOnlyLabel: true},
     });
 

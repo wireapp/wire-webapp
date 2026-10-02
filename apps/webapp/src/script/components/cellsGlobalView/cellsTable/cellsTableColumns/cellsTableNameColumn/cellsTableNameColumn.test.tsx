@@ -22,7 +22,6 @@ import {fireEvent, render} from '@testing-library/react';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -56,10 +55,8 @@ const file: CellFile = {
 };
 
 const renderNameColumn = ({
-  isViewerPermissionFeatureEnabled = true,
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
 }: {
-  isViewerPermissionFeatureEnabled?: boolean;
   selfUserDriveRole?: CellFile['selfUserDriveRole'];
 } = {}) => {
   const portalRoot = document.createElement('div');
@@ -69,9 +66,6 @@ const renderNameColumn = ({
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
-      isFeatureToggleEnabled: featureName => {
-        return featureName === viewerPermissionFeatureToggleName && isViewerPermissionFeatureEnabled;
-      },
     }),
   );
 
@@ -98,12 +92,6 @@ describe('CellsTableNameColumn', () => {
 
   it('does not show the viewer access icon for editor files', () => {
     const {container} = renderNameColumn({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR});
-
-    expect(container.querySelector('[data-uie-name="cells-table-viewer-access-icon"]')).not.toBeInTheDocument();
-  });
-
-  it('does not show the viewer access icon when the viewer permission feature is disabled', () => {
-    const {container} = renderNameColumn({isViewerPermissionFeatureEnabled: false});
 
     expect(container.querySelector('[data-uie-name="cells-table-viewer-access-icon"]')).not.toBeInTheDocument();
   });

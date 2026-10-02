@@ -19,7 +19,6 @@
 
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
 export const conversationListCollapseFeatureToggleName = 'conversation-list-collapse';
-export const viewerPermissionFeatureToggleName = 'viewer-permission';
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upload';
@@ -27,7 +26,6 @@ export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upl
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
-  viewerPermissionFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,

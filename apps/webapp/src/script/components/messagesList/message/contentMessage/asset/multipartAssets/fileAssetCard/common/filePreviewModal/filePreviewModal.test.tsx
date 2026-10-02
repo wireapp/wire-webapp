@@ -37,12 +37,9 @@ const defaultProps = {
   isError: false,
 };
 
-const renderFilePreviewModal = ({isViewerPermissionFeatureEnabled}: {isViewerPermissionFeatureEnabled: boolean}) => {
+const renderFilePreviewModal = () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      isFeatureToggleEnabled: () => {
-        return isViewerPermissionFeatureEnabled;
-      },
       translate: key => {
         return key;
       },
@@ -68,17 +65,11 @@ describe('FilePreviewModal', () => {
     container.reset();
   });
 
-  it('hides download for a conversation viewer when viewer permissions are enabled', async () => {
-    renderFilePreviewModal({isViewerPermissionFeatureEnabled: true});
+  it('hides download for a conversation viewer', async () => {
+    renderFilePreviewModal();
 
     await screen.findByRole('dialog');
 
     expect(screen.queryByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).not.toBeInTheDocument();
-  });
-
-  it('shows download when viewer permissions are disabled', async () => {
-    renderFilePreviewModal({isViewerPermissionFeatureEnabled: false});
-
-    expect(await screen.findByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).toBeInTheDocument();
   });
 });
