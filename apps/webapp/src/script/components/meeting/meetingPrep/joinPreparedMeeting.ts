@@ -84,5 +84,5 @@ export const joinPreparedMeeting = async ({
     return false;
   }
 
-  return true;
+  return result.value;
 };

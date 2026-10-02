@@ -75,7 +75,7 @@ const createDeps = (startAudio: jest.Mock): JoinMeetingCallDeps => {
 
 describe('joinPreparedMeeting', () => {
   it('starts the call with the chosen camera and microphone', async () => {
-    const startAudio = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
 
     const joined = await joinPreparedMeeting({
       deps: createDeps(startAudio),
@@ -108,5 +108,23 @@ describe('joinPreparedMeeting', () => {
 
     expect(joined).toBe(false);
     expect(startAudio).not.toHaveBeenCalled();
+  });
+
+  it('stays unjoined when starting the call resolves without a call', async () => {
+    const startAudio = jest.fn().mockResolvedValue(false);
+
+    const joined = await joinPreparedMeeting({
+      deps: createDeps(startAudio),
+      qualifiedConversationId,
+      media,
+      guardCall: startCall => {
+        return startCall();
+      },
+      translate: translateForTest,
+      callNotEstablishedCopy,
+    });
+
+    expect(joined).toBe(false);
+    expect(startAudio).toHaveBeenCalledWith(expect.anything(), media);
   });
 });

@@ -178,6 +178,11 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
               return showCallNotEstablishedModal(callNotEstablishedCopy);
             },
           });
+          return;
+        }
+
+        if (!result.value) {
+          setIsJoining(false);
         }
       });
     },

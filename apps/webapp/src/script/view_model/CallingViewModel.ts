@@ -60,11 +60,11 @@ import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {Config} from '../Config';
 
 export interface CallActions {
-  answer: (call: Call, media?: CallMediaChoice) => Promise<void>;
+  answer: (call: Call, media?: CallMediaChoice) => Promise<boolean>;
   changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  startAudio: (conversationEntity: Conversation, media?: CallMediaChoice) => Promise<void>;
+  startAudio: (conversationEntity: Conversation, media?: CallMediaChoice) => Promise<boolean>;
   switchCameraInput: (deviceId: string) => void;
   switchScreenInput: (deviceId: string) => void;
   toggleCamera: (call: Call) => void;
@@ -160,7 +160,7 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = async (conversation: Conversation, media?: CallMediaChoice): Promise<void> => {
+    const startCall = async (conversation: Conversation, media?: CallMediaChoice): Promise<boolean> => {
       const canStart = await this.canInitiateCall(conversation.qualifiedId, {
         action: this.translate('modalCallSecondOutgoingAction'),
         message: this.translate('modalCallSecondOutgoingMessage'),
@@ -168,7 +168,7 @@ export class CallingViewModel {
       });
 
       if (!canStart) {
-        return;
+        return false;
       }
 
       const call =
@@ -176,20 +176,21 @@ export class CallingViewModel {
           ? await this.callingRepository.startCall(conversation, media)
           : await this.callingRepository.startCall(conversation);
       if (call === undefined) {
-        return;
+        return false;
       }
 
       ring(call);
+      return true;
     };
 
-    const answerCall = async (call: Call, media?: CallMediaChoice) => {
+    const answerCall = async (call: Call, media?: CallMediaChoice): Promise<boolean> => {
       const canAnswer = await this.canInitiateCall(call.conversation.qualifiedId, {
         action: this.translate('modalCallSecondIncomingAction'),
         message: this.translate('modalCallSecondIncomingMessage'),
         title: this.translate('modalCallSecondIncomingHeadline'),
       });
       if (!canAnswer) {
-        return;
+        return false;
       }
 
       if (media !== undefined) {
@@ -197,6 +198,9 @@ export class CallingViewModel {
       } else {
         await this.callingRepository.answerCall(call);
       }
+
+      const currentCall = this.callingRepository.findCall(call.conversation.qualifiedId);
+      return !isUndefined(currentCall) && currentCall.reason() !== CALL_REASON.ERROR;
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
@@ -290,16 +294,20 @@ export class CallingViewModel {
       );
     };
 
-    const handleCallAction = async (conversationEntity: Conversation, media?: CallMediaChoice): Promise<void> => {
+    const handleCallAction = async (conversationEntity: Conversation, media?: CallMediaChoice): Promise<boolean> => {
       const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
       if (isE2EIDegraded) {
         showE2EICallModal(conversationEntity, media);
-      } else if (shouldShowMaxUsersToCallModal(conversationEntity)) {
-        showMaxUsersToCallModalWithoutConfirm(conversationEntity, media);
-      } else {
-        await startCall(conversationEntity, media);
+        return false;
       }
+
+      if (shouldShowMaxUsersToCallModal(conversationEntity)) {
+        showMaxUsersToCallModalWithoutConfirm(conversationEntity, media);
+        return false;
+      }
+
+      return startCall(conversationEntity, media);
     };
 
     this.callActions = {
@@ -323,9 +331,10 @@ export class CallingViewModel {
             undefined,
             this.translate,
           );
-        } else {
-          return answerCall(call, media);
+          return false;
         }
+
+        return answerCall(call, media);
       },
       changePage: (newPage, call) => {
         this.callingRepository.changeCallPage(call, newPage);
@@ -345,9 +354,10 @@ export class CallingViewModel {
             : conferenceCallingEnabledState;
         if ((conversationEntity.isGroupOrChannel() || conversationEntity.isMeeting()) && !isConferenceCallingEnabled) {
           this.showRestrictedConferenceCallingModal();
-        } else {
-          await handleCallAction(conversationEntity, media);
+          return false;
         }
+
+        return handleCallAction(conversationEntity, media);
       },
       switchCameraInput: (deviceId: string) => {
         setVideoInputDeviceId(deviceId);

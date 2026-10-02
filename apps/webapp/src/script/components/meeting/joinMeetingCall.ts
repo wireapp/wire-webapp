@@ -90,7 +90,7 @@ const performJoin = (
   deps: JoinMeetingCallDeps,
   conversation: Conversation,
   media: CallMediaChoice,
-): Task<void, JoinMeetingCallError> => {
+): Task<boolean, JoinMeetingCallError> => {
   const call = deps.callingRepository.findCall(conversation.qualifiedId);
 
   if (!isUndefined(call) && call.state() === CALL_STATE.INCOMING) {
@@ -122,7 +122,7 @@ export const joinMeetingCall = (
   deps: JoinMeetingCallDeps,
   qualifiedConversationId: QualifiedId,
   media: CallMediaChoice,
-): Task<void, JoinMeetingCallError> => {
+): Task<boolean, JoinMeetingCallError> => {
   return resolveConversation(deps, qualifiedConversationId)
     .andThen(conversation => {
       return ensureMlsConversationReady(deps, conversation);
