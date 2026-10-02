@@ -17,34 +17,12 @@
  *
  */
 
+import {sharedDriveDirectUploadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getTextFilePath, TextFileName} from 'test/e2e_tests/utils/asset.util';
 
-import {test, expect, type PagePlugin, withLogin} from '../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';
-
-const withSharedDriveDirectUpload: PagePlugin = async page => {
-  await page.addInitScript(() => {
-    if (window.top !== window || !['http:', 'https:'].includes(window.location.protocol)) {
-      return;
-    }
-
-    const url = new URL(window.location.href);
-    const enabledFeatures = new Set(
-      (url.searchParams.get('enabled-features') ?? '')
-        .split(',')
-        .map(feature => {
-          return feature.trim();
-        })
-        .filter(feature => {
-          return feature.length > 0;
-        }),
-    );
-    enabledFeatures.add('shared-drive-direct-upload');
-    url.searchParams.set('enabled-features', [...enabledFeatures].join(','));
-    window.history.replaceState(null, '', url.toString());
-  });
-};
 
 test.describe('Drive file uploads', () => {
   let pageManager: PageManager;
@@ -55,7 +33,15 @@ test.describe('Drive file uploads', () => {
       users: [teamMember],
       features: {cells: true},
     });
-    pageManager = await PageManager.from(createPage(withSharedDriveDirectUpload, withLogin(team.owner)));
+    pageManager = await PageManager.from(
+      createPage(
+        withLogin(team.owner, {
+          startupFeatureToggles: {
+            [sharedDriveDirectUploadFeatureToggleName]: true,
+          },
+        }),
+      ),
+    );
     const {pages} = pageManager.webapp;
 
     await test.step('Preconditions: Create and open a conversation with Shared Drive enabled', async () => {
