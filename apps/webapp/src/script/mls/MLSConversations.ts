@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyArray} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, task} from 'true-myth';
 import {match, P} from 'ts-pattern';
@@ -75,7 +75,7 @@ export async function recoverMLSConversationsInBatches({
   batchSize?: number;
 }): Promise<MLSConversationRecoveryResult> {
   const conversationService = core.service?.conversation;
-  if (conversationService === undefined) {
+  if (isUndefined(conversationService)) {
     logger.error('Conversation service is not available for MLS conversation recovery');
     return {completed: false, failedConversationCount: 1, recoveredConversationCount: 0};
   }
@@ -88,7 +88,7 @@ export async function recoverMLSConversationsInBatches({
   let recoveredConversationCount = 0;
 
   // Initialize pending conversation IDs on first run
-  if (mlsService && eligibleConversations.length > 0) {
+  if (!isUndefined(mlsService) && eligibleConversations.length > 0) {
     const pendingIds = await mlsService.getPendingRecoveryConversationIds();
     if (!isNonEmptyArray(pendingIds)) {
       const allPendingIds = eligibleConversations.map(conv => {
@@ -149,7 +149,7 @@ export async function recoverMLSConversationsInBatches({
       recoveredConversationCount++;
 
       // Remove successfully recovered conversation from pending list
-      if (mlsService !== undefined) {
+      if (!isUndefined(mlsService)) {
         const pendingIds = (await mlsService.getPendingRecoveryConversationIds()) ?? [];
         const updatedPending = pendingIds.filter(id => {
           return !matchQualifiedIds(id, conversation.qualifiedId);
@@ -192,8 +192,8 @@ export async function initMLSGroupConversations(
     onError?: (conversation: Conversation, error: unknown) => void;
   },
 ): Promise<void> {
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (isUndefined(mlsService) || isUndefined(conversationService)) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
@@ -237,8 +237,8 @@ export async function initMLSGroupConversation(
     conversationId: mlsConversation.qualifiedId,
     groupId: mlsConversation.groupId,
   });
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (isUndefined(mlsService) || isUndefined(conversationService)) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
@@ -284,8 +284,8 @@ export async function initialiseSelfAndTeamConversations(
   core: Account,
 ): Promise<void> {
   logger.info('Initialising self and team conversations');
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (isUndefined(mlsService) || isUndefined(conversationService)) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
@@ -541,13 +541,13 @@ async function establishMlsGroupConversation({
   const selfUser = userState.self();
   const conversation = conversationState.findConversation(conversationId);
 
-  if (!selfUser || !conversation) {
+  if (isNullOrUndefined(selfUser) || isNullOrUndefined(conversation)) {
     logger.error('Self user or conversation is not available!', {selfUser, conversation});
     throw new Error('Self user or conversation is not available!');
   }
 
   const selfUserClientId = selfUser.localClient?.id;
-  if (!selfUserClientId) {
+  if (!isNonEmptyString(selfUserClientId)) {
     logger.error('Self user client id is not available!', {selfUserClientId});
     throw new Error('Self user client id is not available!');
   }
