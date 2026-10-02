@@ -22,6 +22,7 @@ import {render, screen} from '@testing-library/react';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
+  type CellsSelfUserDriveRole,
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
@@ -58,7 +59,7 @@ const createWrapper = () => {
 };
 
 describe('NoPreviewAvailable', () => {
-  const renderPlaceholder = (selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE) => {
+  const renderPlaceholder = (selfUserDriveRole: CellsSelfUserDriveRole) => {
     return render(
       withThemeAndRootContext(
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
