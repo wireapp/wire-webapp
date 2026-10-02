@@ -19,6 +19,7 @@
 
 import {useState} from 'react';
 
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -34,6 +35,9 @@ export const useMeetNowSubmit = () => {
   const loadMeetings = useMeetingStore(state => {
     return state.loadMeetings;
   });
+  const openMeetingPrep = useMeetingPrepModal(state => {
+    return state.open;
+  });
 
   const submit = async (formState: MeetNowFormState): Promise<MeetNowSubmitResult> => {
     setIsSubmitting(true);
@@ -45,6 +49,7 @@ export const useMeetNowSubmit = () => {
         loadMeetings,
         translate,
         meetingStartTime: clock.currentDate.toISOString(),
+        openMeetingPrep,
       });
     } finally {
       setIsSubmitting(false);

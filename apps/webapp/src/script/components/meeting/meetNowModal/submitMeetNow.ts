@@ -20,7 +20,7 @@
 import {task, type Task} from 'true-myth';
 
 import {mapMeetNowFormToMeetingCommand} from 'Components/meeting/mapMeetNowFormToMeetingCommand';
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
+import type {MeetingPrepSession} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
 import {MEET_NOW_ERROR_TRANSLATION_KEYS} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
@@ -41,6 +41,7 @@ export type SubmitMeetNowParams = {
   loadMeetings: () => Promise<void>;
   translate: Translate;
   meetingStartTime: string;
+  openMeetingPrep: (session: MeetingPrepSession) => void;
 };
 
 export const submitMeetNow = async ({
@@ -49,6 +50,7 @@ export const submitMeetNow = async ({
   loadMeetings,
   translate,
   meetingStartTime,
+  openMeetingPrep,
 }: SubmitMeetNowParams): Promise<MeetNowSubmitResult> => {
   const commandResult = mapMeetNowFormToMeetingCommand(formState);
 
@@ -80,7 +82,7 @@ export const submitMeetNow = async ({
     });
   }
 
-  useMeetingPrepModal.getState().open({
+  openMeetingPrep({
     meetingTitle: commandResult.value.title,
     meetingStartTime,
     qualifiedMeetingId: submitResult.value.qualifiedMeetingId,
