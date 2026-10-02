@@ -166,7 +166,7 @@ describe('MeetingPrepSurface', () => {
   it('writes the chosen microphone to the shared device store', () => {
     renderSurface();
 
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.prepModal.openMicrophoneDevices'}));
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
     fireEvent.click(screen.getByRole('button', {name: 'Mic 2'}));
 
     expect(mediaDevicesStore.getState().audio.input.activeId).toBe('mic-2');
@@ -175,7 +175,7 @@ describe('MeetingPrepSurface', () => {
   it('closes the device list when the pointer goes outside it', () => {
     renderSurface();
 
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.prepModal.openMicrophoneDevices'}));
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
     expect(screen.getByRole('button', {name: 'Mic 2'})).toBeInTheDocument();
 
     fireEvent.pointerDown(screen.getByRole('heading', {name: 'Design review'}));
@@ -186,8 +186,8 @@ describe('MeetingPrepSurface', () => {
   it('keeps only one device list open and removes the preview when the camera is off', () => {
     renderSurface();
 
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.prepModal.openMicrophoneDevices'}));
-    fireEvent.click(screen.getByRole('button', {name: 'meetings.prepModal.openCameraDevices'}));
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenCameraOptions'}));
 
     expect(screen.queryByRole('button', {name: 'Mic 2'})).not.toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Camera 1'})).toBeInTheDocument();
