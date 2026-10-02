@@ -3,7 +3,7 @@ name: Deliver main
 
 on:
   push:
-    branches: [main]
+    branches: [meetings-milestone-2]
   workflow_dispatch:
     inputs:
       reason:
@@ -533,9 +533,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          latest_main_sha="$(git ls-remote origin refs/heads/main | awk '{print $1}')"
+          latest_main_sha="$(git ls-remote origin refs/heads/meetings-milestone-2 | awk '{print $1}')"
           if [[ -z "${latest_main_sha}" ]]; then
-            echo 'Unable to resolve the current origin/main SHA.' >&2
+            echo 'Unable to resolve the current origin/meetings-milestone-2 SHA.' >&2
             exit 1
           fi
 
