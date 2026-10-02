@@ -58,7 +58,9 @@ const DefaultStory = () => {
 };
 
 export const Default: Story = {
-  render: () => <DefaultStory />,
+  render: () => {
+    return <DefaultStory />;
+  },
 };
 
 const FormStory = () => {
@@ -82,5 +84,7 @@ const FormStory = () => {
 };
 
 export const WithForm: Story = {
-  render: () => <FormStory />,
+  render: () => {
+    return <FormStory />;
+  },
 };

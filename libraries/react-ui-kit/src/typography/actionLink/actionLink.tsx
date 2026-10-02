@@ -58,8 +58,8 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
       ...restProps
     } = props;
 
-    const baseCss = (theme: Theme) =>
-      ({
+    const baseCss = (theme: Theme) => {
+      return {
         ...linkStyle(theme, {
           bold,
           color,
@@ -68,7 +68,8 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
         } as LinkProps),
         ...actionLinkButtonStyles.link.base,
         ...(disabled === true ? actionLinkButtonStyles.link.disabled : actionLinkButtonStyles.link.enabled),
-      }) satisfies CSSObject;
+      } satisfies CSSObject;
+    };
 
     if ('href' in restProps && isNonEmptyString(restProps.href)) {
       const {href, target, onClick, ...anchorProps} = restProps;
@@ -87,7 +88,9 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
         <a
           ref={ref as React.Ref<HTMLAnchorElement>}
           href={href}
-          css={(theme: Theme) => baseCss(theme)}
+          css={(theme: Theme) => {
+            return baseCss(theme);
+          }}
           target={target}
           rel={target === '_blank' ? 'noopener noreferrer' : undefined}
           aria-disabled={disabled === true ? true : undefined}
@@ -107,7 +110,9 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
         type="button"
         disabled={disabled === true || btnProps.disabled === true}
         onClick={onClick}
-        css={(theme: Theme) => [actionLinkButtonStyles.buttonReset, baseCss(theme)]}
+        css={(theme: Theme) => {
+          return [actionLinkButtonStyles.buttonReset, baseCss(theme)];
+        }}
         {...btnProps}
       >
         {children}

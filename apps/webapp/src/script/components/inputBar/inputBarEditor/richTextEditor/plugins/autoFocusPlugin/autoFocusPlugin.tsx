@@ -82,7 +82,9 @@ const useTextAreaFocus = (callback: () => void) => {
 export function AutoFocusPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useTextAreaFocus(() => editor.focus());
+  useTextAreaFocus(() => {
+    return editor.focus();
+  });
 
   return null;
 }

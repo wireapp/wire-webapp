@@ -72,26 +72,56 @@ const defaultContent: ModalContent = {
 
 const logger = getLogger('PrimaryModalState');
 
-const usePrimaryModalState = create<PrimaryModalState>((set, get) => ({
-  addToQueue: (modalItem: QueuedModalItem) => set(state => ({...state, queue: [...state.queue, modalItem]})),
-  currentModalContent: defaultContent,
-  currentModalId: null,
-  errorMessage: null,
-  existsInQueue: (modalItem: QueuedModalItem): boolean =>
-    get().queue.findIndex(queueItem => queueItem.id === modalItem.id) !== -1,
-  queue: [],
-  removeFirstItemInQueue: () => set(state => ({...state, queue: state.queue.slice(1)})),
-  replaceInQueue: (modalItem: QueuedModalItem) =>
-    set(state => ({
-      ...state,
-      queue: state.queue.map(queueItem => (queueItem.id === modalItem.id ? modalItem : queueItem)),
-    })),
-  updateCurrentModalContent: nextCurrentModaContent =>
-    set(state => ({...state, currentModalContent: nextCurrentModaContent})),
-  updateCurrentModalId: (nextCurrentModalId: string | null) =>
-    set(state => ({...state, currentModalId: nextCurrentModalId})),
-  updateErrorMessage: nextErrorMessage => set(state => ({...state, errorMessage: nextErrorMessage})),
-}));
+const usePrimaryModalState = create<PrimaryModalState>((set, get) => {
+  return {
+    addToQueue: (modalItem: QueuedModalItem) => {
+      return set(state => {
+        return {...state, queue: [...state.queue, modalItem]};
+      });
+    },
+    currentModalContent: defaultContent,
+    currentModalId: null,
+    errorMessage: null,
+    existsInQueue: (modalItem: QueuedModalItem): boolean => {
+      return (
+        get().queue.findIndex(queueItem => {
+          return queueItem.id === modalItem.id;
+        }) !== -1
+      );
+    },
+    queue: [],
+    removeFirstItemInQueue: () => {
+      return set(state => {
+        return {...state, queue: state.queue.slice(1)};
+      });
+    },
+    replaceInQueue: (modalItem: QueuedModalItem) => {
+      return set(state => {
+        return {
+          ...state,
+          queue: state.queue.map(queueItem => {
+            return queueItem.id === modalItem.id ? modalItem : queueItem;
+          }),
+        };
+      });
+    },
+    updateCurrentModalContent: nextCurrentModaContent => {
+      return set(state => {
+        return {...state, currentModalContent: nextCurrentModaContent};
+      });
+    },
+    updateCurrentModalId: (nextCurrentModalId: string | null) => {
+      return set(state => {
+        return {...state, currentModalId: nextCurrentModalId};
+      });
+    },
+    updateErrorMessage: nextErrorMessage => {
+      return set(state => {
+        return {...state, errorMessage: nextErrorMessage};
+      });
+    },
+  };
+});
 
 const addNewModalToQueue = (
   type: PrimaryModalType,

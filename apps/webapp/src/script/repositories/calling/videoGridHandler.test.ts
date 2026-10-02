@@ -135,7 +135,9 @@ describe('videoGridHandler', () => {
     it('does nothing when call is undefined', () => {
       const setGrid = jest.fn();
 
-      expect(() => updateVideoGrid(undefined, setGrid)).not.toThrow();
+      expect(() => {
+        return updateVideoGrid(undefined, setGrid);
+      }).not.toThrow();
 
       expect(setGrid).not.toHaveBeenCalled();
     });

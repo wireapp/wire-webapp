@@ -24,7 +24,9 @@ import {ConversationRecord} from 'Repositories/storage';
 
 import {BackUpConversation} from '../CPB.library';
 
-const isGroupConversation = (name: string) => name.length > 0;
+const isGroupConversation = (name: string) => {
+  return name.length > 0;
+};
 
 export const mapConversationRecord = ({
   id: qualifiedId,

@@ -95,7 +95,9 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           checked={checked}
           disabled={isInteractionDisabled}
           name={name}
-          onChange={event => handleToggle(event.target.checked)}
+          onChange={event => {
+            return handleToggle(event.target.checked);
+          }}
           onKeyDown={event => {
             if (event.key === 'Enter') {
               event.preventDefault();

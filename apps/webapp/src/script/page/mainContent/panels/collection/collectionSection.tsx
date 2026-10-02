@@ -62,9 +62,9 @@ const CollectionSection = ({
         )}
       </header>
       <div className="collection-images">
-        {topMessages.map(message => (
-          <CollectionItem message={message} allMessages={[]} key={message.id} onImageClick={onImageClick} />
-        ))}
+        {topMessages.map(message => {
+          return <CollectionItem message={message} allMessages={[]} key={message.id} onImageClick={onImageClick} />;
+        })}
       </div>
     </section>
   );

@@ -109,11 +109,13 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
 
-  const {videoInputDevices, videoInputDeviceId, setVideoInputDeviceId} = useMediaDevicesStore(state => ({
-    videoInputDevices: state.video.input.devices,
-    videoInputDeviceId: state.video.input.selectedId,
-    setVideoInputDeviceId: state.setVideoInputDeviceId,
-  }));
+  const {videoInputDevices, videoInputDeviceId, setVideoInputDeviceId} = useMediaDevicesStore(state => {
+    return {
+      videoInputDevices: state.video.input.devices,
+      videoInputDeviceId: state.video.input.activeId,
+      setVideoInputDeviceId: state.setVideoInputDeviceId,
+    };
+  });
 
   const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
 
@@ -171,14 +173,13 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
     };
   }, [stream]);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       if (stream !== null && !hasActiveCameraStream) {
         streamHandler.releaseTracksFromStream(stream);
       }
-    },
-    [hasActiveCameraStream, stream, streamHandler],
-  );
+    };
+  }, [hasActiveCameraStream, stream, streamHandler]);
 
   return (
     <PreferencesSection title={translate('preferencesAVCamera')}>
@@ -196,7 +197,9 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
         defaultDeviceName={translate('preferencesAVCamera')}
         icon={Icon.CameraIcon}
         isRequesting={isRequesting}
-        onChange={deviceId => setVideoInputDeviceId(deviceId)}
+        onChange={deviceId => {
+          return setVideoInputDeviceId(deviceId);
+        }}
         title={translate('preferencesAVCamera')}
       />
 

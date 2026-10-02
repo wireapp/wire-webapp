@@ -60,15 +60,17 @@ export interface ScheduleMeetingFormErrors {
   passwordConfirmation: MeetingPasswordErrorKey | undefined;
 }
 
-export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => ({
-  title: undefined,
-  missingTimes: undefined,
-  startInPast: undefined,
-  endInPast: undefined,
-  endBeforeStart: undefined,
-  password: undefined,
-  passwordConfirmation: undefined,
-});
+export const emptyScheduleMeetingFormErrors = (): ScheduleMeetingFormErrors => {
+  return {
+    title: undefined,
+    missingTimes: undefined,
+    startInPast: undefined,
+    endInPast: undefined,
+    endBeforeStart: undefined,
+    password: undefined,
+    passwordConfirmation: undefined,
+  };
+};
 
 export interface ScheduleMeetingFormDisplayErrors {
   title: string | undefined;
@@ -89,5 +91,6 @@ export const scheduleMeetingSubmitResults = {
 export type ScheduleMeetingSubmitResult =
   (typeof scheduleMeetingSubmitResults)[keyof typeof scheduleMeetingSubmitResults];
 
-export const wasScheduleMeetingPersisted = (result: ScheduleMeetingSubmitResult): boolean =>
-  result !== scheduleMeetingSubmitResults.submitFailed;
+export const wasScheduleMeetingPersisted = (result: ScheduleMeetingSubmitResult): boolean => {
+  return result !== scheduleMeetingSubmitResults.submitFailed;
+};

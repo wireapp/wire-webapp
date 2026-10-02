@@ -67,11 +67,13 @@ const uploadNetworkRetryConfig = {
 // backend applies OR semantics across tags (a node matching any selected tag is returned).
 // Matches the iOS client shape in WireMessaging RestAPI.swift.
 function createTagMetadataFilters(tags: string[]): LookupFilterMetaFilter[] {
-  return tags.map(tag => ({
-    Namespace: USER_META_TAGS_NAMESPACE,
-    Term: tag,
-    Operation: 'Should',
-  }));
+  return tags.map(tag => {
+    return {
+      Namespace: USER_META_TAGS_NAMESPACE,
+      Term: tag,
+      Operation: 'Should',
+    };
+  });
 }
 
 // TODO: remove the apiKey (from pydio and s3) once the Pydio backend has fully support for the auth with the Wire's access token
@@ -408,7 +410,7 @@ export class CellsAPI {
     return node;
   }
 
-  async getNodeVersions({uuid, flags}: {uuid: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<NodeVersions> {
+  async getNodeVersions({uuid, flags}: {uuid: string; flags?: GetByUuidFlagsEnum[]}): Promise<NodeVersions> {
     if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
@@ -424,7 +426,7 @@ export class CellsAPI {
     return result.data.Versions !== undefined ? result.data.Versions : [];
   }
 
-  async getNode({id, flags}: {id: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<Node> {
+  async getNode({id, flags}: {id: string; flags?: GetByUuidFlagsEnum[]}): Promise<Node> {
     if (this.client === null || this.storageService === null) {
       throw new Error(CONFIGURATION_ERROR);
     }
@@ -534,12 +536,16 @@ export class CellsAPI {
         },
         Metadata: [
           ...tagMetadataFilters,
-          ...(mimeTypes?.map(term => ({Namespace: MIME_NAMESPACE, Term: term, Operation: mimeOp})) ?? []),
-          ...(creatorIds?.map(term => ({
-            Namespace: USER_META_OWNER_UUID_NAMESPACE,
-            Term: JSON.stringify(term),
-            Operation: creatorOp,
-          })) ?? []),
+          ...(mimeTypes?.map(term => {
+            return {Namespace: MIME_NAMESPACE, Term: term, Operation: mimeOp};
+          }) ?? []),
+          ...(creatorIds?.map(term => {
+            return {
+              Namespace: USER_META_OWNER_UUID_NAMESPACE,
+              Term: JSON.stringify(term),
+              Operation: creatorOp,
+            };
+          }) ?? []),
         ],
       },
       Flags: ['WithPreSignedURLs'],

@@ -345,9 +345,9 @@ const LoginComponent = ({
           }
           default: {
             const backendError = error;
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              backendError.label.endsWith(errorType),
-            );
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType => {
+              return backendError.label.endsWith(errorType);
+            });
             if (!isValidationError) {
               throw error;
             }
@@ -506,7 +506,9 @@ const LoginComponent = ({
                         disabled={twoFactorSubmitError !== '' || isFetching}
                         type="submit"
                         css={{marginTop: '1rem'}}
-                        onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
+                        onClick={() => {
+                          return handleSubmit({...twoFactorLoginData, verificationCode}, []);
+                        }}
                       >
                         {translate('login.submitTwoFactorButton')}
                       </Button>
@@ -571,7 +573,9 @@ const LoginComponent = ({
                       <Button
                         type="button"
                         variant={ButtonVariant.SECONDARY}
-                        onClick={() => navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`)}
+                        onClick={() => {
+                          return navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`);
+                        }}
                         style={{marginTop: '16px'}}
                         data-uie-name="go-sso-login"
                       >
@@ -615,43 +619,60 @@ const LoginComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
-  isFetching: AuthSelector.isFetching(state),
-  conversationError: ConversationSelector.getError(state),
-  isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
-  loginData: AuthSelector.getLoginData(state),
-  authError: AuthSelector.getError(state),
-  conversationInfo: ConversationSelector.conversationInfo(state),
-  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
-  account: AuthSelector.getAccount(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
+    isFetching: AuthSelector.isFetching(state),
+    conversationError: ConversationSelector.getError(state),
+    isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
+    loginData: AuthSelector.getLoginData(state),
+    authError: AuthSelector.getError(state),
+    conversationInfo: ConversationSelector.conversationInfo(state),
+    conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+    account: AuthSelector.getAccount(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
-  doCheckConversationCode: (...args: Parameters<typeof actionRoot.conversationAction.doCheckConversationCode>) =>
-    dispatch(actionRoot.conversationAction.doCheckConversationCode(...args)),
-  doInit: (...args: Parameters<typeof actionRoot.authAction.doInit>) => dispatch(actionRoot.authAction.doInit(...args)),
-  doInitializeClient: (...args: Parameters<typeof actionRoot.clientAction.doInitializeClient>) =>
-    dispatch(actionRoot.clientAction.doInitializeClient(...args)),
-  doLogin: (...args: Parameters<typeof actionRoot.authAction.doLogin>) =>
-    dispatch(actionRoot.authAction.doLogin(...args)),
-  doLoginAndJoin: (...args: Parameters<typeof actionRoot.authAction.doLoginAndJoin>) =>
-    dispatch(actionRoot.authAction.doLoginAndJoin(...args)),
-  doSendTwoFactorCode: (...args: Parameters<typeof actionRoot.authAction.doSendTwoFactorLoginCode>) =>
-    dispatch(actionRoot.authAction.doSendTwoFactorLoginCode(...args)),
-  doSetLocalStorage: (...args: Parameters<typeof actionRoot.localStorageAction.setLocalStorage>) =>
-    dispatch(actionRoot.localStorageAction.setLocalStorage(...args)),
-  pushEntropyData: (...args: Parameters<typeof actionRoot.authAction.pushEntropyData>) =>
-    dispatch(actionRoot.authAction.pushEntropyData(...args)),
-  pushLoginData: (...args: Parameters<typeof actionRoot.authAction.pushLoginData>) =>
-    dispatch(actionRoot.authAction.pushLoginData(...args)),
-  resetAuthError: (...args: Parameters<typeof actionRoot.authAction.resetAuthError>) =>
-    dispatch(actionRoot.authAction.resetAuthError(...args)),
-  doGetConversationInfoByCode: (
-    ...args: Parameters<typeof actionRoot.conversationAction.doGetConversationInfoByCode>
-  ) => dispatch(actionRoot.conversationAction.doGetConversationInfoByCode(...args)),
-});
+const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+  return {
+    doCheckConversationCode: (...args: Parameters<typeof actionRoot.conversationAction.doCheckConversationCode>) => {
+      return dispatch(actionRoot.conversationAction.doCheckConversationCode(...args));
+    },
+    doInit: (...args: Parameters<typeof actionRoot.authAction.doInit>) => {
+      return dispatch(actionRoot.authAction.doInit(...args));
+    },
+    doInitializeClient: (...args: Parameters<typeof actionRoot.clientAction.doInitializeClient>) => {
+      return dispatch(actionRoot.clientAction.doInitializeClient(...args));
+    },
+    doLogin: (...args: Parameters<typeof actionRoot.authAction.doLogin>) => {
+      return dispatch(actionRoot.authAction.doLogin(...args));
+    },
+    doLoginAndJoin: (...args: Parameters<typeof actionRoot.authAction.doLoginAndJoin>) => {
+      return dispatch(actionRoot.authAction.doLoginAndJoin(...args));
+    },
+    doSendTwoFactorCode: (...args: Parameters<typeof actionRoot.authAction.doSendTwoFactorLoginCode>) => {
+      return dispatch(actionRoot.authAction.doSendTwoFactorLoginCode(...args));
+    },
+    doSetLocalStorage: (...args: Parameters<typeof actionRoot.localStorageAction.setLocalStorage>) => {
+      return dispatch(actionRoot.localStorageAction.setLocalStorage(...args));
+    },
+    pushEntropyData: (...args: Parameters<typeof actionRoot.authAction.pushEntropyData>) => {
+      return dispatch(actionRoot.authAction.pushEntropyData(...args));
+    },
+    pushLoginData: (...args: Parameters<typeof actionRoot.authAction.pushLoginData>) => {
+      return dispatch(actionRoot.authAction.pushLoginData(...args));
+    },
+    resetAuthError: (...args: Parameters<typeof actionRoot.authAction.resetAuthError>) => {
+      return dispatch(actionRoot.authAction.resetAuthError(...args));
+    },
+    doGetConversationInfoByCode: (
+      ...args: Parameters<typeof actionRoot.conversationAction.doGetConversationInfoByCode>
+    ) => {
+      return dispatch(actionRoot.conversationAction.doGetConversationInfoByCode(...args));
+    },
+  };
+};
 
 const Login = connect(mapStateToProps, mapDispatchToProps)(LoginComponent);
 

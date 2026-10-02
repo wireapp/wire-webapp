@@ -99,7 +99,11 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   };
 
   return (
-    <InViewport onVisible={() => setIsVisible(true)}>
+    <InViewport
+      onVisible={() => {
+        return setIsVisible(true);
+      }}
+    >
       <Transition in={isNonEmptyString(avatarImage)} nodeRef={imageRef} timeout={showTransition ? 700 : 0}>
         {(state: string) => {
           return (

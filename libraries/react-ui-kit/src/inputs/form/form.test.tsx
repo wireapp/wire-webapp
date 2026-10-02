@@ -21,5 +21,7 @@ import {matchComponent} from '../../utils/testUtil';
 import {Form} from '../form';
 
 describe('"Form"', () => {
-  it('renders', () => matchComponent(<Form>Form</Form>));
+  it('renders', () => {
+    return matchComponent(<Form>Form</Form>);
+  });
 });

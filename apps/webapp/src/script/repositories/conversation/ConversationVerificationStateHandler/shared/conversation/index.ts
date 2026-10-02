@@ -50,9 +50,11 @@ export const getActiveConversationsWithUsers = ({
         }
 
         const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUser.qualifiedId);
-        const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
-          userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)),
-        );
+        const matchingUserIds = userIdsInConversation.filter(userIdInConversation => {
+          return userIds.some(userId => {
+            return matchQualifiedIds(userId, userIdInConversation);
+          });
+        });
 
         const hasMatchingUserIds = matchingUserIds.length > 0;
         if (hasMatchingUserIds) {
@@ -74,7 +76,9 @@ export const getConversationByGroupId = ({
   conversationState,
   groupId,
 }: GetConversationByGroupIdParams): MLSCapableConversation | undefined => {
-  const conversation = conversationState.conversations().find(conversation => conversation.groupId === groupId);
+  const conversation = conversationState.conversations().find(conversation => {
+    return conversation.groupId === groupId;
+  });
   return conversation !== undefined && isMLSCapableConversation(conversation) ? conversation : undefined;
 };
 

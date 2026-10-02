@@ -93,8 +93,12 @@ const SeekBar = ({
           mediaElement.play();
           setIsSeekBarThumbDragged(false);
         }}
-        onMouseEnter={() => setIsSeekBarMouseOver(true)}
-        onMouseLeave={() => setIsSeekBarMouseOver(false)}
+        onMouseEnter={() => {
+          return setIsSeekBarMouseOver(true);
+        }}
+        onMouseLeave={() => {
+          return setIsSeekBarMouseOver(false);
+        }}
         style={
           {
             '--seek-bar-progress': `${progress.toString(10)}%`,

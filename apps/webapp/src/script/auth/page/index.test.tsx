@@ -30,10 +30,12 @@ import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/testUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 
-jest.mock('react-router', () => ({
-  ...jest.requireActual('react-router'),
-  Navigate: jest.fn().mockImplementation(),
-}));
+jest.mock('react-router', () => {
+  return {
+    ...jest.requireActual('react-router'),
+    Navigate: jest.fn().mockImplementation(),
+  };
+});
 
 describe('when visiting the index page', () => {
   let configSpy: jest.SpyInstance;

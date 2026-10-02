@@ -70,7 +70,9 @@ export const FileAssetSmall = ({
   return (
     <FileCard.Root extension={extension} name={name} size={size}>
       <button
-        onClick={() => showModal()}
+        onClick={() => {
+          return showModal();
+        }}
         css={hollowWrapperButtonStyles}
         aria-label={translate('cells.filePreviewButton.ariaLabel', {name})}
       />

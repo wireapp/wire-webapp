@@ -84,7 +84,9 @@ export class MediaStreamHandler {
   requestMediaStreamAccess(video: boolean): Promise<MediaStream | void> {
     return window.navigator.mediaDevices
       .getUserMedia({audio: true, video})
-      .then((mediaStream: MediaStream) => mediaStream)
+      .then((mediaStream: MediaStream) => {
+        return mediaStream;
+      })
       .catch((error: unknown) => {
         const mediaStreamError = toError(error);
 

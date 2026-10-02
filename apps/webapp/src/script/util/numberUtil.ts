@@ -35,7 +35,9 @@ export function inRange(value: number, lowerBound: number, upperBound: number): 
 }
 
 export const rootMeanSquare = (floatArray: number[] | Float32Array): number => {
-  const sum = (floatArray as number[]).reduce((power, number) => power + number ** 2, 0);
+  const sum = (floatArray as number[]).reduce((power, number) => {
+    return power + number ** 2;
+  }, 0);
   return Math.sqrt(sum) / floatArray.length;
 };
 

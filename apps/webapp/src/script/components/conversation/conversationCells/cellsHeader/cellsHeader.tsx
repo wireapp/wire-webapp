@@ -140,12 +140,15 @@ export const CellsHeader = ({
           ) : (
             <CellsBreadcrumbs
               items={breadcrumbs}
-              onItemClick={item =>
-                openBreadcrumb({
+              onItemClick={item => {
+                return openBreadcrumb({
                   conversationQualifiedId,
-                  path: breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '',
-                })
-              }
+                  path:
+                    breadcrumbs.find(crumb => {
+                      return crumb.name === item.name;
+                    })?.path ?? '',
+                });
+              }}
             />
           )}
         </div>

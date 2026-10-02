@@ -49,12 +49,18 @@ const getDefaultParams = (isGuest: boolean = true) => {
     onBack: jest.fn(),
     onClose: jest.fn(),
     teamRepository: {
-      conversationHasGuestLinkEnabled: async (conversationId: string) => true,
+      conversationHasGuestLinkEnabled: async (conversationId: string) => {
+        return true;
+      },
     } as TeamRepository,
     teamState: {
       ...new TeamState(),
-      isGuestLinkEnabled: ko.pureComputed(() => true),
-      isInTeam: () => true,
+      isGuestLinkEnabled: ko.pureComputed(() => {
+        return true;
+      }),
+      isInTeam: () => {
+        return true;
+      },
     } as unknown as TeamState,
   };
 };
@@ -72,8 +78,12 @@ describe('GuestServicesOptions', () => {
 
     const newConv = {
       ...conversation,
-      inTeam: ko.pureComputed(() => true),
-      isGuestRoom: ko.pureComputed(() => true),
+      inTeam: ko.pureComputed(() => {
+        return true;
+      }),
+      isGuestRoom: ko.pureComputed(() => {
+        return true;
+      }),
     } as Conversation;
 
     const defaultProps = getDefaultParams();

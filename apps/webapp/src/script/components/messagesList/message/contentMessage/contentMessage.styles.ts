@@ -19,13 +19,15 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const messageBodyWrapper = (isEphemeralMessage = false): CSSObject => ({
-  display: 'grid',
-  gridTemplateColumns: isEphemeralMessage
-    ? '64px calc(100% - var(--delivered-state-width) - 64px) var(--delivered-state-width)'
-    : 'calc(100% - var(--delivered-state-width)) var(--delivered-state-width)',
-  paddingLeft: isEphemeralMessage ? '0' : 'var(--conversation-message-sender-width)',
-});
+export const messageBodyWrapper = (isEphemeralMessage = false): CSSObject => {
+  return {
+    display: 'grid',
+    gridTemplateColumns: isEphemeralMessage
+      ? '64px calc(100% - var(--delivered-state-width) - 64px) var(--delivered-state-width)'
+      : 'calc(100% - var(--delivered-state-width)) var(--delivered-state-width)',
+    paddingLeft: isEphemeralMessage ? '0' : 'var(--conversation-message-sender-width)',
+  };
+};
 
 export const messageEphemeralTimer: CSSObject = {
   textAlign: 'center',

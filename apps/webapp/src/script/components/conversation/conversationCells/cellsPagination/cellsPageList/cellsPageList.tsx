@@ -101,7 +101,14 @@ const PaginationPageNumber = ({pageIndex, isCurrent, goToPage}: PaginationPageNu
 
   return (
     <li>
-      <button type="button" css={numberStyles} onClick={() => goToPage(pageIndex)} data-uie-name="go-page">
+      <button
+        type="button"
+        css={numberStyles}
+        onClick={() => {
+          return goToPage(pageIndex);
+        }}
+        data-uie-name="go-page"
+      >
         {pageNumber}
       </button>
     </li>

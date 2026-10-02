@@ -53,16 +53,19 @@ type ScheduledMeetingReminder = {
   meeting: MeetingSeries;
 };
 
-const toFiredOccurrenceKey = (meetingKey: string, occurrenceStartMs: number): string =>
-  `${meetingKey}:${occurrenceStartMs}`;
+const toFiredOccurrenceKey = (meetingKey: string, occurrenceStartMs: number): string => {
+  return `${meetingKey}:${occurrenceStartMs}`;
+};
 
-const toReminderPayload = (meeting: MeetingSeries, occurrenceStartMs: number): MeetingReminderFirePayload => ({
-  qualifiedId: meeting.qualified_id,
-  qualifiedConversationId: meeting.qualified_conversation,
-  meetingTitle: meeting.title,
-  meetingStartTime: new Date(occurrenceStartMs).toISOString(),
-  qualifiedCreator: meeting.qualified_creator,
-});
+const toReminderPayload = (meeting: MeetingSeries, occurrenceStartMs: number): MeetingReminderFirePayload => {
+  return {
+    qualifiedId: meeting.qualified_id,
+    qualifiedConversationId: meeting.qualified_conversation,
+    meetingTitle: meeting.title,
+    meetingStartTime: new Date(occurrenceStartMs).toISOString(),
+    qualifiedCreator: meeting.qualified_creator,
+  };
+};
 
 export const createMeetingReminderScheduler = ({
   clock,
@@ -71,8 +74,9 @@ export const createMeetingReminderScheduler = ({
   const scheduled = new Map<string, ScheduledMeetingReminder>();
   const firedOccurrenceKeys = new Set<string>();
 
-  const hasFiredOccurrence = (meetingKey: string, occurrenceStartMs: number): boolean =>
-    firedOccurrenceKeys.has(toFiredOccurrenceKey(meetingKey, occurrenceStartMs));
+  const hasFiredOccurrence = (meetingKey: string, occurrenceStartMs: number): boolean => {
+    return firedOccurrenceKeys.has(toFiredOccurrenceKey(meetingKey, occurrenceStartMs));
+  };
 
   const clearTimeoutIfScheduled = (scheduledReminder: ScheduledMeetingReminder): void => {
     if (!isUndefined(scheduledReminder.timeoutId)) {
@@ -106,15 +110,21 @@ export const createMeetingReminderScheduler = ({
 
     const delayInMilliseconds = Math.max(0, scheduledReminder.fireAt - clock.currentUnixEpochMilliseconds);
     scheduledReminder.timeoutId = clock.setTimeout(
-      () => onTimeout(meetingKey),
+      () => {
+        return onTimeout(meetingKey);
+      },
       Math.min(delayInMilliseconds, MEETING_REMINDER_MAX_TIMEOUT_DELAY_MS),
     );
   };
 
   const scheduleMeeting = (meeting: MeetingSeries): void => {
     const meetingKey = toMeetingIdKey(meeting.qualified_id);
-    const reminder = getNextSchedulableMeetingReminder(meeting, clock.currentUnixEpochMilliseconds, occurrenceStartMs =>
-      hasFiredOccurrence(meetingKey, occurrenceStartMs),
+    const reminder = getNextSchedulableMeetingReminder(
+      meeting,
+      clock.currentUnixEpochMilliseconds,
+      occurrenceStartMs => {
+        return hasFiredOccurrence(meetingKey, occurrenceStartMs);
+      },
     );
 
     if (maybe.isNothing(reminder)) {
@@ -176,7 +186,11 @@ export const createMeetingReminderScheduler = ({
 
   return {
     sync: meetingSeries => {
-      const nextMeetingKeys = new Set(meetingSeries.map(meeting => toMeetingIdKey(meeting.qualified_id)));
+      const nextMeetingKeys = new Set(
+        meetingSeries.map(meeting => {
+          return toMeetingIdKey(meeting.qualified_id);
+        }),
+      );
 
       for (const meetingKey of scheduled.keys()) {
         if (!nextMeetingKeys.has(meetingKey)) {

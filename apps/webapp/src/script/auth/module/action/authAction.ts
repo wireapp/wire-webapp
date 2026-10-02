@@ -49,8 +49,9 @@ const isSystemKeychainAccessError = (errorCandidate: unknown): errorCandidate is
 
 export class AuthAction {
   doLogin = (loginData: LoginData, getEntropy?: () => Promise<Uint8Array>): ThunkAction => {
-    const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
-      dispatch(authAction.doSilentLogout());
+    const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) => {
+      return dispatch(authAction.doSilentLogout());
+    };
     return this.doLoginPlain(loginData, onBeforeLogin, undefined, getEntropy);
   };
 
@@ -62,8 +63,9 @@ export class AuthAction {
     getEntropy?: () => Promise<Uint8Array>,
     password?: string,
   ): ThunkAction => {
-    const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
-      dispatch(authAction.doSilentLogout());
+    const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) => {
+      return dispatch(authAction.doSilentLogout());
+    };
     const onAfterLogin: LoginLifecycleFunction = async (
       dispatch,
       getState,

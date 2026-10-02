@@ -49,7 +49,10 @@ export const getMeetingTemporalStatusAt = (now: Date, start: Date, end: Date): M
 export const isAttendingMeetingInstance = (
   isConversationCallActive: boolean,
   temporalStatus: MeetingTemporalStatuses,
-): boolean => isConversationCallActive && temporalStatus !== MeetingTemporalStatuses.UPCOMING;
+): boolean => {
+  return isConversationCallActive && temporalStatus !== MeetingTemporalStatuses.UPCOMING;
+};
 
-export const isMeetingListItemOngoing = (temporalStatus: MeetingTemporalStatuses, isCallActive: boolean): boolean =>
-  temporalStatus === MeetingTemporalStatuses.ON_GOING || isCallActive;
+export const isMeetingListItemOngoing = (temporalStatus: MeetingTemporalStatuses, isCallActive: boolean): boolean => {
+  return temporalStatus === MeetingTemporalStatuses.ON_GOING || isCallActive;
+};

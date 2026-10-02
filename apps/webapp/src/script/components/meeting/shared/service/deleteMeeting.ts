@@ -77,10 +77,14 @@ export const deleteMeetingForAll = (
 
   return deps.meetingsRepository
     .deleteMeeting(command.meetingId)
-    .mapRejected(() => meetingSubmitErrors.deleteFailed)
-    .andThen(() =>
-      removeMeetingConversationLocally(deps.conversationRepository, command.qualifiedConversation).mapRejected(
-        () => meetingSubmitErrors.deleteSucceededButLocalCleanupFailed,
-      ),
-    );
+    .mapRejected(() => {
+      return meetingSubmitErrors.deleteFailed;
+    })
+    .andThen(() => {
+      return removeMeetingConversationLocally(deps.conversationRepository, command.qualifiedConversation).mapRejected(
+        () => {
+          return meetingSubmitErrors.deleteSucceededButLocalCleanupFailed;
+        },
+      );
+    });
 };

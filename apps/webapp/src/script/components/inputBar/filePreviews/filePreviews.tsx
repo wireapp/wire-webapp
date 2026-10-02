@@ -44,14 +44,16 @@ export const FilePreviews = ({files, conversationId, conversationQualifiedId}: F
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
-      {files.map(file => (
-        <FilePreview
-          key={file.id}
-          file={file}
-          conversationId={conversationId}
-          conversationQualifiedId={conversationQualifiedId}
-        />
-      ))}
+      {files.map(file => {
+        return (
+          <FilePreview
+            key={file.id}
+            file={file}
+            conversationId={conversationId}
+            conversationQualifiedId={conversationQualifiedId}
+          />
+        );
+      })}
     </div>
   );
 };

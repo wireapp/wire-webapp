@@ -110,7 +110,9 @@ export const CallParticipantsListItem = ({
           user={user}
           isSelf={isSelf}
           showContextMenu={showContextMenu}
-          onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
+          onDropdownClick={event => {
+            return onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>);
+          }}
         />
 
         {handRaisedAt !== undefined && handRaisedAt !== null && (

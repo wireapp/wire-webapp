@@ -64,7 +64,9 @@ export const SelfFingerprint = ({
         <button
           type="button"
           className="button-reset-default participant-devices__link accent-text"
-          onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES)}
+          onClick={() => {
+            return amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
+          }}
         >
           {translate('participantDevicesSelfAllDevices')}
         </button>

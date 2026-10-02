@@ -72,8 +72,9 @@ const getTermsOfUseUrl = () => {
  * @param  utmSource - Optional. The source of the UTM parameters.
  * @returns  The URL for managing services with optional UTM parameters.
  */
-export const getManageServicesUrl = (utmSource?: string): string | undefined =>
-  getTeamSettingsUrl(URL.URL_PATH?.MANAGE_SERVICES, utmSource);
+export const getManageServicesUrl = (utmSource?: string): string | undefined => {
+  return getTeamSettingsUrl(URL.URL_PATH?.MANAGE_SERVICES, utmSource);
+};
 
 /**
  * Retrieves the URL for managing team settings with optional UTM parameters.
@@ -82,11 +83,15 @@ export const getManageServicesUrl = (utmSource?: string): string | undefined =>
  * @param utmSource - Optional. The source of the UTM parameters.
  * @returns The URL for managing team settings with optional UTM parameters.
  */
-export const getManageTeamUrl = (utmSource?: string): string | undefined =>
-  getTeamSettingsUrl(URL.URL_PATH?.MANAGE_TEAM, utmSource);
+export const getManageTeamUrl = (utmSource?: string): string | undefined => {
+  return getTeamSettingsUrl(URL.URL_PATH?.MANAGE_TEAM, utmSource);
+};
 
-const getCreateTeamUrl = (): string | undefined =>
-  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;
+const getCreateTeamUrl = (): string | undefined => {
+  return Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION
+    ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}`
+    : undefined;
+};
 
 const addLocaleToUrl = (url?: string): string | undefined => {
   if (!isNonEmptyString(url)) {

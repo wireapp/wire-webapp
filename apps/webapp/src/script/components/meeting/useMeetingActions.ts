@@ -23,8 +23,12 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useMeetingActions = () => {
   const {clock} = useApplicationContext();
-  const openCreate = useScheduleMeetingModal(state => state.openCreate);
-  const openMeetNow = useMeetNowModal(state => state.open);
+  const openCreate = useScheduleMeetingModal(state => {
+    return state.openCreate;
+  });
+  const openMeetNow = useMeetNowModal(state => {
+    return state.open;
+  });
 
   const handleMeetNow = () => {
     openMeetNow();

@@ -44,10 +44,9 @@ export interface UserDevicesHistoryEntry {
 }
 
 const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
-  const [legalholdDevices, otherDevices] = partition(
-    devices,
-    device => device.class === ClientClassification.LEGAL_HOLD,
-  );
+  const [legalholdDevices, otherDevices] = partition(devices, device => {
+    return device.class === ClientClassification.LEGAL_HOLD;
+  });
   return legalholdDevices.concat(otherDevices);
 };
 
@@ -77,7 +76,9 @@ export const UserDevices = ({
   const {getDeviceIdentity} = useUserIdentity(user.qualifiedId, groupId);
   const [deviceMode, setDeviceMode] = useState(FIND_MODE.REQUESTING);
   const [clients, setClients] = useState<ClientEntity[]>([]);
-  const logger = useMemo(() => getLogger('UserDevicesComponent'), []);
+  const logger = useMemo(() => {
+    return getLogger('UserDevicesComponent');
+  }, []);
 
   useEffect(() => {
     void (async () => {

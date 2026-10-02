@@ -69,122 +69,138 @@ type TransitionContainerProps = HTMLProps<any> & {
   exit?: boolean;
 };
 
-export const TransitionContainer = (props: TransitionContainerProps) => <TransitionGroup {...props} />;
+export const TransitionContainer = (props: TransitionContainerProps) => {
+  return <TransitionGroup {...props} />;
+};
 
 export const Transition = ({animationStyle, timeout, children, ...props}: TransitionProps) => {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   return (
     <ClassNames>
-      {({css}) => (
-        <CSSTransition {...props} timeout={timeout} nodeRef={nodeRef} classNames={css(animationStyle)}>
-          <div ref={nodeRef}>{children}</div>
-        </CSSTransition>
-      )}
+      {({css}) => {
+        return (
+          <CSSTransition {...props} timeout={timeout} nodeRef={nodeRef} classNames={css(animationStyle)}>
+            <div ref={nodeRef}>{children}</div>
+          </CSSTransition>
+        );
+      }}
     </ClassNames>
   );
 };
 
-export const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...props}: OpacityProps) => (
-  <Transition
-    {...props}
-    animationStyle={{
-      '&-enter': {opacity: startValue},
-      '&-enter-active': {
-        opacity: endValue,
-        transition: `all ${timeout}ms ${EASE.QUART}`,
-      },
-      '&-exit': {opacity: endValue},
-      '&-exit-active': {
-        opacity: startValue,
-        pointerEvents: 'none',
-        transition: `all ${timeout}ms ${EASE.QUART}`,
-      },
-      '&-exit-done': {opacity: startValue},
-    }}
-    timeout={timeout}
-  />
-);
+export const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...props}: OpacityProps) => {
+  return (
+    <Transition
+      {...props}
+      animationStyle={{
+        '&-enter': {opacity: startValue},
+        '&-enter-active': {
+          opacity: endValue,
+          transition: `all ${timeout}ms ${EASE.QUART}`,
+        },
+        '&-exit': {opacity: endValue},
+        '&-exit-active': {
+          opacity: startValue,
+          pointerEvents: 'none',
+          transition: `all ${timeout}ms ${EASE.QUART}`,
+        },
+        '&-exit-done': {opacity: startValue},
+      }}
+      timeout={timeout}
+    />
+  );
+};
 
 export const YAxisMovement = ({
   startValue = '-100%',
   endValue = '0%',
   timeout = DURATION.DEFAULT,
   ...props
-}: MovementProps) => (
-  <Transition
-    {...props}
-    animationStyle={{
-      '&-enter': {transform: `translateY(${startValue})`},
-      '&-enter-active': {
-        transform: `translateY(${endValue})`,
-        transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
-      },
-      '&-exit': {transform: `translateY(${endValue})`},
-      '&-exit-active': {
-        pointerEvents: 'none',
-        transform: `translateY(${startValue})`,
-        transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
-      },
-      '&-exit-done': {transform: `translateY(${startValue})`},
-    }}
-    timeout={timeout}
-  />
-);
+}: MovementProps) => {
+  return (
+    <Transition
+      {...props}
+      animationStyle={{
+        '&-enter': {transform: `translateY(${startValue})`},
+        '&-enter-active': {
+          transform: `translateY(${endValue})`,
+          transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
+        },
+        '&-exit': {transform: `translateY(${endValue})`},
+        '&-exit-active': {
+          pointerEvents: 'none',
+          transform: `translateY(${startValue})`,
+          transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
+        },
+        '&-exit-done': {transform: `translateY(${startValue})`},
+      }}
+      timeout={timeout}
+    />
+  );
+};
 
 export const XAxisMovement = ({
   startValue = '-100%',
   endValue = '0%',
   timeout = DURATION.DEFAULT,
   ...props
-}: MovementProps) => (
-  <Transition
-    {...props}
-    animationStyle={{
-      '&-enter': {transform: `translateX(${startValue})`},
-      '&-enter-active': {
-        transform: `translateX(${endValue})`,
-        transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
-      },
-      '&-exit': {transform: `translateX(${endValue})`},
-      '&-exit-active': {
-        pointerEvents: 'none',
-        transform: `translateX(${startValue})`,
-        transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
-      },
-      '&-exit-done': {transform: `translateX(${startValue})`},
-    }}
-    timeout={timeout}
-  />
-);
+}: MovementProps) => {
+  return (
+    <Transition
+      {...props}
+      animationStyle={{
+        '&-enter': {transform: `translateX(${startValue})`},
+        '&-enter-active': {
+          transform: `translateX(${endValue})`,
+          transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
+        },
+        '&-exit': {transform: `translateX(${endValue})`},
+        '&-exit-active': {
+          pointerEvents: 'none',
+          transform: `translateX(${startValue})`,
+          transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
+        },
+        '&-exit-done': {transform: `translateX(${startValue})`},
+      }}
+      timeout={timeout}
+    />
+  );
+};
 
-export const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION.DEFAULT, ...props}: MovementProps) => (
-  <Transition
-    {...props}
-    animationStyle={{
-      '&-enter': {marginTop: startValue},
-      '&-enter-active': {
-        marginTop: endValue,
-        transition: `all ${timeout}ms ${EASE.QUART}`,
-      },
-      '&-exit': {marginTop: endValue},
-      '&-exit-active': {
-        marginTop: startValue,
-        pointerEvents: 'none',
-        transition: `all ${timeout}ms ${EASE.QUART}`,
-      },
-      '&-exit-done': {marginTop: startValue},
-    }}
-    timeout={timeout}
-  />
-);
+export const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION.DEFAULT, ...props}: MovementProps) => {
+  return (
+    <Transition
+      {...props}
+      animationStyle={{
+        '&-enter': {marginTop: startValue},
+        '&-enter-active': {
+          marginTop: endValue,
+          transition: `all ${timeout}ms ${EASE.QUART}`,
+        },
+        '&-exit': {marginTop: endValue},
+        '&-exit-active': {
+          marginTop: startValue,
+          pointerEvents: 'none',
+          transition: `all ${timeout}ms ${EASE.QUART}`,
+        },
+        '&-exit-done': {marginTop: startValue},
+      }}
+      timeout={timeout}
+    />
+  );
+};
 
-export const LeftRightMovement = (props: MovementProps) => (
-  <XAxisMovement startValue="-100vh" endValue="0vh" {...props} />
-);
-export const RightLeftMovement = (props: MovementProps) => (
-  <XAxisMovement startValue="100vh" endValue="0vh" {...props} />
-);
+export const LeftRightMovement = (props: MovementProps) => {
+  return <XAxisMovement startValue="-100vh" endValue="0vh" {...props} />;
+};
+export const RightLeftMovement = (props: MovementProps) => {
+  return <XAxisMovement startValue="100vh" endValue="0vh" {...props} />;
+};
 
-export const TopDownMovement = (props: MovementProps) => <YAxisMovement startValue="-100%" endValue="0%" {...props} />;
-export const BottomUpMovement = (props: MovementProps) => <YAxisMovement startValue="100%" endValue="0%" {...props} />;
+export const TopDownMovement = (props: MovementProps) => {
+  return <YAxisMovement startValue="-100%" endValue="0%" {...props} />;
+};
+export const BottomUpMovement = (props: MovementProps) => {
+  return <YAxisMovement startValue="100%" endValue="0%" {...props} />;
+};

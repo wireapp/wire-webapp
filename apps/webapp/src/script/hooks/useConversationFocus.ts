@@ -40,11 +40,17 @@ type UseConversationFocusResult = {
 function useConversationFocus(
   conversations: Conversation[],
   focusKey = '',
-  focusConversation: FocusConversation = () => false,
+  focusConversation: FocusConversation = () => {
+    return false;
+  },
 ): UseConversationFocusResult {
   const firstConversationId = conversations[0]?.id;
   const [currentFocus, setCurrentFocus] = useState(isNonEmptyString(firstConversationId) ? firstConversationId : '');
-  const conversationIds = conversations.map(conversation => conversation.id).join('\u0000');
+  const conversationIds = conversations
+    .map(conversation => {
+      return conversation.id;
+    })
+    .join('\u0000');
   const focusStateKey = `${focusKey}\u0000${conversationIds}`;
   const previousFocusStateKey = useRef(focusStateKey);
   const registeredElements = useRef(new Map<string, Set<HTMLElement>>());
@@ -64,7 +70,11 @@ function useConversationFocus(
 
   const focusMountedConversation = useCallback((conversationId: string) => {
     const elements = registeredElements.current.get(conversationId);
-    const element = isNullOrUndefined(elements) ? undefined : [...elements].find(candidate => candidate.isConnected);
+    const element = isNullOrUndefined(elements)
+      ? undefined
+      : [...elements].find(candidate => {
+          return candidate.isConnected;
+        });
 
     if (isNullOrUndefined(element)) {
       if (!isNullOrUndefined(elements)) {
@@ -79,59 +89,63 @@ function useConversationFocus(
   }, []);
 
   const handleKeyDown = useCallback(
-    (conversationId: string) => (event: ReactKeyboardEvent | KeyboardEvent) => {
-      if (conversations.length === 0) {
-        return;
-      }
+    (conversationId: string) => {
+      return (event: ReactKeyboardEvent | KeyboardEvent) => {
+        if (conversations.length === 0) {
+          return;
+        }
 
-      const currentIndex = conversations.findIndex(conversation => conversation.id === conversationId);
-      const effectiveIndex = currentIndex === -1 ? 0 : currentIndex;
+        const currentIndex = conversations.findIndex(conversation => {
+          return conversation.id === conversationId;
+        });
+        const effectiveIndex = currentIndex === -1 ? 0 : currentIndex;
 
-      if (isKey(event, KEY.ARROW_DOWN)) {
-        const nextConversationCandidate = conversations[effectiveIndex + 1];
-        const nextConversation = isNullOrUndefined(nextConversationCandidate)
-          ? conversations[0]
-          : nextConversationCandidate;
+        if (isKey(event, KEY.ARROW_DOWN)) {
+          const nextConversationCandidate = conversations[effectiveIndex + 1];
+          const nextConversation = isNullOrUndefined(nextConversationCandidate)
+            ? conversations[0]
+            : nextConversationCandidate;
 
-        if (focusMountedConversation(nextConversation.id)) {
+          if (focusMountedConversation(nextConversation.id)) {
+            event.preventDefault();
+            setCurrentFocus(nextConversation.id);
+            return;
+          }
+
+          const focusResult = focusConversation(nextConversation.id);
+          if (focusResult === false) {
+            return;
+          }
+
           event.preventDefault();
-          setCurrentFocus(nextConversation.id);
-          return;
-        }
+          if (focusResult === true) {
+            setCurrentFocus(nextConversation.id);
+          }
+        } else if (isKey(event, KEY.ARROW_UP)) {
+          const previousConversationCandidate = conversations[effectiveIndex - 1];
+          const previousConversation = isNullOrUndefined(previousConversationCandidate)
+            ? conversations[conversations.length - 1]
+            : previousConversationCandidate;
 
-        const focusResult = focusConversation(nextConversation.id);
-        if (focusResult === false) {
-          return;
-        }
+          if (focusMountedConversation(previousConversation.id)) {
+            event.preventDefault();
+            setCurrentFocus(previousConversation.id);
+            return;
+          }
 
-        event.preventDefault();
-        if (focusResult === true) {
-          setCurrentFocus(nextConversation.id);
-        }
-      } else if (isKey(event, KEY.ARROW_UP)) {
-        const previousConversationCandidate = conversations[effectiveIndex - 1];
-        const previousConversation = isNullOrUndefined(previousConversationCandidate)
-          ? conversations[conversations.length - 1]
-          : previousConversationCandidate;
+          const focusResult = focusConversation(previousConversation.id);
+          if (focusResult === false) {
+            return;
+          }
 
-        if (focusMountedConversation(previousConversation.id)) {
           event.preventDefault();
-          setCurrentFocus(previousConversation.id);
-          return;
+          if (focusResult === true) {
+            setCurrentFocus(previousConversation.id);
+          }
+        } else if (isTabKey(event)) {
+          setCurrentFocus(conversations[0].id);
         }
-
-        const focusResult = focusConversation(previousConversation.id);
-        if (focusResult === false) {
-          return;
-        }
-
-        event.preventDefault();
-        if (focusResult === true) {
-          setCurrentFocus(previousConversation.id);
-        }
-      } else if (isTabKey(event)) {
-        setCurrentFocus(conversations[0].id);
-      }
+      };
     },
     [conversations, focusConversation, focusMountedConversation],
   );
@@ -149,7 +163,12 @@ function useConversationFocus(
       return;
     }
 
-    if (isNonEmptyString(currentFocus) && !conversations.some(conversation => conversation.id === currentFocus)) {
+    if (
+      isNonEmptyString(currentFocus) &&
+      !conversations.some(conversation => {
+        return conversation.id === currentFocus;
+      })
+    ) {
       const firstConversationId = conversations[0]?.id;
       setCurrentFocus(isNonEmptyString(firstConversationId) ? firstConversationId : '');
     }
@@ -157,7 +176,9 @@ function useConversationFocus(
 
   useEffect(() => {
     if (currentFocus === conversations[0]?.id) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     document.addEventListener('click', resetConversationFocus);

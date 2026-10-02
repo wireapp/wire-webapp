@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const SaveIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M0 0h16v16H0V0Zm2 2h12v12H2V2Zm7 2H7v4.09H3L8 12l5-3.91H9V4Z" fillRule="evenodd" clipRule="evenodd" />
-  </SVGIcon>
-);
+export const SaveIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path d="M0 0h16v16H0V0Zm2 2h12v12H2V2Zm7 2H7v4.09H3L8 12l5-3.91H9V4Z" fillRule="evenodd" clipRule="evenodd" />
+    </SVGIcon>
+  );
+};

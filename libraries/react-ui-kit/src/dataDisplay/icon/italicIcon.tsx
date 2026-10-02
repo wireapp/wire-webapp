@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ItalicIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M8.30769 12.8462L9.69231 3.15385H10.6923L11 1H7L6.69231 3.15385H7.69231L6.30769 12.8462H5.30769L5 15H9L9.30769 12.8462H8.30769Z" />
-  </SVGIcon>
-);
+export const ItalicIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path d="M8.30769 12.8462L9.69231 3.15385H10.6923L11 1H7L6.69231 3.15385H7.69231L6.30769 12.8462H5.30769L5 15H9L9.30769 12.8462H8.30769Z" />
+    </SVGIcon>
+  );
+};

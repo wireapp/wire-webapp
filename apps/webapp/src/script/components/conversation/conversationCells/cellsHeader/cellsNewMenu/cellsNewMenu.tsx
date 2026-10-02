@@ -61,7 +61,9 @@ export const CellsNewMenu = ({
   const [isFileModalOpen, setIsFileModalOpen] = useState(false);
   const [fileType, setFileType] = useState<CellsNewFileType>('document');
 
-  const openFolderModal = () => setIsFolderModalOpen(true);
+  const openFolderModal = () => {
+    return setIsFolderModalOpen(true);
+  };
 
   const openFileModal = (selectedFileType: CellsNewFileType) => {
     setFileType(selectedFileType);
@@ -97,13 +99,25 @@ export const CellsNewMenu = ({
             <DropdownMenu.Sub>
               <DropdownMenu.SubTrigger>{translate('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                <DropdownMenu.Item onClick={() => openFileModal('document')}>
+                <DropdownMenu.Item
+                  onClick={() => {
+                    return openFileModal('document');
+                  }}
+                >
                   {translate('cells.newItemMenu.document')}
                 </DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => openFileModal('spreadsheet')}>
+                <DropdownMenu.Item
+                  onClick={() => {
+                    return openFileModal('spreadsheet');
+                  }}
+                >
                   {translate('cells.newItemMenu.spreadsheet')}
                 </DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => openFileModal('presentation')}>
+                <DropdownMenu.Item
+                  onClick={() => {
+                    return openFileModal('presentation');
+                  }}
+                >
                   {translate('cells.newItemMenu.presentation')}
                 </DropdownMenu.Item>
               </DropdownMenu.SubContent>
@@ -114,7 +128,9 @@ export const CellsNewMenu = ({
       <CellsNewFolderModal
         {...commonProps}
         isOpen={isFolderModalOpen}
-        onClose={() => setIsFolderModalOpen(false)}
+        onClose={() => {
+          return setIsFolderModalOpen(false);
+        }}
         onSuccess={() => {
           onRefresh();
           setIsFolderModalOpen(false);
@@ -124,7 +140,9 @@ export const CellsNewMenu = ({
         {...commonProps}
         isOpen={isFileModalOpen}
         fileType={fileType}
-        onClose={() => setIsFileModalOpen(false)}
+        onClose={() => {
+          return setIsFileModalOpen(false);
+        }}
         onSuccess={() => {
           onRefresh();
           setIsFileModalOpen(false);

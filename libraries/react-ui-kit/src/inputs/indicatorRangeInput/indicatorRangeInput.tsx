@@ -82,7 +82,12 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
     return (
       <div css={{wrapperCSS, width: '100%'}}>
         {isNonEmptyString(label) ? (
-          <InputLabel css={(theme: Theme) => ({fontSize: theme.fontSizes.base})} htmlFor={id}>
+          <InputLabel
+            css={(theme: Theme) => {
+              return {fontSize: theme.fontSizes.base};
+            }}
+            htmlFor={id}
+          >
             {label}
           </InputLabel>
         ) : null}
@@ -90,35 +95,41 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
         <div css={containerStyles}>
           {isCustomSlider && (
             <div css={{position: 'relative', display: 'flex', marginBottom: '20px'}}>
-              {dataListOptions.map((dataListOption, index) => (
-                <div
-                  key={dataListOption.value}
-                  css={(theme: Theme) => headingStyle(listLength, theme)}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    if (!isUndefined(dataListOption?.heading) && !isUndefined(onOptionClick)) {
-                      onOptionClick(index);
-                    }
-                  }}
-                  onKeyDown={event => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
+              {dataListOptions.map((dataListOption, index) => {
+                return (
+                  <div
+                    key={dataListOption.value}
+                    css={(theme: Theme) => {
+                      return headingStyle(listLength, theme);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
                       if (!isUndefined(dataListOption?.heading) && !isUndefined(onOptionClick)) {
                         onOptionClick(index);
                       }
-                    }
-                  }}
-                >
-                  {dataListOption?.heading}
-                </div>
-              ))}
+                    }}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        if (!isUndefined(dataListOption?.heading) && !isUndefined(onOptionClick)) {
+                          onOptionClick(index);
+                        }
+                      }
+                    }}
+                  >
+                    {dataListOption?.heading}
+                  </div>
+                );
+              })}
             </div>
           )}
 
           <input
             ref={ref}
-            css={(theme: Theme) => rangeStyles(backgroundSize, valueNum, listLength, isCustomSlider, theme)}
+            css={(theme: Theme) => {
+              return rangeStyles(backgroundSize, valueNum, listLength, isCustomSlider, theme);
+            }}
             id={id}
             name={id}
             min={minNum}
@@ -134,15 +145,24 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
           />
 
           {isCustomSlider && (
-            <datalist id="tickMarks" css={(theme: Theme) => dataListOption(listLength, theme)}>
-              {dataListOptions.map((dataListOption, index) => (
-                <option
-                  key={index}
-                  value={dataListOption.value}
-                  label={dataListOption.label}
-                  onClick={() => onOptionClick?.(index)}
-                />
-              ))}
+            <datalist
+              id="tickMarks"
+              css={(theme: Theme) => {
+                return dataListOption(listLength, theme);
+              }}
+            >
+              {dataListOptions.map((dataListOption, index) => {
+                return (
+                  <option
+                    key={index}
+                    value={dataListOption.value}
+                    label={dataListOption.label}
+                    onClick={() => {
+                      return onOptionClick?.(index);
+                    }}
+                  />
+                );
+              })}
             </datalist>
           )}
         </div>

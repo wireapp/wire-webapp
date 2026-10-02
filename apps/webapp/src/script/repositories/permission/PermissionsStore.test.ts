@@ -131,7 +131,11 @@ describe('usePermissionsStore', () => {
       const permissionTypes = [PermissionType.NOTIFICATIONS, PermissionType.CAMERA, PermissionType.GEO_LOCATION];
       const results = state.getPermissionStates(permissionTypes);
 
-      expect(results.map(r => r.type)).toEqual(permissionTypes);
+      expect(
+        results.map(r => {
+          return r.type;
+        }),
+      ).toEqual(permissionTypes);
     });
   });
 

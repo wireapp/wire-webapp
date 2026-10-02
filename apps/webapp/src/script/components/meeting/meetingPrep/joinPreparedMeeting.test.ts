@@ -49,12 +49,24 @@ const createDeps = (startAudio: jest.Mock): JoinMeetingCallDeps => {
   );
 
   return {
-    conversationState: {findConversation: () => conversation} as unknown as ConversationState,
+    conversationState: {
+      findConversation: () => {
+        return conversation;
+      },
+    } as unknown as ConversationState,
     conversationRepository: {
-      safeGetConversationById: () => task.reject('not found'),
-      safeEnsureConversationExists: () => task.resolve(undefined),
+      safeGetConversationById: () => {
+        return task.reject('not found');
+      },
+      safeEnsureConversationExists: () => {
+        return task.resolve(undefined);
+      },
     } as unknown as ConversationRepository,
-    callingRepository: {findCall: () => undefined} as unknown as CallingRepository,
+    callingRepository: {
+      findCall: () => {
+        return undefined;
+      },
+    } as unknown as CallingRepository,
     callingViewModel: {
       callActions: {answer: jest.fn(), startAudio},
     } as unknown as CallingViewModel,
@@ -69,7 +81,9 @@ describe('joinPreparedMeeting', () => {
       deps: createDeps(startAudio),
       qualifiedConversationId,
       media,
-      guardCall: startCall => startCall(),
+      guardCall: startCall => {
+        return startCall();
+      },
       translate: translateForTest,
       callNotEstablishedCopy,
     });
@@ -85,7 +99,9 @@ describe('joinPreparedMeeting', () => {
       deps: createDeps(startAudio),
       qualifiedConversationId,
       media,
-      guardCall: () => undefined,
+      guardCall: () => {
+        return undefined;
+      },
       translate: translateForTest,
       callNotEstablishedCopy,
     });

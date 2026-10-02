@@ -33,7 +33,9 @@ describe('ComponentUtil', () => {
         observableA: ko.observable(0),
         observableB: ko.observable(0),
       };
-      const {result} = renderHook(() => useKoSubscribableChildren(obj, ['observableA', 'observableB']));
+      const {result} = renderHook(() => {
+        return useKoSubscribableChildren(obj, ['observableA', 'observableB']);
+      });
       const preResult = result.current;
       act(() => {
         obj.observableA(1);
@@ -46,14 +48,19 @@ describe('ComponentUtil', () => {
     });
 
     it('returns a new object when the observed object changes', () => {
-      const {result, rerender} = renderHook(({obj}) => useKoSubscribableChildren(obj, ['observableA', 'observableB']), {
-        initialProps: {
-          obj: {
-            observableA: ko.observable(1),
-            observableB: ko.observable(0),
+      const {result, rerender} = renderHook(
+        ({obj}) => {
+          return useKoSubscribableChildren(obj, ['observableA', 'observableB']);
+        },
+        {
+          initialProps: {
+            obj: {
+              observableA: ko.observable(1),
+              observableB: ko.observable(0),
+            },
           },
         },
-      });
+      );
       const preResult = result.current;
       rerender({
         obj: {

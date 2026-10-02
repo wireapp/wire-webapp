@@ -42,7 +42,9 @@ function getEventRepositoryForTest(): EventRepository {
 }
 
 describe('EventRepository', () => {
-  beforeAll(() => testFactory.exposeClientActors());
+  beforeAll(() => {
+    return testFactory.exposeClientActors();
+  });
 
   beforeEach(() => {
     return testFactory.exposeEventActors();
@@ -311,14 +313,16 @@ describe('EventRepository', () => {
     ] as const;
 
     it.each(
-      meetingLifecycleCases.flatMap(([eventType, webAppEvent]) =>
-        malformedQualifiedIdCases.map(([description, eventOverrides]) => ({
-          description,
-          eventOverrides,
-          eventType,
-          webAppEvent,
-        })),
-      ),
+      meetingLifecycleCases.flatMap(([eventType, webAppEvent]) => {
+        return malformedQualifiedIdCases.map(([description, eventOverrides]) => {
+          return {
+            description,
+            eventOverrides,
+            eventType,
+            webAppEvent,
+          };
+        });
+      }),
     )(
       'does not publish normalized event when $eventType has $description',
       async ({eventType, webAppEvent, eventOverrides}) => {
@@ -428,9 +432,9 @@ describe('EventRepository', () => {
 
       await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
 
-      const visibilityHandler = (document.addEventListener as jest.Mock).mock.calls.find(
-        ([eventName]) => eventName === 'visibilitychange',
-      )?.[1] as (() => void) | undefined;
+      const visibilityHandler = (document.addEventListener as jest.Mock).mock.calls.find(([eventName]) => {
+        return eventName === 'visibilitychange';
+      })?.[1] as (() => void) | undefined;
 
       Object.defineProperty(document, 'visibilityState', {
         value: 'visible',
@@ -441,7 +445,9 @@ describe('EventRepository', () => {
       visibilityHandler?.();
       // Use setTimeout-based flush to resolve the full async chain:
       // tick 1: isWebsocketHealthy resolves → tick 2: connect() calls account.listen
-      await new Promise<void>(resolve => setTimeout(resolve, 0));
+      await new Promise<void>(resolve => {
+        return setTimeout(resolve, 0);
+      });
 
       expect(mockAccount.isWebsocketHealthy).toHaveBeenCalled();
       // Initial connect + reconnect after unhealthy check = 2 calls
@@ -455,9 +461,9 @@ describe('EventRepository', () => {
 
       await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
 
-      const visibilityHandler = (document.addEventListener as jest.Mock).mock.calls.find(
-        ([eventName]) => eventName === 'visibilitychange',
-      )?.[1] as (() => void) | undefined;
+      const visibilityHandler = (document.addEventListener as jest.Mock).mock.calls.find(([eventName]) => {
+        return eventName === 'visibilitychange';
+      })?.[1] as (() => void) | undefined;
 
       Object.defineProperty(document, 'visibilityState', {
         value: 'visible',
@@ -521,7 +527,9 @@ describe('EventRepository', () => {
 
       // Try to trigger reconnection while connection is in progress
       // The connect function should skip if already connecting
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise(resolve => {
+        return setTimeout(resolve, 10);
+      });
 
       connectResolve(jest.fn());
       await connectionPromise;
@@ -532,12 +540,17 @@ describe('EventRepository', () => {
 
     describe('WebSocket reconnection logic', () => {
       // Flushes all pending microtasks and macrotasks so async closures settle
-      const flushPromises = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+      const flushPromises = () => {
+        return new Promise<void>(resolve => {
+          return setTimeout(resolve, 0);
+        });
+      };
 
-      const getVisibilityHandler = () =>
-        (document.addEventListener as jest.Mock).mock.calls.find(
-          ([name]: [string]) => name === 'visibilitychange',
-        )?.[1] as () => void;
+      const getVisibilityHandler = () => {
+        return (document.addEventListener as jest.Mock).mock.calls.find(([name]: [string]) => {
+          return name === 'visibilitychange';
+        })?.[1] as () => void;
+      };
 
       const triggerVisibility = () => {
         Object.defineProperty(document, 'visibilityState', {value: 'visible', configurable: true});
@@ -672,9 +685,9 @@ describe('EventRepository', () => {
           mockAccount.listen.mockReturnValueOnce(connectionPromise);
 
           // online → handleOnline → connect() sets connectionInProgress = true synchronously
-          const onlineHandler = (window.addEventListener as jest.Mock).mock.calls.find(
-            ([name]: [string]) => name === 'online',
-          )?.[1] as () => void;
+          const onlineHandler = (window.addEventListener as jest.Mock).mock.calls.find(([name]: [string]) => {
+            return name === 'online';
+          })?.[1] as () => void;
           onlineHandler();
 
           // connectionInProgress is now true; visibility trigger should be skipped

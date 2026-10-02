@@ -18,6 +18,7 @@
  */
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -136,7 +137,7 @@ export class ListViewModel {
         return preferenceItems;
       }
 
-      const hasConnectRequests = !!this.userState.connectRequests().length;
+      const hasConnectRequests = isNonEmptyArray(this.userState.connectRequests());
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
 
       return states.concat(this.conversationState.visibleConversations());
@@ -164,7 +165,7 @@ export class ListViewModel {
   readonly answerCall = async (conversationEntity: Conversation): Promise<void> => {
     const call = this.callingRepository.findCall(conversationEntity.qualifiedId);
 
-    if (!call) {
+    if (isUndefined(call)) {
       return;
     }
 
@@ -268,7 +269,9 @@ export class ListViewModel {
   };
 
   openPreferencesAccount = (): void => {
-    this.fireAndForgetInvoker.fireAndForget(() => this.teamRepository.getTeam());
+    this.fireAndForgetInvoker.fireAndForget(() => {
+      return this.teamRepository.getTeam();
+    });
     this.openPreferences(ContentState.PREFERENCES_ACCOUNT);
   };
 
@@ -287,7 +290,7 @@ export class ListViewModel {
     };
 
     const preferencePath = preferencePaths[contentState];
-    if (preferencePath) {
+    if (isNonEmptyString(preferencePath)) {
       setHistoryParam(preferencePath);
     }
 
@@ -395,7 +398,9 @@ export class ListViewModel {
 
       if (this.isProAccount()) {
         entries.push({
-          click: () => this.clickToOpenNotificationSettings(conversationEntity),
+          click: () => {
+            return this.clickToOpenNotificationSettings(conversationEntity);
+          },
           label: this.translate('conversationsPopoverNotificationSettings'),
           title: this.translate('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
         });
@@ -408,7 +413,9 @@ export class ListViewModel {
           : this.translate('tooltipConversationsSilence', {shortcut: notificationsShortcut});
 
         entries.push({
-          click: () => this.clickToToggleMute(conversationEntity),
+          click: () => {
+            return this.clickToToggleMute(conversationEntity);
+          },
           label,
           title,
         });
@@ -427,40 +434,49 @@ export class ListViewModel {
         });
       } else {
         entries.push({
-          click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
+          click: () => {
+            return conversationLabelRepository.removeConversationFromFavorites(conversationEntity);
+          },
           label: this.translate('conversationPopoverUnfavorite'),
         });
       }
 
       const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
 
-      if (customLabel) {
+      if (!isUndefined(customLabel)) {
         entries.push({
-          click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
+          click: () => {
+            return conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity);
+          },
           label: this.translate('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
         });
       }
 
       entries.push({
-        click: () =>
-          showLabelContextMenu(event, conversationEntity, conversationLabelRepository, {
+        click: () => {
+          return showLabelContextMenu(event, conversationEntity, conversationLabelRepository, {
             newFolder: this.translate('conversationsPopoverNewFolder'),
             noCustomFolders: this.translate('conversationsPopoverNoCustomFolders'),
-          }),
+          });
+        },
         label: this.translate('conversationsPopoverMoveTo'),
       });
     }
 
     if (conversationEntity.is_archived()) {
       entries.push({
-        click: () => this.clickToUnarchive(conversationEntity),
+        click: () => {
+          return this.clickToUnarchive(conversationEntity);
+        },
         label: this.translate('conversationsPopoverUnarchive'),
       });
     } else {
       const shortcut = Shortcut.getShortcutTooltip(ShortcutType.ARCHIVE);
 
       entries.push({
-        click: () => this.clickToArchive(conversationEntity),
+        click: () => {
+          return this.clickToArchive(conversationEntity);
+        },
         label: this.translate('conversationsPopoverArchive'),
         title: this.translate('tooltipConversationsArchive', {shortcut}),
       });
@@ -468,14 +484,18 @@ export class ListViewModel {
 
     if (conversationEntity.isRequest()) {
       entries.push({
-        click: () => this.clickToCancelRequest(conversationEntity),
+        click: () => {
+          return this.clickToCancelRequest(conversationEntity);
+        },
         label: this.translate('conversationsPopoverCancel'),
       });
     }
 
     if (conversationEntity.isClearable()) {
       entries.push({
-        click: () => this.clickToClear(conversationEntity),
+        click: () => {
+          return this.clickToClear(conversationEntity);
+        },
         label: this.translate('conversationsPopoverClear'),
       });
     }
@@ -487,12 +507,16 @@ export class ListViewModel {
 
       if (canBlock) {
         entries.push({
-          click: () => this.clickToBlock(conversationEntity),
+          click: () => {
+            return this.clickToBlock(conversationEntity);
+          },
           label: this.translate('conversationsPopoverBlock'),
         });
       } else if (canUnblock) {
         entries.push({
-          click: () => this.clickToUnblock(conversationEntity),
+          click: () => {
+            return this.clickToUnblock(conversationEntity);
+          },
           label: this.translate('conversationsPopoverUnblock'),
         });
       }
@@ -500,7 +524,9 @@ export class ListViewModel {
 
     if (conversationEntity.isLeavable()) {
       entries.push({
-        click: () => this.clickToLeave(conversationEntity),
+        click: () => {
+          return this.clickToLeave(conversationEntity);
+        },
         label: conversationEntity.isChannel()
           ? this.translate('channelsPopoverLeave')
           : this.translate('groupsPopoverLeave'),
@@ -514,7 +540,9 @@ export class ListViewModel {
       conversationEntity.isSelfUserRemoved()
     ) {
       entries.push({
-        click: () => this.actionsViewModel.removeConversation(conversationEntity),
+        click: () => {
+          return this.actionsViewModel.removeConversation(conversationEntity);
+        },
         label: this.translate('conversationsPopoverDeleteForMe'),
       });
     }
@@ -581,7 +609,7 @@ export class ListViewModel {
 
   readonly clickToUnarchive = (conversationEntity: Conversation): void => {
     void this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
-      if (!this.conversationState.archivedConversations().length) {
+      if (isEmptyArray(this.conversationState.archivedConversations())) {
         this.switchList(ListState.CONVERSATIONS);
       }
     });

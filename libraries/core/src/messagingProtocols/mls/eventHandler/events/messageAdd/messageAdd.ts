@@ -55,8 +55,12 @@ export const handleMLSMessageAdd = async ({
     qualifiedConversationId,
     groupId,
     coreCryptoEpochNumber: coreCryptoEpochNumber.match({
-      Ok: epoch => epoch,
-      Err: error => error,
+      Ok: epoch => {
+        return epoch;
+      },
+      Err: error => {
+        return error;
+      },
     }),
     eventTime: event.time,
   });

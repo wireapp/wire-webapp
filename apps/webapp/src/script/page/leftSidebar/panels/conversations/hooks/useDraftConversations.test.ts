@@ -31,8 +31,12 @@ describe('useDraftConversations', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     Storage.prototype.getItem = jest.fn();
-    (amplify.subscribe as jest.Mock).mockImplementation(() => undefined);
-    (amplify.unsubscribe as jest.Mock).mockImplementation(() => undefined);
+    (amplify.subscribe as jest.Mock).mockImplementation(() => {
+      return undefined;
+    });
+    (amplify.unsubscribe as jest.Mock).mockImplementation(() => {
+      return undefined;
+    });
   });
 
   afterEach(() => {
@@ -47,33 +51,45 @@ describe('useDraftConversations', () => {
     const draftKey = `__amplify__${StorageKey.CONVERSATION.INPUT}|${draftConversation.id}`;
     const draftData = JSON.stringify({data: {plainMessage: 'Hello'}});
 
-    (localStorage.getItem as jest.Mock).mockImplementation(key => (key === draftKey ? draftData : null));
+    (localStorage.getItem as jest.Mock).mockImplementation(key => {
+      return key === draftKey ? draftData : null;
+    });
 
-    const {result} = renderHook(() => useDraftConversations([draftConversation, otherConversation]));
+    const {result} = renderHook(() => {
+      return useDraftConversations([draftConversation, otherConversation]);
+    });
 
-    await waitFor(() => expect(result.current).toEqual([draftConversation]));
+    await waitFor(() => {
+      return expect(result.current).toEqual([draftConversation]);
+    });
   });
 
   it('updates when a draft change event is published', async () => {
     const draftConversation = generateConversation({name: 'Draft'});
     const draftKey = `__amplify__${StorageKey.CONVERSATION.INPUT}|${draftConversation.id}`;
 
-    (localStorage.getItem as jest.Mock).mockImplementation(() => null);
+    (localStorage.getItem as jest.Mock).mockImplementation(() => {
+      return null;
+    });
 
-    const {result} = renderHook(() => useDraftConversations([draftConversation]));
+    const {result} = renderHook(() => {
+      return useDraftConversations([draftConversation]);
+    });
 
     const subscribeCall = (amplify.subscribe as jest.Mock).mock.calls[0];
     const handleDraftChange = subscribeCall[1];
 
-    (localStorage.getItem as jest.Mock).mockImplementation(key =>
-      key === draftKey ? JSON.stringify({data: {plainMessage: 'Later'}}) : null,
-    );
+    (localStorage.getItem as jest.Mock).mockImplementation(key => {
+      return key === draftKey ? JSON.stringify({data: {plainMessage: 'Later'}}) : null;
+    });
 
     act(() => {
       handleDraftChange();
       jest.advanceTimersByTime(250);
     });
 
-    await waitFor(() => expect(result.current).toEqual([draftConversation]));
+    await waitFor(() => {
+      return expect(result.current).toEqual([draftConversation]);
+    });
   });
 });

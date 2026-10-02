@@ -23,10 +23,22 @@ import {THEME_ID} from '../../identity';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"Heading"', () => {
-  it('renders H1 as default', () => matchComponent(<Heading>H1</Heading>));
-  it('renders H! (dark theme)', () => matchComponent(<Heading>H1</Heading>, THEME_ID.DARK));
-  it('renders H1', () => matchComponent(<Heading level="1">H1</Heading>));
-  it('renders H2', () => matchComponent(<Heading level="2">H2</Heading>));
-  it('renders H3', () => matchComponent(<Heading level="3">H3</Heading>));
-  it('renders H4', () => matchComponent(<Heading level="4">H4</Heading>));
+  it('renders H1 as default', () => {
+    return matchComponent(<Heading>H1</Heading>);
+  });
+  it('renders H! (dark theme)', () => {
+    return matchComponent(<Heading>H1</Heading>, THEME_ID.DARK);
+  });
+  it('renders H1', () => {
+    return matchComponent(<Heading level="1">H1</Heading>);
+  });
+  it('renders H2', () => {
+    return matchComponent(<Heading level="2">H2</Heading>);
+  });
+  it('renders H3', () => {
+    return matchComponent(<Heading level="3">H3</Heading>);
+  });
+  it('renders H4', () => {
+    return matchComponent(<Heading level="4">H4</Heading>);
+  });
 });

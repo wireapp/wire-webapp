@@ -34,7 +34,9 @@ interface UseCellsNewNodeFormBaseProps {
   isOpen?: boolean;
 }
 
-const defaultNameNormalizer = (value: string) => value;
+const defaultNameNormalizer = (value: string) => {
+  return value;
+};
 
 export const useCellsNewNodeFormBase = ({
   createNode,
@@ -77,7 +79,9 @@ export const useCellsNewNodeFormBase = ({
       await createNode(normalizeNameForCreation(trimmedName));
     } catch (err: unknown) {
       const isAlreadyExistsError = getErrorStatus(err)
-        .map(status => status === ITEM_ALREADY_EXISTS_ERROR)
+        .map(status => {
+          return status === ITEM_ALREADY_EXISTS_ERROR;
+        })
         .unwrapOr(false);
 
       if (isAlreadyExistsError) {

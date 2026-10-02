@@ -23,6 +23,10 @@ import {THEME_ID} from '../../identity';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"TextLink"', () => {
-  it('renders', () => matchComponent(<TextLink>TextLink</TextLink>));
-  it('renders (dark theme)', () => matchComponent(<TextLink>TextLink</TextLink>, THEME_ID.DARK));
+  it('renders', () => {
+    return matchComponent(<TextLink>TextLink</TextLink>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<TextLink>TextLink</TextLink>, THEME_ID.DARK);
+  });
 });

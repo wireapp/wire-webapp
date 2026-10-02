@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {ConversationRecord, EventRecord, UserRecord} from 'Repositories/storage';
 
 import {CPBackupImporter, BackupImportResult, BackupQualifiedId} from './CPB.library';
@@ -63,7 +65,7 @@ export const importCPBHistoryToDatabase = async ({
       const messages = pager.messagesPager.nextPage();
       messages.forEach(message => {
         const eventRecord = mapEventRecord(message);
-        if (eventRecord) {
+        if (!isUndefined(eventRecord)) {
           eventRecords.push(eventRecord);
         }
       });
@@ -77,7 +79,7 @@ export const importCPBHistoryToDatabase = async ({
       const conversations = pager.conversationsPager.nextPage();
       conversations.forEach(conversation => {
         const conversationRecord = mapConversationRecord(conversation);
-        if (conversationRecord) {
+        if (conversationRecord !== null) {
           conversationRecords.push(conversationRecord);
         }
       });
@@ -91,7 +93,7 @@ export const importCPBHistoryToDatabase = async ({
       const users = pager.usersPager.nextPage();
       users.forEach(user => {
         const userRecord = mapUserRecord(user);
-        if (userRecord) {
+        if (userRecord !== null) {
           userRecords.push(userRecord);
         }
       });

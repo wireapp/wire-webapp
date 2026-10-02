@@ -35,7 +35,8 @@ export const buildCellsUploadPath = ({
   conversationQualifiedId,
   cellsWireDomain,
   isDevelopment,
-}: BuildCellsUploadPathParams): string =>
-  isDevelopment
+}: BuildCellsUploadPathParams): string => {
+  return isDevelopment
     ? `${conversationId}@${cellsWireDomain}`
     : `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+};

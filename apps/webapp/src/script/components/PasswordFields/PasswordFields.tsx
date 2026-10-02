@@ -51,57 +51,63 @@ export const PasswordFields = ({
   passwordConfirmationValue,
   onPasswordConfirmationChange,
   isPasswordConfirmationMarkInvalid,
-}: PasswordFieldsProps) => (
-  <>
-    <Input
-      name="guest-link-password"
-      data-uie-name="guest-link-password"
-      required={required}
-      placeholder={translate('modalGuestLinkJoinPlaceholder')}
-      label={translate('modalGuestLinkJoinLabel')}
-      helperText={translate('modalGuestLinkJoinHelperText', {
-        minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-      })}
-      id="modal_pswd"
-      className="modal__input"
-      type="password"
-      showTogglePasswordLabel={translate('showTogglePasswordLabel')}
-      hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
-      autoComplete="off"
-      value={passwordValue}
-      ref={passwordValueRef}
-      onChange={event => onPasswordValueChange(event.currentTarget.value)}
-      pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
-      markInvalid={isPasswordInputMarkInvalid}
-      error={
-        isPasswordInputMarkInvalid ? (
-          <PasswordFieldsErrorMessage translate={translate} message={passwordError} />
-        ) : undefined
-      }
-    />
-    <Input
-      name="guest-link-password-confirm"
-      data-uie-name="guest-link-password-confirm"
-      required={required}
-      placeholder={translate('modalGuestLinkJoinConfirmPlaceholder')}
-      label={translate('modalGuestLinkJoinConfirmLabel')}
-      className="modal__input"
-      type="password"
-      showTogglePasswordLabel={translate('showTogglePasswordLabel')}
-      hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
-      id="modal_pswd_confirmation"
-      autoComplete="off"
-      value={passwordConfirmationValue}
-      onChange={event => onPasswordConfirmationChange(event.currentTarget.value)}
-      markInvalid={isPasswordConfirmationMarkInvalid}
-      error={
-        isPasswordConfirmationMarkInvalid ? (
-          <PasswordFieldsErrorMessage translate={translate} message={passwordConfirmationError} />
-        ) : undefined
-      }
-    />
-  </>
-);
+}: PasswordFieldsProps) => {
+  return (
+    <>
+      <Input
+        name="guest-link-password"
+        data-uie-name="guest-link-password"
+        required={required}
+        placeholder={translate('modalGuestLinkJoinPlaceholder')}
+        label={translate('modalGuestLinkJoinLabel')}
+        helperText={translate('modalGuestLinkJoinHelperText', {
+          minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
+        })}
+        id="modal_pswd"
+        className="modal__input"
+        type="password"
+        showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+        hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
+        autoComplete="off"
+        value={passwordValue}
+        ref={passwordValueRef}
+        onChange={event => {
+          return onPasswordValueChange(event.currentTarget.value);
+        }}
+        pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
+        markInvalid={isPasswordInputMarkInvalid}
+        error={
+          isPasswordInputMarkInvalid ? (
+            <PasswordFieldsErrorMessage translate={translate} message={passwordError} />
+          ) : undefined
+        }
+      />
+      <Input
+        name="guest-link-password-confirm"
+        data-uie-name="guest-link-password-confirm"
+        required={required}
+        placeholder={translate('modalGuestLinkJoinConfirmPlaceholder')}
+        label={translate('modalGuestLinkJoinConfirmLabel')}
+        className="modal__input"
+        type="password"
+        showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+        hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
+        id="modal_pswd_confirmation"
+        autoComplete="off"
+        value={passwordConfirmationValue}
+        onChange={event => {
+          return onPasswordConfirmationChange(event.currentTarget.value);
+        }}
+        markInvalid={isPasswordConfirmationMarkInvalid}
+        error={
+          isPasswordConfirmationMarkInvalid ? (
+            <PasswordFieldsErrorMessage translate={translate} message={passwordConfirmationError} />
+          ) : undefined
+        }
+      />
+    </>
+  );
+};
 
 const PasswordFieldsErrorMessage = ({
   translate,
@@ -109,11 +115,13 @@ const PasswordFieldsErrorMessage = ({
 }: {
   translate: PasswordFieldsProps['translate'];
   message?: React.ReactNode;
-}) => (
-  <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
-    {message ??
-      translate('modalGuestLinkJoinHelperText', {
-        minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-      })}
-  </ErrorMessage>
-);
+}) => {
+  return (
+    <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
+      {message ??
+        translate('modalGuestLinkJoinHelperText', {
+          minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
+        })}
+    </ErrorMessage>
+  );
+};

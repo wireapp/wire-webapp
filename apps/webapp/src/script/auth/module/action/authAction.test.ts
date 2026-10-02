@@ -40,10 +40,16 @@ describe('AuthAction', () => {
       'Ntc8CsuNMeGFaRCqhah1dSyDFmNq6m8zL1R2h5TEtLQy_4Up8jLI8CA==.v=1.k=1.d=1494355813.tda7f3557-b40c-4b00-9a4c-4710fdc07709.c=16347884158313001066';
     const response = JSON.parse(`{"expires_in":900,"access_token":"${accessToken}","token_type":"Bearer"}`);
     const spies = {
-      doInitializeClient: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
-      fetchSelf: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
+      doInitializeClient: jasmine.createSpy().and.returnValue(() => {
+        return Promise.resolve();
+      }),
+      fetchSelf: jasmine.createSpy().and.returnValue(() => {
+        return Promise.resolve();
+      }),
       generateClientPayload: jasmine.createSpy().and.returnValue({}),
-      setLocalStorage: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
+      setLocalStorage: jasmine.createSpy().and.returnValue(() => {
+        return Promise.resolve();
+      }),
     };
     const mockedActions = {
       clientAction: {
@@ -61,7 +67,9 @@ describe('AuthAction', () => {
       accessTokenStore: {accessToken: response},
     };
     const mockedCore = {
-      login: () => Promise.resolve({}),
+      login: () => {
+        return Promise.resolve({});
+      },
     };
 
     const store = mockStoreFactory({
@@ -84,12 +92,16 @@ describe('AuthAction', () => {
       'Ntc8CsuNMeGFaRCqhah1dSyDFmNq6m8zL1R2h5TEtLQy_4Up8jLI8CA==.v=1.k=1.d=1494355813.tda7f3557-b40c-4b00-9a4c-4710fdc07709.c=16347884158313001066';
     const response = JSON.parse(`{"expires_in":900,"access_token":"${accessToken}","token_type":"Bearer"}`);
     const spies = {
-      doInitializeClient: jasmine
-        .createSpy()
-        .and.returnValue(() => Promise.reject({label: BackendErrorLabel.TOO_MANY_CLIENTS})),
-      fetchSelf: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
+      doInitializeClient: jasmine.createSpy().and.returnValue(() => {
+        return Promise.reject({label: BackendErrorLabel.TOO_MANY_CLIENTS});
+      }),
+      fetchSelf: jasmine.createSpy().and.returnValue(() => {
+        return Promise.resolve();
+      }),
       generateClientPayload: jasmine.createSpy().and.returnValue({}),
-      setLocalStorage: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
+      setLocalStorage: jasmine.createSpy().and.returnValue(() => {
+        return Promise.resolve();
+      }),
     };
     const mockedActions = {
       clientAction: {
@@ -107,7 +119,9 @@ describe('AuthAction', () => {
       accessTokenStore: {accessToken: response},
     };
     const mockedCore = {
-      login: () => Promise.resolve({}),
+      login: () => {
+        return Promise.resolve({});
+      },
     };
 
     const store = mockStoreFactory({
@@ -179,7 +193,9 @@ describe('AuthAction', () => {
       },
     } as RecursivePartial<ActionRoot>;
     const mockedCore = {
-      login: () => Promise.reject(backendError),
+      login: () => {
+        return Promise.reject(backendError);
+      },
     };
     const store = mockStoreFactory({
       actions: mockedActions,
@@ -204,7 +220,9 @@ describe('AuthAction', () => {
     backendError.label = 'invalid-credentials';
     backendError.message = 'Missing token';
     const mockedCore = {
-      logout: () => Promise.reject(backendError),
+      logout: () => {
+        return Promise.reject(backendError);
+      },
     };
     const store = mockStoreFactory({
       actions: {},
@@ -221,7 +239,9 @@ describe('AuthAction', () => {
     const mockedApiClient = {
       api: {
         auth: {
-          headInitiateLogin: () => Promise.resolve(),
+          headInitiateLogin: () => {
+            return Promise.resolve();
+          },
         },
       },
     };

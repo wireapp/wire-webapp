@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
@@ -110,7 +111,7 @@ export const MessageWrapper = ({
       const mentions = firstAsset.mentions();
       const incomingQuote = message.quote();
       const quote: OutgoingQuote | undefined =
-        incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
+        !isUndefined(incomingQuote) && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
 
       await messageRepository.sendTextWithLinkPreview({
         conversation,
@@ -149,42 +150,54 @@ export const MessageWrapper = ({
 
     if (message.isDownloadable() && !isFileShareRestricted) {
       entries.push({
-        click: () => message.download(container.resolve(AssetRepository)),
+        click: () => {
+          return message.download(container.resolve(AssetRepository));
+        },
         label: translate('conversationContextMenuDownload'),
       });
     }
 
     if (canEdit) {
       entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message),
+        click: () => {
+          return amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message);
+        },
         label: translate('conversationContextMenuEdit'),
       });
     }
 
     if (message.isCopyable() && !isFileShareRestricted) {
       entries.push({
-        click: () => message.copy(),
+        click: () => {
+          return message.copy();
+        },
         label: translate('conversationContextMenuCopy'),
       });
     }
 
     if (hasDetails) {
       entries.push({
-        click: () => onClickDetails(message),
+        click: () => {
+          return onClickDetails(message);
+        },
         label: translate('conversationContextMenuDetails'),
       });
     }
 
     if (message.isDeletable()) {
       entries.push({
-        click: () => messageActions.deleteMessage(conversation, message),
+        click: () => {
+          return messageActions.deleteMessage(conversation, message);
+        },
         label: translate('conversationContextMenuDelete'),
       });
     }
 
     if (canDelete) {
       entries.push({
-        click: () => messageActions.deleteMessageEveryone(conversation, message),
+        click: () => {
+          return messageActions.deleteMessageEveryone(conversation, message);
+        },
         label: translate('conversationContextMenuDeleteEveryone'),
       });
     }

@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const UploadIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M0 14H16V16H0V14ZM7 11H9V4H13L8 0L3 4H7V11Z" />
-  </SVGIcon>
-);
+export const UploadIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path d="M0 14H16V16H0V14ZM7 11H9V4H13L8 0L3 4H7V11Z" />
+    </SVGIcon>
+  );
+};

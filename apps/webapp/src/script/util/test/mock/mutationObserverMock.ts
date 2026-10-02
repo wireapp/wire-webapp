@@ -18,10 +18,12 @@
  */
 
 Object.defineProperty(window, 'MutationObserver', {
-  value: jest.fn(() => ({
-    disconnect: jest.fn(),
-    observe: jest.fn(),
-    unobserve: jest.fn(),
-  })),
+  value: jest.fn(() => {
+    return {
+      disconnect: jest.fn(),
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+    };
+  }),
   writable: true,
 });

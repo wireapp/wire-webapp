@@ -27,11 +27,13 @@ const meta: Meta<typeof TabBar> = {
   component: TabBar,
   title: 'surface/TabBar',
   decorators: [
-    Story => (
-      <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 
@@ -56,11 +58,19 @@ export const Interactive = () => {
 
   return (
     <TabBar>
-      {tabs.map((tab, index) => (
-        <TabBarItem key={tab} active={activeTab === index} onClick={() => setActiveTab(index)}>
-          {tab}
-        </TabBarItem>
-      ))}
+      {tabs.map((tab, index) => {
+        return (
+          <TabBarItem
+            key={tab}
+            active={activeTab === index}
+            onClick={() => {
+              return setActiveTab(index);
+            }}
+          >
+            {tab}
+          </TabBarItem>
+        );
+      })}
     </TabBar>
   );
 };
@@ -72,11 +82,19 @@ export const WithContent = () => {
   return (
     <div>
       <TabBar>
-        {tabs.map((tab, index) => (
-          <TabBarItem key={tab} active={activeTab === index} onClick={() => setActiveTab(index)}>
-            {tab}
-          </TabBarItem>
-        ))}
+        {tabs.map((tab, index) => {
+          return (
+            <TabBarItem
+              key={tab}
+              active={activeTab === index}
+              onClick={() => {
+                return setActiveTab(index);
+              }}
+            >
+              {tab}
+            </TabBarItem>
+          );
+        })}
       </TabBar>
       <div style={{padding: '16px'}}>
         {activeTab === 0 && <div>Details content</div>}
@@ -92,10 +110,20 @@ export const WithBadge = () => {
 
   return (
     <TabBar>
-      <TabBarItem active={activeTab === 0} onClick={() => setActiveTab(0)}>
+      <TabBarItem
+        active={activeTab === 0}
+        onClick={() => {
+          return setActiveTab(0);
+        }}
+      >
         Messages
       </TabBarItem>
-      <TabBarItem active={activeTab === 1} onClick={() => setActiveTab(1)}>
+      <TabBarItem
+        active={activeTab === 1}
+        onClick={() => {
+          return setActiveTab(1);
+        }}
+      >
         <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
           Notifications
           <span

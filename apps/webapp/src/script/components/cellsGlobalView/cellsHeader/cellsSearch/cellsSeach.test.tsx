@@ -41,9 +41,9 @@ const translate: Translate = translationKey => {
 
 const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
-const wrapper = ({children}: {children: ReactNode}) => (
-  <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children})}</StyledApp>
-);
+const wrapper = ({children}: {children: ReactNode}) => {
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children})}</StyledApp>;
+};
 
 describe('CellsSearch', () => {
   it('displays the files-only search placeholder in the all-files Drive view', () => {

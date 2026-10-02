@@ -39,21 +39,23 @@ const createUser = (id: string) => {
   return user;
 };
 
-const baseUpdateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMeetingCommand => ({
-  meetingId,
-  title: 'Weekly sync',
-  start: futureStartDate,
-  end: futureEndDate,
-  recurrence: 'weekly',
-  originalTitle: 'Weekly sync',
-  originalStart: futureStartDate,
-  originalEnd: futureEndDate,
-  originalRecurrence: 'doesNotRepeat',
-  selectedUsers: [],
-  originalSelectedUsers: [],
-  qualifiedConversation: maybe.just(qualifiedConversation),
-  ...overrides,
-});
+const baseUpdateCommand = (overrides: Partial<UpdateMeetingCommand> = {}): UpdateMeetingCommand => {
+  return {
+    meetingId,
+    title: 'Weekly sync',
+    start: futureStartDate,
+    end: futureEndDate,
+    recurrence: 'weekly',
+    originalTitle: 'Weekly sync',
+    originalStart: futureStartDate,
+    originalEnd: futureEndDate,
+    originalRecurrence: 'doesNotRepeat',
+    selectedUsers: [],
+    originalSelectedUsers: [],
+    qualifiedConversation: maybe.just(qualifiedConversation),
+    ...overrides,
+  };
+};
 
 describe('mapUpdateCommandToUpdateMeeting', () => {
   it('maps title, times, and changed recurrence metadata', () => {

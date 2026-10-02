@@ -19,6 +19,7 @@
 
 import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState} from 'react';
 
+import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {maybe} from 'true-myth';
@@ -73,12 +74,12 @@ export const ConversationTabs = ({
       getSharedDriveUploadStatuses(sharedDriveUploadController, conversationQualifiedIdString),
     );
     const aggregateKind = getSharedDriveUploadAggregateKind(statuses);
-    if (!aggregateKind) {
+    if (!isNonEmptyString(aggregateKind)) {
       return null;
     }
 
     const representative = getRepresentativeSharedDriveUploadStatus(statuses, aggregateKind);
-    return representative ? {...representative, kind: aggregateKind} : null;
+    return !isNull(representative) ? {...representative, kind: aggregateKind} : null;
   }, [sharedDriveUploadController, conversationQualifiedIdString]);
   const [uploadStatus, setUploadStatus] = useState<SharedDriveUploadStatus | null>(readUploadStatus);
   const isUploadDismissed =
@@ -126,11 +127,15 @@ export const ConversationTabs = ({
   useEffect(() => {
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      return window.removeEventListener('hashchange', handleHashChange);
+    };
   }, [handleHashChange]);
 
   useEffect(() => {
-    const updateUploadStatus = () => setUploadStatus(readUploadStatus());
+    const updateUploadStatus = () => {
+      return setUploadStatus(readUploadStatus());
+    };
     updateUploadStatus();
     return sharedDriveUploadController.subscribe(updateUploadStatus);
   }, [readUploadStatus, sharedDriveUploadController]);
@@ -195,7 +200,7 @@ const ConversationTab = ({id, label, isActive, uploadStatus = null, onClick, onK
     >
       <span className="conversation-tabs__button-content">
         {label}
-        {uploadStatus && <SharedDriveTabUploadStatusIcon kind={uploadStatus.kind} />}
+        {!isNull(uploadStatus) && <SharedDriveTabUploadStatusIcon kind={uploadStatus.kind} />}
         {uploadStatusLabel !== null && (
           <span className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
             {uploadStatusLabel}

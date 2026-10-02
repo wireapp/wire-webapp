@@ -38,12 +38,22 @@ const defaultProps: React.ComponentProps<typeof DatePickerField> = {
   labels: defaultLabels,
   ariaLabel: 'Select date',
   value: fixedDate,
-  onChange: () => undefined,
+  onChange: () => {
+    return undefined;
+  },
 };
 
 describe('"DatePickerField"', () => {
-  it('renders', () => matchComponent(<DatePickerField {...defaultProps} />));
-  it('renders with label', () => matchComponent(<DatePickerField {...defaultProps} label="Date" />));
-  it('renders as invalid', () => matchComponent(<DatePickerField {...defaultProps} markInvalid />));
-  it('renders as disabled', () => matchComponent(<DatePickerField {...defaultProps} disabled />));
+  it('renders', () => {
+    return matchComponent(<DatePickerField {...defaultProps} />);
+  });
+  it('renders with label', () => {
+    return matchComponent(<DatePickerField {...defaultProps} label="Date" />);
+  });
+  it('renders as invalid', () => {
+    return matchComponent(<DatePickerField {...defaultProps} markInvalid />);
+  });
+  it('renders as disabled', () => {
+    return matchComponent(<DatePickerField {...defaultProps} disabled />);
+  });
 });

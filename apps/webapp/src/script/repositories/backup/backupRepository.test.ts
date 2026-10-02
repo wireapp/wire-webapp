@@ -85,9 +85,11 @@ async function buildBackupRepository() {
   const testFactory = new TestFactory();
   const conversationRepository = await testFactory.exposeConversationActors();
 
-  jest
-    .spyOn(conversationRepository, 'mapConversations')
-    .mockImplementation(conversations => conversations.map(c => generateConversation({type: c.type, overwites: c})));
+  jest.spyOn(conversationRepository, 'mapConversations').mockImplementation(conversations => {
+    return conversations.map(c => {
+      return generateConversation({type: c.type, overwites: c});
+    });
+  });
   jest.spyOn(conversationRepository, 'updateConversationStates');
   jest.spyOn(conversationRepository, 'updateConversations');
   jest.spyOn(conversationRepository, 'syncDeletedConversations').mockResolvedValue(undefined);
@@ -156,7 +158,9 @@ describe('BackupRepository', () => {
       const [backupRepository, {storageService}] = await buildBackupRepository();
       const password = '';
       await Promise.all([
-        ...messages.map(message => storageService.save(eventStoreName, '', message)),
+        ...messages.map(message => {
+          return storageService.save(eventStoreName, '', message);
+        }),
         storageService.save('conversations', conversationId, conversation),
         storageService.save(StorageSchemata.OBJECT_STORE.USERS, 'user-1', generateAPIUser()),
       ]);
@@ -251,7 +255,9 @@ describe('BackupRepository', () => {
 
       expect(importSpy).toHaveBeenCalledWith(
         StorageSchemata.OBJECT_STORE.EVENTS,
-        messages.map(message => omit(message, 'primary_key')),
+        messages.map(message => {
+          return omit(message, 'primary_key');
+        }),
         {generateId: expect.any(Function)},
       );
 
@@ -269,7 +275,9 @@ describe('BackupRepository', () => {
       const user = new User('user1', '', translateForTest);
       const mockHashedUserId = new Uint8Array(32);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation((header: DecodedHeader) => new Uint8Array(32));
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation((header: DecodedHeader) => {
+        return new Uint8Array(32);
+      });
       const mockSalt = new Uint8Array(16);
       const mockReadBackupHeader = jest.fn().mockReturnValue({
         decodedHeader: {
@@ -316,7 +324,9 @@ describe('BackupRepository', () => {
       const clientId = 'ClientId';
       const user = new User('user1', '', translateForTest);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation(_header => new Uint8Array(32));
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation(_header => {
+        return new Uint8Array(32);
+      });
 
       // Mock the behavior of BackUpHeader methods
       jest.spyOn(BackUpHeader.prototype, 'encodeHeader').mockImplementation(mockEncodeHeader);

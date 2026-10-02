@@ -182,7 +182,9 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         <button
           type="button"
           className="button-reset-default text-left"
-          onClick={() => showUserDetails(user)}
+          onClick={() => {
+            return showUserDetails(user);
+          }}
           data-uie-name="label-name-quote"
           tabIndex={messageFocusedTabIndex}
         >
@@ -194,101 +196,105 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           </span>
         )}
       </div>
-      {assets.map((asset, index) => (
-        <Fragment key={index}>
-          {asset.isMultipart() &&
-            (() => {
-              const multipartAsset = asset as Multipart;
-              const shouldRenderText = multipartAsset.should_render_text();
-              const cellAssets = multipartAsset.getCellAssets();
-              const attachmentsCount = cellAssets.length;
-              const attachmentsCountCopy =
-                attachmentsCount === 1
-                  ? translate('replyBarSingleAttachment')
-                  : translate('replyBarMultipleAttachments', {count: attachmentsCount});
+      {assets.map((asset, index) => {
+        return (
+          <Fragment key={index}>
+            {asset.isMultipart() &&
+              (() => {
+                const multipartAsset = asset as Multipart;
+                const shouldRenderText = multipartAsset.should_render_text();
+                const cellAssets = multipartAsset.getCellAssets();
+                const attachmentsCount = cellAssets.length;
+                const attachmentsCountCopy =
+                  attachmentsCount === 1
+                    ? translate('replyBarSingleAttachment')
+                    : translate('replyBarMultipleAttachments', {count: attachmentsCount});
 
-              return (
-                <>
-                  {shouldRenderText && (
-                    <TextMessageRenderer
-                      onMessageClick={handleClickOnMessage}
-                      text={multipartAsset.render(selfId)}
-                      className={cx('message-quote__text', {
-                        'message-quote__text--large': includesOnlyEmojis(multipartAsset.text),
-                      })}
-                      isFocusable={isMessageFocused}
-                      data-uie-name="media-text-quote"
-                      collapse
-                    />
-                  )}
-                  {attachmentsCount > 0 && (
-                    <MultipartAssetPreview
-                      cellAssets={cellAssets}
-                      conversationId={quotedMessage.conversation_id}
-                      attachmentsCountCopy={attachmentsCountCopy}
-                      senderName={senderName}
-                      timestamp={timestamp}
-                    />
-                  )}
-                </>
-              );
-            })()}
+                return (
+                  <>
+                    {shouldRenderText && (
+                      <TextMessageRenderer
+                        onMessageClick={handleClickOnMessage}
+                        text={multipartAsset.render(selfId)}
+                        className={cx('message-quote__text', {
+                          'message-quote__text--large': includesOnlyEmojis(multipartAsset.text),
+                        })}
+                        isFocusable={isMessageFocused}
+                        data-uie-name="media-text-quote"
+                        collapse
+                      />
+                    )}
+                    {attachmentsCount > 0 && (
+                      <MultipartAssetPreview
+                        cellAssets={cellAssets}
+                        conversationId={quotedMessage.conversation_id}
+                        attachmentsCountCopy={attachmentsCountCopy}
+                        senderName={senderName}
+                        timestamp={timestamp}
+                      />
+                    )}
+                  </>
+                );
+              })()}
 
-          {asset.isImage() && (
-            <div data-uie-name="media-picture-quote">
-              <AssetImage
-                className="message-quote__image"
-                imageStyles={{objectFit: 'cover'}}
-                image={asset}
-                onClick={event => showDetail(quotedMessage, event)}
+            {asset.isImage() && (
+              <div data-uie-name="media-picture-quote">
+                <AssetImage
+                  className="message-quote__image"
+                  imageStyles={{objectFit: 'cover'}}
+                  image={asset}
+                  onClick={event => {
+                    return showDetail(quotedMessage, event);
+                  }}
+                />
+              </div>
+            )}
+
+            {asset.isText() && (
+              <TextMessageRenderer
+                onMessageClick={handleClickOnMessage}
+                text={asset.render(selfId)}
+                className={cx('message-quote__text', {
+                  'message-quote__text--large': includesOnlyEmojis(asset.text),
+                })}
+                isFocusable={isMessageFocused}
+                data-uie-name="media-text-quote"
+                collapse
               />
-            </div>
-          )}
+            )}
 
-          {asset.isText() && (
-            <TextMessageRenderer
-              onMessageClick={handleClickOnMessage}
-              text={asset.render(selfId)}
-              className={cx('message-quote__text', {
-                'message-quote__text--large': includesOnlyEmojis(asset.text),
-              })}
-              isFocusable={isMessageFocused}
-              data-uie-name="media-text-quote"
-              collapse
-            />
-          )}
+            {asset.isVideo() && (
+              <VideoAsset
+                isQuote
+                message={quotedMessage}
+                // className="message-quote__video"
+                data-uie-name="media-video-quote"
+                isFocusable={isMessageFocused}
+              />
+            )}
 
-          {asset.isVideo() && (
-            <VideoAsset
-              isQuote
-              message={quotedMessage}
-              // className="message-quote__video"
-              data-uie-name="media-video-quote"
-              isFocusable={isMessageFocused}
-            />
-          )}
+            {asset.isAudio() && (
+              <AudioAsset
+                message={quotedMessage}
+                className="message-quote__audio"
+                data-uie-name="media-audio-quote"
+                isFocusable={isMessageFocused}
+              />
+            )}
 
-          {asset.isAudio() && (
-            <AudioAsset
-              message={quotedMessage}
-              className="message-quote__audio"
-              data-uie-name="media-audio-quote"
-              isFocusable={isMessageFocused}
-            />
-          )}
+            {asset.isFile() && (
+              <FileAsset
+                message={quotedMessage}
+                // className="message-quote__file"
+                data-uie-name="media-file-quote"
+                isFocusable={isMessageFocused}
+              />
+            )}
 
-          {asset.isFile() && (
-            <FileAsset
-              message={quotedMessage}
-              // className="message-quote__file"
-              data-uie-name="media-file-quote"
-              isFocusable={isMessageFocused}
-            />
-          )}
-
-          {asset.isLocation() && <LocationAsset asset={asset} data-uie-name="media-location-quote" />}
-        </Fragment>
-      ))}
+            {asset.isLocation() && <LocationAsset asset={asset} data-uie-name="media-location-quote" />}
+          </Fragment>
+        );
+      })}
       <button
         type="button"
         className="button-reset-default message-quote__timestamp"

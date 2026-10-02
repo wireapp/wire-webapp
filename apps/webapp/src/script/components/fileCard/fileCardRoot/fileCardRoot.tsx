@@ -66,7 +66,9 @@ const FileCardRootWithContext = ({
   name,
   size,
 }: FileCardRootWithContextProps) => {
-  const value = useMemo(() => ({variant, extension, name, size}), [extension, name, size, variant]);
+  const value = useMemo(() => {
+    return {variant, extension, name, size};
+  }, [extension, name, size, variant]);
 
   return (
     <FileCardContextProvider value={value}>

@@ -26,9 +26,15 @@ export const usePausableInterval = (callback: () => void, timer: number) => {
   const startTime = useRef(new Date().getTime());
   const [pause, setPause] = useState(true);
 
-  const pauseInterval = () => setPause(true);
-  const startInterval = () => setPause(false);
-  const clearInterval = () => window.clearTimeout(intervalId.current);
+  const pauseInterval = () => {
+    return setPause(true);
+  };
+  const startInterval = () => {
+    return setPause(false);
+  };
+  const clearInterval = () => {
+    return window.clearTimeout(intervalId.current);
+  };
 
   useEffect(() => {
     intervalIdRef.current = callback;

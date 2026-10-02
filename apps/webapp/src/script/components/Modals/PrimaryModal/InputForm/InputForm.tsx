@@ -34,13 +34,17 @@ export const InputForm = ({onSubmit, inputValue, inputPlaceholder, onInputChange
       </label>
 
       <input
-        ref={ref => ref?.focus()}
+        ref={ref => {
+          return ref?.focus();
+        }}
         maxLength={64}
         className="modal__input"
         id="modal-input"
         value={inputValue}
         placeholder={inputPlaceholder}
-        onChange={event => onInputChange(event.target.value)}
+        onChange={event => {
+          return onInputChange(event.target.value);
+        }}
       />
     </form>
   );

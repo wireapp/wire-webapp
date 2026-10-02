@@ -89,7 +89,9 @@ export const FileVersionItem = (properties: FileVersionItemProps): ReactElement 
         {!isCurrentVersion && (
           <Button
             css={versionButtonCss}
-            onClick={() => onRestore(version.versionId)}
+            onClick={() => {
+              return onRestore(version.versionId);
+            }}
             variant={ButtonVariant.SECONDARY}
             aria-label={translate('cells.versionHistory.restoreAriaLabel', {time: version.time})}
           >

@@ -39,10 +39,14 @@ import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/avatar', () => ({
-  AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},
-  Avatar: () => <div data-testid="mock-avatar" />,
-}));
+jest.mock('Components/avatar', () => {
+  return {
+    AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},
+    Avatar: () => {
+      return <div data-testid="mock-avatar" />;
+    },
+  };
+});
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
@@ -73,10 +77,13 @@ const createMockCall = () => {
   );
 };
 
-const createMediaStream = () =>
-  ({
-    getVideoTracks: jest.fn(() => []),
-  }) as unknown as MediaStream;
+const createMediaStream = () => {
+  return {
+    getVideoTracks: jest.fn(() => {
+      return [];
+    }),
+  } as unknown as MediaStream;
+};
 
 describe('GroupVideoGrid', () => {
   beforeEach(() => {

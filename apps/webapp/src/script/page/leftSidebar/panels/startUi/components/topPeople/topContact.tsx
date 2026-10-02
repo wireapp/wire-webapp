@@ -38,8 +38,12 @@ const TopContact = ({user, clickOnUser}: TopContactProps) => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>();
 
   useEffect(() => {
-    const subscription = connection?.status.subscribe(newStatus => setConnectionStatus(newStatus));
-    return () => subscription?.dispose();
+    const subscription = connection?.status.subscribe(newStatus => {
+      return setConnectionStatus(newStatus);
+    });
+    return () => {
+      return subscription?.dispose();
+    };
   }, [connection]);
 
   return (
@@ -54,15 +58,15 @@ const TopContact = ({user, clickOnUser}: TopContactProps) => {
       onClick={event => {
         clickOnUser?.(user, event);
       }}
-      onKeyPress={event =>
-        clickOnUser !== undefined
+      onKeyPress={event => {
+        return clickOnUser !== undefined
           ? handleKeyDown({
               event,
               callback: clickOnUser.bind(this, user, event),
               keys: [KEY.ENTER, KEY.SPACE],
             })
-          : undefined
-      }
+          : undefined;
+      }}
     >
       <Avatar avatarSize={AVATAR_SIZE.LARGE} className="search-list-item-image" participant={user} />
       <div className="search-list-item-content">

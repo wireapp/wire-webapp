@@ -232,19 +232,21 @@ export const sharedDriveUploadStatusPopupRowFileNameStyles: CSSObject = {
   whiteSpace: 'nowrap',
 };
 
-export const sharedDriveUploadStatusPopupRowStatusStyles = (kind: SharedDriveUploadStatusKind): CSSObject => ({
-  overflow: 'hidden',
-  color: {
-    queued: 'var(--accent-color, #0667c8)',
-    uploading: 'var(--accent-color, #0667c8)',
-    uploaded: 'var(--accent-color, #0667c8)',
-    failed: 'var(--danger-color, #c20013)',
-  }[kind],
-  fontSize: 12,
-  lineHeight: '14px',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-});
+export const sharedDriveUploadStatusPopupRowStatusStyles = (kind: SharedDriveUploadStatusKind): CSSObject => {
+  return {
+    overflow: 'hidden',
+    color: {
+      queued: 'var(--accent-color, #0667c8)',
+      uploading: 'var(--accent-color, #0667c8)',
+      uploaded: 'var(--accent-color, #0667c8)',
+      failed: 'var(--danger-color, #c20013)',
+    }[kind],
+    fontSize: 12,
+    lineHeight: '14px',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  };
+};
 
 export const sharedDriveUploadStatusPopupRowIconStyles: CSSObject = {
   width: 24,
@@ -275,35 +277,41 @@ export const sharedDriveUploadStatusPopupRowActionIconStyles: CSSObject = {
   height: 14,
 };
 
-const sharedDriveUploadStatusPopupProgressBaseStyles = (isExpanded: boolean): CSSObject => ({
-  position: 'absolute',
-  top: isExpanded ? SHARED_DRIVE_UPLOAD_PROGRESS_EXPANDED_TOP : undefined,
-  bottom: isExpanded ? undefined : 0,
-  left: isExpanded ? 0 : SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT,
-  height: 3,
-  overflow: 'hidden',
-});
+const sharedDriveUploadStatusPopupProgressBaseStyles = (isExpanded: boolean): CSSObject => {
+  return {
+    position: 'absolute',
+    top: isExpanded ? SHARED_DRIVE_UPLOAD_PROGRESS_EXPANDED_TOP : undefined,
+    bottom: isExpanded ? undefined : 0,
+    left: isExpanded ? 0 : SHARED_DRIVE_UPLOAD_PROGRESS_COLLAPSED_LEFT,
+    height: 3,
+    overflow: 'hidden',
+  };
+};
 
 export const sharedDriveUploadStatusPopupProgressStyles = (
   isExpanded: boolean,
   kind: SharedDriveUploadStatusKind = 'uploading',
-): CSSObject => ({
-  ...sharedDriveUploadStatusPopupProgressBaseStyles(isExpanded),
-  width: kind === 'uploading' ? 'min(209px, calc(50% + 3px))' : 'calc(100% + 4px)',
-  backgroundColor: kind === 'failed' ? 'var(--danger-color, #c20013)' : 'var(--accent-color, #0667c8)',
-  animation: kind === 'uploading' ? 'shared-drive-upload-progress 1.5s ease-in-out infinite' : 'none',
-  '@keyframes shared-drive-upload-progress': {
-    '0%': {transform: 'translateX(-100%)'},
-    '100%': {transform: 'translateX(200%)'},
-  },
-  '@media (prefers-reduced-motion: reduce)': {
-    animation: 'none',
-  },
-});
+): CSSObject => {
+  return {
+    ...sharedDriveUploadStatusPopupProgressBaseStyles(isExpanded),
+    width: kind === 'uploading' ? 'min(209px, calc(50% + 3px))' : 'calc(100% + 4px)',
+    backgroundColor: kind === 'failed' ? 'var(--danger-color, #c20013)' : 'var(--accent-color, #0667c8)',
+    animation: kind === 'uploading' ? 'shared-drive-upload-progress 1.5s ease-in-out infinite' : 'none',
+    '@keyframes shared-drive-upload-progress': {
+      '0%': {transform: 'translateX(-100%)'},
+      '100%': {transform: 'translateX(200%)'},
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+      animation: 'none',
+    },
+  };
+};
 
-export const sharedDriveUploadStatusPopupDeterminateProgressStyles = (isExpanded: boolean): CSSObject => ({
-  ...sharedDriveUploadStatusPopupProgressBaseStyles(isExpanded),
-  width: `${PROGRESS_PERCENTAGE_MAX}%`,
-  transformOrigin: 'left center',
-  backgroundColor: 'var(--accent-color, #0667c8)',
-});
+export const sharedDriveUploadStatusPopupDeterminateProgressStyles = (isExpanded: boolean): CSSObject => {
+  return {
+    ...sharedDriveUploadStatusPopupProgressBaseStyles(isExpanded),
+    width: `${PROGRESS_PERCENTAGE_MAX}%`,
+    transformOrigin: 'left center',
+    backgroundColor: 'var(--accent-color, #0667c8)',
+  };
+};

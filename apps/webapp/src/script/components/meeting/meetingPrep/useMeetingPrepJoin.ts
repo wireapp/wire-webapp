@@ -33,8 +33,8 @@ export const useMeetingPrepJoin = () => {
   const {content, calling: callingViewModel} = useMainViewModel();
   const {conversation: conversationRepository, calling: callingRepository} = content.repositories;
 
-  const callNotEstablishedCopy = useMemo(
-    () => ({
+  const callNotEstablishedCopy = useMemo(() => {
+    return {
       description: translate('callNotEstablishedDescription'),
       descriptionPoints: [
         translate('callNotEstablishedDescriptionPoint1'),
@@ -43,32 +43,31 @@ export const useMeetingPrepJoin = () => {
       ] as [string, string, string],
       title: translate('callNotEstablishedTitle'),
       translate,
-    }),
-    [translate],
-  );
+    };
+  }, [translate]);
 
   const guardCall = useNoInternetCallGuard(callNotEstablishedCopy);
 
-  const deps = useMemo(
-    () => ({
+  const deps = useMemo(() => {
+    return {
       conversationState: container.resolve(ConversationState),
       conversationRepository,
       callingRepository,
       callingViewModel,
-    }),
-    [callingRepository, callingViewModel, conversationRepository],
-  );
+    };
+  }, [callingRepository, callingViewModel, conversationRepository]);
 
   return useCallback(
-    (qualifiedConversationId: QualifiedId, media: CallMediaChoice) =>
-      joinPreparedMeeting({
+    (qualifiedConversationId: QualifiedId, media: CallMediaChoice) => {
+      return joinPreparedMeeting({
         deps,
         qualifiedConversationId,
         media,
         guardCall,
         translate,
         callNotEstablishedCopy,
-      }),
+      });
+    },
     [callNotEstablishedCopy, deps, guardCall, translate],
   );
 };

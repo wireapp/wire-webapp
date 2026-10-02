@@ -67,9 +67,13 @@ type TestController = SharedDriveUploadController & {
 
 const createController = (state: UploadState | null = null) => {
   let currentState = state;
-  let notify: () => void = () => undefined;
+  let notify: () => void = () => {
+    return undefined;
+  };
   const controller: TestController = {
-    snapshots: jest.fn(scope => (scope === conversationQualifiedIdString && currentState ? [currentState] : [])),
+    snapshots: jest.fn(scope => {
+      return scope === conversationQualifiedIdString && currentState ? [currentState] : [];
+    }),
     subscribe: jest.fn(listener => {
       notify = listener;
       return jest.fn();
@@ -96,8 +100,8 @@ const renderTabs = (
   controller: SharedDriveUploadController,
   isUploadStatusIndicatorEnabled = true,
   dismissedUpload: Maybe<DismissedUpload> = Maybe.nothing<DismissedUpload>(),
-) =>
-  render(
+) => {
+  return render(
     <ThemeProvider>
       <SharedDriveUploadStatusProvider initialDismissedUpload={dismissedUpload}>
         <ConversationTabs
@@ -111,6 +115,7 @@ const renderTabs = (
     </ThemeProvider>,
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}))},
   );
+};
 
 describe('ConversationTabs', () => {
   it('does not render a shared drive upload icon when there is no file upload', () => {
@@ -149,7 +154,9 @@ describe('ConversationTabs', () => {
 
     expect(view.getByTestId('shared-drive-tab-upload-uploading')).toBeInTheDocument();
 
-    act(() => setState(uploadedState));
+    act(() => {
+      return setState(uploadedState);
+    });
 
     expect(view.queryByTestId('shared-drive-tab-upload-uploading')).not.toBeInTheDocument();
     const completedIcon = view.getByTestId('shared-drive-tab-upload-completed');

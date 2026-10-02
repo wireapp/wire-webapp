@@ -89,7 +89,11 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   return (
     <header className={cx('panel__header', {'panel__header--reverse': isReverse}, className)} ref={panelHeaderRef}>
       {showBackArrow && (
-        <DraggableClickWrapper onClick={() => onGoBack()}>
+        <DraggableClickWrapper
+          onClick={() => {
+            return onGoBack();
+          }}
+        >
           <button className="icon-button" data-uie-name={goBackUie} title={effectiveGoBackTitle} onBlur={handleBlur}>
             <Icon.ArrowLeftIcon />
           </button>

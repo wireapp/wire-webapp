@@ -358,7 +358,9 @@ const UserActions = ({
     isNotMe &&
     conversation &&
     !conversation.isSelfUserRemoved() &&
-    conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
+    conversation.participating_user_ids().some(userId => {
+      return matchQualifiedIds(userId, user);
+    }) &&
     conversationRoleRepository?.canRemoveParticipants(conversation) === true
       ? {
           click: async () => {
@@ -383,7 +385,9 @@ const UserActions = ({
     blockUser,
     unblockUser,
     removeUserFromConversation,
-  ].filter((item): item is MenuItem => !!item);
+  ].filter((item): item is MenuItem => {
+    return !!item;
+  });
 
   return items.length === 1 && isModal ? (
     <SingleAction

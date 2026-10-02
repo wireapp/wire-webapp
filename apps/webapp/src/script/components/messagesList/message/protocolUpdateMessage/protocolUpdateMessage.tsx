@@ -53,14 +53,16 @@ export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => 
     ];
     return (
       <>
-        {messages.map(({caption, captionContent}) => (
-          <SystemMessageBase
-            key={caption}
-            icon={<Icon.InfoIcon />}
-            message={createSystemMessage(caption, translate)}
-            captionContent={captionContent}
-          />
-        ))}
+        {messages.map(({caption, captionContent}) => {
+          return (
+            <SystemMessageBase
+              key={caption}
+              icon={<Icon.InfoIcon />}
+              message={createSystemMessage(caption, translate)}
+              captionContent={captionContent}
+            />
+          );
+        })}
       </>
     );
   }

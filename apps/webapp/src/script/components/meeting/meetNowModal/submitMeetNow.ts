@@ -60,7 +60,9 @@ export const submitMeetNow = async ({
 
   if (submitResult.isErr) {
     if (shouldRefreshMeetingsListAfterSubmitError(submitResult.error)) {
-      await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
+      await task.tryOrElse(() => {
+        return meetingSubmitErrors.refreshFailed;
+      }, loadMeetings);
     }
 
     showMeetingSubmitError(translate, submitResult.error, MEET_NOW_ERROR_TRANSLATION_KEYS);

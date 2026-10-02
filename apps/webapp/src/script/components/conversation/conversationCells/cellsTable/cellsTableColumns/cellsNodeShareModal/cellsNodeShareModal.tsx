@@ -20,6 +20,7 @@
 import {useEffect, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isUndefined} from '@sindresorhus/is';
 
 import {CellsShareModalContent} from 'Components/cells/shareModal/cellsShareModalContent';
 import {serializeShareModalInput} from 'Components/cells/shareModal/shareModalSerializer';
@@ -84,7 +85,7 @@ export const showShareModal = ({
       primaryAction: {
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
-          if (submitHandler) {
+          if (!isUndefined(submitHandler)) {
             fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
               await submitHandler();
             });
@@ -127,9 +128,11 @@ export const CellShareModalContent = ({
     cellsRepository,
     fireAndForgetInvoker,
   });
-  const node = useCellsStore(state =>
-    state.nodesByConversation[conversationId]?.find(cellNode => cellNode.id === uuid),
-  );
+  const node = useCellsStore(state => {
+    return state.nodesByConversation[conversationId]?.find(cellNode => {
+      return cellNode.id === uuid;
+    });
+  });
   const {
     isEnabled: isPasswordEnabled,
     toggle: togglePassword,

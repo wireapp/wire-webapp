@@ -77,31 +77,38 @@ export const ConversationFolderTab = ({
   const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
 
   const folders = labels
-    .filter(label => label.type !== LabelType.Favorite)
-    .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
-    .filter(({conversations, name}) => isNonEmptyArray(conversations()) && isNonEmptyString(name));
+    .filter(label => {
+      return label.type !== LabelType.Favorite;
+    })
+    .map(label => {
+      return createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id);
+    })
+    .filter(({conversations, name}) => {
+      return isNonEmptyArray(conversations()) && isNonEmptyString(name);
+    });
 
-  const placeholder = useMemo(
-    () => (
+  const placeholder = useMemo(() => {
+    return (
       <div className="conversations-sidebar-folders--empty">
         {translate('conversationFoldersEmptyText')}
         <a href={Config.getConfig().URL.SUPPORT.FOLDERS} target="_blank" rel="noreferrer">
           {translate('conversationFoldersEmptyTextLearnMore')}
         </a>
       </div>
-    ),
-    [translate],
-  );
+    );
+  }, [translate]);
 
   function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>) {
-    const entries: ContextMenuEntry[] = folders.map(folder => ({
-      click: () => {
-        openFolder(folder.id);
-        onChangeTab(type, folder.id);
-      },
-      identifier: `folder-${folder.id}`,
-      label: folder.name,
-    }));
+    const entries: ContextMenuEntry[] = folders.map(folder => {
+      return {
+        click: () => {
+          openFolder(folder.id);
+          onChangeTab(type, folder.id);
+        },
+        identifier: `folder-${folder.id}`,
+        label: folder.name,
+      };
+    });
 
     const boundingRect = event.currentTarget.getBoundingClientRect();
 
@@ -124,7 +131,9 @@ export const ConversationFolderTab = ({
     let total = 0;
 
     conversations.forEach(conversation => {
-      const exists = unreadConversations.some(conv => conv.id === conversation.id);
+      const exists = unreadConversations.some(conv => {
+        return conv.id === conversation.id;
+      });
       if (exists) {
         total += 1;
       }
@@ -167,7 +176,9 @@ export const ConversationFolderTab = ({
                 aria-selected={isActive}
                 key={folder.id}
                 className={cx('conversations-sidebar-folders--item', {active: isActive})}
-                onClick={() => toggleFolder(folder.id)}
+                onClick={() => {
+                  return toggleFolder(folder.id);
+                }}
               >
                 <span>{folder.name}</span>
                 {unreadCount !== 0 && !isNan(unreadCount) && (

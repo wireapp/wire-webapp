@@ -152,7 +152,9 @@ export class User {
     this.description = undefined;
     this.type = UserType.REGULAR;
 
-    this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
+    this.isAvailable = ko.pureComputed(() => {
+      return this.id !== '' && this.name() !== '';
+    });
 
     this.accent_id = ko.observable(ACCENT_ID.BLUE);
 
@@ -190,27 +192,49 @@ export class User {
 
     this.connection = ko.observable<ConnectionEntity | null>(null);
 
-    this.isBlocked = ko.pureComputed(() => this.connection()?.isBlocked() === true || this.isBlockedLegalHold());
-    this.isBlockedLegalHold = ko.pureComputed(() => this.connection()?.isMissingLegalHoldConsent() === true);
-    this.isCanceled = ko.pureComputed(() => this.connection()?.isCanceled() === true);
-    this.isConnected = ko.pureComputed(() => this.connection()?.isConnected() === true);
-    this.isIgnored = ko.pureComputed(() => this.connection()?.isIgnored() === true);
-    this.isIncomingRequest = ko.pureComputed(() => this.connection()?.isIncomingRequest() === true);
-    this.isOutgoingRequest = ko.pureComputed(() => this.connection()?.isOutgoingRequest() === true);
+    this.isBlocked = ko.pureComputed(() => {
+      return this.connection()?.isBlocked() === true || this.isBlockedLegalHold();
+    });
+    this.isBlockedLegalHold = ko.pureComputed(() => {
+      return this.connection()?.isMissingLegalHoldConsent() === true;
+    });
+    this.isCanceled = ko.pureComputed(() => {
+      return this.connection()?.isCanceled() === true;
+    });
+    this.isConnected = ko.pureComputed(() => {
+      return this.connection()?.isConnected() === true;
+    });
+    this.isIgnored = ko.pureComputed(() => {
+      return this.connection()?.isIgnored() === true;
+    });
+    this.isIncomingRequest = ko.pureComputed(() => {
+      return this.connection()?.isIncomingRequest() === true;
+    });
+    this.isOutgoingRequest = ko.pureComputed(() => {
+      return this.connection()?.isOutgoingRequest() === true;
+    });
     this.isUnknown = ko.pureComputed(() => {
       const connection = this.connection();
       return isNullOrUndefined(connection) || connection.isUnknown();
     });
-    this.isExternal = ko.pureComputed(() => this.teamRole() === TEAM_ROLE.PARTNER);
-    this.isAdminOrOwner = ko.pureComputed(() => [TEAM_ROLE.ADMIN, TEAM_ROLE.OWNER].includes(this.teamRole()));
-    this.isRequest = ko.pureComputed(() => this.connection()?.isRequest() === true);
+    this.isExternal = ko.pureComputed(() => {
+      return this.teamRole() === TEAM_ROLE.PARTNER;
+    });
+    this.isAdminOrOwner = ko.pureComputed(() => {
+      return [TEAM_ROLE.ADMIN, TEAM_ROLE.OWNER].includes(this.teamRole());
+    });
+    this.isRequest = ko.pureComputed(() => {
+      return this.connection()?.isRequest() === true;
+    });
 
     this.isGuest = ko.observable(false);
     this.isDirectGuest = ko.pureComputed(() => {
       return this.isGuest() && !this.isFederated;
     });
     this.isTemporaryGuest = ko.observable(false);
-    this.isActivatedAccount = ko.pureComputed(() => !this.isTemporaryGuest());
+    this.isActivatedAccount = ko.pureComputed(() => {
+      return !this.isTemporaryGuest();
+    });
     this.teamRole = ko.observable(TEAM_ROLE.NONE);
     this.teamId = undefined;
 
@@ -226,17 +250,25 @@ export class User {
       if (this.devices().length === 0 && !this.isMe) {
         return false;
       }
-      return this.devices().every(client_et => client_et.meta.isVerified?.());
+      return this.devices().every(client_et => {
+        return client_et.meta.isVerified?.();
+      });
     });
     this.isOnLegalHold = ko.pureComputed(() => {
-      return this.devices().some(client_et => client_et.isLegalHold());
+      return this.devices().some(client_et => {
+        return client_et.isLegalHold();
+      });
     });
 
     const _hasPendingLegalHold = ko.observable(false);
     this.hasPendingLegalHold = ko.pureComputed({
       owner: this,
-      read: () => this.isMe && !this.isOnLegalHold() && _hasPendingLegalHold(),
-      write: value => _hasPendingLegalHold(value),
+      read: () => {
+        return this.isMe && !this.isOnLegalHold() && _hasPendingLegalHold();
+      },
+      write: value => {
+        return _hasPendingLegalHold(value);
+      },
     });
 
     this.expirationRemaining = ko.observable(0);
@@ -296,7 +328,9 @@ export class User {
   }
 
   removeClient(client_id: string): ClientEntity[] {
-    return this.devices.remove(client_et => client_et.id === client_id);
+    return this.devices.remove(client_et => {
+      return client_et.id === client_id;
+    });
   }
 
   serialize() {
@@ -317,10 +351,9 @@ export class User {
     this._setRemainingExpirationTime(timestamp);
 
     const expirationInterval = User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL;
-    this.expirationIntervalId = window.setInterval(
-      () => this._setRemainingExpirationTime(timestamp),
-      expirationInterval,
-    );
+    this.expirationIntervalId = window.setInterval(() => {
+      return this._setRemainingExpirationTime(timestamp);
+    }, expirationInterval);
 
     window.setTimeout(() => {
       this.isExpired(true);
@@ -348,10 +381,9 @@ export class User {
       }
 
       const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
-      this.expirationTimeoutId = window.setTimeout(
-        () => amplify.publish(WebAppEvents.USER.UPDATE, this.qualifiedId),
-        timeout,
-      );
+      this.expirationTimeoutId = window.setTimeout(() => {
+        return amplify.publish(WebAppEvents.USER.UPDATE, this.qualifiedId);
+      }, timeout);
     }
   }
 

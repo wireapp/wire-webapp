@@ -42,16 +42,18 @@ conversation.type(CONVERSATION_TYPE.REGULAR);
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const getDefaultProps = () => ({
-  isActiveGroupParticipant: true,
-  canRenameGroup: true,
-  updateConversationName: jest.fn(),
-  userParticipants: new Array(participant),
-  serviceParticipants: new Array(service),
-  allUsersCount: 0,
-  isTeam: false,
-  conversation,
-});
+const getDefaultProps = () => {
+  return {
+    isActiveGroupParticipant: true,
+    canRenameGroup: true,
+    updateConversationName: jest.fn(),
+    userParticipants: new Array(participant),
+    serviceParticipants: new Array(service),
+    allUsersCount: 0,
+    isTeam: false,
+    conversation,
+  };
+};
 
 describe('ConversationDetailsHeader', () => {
   it('renders the display name when not editing', () => {

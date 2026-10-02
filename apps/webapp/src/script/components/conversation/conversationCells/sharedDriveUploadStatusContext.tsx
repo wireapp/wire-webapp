@@ -31,7 +31,9 @@ type SharedDriveUploadStatusContextValue = {
 
 const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusContextValue>({
   dismissedUpload: Maybe.nothing(),
-  dismissUpload: () => undefined,
+  dismissUpload: () => {
+    return undefined;
+  },
   isProvided: false,
 });
 
@@ -45,7 +47,9 @@ export const SharedDriveUploadStatusProvider = ({
   initialDismissedUpload = Maybe.nothing(),
 }: SharedDriveUploadStatusProviderProps) => {
   const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(initialDismissedUpload);
-  const dismissUpload = useCallback((upload: DismissedUpload) => setDismissedUpload(Maybe.just(upload)), []);
+  const dismissUpload = useCallback((upload: DismissedUpload) => {
+    return setDismissedUpload(Maybe.just(upload));
+  }, []);
 
   return (
     <SharedDriveUploadStatusContext.Provider value={{dismissedUpload, dismissUpload, isProvided: true}}>

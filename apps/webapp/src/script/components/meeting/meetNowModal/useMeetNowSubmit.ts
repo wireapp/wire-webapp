@@ -28,8 +28,12 @@ import {submitMeetNow} from './submitMeetNow';
 export const useMeetNowSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {translate, clock} = useApplicationContext();
-  const meetNowMeeting = useMeetingStore(state => state.meetNowMeeting);
-  const loadMeetings = useMeetingStore(state => state.loadMeetings);
+  const meetNowMeeting = useMeetingStore(state => {
+    return state.meetNowMeeting;
+  });
+  const loadMeetings = useMeetingStore(state => {
+    return state.loadMeetings;
+  });
 
   const submit = async (formState: MeetNowFormState): Promise<MeetNowSubmitResult> => {
     setIsSubmitting(true);

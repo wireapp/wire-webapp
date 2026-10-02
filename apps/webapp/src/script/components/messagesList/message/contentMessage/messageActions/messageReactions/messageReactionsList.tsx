@@ -49,11 +49,19 @@ const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) 
       {reactions.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
         const emojiListCount = users.length;
-        const hasUserReacted = users.some(user => matchQualifiedIds(selfUserId, user));
+        const hasUserReacted = users.some(user => {
+          return matchQualifiedIds(selfUserId, user);
+        });
 
         const reactingUsers = users
-          .map(qualifiedId => conversationUsers.find(user => matchQualifiedIds(qualifiedId, user.qualifiedId)))
-          .filter((user): user is User => typeof user !== 'undefined');
+          .map(qualifiedId => {
+            return conversationUsers.find(user => {
+              return matchQualifiedIds(qualifiedId, user.qualifiedId);
+            });
+          })
+          .filter((user): user is User => {
+            return typeof user !== 'undefined';
+          });
 
         return (
           <EmojiPill

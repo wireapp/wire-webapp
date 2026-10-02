@@ -55,13 +55,15 @@ const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivEle
       role="button"
       tabIndex={TabIndex.FOCUSABLE}
       onClick={onClick}
-      onKeyDown={event =>
-        handleKeyDown({
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
-          callback: () => onClick(event),
+          callback: () => {
+            return onClick(event);
+          },
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       onMouseEnter={onMouseEnter}
       className={cx('mention-suggestion-list__item', {'mention-suggestion-list__item--highlighted': isSelected})}
       data-uie-name="item-mention-suggestion"

@@ -54,23 +54,33 @@ export const Default: Story = {
 };
 
 export const BoldText: Story = {
-  render: () => <Bold>Bold Text</Bold>,
+  render: () => {
+    return <Bold>Bold Text</Bold>;
+  },
 };
 
 export const SmallText: Story = {
-  render: () => <Small>Small Text</Small>,
+  render: () => {
+    return <Small>Small Text</Small>;
+  },
 };
 
 export const MutedText: Story = {
-  render: () => <Muted>Muted Text</Muted>,
+  render: () => {
+    return <Muted>Muted Text</Muted>;
+  },
 };
 
 export const UppercaseText: Story = {
-  render: () => <Uppercase>Uppercase Text</Uppercase>,
+  render: () => {
+    return <Uppercase>Uppercase Text</Uppercase>;
+  },
 };
 
 export const LargeText: Story = {
-  render: () => <Large>Large Text</Large>,
+  render: () => {
+    return <Large>Large Text</Large>;
+  },
 };
 
 export const ColoredText: Story = {

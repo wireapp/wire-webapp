@@ -195,10 +195,12 @@ export class DebugUtil {
       return;
     }
 
-    const participants = new Array(number)
-      .fill(0)
-      .map((_, i) => new Participant(new User('', '', translate), `some-client-id-${i}`));
-    participants.forEach(participant => call.addParticipant(participant));
+    const participants = new Array(number).fill(0).map((_, i) => {
+      return new Participant(new User('', '', translate), `some-client-id-${i}`);
+    });
+    participants.forEach(participant => {
+      call.addParticipant(participant);
+    });
   }
 
   /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
@@ -209,7 +211,9 @@ export class DebugUtil {
         return;
       }
       const value = eventTarget.innerText;
-      const localConversation = this.conversationState.conversations().find(({id}) => id === value);
+      const localConversation = this.conversationState.conversations().find(({id}) => {
+        return id === value;
+      });
 
       if (!localConversation || !isMLSCapableConversation(localConversation)) {
         return;
@@ -236,10 +240,14 @@ export class DebugUtil {
       });
     };
 
-    const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
+    const removeDebugInfo = (els: NodeListOf<HTMLElement>) => {
+      return els.forEach(el => {
+        el.parentNode?.removeChild(el);
+      });
+    };
 
-    const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
-      els.forEach(el => {
+    const addDebugInfo = (els: NodeListOf<HTMLElement>) => {
+      return els.forEach(el => {
         const debugInfo = document.createElement('div');
         debugInfo.classList.add('debug-info');
         const value = el.dataset.uieUid;
@@ -255,6 +263,7 @@ export class DebugUtil {
         }
         debugInfo.addEventListener('click', logMLSInfo);
       });
+    };
 
     const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
     const isShowingDebugInfo = debugInfos.length > 0;
@@ -386,7 +395,9 @@ export class DebugUtil {
 
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
-    const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
+    const blockUsers = this.userState.users().map(userEntity => {
+      return this.connectionRepository.blockUser(userEntity);
+    });
     return Promise.all(blockUsers);
   }
 
@@ -554,7 +565,9 @@ export class DebugUtil {
   ): Promise<EventRecord[]> {
     if (this.storageRepository.storageService.db) {
       const records = await this.storageRepository.storageService.db.events.toArray();
-      const messages = records.filter(event => event.conversation === conversationId);
+      const messages = records.filter(event => {
+        return event.conversation === conversationId;
+      });
       return messages.slice(-amount).toReversed();
     }
     return [];
@@ -580,7 +593,11 @@ export class DebugUtil {
     }
 
     const clients = await this.clientRepository.getClientsForSelf();
-    return clients.find(client => client.isPermanent())?.id ?? clients[0]?.id;
+    return (
+      clients.find(client => {
+        return client.isPermanent();
+      })?.id ?? clients[0]?.id
+    );
   }
 
   private async fetchAllNotifications(clientId?: string): Promise<Notification[]> {
@@ -622,12 +639,16 @@ export class DebugUtil {
     );
     const lastNotificationId = lastNotificationRecord?.value;
     const notifications = await this.fetchAllNotifications(clientId);
-    const notificationsInRange = notifications.filter(notification =>
-      notification.payload.some(event => this.isEventInTimeRange(event, from, to)),
-    );
-    const eventsInRange = notificationsInRange.flatMap(notification =>
-      notification.payload
-        .filter((event): event is BackendEvent & {time: string} => this.isEventInTimeRange(event, from, to))
+    const notificationsInRange = notifications.filter(notification => {
+      return notification.payload.some(event => {
+        return this.isEventInTimeRange(event, from, to);
+      });
+    });
+    const eventsInRange = notificationsInRange.flatMap(notification => {
+      return notification.payload
+        .filter((event): event is BackendEvent & {time: string} => {
+          return this.isEventInTimeRange(event, from, to);
+        })
         .map(event => {
           const summary: NotificationBackendDumpEvent = {
             notificationId: notification.id,
@@ -654,8 +675,8 @@ export class DebugUtil {
           }
 
           return summary;
-        }),
-    );
+        });
+    });
 
     const dump: NotificationBackendDump = {
       fetchedAt: new Date().toISOString(),
@@ -664,7 +685,9 @@ export class DebugUtil {
       timeRange: {from: from.toISOString(), to: to.toISOString()},
       counts: {
         notifications: notificationsInRange.length,
-        events: notifications.flatMap(notification => notification.payload).length,
+        events: notifications.flatMap(notification => {
+          return notification.payload;
+        }).length,
         eventsInRange: eventsInRange.length,
       },
       eventsInRange,
@@ -689,12 +712,18 @@ export class DebugUtil {
     const clientId = this.clientState.currentClient?.id;
     const userId = this.userState.self().id;
 
-    const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
-    const isInCurrentConversation = (notification: ConversationEvent) => notification.conversation === conversationId;
-    const wasSentByOurCurrentClient = (notification: ConversationOtrMessageAddEvent) =>
-      notification.from === userId && notification.data.sender === clientId;
-    const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
-      notification.time === dateTime.toISOString();
+    const isOTRMessage = (notification: BackendEvent) => {
+      return notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
+    };
+    const isInCurrentConversation = (notification: ConversationEvent) => {
+      return notification.conversation === conversationId;
+    };
+    const wasSentByOurCurrentClient = (notification: ConversationOtrMessageAddEvent) => {
+      return notification.from === userId && notification.data.sender === clientId;
+    };
+    const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) => {
+      return notification.time === dateTime.toISOString();
+    };
     const conversation = await this.conversationRepository.getConversationById({domain: '', id: conversationId});
     const message = await this.messageRepository.getMessageInConversationById(conversation, messageId);
     const notificationList = await this.eventRepository.notificationService.getNotifications(
@@ -704,7 +733,9 @@ export class DebugUtil {
     );
     const dateTime = new Date(message.timestamp());
     const filteredEvents: ConversationOtrMessageAddEvent[] = notificationList.notifications
-      .flatMap((notification: Notification) => notification.payload)
+      .flatMap((notification: Notification) => {
+        return notification.payload;
+      })
       .filter((event: ConversationOtrMessageAddEvent) => {
         return (
           isOTRMessage(event) &&
@@ -713,10 +744,16 @@ export class DebugUtil {
           hasExpectedTimestamp(event, dateTime)
         );
       }) as ConversationOtrMessageAddEvent[];
-    const recipients = filteredEvents.map(event => event.data.recipient);
+    const recipients = filteredEvents.map(event => {
+      return event.data.recipient;
+    });
     const selfClients = await this.clientRepository.getClientsForSelf();
-    const selfClientIds = selfClients.map(client => client.id);
-    const missingClients = selfClientIds.filter(id => recipients.includes(id));
+    const selfClientIds = selfClients.map(client => {
+      return client.id;
+    });
+    const missingClients = selfClientIds.filter(id => {
+      return recipients.includes(id);
+    });
     const logMessage = missingClients.length
       ? `Message was sent to all other "${selfClients.length}" clients.`
       : `Message was NOT sent to the following own clients: ${missingClients.join(',')}`;
@@ -771,7 +808,9 @@ export class DebugUtil {
       {deviceId: '440', groupId: 'fakeMic1', kind: 'audioinput', label: 'First mic'},
       {deviceId: '100', groupId: 'fakeMic2', kind: 'audioinput', label: 'Second mic'},
     ];
-    navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
+    navigator.mediaDevices.enumerateDevices = () => {
+      return Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
+    };
 
     navigator.mediaDevices.getUserMedia = (constraints: MediaStreamConstraints) => {
       const audioSet = isObject(constraints.audio) ? (constraints.audio as MediaTrackConstraintSet) : undefined;
@@ -845,7 +884,9 @@ export class DebugUtil {
           conversation: conversation.id,
           data: {
             reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT,
-            user_ids: users.map(({id}) => id),
+            user_ids: users.map(({id}) => {
+              return id;
+            }),
             qualified_user_ids: users,
           },
           from: this.userState.self().id,

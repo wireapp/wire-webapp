@@ -38,7 +38,11 @@ interface ExtractQualifiedUserIdsParams {
 const extractQualifiedUserIds = ({userIds}: ExtractQualifiedUserIdsParams): QualifiedId[] | undefined => {
   if (isQualifiedUserClients(userIds)) {
     return Object.entries(userIds).reduce<QualifiedId[]>((ids, [domain, userClients]) => {
-      return ids.concat(Object.keys(userClients).map(userId => ({domain, id: userId})));
+      return ids.concat(
+        Object.keys(userClients).map(userId => {
+          return {domain, id: userId};
+        }),
+      );
     }, []);
   }
   return userIds;

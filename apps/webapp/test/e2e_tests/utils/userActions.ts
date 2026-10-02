@@ -66,7 +66,11 @@ export const createGroup = async (
   }
 
   await pages.groupCreation().setGroupName(conversationName);
-  await pages.groupCreation().selectGroupMembers(...user.map(user => user.username));
+  await pages.groupCreation().selectGroupMembers(
+    ...user.map(user => {
+      return user.username;
+    }),
+  );
   await pages.groupCreation().clickCreateGroupButton();
 };
 

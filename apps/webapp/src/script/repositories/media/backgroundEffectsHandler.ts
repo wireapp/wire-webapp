@@ -117,10 +117,9 @@ export class BackgroundEffectsHandler {
         if (!isNullOrUndefined(this.saveDebounceTimer)) {
           clearTimeout(this.saveDebounceTimer);
         }
-        this.saveDebounceTimer = setTimeout(
-          () => this.savePreferredBackgroundEffectInStore(state.preferredEffect),
-          DEBOUNCE_TIMER,
-        );
+        this.saveDebounceTimer = setTimeout(() => {
+          return this.savePreferredBackgroundEffectInStore(state.preferredEffect);
+        }, DEBOUNCE_TIMER);
 
         if (state.preferredEffect.type === 'virtual') {
           backgroundEffectsStore.getState().setLastVirtualBackgroundId(state.preferredEffect.backgroundId);
@@ -372,6 +371,8 @@ export class BackgroundEffectsHandler {
 export class ReleasableMediaStream {
   constructor(
     public stream: MediaStream,
-    public release: () => void = () => null,
+    public release: () => void = () => {
+      return null;
+    },
   ) {}
 }

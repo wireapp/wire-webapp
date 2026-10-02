@@ -190,7 +190,9 @@ const AccountInput: FC<AccountInputProps> = ({
           name={isNonEmptyString(valueUie) ? valueUie : fieldName}
           value={input}
           ref={inputWrapperRef}
-          onChange={({target}) => updateInput(target.value)}
+          onChange={({target}) => {
+            return updateInput(target.value);
+          }}
           onCancel={() => {
             updateInput('');
             setIsEditing(true);

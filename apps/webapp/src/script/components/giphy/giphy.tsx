@@ -110,7 +110,9 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     [giphyRepository, isErrorState],
   );
 
-  const onGridClick = async () => getGifs(currentQuery);
+  const onGridClick = async () => {
+    return getGifs(currentQuery);
+  };
 
   const onBackClick = () => {
     if (currentGif !== null) {
@@ -121,7 +123,9 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   };
 
   const onCloseClick = () => {
-    requestAnimationFrame(() => setPlayAnimation(false));
+    requestAnimationFrame(() => {
+      return setPlayAnimation(false);
+    });
 
     setTimeout(() => {
       onClose();
@@ -178,7 +182,9 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
 
   useEffect(() => {
     if (isNonEmptyString(inputValue)) {
-      requestAnimationFrame(() => setPlayAnimation(true));
+      requestAnimationFrame(() => {
+        return setPlayAnimation(true);
+      });
       void showGiphy(inputValue);
     }
   }, [inputValue, showGiphy]);
@@ -240,18 +246,22 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
 
             {isMultipleGifs && (
               <div className="gif-container gif-container-grid">
-                {gifs.map(gif => (
-                  <button
-                    key={gif.url}
-                    className={cx('button-reset-default gif-container-item', {
-                      'gif-container-item-unselected': gif.url !== selectedGif?.url,
-                    })}
-                    onClick={() => onSelectGif(gif)}
-                    aria-label={translate('accessibility.giphyModal.selectGif')}
-                  >
-                    <GifImage src={gif.static} animatedSrc={gif.animated} objectFit="cover" title={gif.title} />
-                  </button>
-                ))}
+                {gifs.map(gif => {
+                  return (
+                    <button
+                      key={gif.url}
+                      className={cx('button-reset-default gif-container-item', {
+                        'gif-container-item-unselected': gif.url !== selectedGif?.url,
+                      })}
+                      onClick={() => {
+                        return onSelectGif(gif);
+                      }}
+                      aria-label={translate('accessibility.giphyModal.selectGif')}
+                    >
+                      <GifImage src={gif.static} animatedSrc={gif.animated} objectFit="cover" title={gif.title} />
+                    </button>
+                  );
+                })}
               </div>
             )}
 

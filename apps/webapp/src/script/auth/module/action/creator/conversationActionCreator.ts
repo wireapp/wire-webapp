@@ -82,38 +82,56 @@ export interface ConversationCodeJoinFailedAction extends AppAction {
 }
 
 export class ConversationActionCreator {
-  static startConversationCodeCheck = (): ConversationCodeCheckStartAction => ({
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START,
-  });
-  static successfulConversationCodeCheck = (): ConversationCodeCheckSuccessAction => ({
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS,
-  });
-  static failedConversationCodeCheck = (error: Error): ConversationCodeCheckFailedAction => ({
-    error,
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED,
-  });
+  static startConversationCodeCheck = (): ConversationCodeCheckStartAction => {
+    return {
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START,
+    };
+  };
+  static successfulConversationCodeCheck = (): ConversationCodeCheckSuccessAction => {
+    return {
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS,
+    };
+  };
+  static failedConversationCodeCheck = (error: Error): ConversationCodeCheckFailedAction => {
+    return {
+      error,
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED,
+    };
+  };
 
-  static startConversationCodeGetInfo = (): ConversationCodeGetInfoStartAction => ({
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_START,
-  });
-  static successfulConversationCodeGetInfo = (data: ConversationJoinData): ConversationCodeGetInfoSuccessAction => ({
-    payload: data,
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_SUCCESS,
-  });
-  static failedConversationCodeGetInfo = (error: BackendError): ConversationCodeGetInfoFailedAction => ({
-    error,
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_FAILED,
-  });
+  static startConversationCodeGetInfo = (): ConversationCodeGetInfoStartAction => {
+    return {
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_START,
+    };
+  };
+  static successfulConversationCodeGetInfo = (data: ConversationJoinData): ConversationCodeGetInfoSuccessAction => {
+    return {
+      payload: data,
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_SUCCESS,
+    };
+  };
+  static failedConversationCodeGetInfo = (error: BackendError): ConversationCodeGetInfoFailedAction => {
+    return {
+      error,
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_FAILED,
+    };
+  };
 
-  static startJoinConversationByCode = (): ConversationCodeJoinStartAction => ({
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START,
-  });
-  static successfulJoinConversationByCode = (data: ConversationEvent): ConversationCodeJoinSuccessAction => ({
-    payload: data,
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
-  });
-  static failedJoinConversationByCode = (error: Error | null): ConversationCodeJoinFailedAction => ({
-    error,
-    type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED,
-  });
+  static startJoinConversationByCode = (): ConversationCodeJoinStartAction => {
+    return {
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START,
+    };
+  };
+  static successfulJoinConversationByCode = (data: ConversationEvent): ConversationCodeJoinSuccessAction => {
+    return {
+      payload: data,
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
+    };
+  };
+  static failedJoinConversationByCode = (error: Error | null): ConversationCodeJoinFailedAction => {
+    return {
+      error,
+      type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED,
+    };
+  };
 }

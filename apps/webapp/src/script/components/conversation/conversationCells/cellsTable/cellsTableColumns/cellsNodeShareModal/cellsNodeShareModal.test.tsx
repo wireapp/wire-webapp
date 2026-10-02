@@ -32,36 +32,41 @@ import {CellShareModalContent} from './cellsNodeShareModal';
 
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
-const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+const withTheme = (component: ReactNode) => {
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+};
 
 describe('CellShareModalContent', () => {
   const conversationId = 'conversation-id';
   const nodeId = 'node-id';
 
-  const createNode = (): CellNode => ({
-    id: nodeId,
-    name: 'file.pdf',
-    path: '/file.pdf',
-    mimeType: 'application/pdf',
-    sizeMb: '1',
-    extension: 'pdf',
-    uploadedAtTimestamp: Date.now(),
-    owner: 'owner',
-    conversationName: 'Conversation',
-    tags: [],
-    presignedUrlExpiresAt: null,
-    user: null,
-    selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-    type: CellNodeType.FILE,
-  });
+  const createNode = (): CellNode => {
+    return {
+      id: nodeId,
+      name: 'file.pdf',
+      path: '/file.pdf',
+      mimeType: 'application/pdf',
+      sizeMb: '1',
+      extension: 'pdf',
+      uploadedAtTimestamp: Date.now(),
+      owner: 'owner',
+      conversationName: 'Conversation',
+      tags: [],
+      presignedUrlExpiresAt: null,
+      user: null,
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+      type: CellNodeType.FILE,
+    };
+  };
 
-  const createCellsRepository = (): CellsRepository =>
-    ({
+  const createCellsRepository = (): CellsRepository => {
+    return {
       createPublicLink: jest.fn(),
       getPublicLink: jest.fn(),
       deletePublicLink: jest.fn(),
       updatePublicLink: jest.fn(),
-    }) as unknown as CellsRepository;
+    } as unknown as CellsRepository;
+  };
 
   beforeEach(() => {
     useCellsStore.getState().clearAll({conversationId});
@@ -69,8 +74,8 @@ describe('CellShareModalContent', () => {
   });
 
   it('renders conversation share modal outside RootProvider when fireAndForgetInvoker is provided', () => {
-    expect(() =>
-      render(
+    expect(() => {
+      return render(
         withTheme(
           <CellShareModalContent
             type="file"
@@ -84,7 +89,7 @@ describe('CellShareModalContent', () => {
             }}
           />,
         ),
-      ),
-    ).not.toThrow('RootContext has not been set');
+      );
+    }).not.toThrow('RootContext has not been set');
   });
 });

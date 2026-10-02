@@ -19,6 +19,7 @@
 
 import {useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {Accept, DropzoneInputProps, FileRejection, useDropzone} from 'react-dropzone';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -135,7 +136,12 @@ export const useFilesUploadDropzone = ({
     maxFiles: number,
     conversationId: string,
   ) => {
-    const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
+    const newFiles = [
+      ...acceptedFiles,
+      ...rejectedFiles.map(file => {
+        return file.file;
+      }),
+    ];
 
     const validationResult = validateFiles({
       newFiles,
@@ -229,7 +235,7 @@ export const useFilesUploadDropzone = ({
         try {
           const metadata = await buildFileMetadata(file);
 
-          if (!metadata) {
+          if (isNullOrUndefined(metadata)) {
             return;
           }
 

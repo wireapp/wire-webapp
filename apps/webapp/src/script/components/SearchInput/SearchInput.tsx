@@ -81,7 +81,9 @@ export const SearchInput = ({
             className={cx('search-input', {'search-input-padding': isNonEmptyString(input)})}
             data-uie-name="enter-users"
             maxLength={MAX_HANDLE_LENGTH}
-            onChange={event => setInput(event.target.value)}
+            onChange={event => {
+              return setInput(event.target.value);
+            }}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (isEnterKey(event.nativeEvent)) {
                 event.preventDefault();
@@ -101,7 +103,9 @@ export const SearchInput = ({
           {isNonEmptyString(input) && (
             <button
               className="search-input-cancel"
-              onClick={() => setInput('')}
+              onClick={() => {
+                return setInput('');
+              }}
               aria-label={translate('accessibility.searchInput.cancel')}
             >
               <Icon.CloseIcon css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />

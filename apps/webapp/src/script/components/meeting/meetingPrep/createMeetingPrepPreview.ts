@@ -28,11 +28,20 @@ export const createMeetingPrepPreview = (
 ): {
   requestPreviewStream: RequestMeetingPrepPreview;
   releasePreviewStream: (stream: MediaStream) => void;
-} => ({
-  requestPreviewStream: request =>
-    task.tryOrElse(
-      () => meetingPrepPreviewErrors.requestFailed,
-      () => streamHandler.requestMediaStream(request.audio, request.video, false, false),
-    ),
-  releasePreviewStream: stream => streamHandler.releaseTracksFromStream(stream),
-});
+} => {
+  return {
+    requestPreviewStream: request => {
+      return task.tryOrElse(
+        () => {
+          return meetingPrepPreviewErrors.requestFailed;
+        },
+        () => {
+          return streamHandler.requestMediaStream(request.audio, request.video, false, false);
+        },
+      );
+    },
+    releasePreviewStream: stream => {
+      return streamHandler.releaseTracksFromStream(stream);
+    },
+  };
+};

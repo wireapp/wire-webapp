@@ -69,7 +69,13 @@ export async function generateSecretKey({
       await secretsDb.saveSecretValue(keyId, key);
       freshlyGenerated = true;
     }
-    return {key, deleteKey: () => secretsDb.deleteSecretValue(keyId), freshlyGenerated};
+    return {
+      key,
+      deleteKey: () => {
+        return secretsDb.deleteSecretValue(keyId);
+      },
+      freshlyGenerated,
+    };
   } catch (error: unknown) {
     throw error;
   }

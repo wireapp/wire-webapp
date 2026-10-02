@@ -51,9 +51,13 @@ import {
   withTheme,
 } from '../../../auth/util/test/testUtil';
 
-jest.mock('Repositories/tracking/telemetry.helpers', () => ({
-  isTelemetryEnabledAtCurrentEnvironment: () => true,
-}));
+jest.mock('Repositories/tracking/telemetry.helpers', () => {
+  return {
+    isTelemetryEnabledAtCurrentEnvironment: () => {
+      return true;
+    },
+  };
+});
 
 describe('QualityFeedbackModal', () => {
   function translateQualityFeedbackForTest(translationKey: Parameters<typeof translateForTest>[0]): string {
@@ -100,8 +104,8 @@ describe('QualityFeedbackModal', () => {
     });
   });
 
-  const renderQualityFeedbackModal = () =>
-    render(
+  const renderQualityFeedbackModal = () => {
+    return render(
       withTheme(
         withIntl(
           <QualityFeedbackModal callingRepository={callingRepository} translate={translateQualityFeedbackForTest} />,
@@ -111,6 +115,7 @@ describe('QualityFeedbackModal', () => {
         wrapper: rootProviderWrapper,
       },
     );
+  };
 
   it('should not render if qualityFeedbackModalShown is false', () => {
     renderQualityFeedbackModal();

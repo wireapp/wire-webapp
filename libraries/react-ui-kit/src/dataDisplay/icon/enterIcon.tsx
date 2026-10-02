@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const EnterIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={24} realHeight={18} {...props}>
-    <path d="M11.643 7l-1.5 1.4 2.786 2.6H2v2h10.929l-2.786 2.6 1.5 1.4L17 12l-5.357-5zM21.8 19H13v2h8.8c1.21 0 2.2-.9 2.2-2V5c0-1.1-.99-2-2.2-2H13v2h8.8v14z" />
-  </SVGIcon>
-);
+export const EnterIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={24} realHeight={18} {...props}>
+      <path d="M11.643 7l-1.5 1.4 2.786 2.6H2v2h10.929l-2.786 2.6 1.5 1.4L17 12l-5.357-5zM21.8 19H13v2h8.8c1.21 0 2.2-.9 2.2-2V5c0-1.1-.99-2-2.2-2H13v2h8.8v14z" />
+    </SVGIcon>
+  );
+};

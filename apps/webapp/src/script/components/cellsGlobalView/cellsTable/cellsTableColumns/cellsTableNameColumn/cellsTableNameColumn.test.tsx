@@ -69,8 +69,9 @@ const renderNameColumn = ({
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
-      isFeatureToggleEnabled: featureName =>
-        featureName === viewerPermissionFeatureToggleName && isViewerPermissionFeatureEnabled,
+      isFeatureToggleEnabled: featureName => {
+        return featureName === viewerPermissionFeatureToggleName && isViewerPermissionFeatureEnabled;
+      },
     }),
   );
 

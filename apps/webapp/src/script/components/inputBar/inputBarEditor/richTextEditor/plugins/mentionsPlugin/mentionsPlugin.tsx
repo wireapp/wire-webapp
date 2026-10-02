@@ -97,21 +97,23 @@ function MentionMenu({
         data-uie-name="list-mention-suggestions"
       >
         <div className="mention-suggestion-list">
-          {options.map((menuOption, index) => (
-            <MentionSuggestionsItem
-              ref={menuOption.setRefElement}
-              key={menuOption.user.id}
-              suggestion={menuOption.user}
-              isSelected={selectedIndex === index}
-              onSuggestionClick={() => {
-                setHighlightedIndex(index);
-                selectOptionAndCleanUp(menuOption);
-              }}
-              onMouseEnter={() => {
-                setHighlightedIndex(index);
-              }}
-            />
-          ))}
+          {options.map((menuOption, index) => {
+            return (
+              <MentionSuggestionsItem
+                ref={menuOption.setRefElement}
+                key={menuOption.user.id}
+                suggestion={menuOption.user}
+                isSelected={selectedIndex === index}
+                onSuggestionClick={() => {
+                  setHighlightedIndex(index);
+                  selectOptionAndCleanUp(menuOption);
+                }}
+                onMouseEnter={() => {
+                  setHighlightedIndex(index);
+                }}
+              />
+            );
+          })}
         </div>
       </FadingScrollbar>
     </IgnoreOutsideClickWrapper>
@@ -124,7 +126,11 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps): R
 
   const results = onSearch(queryString);
 
-  const options = results.map(result => new MenuOption(result, result.name())).toReversed();
+  const options = results
+    .map(result => {
+      return new MenuOption(result, result.name());
+    })
+    .toReversed();
 
   const insertMention = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
@@ -178,7 +184,9 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps): R
       triggerFn={checkForMentionMatch}
       options={options}
       menuRenderFn={menuRenderFn}
-      onClose={() => (openStateRef.current = false)}
+      onClose={() => {
+        return (openStateRef.current = false);
+      }}
       containerId="mentions-typeahead-menu"
       isReversed
     />

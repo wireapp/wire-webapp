@@ -24,23 +24,33 @@ import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/call
 
 import {CallMessage} from './callMessage';
 
-jest.mock('Components/icon', () => ({
-  HangupIcon: () => {
-    return <span>hangupIcon</span>;
-  },
-  PickupIcon: () => {
-    return <span>pickupIcon</span>;
-  },
-  __esModule: true,
-}));
+jest.mock('Components/icon', () => {
+  return {
+    HangupIcon: () => {
+      return <span>hangupIcon</span>;
+    },
+    PickupIcon: () => {
+      return <span>pickupIcon</span>;
+    },
+    __esModule: true,
+  };
+});
 
 const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {
   const callMessage: Partial<CallMessageEntity> = {
-    caption: ko.pureComputed(() => ''),
-    displayTimestampLong: () => '',
-    displayTimestampShort: () => '',
+    caption: ko.pureComputed(() => {
+      return '';
+    }),
+    displayTimestampLong: () => {
+      return '';
+    },
+    displayTimestampShort: () => {
+      return '';
+    },
     timestamp: ko.observable(Date.now()),
-    unsafeSenderName: ko.pureComputed(() => ''),
+    unsafeSenderName: ko.pureComputed(() => {
+      return '';
+    }),
     ...partialCallMessage,
   };
   return callMessage as CallMessageEntity;
@@ -50,7 +60,9 @@ describe('CallMessage', () => {
   it('shows green pickup icon for completed calls', async () => {
     const props = {
       message: createCallMessage({
-        wasCompleted: () => true,
+        wasCompleted: () => {
+          return true;
+        },
       }),
     };
 
@@ -66,7 +78,9 @@ describe('CallMessage', () => {
   it('shows red hangup icon for incompleted calls', async () => {
     const props = {
       message: createCallMessage({
-        wasCompleted: () => false,
+        wasCompleted: () => {
+          return false;
+        },
       }),
     };
 

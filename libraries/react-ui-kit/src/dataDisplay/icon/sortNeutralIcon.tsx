@@ -19,17 +19,19 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const SortNeutralIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={14} realHeight={14} {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M10.7451 9.7373L12.25 8.2334L13.1777 9.16113L10.0889 12.25L7 9.16113L7.92773 8.2334L9.43262 9.7373V2.13477H10.7451V9.7373Z"
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M3.30762 4.64648L1.80273 6.15137L0.875001 5.22363L3.96387 2.13477L7.05273 5.22363L6.125 6.15137L4.62012 4.64648L4.62012 12.25L3.30762 12.25L3.30762 4.64648Z"
-    />
-  </SVGIcon>
-);
+export const SortNeutralIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={14} realHeight={14} {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10.7451 9.7373L12.25 8.2334L13.1777 9.16113L10.0889 12.25L7 9.16113L7.92773 8.2334L9.43262 9.7373V2.13477H10.7451V9.7373Z"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M3.30762 4.64648L1.80273 6.15137L0.875001 5.22363L3.96387 2.13477L7.05273 5.22363L6.125 6.15137L4.62012 4.64648L4.62012 12.25L3.30762 12.25L3.30762 4.64648Z"
+      />
+    </SVGIcon>
+  );
+};

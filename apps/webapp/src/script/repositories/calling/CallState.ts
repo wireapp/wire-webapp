@@ -82,26 +82,36 @@ export class CallState {
   private currentViewMode = this.viewMode();
 
   constructor() {
-    this.joinedCall = ko.pureComputed(() => this.calls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
-    this.activeCalls = ko.pureComputed(() =>
-      this.calls().filter((call): boolean => {
+    this.joinedCall = ko.pureComputed(() => {
+      return this.calls().find(call => {
+        return call.state() === CALL_STATE.MEDIA_ESTAB;
+      });
+    });
+    this.activeCalls = ko.pureComputed(() => {
+      return this.calls().filter((call): boolean => {
         const callReason = call.reason();
         return isNullOrUndefined(callReason) || callReason === 0 || isNan(callReason);
-      }),
-    );
-    this.joinableCalls = ko.pureComputed(() =>
-      this.calls().filter(
-        call => call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE,
-      ),
-    );
+      });
+    });
+    this.joinableCalls = ko.pureComputed(() => {
+      return this.calls().filter(call => {
+        return call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
+      });
+    });
 
     this.calls.subscribe(activeCalls => {
-      const activeCallIds = activeCalls.map(call => call.conversation.qualifiedId);
-      this.acceptedVersionWarnings.remove(
-        acceptedId => !activeCallIds.some(callId => matchQualifiedIds(acceptedId, callId)),
-      );
+      const activeCallIds = activeCalls.map(call => {
+        return call.conversation.qualifiedId;
+      });
+      this.acceptedVersionWarnings.remove(acceptedId => {
+        return !activeCallIds.some(callId => {
+          return matchQualifiedIds(acceptedId, callId);
+        });
+      });
     });
-    this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
+    this.isSpeakersViewActive = ko.pureComputed(() => {
+      return this.activeCallViewTab() === CallViewTab.SPEAKERS;
+    });
 
     this.isMaximisedViewActive = ko.pureComputed(() => {
       const call = this.joinedCall();
@@ -111,12 +121,18 @@ export class CallState {
       return call.maximizedParticipant() !== null;
     });
 
-    this.hasAvailableScreensToShare = ko.pureComputed(
-      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
-    );
+    this.hasAvailableScreensToShare = ko.pureComputed(() => {
+      return this.selectableScreens().length > 0 || this.selectableWindows().length > 0;
+    });
 
     // Capture the viewMode value before change
-    this.viewMode.subscribe(newVal => (this.currentViewMode = newVal), this, 'beforeChange');
+    this.viewMode.subscribe(
+      newVal => {
+        return (this.currentViewMode = newVal);
+      },
+      this,
+      'beforeChange',
+    );
 
     this.viewMode.subscribe(() => {
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CALLING_UI_SIZE, {

@@ -99,7 +99,9 @@ type Props = {
 const emojies: {n: string[]; u: string}[] = Object.values(emojiList).flat();
 
 const emojiOptions = emojies.map(({n: aliases, u: codepoint}) => {
-  const codepoints = codepoint.split('-').map(code => parseInt(code, 16));
+  const codepoints = codepoint.split('-').map(code => {
+    return parseInt(code, 16);
+  });
   return new EmojiOption(aliases[0], String.fromCodePoint(...codepoints), {
     keywords: aliases,
   });
@@ -128,13 +130,15 @@ export function EmojiPickerPlugin({openStateRef}: Props): ReactElement {
     return checkForEmojis(text);
   };
 
-  const options: Array<EmojiOption> = useMemo(() => {
+  const options: EmojiOption[] = useMemo(() => {
     const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
       if (queryString === null) {
         return false;
       }
 
-      return emoji.keywords.some(emojiNameWord => emojiNameWord.includes(queryString));
+      return emoji.keywords.some(emojiNameWord => {
+        return emojiNameWord.includes(queryString);
+      });
     });
 
     return filteredEmojis
@@ -188,19 +192,23 @@ export function EmojiPickerPlugin({openStateRef}: Props): ReactElement {
     return ReactDOM.createPortal(
       <div data-outside-click-ignore className="typeahead-popover emoji-menu">
         <div className="conversation-input-bar-emoji-list" style={{bottom, left}}>
-          {options.map((option: EmojiOption, index) => (
-            <EmojiItem
-              ref={option.setRefElement}
-              key={option.key}
-              selectedEmoji={selectedIndex === index}
-              emoji={option}
-              onMouseEnter={() => setHighlightedIndex(index)}
-              onClick={() => {
-                setHighlightedIndex(index);
-                selectOptionAndCleanUp(option);
-              }}
-            />
-          ))}
+          {options.map((option: EmojiOption, index) => {
+            return (
+              <EmojiItem
+                ref={option.setRefElement}
+                key={option.key}
+                selectedEmoji={selectedIndex === index}
+                emoji={option}
+                onMouseEnter={() => {
+                  return setHighlightedIndex(index);
+                }}
+                onClick={() => {
+                  setHighlightedIndex(index);
+                  selectOptionAndCleanUp(option);
+                }}
+              />
+            );
+          })}
         </div>
       </div>,
       anchorElementRef.current,
@@ -216,7 +224,9 @@ export function EmojiPickerPlugin({openStateRef}: Props): ReactElement {
       triggerFn={checkForEmojiPickerMatch}
       options={options}
       menuRenderFn={menuRender}
-      onClose={() => (openStateRef.current = false)}
+      onClose={() => {
+        return (openStateRef.current = false);
+      }}
       containerId="emoji-typeahead-menu"
     />
   );

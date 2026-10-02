@@ -89,8 +89,14 @@ export class FileEngine implements CRUDEngine {
 
   public async clearTables(): Promise<void> {
     const files = await fs.readdir(this.storeName);
-    const tableNames = files.map(file => FileEngine.path.basename(file, FileEngine.path.extname(file)));
-    await Promise.all(tableNames.map(tableName => this.deleteAll(tableName)));
+    const tableNames = files.map(file => {
+      return FileEngine.path.basename(file, FileEngine.path.extname(file));
+    });
+    await Promise.all(
+      tableNames.map(tableName => {
+        return this.deleteAll(tableName);
+      }),
+    );
   }
 
   public async create<EntityType = Object, PrimaryKey = string>(
@@ -172,8 +178,12 @@ export class FileEngine implements CRUDEngine {
   public async readAll<T>(tableName: string): Promise<T[]> {
     const directory = this.resolvePath(tableName);
     const files = await fs.readdir(directory);
-    const recordNames = files.map(file => FileEngine.path.basename(file, FileEngine.path.extname(file)));
-    const promises = recordNames.map(primaryKey => this.read<T>(tableName, primaryKey));
+    const recordNames = files.map(file => {
+      return FileEngine.path.basename(file, FileEngine.path.extname(file));
+    });
+    const promises = recordNames.map(primaryKey => {
+      return this.read<T>(tableName, primaryKey);
+    });
     return Promise.all(promises);
   }
 
@@ -190,7 +200,9 @@ export class FileEngine implements CRUDEngine {
       throw error;
     }
 
-    return files.map(file => FileEngine.path.parse(file).name);
+    return files.map(file => {
+      return FileEngine.path.parse(file).name;
+    });
   }
 
   public async update<PrimaryKey = string, ChangesType = Object>(

@@ -28,11 +28,13 @@ const meta: Meta<typeof IconButton> = {
   component: IconButton,
   title: 'inputs/iconButton',
   decorators: [
-    Story => (
-      <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px', maxWidth: '600px', margin: '0 auto'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   argTypes: {
     variant: {
@@ -76,64 +78,72 @@ export const CustomBackground: Story = {
   },
 };
 
-export const AllVariants = () => (
-  <div style={{display: 'flex', flexDirection: 'column', gap: '32px'}}>
-    <div>
-      <h3>Primary Variant</h3>
-      <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-        <IconButton variant={IconButtonVariant.PRIMARY}>
-          <InfoIcon />
-        </IconButton>
-        <IconButton variant={IconButtonVariant.PRIMARY} disabled>
-          <InfoIcon />
-        </IconButton>
+export const AllVariants = () => {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '32px'}}>
+      <div>
+        <h3>Primary Variant</h3>
+        <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+          <IconButton variant={IconButtonVariant.PRIMARY}>
+            <InfoIcon />
+          </IconButton>
+          <IconButton variant={IconButtonVariant.PRIMARY} disabled>
+            <InfoIcon />
+          </IconButton>
+        </div>
+      </div>
+
+      <div>
+        <h3>Secondary Variant</h3>
+        <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+          <IconButton variant={IconButtonVariant.SECONDARY}>
+            <InfoIcon />
+          </IconButton>
+          <IconButton variant={IconButtonVariant.SECONDARY} disabled>
+            <InfoIcon />
+          </IconButton>
+        </div>
       </div>
     </div>
+  );
+};
 
-    <div>
-      <h3>Secondary Variant</h3>
-      <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-        <IconButton variant={IconButtonVariant.SECONDARY}>
-          <InfoIcon />
-        </IconButton>
-        <IconButton variant={IconButtonVariant.SECONDARY} disabled>
-          <InfoIcon />
-        </IconButton>
-      </div>
+export const DifferentIcons = () => {
+  return (
+    <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+      <IconButton>
+        <InfoIcon />
+      </IconButton>
+      <IconButton>
+        <PlusIcon />
+      </IconButton>
+      <IconButton>
+        <TrashIcon />
+      </IconButton>
     </div>
-  </div>
-);
+  );
+};
 
-export const DifferentIcons = () => (
-  <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-    <IconButton>
-      <InfoIcon />
-    </IconButton>
-    <IconButton>
-      <PlusIcon />
-    </IconButton>
-    <IconButton>
-      <TrashIcon />
-    </IconButton>
-  </div>
-);
-
-export const WithCustomStyles = () => (
-  <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-    <IconButton style={{backgroundColor: COLOR.GREEN}}>
-      <PlusIcon />
-    </IconButton>
-    <IconButton style={{backgroundColor: COLOR.RED}}>
-      <TrashIcon />
-    </IconButton>
-    <IconButton style={{border: `2px solid ${COLOR.BLUE}`}}>
-      <InfoIcon />
-    </IconButton>
-  </div>
-);
+export const WithCustomStyles = () => {
+  return (
+    <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+      <IconButton style={{backgroundColor: COLOR.GREEN}}>
+        <PlusIcon />
+      </IconButton>
+      <IconButton style={{backgroundColor: COLOR.RED}}>
+        <TrashIcon />
+      </IconButton>
+      <IconButton style={{border: `2px solid ${COLOR.BLUE}`}}>
+        <InfoIcon />
+      </IconButton>
+    </div>
+  );
+};
 
 export const Interactive = () => {
-  const handleClick = () => alert('Button clicked!');
+  const handleClick = () => {
+    return alert('Button clicked!');
+  };
 
   return (
     <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>

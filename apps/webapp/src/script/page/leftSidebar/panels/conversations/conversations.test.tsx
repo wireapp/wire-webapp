@@ -106,7 +106,9 @@ describe('Conversations', () => {
     conversationState.conversations([firstConversation, secondConversation]);
     const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
     window.HTMLElement.prototype.scrollTo = jest.fn();
-    const navigate = jest.spyOn(Router, 'navigate').mockImplementation(() => undefined);
+    const navigate = jest.spyOn(Router, 'navigate').mockImplementation(() => {
+      return undefined;
+    });
     const {container, getByRole} = render(
       withTheme(
         <Conversations
@@ -137,7 +139,9 @@ describe('Conversations', () => {
 
     searchInput.focus();
     const searchTabEvent = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Tab'});
-    act(() => searchInput.dispatchEvent(searchTabEvent));
+    act(() => {
+      return searchInput.dispatchEvent(searchTabEvent);
+    });
     expect(searchTabEvent.defaultPrevented).toBe(true);
     expect(firstResult).toHaveFocus();
 
@@ -147,7 +151,9 @@ describe('Conversations', () => {
     expect(firstResult).toHaveFocus();
 
     const tabEvent = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Tab'});
-    act(() => firstResult?.dispatchEvent(tabEvent));
+    act(() => {
+      return firstResult?.dispatchEvent(tabEvent);
+    });
     expect(tabEvent.defaultPrevented).toBe(false);
 
     await user.tab({shift: true});
@@ -240,7 +246,9 @@ describe('Conversations', () => {
 
     const outsideTarget = document.createElement('button');
     document.body.append(outsideTarget);
-    act(() => outsideTarget.focus());
+    act(() => {
+      return outsideTarget.focus();
+    });
     unmount();
 
     const replacementTarget = document.createElement('button');
@@ -290,7 +298,9 @@ describe('Conversations', () => {
     secondResult?.remove();
     await user.keyboard('{ArrowDown}');
 
-    act(() => getByTitle('conversationLabelFavorites').click());
+    act(() => {
+      return getByTitle('conversationLabelFavorites').click();
+    });
 
     expect(searchInput).not.toHaveFocus();
   });
@@ -316,7 +326,9 @@ describe('Conversations', () => {
     await user.type(searchInput, 'No match');
 
     const tabEvent = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Tab'});
-    act(() => searchInput.dispatchEvent(tabEvent));
+    act(() => {
+      return searchInput.dispatchEvent(tabEvent);
+    });
 
     expect(tabEvent.defaultPrevented).toBe(false);
   });

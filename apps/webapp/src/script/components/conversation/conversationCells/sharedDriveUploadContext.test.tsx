@@ -26,21 +26,30 @@ const controller = {} as SharedDriveUploadController;
 
 describe('useSharedDriveUploadController', () => {
   it('returns the controller supplied by the nearest provider', () => {
-    const {result} = renderHook(() => useSharedDriveUploadController(), {
-      wrapper: ({children}) => (
-        <SharedDriveUploadProvider controller={controller}>{children}</SharedDriveUploadProvider>
-      ),
-    });
+    const {result} = renderHook(
+      () => {
+        return useSharedDriveUploadController();
+      },
+      {
+        wrapper: ({children}) => {
+          return <SharedDriveUploadProvider controller={controller}>{children}</SharedDriveUploadProvider>;
+        },
+      },
+    );
 
     expect(result.current).toBe(controller);
   });
 
   it('fails when used outside a provider', () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {
+      return undefined;
+    });
 
-    expect(() => renderHook(() => useSharedDriveUploadController())).toThrow(
-      'useSharedDriveUploadController must be used within a SharedDriveUploadProvider',
-    );
+    expect(() => {
+      return renderHook(() => {
+        return useSharedDriveUploadController();
+      });
+    }).toThrow('useSharedDriveUploadController must be used within a SharedDriveUploadProvider');
 
     consoleError.mockRestore();
   });

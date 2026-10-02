@@ -220,7 +220,11 @@ export const Mention = (props: MentionComponentProps) => {
     const unregister = mergeRegister(
       editor.registerUpdateListener(({editorState}) => {
         if (isMounted) {
-          setSelection(editorState.read(() => $getSelection()));
+          setSelection(
+            editorState.read(() => {
+              return $getSelection();
+            }),
+          );
         }
       }),
 

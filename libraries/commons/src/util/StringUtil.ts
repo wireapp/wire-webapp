@@ -135,10 +135,9 @@ function redactSensitiveString(value: string): string {
     `$1=${redactedValue}`,
   );
   const valueWithSanitizedHeaders = valueWithSanitizedQueryParameters
-    .replace(
-      bearerCredentialPattern,
-      (_matchedValue, authorizationPrefix: string | undefined) => `${authorizationPrefix ?? ''}Bearer ${redactedValue}`,
-    )
+    .replace(bearerCredentialPattern, (_matchedValue, authorizationPrefix: string | undefined) => {
+      return `${authorizationPrefix ?? ''}Bearer ${redactedValue}`;
+    })
     .replace(cookieHeaderPattern, `Cookie: ${redactedValue}`);
 
   return valueWithSanitizedHeaders.replace(jsonWebTokenPattern, redactedValue);

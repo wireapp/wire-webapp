@@ -45,7 +45,11 @@ const emptyGlobalFilters: GlobalDriveFiltersState = {
 
 describe('FILE_TYPE_CATALOG', () => {
   it('lists file types in this fixed display order', () => {
-    expect(FILE_TYPE_CATALOG.map(({id}) => id)).toEqual([
+    expect(
+      FILE_TYPE_CATALOG.map(({id}) => {
+        return id;
+      }),
+    ).toEqual([
       'pdfs',
       'documents',
       'pictures',

@@ -19,13 +19,15 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ShieldIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M15 8V1.87197L8 0L1 2V8C1 12 4.00718 15.0977 8 16C12.0344 15.0977 15 12 15 8ZM7.98678 1.55625L8 1.56002V14.4558L7.99817 14.4563C4.68611 13.589 2.5 11.0575 2.5 8L2.5 3.02354L7.98678 1.55625Z"
-      fill="currentColor"
-    />
-  </SVGIcon>
-);
+export const ShieldIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M15 8V1.87197L8 0L1 2V8C1 12 4.00718 15.0977 8 16C12.0344 15.0977 15 12 15 8ZM7.98678 1.55625L8 1.56002V14.4558L7.99817 14.4563C4.68611 13.589 2.5 11.0575 2.5 8L2.5 3.02354L7.98678 1.55625Z"
+        fill="currentColor"
+      />
+    </SVGIcon>
+  );
+};

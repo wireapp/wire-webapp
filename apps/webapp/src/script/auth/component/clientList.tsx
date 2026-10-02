@@ -101,7 +101,9 @@ const ClientListComponent = ({
     }
   };
 
-  const isSelectedClient = (clientId: string) => clientId === currentlySelectedClient;
+  const isSelectedClient = (clientId: string) => {
+    return clientId === currentlySelectedClient;
+  };
 
   return isFetching || showLoading ? (
     <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
@@ -113,43 +115,61 @@ const ClientListComponent = ({
       verticalCenter
       style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
     >
-      {sortedClients.map(client => (
-        <ClientItem
-          client={client}
-          clientError={isSelectedClient(client.id) ? (clientError ?? undefined) : undefined}
-          key={client.id}
-          onClick={() => setSelectedClient(client.id)}
-          onClientRemoval={(password?: string) => removeClient(client.id, password)}
-          requirePassword={!isNoPasswordSSO}
-          selected={isSelectedClient(client.id)}
-        />
-      ))}
+      {sortedClients.map(client => {
+        return (
+          <ClientItem
+            client={client}
+            clientError={isSelectedClient(client.id) ? (clientError ?? undefined) : undefined}
+            key={client.id}
+            onClick={() => {
+              setSelectedClient(client.id);
+            }}
+            onClientRemoval={(password?: string) => {
+              return removeClient(client.id, password);
+            }}
+            requirePassword={!isNoPasswordSSO}
+            selected={isSelectedClient(client.id)}
+          />
+        );
+      })}
     </ContainerXS>
   );
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  clientError: ClientSelector.getError(state),
-  entropy: getEntropy(state),
-  isFetching: ClientSelector.isFetching(state),
-  isNoPasswordSSO: SelfSelector.isNoPasswordSSO(state),
-  permanentClients: ClientSelector.getPermanentClients(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    clientError: ClientSelector.getError(state),
+    entropy: getEntropy(state),
+    isFetching: ClientSelector.isFetching(state),
+    isNoPasswordSSO: SelfSelector.isNoPasswordSSO(state),
+    permanentClients: ClientSelector.getPermanentClients(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
-  doInitializeClient: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doInitializeClient>) =>
-    dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(...args)),
-  doRemoveClient: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doRemoveClient>) =>
-    dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(...args)),
-  getLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.getLocalStorage>) =>
-    dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(...args)),
-  removeLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.deleteLocalStorage>) =>
-    dispatch(ROOT_ACTIONS.localStorageAction.deleteLocalStorage(...args)),
-  resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-  resetClientError: () => dispatch(ROOT_ACTIONS.clientAction.resetClientError()),
-});
+const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+  return {
+    doInitializeClient: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doInitializeClient>) => {
+      return dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(...args));
+    },
+    doRemoveClient: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doRemoveClient>) => {
+      return dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(...args));
+    },
+    getLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.getLocalStorage>) => {
+      return dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(...args));
+    },
+    removeLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.deleteLocalStorage>) => {
+      return dispatch(ROOT_ACTIONS.localStorageAction.deleteLocalStorage(...args));
+    },
+    resetAuthError: () => {
+      return dispatch(ROOT_ACTIONS.authAction.resetAuthError());
+    },
+    resetClientError: () => {
+      return dispatch(ROOT_ACTIONS.clientAction.resetClientError());
+    },
+  };
+};
 
 const ClientList = connect(mapStateToProps, mapDispatchToProps)(ClientListComponent);
 

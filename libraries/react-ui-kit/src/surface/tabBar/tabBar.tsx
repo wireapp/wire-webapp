@@ -35,13 +35,17 @@ const tabBarStyle: <T>(props: TabBarProps<T>) => CSSObject = ({}) => {
   };
 };
 
-const filteredTabBarProps = (props: TabBarProps) => filterProps(props, []);
+const filteredTabBarProps = (props: TabBarProps) => {
+  return filterProps(props, []);
+};
 
-export const TabBar = ({children = null, ...props}: TabBarProps) => (
-  <div css={tabBarStyle(props)} {...filteredTabBarProps(props)}>
-    {children}
-  </div>
-);
+export const TabBar = ({children = null, ...props}: TabBarProps) => {
+  return (
+    <div css={tabBarStyle(props)} {...filteredTabBarProps(props)}>
+      {children}
+    </div>
+  );
+};
 
 export interface TabBarItemProps<T = HTMLSpanElement> extends TextProps<T> {
   active: boolean;
@@ -72,8 +76,15 @@ const tabBarItemStyle: <T>(theme: Theme, props: TabBarItemProps<T>) => CSSObject
   };
 };
 
-export const TabBarItem = ({children = null, ...props}: TabBarItemProps) => (
-  <span css={(theme: Theme) => tabBarItemStyle(theme, props)} {...props}>
-    {children}
-  </span>
-);
+export const TabBarItem = ({children = null, ...props}: TabBarItemProps) => {
+  return (
+    <span
+      css={(theme: Theme) => {
+        return tabBarItemStyle(theme, props);
+      }}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+};

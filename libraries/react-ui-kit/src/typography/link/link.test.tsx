@@ -23,6 +23,10 @@ import {matchComponent} from '../../utils/testUtil';
 import {Link} from '.';
 
 describe('"Link"', () => {
-  it('renders', () => matchComponent(<Link>Link</Link>));
-  it('renders (dark theme)', () => matchComponent(<Link>Link</Link>, THEME_ID.DARK));
+  it('renders', () => {
+    return matchComponent(<Link>Link</Link>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<Link>Link</Link>, THEME_ID.DARK);
+  });
 });

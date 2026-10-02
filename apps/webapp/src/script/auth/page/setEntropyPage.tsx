@@ -55,16 +55,19 @@ const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & Dis
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({});
+const mapStateToProps = (state: RootState) => {
+  return {};
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       pushEntropyData: ROOT_ACTIONS.authAction.pushEntropyData,
     },
     dispatch,
   );
+};
 
 const SetEntropyPage = connect(mapStateToProps, mapDispatchToProps)(SetEntropyPageComponent);
 

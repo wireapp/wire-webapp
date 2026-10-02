@@ -138,7 +138,9 @@ export class BackgroundEffectsController {
     const offscreen = canvas.transferControlToOffscreen();
 
     const outputTrackStop = outputTrack.stop.bind(outputTrack);
-    let onWorkerMessage: ({data}: MessageEvent) => void = () => null;
+    let onWorkerMessage: ({data}: MessageEvent) => void = () => {
+      return null;
+    };
 
     if (resolved.useWorker) {
       if (this.worker === null) {
@@ -177,7 +179,9 @@ export class BackgroundEffectsController {
         offscreen,
         readable,
         workerOptions,
-        stats => this.onMetrics?.(stats),
+        stats => {
+          return this.onMetrics?.(stats);
+        },
         (sample: PerformanceSample, mode: Mode) => {
           this.enqueuePerformanceSample(sample, mode);
         },
@@ -199,10 +203,18 @@ export class BackgroundEffectsController {
       }
     };
 
-    outputTrack.getCapabilities = () => trackCapabilities;
-    outputTrack.getSettings = () => trackSettings;
-    outputTrack.getConstraints = () => trackConstraints;
-    inputTrack.addEventListener('ended', () => outputTrack.stop());
+    outputTrack.getCapabilities = () => {
+      return trackCapabilities;
+    };
+    outputTrack.getSettings = () => {
+      return trackSettings;
+    };
+    outputTrack.getConstraints = () => {
+      return trackConstraints;
+    };
+    inputTrack.addEventListener('ended', () => {
+      return outputTrack.stop();
+    });
 
     return outputTrack;
   }
@@ -229,8 +241,12 @@ export class BackgroundEffectsController {
 
     if (media instanceof HTMLImageElement) {
       await createImageBitmap(media)
-        .then(bitmap => this.applyImageBitmap(bitmap, url))
-        .catch((error: unknown) => this.logger.warn('Failed to set background image', error));
+        .then(bitmap => {
+          return this.applyImageBitmap(bitmap, url);
+        })
+        .catch((error: unknown) => {
+          return this.logger.warn('Failed to set background image', error);
+        });
       return;
     }
 
@@ -377,7 +393,9 @@ export class BackgroundEffectsController {
 
   private enqueuePerformanceSample(sample: PerformanceSample, mode: Mode): void {
     this.qualitySampleQueue = this.qualitySampleQueue
-      .then(() => this.onPerformanceSample(sample, mode))
+      .then(() => {
+        return this.onPerformanceSample(sample, mode);
+      })
       .catch((error: unknown) => {
         this.logger?.error?.('onPerformanceSample failed', {error});
       });
@@ -409,7 +427,9 @@ export class BackgroundEffectsController {
 // Module-level pure helpers
 // ---------------------------------------------------------------------------
 
-const blurStrengthToBgBlur = (strength: number): number => Math.max(strength * BLUR_SIGMA_SCALE, 1);
+const blurStrengthToBgBlur = (strength: number): number => {
+  return Math.max(strength * BLUR_SIGMA_SCALE, 1);
+};
 
 const modeToRenderFlags = (
   mode: EffectMode,

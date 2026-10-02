@@ -67,7 +67,7 @@ export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadat
   const router = express.Router();
 
   router.get('/robots.txt', async (req, res) => {
-    const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as ReadonlyArray<string>).includes(req.hostname)
+    const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as readonly string[]).includes(req.hostname)
       ? config.ROBOTS.ALLOW
       : config.ROBOTS.DISALLOW;
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
@@ -103,7 +103,9 @@ export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadat
   router.get('/oidc?', (_req, res) => {
     const {query} = _req;
     const queryString = Object.keys(query)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as string)}`)
+      .map(key => {
+        return `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as string)}`;
+      })
       .join('&');
     return res.redirect(
       HTTP_STATUS.MOVED_TEMPORARILY,

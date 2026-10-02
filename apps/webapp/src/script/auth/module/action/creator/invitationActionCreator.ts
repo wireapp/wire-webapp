@@ -47,19 +47,27 @@ export interface ResetInviteErrorAction {
 }
 
 export class InvitationActionCreator {
-  static startAddInvite = (): AddInviteStartAction => ({
-    type: INVITATION_ACTION.INVITE_ADD_START,
-  });
-  static successfulAddInvite = (invite: any): AddInviteSuccessAction => ({
-    payload: {invite},
-    type: INVITATION_ACTION.INVITE_ADD_SUCCESS,
-  });
-  static failedAddInvite = (error: Error): AddInviteFailedAction => ({
-    error,
-    type: INVITATION_ACTION.INVITE_ADD_FAILED,
-  });
+  static startAddInvite = (): AddInviteStartAction => {
+    return {
+      type: INVITATION_ACTION.INVITE_ADD_START,
+    };
+  };
+  static successfulAddInvite = (invite: any): AddInviteSuccessAction => {
+    return {
+      payload: {invite},
+      type: INVITATION_ACTION.INVITE_ADD_SUCCESS,
+    };
+  };
+  static failedAddInvite = (error: Error): AddInviteFailedAction => {
+    return {
+      error,
+      type: INVITATION_ACTION.INVITE_ADD_FAILED,
+    };
+  };
 
-  static resetError = (): ResetInviteErrorAction => ({
-    type: INVITATION_ACTION.INVITE_RESET_ERROR,
-  });
+  static resetError = (): ResetInviteErrorAction => {
+    return {
+      type: INVITATION_ACTION.INVITE_RESET_ERROR,
+    };
+  };
 }

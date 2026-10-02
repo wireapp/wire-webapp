@@ -36,29 +36,32 @@ import {CELLS_SELF_USER_DRIVE_ROLE} from '../common/cellsSelfUserDriveRole/cells
 
 const conversationQualifiedId = {id: 'conversation-id', domain: 'example.com'};
 
-const createNode = (overrides: Partial<CellNode>): CellNode => ({
-  id: 'node-id',
-  path: 'node-name',
-  name: 'Node name',
-  sizeMb: '1 MB',
-  uploadedAtTimestamp: 0,
-  owner: 'Owner',
-  conversationName: 'Conversation',
-  tags: [],
-  presignedUrlExpiresAt: null,
-  user: null,
-  selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-  extension: '',
-  type: CellNodeType.FOLDER,
-  ...overrides,
-});
+const createNode = (overrides: Partial<CellNode>): CellNode => {
+  return {
+    id: 'node-id',
+    path: 'node-name',
+    name: 'Node name',
+    sizeMb: '1 MB',
+    uploadedAtTimestamp: 0,
+    owner: 'Owner',
+    conversationName: 'Conversation',
+    tags: [],
+    presignedUrlExpiresAt: null,
+    user: null,
+    selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+    extension: '',
+    type: CellNodeType.FOLDER,
+    ...overrides,
+  };
+};
 
-const createDataTransfer = (files: readonly File[]): DataTransfer =>
-  ({
+const createDataTransfer = (files: readonly File[]): DataTransfer => {
+  return {
     dropEffect: 'none',
     files,
     types: ['Files'],
-  }) as unknown as DataTransfer;
+  } as unknown as DataTransfer;
+};
 
 const renderCellsTable = ({
   folderPath = 'conversation-id@example.com/Marketing/images',
@@ -83,25 +86,29 @@ const renderCellsTable = ({
     extension: 'pdf',
   });
 
-  const renderTable = (resetKey = folderDropResetKey) => (
-    <ThemeProvider>
-      <CellsTable
-        nodes={[folder, file]}
-        cellsRepository={{} as CellsRepository}
-        conversation={{} as Conversation}
-        conversationQualifiedId={conversationQualifiedId}
-        conversationName="Conversation"
-        onRefresh={jest.fn()}
-        onFolderDropTargetChange={onFolderDropTargetChange}
-        onDropFilesToFolder={onDropFilesToFolder}
-        onDropReadError={onDropReadError}
-        folderDropResetKey={resetKey}
-        getDirectionFor={() => undefined}
-        isSortingEnabled
-        onToggleSort={jest.fn()}
-      />
-    </ThemeProvider>
-  );
+  const renderTable = (resetKey = folderDropResetKey) => {
+    return (
+      <ThemeProvider>
+        <CellsTable
+          nodes={[folder, file]}
+          cellsRepository={{} as CellsRepository}
+          conversation={{} as Conversation}
+          conversationQualifiedId={conversationQualifiedId}
+          conversationName="Conversation"
+          onRefresh={jest.fn()}
+          onFolderDropTargetChange={onFolderDropTargetChange}
+          onDropFilesToFolder={onDropFilesToFolder}
+          onDropReadError={onDropReadError}
+          folderDropResetKey={resetKey}
+          getDirectionFor={() => {
+            return undefined;
+          }}
+          isSortingEnabled
+          onToggleSort={jest.fn()}
+        />
+      </ThemeProvider>
+    );
+  };
 
   const {rerender} = render(renderTable(), {wrapper});
 
@@ -111,7 +118,9 @@ const renderCellsTable = ({
     onDropFilesToFolder,
     onDropReadError,
     onFolderDropTargetChange,
-    rerenderWithResetKey: (resetKey: number) => rerender(renderTable(resetKey)),
+    rerenderWithResetKey: (resetKey: number) => {
+      return rerender(renderTable(resetKey));
+    },
   };
 };
 
@@ -132,9 +141,12 @@ describe('CellsTable folder row drop target', () => {
 
     fireEvent.drop(folderRow, {dataTransfer});
 
-    await waitFor(() =>
-      expect(onDropFilesToFolder).toHaveBeenCalledWith([droppedFile], 'conversation-id@example.com/Marketing/images'),
-    );
+    await waitFor(() => {
+      return expect(onDropFilesToFolder).toHaveBeenCalledWith(
+        [droppedFile],
+        'conversation-id@example.com/Marketing/images',
+      );
+    });
     expect(onFolderDropTargetChange).toHaveBeenLastCalledWith(null);
   });
 
@@ -146,7 +158,9 @@ describe('CellsTable folder row drop target', () => {
 
     fireEvent.drop(folderRow, {dataTransfer});
 
-    await waitFor(() => expect(onDropFilesToFolder).toHaveBeenCalledWith([droppedFile], 'direct-upload'));
+    await waitFor(() => {
+      return expect(onDropFilesToFolder).toHaveBeenCalledWith([droppedFile], 'direct-upload');
+    });
   });
 
   it('reports folder discovery failure without uploading partial files to the folder row', async () => {
@@ -157,21 +171,32 @@ describe('CellsTable folder row drop target', () => {
       isFile: false,
       name: 'Reports',
       fullPath: '/Reports',
-      createReader: () => ({
-        readEntries: (_success: unknown, failure: (error: DOMException) => void) =>
-          failure(new DOMException('Directory unavailable', 'NotFoundError')),
-      }),
+      createReader: () => {
+        return {
+          readEntries: (_success: unknown, failure: (error: DOMException) => void) => {
+            return failure(new DOMException('Directory unavailable', 'NotFoundError'));
+          },
+        };
+      },
     };
     const dataTransfer = {
       dropEffect: 'none',
       files: [],
-      items: [{webkitGetAsEntry: () => failedDirectory}],
+      items: [
+        {
+          webkitGetAsEntry: () => {
+            return failedDirectory;
+          },
+        },
+      ],
       types: ['Files'],
     };
 
     fireEvent.drop(folderRow, {dataTransfer});
 
-    await waitFor(() => expect(onDropReadError).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(onDropReadError).toHaveBeenCalledTimes(1);
+    });
     expect(onDropFilesToFolder).not.toHaveBeenCalled();
   });
 

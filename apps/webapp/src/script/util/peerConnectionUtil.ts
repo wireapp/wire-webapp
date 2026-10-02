@@ -45,7 +45,9 @@ export function isValidIceCandidatesGathering(
     // the call cannot work
     return false;
   }
-  const numberOfRelays = iceCandidates.filter(candidate => candidate.toLowerCase().includes('relay')).length;
+  const numberOfRelays = iceCandidates.filter(candidate => {
+    return candidate.toLowerCase().includes('relay');
+  }).length;
   const numberOfIceServers = (peerConnectionConfig.iceServers || []).length;
   if (numberOfIceServers <= 0) {
     return true;

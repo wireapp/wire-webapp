@@ -17,6 +17,8 @@
  *
  */
 
+import {isNan, isNull, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+
 import type {UploadState} from 'Repositories/cells/upload';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
@@ -97,7 +99,7 @@ export const toSharedDriveUploadStatus = (
 ): SharedDriveUploadFileStatus | null => {
   const kind = getSharedDriveUploadStatusKind(state);
 
-  if (!kind) {
+  if (isNull(kind)) {
     return null;
   }
 
@@ -113,17 +115,17 @@ export const toSharedDriveUploadStatus = (
     isFolder: false,
     cancellableUploadIds: state.kind === 'queued' || state.kind === 'uploading' ? [state.identity.uploadId] : [],
     retryableUploads: getRetryableUploads(state),
-    ...(state.source.relativePath ? {relativePath: state.source.relativePath} : {}),
+    ...(isNonEmptyString(state.source.relativePath) ? {relativePath: state.source.relativePath} : {}),
   };
 };
 
 const getTopLevelFolder = (relativePath: string | undefined): string | null => {
-  if (!relativePath) {
+  if (!isNonEmptyString(relativePath)) {
     return null;
   }
 
   const [folderName, fileName] = relativePath.split('/');
-  return folderName && fileName ? folderName : null;
+  return isNonEmptyString(folderName) && isNonEmptyString(fileName) ? folderName : null;
 };
 
 const getFolderStatus = (statuses: readonly SharedDriveUploadFileStatus[]): SharedDriveUploadStatusKind => {
@@ -134,20 +136,20 @@ export const getSharedDriveUploadDisplayStatuses = (
   statuses: readonly SharedDriveUploadFileStatus[],
 ): SharedDriveUploadStatus[] => {
   const grouped = new Map<string, SharedDriveUploadFileStatus[]>();
-  const orderedGroups: Array<{folderId: string; folderName: string; statuses: SharedDriveUploadFileStatus[]}> = [];
+  const orderedGroups: {folderId: string; folderName: string; statuses: SharedDriveUploadFileStatus[]}[] = [];
   const individualStatuses: SharedDriveUploadStatus[] = [];
   const rowOrder: string[] = [];
 
   statuses.forEach(status => {
     const folderName = getTopLevelFolder(status.relativePath);
-    if (!folderName) {
+    if (!isNonEmptyString(folderName)) {
       individualStatuses.push(status);
       rowOrder.push(status.uploadId);
       return;
     }
 
     const group = grouped.get(folderName);
-    if (group) {
+    if (!isUndefined(group)) {
       group.push(status);
     } else {
       const folderStatuses = [status];
@@ -159,20 +161,27 @@ export const getSharedDriveUploadDisplayStatuses = (
   });
 
   orderedGroups.forEach(({folderId, statuses: folderStatuses, folderName}) => {
-    const totalSize = folderStatuses.reduce((total, status) => total + status.fileSize, 0);
-    const progress = totalSize
-      ? folderStatuses.reduce((total, status) => {
-          let fileProgress = 0;
-          if (status.kind === 'uploaded') {
-            fileProgress = 1;
-          } else if (status.isTransferActive) {
-            fileProgress = status.progress;
-          }
-          return total + status.fileSize * fileProgress;
-        }, 0) / totalSize
-      : 0;
-    const failedFileCount = folderStatuses.filter(status => status.kind === 'failed').length;
-    const uploadedFileCount = folderStatuses.filter(status => status.kind === 'uploaded').length;
+    const totalSize = folderStatuses.reduce((total, status) => {
+      return total + status.fileSize;
+    }, 0);
+    const progress =
+      totalSize !== 0 && !isNan(totalSize)
+        ? folderStatuses.reduce((total, status) => {
+            let fileProgress = 0;
+            if (status.kind === 'uploaded') {
+              fileProgress = 1;
+            } else if (status.isTransferActive) {
+              fileProgress = status.progress;
+            }
+            return total + status.fileSize * fileProgress;
+          }, 0) / totalSize
+        : 0;
+    const failedFileCount = folderStatuses.filter(status => {
+      return status.kind === 'failed';
+    }).length;
+    const uploadedFileCount = folderStatuses.filter(status => {
+      return status.kind === 'uploaded';
+    }).length;
     const displayStatus = {
       uploadId: folderId,
       conversationQualifiedId: folderStatuses[0].conversationQualifiedId,
@@ -180,48 +189,81 @@ export const getSharedDriveUploadDisplayStatuses = (
       fileSize: totalSize,
       kind: getFolderStatus(folderStatuses),
       progress,
-      hasProgress: folderStatuses.some(status => status.hasProgress || status.kind === 'uploaded'),
-      isTransferActive: folderStatuses.some(status => status.isTransferActive),
+      hasProgress: folderStatuses.some(status => {
+        return status.hasProgress || status.kind === 'uploaded';
+      }),
+      isTransferActive: folderStatuses.some(status => {
+        return status.isTransferActive;
+      }),
       isFolder: true,
       fileCount: folderStatuses.length,
       uploadedFileCount,
       failedFileCount,
-      cancellableUploadIds: folderStatuses.flatMap(status => status.cancellableUploadIds),
-      retryableUploads: folderStatuses.flatMap(status => status.retryableUploads),
+      cancellableUploadIds: folderStatuses.flatMap(status => {
+        return status.cancellableUploadIds;
+      }),
+      retryableUploads: folderStatuses.flatMap(status => {
+        return status.retryableUploads;
+      }),
     } satisfies SharedDriveUploadStatus;
     individualStatuses.push(displayStatus);
   });
 
-  const folderStatuses = individualStatuses.filter(status => status.isFolder);
+  const folderStatuses = individualStatuses.filter(status => {
+    return status.isFolder;
+  });
   const fileStatuses = new Map(
-    individualStatuses.filter(status => !status.isFolder).map(status => [status.uploadId, status]),
+    individualStatuses
+      .filter(status => {
+        return !status.isFolder;
+      })
+      .map(status => {
+        return [status.uploadId, status];
+      }),
   );
-  const folders = new Map(folderStatuses.map(status => [status.uploadId, status]));
+  const folders = new Map(
+    folderStatuses.map(status => {
+      return [status.uploadId, status];
+    }),
+  );
   return rowOrder.flatMap(rowId => {
     const row = folders.get(rowId) ?? fileStatuses.get(rowId);
-    return row ? [row] : [];
+    return !isUndefined(row) ? [row] : [];
   });
 };
 
 export const getSharedDriveUploadStatuses = (
   controller: SharedDriveUploadController,
   conversationQualifiedId: string,
-): SharedDriveUploadFileStatus[] =>
-  controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
+): SharedDriveUploadFileStatus[] => {
+  return controller.snapshots(conversationQualifiedId).flatMap(snapshot => {
     const status = toSharedDriveUploadStatus(snapshot, conversationQualifiedId);
-    return status ? [status] : [];
+    return !isNull(status) ? [status] : [];
   });
+};
 
 export const getSharedDriveUploadAggregateKind = (
   statuses: readonly SharedDriveUploadStatus[],
 ): SharedDriveUploadStatusKind | null => {
-  if (statuses.some(status => status.kind === 'uploading')) {
+  if (
+    statuses.some(status => {
+      return status.kind === 'uploading';
+    })
+  ) {
     return 'uploading';
   }
-  if (statuses.some(status => status.kind === 'queued')) {
+  if (
+    statuses.some(status => {
+      return status.kind === 'queued';
+    })
+  ) {
     return 'queued';
   }
-  if (statuses.some(status => status.kind === 'failed')) {
+  if (
+    statuses.some(status => {
+      return status.kind === 'failed';
+    })
+  ) {
     return 'failed';
   }
   return statuses.length > 0 ? 'uploaded' : null;
@@ -230,9 +272,18 @@ export const getSharedDriveUploadAggregateKind = (
 export const getRepresentativeSharedDriveUploadStatus = (
   statuses: readonly SharedDriveUploadStatus[],
   aggregateKind: SharedDriveUploadStatusKind,
-): SharedDriveUploadStatus | null =>
-  statuses.find(status => status.kind === aggregateKind) ??
-  statuses.find(status => status.kind === 'uploading') ??
-  statuses.find(status => status.kind === 'queued') ??
-  statuses[0] ??
-  null;
+): SharedDriveUploadStatus | null => {
+  return (
+    statuses.find(status => {
+      return status.kind === aggregateKind;
+    }) ??
+    statuses.find(status => {
+      return status.kind === 'uploading';
+    }) ??
+    statuses.find(status => {
+      return status.kind === 'queued';
+    }) ??
+    statuses[0] ??
+    null
+  );
+};

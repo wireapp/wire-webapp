@@ -21,4 +21,6 @@ import * as React from 'react';
 
 type FooterProps = React.HTMLProps<HTMLElement>;
 
-export const Footer = (props: FooterProps) => <footer {...props} />;
+export const Footer = (props: FooterProps) => {
+  return <footer {...props} />;
+};

@@ -116,7 +116,11 @@ export const IntegrationMapper = {
 
   mapServicesFromArray: (servicesData: ServiceData[] = [], domain: string) => {
     return servicesData
-      .filter(serviceData => serviceData.enabled === true)
-      .map(serviceData => IntegrationMapper.mapServiceFromObject(serviceData, domain));
+      .filter(serviceData => {
+        return serviceData.enabled === true;
+      })
+      .map(serviceData => {
+        return IntegrationMapper.mapServiceFromObject(serviceData, domain);
+      });
   },
 };

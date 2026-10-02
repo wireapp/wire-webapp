@@ -88,6 +88,29 @@ describe('ConversationService', () => {
       expect(await conversationService.searchInConversation('conversation-id', 'unrelated')).toEqual([]);
     });
 
+    it.each([
+      {content: '', matchesLegacyText: true},
+      {content: undefined, matchesLegacyText: true},
+      {content: ' ', matchesLegacyText: false},
+    ])('preserves legacy text fallback for content "$content"', async options => {
+      const {content, matchesLegacyText} = options;
+      const event = createMessageEvent('legacy-text-event', '', {data: {content, message: 'legacy caption'}});
+      const eventService: EventServiceLike = {
+        loadEventsWithCategory: jest.fn().mockResolvedValue([event]),
+      };
+      const conversationService = new ConversationService(
+        eventService,
+        {} as unknown as StorageService,
+        {} as unknown as APIClient,
+        {} as unknown as Core,
+      );
+
+      const actualMatches = await conversationService.searchInConversation('conversation-id', 'legacy');
+      const expectedMatches = matchesLegacyText ? [event] : [];
+
+      expect(actualMatches).toEqual(expectedMatches);
+    });
+
     it('matches composite message text items', async () => {
       const compositeEvent = {
         primary_key: 'primary-key',
@@ -260,7 +283,16 @@ describe('ConversationService', () => {
       const settled = await task;
 
       expect(settled.isOk).toBe(true);
-      expect(settled.match({Ok: c => c, Err: () => null})).toEqual(conversation);
+      expect(
+        settled.match({
+          Ok: c => {
+            return c;
+          },
+          Err: () => {
+            return null;
+          },
+        }),
+      ).toEqual(conversation);
       expect(getConversation).toHaveBeenCalledWith(conversationId);
     });
 
@@ -272,7 +304,16 @@ describe('ConversationService', () => {
       const settled = await service.getSafeConversationById(conversationId);
 
       expect(settled.isErr).toBe(true);
-      expect(settled.match({Ok: () => null, Err: e => e})).toBe(error);
+      expect(
+        settled.match({
+          Ok: () => {
+            return null;
+          },
+          Err: e => {
+            return e;
+          },
+        }),
+      ).toBe(error);
     });
 
     it('does not throw on rejection (the failure stays in the data model)', async () => {

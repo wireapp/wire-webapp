@@ -19,6 +19,8 @@
 
 import {createContext, type ReactNode, useContext} from 'react';
 
+import {isNull} from '@sindresorhus/is';
+
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 
 const SharedDriveUploadContext = createContext<SharedDriveUploadController | null>(null);
@@ -35,7 +37,7 @@ export const SharedDriveUploadProvider = ({children, controller}: SharedDriveUpl
 export const useSharedDriveUploadController = (): SharedDriveUploadController => {
   const controller = useContext(SharedDriveUploadContext);
 
-  if (!controller) {
+  if (isNull(controller)) {
     throw new Error('useSharedDriveUploadController must be used within a SharedDriveUploadProvider');
   }
 

@@ -19,8 +19,8 @@
 
 import {z} from 'zod';
 
-const ActivityObjectSchema: z.ZodType<any> = z.lazy(() =>
-  z.object({
+const ActivityObjectSchema: z.ZodType<any> = z.lazy(() => {
+  return z.object({
     '@context': z.string().optional(),
     accuracy: z.number().optional(),
     actor: ActivityObjectSchema.optional(),
@@ -33,8 +33,8 @@ const ActivityObjectSchema: z.ZodType<any> = z.lazy(() =>
     bto: ActivityObjectSchema.optional(),
     cc: ActivityObjectSchema.optional(),
     closed: z.string().optional(),
-  }),
-);
+  });
+});
 
 const RestLockInfoSchema = z.object({
   IsLocked: z.boolean().optional(),

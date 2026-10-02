@@ -19,6 +19,8 @@
 
 import {useCallback, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {useAppNotification} from 'Components/appNotification/index';
 import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -56,7 +58,13 @@ export const useSendFiles = ({
     try {
       setStatus('loading');
       await Promise.all(files.map(sendFile));
-      files.map(file => file.preview && URL.revokeObjectURL(file.preview));
+      files.map(file => {
+        if (!isNonEmptyString(file.preview)) {
+          return file.preview;
+        }
+
+        return URL.revokeObjectURL(file.preview);
+      });
       setStatus('success');
     } catch (error: unknown) {
       errorNotification.show();

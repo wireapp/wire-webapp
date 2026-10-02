@@ -19,12 +19,14 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const CollectionIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M2.75065 0C2.33346 0 1.99999 0.335786 1.99999 0.75V1.5H14V0.75C14 0.332899 13.6639 0 13.2493 0H2.75065ZM0.999992 3.75C0.999992 3.33579 1.33225 3 1.75269 3H14.2473C14.663 3 15 3.3329 15 3.75V4.5H0.999992V3.75ZM0.0995315 6.9954C0.0445572 6.44565 0.444623 6 1.00086 6H14.9991C15.5519 6 15.9557 6.44259 15.9005 6.9954L15 16H0.999992L0.0995315 6.9954Z"
-    />
-  </SVGIcon>
-);
+export const CollectionIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M2.75065 0C2.33346 0 1.99999 0.335786 1.99999 0.75V1.5H14V0.75C14 0.332899 13.6639 0 13.2493 0H2.75065ZM0.999992 3.75C0.999992 3.33579 1.33225 3 1.75269 3H14.2473C14.663 3 15 3.3329 15 3.75V4.5H0.999992V3.75ZM0.0995315 6.9954C0.0445572 6.44565 0.444623 6 1.00086 6H14.9991C15.5519 6 15.9557 6.44259 15.9005 6.9954L15 16H0.999992L0.0995315 6.9954Z"
+      />
+    </SVGIcon>
+  );
+};

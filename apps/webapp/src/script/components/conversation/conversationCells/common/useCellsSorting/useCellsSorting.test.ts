@@ -23,7 +23,9 @@ import {useCellsSorting} from './useCellsSorting';
 
 describe('useCellsSorting', () => {
   it('starts without a selected sort', () => {
-    const {result} = renderHook(() => useCellsSorting());
+    const {result} = renderHook(() => {
+      return useCellsSorting();
+    });
 
     expect(result.current.sort).toBeNull();
     expect(result.current.getDirectionFor('name')).toBeUndefined();
@@ -32,38 +34,58 @@ describe('useCellsSorting', () => {
   });
 
   it('applies the default direction when selecting a sort field', () => {
-    const {result} = renderHook(() => useCellsSorting());
+    const {result} = renderHook(() => {
+      return useCellsSorting();
+    });
 
-    act(() => result.current.toggleSort('name'));
+    act(() => {
+      return result.current.toggleSort('name');
+    });
     expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
     expect(result.current.getDirectionFor('name')).toBe('asc');
 
-    act(() => result.current.toggleSort('mtime'));
+    act(() => {
+      return result.current.toggleSort('mtime');
+    });
     expect(result.current.sort).toEqual({field: 'mtime', direction: 'desc'});
     expect(result.current.getDirectionFor('mtime')).toBe('desc');
 
-    act(() => result.current.toggleSort('size'));
+    act(() => {
+      return result.current.toggleSort('size');
+    });
     expect(result.current.sort).toEqual({field: 'size', direction: 'asc'});
     expect(result.current.getDirectionFor('size')).toBe('asc');
   });
 
   it('toggles the active sort field between ascending and descending', () => {
-    const {result} = renderHook(() => useCellsSorting());
+    const {result} = renderHook(() => {
+      return useCellsSorting();
+    });
 
-    act(() => result.current.toggleSort('name'));
+    act(() => {
+      return result.current.toggleSort('name');
+    });
     expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
 
-    act(() => result.current.toggleSort('name'));
+    act(() => {
+      return result.current.toggleSort('name');
+    });
     expect(result.current.sort).toEqual({field: 'name', direction: 'desc'});
 
-    act(() => result.current.toggleSort('name'));
+    act(() => {
+      return result.current.toggleSort('name');
+    });
     expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
   });
 
   it('returns a direction only for the active sort field', () => {
-    const {result} = renderHook(() => useCellsSorting());
+    const {result} = renderHook(() => {
+      return useCellsSorting();
+    });
 
-    act(() => result.current.toggleSort('mtime'));
+    act(() => {
+      return result.current.toggleSort('mtime');
+    });
 
     expect(result.current.getDirectionFor('name')).toBeUndefined();
     expect(result.current.getDirectionFor('mtime')).toBe('desc');
@@ -71,23 +93,36 @@ describe('useCellsSorting', () => {
   });
 
   it('resets sorting to the unsorted state', () => {
-    const {result} = renderHook(() => useCellsSorting());
+    const {result} = renderHook(() => {
+      return useCellsSorting();
+    });
 
-    act(() => result.current.toggleSort('size'));
+    act(() => {
+      return result.current.toggleSort('size');
+    });
     expect(result.current.sort).toEqual({field: 'size', direction: 'asc'});
 
-    act(() => result.current.setSort(null));
+    act(() => {
+      return result.current.setSort(null);
+    });
 
     expect(result.current.sort).toBeNull();
     expect(result.current.getDirectionFor('size')).toBeUndefined();
   });
 
   it('derives an unsorted state immediately when the sorting scope changes', () => {
-    const {result, rerender} = renderHook(({scopeKey}: {scopeKey: string}) => useCellsSorting(scopeKey), {
-      initialProps: {scopeKey: 'conversation-a:browse'},
-    });
+    const {result, rerender} = renderHook(
+      ({scopeKey}: {scopeKey: string}) => {
+        return useCellsSorting(scopeKey);
+      },
+      {
+        initialProps: {scopeKey: 'conversation-a:browse'},
+      },
+    );
 
-    act(() => result.current.toggleSort('name'));
+    act(() => {
+      return result.current.toggleSort('name');
+    });
     expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
 
     rerender({scopeKey: 'conversation-a:search'});
@@ -95,7 +130,9 @@ describe('useCellsSorting', () => {
     expect(result.current.sort).toBeNull();
     expect(result.current.getDirectionFor('name')).toBeUndefined();
 
-    act(() => result.current.toggleSort('name'));
+    act(() => {
+      return result.current.toggleSort('name');
+    });
 
     expect(result.current.sort).toEqual({field: 'name', direction: 'asc'});
 
@@ -107,22 +144,30 @@ describe('useCellsSorting', () => {
   });
 
   it('supports a visual-only default sort when configured', () => {
-    const {result} = renderHook(() => useCellsSorting('default', {field: 'mtime', direction: 'desc'}));
+    const {result} = renderHook(() => {
+      return useCellsSorting('default', {field: 'mtime', direction: 'desc'});
+    });
 
     expect(result.current.sort).toBeNull();
     expect(result.current.getDirectionFor('mtime')).toBe('desc');
 
-    act(() => result.current.toggleSort('mtime'));
+    act(() => {
+      return result.current.toggleSort('mtime');
+    });
 
     expect(result.current.sort).toEqual({field: 'mtime', direction: 'asc'});
     expect(result.current.getDirectionFor('mtime')).toBe('asc');
   });
 
   it('keeps setSort stable across sort changes', () => {
-    const {result} = renderHook(() => useCellsSorting());
+    const {result} = renderHook(() => {
+      return useCellsSorting();
+    });
     const setSort = result.current.setSort;
 
-    act(() => result.current.toggleSort('name'));
+    act(() => {
+      return result.current.toggleSort('name');
+    });
 
     expect(result.current.setSort).toBe(setSort);
   });

@@ -111,7 +111,11 @@ export const test = baseTest.extend<Fixtures>({
     });
 
     // Close all contexts created throughout the tests (will automatically close all pages associated with each context)
-    await Promise.all(contexts.map(ctx => ctx.close()));
+    await Promise.all(
+      contexts.map(ctx => {
+        return ctx.close();
+      }),
+    );
   },
   createUser: async ({api}, use) => {
     const users: User[] = [];
@@ -122,7 +126,11 @@ export const test = baseTest.extend<Fixtures>({
       return user;
     });
 
-    await Promise.all(users.map(user => api.deletePersonalUser(user)));
+    await Promise.all(
+      users.map(user => {
+        return api.deletePersonalUser(user);
+      }),
+    );
   },
   createTeam: async ({api}, use) => {
     const teamOwners: User[] = [];
@@ -134,7 +142,11 @@ export const test = baseTest.extend<Fixtures>({
     });
 
     // Deletes each created team and the owner / members associated with it
-    await Promise.all(teamOwners.map(owner => api.team.deleteTeam(owner, owner.teamId)));
+    await Promise.all(
+      teamOwners.map(owner => {
+        return api.team.deleteTeam(owner, owner.teamId);
+      }),
+    );
   },
 });
 
@@ -142,9 +154,11 @@ export const test = baseTest.extend<Fixtures>({
 export const LOGIN_TIMEOUT = 40_000;
 
 /** PagePlugin to log in as the given user */
-export const withLogin =
-  (user: User | Promise<User>, options?: {baseUrl?: string; confirmNewHistory?: boolean}): PagePlugin =>
-  async page => {
+export const withLogin = (
+  user: User | Promise<User>,
+  options?: {baseUrl?: string; confirmNewHistory?: boolean},
+): PagePlugin => {
+  return async page => {
     const pageManager = PageManager.from(page);
     await pageManager.openLoginPage(options?.baseUrl);
     await pageManager.webapp.pages.login().login(await user);
@@ -161,11 +175,11 @@ export const withLogin =
       .conversationSidebar()
       .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   };
+};
 
 /** PagePlugin to open a guest user link and join the group chat as temporary member */
-export const withGuestUser =
-  (link: string, guestName: string): PagePlugin =>
-  async page => {
+export const withGuestUser = (link: string, guestName: string): PagePlugin => {
+  return async page => {
     await page.goto(link);
     await page.getByRole('link', {name: 'Join in Browser'}).click();
     const pageManager = PageManager.from(page);
@@ -177,6 +191,7 @@ export const withGuestUser =
      */
     await pageManager.webapp.pages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   };
+};
 
 export const createUser = async (
   api: ApiManagerE2E,

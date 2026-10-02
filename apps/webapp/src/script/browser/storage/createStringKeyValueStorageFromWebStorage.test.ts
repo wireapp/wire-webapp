@@ -26,7 +26,7 @@ const storageKey = 'app_opened';
 const storageValue = 'stored-value';
 
 function createWorkingWebStorage(): Storage {
-  const storedValues: Array<{key: string; value: string}> = [];
+  const storedValues: {key: string; value: string}[] = [];
 
   return {
     get length(): number {

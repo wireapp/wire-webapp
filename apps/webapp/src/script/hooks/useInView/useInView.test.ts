@@ -51,14 +51,18 @@ describe('useInView', () => {
   });
 
   it('initializes with element not in view', () => {
-    const {result} = renderHook(() => useInView());
+    const {result} = renderHook(() => {
+      return useInView();
+    });
     const {isInView} = result.current;
 
     expect(isInView).toBe(false);
   });
 
   it('updates isInView state when intersection changes', () => {
-    const {result, rerender} = renderHook(() => useInView());
+    const {result, rerender} = renderHook(() => {
+      return useInView();
+    });
 
     act(() => {
       result.current.elementRef.current = document.createElement('div');
@@ -75,7 +79,9 @@ describe('useInView', () => {
   });
 
   it('disconnects observer on unmount', () => {
-    const {result, rerender, unmount} = renderHook(() => useInView());
+    const {result, rerender, unmount} = renderHook(() => {
+      return useInView();
+    });
 
     act(() => {
       result.current.elementRef.current = document.createElement('div');
@@ -90,11 +96,11 @@ describe('useInView', () => {
   });
 
   it('respects rootMargin option when determining visibility', () => {
-    const {result, rerender} = renderHook(() =>
-      useInView({
+    const {result, rerender} = renderHook(() => {
+      return useInView({
         rootMargin: '50px',
-      }),
-    );
+      });
+    });
 
     act(() => {
       result.current.elementRef.current = document.createElement('div');
@@ -122,7 +128,9 @@ describe('useInView', () => {
 
   it('handles configuration options', () => {
     const threshold = 0.5;
-    const {result, rerender} = renderHook(() => useInView({threshold}));
+    const {result, rerender} = renderHook(() => {
+      return useInView({threshold});
+    });
 
     act(() => {
       result.current.elementRef.current = document.createElement('div');
@@ -136,7 +144,9 @@ describe('useInView', () => {
   });
 
   it('tracks if element has ever been in view', () => {
-    const {result, rerender} = renderHook(() => useInView());
+    const {result, rerender} = renderHook(() => {
+      return useInView();
+    });
 
     act(() => {
       result.current.elementRef.current = document.createElement('div');

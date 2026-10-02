@@ -23,9 +23,11 @@ import {CopyToClipboardButton} from './copyToClipboardButton';
 
 import {withTheme} from '../../auth/util/test/testUtil';
 
-jest.mock('Util/clipboardUtil', () => ({
-  copyText: jest.fn(),
-}));
+jest.mock('Util/clipboardUtil', () => {
+  return {
+    copyText: jest.fn(),
+  };
+});
 
 describe('CopyToClipboardButton', () => {
   const textToCopy = 'some text';

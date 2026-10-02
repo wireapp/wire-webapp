@@ -19,6 +19,7 @@
 
 import {DragEvent, useEffect, useState} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -52,7 +53,7 @@ import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCe
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
 
 interface CellsTableProps {
-  nodes: Array<CellNode>;
+  nodes: CellNode[];
   cellsRepository: CellsRepository;
   conversation: Conversation;
   conversationQualifiedId: QualifiedId;
@@ -76,7 +77,7 @@ interface CellsTableHeaderCellProps {
 
 const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
-  const ariaSort = isSortingEnabled && sortField ? toAriaSort(getDirectionFor(sortField)) : undefined;
+  const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
   return (
     <th
@@ -91,8 +92,9 @@ const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: Cells
   );
 };
 
-const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean =>
-  Array.from(event.dataTransfer.types).includes('Files');
+const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
+  return Array.from(event.dataTransfer.types).includes('Files');
+};
 
 const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.preventDefault();
@@ -149,7 +151,9 @@ export const CellsTable = ({
   const tableWrapperStyles = rows.length > 0 ? [wrapperStyles, wrapperWithRowsStyles] : wrapperStyles;
 
   useEffect(() => {
-    return () => onFolderDropTargetChange?.(null);
+    return () => {
+      return onFolderDropTargetChange?.(null);
+    };
   }, [onFolderDropTargetChange]);
 
   useEffect(() => {
@@ -236,18 +240,22 @@ export const CellsTable = ({
         )}
         <table css={tableStyles}>
           <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <CellsTableHeaderCell
-                    key={header.id}
-                    header={header}
-                    getDirectionFor={getDirectionFor}
-                    isSortingEnabled={isSortingEnabled}
-                  />
-                ))}
-              </tr>
-            ))}
+            {table.getHeaderGroups().map(headerGroup => {
+              return (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => {
+                    return (
+                      <CellsTableHeaderCell
+                        key={header.id}
+                        header={header}
+                        getDirectionFor={getDirectionFor}
+                        isSortingEnabled={isSortingEnabled}
+                      />
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </thead>
           {rows.length > 0 && (
             <tbody>
@@ -264,18 +272,20 @@ export const CellsTable = ({
                     data-uie-name="cells-table-row"
                     {...getFolderDropHandlers(node)}
                   >
-                    {row.getVisibleCells().map(cell => (
-                      <td
-                        key={cell.id}
-                        css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                        data-cell={cellLabels[cell.column.id]}
-                        style={{
-                          width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
-                        }}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
+                    {row.getVisibleCells().map(cell => {
+                      return (
+                        <td
+                          key={cell.id}
+                          css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                          data-cell={cellLabels[cell.column.id]}
+                          style={{
+                            width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                          }}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      );
+                    })}
                   </tr>
                 );
               })}

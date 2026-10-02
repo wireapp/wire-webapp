@@ -55,7 +55,9 @@ describe('useElementSize', () => {
   });
 
   it('initializes with zero dimensions', () => {
-    const {result} = renderHook(() => useElementSize());
+    const {result} = renderHook(() => {
+      return useElementSize();
+    });
     expect(result.current.width).toBe(0);
     expect(result.current.height).toBe(0);
   });
@@ -64,7 +66,9 @@ describe('useElementSize', () => {
     const divElement = document.createElement('div');
     mockRef.current = divElement;
 
-    const {result} = renderHook(() => useElementSize());
+    const {result} = renderHook(() => {
+      return useElementSize();
+    });
 
     act(() => {
       observerCallback(
@@ -85,7 +89,9 @@ describe('useElementSize', () => {
     const divElement = document.createElement('div');
     mockRef.current = divElement;
 
-    const {unmount} = renderHook(() => useElementSize());
+    const {unmount} = renderHook(() => {
+      return useElementSize();
+    });
 
     unmount();
 
@@ -93,14 +99,18 @@ describe('useElementSize', () => {
   });
 
   it('does not observe if ref is null', () => {
-    const {result} = renderHook(() => useElementSize());
+    const {result} = renderHook(() => {
+      return useElementSize();
+    });
 
     expect(result.current.ref.current).toBeNull();
     expect(mockObserve).not.toHaveBeenCalled();
   });
 
   it('handles invalid entries array', () => {
-    const {result} = renderHook(() => useElementSize());
+    const {result} = renderHook(() => {
+      return useElementSize();
+    });
     const divElement = document.createElement('div');
     const refObj = {current: divElement};
     Object.defineProperty(result.current, 'ref', {value: refObj});
@@ -117,7 +127,9 @@ describe('useElementSize', () => {
   });
 
   it('handles empty entries array', () => {
-    const {result, rerender} = renderHook(() => useElementSize());
+    const {result, rerender} = renderHook(() => {
+      return useElementSize();
+    });
     const divElement = document.createElement('div');
     const refObj = {current: divElement};
     Object.defineProperty(result.current, 'ref', {value: refObj});
@@ -139,7 +151,9 @@ describe('useElementSize', () => {
     const divElement = document.createElement('div');
     mockRef.current = divElement;
 
-    const {result} = renderHook(() => useElementSize());
+    const {result} = renderHook(() => {
+      return useElementSize();
+    });
 
     act(() => {
       observerCallback(
@@ -174,7 +188,9 @@ describe('useElementSize', () => {
     const canvasElement = document.createElement('canvas');
     mockRef.current = canvasElement;
 
-    const {result} = renderHook(() => useElementSize<HTMLCanvasElement>());
+    const {result} = renderHook(() => {
+      return useElementSize<HTMLCanvasElement>();
+    });
 
     act(() => {
       observerCallback(
@@ -193,7 +209,9 @@ describe('useElementSize', () => {
   });
 
   it('maintains previous dimensions when entries array is invalid', () => {
-    const {result, rerender} = renderHook(() => useElementSize());
+    const {result, rerender} = renderHook(() => {
+      return useElementSize();
+    });
     const divElement = document.createElement('div');
     const refObj = {current: divElement};
     Object.defineProperty(result.current, 'ref', {value: refObj});

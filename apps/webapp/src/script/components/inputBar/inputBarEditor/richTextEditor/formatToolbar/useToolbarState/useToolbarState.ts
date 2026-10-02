@@ -54,25 +54,83 @@ export const useToolbarState = () => {
 
       const node = selection.anchor.getNode();
 
-      const formatChecks: Array<{format: FormatTypes; check: () => boolean}> = [
-        {format: 'bold', check: () => selection.hasFormat('bold')},
-        {format: 'italic', check: () => selection.hasFormat('italic')},
-        {format: 'strikethrough', check: () => selection.hasFormat('strikethrough')},
-        {format: 'code', check: () => selection.hasFormat('code')},
-        {format: 'unorderedList', check: () => isListNode(node, 'unordered')},
-        {format: 'orderedList', check: () => isListNode(node, 'ordered')},
-        {format: 'heading', check: () => isHeadingNode(node)},
-        {format: 'blockquote', check: () => isBlockquoteNode(node)},
-        {format: 'codeBlock', check: () => isCodeBlockNode(node)},
-        {format: 'link', check: () => $isLinkNode(node) || $isLinkNode(node.getParent())},
+      const formatChecks: {format: FormatTypes; check: () => boolean}[] = [
+        {
+          format: 'bold',
+          check: () => {
+            return selection.hasFormat('bold');
+          },
+        },
+        {
+          format: 'italic',
+          check: () => {
+            return selection.hasFormat('italic');
+          },
+        },
+        {
+          format: 'strikethrough',
+          check: () => {
+            return selection.hasFormat('strikethrough');
+          },
+        },
+        {
+          format: 'code',
+          check: () => {
+            return selection.hasFormat('code');
+          },
+        },
+        {
+          format: 'unorderedList',
+          check: () => {
+            return isListNode(node, 'unordered');
+          },
+        },
+        {
+          format: 'orderedList',
+          check: () => {
+            return isListNode(node, 'ordered');
+          },
+        },
+        {
+          format: 'heading',
+          check: () => {
+            return isHeadingNode(node);
+          },
+        },
+        {
+          format: 'blockquote',
+          check: () => {
+            return isBlockquoteNode(node);
+          },
+        },
+        {
+          format: 'codeBlock',
+          check: () => {
+            return isCodeBlockNode(node);
+          },
+        },
+        {
+          format: 'link',
+          check: () => {
+            return $isLinkNode(node) || $isLinkNode(node.getParent());
+          },
+        },
       ];
 
-      const activeFormats = formatChecks.filter(({check}) => check()).map(({format}) => format);
+      const activeFormats = formatChecks
+        .filter(({check}) => {
+          return check();
+        })
+        .map(({format}) => {
+          return format;
+        });
 
       setActiveFormats(prevFormats => {
         if (
           prevFormats.length !== activeFormats.length ||
-          !prevFormats.every(format => activeFormats.includes(format))
+          !prevFormats.every(format => {
+            return activeFormats.includes(format);
+          })
         ) {
           return activeFormats;
         }

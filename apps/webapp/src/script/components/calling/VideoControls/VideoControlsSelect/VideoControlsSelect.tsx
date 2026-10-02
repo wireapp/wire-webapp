@@ -38,7 +38,7 @@ import {
 } from '../VideoControls.styles';
 
 type SelectProps = React.ComponentProps<typeof Select<false>>;
-type SelectOption = SelectProps['options'] extends Array<infer T> ? T : never;
+type SelectOption = SelectProps['options'] extends (infer T)[] ? T : never;
 
 type BaseSelectProps = Pick<
   SelectProps,
@@ -154,7 +154,11 @@ export const VideoControlsSelect = ({
         selectGroupCSS={selectGroupStyles}
         isOptionSelected={isOptionSelected}
         formatOptionLabel={
-          isInlineMenu ? option => <VideoOptionLabel option={option as VideoOptionLabelProps['option']} /> : undefined
+          isInlineMenu
+            ? option => {
+                return <VideoOptionLabel option={option as VideoOptionLabelProps['option']} />;
+              }
+            : undefined
         }
       />
     </>

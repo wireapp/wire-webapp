@@ -39,6 +39,7 @@ type CreatedNotification = {
   request: PlatformNotificationRequest;
   closeCallCount: number;
   clickListener: (() => void) | null;
+  showListener: (() => void) | null;
   closeListener: (() => void) | null;
   errorListener: ((event: unknown) => void) | null;
 };
@@ -70,6 +71,7 @@ const createPlatformFake = ({
         request,
         closeCallCount: 0,
         clickListener: null,
+        showListener: null,
         closeListener: null,
         errorListener: null,
       };
@@ -79,6 +81,9 @@ const createPlatformFake = ({
       return {
         onClick: listener => {
           createdNotification.clickListener = listener;
+        },
+        onShow: listener => {
+          createdNotification.showListener = listener;
         },
         onClose: listener => {
           createdNotification.closeListener = listener;
@@ -115,12 +120,20 @@ const createApi = ({
   const {createNotification, createdNotifications} = createPlatformFake(fakeOptions);
   const focusWindow = jest.fn();
   const publishNotificationClick = jest.fn();
+  const requestPermission = jest.fn(async () => {
+    return permission;
+  });
   const logger = {warn: jest.fn()};
 
   const api = createSystemNotificationApiFromBrowserNotification({
     createNotification,
-    getPermission: () => permission,
-    isSupported: () => true,
+    getPermission: () => {
+      return permission;
+    },
+    requestPermission,
+    isSupported: () => {
+      return true;
+    },
     focusWindow,
     publishNotificationClick,
     logger,
@@ -134,6 +147,7 @@ const notificationRequestFactory = createFactory<SystemNotificationRequest>(() =
     title: 'Weekly sync',
     body: 'Starts at 12:00 PM',
     tag: 'meeting-reminder:tag',
+    requireInteraction: false,
     onClick: jest.fn(),
     onClose: jest.fn(),
   };
@@ -143,8 +157,15 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
   it('reports support from the injected predicate', () => {
     const api = createSystemNotificationApiFromBrowserNotification({
       createNotification: createPlatformFake().createNotification,
-      getPermission: () => 'granted',
-      isSupported: () => false,
+      getPermission: () => {
+        return 'granted';
+      },
+      requestPermission: async () => {
+        return 'granted';
+      },
+      isSupported: () => {
+        return false;
+      },
       focusWindow: jest.fn(),
       publishNotificationClick: jest.fn(),
       logger: {warn: jest.fn()},
@@ -159,10 +180,41 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
     expect(api.getPermission()).toBe(permission);
   });
 
-  it('constructs a notification carrying the title, body and tag', () => {
+  it('requests permission through the platform', async () => {
+    const {api} = createApi();
+
+    await expect(api.requestPermission()).resolves.toBe('granted');
+  });
+
+  it('returns the current permission when the platform cannot request permission', async () => {
+    const {createNotification} = createPlatformFake();
+    const api = createSystemNotificationApiFromBrowserNotification({
+      createNotification,
+      getPermission: () => {
+        return 'denied';
+      },
+      isSupported: () => {
+        return false;
+      },
+      focusWindow: jest.fn(),
+      publishNotificationClick: jest.fn(),
+      logger: {warn: jest.fn()},
+    });
+
+    await expect(api.requestPermission()).resolves.toBe('denied');
+  });
+
+  it.each([true, false])('forwards notification options with requireInteraction: %s', requireInteraction => {
     const {api, createdNotifications} = createApi();
 
-    api.show(notificationRequestFactory.build());
+    api.show(
+      notificationRequestFactory.build({
+        icon: '/image/logo/notification.png',
+        silent: true,
+        data: {messageType: 'content'},
+        requireInteraction,
+      }),
+    );
 
     expect(createdNotifications).toHaveLength(1);
     expect(createdNotifications.at(0)?.request.title).toBe('Weekly sync');
@@ -170,6 +222,10 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
       title: 'Weekly sync',
       body: 'Starts at 12:00 PM',
       tag: 'meeting-reminder:tag',
+      icon: '/image/logo/notification.png',
+      silent: true,
+      data: {messageType: 'content'},
+      requireInteraction,
     });
   });
 
@@ -182,6 +238,16 @@ describe('createSystemNotificationApiFromBrowserNotification', () => {
 
     expect(focusWindow).toHaveBeenCalledTimes(1);
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls back when the platform shows the notification', () => {
+    const {api, createdNotifications} = createApi();
+    const onShow = jest.fn();
+
+    api.show(notificationRequestFactory.build({onShow}));
+    createdNotifications.at(0)?.showListener?.();
+
+    expect(onShow).toHaveBeenCalledTimes(1);
   });
 
   it('announces the click so the desktop app restores its window and switches account', () => {

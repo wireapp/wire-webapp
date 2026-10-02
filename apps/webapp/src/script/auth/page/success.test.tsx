@@ -36,10 +36,12 @@ describe('Success', () => {
   beforeEach(() => {
     jest.spyOn(trackingUtil, 'trackTelemetryPageView').mockImplementation(jest.fn());
     jest.spyOn(trackingUtil, 'resetTelemetrySession').mockImplementation(jest.fn());
-    jest.spyOn(urlUtil, 'pathWithParams').mockImplementation((url: string) => url);
-    replaceLocationMock = jest
-      .spyOn(browserLocationModule, 'replaceBrowserLocation')
-      .mockImplementation(() => undefined);
+    jest.spyOn(urlUtil, 'pathWithParams').mockImplementation((url: string) => {
+      return url;
+    });
+    replaceLocationMock = jest.spyOn(browserLocationModule, 'replaceBrowserLocation').mockImplementation(() => {
+      return undefined;
+    });
   });
 
   afterEach(() => {

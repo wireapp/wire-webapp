@@ -96,7 +96,9 @@ const continueTask = ({key, task}: Omit<ScheduleTaskParams, 'firingDate' | 'pers
   }
 };
 
-const hasActiveTask = (key: string) => activeTimeouts[key] !== undefined;
+const hasActiveTask = (key: string) => {
+  return activeTimeouts[key] !== undefined;
+};
 
 export const TaskScheduler = {
   addTask,

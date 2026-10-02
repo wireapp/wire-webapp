@@ -19,8 +19,8 @@
 
 import {Router} from 'express';
 
-export const AppleAssociationRoute = () =>
-  Router().get('/apple-app-site-association', (_req, res) => {
+export const AppleAssociationRoute = () => {
+  return Router().get('/apple-app-site-association', (_req, res) => {
     const response = {
       webcredentials: {
         apps: [
@@ -35,3 +35,4 @@ export const AppleAssociationRoute = () =>
 
     res.send(response);
   });
+};

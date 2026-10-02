@@ -41,7 +41,9 @@ export const SelectValueContainer = <
 
 const renderValue = (value: ReactNode) => {
   if (Array.isArray(value)) {
-    const currentValue = (i: number) => value[i].props.children;
+    const currentValue = (i: number) => {
+      return value[i].props.children;
+    };
 
     return (
       <div

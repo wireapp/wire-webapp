@@ -36,20 +36,22 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
   const {translate} = useApplicationContext();
   const {name: serviceName} = useKoSubscribableChildren(service, ['name']);
 
-  const onServiceClick = () => onClick(service);
+  const onServiceClick = () => {
+    return onClick(service);
+  };
 
   return (
     <div
       tabIndex={TabIndex.FOCUSABLE}
       role="button"
       onClick={onServiceClick}
-      onKeyDown={event =>
-        handleKeyDown({
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
           callback: onServiceClick,
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       data-uie-name="item-service"
       data-uie-value={serviceName}
       aria-label={translate('accessibility.openConversation', {name: serviceName})}

@@ -30,13 +30,17 @@ import {SystemMessage} from './systemMessage';
 describe('SystemMessage MLS reset messages', () => {
   it('shows the resetting user and the recovery explanation as a system message', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n});
-    const message = createSessionResetMessage(key => enUS[key]);
+    const message = createSessionResetMessage(key => {
+      return enUS[key];
+    });
     message.timestamp(clock.currentUnixEpochMilliseconds);
     const user = new User('resetting-user-id', 'staging.zinfra.io', translateForTest);
     user.name('User X');
     render(<SystemMessage message={message} />);
 
-    act(() => message.user(user));
+    act(() => {
+      return message.user(user);
+    });
 
     expect(screen.getByTestId('element-message-system')).toHaveTextContent(
       'User X was unable to decrypt some of your messages but has solved the issue. This affected all conversations you share together.',
@@ -45,14 +49,18 @@ describe('SystemMessage MLS reset messages', () => {
 
   it('shows the success caption without a sender name once the resetting user resolves to self', () => {
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n});
-    const message = createSessionResetMessage(key => enUS[key]);
+    const message = createSessionResetMessage(key => {
+      return enUS[key];
+    });
     message.timestamp(clock.currentUnixEpochMilliseconds);
     render(<SystemMessage message={message} />);
 
     const user = new User('self-user-id', 'staging.zinfra.io', translateForTest);
     user.name('My Name');
     user.isMe = true;
-    act(() => message.user(user));
+    act(() => {
+      return message.user(user);
+    });
 
     expect(
       screen.getByText('You were unable to decrypt some of your messages but have solved the issue.'),

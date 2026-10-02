@@ -50,8 +50,9 @@ export type MeetingReminderOsNotifier = {
 
 const grantedPermission: SystemNotificationPermission = 'granted';
 
-export const toMeetingReminderNotificationTag = (payload: MeetingReminderFirePayload): string =>
-  `meeting-reminder:${toMeetingIdKey(payload.qualifiedId)}:${payload.meetingStartTime}`;
+export const toMeetingReminderNotificationTag = (payload: MeetingReminderFirePayload): string => {
+  return `meeting-reminder:${toMeetingIdKey(payload.qualifiedId)}:${payload.meetingStartTime}`;
+};
 
 /**
  * Presents a meeting reminder as an OS/browser notification.
@@ -117,6 +118,7 @@ export const createMeetingReminderOsNotifier = ({
         title: payload.meetingTitle,
         body: translate('meetings.notifications.startsAt', {time: formatMeetingTime(payload.meetingStartTime)}),
         tag,
+        requireInteraction: true,
         onClick: () => {
           openMeetingsList();
           openMeetingPrep(payload);

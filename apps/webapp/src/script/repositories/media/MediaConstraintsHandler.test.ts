@@ -62,14 +62,14 @@ describe('MediaConstraintsHandler', () => {
   }: CreateAvailableDevicesParams = {}) => {
     mediaDevicesStore.setState({
       audio: {
-        input: {devices: [], supported: false, selectedId: audio},
-        output: {devices: [], supported: false, selectedId: defaultAudioOutputId},
+        input: {devices: [], supported: false, activeId: audio, preferredId: audio},
+        output: {devices: [], supported: false, activeId: defaultAudioOutputId, preferredId: defaultAudioOutputId},
       },
       video: {
-        input: {devices: [], selectedId: video, supported: false},
+        input: {devices: [], activeId: video, preferredId: video, supported: false},
       },
       screen: {
-        input: {devices: [], selectedId: screen, supported: false},
+        input: {devices: [], activeId: screen, supported: false},
       },
     });
   };

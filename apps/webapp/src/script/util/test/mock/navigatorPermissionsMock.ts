@@ -19,7 +19,9 @@
 
 Object.defineProperty(window.navigator, 'permissions', {
   value: {
-    query: jest.fn().mockImplementation(() => Promise.resolve()),
+    query: jest.fn().mockImplementation(() => {
+      return Promise.resolve();
+    }),
   },
   writable: true,
 });

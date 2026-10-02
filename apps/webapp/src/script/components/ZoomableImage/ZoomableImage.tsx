@@ -141,7 +141,9 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
       });
     }
 
-    setIsZoomEnabled(prevState => !prevState);
+    setIsZoomEnabled(prevState => {
+      return !prevState;
+    });
   };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {

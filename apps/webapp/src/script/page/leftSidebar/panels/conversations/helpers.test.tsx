@@ -143,12 +143,14 @@ describe('scrollToConversation', () => {
     const element = document.createElement('div');
     element.className = 'conversation-list-cell';
     element.dataset.uieUid = conversationId;
-    element.getBoundingClientRect = jest.fn(() => ({
-      top: -10,
-      left: 0,
-      bottom: 10,
-      right: 10,
-    })) as any;
+    element.getBoundingClientRect = jest.fn(() => {
+      return {
+        top: -10,
+        left: 0,
+        bottom: 10,
+        right: 10,
+      };
+    }) as any;
     element.scrollIntoView = jest.fn();
     document.body.appendChild(element);
 
@@ -162,12 +164,14 @@ describe('scrollToConversation', () => {
     const element = document.createElement('div');
     element.className = 'conversation-list-cell';
     element.dataset.uieUid = conversationId;
-    element.getBoundingClientRect = jest.fn(() => ({
-      top: 10,
-      left: 10,
-      bottom: 100,
-      right: 100,
-    })) as any;
+    element.getBoundingClientRect = jest.fn(() => {
+      return {
+        top: 10,
+        left: 10,
+        bottom: 100,
+        right: 100,
+      };
+    }) as any;
     element.scrollIntoView = jest.fn();
     document.body.appendChild(element);
 
@@ -231,7 +235,9 @@ describe('getConversationsWithHeadings', () => {
     const folderMatch = generateConversation({name: 'Match'});
     const folderNonMatch = generateConversation({name: 'Other'});
     const currentFolder = {
-      conversations: () => [folderMatch, folderNonMatch],
+      conversations: () => {
+        return [folderMatch, folderNonMatch];
+      },
     } as any;
 
     const result = getConversationFocusCandidates({

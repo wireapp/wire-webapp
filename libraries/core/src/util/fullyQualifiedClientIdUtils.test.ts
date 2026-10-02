@@ -64,8 +64,12 @@ describe('parseFullQualifiedClientId', () => {
   });
 
   it('throws an error when a wrong id is given', () => {
-    expect(() => parseFullQualifiedClientId('')).toThrow();
-    expect(() => parseFullQualifiedClientId('userid:clientid:domain')).toThrow();
+    expect(() => {
+      return parseFullQualifiedClientId('');
+    }).toThrow();
+    expect(() => {
+      return parseFullQualifiedClientId('userid:clientid:domain');
+    }).toThrow();
   });
 });
 

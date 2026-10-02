@@ -38,7 +38,9 @@ const Duration = ({startedAt}: DurationProps) => {
       updateTimer();
       durationUpdateInterval = window.setInterval(updateTimer, 1000);
     }
-    return () => window.clearInterval(durationUpdateInterval);
+    return () => {
+      return window.clearInterval(durationUpdateInterval);
+    };
   }, [startedAt]);
 
   return <>{duration}</>;

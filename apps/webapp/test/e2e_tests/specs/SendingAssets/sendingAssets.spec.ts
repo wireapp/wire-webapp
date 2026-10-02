@@ -175,7 +175,11 @@ test.describe('Sending Assets', () => {
     const messageOptions = await userAPages.conversation().openMessageOptions(message);
     await messageOptions.getByRole('button', {name: 'Copy'}).click();
     await expect
-      .poll(async () => await userAPage.evaluate(() => navigator.clipboard.readText()))
+      .poll(async () => {
+        return await userAPage.evaluate(() => {
+          return navigator.clipboard.readText();
+        });
+      })
       .toBe('Message to copy');
   });
 

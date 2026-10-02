@@ -126,34 +126,45 @@ export class ChainedMlsErrorMapper implements MlsErrorMapper {
 
 /** Wrong epoch or stale message from MLS/core-crypto/backend. */
 const WrongEpochHandler: ErrorHandler = {
-  canHandle: err =>
-    isCoreCryptoMLSWrongEpochError?.(err) || isMLSStaleMessageError?.(err) || err instanceof MLSStaleMessageError,
-  map: (err, context) => ({
-    type: MlsErrorType.WrongEpoch,
-    message: 'Epoch mismatch or stale message',
-    cause: err,
-    context: {
-      qualifiedConversationId: context?.qualifiedConversationId,
-      groupId: context?.groupId,
-      subconvId: context?.subconvId,
-    },
-  }),
+  canHandle: err => {
+    return (
+      isCoreCryptoMLSWrongEpochError?.(err) || isMLSStaleMessageError?.(err) || err instanceof MLSStaleMessageError
+    );
+  },
+  map: (err, context) => {
+    return {
+      type: MlsErrorType.WrongEpoch,
+      message: 'Epoch mismatch or stale message',
+      cause: err,
+      context: {
+        qualifiedConversationId: context?.qualifiedConversationId,
+        groupId: context?.groupId,
+        subconvId: context?.subconvId,
+      },
+    };
+  },
 };
 
 /** Local MLS state indicates the conversation is broken/not established. */
 const BrokenConversationHandler: ErrorHandler = {
-  canHandle: err => isBrokenMLSConversationError?.(err),
-  map: (err, context) => ({
-    type: 'GroupNotEstablished',
-    message: 'Broken MLS conversation',
-    cause: err,
-    context: {qualifiedConversationId: context?.qualifiedConversationId, groupId: context?.groupId},
-  }),
+  canHandle: err => {
+    return isBrokenMLSConversationError?.(err);
+  },
+  map: (err, context) => {
+    return {
+      type: 'GroupNotEstablished',
+      message: 'Broken MLS conversation',
+      cause: err,
+      context: {qualifiedConversationId: context?.qualifiedConversationId, groupId: context?.groupId},
+    };
+  },
 };
 
 /** Backend/MLS reports missing users; group is out-of-sync. */
 const GroupOutOfSyncHandler: ErrorHandler = {
-  canHandle: err => isMLSGroupOutOfSyncError?.(err) || err instanceof MLSGroupOutOfSyncError,
+  canHandle: err => {
+    return isMLSGroupOutOfSyncError?.(err) || err instanceof MLSGroupOutOfSyncError;
+  },
   map: (err, context) => {
     let missingUsers: QualifiedId[] = [];
     if (isMLSGroupOutOfSyncError?.(err)) {
@@ -177,7 +188,9 @@ const GroupOutOfSyncHandler: ErrorHandler = {
 
 /** core-crypto indicates a local group already exists for the welcome's group id. */
 const ConversationAlreadyExistsHandler: ErrorHandler = {
-  canHandle: error => isMlsConversationAlreadyExistsError?.(error),
+  canHandle: error => {
+    return isMlsConversationAlreadyExistsError?.(error);
+  },
   map: (error, context) => {
     if (!isMlsConversationAlreadyExistsError(error)) {
       throw new Error('Error is not a ConversationAlreadyExists error');
@@ -194,22 +207,29 @@ const ConversationAlreadyExistsHandler: ErrorHandler = {
 
 /** Orphan welcome (no matching state); caller should try to join. */
 const OrphanWelcomeHandler: ErrorHandler = {
-  canHandle: err => isMlsOrphanWelcomeError?.(err),
-  map: (err, context) => ({
-    type: MlsErrorType.OrphanWelcome,
-    message: 'Orphan welcome message',
-    cause: err,
-    context: {qualifiedConversationId: context?.qualifiedConversationId},
-  }),
+  canHandle: err => {
+    return isMlsOrphanWelcomeError?.(err);
+  },
+  map: (err, context) => {
+    return {
+      type: MlsErrorType.OrphanWelcome,
+      message: 'Orphan welcome message',
+      cause: err,
+      context: {qualifiedConversationId: context?.qualifiedConversationId},
+    };
+  },
 };
 
 /** Fallback classification when no handler matches. */
 const FallbackHandler: ErrorHandler = {
-  canHandle: () => true,
-  map: (err, context): DomainMlsError =>
-    err instanceof Error
+  canHandle: () => {
+    return true;
+  },
+  map: (err, context): DomainMlsError => {
+    return err instanceof Error
       ? {type: MlsErrorType.Other, message: err.message, cause: err, context}
-      : {type: MlsErrorType.Other, message: String(err), cause: err, context},
+      : {type: MlsErrorType.Other, message: String(err), cause: err, context};
+  },
 };
 
 /**

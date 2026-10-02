@@ -34,7 +34,8 @@ function checkOverlayedElements() {
   overlayedElements.forEach(({onVisible, onChange}, element) => {
     const isVisible = !isOverlayed(element);
     if (!isUndefined(onChange)) {
-      return onChange(isVisible);
+      onChange(isVisible);
+      return;
     }
     if (isVisible) {
       onVisible?.();

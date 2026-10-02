@@ -108,7 +108,9 @@ describe('server build metadata', () => {
 
   it('fails when the metadata file contains malformed JSON', () => {
     const loadedBuildMetadataResult = loadBuildMetadata('/build/version.json', {
-      readFile: () => '{not-json',
+      readFile: () => {
+        return '{not-json';
+      },
     });
 
     assert(loadedBuildMetadataResult.isErr);
@@ -119,12 +121,13 @@ describe('server build metadata', () => {
 
   it('fails when the metadata file has an invalid structure', () => {
     const loadedBuildMetadataResult = loadBuildMetadata('/build/version.json', {
-      readFile: () =>
-        JSON.stringify({
+      readFile: () => {
+        return JSON.stringify({
           version: 'main-025edc6',
           commit: authoritativeBuildMetadata.commit,
           builtAt: authoritativeBuildMetadata.builtAt,
-        }),
+        });
+      },
     });
 
     assert(loadedBuildMetadataResult.isErr);

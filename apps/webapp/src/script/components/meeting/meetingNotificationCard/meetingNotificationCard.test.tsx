@@ -41,9 +41,11 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import type {MainViewModel} from 'src/script/view_model/MainViewModel';
 
-jest.mock('Components/meeting/useJoinMeetingCall', () => ({
-  useJoinMeetingCall: jest.fn(),
-}));
+jest.mock('Components/meeting/useJoinMeetingCall', () => {
+  return {
+    useJoinMeetingCall: jest.fn(),
+  };
+});
 
 const qualifiedId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
@@ -52,14 +54,23 @@ const meetingStartTime = '2026-06-01T09:00:00.000Z';
 const ongoingMeetingStartTime = '2026-06-01T09:50:00.000Z';
 const specialCharacterName = `Eldon Bauch ±§!@#{}[]:"|;'\\<>?,./$%^&*()`;
 const renderedTranslations: Partial<Record<TranslationKey, (substitutions?: Substitutions) => string>> = {
-  'meetings.notifications.title': substitutions => `${substitutions?.label} ${substitutions?.meetingTitle}`,
-  'meetings.notifications.by': substitutions => `By ${substitutions?.organizer}`,
-  'meetings.meetingStatus.startedAt': substitutions => `Started at ${substitutions?.time}`,
-  'meetings.notifications.startsAt': substitutions => `Starts at ${substitutions?.time}`,
+  'meetings.notifications.title': substitutions => {
+    return `${substitutions?.label} ${substitutions?.meetingTitle}`;
+  },
+  'meetings.notifications.by': substitutions => {
+    return `By ${substitutions?.organizer}`;
+  },
+  'meetings.meetingStatus.startedAt': substitutions => {
+    return `Started at ${substitutions?.time}`;
+  },
+  'meetings.notifications.startsAt': substitutions => {
+    return `Starts at ${substitutions?.time}`;
+  },
 };
 
-const translateForNotificationTest: Translate = (key, substitutions) =>
-  renderedTranslations[key]?.(substitutions) ?? key;
+const translateForNotificationTest: Translate = (key, substitutions) => {
+  return renderedTranslations[key]?.(substitutions) ?? key;
+};
 const mainViewModel = {
   content: {repositories: {conversation: {}, calling: {}}},
   calling: {callActions: {answer: jest.fn(), startAudio: jest.fn()}},
@@ -68,8 +79,9 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForNotificationTest, mainViewModel}),
 );
 
-const renderCard = (card: ReactElement) =>
-  render(<ThemeProvider>{card}</ThemeProvider>, {wrapper: rootProviderWrapper});
+const renderCard = (card: ReactElement) => {
+  return render(<ThemeProvider>{card}</ThemeProvider>, {wrapper: rootProviderWrapper});
+};
 
 describe('MeetingNotificationCard', () => {
   beforeEach(() => {
@@ -181,6 +193,18 @@ describe('MeetingNotificationCard', () => {
     } else {
       expect(screen.getByRole('button', {name: 'meetings.notifications.view'})).toBeInTheDocument();
     }
+  });
+
+  it.each(notifications)('omits the metadata separator for an empty organizer in $kind notifications', notification => {
+    renderCard(
+      <MeetingNotificationCard
+        {...notification}
+        qualifiedCreator={{id: '', domain: 'empty-organizer-domain'}}
+        onDismiss={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('listitem')).not.toHaveTextContent('•');
   });
 
   it('highlights an ongoing time', () => {

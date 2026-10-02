@@ -96,7 +96,9 @@ function createFailureForReason(users: QualifiedId[], reason: AddUsersFailureRea
 }
 
 function findMessageDetailByText(messageDetails: HTMLElement[], text: string): HTMLElement {
-  const matchingMessageDetail = messageDetails.find(messageDetail => messageDetail.textContent?.includes(text));
+  const matchingMessageDetail = messageDetails.find(messageDetail => {
+    return messageDetail.textContent?.includes(text);
+  });
 
   if (isUndefined(matchingMessageDetail)) {
     throw new Error(`Expected a message detail containing: ${text}`);
@@ -137,11 +139,12 @@ describe('FailedToAddUsersMessage', () => {
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
     );
 
-    const mainMessage = getAllByText(
-      (_, element) =>
+    const mainMessage = getAllByText((_, element) => {
+      return (
         element?.textContent ===
-        'Felix could not be added to the group as the backend of test.domain could not be reached.',
-    );
+        'Felix could not be added to the group as the backend of test.domain could not be reached.'
+      );
+    });
     expect(mainMessage.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -166,9 +169,9 @@ describe('FailedToAddUsersMessage', () => {
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
     );
 
-    const mainMessage = getAllByText(
-      (_, element) => element?.textContent === '3 participants could not be added to the group.',
-    );
+    const mainMessage = getAllByText((_, element) => {
+      return element?.textContent === '3 participants could not be added to the group.';
+    });
     expect(mainMessage.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -193,9 +196,9 @@ describe('FailedToAddUsersMessage', () => {
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
     );
 
-    const mainMessage = getAllByText(
-      (_, element) => element?.textContent === '3 participants could not be added to the group.',
-    );
+    const mainMessage = getAllByText((_, element) => {
+      return element?.textContent === '3 participants could not be added to the group.';
+    });
 
     expect(mainMessage.length).toBeGreaterThanOrEqual(1);
 
@@ -205,11 +208,12 @@ describe('FailedToAddUsersMessage', () => {
       toggleButton.click();
     });
 
-    const details = getAllByText(
-      (_, element) =>
+    const details = getAllByText((_, element) => {
+      return (
         element?.textContent ===
-        'Adrian, Przemek and Tim could not be added to the group as the backend of test.domain could not be reached.',
-    );
+        'Adrian, Przemek and Tim could not be added to the group as the backend of test.domain could not be reached.'
+      );
+    });
 
     expect(details.length).toBeGreaterThanOrEqual(1);
   });
@@ -235,9 +239,9 @@ describe('FailedToAddUsersMessage', () => {
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
     );
 
-    const mainMessage = getAllByText(
-      (_, element) => element?.textContent === '2 participants could not be added to the group.',
-    );
+    const mainMessage = getAllByText((_, element) => {
+      return element?.textContent === '2 participants could not be added to the group.';
+    });
     expect(mainMessage.length).toBeGreaterThanOrEqual(1);
 
     const toggleButton = getByText('Show details');
@@ -246,11 +250,12 @@ describe('FailedToAddUsersMessage', () => {
       toggleButton.click();
     });
 
-    const details = getAllByText(
-      (_, element) =>
+    const details = getAllByText((_, element) => {
+      return (
         element?.textContent ===
-        'Arjita and Tom could not be added to the group as the backend of test.domain, test-2.domain could not be reached.',
-    );
+        'Arjita and Tom could not be added to the group as the backend of test.domain, test-2.domain could not be reached.'
+      );
+    });
 
     expect(details.length).toBeGreaterThanOrEqual(1);
   });
@@ -285,11 +290,12 @@ describe('FailedToAddUsersMessage', () => {
       toggleButton.click();
     });
 
-    const details = getAllByText(
-      (_, element) =>
+    const details = getAllByText((_, element) => {
+      return (
         element?.textContent ===
-        'Przemek and Patryk could not be added to the group as their backends do not federate with each other.',
-    );
+        'Przemek and Patryk could not be added to the group as their backends do not federate with each other.'
+      );
+    });
 
     expect(details.length).toBeGreaterThanOrEqual(1);
   });
@@ -335,30 +341,32 @@ describe('FailedToAddUsersMessage', () => {
       toggleButton.click();
     });
 
-    const mainMessage = getAllByText(
-      (_, element) => element?.textContent === '3 participants could not be added to the group.',
-    );
+    const mainMessage = getAllByText((_, element) => {
+      return element?.textContent === '3 participants could not be added to the group.';
+    });
     expect(mainMessage.length).toBeGreaterThanOrEqual(1);
 
-    const details1 = getAllByText(
-      (_, element) =>
+    const details1 = getAllByText((_, element) => {
+      return (
         element?.textContent ===
-        `${user1.name()} could not be added to the group as their backends do not federate with each other.`,
-    );
+        `${user1.name()} could not be added to the group as their backends do not federate with each other.`
+      );
+    });
 
     expect(details1.length).toBeGreaterThanOrEqual(1);
 
-    const details2 = getAllByText(
-      (_, element) =>
+    const details2 = getAllByText((_, element) => {
+      return (
         element?.textContent ===
-        `${user2.name()} could not be added to the group as the backend of ${user2.qualifiedId.domain} could not be reached.`,
-    );
+        `${user2.name()} could not be added to the group as the backend of ${user2.qualifiedId.domain} could not be reached.`
+      );
+    });
 
     expect(details2.length).toBeGreaterThanOrEqual(1);
 
-    const details3 = getAllByText(
-      (_, element) => element?.textContent === `${user3.name()} could not be added to the group.`,
-    );
+    const details3 = getAllByText((_, element) => {
+      return element?.textContent === `${user3.name()} could not be added to the group.`;
+    });
 
     expect(details3.length).toBeGreaterThanOrEqual(1);
   });
@@ -485,7 +493,11 @@ describe('FailedToAddUsersMessage', () => {
       () => {
         const userState = new UserState();
         const qualifiedIds = generateQualifiedIds(2, 'test.domain');
-        userState.users(qualifiedIds.map(qualifiedId => createUser(qualifiedId, qualifiedId.id)));
+        userState.users(
+          qualifiedIds.map(qualifiedId => {
+            return createUser(qualifiedId, qualifiedId.id);
+          }),
+        );
 
         const message = createFailedToAddUsersMessages([
           {

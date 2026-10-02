@@ -72,7 +72,9 @@ const InfoToggle = ({
             name={inputId}
             id={inputId}
             checked={isChecked}
-            onChange={event => setIsChecked(event.target.checked)}
+            onChange={event => {
+              return setIsChecked(event.target.checked);
+            }}
             type="checkbox"
             data-uie-name="info-toggle-input"
             disabled={isDisabled}
@@ -80,7 +82,9 @@ const InfoToggle = ({
           <button
             className="button-label"
             aria-pressed={isChecked}
-            onClick={() => setIsChecked(!isChecked)}
+            onClick={() => {
+              return setIsChecked(!isChecked);
+            }}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           >
             <span className="button-label__switch" />

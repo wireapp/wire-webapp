@@ -74,9 +74,13 @@ const MeetingListItemComponent = ({
     meetingSeries.qualified_conversation,
   );
 
-  const now = useMemo(() => new Date(nowMilliseconds), [nowMilliseconds]);
+  const now = useMemo(() => {
+    return new Date(nowMilliseconds);
+  }, [nowMilliseconds]);
 
-  const temporalStatus = useMemo(() => getMeetingTemporalStatusAt(now, start, end), [now, start, end]);
+  const temporalStatus = useMemo(() => {
+    return getMeetingTemporalStatusAt(now, start, end);
+  }, [now, start, end]);
   const isCallActive = isAttendingMeetingInstance(isConversationCallActive, temporalStatus);
 
   const openPrep = () => {

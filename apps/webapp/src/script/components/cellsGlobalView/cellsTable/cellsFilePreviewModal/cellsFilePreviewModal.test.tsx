@@ -39,14 +39,17 @@ import {
   CellsFilePreviewModalContextValue,
 } from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
-const translate = (key: string) =>
-  ({
-    'cells.imageFullScreenModal.closeButton': 'Close',
-    'cells.imageFullScreenModal.downloadButton': 'Download',
-    'cells.options.label': 'More options',
-    'cells.options.versionHistory': 'Version History',
-    'fileFullscreenModal.editor.iframeTitle': 'Collabora editor',
-  })[key] ?? key;
+const translate = (key: string) => {
+  return (
+    {
+      'cells.imageFullScreenModal.closeButton': 'Close',
+      'cells.imageFullScreenModal.downloadButton': 'Download',
+      'cells.options.label': 'More options',
+      'cells.options.versionHistory': 'Version History',
+      'fileFullscreenModal.editor.iframeTitle': 'Collabora editor',
+    }[key] ?? key
+  );
+};
 
 const createRootProviderWrapper = ({
   fireAndForgetInvoker,
@@ -54,15 +57,17 @@ const createRootProviderWrapper = ({
 }: {
   fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   isViewerPermissionFeatureEnabled: boolean;
-}) =>
-  createRootProviderWrapperForTest(
+}) => {
+  return createRootProviderWrapperForTest(
     createRootContextValueForTest({
       fireAndForgetInvoker,
-      isFeatureToggleEnabled: featureName =>
-        featureName === viewerPermissionFeatureToggleName && isViewerPermissionFeatureEnabled,
+      isFeatureToggleEnabled: featureName => {
+        return featureName === viewerPermissionFeatureToggleName && isViewerPermissionFeatureEnabled;
+      },
       translate,
     }),
   );
+};
 
 const file: CellFile = {
   id: 'file-id',
@@ -162,7 +167,9 @@ describe('CellsFilePreviewModal', () => {
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Editing'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'More options'})).toBeInTheDocument();
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
     expect(await screen.findByTitle('Collabora editor')).toBeInTheDocument();
   });
 });

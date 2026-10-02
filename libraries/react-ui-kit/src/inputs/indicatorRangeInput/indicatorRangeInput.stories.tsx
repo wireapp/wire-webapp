@@ -48,7 +48,11 @@ export const Default: Story = {
     label: 'Font size',
     value: 3,
     dataListOptions,
-    onChange: event => console.log('Value changed:', event.currentTarget.value),
-    onOptionClick: value => console.log('Option clicked:', value),
+    onChange: event => {
+      return console.log('Value changed:', event.currentTarget.value);
+    },
+    onOptionClick: value => {
+      return console.log('Option clicked:', value);
+    },
   },
 };

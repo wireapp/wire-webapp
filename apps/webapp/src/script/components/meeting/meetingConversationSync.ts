@@ -55,9 +55,9 @@ const addUsers = (
     return task.resolve({failedToAdd: []});
   }
 
-  return conversationRepository
-    .safeAddUsers(conversation, users)
-    .mapRejected(() => meetingConversationSyncErrors.addFailed);
+  return conversationRepository.safeAddUsers(conversation, users).mapRejected(() => {
+    return meetingConversationSyncErrors.addFailed;
+  });
 };
 
 const establishWithUsers = (
@@ -77,46 +77,59 @@ const establishWithUsers = (
       userIdsToAdd,
       conversationQualifiedId: conversation.qualifiedId,
     })
-    .mapRejected(() => meetingConversationSyncErrors.establishFailed);
+    .mapRejected(() => {
+      return meetingConversationSyncErrors.establishFailed;
+    });
 };
 
 const syncCreateParticipants = (
   conversationRepository: ConversationRepository,
   conversation: Conversation,
   usersToAdd: User[],
-): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> =>
-  establishWithUsers(
+): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> => {
+  return establishWithUsers(
     conversationRepository,
     conversation,
-    usersToAdd.map(user => user.qualifiedId),
+    usersToAdd.map(user => {
+      return user.qualifiedId;
+    }),
   );
+};
 
 const syncUpdateParticipants = (
   conversationRepository: ConversationRepository,
   conversation: Conversation,
   usersToAdd: User[],
   userIdsToRemove: QualifiedId[],
-): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> =>
-  addUsers(conversationRepository, conversation, usersToAdd).andThen(addResult => {
+): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> => {
+  return addUsers(conversationRepository, conversation, usersToAdd).andThen(addResult => {
     if (userIdsToRemove.length === 0) {
       return task.resolve(addResult);
     }
 
     return conversationRepository
       .safeRemoveMembers(conversation, userIdsToRemove)
-      .mapRejected(() => meetingConversationSyncErrors.removeFailed)
-      .map(() => addResult);
+      .mapRejected(() => {
+        return meetingConversationSyncErrors.removeFailed;
+      })
+      .map(() => {
+        return addResult;
+      });
   });
+};
 
 export const syncMeetingConversationParticipants = (
   conversationRepository: ConversationRepository,
   {qualifiedConversationId, usersToAdd, userIdsToRemove, isCreate = false}: SyncMeetingConversationParticipantsParams,
-): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> =>
-  conversationRepository
+): Task<{failedToAdd: AddUsersFailure[]}, MeetingConversationSyncError> => {
+  return conversationRepository
     .safeGetConversationById(qualifiedConversationId)
-    .mapRejected(() => meetingConversationSyncErrors.conversationNotFound)
-    .andThen(conversation =>
-      isCreate
+    .mapRejected(() => {
+      return meetingConversationSyncErrors.conversationNotFound;
+    })
+    .andThen(conversation => {
+      return isCreate
         ? syncCreateParticipants(conversationRepository, conversation, usersToAdd)
-        : syncUpdateParticipants(conversationRepository, conversation, usersToAdd, userIdsToRemove),
-    );
+        : syncUpdateParticipants(conversationRepository, conversation, usersToAdd, userIdsToRemove);
+    });
+};

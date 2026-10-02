@@ -29,7 +29,9 @@ import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scrollHelpers';
 
-export const getListWrapperHeadingId = (panelId: string): string => `${panelId}-heading`;
+export const getListWrapperHeadingId = (panelId: string): string => {
+  return `${panelId}-heading`;
+};
 
 const scrollStyle = css`
   flex: 1 1 auto;
@@ -125,7 +127,9 @@ const ListWrapper = memo(
       }
 
       calculateBorders(element);
-      element.addEventListener('scroll', () => calculateBorders(element));
+      element.addEventListener('scroll', () => {
+        return calculateBorders(element);
+      });
     }
 
     const {isSlow} = useConnectionQuality();

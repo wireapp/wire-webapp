@@ -31,16 +31,20 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {TabAndFilterSettings} from './tabAndFilterSettings';
 import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
-jest.mock('Util/useChannelsFeatureFlag', () => ({
-  useChannelsFeatureFlag: jest.fn(() => ({
-    canCreateChannels: false,
-    isChannelsEnabled: false,
-    isChannelsFeatureEnabled: false,
-    isChannelsHistorySharingEnabled: false,
-    isPublicChannelsEnabled: false,
-    shouldShowChannelTab: false,
-  })),
-}));
+jest.mock('Util/useChannelsFeatureFlag', () => {
+  return {
+    useChannelsFeatureFlag: jest.fn(() => {
+      return {
+        canCreateChannels: false,
+        isChannelsEnabled: false,
+        isChannelsFeatureEnabled: false,
+        isChannelsHistorySharingEnabled: false,
+        isPublicChannelsEnabled: false,
+        shouldShowChannelTab: false,
+      };
+    }),
+  };
+});
 
 describe('TabAndFilterSettings', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -96,7 +100,9 @@ describe('TabAndFilterSettings', () => {
 
     fireEvent.click(getByTitle('tabsFilterTooltip'));
 
-    const tabLabels = getAllByRole('menuitemcheckbox').map(checkboxElement => checkboxElement.textContent);
+    const tabLabels = getAllByRole('menuitemcheckbox').map(checkboxElement => {
+      return checkboxElement.textContent;
+    });
 
     expect(tabLabels).toEqual([
       'conversationLabelFavorites',

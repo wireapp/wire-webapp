@@ -34,19 +34,21 @@ const meta: Meta<typeof Columns> = {
 export default meta;
 type Story = StoryObj<typeof Columns>;
 
-const Box = ({children}: {children: ReactNode}) => (
-  <div
-    style={{
-      backgroundColor: COLOR.GRAY_LIGHTEN_72,
-      border: `1px solid ${COLOR.GRAY_LIGHTEN_48}`,
-      borderRadius: '4px',
-      padding: '16px',
-      textAlign: 'center',
-    }}
-  >
-    {children}
-  </div>
-);
+const Box = ({children}: {children: ReactNode}) => {
+  return (
+    <div
+      style={{
+        backgroundColor: COLOR.GRAY_LIGHTEN_72,
+        border: `1px solid ${COLOR.GRAY_LIGHTEN_48}`,
+        borderRadius: '4px',
+        padding: '16px',
+        textAlign: 'center',
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 export const Default: Story = {
   args: {

@@ -98,8 +98,8 @@ function renderSearchHook({
   return {
     fireAndForgetInvoker,
     onClear,
-    ...renderHook(() =>
-      useConversationSearchFiles({
+    ...renderHook(() => {
+      return useConversationSearchFiles({
         cellsRepository: cellsRepository as unknown as CellsRepository,
         userRepository: userRepository as unknown as UserRepository,
         conversationQualifiedId: QUALIFIED_ID,
@@ -108,8 +108,8 @@ function renderSearchHook({
         filters,
         onClear,
         sort,
-      }),
-    ),
+      });
+    }),
   };
 }
 
@@ -121,7 +121,9 @@ describe('useConversationSearchFiles', () => {
 
   it('fires an initial fetch when enabled', async () => {
     const {fireAndForgetInvoker} = renderSearchHook();
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(useCellsStore.getState().status).toBe('success');
   });
@@ -129,7 +131,9 @@ describe('useConversationSearchFiles', () => {
   it('does not fetch when disabled', async () => {
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository, enabled: false});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).not.toHaveBeenCalled();
   });
@@ -138,7 +142,9 @@ describe('useConversationSearchFiles', () => {
     window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/MyFolder`;
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -155,8 +161,8 @@ describe('useConversationSearchFiles', () => {
     const cellsRepository = createFakeCellsRepository();
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
     const {rerender} = renderHook(
-      ({sort}: {sort: CellsSort | null}) =>
-        useConversationSearchFiles({
+      ({sort}: {sort: CellsSort | null}) => {
+        return useConversationSearchFiles({
           cellsRepository: cellsRepository as unknown as CellsRepository,
           userRepository: createFakeUserRepository() as unknown as UserRepository,
           conversationQualifiedId: QUALIFIED_ID,
@@ -165,15 +171,22 @@ describe('useConversationSearchFiles', () => {
           filters: emptyFilters,
           onClear: jest.fn(),
           sort,
-        }),
+        });
+      },
       {initialProps: {sort: null}},
     );
 
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
     const searchCallCountBeforeSorting = cellsRepository.searchNodes.mock.calls.length;
 
-    act(() => rerender({sort: {field: 'size', direction: 'asc'}}));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    act(() => {
+      return rerender({sort: {field: 'size', direction: 'asc'}});
+    });
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeSorting + 1);
     expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
@@ -191,7 +204,9 @@ describe('useConversationSearchFiles', () => {
     window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/recycle_bin`;
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -206,7 +221,9 @@ describe('useConversationSearchFiles', () => {
     window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/recycle_bin/folder`;
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(expect.objectContaining({deleted: true}));
   });
@@ -232,7 +249,9 @@ describe('useConversationSearchFiles', () => {
     act(() => {
       search.resolve({Nodes: []});
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
   });
 
   it('shows loading when reloading search results', async () => {
@@ -243,7 +262,9 @@ describe('useConversationSearchFiles', () => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     const {result} = renderSearchHook({cellsRepository, fireAndForgetInvoker});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     act(() => {
       useCellsStore.getState().setStatus('success');
@@ -258,7 +279,9 @@ describe('useConversationSearchFiles', () => {
     act(() => {
       reloadSearch.resolve({Nodes: []});
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
   });
 
   it('does not write to the store when disabled mid-flight', async () => {
@@ -267,8 +290,8 @@ describe('useConversationSearchFiles', () => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     const {rerender} = renderHook(
-      ({enabled}: {enabled: boolean}) =>
-        useConversationSearchFiles({
+      ({enabled}: {enabled: boolean}) => {
+        return useConversationSearchFiles({
           cellsRepository: cellsRepository as unknown as CellsRepository,
           userRepository: createFakeUserRepository() as unknown as UserRepository,
           conversationQualifiedId: QUALIFIED_ID,
@@ -277,16 +300,21 @@ describe('useConversationSearchFiles', () => {
           filters: emptyFilters,
           onClear: jest.fn(),
           sort: null,
-        }),
+        });
+      },
       {initialProps: {enabled: true}},
     );
 
-    act(() => rerender({enabled: false}));
+    act(() => {
+      return rerender({enabled: false});
+    });
 
     act(() => {
       search.resolve({Nodes: [{Path: `${CONV_ID}@${DOMAIN}/stale-file.txt`, Type: 'LEAF', Uuid: 'uuid-1'}]});
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(0);
   });
@@ -297,12 +325,16 @@ describe('useConversationSearchFiles', () => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
     const {result} = renderSearchHook({cellsRepository, fireAndForgetInvoker});
 
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
-    act(() => result.current.handleSearch('doc'));
+    act(() => {
+      return result.current.handleSearch('doc');
+    });
 
-    await waitFor(() =>
-      expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
+    await waitFor(() => {
+      return expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
         expect.objectContaining({
           query: 'doc',
           recursive: true,
@@ -310,8 +342,8 @@ describe('useConversationSearchFiles', () => {
           sortBy: 'mtime',
           sortDirection: 'desc',
         }),
-      ),
-    );
+      );
+    });
   });
 
   it('searches recursively when an active filter is applied without a text query', async () => {
@@ -327,7 +359,9 @@ describe('useConversationSearchFiles', () => {
       },
     });
 
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -347,20 +381,24 @@ describe('useConversationSearchFiles', () => {
       sort: {field: 'name', direction: 'asc'},
     });
 
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
-    act(() => result.current.handleSearch('doc'));
+    act(() => {
+      return result.current.handleSearch('doc');
+    });
 
-    await waitFor(() =>
-      expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
+    await waitFor(() => {
+      return expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
         expect.objectContaining({
           query: 'doc',
           recursive: true,
           sortBy: 'name',
           sortDirection: 'asc',
         }),
-      ),
-    );
+      );
+    });
   });
 
   it('reloads the unfiltered search list when all filters are cleared with no query', async () => {
@@ -370,8 +408,8 @@ describe('useConversationSearchFiles', () => {
     });
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
     const {rerender} = renderHook(
-      ({filters}: {filters: ConversationDriveFiltersState}) =>
-        useConversationSearchFiles({
+      ({filters}: {filters: ConversationDriveFiltersState}) => {
+        return useConversationSearchFiles({
           cellsRepository: cellsRepository as unknown as CellsRepository,
           userRepository: createFakeUserRepository() as unknown as UserRepository,
           conversationQualifiedId: QUALIFIED_ID,
@@ -380,7 +418,8 @@ describe('useConversationSearchFiles', () => {
           filters,
           onClear,
           sort: null,
-        }),
+        });
+      },
       {
         initialProps: {
           filters: {
@@ -391,12 +430,18 @@ describe('useConversationSearchFiles', () => {
       },
     );
 
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     const searchCallCountBeforeClearingFilters = cellsRepository.searchNodes.mock.calls.length;
 
-    act(() => rerender({filters: emptyFilters}));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    act(() => {
+      return rerender({filters: emptyFilters});
+    });
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeClearingFilters + 1);
     expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
@@ -413,15 +458,25 @@ describe('useConversationSearchFiles', () => {
       Nodes: [createRestNode('all-files.pdf')],
     });
     const {result, fireAndForgetInvoker} = renderSearchHook({cellsRepository, onClear});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
-    act(() => result.current.handleSearch('test'));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    act(() => {
+      return result.current.handleSearch('test');
+    });
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     const searchCallCountBeforeClearingInput = cellsRepository.searchNodes.mock.calls.length;
 
-    act(() => result.current.handleSearch(''));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    act(() => {
+      return result.current.handleSearch('');
+    });
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeClearingInput + 1);
     expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
@@ -435,7 +490,9 @@ describe('useConversationSearchFiles', () => {
   it('clears search-owned rows before handing control back to browse mode', async () => {
     const onClear = jest.fn();
     const {result, fireAndForgetInvoker} = renderSearchHook({onClear});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     act(() => {
       useCellsStore.getState().setNodes({
@@ -445,7 +502,9 @@ describe('useConversationSearchFiles', () => {
       useCellsStore.getState().setStatus('success');
     });
 
-    act(() => result.current.handleClearSearch({preserveFilters: false}));
+    act(() => {
+      return result.current.handleClearSearch({preserveFilters: false});
+    });
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toEqual([]);
     expect(useCellsStore.getState().getPagination({conversationId: CONV_ID})).toBeNull();
@@ -463,19 +522,27 @@ describe('useConversationSearchFiles', () => {
     });
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
     const {result} = renderSearchHook({cellsRepository, fireAndForgetInvoker});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
-    act(() => result.current.handleSearch('stale'));
-    await waitFor(() =>
-      expect(cellsRepository.searchNodes).toHaveBeenCalledWith(expect.objectContaining({query: 'stale'})),
-    );
+    act(() => {
+      return result.current.handleSearch('stale');
+    });
+    await waitFor(() => {
+      return expect(cellsRepository.searchNodes).toHaveBeenCalledWith(expect.objectContaining({query: 'stale'}));
+    });
 
-    act(() => result.current.handleSearch(''));
+    act(() => {
+      return result.current.handleSearch('');
+    });
 
     act(() => {
       staleSearch.resolve({Nodes: [createRestNode('stale-file.txt')]});
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toEqual([]);
   });

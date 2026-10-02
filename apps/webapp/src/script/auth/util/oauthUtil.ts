@@ -43,12 +43,17 @@ export const getOAuthQueryString = (location: Location) => {
  * @param oauthBody oauth body object
  * @returns Scope[]
  */
-export const oAuthScope = (oauthBody: OAuthBody) =>
-  oauthBody.scope.split(/\+|%20|\s/).filter(scope => Object.values(Scope).includes(scope as Scope)) as Scope[];
+export const oAuthScope = (oauthBody: OAuthBody) => {
+  return oauthBody.scope.split(/\+|%20|\s/).filter(scope => {
+    return Object.values(Scope).includes(scope as Scope);
+  }) as Scope[];
+};
 
 /**
  * Takes the oauth Scopes and returns the scopes as a string accepted by the API.
  * @param Scopes Scopes accepted by the app
  * @returns string
  */
-export const oAuthScopesToString = (scopes: Scope[]) => scopes.join(' ');
+export const oAuthScopesToString = (scopes: Scope[]) => {
+  return scopes.join(' ');
+};

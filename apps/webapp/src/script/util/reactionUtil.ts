@@ -37,7 +37,9 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
   }
   return Object.entries(userReactions).reduce<ReactionMap>((acc, [userId, reactions]) => {
     reactions.split(',').forEach(reaction => {
-      const existingReaction = acc.find(([r]) => r === reaction);
+      const existingReaction = acc.find(([r]) => {
+        return r === reaction;
+      });
       const qualifiedId = {id: userId, domain: ''};
       if (existingReaction) {
         existingReaction[1].push(qualifiedId);
@@ -54,18 +56,29 @@ export function addReaction(reactions: ReactionMap, reactionsStr: string, userId
 
   // First step is to remove all of this user's reactions
   const filteredReactions = reactions.map<ReactionMap[0]>(([reaction, users]) => {
-    return [reaction, users.filter(user => !matchQualifiedIds(user, userId))];
+    return [
+      reaction,
+      users.filter(user => {
+        return !matchQualifiedIds(user, userId);
+      }),
+    ];
   });
 
   userReactions
-    .filter(([reaction]) => !!reaction)
+    .filter(([reaction]) => {
+      return !!reaction;
+    })
     .forEach(reaction => {
-      const existingEntry = filteredReactions.find(([r]) => r === reaction);
+      const existingEntry = filteredReactions.find(([r]) => {
+        return r === reaction;
+      });
       if (existingEntry) {
         existingEntry[1].push(userId);
       } else {
         filteredReactions.push([reaction, [userId]]);
       }
     });
-  return filteredReactions.filter(([, users]) => users.length > 0);
+  return filteredReactions.filter(([, users]) => {
+    return users.length > 0;
+  });
 }

@@ -103,25 +103,27 @@ const createJoinTestMocks = ({
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
   meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation})),
-}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'meetNowMeeting'>> = {}) =>
-  createStore<MeetingStoreState>(() => ({
-    meetingSeries: [],
-    isLoading: false,
-    hasLoadError: false,
-    loadMeetings,
-    scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    meetNowMeeting,
-    updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
-    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
-    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
-    removeMeetingByQualifiedId: jest.fn(),
-    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
-  }));
+}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'meetNowMeeting'>> = {}) => {
+  return createStore<MeetingStoreState>(() => {
+    return {
+      meetingSeries: [],
+      isLoading: false,
+      hasLoadError: false,
+      loadMeetings,
+      scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+      meetNowMeeting,
+      updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+      loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+      deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+      deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+      removeMeetingByQualifiedId: jest.fn(),
+      syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
+    };
+  });
+};
 
-const createWrapper =
-  (store: ReturnType<typeof createMeetingStore>, mainViewModel: MainViewModel) =>
-  ({children}: {children: ReactNode}) => {
+const createWrapper = (store: ReturnType<typeof createMeetingStore>, mainViewModel: MainViewModel) => {
+  return ({children}: {children: ReactNode}) => {
     const RootProviderWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
@@ -135,6 +137,7 @@ const createWrapper =
       </RootProviderWrapper>
     );
   };
+};
 
 describe('useMeetNowSubmit', () => {
   beforeEach(() => {
@@ -161,9 +164,14 @@ describe('useMeetNowSubmit', () => {
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
     const {startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
     await act(async () => {
@@ -183,9 +191,14 @@ describe('useMeetNowSubmit', () => {
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
     const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     let submitResult: MeetNowSubmitResult = meetNowSubmitResults.joined;
     await act(async () => {
@@ -204,9 +217,14 @@ describe('useMeetNowSubmit', () => {
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
     const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
     await act(async () => {
@@ -225,9 +243,14 @@ describe('useMeetNowSubmit', () => {
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
     const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
     await act(async () => {

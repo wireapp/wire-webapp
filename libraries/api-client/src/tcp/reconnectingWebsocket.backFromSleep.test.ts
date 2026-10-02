@@ -303,7 +303,9 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     });
     websocket.connect();
 
-    expect(() => getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails)).not.toThrow();
+    expect(() => {
+      return getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails);
+    }).not.toThrow();
 
     expect(oldSocket.close).toHaveBeenCalledTimes(1);
     expect(oldSocket.reconnect).not.toHaveBeenCalled();
@@ -355,7 +357,9 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
       websocketFactory: Maybe.nothing(),
     });
 
-    expect(() => getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails)).not.toThrow();
+    expect(() => {
+      return getLatestBackFromSleepRegistration(registrations).callback(backFromSleepDetails);
+    }).not.toThrow();
   });
 
   it('restarts the sleep handler after disconnect and does not register duplicates while active', () => {

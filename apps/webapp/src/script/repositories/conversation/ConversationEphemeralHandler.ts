@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {ConversationMessageTimerUpdateEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 
@@ -92,7 +93,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       const shouldSetInterval = messageEntities.length !== 0 && updateIntervalId === null;
       if (shouldSetInterval) {
         const INTERVAL_TIME = ConversationEphemeralHandler.CONFIG.INTERVAL_TIME;
-        updateIntervalId = window.setInterval(() => this._updateTimedMessages(), INTERVAL_TIME);
+        updateIntervalId = window.setInterval(() => {
+          return this._updateTimedMessages();
+        }, INTERVAL_TIME);
         this.logger.info('Started ephemeral message check interval');
       }
     });
@@ -143,7 +146,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       return messageEntity;
     }
 
-    const isExpired = !!(await this._updateTimedMessage(messageEntity));
+    const isExpired = !isUndefined(await this._updateTimedMessage(messageEntity));
     if (!isExpired) {
       const {id, conversation_id: conversationId} = messageEntity;
       const matchingMessageEntity = this.timedMessages().find(timedMessageEntity => {
@@ -151,7 +154,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         return timedMessageId === id && timedConversationId === conversationId;
       });
 
-      if (matchingMessageEntity) {
+      if (!isUndefined(matchingMessageEntity)) {
         this.timedMessages.replace(matchingMessageEntity, messageEntity);
       } else {
         this.timedMessages.push(messageEntity);
@@ -163,9 +166,13 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
   async validateMessages(messageEntities: ContentMessage[]): Promise<Message[]> {
     const validatedMessages = await Promise.all(
-      messageEntities.map(messageEntity => this.validateMessage(messageEntity)),
+      messageEntities.map(messageEntity => {
+        return this.validateMessage(messageEntity);
+      }),
     );
-    return validatedMessages.filter(messageEntity => !!messageEntity) as Message[];
+    return validatedMessages.filter(messageEntity => {
+      return !isUndefined(messageEntity);
+    }) as Message[];
   }
 
   private _obfuscateAssetMessage(messageEntity: ContentMessage): void {
@@ -301,9 +308,13 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
   async _updateTimedMessages(): Promise<void> {
     const updatedMessages = await Promise.all(
-      this.timedMessages().map(messageEntity => this._updateTimedMessage(messageEntity)),
+      this.timedMessages().map(messageEntity => {
+        return this._updateTimedMessage(messageEntity);
+      }),
     );
-    const expiredMessages = updatedMessages.filter(messageEntity => !!messageEntity) as ContentMessage[];
+    const expiredMessages = updatedMessages.filter(messageEntity => {
+      return !isUndefined(messageEntity);
+    }) as ContentMessage[];
 
     if (expiredMessages.length !== 0) {
       this.timedMessages.remove(messageEntity => {

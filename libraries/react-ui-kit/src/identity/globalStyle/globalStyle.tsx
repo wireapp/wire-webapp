@@ -23,49 +23,53 @@ import emotionNormalize from 'emotion-normalize';
 import {GlobalCssVariables} from '../globalCssVariables';
 import {Theme} from '../theme';
 
-const getGlobalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
-  '*': {
-    boxSizing: 'border-box',
-  },
-  'b, strong': {
-    fontWeight: 600,
-  },
-  body: {
-    ...GlobalCssVariables.accentColors(),
-    ...GlobalCssVariables.zIndexes(),
-    MozOsxFontSmoothing: 'grayscale',
-    WebkitFontSmoothing: 'antialiased',
-    background: theme.general.backgroundColor,
-    color: theme.general.color,
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh',
-    transition: 'background 0.15s',
-  },
-  'body, body.theme-default': {
-    ...GlobalCssVariables.light(),
-  },
-  'body.theme-dark': {
-    ...GlobalCssVariables.dark(),
-  },
-  html: {
-    background: theme.general.backgroundColor,
-    transition: 'background 0.15s',
-    fontSize: '16px',
-  },
-  p: {
-    marginTop: 0,
-  },
-});
+const getGlobalStyles: (theme: Theme) => CSSObject = (theme: Theme) => {
+  return {
+    '*': {
+      boxSizing: 'border-box',
+    },
+    'b, strong': {
+      fontWeight: 600,
+    },
+    body: {
+      ...GlobalCssVariables.accentColors(),
+      ...GlobalCssVariables.zIndexes(),
+      MozOsxFontSmoothing: 'grayscale',
+      WebkitFontSmoothing: 'antialiased',
+      background: theme.general.backgroundColor,
+      color: theme.general.color,
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: '100vh',
+      transition: 'background 0.15s',
+    },
+    'body, body.theme-default': {
+      ...GlobalCssVariables.light(),
+    },
+    'body.theme-dark': {
+      ...GlobalCssVariables.dark(),
+    },
+    html: {
+      background: theme.general.backgroundColor,
+      transition: 'background 0.15s',
+      fontSize: '16px',
+    },
+    p: {
+      marginTop: 0,
+    },
+  };
+};
 
-const getGlobalFontStyle = (): CSSObject => ({
-  body: {
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";',
-    fontWeight: 400,
-    lineHeight: 1.5,
-  },
-});
+const getGlobalFontStyle = (): CSSObject => {
+  return {
+    body: {
+      fontFamily:
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";',
+      fontWeight: 400,
+      lineHeight: 1.5,
+    },
+  };
+};
 
 export const GlobalStyle = withTheme(({theme}: {theme: Theme}) => {
   return (

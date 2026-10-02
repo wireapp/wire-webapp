@@ -19,11 +19,13 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const RecordIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <g fill="#FB0807" fillRule="evenodd">
-      <circle fillOpacity=".24" cx="8" cy="8" r="8" />
-      <circle cx="8" cy="8" r="4" />
-    </g>
-  </SVGIcon>
-);
+export const RecordIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <g fill="#FB0807" fillRule="evenodd">
+        <circle fillOpacity=".24" cx="8" cy="8" r="8" />
+        <circle cx="8" cy="8" r="4" />
+      </g>
+    </SVGIcon>
+  );
+};

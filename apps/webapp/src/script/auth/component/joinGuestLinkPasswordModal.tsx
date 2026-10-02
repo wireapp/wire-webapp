@@ -72,7 +72,9 @@ const JoinGuestLinkPasswordModal = ({
         <Form
           name="guest-password-join-form"
           data-uie-name="guest-password-join-form"
-          onSubmit={(event: FormEvent<HTMLFormElement>) => onSubmit(event)}
+          onSubmit={(event: FormEvent<HTMLFormElement>) => {
+            onSubmit(event);
+          }}
           autoComplete="off"
         >
           <Input
@@ -89,7 +91,9 @@ const JoinGuestLinkPasswordModal = ({
             hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
             autoComplete="off"
             value={passwordValue}
-            onChange={event => setPasswordValue(event.currentTarget.value)}
+            onChange={event => {
+              setPasswordValue(event.currentTarget.value);
+            }}
           />
         </Form>
         <Link href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">
@@ -102,7 +106,9 @@ const JoinGuestLinkPasswordModal = ({
           block
           type="button"
           disabled={!isNonEmptyString(passwordValue)}
-          onClick={(event: FormEvent<HTMLButtonElement>) => onSubmit(event)}
+          onClick={(event: FormEvent<HTMLButtonElement>) => {
+            onSubmit(event);
+          }}
           data-uie-name="guest-link-join-submit-button"
         >
           {translate('guestLinkPasswordModal.joinConversation')}

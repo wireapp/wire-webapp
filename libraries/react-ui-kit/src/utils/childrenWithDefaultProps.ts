@@ -24,8 +24,10 @@ export interface ChildrenProps<T extends Element, P extends React.HTMLProps<T>> 
   defaultProps: P;
 }
 
-export const childrenWithDefaultProps = <E extends Element, P extends React.HTMLProps<E>>(props: ChildrenProps<E, P>) =>
-  React.Children.map<React.ReactNode, React.ReactNode>(props.children, node => {
+export const childrenWithDefaultProps = <E extends Element, P extends React.HTMLProps<E>>(
+  props: ChildrenProps<E, P>,
+) => {
+  return React.Children.map<React.ReactNode, React.ReactNode>(props.children, node => {
     if (typeof node === 'string') {
       return node;
     }
@@ -37,3 +39,4 @@ export const childrenWithDefaultProps = <E extends Element, P extends React.HTML
     const elementChild: React.ReactElement<P> = node;
     return React.cloneElement<P>(elementChild, {...(props.defaultProps as any), ...(elementChild.props as any)});
   });
+};

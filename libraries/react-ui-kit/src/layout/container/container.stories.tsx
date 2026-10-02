@@ -33,19 +33,21 @@ const meta: Meta<typeof Container> = {
 export default meta;
 type Story = StoryObj<typeof Container>;
 
-const DemoContent = ({children}: {children: ReactNode}) => (
-  <div
-    style={{
-      backgroundColor: COLOR.GRAY_LIGHTEN_72,
-      border: `1px solid ${COLOR.GRAY_LIGHTEN_48}`,
-      borderRadius: '4px',
-      padding: '16px',
-      textAlign: 'center',
-    }}
-  >
-    {children}
-  </div>
-);
+const DemoContent = ({children}: {children: ReactNode}) => {
+  return (
+    <div
+      style={{
+        backgroundColor: COLOR.GRAY_LIGHTEN_72,
+        border: `1px solid ${COLOR.GRAY_LIGHTEN_48}`,
+        borderRadius: '4px',
+        padding: '16px',
+        textAlign: 'center',
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 export const Default: Story = {
   args: {
@@ -68,22 +70,24 @@ export const VerticalCentered: Story = {
   },
 };
 
-export const Sizes = () => (
-  <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-    <ContainerXXS>
-      <DemoContent>XXS Container</DemoContent>
-    </ContainerXXS>
-    <ContainerXS>
-      <DemoContent>XS Container</DemoContent>
-    </ContainerXS>
-    <ContainerSM>
-      <DemoContent>SM Container</DemoContent>
-    </ContainerSM>
-    <ContainerMD>
-      <DemoContent>MD Container</DemoContent>
-    </ContainerMD>
-    <ContainerLG>
-      <DemoContent>LG Container</DemoContent>
-    </ContainerLG>
-  </div>
-);
+export const Sizes = () => {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+      <ContainerXXS>
+        <DemoContent>XXS Container</DemoContent>
+      </ContainerXXS>
+      <ContainerXS>
+        <DemoContent>XS Container</DemoContent>
+      </ContainerXS>
+      <ContainerSM>
+        <DemoContent>SM Container</DemoContent>
+      </ContainerSM>
+      <ContainerMD>
+        <DemoContent>MD Container</DemoContent>
+      </ContainerMD>
+      <ContainerLG>
+        <DemoContent>LG Container</DemoContent>
+      </ContainerLG>
+    </div>
+  );
+};

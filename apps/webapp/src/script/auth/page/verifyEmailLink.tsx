@@ -75,9 +75,11 @@ const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  hasSelfEmail: SelfSelector.hasSelfEmail(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    hasSelfEmail: SelfSelector.hasSelfEmail(state),
+  };
+};
 
 const VerifyEmailLink = connect(mapStateToProps)(VerifyEmailLinkComponent);
 

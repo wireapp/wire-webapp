@@ -29,7 +29,11 @@ describe('useTheme', () => {
     ['dark', 'theme-dark'],
     ['default', 'theme-default'],
   ] as const)('should set the initial theme to the body classes', (theme, bodyclass) => {
-    renderHook(() => useTheme(() => theme));
+    renderHook(() => {
+      return useTheme(() => {
+        return theme;
+      });
+    });
 
     expect(document.body.className).toContain(bodyclass);
   });
@@ -37,7 +41,11 @@ describe('useTheme', () => {
   it('live updates as theme changes', () => {
     let theme: Theme = 'default';
 
-    renderHook(() => useTheme(() => theme));
+    renderHook(() => {
+      return useTheme(() => {
+        return theme;
+      });
+    });
 
     expect(document.body.className).toContain('theme-default');
 

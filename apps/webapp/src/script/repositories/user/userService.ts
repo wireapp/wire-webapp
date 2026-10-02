@@ -79,7 +79,9 @@ export class UserService {
    */
   async clearNonQualifiedUsers(): Promise<UserRecord[]> {
     const keys = await this.storageService.readAllPrimaryKeys(this.USER_STORE_NAME);
-    const nonQualifiedKeys = keys.filter(key => !key.includes('@'));
+    const nonQualifiedKeys = keys.filter(key => {
+      return !key.includes('@');
+    });
     const deletedEntries = [];
     for (const key of nonQualifiedKeys) {
       const entry = await this.storageService.load<UserRecord>(this.USER_STORE_NAME, key);

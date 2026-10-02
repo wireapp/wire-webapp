@@ -56,7 +56,9 @@ export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploa
         aria-label={translate('tooltipConversationFile')}
         title={translate('tooltipConversationFile')}
         className="input-bar-control file-button"
-        onClick={() => fileRef.current?.click()}
+        onClick={() => {
+          return fileRef.current?.click();
+        }}
         data-uie-name="do-share-file"
       >
         <Icon.AttachmentIcon />

@@ -17,6 +17,7 @@
  *
  */
 
+import {isEmptyObject, isFunction, isObject, isUndefined} from '@sindresorhus/is';
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -279,17 +280,21 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
           recoveryKey,
           trigger,
         });
-        await this.runOnceWithKey(recoveryKey, () =>
-          this.deps.recoverFromEpochMismatch(id, context.subconvId, trigger),
-        );
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.recoverFromEpochMismatch(id, context.subconvId, trigger);
+        });
         break;
       }
       case 'JoinViaExternalCommit': {
-        await this.runOnceWithKey(recoveryKey, () => this.deps.joinViaExternalCommit(id));
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.joinViaExternalCommit(id);
+        });
         break;
       }
       case 'ResetAndReestablish': {
-        await this.runOnceWithKey(recoveryKey, () => this.deps.resetAndReestablish(id));
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.resetAndReestablish(id);
+        });
         break;
       }
       case 'AddMissingUsers': {
@@ -301,7 +306,9 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
         if (groupId === undefined || groupId.length === 0) {
           throw new Error('Missing groupId for AddMissingUsers');
         }
-        await this.runOnceWithKey(recoveryKey, () => this.deps.addMissingUsers(id, groupId, missing));
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.addMissingUsers(id, groupId, missing);
+        });
         break;
       }
       case 'WipeAndReprocessWelcome': {
@@ -311,7 +318,9 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
           this.logger.warn('Could not determine groupId for WipeAndReprocessWelcome; skipping wipe');
           break;
         }
-        await this.runOnceWithKey(recoveryKey, () => this.deps.wipeMLSConversation(groupId));
+        await this.runOnceWithKey(recoveryKey, () => {
+          return this.deps.wipeMLSConversation(groupId);
+        });
         break;
       }
       default:
@@ -345,7 +354,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     try {
       await task();
     } catch (error: unknown) {
-      this.logger.warn(`Recovery failed for key ${key}`, {error});
+      this.logger.warn(`Recovery failed for key ${key}`, {error: extractErrorDetails(error)});
       throw error;
     } finally {
       this.logger.info(`Completed recovery for key ${key}`);
@@ -362,12 +371,31 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => {
+      return setTimeout(resolve, ms);
+    });
   }
 }
 
+function extractErrorDetails(error: unknown): unknown {
+  if (!isObject(error) || isFunction(error)) {
+    return '(not an object)';
+  }
+
+  const {status, response} = error as Record<string, unknown>;
+  const details: Record<string, unknown> = {};
+
+  if (!isUndefined(status)) {
+    details.status = status;
+  }
+  if (isObject(response) && !isFunction(response)) {
+    details.response = {data: (response as Record<string, unknown>).data};
+  }
+
+  return isEmptyObject(details) ? '(no meaningful data)' : details;
+}
+
 /**
- * Minimal default policies used by the initial integration. These can be extended over time.
  *
  * Highlights:
  * - WrongEpoch: reconcile and retry for typed ops; do not re-run for join.

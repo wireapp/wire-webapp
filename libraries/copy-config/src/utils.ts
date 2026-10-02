@@ -36,9 +36,11 @@ export async function copyAsync(source: string, destination: string): Promise<Fi
     await ensureDir(destination);
   }
 
-  return new Promise((resolve, reject) =>
-    copy(source, destination, (error, files = []) => (Boolean(error) ? reject(error) : resolve(files))),
-  );
+  return new Promise((resolve, reject) => {
+    return copy(source, destination, (error, files = []) => {
+      return Boolean(error) ? reject(error) : resolve(files);
+    });
+  });
 }
 
 export async function downloadFileAsync(url: string, baseDir: string): Promise<void> {
@@ -71,7 +73,9 @@ export async function extractAsync(zipFile: string, destination: string): Promis
   const entries: [string, JSZip.JSZipObject][] = [];
 
   await jszip.loadAsync(data, {createFolders: true});
-  jszip.forEach((filePath, entry) => entries.push([filePath, entry]));
+  jszip.forEach((filePath, entry) => {
+    entries.push([filePath, entry]);
+  });
   const firstEntry = entries[0];
   if (isUndefined(firstEntry)) {
     throw new Error('The archive contains no entries');
@@ -91,6 +95,8 @@ export async function extractAsync(zipFile: string, destination: string): Promis
   );
 }
 
-export const isFile = (path: string) => /\w\.\w+$/.test(path);
+export const isFile = (path: string) => {
+  return /\w\.\w+$/.test(path);
+};
 export const rimrafAsync = rimraf;
 export const execAsync = promisify(exec);

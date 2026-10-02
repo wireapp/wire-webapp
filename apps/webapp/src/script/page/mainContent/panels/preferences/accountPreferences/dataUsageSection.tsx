@@ -57,7 +57,9 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
       setOptionMarketingSharing(settings.privacy.marketing_consent);
     };
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
-    return () => amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+    return () => {
+      return amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+    };
   }, []);
 
   const {isTelemetryEnabledAtCurrentEnvironment} = propertiesRepository.getUserConsentStatus();

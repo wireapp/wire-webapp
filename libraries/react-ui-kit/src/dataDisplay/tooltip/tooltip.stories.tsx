@@ -31,11 +31,13 @@ const meta = {
     layout: 'centered',
   },
   decorators: [
-    Story => (
-      <div id="wire-app" style={{position: 'relative', minHeight: '200px', padding: '24px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div id="wire-app" style={{position: 'relative', minHeight: '200px', padding: '24px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   tags: ['autodocs'],
 } satisfies Meta<typeof Tooltip>;

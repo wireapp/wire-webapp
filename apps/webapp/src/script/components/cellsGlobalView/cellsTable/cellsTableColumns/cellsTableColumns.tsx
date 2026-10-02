@@ -36,16 +36,18 @@ import {CellsTableTagsColumn} from './cellsTableTagsColumn/cellsTableTagsColumn'
 
 const columnHelper = createColumnHelper<CellNode>();
 
-const getCellsTableColumnLabels = (translate: RootContextValue['translate']) => ({
-  actions: translate('cells.tableRow.actions'),
-  conversationName: translate('cells.tableRow.conversationName'),
-  created: translate('cells.tableRow.modified'),
-  name: translate('cells.tableRow.name'),
-  owner: translate('cells.tableRow.owner'),
-  publicLink: translate('cells.tableRow.publicLink'),
-  size: translate('cells.tableRow.size'),
-  tags: translate('cells.tableRow.tags'),
-});
+const getCellsTableColumnLabels = (translate: RootContextValue['translate']) => {
+  return {
+    actions: translate('cells.tableRow.actions'),
+    conversationName: translate('cells.tableRow.conversationName'),
+    created: translate('cells.tableRow.modified'),
+    name: translate('cells.tableRow.name'),
+    owner: translate('cells.tableRow.owner'),
+    publicLink: translate('cells.tableRow.publicLink'),
+    size: translate('cells.tableRow.size'),
+    tags: translate('cells.tableRow.tags'),
+  };
+};
 
 export const getCellsTableDataCellLabels = (
   translate: RootContextValue['translate'],
@@ -81,66 +83,96 @@ export const getCellsTableColumns = ({
   return [
     columnHelper.accessor('name', {
       header: isSortingEnabled
-        ? () => (
-            <CellsTableSortableHeader
-              label={labels.name}
-              direction={getDirectionFor('name')}
-              onClick={() => onToggleSort('name')}
-            />
-          )
+        ? () => {
+            return (
+              <CellsTableSortableHeader
+                label={labels.name}
+                direction={getDirectionFor('name')}
+                onClick={() => {
+                  return onToggleSort('name');
+                }}
+              />
+            );
+          }
         : labels.name,
-      cell: info => <CellsTableNameColumn node={info.row.original} />,
+      cell: info => {
+        return <CellsTableNameColumn node={info.row.original} />;
+      },
     }),
     columnHelper.accessor('conversationName', {
       header: labels.conversationName,
-      cell: info => <CellsConversationColumn conversation={info.row.original.conversation} name={info.getValue()} />,
+      cell: info => {
+        return <CellsConversationColumn conversation={info.row.original.conversation} name={info.getValue()} />;
+      },
       size: 190,
     }),
     columnHelper.accessor('owner', {
       header: labels.owner,
-      cell: info => <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />,
+      cell: info => {
+        return <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />;
+      },
       size: 175,
     }),
     columnHelper.accessor('tags', {
       header: labels.tags,
-      cell: info => <CellsTableTagsColumn tags={info.getValue()} />,
+      cell: info => {
+        return <CellsTableTagsColumn tags={info.getValue()} />;
+      },
       size: 120,
     }),
     columnHelper.accessor('sizeMb', {
       header: isSortingEnabled
-        ? () => (
-            <CellsTableSortableHeader
-              label={labels.size}
-              direction={getDirectionFor('size')}
-              onClick={() => onToggleSort('size')}
-            />
-          )
+        ? () => {
+            return (
+              <CellsTableSortableHeader
+                label={labels.size}
+                direction={getDirectionFor('size')}
+                onClick={() => {
+                  return onToggleSort('size');
+                }}
+              />
+            );
+          }
         : labels.size,
-      cell: info => info.getValue(),
+      cell: info => {
+        return info.getValue();
+      },
       size: 100,
     }),
     columnHelper.accessor('uploadedAtTimestamp', {
       header: isSortingEnabled
-        ? () => (
-            <CellsTableSortableHeader
-              label={labels.created}
-              direction={getDirectionFor('mtime')}
-              onClick={() => onToggleSort('mtime')}
-            />
-          )
+        ? () => {
+            return (
+              <CellsTableSortableHeader
+                label={labels.created}
+                direction={getDirectionFor('mtime')}
+                onClick={() => {
+                  return onToggleSort('mtime');
+                }}
+              />
+            );
+          }
         : labels.created,
-      cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
+      cell: info => {
+        return <CellsTableDateColumn timestamp={info.getValue()} />;
+      },
       size: 125,
     }),
     columnHelper.accessor('publicLink', {
       header: labels.publicLink,
-      cell: info => <CellsTableSharedColumn isShared={info.getValue()?.alreadyShared === true} />,
+      cell: info => {
+        return <CellsTableSharedColumn isShared={info.getValue()?.alreadyShared === true} />;
+      },
       size: 60,
     }),
     columnHelper.accessor('id', {
-      header: () => <span className="visually-hidden">{labels.actions}</span>,
+      header: () => {
+        return <span className="visually-hidden">{labels.actions}</span>;
+      },
       size: 40,
-      cell: info => <CellsTableRowOptions node={info.row.original} cellsRepository={cellsRepository} />,
+      cell: info => {
+        return <CellsTableRowOptions node={info.row.original} cellsRepository={cellsRepository} />;
+      },
     }),
   ];
 };

@@ -26,11 +26,13 @@ interface CellsViewerAccessLabelProps {
   iconUieName?: string;
 }
 
-export const CellsViewerAccessLabel = ({label, iconUieName}: CellsViewerAccessLabelProps) => (
-  <div css={viewerAccessLabelStyles}>
-    <span data-uie-name={iconUieName} aria-hidden="true">
-      <ViewerAccessIcon width={16} height={16} />
-    </span>
-    {label}
-  </div>
-);
+export const CellsViewerAccessLabel = ({label, iconUieName}: CellsViewerAccessLabelProps) => {
+  return (
+    <div css={viewerAccessLabelStyles}>
+      <span data-uie-name={iconUieName} aria-hidden="true">
+        <ViewerAccessIcon width={16} height={16} />
+      </span>
+      {label}
+    </div>
+  );
+};

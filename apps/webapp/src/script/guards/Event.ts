@@ -17,4 +17,6 @@
  *
  */
 
-export const isKeyDownEvent = (event: Event): event is KeyboardEvent => event.type === 'keydown';
+export const isKeyDownEvent = (event: Event): event is KeyboardEvent => {
+  return event.type === 'keydown';
+};

@@ -30,16 +30,24 @@ const createUser = ({id, domain = 'example.com', name}: {id: string; domain?: st
   return user;
 };
 
-const createConversation = ({users, lastEventTimestamp}: {users: User[]; lastEventTimestamp: number}): Conversation =>
-  ({
-    allUserEntities: () => users,
-    last_event_timestamp: () => lastEventTimestamp,
-  }) as Conversation;
+const createConversation = ({users, lastEventTimestamp}: {users: User[]; lastEventTimestamp: number}): Conversation => {
+  return {
+    allUserEntities: () => {
+      return users;
+    },
+    last_event_timestamp: () => {
+      return lastEventTimestamp;
+    },
+  } as Conversation;
+};
 
-const createConversationRepository = (conversations: Conversation[]): ConversationRepository =>
-  ({
-    getAllCellEnabledGroupConversations: () => conversations,
-  }) as ConversationRepository;
+const createConversationRepository = (conversations: Conversation[]): ConversationRepository => {
+  return {
+    getAllCellEnabledGroupConversations: () => {
+      return conversations;
+    },
+  } as ConversationRepository;
+};
 
 describe('getDriveEnabledParticipants', () => {
   it('returns unique participants from all drive-enabled conversations sorted by recent conversations first', () => {

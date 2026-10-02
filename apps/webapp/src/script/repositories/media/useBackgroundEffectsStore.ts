@@ -64,65 +64,76 @@ export type BackgroundEffectsState = {
 };
 
 export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
-  immer<BackgroundEffectsState>(set => ({
-    isPerformancePanelEnabled: false,
-    preferredEffect: DEFAULT_BACKGROUND_EFFECT,
-    metrics: undefined,
-    model: 'unknown',
-    lastVirtualBackgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
-    qualityTier: 'privacy',
-    effectiveQualityTier: 'privacy',
+  immer<BackgroundEffectsState>(set => {
+    return {
+      isPerformancePanelEnabled: false,
+      preferredEffect: DEFAULT_BACKGROUND_EFFECT,
+      metrics: undefined,
+      model: 'unknown',
+      lastVirtualBackgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
+      qualityTier: 'privacy',
+      effectiveQualityTier: 'privacy',
 
-    setIsPerformancePanelEnabled: value =>
-      set(state => {
-        state.isPerformancePanelEnabled = value;
-      }),
+      setIsPerformancePanelEnabled: value => {
+        return set(state => {
+          state.isPerformancePanelEnabled = value;
+        });
+      },
 
-    setPreferredEffect: effect =>
-      set(state => {
-        state.preferredEffect = effect;
-      }),
-    setLastVirtualBackgroundId: backgroundId =>
-      set(state => {
-        state.lastVirtualBackgroundId = backgroundId;
-      }),
+      setPreferredEffect: effect => {
+        return set(state => {
+          state.preferredEffect = effect;
+        });
+      },
+      setLastVirtualBackgroundId: backgroundId => {
+        return set(state => {
+          state.lastVirtualBackgroundId = backgroundId;
+        });
+      },
 
-    setMetrics: metrics =>
-      set(state => {
-        state.metrics = metrics;
-      }),
+      setMetrics: metrics => {
+        return set(state => {
+          state.metrics = metrics;
+        });
+      },
 
-    setModel: model =>
-      set(state => {
-        switch (model) {
-          case SELFIE_SEGMENTER_MODEL_PATH:
-            state.model = 'selfie-segmenter';
-            break;
-          case SELFIE_MULTICLASS_MODEL_PATH:
-            state.model = 'selfie-multiclass';
-            break;
-          default:
-            state.model = 'unknown';
-        }
-      }),
+      setModel: model => {
+        return set(state => {
+          switch (model) {
+            case SELFIE_SEGMENTER_MODEL_PATH:
+              state.model = 'selfie-segmenter';
+              break;
+            case SELFIE_MULTICLASS_MODEL_PATH:
+              state.model = 'selfie-multiclass';
+              break;
+            default:
+              state.model = 'unknown';
+          }
+        });
+      },
 
-    setQualityTier: tier =>
-      set(state => {
-        state.qualityTier = tier;
-      }),
+      setQualityTier: tier => {
+        return set(state => {
+          state.qualityTier = tier;
+        });
+      },
 
-    setEffectiveQualityTier: tier =>
-      set(state => {
-        state.effectiveQualityTier = tier;
-      }),
+      setEffectiveQualityTier: tier => {
+        return set(state => {
+          state.effectiveQualityTier = tier;
+        });
+      },
 
-    isInitializing: false,
-    setIsInitializing: value =>
-      set(state => {
-        state.isInitializing = value;
-      }),
-  })),
+      isInitializing: false,
+      setIsInitializing: value => {
+        return set(state => {
+          state.isInitializing = value;
+        });
+      },
+    };
+  }),
 );
 
-export const useBackgroundEffectsStore = <T>(selector: (state: BackgroundEffectsState) => T): T =>
-  useStore(backgroundEffectsStore, selector);
+export const useBackgroundEffectsStore = <T>(selector: (state: BackgroundEffectsState) => T): T => {
+  return useStore(backgroundEffectsStore, selector);
+};

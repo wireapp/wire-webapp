@@ -232,7 +232,11 @@ describe('WebApp version synchronization GitHub client', () => {
 
     assert(actualResult.isOk);
     expect(actualResult.value).toHaveLength(201);
-    expect(actualResult.value.map(pullRequest => pullRequest.number)).toEqual(
+    expect(
+      actualResult.value.map(pullRequest => {
+        return pullRequest.number;
+      }),
+    ).toEqual(
       Array.from({length: 201}, (_, index) => {
         return index + 1;
       }),
@@ -267,8 +271,16 @@ describe('WebApp version synchronization GitHub client', () => {
     const actualResult = await githubClient.listPullRequests();
 
     assert(actualResult.isOk);
-    expect(actualResult.value.map(pullRequest => pullRequest.number)).toEqual([7, 42, 99]);
-    expect(fakeHttpClient.requests.map(request => request.url.pathname)).toEqual([
+    expect(
+      actualResult.value.map(pullRequest => {
+        return pullRequest.number;
+      }),
+    ).toEqual([7, 42, 99]);
+    expect(
+      fakeHttpClient.requests.map(request => {
+        return request.url.pathname;
+      }),
+    ).toEqual([
       '/search/issues',
       '/search/issues',
       '/repos/wireapp/wire-webapp/pulls/7',

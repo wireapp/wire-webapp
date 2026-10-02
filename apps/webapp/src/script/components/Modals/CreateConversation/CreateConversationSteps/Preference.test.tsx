@@ -53,8 +53,12 @@ describe('Preference', () => {
     ({isAppsEnabled, isMLSEnabled, defaultProtocol, expectedAppsEnabled}) => {
       // Arrange
       const mockTeamState: Partial<TeamState> = {
-        isMLSEnabled: ko.pureComputed(() => isMLSEnabled),
-        isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
+        isMLSEnabled: ko.pureComputed(() => {
+          return isMLSEnabled;
+        }),
+        isAppsEnabled: ko.pureComputed(() => {
+          return isAppsEnabled;
+        }),
         teamFeatures: ko.observable({
           mls: {
             config: {

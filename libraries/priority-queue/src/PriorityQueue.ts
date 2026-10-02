@@ -35,7 +35,9 @@ export class PriorityQueue {
     maxRetryDelay: Number.MAX_SAFE_INTEGER,
     retryDelay: 1000,
     retryGrowthFactor: 1.3,
-    shouldRetry: () => true,
+    shouldRetry: () => {
+      return true;
+    },
   };
 
   private isRunning: boolean = false;
@@ -71,7 +73,9 @@ export class PriorityQueue {
   }
 
   public delete(label: string): void {
-    this.queue = this.queue.filter(item => item.label !== label);
+    this.queue = this.queue.filter(item => {
+      return item.label !== label;
+    });
   }
 
   public deleteAll(): void {
@@ -118,7 +122,9 @@ export class PriorityQueue {
     } catch (error) {
       if (this.config.shouldRetry(error) && item.retry < this.config.maxRetries) {
         this.enqueue(item);
-        setTimeout(() => this.processList(), this.getGrowingDelay(item.retry));
+        setTimeout(() => {
+          return this.processList();
+        }, this.getGrowingDelay(item.retry));
         item.retry++;
       } else {
         item.reject(error);

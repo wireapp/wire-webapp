@@ -162,9 +162,9 @@ describe('ConnectionRepository', () => {
 
   describe('createConnection', () => {
     it('uses the injected translate function for modal copy', async () => {
-      const translate = jest.fn(
-        (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
-      ) as Translate;
+      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => {
+        return `translated:${translationKey}`;
+      }) as Translate;
       const [connectionRepository, {connectionService}] = buildConnectionRepository(translate);
       const user = generateUser();
       const primaryModalShow = jest.fn();

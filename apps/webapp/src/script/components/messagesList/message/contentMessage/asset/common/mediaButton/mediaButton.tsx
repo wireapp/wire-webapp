@@ -56,8 +56,12 @@ const MediaButton = ({
 }: MediaButtonProps) => {
   const {translate} = useApplicationContext();
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const onPlay = () => setIsPlaying(true);
-  const onPause = () => setIsPlaying(false);
+  const onPlay = () => {
+    return setIsPlaying(true);
+  };
+  const onPause = () => {
+    return setIsPlaying(false);
+  };
   const unwrappedAsset = useKoSubscribableChildren(asset, ['downloadProgress']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 

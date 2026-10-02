@@ -49,11 +49,15 @@ export const useHeadingState = () => {
       const isHeading = isHeadingNode(anchorNode);
 
       if (isHeading) {
-        $setBlocksType(selection, () => $createParagraphNode());
+        $setBlocksType(selection, () => {
+          return $createParagraphNode();
+        });
         return;
       }
 
-      $setBlocksType(selection, () => $createHeadingNode('h1'));
+      $setBlocksType(selection, () => {
+        return $createHeadingNode('h1');
+      });
     });
   };
 

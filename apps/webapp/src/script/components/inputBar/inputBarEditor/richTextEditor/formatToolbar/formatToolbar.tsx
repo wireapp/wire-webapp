@@ -84,21 +84,27 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
         label={translate('richTextFormatBold')}
         icon={BoldIcon}
         active={activeFormats.includes('bold')}
-        onClick={() => formatText('bold')}
+        onClick={() => {
+          return formatText('bold');
+        }}
         isEditing={isEditing}
       />
       <FormatButton
         label={translate('richTextFormatItalic')}
         icon={ItalicIcon}
         active={activeFormats.includes('italic')}
-        onClick={() => formatText('italic')}
+        onClick={() => {
+          return formatText('italic');
+        }}
         isEditing={isEditing}
       />
       <FormatButton
         label={translate('richTextFormatStrikethrough')}
         icon={StrikethroughIcon}
         active={activeFormats.includes('strikethrough')}
-        onClick={() => formatText('strikethrough')}
+        onClick={() => {
+          return formatText('strikethrough');
+        }}
         isEditing={isEditing}
       />
       <FormatSeparator isEditing={isEditing} />
@@ -106,14 +112,18 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
         label={translate('richTextFormatOrderedList')}
         icon={NumberedListIcon}
         active={activeFormats.includes('orderedList')}
-        onClick={() => formatList('ordered')}
+        onClick={() => {
+          return formatList('ordered');
+        }}
         isEditing={isEditing}
       />
       <FormatButton
         label={translate('richTextFormatUnorderedList')}
         icon={BulletListIcon}
         active={activeFormats.includes('unorderedList')}
-        onClick={() => formatList('unordered')}
+        onClick={() => {
+          return formatList('unordered');
+        }}
         isEditing={isEditing}
       />
       <FormatButton
@@ -142,7 +152,9 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
         label={translate('richTextFormatCodeInline')}
         icon={CodeInlineIcon}
         active={activeFormats.includes('code')}
-        onClick={() => formatText('code')}
+        onClick={() => {
+          return formatText('code');
+        }}
         isEditing={isEditing}
       />
       <LinkDialog

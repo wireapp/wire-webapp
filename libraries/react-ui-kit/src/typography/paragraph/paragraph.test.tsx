@@ -23,11 +23,19 @@ import {THEME_ID} from '../../identity';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"Paragraph"', () => {
-  it('renders', () => matchComponent(<Paragraph>Paragraph</Paragraph>));
-  it('renders (dark theme)', () => matchComponent(<Paragraph>Paragraph</Paragraph>, THEME_ID.DARK));
+  it('renders', () => {
+    return matchComponent(<Paragraph>Paragraph</Paragraph>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<Paragraph>Paragraph</Paragraph>, THEME_ID.DARK);
+  });
 });
 
 describe('"Lead"', () => {
-  it('renders', () => matchComponent(<Lead>Lead</Lead>));
-  it('renders (dark theme)', () => matchComponent(<Lead>Lead</Lead>, THEME_ID.DARK));
+  it('renders', () => {
+    return matchComponent(<Lead>Lead</Lead>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<Lead>Lead</Lead>, THEME_ID.DARK);
+  });
 });

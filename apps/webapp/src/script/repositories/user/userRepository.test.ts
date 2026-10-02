@@ -227,7 +227,9 @@ describe('UserRepository', () => {
       });
 
       it('uses the injected translate function for local-only deleted users', async () => {
-        const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+        const translate = jest.fn((translationKey: string) => {
+          return `translated:${translationKey}`;
+        });
         const [translatedRepository] = await buildUserRepository(translate);
 
         const deletedUser = await translatedRepository.getUserById({id: createUuid(), domain: ''}, {localOnly: true});
@@ -275,9 +277,21 @@ describe('UserRepository', () => {
 
         const users = await userRepository.getUsersByIdsFromDb([firstRequestedUserId, secondRequestedUserId]);
 
-        expect(users.map(user => user.qualifiedId)).toEqual([firstRequestedUserId, secondRequestedUserId]);
-        expect(users.map(user => user.name())).toEqual(['First Former Member', 'Second Former Member']);
-        expect(users.every(user => user.isFederated)).toBe(true);
+        expect(
+          users.map(user => {
+            return user.qualifiedId;
+          }),
+        ).toEqual([firstRequestedUserId, secondRequestedUserId]);
+        expect(
+          users.map(user => {
+            return user.name();
+          }),
+        ).toEqual(['First Former Member', 'Second Former Member']);
+        expect(
+          users.every(user => {
+            return user.isFederated;
+          }),
+        ).toBe(true);
       });
 
       it('returns a translated deleted user when the cached user is unavailable', async () => {
@@ -343,7 +357,11 @@ describe('UserRepository', () => {
         await userRepository.loadUsers(new User('self', '', translateForTest), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
-        expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => requireValueForTest(user.qualified_id)));
+        expect(fetchUserSpy).toHaveBeenCalledWith(
+          users.map(user => {
+            return requireValueForTest(user.qualified_id);
+          }),
+        );
       });
 
       it('assigns connections with users', async () => {
@@ -356,13 +374,17 @@ describe('UserRepository', () => {
 
         expect(userState.users()).toHaveLength(users.length + 1);
         users.forEach(user => {
-          const localUser = userState.users().find(u => matchQualifiedIds(u.qualifiedId, user.qualified_id));
+          const localUser = userState.users().find(u => {
+            return matchQualifiedIds(u.qualifiedId, user.qualified_id);
+          });
           expect(localUser?.connection()?.userId).toEqual(user.qualified_id);
         });
       });
 
       it('loads users that are partially stored in the DB and maps availability', async () => {
-        const userIds = localUsers.map(user => requireValueForTest(user.qualified_id));
+        const userIds = localUsers.map(user => {
+          return requireValueForTest(user.qualified_id);
+        });
         const connections = createConnections(localUsers);
         const partialUsers = [
           {
@@ -385,7 +407,9 @@ describe('UserRepository', () => {
         expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(userIds);
 
-        const userWithAvailability = userState.users().filter(user => user.availability() !== Availability.Type.NONE);
+        const userWithAvailability = userState.users().filter(user => {
+          return user.availability() !== Availability.Type.NONE;
+        });
         expect(userWithAvailability).toHaveLength(partialUsers.length);
       });
     });

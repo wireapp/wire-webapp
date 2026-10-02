@@ -156,7 +156,11 @@ test.describe('account settings', () => {
 
     const expectedLog = '@wireapp/webapp/avs'; // get one phone call
     await expect
-      .poll(async () => (await memberAPage.consoleMessages()).map(m => m.text()))
+      .poll(async () => {
+        return (await memberAPage.consoleMessages()).map(m => {
+          return m.text();
+        });
+      })
       .toEqual(expect.arrayContaining([expect.stringContaining(expectedLog)]));
   });
 

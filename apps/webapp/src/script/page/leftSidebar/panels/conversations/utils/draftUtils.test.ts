@@ -39,7 +39,9 @@ describe('conversationHasDraft', () => {
     const storageKey = `__amplify__${StorageKey.CONVERSATION.INPUT}|${conversation.id}`;
     const draftData = JSON.stringify({data: {plainMessage: '   '}});
 
-    (localStorage.getItem as jest.Mock).mockImplementation(key => (key === storageKey ? draftData : null));
+    (localStorage.getItem as jest.Mock).mockImplementation(key => {
+      return key === storageKey ? draftData : null;
+    });
 
     expect(conversationHasDraft(conversation)).toBe(false);
   });
@@ -49,7 +51,9 @@ describe('conversationHasDraft', () => {
     const storageKey = `__amplify__${StorageKey.CONVERSATION.INPUT}|${conversation.id}`;
     const draftData = JSON.stringify({data: {plainMessage: 'Hello'}});
 
-    (localStorage.getItem as jest.Mock).mockImplementation(key => (key === storageKey ? draftData : null));
+    (localStorage.getItem as jest.Mock).mockImplementation(key => {
+      return key === storageKey ? draftData : null;
+    });
 
     expect(conversationHasDraft(conversation)).toBe(true);
   });
@@ -58,7 +62,9 @@ describe('conversationHasDraft', () => {
     const conversation = generateConversation();
     const storageKey = `__amplify__${StorageKey.CONVERSATION.INPUT}|${conversation.id}`;
 
-    (localStorage.getItem as jest.Mock).mockImplementation(key => (key === storageKey ? 'not-json' : null));
+    (localStorage.getItem as jest.Mock).mockImplementation(key => {
+      return key === storageKey ? 'not-json' : null;
+    });
 
     expect(conversationHasDraft(conversation)).toBe(false);
   });

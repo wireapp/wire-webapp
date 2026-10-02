@@ -100,20 +100,23 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
   ) {
     const conversations = await this.listAllConversations(token);
 
-    const conversation = conversations.find(conversation =>
-      conversation.members.others.some(
-        member =>
+    const conversation = conversations.find(conversation => {
+      return conversation.members.others.some(member => {
+        return (
           member.id === conversationPartnerId &&
           // If a specific protocol to use was provided also filter by it
-          (options?.protocol ? conversation.protocol === options.protocol : true),
-      ),
-    );
+          (options?.protocol ? conversation.protocol === options.protocol : true)
+        );
+      });
+    });
 
     return conversation?.qualified_id.id;
   }
 
   async getGroupConversation(token: string, conversationName: string) {
     const conversations = await this.listAllConversations(token);
-    return conversations.find(conv => conv.name === conversationName)?.qualified_id.id;
+    return conversations.find(conv => {
+      return conv.name === conversationName;
+    })?.qualified_id.id;
   }
 }

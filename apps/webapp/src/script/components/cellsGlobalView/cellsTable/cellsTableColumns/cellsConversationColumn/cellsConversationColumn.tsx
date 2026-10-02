@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import {GroupAvatar, ChannelAvatar} from 'Components/avatar';
 import {openConversation} from 'Components/cellsGlobalView/common/openConversation/openConversation';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -31,7 +33,7 @@ interface CellsConversationColumnProps {
 }
 
 export const CellsConversationColumn = ({conversation, name}: CellsConversationColumnProps) => {
-  if (!conversation) {
+  if (isUndefined(conversation)) {
     return <span css={textStyles}>{name}</span>;
   }
 
@@ -43,7 +45,12 @@ const ConversationAvatar = ({conversation}: {conversation: Conversation}) => {
   const {isChannelsEnabled} = useChannelsFeatureFlag();
 
   return (
-    <button css={wrapperStyles} onClick={() => openConversation(conversation.qualifiedId)}>
+    <button
+      css={wrapperStyles}
+      onClick={() => {
+        return openConversation(conversation.qualifiedId);
+      }}
+    >
       <div css={avatarWrapperStyles}>
         {isChannel && isChannelsEnabled ? (
           <ChannelAvatar conversationID={conversation.id} isLocked={false} size="small" />

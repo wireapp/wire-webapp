@@ -51,32 +51,41 @@ function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
 }
 
-const createMeetingStore = (scheduleMeeting: MeetingStoreState['scheduleMeeting']) =>
-  createStore<MeetingStoreState>(() => ({
-    meetingSeries: [],
-    isLoading: false,
-    hasLoadError: false,
-    loadMeetings: jest.fn().mockResolvedValue(undefined),
-    scheduleMeeting,
-    meetNowMeeting: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed)),
-    updateMeeting: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
-    loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
-    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
-    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
-    removeMeetingByQualifiedId: jest.fn(),
-    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
-  }));
+const createMeetingStore = (scheduleMeeting: MeetingStoreState['scheduleMeeting']) => {
+  return createStore<MeetingStoreState>(() => {
+    return {
+      meetingSeries: [],
+      isLoading: false,
+      hasLoadError: false,
+      loadMeetings: jest.fn().mockResolvedValue(undefined),
+      scheduleMeeting,
+      meetNowMeeting: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed)),
+      updateMeeting: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+      loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+      deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+      deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+      removeMeetingByQualifiedId: jest.fn(),
+      syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
+    };
+  });
+};
 
 const setupContainerMocks = () => {
   const selfUser = new User('self-id', 'example.com', translateForTest);
   const conversationState = {findConversation: jest.fn().mockReturnValue(undefined)} as unknown as ConversationState;
   const userState = {
     self: ko.observable(selfUser),
-    connectedUsers: ko.pureComputed(() => [] as User[]),
+    connectedUsers: ko.pureComputed(() => {
+      return [] as User[];
+    }),
   } as unknown as UserState;
   const teamState = {
-    isTeam: ko.pureComputed(() => false),
-    teamUsers: ko.pureComputed(() => [] as User[]),
+    isTeam: ko.pureComputed(() => {
+      return false;
+    }),
+    teamUsers: ko.pureComputed(() => {
+      return [] as User[];
+    }),
   } as unknown as TeamState;
 
   jest.spyOn(container, 'resolve').mockImplementation(token => {
@@ -94,11 +103,27 @@ const renderModal = (scheduleMeeting = jest.fn().mockReturnValue(task.resolve({f
   const mainViewModel = {
     content: {
       repositories: {
-        conversation: {findConversation: jest.fn(), getAllGroupConversations: () => []},
-        search: {searchByName: async () => [], searchUserInSet: () => []},
+        conversation: {
+          findConversation: jest.fn(),
+          getAllGroupConversations: () => {
+            return [];
+          },
+        },
+        search: {
+          searchByName: async () => {
+            return [];
+          },
+          searchUserInSet: () => {
+            return [];
+          },
+        },
         team: {
-          filterExternals: async (users: User[]) => users,
-          filterRemoteDomainUsers: async (users: User[]) => users,
+          filterExternals: async (users: User[]) => {
+            return users;
+          },
+          filterRemoteDomainUsers: async (users: User[]) => {
+            return users;
+          },
         },
       },
     },
@@ -167,8 +192,12 @@ describe('ScheduleMeetingModal', () => {
     const deferred = createDeferred<{failedToAdd: User[]}>();
     const scheduleMeeting = jest.fn().mockReturnValue(
       task.tryOrElse(
-        () => meetingSubmitErrors.createFailed,
-        () => deferred.promise,
+        () => {
+          return meetingSubmitErrors.createFailed;
+        },
+        () => {
+          return deferred.promise;
+        },
       ),
     );
     const {fireAndForgetInvoker} = renderModal(scheduleMeeting);

@@ -63,7 +63,9 @@ const isSameState = (left: UploadState, right: UploadState): boolean => {
   const leftRecord = left as unknown as Record<string, unknown>;
   const rightRecord = right as unknown as Record<string, unknown>;
   const keys = new Set([...Object.keys(leftRecord), ...Object.keys(rightRecord)]);
-  return [...keys].every(key => leftRecord[key] === rightRecord[key]);
+  return [...keys].every(key => {
+    return leftRecord[key] === rightRecord[key];
+  });
 };
 
 export const createCellsUploadProcess = (
@@ -80,16 +82,21 @@ export const createCellsUploadProcess = (
   let released = false;
   const subscribers = new Set<UploadSnapshotListener>();
 
-  const releasedResult = <T>(): Result<T, UploadProcessError> => Result.err({kind: 'released'});
-  const snapshot = (): Result<UploadState, UploadProcessError> =>
-    maybe.isJust(state) ? Result.ok(state.value) : releasedResult();
+  const releasedResult = <T>(): Result<T, UploadProcessError> => {
+    return Result.err({kind: 'released'});
+  };
+  const snapshot = (): Result<UploadState, UploadProcessError> => {
+    return maybe.isJust(state) ? Result.ok(state.value) : releasedResult();
+  };
 
   const notify = (previous: UploadState, next: UploadState): void => {
     if (isSameState(previous, next)) {
       return;
     }
     state = Maybe.just(next);
-    subscribers.forEach(listener => listener(next));
+    subscribers.forEach(listener => {
+      listener(next);
+    });
   };
 
   const apply = (action: UploadAction): Result<UploadState, UploadLifecycleError> => {
@@ -107,24 +114,29 @@ export const createCellsUploadProcess = (
   const isGatewayError = (
     reason: unknown,
     operation: CellsUploadGatewayError['operation'],
-  ): reason is CellsUploadGatewayError =>
-    typeof reason === 'object' &&
-    reason !== null &&
-    (reason as {kind?: unknown; operation?: unknown}).kind === 'gatewayError' &&
-    (reason as {kind?: unknown; operation?: unknown}).operation === operation;
+  ): reason is CellsUploadGatewayError => {
+    return (
+      typeof reason === 'object' &&
+      reason !== null &&
+      (reason as {kind?: unknown; operation?: unknown}).kind === 'gatewayError' &&
+      (reason as {kind?: unknown; operation?: unknown}).operation === operation
+    );
+  };
 
   const safeGateway = <T>(
     operation: CellsUploadGatewayError['operation'],
     call: () => PromiseLike<Result<T, CellsUploadGatewayError>>,
-  ) =>
-    task.tryOrElse(
-      reason =>
-        isGatewayError(reason, operation) ? reason : {kind: 'gatewayError' as const, operation, cause: reason},
+  ) => {
+    return task.tryOrElse(
+      reason => {
+        return isGatewayError(reason, operation) ? reason : {kind: 'gatewayError' as const, operation, cause: reason};
+      },
       async () => {
         const result = await call();
         return resultModule.isErr(result) ? Promise.reject(result.error) : result.value;
       },
     );
+  };
 
   const isCurrentAttempt = (attempt: Attempt): boolean => {
     const activeAttempt = currentAttempt;
@@ -159,8 +171,8 @@ export const createCellsUploadProcess = (
       identity: {uploadId, resourceUuid: currentResourceUuid.value, versionId: dependencies.createVersionUuid()},
     };
     currentAttempt = Maybe.just(attempt);
-    const gatewayResult = await safeGateway('upload', () =>
-      dependencies.gateway.uploadDraft({
+    const gatewayResult = await safeGateway('upload', () => {
+      return dependencies.gateway.uploadDraft({
         uploadId,
         attemptId: attempt.id,
         identity: attempt.identity,
@@ -173,8 +185,8 @@ export const createCellsUploadProcess = (
             apply({type: 'progress', progress});
           }
         },
-      }),
-    );
+      });
+    });
 
     if (!isCurrentAttempt(attempt)) {
       return Result.ok(undefined);
@@ -244,11 +256,11 @@ export const createCellsUploadProcess = (
     completion: UploadAction,
   ): Promise<Result<void, UploadProcessError>> => {
     const operationToken = ++operationId;
-    const gatewayResult = await safeGateway(operation, () =>
-      operation === 'publish'
+    const gatewayResult = await safeGateway(operation, () => {
+      return operation === 'publish'
         ? dependencies.gateway.publishDraft(identity)
-        : dependencies.gateway.discardDraft(identity),
-    );
+        : dependencies.gateway.discardDraft(identity);
+    });
     if (
       released ||
       operationToken !== operationId ||
@@ -325,7 +337,9 @@ export const createCellsUploadProcess = (
     }
     subscribers.add(listener);
     listener(state.value);
-    return Result.ok(() => subscribers.delete(listener));
+    return Result.ok(() => {
+      return subscribers.delete(listener);
+    });
   };
 
   const release = (): Result<void, UploadProcessError> => {

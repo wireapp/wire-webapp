@@ -40,13 +40,34 @@ type WarningsState = {
   removeWarning: (warning: TYPE) => void;
 };
 
-const useWarningsState = create<WarningsState>(set => ({
-  addWarning: type => set(state => ({...state, warnings: [...state.warnings, type]})),
-  name: '',
-  removeWarning: type => set(state => ({...state, warnings: [...state.warnings.filter(warning => warning !== type)]})),
-  setName: newName => set(state => ({...state, name: newName})),
-  warnings: [],
-}));
+const useWarningsState = create<WarningsState>(set => {
+  return {
+    addWarning: type => {
+      return set(state => {
+        return {...state, warnings: [...state.warnings, type]};
+      });
+    },
+    name: '',
+    removeWarning: type => {
+      return set(state => {
+        return {
+          ...state,
+          warnings: [
+            ...state.warnings.filter(warning => {
+              return warning !== type;
+            }),
+          ],
+        };
+      });
+    },
+    setName: newName => {
+      return set(state => {
+        return {...state, name: newName};
+      });
+    },
+    warnings: [],
+  };
+});
 
 type Translate = (
   key: TranslationKey,

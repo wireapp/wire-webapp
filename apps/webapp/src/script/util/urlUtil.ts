@@ -116,7 +116,9 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
  * @param url URL to be prepended
  * @returns prepended URL
  */
-export const prependProtocol = (url: string) => (isNull(url.match(/^http[s]?:\/\//i)) ? `http://${url}` : url);
+export const prependProtocol = (url: string) => {
+  return isNull(url.match(/^http[s]?:\/\//i)) ? `http://${url}` : url;
+};
 
 /**
  * Removes all URL parameters from the current URL

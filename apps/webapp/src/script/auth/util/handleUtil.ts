@@ -72,7 +72,9 @@ function generateHandleVariations(handle: string, numberOfVariations: number = D
 
 function appendRandomDigits(handle: string, additionalNumbers: number): string {
   const MAX_RANDOM_INT = 9;
-  const randomDigits = Array.from(Array(additionalNumbers), () => randomInt(MAX_RANDOM_INT));
+  const randomDigits = Array.from(Array(additionalNumbers), () => {
+    return randomInt(MAX_RANDOM_INT);
+  });
   return `${handle}${randomDigits.join('')}`;
 }
 

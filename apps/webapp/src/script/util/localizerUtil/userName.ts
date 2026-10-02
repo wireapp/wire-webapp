@@ -59,9 +59,13 @@ export function joinNames(
   skipAnd = false,
   boldNames = false,
 ): string {
-  const containsSelfUser = userEntities.some(userEntity => userEntity.isMe);
+  const containsSelfUser = userEntities.some(userEntity => {
+    return userEntity.isMe;
+  });
   if (containsSelfUser) {
-    userEntities = userEntities.filter(userEntity => !userEntity.isMe);
+    userEntities = userEntities.filter(userEntity => {
+      return !userEntity.isMe;
+    });
   }
 
   const userNames = userEntities.toSorted(sortUsersByPriority).map(userEntity => {

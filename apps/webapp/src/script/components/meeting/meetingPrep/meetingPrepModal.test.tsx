@@ -39,11 +39,18 @@ const session: MeetingPrepSession = {
   qualifiedConversationId: {id: 'conversation-id', domain: 'example.com'},
 };
 
-const pendingPreview: RequestMeetingPrepPreview = () =>
-  task.tryOrElse(
-    () => meetingPrepPreviewErrors.requestFailed,
-    () => new Promise<MediaStream>(() => undefined),
+const pendingPreview: RequestMeetingPrepPreview = () => {
+  return task.tryOrElse(
+    () => {
+      return meetingPrepPreviewErrors.requestFailed;
+    },
+    () => {
+      return new Promise<MediaStream>(() => {
+        return undefined;
+      });
+    },
   );
+};
 
 const expectClosed = async () => {
   expect(screen.queryByRole('heading', {name: 'Design review'})).not.toBeInTheDocument();

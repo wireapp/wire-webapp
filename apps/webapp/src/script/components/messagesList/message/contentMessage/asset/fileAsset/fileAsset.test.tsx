@@ -50,7 +50,9 @@ describe('FileAssetComponent', () => {
   }
 
   const teamState = {
-    isFileSharingReceivingEnabled: ko.pureComputed(() => true),
+    isFileSharingReceivingEnabled: ko.pureComputed(() => {
+      return true;
+    }),
   } as TeamState;
 
   it('renders file uploads', () => {

@@ -33,21 +33,30 @@ import {meetingPrepPreviewErrors, type RequestMeetingPrepPreview} from './meetin
 
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 
-const translateForPrepTest: Translate = (key, substitutions) =>
-  key === 'meetings.notifications.startsAt' ? `Starts at ${String(substitutions?.time)}` : key;
+const translateForPrepTest: Translate = (key, substitutions) => {
+  return key === 'meetings.notifications.startsAt' ? `Starts at ${String(substitutions?.time)}` : key;
+};
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForPrepTest}),
 );
 
-const device = (deviceId: string, label: string): MediaDeviceInfo =>
-  ({deviceId, label, kind: 'audioinput', groupId: 'group'}) as MediaDeviceInfo;
+const device = (deviceId: string, label: string): MediaDeviceInfo => {
+  return {deviceId, label, kind: 'audioinput', groupId: 'group'} as MediaDeviceInfo;
+};
 
-const pendingPreview: RequestMeetingPrepPreview = () =>
-  task.tryOrElse(
-    () => meetingPrepPreviewErrors.requestFailed,
-    () => new Promise<MediaStream>(() => undefined),
+const pendingPreview: RequestMeetingPrepPreview = () => {
+  return task.tryOrElse(
+    () => {
+      return meetingPrepPreviewErrors.requestFailed;
+    },
+    () => {
+      return new Promise<MediaStream>(() => {
+        return undefined;
+      });
+    },
   );
+};
 
 const renderSurface = (
   overrides: Partial<{
@@ -127,13 +136,16 @@ describe('MeetingPrepSurface', () => {
   });
 
   it('ignores another Join click while the first request is still running', async () => {
-    let finishJoin: () => void = () => undefined;
-    const onJoin = jest.fn(
-      () =>
-        new Promise<void>(resolve => {
-          finishJoin = () => resolve();
-        }),
-    );
+    let finishJoin: () => void = () => {
+      return undefined;
+    };
+    const onJoin = jest.fn(() => {
+      return new Promise<void>(resolve => {
+        finishJoin = () => {
+          return resolve();
+        };
+      });
+    });
     renderSurface({onJoin});
 
     const joinButton = screen.getByRole('button', {name: 'callJoin'});
@@ -157,7 +169,7 @@ describe('MeetingPrepSurface', () => {
     fireEvent.click(screen.getByRole('button', {name: 'meetings.prepModal.openMicrophoneDevices'}));
     fireEvent.click(screen.getByRole('button', {name: 'Mic 2'}));
 
-    expect(mediaDevicesStore.getState().audio.input.selectedId).toBe('mic-2');
+    expect(mediaDevicesStore.getState().audio.input.activeId).toBe('mic-2');
   });
 
   it('closes the device list when the pointer goes outside it', () => {

@@ -203,16 +203,17 @@ export const ConversationTabs = ({
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const isDebugEnabled = Config.getConfig().FEATURE.ENABLE_DEBUG;
 
-  const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
-    favoriteConversation.hasUnread(),
-  ).length;
+  const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation => {
+    return favoriteConversation.hasUnread();
+  }).length;
 
-  const totalUnreadArchivedConversations = archivedConversations.filter(conversation =>
-    conversation.hasUnread(),
-  ).length;
+  const totalUnreadArchivedConversations = archivedConversations.filter(conversation => {
+    return conversation.hasUnread();
+  }).length;
 
-  const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
-    conversationFilters.notArchived(conversation) && conversationFilters.hasUnread(conversation);
+  const filterUnreadAndArchivedConversations = (conversation: Conversation) => {
+    return conversationFilters.notArchived(conversation) && conversationFilters.hasUnread(conversation);
+  };
 
   const isTeamCreationEnabled =
     Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
@@ -221,16 +222,16 @@ export const ConversationTabs = ({
   const channelConversationsLength = channelConversations.filter(filterUnreadAndArchivedConversations).length;
   const groupConversationsLength = groupConversations.filter(filterUnreadAndArchivedConversations).length;
   const unreadCount = unreadConversations.filter(conversationFilters.notArchived).length;
-  const mentionsCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasMentions(conv),
-  ).length;
-  const repliesCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasReplies(conv),
-  ).length;
+  const mentionsCount = unreadConversations.filter(conv => {
+    return conversationFilters.notArchived(conv) && conversationFilters.hasMentions(conv);
+  }).length;
+  const repliesCount = unreadConversations.filter(conv => {
+    return conversationFilters.notArchived(conv) && conversationFilters.hasReplies(conv);
+  }).length;
   const draftsCount = draftConversations.filter(conversationFilters.notArchived).length;
-  const pingsCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasPings(conv),
-  ).length;
+  const pingsCount = unreadConversations.filter(conv => {
+    return conversationFilters.notArchived(conv) && conversationFilters.hasPings(conv);
+  }).length;
   const directConversationsLength = directConversations.filter(filterUnreadAndArchivedConversations).length;
 
   const channelsTab = shouldShowChannelTab
@@ -330,7 +331,9 @@ export const ConversationTabs = ({
   ];
 
   // Filter tabs based on visibility preferences
-  const visibleConversationTabs = conversationTabs.filter(tab => isTabVisible(tab.type, visibleTabs));
+  const visibleConversationTabs = conversationTabs.filter(tab => {
+    return isTabVisible(tab.type, visibleTabs);
+  });
 
   const manageTeamUrl = getManageTeamUrl();
   const showCellsTab = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;

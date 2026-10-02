@@ -38,11 +38,15 @@ export const HeaderMenu = ({children, logoElement = null, centerElement = null, 
   const toggleMenu = () => {
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
-      setIsOpen(current => !current);
+      setIsOpen(current => {
+        return !current;
+      });
     }
   };
 
-  const closeMenu = () => setIsOpen(false);
+  const closeMenu = () => {
+    return setIsOpen(false);
+  };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = e => {
     if (e.key === 'Enter' || e.key === ' ') {

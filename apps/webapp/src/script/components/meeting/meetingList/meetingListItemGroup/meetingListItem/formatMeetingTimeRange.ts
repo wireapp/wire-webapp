@@ -24,22 +24,32 @@ const timeFormatterOptions: Intl.DateTimeFormatOptions = {
   minute: '2-digit',
 };
 
-const getTimeParts = (date: Date): Intl.DateTimeFormatPart[] =>
-  new Intl.DateTimeFormat(getRegionalDateLocale(), timeFormatterOptions).formatToParts(date);
+const getTimeParts = (date: Date): Intl.DateTimeFormatPart[] => {
+  return new Intl.DateTimeFormat(getRegionalDateLocale(), timeFormatterOptions).formatToParts(date);
+};
 
-const formatTime = (parts: Intl.DateTimeFormatPart[], includeDayPeriod: boolean): string =>
-  parts
-    .filter(({type}) => includeDayPeriod || type !== 'dayPeriod')
-    .map(({value}) => value)
+const formatTime = (parts: Intl.DateTimeFormatPart[], includeDayPeriod: boolean): string => {
+  return parts
+    .filter(({type}) => {
+      return includeDayPeriod || type !== 'dayPeriod';
+    })
+    .map(({value}) => {
+      return value;
+    })
     .join('')
     .trim()
     .replace(/[\u00a0\u202f]/g, ' ');
+};
 
 export const formatMeetingTimeRange = (start: Date, end: Date): string => {
   const startParts = getTimeParts(start);
   const endParts = getTimeParts(end);
-  const startDayPeriod = startParts.find(({type}) => type === 'dayPeriod')?.value;
-  const endDayPeriod = endParts.find(({type}) => type === 'dayPeriod')?.value;
+  const startDayPeriod = startParts.find(({type}) => {
+    return type === 'dayPeriod';
+  })?.value;
+  const endDayPeriod = endParts.find(({type}) => {
+    return type === 'dayPeriod';
+  })?.value;
   const sameDayPeriod = startDayPeriod === endDayPeriod;
 
   return `${formatTime(startParts, !sameDayPeriod)} - ${formatTime(endParts, true)}`;

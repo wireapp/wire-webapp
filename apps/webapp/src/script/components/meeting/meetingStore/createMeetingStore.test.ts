@@ -75,22 +75,24 @@ describe('createMeetingStore', () => {
     initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T13:00:00.000Z')) * 1_000n,
   });
 
-  const createServiceTasks = (overrides: Partial<MeetingStoreServiceTasks> = {}): MeetingStoreServiceTasks => ({
-    scheduleMeeting: jest
-      .fn()
-      .mockReturnValue(task.resolve({failedToAdd: [], qualifiedMeetingId: apiMeeting.qualified_id})),
-    meetNowMeeting: jest.fn().mockReturnValue(
-      task.resolve({
-        failedToAdd: [],
-        qualifiedConversation: {id: 'conversation-id', domain: 'example.com'},
-        qualifiedMeetingId: apiMeeting.qualified_id,
-      }),
-    ),
-    updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
-    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
-    ...overrides,
-  });
+  const createServiceTasks = (overrides: Partial<MeetingStoreServiceTasks> = {}): MeetingStoreServiceTasks => {
+    return {
+      scheduleMeeting: jest
+        .fn()
+        .mockReturnValue(task.resolve({failedToAdd: [], qualifiedMeetingId: apiMeeting.qualified_id})),
+      meetNowMeeting: jest.fn().mockReturnValue(
+        task.resolve({
+          failedToAdd: [],
+          qualifiedConversation: {id: 'conversation-id', domain: 'example.com'},
+          qualifiedMeetingId: apiMeeting.qualified_id,
+        }),
+      ),
+      updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+      deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+      deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+      ...overrides,
+    };
+  };
 
   const createDeps = ({
     getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting])),
@@ -104,14 +106,16 @@ describe('createMeetingStore', () => {
     safeGetConversationById?: jest.Mock;
     serviceTasks?: MeetingStoreServiceTasks;
     clock?: typeof clock;
-  } = {}): MeetingStoreDeps => ({
-    meetingsRepository: {getMeetingsList, getMeeting} as unknown as MeetingsRepository,
-    conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
-    callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
-    clock: clockOverride,
-    deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
-    serviceTasks,
-  });
+  } = {}): MeetingStoreDeps => {
+    return {
+      meetingsRepository: {getMeetingsList, getMeeting} as unknown as MeetingsRepository,
+      conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
+      callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
+      clock: clockOverride,
+      deviceTimeZone: {ianaTimeZoneId: 'Europe/Berlin'},
+      serviceTasks,
+    };
+  };
 
   it('loads meetings successfully', async () => {
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting]));
@@ -136,7 +140,9 @@ describe('createMeetingStore', () => {
     });
     const getMeetingsList = jest.fn().mockReturnValue(
       task.tryOrElse(
-        () => new Error('fetch failed'),
+        () => {
+          return new Error('fetch failed');
+        },
         async () => {
           await fetchGate;
           return [{...apiMeeting, title: 'Weekly sync (refreshed)'}];
@@ -183,7 +189,9 @@ describe('createMeetingStore', () => {
     });
     const getMeetingsList = jest.fn().mockReturnValue(
       task.tryOrElse(
-        () => new Error('fetch failed'),
+        () => {
+          return new Error('fetch failed');
+        },
         async () => {
           await fetchGate;
           return [apiMeeting];
@@ -208,7 +216,9 @@ describe('createMeetingStore', () => {
     });
     const getMeetingsList = jest.fn().mockReturnValue(
       task.tryOrElse(
-        () => new Error('fetch failed'),
+        () => {
+          return new Error('fetch failed');
+        },
         async () => {
           await fetchGate;
           return [];
@@ -477,7 +487,9 @@ describe('createMeetingStore', () => {
       });
       const getMeeting = jest.fn().mockReturnValue(
         task.tryOrElse(
-          () => new Error('fetch failed'),
+          () => {
+            return new Error('fetch failed');
+          },
           async () => {
             await fetchGate;
             return apiMeeting;
@@ -505,9 +517,11 @@ describe('createMeetingStore', () => {
       expect(result.isOk).toBe(true);
       expect(store.getState().meetingSeries).toHaveLength(2);
       expect(store.getState().meetingSeries).toContainEqual(otherDomainEntry);
-      expect(store.getState().meetingSeries.find(series => series.qualified_id.domain === 'example.com')).toEqual(
-        expect.objectContaining(meetingSeriesEntry),
-      );
+      expect(
+        store.getState().meetingSeries.find(series => {
+          return series.qualified_id.domain === 'example.com';
+        }),
+      ).toEqual(expect.objectContaining(meetingSeriesEntry));
     });
 
     it('preserves existing state and rejects with fetchFailed when fetching the meeting fails', async () => {

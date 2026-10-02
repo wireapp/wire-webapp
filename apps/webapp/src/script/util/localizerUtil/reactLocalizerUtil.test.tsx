@@ -32,7 +32,9 @@ describe('replaceReactComponents', () => {
       {
         start: '<strong>',
         end: '</strong>',
-        render: text => <strong>{text}</strong>,
+        render: text => {
+          return <strong>{text}</strong>;
+        },
       },
     ]);
 
@@ -44,7 +46,9 @@ describe('replaceReactComponents', () => {
       {
         start: '<strong>',
         end: '</strong>',
-        render: text => <strong>{text}</strong>,
+        render: text => {
+          return <strong>{text}</strong>;
+        },
       },
     ]);
 
@@ -56,12 +60,16 @@ describe('replaceReactComponents', () => {
       {
         start: '<strong>',
         end: '</strong>',
-        render: text => <strong>{text}</strong>,
+        render: text => {
+          return <strong>{text}</strong>;
+        },
       },
       {
         start: '[link]',
         end: '[/link]',
-        render: text => <button>{text}</button>,
+        render: text => {
+          return <button>{text}</button>;
+        },
       },
     ]);
 
@@ -73,7 +81,9 @@ describe('replaceReactComponents', () => {
     const result = replaceReactComponents('Hello {username}!', [
       {
         exactMatch: '{username}',
-        render: () => <strong>{username}</strong>,
+        render: () => {
+          return <strong>{username}</strong>;
+        },
       },
     ]);
     const {getByText} = render(<div>{result}</div>);
@@ -86,7 +96,9 @@ describe('replaceReactComponents', () => {
     const result = replaceReactComponents('Hello {username}!', [
       {
         exactMatch: '{username}',
-        render: () => username,
+        render: () => {
+          return username;
+        },
       },
     ]);
 
@@ -102,11 +114,15 @@ describe('replaceReactComponents', () => {
     const result = replaceReactComponents(`Hello {username1} and {username2}, my name is also {username1}!`, [
       {
         exactMatch: '{username1}',
-        render: () => <u>{username1}</u>,
+        render: () => {
+          return <u>{username1}</u>;
+        },
       },
       {
         exactMatch: '{username2}',
-        render: () => <u>{username2}</u>,
+        render: () => {
+          return <u>{username2}</u>;
+        },
       },
     ]);
 
@@ -123,11 +139,15 @@ describe('replaceReactComponents', () => {
       {
         start: '[bold]',
         end: '[/bold]',
-        render: text => <strong>{text}</strong>,
+        render: text => {
+          return <strong>{text}</strong>;
+        },
       },
       {
         exactMatch: '{username2}',
-        render: () => <u>{username2}</u>,
+        render: () => {
+          return <u>{username2}</u>;
+        },
       },
     ]);
 
@@ -144,15 +164,21 @@ describe('replaceReactComponents', () => {
       {
         start: '[bold]',
         end: '[/bold]',
-        render: text => <strong>{text}</strong>,
+        render: text => {
+          return <strong>{text}</strong>;
+        },
       },
       {
         exactMatch: '{username}',
-        render: () => <u>{username}</u>,
+        render: () => {
+          return <u>{username}</u>;
+        },
       },
       {
         exactMatch: '{username2}',
-        render: () => <u>{username2}</u>,
+        render: () => {
+          return <u>{username2}</u>;
+        },
       },
     ]);
 

@@ -73,7 +73,9 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
               {replaceReactComponents(translate('otherUserNotSupportMLSMsg', {participantName: '{participantName}'}), [
                 {
                   exactMatch: '{participantName}',
-                  render: () => <strong>{user.name()}</strong>,
+                  render: () => {
+                    return <strong>{user.name()}</strong>;
+                  },
                 },
               ])}
             </span>
@@ -86,7 +88,9 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
               {replaceReactComponents(translate('selfNotSupportMLSMsgPart1', {selfUserName: '{selfUserName}'}), [
                 {
                   exactMatch: '{selfUserName}',
-                  render: () => <strong>{user.name()}</strong>,
+                  render: () => {
+                    return <strong>{user.name()}</strong>;
+                  },
                 },
               ])}
             </span>
@@ -113,7 +117,9 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
                 [
                   {
                     exactMatch: '{participantName}',
-                    render: () => <strong>{user.name()}</strong>,
+                    render: () => {
+                      return <strong>{user.name()}</strong>;
+                    },
                   },
                 ],
               )}

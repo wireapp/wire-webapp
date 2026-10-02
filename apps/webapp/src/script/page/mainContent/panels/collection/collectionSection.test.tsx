@@ -35,15 +35,19 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => new ContentMessage(createUuid(), translateForTest));
-
-const getDefaultProps = (limit: number) => ({
-  label: 'cool collection',
-  limit,
-  messages,
-  onSelect: jest.fn(),
-  uieName: 'cool-collection',
+const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => {
+  return new ContentMessage(createUuid(), translateForTest);
 });
+
+const getDefaultProps = (limit: number) => {
+  return {
+    label: 'cool collection',
+    limit,
+    messages,
+    onSelect: jest.fn(),
+    uieName: 'cool-collection',
+  };
+};
 
 describe('CollectionSection', () => {
   it('does not show show all button when under or equal a limit', async () => {

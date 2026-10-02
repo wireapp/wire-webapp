@@ -68,8 +68,11 @@ type DeviceOption = {
   label: string;
 };
 
-const toDeviceOptions = (devices: readonly MediaDeviceInfo[]): DeviceOption[] =>
-  devices.map(device => ({id: device.deviceId, label: device.label}));
+const toDeviceOptions = (devices: readonly MediaDeviceInfo[]): DeviceOption[] => {
+  return devices.map(device => {
+    return {id: device.deviceId, label: device.label};
+  });
+};
 
 const usePreviewStream = (
   enabled: boolean,
@@ -124,22 +127,28 @@ const MeetingPrepDeviceList = ({
   devices: readonly DeviceOption[];
   selectedId: string;
   onSelect: (deviceId: string) => void;
-}) => (
-  <div>
-    <p css={meetingPrepMenuLabelStyles}>{label}</p>
-    {devices.map(device => (
-      <button
-        key={device.id}
-        type="button"
-        css={meetingPrepDeviceButtonStyles(device.id === selectedId)}
-        aria-pressed={device.id === selectedId}
-        onClick={() => onSelect(device.id)}
-      >
-        {device.label}
-      </button>
-    ))}
-  </div>
-);
+}) => {
+  return (
+    <div>
+      <p css={meetingPrepMenuLabelStyles}>{label}</p>
+      {devices.map(device => {
+        return (
+          <button
+            key={device.id}
+            type="button"
+            css={meetingPrepDeviceButtonStyles(device.id === selectedId)}
+            aria-pressed={device.id === selectedId}
+            onClick={() => {
+              return onSelect(device.id);
+            }}
+          >
+            {device.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 export const MeetingPrepSurface = ({
   meetingTitle,
@@ -170,17 +179,19 @@ export const MeetingPrepSurface = ({
     videoInputDevices,
     videoInputDeviceId,
     setVideoInputDeviceId,
-  } = useMediaDevicesStore(state => ({
-    audioInputDevices: state.audio.input.devices,
-    audioInputDeviceId: state.audio.input.selectedId,
-    setAudioInputDeviceId: state.setAudioInputDeviceId,
-    audioOutputDevices: state.audio.output.devices,
-    audioOutputDeviceId: state.audio.output.selectedId,
-    setAudioOutputDeviceId: state.setAudioOutputDeviceId,
-    videoInputDevices: state.video.input.devices,
-    videoInputDeviceId: state.video.input.selectedId,
-    setVideoInputDeviceId: state.setVideoInputDeviceId,
-  }));
+  } = useMediaDevicesStore(state => {
+    return {
+      audioInputDevices: state.audio.input.devices,
+      audioInputDeviceId: state.audio.input.activeId,
+      setAudioInputDeviceId: state.setAudioInputDeviceId,
+      audioOutputDevices: state.audio.output.devices,
+      audioOutputDeviceId: state.audio.output.activeId,
+      setAudioOutputDeviceId: state.setAudioOutputDeviceId,
+      videoInputDevices: state.video.input.devices,
+      videoInputDeviceId: state.video.input.activeId,
+      setVideoInputDeviceId: state.setVideoInputDeviceId,
+    };
+  });
   const audioPreview = usePreviewStream(
     microphoneEnabled,
     audioInputDeviceId,
@@ -216,7 +227,9 @@ export const MeetingPrepSurface = ({
     };
 
     document.addEventListener('pointerdown', closeOnOutsidePointer);
-    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+    return () => {
+      return document.removeEventListener('pointerdown', closeOnOutsidePointer);
+    };
   }, [cameraMenuOpen, microphoneMenuOpen]);
 
   useEffect(() => {
@@ -241,7 +254,9 @@ export const MeetingPrepSurface = ({
     });
   };
 
-  const audioStream = audioPreview.mapOr(null, stream => stream);
+  const audioStream = audioPreview.mapOr(null, stream => {
+    return stream;
+  });
   const showVideo = cameraEnabled && maybe.isJust(videoPreview);
   const meterStream =
     microphoneEnabled && audioStream !== null && audioStream.getAudioTracks().length > 0 ? audioStream : null;
@@ -283,7 +298,11 @@ export const MeetingPrepSurface = ({
                 css={meetingPrepToggleStyles}
                 aria-pressed={microphoneEnabled}
                 aria-label={translate('preferencesAVMicrophone')}
-                onClick={() => setMicrophoneEnabled(enabled => !enabled)}
+                onClick={() => {
+                  return setMicrophoneEnabled(enabled => {
+                    return !enabled;
+                  });
+                }}
               >
                 {microphoneEnabled ? <MicOnIcon /> : <MicOffIcon />}
               </button>
@@ -294,7 +313,9 @@ export const MeetingPrepSurface = ({
                 aria-label={translate('meetings.prepModal.openMicrophoneDevices')}
                 onClick={() => {
                   setCameraMenuOpen(false);
-                  setMicrophoneMenuOpen(open => !open);
+                  setMicrophoneMenuOpen(open => {
+                    return !open;
+                  });
                 }}
               >
                 <ChevronIcon />
@@ -322,7 +343,11 @@ export const MeetingPrepSurface = ({
                 css={meetingPrepToggleStyles}
                 aria-pressed={cameraEnabled}
                 aria-label={translate('preferencesAVCamera')}
-                onClick={() => setCameraEnabled(enabled => !enabled)}
+                onClick={() => {
+                  return setCameraEnabled(enabled => {
+                    return !enabled;
+                  });
+                }}
               >
                 {cameraEnabled ? <CameraIcon /> : <CameraOffIcon />}
               </button>
@@ -333,7 +358,9 @@ export const MeetingPrepSurface = ({
                 aria-label={translate('meetings.prepModal.openCameraDevices')}
                 onClick={() => {
                   setMicrophoneMenuOpen(false);
-                  setCameraMenuOpen(open => !open);
+                  setCameraMenuOpen(open => {
+                    return !open;
+                  });
                 }}
               >
                 <ChevronIcon />

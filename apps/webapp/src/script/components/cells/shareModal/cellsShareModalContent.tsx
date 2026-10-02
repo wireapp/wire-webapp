@@ -150,31 +150,33 @@ const DEFAULT_SWITCH_COLORS: SwitchColorProps = {
   disabledColorDark: COLOR_V2.GRAY_60,
 };
 
-const getDefaultLabels = (translate: RootContextValue['translate']): CellsShareModalContentLabels => ({
-  enablePublicLink: translate('cells.shareModal.enablePublicLink'),
-  password: translate('cells.shareModal.password'),
-  passwordDescription: translate('cells.shareModal.password.description'),
-  changePassword: translate('cells.shareModal.changePassword'),
-  expiration: translate('cells.shareModal.expiration'),
-  expirationDescription: translate('cells.shareModal.expiration.description'),
-  expirationExpiresLabel: translate('cells.shareModal.expiration.expiresLabel'),
-  expirationDateAriaLabel: translate('cells.shareModal.expiration.dateAriaLabel'),
-  expirationTimeAriaLabel: translate('cells.shareModal.expiration.timeAriaLabel'),
-  expirationOpenCalendarLabel: translate('cells.shareModal.expiration.openCalendarLabel'),
-  expirationPreviousMonthLabel: translate('cells.shareModal.expiration.previousMonthLabel'),
-  expirationNextMonthLabel: translate('cells.shareModal.expiration.nextMonthLabel'),
-  expirationPastDateError: translate('cells.shareModal.expiration.error.pastDate'),
-  generatedPublicLink: translate('cells.shareModal.generatedPublicLink'),
-  copyLink: translate('cells.shareModal.copyLink'),
-  linkCopied: translate('cells.shareModal.linkCopied'),
-  errorLoadingLink: translate('cells.shareModal.error.loadingLink'),
-  passwordInputLabel: translate('modalGuestLinkJoinLabel'),
-  passwordInputPlaceholder: translate('modalGuestLinkJoinPlaceholder'),
-  passwordCopy: translate('conversationContextMenuCopy'),
-  passwordCopied: translate('guestOptionsPasswordCopyToClipboardSuccess'),
-  showTogglePasswordLabel: translate('showTogglePasswordLabel'),
-  hideTogglePasswordLabel: translate('hideTogglePasswordLabel'),
-});
+const getDefaultLabels = (translate: RootContextValue['translate']): CellsShareModalContentLabels => {
+  return {
+    enablePublicLink: translate('cells.shareModal.enablePublicLink'),
+    password: translate('cells.shareModal.password'),
+    passwordDescription: translate('cells.shareModal.password.description'),
+    changePassword: translate('cells.shareModal.changePassword'),
+    expiration: translate('cells.shareModal.expiration'),
+    expirationDescription: translate('cells.shareModal.expiration.description'),
+    expirationExpiresLabel: translate('cells.shareModal.expiration.expiresLabel'),
+    expirationDateAriaLabel: translate('cells.shareModal.expiration.dateAriaLabel'),
+    expirationTimeAriaLabel: translate('cells.shareModal.expiration.timeAriaLabel'),
+    expirationOpenCalendarLabel: translate('cells.shareModal.expiration.openCalendarLabel'),
+    expirationPreviousMonthLabel: translate('cells.shareModal.expiration.previousMonthLabel'),
+    expirationNextMonthLabel: translate('cells.shareModal.expiration.nextMonthLabel'),
+    expirationPastDateError: translate('cells.shareModal.expiration.error.pastDate'),
+    generatedPublicLink: translate('cells.shareModal.generatedPublicLink'),
+    copyLink: translate('cells.shareModal.copyLink'),
+    linkCopied: translate('cells.shareModal.linkCopied'),
+    errorLoadingLink: translate('cells.shareModal.error.loadingLink'),
+    passwordInputLabel: translate('modalGuestLinkJoinLabel'),
+    passwordInputPlaceholder: translate('modalGuestLinkJoinPlaceholder'),
+    passwordCopy: translate('conversationContextMenuCopy'),
+    passwordCopied: translate('guestOptionsPasswordCopyToClipboardSuccess'),
+    showTogglePasswordLabel: translate('showTogglePasswordLabel'),
+    hideTogglePasswordLabel: translate('hideTogglePasswordLabel'),
+  };
+};
 
 export const CellsShareModalContent = ({
   translate,
@@ -276,7 +278,9 @@ export const CellsShareModalContent = ({
                 hideTogglePasswordLabel={resolvedLabels.hideTogglePasswordLabel}
                 autoComplete="off"
                 value={password.value}
-                onChange={event => password.onChange(event.currentTarget.value)}
+                onChange={event => {
+                  return password.onChange(event.currentTarget.value);
+                }}
                 pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
                 wrapperCSS={styles.passwordInputStyles}
               />

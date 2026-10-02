@@ -55,33 +55,42 @@ export const useGlobalDriveFilters = ({
   const [selectedCreatorIds, setSelectedCreatorIds] = useState<string[]>([]);
   const [isSharedViaLink, setIsSharedViaLink] = useState(false);
 
-  const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
-  const filterState = useMemo<GlobalDriveFiltersState>(
-    () => ({
+  const toggleSharedViaLink = useCallback(() => {
+    return setIsSharedViaLink(prev => {
+      return !prev;
+    });
+  }, []);
+  const filterState = useMemo<GlobalDriveFiltersState>(() => {
+    return {
       selectedTagIds,
       selectedFileTypeIds,
       selectedCreatorIds,
       selectedConversationIds,
       isSharedViaLink,
-    }),
-    [isSharedViaLink, selectedConversationIds, selectedCreatorIds, selectedFileTypeIds, selectedTagIds],
-  );
+    };
+  }, [isSharedViaLink, selectedConversationIds, selectedCreatorIds, selectedFileTypeIds, selectedTagIds]);
 
-  const tagItems = useMemo<FilterItem[]>(() => allTags.map(tag => ({id: tag, label: tag})), [allTags]);
-  const activeFilterType = useMemo(() => getActiveGlobalDriveFilterType(filterState), [filterState]);
+  const tagItems = useMemo<FilterItem[]>(() => {
+    return allTags.map(tag => {
+      return {id: tag, label: tag};
+    });
+  }, [allTags]);
+  const activeFilterType = useMemo(() => {
+    return getActiveGlobalDriveFilterType(filterState);
+  }, [filterState]);
 
-  const fileTypes = useMemo<FilterItem[]>(
-    () =>
-      FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => ({
+  const fileTypes = useMemo<FilterItem[]>(() => {
+    return FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => {
+      return {
         id,
         label: translate(labelKey),
         startContent: <Icon />,
-      })),
-    [translate],
-  );
+      };
+    });
+  }, [translate]);
 
-  const filters = useMemo<FilterConfig[]>(
-    () => [
+  const filters = useMemo<FilterConfig[]>(() => {
+    return [
       {
         type: 'popover',
         id: 'tags',
@@ -130,22 +139,21 @@ export const useGlobalDriveFilters = ({
         onToggle: toggleSharedViaLink,
         disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
       },
-    ],
-    [
-      activeFilterType,
-      conversationItems,
-      creatorItems,
-      fileTypes,
-      tagItems,
-      selectedTagIds,
-      selectedFileTypeIds,
-      selectedConversationIds,
-      selectedCreatorIds,
-      isSharedViaLink,
-      toggleSharedViaLink,
-      translate,
-    ],
-  );
+    ];
+  }, [
+    activeFilterType,
+    conversationItems,
+    creatorItems,
+    fileTypes,
+    tagItems,
+    selectedTagIds,
+    selectedFileTypeIds,
+    selectedConversationIds,
+    selectedCreatorIds,
+    isSharedViaLink,
+    toggleSharedViaLink,
+    translate,
+  ]);
 
   return {filters, filterState};
 };

@@ -19,6 +19,8 @@
 
 import {createContext, type ReactNode, useCallback, useContext} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -38,11 +40,11 @@ export const getSelfUserDriveRole = ({
   conversationTeamId,
   selfUserTeamId,
 }: GetSelfUserDriveRoleParams): CellsSelfUserDriveRole => {
-  if (!conversationTeamId) {
+  if (!isNonEmptyString(conversationTeamId)) {
     return CELLS_SELF_USER_DRIVE_ROLE.EDITOR;
   }
 
-  if (!selfUserTeamId) {
+  if (!isNonEmptyString(selfUserTeamId)) {
     return CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
   }
 
@@ -133,12 +135,13 @@ export const useCellsActionPermissions = () => {
   const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
 
   return useCallback(
-    (action: CellsAction) =>
-      canPerformCellsAction({
+    (action: CellsAction) => {
+      return canPerformCellsAction({
         action,
         isViewerPermissionFeatureEnabled,
         selfUserDriveRole,
-      }),
+      });
+    },
     [isViewerPermissionFeatureEnabled, selfUserDriveRole],
   );
 };

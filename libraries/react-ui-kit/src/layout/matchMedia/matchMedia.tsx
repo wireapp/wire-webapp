@@ -38,7 +38,9 @@ export type MatchMediaProps = React.PropsWithChildren<{
 
 export const useMatchMedia = (query: Query, customWindowObj?: Window) => {
   const windowObj = customWindowObj !== undefined ? customWindowObj : window;
-  const matchMedia = useMemo(() => windowObj.matchMedia(`(${query})`), [query, windowObj]);
+  const matchMedia = useMemo(() => {
+    return windowObj.matchMedia(`(${query})`);
+  }, [query, windowObj]);
 
   const [isMatching, setIsMatching] = useState(matchMedia.matches);
 
@@ -50,7 +52,9 @@ export const useMatchMedia = (query: Query, customWindowObj?: Window) => {
     // update isMatching when matchMedia (or customWindowObj) change
     updateMatching(matchMedia);
     matchMedia.addEventListener('change', updateMatching);
-    return () => matchMedia.removeEventListener('change', updateMatching);
+    return () => {
+      return matchMedia.removeEventListener('change', updateMatching);
+    };
   }, [matchMedia]);
 
   return isMatching;
@@ -64,11 +68,27 @@ export const MatchMedia: React.FC<MatchMediaProps> = ({query, children, not}) =>
 
 export type NamedMatchMediaProps = Omit<MatchMediaProps, 'query'>;
 
-export const IsDesktop = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.DESKTOP} {...props} />;
-export const IsDesktopXL = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.DESKTOP_XL} {...props} />;
-export const IsMobile = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.MOBILE} {...props} />;
-export const IsMobileDown = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.MOBILE_DOWN} {...props} />;
-export const IsMobileUp = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.MOBILE_UP} {...props} />;
-export const IsTablet = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.TABLET} {...props} />;
-export const IsTabletDown = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.TABLET_DOWN} {...props} />;
-export const IsTabletUp = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.TABLET_UP} {...props} />;
+export const IsDesktop = (props: NamedMatchMediaProps) => {
+  return <MatchMedia query={QueryKeys.DESKTOP} {...props} />;
+};
+export const IsDesktopXL = (props: NamedMatchMediaProps) => {
+  return <MatchMedia query={QueryKeys.DESKTOP_XL} {...props} />;
+};
+export const IsMobile = (props: NamedMatchMediaProps) => {
+  return <MatchMedia query={QueryKeys.MOBILE} {...props} />;
+};
+export const IsMobileDown = (props: NamedMatchMediaProps) => {
+  return <MatchMedia query={QueryKeys.MOBILE_DOWN} {...props} />;
+};
+export const IsMobileUp = (props: NamedMatchMediaProps) => {
+  return <MatchMedia query={QueryKeys.MOBILE_UP} {...props} />;
+};
+export const IsTablet = (props: NamedMatchMediaProps) => {
+  return <MatchMedia query={QueryKeys.TABLET} {...props} />;
+};
+export const IsTabletDown = (props: NamedMatchMediaProps) => {
+  return <MatchMedia query={QueryKeys.TABLET_DOWN} {...props} />;
+};
+export const IsTabletUp = (props: NamedMatchMediaProps) => {
+  return <MatchMedia query={QueryKeys.TABLET_UP} {...props} />;
+};

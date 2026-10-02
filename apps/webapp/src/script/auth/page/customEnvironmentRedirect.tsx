@@ -59,7 +59,9 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
           doNavigate(destinationUrl);
         }
       }, REDIRECT_DELAY);
-      afterRender(() => setIsAnimating(true));
+      afterRender(() => {
+        return setIsAnimating(true);
+      });
     }
     return () => {
       window.clearTimeout(redirectTimeoutId);
@@ -129,12 +131,16 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
-  doNavigate: (...args: Parameters<typeof actionRoot.navigationAction.doNavigate>) =>
-    dispatch(actionRoot.navigationAction.doNavigate(...args)),
-  doSendNavigationEvent: (...args: Parameters<typeof actionRoot.wrapperEventAction.doSendNavigationEvent>) =>
-    dispatch(actionRoot.wrapperEventAction.doSendNavigationEvent(...args)),
-});
+const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+  return {
+    doNavigate: (...args: Parameters<typeof actionRoot.navigationAction.doNavigate>) => {
+      return dispatch(actionRoot.navigationAction.doNavigate(...args));
+    },
+    doSendNavigationEvent: (...args: Parameters<typeof actionRoot.wrapperEventAction.doSendNavigationEvent>) => {
+      return dispatch(actionRoot.wrapperEventAction.doSendNavigationEvent(...args));
+    },
+  };
+};
 
 const CustomEnvironmentRedirect = connect(null, mapDispatchToProps)(CustomEnvironmentRedirectComponent);
 

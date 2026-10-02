@@ -43,7 +43,9 @@ export class BackupService {
     const collection = table.toCollection();
     const tableCount = await table.count();
     const parallelBatchDriver = new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: tableCount});
-    const batchCount = await parallelBatchDriver.eachBatch(collection, batch => onProgress(batch));
+    const batchCount = await parallelBatchDriver.eachBatch(collection, batch => {
+      return onProgress(batch);
+    });
     this.logger.debug(`Exported store '${table.name}' in '${batchCount}' batches`);
   }
 
@@ -55,8 +57,14 @@ export class BackupService {
   }
 
   async getHistoryCount(): Promise<number> {
-    const recordsPerTable = await Promise.all(this.getTables().map(table => table.count()));
-    return recordsPerTable.reduce((accumulator, recordCount) => accumulator + recordCount, 0);
+    const recordsPerTable = await Promise.all(
+      this.getTables().map(table => {
+        return table.count();
+      }),
+    );
+    return recordsPerTable.reduce((accumulator, recordCount) => {
+      return accumulator + recordCount;
+    }, 0);
   }
 
   getTables() {
@@ -136,11 +144,15 @@ export class BackupService {
       return entities.length;
     }
 
-    const ids = entities.map(generateId).filter((id): id is string => typeof id === 'string');
+    const ids = entities.map(generateId).filter((id): id is string => {
+      return typeof id === 'string';
+    });
     const existingEntities = await table.where('id').anyOf(ids).toArray();
-    const newEntities = entities.filter(
-      entity => !existingEntities.some(existingEntity => generateId(existingEntity) === generateId(entity)),
-    );
+    const newEntities = entities.filter(entity => {
+      return !existingEntities.some(existingEntity => {
+        return generateId(existingEntity) === generateId(entity);
+      });
+    });
     await table.bulkAdd(newEntities);
 
     return newEntities.length;

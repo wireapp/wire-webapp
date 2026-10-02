@@ -45,11 +45,11 @@ export class CallMessage extends Message {
     this.finished_reason = reason;
     this.duration = duration;
 
-    this.caption = ko.pureComputed(() =>
-      this.user().isMe
+    this.caption = ko.pureComputed(() => {
+      return this.user().isMe
         ? this.translate('conversationVoiceChannelDeactivateYou')
-        : this.translate('conversationVoiceChannelDeactivate'),
-    );
+        : this.translate('conversationVoiceChannelDeactivate');
+    });
   }
 
   isActivation(): boolean {

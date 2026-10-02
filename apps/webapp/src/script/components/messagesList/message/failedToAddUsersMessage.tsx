@@ -127,7 +127,11 @@ const failedToAddReactTranslationFormatting = {
 };
 
 function getFailedToAddMarkerSubstitutions(values: readonly FailedToAddTranslationValue[]): Record<string, string> {
-  return Object.fromEntries(values.map(({placeholder, marker}) => [placeholder, marker.substitution]));
+  return Object.fromEntries(
+    values.map(({placeholder, marker}) => {
+      return [placeholder, marker.substitution];
+    }),
+  );
 }
 
 function applyFailedToAddTranslationCompatibility(translationKey: TranslationKey, translatedText: string): string {
@@ -158,7 +162,9 @@ function renderFailedToAddReactTranslation(options: RenderFailedToAddTranslation
       },
     ],
     nodeReplacements: [],
-    valueReplacements: values.map(({marker, runtimeText}) => ({marker, runtimeText})),
+    valueReplacements: values.map(({marker, runtimeText}) => {
+      return {marker, runtimeText};
+    }),
   });
 }
 
@@ -287,7 +293,9 @@ function renderFailedToAddDetailsTranslation(options: RenderFailedToAddDetailsTr
     translationKey = pluralDetailsTranslationKeyByReason[reason];
     const runtimeNames = users
       .slice(1)
-      .map(user => getUserNameWithTranslate(user, translate))
+      .map(user => {
+        return getUserNameWithTranslate(user, translate);
+      })
       .join(', ');
 
     if (translationLabel === 'OfflineBackend') {
@@ -342,7 +350,9 @@ function MessageDetails({failure, isMessageFocused, allUsers, translate}: Messag
 
   const users = useMemo(() => {
     const users: User[] = userIds.reduce<User[]>((previous, current) => {
-      const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
+      const foundUser = allUsers.find(user => {
+        return matchQualifiedIds(current, user.qualifiedId);
+      });
       return !isUndefined(foundUser) ? [...previous, foundUser] : previous;
     }, []);
     return users;
@@ -396,7 +406,11 @@ function FailedToAddUsersMessage({
   const {users: allUsers} = useKoSubscribableChildren(userState, ['users']);
   const {failures} = message;
 
-  const allUserIds = useMemo(() => failures.flatMap(failure => failure.users), [failures]);
+  const allUserIds = useMemo(() => {
+    return failures.flatMap(failure => {
+      return failure.users;
+    });
+  }, [failures]);
   const totalNumberOfUsers = allUserIds.length;
 
   if (allUserIds.length === 0) {
@@ -404,7 +418,9 @@ function FailedToAddUsersMessage({
   }
 
   // These will be used if we've only failed to add a single user
-  const firstUser = allUsers.find(user => matchQualifiedIds(allUserIds[0], user.qualifiedId));
+  const firstUser = allUsers.find(user => {
+    return matchQualifiedIds(allUserIds[0], user.qualifiedId);
+  });
   const {link} = reasonToMessageDataMap[failures[0].reason];
 
   const learnMore = (
@@ -458,15 +474,17 @@ function FailedToAddUsersMessage({
       </div>
       <div className="message-details">
         {isOpen &&
-          failures.map((failure, index) => (
-            <MessageDetails
-              allUsers={allUsers}
-              isMessageFocused={isMessageFocused}
-              key={index}
-              failure={failure}
-              translate={translate}
-            />
-          ))}
+          failures.map((failure, index) => {
+            return (
+              <MessageDetails
+                allUsers={allUsers}
+                isMessageFocused={isMessageFocused}
+                key={index}
+                failure={failure}
+                translate={translate}
+              />
+            );
+          })}
 
         {totalNumberOfUsers > 1 && (
           <div>
@@ -475,7 +493,11 @@ function FailedToAddUsersMessage({
               data-uie-name="toggle-failed-to-add-users"
               type="button"
               variant={ButtonVariant.TERTIARY}
-              onClick={() => setIsOpen(state => !state)}
+              onClick={() => {
+                return setIsOpen(state => {
+                  return !state;
+                });
+              }}
               style={{marginTop: 4}}
             >
               {isOpen ? translate('messageFailedToSendHideDetails') : translate('messageFailedToSendShowDetails')}

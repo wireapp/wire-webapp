@@ -52,33 +52,34 @@ export const dropFileWrapperStyle: CSSObject = {
   maxWidth: '330px',
 };
 
-export const dropFileZoneWrapperStyle: (theme: Theme, isDraggedOver: boolean) => CSSObject = (
-  theme,
-  isDraggedOver,
-) => ({
-  width: '100%',
-  padding: '28px 12px',
-  border: `1px dashed ${theme.general.primaryColor}`,
-  borderBottomWidth: '2px',
-  borderRadius: '6px',
-  textAlign: 'center',
-  backgroundColor: isDraggedOver ? theme.general.backgroundColor : COLOR.WHITE,
-  fontWeight: 400,
-  fontSize: '0.75rem',
-  lineHeight: '13px',
-  color: COLOR.GRAY,
-});
+export const dropFileZoneWrapperStyle: (theme: Theme, isDraggedOver: boolean) => CSSObject = (theme, isDraggedOver) => {
+  return {
+    width: '100%',
+    padding: '28px 12px',
+    border: `1px dashed ${theme.general.primaryColor}`,
+    borderBottomWidth: '2px',
+    borderRadius: '6px',
+    textAlign: 'center',
+    backgroundColor: isDraggedOver ? theme.general.backgroundColor : COLOR.WHITE,
+    fontWeight: 400,
+    fontSize: '0.75rem',
+    lineHeight: '13px',
+    color: COLOR.GRAY,
+  };
+};
 
-export const dropFileZoneLabelStyle: (theme: Theme) => CSSObject = theme => ({
-  color: theme.general.primaryColor,
-  cursor: 'pointer',
-  ':focus-within': {
-    outline: `1px solid ${theme.general.primaryColor}`,
-  },
-  ':hover': {
-    textDecoration: 'underline',
-  },
-});
+export const dropFileZoneLabelStyle: (theme: Theme) => CSSObject = theme => {
+  return {
+    color: theme.general.primaryColor,
+    cursor: 'pointer',
+    ':focus-within': {
+      outline: `1px solid ${theme.general.primaryColor}`,
+    },
+    ':hover': {
+      textDecoration: 'underline',
+    },
+  };
+};
 
 export const dropFileZoneHeadingStyle: CSSObject = {
   display: 'block',
@@ -111,7 +112,9 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
   ) => {
     const [isDraggedOver, setIsDraggedOver] = useState(false);
 
-    const resetDraggedOver = () => setIsDraggedOver(false);
+    const resetDraggedOver = () => {
+      return setIsDraggedOver(false);
+    };
 
     const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -137,12 +140,14 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
       const filesArr = multiple === true ? Array.from(files) : [files[0]];
 
       const areFilesValid = isNonEmptyString(accept)
-        ? filesArr.every(file =>
-            accept
+        ? filesArr.every(file => {
+            return accept
               .split(',')
-              .map(v => v.trim())
-              .includes(file.type),
-          )
+              .map(v => {
+                return v.trim();
+              })
+              .includes(file.type);
+          })
         : true;
 
       if (!areFilesValid) {
@@ -166,10 +171,12 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
     return (
       <div css={dropFileWrapperStyle}>
         <div
-          css={(theme: Theme) => ({
-            ...dropFileZoneWrapperStyle(theme, isDraggedOver),
-            ...dropFileZoneWrapperCSS,
-          })}
+          css={(theme: Theme) => {
+            return {
+              ...dropFileZoneWrapperStyle(theme, isDraggedOver),
+              ...dropFileZoneWrapperCSS,
+            };
+          }}
           data-testid="dropzone"
           onDragOver={handleDragOver}
           onDragLeave={resetDraggedOver}
@@ -181,7 +188,9 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
               <span css={dropFileZoneHeadingStyle}>{headingText}</span>
               <label
                 aria-label={`${headingText} ${labelText} (${description})`}
-                css={(theme: Theme) => dropFileZoneLabelStyle(theme)}
+                css={(theme: Theme) => {
+                  return dropFileZoneLabelStyle(theme);
+                }}
               >
                 <span>{labelText}</span>
                 <input

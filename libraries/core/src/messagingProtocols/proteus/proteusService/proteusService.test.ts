@@ -53,11 +53,13 @@ jest.mock('./cryptoClient/coreCryptoWrapper/prekeysTracker', () => {
   };
 });
 
-jest.mock('../utility/recipients', () => ({
-  ...jest.requireActual('../utility/recipients'),
-  getRecipientsForConversation: jest.fn(),
-  getQualifiedRecipientsForConversation: jest.fn(),
-}));
+jest.mock('../utility/recipients', () => {
+  return {
+    ...jest.requireActual('../utility/recipients'),
+    getRecipientsForConversation: jest.fn(),
+    getQualifiedRecipientsForConversation: jest.fn(),
+  };
+});
 const MockedRecipients = Recipients as jest.Mocked<typeof Recipients>;
 
 const prepareDataForEncryption = async () => {
@@ -787,12 +789,12 @@ describe('ProteusService', () => {
           new FederatedBackendsError(FederatedBackendsErrorLabel.NON_FEDERATING_BACKENDS, [domain1, domain2]),
         );
 
-      await expect(() =>
-        proteusService.createConversation({
+      await expect(() => {
+        return proteusService.createConversation({
           receipt_mode: null,
           qualified_users: [...usersDomain1, ...usersDomain2],
-        }),
-      ).rejects.toThrow(NonFederatingBackendsError);
+        });
+      }).rejects.toThrow(NonFederatingBackendsError);
     });
   });
 });

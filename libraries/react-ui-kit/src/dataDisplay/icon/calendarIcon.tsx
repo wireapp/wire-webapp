@@ -19,15 +19,17 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const CalendarIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path
-      fill="none"
-      strokeWidth={2}
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
-    />
-  </SVGIcon>
-);
+export const CalendarIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path
+        fill="none"
+        strokeWidth={2}
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
+      />
+    </SVGIcon>
+  );
+};

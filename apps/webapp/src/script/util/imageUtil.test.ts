@@ -31,7 +31,9 @@ const jpegWithoutExif = new Blob([new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 
 
 const nonJpeg = new Blob([new Uint8Array([0x00, 0x00, 0x00, 0x00])], {type: 'application/octet-stream'});
 
-URL.createObjectURL = jest.fn(() => 'mocked-url');
+URL.createObjectURL = jest.fn(() => {
+  return 'mocked-url';
+});
 URL.revokeObjectURL = jest.fn();
 
 describe('imageUtil', () => {
@@ -39,15 +41,19 @@ describe('imageUtil', () => {
   let mockContext: CanvasRenderingContext2D;
 
   beforeEach(() => {
-    global.Image = jest.fn(() => ({
-      onload: jest.fn(),
-      onerror: jest.fn(),
-      set src(value: string) {
-        if (value === 'mocked-url') {
-          setTimeout(() => this.onload(new Event('load')), 10);
-        }
-      },
-    })) as jest.Mock;
+    global.Image = jest.fn(() => {
+      return {
+        onload: jest.fn(),
+        onerror: jest.fn(),
+        set src(value: string) {
+          if (value === 'mocked-url') {
+            setTimeout(() => {
+              return this.onload(new Event('load'));
+            }, 10);
+          }
+        },
+      };
+    }) as jest.Mock;
 
     mockContext = {
       drawImage: jest.fn(),
@@ -56,7 +62,9 @@ describe('imageUtil', () => {
     mockCanvas = {
       width: 0,
       height: 0,
-      getContext: jest.fn(() => mockContext),
+      getContext: jest.fn(() => {
+        return mockContext;
+      }),
       toBlob: jest.fn((callback: (blob: Blob | null) => void) => {
         callback(new Blob(['mocked-data'], {type: 'image/png'}));
       }),
@@ -103,15 +111,19 @@ describe('imageUtil', () => {
     });
 
     it('throws an error if the image fails to load', async () => {
-      global.Image = jest.fn(() => ({
-        onload: jest.fn(),
-        onerror: jest.fn(),
-        set src(value: string) {
-          if (value === 'mocked-url') {
-            setTimeout(() => this.onerror?.(new ErrorEvent('error')), 10);
-          }
-        },
-      })) as jest.Mock;
+      global.Image = jest.fn(() => {
+        return {
+          onload: jest.fn(),
+          onerror: jest.fn(),
+          set src(value: string) {
+            if (value === 'mocked-url') {
+              setTimeout(() => {
+                return this.onerror?.(new ErrorEvent('error'));
+              }, 10);
+            }
+          },
+        };
+      }) as jest.Mock;
 
       const inputBlob = new Blob(['dummy-image'], {type: 'image/png'});
 

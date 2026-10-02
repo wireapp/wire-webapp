@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {
   CompositeMessageAddEvent,
   MessageAddEvent,
@@ -44,8 +46,9 @@ export function getCommonMessageUpdates(
 ): EditableEvent {
   const commonProps = {
     edited_time: originalEvent.edited_time,
-    read_receipts: !newEvent.read_receipts ? originalEvent.read_receipts : newEvent.read_receipts,
-    status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
+    read_receipts: !isTruthy(newEvent.read_receipts) ? originalEvent.read_receipts : newEvent.read_receipts,
+    status:
+      !isTruthy(newEvent.status) || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
     time: originalEvent.time,
   };
 

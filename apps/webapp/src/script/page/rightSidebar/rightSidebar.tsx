@@ -145,9 +145,13 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const messageEntity = !isNullOrUndefined(currentEntity) && isReadableMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = !isNullOrUndefined(currentEntity) && isAppOrServiceEntity(currentEntity) ? currentEntity : null;
 
-  const goToRoot = () => rightSidebar.goToRoot(isNullOrUndefined(activeConversation) ? null : activeConversation);
+  const goToRoot = () => {
+    return rightSidebar.goToRoot(isNullOrUndefined(activeConversation) ? null : activeConversation);
+  };
 
-  const closePanel = () => rightSidebar.close();
+  const closePanel = () => {
+    return rightSidebar.close();
+  };
 
   const togglePanel = (newState: PanelState, entity: PanelEntity | null, isAddMode: boolean = false) => {
     setAnimatePanelToLeft(true);
@@ -199,7 +203,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
     });
   }, []);
 
-  const containerRef = useCallback((element: HTMLDivElement | null) => element?.focus(), [currentState]);
+  const containerRef = useCallback(
+    (element: HTMLDivElement | null) => {
+      return element?.focus();
+    },
+    [currentState],
+  );
 
   if (isNullOrUndefined(activeConversation)) {
     return null;

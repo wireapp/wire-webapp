@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {ConversationCode} from '@wireapp/api-client/lib/conversation/';
 import {ConversationAccessUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
@@ -80,7 +81,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     if (isConversationInTeam) {
       if (isStateChange) {
         const {accessModes, accessRole} = updateAccessRights(accessState);
-        if (accessModes !== undefined && accessRole !== undefined) {
+        if (!isUndefined(accessModes) && !isUndefined(accessRole)) {
           try {
             const isLosingAccessCode =
               hasAccessToFeature(ACCESS_MODES.CODE, prevAccessState) &&
@@ -98,10 +99,11 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             conversationEntity.accessState(accessState);
           } catch {
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
-            if (featureName !== undefined) {
-              const messageKey = featureInfo.isAvailable
-                ? ACCESS_FEATURE_TRANSLATION_KEYS[featureName].allow
-                : ACCESS_FEATURE_TRANSLATION_KEYS[featureName].disable;
+            if (!isUndefined(featureName)) {
+              const messageKey =
+                featureInfo.isAvailable === true
+                  ? ACCESS_FEATURE_TRANSLATION_KEYS[featureName].allow
+                  : ACCESS_FEATURE_TRANSLATION_KEYS[featureName].disable;
               this._showModal(this.translate(messageKey));
             }
           }
@@ -110,7 +112,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       }
     }
     const {featureName} = featureFromStateChange(prevAccessState, accessState);
-    if (featureName !== undefined) {
+    if (!isUndefined(featureName)) {
       this._showModal(this.translate(ACCESS_FEATURE_TRANSLATION_KEYS[featureName].toggle));
     }
   }
@@ -131,7 +133,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     try {
       const response = await this.conversationService.postConversationCode(conversationEntity.id, password ?? '');
       const accessCode = response?.data;
-      if (accessCode !== undefined) {
+      if (!isUndefined(accessCode)) {
         ConversationMapper.mapAccessCode(conversationEntity, accessCode);
       }
     } catch {
@@ -154,7 +156,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
   ): void {
     const {access: accessModes, ...roles} = eventJson.data;
     const accessRole = roles.access_role;
-    if (accessRole === undefined) {
+    if (isUndefined(accessRole)) {
       return;
     }
     ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, roles.access_role_v2);

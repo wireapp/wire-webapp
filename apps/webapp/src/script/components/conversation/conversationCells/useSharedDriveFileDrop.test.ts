@@ -31,15 +31,18 @@ const uploadPath = 'conversation-id@example.com';
 const folderUploadPath = 'Folder';
 const conversationQualifiedId = 'conversation-id@example.com';
 
-const createFireAndForgetInvoker = (): FireAndForgetInvoker => ({
-  fireAndForget: jest.fn(),
-  waitUntilAllSettled: jest.fn().mockResolvedValue(undefined),
-});
+const createFireAndForgetInvoker = (): FireAndForgetInvoker => {
+  return {
+    fireAndForget: jest.fn(),
+    waitUntilAllSettled: jest.fn().mockResolvedValue(undefined),
+  };
+};
 
-const createSharedDriveUploadController = (): SharedDriveUploadController =>
-  ({
+const createSharedDriveUploadController = (): SharedDriveUploadController => {
+  return {
     upload: jest.fn().mockResolvedValue(undefined),
-  }) as unknown as SharedDriveUploadController;
+  } as unknown as SharedDriveUploadController;
+};
 
 describe('useSharedDriveFileDrop', () => {
   const defaultConfiguration = Config.getConfig();
@@ -64,8 +67,8 @@ describe('useSharedDriveFileDrop', () => {
     const showFileDropzoneError = jest.fn();
     const onRefresh = jest.fn();
     const file = new File(['content'], 'malware.exe', {type: 'application/octet-stream'});
-    const {result} = renderHook(() =>
-      useSharedDriveFileDrop({
+    const {result} = renderHook(() => {
+      return useSharedDriveFileDrop({
         conversationQualifiedId,
         fireAndForgetInvoker,
         isInRecycleBin: false,
@@ -75,10 +78,12 @@ describe('useSharedDriveFileDrop', () => {
         showFileDropzoneError,
         translate: translateForTest,
         uploadPath,
-      }),
-    );
+      });
+    });
 
-    act(() => result.current([file]));
+    act(() => {
+      return result.current([file]);
+    });
 
     expect(fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
     expect(sharedDriveUploadController.upload).not.toHaveBeenCalled();
@@ -108,8 +113,8 @@ describe('useSharedDriveFileDrop', () => {
     const showFileDropzoneError = jest.fn();
     const onRefresh = jest.fn();
     const file = new File(['content'], fileName, {type: fileType});
-    const {result} = renderHook(() =>
-      useSharedDriveFileDrop({
+    const {result} = renderHook(() => {
+      return useSharedDriveFileDrop({
         conversationQualifiedId,
         fireAndForgetInvoker,
         isInRecycleBin: false,
@@ -119,10 +124,12 @@ describe('useSharedDriveFileDrop', () => {
         showFileDropzoneError,
         translate: translateForTest,
         uploadPath,
-      }),
-    );
+      });
+    });
 
-    act(() => result.current([file]));
+    act(() => {
+      return result.current([file]);
+    });
 
     expect(showFileDropzoneError).not.toHaveBeenCalled();
     expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
@@ -149,8 +156,8 @@ describe('useSharedDriveFileDrop', () => {
     const showFileDropzoneError = jest.fn();
     const onRefresh = jest.fn();
     const file = new File(['content'], 'installer.exe', {type: 'application/octet-stream'});
-    const {result} = renderHook(() =>
-      useSharedDriveFileDrop({
+    const {result} = renderHook(() => {
+      return useSharedDriveFileDrop({
         conversationQualifiedId,
         fireAndForgetInvoker,
         isInRecycleBin: false,
@@ -160,10 +167,12 @@ describe('useSharedDriveFileDrop', () => {
         showFileDropzoneError,
         translate: translateForTest,
         uploadPath,
-      }),
-    );
+      });
+    });
 
-    act(() => result.current([file]));
+    act(() => {
+      return result.current([file]);
+    });
 
     expect(showFileDropzoneError).not.toHaveBeenCalled();
     expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);
@@ -183,8 +192,8 @@ describe('useSharedDriveFileDrop', () => {
     const showFileDropzoneError = jest.fn();
     const onRefresh = jest.fn();
     const file = new File(['content'], 'document.pdf', {type: 'application/pdf'});
-    const {result} = renderHook(() =>
-      useSharedDriveFileDrop({
+    const {result} = renderHook(() => {
+      return useSharedDriveFileDrop({
         conversationQualifiedId,
         fireAndForgetInvoker,
         isInRecycleBin: false,
@@ -194,10 +203,12 @@ describe('useSharedDriveFileDrop', () => {
         showFileDropzoneError,
         translate: translateForTest,
         uploadPath,
-      }),
-    );
+      });
+    });
 
-    act(() => result.current([file]));
+    act(() => {
+      return result.current([file]);
+    });
 
     expect(fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
     expect(sharedDriveUploadController.upload).not.toHaveBeenCalled();
@@ -223,8 +234,8 @@ describe('useSharedDriveFileDrop', () => {
     const showFileDropzoneError = jest.fn();
     const onRefresh = jest.fn();
     const file = new File(['content'], 'document.pdf', {type: 'application/pdf'});
-    const {result} = renderHook(() =>
-      useSharedDriveFileDrop({
+    const {result} = renderHook(() => {
+      return useSharedDriveFileDrop({
         conversationQualifiedId,
         fireAndForgetInvoker,
         isInRecycleBin: false,
@@ -234,10 +245,12 @@ describe('useSharedDriveFileDrop', () => {
         showFileDropzoneError,
         translate: translateForTest,
         uploadPath,
-      }),
-    );
+      });
+    });
 
-    act(() => result.current([file], folderUploadPath));
+    act(() => {
+      return result.current([file], folderUploadPath);
+    });
 
     expect(showFileDropzoneError).not.toHaveBeenCalled();
     expect(fireAndForgetInvoker.fireAndForget).toHaveBeenCalledTimes(1);

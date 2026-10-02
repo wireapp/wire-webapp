@@ -51,7 +51,9 @@ export const ConversationViewerPermissionBanner = () => {
         type="button"
         className="conversation-viewer-permission-banner__close"
         aria-label={translate('accessibility.rightPanel.close')}
-        onClick={() => setIsVisible(false)}
+        onClick={() => {
+          return setIsVisible(false);
+        }}
       >
         <CloseIcon />
       </button>

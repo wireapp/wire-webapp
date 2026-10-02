@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {
   CompositeMessageAddEvent,
   MessageAddEvent,
@@ -40,7 +42,7 @@ function validateEditEvent(
   originalEvent: HandledEvents | undefined,
   editEvent: EditableEvent,
 ): originalEvent is StoredEvent<EditableEvent> {
-  if (!originalEvent) {
+  if (!isTruthy(originalEvent)) {
     throwValidationError('Edit event without original event');
   }
 
@@ -87,7 +89,7 @@ export const handleEditEvent: EventHandler = async (event, {findEvent}) => {
     return undefined;
   }
   const editedEventId = event.data.replacing_message_id;
-  if (!editedEventId) {
+  if (!isTruthy(editedEventId)) {
     return undefined;
   }
   const originalEvent = await findEvent(editedEventId);

@@ -26,5 +26,10 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 export const findMeetingSeriesByQualifiedConversation = (
   meetingSeries: readonly MeetingSeries[],
   qualifiedConversationId: QualifiedId,
-): Maybe<MeetingSeries> =>
-  Maybe.of(meetingSeries.find(series => matchQualifiedIds(series.qualified_conversation, qualifiedConversationId)));
+): Maybe<MeetingSeries> => {
+  return Maybe.of(
+    meetingSeries.find(series => {
+      return matchQualifiedIds(series.qualified_conversation, qualifiedConversationId);
+    }),
+  );
+};

@@ -65,18 +65,15 @@ export const MeetNowModal = () => {
   const selfUser = container.resolve(UserState).self();
   const submitGenerationRef = useRef(0);
 
-  const titleError = useMemo(
-    () => (isUndefined(errors.title) ? undefined : translate(errors.title)),
-    [errors.title, translate],
-  );
-  const passwordError = useMemo(
-    () => (isUndefined(errors.password) ? undefined : translate(errors.password)),
-    [errors.password, translate],
-  );
-  const passwordConfirmationError = useMemo(
-    () => (isUndefined(errors.passwordConfirmation) ? undefined : translate(errors.passwordConfirmation)),
-    [errors.passwordConfirmation, translate],
-  );
+  const titleError = useMemo(() => {
+    return isUndefined(errors.title) ? undefined : translate(errors.title);
+  }, [errors.title, translate]);
+  const passwordError = useMemo(() => {
+    return isUndefined(errors.password) ? undefined : translate(errors.password);
+  }, [errors.password, translate]);
+  const passwordConfirmationError = useMemo(() => {
+    return isUndefined(errors.passwordConfirmation) ? undefined : translate(errors.passwordConfirmation);
+  }, [errors.passwordConfirmation, translate]);
 
   const dismissModal = () => {
     close();
@@ -122,7 +119,9 @@ export const MeetNowModal = () => {
       wrapperCSS={{...modalWrapperStyles, ...meetNowModalWrapperStyles}}
       isShown={isOpen}
       onClosed={handleClose}
-      onKeyDown={event => handleEscDown(event, handleClose)}
+      onKeyDown={event => {
+        return handleEscDown(event, handleClose);
+      }}
     >
       <div css={wrapperStyles}>
         <header css={headerStyles}>

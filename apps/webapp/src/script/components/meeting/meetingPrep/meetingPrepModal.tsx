@@ -42,8 +42,12 @@ export const MeetingPrepModal = ({
   releasePreviewStream,
   joinMeeting,
 }: MeetingPrepModalProps) => {
-  const session = useMeetingPrepModal(state => state.session);
-  const close = useMeetingPrepModal(state => state.close);
+  const session = useMeetingPrepModal(state => {
+    return state.session;
+  });
+  const close = useMeetingPrepModal(state => {
+    return state.close;
+  });
 
   return (
     <ModalComponent
@@ -52,7 +56,9 @@ export const MeetingPrepModal = ({
       wrapperCSS={modalWrapperStyles}
       isShown={maybe.isJust(session)}
       onBgClick={close}
-      onKeyDown={event => handleEscDown(event, close)}
+      onKeyDown={event => {
+        return handleEscDown(event, close);
+      }}
     >
       {maybe.isJust(session) && (
         <MeetingPrepSurface

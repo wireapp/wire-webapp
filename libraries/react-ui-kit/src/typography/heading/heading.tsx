@@ -44,79 +44,115 @@ export const Heading = ({level, ...props}: HeadingProps) => {
 export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
   {block = true, color = theme.general.color, level = '1', noWrap = false, textTransform = 'none', ...props},
-) => ({
-  ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
-  fontSize: '3rem',
-  fontWeight: 400,
-  lineHeight: '3.5rem',
-  marginBottom: '64px',
-  marginTop: 0,
-  minHeight: '3rem',
-  [media[QueryKeys.MOBILE]]: {
-    fontSize: '2.5rem',
-    lineHeight: '3rem',
-  },
-});
+) => {
+  return {
+    ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
+    fontSize: '3rem',
+    fontWeight: 400,
+    lineHeight: '3.5rem',
+    marginBottom: '64px',
+    marginTop: 0,
+    minHeight: '3rem',
+    [media[QueryKeys.MOBILE]]: {
+      fontSize: '2.5rem',
+      lineHeight: '3rem',
+    },
+  };
+};
 
-export const H1 = ({children, ...props}: HeadingProps) => (
-  <h1 css={(theme: Theme) => h1Style(theme, props)} {...filterTextProps(props)}>
-    {children}
-  </h1>
-);
+export const H1 = ({children, ...props}: HeadingProps) => {
+  return (
+    <h1
+      css={(theme: Theme) => {
+        return h1Style(theme, props);
+      }}
+      {...filterTextProps(props)}
+    >
+      {children}
+    </h1>
+  );
+};
 
 export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
   {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
-) => ({
-  ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
-  fontSize: '1.25rem',
-  fontWeight: 700,
-  lineHeight: '1.75rem',
-  marginBottom: '24px',
-  marginTop: '32px',
-  [media[QueryKeys.MOBILE]]: {
-    fontSize: '1.125rem',
-    lineHeight: '1.625rem',
-    marginBottom: '20px',
-    marginTop: '26px',
-  },
-});
+) => {
+  return {
+    ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
+    fontSize: '1.25rem',
+    fontWeight: 700,
+    lineHeight: '1.75rem',
+    marginBottom: '24px',
+    marginTop: '32px',
+    [media[QueryKeys.MOBILE]]: {
+      fontSize: '1.125rem',
+      lineHeight: '1.625rem',
+      marginBottom: '20px',
+      marginTop: '26px',
+    },
+  };
+};
 
-export const H2 = ({children, ...props}: HeadingProps) => (
-  <h2 css={(theme: Theme) => h2Style(theme, props)} {...filterTextProps(props)}>
-    {children}
-  </h2>
-);
+export const H2 = ({children, ...props}: HeadingProps) => {
+  return (
+    <h2
+      css={(theme: Theme) => {
+        return h2Style(theme, props);
+      }}
+      {...filterTextProps(props)}
+    >
+      {children}
+    </h2>
+  );
+};
 
 export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
   {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
-) => ({
-  ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
-  fontSize: theme.fontSizes.base,
-  fontWeight: 600,
-  marginBottom: '16px',
-});
+) => {
+  return {
+    ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
+    fontSize: theme.fontSizes.base,
+    fontWeight: 600,
+    marginBottom: '16px',
+  };
+};
 
-export const H3 = ({children, ...props}: HeadingProps) => (
-  <h3 css={(theme: Theme) => h3Style(theme, props)} {...filterTextProps(props)}>
-    {children}
-  </h3>
-);
+export const H3 = ({children, ...props}: HeadingProps) => {
+  return (
+    <h3
+      css={(theme: Theme) => {
+        return h3Style(theme, props);
+      }}
+      {...filterTextProps(props)}
+    >
+      {children}
+    </h3>
+  );
+};
 
 export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
   {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
-) => ({
-  ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
-  fontSize: theme.fontSizes.extraSmall,
-  fontWeight: 400,
-  marginBottom: '5px',
-  marginTop: '20px',
-});
+) => {
+  return {
+    ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
+    fontSize: theme.fontSizes.extraSmall,
+    fontWeight: 400,
+    marginBottom: '5px',
+    marginTop: '20px',
+  };
+};
 
-export const H4 = ({children, ...props}: HeadingProps) => (
-  <h3 css={(theme: Theme) => h4Style(theme, props)} {...filterTextProps(props)}>
-    {children}
-  </h3>
-);
+export const H4 = ({children, ...props}: HeadingProps) => {
+  return (
+    <h3
+      css={(theme: Theme) => {
+        return h4Style(theme, props);
+      }}
+      {...filterTextProps(props)}
+    >
+      {children}
+    </h3>
+  );
+};

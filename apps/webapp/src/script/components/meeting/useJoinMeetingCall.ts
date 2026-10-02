@@ -73,14 +73,15 @@ const useMeetingConversationCall = (qualifiedConversationId: QualifiedId) => {
   const isCallActive =
     joinedCall !== undefined && matchQualifiedIds(joinedCall.conversation.qualifiedId, qualifiedConversationId);
 
-  const call = useMemo(
-    () => calls.find(callInstance => matchQualifiedIds(callInstance.conversation.qualifiedId, qualifiedConversationId)),
-    [calls, qualifiedConversationId],
-  );
+  const call = useMemo(() => {
+    return calls.find(callInstance => {
+      return matchQualifiedIds(callInstance.conversation.qualifiedId, qualifiedConversationId);
+    });
+  }, [calls, qualifiedConversationId]);
 
-  const [connectingCallState, setConnectingCallState] = useState<CALL_STATE | null>(() =>
-    isCallActive ? null : (call?.state() ?? null),
-  );
+  const [connectingCallState, setConnectingCallState] = useState<CALL_STATE | null>(() => {
+    return isCallActive ? null : (call?.state() ?? null);
+  });
 
   useEffect(() => {
     if (isUndefined(call) || isCallActive) {
@@ -120,8 +121,8 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
     }
   }, [isCallActive]);
 
-  const callNotEstablishedCopy = useMemo(
-    () => ({
+  const callNotEstablishedCopy = useMemo(() => {
+    return {
       description: translate('callNotEstablishedDescription'),
       descriptionPoints: [
         translate('callNotEstablishedDescriptionPoint1'),
@@ -130,21 +131,19 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
       ] as [string, string, string],
       title: translate('callNotEstablishedTitle'),
       translate,
-    }),
-    [translate],
-  );
+    };
+  }, [translate]);
 
   const guardCall = useNoInternetCallGuard(callNotEstablishedCopy);
 
-  const deps = useMemo<JoinMeetingCallDeps>(
-    () => ({
+  const deps = useMemo<JoinMeetingCallDeps>(() => {
+    return {
       conversationState: container.resolve(ConversationState),
       conversationRepository,
       callingRepository,
       callingViewModel,
-    }),
-    [callingRepository, callingViewModel, conversationRepository],
-  );
+    };
+  }, [callingRepository, callingViewModel, conversationRepository]);
 
   const showConversationNotFoundModal = useCallback(() => {
     PrimaryModal.show(
@@ -175,7 +174,9 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
           setIsJoining(false);
           handleJoinMeetingCallResult(result, {
             showConversationNotFoundModal,
-            showJoinFailedModal: () => showCallNotEstablishedModal(callNotEstablishedCopy),
+            showJoinFailedModal: () => {
+              return showCallNotEstablishedModal(callNotEstablishedCopy);
+            },
           });
         }
       });

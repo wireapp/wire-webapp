@@ -51,11 +51,13 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const {audioInputDevices, audioInputDeviceId, setAudioInputDeviceId} = useMediaDevicesStore(state => ({
-    audioInputDevices: state.audio.input.devices,
-    audioInputDeviceId: state.audio.input.selectedId,
-    setAudioInputDeviceId: state.setAudioInputDeviceId,
-  }));
+  const {audioInputDevices, audioInputDeviceId, setAudioInputDeviceId} = useMediaDevicesStore(state => {
+    return {
+      audioInputDevices: state.audio.input.devices,
+      audioInputDeviceId: state.audio.input.activeId,
+      setAudioInputDeviceId: state.setAudioInputDeviceId,
+    };
+  });
 
   const {URL: urls} = Config.getConfig();
 
@@ -80,14 +82,13 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
     void debouncedRequestStream();
   }, [audioInputDeviceId, audioInputDevices.length, debouncedRequestStream]);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       if (stream !== null && !hasActiveCall) {
         streamHandler.releaseTracksFromStream(stream);
       }
-    },
-    [hasActiveCall, stream, streamHandler],
-  );
+    };
+  }, [hasActiveCall, stream, streamHandler]);
 
   return (
     <PreferencesSection title={translate('preferencesAVMicrophone')}>
@@ -106,7 +107,9 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
         defaultDeviceName={translate('preferencesAVMicrophone')}
         icon={Icon.MicOnIcon}
         isRequesting={isRequesting}
-        onChange={deviceId => setAudioInputDeviceId(deviceId)}
+        onChange={deviceId => {
+          return setAudioInputDeviceId(deviceId);
+        }}
         title={translate('preferencesAVMicrophone')}
       />
       {isRequesting ? (

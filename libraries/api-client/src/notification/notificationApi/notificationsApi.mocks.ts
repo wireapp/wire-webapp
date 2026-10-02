@@ -82,6 +82,8 @@ const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenS
 
 const notificationAPI = new NotificationAPI(client);
 
-const getAllNotificationsResult = () => notificationAPI.getAllNotifications(mockedClientId, mockedNotificationId);
+const getAllNotificationsResult = () => {
+  return notificationAPI.getAllNotifications(mockedClientId, mockedNotificationId);
+};
 
 export {client, notificationAPI, getAllNotificationsResult, mockedResultData, mockedNotificationId};

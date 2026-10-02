@@ -24,8 +24,8 @@ import type {ClientConfig, ServerConfig} from '@wireapp/config';
 import {setNonCacheHeaders} from '../../http/setNonCacheHeaders';
 import {replaceHostname} from '../../util/hostnameReplacer';
 
-export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConfig) =>
-  Router().get('/config.js', (request, res) => {
+export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConfig) => {
+  return Router().get('/config.js', (request, res) => {
     const serializedConfig = `window.wire = window.wire || {}; window.wire.env = ${JSON.stringify(clientConfig)};`;
     const payload = serverConfig.ENABLE_DYNAMIC_HOSTNAME
       ? // In case we want URLs that depends on the the hostname, we need to replace the placeholder with the actual hostname.
@@ -35,3 +35,4 @@ export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConf
 
     return response.type('application/javascript').send(payload);
   });
+};

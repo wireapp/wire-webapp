@@ -22,7 +22,7 @@ declare module 'qrcode-reader' {
 
   interface QRCode {
     result: string;
-    points: Array<{x: number; y: number}>;
+    points: {x: number; y: number}[];
   }
 
   interface DecodeCallback {

@@ -81,18 +81,22 @@ export const ConversationTypeContainer = () => {
 
   return (
     <div css={conversationTypeContainerCss}>
-      {getConversationTypeOptions(translate).map(option => (
-        <>
-          <ConversationOption
-            key={option.conversationType}
-            isUpgradeBannerVisible={option.conversationType === ConversationType.Channel && !isInTeam}
-            title={option.label}
-            isSelected={option.conversationType === conversationType}
-            onClick={() => onConversationTypeChange(option.conversationType)}
-          />
-          <ConversationFeature conversationType={option.conversationType} key={option.conversationType} />
-        </>
-      ))}
+      {getConversationTypeOptions(translate).map(option => {
+        return (
+          <>
+            <ConversationOption
+              key={option.conversationType}
+              isUpgradeBannerVisible={option.conversationType === ConversationType.Channel && !isInTeam}
+              title={option.label}
+              isSelected={option.conversationType === conversationType}
+              onClick={() => {
+                return onConversationTypeChange(option.conversationType);
+              }}
+            />
+            <ConversationFeature conversationType={option.conversationType} key={option.conversationType} />
+          </>
+        );
+      })}
     </div>
   );
 };

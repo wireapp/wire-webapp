@@ -78,7 +78,9 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
     restoreFocusRef.current = focusContext.createFocusRestorationCallback();
 
     // Get all focusable elements
-    const getFocusableElements = () => Array.from(dialog.querySelectorAll<HTMLElement>('button:not([disabled])'));
+    const getFocusableElements = () => {
+      return Array.from(dialog.querySelectorAll<HTMLElement>('button:not([disabled])'));
+    };
 
     // Focus first screen when dialog appears
     const firstFocusableElement = getFocusableElements().at(0);
@@ -131,20 +133,25 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
     };
   }, [selectableScreens, selectableWindows, cancel, callState, restoreFocusRef]);
 
-  const renderPreviews = (list: ElectronDesktopCapturerSource[], uieName: string) =>
-    list.map(({id, name, thumbnail}) => (
-      <button
-        type="button"
-        key={id}
-        className="choose-screen-list-item"
-        data-uie-name={uieName}
-        onClick={() => handleChoose(id)}
-        aria-label={name}
-        title={name}
-      >
-        <img className="choose-screen-list-image" src={thumbnail.toDataURL()} role="presentation" alt="" />
-      </button>
-    ));
+  const renderPreviews = (list: ElectronDesktopCapturerSource[], uieName: string) => {
+    return list.map(({id, name, thumbnail}) => {
+      return (
+        <button
+          type="button"
+          key={id}
+          className="choose-screen-list-item"
+          data-uie-name={uieName}
+          onClick={() => {
+            return handleChoose(id);
+          }}
+          aria-label={name}
+          title={name}
+        >
+          <img className="choose-screen-list-image" src={thumbnail.toDataURL()} role="presentation" alt="" />
+        </button>
+      );
+    });
+  };
 
   return (
     <div

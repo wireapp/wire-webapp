@@ -55,10 +55,14 @@ describe('UserList', () => {
     const user = new User('test-id', '', translateForTest);
     user.isMe = true;
 
-    const users = ['1', '2', '3', '4'].map(id => new User(id, '', translateForTest));
+    const users = ['1', '2', '3', '4'].map(id => {
+      return new User(id, '', translateForTest);
+    });
     const props = {
       conversationRepository,
-      onSelectUser: (user: User) => jest.fn(),
+      onSelectUser: (user: User) => {
+        return jest.fn();
+      },
       selfUser: user,
       selectedUsers: users,
       users,
@@ -75,14 +79,20 @@ describe('UserList', () => {
     user.isMe = true;
 
     const setStateMock = jest.fn();
-    const useStateMock: any = (useState: any) => [useState, setStateMock];
+    const useStateMock: any = (useState: any) => {
+      return [useState, setStateMock];
+    };
     jest.spyOn(React, 'useState').mockImplementation(useStateMock);
 
     const [selectedUsers, setSelectedUsers] = useStateMock([]);
 
-    const mockOnSelectUser = jest.fn((user: User) => setSelectedUsers(user));
+    const mockOnSelectUser = jest.fn((user: User) => {
+      return setSelectedUsers(user);
+    });
 
-    const users = ['1', '2', '3', '4'].map(id => new User(id, '', translateForTest));
+    const users = ['1', '2', '3', '4'].map(id => {
+      return new User(id, '', translateForTest);
+    });
     const props = {
       conversationRepository,
       onSelectUser: mockOnSelectUser,

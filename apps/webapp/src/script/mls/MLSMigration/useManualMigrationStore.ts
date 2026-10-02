@@ -25,19 +25,21 @@ interface ManualMigrationState {
   finish: (conversationId: string) => void;
 }
 
-export const useManualMigrationStore = create<ManualMigrationState>((set, get) => ({
-  pendingConversationIds: new Set<string>(),
-  tryStart: conversationId => {
-    const {pendingConversationIds} = get();
-    if (pendingConversationIds.has(conversationId)) {
-      return false;
-    }
-    set({pendingConversationIds: new Set(pendingConversationIds).add(conversationId)});
-    return true;
-  },
-  finish: conversationId => {
-    const pendingConversationIds = new Set(get().pendingConversationIds);
-    pendingConversationIds.delete(conversationId);
-    set({pendingConversationIds});
-  },
-}));
+export const useManualMigrationStore = create<ManualMigrationState>((set, get) => {
+  return {
+    pendingConversationIds: new Set<string>(),
+    tryStart: conversationId => {
+      const {pendingConversationIds} = get();
+      if (pendingConversationIds.has(conversationId)) {
+        return false;
+      }
+      set({pendingConversationIds: new Set(pendingConversationIds).add(conversationId)});
+      return true;
+    },
+    finish: conversationId => {
+      const pendingConversationIds = new Set(get().pendingConversationIds);
+      pendingConversationIds.delete(conversationId);
+      set({pendingConversationIds});
+    },
+  };
+});

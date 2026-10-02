@@ -41,8 +41,14 @@ const {values: args} = parseArgs({
 
 const getTests = (suite: JSONReportSuite): (JSONReportTest & Pick<JSONReportSpec, 'tags'>)[] => {
   return [
-    ...(suite.specs.flatMap(spec => spec.tests.map(test => ({...test, tags: spec.tags}))) ?? []),
-    ...(suite.suites?.flatMap(suite => getTests(suite)) ?? []),
+    ...(suite.specs.flatMap(spec => {
+      return spec.tests.map(test => {
+        return {...test, tags: spec.tags};
+      });
+    }) ?? []),
+    ...(suite.suites?.flatMap(suite => {
+      return getTests(suite);
+    }) ?? []),
   ];
 };
 
@@ -116,11 +122,17 @@ function transformReportToTestinyMappings(report: JSONReport, runId: number) {
   };
 
   return report.suites
-    .flatMap(suite => getTests(suite))
+    .flatMap(suite => {
+      return getTests(suite);
+    })
     .reduce<TestinyTestCaseMapping[]>((acc, test) => {
       const testIds = test.tags
-        .filter(tag => tag.startsWith('TC-'))
-        .map(tag => Number(tag.replace('TC-', '')))
+        .filter(tag => {
+          return tag.startsWith('TC-');
+        })
+        .map(tag => {
+          return Number(tag.replace('TC-', ''));
+        })
         .filter(Number.isInteger);
 
       for (const testId of testIds) {

@@ -82,32 +82,42 @@ type AppState = {
 
 const STATE_WITH_CONVERSATION = [ContentState.WATERMARK, ContentState.COLLECTION, ContentState.CONVERSATION];
 
-const useAppState = create<AppState>((set, get) => ({
-  contentState: ContentState.WATERMARK,
-  listState: ListState.CONVERSATIONS,
-  previousContentState: null,
-  setContentState: (contentState: ContentState) => {
-    const previousContentState = get().contentState;
-    set(state => ({
-      ...state,
-      contentState,
-      previousContentState,
-    }));
-  },
-  isShowingConversation() {
-    return STATE_WITH_CONVERSATION.includes(get().contentState);
-  },
-  setListState: (listState: ListState) =>
-    set(state => ({
-      ...state,
-      listState,
-    })),
-  setUnreadMessagesCount: (unreadMessagesCount: number) =>
-    set(state => ({
-      ...state,
-      unreadMessagesCount,
-    })),
-  unreadMessagesCount: 0,
-}));
+const useAppState = create<AppState>((set, get) => {
+  return {
+    contentState: ContentState.WATERMARK,
+    listState: ListState.CONVERSATIONS,
+    previousContentState: null,
+    setContentState: (contentState: ContentState) => {
+      const previousContentState = get().contentState;
+      set(state => {
+        return {
+          ...state,
+          contentState,
+          previousContentState,
+        };
+      });
+    },
+    isShowingConversation() {
+      return STATE_WITH_CONVERSATION.includes(get().contentState);
+    },
+    setListState: (listState: ListState) => {
+      return set(state => {
+        return {
+          ...state,
+          listState,
+        };
+      });
+    },
+    setUnreadMessagesCount: (unreadMessagesCount: number) => {
+      return set(state => {
+        return {
+          ...state,
+          unreadMessagesCount,
+        };
+      });
+    },
+    unreadMessagesCount: 0,
+  };
+});
 
 export {useAppState};

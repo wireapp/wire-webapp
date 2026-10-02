@@ -78,7 +78,7 @@ export class AudioRepository {
   }
 
   private updateSinkIds() {
-    const currentOutputDevice = mediaDevicesStore.getState().audio.output.selectedId;
+    const currentOutputDevice = mediaDevicesStore.getState().audio.output.activeId;
     if (!isNonEmptyString(currentOutputDevice)) {
       return;
     }
@@ -102,7 +102,9 @@ export class AudioRepository {
   }
 
   private stopAll(): void {
-    Object.keys(this.audioElements).forEach((audioId: AudioType) => this.stop(audioId));
+    Object.keys(this.audioElements).forEach((audioId: AudioType) => {
+      this.stop(audioId);
+    });
   }
 
   private subscribeToEvents(): void {

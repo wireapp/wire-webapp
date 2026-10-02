@@ -46,10 +46,12 @@ const defaultAppLockCrypto: AppLockCrypto = {
     return sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
   },
   ready,
-  cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number): Uint8Array | string =>
-    sodium.crypto_pwhash_str(code, opsLimit, memLimit),
-  cryptoPwhashStrVerify: (hashedCode: string, code: string): boolean =>
-    sodium.crypto_pwhash_str_verify(hashedCode, code),
+  cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number): Uint8Array | string => {
+    return sodium.crypto_pwhash_str(code, opsLimit, memLimit);
+  },
+  cryptoPwhashStrVerify: (hashedCode: string, code: string): boolean => {
+    return sodium.crypto_pwhash_str_verify(hashedCode, code);
+  },
 };
 
 // libsodium-wrappers-sumo currently returns a string here despite the published typings.
@@ -72,8 +74,12 @@ export class AppLockRepository {
     private readonly appLockState = container.resolve(AppLockState),
     private readonly appLockCrypto: AppLockCrypto = defaultAppLockCrypto,
   ) {
-    this.getPassphraseStorageKey = (): string => `${APP_LOCK_STORAGE}_${this.userState.self().id}`;
-    this.getEnabledStorageKey = (): string => `${APP_LOCK_ENABLED_STORAGE}_${this.userState.self().id}`;
+    this.getPassphraseStorageKey = (): string => {
+      return `${APP_LOCK_STORAGE}_${this.userState.self().id}`;
+    };
+    this.getEnabledStorageKey = (): string => {
+      return `${APP_LOCK_ENABLED_STORAGE}_${this.userState.self().id}`;
+    };
     const hasPassphrase = isNonEmptyString(this.getStoredPassphrase());
     this.appLockState.hasPassphrase(hasPassphrase);
     this.appLockState.isActivatedInPreferences(this.getStoredEnabled() === 'true');
@@ -85,9 +91,13 @@ export class AppLockRepository {
     this.handleDisabledOnTeam(this.appLockState.isAppLockDisabledOnTeam());
   }
 
-  getStoredPassphrase = (): string | null => window.localStorage.getItem(this.getPassphraseStorageKey());
+  getStoredPassphrase = (): string | null => {
+    return window.localStorage.getItem(this.getPassphraseStorageKey());
+  };
 
-  getStoredEnabled = (): string | null => window.localStorage.getItem(this.getEnabledStorageKey());
+  getStoredEnabled = (): string | null => {
+    return window.localStorage.getItem(this.getEnabledStorageKey());
+  };
 
   handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent): void => {
     const storageKey = this.getPassphraseStorageKey();

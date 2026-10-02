@@ -34,7 +34,9 @@ describe('ShowMoreButton', () => {
 
   it('toggles button show more/show less for a quoted message', () => {
     let show = true;
-    const setShowFullText = jest.fn(show => !show);
+    const setShowFullText = jest.fn(show => {
+      return !show;
+    });
     const {getByTestId, getByText, rerender} = render(
       <ShowMoreButton active={show} onClick={setShowFullText} isFocusable />,
       {wrapper: rootProviderWrapper},

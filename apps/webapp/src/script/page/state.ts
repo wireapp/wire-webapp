@@ -60,73 +60,93 @@ type AppMainState = {
   };
 };
 
-const useAppMainState = create<AppMainState>((set, get) => ({
-  responsiveView: {
-    currentView: ViewType.MOBILE_LEFT_SIDEBAR,
-    setCurrentView: (view: ViewType) =>
-      set(state => ({...state, responsiveView: {...state.responsiveView, currentView: view}})),
-  },
-  rightSidebar: {
-    close: () =>
-      set(state => ({
-        ...state,
-        rightSidebar: {
-          ...state.rightSidebar,
-          currentState: null,
-          entity: null,
-          highlightedUsers: [],
-          history: [],
-          showReactions: false,
-        },
-      })),
-    entity: null,
-    lastViewedMessageDetailsEntity: null,
-    goBack: (entity: RightSidebarParams['entity']) =>
-      set(state => ({
-        ...state,
-        rightSidebar: {...state.rightSidebar, entity, history: state.rightSidebar.history.slice(0, -1)},
-      })),
-    goTo: (panel: PanelState, params: RightSidebarParams) => {
-      return set(state => {
-        const {rightSidebar} = state;
-        const lastItem = rightSidebar.history.length - 1;
-        const previousState = rightSidebar.history[lastItem];
-        const replacedNewState = previousState === panel ? rightSidebar.history.slice(0, -1) : rightSidebar.history;
-
-        const lastViewedMessageDetailsEntity =
-          params?.entity instanceof Message ? params.entity : state.rightSidebar.lastViewedMessageDetailsEntity;
-
-        return {
-          ...state,
-          rightSidebar: {
-            ...state.rightSidebar,
-            entity: params?.entity ?? null,
-            lastViewedMessageDetailsEntity,
-            highlightedUsers: params?.highlighted ?? [],
-            history: [...replacedNewState, panel],
-            showReactions: params?.showReactions === true,
-            isAddMode: params?.isAddMode === true,
-          },
-        };
-      });
+const useAppMainState = create<AppMainState>((set, get) => {
+  return {
+    responsiveView: {
+      currentView: ViewType.MOBILE_LEFT_SIDEBAR,
+      setCurrentView: (view: ViewType) => {
+        return set(state => {
+          return {...state, responsiveView: {...state.responsiveView, currentView: view}};
+        });
+      },
     },
-    goToRoot: (entity: RightSidebarParams['entity']) =>
-      set(state => ({
-        ...state,
-        rightSidebar: {...state.rightSidebar, entity, history: [PanelState.CONVERSATION_DETAILS]},
-      })),
-    highlightedUsers: [],
-    history: [],
-    showReactions: false,
-    isAddMode: false,
-    updateEntity: (entity: RightSidebarParams['entity']) =>
-      set(state => ({...state, rightSidebar: {...state.rightSidebar, entity}})),
-  },
-  leftSidebar: {
-    isHidden: false,
-    hide: (shouldHide: boolean) =>
-      set(state => ({...state, leftSidebar: {...state.leftSidebar, isHidden: shouldHide}})),
-  },
-}));
+    rightSidebar: {
+      close: () => {
+        return set(state => {
+          return {
+            ...state,
+            rightSidebar: {
+              ...state.rightSidebar,
+              currentState: null,
+              entity: null,
+              highlightedUsers: [],
+              history: [],
+              showReactions: false,
+            },
+          };
+        });
+      },
+      entity: null,
+      lastViewedMessageDetailsEntity: null,
+      goBack: (entity: RightSidebarParams['entity']) => {
+        return set(state => {
+          return {
+            ...state,
+            rightSidebar: {...state.rightSidebar, entity, history: state.rightSidebar.history.slice(0, -1)},
+          };
+        });
+      },
+      goTo: (panel: PanelState, params: RightSidebarParams) => {
+        return set(state => {
+          const {rightSidebar} = state;
+          const lastItem = rightSidebar.history.length - 1;
+          const previousState = rightSidebar.history[lastItem];
+          const replacedNewState = previousState === panel ? rightSidebar.history.slice(0, -1) : rightSidebar.history;
+
+          const lastViewedMessageDetailsEntity =
+            params?.entity instanceof Message ? params.entity : state.rightSidebar.lastViewedMessageDetailsEntity;
+
+          return {
+            ...state,
+            rightSidebar: {
+              ...state.rightSidebar,
+              entity: params?.entity ?? null,
+              lastViewedMessageDetailsEntity,
+              highlightedUsers: params?.highlighted ?? [],
+              history: [...replacedNewState, panel],
+              showReactions: params?.showReactions === true,
+              isAddMode: params?.isAddMode === true,
+            },
+          };
+        });
+      },
+      goToRoot: (entity: RightSidebarParams['entity']) => {
+        return set(state => {
+          return {
+            ...state,
+            rightSidebar: {...state.rightSidebar, entity, history: [PanelState.CONVERSATION_DETAILS]},
+          };
+        });
+      },
+      highlightedUsers: [],
+      history: [],
+      showReactions: false,
+      isAddMode: false,
+      updateEntity: (entity: RightSidebarParams['entity']) => {
+        return set(state => {
+          return {...state, rightSidebar: {...state.rightSidebar, entity}};
+        });
+      },
+    },
+    leftSidebar: {
+      isHidden: false,
+      hide: (shouldHide: boolean) => {
+        return set(state => {
+          return {...state, leftSidebar: {...state.leftSidebar, isHidden: shouldHide}};
+        });
+      },
+    },
+  };
+});
 
 export {useAppMainState};

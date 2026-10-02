@@ -52,7 +52,9 @@ function createDependencies() {
     isUploadFilesEnabled: true,
     isInRecycleBin: false,
     maxFileSize: 100,
-    isAcceptedFile: jest.fn((_file: File) => true),
+    isAcceptedFile: jest.fn((_file: File) => {
+      return true;
+    }),
   };
 }
 
@@ -156,7 +158,9 @@ describe('handleSharedDriveUploadInput', () => {
     const validFile = new File(['valid'], 'valid.txt');
     const invalidFile = new File(['invalid'], 'invalid.exe');
     const dependencies = createDependencies();
-    dependencies.isAcceptedFile.mockImplementation(file => file !== invalidFile);
+    dependencies.isAcceptedFile.mockImplementation(file => {
+      return file !== invalidFile;
+    });
 
     handleSharedDriveUploadInput(createEvent([validFile, invalidFile]), {...dependencies, uploadPath});
 

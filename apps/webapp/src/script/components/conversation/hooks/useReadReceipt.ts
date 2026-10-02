@@ -19,6 +19,7 @@
 
 import {useCallback, useRef} from 'react';
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {groupBy} from 'underscore';
 
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -35,15 +36,19 @@ export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sen
 
   const flush = useCallback(() => {
     const readMessages = readMessagesBuffer.current;
-    if (readMessages.length) {
-      const groupedMessages = groupBy(readMessages, ({conversation, message}) => conversation.id + message.from);
+    if (isNonEmptyArray(readMessages)) {
+      const groupedMessages = groupBy(readMessages, ({conversation, message}) => {
+        return conversation.id + message.from;
+      });
 
       Object.values(groupedMessages).forEach(readMessagesBatch => {
         const [firstEntry, ...otherEntries] = readMessagesBatch;
 
         if (firstEntry !== undefined) {
           const {conversation, message: firstMessage} = firstEntry;
-          const otherMessageIds = otherEntries.map(({message}) => message);
+          const otherMessageIds = otherEntries.map(({message}) => {
+            return message;
+          });
           messageSender.sendReadReceipt(conversation, firstMessage, otherMessageIds);
         }
       });
@@ -54,9 +59,9 @@ export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sen
   return {
     addReadReceiptToBatch: (conversation: Conversation, message: Message) => {
       // Check that the message has not already been batched for a future read receipt
-      const hasBatchedReadReceipts = readMessagesBuffer.current.some(
-        readReceipt => readReceipt.message.id === message.id,
-      );
+      const hasBatchedReadReceipts = readMessagesBuffer.current.some(readReceipt => {
+        return readReceipt.message.id === message.id;
+      });
       if (hasBatchedReadReceipts) {
         return;
       }

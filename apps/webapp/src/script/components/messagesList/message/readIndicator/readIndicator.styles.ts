@@ -35,29 +35,31 @@ export const ReadReceiptText: CSSObject = {
   verticalAlign: 'text-bottom',
 };
 
-export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
-  color: 'var(--content-message-timestamp)',
-  fontSize: 'var(--font-size-small)',
-  fontWeight: 'var(--font-weight-regular)',
-  lineHeight: 'var(--line-height-sm)',
+export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => {
+  return {
+    color: 'var(--content-message-timestamp)',
+    fontSize: 'var(--font-size-small)',
+    fontWeight: 'var(--font-weight-regular)',
+    lineHeight: 'var(--line-height-sm)',
 
-  svg: {
-    width: '10px',
-    minHeight: '10px',
-    marginRight: '4px',
-    fill: 'currentColor',
-  },
-
-  ...(showIconOnly && {
-    display: 'flex',
-    alignItems: 'center',
-    marginLeft: '8px',
-  }),
-
-  ...(!showIconOnly && {
-    opacity: 0,
-    '.message:hover &': {
-      opacity: '1',
+    svg: {
+      width: '10px',
+      minHeight: '10px',
+      marginRight: '4px',
+      fill: 'currentColor',
     },
-  }),
-});
+
+    ...(showIconOnly && {
+      display: 'flex',
+      alignItems: 'center',
+      marginLeft: '8px',
+    }),
+
+    ...(!showIconOnly && {
+      opacity: 0,
+      '.message:hover &': {
+        opacity: '1',
+      },
+    }),
+  };
+};

@@ -133,7 +133,9 @@ export const AppMain = (properties: AppMainProps) => {
   const teamState = container.resolve(TeamState);
   const core = container.resolve(Core);
   const userState = container.resolve(UserState);
-  const appLockRepository = useMemo(() => new AppLockRepository(translate), [translate]);
+  const appLockRepository = useMemo(() => {
+    return new AppLockRepository(translate);
+  }, [translate]);
 
   const isScreenshareActive =
     hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
@@ -144,7 +146,9 @@ export const AppMain = (properties: AppMainProps) => {
     close: closeRightSidebar,
     lastViewedMessageDetailsEntity,
     goTo,
-  } = useAppMainState(state => state.rightSidebar);
+  } = useAppMainState(state => {
+    return state.rightSidebar;
+  });
   const currentState = history[history.length - 1];
 
   const {currentTab} = useSidebarStore();
@@ -162,8 +166,12 @@ export const AppMain = (properties: AppMainProps) => {
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isMobileView = useMatchMedia(QUERY.tabletSMDown);
-  const {currentView} = useAppMainState(state => state.responsiveView);
-  const {isHidden: isLeftSidebarHidden} = useAppMainState(state => state.leftSidebar);
+  const {currentView} = useAppMainState(state => {
+    return state.responsiveView;
+  });
+  const {isHidden: isLeftSidebarHidden} = useAppMainState(state => {
+    return state.leftSidebar;
+  });
 
   const isMobileLeftSidebarView = currentView == ViewType.MOBILE_LEFT_SIDEBAR;
   const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
@@ -244,7 +252,9 @@ export const AppMain = (properties: AppMainProps) => {
       }
 
       showMostRecentConversation();
-      showUserModal({domain, id: userId}, () => navigate('/'));
+      showUserModal({domain, id: userId}, () => {
+        return navigate('/');
+      });
     };
 
     configureRouterClock(clock);
@@ -256,18 +266,29 @@ export const AppMain = (properties: AppMainProps) => {
       '/conversation/:conversationId/files': showConversationFiles,
       '/conversation/:conversationId/:domain/files/*path': showConversationFiles,
       '/conversation/:conversationId/files/*path': showConversationFiles,
-      '/preferences/about': () => mainView.list.openPreferencesAbout(),
-      '/preferences/account': () => mainView.list.openPreferencesAccount(),
-      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
-      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
-      '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/meetings': () =>
-        canUseMeetings({
+      '/preferences/about': () => {
+        return mainView.list.openPreferencesAbout();
+      },
+      '/preferences/account': () => {
+        return mainView.list.openPreferencesAccount();
+      },
+      '/preferences/av': () => {
+        return mainView.list.openPreferencesAudioVideo();
+      },
+      '/preferences/devices': () => {
+        return mainView.list.openPreferencesDevices();
+      },
+      '/preferences/options': () => {
+        return mainView.list.openPreferencesOptions();
+      },
+      '/meetings': () => {
+        return canUseMeetings({
           isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
           apiVersion: core.backendFeatures.version,
         })
           ? mainView.list.openMeetingsList()
-          : navigate('/'),
+          : navigate('/');
+      },
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,
@@ -289,7 +310,9 @@ export const AppMain = (properties: AppMainProps) => {
     }
 
     repositories.properties.checkTelemetrySharingPermission();
-    window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
+    window.setTimeout(() => {
+      return repositories.notification.checkPermission();
+    }, App.CONFIG.NOTIFICATION_CHECK);
 
     //after app is loaded, check mls migration configuration and start migration if needed
     await initialiseMLSMigrationFlow({

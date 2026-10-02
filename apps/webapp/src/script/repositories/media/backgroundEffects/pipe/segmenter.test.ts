@@ -27,63 +27,87 @@ import {
 } from 'Repositories/media/backgroundEffects/pipe/segmenter';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
-jest.mock('@enormora/clock/clock', () => ({
-  createClock: jest.fn(() => ({
-    setTimeout: jest.fn((callback: () => void) => {
-      callback();
-      return 1;
+jest.mock('@enormora/clock/clock', () => {
+  return {
+    createClock: jest.fn(() => {
+      return {
+        setTimeout: jest.fn((callback: () => void) => {
+          callback();
+          return 1;
+        }),
+        clearTimeout: jest.fn(),
+        setInterval: jest.fn(),
+        clearInterval: jest.fn(),
+        currentUnixEpochMilliseconds: 0,
+        currentDate: new Date(0),
+      };
     }),
-    clearTimeout: jest.fn(),
-    setInterval: jest.fn(),
-    clearInterval: jest.fn(),
-    currentUnixEpochMilliseconds: 0,
-    currentDate: new Date(0),
-  })),
-}));
+  };
+});
 
-jest.mock('./renderer', () => ({
-  WebGLRenderer: jest.fn().mockImplementation(() => ({
-    renderWithNewMasks: jest.fn(),
-    renderWithPreviousMask: jest.fn(),
-    renderPassthrough: jest.fn(),
-    close: jest.fn(),
-  })),
-}));
-
-jest.mock('@mediapipe/tasks-vision', () => ({
-  FilesetResolver: {
-    forVisionTasks: jest.fn().mockResolvedValue({}),
-  },
-  ImageSegmenter: {
-    createFromOptions: jest.fn().mockResolvedValue({
-      close: jest.fn(),
-      setOptions: jest.fn(),
-      segmentForVideo: jest.fn(),
+jest.mock('./renderer', () => {
+  return {
+    WebGLRenderer: jest.fn().mockImplementation(() => {
+      return {
+        renderWithNewMasks: jest.fn(),
+        renderWithPreviousMask: jest.fn(),
+        renderPassthrough: jest.fn(),
+        close: jest.fn(),
+      };
     }),
-  },
-}));
+  };
+});
 
-jest.mock('./filter', () => ({
-  VideoFilter: jest.fn().mockImplementation(() => ({
-    render: jest.fn(),
-    destroy: jest.fn(),
-  })),
-}));
+jest.mock('@mediapipe/tasks-vision', () => {
+  return {
+    FilesetResolver: {
+      forVisionTasks: jest.fn().mockResolvedValue({}),
+    },
+    ImageSegmenter: {
+      createFromOptions: jest.fn().mockResolvedValue({
+        close: jest.fn(),
+        setOptions: jest.fn(),
+        segmentForVideo: jest.fn(),
+      }),
+    },
+  };
+});
 
-jest.mock('Repositories/media/backgroundEffects/helper/logger', () => ({
-  getSafeLogger: jest.fn(() => ({
-    log: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-  })),
-}));
+jest.mock('./filter', () => {
+  return {
+    VideoFilter: jest.fn().mockImplementation(() => {
+      return {
+        render: jest.fn(),
+        destroy: jest.fn(),
+      };
+    }),
+  };
+});
 
-jest.mock('Repositories/media/backgroundEffects/helper/metrics', () => ({
-  createMetricsWindow: jest.fn(() => ({})),
-  pushMetricsSample: jest.fn(),
-  buildMetrics: jest.fn(() => ({})),
-}));
+jest.mock('Repositories/media/backgroundEffects/helper/logger', () => {
+  return {
+    getSafeLogger: jest.fn(() => {
+      return {
+        log: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      };
+    }),
+  };
+});
+
+jest.mock('Repositories/media/backgroundEffects/helper/metrics', () => {
+  return {
+    createMetricsWindow: jest.fn(() => {
+      return {};
+    }),
+    pushMetricsSample: jest.fn(),
+    buildMetrics: jest.fn(() => {
+      return {};
+    }),
+  };
+});
 
 async function writeVideoFrameToSink(writerSink: UnderlyingSink<VideoFrame>, frame: VideoFrame): Promise<void> {
   if (isUndefined(writerSink.write)) {
@@ -98,20 +122,26 @@ describe('segmenter tests', () => {
     jest.clearAllMocks();
 
     Object.assign(globalThis, {
-      OffscreenCanvas: jest.fn().mockImplementation(() => ({
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        width: 1,
-        height: 1,
-      })),
+      OffscreenCanvas: jest.fn().mockImplementation(() => {
+        return {
+          addEventListener: jest.fn(),
+          removeEventListener: jest.fn(),
+          width: 1,
+          height: 1,
+        };
+      }),
     });
 
     Object.assign(globalThis, {
-      WritableStream: jest.fn().mockImplementation((sink, strategy) => ({
-        sink,
-        strategy,
-      })),
-      CountQueuingStrategy: jest.fn().mockImplementation(options => options),
+      WritableStream: jest.fn().mockImplementation((sink, strategy) => {
+        return {
+          sink,
+          strategy,
+        };
+      }),
+      CountQueuingStrategy: jest.fn().mockImplementation(options => {
+        return options;
+      }),
     });
   });
 
@@ -257,16 +287,22 @@ describe('segmenter tests', () => {
       jest.clearAllMocks();
 
       Object.assign(globalThis, {
-        OffscreenCanvas: jest.fn().mockImplementation(() => ({
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          width: 1,
-          height: 1,
-        })),
-        WritableStream: jest.fn().mockImplementation(sink => ({
-          sink,
-        })),
-        CountQueuingStrategy: jest.fn().mockImplementation(options => options),
+        OffscreenCanvas: jest.fn().mockImplementation(() => {
+          return {
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            width: 1,
+            height: 1,
+          };
+        }),
+        WritableStream: jest.fn().mockImplementation(sink => {
+          return {
+            sink,
+          };
+        }),
+        CountQueuingStrategy: jest.fn().mockImplementation(options => {
+          return options;
+        }),
       });
     });
 
@@ -296,7 +332,9 @@ describe('segmenter tests', () => {
 
       (ImageSegmenter.createFromOptions as jest.Mock)
         .mockResolvedValueOnce(firstSegmenter)
-        .mockImplementationOnce(() => secondSegmenterPromise)
+        .mockImplementationOnce(() => {
+          return secondSegmenterPromise;
+        })
         .mockResolvedValueOnce(thirdSegmenter);
 
       const canvas = {
@@ -438,12 +476,16 @@ describe('segmenter tests', () => {
       const confidenceTexture = {} as WebGLTexture;
 
       const categoryMask = {
-        getAsWebGLTexture: jest.fn(() => categoryTexture),
+        getAsWebGLTexture: jest.fn(() => {
+          return categoryTexture;
+        }),
         close: jest.fn(),
       };
 
       const confidenceMask = {
-        getAsWebGLTexture: jest.fn(() => confidenceTexture),
+        getAsWebGLTexture: jest.fn(() => {
+          return confidenceTexture;
+        }),
         close: jest.fn(),
       };
 
@@ -454,10 +496,7 @@ describe('segmenter tests', () => {
           (
             _source: VideoFrame,
             _timestamp: number,
-            callback: (result: {
-              categoryMask: typeof categoryMask;
-              confidenceMasks: Array<typeof confidenceMask>;
-            }) => void,
+            callback: (result: {categoryMask: typeof categoryMask; confidenceMasks: (typeof confidenceMask)[]}) => void,
           ) => {
             callback({
               categoryMask,
@@ -536,7 +575,9 @@ describe('segmenter tests', () => {
       'uses the expected segmentation interval when enhanced performance is $enhancePerformance',
       async ({enhancePerformance, expectedSegmentCalls, expectedPreviousMaskCalls}) => {
         const mask = {
-          getAsWebGLTexture: jest.fn(() => ({}) as WebGLTexture),
+          getAsWebGLTexture: jest.fn(() => {
+            return {} as WebGLTexture;
+          }),
           close: jest.fn(),
         };
         const segmenter = {
@@ -546,7 +587,7 @@ describe('segmenter tests', () => {
             (
               _source: VideoFrame,
               _timestamp: number,
-              callback: (result: {categoryMask: typeof mask; confidenceMasks: Array<typeof mask>}) => void,
+              callback: (result: {categoryMask: typeof mask; confidenceMasks: (typeof mask)[]}) => void,
             ) => {
               callback({categoryMask: mask, confidenceMasks: [mask]});
             },
@@ -580,15 +621,16 @@ describe('segmenter tests', () => {
 
         await runSegmenter(canvas, readable, options, jest.fn(), jest.fn());
 
-        const createFrame = (timestamp: number) =>
-          ({
+        const createFrame = (timestamp: number) => {
+          return {
             codedWidth: 640,
             codedHeight: 480,
             displayWidth: 640,
             displayHeight: 480,
             timestamp,
             close: jest.fn(),
-          }) as unknown as VideoFrame;
+          } as unknown as VideoFrame;
+        };
 
         const writerSink = await writerSinkPromise;
         await writeVideoFrameToSink(writerSink, createFrame(1));

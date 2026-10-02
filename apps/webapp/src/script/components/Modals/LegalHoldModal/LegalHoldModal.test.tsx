@@ -97,23 +97,29 @@ function createOthersDescriptionProps(): LegalHoldModalProps {
   return props;
 }
 
-const defaultProps = () => ({
-  clientRepository: {} as ClientRepository,
-  conversationRepository: {
-    getAllUsersInConversation: (conversationId: QualifiedId): Promise<User[]> => Promise.resolve([]),
-  } as ConversationRepository,
-  cryptographyRepository: new CryptographyRepository({} as any),
-  messageRepository: {
-    updateAllClients: (conversation: Conversation, blockSystemMessage: boolean): Promise<void> => Promise.resolve(),
-  } as MessageRepository,
-  searchRepository: new SearchRepository(userRepository),
-  teamRepository: {
-    isSelfConnectedTo: function isSelfConnectedTo(): boolean {
-      return false;
-    },
-  } as unknown as TeamRepository,
-  selfUser: new User('mocked-id', '', translateForTest),
-});
+const defaultProps = () => {
+  return {
+    clientRepository: {} as ClientRepository,
+    conversationRepository: {
+      getAllUsersInConversation: (conversationId: QualifiedId): Promise<User[]> => {
+        return Promise.resolve([]);
+      },
+    } as ConversationRepository,
+    cryptographyRepository: new CryptographyRepository({} as any),
+    messageRepository: {
+      updateAllClients: (conversation: Conversation, blockSystemMessage: boolean): Promise<void> => {
+        return Promise.resolve();
+      },
+    } as MessageRepository,
+    searchRepository: new SearchRepository(userRepository),
+    teamRepository: {
+      isSelfConnectedTo: function isSelfConnectedTo(): boolean {
+        return false;
+      },
+    } as unknown as TeamRepository,
+    selfUser: new User('mocked-id', '', translateForTest),
+  };
+};
 
 describe('LegalHoldModal', () => {
   beforeAll(async () => {

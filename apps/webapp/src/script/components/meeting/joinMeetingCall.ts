@@ -55,9 +55,9 @@ const resolveConversation = (
     return task.resolve(localConversation.value);
   }
 
-  return deps.conversationRepository
-    .safeGetConversationById(qualifiedConversationId)
-    .mapRejected(() => joinMeetingCallErrors.conversationNotFound);
+  return deps.conversationRepository.safeGetConversationById(qualifiedConversationId).mapRejected(() => {
+    return joinMeetingCallErrors.conversationNotFound;
+  });
 };
 
 /**
@@ -78,8 +78,12 @@ const ensureMlsConversationReady = (
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     })
-    .map(() => conversation)
-    .mapRejected(() => joinMeetingCallErrors.joinFailed);
+    .map(() => {
+      return conversation;
+    })
+    .mapRejected(() => {
+      return joinMeetingCallErrors.joinFailed;
+    });
 };
 
 const performJoin = (
@@ -91,14 +95,22 @@ const performJoin = (
 
   if (!isUndefined(call) && call.state() === CALL_STATE.INCOMING) {
     return task.tryOrElse(
-      () => joinMeetingCallErrors.joinFailed,
-      () => deps.callingViewModel.callActions.answer(call, media),
+      () => {
+        return joinMeetingCallErrors.joinFailed;
+      },
+      () => {
+        return deps.callingViewModel.callActions.answer(call, media);
+      },
     );
   }
 
   return task.tryOrElse(
-    () => joinMeetingCallErrors.joinFailed,
-    () => deps.callingViewModel.callActions.startAudio(conversation, media),
+    () => {
+      return joinMeetingCallErrors.joinFailed;
+    },
+    () => {
+      return deps.callingViewModel.callActions.startAudio(conversation, media);
+    },
   );
 };
 
@@ -110,7 +122,12 @@ export const joinMeetingCall = (
   deps: JoinMeetingCallDeps,
   qualifiedConversationId: QualifiedId,
   media: CallMediaChoice,
-): Task<void, JoinMeetingCallError> =>
-  resolveConversation(deps, qualifiedConversationId)
-    .andThen(conversation => ensureMlsConversationReady(deps, conversation))
-    .andThen(conversation => performJoin(deps, conversation, media));
+): Task<void, JoinMeetingCallError> => {
+  return resolveConversation(deps, qualifiedConversationId)
+    .andThen(conversation => {
+      return ensureMlsConversationReady(deps, conversation);
+    })
+    .andThen(conversation => {
+      return performJoin(deps, conversation, media);
+    });
+};

@@ -25,7 +25,9 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {CellsStateInfo} from './cellsStateInfo';
 
-const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+const withTheme = (component: ReactNode) => {
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+};
 
 describe('CellsStateInfo', () => {
   it('renders description-only default state', () => {

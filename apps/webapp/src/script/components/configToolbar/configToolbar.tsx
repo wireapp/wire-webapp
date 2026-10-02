@@ -50,7 +50,9 @@ function getStartOfToday(): Date {
 }
 
 function toDateInputValue(date: Date): string {
-  const pad = (value: number) => String(value).padStart(2, '0');
+  const pad = (value: number) => {
+    return String(value).padStart(2, '0');
+  };
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
@@ -81,22 +83,32 @@ export function ConfigToolbar() {
     window.wire?.app?.debug?.isPerformancePanelEnabled() ?? false,
   );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
-  const [notificationDumpFrom, setNotificationDumpFrom] = useState(() => toDateInputValue(getStartOfToday()));
+  const [notificationDumpFrom, setNotificationDumpFrom] = useState(() => {
+    return toDateInputValue(getStartOfToday());
+  });
   const [notificationDumpToMode, setNotificationDumpToMode] = useState<NotificationDumpToMode>('now');
-  const [notificationDumpToDate, setNotificationDumpToDate] = useState(() => toDateInputValue(new Date()));
+  const [notificationDumpToDate, setNotificationDumpToDate] = useState(() => {
+    return toDateInputValue(new Date());
+  });
   const [isDownloadingNotifications, setIsDownloadingNotifications] = useState(false);
 
   useEffect(() => {
-    const openToolbar = () => setShowConfig(true);
+    const openToolbar = () => {
+      return setShowConfig(true);
+    };
     window.addEventListener(openDebugToolbarEventName, openToolbar);
 
-    return () => window.removeEventListener(openDebugToolbarEventName, openToolbar);
+    return () => {
+      return window.removeEventListener(openDebugToolbarEventName, openToolbar);
+    };
   }, []);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
     const handleKeyDown = () => {
-      setShowConfig(prev => !prev);
+      setShowConfig(prev => {
+        return !prev;
+      });
     };
 
     keyboardjs.bind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
@@ -187,7 +199,14 @@ export function ConfigToolbar() {
 
   const renderInput = (value: string | boolean | string[] | number | object | null, path: string) => {
     if (typeof value === 'boolean') {
-      return <Switch checked={value} onToggle={isChecked => handleChange(path, isChecked)} />;
+      return (
+        <Switch
+          checked={value}
+          onToggle={isChecked => {
+            return handleChange(path, isChecked);
+          }}
+        />
+      );
     }
 
     if (Array.isArray(value)) {
@@ -195,12 +214,14 @@ export function ConfigToolbar() {
         <Input
           type="text"
           value={value.join(',')}
-          onChange={event =>
-            handleChange(
+          onChange={event => {
+            return handleChange(
               path,
-              event.currentTarget.value.split(',').map(value => value.trim()),
-            )
-          }
+              event.currentTarget.value.split(',').map(value => {
+                return value.trim();
+              }),
+            );
+          }}
         />
       );
     }
@@ -210,7 +231,13 @@ export function ConfigToolbar() {
     }
 
     return (
-      <Input type="text" value={value as string} onChange={event => handleChange(path, event.currentTarget.value)} />
+      <Input
+        type="text"
+        value={value as string}
+        onChange={event => {
+          return handleChange(path, event.currentTarget.value);
+        }}
+      />
     );
   };
 
@@ -228,7 +255,9 @@ export function ConfigToolbar() {
     });
   };
 
-  useClickOutside(wrapperRef, () => setShowConfig(false));
+  useClickOutside(wrapperRef, () => {
+    return setShowConfig(false);
+  });
 
   const handleAvsEnable = (isChecked: boolean) => {
     setAvsDebuggerEnabled(window.wire?.app?.debug?.enableAvsDebugger(isChecked) === true);
@@ -243,7 +272,9 @@ export function ConfigToolbar() {
         <Switch
           id="avs-debugger-checkbox"
           checked={avsDebuggerEnabled}
-          onToggle={isChecked => handleAvsEnable(isChecked)}
+          onToggle={isChecked => {
+            return handleAvsEnable(isChecked);
+          }}
         />
       </div>
     );
@@ -261,7 +292,9 @@ export function ConfigToolbar() {
         <Switch
           id="avs-rust-sft-checkbox"
           checked={avsRustSftEnabled}
-          onToggle={isChecked => handleAvsRustSftEnable(isChecked)}
+          onToggle={isChecked => {
+            return handleAvsRustSftEnable(isChecked);
+          }}
         />
       </div>
     );
@@ -282,7 +315,9 @@ export function ConfigToolbar() {
         <Switch
           id="video-background-effects-performance-panel-checkbox"
           checked={isPerformancePanelEnabled}
-          onToggle={isChecked => handlePerformancePanel(isChecked)}
+          onToggle={isChecked => {
+            return handlePerformancePanel(isChecked);
+          }}
         />
       </div>
     );
@@ -309,7 +344,7 @@ export function ConfigToolbar() {
   };
 
   const renderCoreCryptoLogLevelSelect = () => {
-    const options: Array<{label: string; value: CoreCryptoLogLevel}> = [
+    const options: {label: string; value: CoreCryptoLogLevel}[] = [
       {label: 'Off', value: CoreCryptoLogLevel.Off},
       {label: 'Trace', value: CoreCryptoLogLevel.Trace},
       {label: 'Debug', value: CoreCryptoLogLevel.Debug},
@@ -335,11 +370,13 @@ export function ConfigToolbar() {
           }}
           style={{padding: '6px 8px'}}
         >
-          {options.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          {options.map(option => {
+            return (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            );
+          })}
         </select>
       </div>
     );
@@ -455,7 +492,9 @@ export function ConfigToolbar() {
             id="notification-dump-from"
             type="date"
             value={notificationDumpFrom}
-            onChange={event => setNotificationDumpFrom(event.currentTarget.value)}
+            onChange={event => {
+              return setNotificationDumpFrom(event.currentTarget.value);
+            }}
             style={{padding: '6px 8px', width: '100%'}}
           />
         </div>
@@ -467,7 +506,9 @@ export function ConfigToolbar() {
               type="radio"
               name="notification-dump-to-mode"
               checked={notificationDumpToMode === 'now'}
-              onChange={() => setNotificationDumpToMode('now')}
+              onChange={() => {
+                return setNotificationDumpToMode('now');
+              }}
             />
             {' Now'}
           </label>
@@ -477,7 +518,9 @@ export function ConfigToolbar() {
               type="radio"
               name="notification-dump-to-mode"
               checked={notificationDumpToMode === 'date'}
-              onChange={() => setNotificationDumpToMode('date')}
+              onChange={() => {
+                return setNotificationDumpToMode('date');
+              }}
             />
             {' Date'}
           </label>
@@ -486,7 +529,9 @@ export function ConfigToolbar() {
               id="notification-dump-to-date"
               type="date"
               value={notificationDumpToDate}
-              onChange={event => setNotificationDumpToDate(event.currentTarget.value)}
+              onChange={event => {
+                return setNotificationDumpToDate(event.currentTarget.value);
+              }}
               style={{padding: '6px 8px', width: '100%'}}
             />
           )}
@@ -514,9 +559,25 @@ export function ConfigToolbar() {
 
       <h3>Debug Functions</h3>
 
-      <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>Reconnect WebSocket</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>Enable Press Space To Unmute</Button>
-      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>
+      <Button
+        onClick={() => {
+          return window.wire?.app?.debug?.reconnectWebSocket();
+        }}
+      >
+        Reconnect WebSocket
+      </Button>
+      <Button
+        onClick={() => {
+          return window.wire?.app?.debug?.enablePressSpaceToUnmute();
+        }}
+      >
+        Enable Press Space To Unmute
+      </Button>
+      <Button
+        onClick={() => {
+          return window.wire?.app?.debug?.disablePressSpaceToUnmute();
+        }}
+      >
         Disable Press Space To Unmute
       </Button>
       <Button disabled={isResettingMLSConversation} onClick={resetMLSConversation}>
@@ -525,7 +586,13 @@ export function ConfigToolbar() {
       <Button disabled={isAdvancingEpoch} onClick={advanceEpoch}>
         {isAdvancingEpoch ? 'Advancing Epoch…' : 'Advance Epoch'}
       </Button>
-      <Button onClick={() => window.wire?.app?.debug?.refreshE2EIRevocationData()}>Force CRL expiry</Button>
+      <Button
+        onClick={() => {
+          return window.wire?.app?.debug?.refreshE2EIRevocationData();
+        }}
+      >
+        Force CRL expiry
+      </Button>
 
       <hr />
 
@@ -561,7 +628,9 @@ export function ConfigToolbar() {
       <Input
         type="text"
         value={prefix}
-        onChange={event => setPrefix(event.currentTarget.value)}
+        onChange={event => {
+          return setPrefix(event.currentTarget.value);
+        }}
         placeholder="Prefix for the messages"
       />
       <div style={{marginTop: '8px'}}>

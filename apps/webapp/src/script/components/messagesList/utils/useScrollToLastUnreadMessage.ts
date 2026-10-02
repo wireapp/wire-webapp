@@ -45,9 +45,9 @@ export function getInitialScrollPosition(
     return Maybe.nothing();
   }
 
-  const firstUnreadMessageIndex = groupedMessages.findIndex(
-    message => !isMarker(message) && message.timestamp > lastReadTimestamp,
-  );
+  const firstUnreadMessageIndex = groupedMessages.findIndex(message => {
+    return !isMarker(message) && message.timestamp > lastReadTimestamp;
+  });
 
   if (firstUnreadMessageIndex !== -1) {
     return Maybe.just({

@@ -41,134 +41,242 @@ const ModalDemo = ({children}: {children: (isOpen: boolean, setIsOpen: (open: bo
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div style={{padding: '24px'}}>
-      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Button
+        onClick={() => {
+          return setIsOpen(true);
+        }}
+      >
+        Open Modal
+      </Button>
       {children(isOpen, setIsOpen)}
     </div>
   );
 };
 
 export const Default: Story = {
-  render: () => (
-    <ModalDemo>
-      {(isOpen, setIsOpen) =>
-        isOpen && (
-          <Modal onClose={() => setIsOpen(false)}>
-            <H2 style={{margin: 0}}>Normal Modal</H2>
-            <Paragraph>
-              <Text block>This is a normal modal with default styling.</Text>
-            </Paragraph>
-            <Button onClick={() => setIsOpen(false)}>Close</Button>
-          </Modal>
-        )
-      }
-    </ModalDemo>
-  ),
+  render: () => {
+    return (
+      <ModalDemo>
+        {(isOpen, setIsOpen) => {
+          return (
+            isOpen && (
+              <Modal
+                onClose={() => {
+                  return setIsOpen(false);
+                }}
+              >
+                <H2 style={{margin: 0}}>Normal Modal</H2>
+                <Paragraph>
+                  <Text block>This is a normal modal with default styling.</Text>
+                </Paragraph>
+                <Button
+                  onClick={() => {
+                    return setIsOpen(false);
+                  }}
+                >
+                  Close
+                </Button>
+              </Modal>
+            )
+          );
+        }}
+      </ModalDemo>
+    );
+  },
 };
 
 export const WithActions: Story = {
-  render: () => (
-    <ModalDemo>
-      {(isOpen, setIsOpen) =>
-        isOpen && (
-          <Modal
-            onClose={() => setIsOpen(false)}
-            bodyStyle={{width: 360}}
-            actions={[
-              {title: 'Cancel', onClick: () => setIsOpen(false), bold: false},
-              {title: 'Send', onClick: () => setIsOpen(false), bold: true},
-            ]}
-          >
-            <H2 style={{margin: 0}}>Modal with actions</H2>
-            <Paragraph>
-              <Text block>This modal has action buttons at the bottom.</Text>
-            </Paragraph>
-          </Modal>
-        )
-      }
-    </ModalDemo>
-  ),
+  render: () => {
+    return (
+      <ModalDemo>
+        {(isOpen, setIsOpen) => {
+          return (
+            isOpen && (
+              <Modal
+                onClose={() => {
+                  return setIsOpen(false);
+                }}
+                bodyStyle={{width: 360}}
+                actions={[
+                  {
+                    title: 'Cancel',
+                    onClick: () => {
+                      return setIsOpen(false);
+                    },
+                    bold: false,
+                  },
+                  {
+                    title: 'Send',
+                    onClick: () => {
+                      return setIsOpen(false);
+                    },
+                    bold: true,
+                  },
+                ]}
+              >
+                <H2 style={{margin: 0}}>Modal with actions</H2>
+                <Paragraph>
+                  <Text block>This modal has action buttons at the bottom.</Text>
+                </Paragraph>
+              </Modal>
+            )
+          );
+        }}
+      </ModalDemo>
+    );
+  },
 };
 
 export const Fullscreen: Story = {
-  render: () => (
-    <ModalDemo>
-      {(isOpen, setIsOpen) =>
-        isOpen && (
-          <Modal fullscreen onClose={() => setIsOpen(false)}>
-            <H1>Fullscreen Modal</H1>
-            <Paragraph>
-              <Text block>This modal takes up the entire screen.</Text>
-            </Paragraph>
-            <Button onClick={() => setIsOpen(false)}>Close</Button>
-          </Modal>
-        )
-      }
-    </ModalDemo>
-  ),
+  render: () => {
+    return (
+      <ModalDemo>
+        {(isOpen, setIsOpen) => {
+          return (
+            isOpen && (
+              <Modal
+                fullscreen
+                onClose={() => {
+                  return setIsOpen(false);
+                }}
+              >
+                <H1>Fullscreen Modal</H1>
+                <Paragraph>
+                  <Text block>This modal takes up the entire screen.</Text>
+                </Paragraph>
+                <Button
+                  onClick={() => {
+                    return setIsOpen(false);
+                  }}
+                >
+                  Close
+                </Button>
+              </Modal>
+            )
+          );
+        }}
+      </ModalDemo>
+    );
+  },
 };
 
 export const CustomWidth: Story = {
-  render: () => (
-    <ModalDemo>
-      {(isOpen, setIsOpen) =>
-        isOpen && (
-          <Modal onClose={() => setIsOpen(false)} bodyStyle={{width: 800}}>
-            <H2 style={{margin: 0}}>Wide Modal</H2>
-            <Paragraph>
-              <Text block>This modal has a custom width of 800px.</Text>
-            </Paragraph>
-            <Button onClick={() => setIsOpen(false)}>Close</Button>
-          </Modal>
-        )
-      }
-    </ModalDemo>
-  ),
+  render: () => {
+    return (
+      <ModalDemo>
+        {(isOpen, setIsOpen) => {
+          return (
+            isOpen && (
+              <Modal
+                onClose={() => {
+                  return setIsOpen(false);
+                }}
+                bodyStyle={{width: 800}}
+              >
+                <H2 style={{margin: 0}}>Wide Modal</H2>
+                <Paragraph>
+                  <Text block>This modal has a custom width of 800px.</Text>
+                </Paragraph>
+                <Button
+                  onClick={() => {
+                    return setIsOpen(false);
+                  }}
+                >
+                  Close
+                </Button>
+              </Modal>
+            )
+          );
+        }}
+      </ModalDemo>
+    );
+  },
 };
 
 export const WithLongContent: Story = {
-  render: () => (
-    <ModalDemo>
-      {(isOpen, setIsOpen) =>
-        isOpen && (
-          <Modal onClose={() => setIsOpen(false)}>
-            <H2 style={{margin: 0}}>Modal with Long Content</H2>
-            {Array.from({length: 10}).map((_, index) => (
-              <Paragraph key={index}>
-                <Text block>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies ultricies,
-                  nunc nunc aliquam nunc, vitae aliquam nunc nunc vitae nunc.
-                </Text>
-              </Paragraph>
-            ))}
-            <Button onClick={() => setIsOpen(false)}>Close</Button>
-          </Modal>
-        )
-      }
-    </ModalDemo>
-  ),
+  render: () => {
+    return (
+      <ModalDemo>
+        {(isOpen, setIsOpen) => {
+          return (
+            isOpen && (
+              <Modal
+                onClose={() => {
+                  return setIsOpen(false);
+                }}
+              >
+                <H2 style={{margin: 0}}>Modal with Long Content</H2>
+                {Array.from({length: 10}).map((_, index) => {
+                  return (
+                    <Paragraph key={index}>
+                      <Text block>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies
+                        ultricies, nunc nunc aliquam nunc, vitae aliquam nunc nunc vitae nunc.
+                      </Text>
+                    </Paragraph>
+                  );
+                })}
+                <Button
+                  onClick={() => {
+                    return setIsOpen(false);
+                  }}
+                >
+                  Close
+                </Button>
+              </Modal>
+            )
+          );
+        }}
+      </ModalDemo>
+    );
+  },
 };
 
 export const MultipleActions: Story = {
-  render: () => (
-    <ModalDemo>
-      {(isOpen, setIsOpen) =>
-        isOpen && (
-          <Modal
-            onClose={() => setIsOpen(false)}
-            bodyStyle={{width: 400}}
-            actions={[
-              {title: 'Delete', onClick: () => setIsOpen(false), bold: false},
-              {title: 'Edit', onClick: () => setIsOpen(false), bold: false},
-              {title: 'Save', onClick: () => setIsOpen(false), bold: true},
-            ]}
-          >
-            <H2 style={{margin: 0}}>Multiple Actions</H2>
-            <Paragraph>
-              <Text block>This modal has multiple action buttons.</Text>
-            </Paragraph>
-          </Modal>
-        )
-      }
-    </ModalDemo>
-  ),
+  render: () => {
+    return (
+      <ModalDemo>
+        {(isOpen, setIsOpen) => {
+          return (
+            isOpen && (
+              <Modal
+                onClose={() => {
+                  return setIsOpen(false);
+                }}
+                bodyStyle={{width: 400}}
+                actions={[
+                  {
+                    title: 'Delete',
+                    onClick: () => {
+                      return setIsOpen(false);
+                    },
+                    bold: false,
+                  },
+                  {
+                    title: 'Edit',
+                    onClick: () => {
+                      return setIsOpen(false);
+                    },
+                    bold: false,
+                  },
+                  {
+                    title: 'Save',
+                    onClick: () => {
+                      return setIsOpen(false);
+                    },
+                    bold: true,
+                  },
+                ]}
+              >
+                <H2 style={{margin: 0}}>Multiple Actions</H2>
+                <Paragraph>
+                  <Text block>This modal has multiple action buttons.</Text>
+                </Paragraph>
+              </Modal>
+            )
+          );
+        }}
+      </ModalDemo>
+    );
+  },
 };

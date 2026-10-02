@@ -26,13 +26,17 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';
 
-jest.mock('src/script/Config', () => ({
-  Config: {
-    getConfig: () => ({
-      CELLS_PYDIO_URL: 'https://cells.example.com',
-    }),
-  },
-}));
+jest.mock('src/script/Config', () => {
+  return {
+    Config: {
+      getConfig: () => {
+        return {
+          CELLS_PYDIO_URL: 'https://cells.example.com',
+        };
+      },
+    },
+  };
+});
 
 describe('useCellPublicLink', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
@@ -40,23 +44,25 @@ describe('useCellPublicLink', () => {
   const mockSetPublicLink = jest.fn();
   const defaultFireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
-  const createMockNode = (overrides: Partial<CellNode> = {}): CellNode => ({
-    id: 'test-uuid',
-    name: 'test-file.pdf',
-    path: '/test/test-file.pdf',
-    mimeType: 'application/pdf',
-    sizeMb: '1.5',
-    extension: 'pdf',
-    uploadedAtTimestamp: Date.now(),
-    owner: 'test-owner',
-    conversationName: 'Test Conversation',
-    tags: [],
-    presignedUrlExpiresAt: null,
-    user: null,
-    type: CellNodeType.FILE,
-    selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-    ...overrides,
-  });
+  const createMockNode = (overrides: Partial<CellNode> = {}): CellNode => {
+    return {
+      id: 'test-uuid',
+      name: 'test-file.pdf',
+      path: '/test/test-file.pdf',
+      mimeType: 'application/pdf',
+      sizeMb: '1.5',
+      extension: 'pdf',
+      uploadedAtTimestamp: Date.now(),
+      owner: 'test-owner',
+      conversationName: 'Test Conversation',
+      tags: [],
+      presignedUrlExpiresAt: null,
+      user: null,
+      type: CellNodeType.FILE,
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+      ...overrides,
+    };
+  };
 
   const renderPublicLinkHook = (options?: {
     node?: CellNode;
@@ -72,8 +78,8 @@ describe('useCellPublicLink', () => {
     };
 
     const hook = renderHook(
-      ({node, refreshLinkDataAfterUpdate, setStatusOnPublicLinkUrl, fireAndForgetInvoker}) =>
-        useCellPublicLink({
+      ({node, refreshLinkDataAfterUpdate, setStatusOnPublicLinkUrl, fireAndForgetInvoker}) => {
+        return useCellPublicLink({
           uuid: 'test-uuid',
           node,
           cellsRepository: mockCellsRepository,
@@ -81,17 +87,19 @@ describe('useCellPublicLink', () => {
           refreshLinkDataAfterUpdate,
           setStatusOnPublicLinkUrl,
           fireAndForgetInvoker,
-        }),
+        });
+      },
       {initialProps},
     );
 
-    const rerenderWith = (props: Partial<typeof initialProps>) =>
-      hook.rerender({
+    const rerenderWith = (props: Partial<typeof initialProps>) => {
+      return hook.rerender({
         node: props.node ?? initialProps.node,
         refreshLinkDataAfterUpdate: props.refreshLinkDataAfterUpdate ?? initialProps.refreshLinkDataAfterUpdate,
         setStatusOnPublicLinkUrl: props.setStatusOnPublicLinkUrl ?? initialProps.setStatusOnPublicLinkUrl,
         fireAndForgetInvoker: props.fireAndForgetInvoker ?? initialProps.fireAndForgetInvoker,
       });
+    };
 
     return {...hook, rerenderWith};
   };

@@ -51,16 +51,22 @@ import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('@wireapp/react-ui-kit', () => ({
-  ...(jest.requireActual('@wireapp/react-ui-kit') as any),
-  useMatchMedia: jest.fn(),
-}));
+jest.mock('@wireapp/react-ui-kit', () => {
+  return {
+    ...(jest.requireActual('@wireapp/react-ui-kit') as any),
+    useMatchMedia: jest.fn(),
+  };
+});
 
-jest.mock('Components/calling/useCallAlertState', () => ({
-  useCallAlertState: () => ({
-    showStartedCallAlert: jest.fn(),
-  }),
-}));
+jest.mock('Components/calling/useCallAlertState', () => {
+  return {
+    useCallAlertState: () => {
+      return {
+        showStartedCallAlert: jest.fn(),
+      };
+    },
+  };
+});
 
 const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
@@ -85,20 +91,22 @@ const callActions = {
   toggleScreenshare: jest.fn(),
 };
 
-const getDefaultProps = (callingRepository: CallingRepository, conversation: Conversation) => ({
-  callActions,
-  callState: new CallState(),
-  conversation,
-  openRightSidebar: jest.fn(),
-  repositories: {
-    calling: {
-      supportsConferenceCalling: true,
-    } as CallingRepository,
-  } as ViewModelRepositories,
-  teamState: new TeamState(),
-  selfUser: new User('', '', translateForTest),
-  withBottomDivider: true,
-});
+const getDefaultProps = (callingRepository: CallingRepository, conversation: Conversation) => {
+  return {
+    callActions,
+    callState: new CallState(),
+    conversation,
+    openRightSidebar: jest.fn(),
+    repositories: {
+      calling: {
+        supportsConferenceCalling: true,
+      } as CallingRepository,
+    } as ViewModelRepositories,
+    teamState: new TeamState(),
+    selfUser: new User('', '', translateForTest),
+    withBottomDivider: true,
+  };
+};
 
 type TranslationTestFunction = () => void | Promise<void>;
 type IsolatedTranslationTestFunction = () => Promise<void>;
@@ -175,7 +183,9 @@ describe('TitleBar', () => {
     const selfUser = createUser(true);
     const displayName = 'test name';
     const conversation = createConversationEntity({
-      display_name: ko.pureComputed(() => displayName),
+      display_name: ko.pureComputed(() => {
+        return displayName;
+      }),
     });
     const props = getDefaultProps(callingRepository, conversation);
     const {getByText} = render(withTheme(<TitleBar {...props} selfUser={selfUser} />));
@@ -217,7 +227,11 @@ describe('TitleBar', () => {
 
   it("doesn't show legal-hold icon for non legal-hold user", async () => {
     const selfUser = createUser(true);
-    const conversation = createConversationEntity({hasLegalHold: ko.pureComputed(() => false)});
+    const conversation = createConversationEntity({
+      hasLegalHold: ko.pureComputed(() => {
+        return false;
+      }),
+    });
 
     const {container} = render(
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
@@ -229,7 +243,11 @@ describe('TitleBar', () => {
 
   it('shows legal-hold icon for legal-hold user', async () => {
     const selfUser = createUser(true);
-    const conversation = createConversationEntity({hasLegalHold: ko.pureComputed(() => true)});
+    const conversation = createConversationEntity({
+      hasLegalHold: ko.pureComputed(() => {
+        return true;
+      }),
+    });
 
     const {container} = render(
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
@@ -273,8 +291,12 @@ describe('TitleBar', () => {
   it('starts audio call on audio call button click', async () => {
     const firstUser = new User('', '', translateForTest);
     const conversation = createConversationEntity({
-      firstUserEntity: ko.pureComputed(() => firstUser),
-      is1to1: ko.pureComputed(() => true),
+      firstUserEntity: ko.pureComputed(() => {
+        return firstUser;
+      }),
+      is1to1: ko.pureComputed(() => {
+        return true;
+      }),
       participating_user_ids: ko.observableArray([
         {domain: '', id: ''},
         {domain: '', id: ''},
@@ -291,15 +313,23 @@ describe('TitleBar', () => {
   it("doesn't show video call button when video calling is not enabled", async () => {
     const firstUser = new User('', '', translateForTest);
     const conversation = createConversationEntity({
-      firstUserEntity: ko.pureComputed(() => firstUser),
-      is1to1: ko.pureComputed(() => true),
+      firstUserEntity: ko.pureComputed(() => {
+        return firstUser;
+      }),
+      is1to1: ko.pureComputed(() => {
+        return true;
+      }),
       participating_user_ids: ko.observableArray([
         {domain: '', id: ''},
         {domain: '', id: ''},
       ] as QualifiedId[]),
     });
 
-    const teamState = createTeamState({isVideoCallingEnabled: ko.pureComputed(() => false)});
+    const teamState = createTeamState({
+      isVideoCallingEnabled: ko.pureComputed(() => {
+        return false;
+      }),
+    });
 
     const {queryByLabelText} = render(
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} teamState={teamState} />),
@@ -311,8 +341,12 @@ describe('TitleBar', () => {
 
   it('displays warning badge', async () => {
     const conversation = createConversationEntity({
-      hasDirectGuest: ko.pureComputed(() => true),
-      isGroup: ko.pureComputed(() => true),
+      hasDirectGuest: ko.pureComputed(() => {
+        return true;
+      }),
+      isGroup: ko.pureComputed(() => {
+        return true;
+      }),
     });
 
     const {container, getByText} = render(
@@ -331,8 +365,12 @@ describe('TitleBar', () => {
       },
       async () => {
         const conversation = createConversationEntity({
-          hasDirectGuest: ko.pureComputed(() => true),
-          isGroup: ko.pureComputed(() => true),
+          hasDirectGuest: ko.pureComputed(() => {
+            return true;
+          }),
+          isGroup: ko.pureComputed(() => {
+            return true;
+          }),
         });
 
         const {container} = render(
@@ -359,9 +397,15 @@ describe('TitleBar', () => {
       },
       async () => {
         const conversation = createConversationEntity({
-          hasDirectGuest: ko.pureComputed(() => true),
-          hasExternal: ko.pureComputed(() => true),
-          isGroup: ko.pureComputed(() => true),
+          hasDirectGuest: ko.pureComputed(() => {
+            return true;
+          }),
+          hasExternal: ko.pureComputed(() => {
+            return true;
+          }),
+          isGroup: ko.pureComputed(() => {
+            return true;
+          }),
         });
 
         const {container} = render(
@@ -385,8 +429,12 @@ describe('TitleBar', () => {
     'renders the audited malformed Russian warning badge through local compatibility',
     withTranslationStrings(ru, async () => {
       const conversation = createConversationEntity({
-        hasFederatedUsers: ko.pureComputed(() => true),
-        isGroup: ko.pureComputed(() => true),
+        hasFederatedUsers: ko.pureComputed(() => {
+          return true;
+        }),
+        isGroup: ko.pureComputed(() => {
+          return true;
+        }),
       });
 
       const {container} = render(
@@ -406,12 +454,24 @@ describe('TitleBar', () => {
 
   it('does not render a warning badge when no warning applies in React translation rendering', async () => {
     const conversation = createConversationEntity({
-      hasDirectGuest: ko.pureComputed(() => false),
-      hasExternal: ko.pureComputed(() => false),
-      hasFederatedUsers: ko.pureComputed(() => false),
-      hasService: ko.pureComputed(() => false),
-      hasApps: ko.pureComputed(() => false),
-      isGroup: ko.pureComputed(() => true),
+      hasDirectGuest: ko.pureComputed(() => {
+        return false;
+      }),
+      hasExternal: ko.pureComputed(() => {
+        return false;
+      }),
+      hasFederatedUsers: ko.pureComputed(() => {
+        return false;
+      }),
+      hasService: ko.pureComputed(() => {
+        return false;
+      }),
+      hasApps: ko.pureComputed(() => {
+        return false;
+      }),
+      isGroup: ko.pureComputed(() => {
+        return true;
+      }),
     });
 
     const {container} = render(
@@ -432,8 +492,12 @@ describe('TitleBar', () => {
     "displays 'apps are active' badge when the conversation hasServices: $hasServices and hasApps: $hasApps",
     ({hasServices, hasApps}) => {
       const conversation = createConversationEntity({
-        hasService: ko.pureComputed(() => hasServices),
-        hasApps: ko.pureComputed(() => hasApps),
+        hasService: ko.pureComputed(() => {
+          return hasServices;
+        }),
+        hasApps: ko.pureComputed(() => {
+          return hasApps;
+        }),
       });
 
       const {queryByText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));

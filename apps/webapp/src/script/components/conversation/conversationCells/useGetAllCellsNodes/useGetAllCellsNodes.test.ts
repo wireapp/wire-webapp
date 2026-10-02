@@ -68,15 +68,16 @@ function renderGetAllNodesHook({
   return {
     fireAndForgetInvoker,
     ...renderHook(
-      ({enabled, sort}: {enabled: boolean; sort: CellsSort | null}) =>
-        useGetAllCellsNodes({
+      ({enabled, sort}: {enabled: boolean; sort: CellsSort | null}) => {
+        return useGetAllCellsNodes({
           cellsRepository: cellsRepository as unknown as CellsRepository,
           userRepository: userRepository as unknown as UserRepository,
           conversationQualifiedId: QUALIFIED_ID,
           enabled,
           fireAndForgetInvoker,
           sort,
-        }),
+        });
+      },
       {initialProps: {enabled, sort}},
     ),
   };
@@ -94,14 +95,20 @@ describe('useGetAllCellsNodes', () => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     const {rerender} = renderGetAllNodesHook({cellsRepository, fireAndForgetInvoker});
-    await waitFor(() => expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(1);
+    });
 
-    act(() => rerender({enabled: false, sort: null}));
+    act(() => {
+      return rerender({enabled: false, sort: null});
+    });
 
     act(() => {
       fetch.resolve({Nodes: [createRestNode('stale-file.txt')]});
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(0);
   });
@@ -109,7 +116,9 @@ describe('useGetAllCellsNodes', () => {
   it('keeps the browse order natural when no sort is selected', async () => {
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderGetAllNodesHook({cellsRepository});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.getAllNodes).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -125,7 +134,9 @@ describe('useGetAllCellsNodes', () => {
       cellsRepository,
       sort: {field: 'mtime', direction: 'desc'},
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.getAllNodes).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -140,15 +151,25 @@ describe('useGetAllCellsNodes', () => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     const {result, rerender} = renderGetAllNodesHook({cellsRepository, fireAndForgetInvoker});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
-    act(() => result.current.setOffset(50));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    act(() => {
+      return result.current.setOffset(50);
+    });
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.getAllNodes).toHaveBeenLastCalledWith(expect.objectContaining({offset: 50}));
 
-    act(() => rerender({enabled: true, sort: {field: 'name', direction: 'asc'}}));
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    act(() => {
+      return rerender({enabled: true, sort: {field: 'name', direction: 'asc'}});
+    });
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(3);
     expect(cellsRepository.getAllNodes).toHaveBeenLastCalledWith(
@@ -169,22 +190,30 @@ describe('useGetAllCellsNodes', () => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     const {result} = renderGetAllNodesHook({cellsRepository, fireAndForgetInvoker});
-    await waitFor(() => expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(1);
+    });
 
-    act(() => result.current.setOffset(50));
-    await waitFor(() => expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(2));
+    act(() => {
+      return result.current.setOffset(50);
+    });
+    await waitFor(() => {
+      return expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(2);
+    });
 
     act(() => {
       secondFetch.resolve({Nodes: [createRestNode('new-file.txt')]});
     });
-    await waitFor(() =>
-      expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('new-file.txt'),
-    );
+    await waitFor(() => {
+      return expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('new-file.txt');
+    });
 
     act(() => {
       firstFetch.resolve({Nodes: [createRestNode('stale-file.txt')]});
     });
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('new-file.txt');
   });
@@ -193,7 +222,9 @@ describe('useGetAllCellsNodes', () => {
     window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/recycle_bin/folder`;
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderGetAllNodesHook({cellsRepository});
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
 
     expect(cellsRepository.getAllNodes).toHaveBeenCalledWith(expect.objectContaining({deleted: true}));
   });

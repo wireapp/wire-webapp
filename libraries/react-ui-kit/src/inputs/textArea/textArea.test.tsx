@@ -22,13 +22,20 @@ import {TextArea} from './textArea';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"TextArea"', () => {
-  it('renders', () => matchComponent(<TextArea>TextArea</TextArea>));
-  it('renders as invalid', () => matchComponent(<TextArea markInvalid>TextArea</TextArea>));
-  it('renders as disabled', () => matchComponent(<TextArea disabled>TextArea</TextArea>));
-  it('renders with placeholderTextTransform', () =>
-    matchComponent(
+  it('renders', () => {
+    return matchComponent(<TextArea>TextArea</TextArea>);
+  });
+  it('renders as invalid', () => {
+    return matchComponent(<TextArea markInvalid>TextArea</TextArea>);
+  });
+  it('renders as disabled', () => {
+    return matchComponent(<TextArea disabled>TextArea</TextArea>);
+  });
+  it('renders with placeholderTextTransform', () => {
+    return matchComponent(
       <TextArea placeholderTextTransform="uppercase" placeholder="TextArea">
         TextArea
       </TextArea>,
-    ));
+    );
+  });
 });

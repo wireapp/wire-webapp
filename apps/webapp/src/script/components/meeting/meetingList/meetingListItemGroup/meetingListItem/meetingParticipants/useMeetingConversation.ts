@@ -31,8 +31,9 @@ export const useMeetingConversation = (qualifiedConversation: QualifiedId): Conv
   const conversationState = container.resolve(ConversationState);
   const {conversations} = useKoSubscribableChildren(conversationState, ['conversations']);
 
-  return useMemo(
-    () => conversations.find(item => matchQualifiedIds(item.qualifiedId, qualifiedConversation)),
-    [conversations, qualifiedConversation],
-  );
+  return useMemo(() => {
+    return conversations.find(item => {
+      return matchQualifiedIds(item.qualifiedId, qualifiedConversation);
+    });
+  }, [conversations, qualifiedConversation]);
 };

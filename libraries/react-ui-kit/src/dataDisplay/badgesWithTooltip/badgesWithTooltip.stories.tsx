@@ -29,21 +29,23 @@ const meta = {
   },
   tags: ['autodocs'],
   decorators: [
-    Story => (
-      <div
-        id="wire-app"
-        style={{
-          position: 'relative',
-          minHeight: '200px',
-          padding: '24px',
-          maxWidth: '300px',
-          margin: '0 auto',
-          background: 'white',
-        }}
-      >
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div
+          id="wire-app"
+          style={{
+            position: 'relative',
+            minHeight: '200px',
+            padding: '24px',
+            maxWidth: '300px',
+            margin: '0 auto',
+            background: 'white',
+          }}
+        >
+          <Story />
+        </div>
+      );
+    },
   ],
 } satisfies Meta<typeof BadgesWithTooltip>;
 

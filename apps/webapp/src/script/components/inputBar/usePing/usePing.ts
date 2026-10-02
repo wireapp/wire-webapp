@@ -43,7 +43,9 @@ export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps)
     setIsPingDisabled(true);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await messageRepository.sendPing(conversation);
-      window.setTimeout(() => setIsPingDisabled(false), TIME_IN_MILLIS.SECOND * 2);
+      window.setTimeout(() => {
+        return setIsPingDisabled(false);
+      }, TIME_IN_MILLIS.SECOND * 2);
     });
   };
 

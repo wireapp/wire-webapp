@@ -38,7 +38,11 @@ const CONVERSATION_LIST_TAB_IDS = [
 ] as const;
 
 const expectHash = async (page: Page, hash: string) => {
-  await expect.poll(() => new URL(page.url()).hash).toBe(hash);
+  await expect
+    .poll(() => {
+      return new URL(page.url()).hash;
+    })
+    .toBe(hash);
 };
 
 const expectTabSelected = async (sidebar: ConversationSidebar, testId: string) => {

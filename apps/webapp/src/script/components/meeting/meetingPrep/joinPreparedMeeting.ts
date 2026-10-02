@@ -74,8 +74,12 @@ export const joinPreparedMeeting = async ({
 
   if (result.isErr) {
     handleJoinMeetingCallResult(result, {
-      showConversationNotFoundModal: () => showConversationNotFoundModal(translate),
-      showJoinFailedModal: () => showCallNotEstablishedModal(callNotEstablishedCopy),
+      showConversationNotFoundModal: () => {
+        return showConversationNotFoundModal(translate);
+      },
+      showJoinFailedModal: () => {
+        return showCallNotEstablishedModal(callNotEstablishedCopy);
+      },
     });
     return false;
   }

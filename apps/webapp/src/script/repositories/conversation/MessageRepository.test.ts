@@ -119,7 +119,9 @@ async function buildMessageRepository(
   conversationState.conversations([selfConversation]);
   const conversationRepository = {checkMessageTimer: jest.fn()} as unknown as ConversationRepository;
   const dependencies = {
-    conversationRepository: () => conversationRepository,
+    conversationRepository: () => {
+      return conversationRepository;
+    },
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any, translate),
@@ -196,7 +198,65 @@ describe('MessageRepository', () => {
     });
   });
 
+  describe('updateClearedTimestamp', () => {
+    it.each([
+      {lastKnownTimestamp: 0, clearedTimestamp: 1, updatesTimestamp: false, sendsClearedMessage: false},
+      {lastKnownTimestamp: Number.NaN, clearedTimestamp: 1, updatesTimestamp: false, sendsClearedMessage: false},
+      {lastKnownTimestamp: 1, clearedTimestamp: false, updatesTimestamp: true, sendsClearedMessage: false},
+      {lastKnownTimestamp: 1, clearedTimestamp: 0, updatesTimestamp: true, sendsClearedMessage: false},
+      {lastKnownTimestamp: 1, clearedTimestamp: Number.NaN, updatesTimestamp: true, sendsClearedMessage: false},
+      {lastKnownTimestamp: 1, clearedTimestamp: -1, updatesTimestamp: true, sendsClearedMessage: true},
+      {lastKnownTimestamp: 1, clearedTimestamp: 1, updatesTimestamp: true, sendsClearedMessage: true},
+      {lastKnownTimestamp: -1, clearedTimestamp: -1, updatesTimestamp: true, sendsClearedMessage: true},
+    ] as const)(
+      'preserves clear-message sending for timestamps $lastKnownTimestamp / $clearedTimestamp',
+      async options => {
+        const {lastKnownTimestamp, clearedTimestamp, updatesTimestamp, sendsClearedMessage} = options;
+        const [messageRepository, {core, conversationState}] = await buildMessageRepository(translateForTest);
+        const selfConversation = requireValueForTest(conversationState.conversations().at(0));
+        selfConversation.type(CONVERSATION_TYPE.SELF);
+        const send = jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
+        const conversation = generateConversation();
+        jest.spyOn(conversation, 'getLastKnownTimestamp').mockReturnValue(lastKnownTimestamp);
+        const setTimestamp = jest.spyOn(conversation, 'setTimestamp').mockReturnValue(clearedTimestamp);
+
+        await messageRepository.updateClearedTimestamp(conversation);
+
+        expect(setTimestamp).toHaveBeenCalledTimes(updatesTimestamp ? 1 : 0);
+        expect(send).toHaveBeenCalledTimes(sendsClearedMessage ? 1 : 0);
+        if (sendsClearedMessage) {
+          const [sendOptions] = requireValueForTest(send.mock.calls.at(0));
+
+          expect(sendOptions.payload.content).toBe('cleared');
+        }
+      },
+    );
+  });
+
   describe('sendPing', () => {
+    it.each([
+      {timerMilliseconds: 0, wrapsInEphemeral: false},
+      {timerMilliseconds: Number.NaN, wrapsInEphemeral: false},
+      {timerMilliseconds: -1, wrapsInEphemeral: true},
+      {timerMilliseconds: 1, wrapsInEphemeral: true},
+    ])('preserves timer truthiness for $timerMilliseconds milliseconds', async options => {
+      const {timerMilliseconds, wrapsInEphemeral} = options;
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
+      const send = jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+      const conversation = generateConversation();
+      jest.spyOn(conversation, 'messageTimer').mockReturnValue(timerMilliseconds);
+
+      await messageRepository.sendPing(conversation);
+
+      const [sendOptions] = requireValueForTest(send.mock.calls.at(0));
+      const actualPayload = sendOptions.payload;
+      expect(actualPayload.content).toBe(wrapsInEphemeral ? 'ephemeral' : 'knock');
+      if (wrapsInEphemeral) {
+        expect(actualPayload.ephemeral?.expireAfterMillis).toBe(timerMilliseconds);
+      }
+    });
+
     it('sends a ping', async () => {
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository(translateForTest);
       jest.spyOn(getConversationServiceForTest(core), 'send').mockResolvedValue(successPayload);
@@ -217,14 +277,20 @@ describe('MessageRepository', () => {
 
   describe('requestUserSendingPermission', () => {
     it('uses injected translate for degraded conversation modal copy', async () => {
-      const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
+      const translate = ((translationKey: string) => {
+        return `translated:${translationKey}`;
+      }) as Translate;
       const [messageRepository] = await buildMessageRepository(translate);
-      const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
+      const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {
+        return undefined;
+      });
       const conversation = generateConversation();
       const unverifiedUser = new User(createUuid(), '', translateForTest);
 
       unverifiedUser.name('Alice');
-      conversation.getUsersWithUnverifiedClients = () => [unverifiedUser];
+      conversation.getUsersWithUnverifiedClients = () => {
+        return [unverifiedUser];
+      };
       conversation.verification_state(ConversationVerificationState.DEGRADED);
 
       const permissionPromise = messageRepository.requestUserSendingPermission(conversation, false);

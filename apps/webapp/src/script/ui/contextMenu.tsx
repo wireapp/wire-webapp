@@ -77,10 +77,14 @@ const cleanUp = () => {
   }
 };
 
-export const closeContextMenu = () => queueMicrotask(cleanUp);
+export const closeContextMenu = () => {
+  return queueMicrotask(cleanUp);
+};
 
 // Clamping the value between min and max
-const clampValue = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
+const clampValue = (value: number, min: number, max: number) => {
+  return Math.max(min, Math.min(value, max));
+};
 
 const getPositionFromPlacement = (
   anchorRect: DOMRect,
@@ -109,7 +113,9 @@ const getPositionFromPlacement = (
   }
 };
 
-const getButtonId = (label: string | undefined): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
+const getButtonId = (label: string | undefined): string => {
+  return `btn-${label?.split(' ').join('-').toLowerCase()}`;
+};
 
 const contextMenuClassName = 'ctx-menu';
 const msgMenuIdentifier = 'message-options-menu';
@@ -182,7 +188,9 @@ const ContextMenu = ({
   }, [selected]);
 
   useEffect(() => {
-    const onWheel = (event: MouseEvent) => event.preventDefault();
+    const onWheel = (event: MouseEvent) => {
+      return event.preventDefault();
+    };
 
     //after opening the menu first time, select the first option
     if (selected === undefined) {
@@ -260,12 +268,14 @@ const ContextMenu = ({
         {entries.length > 0 ? (
           <ul
             className={contextMenuClassName}
-            ref={el => setActiveElement(el ?? undefined)}
+            ref={el => {
+              return setActiveElement(el ?? undefined);
+            }}
             style={{maxHeight: activeWindow.innerHeight, ...style}}
             role="menu"
           >
-            {entries.map((entry, index) =>
-              entry.isSeparator === true ? (
+            {entries.map((entry, index) => {
+              return entry.isSeparator === true ? (
                 <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
               ) : (
                 <li
@@ -310,8 +320,8 @@ const ContextMenu = ({
                     )}
                   </button>
                 </li>
-              ),
-            )}
+              );
+            })}
           </ul>
         ) : (
           <div ref={placeholderElement} className={`${contextMenuClassName}__placeholder`} style={style}>

@@ -23,7 +23,9 @@ import {Config} from '../Config';
 
 export const allowsAllFiles = (): boolean => {
   const allowedExtensions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
-  return allowedExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
+  return allowedExtensions.some(extension => {
+    return ['*', '.*', '*.*'].includes(extension);
+  });
 };
 
 export const hasAllowedExtension = (fileName: string): boolean => {
@@ -36,10 +38,10 @@ export const hasAllowedExtension = (fileName: string): boolean => {
 
 export const isAllowedFile = (name: string, type: string): boolean => {
   const allowedImages = [...Config.getConfig().ALLOWED_IMAGE_TYPES];
-  const [imageFileExtensions, imageContentTypes] = partition(allowedImages, allowedImageType =>
-    allowedImageType.startsWith('.'),
-  );
-  if ((imageContentTypes as ReadonlyArray<string>).includes(type)) {
+  const [imageFileExtensions, imageContentTypes] = partition(allowedImages, allowedImageType => {
+    return allowedImageType.startsWith('.');
+  });
+  if ((imageContentTypes as readonly string[]).includes(type)) {
     return true;
   }
   const allowedExtensions = [...imageFileExtensions, ...Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS];

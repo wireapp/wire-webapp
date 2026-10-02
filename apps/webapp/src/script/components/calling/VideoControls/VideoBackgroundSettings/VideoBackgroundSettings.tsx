@@ -77,15 +77,25 @@ export const getBackgroundEffectLabel = (
   translate: Translate,
 ): string => {
   return match(effect)
-    .with({type: 'none'}, () => translate('videoCallBackgroundNoEffect'))
-    .with({type: 'blur', level: 'low'}, () => translate('videoCallBackgroundBlurLow'))
-    .with({type: 'blur', level: 'high'}, () => translate('videoCallBackgroundBlurHigh'))
+    .with({type: 'none'}, () => {
+      return translate('videoCallBackgroundNoEffect');
+    })
+    .with({type: 'blur', level: 'low'}, () => {
+      return translate('videoCallBackgroundBlurLow');
+    })
+    .with({type: 'blur', level: 'high'}, () => {
+      return translate('videoCallBackgroundBlurHigh');
+    })
     .with({type: 'virtual'}, ({backgroundId}: {backgroundId: string}) => {
-      const background = backgrounds.find(({id}) => id === backgroundId);
+      const background = backgrounds.find(({id}) => {
+        return id === backgroundId;
+      });
 
       return background !== undefined ? translate(background.labelKey) : translate('videoCallBackgroundVirtual');
     })
-    .with({type: 'custom'}, () => translate('videoCallBackgroundCustom'))
+    .with({type: 'custom'}, () => {
+      return translate('videoCallBackgroundCustom');
+    })
     .exhaustive();
 };
 
@@ -118,7 +128,9 @@ const BackgroundTile = ({
       disabled={disabled}
       aria-checked={selected}
       aria-label={ariaLabel}
-      onClick={() => onSelectEffect(effect)}
+      onClick={() => {
+        return onSelectEffect(effect);
+      }}
     >
       <div css={tilePreviewStyles} style={previewStyle} className="bg-tile__preview">
         {previewContent}
@@ -127,14 +139,16 @@ const BackgroundTile = ({
   );
 };
 
-const WebGLNotAvailableHint = ({translate}: {translate: Translate}) => (
-  <p css={backgroundEffectPanelHintStyles}>
-    {translate('videoCallBackgroundNoWebGLHint')}{' '}
-    <a href={Config.getConfig().URL.SUPPORT.BACKGROUND_EFFECTS} rel="nofollow noopener noreferrer" target="_blank">
-      {translate('warningLearnMore')}
-    </a>
-  </p>
-);
+const WebGLNotAvailableHint = ({translate}: {translate: Translate}) => {
+  return (
+    <p css={backgroundEffectPanelHintStyles}>
+      {translate('videoCallBackgroundNoWebGLHint')}{' '}
+      <a href={Config.getConfig().URL.SUPPORT.BACKGROUND_EFFECTS} rel="nofollow noopener noreferrer" target="_blank">
+        {translate('warningLearnMore')}
+      </a>
+    </p>
+  );
+};
 
 export const VideoBackgroundSettings = ({
   selectedEffect,

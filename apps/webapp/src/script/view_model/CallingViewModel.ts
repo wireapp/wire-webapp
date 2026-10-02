@@ -103,17 +103,19 @@ export class CallingViewModel {
     private readonly teamState = container.resolve(TeamState),
   ) {
     const {setVideoInputDeviceId, setScreenInputDeviceId} = mediaDevicesStore.getState();
-    this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
-    this.activeCalls = ko.pureComputed(() =>
-      this.callState.calls().filter(call => {
+    this.isSelfVerified = ko.pureComputed(() => {
+      return selfUser().is_verified();
+    });
+    this.activeCalls = ko.pureComputed(() => {
+      return this.callState.calls().filter(call => {
         const {conversation} = call;
         if (conversation.isSelfUserRemoved()) {
           return false;
         }
 
         return call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
-      }),
-    );
+      });
+    });
 
     const toggleState = async (): Promise<void> => {
       const conversation = this.conversationState.activeConversation();
@@ -250,7 +252,9 @@ export class CallingViewModel {
         {
           preventClose: true,
           primaryAction: {
-            action: async () => await startCall(conversationEntity, media),
+            action: async () => {
+              return await startCall(conversationEntity, media);
+            },
             text: this.translate('groupCallModalPrimaryBtnName'),
           },
           secondaryAction: {
@@ -279,9 +283,12 @@ export class CallingViewModel {
       );
     };
 
-    const shouldShowMaxUsersToCallModal = (conversationEntity: Conversation): boolean =>
-      !conversationEntity.isMeeting() &&
-      conversationEntity.participating_user_ets().length > MAX_USERS_TO_CALL_WITHOUT_CONFIRM;
+    const shouldShowMaxUsersToCallModal = (conversationEntity: Conversation): boolean => {
+      return (
+        !conversationEntity.isMeeting() &&
+        conversationEntity.participating_user_ets().length > MAX_USERS_TO_CALL_WITHOUT_CONFIRM
+      );
+    };
 
     const handleCallAction = async (conversationEntity: Conversation, media?: CallMediaChoice): Promise<void> => {
       const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
@@ -374,15 +381,23 @@ export class CallingViewModel {
               if (sources.length === 1) {
                 return this.callingRepository.onChooseScreen(sources[0].id);
               }
-              this.callState.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
-              this.callState.selectableWindows(sources.filter(source => source.id.startsWith('window')));
+              this.callState.selectableScreens(
+                sources.filter(source => {
+                  return source.id.startsWith('screen');
+                }),
+              );
+              this.callState.selectableWindows(
+                sources.filter(source => {
+                  return source.id.startsWith('window');
+                }),
+              );
             });
           });
         };
 
-        this.mediaStreamHandler
-          .selectScreenToShare(showScreenSelection)
-          .then(() => this.callingRepository.toggleScreenshare(call));
+        this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
+          return this.callingRepository.toggleScreenshare(call);
+        });
       },
     };
   }
@@ -399,7 +414,9 @@ export class CallingViewModel {
       this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
     }
     // We want to wait a bit to be sure the call have been tear down properly
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => {
+      return setTimeout(resolve, 1000);
+    });
   }
 
   /**
@@ -415,12 +432,11 @@ export class CallingViewModel {
     warningStrings: {action: string; message: string; title: string},
   ): Promise<boolean> {
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
-    const otherActiveCall = this.callState
-      .calls()
-      .find(
-        call =>
-          !matchQualifiedIds(call.conversation.qualifiedId, conversationId) && !idleCallStates.includes(call.state()),
+    const otherActiveCall = this.callState.calls().find(call => {
+      return (
+        !matchQualifiedIds(call.conversation.qualifiedId, conversationId) && !idleCallStates.includes(call.state())
       );
+    });
     if (isUndefined(otherActiveCall)) {
       return Promise.resolve(true);
     }
@@ -437,7 +453,9 @@ export class CallingViewModel {
             text: warningStrings.action,
           },
           secondaryAction: {
-            action: () => resolve(false),
+            action: () => {
+              return resolve(false);
+            },
           },
           text: {
             message: warningStrings.message,

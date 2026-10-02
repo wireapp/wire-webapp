@@ -57,7 +57,9 @@ export const JoinGuestLinkPasswordForm = ({
         type="password"
         value={inputValue}
         placeholder={translate('guestLinkPasswordModal.passwordInputPlaceholder')}
-        onChange={event => onInputChange(event.target.value)}
+        onChange={event => {
+          return onInputChange(event.target.value);
+        }}
       />
 
       <Link css={linkStyles} href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">

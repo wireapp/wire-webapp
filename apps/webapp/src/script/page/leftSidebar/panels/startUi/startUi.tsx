@@ -144,8 +144,12 @@ const StartUI = ({
     });
   };
 
-  const openApp = (user: User) => openService(integrationRepository.mapServiceFromUser(user));
-  const openInviteModal = () => showInviteModal({translate, selfUser});
+  const openApp = (user: User) => {
+    return openService(integrationRepository.mapServiceFromUser(user));
+  };
+  const openInviteModal = () => {
+    return showInviteModal({translate, selfUser});
+  };
 
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
@@ -165,7 +169,9 @@ const StartUI = ({
               className="start-ui-list-tab-button"
               type="button"
               disabled={activeTab === Tabs.PEOPLE}
-              onClick={() => setActiveTab(Tabs.PEOPLE)}
+              onClick={() => {
+                return setActiveTab(Tabs.PEOPLE);
+              }}
               data-uie-name="do-add-people"
             >
               {translate('searchPeople')}
@@ -176,7 +182,9 @@ const StartUI = ({
               className="start-ui-list-tab-button"
               type="button"
               disabled={activeTab === Tabs.SERVICES}
-              onClick={() => setActiveTab(Tabs.SERVICES)}
+              onClick={() => {
+                return setActiveTab(Tabs.SERVICES);
+              }}
               data-uie-name="do-add-services"
             >
               {translate('searchApps')}
@@ -209,7 +217,9 @@ const StartUI = ({
           onClickApp={openApp}
           onClickContact={openContact}
           onClickUser={openOther}
-          onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
+          onSearchResults={searchResult => {
+            return (peopleSearchResults.current = searchResult);
+          }}
         />
       </>
     ) : (

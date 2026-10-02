@@ -28,13 +28,17 @@ const linkButtonStyle = {
   padding: 0,
 };
 
-const LinkButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-  <button
-    type="button"
-    css={(theme: Theme) => linkStyle(theme, props as unknown as LinkProps)}
-    style={linkButtonStyle}
-    {...props}
-  />
-);
+const LinkButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+  return (
+    <button
+      type="button"
+      css={(theme: Theme) => {
+        return linkStyle(theme, props as unknown as LinkProps);
+      }}
+      style={linkButtonStyle}
+      {...props}
+    />
+  );
+};
 
 export {LinkButton};

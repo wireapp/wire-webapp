@@ -19,12 +19,14 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ChevronDownIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M7.99999 12.5711L15.6568 4.91421L14.2426 3.5L7.99999 9.74264L1.75735 3.5L0.34314 4.91421L7.99999 12.5711Z"
-    />
-  </SVGIcon>
-);
+export const ChevronDownIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.99999 12.5711L15.6568 4.91421L14.2426 3.5L7.99999 9.74264L1.75735 3.5L0.34314 4.91421L7.99999 12.5711Z"
+      />
+    </SVGIcon>
+  );
+};

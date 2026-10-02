@@ -90,10 +90,12 @@ export const meetingNotificationHostListStyles: CSSObject = {
   overflowY: 'auto',
 };
 
-export const meetingNotificationHostExpandIconStyles = (isExpanded: boolean): CSSObject => ({
-  transform: isExpanded ? 'rotate(90deg)' : 'rotate(270deg)',
-  transition: 'all 500ms var(--ease-out-expo)',
-  marginRight: '2px',
-  height: '10px',
-  width: '10px',
-});
+export const meetingNotificationHostExpandIconStyles = (isExpanded: boolean): CSSObject => {
+  return {
+    transform: isExpanded ? 'rotate(90deg)' : 'rotate(270deg)',
+    transition: 'all 500ms var(--ease-out-expo)',
+    marginRight: '2px',
+    height: '10px',
+    width: '10px',
+  };
+};

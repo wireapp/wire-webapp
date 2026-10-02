@@ -47,11 +47,13 @@ const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
 };
 const arrange = () => {
   const repository = {
-    updateConversationProtocol: jest.fn(async (conversation: Conversation, protocol: CONVERSATION_PROTOCOL) =>
-      ConversationMapper.updateProperties(conversation, {protocol, groupId: 'group'}),
-    ),
+    updateConversationProtocol: jest.fn(async (conversation: Conversation, protocol: CONVERSATION_PROTOCOL) => {
+      return ConversationMapper.updateProperties(conversation, {protocol, groupId: 'group'});
+    }),
     tryEstablishingMLSGroup: jest.fn(asyncNoop),
-    safeEnsureConversationExists: jest.fn(() => task.resolve().map(noop)),
+    safeEnsureConversationExists: jest.fn(() => {
+      return task.resolve().map(noop);
+    }),
   };
   const teamState = {
     teamFeatures: ko.observable<FeatureList | undefined>({
@@ -86,10 +88,14 @@ describe('manual migration protocol details', () => {
       fireEvent.click(screen.getByText('PROTEUS'));
     }
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    act(() => props.conversation.roles({self: DefaultConversationRoleName.WIRE_ADMIN}));
+    act(() => {
+      return props.conversation.roles({self: DefaultConversationRoleName.WIRE_ADMIN});
+    });
     activate();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    act(() => props.conversation.roles({self: DefaultConversationRoleName.WIRE_MEMBER}));
+    act(() => {
+      return props.conversation.roles({self: DefaultConversationRoleName.WIRE_MEMBER});
+    });
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'modalCreateGroupProtocolHeading PROTEUS'})).not.toBeInTheDocument();
     expect(repository.updateConversationProtocol).not.toHaveBeenCalled();
@@ -166,7 +172,9 @@ describe('manual migration protocol details', () => {
         }),
       );
     });
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess'));
+    await waitFor(() => {
+      return expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess');
+    });
     expect(screen.getByText('MLS')).toBeInTheDocument();
     expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MLS);
     const resultDialog = screen.getByRole('dialog');
@@ -202,13 +210,18 @@ describe('manual migration protocol details', () => {
 
   it('shows the translated reason when finalisation does not change the protocol', async () => {
     const {props, repository} = arrange();
-    repository.updateConversationProtocol.mockImplementation(async conversation =>
-      ConversationMapper.updateProperties(conversation, {protocol: CONVERSATION_PROTOCOL.MIXED, groupId: 'group'}),
-    );
+    repository.updateConversationProtocol.mockImplementation(async conversation => {
+      return ConversationMapper.updateProperties(conversation, {
+        protocol: CONVERSATION_PROTOCOL.MIXED,
+        groupId: 'group',
+      });
+    });
     render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
     activate();
     fireEvent.click(screen.getByRole('button', {name: 'manualMlsMigrationConfirm'}));
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationProtocolUnchanged'));
+    await waitFor(() => {
+      return expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationProtocolUnchanged');
+    });
     expect(within(screen.getByRole('dialog')).getAllByRole('button')).toHaveLength(1);
   });
 
@@ -218,7 +231,9 @@ describe('manual migration protocol details', () => {
     render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
     activate();
     fireEvent.click(screen.getByRole('button', {name: 'manualMlsMigrationConfirm'}));
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationFailure'));
+    await waitFor(() => {
+      return expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationFailure');
+    });
     expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MIXED);
     expect(screen.getByText('MIXED')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', {name: 'modalAcknowledgeAction'}));
@@ -226,11 +241,14 @@ describe('manual migration protocol details', () => {
       fireEvent.click(screen.getByRole('button', {name: 'modalCreateGroupProtocolHeading MIXED'}));
     }
     fireEvent.click(screen.getByRole('button', {name: 'manualMlsMigrationConfirm'}));
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess'));
-    expect(repository.updateConversationProtocol.mock.calls.map(([, protocol]) => protocol)).toEqual([
-      CONVERSATION_PROTOCOL.MIXED,
-      CONVERSATION_PROTOCOL.MLS,
-    ]);
+    await waitFor(() => {
+      return expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationSuccess');
+    });
+    expect(
+      repository.updateConversationProtocol.mock.calls.map(([, protocol]) => {
+        return protocol;
+      }),
+    ).toEqual([CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS]);
     expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MLS);
   });
 
@@ -251,7 +269,9 @@ describe('manual migration protocol details', () => {
         }),
       );
     });
-    await waitFor(() => expect(screen.getByText('MLS')).toBeInTheDocument());
+    await waitFor(() => {
+      return expect(screen.getByText('MLS')).toBeInTheDocument();
+    });
     expect(props.conversation.protocol).toBe(CONVERSATION_PROTOCOL.MLS);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'modalCreateGroupProtocolHeading MLS'})).not.toBeInTheDocument();
@@ -263,7 +283,9 @@ describe('manual migration protocol details', () => {
     render(withTheme(<ManualMigrationProtocolDetails {...props} />), {wrapper});
     activate();
     fireEvent.click(screen.getByRole('button', {name: 'manualMlsMigrationConfirm'}));
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationFailure'));
+    await waitFor(() => {
+      return expect(screen.getByRole('status')).toHaveTextContent('manualMlsMigrationFailure');
+    });
     expect(screen.getByText('PROTEUS')).toBeInTheDocument();
     const resultDialog = screen.getByRole('dialog');
     expect(resultDialog).toHaveAttribute('aria-busy', 'false');

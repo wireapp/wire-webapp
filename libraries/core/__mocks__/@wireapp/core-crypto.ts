@@ -54,7 +54,9 @@ export enum DeviceStatus {
 
 export class CoreCrypto {
   proteusInit = jest.fn();
-  proteusNewPrekey = jest.fn(() => Uint8Array.from([]));
+  proteusNewPrekey = jest.fn(() => {
+    return Uint8Array.from([]);
+  });
   getRemoteFingerprint = jest.fn();
   getLocalFingerprint = jest.fn();
   proteusSessionExists = jest.fn();
@@ -143,21 +145,29 @@ export const isProteusError = <E extends ProteusErrorType>(
   return isCoreCryptoError(error, ErrorType.Proteus) && (error as any).context?.type === errorType;
 };
 
-export const isProteusSessionNotFoundError = (error: unknown) =>
-  isProteusError(error, ProteusErrorType.SessionNotFound);
-export const isProteusDuplicateMessageError = (error: unknown) =>
-  isProteusError(error, ProteusErrorType.DuplicateMessage);
-export const isProteusRemoteIdentityChangedError = (error: unknown) =>
-  isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
+export const isProteusSessionNotFoundError = (error: unknown) => {
+  return isProteusError(error, ProteusErrorType.SessionNotFound);
+};
+export const isProteusDuplicateMessageError = (error: unknown) => {
+  return isProteusError(error, ProteusErrorType.DuplicateMessage);
+};
+export const isProteusRemoteIdentityChangedError = (error: unknown) => {
+  return isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
+};
 
-export const isMlsOrphanWelcomeError = (error: unknown) =>
-  isCoreCryptoError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
+export const isMlsOrphanWelcomeError = (error: unknown) => {
+  return isCoreCryptoError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
+};
 
 // Added to support tests that rely on the core-crypto guard for ConversationAlreadyExists classification
-export const isMlsConversationAlreadyExistsError = (error: unknown) =>
-  isCoreCryptoError(error, ErrorType.Mls) &&
-  error.context?.type === MlsErrorType.ConversationAlreadyExists &&
-  Array.isArray(error.context?.context?.conversationId);
+export const isMlsConversationAlreadyExistsError = (error: unknown) => {
+  return (
+    isCoreCryptoError(error, ErrorType.Mls) &&
+    error.context?.type === MlsErrorType.ConversationAlreadyExists &&
+    Array.isArray(error.context?.context?.conversationId)
+  );
+};
 
-export const isMlsMessageRejectedError = (error: unknown) =>
-  isCoreCryptoError(error, ErrorType.Mls) && error.context?.type === MlsErrorType.MessageRejected;
+export const isMlsMessageRejectedError = (error: unknown) => {
+  return isCoreCryptoError(error, ErrorType.Mls) && error.context?.type === MlsErrorType.MessageRejected;
+};

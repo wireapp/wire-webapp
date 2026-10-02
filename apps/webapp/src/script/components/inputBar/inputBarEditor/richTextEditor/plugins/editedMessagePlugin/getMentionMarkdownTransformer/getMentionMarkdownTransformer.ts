@@ -24,7 +24,7 @@ import {$createMentionNode, $isMentionNode, MentionNode} from '../../../nodes/me
 // Cutom transformer for handling mentions when converting markdown to editor format.
 // Based on https://github.com/facebook/lexical/blob/main/packages/lexical-markdown/src/MarkdownTransformers.ts#L489
 // It takes mentions from the markdown (e.g. <mention>@John Doe</mention>) and converts them to MentionNodes.
-export const getMentionMarkdownTransformer = (allowedMentions: Array<string>): TextMatchTransformer => {
+export const getMentionMarkdownTransformer = (allowedMentions: string[]): TextMatchTransformer => {
   return {
     dependencies: [MentionNode],
     export: node => {

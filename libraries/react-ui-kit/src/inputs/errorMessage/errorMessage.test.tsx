@@ -22,5 +22,7 @@ import {ErrorMessage} from './errorMessage';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"ErrorMessage"', () => {
-  it('renders', () => matchComponent(<ErrorMessage>ErrorMessage</ErrorMessage>));
+  it('renders', () => {
+    return matchComponent(<ErrorMessage>ErrorMessage</ErrorMessage>);
+  });
 });

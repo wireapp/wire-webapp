@@ -72,7 +72,9 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
     element.style.setProperty('--scrollbar-color', `rgba(${newColor})`);
     currentAlpha.current = nextAlpha;
     isAnimating.current = true;
-    window.requestAnimationFrame(() => animate(animation, element));
+    window.requestAnimationFrame(() => {
+      return animate(animation, element);
+    });
   }
 
   function startAnimation(animation: 'fadein' | 'fadeout', element: HTMLElement) {
@@ -81,10 +83,16 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
     }
   }
 
-  const fadeIn = (element: HTMLElement) => startAnimation('fadein', element);
-  const fadeOut = (element: HTMLElement) => startAnimation('fadeout', element);
+  const fadeIn = (element: HTMLElement) => {
+    return startAnimation('fadein', element);
+  };
+  const fadeOut = (element: HTMLElement) => {
+    return startAnimation('fadeout', element);
+  };
 
-  const debouncedFadeOut = useDebouncedCallback((element: HTMLElement) => fadeOut(element), config.DEBOUNCE_THRESHOLD);
+  const debouncedFadeOut = useDebouncedCallback((element: HTMLElement) => {
+    return fadeOut(element);
+  }, config.DEBOUNCE_THRESHOLD);
 
   const fadeInIdle = (element: HTMLElement) => {
     fadeIn(element);
@@ -93,10 +101,18 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
 
   return (
     <div
-      onMouseEnter={event => fadeInIdle(event.currentTarget)}
-      onMouseLeave={event => fadeOut(event.currentTarget)}
-      onMouseMove={event => fadeInIdle(event.currentTarget)}
-      onScroll={event => fadeInIdle(event.currentTarget)}
+      onMouseEnter={event => {
+        return fadeInIdle(event.currentTarget);
+      }}
+      onMouseLeave={event => {
+        return fadeOut(event.currentTarget);
+      }}
+      onMouseMove={event => {
+        return fadeInIdle(event.currentTarget);
+      }}
+      onScroll={event => {
+        return fadeInIdle(event.currentTarget);
+      }}
       ref={ref}
       {...props}
     />

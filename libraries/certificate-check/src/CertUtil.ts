@@ -68,7 +68,9 @@ export function getFingerprint(derCert: Buffer): string {
 }
 
 export function hostnameShouldBePinned(hostname: string): boolean {
-  return KNOWN_PINS.some(pin => pin.url.test(hostname.toLowerCase().trim()));
+  return KNOWN_PINS.some(pin => {
+    return pin.url.test(hostname.toLowerCase().trim());
+  });
 }
 
 export function verifyPinning(hostname: string, remoteCertificate?: ElectronCertificate): PinningResult {
@@ -118,9 +120,9 @@ export function verifyPinning(hostname: string, remoteCertificate?: ElectronCert
 
     if (url.test(hostname.toLowerCase().trim())) {
       if (knownIssuerRootCerts.length > 0) {
-        result.verifiedIssuerRootCerts = knownIssuerRootCerts.some(
-          knownRootCert => remoteIssuerCertHex === rs.pemtohex(knownRootCert),
-        );
+        result.verifiedIssuerRootCerts = knownIssuerRootCerts.some(knownRootCert => {
+          return remoteIssuerCertHex === rs.pemtohex(knownRootCert);
+        });
         if (!result.verifiedIssuerRootCerts) {
           const knownCertsCombined = knownIssuerRootCerts.join(', ').replace(/[\r\n]/g, '');
           const errorMessage = `Issuer root certificates: none of "${knownCertsCombined}" could be verified against "${
@@ -140,7 +142,9 @@ export function verifyPinning(hostname: string, remoteCertificate?: ElectronCert
 
           const fingerprintCheck =
             localFingerprints.length > 0 &&
-            localFingerprints.some(knownFingerprint => knownFingerprint === remotePublicKeyFingerprint);
+            localFingerprints.some(knownFingerprint => {
+              return knownFingerprint === remotePublicKeyFingerprint;
+            });
           const algorithmIDCheck = localAlgorithmID === remotePublicKey.algoid;
           const algorithmParamCheck = localAlgorithmParam === remotePublicKey.algparam;
 
@@ -166,7 +170,9 @@ export function verifyPinning(hostname: string, remoteCertificate?: ElectronCert
 
           return arr;
         }, [])
-        .every(value => Boolean(value));
+        .every(value => {
+          return Boolean(value);
+        });
 
       break;
     }

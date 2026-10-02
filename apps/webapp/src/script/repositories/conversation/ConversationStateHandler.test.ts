@@ -36,7 +36,9 @@ function buildHandler() {
     deleteConversationCode: jest.fn(),
     putConversationAccess: jest.fn(),
   };
-  const translate = jest.fn((key: Parameters<Translate>[0]) => `translated:${key}`) as Translate;
+  const translate = jest.fn((key: Parameters<Translate>[0]) => {
+    return `translated:${key}`;
+  }) as Translate;
   const handler = new ConversationStateHandler(conversationService as unknown as ConversationService, translate);
 
   return {conversationService, translate, handler};
@@ -44,7 +46,9 @@ function buildHandler() {
 
 function buildConversation(inTeam: boolean) {
   const conversation = new Conversation('conversation-id', 'wire.com', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-  (conversation as any).inTeam = jest.fn(() => inTeam);
+  (conversation as any).inTeam = jest.fn(() => {
+    return inTeam;
+  });
   return conversation;
 }
 

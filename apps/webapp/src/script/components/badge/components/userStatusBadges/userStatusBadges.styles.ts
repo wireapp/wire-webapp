@@ -19,12 +19,14 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const badgesWrapper = (count: number): CSSObject => ({
-  margin: '0 8px',
-  display: 'grid',
-  gap: '8px',
-  gridTemplateColumns: `repeat(${count}, 1fr)`,
-});
+export const badgesWrapper = (count: number): CSSObject => {
+  return {
+    margin: '0 8px',
+    display: 'grid',
+    gap: '8px',
+    gridTemplateColumns: `repeat(${count}, 1fr)`,
+  };
+};
 
 export const icon: CSSObject = {
   alignItems: 'center',

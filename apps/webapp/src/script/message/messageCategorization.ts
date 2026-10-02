@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray, isNumber, isTruthy} from '@sindresorhus/is';
 import {isObject} from 'underscore';
 
 import {ClientEvent} from 'Repositories/event/Client';
@@ -72,7 +73,7 @@ const _checkText = (event: any): MessageCategory | void => {
   if (isMessageAdd) {
     let category = MessageCategory.TEXT;
 
-    const isLinkPreview = eventData.previews && !!eventData.previews.length;
+    const isLinkPreview = isTruthy(eventData.previews) && isTruthy(eventData.previews.length);
     if (isLinkPreview) {
       category = category | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
     }
@@ -89,13 +90,13 @@ export const categoryFromEvent = (event: Partial<EventRecord>): MessageCategory 
     const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation, _checkComposite];
     for (const check of categoryChecks) {
       const matchedCategory = check(event);
-      if (matchedCategory) {
+      if (isNumber(matchedCategory) && matchedCategory !== 0) {
         category = matchedCategory;
         break;
       }
     }
 
-    const isReaction = isObject(eventReactions) && !!Object.keys(eventReactions).length;
+    const isReaction = isObject(eventReactions) && isNonEmptyArray(Object.keys(eventReactions));
     if (isReaction) {
       category = category | MessageCategory.LIKED;
     }

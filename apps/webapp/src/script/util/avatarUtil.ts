@@ -66,11 +66,13 @@ const borderIdentifier = 'border';
 const backgroundIdentifier = 'background';
 const colorIdentifier = 'color';
 
-const channelAvatarColorPalette = channelAvatarColorOptions.map(color => ({
-  background: `${color}-${backgroundIdentifier}`,
-  color: `${color}-${colorIdentifier}`,
-  border: `${color}-${borderIdentifier}`,
-}));
+const channelAvatarColorPalette = channelAvatarColorOptions.map(color => {
+  return {
+    background: `${color}-${backgroundIdentifier}`,
+    color: `${color}-${colorIdentifier}`,
+    border: `${color}-${borderIdentifier}`,
+  };
+});
 /**
  *
  * @param id - unique id - The ID used to generate a hash code for selecting a color.

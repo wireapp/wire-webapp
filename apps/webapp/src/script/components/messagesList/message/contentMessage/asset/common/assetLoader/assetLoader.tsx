@@ -47,7 +47,15 @@ const AssetLoader = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
       tabIndex={TabIndex.FOCUSABLE}
       className="media-button"
       onClick={onClick}
-      onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
+      onKeyDown={event => {
+        return handleKeyDown({
+          event,
+          callback: () => {
+            return onClick(event);
+          },
+          keys: [KEY.ENTER, KEY.SPACE],
+        });
+      }}
       data-uie-name="status-loading-media"
     >
       <svg aria-hidden="true" viewBox={viewBox} data-uie-name="asset-loader-svg">

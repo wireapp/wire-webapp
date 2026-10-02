@@ -30,36 +30,56 @@ export class MeetingsRepository {
 
   createMeeting(payload: CreateMeeting): Task<MeetingWithConversation, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.dataSource.createMeeting(payload),
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.createMeeting(payload);
+      },
     );
   }
 
   deleteMeeting(meetingId: QualifiedId): Task<void, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.dataSource.deleteMeeting(meetingId),
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.deleteMeeting(meetingId);
+      },
     );
   }
 
   getMeeting(meetingId: QualifiedId): Task<Meeting, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.dataSource.getMeeting(meetingId),
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.getMeeting(meetingId);
+      },
     );
   }
 
   getMeetingsList(): Task<Meeting[], unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.dataSource.getMeetingsList(),
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.getMeetingsList();
+      },
     );
   }
 
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Task<MeetingWithConversation, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.dataSource.updateMeeting(meetingId, payload),
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.updateMeeting(meetingId, payload);
+      },
     );
   }
 }

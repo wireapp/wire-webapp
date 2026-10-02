@@ -35,8 +35,12 @@ export const Pagination: React.FC<PaginationProps> = ({
   currentPage = 0,
   numberOfPages = 1,
   goPage,
-  previousPageComponent: PreviousPageComponent = () => '<',
-  nextPageComponent: NextPageComponent = () => '>',
+  previousPageComponent: PreviousPageComponent = () => {
+    return '<';
+  },
+  nextPageComponent: NextPageComponent = () => {
+    return '>';
+  },
   ...props
 }) => {
   const isLastPage = currentPage === numberOfPages - 1;
@@ -48,13 +52,15 @@ export const Pagination: React.FC<PaginationProps> = ({
     const endLength = 1;
     const skipLength = 1;
     const normalizeCount = endLength + skipLength + spanLength;
-    const dots = (key: string) => (
-      <Bold key={key} fontSize={'11px'}>
-        {'…'}
-      </Bold>
-    );
-    const renderPageNumber = (pageIndex: number) =>
-      currentPage === pageIndex ? (
+    const dots = (key: string) => {
+      return (
+        <Bold key={key} fontSize={'11px'}>
+          {'…'}
+        </Bold>
+      );
+    };
+    const renderPageNumber = (pageIndex: number) => {
+      return currentPage === pageIndex ? (
         <Bold
           fontSize={'11px'}
           key={pageIndex}
@@ -64,16 +70,26 @@ export const Pagination: React.FC<PaginationProps> = ({
           {pageIndex + 1}
         </Bold>
       ) : (
-        <Link key={pageIndex} style={{margin: '0 8px'}} onClick={() => goPage?.(pageIndex)} data-uie-name="go-page">
+        <Link
+          key={pageIndex}
+          style={{margin: '0 8px'}}
+          onClick={() => {
+            return goPage?.(pageIndex);
+          }}
+          data-uie-name="go-page"
+        >
           {pageIndex + 1}
         </Link>
       );
+    };
 
     const normalizedCurrent = Math.min(Math.max(currentPage, normalizeCount), lastPageIndex - normalizeCount);
     const beforeCount = normalizedCurrent - spanLength - endLength;
     const afterCount = lastPageIndex - endLength - normalizedCurrent - spanLength;
 
-    let pages = Array.from(Array(numberOfPages), (_, index) => renderPageNumber(index));
+    let pages = Array.from(Array(numberOfPages), (_, index) => {
+      return renderPageNumber(index);
+    });
     if (afterCount > skipLength) {
       pages = pages.toSpliced(normalizedCurrent + spanLength + 1, afterCount, dots('dots-end'));
     }
@@ -88,7 +104,13 @@ export const Pagination: React.FC<PaginationProps> = ({
     <FlexBox align="flex-end" data-uie-name="element-pagination" {...props}>
       <div css={{flexBasis: 100}}>
         {!isFirstPage && (
-          <Link block onClick={() => goPage?.(currentPage - 1)} data-uie-name="go-previous-page">
+          <Link
+            block
+            onClick={() => {
+              return goPage?.(currentPage - 1);
+            }}
+            data-uie-name="go-previous-page"
+          >
             <PreviousPageComponent />
           </Link>
         )}
@@ -101,7 +123,13 @@ export const Pagination: React.FC<PaginationProps> = ({
       </div>
       <div css={{display: 'flex', flexBasis: 100, justifyContent: 'flex-end'}}>
         {!isLastPage && (
-          <Link block onClick={() => goPage?.(currentPage + 1)} data-uie-name="go-next-page">
+          <Link
+            block
+            onClick={() => {
+              return goPage?.(currentPage + 1);
+            }}
+            data-uie-name="go-next-page"
+          >
             <NextPageComponent />
           </Link>
         )}

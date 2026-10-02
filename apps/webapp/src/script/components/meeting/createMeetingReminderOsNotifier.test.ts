@@ -60,11 +60,13 @@ const meetingReminderFirePayloadFactory = createFactory<MeetingReminderFirePaylo
   };
 });
 
-const translate: Translate = (identifier, substitutions) =>
-  identifier === 'meetings.notifications.startsAt' ? `Starts at ${substitutions?.time}` : identifier;
+const translate: Translate = (identifier, substitutions) => {
+  return identifier === 'meetings.notifications.startsAt' ? `Starts at ${substitutions?.time}` : identifier;
+};
 
-const formatMeetingTime = (meetingStartTime: string): string =>
-  meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
+const formatMeetingTime = (meetingStartTime: string): string => {
+  return meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
+};
 
 const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotificationApi> = {}) => {
   const requests: SystemNotificationRequest[] = [];
@@ -75,8 +77,15 @@ const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotif
 
   const notifier = createMeetingReminderOsNotifier({
     notificationApi: {
-      isSupported: () => true,
-      getPermission: () => 'granted',
+      isSupported: () => {
+        return true;
+      },
+      getPermission: () => {
+        return 'granted';
+      },
+      requestPermission: async () => {
+        return 'granted';
+      },
       show: request => {
         requests.push(request);
 
@@ -100,7 +109,7 @@ const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotif
 };
 
 describe('createMeetingReminderOsNotifier', () => {
-  it('presents a notification naming the meeting and its start time', () => {
+  it('presents a notification requiring interaction and naming the meeting and its start time', () => {
     const {requests, notifier} = createNotifierWithFakeNotificationApi();
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
@@ -108,6 +117,7 @@ describe('createMeetingReminderOsNotifier', () => {
     expect(requests).toHaveLength(1);
     expect(firstRequestOf(requests).title).toBe('Weekly sync');
     expect(firstRequestOf(requests).body).toBe('Starts at 12:00 PM');
+    expect(firstRequestOf(requests).requireInteraction).toBe(true);
   });
 
   it('attaches neither action buttons nor a Wire sound file', () => {
@@ -115,7 +125,14 @@ describe('createMeetingReminderOsNotifier', () => {
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
-    expect(Object.keys(firstRequestOf(requests)).sort()).toEqual(['body', 'onClick', 'onClose', 'tag', 'title']);
+    expect(Object.keys(firstRequestOf(requests)).sort()).toEqual([
+      'body',
+      'onClick',
+      'onClose',
+      'requireInteraction',
+      'tag',
+      'title',
+    ]);
   });
 
   it('focuses the meetings list, opens the prep modal, and closes the toast when clicked', () => {
@@ -143,7 +160,11 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it.each(['denied', 'default'] as const)('presents nothing when permission is %s', permission => {
-    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({getPermission: () => permission});
+    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({
+      getPermission: () => {
+        return permission;
+      },
+    });
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
@@ -152,7 +173,11 @@ describe('createMeetingReminderOsNotifier', () => {
   });
 
   it('presents nothing when notifications are unsupported', () => {
-    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({isSupported: () => false});
+    const {requests, logger, notifier} = createNotifierWithFakeNotificationApi({
+      isSupported: () => {
+        return false;
+      },
+    });
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
 
@@ -162,11 +187,12 @@ describe('createMeetingReminderOsNotifier', () => {
 
   it('logs and drops a failure to present the toast', () => {
     const {logger, notifier} = createNotifierWithFakeNotificationApi({
-      show: () =>
-        result.err({
+      show: () => {
+        return result.err({
           kind: systemNotificationErrorKinds.presentationFailed,
           cause: new Error('notification could not be constructed'),
-        }),
+        });
+      },
     });
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
@@ -185,11 +211,12 @@ describe('createMeetingReminderOsNotifier', () => {
         requests.push(request);
 
         return result.ok({
-          close: () =>
-            result.err({
+          close: () => {
+            return result.err({
               kind: systemNotificationErrorKinds.closeFailed,
               cause: new Error('notification could not be closed'),
-            }),
+            });
+          },
         });
       },
     });

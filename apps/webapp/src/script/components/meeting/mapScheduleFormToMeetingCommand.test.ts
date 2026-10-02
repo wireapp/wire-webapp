@@ -38,16 +38,18 @@ const createUser = (id: string) => {
   return user;
 };
 
-const baseFormState = (): ScheduleMeetingFormState => ({
-  title: 'Weekly sync',
-  start: maybe.just(futureStartDate),
-  end: maybe.just(futureEndDate),
-  recurrence: 'weekly',
-  selectedUsers: [],
-  participantsFilter: 'alice',
-  password: '',
-  passwordConfirmation: '',
-});
+const baseFormState = (): ScheduleMeetingFormState => {
+  return {
+    title: 'Weekly sync',
+    start: maybe.just(futureStartDate),
+    end: maybe.just(futureEndDate),
+    recurrence: 'weekly',
+    selectedUsers: [],
+    participantsFilter: 'alice',
+    password: '',
+    passwordConfirmation: '',
+  };
+};
 
 describe('mapScheduleFormToMeetingCommand', () => {
   it('maps validated form state to a meeting command', () => {

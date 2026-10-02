@@ -48,7 +48,9 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
   });
 
   const updateSvgWidth = useCallback(() => {
-    setState(state => ({...state, svgWidth: svgRef.current?.clientWidth ?? 0}));
+    setState(state => {
+      return {...state, svgWidth: svgRef.current?.clientWidth ?? 0};
+    });
   }, [svgRef]);
 
   const onTimeUpdate = useCallback(() => {
@@ -57,14 +59,18 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
       return;
     }
 
-    setState(state => ({
-      ...state,
-      position: audioElement.currentTime / audioDuration,
-    }));
+    setState(state => {
+      return {
+        ...state,
+        position: audioElement.currentTime / audioDuration,
+      };
+    });
   }, [audioElement]);
 
   const onAudioEnded = useCallback(() => {
-    setState(state => ({...state, position: 0}));
+    setState(state => {
+      return {...state, position: 0};
+    });
   }, []);
 
   const onLevelClick = useCallback(
@@ -106,7 +112,9 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
   useEffect(() => {
     window.addEventListener('resize', updateSvgWidth);
-    return () => window.removeEventListener('resize', updateSvgWidth);
+    return () => {
+      return window.removeEventListener('resize', updateSvgWidth);
+    };
   }, [updateSvgWidth]);
 
   useEffect(() => {
@@ -115,10 +123,14 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
       return;
     }
 
-    setState(state => ({
-      ...state,
-      loudness: Array.from(assetLoudness).map(level => level / NORMALIZED_LOUDNESS),
-    }));
+    setState(state => {
+      return {
+        ...state,
+        loudness: Array.from(assetLoudness).map(level => {
+          return level / NORMALIZED_LOUDNESS;
+        }),
+      };
+    });
   }, [asset]);
 
   useEffect(() => {

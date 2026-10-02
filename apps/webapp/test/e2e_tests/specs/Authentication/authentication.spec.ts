@@ -185,10 +185,11 @@ test.describe('Authentication', () => {
     'I want to make sure i connect to webapp only through TLS >= 1.3 connection',
     {tag: ['@TC-3480', '@regression']},
     async () => {
-      const requestWithTlsVersion = (versions: {min?: SecureVersion; max?: SecureVersion}) =>
-        new Promise<IncomingMessage>((res, rej) => {
+      const requestWithTlsVersion = (versions: {min?: SecureVersion; max?: SecureVersion}) => {
+        return new Promise<IncomingMessage>((res, rej) => {
           https.get(webAppPath, {minVersion: versions.min, maxVersion: versions.max}, res).on('error', rej);
         });
+      };
 
       await expect(requestWithTlsVersion({max: 'TLSv1.2'})).rejects.toBeDefined();
       await expect(requestWithTlsVersion({min: 'TLSv1.3'})).resolves.toBeDefined();

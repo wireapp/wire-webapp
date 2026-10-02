@@ -17,8 +17,12 @@ test.describe('Mention', () => {
 
   test('I want to be able to write a mention in a group', {tag: ['@TC-3487', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userA))).then(pm => {
+        return pm.webapp.pages;
+      }),
+      PageManager.from(createPage(withLogin(userB))).then(pm => {
+        return pm.webapp.pages;
+      }),
     ]);
     await createGroup(userAPages, 'Mention Group', [userB]);
 
@@ -39,9 +43,15 @@ test.describe('Mention', () => {
     {tag: ['@TC-3488', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages, userCPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userC))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await createGroup(userAPages, 'Multi-Mention Group', [userB, userC]);
@@ -72,9 +82,15 @@ test.describe('Mention', () => {
     {tag: ['@TC-3489', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages, userCPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userC))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await test.step('Create group', async () => {
@@ -553,12 +569,16 @@ test.describe('Mention', () => {
     {tag: ['@TC-3545', '@regression']},
     async ({createUser, createPage}) => {
       const otherUser = await createUser();
-      const otherUserPages = await PageManager.from(createPage(withLogin(otherUser))).then(pm => pm.webapp.pages);
+      const otherUserPages = await PageManager.from(createPage(withLogin(otherUser))).then(pm => {
+        return pm.webapp.pages;
+      });
 
       const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await sendConnectionRequest(userAPage, otherUser);
 
-      const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
+      const [userAPages, userBPages] = [userAPage, userBPage].map(page => {
+        return PageManager.from(page).webapp.pages;
+      });
 
       await otherUserPages.conversationList().pendingConnectionRequest.click();
       await otherUserPages.connectRequest().connectButton.click();

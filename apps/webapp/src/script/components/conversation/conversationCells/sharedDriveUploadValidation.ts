@@ -28,10 +28,15 @@ export interface SharedDriveUploadRejection {
 
 const UPLOAD_METADATA_FILE_NAMES = new Set(['.DS_Store', 'Thumbs.db', 'desktop.ini']);
 
-export const isUploadMetadataFile = (file: File): boolean => UPLOAD_METADATA_FILE_NAMES.has(file.name);
+export const isUploadMetadataFile = (file: File): boolean => {
+  return UPLOAD_METADATA_FILE_NAMES.has(file.name);
+};
 
-export const filterSharedDriveUploadFiles = (files: readonly File[]): File[] =>
-  files.filter(file => !isUploadMetadataFile(file));
+export const filterSharedDriveUploadFiles = (files: readonly File[]): File[] => {
+  return files.filter(file => {
+    return !isUploadMetadataFile(file);
+  });
+};
 
 interface SharedDriveUploadValidationOptions {
   readonly isUploadFilesEnabled: boolean;
@@ -56,12 +61,16 @@ export const validateSharedDriveUploadFiles = (
     return Result.err({reason: 'empty', invalidFiles: []});
   }
 
-  const invalidTypeFiles = files.filter(file => !isAcceptedFile(file));
+  const invalidTypeFiles = files.filter(file => {
+    return !isAcceptedFile(file);
+  });
   if (invalidTypeFiles.length > 0) {
     return Result.err({reason: 'notAccepted', invalidFiles: invalidTypeFiles});
   }
 
-  const oversizedFiles = files.filter(file => file.size > maxFileSize);
+  const oversizedFiles = files.filter(file => {
+    return file.size > maxFileSize;
+  });
   if (oversizedFiles.length > 0) {
     return Result.err({reason: 'tooLarge', invalidFiles: oversizedFiles});
   }

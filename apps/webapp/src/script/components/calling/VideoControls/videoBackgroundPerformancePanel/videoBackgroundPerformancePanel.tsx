@@ -66,33 +66,37 @@ const formatValue = (value?: string | number | null): string => {
 
 const getMetricRows = (renderMetrics: RenderMetrics) => {
   return Maybe.of(renderMetrics)
-    .map(metrics => [
-      {label: 'Quality', value: formatValue(metrics.tier).toUpperCase()},
-      {label: 'Total', value: formatMs(metrics.avgTotalMs)},
-      {label: 'Segmentation', value: formatMs(metrics.avgSegmentationMs)},
-      {label: 'GPU', value: formatMs(metrics.avgGpuMs)},
-      {label: 'Budget', value: formatMs(metrics.budget)},
-      {label: 'ML delegate type', value: formatValue(metrics.ml)},
-      {label: 'Utilization', value: formatPercent(metrics.utilShare)},
-      {label: 'ML', value: formatPercent(metrics.mlShare)},
-      {label: 'WebGL', value: formatPercent(metrics.webglShare)},
-      {
-        label: 'Delegate',
-        value: formatValue(metrics.segmentationDelegate),
-      },
-      {label: 'Dropped', value: formatValue(metrics.droppedFrames)},
-    ])
+    .map(metrics => {
+      return [
+        {label: 'Quality', value: formatValue(metrics.tier).toUpperCase()},
+        {label: 'Total', value: formatMs(metrics.avgTotalMs)},
+        {label: 'Segmentation', value: formatMs(metrics.avgSegmentationMs)},
+        {label: 'GPU', value: formatMs(metrics.avgGpuMs)},
+        {label: 'Budget', value: formatMs(metrics.budget)},
+        {label: 'ML delegate type', value: formatValue(metrics.ml)},
+        {label: 'Utilization', value: formatPercent(metrics.utilShare)},
+        {label: 'ML', value: formatPercent(metrics.mlShare)},
+        {label: 'WebGL', value: formatPercent(metrics.webglShare)},
+        {
+          label: 'Delegate',
+          value: formatValue(metrics.segmentationDelegate),
+        },
+        {label: 'Dropped', value: formatValue(metrics.droppedFrames)},
+      ];
+    })
     .unwrapOr([]);
 };
 
 const getCapabilityRows = (capabilityInfo: CapabilityInfo | null | undefined) => {
   return Maybe.of(capabilityInfo)
-    .map(info => [
-      {label: 'WebGL2', value: info.webgl2 ? '✔' : '✖'},
-      {label: 'Worker', value: info.worker ? '✔' : '✖'},
-      {label: 'OffscreenCanvas', value: info.offscreenCanvas ? '✔' : '✖'},
-      {label: 'VideoFrameCallback', value: info.requestVideoFrameCallback ? '✔' : '✖'},
-    ])
+    .map(info => {
+      return [
+        {label: 'WebGL2', value: info.webgl2 ? '✔' : '✖'},
+        {label: 'Worker', value: info.worker ? '✔' : '✖'},
+        {label: 'OffscreenCanvas', value: info.offscreenCanvas ? '✔' : '✖'},
+        {label: 'VideoFrameCallback', value: info.requestVideoFrameCallback ? '✔' : '✖'},
+      ];
+    })
     .unwrapOr([]);
 };
 
@@ -105,18 +109,24 @@ type MetricsDisplayProps = {
   readonly capabilityInfo: CapabilityInfo;
 };
 
-const MetricRow = ({label, value}: MetricRowProps) => (
-  <div css={metricsRowStyles}>
-    <span css={metricsLabelStyles}>{label}</span>
-    <span css={metricsValueStyles}>{value}</span>
-  </div>
-);
+const MetricRow = ({label, value}: MetricRowProps) => {
+  return (
+    <div css={metricsRowStyles}>
+      <span css={metricsLabelStyles}>{label}</span>
+      <span css={metricsValueStyles}>{value}</span>
+    </div>
+  );
+};
 
 const POLLING_INTERVAL = 500;
 
 const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
-  const renderMetrics = useBackgroundEffectsStore(state => state.metrics);
-  const model = useBackgroundEffectsStore(state => state.model);
+  const renderMetrics = useBackgroundEffectsStore(state => {
+    return state.metrics;
+  });
+  const model = useBackgroundEffectsStore(state => {
+    return state.model;
+  });
 
   const metricRows = isNullOrUndefined(renderMetrics) ? [] : getMetricRows(renderMetrics);
 
@@ -125,33 +135,42 @@ const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
   return (
     <div css={metricsListStyles}>
       <MetricRow label="Model" value={formatValue(model)} />
-      {metricRows.map(row => (
-        <MetricRow key={row.label} label={row.label} value={row.value} />
-      ))}
-      {capabilityRows.map(row => (
-        <MetricRow key={row.label} label={row.label} value={row.value} />
-      ))}
+      {metricRows.map(row => {
+        return <MetricRow key={row.label} label={row.label} value={row.value} />;
+      })}
+      {capabilityRows.map(row => {
+        return <MetricRow key={row.label} label={row.label} value={row.value} />;
+      })}
     </div>
   );
 };
 
-const qualitySelectOptions = QUALITY_OPTIONS.map(option => ({
-  label: option.toUpperCase(),
-  value: option,
-}));
+const qualitySelectOptions = QUALITY_OPTIONS.map(option => {
+  return {
+    label: option.toUpperCase(),
+    value: option,
+  };
+});
 
 export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
   const {translate} = useApplicationContext();
-  const isPerformancePanelEnabled = useBackgroundEffectsStore(state => state.isPerformancePanelEnabled);
+  const isPerformancePanelEnabled = useBackgroundEffectsStore(state => {
+    return state.isPerformancePanelEnabled;
+  });
 
-  const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => backgroundEffectsHandler.getQuality());
+  const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => {
+    return backgroundEffectsHandler.getQuality();
+  });
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [capabilityInfo, setCapabilityInfo] = useState<CapabilityInfo | null>(null);
 
-  const selectedOption = useMemo(
-    () => qualitySelectOptions.find(option => option.value === selectedQuality) ?? null,
-    [selectedQuality],
-  );
+  const selectedOption = useMemo(() => {
+    return (
+      qualitySelectOptions.find(option => {
+        return option.value === selectedQuality;
+      }) ?? null
+    );
+  }, [selectedQuality]);
 
   useEffect(() => {
     if (!isPerformancePanelEnabled || !isPanelOpen) {
@@ -171,7 +190,9 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     const interval = setInterval(() => {
       const current = backgroundEffectsHandler.getQuality();
 
-      setSelectedQuality(prev => (prev !== current ? current : prev));
+      setSelectedQuality(prev => {
+        return prev !== current ? current : prev;
+      });
     }, POLLING_INTERVAL);
 
     return () => {
@@ -188,7 +209,9 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
 
     const syncCapabilities = () => {
       const current = backgroundEffectsHandler.getCapabilityInfo();
-      setCapabilityInfo(prev => (areCapabilityInfosEqual(Maybe.of(prev), Maybe.of(current)) ? prev : current));
+      setCapabilityInfo(prev => {
+        return areCapabilityInfosEqual(Maybe.of(prev), Maybe.of(current)) ? prev : current;
+      });
     };
 
     syncCapabilities();
@@ -208,7 +231,9 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
   }, [isPerformancePanelEnabled, isPanelOpen]);
 
   const togglePerformancePanel = () => {
-    setIsPanelOpen(prev => !prev);
+    setIsPanelOpen(prev => {
+      return !prev;
+    });
   };
 
   const handleQualityChange = useCallback(

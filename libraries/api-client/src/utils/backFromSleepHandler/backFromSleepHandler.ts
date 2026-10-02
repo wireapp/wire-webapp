@@ -79,5 +79,7 @@ export const onBackFromSleep = ({
     }
   }, CHECK_INTERVAL);
 
-  return () => clearInterval(tid);
+  return () => {
+    return clearInterval(tid);
+  };
 };

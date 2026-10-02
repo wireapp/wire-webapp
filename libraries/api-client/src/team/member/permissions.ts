@@ -40,5 +40,7 @@ export const hasPermissions = (permissions: number, expectedPermissions: Permiss
 };
 
 export const combinePermissions = (permissionList: Permissions[]): Permissions => {
-  return permissionList.reduce<number>((acc, permission) => acc | permission, 0);
+  return permissionList.reduce<number>((acc, permission) => {
+    return acc | permission;
+  }, 0);
 };

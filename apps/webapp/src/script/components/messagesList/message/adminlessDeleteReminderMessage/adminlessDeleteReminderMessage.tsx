@@ -48,22 +48,30 @@ export const AdminlessDeleteReminderMessage = ({message}: AdminlessDeleteReminde
   );
 
   const content = replaceReactComponents(caption, [
-    {start: '<strong>', end: '</strong>', render: text => <strong key={text}>{text}</strong>},
+    {
+      start: '<strong>',
+      end: '</strong>',
+      render: text => {
+        return <strong key={text}>{text}</strong>;
+      },
+    },
     {
       start: '[link]',
       end: '[/link]',
-      render: text => (
-        <Link
-          key={text}
-          css={adminlessDeleteReminderLinkCss}
-          variant={LinkVariant.PRIMARY}
-          href={Config.getConfig().URL.SUPPORT.ADMINLESS_GROUP_DELETE}
-          targetBlank
-          data-uie-name="go-adminless-group-delete-learn-more"
-        >
-          {text}
-        </Link>
-      ),
+      render: text => {
+        return (
+          <Link
+            key={text}
+            css={adminlessDeleteReminderLinkCss}
+            variant={LinkVariant.PRIMARY}
+            href={Config.getConfig().URL.SUPPORT.ADMINLESS_GROUP_DELETE}
+            targetBlank
+            data-uie-name="go-adminless-group-delete-learn-more"
+          >
+            {text}
+          </Link>
+        );
+      },
     },
   ]);
 

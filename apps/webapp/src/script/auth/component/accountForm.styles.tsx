@@ -28,12 +28,14 @@ const formBody: CSSObject = {
   textAlign: 'left',
 };
 
-const passwordInfo = (hasValidationErrors: boolean): CSSObject => ({
-  display: hasValidationErrors ? 'none' : 'block',
-  marginTop: '-18px',
-  marginBottom: '20px',
-  fontSize: '12px',
-});
+const passwordInfo = (hasValidationErrors: boolean): CSSObject => {
+  return {
+    display: hasValidationErrors ? 'none' : 'block',
+    marginTop: '-18px',
+    marginBottom: '20px',
+    fontSize: '12px',
+  };
+};
 
 const checkbox: CSSObject = {
   marginBottom: '6px',

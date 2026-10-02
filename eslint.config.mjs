@@ -47,7 +47,7 @@ const ignores = [
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/webapp/src/sw.js',
-  'apps/server/bin/',
+  'apps/server/bin/copy_server_assets.js',
   'apps/server/coverage/',
   'apps/server/dist/',
   'apps/server/node_modules/',
@@ -356,6 +356,22 @@ const productionConfigs = [
     },
   },
   {
+    files: ['**/*.mts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}', 'tools/release-cli/webappVersionSynchronization.mts'],
     languageOptions: {
       parser: tsParser,
@@ -439,6 +455,12 @@ const productionConfigs = [
         },
       ],
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
+      '@typescript-eslint/array-type': [
+        'error',
+        {
+          default: 'array',
+        },
+      ],
       '@typescript-eslint/typedef': 'off',
       'no-dupe-class-members': 'off',
       'no-unsanitized/property': 'off',
@@ -459,10 +481,19 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/release-cli/webappVersionSynchronization.mts'],
+    files: ['tools/release-cli/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.release-cli.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: ['tools/build-artifact/**/*.mts', 'tools/runtime-verification/**/*.mts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.tools.json',
         projectService: false,
       },
     },
@@ -774,15 +805,7 @@ const productionConfigs = [
   },
   {
     files: ['apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**/*.{ts,tsx}'],
-    ignores: [
-      '**/*.test.ts',
-      '**/*.test.tsx',
-      '**/*.spec.ts',
-      '**/*.spec.tsx',
-      '**/test/**',
-      '**/mocks/**',
-      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer.ts',
-    ],
+    ignores: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', '**/test/**', '**/mocks/**'],
     rules: {
       ...strictBooleanRules,
     },
@@ -823,16 +846,26 @@ const productionConfigs = [
       '**/*.d.ts',
       '**/test/**',
       '**/mocks/**',
-      // Backup import/export and event conversion have persistence/event semantics outside this batch.
+      // General backup orchestration and encryption remain outside the event/notification batch.
       'apps/webapp/src/script/repositories/backup/backupRepository.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/CPB.export.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/CPB.import.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/importMappers/mapEventRecord.ts',
       // MLS configuration needs protocol-specific reasoning.
       'apps/webapp/src/script/repositories/client/clientMLSConfig.ts',
-      // Event record validation and persisted schema changes need a separate storage pass.
-      'apps/webapp/src/script/repositories/storage/record/eventRecordGuards.ts',
-      'apps/webapp/src/script/repositories/storage/storageSchemata.ts',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/repositories/event/**/*.{ts,tsx}',
+      'apps/webapp/src/script/repositories/notification/**/*.{ts,tsx}',
+      'apps/webapp/src/script/notification/**/*.{ts,tsx}',
+      'apps/webapp/src/script/error/eventError.ts',
+      'apps/webapp/src/script/components/meeting/meetingNotificationCard/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/meeting/meetingNotificationHost/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/meeting/meetingNotificationStore/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/meeting/meetingNotificationEventHandlers.ts',
+      'apps/webapp/src/script/components/meeting/createMeetingReminderOsNotifier.ts',
     ],
     rules: {
       ...strictBooleanRules,
@@ -840,16 +873,24 @@ const productionConfigs = [
   },
   {
     files: ['apps/webapp/src/script/components/conversation/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/components/conversation/conversation.tsx',
-      'apps/webapp/src/script/components/conversation/conversationCells/**',
-      'apps/webapp/src/script/components/conversation/conversationTabs/conversationTabs.tsx',
-      'apps/webapp/src/script/components/conversation/hooks/useReadReceipt.ts',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/buildCellFileMetadata/**',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/createFileDropHandler/**',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/transformAcceptedFiles/**',
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/cells/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/cellsGlobalView/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/cellsSearchInput/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/conversationCells/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/buildCellFileMetadata/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/createFileDropHandler/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/transformAcceptedFiles/**/*.{ts,tsx}',
       'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/useFilesUploadDropzone.ts',
+      'apps/webapp/src/script/repositories/cells/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/rightSidebar/sharedDrive/**/*.{ts,tsx}',
     ],
+    ignores: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', '**/test/**', '**/mocks/**'],
     rules: {
       ...strictBooleanRules,
     },
@@ -859,12 +900,6 @@ const productionConfigs = [
     ignores: [
       'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**',
       'apps/webapp/src/script/components/messagesList/message/e2eiVerificationMessage/**',
-      'apps/webapp/src/script/components/messagesList/message/messageWrapper.tsx',
-      'apps/webapp/src/script/components/messagesList/uploadAssets/**',
-      'apps/webapp/src/script/components/messagesList/utils/messagesFilter.ts',
-      'apps/webapp/src/script/components/messagesList/utils/useLoadConversation.ts',
-      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/useLoadMessages.ts',
-      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/virtualizedMessagesList.tsx',
     ],
     rules: {
       ...strictBooleanRules,
@@ -872,23 +907,6 @@ const productionConfigs = [
   },
   {
     files: ['apps/webapp/src/script/components/inputBar/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/components/inputBar/inputBar.tsx',
-      'apps/webapp/src/script/components/inputBar/filePreviews/useFilePreview/useFilePreview.ts',
-      'apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/sendPlugin/sendPlugin.tsx',
-      'apps/webapp/src/script/components/inputBar/useFileHandling/**',
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/**',
-      'apps/webapp/src/script/components/inputBar/usePing/usePing.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/useDraftState/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/useOutsideInputClick/**/*.{ts,tsx}',
-    ],
     rules: {
       ...strictBooleanRules,
     },
@@ -917,21 +935,30 @@ const productionConfigs = [
     },
   },
   {
+    files: ['apps/webapp/src/script/repositories/conversation/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/webapp/src/script/repositories/conversation/ConversationVerificationStateHandler/MLS/**',
+      'apps/webapp/src/script/repositories/conversation/ConversationVerificationStateHandler/Proteus/**',
+    ],
+    rules: {
+      ...strictBooleanRules,
+    },
+  },
+  {
     files: [
-      'apps/webapp/src/script/repositories/conversation/AccessState.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationAccessPermission.ts',
-      'apps/webapp/src/script/repositories/conversation/ClientMismatchUtil.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationFilter.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationLabelRepository.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationMapper.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationRoleRepository.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationState.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationStatus.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationStatusIcon.ts',
-      'apps/webapp/src/script/repositories/conversation/NotificationSetting.ts',
-      'apps/webapp/src/script/repositories/conversation/isSelfInitiatedConversationLeave.ts',
-      'apps/webapp/src/script/repositories/conversation/linkPreviews/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/conversation/userClientsUtils.ts',
+      'apps/webapp/src/script/repositories/entity/Conversation.ts',
+      'apps/webapp/src/script/guards/Message.ts',
+      'apps/webapp/src/script/ephemeral/**/*.{ts,tsx}',
+      'apps/webapp/src/script/message/**/*.{ts,tsx}',
+      'apps/webapp/src/script/page/mainContent/panels/collection/**/*.{ts,tsx}',
+      'apps/webapp/src/script/util/conversationMessages.ts',
+      'apps/webapp/src/script/view_model/ActionsViewModel.ts',
+      'apps/webapp/src/script/view_model/ContentViewModel.ts',
+      'apps/webapp/src/script/view_model/ListViewModel.ts',
+    ],
+    ignores: [
+      'apps/webapp/src/script/message/messageHasher.ts',
+      'apps/webapp/src/script/message/e2eiVerificationMessageType.ts',
     ],
     rules: {
       ...strictBooleanRules,
@@ -1195,6 +1222,20 @@ const config = [
   {ignores},
   {linterOptions: repositoryLinterOptions},
   ...productionConfigs,
+  {
+    files: ['**/*.{ts,tsx,mts}'],
+    rules: {
+      'arrow-body-style': ['error', 'always'],
+      'array-callback-return': [
+        'error',
+        {
+          allowImplicit: false,
+          checkForEach: true,
+          allowVoid: false,
+        },
+      ],
+    },
+  },
   {
     files: testTypeScriptFilePatterns,
     linterOptions: testLinterOptions,

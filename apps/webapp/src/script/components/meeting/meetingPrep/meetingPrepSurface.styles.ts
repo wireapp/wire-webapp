@@ -213,17 +213,19 @@ export const meetingPrepMenuLabelStyles: CSSObject = {
   fontWeight: 'var(--font-weight-semibold)',
 };
 
-export const meetingPrepDeviceButtonStyles = (selected: boolean): CSSObject => ({
-  display: 'block',
-  width: '100%',
-  padding: '8px',
-  border: 'none',
-  borderRadius: '6px',
-  textAlign: 'left',
-  cursor: 'pointer',
-  color: 'var(--text-color)',
-  backgroundColor: selected ? 'var(--app-bg-secondary)' : 'transparent',
-});
+export const meetingPrepDeviceButtonStyles = (selected: boolean): CSSObject => {
+  return {
+    display: 'block',
+    width: '100%',
+    padding: '8px',
+    border: 'none',
+    borderRadius: '6px',
+    textAlign: 'left',
+    cursor: 'pointer',
+    color: 'var(--text-color)',
+    backgroundColor: selected ? 'var(--app-bg-secondary)' : 'transparent',
+  };
+};
 
 export const meetingPrepFooterStyles: CSSObject = {
   display: 'flex',

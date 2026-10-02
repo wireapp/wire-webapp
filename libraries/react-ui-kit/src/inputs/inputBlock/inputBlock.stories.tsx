@@ -39,33 +39,39 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: () => (
-    <InputBlock>
-      <Input placeholder="First input" />
-      <Input placeholder="Second input" />
-    </InputBlock>
-  ),
+  render: () => {
+    return (
+      <InputBlock>
+        <Input placeholder="First input" />
+        <Input placeholder="Second input" />
+      </InputBlock>
+    );
+  },
 };
 
 export const WithSubmitCombo: Story = {
-  render: () => (
-    <InputBlock>
-      <Input placeholder="Regular input" />
-      <InputSubmitCombo>
-        <Input placeholder="Input with submit" />
-        <RoundIconButton type="submit">
-          <ArrowIcon />
-        </RoundIconButton>
-      </InputSubmitCombo>
-    </InputBlock>
-  ),
+  render: () => {
+    return (
+      <InputBlock>
+        <Input placeholder="Regular input" />
+        <InputSubmitCombo>
+          <Input placeholder="Input with submit" />
+          <RoundIconButton type="submit">
+            <ArrowIcon />
+          </RoundIconButton>
+        </InputSubmitCombo>
+      </InputBlock>
+    );
+  },
 };
 
 export const Invalid: Story = {
-  render: () => (
-    <InputBlock>
-      <Input placeholder="Invalid input" markInvalid />
-      <Input placeholder="Another invalid input" markInvalid />
-    </InputBlock>
-  ),
+  render: () => {
+    return (
+      <InputBlock>
+        <Input placeholder="Invalid input" markInvalid />
+        <Input placeholder="Another invalid input" markInvalid />
+      </InputBlock>
+    );
+  },
 };

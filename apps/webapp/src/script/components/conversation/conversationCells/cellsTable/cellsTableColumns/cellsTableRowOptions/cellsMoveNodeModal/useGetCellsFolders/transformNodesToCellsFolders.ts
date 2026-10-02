@@ -21,7 +21,9 @@ import {RestNode} from 'cells-sdk-ts';
 
 export const transformNodesToCellsFolders = (nodes: RestNode[]) => {
   return nodes
-    .filter(node => node.Type === 'COLLECTION')
+    .filter(node => {
+      return node.Type === 'COLLECTION';
+    })
     .map(node => {
       const pathParts = node.Path.split('/');
       const name = pathParts[pathParts.length - 1];

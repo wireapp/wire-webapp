@@ -158,8 +158,14 @@ const AddParticipants: FC<AddParticipantsProps> = ({
       return baseContacts;
     }
 
-    const knownIds = new Set(baseContacts.map(contact => contact.id));
-    const newCollaborators = teamCollaborators.filter(collaborator => !knownIds.has(collaborator.id));
+    const knownIds = new Set(
+      baseContacts.map(contact => {
+        return contact.id;
+      }),
+    );
+    const newCollaborators = teamCollaborators.filter(collaborator => {
+      return !knownIds.has(collaborator.id);
+    });
 
     return [...baseContacts, ...newCollaborators];
   }, [baseContacts, teamCollaborators]);
@@ -168,14 +174,24 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const normalizedQuery = searchInput.trim().toLowerCase();
 
     return teamApps
-      .map(app => integrationRepository.mapServiceFromUser(app))
-      .filter(app => compareTransliteration(app.name(), normalizedQuery))
-      .toSorted((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
+      .map(app => {
+        return integrationRepository.mapServiceFromUser(app);
+      })
+      .filter(app => {
+        return compareTransliteration(app.name(), normalizedQuery);
+      })
+      .toSorted((serviceA, serviceB) => {
+        return sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery);
+      });
   }, [teamApps, integrationRepository, searchInput]);
 
   const servicesList = useMemo(() => {
     const allApps = activeConversation.protocol === CONVERSATION_PROTOCOL.MLS ? apps : services;
-    return allApps.filter(app => !participatingUserIds.some(participant => participant.id === app.id)); // Make sure apps already added to the conversation don't show up again
+    return allApps.filter(app => {
+      return !participatingUserIds.some(participant => {
+        return participant.id === app.id;
+      });
+    }); // Make sure apps already added to the conversation don't show up again
   }, [activeConversation.protocol, apps, services, participatingUserIds]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
@@ -211,7 +227,9 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const manageServicesUrl = getManageServicesUrl('client_landing');
   const isSearching = searchInput.length > ENABLE_IS_SEARCHING_LENGTH;
 
-  const onAddPeople = () => setCurrentState(PARTICIPANTS_STATE.ADD_PEOPLE);
+  const onAddPeople = () => {
+    return setCurrentState(PARTICIPANTS_STATE.ADD_PEOPLE);
+  };
 
   const searchServices = useCallback(
     async (value: string): Promise<void> => {
@@ -233,7 +251,9 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     }
   };
 
-  const onServiceSelect = (entity: ServiceEntity) => togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, entity, true);
+  const onServiceSelect = (entity: ServiceEntity) => {
+    return togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, entity, true);
+  };
 
   const addUsers = async () => {
     const userEntities = selectedContacts.slice();
@@ -284,13 +304,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               tabIndex={TabIndex.FOCUSABLE}
               className={cx('panel__tab', {'panel__tab--active': isAddPeopleState})}
               onClick={onAddPeople}
-              onKeyDown={event =>
-                handleKeyDown({
+              onKeyDown={event => {
+                return handleKeyDown({
                   event,
                   callback: onAddPeople,
                   keys: [KEY.ENTER, KEY.SPACE],
-                })
-              }
+                });
+              }}
               data-uie-name="do-add-people"
             >
               {translate('addParticipantsTabsPeople')}
@@ -301,13 +321,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               tabIndex={TabIndex.FOCUSABLE}
               className={cx('panel__tab', {'panel__tab--active': isAddServiceState})}
               onClick={onAddServices}
-              onKeyDown={event =>
-                handleKeyDown({
+              onKeyDown={event => {
+                return handleKeyDown({
                   event,
                   callback: onAddServices,
                   keys: [KEY.ENTER, KEY.SPACE],
-                })
-              }
+                });
+              }}
               data-uie-name="do-add-services"
             >
               {translate('addParticipantsTabsApps')}
@@ -344,13 +364,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         tabIndex={TabIndex.FOCUSABLE}
                         className="left-list-item left-list-item-clickable"
                         onClick={openManageServices}
-                        onKeyDown={event =>
-                          handleKeyDown({
+                        onKeyDown={event => {
+                          return handleKeyDown({
                             event,
                             callback: openManageServices,
                             keys: [KEY.ENTER, KEY.SPACE],
-                          })
-                        }
+                          });
+                        }}
                         data-uie-name="go-manage-services"
                       >
                         <div className="left-column-icon left-column-icon-dark">
@@ -381,13 +401,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         type="button"
                         tabIndex={TabIndex.FOCUSABLE}
                         onClick={openManageServices}
-                        onKeyDown={event =>
-                          handleKeyDown({
+                        onKeyDown={event => {
+                          return handleKeyDown({
                             event,
                             callback: openManageServices,
                             keys: [KEY.ENTER, KEY.SPACE],
-                          })
-                        }
+                          });
+                        }}
                         data-uie-name="go-enable-services"
                         style={{marginTop: '1em'}}
                       >

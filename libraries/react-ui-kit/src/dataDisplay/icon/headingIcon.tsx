@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const HeadingIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M2 1H4.00562V6.99719H6.48315V1H8.48876V15H6.48315V8.76685H4.00562V15H2V1ZM12.4803 3.1236L10.4747 4.59831V2.47472L12.4803 1H14.486V15H12.4803V3.1236Z" />
-  </SVGIcon>
-);
+export const HeadingIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path d="M2 1H4.00562V6.99719H6.48315V1H8.48876V15H6.48315V8.76685H4.00562V15H2V1ZM12.4803 3.1236L10.4747 4.59831V2.47472L12.4803 1H14.486V15H12.4803V3.1236Z" />
+    </SVGIcon>
+  );
+};

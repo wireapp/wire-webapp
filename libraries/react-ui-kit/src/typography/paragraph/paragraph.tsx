@@ -28,30 +28,48 @@ export type ParagraphProps<T = HTMLParagraphElement> = TextProps<T>;
 export const paragraphStyle: <T>(theme: Theme, props: ParagraphProps<T>) => CSSObject = (
   theme,
   {block = true, ...props},
-) => ({
-  ...textStyle(theme, {block, ...props}),
-  marginBottom: '16px',
-  marginTop: 0,
-});
+) => {
+  return {
+    ...textStyle(theme, {block, ...props}),
+    marginBottom: '16px',
+    marginTop: 0,
+  };
+};
 
-export const Paragraph = (props: ParagraphProps) => (
-  <p css={theme => paragraphStyle(theme, props)} {...filterTextProps(props)} />
-);
+export const Paragraph = (props: ParagraphProps) => {
+  return (
+    <p
+      css={theme => {
+        return paragraphStyle(theme, props);
+      }}
+      {...filterTextProps(props)}
+    />
+  );
+};
 
 export type LeadProps<T = HTMLParagraphElement> = TextProps<T>;
 
 export const leadStyle: <T>(theme: Theme, props: LeadProps<T>) => CSSObject = (
   theme,
   {block = true, center = true, fontSize = theme.fontSizes.extraLarge, ...props},
-) => ({
-  ...textStyle(theme, {block, center, fontSize, ...props}),
-  marginBottom: '56px',
-  marginTop: 0,
-  [media[QueryKeys.MOBILE]]: {
-    fontSize: '1.125rem',
-  },
-});
+) => {
+  return {
+    ...textStyle(theme, {block, center, fontSize, ...props}),
+    marginBottom: '56px',
+    marginTop: 0,
+    [media[QueryKeys.MOBILE]]: {
+      fontSize: '1.125rem',
+    },
+  };
+};
 
-export const Lead = (props: LeadProps) => (
-  <p css={theme => leadStyle(theme as Theme, props)} {...filterTextProps(props)} />
-);
+export const Lead = (props: LeadProps) => {
+  return (
+    <p
+      css={theme => {
+        return leadStyle(theme as Theme, props);
+      }}
+      {...filterTextProps(props)}
+    />
+  );
+};

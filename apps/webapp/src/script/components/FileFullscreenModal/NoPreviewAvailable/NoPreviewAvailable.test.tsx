@@ -31,14 +31,17 @@ import {
 
 import {NoPreviewAvailable} from './NoPreviewAvailable';
 
-const translate = (key: string) =>
-  ({
-    'fileFullscreenModal.noPreviewAvailable.title': 'No preview available',
-    'fileFullscreenModal.noPreviewAvailable.description': 'Download this file to view it.',
-    'fileFullscreenModal.noPreviewAvailable.viewerDescription':
-      "Previews aren't available for this file type, and viewers can't download files.",
-    'fileFullscreenModal.noPreviewAvailable.callToAction': 'Download',
-  })[key] ?? key;
+const translate = (key: string) => {
+  return (
+    {
+      'fileFullscreenModal.noPreviewAvailable.title': 'No preview available',
+      'fileFullscreenModal.noPreviewAvailable.description': 'Download this file to view it.',
+      'fileFullscreenModal.noPreviewAvailable.viewerDescription':
+        "Previews aren't available for this file type, and viewers can't download files.",
+      'fileFullscreenModal.noPreviewAvailable.callToAction': 'Download',
+    }[key] ?? key
+  );
+};
 
 const defaultProps = {
   fileExtension: 'zip',
@@ -46,17 +49,20 @@ const defaultProps = {
   fileUrl: 'https://example.com/archive.zip',
 };
 
-const createWrapper = (isViewerPermissionFeatureEnabled: boolean) =>
-  createRootProviderWrapperForTest(
+const createWrapper = (isViewerPermissionFeatureEnabled: boolean) => {
+  return createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+      isFeatureToggleEnabled: () => {
+        return isViewerPermissionFeatureEnabled;
+      },
       translate,
     }),
   );
+};
 
 describe('NoPreviewAvailable', () => {
-  const renderPlaceholder = (isViewerPermissionFeatureEnabled: boolean) =>
-    render(
+  const renderPlaceholder = (isViewerPermissionFeatureEnabled: boolean) => {
+    return render(
       withThemeAndRootContext(
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
           <NoPreviewAvailable {...defaultProps} />
@@ -64,6 +70,7 @@ describe('NoPreviewAvailable', () => {
         createWrapper(isViewerPermissionFeatureEnabled),
       ),
     );
+  };
 
   it('hides download action when download is restricted', () => {
     renderPlaceholder(true);

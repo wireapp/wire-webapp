@@ -147,7 +147,15 @@ export const getChatHistoryOptions = (
   if (enableCustomHistory === true || teamState.isConferenceCallingEnabled()) {
     chatHistoryOptions.push({
       value: ChatHistory.Custom,
-      label: `${translate('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity !== 0 && !isNan(historySharingQuantity) ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
+      label: `${translate('conversationHistoryOptionCustom')}${
+        chatHistory === ChatHistory.Custom && historySharingQuantity !== 0 && !isNan(historySharingQuantity)
+          ? ` (${historySharingQuantity} ${
+              chatHistorySharingUnitOptions.find(option => {
+                return option.value === historySharingUnit;
+              })?.label
+            })`
+          : ''
+      }`,
     });
   }
 

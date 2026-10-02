@@ -53,7 +53,9 @@ export const validateFiles = ({
     validateFileSize({files: newFiles, maxSize, translate}),
   ];
 
-  const firstError = validations.find(validation => !validation.isValid);
+  const firstError = validations.find(validation => {
+    return !validation.isValid;
+  });
 
   if (isUndefined(firstError)) {
     return {isValid: true};
@@ -73,13 +75,16 @@ const validateFileSize = ({files, maxSize, translate}: ValidateFileSizeParams): 
   const fileMaxSizeInMB = maxSize / bytesMultiplier / bytesMultiplier;
   const imageMaxSizeInMB = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
 
-  const oversizedImages = files.filter(
-    file =>
-      (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type) &&
-      file.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE,
-  );
+  const oversizedImages = files.filter(file => {
+    return (
+      (CONFIG.ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type) &&
+      file.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE
+    );
+  });
 
-  const oversizedFiles = files.filter(file => file.size > maxSize);
+  const oversizedFiles = files.filter(file => {
+    return file.size > maxSize;
+  });
 
   const getMessage = () => {
     if (oversizedImages.length > 0 && oversizedFiles.length > 0) {

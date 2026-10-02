@@ -79,7 +79,12 @@ export const TimePickerField = ({
       options = filterTimeOptionsAfter(options, minTime);
     }
 
-    if (value !== null && !options.some(option => option.value === value.value)) {
+    if (
+      value !== null &&
+      !options.some(option => {
+        return option.value === value.value;
+      })
+    ) {
       options = [value, ...options];
     }
 
@@ -90,14 +95,16 @@ export const TimePickerField = ({
 
   return (
     <div
-      css={(theme: Theme) => ({
-        marginBottom: markInvalid ? '2px' : '20px',
-        ...timePickerWrapperStyles,
-        '&:focus-within label': {
-          color: theme.general.primaryColor,
-        },
-        ...wrapperCSS,
-      })}
+      css={(theme: Theme) => {
+        return {
+          marginBottom: markInvalid ? '2px' : '20px',
+          ...timePickerWrapperStyles,
+          '&:focus-within label': {
+            color: theme.general.primaryColor,
+          },
+          ...wrapperCSS,
+        };
+      }}
       data-uie-name={dataUieName}
     >
       {isNonEmptyString(label) ? (

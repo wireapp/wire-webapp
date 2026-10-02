@@ -19,7 +19,7 @@
 
 import {useCallback, useRef, useState, type ReactElement} from 'react';
 
-import {isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNull, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
@@ -190,9 +190,10 @@ function InputBarContent({
     },
   });
 
-  const inputPlaceholder = messageTimer
-    ? translate('tooltipConversationEphemeral')
-    : translate('tooltipConversationInputPlaceholder');
+  const inputPlaceholder =
+    isNumber(messageTimer) && messageTimer !== 0
+      ? translate('tooltipConversationEphemeral')
+      : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
@@ -202,17 +203,19 @@ function InputBarContent({
     isCellsEnabled,
     isViewerPermissionFeatureEnabled,
   });
-  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
+  const hasLocalEphemeralTimer =
+    isSelfDeletingMessagesEnabled && isNumber(localMessageTimer) && localMessageTimer !== 0 && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  const shouldReplaceEmoji = useUserPropertyValue<boolean>(
-    () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
-    WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
-  );
+  const shouldReplaceEmoji = useUserPropertyValue<boolean>(() => {
+    return propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
+  }, WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE);
 
   const getMentionCandidates = useCallback(
     (search?: string | null) => {
-      const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
+      const candidates = conversation.participating_user_ets().filter(userEntity => {
+        return !userEntity.isService;
+      });
       return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : candidates;
     },
     [conversation, searchRepository],
@@ -245,10 +248,9 @@ function InputBarContent({
     translate,
   });
 
-  const showMarkdownPreview = useUserPropertyValue<boolean>(
-    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
-    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
-  );
+  const showMarkdownPreview = useUserPropertyValue<boolean>(() => {
+    return propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW);
+  }, WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW);
   const effectiveShowMarkdownPreview = showMarkdownPreview && !disableMessagePreprocessing;
 
   const {
@@ -279,7 +281,7 @@ function InputBarContent({
     translate,
   });
 
-  if (fileHandling.pastedFile && !!isCellsEnabled) {
+  if (!isNull(fileHandling.pastedFile) && !!isCellsEnabled) {
     uploadPastedFiles(fileHandling.pastedFile);
     fileHandling.clearPastedFile();
   }
@@ -308,26 +310,31 @@ function InputBarContent({
     fireAndForgetInvoker.fireAndForget(sendMessage);
   }, [fireAndForgetInvoker, isSendingDisabled, sendMessage]);
 
-  const showAvatar = !!messageContent.text.length;
+  const showAvatar = isNonEmptyString(messageContent.text);
 
   return (
     <div ref={wrapperRef}>
       <InputBarContainer>
         {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
-        {classifiedDomains && !isConnectionRequest && (
+        {!isUndefined(classifiedDomains) && !isConnectionRequest && (
           <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
         )}
 
-        {isReplying && !isEditing && replyMessageEntity && (
-          <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(false)} />
+        {isReplying && !isEditing && !isNull(replyMessageEntity) && (
+          <ReplyBar
+            replyMessageEntity={replyMessageEntity}
+            onCancel={() => {
+              return cancelMessageReply(false);
+            }}
+          />
         )}
 
         <div
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && effectiveShowMarkdownPreview,
-            'input-bar-container--with-files': !!files.length,
+            'input-bar-container--with-files': isNonEmptyArray(files),
           })}
         >
           {!isOutgoingRequest && (
@@ -342,7 +349,7 @@ function InputBarContent({
                   />
                 )}
               </div>
-              {!isSelfUserRemoved && !fileHandling.pastedFile && (
+              {!isSelfUserRemoved && isNull(fileHandling.pastedFile) && (
                 <InputBarEditor
                   editorRef={editorRef}
                   editedMessage={editedMessage}
@@ -360,7 +367,9 @@ function InputBarContent({
                     }
                   }}
                   onShiftTab={onShiftTab}
-                  onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
+                  onBlur={() => {
+                    return isTypingRef.current && conversationRepository.sendTypingStop(conversation);
+                  }}
                   onUpdate={setMessageContent}
                   onSend={handleSendMessage}
                   getMentionCandidates={getMentionCandidates}
@@ -369,7 +378,7 @@ function InputBarContent({
                   disableMessagePreprocessing={disableMessagePreprocessing}
                   replaceEmojis={shouldReplaceEmoji}
                 >
-                  {!!files.length && (
+                  {isNonEmptyArray(files) && (
                     <FilePreviews
                       files={files}
                       conversationId={conversation.id}
@@ -404,7 +413,7 @@ function InputBarContent({
             </>
           )}
 
-          {fileHandling.pastedFile && !isCellsEnabled && (
+          {!isNull(fileHandling.pastedFile) && !isCellsEnabled && (
             <PastedFileControls
               pastedFile={fileHandling.pastedFile}
               onClear={fileHandling.clearPastedFile}

@@ -39,22 +39,44 @@ interface CellsState {
   clearAll: () => void;
 }
 
-export const useCellsStore = create<CellsState>(set => ({
-  nodes: [],
-  status: 'idle',
-  error: null,
-  pagination: null,
-  setNodes: nodes => set({nodes}),
-  setStatus: status => set({status}),
-  setError: error => set({error}),
-  setPagination: pagination => set({pagination}),
-  setPublicLink: (nodeId, updates) =>
-    set(state => ({
-      nodes: state.nodes.map(node => (node.id === nodeId ? {...node, publicLink: updates} : node)),
-    })),
-  removeNode: nodeId =>
-    set(state => ({
-      nodes: state.nodes.filter(node => node.id !== nodeId),
-    })),
-  clearAll: () => set({nodes: [], error: null}),
-}));
+export const useCellsStore = create<CellsState>(set => {
+  return {
+    nodes: [],
+    status: 'idle',
+    error: null,
+    pagination: null,
+    setNodes: nodes => {
+      return set({nodes});
+    },
+    setStatus: status => {
+      return set({status});
+    },
+    setError: error => {
+      return set({error});
+    },
+    setPagination: pagination => {
+      return set({pagination});
+    },
+    setPublicLink: (nodeId, updates) => {
+      return set(state => {
+        return {
+          nodes: state.nodes.map(node => {
+            return node.id === nodeId ? {...node, publicLink: updates} : node;
+          }),
+        };
+      });
+    },
+    removeNode: nodeId => {
+      return set(state => {
+        return {
+          nodes: state.nodes.filter(node => {
+            return node.id !== nodeId;
+          }),
+        };
+      });
+    },
+    clearAll: () => {
+      return set({nodes: [], error: null});
+    },
+  };
+});

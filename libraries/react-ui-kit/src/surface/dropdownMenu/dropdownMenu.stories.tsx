@@ -39,63 +39,71 @@ export default meta;
 type Story = StoryObj<typeof DropdownMenu>;
 
 export const Default: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenu.Trigger cssObj={{width: '40px', height: '40px'}}>
-        <PlusIcon />
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
-      </DropdownMenu.Content>
-    </DropdownMenu>
-  ),
+  render: () => {
+    return (
+      <DropdownMenu>
+        <DropdownMenu.Trigger cssObj={{width: '40px', height: '40px'}}>
+          <PlusIcon />
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
+    );
+  },
 };
 
 export const WithLongItems: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenu.Trigger cssObj={{width: '40px', height: '40px'}}>
-        <PlusIcon />
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={noop}>Copy the detail of this message</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={noop}>Contact the sender</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={noop}>Delete this message (works only if you are the owner)</DropdownMenu.Item>
-      </DropdownMenu.Content>
-    </DropdownMenu>
-  ),
+  render: () => {
+    return (
+      <DropdownMenu>
+        <DropdownMenu.Trigger cssObj={{width: '40px', height: '40px'}}>
+          <PlusIcon />
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <DropdownMenu.Item onClick={noop}>Copy the detail of this message</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={noop}>Contact the sender</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={noop}>Delete this message (works only if you are the owner)</DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
+    );
+  },
 };
 
 export const WithCustomButton: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenu.Trigger asChild>
-        <Button variant={ButtonVariant.PRIMARY}>Open menu</Button>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
-      </DropdownMenu.Content>
-    </DropdownMenu>
-  ),
+  render: () => {
+    return (
+      <DropdownMenu>
+        <DropdownMenu.Trigger asChild>
+          <Button variant={ButtonVariant.PRIMARY}>Open menu</Button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
+    );
+  },
 };
 
 export const WithCustomIconButton: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenu.Trigger asChild>
-        <IconButton variant={IconButtonVariant.PRIMARY}>
-          <PlusIcon />
-        </IconButton>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
-      </DropdownMenu.Content>
-    </DropdownMenu>
-  ),
+  render: () => {
+    return (
+      <DropdownMenu>
+        <DropdownMenu.Trigger asChild>
+          <IconButton variant={IconButtonVariant.PRIMARY}>
+            <PlusIcon />
+          </IconButton>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <DropdownMenu.Item onClick={noop}>Copy</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={noop}>Details</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={noop}>Delete for me</DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
+    );
+  },
 };

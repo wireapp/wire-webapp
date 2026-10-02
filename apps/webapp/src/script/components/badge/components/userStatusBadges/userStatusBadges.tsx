@@ -28,26 +28,34 @@ import {badgesWrapper, icon} from './userStatusBadges.styles';
 
 function createBadgeToComponentMap(translate: RootContextValue['translate']) {
   return {
-    guest: () => (
-      <Tooltip css={icon} body={translate('conversationGuestIndicator')}>
-        <Icon.GuestIcon data-uie-name="status-guest" />
-      </Tooltip>
-    ),
-    federated: () => (
-      <Tooltip css={icon} body={translate('conversationFederationIndicator')}>
-        <Icon.FederationIcon data-uie-name="status-federated-user" />
-      </Tooltip>
-    ),
-    external: () => (
-      <Tooltip css={icon} body={translate('rolePartner')}>
-        <Icon.ExternalIcon data-uie-name="status-external" />
-      </Tooltip>
-    ),
-    verified: () => (
-      <span css={icon}>
-        <Icon.VerifiedIcon data-uie-name="status-verified" />
-      </span>
-    ),
+    guest: () => {
+      return (
+        <Tooltip css={icon} body={translate('conversationGuestIndicator')}>
+          <Icon.GuestIcon data-uie-name="status-guest" />
+        </Tooltip>
+      );
+    },
+    federated: () => {
+      return (
+        <Tooltip css={icon} body={translate('conversationFederationIndicator')}>
+          <Icon.FederationIcon data-uie-name="status-federated-user" />
+        </Tooltip>
+      );
+    },
+    external: () => {
+      return (
+        <Tooltip css={icon} body={translate('rolePartner')}>
+          <Icon.ExternalIcon data-uie-name="status-external" />
+        </Tooltip>
+      );
+    },
+    verified: () => {
+      return (
+        <span css={icon}>
+          <Icon.VerifiedIcon data-uie-name="status-verified" />
+        </span>
+      );
+    },
   } as const;
 }
 
@@ -61,7 +69,9 @@ interface UserStatusBadgesProps {
 export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
   const {translate} = useApplicationContext();
   const badgeToComponentMap = createBadgeToComponentMap(translate);
-  const badges = Object.entries(config).filter(([_badge, shouldShow]) => shouldShow);
+  const badges = Object.entries(config).filter(([_badge, shouldShow]) => {
+    return shouldShow;
+  });
   const badgesCount = badges.length;
 
   if (badgesCount === 0) {
@@ -70,9 +80,9 @@ export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
 
   return (
     <div css={badgesWrapper(badgesCount)}>
-      {badges.map(([badge]) => (
-        <Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</Fragment>
-      ))}
+      {badges.map(([badge]) => {
+        return <Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</Fragment>;
+      })}
     </div>
   );
 };

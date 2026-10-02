@@ -69,9 +69,9 @@ export class FederationEventProcessor implements EventProcessor {
    * @param deletedDomain the domain that stopped federating
    */
   private onFederationDelete = debounce(async (deletedDomain: string) => {
-    const allConversations = this.conversationState
-      .conversations()
-      .filter(conversation => !this.conversationState.isSelfConversation(conversation));
+    const allConversations = this.conversationState.conversations().filter(conversation => {
+      return !this.conversationState.isSelfConversation(conversation);
+    });
 
     const {conversationsToDeleteUsers, conversationsToLeave, connectionRequestsToDelete, conversationsToDisable} =
       getFederationDeleteEventUpdates(deletedDomain, allConversations);
@@ -144,7 +144,9 @@ export class FederationEventProcessor implements EventProcessor {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = EventBuilder.buildMemberLeave(
       conversation,
-      users.map(user => user.qualifiedId),
+      users.map(user => {
+        return user.qualifiedId;
+      }),
       '',
       currentTimestamp,
     );

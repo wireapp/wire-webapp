@@ -26,7 +26,9 @@ describe('callingSubscriptions', () => {
     const call3 = {conversation: {id: '3', domain: '3'}, unsubscribe: jest.fn()} as const;
     const calls = [call1, call2, call3] as const;
 
-    calls.forEach(({conversation, unsubscribe}) => callingSubscriptions.addCall(conversation, unsubscribe));
+    calls.forEach(({conversation, unsubscribe}) => {
+      callingSubscriptions.addCall(conversation, unsubscribe);
+    });
 
     callingSubscriptions.removeCall(call1.conversation);
     expect(call1.unsubscribe).toHaveBeenCalled();

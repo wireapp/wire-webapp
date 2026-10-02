@@ -105,13 +105,19 @@ describe('serviceOptions', () => {
     ({protocol, isAppsEnabled, isServicesRoom, isGuestAndServicesRoom, expectedToggleToBeVisible}) => {
       // Arrange
       const mockTeamState: Partial<TeamState> = {
-        isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
+        isAppsEnabled: ko.pureComputed(() => {
+          return isAppsEnabled;
+        }),
       };
 
       const mockConversation: Partial<Conversation> = {
         protocol,
-        isServicesRoom: ko.pureComputed(() => isServicesRoom),
-        isGuestAndServicesRoom: ko.pureComputed(() => isGuestAndServicesRoom),
+        isServicesRoom: ko.pureComputed(() => {
+          return isServicesRoom;
+        }),
+        isGuestAndServicesRoom: ko.pureComputed(() => {
+          return isGuestAndServicesRoom;
+        }),
       };
 
       // Act

@@ -139,7 +139,9 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     if (!isLinkCopied) {
       await copyText(accessCode);
       setIsLinkCopied(true);
-      window.setTimeout(() => setIsLinkCopied(false), COPY_LINK_CONFIRM_DURATION);
+      window.setTimeout(() => {
+        return setIsLinkCopied(false);
+      }, COPY_LINK_CONFIRM_DURATION);
     }
   };
 
@@ -377,7 +379,9 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                   <Button
                     disabled={isRequestOngoing}
                     variant={ButtonVariant.TERTIARY}
-                    onClick={() => requestAccessCode()}
+                    onClick={() => {
+                      return requestAccessCode();
+                    }}
                     data-uie-name="do-create-link"
                   >
                     <Icon.LinkIcon width="16" height="16" css={{marginRight: '10px'}} />

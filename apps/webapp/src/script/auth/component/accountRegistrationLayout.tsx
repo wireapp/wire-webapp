@@ -58,17 +58,19 @@ export const AccountRegistrationLayout = ({children}: {children: ReactNode}) => 
             <Text css={registrationLayoutSubHeaderCss}>{translate('registrationLayout.subhead')}</Text>
           </div>
 
-          {featureList.map(item => (
-            <div key={item} css={registrationLayoutListItemContainerCss}>
-              <CheckRoundIcon
-                css={registrationLayoutListItemIconCss}
-                width={16}
-                height={16}
-                color={COLOR_V2.GREEN_DARK_500}
-              />
-              <Text css={whiteFontCss}>{item}</Text>
-            </div>
-          ))}
+          {featureList.map(item => {
+            return (
+              <div key={item} css={registrationLayoutListItemContainerCss}>
+                <CheckRoundIcon
+                  css={registrationLayoutListItemIconCss}
+                  width={16}
+                  height={16}
+                  color={COLOR_V2.GREEN_DARK_500}
+                />
+                <Text css={whiteFontCss}>{item}</Text>
+              </div>
+            );
+          })}
 
           <div css={registrationLayoutSubHeaderContainerCss}>
             <Text css={registrationLayoutSubHeaderCss}>{translate('registrationLayout.footer')}</Text>

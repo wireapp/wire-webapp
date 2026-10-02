@@ -34,8 +34,14 @@ type MeetingPrepModalState = {
   close: () => void;
 };
 
-export const useMeetingPrepModal = create<MeetingPrepModalState>(set => ({
-  session: Maybe.nothing(),
-  open: session => set({session: Maybe.just(session)}),
-  close: () => set({session: Maybe.nothing()}),
-}));
+export const useMeetingPrepModal = create<MeetingPrepModalState>(set => {
+  return {
+    session: Maybe.nothing(),
+    open: session => {
+      return set({session: Maybe.just(session)});
+    },
+    close: () => {
+      return set({session: Maybe.nothing()});
+    },
+  };
+});

@@ -56,7 +56,9 @@ export const useElementSize = <Element extends HTMLElement = HTMLDivElement>(): 
     const observer = new ResizeObserver(onResize);
     observer.observe(ref.current);
 
-    return () => observer.disconnect();
+    return () => {
+      return observer.disconnect();
+    };
   }, [onResize]);
 
   return {ref, width, height};

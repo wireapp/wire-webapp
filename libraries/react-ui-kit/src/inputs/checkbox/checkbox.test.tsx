@@ -27,24 +27,32 @@ import {StyledApp} from '../../layout';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"Checkbox"', () => {
-  it('renders', () => matchComponent(<Checkbox id="1">Check</Checkbox>));
-  it('renders (dark theme)', () => matchComponent(<Checkbox id="1">Checkbox</Checkbox>, THEME_ID.DARK));
-  it('renders as invalid', () =>
-    matchComponent(
+  it('renders', () => {
+    return matchComponent(<Checkbox id="1">Check</Checkbox>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<Checkbox id="1">Checkbox</Checkbox>, THEME_ID.DARK);
+  });
+  it('renders as invalid', () => {
+    return matchComponent(
       <Checkbox id="1" markInvalid>
         Check
       </Checkbox>,
-    ));
-  it('renders disabled', () =>
-    matchComponent(
+    );
+  });
+  it('renders disabled', () => {
+    return matchComponent(
       <Checkbox id="1" disabled>
         Check
       </Checkbox>,
-    ));
+    );
+  });
 });
 
 describe('"CheckboxLabel"', () => {
-  it('renders', () => matchComponent(<CheckboxLabel>Label</CheckboxLabel>));
+  it('renders', () => {
+    return matchComponent(<CheckboxLabel>Label</CheckboxLabel>);
+  });
 });
 
 //TODO: - create custom render for UI-Kit with a styledapp wrapper(SQSERVICES-1672)

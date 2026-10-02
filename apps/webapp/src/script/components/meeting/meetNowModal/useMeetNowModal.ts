@@ -32,13 +32,15 @@ import {emptyMeetNowFormErrors, type MeetNowFormErrors, type MeetNowFormState} f
 
 export type {MeetNowFormErrors, MeetNowFormState} from './meetNowTypes';
 
-export const getDefaultMeetNowFormState = (): MeetNowFormState => ({
-  title: '',
-  selectedUsers: [],
-  participantsFilter: '',
-  password: '',
-  passwordConfirmation: '',
-});
+export const getDefaultMeetNowFormState = (): MeetNowFormState => {
+  return {
+    title: '',
+    selectedUsers: [],
+    participantsFilter: '',
+    password: '',
+    passwordConfirmation: '',
+  };
+};
 
 type MeetNowModalState = {
   isOpen: boolean;
@@ -62,13 +64,16 @@ const initialState = {
   errors: emptyMeetNowFormErrors(),
 };
 
-export const getMeetNowFormErrors = ({title, password, passwordConfirmation}: MeetNowFormState): MeetNowFormErrors => ({
-  title: getMeetingTitleError(title),
-  ...getMeetingPasswordErrors(password, passwordConfirmation),
-});
+export const getMeetNowFormErrors = ({title, password, passwordConfirmation}: MeetNowFormState): MeetNowFormErrors => {
+  return {
+    title: getMeetingTitleError(title),
+    ...getMeetingPasswordErrors(password, passwordConfirmation),
+  };
+};
 
-export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean =>
-  !isUndefined(errors.title) || !isUndefined(errors.password) || !isUndefined(errors.passwordConfirmation);
+export const hasMeetNowFormErrors = (errors: MeetNowFormErrors): boolean => {
+  return !isUndefined(errors.title) || !isUndefined(errors.password) || !isUndefined(errors.passwordConfirmation);
+};
 
 export const validateMeetNowForm = (formState: MeetNowFormState): Result<MeetNowFormState, MeetNowFormErrors> => {
   const errors = getMeetNowFormErrors(formState);
@@ -80,47 +85,70 @@ export const validateMeetNowForm = (formState: MeetNowFormState): Result<MeetNow
   return result.ok(formState);
 };
 
-export const useMeetNowModal = create<MeetNowModalState>((set, get) => ({
-  ...initialState,
-  open: () =>
-    set({
-      isOpen: true,
-      formState: getDefaultMeetNowFormState(),
-      errors: emptyMeetNowFormErrors(),
-    }),
-  close: () => set({isOpen: false}),
-  reset: () =>
-    set({
-      formState: getDefaultMeetNowFormState(),
-      errors: emptyMeetNowFormErrors(),
-    }),
-  setTitle: title =>
-    set(state => ({
-      formState: {...state.formState, title},
-      errors: {...state.errors, title: getMeetingTitleInputError(title)},
-    })),
-  setSelectedUsers: selectedUsers =>
-    set(state => ({
-      formState: {...state.formState, selectedUsers},
-    })),
-  setParticipantsFilter: participantsFilter =>
-    set(state => ({
-      formState: {...state.formState, participantsFilter},
-    })),
-  setPassword: password =>
-    set(state => ({
-      formState: {...state.formState, password},
-      errors: {...state.errors, ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation)},
-    })),
-  setPasswordConfirmation: passwordConfirmation =>
-    set(state => ({
-      formState: {...state.formState, passwordConfirmation},
-      errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
-    })),
-  validate: () => {
-    const errors = getMeetNowFormErrors(get().formState);
-    set({errors});
-    return errors;
-  },
-  clearErrors: () => set({errors: emptyMeetNowFormErrors()}),
-}));
+export const useMeetNowModal = create<MeetNowModalState>((set, get) => {
+  return {
+    ...initialState,
+    open: () => {
+      return set({
+        isOpen: true,
+        formState: getDefaultMeetNowFormState(),
+        errors: emptyMeetNowFormErrors(),
+      });
+    },
+    close: () => {
+      return set({isOpen: false});
+    },
+    reset: () => {
+      return set({
+        formState: getDefaultMeetNowFormState(),
+        errors: emptyMeetNowFormErrors(),
+      });
+    },
+    setTitle: title => {
+      return set(state => {
+        return {
+          formState: {...state.formState, title},
+          errors: {...state.errors, title: getMeetingTitleInputError(title)},
+        };
+      });
+    },
+    setSelectedUsers: selectedUsers => {
+      return set(state => {
+        return {
+          formState: {...state.formState, selectedUsers},
+        };
+      });
+    },
+    setParticipantsFilter: participantsFilter => {
+      return set(state => {
+        return {
+          formState: {...state.formState, participantsFilter},
+        };
+      });
+    },
+    setPassword: password => {
+      return set(state => {
+        return {
+          formState: {...state.formState, password},
+          errors: {...state.errors, ...getMeetingPasswordErrors(password, state.formState.passwordConfirmation)},
+        };
+      });
+    },
+    setPasswordConfirmation: passwordConfirmation => {
+      return set(state => {
+        return {
+          formState: {...state.formState, passwordConfirmation},
+          errors: {...state.errors, ...getMeetingPasswordErrors(state.formState.password, passwordConfirmation)},
+        };
+      });
+    },
+    validate: () => {
+      const errors = getMeetNowFormErrors(get().formState);
+      set({errors});
+      return errors;
+    },
+    clearErrors: () => {
+      return set({errors: emptyMeetNowFormErrors()});
+    },
+  };
+});

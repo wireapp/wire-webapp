@@ -120,17 +120,39 @@ export const useScheduleMeetingSubmit = () => {
   const {translate, clock} = useApplicationContext();
   const {content} = useMainViewModel();
   const conversationRepository = content.repositories.conversation;
-  const scheduleMeeting = useMeetingStore(state => state.scheduleMeeting);
-  const updateMeeting = useMeetingStore(state => state.updateMeeting);
-  const loadMeetings = useMeetingStore(state => state.loadMeetings);
-  const mode = useScheduleMeetingModal(state => state.mode);
-  const editingMeetingId = useScheduleMeetingModal(state => state.editingMeetingId);
-  const qualifiedConversation = useScheduleMeetingModal(state => state.qualifiedConversation);
-  const originalTitle = useScheduleMeetingModal(state => state.originalTitle);
-  const originalStart = useScheduleMeetingModal(state => state.originalStart);
-  const originalEnd = useScheduleMeetingModal(state => state.originalEnd);
-  const originalRecurrence = useScheduleMeetingModal(state => state.originalRecurrence);
-  const originalSelectedUsers = useScheduleMeetingModal(state => state.originalSelectedUsers);
+  const scheduleMeeting = useMeetingStore(state => {
+    return state.scheduleMeeting;
+  });
+  const updateMeeting = useMeetingStore(state => {
+    return state.updateMeeting;
+  });
+  const loadMeetings = useMeetingStore(state => {
+    return state.loadMeetings;
+  });
+  const mode = useScheduleMeetingModal(state => {
+    return state.mode;
+  });
+  const editingMeetingId = useScheduleMeetingModal(state => {
+    return state.editingMeetingId;
+  });
+  const qualifiedConversation = useScheduleMeetingModal(state => {
+    return state.qualifiedConversation;
+  });
+  const originalTitle = useScheduleMeetingModal(state => {
+    return state.originalTitle;
+  });
+  const originalStart = useScheduleMeetingModal(state => {
+    return state.originalStart;
+  });
+  const originalEnd = useScheduleMeetingModal(state => {
+    return state.originalEnd;
+  });
+  const originalRecurrence = useScheduleMeetingModal(state => {
+    return state.originalRecurrence;
+  });
+  const originalSelectedUsers = useScheduleMeetingModal(state => {
+    return state.originalSelectedUsers;
+  });
 
   const submit = useCallback(
     async (formState: ScheduleMeetingFormState): Promise<ScheduleMeetingSubmitResult> => {
@@ -153,7 +175,9 @@ export const useScheduleMeetingSubmit = () => {
 
       if (submitResult.isErr) {
         if (shouldRefreshMeetingsListAfterSubmitError(submitResult.error)) {
-          await task.tryOrElse(() => meetingSubmitErrors.refreshFailed, loadMeetings);
+          await task.tryOrElse(() => {
+            return meetingSubmitErrors.refreshFailed;
+          }, loadMeetings);
         }
 
         setIsSubmitting(false);
@@ -161,11 +185,12 @@ export const useScheduleMeetingSubmit = () => {
         if (submitResult.error === meetingSubmitErrors.conversationRenameFailed && qualifiedConversation.isJust) {
           showMeetingConversationRenameFailedModal({
             translate,
-            retryRename: () =>
-              syncMeetingConversationName(conversationRepository, {
+            retryRename: () => {
+              return syncMeetingConversationName(conversationRepository, {
                 qualifiedConversationId: qualifiedConversation.value,
                 title: formState.title.trim(),
-              }),
+              });
+            },
           });
         } else {
           showMeetingSubmitError(translate, submitResult.error, getScheduleMeetingSubmitErrorTranslationKeys(mode));

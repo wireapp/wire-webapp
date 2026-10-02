@@ -119,7 +119,9 @@ export class SelfRepository extends TypedEventEmitter<Events> {
 
       const hasTeamSupportedProtocolsChanged = !(
         prevSupportedProtocols.length === newSupportedProtocols.length &&
-        [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
+        [...prevSupportedProtocols].every(protocol => {
+          return newSupportedProtocols.includes(protocol);
+        })
       );
 
       if (hasTeamSupportedProtocolsChanged) {
@@ -203,7 +205,9 @@ export class SelfRepository extends TypedEventEmitter<Events> {
 
     const hasSupportedProtocolsChanged = !(
       localSupportedProtocols.length === refreshedSupportedProtocols.length &&
-      [...localSupportedProtocols].every(protocol => refreshedSupportedProtocols.includes(protocol))
+      [...localSupportedProtocols].every(protocol => {
+        return refreshedSupportedProtocols.includes(protocol);
+      })
     );
 
     if (!hasSupportedProtocolsChanged) {
@@ -224,7 +228,9 @@ export class SelfRepository extends TypedEventEmitter<Events> {
 
     await this.core.recurringTaskScheduler.registerTask({
       every: TIME_IN_MILLIS.DAY,
-      task: () => this.refreshSelfSupportedProtocols(),
+      task: () => {
+        return this.refreshSelfSupportedProtocols();
+      },
       key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
   }

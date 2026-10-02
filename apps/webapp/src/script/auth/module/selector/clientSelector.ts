@@ -21,11 +21,26 @@ import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 
 import type {RootState} from '../reducer';
 
-export const getClients = (state: RootState) => state.clientState.clients ?? [];
-export const getCurrentSelfClient = (state: RootState): RegisteredClient | null => state.clientState.currentClient;
-export const hasLoadedClients = (state: RootState) => state.clientState.clients !== null;
-export const isNewCurrentSelfClient = (state: RootState): boolean => state.clientState.isNewClient;
-export const getPermanentClients = (state: RootState) =>
-  getClients(state).filter(client => client.type === ClientType.PERMANENT);
-export const getError = (state: RootState) => state.clientState.error;
-export const isFetching = (state: RootState) => state.clientState.fetching;
+export const getClients = (state: RootState) => {
+  return state.clientState.clients ?? [];
+};
+export const getCurrentSelfClient = (state: RootState): RegisteredClient | null => {
+  return state.clientState.currentClient;
+};
+export const hasLoadedClients = (state: RootState) => {
+  return state.clientState.clients !== null;
+};
+export const isNewCurrentSelfClient = (state: RootState): boolean => {
+  return state.clientState.isNewClient;
+};
+export const getPermanentClients = (state: RootState) => {
+  return getClients(state).filter(client => {
+    return client.type === ClientType.PERMANENT;
+  });
+};
+export const getError = (state: RootState) => {
+  return state.clientState.error;
+};
+export const isFetching = (state: RootState) => {
+  return state.clientState.fetching;
+};

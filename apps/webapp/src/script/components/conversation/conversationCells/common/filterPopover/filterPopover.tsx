@@ -54,17 +54,22 @@ export interface FilterItem {
 }
 
 export const filterItems = (items: FilterItem[], query: string): FilterItem[] => {
-  if (!query) {
+  if (query.length === 0) {
     return items;
   }
   const lowerQuery = query.toLowerCase();
-  return items.filter(
-    item => item.label.toLowerCase().includes(lowerQuery) || item.subLabel?.toLowerCase().includes(lowerQuery) === true,
-  );
+  return items.filter(item => {
+    return item.label.toLowerCase().includes(lowerQuery) || item.subLabel?.toLowerCase().includes(lowerQuery) === true;
+  });
 };
 
-export const computeNextSelection = (currentIds: string[], id: string): string[] =>
-  currentIds.includes(id) ? currentIds.filter(existing => existing !== id) : [...currentIds, id];
+export const computeNextSelection = (currentIds: string[], id: string): string[] => {
+  return currentIds.includes(id)
+    ? currentIds.filter(existing => {
+        return existing !== id;
+      })
+    : [...currentIds, id];
+};
 
 interface FilterPopoverProps {
   triggerLabel: string;
@@ -87,7 +92,9 @@ export const FilterPopover = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
-  const filteredItems = useMemo(() => filterItems(items, searchValue), [items, searchValue]);
+  const filteredItems = useMemo(() => {
+    return filterItems(items, searchValue);
+  }, [items, searchValue]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -161,15 +168,19 @@ export const FilterPopover = ({
                 filterName: triggerLabel.toLowerCase(),
               })}
               value={searchValue}
-              onChange={event => setSearchValue(event.target.value)}
+              onChange={event => {
+                return setSearchValue(event.target.value);
+              }}
               data-uie-name="filter-popover-search"
             />
-            {searchValue && (
+            {searchValue.length > 0 && (
               <button
                 type="button"
                 css={searchClearButtonStyles}
                 aria-label={translate('cells.filterPopover.search.clearButton')}
-                onClick={() => setSearchValue('')}
+                onClick={() => {
+                  return setSearchValue('');
+                }}
               >
                 <CircleCloseIcon color="currentColor" />
               </button>
@@ -190,7 +201,9 @@ export const FilterPopover = ({
                       wrapperCSS={checkboxWrapperStyles}
                       checked={isSelected}
                       disabled={isItemDisabled}
-                      onChange={() => handleItemSelect(item.id)}
+                      onChange={() => {
+                        return handleItemSelect(item.id);
+                      }}
                       labelBeforeCheckbox
                       data-uie-name="filter-popover-item"
                       data-uie-value={item.id}

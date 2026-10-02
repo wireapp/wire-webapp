@@ -67,8 +67,12 @@ const appLockCrypto: AppLockCrypto = {
   cryptoPwhashMemLimitInteractive: 1,
   cryptoPwhashOpsLimitInteractive: 1,
   ready: Promise.resolve(),
-  cryptoPwhashStr: (value: string) => value,
-  cryptoPwhashStrVerify: (value1: string, value2: string) => value1 === value2,
+  cryptoPwhashStr: (value: string) => {
+    return value;
+  },
+  cryptoPwhashStrVerify: (value1: string, value2: string) => {
+    return value1 === value2;
+  },
 };
 
 const createTeamState = ({
@@ -81,7 +85,11 @@ const createTeamState = ({
   status?: string;
 } = {}) => {
   const teamState = new TeamState();
-  jest.spyOn(teamState, 'isTeam').mockImplementation(ko.pureComputed(() => true));
+  jest.spyOn(teamState, 'isTeam').mockImplementation(
+    ko.pureComputed(() => {
+      return true;
+    }),
+  );
   const teamFeatures = {
     applock: {
       config: {

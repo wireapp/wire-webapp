@@ -75,7 +75,9 @@ describe('initialiseMigrationOfProteusConversations', () => {
   it('Should initialise migration for proteus conversations and add other users to MLS group', async () => {
     const conversationMembers = Array(3)
       .fill(0)
-      .map(() => ({id: createUuid(), domain: 'local.wire.com'}));
+      .map(() => {
+        return {id: createUuid(), domain: 'local.wire.com'};
+      });
 
     const proteusConversation = createProteusConversation(conversationMembers);
 

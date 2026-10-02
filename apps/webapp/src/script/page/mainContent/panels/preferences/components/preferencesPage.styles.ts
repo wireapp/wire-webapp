@@ -26,9 +26,11 @@ export const wrapperStyle: CSSObject = {
   containerType: 'inline-size',
 };
 
-export const titleStyle = (smallScreen: boolean): CSSObject => ({
-  paddingRight: smallScreen ? '40px' : 0,
-});
+export const titleStyle = (smallScreen: boolean): CSSObject => {
+  return {
+    paddingRight: smallScreen ? '40px' : 0,
+  };
+};
 
 export const buttonsStyle: CSSObject = {
   marginBottom: 0,

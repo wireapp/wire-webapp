@@ -72,11 +72,13 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
       : (globalMessageTimer ?? 0);
     setCurrentMessageTimer(messageTimer);
 
-    const mappedTimes = EphemeralTimings.VALUES.map(time => ({
-      isCustom: false,
-      text: formatDuration(time, translate).text,
-      value: time,
-    }));
+    const mappedTimes = EphemeralTimings.VALUES.map(time => {
+      return {
+        isCustom: false,
+        text: formatDuration(time, translate).text,
+        value: time,
+      };
+    });
 
     if (
       !isNullOrUndefined(messageTimer) &&
@@ -123,12 +125,14 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
             name="timed-message-settings"
             selectedValue={currentMessageTimer}
             onChange={timedMessageChange}
-            options={messageTimes.map(({text, isCustom, value}) => ({
-              label: text,
-              value: value,
-              isDisabled: isCustom || isSelfDeletingMessagesEnforced,
-              optionUieName: 'item-timed-messages-option',
-            }))}
+            options={messageTimes.map(({text, isCustom, value}) => {
+              return {
+                label: text,
+                value: value,
+                isDisabled: isCustom || isSelfDeletingMessagesEnforced,
+                optionUieName: 'item-timed-messages-option',
+              };
+            })}
           />
         </div>
         <p className="panel__info-text timed-messages__disclaimer" tabIndex={TabIndex.FOCUSABLE}>

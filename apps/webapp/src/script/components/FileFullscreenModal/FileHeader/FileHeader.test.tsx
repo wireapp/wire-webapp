@@ -33,14 +33,17 @@ import {
 
 import {FileHeader, getConversationIconType} from './FileHeader';
 
-const translate = (key: string) =>
-  ({
-    'cells.imageFullScreenModal.closeButton': 'Close',
-    'cells.imageFullScreenModal.downloadButton': 'Download',
-    'cells.imageFullScreenModal.viewerAccessLabel': 'Viewer access',
-    'cells.options.label': 'More options',
-    'cells.options.versionHistory': 'Version History',
-  })[key] ?? key;
+const translate = (key: string) => {
+  return (
+    {
+      'cells.imageFullScreenModal.closeButton': 'Close',
+      'cells.imageFullScreenModal.downloadButton': 'Download',
+      'cells.imageFullScreenModal.viewerAccessLabel': 'Viewer access',
+      'cells.options.label': 'More options',
+      'cells.options.versionHistory': 'Version History',
+    }[key] ?? key
+  );
+};
 
 const defaultProps = {
   id: 'file-id',
@@ -54,13 +57,16 @@ const defaultProps = {
   onFileContentRefresh: jest.fn(),
 };
 
-const createWrapper = (isViewerPermissionFeatureEnabled: boolean) =>
-  createRootProviderWrapperForTest(
+const createWrapper = (isViewerPermissionFeatureEnabled: boolean) => {
+  return createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
+      isFeatureToggleEnabled: () => {
+        return isViewerPermissionFeatureEnabled;
+      },
       translate,
     }),
   );
+};
 
 describe('FileHeader', () => {
   beforeEach(() => {
@@ -77,8 +83,8 @@ describe('FileHeader', () => {
   }: {
     isViewerPermissionFeatureEnabled?: boolean;
     props?: Partial<Parameters<typeof FileHeader>[0]>;
-  } = {}) =>
-    render(
+  } = {}) => {
+    return render(
       withThemeAndRootContext(
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
           <FileHeader {...defaultProps} {...props} />
@@ -86,6 +92,7 @@ describe('FileHeader', () => {
         createWrapper(isViewerPermissionFeatureEnabled),
       ),
     );
+  };
 
   it('hides download action when download is restricted', () => {
     renderHeader({isViewerPermissionFeatureEnabled: true});

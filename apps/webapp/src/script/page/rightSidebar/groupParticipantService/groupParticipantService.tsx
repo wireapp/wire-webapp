@@ -113,7 +113,9 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   useEffect(() => {
     // Set the author of the Service / App to the name of the team the user is in
     if (!isNullOrUndefined(selfUser.teamId) && serviceEntity.author !== undefined) {
-      void teamRepository.getTeamNameById(selfUser.teamId).then(name => serviceEntity.author?.(name));
+      void teamRepository.getTeamNameById(selfUser.teamId).then(name => {
+        return serviceEntity.author?.(name);
+      });
     }
   }, [serviceEntity, teamRepository, selfUser.teamId]);
 
@@ -135,13 +137,13 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
                 className="panel__action-item"
                 data-uie-name="go-conversation"
                 onClick={onOpen}
-                onKeyDown={event =>
-                  handleKeyDown({
+                onKeyDown={event => {
+                  return handleKeyDown({
                     event,
                     callback: onOpen,
                     keys: [KEY.ENTER, KEY.SPACE],
-                  })
-                }
+                  });
+                }}
               >
                 <span className="panel__action-item__icon">
                   <Icon.MessageIcon />
@@ -160,15 +162,15 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
                 onClick={() => {
                   onRemove(serviceUser);
                 }}
-                onKeyDown={event =>
-                  handleKeyDown({
+                onKeyDown={event => {
+                  return handleKeyDown({
                     event,
                     callback: () => {
                       onRemove(serviceUser);
                     },
                     keys: [KEY.ENTER, KEY.SPACE],
-                  })
-                }
+                  });
+                }}
               >
                 <span className="panel__action-item__icon">
                   <Icon.MinusIcon />
