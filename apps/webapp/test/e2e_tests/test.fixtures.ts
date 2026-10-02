@@ -21,7 +21,7 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
-import {PageManager} from './pageManager';
+import {PageManager, WebAppNavigationOptions} from './pageManager';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
@@ -156,11 +156,11 @@ export const LOGIN_TIMEOUT = 40_000;
 /** PagePlugin to log in as the given user */
 export const withLogin = (
   user: User | Promise<User>,
-  options?: {baseUrl?: string; confirmNewHistory?: boolean},
+  options?: WebAppNavigationOptions & {readonly confirmNewHistory?: boolean},
 ): PagePlugin => {
   return async page => {
     const pageManager = PageManager.from(page);
-    await pageManager.openLoginPage(options?.baseUrl);
+    await pageManager.openLoginPage(options);
     await pageManager.webapp.pages.login().login(await user);
 
     if (options?.confirmNewHistory) {
