@@ -470,6 +470,43 @@ describe('CallingRepository', () => {
       expect(startSpy).not.toHaveBeenCalled();
     });
 
+    it('does not start a call and releases media when camera acquisition fails', async () => {
+      const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.PROTEUS);
+
+      acquireCallMediaSpy.mockRejectedValueOnce(new Error('Camera unavailable'));
+
+      const startSpy = jest.spyOn(wCall, 'start');
+      const removeCallSpy = jest.spyOn(callingRepository as any, 'removeCall');
+
+      await expect(
+        callingRepository.startCall(conversation, {cameraEnabled: true, microphoneEnabled: true}),
+      ).rejects.toThrow('Failed to acquire camera for call');
+
+      expect(startSpy).not.toHaveBeenCalled();
+      expect(removeCallSpy).toHaveBeenCalled();
+      expect(callingRepository.findCall(conversation.qualifiedId)).toBeUndefined();
+    });
+
+    it('starts an audio call when video calling is disabled', async () => {
+      jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+      jest.spyOn(callingRepository['teamState'], 'isVideoCallingEnabled').mockReturnValue(false);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
+      conversation.groupConversationType(GROUP_CONVERSATION_TYPE.MEETING);
+      jest.spyOn(wCall, 'start');
+
+      await callingRepository.startCall(conversation, {cameraEnabled: true, microphoneEnabled: true});
+
+      expect(acquireCallMediaSpy).toHaveBeenCalledWith(expect.anything(), {audio: true, camera: false});
+      expect(wCall.start).toHaveBeenCalledWith(
+        wUser,
+        conversation.id,
+        CALL_TYPE.NORMAL,
+        CONV_TYPE.CONFERENCE_MLS,
+        0,
+        1,
+      );
+    });
+
     it('does not start a call and shows microphone error when microphone acquisition fails', async () => {
       const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, CONVERSATION_PROTOCOL.PROTEUS);
 

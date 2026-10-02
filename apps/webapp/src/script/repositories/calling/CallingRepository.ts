@@ -1352,7 +1352,8 @@ export class CallingRepository {
     }
     const conversationId = conversation.qualifiedId;
     const convId = this.serializeQualifiedId(conversationId);
-    const callType = media?.cameraEnabled === true ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+    const cameraRequested = media?.cameraEnabled === true && this.teamState.isVideoCallingEnabled();
+    const callType = cameraRequested ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
     try {
       const rejectedCallInConversation = this.findCall(conversationId);
@@ -1376,11 +1377,12 @@ export class CallingRepository {
       // Temporary feature to toggle Rust SFT
       this.setSetupSftConfig(call);
 
-      // Microphone access is required to start a call.
+      // Microphone access is required to start a call. Camera failures stay separate:
+      // warmupMediaStreams reports them as `false` and still honors the video-calling flag.
       try {
-        await this.acquireCallMedia(call, {audio: true, camera: media?.cameraEnabled ?? false});
-        if (media?.cameraEnabled === true && call.state() !== CALL_STATE.NONE) {
-          call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
+        const mediaReady = await this.warmupMediaStreams(call, true, cameraRequested);
+        if (!mediaReady) {
+          throw new Error('Failed to acquire camera for call');
         }
       } catch (error: unknown) {
         if (error instanceof NoAudioInputError) {
@@ -1434,6 +1436,12 @@ export class CallingRepository {
       if (this.isMLSConference(conversation)) {
         await this.leaveMLSConferenceBecauseError(conversation);
       }
+      const failedCall = this.findCall(conversationId);
+      if (!isUndefined(failedCall)) {
+        failedCall.state(CALL_STATE.NONE);
+        this.removeCall(failedCall);
+      }
+      throw error;
     }
   }
 
