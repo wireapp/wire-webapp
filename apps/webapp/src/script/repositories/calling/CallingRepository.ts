@@ -70,6 +70,7 @@ import {
   NetworkQualityInfoSchema,
   UNKNOWN_NETWORK_QUALITY,
 } from 'Repositories/calling/calling.schema';
+import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -1351,7 +1352,7 @@ export class CallingRepository {
     return CONV_TYPE.ONEONONE;
   }
 
-  async startCall(conversation: Conversation): Promise<void | Call> {
+  async startCall(conversation: Conversation, media?: CallMediaChoice): Promise<void | Call> {
     void this.setViewModeMinimized();
     if (isNullOrUndefined(this.selfUser) || !isNonEmptyString(this.selfClientId)) {
       this.logger.warn(
@@ -1365,7 +1366,9 @@ export class CallingRepository {
     }
     const conversationId = conversation.qualifiedId;
     const convId = this.serializeQualifiedId(conversationId);
-    this.logger.log(`Starting a call of type "${CALL_TYPE.NORMAL}" in conversation ID "${convId}"...`);
+    const cameraRequested = media?.cameraEnabled === true && this.teamState.isVideoCallingEnabled();
+    const callType = cameraRequested ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+    this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
     try {
       const rejectedCallInConversation = this.findCall(conversationId);
       if (!isUndefined(rejectedCallInConversation)) {
@@ -1380,7 +1383,7 @@ export class CallingRepository {
         conversation,
         conversationType,
         selfParticipant,
-        CALL_TYPE.NORMAL,
+        callType,
         this.mediaDevicesHandler,
       );
       this.storeCall(call);
@@ -1388,9 +1391,13 @@ export class CallingRepository {
       // Temporary feature to toggle Rust SFT
       this.setSetupSftConfig(call);
 
-      // Microphone access is required to start a call.
+      // Microphone access is required to start a call. Camera failures stay separate:
+      // warmupMediaStreams reports them as `false` and still honors the video-calling flag.
       try {
-        await this.acquireCallMedia(call, {audio: true});
+        const mediaReady = await this.warmupMediaStreams(call, true, cameraRequested);
+        if (!mediaReady) {
+          throw new Error('Failed to acquire camera for call');
+        }
       } catch (error: unknown) {
         if (error instanceof NoAudioInputError) {
           this.showNoAudioInputModal();
@@ -1414,11 +1421,15 @@ export class CallingRepository {
        * we are stuck in muted state so we should call the AVS function setMute(this.wUser, 0) before initiating the call to fix this
        * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
        */
-      this.wCall?.setMute(this.wUser, 0);
+      if (media !== undefined) {
+        this.setMute(!media.microphoneEnabled);
+      } else {
+        this.wCall?.setMute(this.wUser, 0);
+      }
       this.wCall?.start(
         this.wUser,
         convId,
-        CALL_TYPE.NORMAL,
+        callType,
         conversationType,
         this.callState.cbrEncoding(),
         this.getMeetingCallFlag(conversation),
@@ -1439,6 +1450,12 @@ export class CallingRepository {
       if (this.isMLSConference(conversation)) {
         await this.leaveMLSConferenceBecauseError(conversation);
       }
+      const failedCall = this.findCall(conversationId);
+      if (!isUndefined(failedCall)) {
+        failedCall.state(CALL_STATE.NONE);
+        this.removeCall(failedCall);
+      }
+      throw error;
     }
   }
 
@@ -1764,7 +1781,7 @@ export class CallingRepository {
     this.callState.viewMode(CallingViewMode.DETACHED_WINDOW);
   }
 
-  async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
+  async answerCall(call: Call, callType?: CALL_TYPE, media?: CallMediaChoice): Promise<void> {
     void this.setViewModeMinimized();
 
     // Temporary feature to toggle Rust SFT
@@ -1772,7 +1789,11 @@ export class CallingRepository {
 
     const {conversation} = call;
     try {
-      callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+      if (media !== undefined) {
+        callType = media.cameraEnabled ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+      } else {
+        callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+      }
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
@@ -1819,7 +1840,11 @@ export class CallingRepository {
         this.rejectCall(conversation.qualifiedId);
         return;
       }
-      this.setMute(call.muteState() !== MuteState.NOT_MUTED);
+      if (media !== undefined) {
+        this.setMute(!media.microphoneEnabled);
+      } else {
+        this.setMute(call.muteState() !== MuteState.NOT_MUTED);
+      }
 
       if (this.isMLSConference(conversation)) {
         // Enable the epoch cache to save all epoch infos while init avs!

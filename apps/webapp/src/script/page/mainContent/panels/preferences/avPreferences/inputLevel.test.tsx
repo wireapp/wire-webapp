@@ -70,7 +70,12 @@ describe('InputLevel', () => {
 
   it('represents the audio input volume in an audiometer with active audio bullets', () => {
     const expectedAudioLevel = (128 / 160) * MAX_AUDIO_BULLETS;
-    const mediaStream = new MediaStream();
+    const mediaStream = {
+      id: 'test-stream',
+      getAudioTracks: () => {
+        return [{}];
+      },
+    } as MediaStream;
 
     const props = {
       disabled: false,

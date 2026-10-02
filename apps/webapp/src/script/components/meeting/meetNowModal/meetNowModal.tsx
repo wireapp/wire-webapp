@@ -36,7 +36,6 @@ import {
   wrapperStyles,
 } from 'Components/meeting/shared/styles/meetingModalShell.styles';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
@@ -62,8 +61,7 @@ export const MeetNowModal = () => {
     setPasswordConfirmation,
     validate,
   } = useMeetNowModal();
-  const conversationState = container.resolve(ConversationState);
-  const {isSubmitting, submit} = useMeetNowSubmit(conversationState);
+  const {isSubmitting, submit} = useMeetNowSubmit();
   const selfUser = container.resolve(UserState).self();
   const submitGenerationRef = useRef(0);
 

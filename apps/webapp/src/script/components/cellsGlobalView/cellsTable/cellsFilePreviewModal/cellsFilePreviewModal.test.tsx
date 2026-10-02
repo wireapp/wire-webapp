@@ -162,6 +162,6 @@ describe('CellsFilePreviewModal', () => {
     await act(() => {
       return fireAndForgetInvoker.waitUntilAllSettled();
     });
-    expect(screen.getByTitle('Collabora editor')).toBeInTheDocument();
+    expect(await screen.findByTitle('Collabora editor')).toBeInTheDocument();
   });
 });

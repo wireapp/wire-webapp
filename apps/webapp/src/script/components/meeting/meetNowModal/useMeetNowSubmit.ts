@@ -19,46 +19,25 @@
 
 import {useState} from 'react';
 
-import type {JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {ConversationState} from 'Repositories/conversation/ConversationState';
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import type {MeetNowFormState, MeetNowSubmitResult} from './meetNowTypes';
 import {submitMeetNow} from './submitMeetNow';
 
-export const useMeetNowSubmit = (conversationState: ConversationState) => {
+export const useMeetNowSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {translate} = useApplicationContext();
-  const {content, calling: callingViewModel} = useMainViewModel();
-  const {conversation: conversationRepository, calling: callingRepository} = content.repositories;
+  const {translate, clock} = useApplicationContext();
   const meetNowMeeting = useMeetingStore(state => {
     return state.meetNowMeeting;
   });
   const loadMeetings = useMeetingStore(state => {
     return state.loadMeetings;
   });
-
-  const callNotEstablishedCopy = {
-    description: translate('callNotEstablishedDescription'),
-    descriptionPoints: [
-      translate('callNotEstablishedDescriptionPoint1'),
-      translate('callNotEstablishedDescriptionPoint2'),
-      translate('callNotEstablishedDescriptionPoint3'),
-    ] as [string, string, string],
-    title: translate('callNotEstablishedTitle'),
-    translate,
-  };
-
-  const guardCall = useNoInternetCallGuard(callNotEstablishedCopy);
-
-  const joinDeps: JoinMeetingCallDeps = {
-    conversationState,
-    conversationRepository,
-    callingRepository,
-    callingViewModel,
-  };
+  const openMeetingPrep = useMeetingPrepModal(state => {
+    return state.open;
+  });
 
   const submit = async (formState: MeetNowFormState): Promise<MeetNowSubmitResult> => {
     setIsSubmitting(true);
@@ -68,10 +47,9 @@ export const useMeetNowSubmit = (conversationState: ConversationState) => {
         formState,
         meetNowMeeting,
         loadMeetings,
-        joinDeps,
-        guardCall,
         translate,
-        callNotEstablishedCopy,
+        meetingStartTime: clock.currentDate.toISOString(),
+        openMeetingPrep,
       });
     } finally {
       setIsSubmitting(false);

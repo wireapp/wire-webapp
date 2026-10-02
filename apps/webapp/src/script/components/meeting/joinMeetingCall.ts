@@ -24,6 +24,7 @@ import {Maybe, Task, task} from 'true-myth';
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -85,7 +86,11 @@ const ensureMlsConversationReady = (
     });
 };
 
-const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Task<void, JoinMeetingCallError> => {
+const performJoin = (
+  deps: JoinMeetingCallDeps,
+  conversation: Conversation,
+  media: CallMediaChoice,
+): Task<boolean, JoinMeetingCallError> => {
   const call = deps.callingRepository.findCall(conversation.qualifiedId);
 
   if (!isUndefined(call) && call.state() === CALL_STATE.INCOMING) {
@@ -94,7 +99,7 @@ const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Tas
         return joinMeetingCallErrors.joinFailed;
       },
       () => {
-        return deps.callingViewModel.callActions.answer(call);
+        return deps.callingViewModel.callActions.answer(call, media);
       },
     );
   }
@@ -104,7 +109,7 @@ const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Tas
       return joinMeetingCallErrors.joinFailed;
     },
     () => {
-      return deps.callingViewModel.callActions.startAudio(conversation);
+      return deps.callingViewModel.callActions.startAudio(conversation, media);
     },
   );
 };
@@ -116,12 +121,13 @@ const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Tas
 export const joinMeetingCall = (
   deps: JoinMeetingCallDeps,
   qualifiedConversationId: QualifiedId,
-): Task<void, JoinMeetingCallError> => {
+  media: CallMediaChoice,
+): Task<boolean, JoinMeetingCallError> => {
   return resolveConversation(deps, qualifiedConversationId)
     .andThen(conversation => {
       return ensureMlsConversationReady(deps, conversation);
     })
     .andThen(conversation => {
-      return performJoin(deps, conversation);
+      return performJoin(deps, conversation, media);
     });
 };

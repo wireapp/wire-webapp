@@ -185,7 +185,7 @@ export class ListViewModel {
       );
     }
 
-    return this.callingViewModel.callActions.answer(call);
+    await this.callingViewModel.callActions.answer(call);
   };
 
   readonly changeNotificationSetting = () => {

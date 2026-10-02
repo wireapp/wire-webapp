@@ -24,7 +24,7 @@ import assert from 'node:assert';
 import {isUndefined} from '@sindresorhus/is';
 
 import {createFactory} from '@enormora/objectory';
-import {result} from 'true-myth';
+import {Maybe, result} from 'true-myth';
 
 import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
 import type {Translate} from 'Util/localizerUtil';
@@ -35,7 +35,11 @@ import {
   type SystemNotificationRequest,
 } from 'src/script/notification/systemNotificationTypes';
 
-import {createMeetingReminderOsNotifier, toMeetingReminderNotificationTag} from './createMeetingReminderOsNotifier';
+import {
+  createMeetingReminderOsNotifier,
+  type CreateMeetingReminderOsNotifierDependencies,
+  toMeetingReminderNotificationTag,
+} from './createMeetingReminderOsNotifier';
 
 /** Keeps the "a notification was requested" invariant visible instead of trusting an index. */
 const firstRequestOf = (requests: SystemNotificationRequest[]): SystemNotificationRequest => {
@@ -68,11 +72,17 @@ const formatMeetingTime = (meetingStartTime: string): string => {
   return meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
 };
 
-const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotificationApi> = {}) => {
+const createNotifierWithFakeNotificationApi = (
+  apiOverrides: Partial<SystemNotificationApi> = {},
+  currentReminderPayload: CreateMeetingReminderOsNotifierDependencies['currentReminderPayload'] = payload => {
+    return Maybe.just(payload);
+  },
+) => {
   const requests: SystemNotificationRequest[] = [];
   const closedTags: string[] = [];
   const logger = {info: jest.fn(), warn: jest.fn()};
   const openMeetingsList = jest.fn();
+  const openMeetingPrep = jest.fn();
 
   const notifier = createMeetingReminderOsNotifier({
     notificationApi: {
@@ -98,12 +108,14 @@ const createNotifierWithFakeNotificationApi = (apiOverrides: Partial<SystemNotif
       ...apiOverrides,
     },
     openMeetingsList,
+    openMeetingPrep,
+    currentReminderPayload,
     formatMeetingTime,
     translate,
     logger,
   });
 
-  return {requests, closedTags, logger, openMeetingsList, notifier};
+  return {requests, closedTags, logger, openMeetingsList, openMeetingPrep, notifier};
 };
 
 describe('createMeetingReminderOsNotifier', () => {
@@ -133,14 +145,28 @@ describe('createMeetingReminderOsNotifier', () => {
     ]);
   });
 
-  it('focuses the meetings list and closes the toast when clicked', () => {
-    const {requests, closedTags, openMeetingsList, notifier} = createNotifierWithFakeNotificationApi();
+  it('focuses the meetings list, opens the prep modal, and closes the toast when clicked', () => {
+    const {requests, closedTags, openMeetingsList, openMeetingPrep, notifier} = createNotifierWithFakeNotificationApi();
+    const payload = meetingReminderFirePayloadFactory.build();
+
+    notifier.notify(payload);
+    firstRequestOf(requests).onClick();
+
+    expect(openMeetingsList).toHaveBeenCalledTimes(1);
+    expect(openMeetingPrep).toHaveBeenCalledWith(payload);
+    expect(closedTags).toEqual([firstRequestOf(requests).tag]);
+  });
+
+  it('opens the meetings list without prep when the occurrence is no longer current', () => {
+    const {requests, openMeetingsList, openMeetingPrep, notifier} = createNotifierWithFakeNotificationApi({}, () => {
+      return Maybe.nothing();
+    });
 
     notifier.notify(meetingReminderFirePayloadFactory.build());
     firstRequestOf(requests).onClick();
 
     expect(openMeetingsList).toHaveBeenCalledTimes(1);
-    expect(closedTags).toEqual([firstRequestOf(requests).tag]);
+    expect(openMeetingPrep).not.toHaveBeenCalled();
   });
 
   it('tags the toast per meeting occurrence so a recurring meeting does not stack toasts', () => {

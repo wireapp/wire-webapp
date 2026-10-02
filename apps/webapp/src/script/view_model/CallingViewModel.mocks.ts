@@ -37,6 +37,7 @@ import {Core} from '../service/coreSingleton';
 export const mockCallingRepository = {
   startCall: jest.fn(),
   answerCall: jest.fn(),
+  findCall: jest.fn(),
   onIncomingCall: jest.fn(),
   onRequestClientsCallback: jest.fn(),
   onRequestNewEpochCallback: jest.fn(),

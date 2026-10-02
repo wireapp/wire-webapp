@@ -37,6 +37,7 @@ import {
 } from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingListItem.styles';
 import {MeetingParticipants} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingParticipants/meetingParticipants';
 import {MeetingStatus} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingStatus/meetingStatus';
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
@@ -69,11 +70,9 @@ const MeetingListItemComponent = ({
   const {title, recurrence} = meetingSeries;
   const {translate, clock} = useApplicationContext();
   const nowMilliseconds = providedNowMilliseconds ?? clock.currentUnixEpochMilliseconds;
-  const {
-    joinMeeting,
-    isJoinDisabled,
-    isCallActive: isConversationCallActive,
-  } = useJoinMeetingCall(meetingSeries.qualified_conversation);
+  const {isJoinDisabled, isCallActive: isConversationCallActive} = useJoinMeetingCall(
+    meetingSeries.qualified_conversation,
+  );
 
   const now = useMemo(() => {
     return new Date(nowMilliseconds);
@@ -83,6 +82,15 @@ const MeetingListItemComponent = ({
     return getMeetingTemporalStatusAt(now, start, end);
   }, [now, start, end]);
   const isCallActive = isAttendingMeetingInstance(isConversationCallActive, temporalStatus);
+
+  const openPrep = () => {
+    useMeetingPrepModal.getState().open({
+      meetingTitle: title,
+      meetingStartTime: start.toISOString(),
+      qualifiedMeetingId: meetingSeries.qualified_id,
+      qualifiedConversationId: meetingSeries.qualified_conversation,
+    });
+  };
 
   const time = formatMeetingTimeRange(start, end);
 
@@ -124,14 +132,14 @@ const MeetingListItemComponent = ({
         />
         <MeetingStatus
           temporalStatus={temporalStatus}
-          joinMeeting={joinMeeting}
+          joinMeeting={openPrep}
           isJoinDisabled={isJoinDisabled}
           isCallActive={isCallActive}
         />
         <MeetingAction
           meetingInstance={meetingInstance}
           selfUser={selfUser}
-          joinMeeting={joinMeeting}
+          joinMeeting={openPrep}
           isJoinDisabled={isJoinDisabled}
         />
       </div>

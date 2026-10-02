@@ -34,6 +34,7 @@ import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};
+const media = {cameraEnabled: true, microphoneEnabled: false};
 
 const createMeetingConversation = (): Conversation => {
   return createConversation(
@@ -100,24 +101,24 @@ const createDeps = (overrides: Partial<JoinMeetingCallDeps> = {}): JoinMeetingCa
 
 describe('joinMeetingCall', () => {
   it('starts an outgoing call when the meeting conversation is found locally and no incoming call exists', async () => {
-    const startAudio = jest.fn().mockResolvedValue(undefined);
-    const answer = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
+    const answer = jest.fn().mockResolvedValue(true);
     const deps = createDeps({
       callingViewModel: {
         callActions: {answer, startAudio},
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
-    expect(result.isOk).toBe(true);
+    expect(result.isOk && result.value).toBe(true);
     expect(startAudio).toHaveBeenCalledTimes(1);
     expect(answer).not.toHaveBeenCalled();
   });
 
   it('ensures the MLS group exists locally before starting the call', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
     const safeEnsureConversationExists = jest.fn(() => {
       return task.resolve(undefined);
     });
@@ -139,19 +140,19 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
-    expect(result.isOk).toBe(true);
+    expect(result.isOk && result.value).toBe(true);
     expect(safeEnsureConversationExists).toHaveBeenCalledWith({
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     });
-    expect(startAudio).toHaveBeenCalledWith(conversation);
+    expect(startAudio).toHaveBeenCalledWith(conversation, media);
   });
 
   it('returns joinFailed when ensuring the MLS group fails', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
 
     const deps = createDeps({
       conversationState: {
@@ -172,7 +173,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
@@ -182,8 +183,8 @@ describe('joinMeetingCall', () => {
   it('answers an incoming call when one exists in the meeting conversation', async () => {
     const conversation = createMeetingConversation();
     const incomingCall = createIncomingCall(conversation);
-    const startAudio = jest.fn().mockResolvedValue(undefined);
-    const answer = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
+    const answer = jest.fn().mockResolvedValue(true);
 
     const deps = createDeps({
       conversationState: {
@@ -201,16 +202,16 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
-    expect(result.isOk).toBe(true);
-    expect(answer).toHaveBeenCalledWith(incomingCall);
+    expect(result.isOk && result.value).toBe(true);
+    expect(answer).toHaveBeenCalledWith(incomingCall, media);
     expect(startAudio).not.toHaveBeenCalled();
   });
 
   it('fetches the conversation when it is not available locally', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
     const findConversation = jest.fn(() => {
       return undefined;
     });
@@ -234,16 +235,16 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
-    expect(result.isOk).toBe(true);
+    expect(result.isOk && result.value).toBe(true);
     expect(findConversation).toHaveBeenCalledWith(qualifiedConversationId);
     expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversationId);
     expect(safeEnsureConversationExists).toHaveBeenCalledWith({
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     });
-    expect(startAudio).toHaveBeenCalledWith(conversation);
+    expect(startAudio).toHaveBeenCalledWith(conversation, media);
   });
 
   it('returns conversationNotFound when the conversation cannot be resolved', async () => {
@@ -260,10 +261,25 @@ describe('joinMeetingCall', () => {
       } as unknown as ConversationRepository,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.conversationNotFound);
+  });
+
+  it('reports that the call was not joined when startAudio resolves without starting one', async () => {
+    const deps = createDeps({
+      callingViewModel: {
+        callActions: {
+          answer: jest.fn(),
+          startAudio: jest.fn().mockResolvedValue(false),
+        },
+      } as unknown as CallingViewModel,
+    });
+
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
+
+    expect(result.isOk && result.value).toBe(false);
   });
 
   it('returns joinFailed when startAudio rejects', async () => {
@@ -278,7 +294,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
@@ -304,7 +320,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);

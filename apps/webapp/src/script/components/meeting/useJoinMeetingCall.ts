@@ -35,6 +35,7 @@ import {
 } from 'Components/meeting/joinMeetingCall';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showCallNotEstablishedModal, useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config} from 'src/script/Config';
@@ -48,7 +49,7 @@ type JoinMeetingCallResultHandlers = {
 };
 
 export const handleJoinMeetingCallResult = (
-  result: Result<void, JoinMeetingCallError>,
+  result: Result<boolean, JoinMeetingCallError>,
   {showConversationNotFoundModal, showJoinFailedModal}: JoinMeetingCallResultHandlers,
 ): void => {
   if (!result.isErr) {
@@ -158,36 +159,44 @@ export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
     );
   }, [translate]);
 
-  const joinMeeting = useCallback(() => {
-    if (isJoining || isCallConnecting || isCallActive) {
-      return;
-    }
-
-    guardCall(async () => {
-      setIsJoining(true);
-
-      const result = await joinMeetingCall(deps, qualifiedConversationId);
-
-      if (result.isErr) {
-        setIsJoining(false);
-        handleJoinMeetingCallResult(result, {
-          showConversationNotFoundModal,
-          showJoinFailedModal: () => {
-            return showCallNotEstablishedModal(callNotEstablishedCopy);
-          },
-        });
+  const joinMeeting = useCallback(
+    (media: CallMediaChoice) => {
+      if (isJoining || isCallConnecting || isCallActive) {
+        return;
       }
-    });
-  }, [
-    callNotEstablishedCopy,
-    deps,
-    guardCall,
-    isCallActive,
-    isCallConnecting,
-    isJoining,
-    qualifiedConversationId,
-    showConversationNotFoundModal,
-  ]);
+
+      guardCall(async () => {
+        setIsJoining(true);
+
+        const result = await joinMeetingCall(deps, qualifiedConversationId, media);
+
+        if (result.isErr) {
+          setIsJoining(false);
+          handleJoinMeetingCallResult(result, {
+            showConversationNotFoundModal,
+            showJoinFailedModal: () => {
+              return showCallNotEstablishedModal(callNotEstablishedCopy);
+            },
+          });
+          return;
+        }
+
+        if (!result.value) {
+          setIsJoining(false);
+        }
+      });
+    },
+    [
+      callNotEstablishedCopy,
+      deps,
+      guardCall,
+      isCallActive,
+      isCallConnecting,
+      isJoining,
+      qualifiedConversationId,
+      showConversationNotFoundModal,
+    ],
+  );
 
   const isJoinDisabled = isJoining || isCallConnecting || isCallActive;
 

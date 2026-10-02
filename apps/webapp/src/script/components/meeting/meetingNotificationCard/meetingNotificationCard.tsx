@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CallIcon, CalendarIcon} from '@wireapp/react-ui-kit';
 
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -53,19 +54,24 @@ type MeetingNotificationCardProps = MeetingNotification & {
 };
 
 type MeetingNotificationJoinButtonProps = {
+  meetingTitle: string;
+  meetingStartTime: string;
+  qualifiedId: QualifiedId;
   qualifiedConversationId: QualifiedId;
   onDismiss: () => void;
   onCallJoined?: () => void;
 };
 
 const MeetingNotificationJoinButton = ({
+  meetingTitle,
+  meetingStartTime,
+  qualifiedId,
   qualifiedConversationId,
   onDismiss,
   onCallJoined,
 }: MeetingNotificationJoinButtonProps) => {
   const {translate} = useApplicationContext();
-  const {joinMeeting, isJoinDisabled, isCallActive, isCallConnecting, isJoining} =
-    useJoinMeetingCall(qualifiedConversationId);
+  const {isJoinDisabled, isCallActive, isCallConnecting, isJoining} = useJoinMeetingCall(qualifiedConversationId);
 
   useEffect(() => {
     if (isCallActive) {
@@ -78,7 +84,14 @@ const MeetingNotificationJoinButton = ({
       variant={ButtonVariant.PRIMARY}
       css={meetingNotificationCardActionStyles}
       type="button"
-      onClick={joinMeeting}
+      onClick={() => {
+        useMeetingPrepModal.getState().open({
+          meetingTitle,
+          meetingStartTime,
+          qualifiedMeetingId: qualifiedId,
+          qualifiedConversationId,
+        });
+      }}
       disabled={isJoinDisabled}
       showLoading={isJoining || isCallConnecting}
       aria-label={translate('callJoin')}
@@ -201,6 +214,9 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
     if (kind === MeetingNotificationKind.ONGOING) {
       return (
         <MeetingNotificationJoinButton
+          meetingTitle={notification.meetingTitle}
+          meetingStartTime={notification.meetingStartTime}
+          qualifiedId={notification.qualifiedId}
           qualifiedConversationId={notification.qualifiedConversationId}
           onDismiss={onDismiss}
           onCallJoined={notification.onCallJoined}
