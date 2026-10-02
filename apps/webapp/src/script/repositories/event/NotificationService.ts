@@ -26,6 +26,8 @@ import {StorageSchemata, StorageService} from 'Repositories/storage/';
 
 import {APIClient} from '../../service/apiClientSingleton';
 
+const notificationPageSize = 100;
+
 export class NotificationService {
   private readonly AMPLIFY_STORE_NAME: string;
 
@@ -58,7 +60,11 @@ export class NotificationService {
 
   async getServerTime(): Promise<string> {
     // Info: We use "100" as size limit because it's the minimum value accepted by the backend's notification stream
-    const notificationList = await this.apiClient.api.notification.getNotifications(undefined, 100, undefined);
+    const notificationList = await this.apiClient.api.notification.getNotifications(
+      undefined,
+      notificationPageSize,
+      undefined,
+    );
     return notificationList.time;
   }
 

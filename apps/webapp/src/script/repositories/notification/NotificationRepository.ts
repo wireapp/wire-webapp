@@ -73,6 +73,8 @@ import type {SystemNotificationApi, SystemNotificationHandle} from '../../notifi
 import {ContentState, useAppState} from '../../page/useAppState';
 import {Warnings} from '../../view_model/WarningsContainer';
 
+const notificationTimeoutInSeconds = 5;
+
 type NotificationData = {
   conversationId?: QualifiedId;
   messageId?: string;
@@ -123,7 +125,7 @@ export class NotificationRepository {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
       // Keep system notifications visible long enough to be noticed before auto-closing.
-      TIMEOUT: TIME_IN_MILLIS.SECOND * 5, // eslint-disable-line no-magic-numbers
+      TIMEOUT: TIME_IN_MILLIS.SECOND * notificationTimeoutInSeconds,
       TITLE_LENGTH: 17,
       TITLE_MAX_LENGTH: 38,
     };

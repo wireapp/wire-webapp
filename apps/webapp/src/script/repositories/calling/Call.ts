@@ -39,6 +39,9 @@ import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../../Config';
 
+const participantsPerPage = 9;
+const maximumDisplayedParticipantNames = 4;
+
 export type SerializedConversationId = string;
 
 interface ActiveSpeaker {
@@ -67,7 +70,7 @@ export class Call {
   public blockMessages: boolean = false;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
-  public numberOfParticipantsInOnePage: number = 9;
+  public numberOfParticipantsInOnePage: number = participantsPerPage;
   public readonly maximizedParticipant: ko.Observable<Participant | null>;
   public readonly isActive: ko.PureComputed<boolean>;
   public readonly epochCache = new CallingEpochCache();
@@ -230,7 +233,7 @@ export class Call {
         return participant !== undefined;
       })
       // Limit them to 4.
-      .slice(0, 4)
+      .slice(0, maximumDisplayedParticipantNames)
       // Sort them by name
       .toSorted((participantA, participantB) => {
         return sortUsersByPriority(participantA.user, participantB.user);

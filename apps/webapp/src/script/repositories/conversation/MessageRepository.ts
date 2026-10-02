@@ -126,6 +126,8 @@ import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 
+const conversationStatisticsRoundingFactor = 6;
+
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
   nativePush?: boolean;
@@ -1926,12 +1928,15 @@ export class MessageRepository {
       }).length;
 
       let segmentations: ContributedSegmentations = {
-        [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),
-        [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, 6),
-        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),
-        [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(participants.length, 6),
+        [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, conversationStatisticsRoundingFactor),
+        [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, conversationStatisticsRoundingFactor),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(
+          guestsWireless,
+          conversationStatisticsRoundingFactor,
+        ),
+        [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(participants.length, conversationStatisticsRoundingFactor),
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
+        [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, conversationStatisticsRoundingFactor),
         [Segmentation.MESSAGE.ACTION]: actionType,
         ...(isRichText !== undefined && {
           [Segmentation.IS_RICH_TEXT]: isRichText,

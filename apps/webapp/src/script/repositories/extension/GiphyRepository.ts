@@ -23,6 +23,11 @@ import type {GiphyService} from './GiphyService';
 
 import {Logger, getLogger} from '../../util/logger';
 
+const bytesPerKibibyte = 1024;
+const maximumGifSizeInMebibytes = 3;
+const decimalRadix = 10;
+const gifPaginationStep = 6;
+
 export interface Gif {
   animated: string;
   static: string;
@@ -54,7 +59,7 @@ export class GiphyRepository {
     MAX_RESULTS: 6,
     MAX_RETRIES: 3,
     // 3MB
-    MAX_SIZE: 3 * 1024 * 1024,
+    MAX_SIZE: maximumGifSizeInMebibytes * bytesPerKibibyte * bytesPerKibibyte,
   };
 
   constructor(giphyService: GiphyService) {
@@ -93,7 +98,7 @@ export class GiphyRepository {
     } = await this.giphyService.getById(randomGif.id);
     const staticGif = images.fixed_width_still;
     const animatedGif = images.downsized;
-    const exceedsMaxSize = window.parseInt(animatedGif.size, 10) > maximumSize;
+    const exceedsMaxSize = window.parseInt(animatedGif.size, decimalRadix) > maximumSize;
 
     if (exceedsMaxSize) {
       this.logger.info(`Gif size (${animatedGif.size}) is over maximum size (${animatedGif.size})`);
@@ -132,7 +137,8 @@ export class GiphyRepository {
       });
 
       // reset the offset to 0 when we received the maximum of results
-      this.currentOffset = this.currentOffset < pagination.total_count - 6 ? this.currentOffset + 6 : 0;
+      this.currentOffset =
+        this.currentOffset < pagination.total_count - gifPaginationStep ? this.currentOffset + gifPaginationStep : 0;
 
       const result = [];
 

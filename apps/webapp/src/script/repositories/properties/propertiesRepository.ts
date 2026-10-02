@@ -44,6 +44,9 @@ import {loadValue} from 'Util/storageUtil';
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
+const nestedPreferencePathDepth = 2;
+const deeplyNestedPreferencePathDepth = 3;
+
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
   static get CONFIG() {
@@ -221,9 +224,9 @@ export class PropertiesRepository {
     switch (typeParts.length) {
       case 1:
         return this.properties[partOne];
-      case 2:
+      case nestedPreferencePathDepth:
         return this.properties[partOne][partTwo];
-      case 3:
+      case deeplyNestedPreferencePathDepth:
         return this.properties[partOne][partTwo][partThree];
       default:
         throw new Error(`Failed to get preference of type ${propertiesType}`);
@@ -421,10 +424,10 @@ export class PropertiesRepository {
       case 1:
         this.properties[partOne] = changedPreference;
         break;
-      case 2:
+      case nestedPreferencePathDepth:
         this.properties[partOne][partTwo] = changedPreference;
         break;
-      case 3:
+      case deeplyNestedPreferencePathDepth:
         this.properties[partOne][partTwo][partThree] = changedPreference;
         break;
       default:

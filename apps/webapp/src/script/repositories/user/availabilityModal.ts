@@ -25,6 +25,8 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
+const visibleModalStorageInteger = 0n;
+
 const initialKey = 'hide_initial_modal';
 
 type Translate = (
@@ -41,7 +43,7 @@ function showModal(storageKey: string, title: string, message: string, translate
     hideModal === false ||
     hideModal === '' ||
     hideModal === 0 ||
-    hideModal === 0n ||
+    hideModal === visibleModalStorageInteger ||
     (typeof hideModal === 'number' && isNan(hideModal))
   ) {
     PrimaryModal.show(
@@ -120,7 +122,7 @@ export function showInitialModal(availability: Availability.Type, translate: Tra
       hideInitialModal === false ||
       hideInitialModal === '' ||
       hideInitialModal === 0 ||
-      hideInitialModal === 0n ||
+      hideInitialModal === visibleModalStorageInteger ||
       (typeof hideInitialModal === 'number' && isNan(hideInitialModal))) &&
     availability !== Availability.Type.NONE
   ) {

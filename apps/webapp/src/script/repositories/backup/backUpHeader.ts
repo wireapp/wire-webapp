@@ -19,6 +19,14 @@
 
 import sodium from 'libsodium-wrappers-sumo';
 
+const passwordHashMemoryLimitInBytes = 33554432;
+const passwordHashOperationsLimit = 4;
+const passwordHashOutputLengthInBytes = 32;
+const unsignedIntegerLengthInBytes = 4;
+const backupHeaderFormatLengthInBytes = 4;
+const backupHeaderVersionLengthInBytes = 2;
+const passwordHashLimitFieldCount = 2;
+
 export interface DecodedHeader {
   format: string;
   version: string;
@@ -43,13 +51,13 @@ export class BackUpHeader {
   // Defined by given specs on: https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/59867179/Exporting+history+v2
   private readonly format = ENCRYPTED_BACKUP_FORMAT;
   private readonly version = ENCRYPTED_BACKUP_VERSION;
-  private readonly MEMLIMIT_INTERACTIVE_VALUE = 33554432;
-  private readonly OPSLIMIT_INTERACTIVE_VALUE = 4;
-  private readonly PWD_HASH_OUTPUT_BYTES = 32;
-  private readonly UNSIGNED_INT_LENGTH = 4;
+  private readonly MEMLIMIT_INTERACTIVE_VALUE = passwordHashMemoryLimitInBytes;
+  private readonly OPSLIMIT_INTERACTIVE_VALUE = passwordHashOperationsLimit;
+  private readonly PWD_HASH_OUTPUT_BYTES = passwordHashOutputLengthInBytes;
+  private readonly UNSIGNED_INT_LENGTH = unsignedIntegerLengthInBytes;
   private readonly BACKUP_HEADER_EXTRA_GAP_LENGTH = 1;
-  private readonly BACKUP_HEADER_FORMAT_LENGTH = 4;
-  private readonly BACKUP_HEADER_VERSION_LENGTH = 2;
+  private readonly BACKUP_HEADER_FORMAT_LENGTH = backupHeaderFormatLengthInBytes;
+  private readonly BACKUP_HEADER_VERSION_LENGTH = backupHeaderVersionLengthInBytes;
 
   constructor(userId: string, password: string) {
     this.userId = userId;
@@ -89,7 +97,7 @@ export class BackUpHeader {
         BACKUP_HEADER_VERSION_LENGTH +
         sodium.crypto_pwhash_SALTBYTES +
         PWD_HASH_OUTPUT_BYTES +
-        2 * UNSIGNED_INT_LENGTH,
+        passwordHashLimitFieldCount * UNSIGNED_INT_LENGTH,
     );
     let offset = 0;
     offset = this.copyBytes(headerData, formatBytes, offset);

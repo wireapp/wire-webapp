@@ -24,6 +24,8 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Call} from './Call';
 import type {Participant} from './Participant';
 
+const participantPairSize = 2;
+
 export interface Grid {
   grid: Participant[];
   thumbnail: Participant | null;
@@ -37,7 +39,7 @@ export function getGrid(call: Call | undefined) {
     };
   }
 
-  if (call.participants()?.length === 2) {
+  if (call.participants()?.length === participantPairSize) {
     return {
       grid: call.getRemoteParticipants(),
       thumbnail: call.getSelfParticipant(),

@@ -75,6 +75,9 @@ import {isContentMessage, isDeleteMessage} from '../../guards/Message';
 import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
 
+const userSearchDebounceInMilliseconds = 100;
+const decimalRadix = 10;
+
 export interface UnreadState {
   allEvents: Message[];
   allMessages: ContentMessage[];
@@ -738,7 +741,7 @@ export class Conversation {
     this.shouldPersistStateChanges = false;
     this.publishPersistState = debounce(() => {
       amplify.publish(WebAppEvents.CONVERSATION.PERSIST_STATE, this);
-    }, 100);
+    }, userSearchDebounceInMilliseconds);
 
     this._initSubscriptions();
   }
@@ -820,7 +823,7 @@ export class Conversation {
    */
   setTimestamp(timestamp: string | number, type: TIMESTAMP_TYPE, forceUpdate: boolean = false): number | false {
     if (typeof timestamp === 'string') {
-      timestamp = window.parseInt(timestamp, 10);
+      timestamp = window.parseInt(timestamp, decimalRadix);
     }
 
     let entityTimestamp: ko.Observable<number>;

@@ -364,6 +364,9 @@ const productionConfigs = [
       'libraries/priority-queue/**/*.{ts,tsx,mts,cts}',
       'libraries/react-ui-kit/**/*.{ts,tsx,mts,cts}',
       'apps/webapp/src/script/components/**/*.{ts,tsx,mts,cts}',
+      'apps/webapp/src/script/repositories/**/*.{ts,tsx,mts,cts}',
+      'apps/webapp/src/script/service/**/*.{ts,tsx,mts,cts}',
+      'apps/webapp/src/script/view_model/**/*.{ts,tsx,mts,cts}',
     ],
     rules: {
       'no-magic-numbers': 'off',

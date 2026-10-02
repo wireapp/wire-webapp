@@ -42,12 +42,14 @@ interface Config {
   DEFAULT_DEVICE_ID: string;
 }
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Capture modes define their existing numeric values inline. */
 export enum ScreensharingMethods {
   DISPLAY_MEDIA = 0,
   USER_MEDIA = 1,
   DESKTOP_CAPTURER = 2,
   NONE = 3,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export class MediaConstraintsHandler {
   private readonly logger: Logger;

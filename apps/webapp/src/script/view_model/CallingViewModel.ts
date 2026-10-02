@@ -58,6 +58,8 @@ import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {Config} from '../Config';
 
+const callStateSettleDelayInMilliseconds = 1000;
+
 export interface CallActions {
   answer: (call: Call) => Promise<void>;
   changePage: (newPage: number, call: Call) => void;
@@ -407,7 +409,7 @@ export class CallingViewModel {
     }
     // We want to wait a bit to be sure the call have been tear down properly
     await new Promise(resolve => {
-      return setTimeout(resolve, 1000);
+      return setTimeout(resolve, callStateSettleDelayInMilliseconds);
     });
   }
 

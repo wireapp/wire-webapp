@@ -36,6 +36,11 @@ import {
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 
+const propertyOrderWeightMultiplier = 10;
+const exactPrefixMatchWeight = 100;
+const transliteratedPrefixMatchWeight = 50;
+const tokenPrefixMatchWeightMultiplier = 10;
+
 const CONFIG = {
   MAX_DIRECTORY_RESULTS: 30,
   MAX_SEARCH_RESULTS: 10,
@@ -96,7 +101,7 @@ export class SearchRepository {
 
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
-        const propertyWeight = 10 * index + 1;
+        const propertyWeight = propertyOrderWeightMultiplier * index + 1;
         const propertyMatchWeight = this.matches(query, termSlug, excludedEmojis, value);
         return weight + propertyMatchWeight * propertyWeight;
       }, 0);
@@ -133,7 +138,7 @@ export class SearchRepository {
     const isStrictMatch = (isNonEmptyString(value) ? value : '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match
-      return 100;
+      return exactPrefixMatchWeight;
     }
     const nameSlug = computeTransliteration(value, excludedChars);
     const nameIndexWithSlug = transliterationIndex(nameSlug, termSlug);
@@ -142,7 +147,7 @@ export class SearchRepository {
     const isStrictTransliteratedMatch = nameIndex === 0;
     if (isStrictTransliteratedMatch) {
       // give a little less points if the pattern strictly matches the transliterated string
-      return 50;
+      return transliteratedPrefixMatchWeight;
     }
     const noMatch = nameIndex < 0;
     if (noMatch) {
@@ -157,7 +162,7 @@ export class SearchRepository {
       const tokenIndex = transliterationIndex(token, termSlug);
 
       if (tokenIndex === 0) {
-        tokenWeight = indexWeight * 10;
+        tokenWeight = indexWeight * tokenPrefixMatchWeightMultiplier;
       } else if (tokenIndex > 0) {
         tokenWeight = indexWeight;
       }

@@ -38,6 +38,15 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ACCENT_ID} from '../../../Config';
 
+const guestExpirationThresholdInSeconds = 10;
+const singleNameInitialsLength = 2;
+const quarterHourDisplayThresholdInMinutes = 45;
+const minutesPerQuarterHour = 15;
+const ninetyMinuteDisplayThresholdInMinutes = 90;
+const minutesPerHour = 60;
+const ninetyMinuteDurationInHours = 1.5;
+const urgentExpirationThresholdInMinutes = 120;
+
 export class User {
   private expirationIntervalId?: number;
   private expirationTimeoutId?: number;
@@ -128,7 +137,7 @@ export class User {
       },
       TEMPORARY_GUEST: {
         EXPIRATION_INTERVAL: TIME_IN_MILLIS.MINUTE,
-        EXPIRATION_THRESHOLD: TIME_IN_MILLIS.SECOND * 10,
+        EXPIRATION_THRESHOLD: TIME_IN_MILLIS.SECOND * guestExpirationThresholdInSeconds,
         LIFETIME: TIME_IN_MILLIS.DAY,
       },
     };
@@ -178,7 +187,7 @@ export class User {
         const last = getFirstChar(nameParts[nameParts.length - 1]);
         return `${first}${last}`;
       }
-      return nameParts[0].slice(0, 2);
+      return nameParts[0].slice(0, singleNameInitialsLength);
     });
 
     this.username = ko.observable('');
@@ -391,20 +400,21 @@ export class User {
     const remainingTime = clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
     const remainingMinutes = Math.ceil(remainingTime / TIME_IN_MILLIS.MINUTE);
 
-    if (remainingMinutes <= 45) {
-      const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
-      const timeValue = remainingQuarters * 15;
+    if (remainingMinutes <= quarterHourDisplayThresholdInMinutes) {
+      const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / minutesPerQuarterHour));
+      const timeValue = remainingQuarters * minutesPerQuarterHour;
       this.expirationText(this.translate('userRemainingTimeMinutes', {time: timeValue}));
       this.expirationRemaining(timeValue * TIME_IN_MILLIS.MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
-      const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
-      const timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
+      const showOneAndAHalf =
+        remainingMinutes > minutesPerHour && remainingMinutes <= ninetyMinuteDisplayThresholdInMinutes;
+      const timeValue = showOneAndAHalf ? ninetyMinuteDurationInHours : Math.ceil(remainingMinutes / minutesPerHour);
       this.expirationText(this.translate('userRemainingTimeHours', {time: timeValue}));
       this.expirationRemaining(timeValue * TIME_IN_MILLIS.HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }
 
-    this.expirationIsUrgent(remainingMinutes < 120);
+    this.expirationIsUrgent(remainingMinutes < urgentExpirationThresholdInMinutes);
   }
 }

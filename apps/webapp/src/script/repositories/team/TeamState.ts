@@ -34,6 +34,8 @@ import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
+const millisecondsPerSecond = 1000;
+
 @singleton()
 export class TeamState {
   public readonly isTeamDeleted: ko.Observable<boolean>;
@@ -136,7 +138,7 @@ export class TeamState {
         !isNullOrUndefined(timeoutSeconds) && timeoutSeconds !== 0 && !isNan(timeoutSeconds)
           ? timeoutSeconds
           : SELF_DELETING_TIMEOUT.OFF;
-      return effectiveTimeoutSeconds * 1000;
+      return effectiveTimeoutSeconds * millisecondsPerSecond;
     });
     this.isSelfDeletingMessagesEnforced = ko.pureComputed(() => {
       return this.getEnforcedSelfDeletingMessagesTimeout() > SELF_DELETING_TIMEOUT.OFF;

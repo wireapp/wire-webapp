@@ -50,6 +50,8 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 
+const guestLinkAccessModeCount = 2;
+
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {
   archived_state: boolean;
@@ -826,7 +828,7 @@ export class ConversationMapper {
     const isNonActivatedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED;
 
     const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
-    const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
+    const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === guestLinkAccessModeCount;
 
     const isGuestRoomMode = isNonActivatedRole && isExpectedModes;
 

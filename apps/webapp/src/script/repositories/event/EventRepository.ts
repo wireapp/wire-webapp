@@ -62,6 +62,11 @@ import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
+const callEventLifetimeInSeconds = 30;
+const heartbeatIntervalInSeconds = 30;
+const outdatedMessageDecryptionErrorCode = 208;
+const duplicateMessageDecryptionErrorCode = 209;
+
 type WebSocketConnectTrigger =
   'initial' | 'online' | 'focus' | 'visibility' | 'heartbeat-closed' | 'heartbeat-unhealthy';
 
@@ -81,8 +86,8 @@ export class EventRepository {
 
   static get CONFIG() {
     return {
-      E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
-      HEARTBEAT_INTERVAL: TIME_IN_MILLIS.SECOND * 30,
+      E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * callEventLifetimeInSeconds,
+      HEARTBEAT_INTERVAL: TIME_IN_MILLIS.SECOND * heartbeatIntervalInSeconds,
       IGNORED_ERRORS: [
         CryptographyError.TYPE.IGNORED_ASSET,
         CryptographyError.TYPE.IGNORED_PREVIEW,
@@ -669,8 +674,8 @@ export class EventRepository {
       });
 
       const ignoredCodes = [
-        208, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
-        209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
+        outdatedMessageDecryptionErrorCode, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
+        duplicateMessageDecryptionErrorCode, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
       ];
 
       if (isTruthy(decryptionError.code) && ignoredCodes.includes(decryptionError.code)) {

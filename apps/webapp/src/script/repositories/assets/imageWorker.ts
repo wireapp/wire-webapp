@@ -22,6 +22,10 @@
 import {isUndefined} from '@sindresorhus/is';
 import * as _Jimp from 'jimp';
 
+const bytesPerKibibyte = 1024;
+const previewMaximumFileSizeInKibibytes = 310;
+const profileImageMaximumSizeInPixels = 280;
+
 type JimpWorkerScope = typeof self & {Jimp?: typeof _Jimp};
 
 const workerScope: JimpWorkerScope | undefined = typeof self === 'undefined' ? undefined : (self as JimpWorkerScope);
@@ -34,11 +38,11 @@ if (!isUndefined(workerScope) && !isUndefined(workerScope.Jimp)) {
 self.addEventListener('message', async event => {
   const COMPRESSION = 80;
   let MAX_SIZE = 1448;
-  let MAX_FILE_SIZE = 310 * 1024;
+  let MAX_FILE_SIZE = previewMaximumFileSizeInKibibytes * bytesPerKibibyte;
 
   if (event.data.useProfileImageSize === true) {
-    MAX_SIZE = 280;
-    MAX_FILE_SIZE = 1024 * 1024;
+    MAX_SIZE = profileImageMaximumSizeInPixels;
+    MAX_FILE_SIZE = bytesPerKibibyte * bytesPerKibibyte;
   }
 
   // Unfortunately, Jimp doesn't support MIME type "image/webp": https://github.com/oliver-moran/jimp/issues/144

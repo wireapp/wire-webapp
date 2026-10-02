@@ -36,6 +36,8 @@ import {
 import {EventProcessor, IncomingEvent} from '../../EventProcessor';
 import {EventRepository} from '../../EventRepository';
 
+const federationEventDebounceInMilliseconds = 1000;
+
 export class FederationEventProcessor implements EventProcessor {
   constructor(
     private eventRepository: EventRepository,
@@ -95,7 +97,7 @@ export class FederationEventProcessor implements EventProcessor {
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
       await this.removeDeletedFederationUsers(conversation, users);
     });
-  }, 1000);
+  }, federationEventDebounceInMilliseconds);
 
   /**
    * For the `federation.connectionRemoved` event: (Backend A & B stopped federating, user is on C)
@@ -120,7 +122,7 @@ export class FederationEventProcessor implements EventProcessor {
       await this.insertFederationStopSystemMessage(conversation, domains);
       await this.removeDeletedFederationUsers(conversation, usersToRemove);
     }
-  }, 1000);
+  }, federationEventDebounceInMilliseconds);
 
   private async removeDeletedFederationUsers(conversation: Conversation, users: User[]) {
     if (users.length === 0) {

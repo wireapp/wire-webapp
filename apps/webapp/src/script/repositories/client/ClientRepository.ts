@@ -53,6 +53,8 @@ import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
 
+const loginHashSeed = 42;
+
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
 
@@ -251,7 +253,7 @@ export class ClientRepository {
     login: string,
     clientType: ClientType = this.loadCurrentClientType() ?? ClientType.PERMANENT,
   ): string {
-    const loginHash = murmurhash.v3(login !== '' ? login : this.selfUser().id, 42);
+    const loginHash = murmurhash.v3(login !== '' ? login : this.selfUser().id, loginHashSeed);
     return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 

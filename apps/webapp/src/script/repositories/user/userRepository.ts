@@ -81,6 +81,9 @@ import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 
+const connectionUpdateDebounceInMilliseconds = 100;
+const maximumUserClients = 8;
+
 type GetUserOptions = {
   /**
    * will only lookup for users that are in memory (will avoid a backend request in case the user is not found locally)
@@ -316,7 +319,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       // database connection gets closed and the database gets deleted (WEBAPP-6379).
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
-      }, 100);
+      }, connectionUpdateDebounceInMilliseconds);
     }
   }
 
@@ -422,7 +425,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
       const clientEntities = recipients[userEntity.id];
-      const tooManyClients = clientEntities.length > 8;
+      const tooManyClients = clientEntities.length > maximumUserClients;
       if (tooManyClients) {
         this.logger.debug(`Found '${clientEntities.length}' clients for user`);
       }

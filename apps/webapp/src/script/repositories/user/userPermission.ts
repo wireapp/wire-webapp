@@ -28,6 +28,7 @@ import {TeamError} from '../../error/teamError';
 /**
  * Enum for various team permissions.
  */
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Team features document their backend permission bit positions inline. */
 const TEAM_FEATURES = {
   NONE: 0,
   CREATE_CONVERSATION: 1 << 0,
@@ -44,6 +45,7 @@ const TEAM_FEATURES = {
   DELETE_TEAM: 1 << 11,
   SET_MEMBER_PERMISSIONS: 1 << 12,
 };
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 /*
  * While the values for team features are set by the backend,

@@ -33,6 +33,8 @@ import {StorageSchemata} from './storageSchemata';
 
 import {StorageError} from '../../error/storageError';
 
+const emptyStorageInteger = 0n;
+
 interface DatabaseListener {
   callback: DatabaseListenerCallback;
   store: string;
@@ -313,7 +315,7 @@ export class StorageService {
       entity === false ||
       entity === '' ||
       entity === 0 ||
-      entity === 0n ||
+      entity === emptyStorageInteger ||
       (typeof entity === 'number' && isNan(entity))
     ) {
       throw new StorageError(StorageError.TYPE.NO_DATA, StorageError.MESSAGE.NO_DATA);

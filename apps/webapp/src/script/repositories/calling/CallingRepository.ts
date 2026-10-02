@@ -122,6 +122,19 @@ import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
+const emojiTimeoutInSeconds = 4;
+const secondsPerMinute = 60;
+const minutesPerHour = 60;
+const callConfigurationPollingIntervalInMinutes = 15;
+const maximumHighResolutionParticipants = 2;
+const callStateUpdateDelayInMilliseconds = 500;
+const millisecondsPerSecond = 1000;
+const emojiHorizontalRangeInPixels = 500;
+const callParticipantTimeoutInMinutes = 3;
+const screenShareDurationBucketInSeconds = 5;
+const screenShareDurationBucketInMilliseconds = TIME_IN_MILLIS.SECOND * screenShareDurationBucketInSeconds;
+const conversationStatisticsRoundingFactor = 6;
+
 const avsLogger = getLogger('avs');
 const AVS_BROWSER_SLEEP_MODE_DETECTION_TIME = 3000;
 
@@ -200,7 +213,7 @@ export class CallingRepository {
   private isOnAvsRustSft = false;
   private readonly incomingSetupReceivedAtByConversation = new Map<SerializedConversationId, number>();
 
-  static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
+  static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * emojiTimeoutInSeconds;
 
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
@@ -212,7 +225,7 @@ export class CallingRepository {
 
   static get CONFIG() {
     return {
-      DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
+      DEFAULT_CONFIG_TTL: secondsPerMinute * minutesPerHour, // 60 minutes in seconds
       MAX_FIREFOX_TURN_COUNT: 3,
     };
   }
@@ -300,7 +313,7 @@ export class CallingRepository {
       this.callState.acceptedVersionWarnings.push(conversationId);
       window.setTimeout(() => {
         return this.callState.acceptedVersionWarnings.remove(conversationId);
-      }, TIME_IN_MILLIS.MINUTE * 15);
+      }, TIME_IN_MILLIS.MINUTE * callConfigurationPollingIntervalInMinutes);
     };
 
     this.subscribeToEvents();
@@ -315,7 +328,8 @@ export class CallingRepository {
       }
       const isSpeakersViewActive = this.callState.isSpeakersViewActive();
       if (isSpeakersViewActive) {
-        const videoQuality = call.activeSpeakers().length > 2 ? RESOLUTION.LOW : RESOLUTION.HIGH;
+        const videoQuality =
+          call.activeSpeakers().length > maximumHighResolutionParticipants ? RESOLUTION.LOW : RESOLUTION.HIGH;
 
         const speakers = call.activeSpeakers();
         speakers.forEach(speaker => {
@@ -582,7 +596,7 @@ export class CallingRepository {
 
       wCall.poll();
       last = now;
-    }, 500);
+    }, callStateUpdateDelayInMilliseconds);
 
     return wCall;
   }
@@ -652,7 +666,7 @@ export class CallingRepository {
       this.parseQualifiedId(userId),
       callDuration,
       REASON.CANCELED,
-      new Date(timestamp * 1000).toISOString(),
+      new Date(timestamp * millisecondsPerSecond).toISOString(),
       EventSource.INJECTED,
     );
   };
@@ -1176,7 +1190,7 @@ export class CallingRepository {
           return {
             id: `${Date.now()}-${id}`,
             emoji,
-            left: Math.random() * 500,
+            left: Math.random() * emojiHorizontalRangeInPixels,
             from: isSelf ? this.translate('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
           };
         });
@@ -1264,7 +1278,7 @@ export class CallingRepository {
     const contentStr = JSON.stringify(content);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => {
-      return Math.floor(timestamp / 1000);
+      return Math.floor(timestamp / millisecondsPerSecond);
     };
 
     const isFederated =
@@ -1962,7 +1976,7 @@ export class CallingRepository {
       }
 
       // otherwise, remove the client from subconversation if it won't establish their audio state in 3 mins timeout
-      const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * 3;
+      const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * callParticipantTimeoutInMinutes;
 
       TaskScheduler.addTask({
         firingDate,
@@ -2046,7 +2060,8 @@ export class CallingRepository {
    */
   requestCurrentPageVideoStreams(call: Call): void {
     const currentPageParticipants = call.pages()[call.currentPage()] ?? [];
-    const videoQuality: RESOLUTION = currentPageParticipants.length <= 2 ? RESOLUTION.HIGH : RESOLUTION.LOW;
+    const videoQuality: RESOLUTION =
+      currentPageParticipants.length <= maximumHighResolutionParticipants ? RESOLUTION.HIGH : RESOLUTION.LOW;
     this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
@@ -2655,7 +2670,8 @@ export class CallingRepository {
         this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
           [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
           [Segmentation.SCREEN_SHARE.DURATION]:
-            Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
+            Math.ceil((Date.now() - participant.startedScreenSharingAt()) / screenShareDurationBucketInMilliseconds) *
+            screenShareDurationBucketInSeconds,
         });
       }
     });
@@ -2791,7 +2807,11 @@ export class CallingRepository {
     if (canRing && isVideoCall) {
       this.warmupMediaStreams(call, true, true);
     }
-    this.injectActivateEvent(conversationId, qualifiedUserId, new Date(timestamp * 1000).toISOString());
+    this.injectActivateEvent(
+      conversationId,
+      qualifiedUserId,
+      new Date(timestamp * millisecondsPerSecond).toISOString(),
+    );
 
     this.storeCall(call);
     this.incomingCallCallback(call);
@@ -3140,7 +3160,9 @@ export class CallingRepository {
       }
       this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
         [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
-        [Segmentation.SCREEN_SHARE.DURATION]: Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
+        [Segmentation.SCREEN_SHARE.DURATION]:
+          Math.ceil((Date.now() - participant.startedScreenSharingAt()) / screenShareDurationBucketInMilliseconds) *
+          screenShareDurationBucketInSeconds,
       });
     }
 
@@ -3187,11 +3209,17 @@ export class CallingRepository {
     const servicesCountOrZero =
       isNullOrUndefined(servicesCount) || servicesCount === 0 || isNan(servicesCount) ? 0 : servicesCount;
     const segmentations = {
-      [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),
-      [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, 6),
-      [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),
-      [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(servicesCountOrZero, 6),
-      [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(conversation.participating_user_ets().length, 6),
+      [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, conversationStatisticsRoundingFactor),
+      [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, conversationStatisticsRoundingFactor),
+      [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(
+        guestsWireless,
+        conversationStatisticsRoundingFactor,
+      ),
+      [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(servicesCountOrZero, conversationStatisticsRoundingFactor),
+      [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(
+        conversation.participating_user_ets().length,
+        conversationStatisticsRoundingFactor,
+      ),
       [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversation),
       [Segmentation.CALL.VIDEO]: call.getSelfParticipant().sharesCamera(),
       ...customSegmentations,

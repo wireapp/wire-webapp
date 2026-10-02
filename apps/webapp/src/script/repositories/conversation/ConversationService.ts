@@ -65,6 +65,9 @@ import {MessageCategory} from '../../message/messageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 
+const minimumLegacyAccessRoleBackendVersion = 3;
+const remoteConversationLookbackInDays = 30;
+
 const logger = getLogger('ConversationService');
 const SEARCH_BATCH_SIZE = 500;
 
@@ -404,7 +407,10 @@ export class ConversationService {
     accessModes: CONVERSATION_ACCESS[],
     accessRole: CONVERSATION_ACCESS_ROLE[],
   ): Promise<ConversationEvent> {
-    const accessRoleField = this.apiClient.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+    const accessRoleField =
+      this.apiClient.backendFeatures.version >= minimumLegacyAccessRoleBackendVersion
+        ? 'access_role'
+        : 'access_role_v2';
 
     return this.apiClient.api.conversation.putAccess(conversationId, {
       access: accessModes,
@@ -486,7 +492,7 @@ export class ConversationService {
    */
   async getActiveConversationsFromDb(): Promise<QualifiedId[]> {
     const min_date = new Date();
-    min_date.setDate(min_date.getDate() - 30);
+    min_date.setDate(min_date.getDate() - remoteConversationLookbackInDays);
 
     let events;
 
