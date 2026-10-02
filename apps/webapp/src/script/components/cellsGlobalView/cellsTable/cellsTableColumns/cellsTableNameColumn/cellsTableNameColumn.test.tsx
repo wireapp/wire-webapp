@@ -95,5 +95,4 @@ describe('CellsTableNameColumn', () => {
 
     expect(container.querySelector('[data-uie-name="cells-table-viewer-access-icon"]')).not.toBeInTheDocument();
   });
-
 });

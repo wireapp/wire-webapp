@@ -87,5 +87,4 @@ describe('canPerformCellsAction', () => {
       }),
     ).toBe(false);
   });
-
 });

@@ -75,5 +75,4 @@ describe('FilePreviewModal', () => {
 
     expect(screen.queryByRole('button', {name: 'cells.imageFullScreenModal.downloadButton'})).not.toBeInTheDocument();
   });
-
 });
