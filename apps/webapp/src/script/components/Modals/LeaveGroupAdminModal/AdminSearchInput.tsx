@@ -61,7 +61,7 @@ export const AdminSearchInput = ({
   const options: Option[] = eligibleUsers.map(user => {
     return {value: user.id, label: user.name()};
   });
-  const selectedOption = selectedUser
+  const selectedOption = !isNullOrUndefined(selectedUser)
     ? (options.find(opt => {
         return opt.value === selectedUser.id;
       }) ?? null)
@@ -84,7 +84,7 @@ export const AdminSearchInput = ({
     const user = eligibleUsers.find(usr => {
       return usr.id === option.value;
     });
-    if (!user || meta.context === 'value') {
+    if (isNullOrUndefined(user) || meta.context === 'value') {
       return <span>{option.label}</span>;
     }
 

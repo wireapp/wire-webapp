@@ -17,6 +17,8 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
 import * as Icon from 'Components/icon';
@@ -42,7 +44,7 @@ export const FileHistoryHeader = ({file}: {file?: FileInfo}) => {
         <h2 css={fileHistoryHeaderTitleCss}>{translate('cells.versionHistory.title')}</h2>
 
         <div css={fileHeaderFileInfoCss}>
-          {file ? (
+          {!isNullOrUndefined(file) ? (
             <>
               <FileTypeIcon extension={file.extension} />
               {file.name}

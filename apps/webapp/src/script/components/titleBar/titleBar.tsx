@@ -20,7 +20,7 @@
 import type {ReactNode} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -153,7 +153,7 @@ export const TitleBar = ({
   }, [hasApps, hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest]);
 
   const hasCall = useMemo(() => {
-    const hasEntities = !!joinedCall;
+    const hasEntities = !isNullOrUndefined(joinedCall);
     return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversation.qualifiedId);
   }, [conversation, joinedCall]);
 
@@ -262,7 +262,7 @@ export const TitleBar = ({
   };
 
   useEffect(() => {
-    if (!activeCalls.length && currentFocusedElementRef.current) {
+    if (activeCalls.length === 0 && !isNullOrUndefined(currentFocusedElementRef.current)) {
       currentFocusedElementRef.current.focus();
       currentFocusedElementRef.current = null;
     }
@@ -351,7 +351,11 @@ export const TitleBar = ({
             <ConversationVerificationBadges conversation={conversation} />
           </div>
 
-          {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
+          {isNonEmptyString(conversationSubtitle) ? (
+            <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>
+          ) : (
+            conversationSubtitle
+          )}
         </div>
       </li>
 

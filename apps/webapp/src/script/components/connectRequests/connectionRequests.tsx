@@ -19,6 +19,7 @@
 
 import {useEffect, useRef} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
@@ -53,7 +54,7 @@ export const ConnectRequests = ({
     const user1Connection = user1.connection();
     const user2Connection = user2.connection();
 
-    if (!user1Connection || !user2Connection) {
+    if (isNullOrUndefined(user1Connection) || isNullOrUndefined(user2Connection)) {
       return 0;
     }
 
@@ -70,7 +71,7 @@ export const ConnectRequests = ({
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
-    if (connectRequestsRefEnd.current) {
+    if (!isNullOrUndefined(connectRequestsRefEnd.current)) {
       connectRequestsRefEnd.current.scrollIntoView({behavior});
     }
   };
@@ -137,7 +138,9 @@ export const ConnectRequests = ({
 
                 <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
-                {classifiedDomains && (
+                {isNullOrUndefined(classifiedDomains) ? (
+                  classifiedDomains
+                ) : (
                   <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />
                 )}
 

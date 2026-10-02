@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -35,7 +37,7 @@ export const CreateConversationSubmit = () => {
     <Button
       id="group-go-next"
       css={{marginBottom: 0}}
-      disabled={!!error || !conversationName}
+      disabled={isNonEmptyString(error) || !isNonEmptyString(conversationName)}
       type="button"
       onClick={onSubmit}
       data-uie-name="do-create-group"
