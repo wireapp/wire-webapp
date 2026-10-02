@@ -23,6 +23,38 @@ import {bytesToHex} from 'Util/stringUtil';
 
 describe('MessageHasher', () => {
   describe('hashEvent', () => {
+    describe('multipart events', () => {
+      it.each([
+        ['', [], 0, '8c0757936d2d2548f8a2a13bd5fcefcaaf9a94efd84bbdec30cdc08afafc4f18'],
+        ['', [''], 0, '8c0757936d2d2548f8a2a13bd5fcefcaaf9a94efd84bbdec30cdc08afafc4f18'],
+        ['text', ['asset-one'], 1540213769000, 'bb7a890c763d6a6d9a495e923752d3d32b77956734374e9ac6c40e03ee2f0718'],
+        [
+          'text',
+          ['', null, 'asset-one', undefined, 'asset-two'],
+          1540213769000,
+          '2ffc523ab3af60be15356f06d0eeadc5f20c395ef4452f2bd2677ff1928b72e0',
+        ],
+        ['', ['asset-one', 'asset-two'], 0, '2f3819324626d1b3773857bfeb490c5f4862796e883d6d85db8c3089677ff34b'],
+      ])(
+        'preserves multipart hash bytes for text %p and attachment identifiers %p',
+        async (text, identifiers, timestamp, expectedHash) => {
+          const event = {
+            type: ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD,
+            time: new Date(timestamp),
+            data: {
+              text: {content: text},
+              attachments: identifiers.map(identifier => {
+                return {cellAsset: {uuid: identifier}};
+              }),
+            },
+          };
+          const hashBytes = await MessageHasher.hashEvent(event);
+
+          expect(bytesToHex(new Uint8Array(hashBytes))).toBe(expectedHash);
+        },
+      );
+    });
+
     describe('unhandled event type', () => {
       it('throws if the event type is not handled', () => {
         const event = {
