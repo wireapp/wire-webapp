@@ -19,7 +19,7 @@
 
 import {sharedDriveDirectUploadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {getTextFilePath, TextFileName} from 'test/e2e_tests/utils/asset.util';
+import {AudioFileName, getAudioFilePath, getTextFilePath, TextFileName} from 'test/e2e_tests/utils/asset.util';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';
@@ -103,6 +103,25 @@ test.describe('Drive file uploads', () => {
       await expect(async () => {
         await sharedDrive.refresh();
         await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
+      }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+    });
+  });
+
+  test('I want to upload multiple files to Drive', {tag: ['@TC-12133', '@functional']}, async () => {
+    const {pages} = pageManager.webapp;
+    const sharedDrive = pages.cellsSharedDrive();
+
+    await test.step('User uploads multiple files', async () => {
+      await sharedDrive.uploadFile([getTextFilePath(), getAudioFilePath()]);
+    });
+
+    await test.step('Uploaded files are visible in Drive', async () => {
+      await expect(sharedDrive.uploadStatusHeader.getByRole('status')).toContainText('Uploaded 2 items');
+
+      await expect(async () => {
+        await sharedDrive.refresh();
+        await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
+        await expect(sharedDrive.getFile(AudioFileName)).toBeVisible({timeout: 2_000});
       }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
     });
   });

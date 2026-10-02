@@ -42,7 +42,7 @@ export class CellsSharedDrivePage {
     return this.filesList.getByRole('button', {name: fileName, exact: true});
   }
 
-  async uploadFile(filePath: string) {
+  async uploadFile(filePath: string | readonly string[]) {
     await this.newButton.click();
     await this.uploadFileMenuItem.waitFor({state: 'visible'});
     await shareAssetHelper(filePath, this.page, this.uploadFileMenuItem);
