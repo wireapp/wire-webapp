@@ -24,6 +24,9 @@ import {shareAssetHelper} from '../../../utils/asset.util';
 export class CellsSharedDrivePage {
   private readonly page: Page;
   readonly filesList: Locator;
+  readonly createFolderMenuItem: Locator;
+  readonly folderNameInput: Locator;
+  readonly createFolderButton: Locator;
   readonly newButton: Locator;
   readonly refreshButton: Locator;
   readonly uploadFileMenuItem: Locator;
@@ -32,6 +35,9 @@ export class CellsSharedDrivePage {
   constructor(page: Page) {
     this.page = page;
     this.filesList = page.locator('table td[data-cell="Name"]');
+    this.createFolderMenuItem = page.getByRole('menuitem', {name: 'Create Folder', exact: true});
+    this.folderNameInput = page.getByRole('textbox', {name: 'Folder name', exact: true});
+    this.createFolderButton = page.getByRole('button', {name: 'Create', exact: true});
     this.newButton = page.getByRole('button', {name: 'New', exact: true});
     this.refreshButton = page.getByRole('button', {name: 'Refresh list', exact: true});
     this.uploadFileMenuItem = page.getByRole('menuitem', {name: 'Upload file', exact: true});
@@ -42,9 +48,36 @@ export class CellsSharedDrivePage {
     return this.filesList.getByRole('button', {name: fileName, exact: true});
   }
 
+  getFolder(folderName: string) {
+    return this.getFile(folderName);
+  }
+
+  async createFolder(folderName: string) {
+    await this.newButton.click();
+    await this.createFolderMenuItem.click();
+    await this.folderNameInput.fill(folderName);
+    await this.createFolderButton.click();
+  }
+
+  async openFolder(folderName: string) {
+    await this.getFolder(folderName).click();
+  }
+
+  async openRoot() {
+    await this.page.locator('ol').getByRole('button').first().click();
+  }
+
   async uploadFile(filePath: string | readonly string[]) {
+    await this.openNewMenu();
+    await this.uploadFileFromOpenMenu(filePath);
+  }
+
+  async openNewMenu() {
     await this.newButton.click();
     await this.uploadFileMenuItem.waitFor({state: 'visible'});
+  }
+
+  async uploadFileFromOpenMenu(filePath: string | readonly string[]) {
     await shareAssetHelper(filePath, this.page, this.uploadFileMenuItem);
   }
 
