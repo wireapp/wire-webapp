@@ -167,10 +167,6 @@ type ApplicationStartupInput = {
   readonly timing: ApplicationStartupTimingInput;
 };
 
-type AppOptions = {
-  readonly isPreferredMediaDevicePersistenceEnabled: boolean;
-};
-
 export async function waitUntilAllMessagesAreProcessed(dependencies: WaitUntilAllMessagesAreProcessedDependencies) {
   const {eventRepository} = dependencies;
 
@@ -197,7 +193,6 @@ export class App {
   util?: {debug: DebugUtil};
   private newVersionPollingCleanup: (() => void) | undefined;
   private mlsConversationRecoveryCleanup: (() => void) | undefined;
-  private readonly appOptions: AppOptions;
 
   static get CONFIG() {
     return {
@@ -221,11 +216,9 @@ export class App {
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
     private readonly translate: Translate,
-    options: AppOptions,
     private readonly clock: Clock,
     private readonly fireAndForgetInvoker: FireAndForgetInvoker,
   ) {
-    this.appOptions = options;
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
       return this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
@@ -257,7 +250,6 @@ export class App {
    * @returns All repositories
    */
   private _setupRepositories(): ViewModelRepositories {
-    const {isPreferredMediaDevicePersistenceEnabled} = this.appOptions;
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
     const teamService = new TeamService();
@@ -267,7 +259,7 @@ export class App {
     const mediaConstraintsHandler = new MediaConstraintsHandler(container.resolve(UserState));
 
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
-    const mediaDevicesHandler = new MediaDevicesHandler({isPreferredMediaDevicePersistenceEnabled});
+    const mediaDevicesHandler = new MediaDevicesHandler();
     const backgroundEffectsHandler = new BackgroundEffectsHandler(new BackgroundEffectsController());
 
     container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);

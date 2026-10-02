@@ -153,9 +153,6 @@ describe('MediaDevicesHandler', () => {
   };
 
   let enumerateDevicesSpy: jasmine.Spy;
-  const enabledMediaDevicePersistenceOptions = {
-    isPreferredMediaDevicePersistenceEnabled: true,
-  } as const;
 
   beforeEach(() => {
     localStorage.clear();
@@ -194,7 +191,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      const devicesHandler = new MediaDevicesHandler();
       await devicesHandler.initializeMediaDevices(true);
 
       setTimeout(() => {
@@ -212,7 +209,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      const devicesHandler = new MediaDevicesHandler();
       await devicesHandler.initializeMediaDevices(true);
 
       const {
@@ -243,7 +240,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      const devicesHandler = new MediaDevicesHandler();
       await devicesHandler.initializeMediaDevices(true);
 
       expect(enumerateDevicesSpy.calls.count()).toBe(2);
@@ -292,7 +289,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      const devicesHandler = new MediaDevicesHandler();
       await devicesHandler.initializeMediaDevices(true);
 
       const audioInputState = mediaDevicesStore.getState().audio.input;
@@ -324,7 +321,7 @@ describe('MediaDevicesHandler', () => {
       });
       enumerateDevicesSpy.and.returnValue(initialEnumeration);
 
-      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      const devicesHandler = new MediaDevicesHandler();
       if (isUndefined(completeInitialEnumeration)) {
         throw new Error('Expected the initial media-device enumeration to be pending');
       }
@@ -360,7 +357,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      const devicesHandler = new MediaDevicesHandler();
       await devicesHandler.initializeMediaDevices(true);
 
       enumerateDevicesSpy.and.returnValue(
@@ -409,7 +406,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      const devicesHandler = new MediaDevicesHandler();
       await devicesHandler.initializeMediaDevices(true);
 
       enumerateDevicesSpy.and.returnValue(
@@ -453,7 +450,7 @@ describe('MediaDevicesHandler', () => {
         ]),
       );
 
-      const devicesHandler = new MediaDevicesHandler(enabledMediaDevicePersistenceOptions);
+      const devicesHandler = new MediaDevicesHandler();
       await devicesHandler.initializeMediaDevices(true);
 
       const store = mediaDevicesStore.getState();
@@ -492,28 +489,6 @@ describe('MediaDevicesHandler', () => {
         MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audiooutput,
       );
       expect(mediaDevicesStore.getState().audio.output.preferredId).toBe(secondSpeaker.deviceId);
-    });
-
-    it('preserves legacy fallback persistence when preferred media-device persistence is disabled', async () => {
-      const preferredMicrophoneId = 'mic2';
-      const initiallyAvailableDevices = [
-        ...fakeWorldTestSetup.cameras,
-        ...fakeWorldTestSetup.microphones.filter(device => {
-          return device.deviceId !== preferredMicrophoneId;
-        }),
-        ...fakeWorldTestSetup.speakers,
-      ];
-      storeValue(MediaDeviceType.AUDIO_INPUT, preferredMicrophoneId);
-      storeValue(`${MediaDeviceType.AUDIO_INPUT}-fave`, [preferredMicrophoneId]);
-      enumerateDevicesSpy.and.returnValue(Promise.resolve(initiallyAvailableDevices));
-
-      const devicesHandler = new MediaDevicesHandler({isPreferredMediaDevicePersistenceEnabled: false});
-      await devicesHandler.initializeMediaDevices(true);
-
-      const audioInputState = mediaDevicesStore.getState().audio.input;
-      expect(audioInputState.activeId).toBe('default');
-      expect(loadValue(MediaDeviceType.AUDIO_INPUT)).toBe('default');
-      expect(loadValue<string[]>(`${MediaDeviceType.AUDIO_INPUT}-fave`)).toEqual(['default', preferredMicrophoneId]);
     });
   });
 });
