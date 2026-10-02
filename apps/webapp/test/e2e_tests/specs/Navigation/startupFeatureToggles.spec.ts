@@ -38,9 +38,7 @@ test.describe('Startup feature toggles on navigation', () => {
 
       const mainAppUrl = new URL(page.url());
       expect(mainAppUrl.pathname).toBe('/');
-      expect(mainAppUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(
-        testOnlyFeatureToggleName,
-      );
+      expect(mainAppUrl.searchParams.get(startupFeatureToggleQueryParameterName)).toBe(testOnlyFeatureToggleName);
     },
   );
 });
