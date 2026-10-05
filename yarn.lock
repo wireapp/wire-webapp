@@ -29807,9 +29807,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint@npm:17.15.0":
-  version: 17.15.0
-  resolution: "stylelint@npm:17.15.0"
+"stylelint@npm:17.16.0":
+  version: 17.16.0
+  resolution: "stylelint@npm:17.16.0"
   dependencies:
     "@csstools/css-calc": "npm:^3.3.0"
     "@csstools/css-parser-algorithms": "npm:^4.0.0"
@@ -29848,7 +29848,7 @@ __metadata:
     write-file-atomic: "npm:^7.0.1"
   bin:
     stylelint: bin/stylelint.mjs
-  checksum: 10/21daff661bd4f38b3ba80dc3adae86efe4969475f522e8448f1f87de70f90d09ae607b20cf1e9b789f6eac189746f333ab141e00b4115b481a669113a22c4776
+  checksum: 10/9776f701f486e78b0f6170fddceb5c7705b9491deed77056618b3606b298fe2d197c3d4a456349f7b96d71f6a262699d16625a7af3f5009f0d9dca7392fdd1c3
   languageName: node
   linkType: hard
 
@@ -32786,7 +32786,7 @@ __metadata:
     prettier: "npm:3.9.9"
     rimraf: "npm:6.1.3"
     simple-git: "npm:3.36.0"
-    stylelint: "npm:17.15.0"
+    stylelint: "npm:17.16.0"
     stylelint-config-idiomatic-order: "npm:10.0.0"
     true-myth: "npm:9.4.0"
     ts-node: "npm:10.9.2"
