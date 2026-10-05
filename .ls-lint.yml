@@ -4224,3 +4224,9 @@ ls:
 
   tools/README.md:
     .md: regex:^README$
+
+  apps/webapp/src/style:
+    .dir: camelCase
+    .less: camelCase
+    .css: camelCase
+    .md: regex:^README$
