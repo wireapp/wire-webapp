@@ -38,7 +38,7 @@ import {EntropyContainer} from './entropyContainer';
 import {Login} from './login/login';
 import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {AppAlreadyOpen} from '../component/appAlreadyOpen';
 import {JoinGuestLinkPasswordModal} from '../component/joinGuestLinkPasswordModal';
 import {WirelessContainer} from '../component/wirelessContainer';

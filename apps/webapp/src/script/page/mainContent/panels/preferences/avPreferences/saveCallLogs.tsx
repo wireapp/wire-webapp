@@ -28,7 +28,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface SaveCallLogsProps {

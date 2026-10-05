@@ -22,9 +22,9 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
+import {generateConversation} from 'test/helper/conversationGenerator';
+import {TestFactory} from 'test/helper/testFactory';
+import {generateAPIUser} from 'test/helper/userGenerator';
 
 import {User} from 'Repositories/entity/user';
 import {ClientEvent} from 'Repositories/event/client';
@@ -43,7 +43,7 @@ import {createMetaData} from './legacyBackup.helper';
 import {preprocessEvents} from './recordPreprocessors';
 import {handleZipEvent} from './zipWorker';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {DatabaseTypes, createStorageEngine} from '../../service/storeEngineProvider';
 import {translateForTest} from 'Util/test/translateForTest';
 

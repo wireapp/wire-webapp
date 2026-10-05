@@ -26,7 +26,7 @@ import en from 'I18n/en-US.json';
 import {Conversation} from 'Repositories/entity/conversation';
 import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {User} from 'Repositories/entity/user';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 import {
   createRootContextValueForTest,

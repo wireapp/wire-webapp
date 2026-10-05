@@ -26,7 +26,7 @@ import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
 
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import {TeamService} from 'Repositories/team/teamService';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {StepProps} from './stepProps';

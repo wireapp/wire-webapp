@@ -95,7 +95,7 @@ import {Segmentation} from 'Repositories/tracking/segmentation';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {flatten} from 'Util/arrayUtil';
-import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {calculateChildWindowPosition} from 'Util/dom/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -117,12 +117,12 @@ import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCal
 import {ClientId, Participant, UserId} from './participant';
 import {getAllowedSftOrigins, isAllowedSftUrl} from './sftUrl';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 
 const emojiTimeoutInSeconds = 4;
 const secondsPerMinute = 60;

@@ -69,7 +69,7 @@ import {MeetingsConversationTab} from './meetingsConversationTab';
 import {SettingsTab} from './settingsTab';
 import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../conversationTab';
 import {conversationFilters} from '../helpers';

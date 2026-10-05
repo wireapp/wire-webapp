@@ -32,7 +32,7 @@ import {
 
 import {GuestServicesOptions} from './guestServicesOptions';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';

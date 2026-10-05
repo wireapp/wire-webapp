@@ -17,16 +17,16 @@
  *
  */
 
-import {CallingCell} from 'Components/calling/CallingCell';
+import {CallingCell} from 'Components/calling/callingCell';
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {Config} from '../../../Config';
-import {CallingViewModel} from '../../../view_model/CallingViewModel';
-import {ListViewModel} from '../../../view_model/ListViewModel';
+import {Config} from '../../../config';
+import {CallingViewModel} from '../../../viewModel/callingViewModel';
+import {ListViewModel} from '../../../viewModel/listViewModel';
 
 type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;

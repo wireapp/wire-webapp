@@ -38,7 +38,7 @@ import {MediaType} from './mediaType';
 import {MediaError} from '../../error/mediaError';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {PermissionError} from '../../error/permissionError';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 
 export class MediaStreamHandler {
   static get CONFIG() {

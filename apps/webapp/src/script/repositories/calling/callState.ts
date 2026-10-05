@@ -33,8 +33,8 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {Call} from './call';
 
-import {Config} from '../../Config';
-import {CallViewTab} from '../../view_model/CallingViewModel';
+import {Config} from '../../config';
+import {CallViewTab} from '../../viewModel/callingViewModel';
 
 export enum MuteState {
   NOT_MUTED,

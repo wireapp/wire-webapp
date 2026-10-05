@@ -1,0 +1,201 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {User} from 'test/e2eTests/data/user';
+
+import {Services} from '../../data/serviceInfo';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin} from '../../testFixtures';
+import {createGroup} from 'test/e2eTests/utils/userActions';
+
+// Generating test data
+const conversationName = 'Crits';
+
+test(
+  'Team owner adds whole team to an all team chat',
+  {tag: ['@TC-8631', '@crit-flow-web']},
+  async ({createUser, createTeam, createPage, api}) => {
+    let owner: User;
+    let member1: User;
+    let member2: User;
+    let ownerPageManager: PageManager;
+    let member1PageManager: PageManager;
+    let member2PageManager: PageManager;
+
+    await test.step('Preconditions: Creating preconditions for the test via API', async () => {
+      member1 = await createUser();
+      member2 = await createUser();
+      const team = await createTeam('Critical', {users: [member1, member2]});
+      owner = team.owner;
+
+      await api.team.addServiceToTeamWhitelist(owner.teamId, Services.POLL_SERVICE, owner.token);
+
+      const [pmOwner, pm1, pm2] = await Promise.all([
+        PageManager.from(createPage(withLogin(owner))),
+        PageManager.from(createPage(withLogin(member1))),
+        PageManager.from(createPage(withLogin(member2))),
+      ]);
+      ownerPageManager = pmOwner;
+      member1PageManager = pm1;
+      member2PageManager = pm2;
+    });
+
+    await test.step('Team owner creates group conversation with team members', async () => {
+      const {pages} = ownerPageManager.webapp;
+      await createGroup(pages, conversationName, [member1, member2]);
+      await expect(pages.conversationList().getConversation(conversationName)).toBeVisible();
+    });
+
+    await test.step('Team owner adds a service to newly created group', async () => {
+      const {pages} = ownerPageManager.webapp;
+      // Add the Poll service to the conversation
+      await pages.conversation().clickConversationTitle();
+      await pages.conversationDetails().waitForSidebar();
+      await pages.conversationDetails().clickAddPeopleButton();
+      await pages.conversationDetails().addServiceToConversation('Poll');
+      // Verify service was added by checking for system message
+      await expect(ownerPageManager.page.getByText('You added Poll Bot to the')).toBeVisible();
+    });
+
+    await test.step('All group participants send messages in a group', async () => {
+      const {pages} = ownerPageManager.webapp;
+      // Member1 and Member2 open the conversation (establish encrypted session)
+      await member1PageManager.webapp.pages.conversationList().getConversation(conversationName).open();
+      await member2PageManager.webapp.pages.conversationList().getConversation(conversationName).open();
+
+      // Wait for encryption to be established by checking that conversation is fully loaded
+      await pages.conversationList().getConversation(conversationName).open();
+      await pages.conversation().conversationTitle.waitFor({state: 'visible'});
+
+      // Now all members can send and receive encrypted messages
+      // Team owner sends a message
+      await pages.conversation().sendMessage(`Hello from ${owner.firstName}!`);
+      await expect(pages.conversation().getMessage({content: `Hello from ${owner.firstName}!`})).toBeVisible();
+
+      // Member1 sends a message
+      await member1PageManager.webapp.pages.conversation().sendMessage(`Hello from ${member1.firstName}!`);
+      await expect(
+        member1PageManager.webapp.pages.conversation().getMessage({content: `Hello from ${member1.firstName}!`}),
+      ).toBeVisible();
+
+      // Member2 sends a message
+      await member2PageManager.webapp.pages.conversation().sendMessage(`Hello from ${member2.firstName}!`);
+      await expect(
+        member2PageManager.webapp.pages.conversation().getMessage({content: `Hello from ${member2.firstName}!`}),
+      ).toBeVisible();
+
+      // Owner verifies all messages are visible
+      await pages.conversationList().getConversation(conversationName).open();
+      await expect(pages.conversation().getMessage({content: `Hello from ${member1.firstName}!`})).toBeVisible();
+      await expect(pages.conversation().getMessage({content: `Hello from ${member2.firstName}!`})).toBeVisible();
+    });
+
+    await test.step('Team owner and group members react on received messages with reactions', async () => {
+      const {pages} = ownerPageManager.webapp;
+      // Owner reacts to member1's message with +1 (thumbs up)
+      await pages.conversationList().getConversation(conversationName).open();
+      const member1MessageForOwner = pages.conversation().getMessage({content: `Hello from ${member1.firstName}!`});
+      await member1MessageForOwner.waitFor({state: 'visible'}); // Wait for message to be ready
+      await pages.conversation().reactOnMessage(member1MessageForOwner, 'plus-one');
+
+      // Owner reacts to member2's message with +1 (thumbs up)
+      const member2MessageForOwner = pages.conversation().getMessage({content: `Hello from ${member2.firstName}!`});
+      await pages.conversation().reactOnMessage(member2MessageForOwner, 'plus-one');
+
+      // Member1 reacts to owner's message with heart (❤️)
+      await member1PageManager.webapp.pages.conversationList().getConversation(conversationName).open();
+      const ownerMessageForMember1 = member1PageManager.webapp.pages
+        .conversation()
+        .getMessage({content: `Hello from ${owner.firstName}!`});
+      await member1PageManager.webapp.pages.conversation().reactOnMessage(ownerMessageForMember1, 'heart');
+
+      // Member1 reacts to member2's message with heart (❤️)
+      const member2MessageForMember1 = member1PageManager.webapp.pages
+        .conversation()
+        .getMessage({content: `Hello from ${member2.firstName}!`});
+      await member1PageManager.webapp.pages.conversation().reactOnMessage(member2MessageForMember1, 'heart');
+
+      // Member2 reacts to owner's message with joy (😂)
+      await member2PageManager.webapp.pages.conversationList().getConversation(conversationName).open();
+      const ownerMessageForMember2 = member2PageManager.webapp.pages
+        .conversation()
+        .getMessage({content: `Hello from ${owner.firstName}!`});
+      await member2PageManager.webapp.pages.conversation().reactOnMessage(ownerMessageForMember2, 'joy');
+
+      // Member2 reacts to member1's message with joy (😂)
+      const member1MessageForMember2 = member2PageManager.webapp.pages
+        .conversation()
+        .getMessage({content: `Hello from ${member1.firstName}!`});
+      await member2PageManager.webapp.pages.conversation().reactOnMessage(member1MessageForMember2, 'joy');
+    });
+
+    await test.step('All group participants make sure they see reactions from other group participants', async () => {
+      const {pages} = ownerPageManager.webapp;
+      // Owner verifies they can see heart (❤️) and joy (😂) reactions on their message from member1 and member2
+      await pages.conversationList().getConversation(conversationName).open();
+      const ownerMessage = pages.conversation().getMessage({content: `Hello from ${owner.firstName}!`});
+      await expect(pages.conversation().getReactionOnMessage(ownerMessage, 'heart')).toBeVisible();
+      await expect(pages.conversation().getReactionOnMessage(ownerMessage, 'joy')).toBeVisible();
+
+      // Member1 verifies they can see thumbs up (+1) and joy (😂) reactions on their message from owner and member2
+      await member1PageManager.webapp.pages.conversationList().getConversation(conversationName).open();
+      const member1Message = member1PageManager.webapp.pages
+        .conversation()
+        .getMessage({content: `Hello from ${member1.firstName}!`});
+      await expect(
+        member1PageManager.webapp.pages.conversation().getReactionOnMessage(member1Message, 'plus-one'),
+      ).toBeVisible();
+      await expect(
+        member1PageManager.webapp.pages.conversation().getReactionOnMessage(member1Message, 'joy'),
+      ).toBeVisible();
+
+      // Member2 verifies they can see thumbs up (+1) and heart (❤️) reactions on their message from owner and member1
+      await member2PageManager.webapp.pages.conversationList().getConversation(conversationName).open();
+      const member2Message = member2PageManager.webapp.pages
+        .conversation()
+        .getMessage({content: `Hello from ${member2.firstName}!`});
+      await expect(
+        member2PageManager.webapp.pages.conversation().getReactionOnMessage(member2Message, 'plus-one'),
+      ).toBeVisible();
+      await expect(
+        member2PageManager.webapp.pages.conversation().getReactionOnMessage(member2Message, 'heart'),
+      ).toBeVisible();
+    });
+
+    await test.step('Team owner removes one group member from a group', async () => {
+      const {pages} = ownerPageManager.webapp;
+      // Get the member from the members list and remove them
+      await pages.conversation().removeMemberFromGroup(member2.fullName);
+
+      // Verify member is no longer in the conversation by checking system message
+      await expect(
+        pages.conversation().systemMessages.filter({hasText: `You removed ${member2.fullName}`}),
+      ).toBeVisible();
+    });
+
+    await test.step('Team owner removes a service from a group', async () => {
+      const {pages} = ownerPageManager.webapp;
+      // Remove the Poll service (services appear in the members list)
+      await pages.conversationDetails().removeServiceFromConversation('Poll');
+
+      // Verify service was removed by checking for system message
+      await expect(pages.conversation().systemMessages.filter({hasText: 'You removed Poll Bot'})).toBeVisible();
+    });
+  },
+);

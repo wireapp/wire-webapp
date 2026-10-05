@@ -1,0 +1,187 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useEffect, useState} from 'react';
+
+import {Maybe} from 'true-myth';
+
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
+import {PDFViewer} from 'Components/fileFullscreenModal/pdfViewer/pdfViewer';
+import {FullscreenModal} from 'Components/fullscreenModal/fullscreenModal';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {isFileEditable} from 'Util/fileTypeUtil';
+import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {getBestPreviewSource} from 'Util/imageUtil';
+import {getFileExtensionFromUrl} from 'Util/util';
+
+import {FileEditor} from './fileEditor/fileEditor';
+import {useFileFullscreenModalSourceConversation} from './fileFullscreenModalSourceConversationContext';
+import {FileHeader} from './fileHeader/fileHeader';
+import {FileLoader} from './fileLoader/fileLoader';
+import {ImageFileView} from './imageFileView/imageFileView';
+import {NoPreviewAvailable} from './noPreviewAvailable/noPreviewAvailable';
+
+type Status = 'loading' | 'unavailable' | 'success';
+
+interface FileFullscreenModalProps {
+  id: string;
+  isOpen: boolean;
+  onClose: () => void;
+  filePreviewUrl?: string;
+  fileName: string;
+  fileExtension: string;
+  fileUrl?: string;
+  status?: Status;
+  senderName: string;
+  timestamp: number;
+  fallbackConversationName?: string;
+  sourceConversation?: Conversation;
+  badges?: string[];
+  isEditMode?: boolean;
+  checkIsInRecycleBin?: () => boolean;
+}
+
+export const FileFullscreenModal = ({
+  id,
+  isOpen,
+  onClose,
+  filePreviewUrl,
+  fileUrl,
+  status = 'success',
+  fileName,
+  fileExtension,
+  senderName,
+  timestamp,
+  fallbackConversationName,
+  sourceConversation,
+  badges,
+  isEditMode = false,
+  checkIsInRecycleBin = isInRecycleBin,
+}: FileFullscreenModalProps) => {
+  const sourceConversationFromContext = useFileFullscreenModalSourceConversation();
+  const sourceConversationForMetadata = sourceConversation ?? sourceConversationFromContext;
+  const notInRecycleBin = !checkIsInRecycleBin();
+  const canPerformCellsAction = useCellsActionPermissions();
+  const canEdit = canPerformCellsAction(CELLS_ACTION.EDIT);
+  const [isInEditMode, setIsInEditMode] = useState(isEditMode && notInRecycleBin && canEdit);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const isEditable = isFileEditable(fileExtension);
+
+  const refreshModalContent = () => {
+    setRefreshKey(prev => {
+      return prev + 1;
+    });
+  };
+
+  const onCloseModal = () => {
+    setIsInEditMode(false);
+    onClose();
+  };
+
+  useEffect(() => {
+    setIsInEditMode(isEditMode && notInRecycleBin && canEdit);
+  }, [canEdit, isEditMode, notInRecycleBin]);
+
+  return (
+    <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
+      <FileHeader
+        onClose={onCloseModal}
+        fileName={fileName}
+        fileExtension={fileExtension}
+        fileUrl={fileUrl}
+        senderName={senderName}
+        timestamp={timestamp}
+        fallbackConversationName={fallbackConversationName}
+        sourceConversation={sourceConversationForMetadata}
+        badges={badges}
+        isInEditMode={isInEditMode}
+        onEditModeChange={setIsInEditMode}
+        isEditable={isEditable}
+        id={id}
+        onFileContentRefresh={refreshModalContent}
+        showViewOnlyLabel={!canEdit}
+      />
+      {isInEditMode && isEditable ? (
+        <FileEditor key={refreshKey} id={id} />
+      ) : (
+        <ModalContent
+          key={refreshKey}
+          fileExtension={fileExtension}
+          filePreviewUrl={filePreviewUrl}
+          fileName={fileName}
+          fileUrl={fileUrl}
+          senderName={senderName}
+          timestamp={timestamp}
+          status={status}
+        />
+      )}
+    </FullscreenModal>
+  );
+};
+
+interface ModalContentProps {
+  fileExtension: string;
+  fileName: string;
+  status: Status;
+  senderName: string;
+  timestamp: number;
+  filePreviewUrl?: string;
+  fileUrl?: string;
+}
+
+const ModalContent = ({
+  fileExtension,
+  filePreviewUrl,
+  fileName,
+  fileUrl,
+  senderName,
+  timestamp,
+  status,
+}: ModalContentProps) => {
+  if (status === 'loading' && (filePreviewUrl === undefined || filePreviewUrl.length === 0)) {
+    return <FileLoader />;
+  }
+
+  if (status === 'unavailable' || filePreviewUrl === undefined || filePreviewUrl.length === 0) {
+    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
+  }
+
+  const extension = getFileExtensionFromUrl(filePreviewUrl);
+  const type = getFileTypeFromExtension(extension);
+
+  if (type === 'pdf') {
+    return <PDFViewer src={filePreviewUrl} />;
+  }
+
+  if (type === 'image') {
+    const imageSrc = getBestPreviewSource({
+      fileExtension,
+      fileUrl: Maybe.of(fileUrl),
+      filePreviewUrl: Maybe.of(filePreviewUrl),
+    }).unwrapOr(undefined);
+
+    return <ImageFileView src={imageSrc} senderName={senderName} timestamp={timestamp} />;
+  }
+
+  return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
+};

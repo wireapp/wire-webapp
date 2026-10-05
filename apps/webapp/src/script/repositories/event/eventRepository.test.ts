@@ -25,14 +25,14 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 
 import {ClientConversationEvent} from 'Repositories/conversation/eventBuilder';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 
 import {ClientEvent} from './client';
 import {EventRepository} from './eventRepository';
 import {EventSource} from './eventSource';
 import {NOTIFICATION_HANDLING_STATE} from './notificationHandlingState';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 const testFactory = new TestFactory();

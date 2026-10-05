@@ -19,7 +19,7 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 
-import {TextInput} from 'Components/TextInput';
+import {TextInput} from 'Components/textInput';
 
 import {inputWrapperStyles} from './cellsNewNodeForm.styles';
 

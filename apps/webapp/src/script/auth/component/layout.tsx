@@ -27,7 +27,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './layout.styles';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 export const Layout = ({children}: {children: ReactNode}) => {
   const {translate} = useApplicationContext();

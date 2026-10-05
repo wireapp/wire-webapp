@@ -29,9 +29,9 @@ import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './marker.styles';
-import {getMessagesGroupLabel} from './marker.utils';
+import {getMessagesGroupLabel} from './markerUtils';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../messageTime';
 

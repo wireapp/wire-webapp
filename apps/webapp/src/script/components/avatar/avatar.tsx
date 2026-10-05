@@ -29,7 +29,7 @@ import {ServiceAvatar} from './serviceAvatar';
 import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 import {UserAvatar} from './userAvatar';
 
-import {isAppOrServiceEntity} from '../../guards/Service';
+import {isAppOrServiceEntity} from '../../guards/service';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',

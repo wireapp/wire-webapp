@@ -19,7 +19,7 @@
 
 import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 
-import {TextInput} from 'Components/TextInput';
+import {TextInput} from 'Components/textInput';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';

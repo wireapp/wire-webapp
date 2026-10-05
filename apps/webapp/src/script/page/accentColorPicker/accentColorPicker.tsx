@@ -22,7 +22,7 @@ import React from 'react';
 import {CSSObject} from '@emotion/serialize';
 
 import {User} from 'Repositories/entity/user';
-import {ACCENT_ID} from 'src/script/Config';
+import {ACCENT_ID} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {CSS_SQUARE} from 'Util/cssMixin';

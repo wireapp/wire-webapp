@@ -1,0 +1,267 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {PageManager, webAppPath} from 'test/e2eTests/pageManager';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from 'test/e2eTests/testFixtures';
+import {connectWithUser} from 'test/e2eTests/utils/userActions';
+
+import {IncomingMessage} from 'node:http';
+import https from 'node:https';
+import {SecureVersion} from 'node:tls';
+
+test.describe('Authentication', () => {
+  test(
+    'Verify sign in button is disabled in case of empty credentials',
+    {tag: ['@TC-3457', '@regression']},
+    async ({createPage}) => {
+      const pageManager = PageManager.from(await createPage());
+      const {pages} = pageManager.webapp;
+      const {emailInput, passwordInput, signInButton} = pages.login();
+      await pageManager.openLoginPage();
+
+      await expect(signInButton).toBeDisabled();
+
+      await emailInput.fill('invalid@email');
+      await passwordInput.fill('invalidPassword');
+      await expect(signInButton).not.toBeDisabled();
+
+      await passwordInput.clear();
+      await expect(signInButton).toBeDisabled();
+    },
+  );
+
+  test(
+    'I want to be asked to share telemetry data when I log in',
+    {tag: ['@TC-8780', '@regression']},
+    async ({createUser, createPage}) => {
+      const pageManager = await PageManager.from(createPage(withLogin(createUser({disableTelemetry: false}))));
+      const {modals} = pageManager.webapp;
+
+      await expect(modals.confirm().modalTitle).toBeVisible();
+    },
+  );
+
+  test(
+    'Verify sign in error appearance in case of suspended team account',
+    {tag: ['@TC-3458', '@regression']},
+    async ({createPage}) => {
+      const pageManager = PageManager.from(await createPage());
+      const {pages} = pageManager.webapp;
+      await pageManager.openLoginPage();
+
+      const userOfSuspendedTeam = {email: 'sven+team6@wire.com', password: '12345678'};
+      await pages.login().login(userOfSuspendedTeam);
+
+      await expect(pages.login().loginErrorText).toHaveText('This account is no longer authorized to log in');
+    },
+  );
+
+  test(
+    'Verify current browser is set as temporary device',
+    {tag: ['@TC-3460', '@regression']},
+    async ({createUser, createPage}) => {
+      const user = await createUser();
+      const pageManager = await PageManager.from(createPage());
+      const {pages, components} = pageManager.webapp;
+
+      await test.step('Log in with public computer checked', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().login(user, {publicComputer: true});
+        await pages.historyInfo().clickConfirmButton();
+        await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+      });
+
+      const proteusId = await test.step('Open device settings and get current proteus id', async () => {
+        await components.conversationSidebar().clickPreferencesButton();
+        await pages.settings().devicesButton.click();
+
+        const proteusId = (await pages.devices().proteusId.textContent()) ?? '';
+        expect(proteusId).toBeDefined();
+
+        return proteusId;
+      });
+
+      await test.step('Log out of public computer', async () => {
+        await pages.settings().accountButton.click();
+        await pages.account().clickLogoutButton();
+        await expect(pages.singleSignOn().ssoSignInButton).toBeVisible();
+      });
+
+      await test.step('Log in again on non public computer', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().login(user);
+        await pages.historyInfo().clickConfirmButtonIfVisible();
+        await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+      });
+
+      await test.step("Open device settings and ensure the public computer isn't active and the ID was re-generated", async () => {
+        await components.conversationSidebar().clickPreferencesButton();
+        await pages.settings().devicesButton.click();
+
+        await expect(pages.devices().activeDevices).toHaveCount(0);
+        await expect(pages.devices().proteusId).not.toContainText(proteusId);
+      });
+    },
+  );
+
+  test(
+    'Verify sign in error appearance in case of wrong credentials',
+    {tag: ['@TC-3465', '@regression']},
+    async ({createPage}) => {
+      const pageManager = await PageManager.from(createPage());
+      const {pages} = pageManager.webapp;
+
+      await pageManager.openLoginPage();
+      await pages.login().login({email: 'invalid@wire.com', password: 'invalid'});
+
+      await expect(pages.login().loginErrorText).toHaveText('Please verify your details and try again');
+    },
+  );
+
+  [
+    {tag: '@TC-3472', deviceType: 'permanent'},
+    {tag: '@TC-3473', deviceType: 'temporary'},
+  ].forEach(({deviceType, tag}) => {
+    test(
+      `I want to keep my history after refreshing the page on ${deviceType} device`,
+      {tag: [tag, '@regression']},
+      async ({createUser, createTeam, createPage}) => {
+        const userB = await createUser();
+        const {owner: userA} = await createTeam('Test Team', {users: [userB]});
+
+        const pageManager = PageManager.from(await createPage());
+        const {pages, components} = pageManager.webapp;
+
+        await test.step('Log in and connect with user B', async () => {
+          await pageManager.openLoginPage();
+
+          if (deviceType === 'temporary') {
+            await pages.login().login(userA, {publicComputer: true});
+            await pages.historyInfo().clickConfirmButton();
+          } else {
+            await pages.login().login(userA);
+          }
+
+          await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+          await connectWithUser(pageManager, userB);
+        });
+
+        await test.step('Send a message', async () => {
+          await pages.conversationList().getConversation(userB.fullName).open();
+          await pages.conversation().sendMessage('Before refresh');
+        });
+
+        await test.step('Ensure message is still visible after page refresh', async () => {
+          const message = pages.conversation().getMessage({content: 'Before refresh'});
+          await expect(message).toBeVisible();
+
+          await pageManager.refreshPage({waitUntil: 'load'});
+
+          await pages.conversationList().getConversation(userB.fullName).open();
+          await expect(message).toBeVisible();
+        });
+      },
+    );
+  });
+
+  // Bug: Connecting using TLSv1.2 should not be allowed but succeeds (See: WPB-22162)
+  test.skip(
+    'I want to make sure i connect to webapp only through TLS >= 1.3 connection',
+    {tag: ['@TC-3480', '@regression']},
+    async () => {
+      const requestWithTlsVersion = (versions: {min?: SecureVersion; max?: SecureVersion}) => {
+        return new Promise<IncomingMessage>((res, rej) => {
+          https.get(webAppPath, {minVersion: versions.min, maxVersion: versions.max}, res).on('error', rej);
+        });
+      };
+
+      await expect(requestWithTlsVersion({max: 'TLSv1.2'})).rejects.toBeDefined();
+      await expect(requestWithTlsVersion({min: 'TLSv1.3'})).resolves.toBeDefined();
+    },
+  );
+
+  test(
+    'Make sure user does not see data of user of previous sessions on same browser',
+    {tag: ['@TC-1311', '@regression']},
+    async ({createUser, createTeam, createPage}) => {
+      const userB = await createUser();
+      const {owner: userA} = await createTeam('Test Team', {users: [userB]});
+
+      const pageManager = await PageManager.from(createPage());
+      const {pages, components} = pageManager.webapp;
+
+      await test.step('Log in with public computer checked', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().login(userA, {publicComputer: true});
+        await pages.historyInfo().clickConfirmButton();
+        await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+      });
+
+      await test.step('Connect with and send message to userB', async () => {
+        await connectWithUser(pageManager, userB);
+        await pages.conversationList().getConversation(userB.fullName).open();
+        await pages.conversation().sendMessage('Test message');
+        await expect(pages.conversation().getMessage({content: 'Test message'})).toBeVisible();
+      });
+
+      await test.step('Log out of public computer', async () => {
+        await components.conversationSidebar().clickPreferencesButton();
+        await pages.settings().accountButton.click();
+        await pages.account().clickLogoutButton();
+        await expect(pages.singleSignOn().ssoSignInButton).toBeVisible();
+      });
+
+      await test.step('Log in again', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().login(userA);
+        await pages.historyInfo().clickConfirmButtonIfVisible();
+        await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+      });
+
+      await test.step('Verify previously sent message is gone', async () => {
+        await pages.conversationList().getConversation(userB.fullName).open();
+        await expect(pages.conversation().getMessage({content: 'Test message'})).not.toBeAttached();
+      });
+    },
+  );
+
+  test(
+    'Verify session expired info is visible on login page',
+    {tag: ['@TC-1312', '@regression']},
+    async ({createPage, createUser}) => {
+      const user = await createUser();
+      const device1Page = await createPage(withLogin(user));
+
+      const {
+        pages: device2Pages,
+        modals: device2Modals,
+        components: device2Components,
+      } = PageManager.from(await createPage(withLogin(user, {confirmNewHistory: true}))).webapp;
+
+      await device2Components.conversationSidebar().clickPreferencesButton();
+      await device2Pages.settings().devicesButton.click();
+      await device2Pages.devices().activeDevices.getByRole('button', {name: 'Remove Device'}).click();
+
+      await device2Modals.password().passwordInput.fill(user.password);
+      await device2Modals.password().clickAction();
+
+      await expect(device1Page.getByText('You were signed out because your device was deleted')).toBeVisible();
+    },
+  );
+});

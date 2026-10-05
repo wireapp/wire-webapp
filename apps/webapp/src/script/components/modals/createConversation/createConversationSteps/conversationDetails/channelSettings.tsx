@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {Muted, Option, Select} from '@wireapp/react-ui-kit';
 
-import {RadioGroup} from 'Components/Radio';
+import {RadioGroup} from 'Components/radio';
 import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';

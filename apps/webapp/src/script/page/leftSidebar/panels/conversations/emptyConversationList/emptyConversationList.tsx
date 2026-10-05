@@ -27,7 +27,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './emptyConversationList.styles';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {SidebarTabs} from '../useSidebarStore';
 
 interface EmptyConversationListProps {

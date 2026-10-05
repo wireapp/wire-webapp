@@ -1,0 +1,136 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {User} from 'test/e2eTests/data/user';
+import {PageManager} from 'test/e2eTests/pageManager';
+
+import {test, expect, withLogin} from '../../testFixtures';
+import {createGroup, sendConnectionRequest} from 'test/e2eTests/utils/userActions';
+
+test.describe('Connections', () => {
+  let memberA: User;
+  let memberB: User;
+
+  test.beforeEach(async ({createUser}) => {
+    [memberA, memberB] = await Promise.all([createUser(), createUser()]);
+  });
+
+  test(
+    'Verify 1on1 conversation is not created on the second end after you ignore connection request',
+    {tag: ['@TC-365', '@regression']},
+    async ({createPage}) => {
+      const [memberBPages, memberAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(memberB))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(memberA))),
+      ]);
+      await sendConnectionRequest(memberAPageManager, memberB);
+
+      await memberBPages.conversationList().pendingConnectionRequest.click();
+      await memberBPages.conversation().clickIgnoreButton();
+
+      await expect(memberBPages.conversation().itemPendingRequest).not.toBeVisible();
+    },
+  );
+
+  test(
+    'Verify sending a connection request to user from conversation view',
+    {tag: ['@TC-369', '@regression']},
+    async ({createPage, createUser}) => {
+      const memberC = await createUser();
+      const [memberAPage, memberBPage, memberCPage] = await Promise.all([
+        PageManager.from(createPage(withLogin(memberA))),
+        PageManager.from(createPage(withLogin(memberB))),
+        PageManager.from(createPage(withLogin(memberC))),
+      ]);
+
+      const [memberAPages, memberBPages, memberCPages] = [memberAPage, memberBPage, memberCPage].map(page => {
+        return page.webapp.pages;
+      });
+
+      await test.step('B & C accept connection requests from A', async () => {
+        await sendConnectionRequest(memberAPage, memberB);
+        await memberBPages.conversationList().pendingConnectionRequest.click();
+        await memberBPages.connectRequest().connectButton.click();
+
+        await sendConnectionRequest(memberAPage, memberC);
+        await memberCPages.conversationList().pendingConnectionRequest.click();
+        await memberCPages.connectRequest().connectButton.click();
+      });
+
+      await test.step('A creates a group with B & C', async () => {
+        await expect(
+          memberAPages.conversationList().getConversation(memberB.fullName, {protocol: 'mls'}),
+        ).toBeAttached();
+        await expect(
+          memberAPages.conversationList().getConversation(memberC.fullName, {protocol: 'mls'}),
+        ).toBeAttached();
+
+        await createGroup(memberAPages, 'Group', [memberB, memberC]);
+      });
+
+      await test.step('B sends a connection request to C via the group conversation', async () => {
+        await memberBPages.conversationList().getConversation('Group').open();
+        await memberBPages.conversation().conversationInfoButton.click();
+        await memberBPages.conversationDetails().getParticipant(memberC.fullName).openDetails();
+        await memberBPages.participantDetails().sendConnectRequest();
+      });
+
+      await test.step('C sees the connection request from B', async () => {
+        await expect(memberCPages.conversationList().pendingConnectionRequest).toBeVisible();
+      });
+    },
+  );
+
+  test(
+    'I want to cancel a pending request from conversation list',
+    {tag: ['@TC-370', '@regression']},
+    async ({createPage}) => {
+      const [memberBPages, memberAPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(memberB))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(memberA))),
+      ]);
+      await sendConnectionRequest(memberAPageManager, memberB);
+
+      await memberBPages.conversationList().pendingConnectionRequest.click();
+      await memberBPages.conversation().ignoreButton.click();
+
+      await expect(memberBPages.conversationList().getConversation(memberB.fullName)).not.toBeVisible();
+    },
+  );
+
+  test(
+    'I want to archive a pending request from conversation list',
+    {tag: ['@TC-371', '@regression']},
+    async ({createPage}) => {
+      const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+      await sendConnectionRequest(pageManager, memberB);
+
+      const {pages} = pageManager.webapp;
+      const conversation = pages.conversationList().getConversation(memberB.fullName);
+      const contextMenu = await conversation.openContextMenu();
+      await contextMenu.archiveButton.click();
+
+      await expect(conversation).not.toBeVisible();
+    },
+  );
+});

@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import assert from 'node:assert';
 import {ReactElement} from 'react';
 
@@ -25,7 +24,7 @@ import {render} from '@testing-library/react';
 import {usePrimaryModalState} from 'Components/modals/primaryModal';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {MainViewModel} from 'src/script/viewModel/mainViewModel';
 import {translate} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

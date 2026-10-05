@@ -24,7 +24,7 @@
     "src/**/*.mocks.ts",
     "src/**/test/**",
     "src/**/testSupport/**",
-    "test/unit_tests/**",
+    "test/unitTests/**",
     "test/helper/**",
     "**/*.test.*"
   ]

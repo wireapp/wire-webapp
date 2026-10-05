@@ -28,7 +28,7 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {Conversation} from 'Repositories/entity/conversation';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';

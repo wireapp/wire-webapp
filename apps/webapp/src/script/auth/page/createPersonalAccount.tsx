@@ -26,7 +26,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {styles} from './createPersonalAccount.styles';
 import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {AccountForm} from '../component/accountForm';
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {BackButton} from '../component/backButton';

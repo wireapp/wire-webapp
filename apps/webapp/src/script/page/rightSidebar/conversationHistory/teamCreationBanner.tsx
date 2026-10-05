@@ -19,7 +19,7 @@
 
 import {Button, Text} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';

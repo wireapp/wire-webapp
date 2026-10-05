@@ -41,8 +41,8 @@ import {
 import {CellsTableLoader} from 'Components/conversation/conversationCells/common/cellsTableLoader/cellsTableLoader';
 import {CopyToClipboardButton} from 'Components/copyToClipboardButton/copyToClipboardButton';
 import * as Icon from 'Components/icon';
-import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
-import {Config} from 'src/script/Config';
+import {PasswordGeneratorButton} from 'Components/passwordGeneratorButton';
+import {Config} from 'src/script/config';
 import {type RootContextValue} from 'src/script/page/rootProvider';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';

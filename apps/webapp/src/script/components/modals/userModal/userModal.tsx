@@ -39,7 +39,6 @@ import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 
-import {useUserModalState} from './userModal.state';
 import {
   unverifiedUserWarningIconStyle,
   unverifiedUserWarningLinkStyle,
@@ -50,8 +49,9 @@ import {
   userModalStyle,
   userModalWrapperStyle,
 } from './userModal.styles';
+import {useUserModalState} from './userModalState';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {Core} from '../../../service/coreSingleton';
 
 export interface UserModalProps {

@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {buildCellsUploadPath} from 'Components/conversation/utils/buildCellsUploadPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 

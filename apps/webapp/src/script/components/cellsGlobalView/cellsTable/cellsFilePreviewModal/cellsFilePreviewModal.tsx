@@ -20,7 +20,7 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CellsSelfUserDriveRoleProvider} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from 'Components/fileFullscreenModal/fileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
 import {sortTagsAlphabetically} from '../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';

@@ -35,7 +35,7 @@ import {formatBytes, validateProfileImageResolution} from 'Util/util';
 
 import {FileInput} from './fileInput';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {UserError} from '../../../../../error/userError';
 
 interface AvatarInputProps {

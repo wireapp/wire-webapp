@@ -43,7 +43,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
-import {Config} from '../Config';
+import {Config} from '../config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';

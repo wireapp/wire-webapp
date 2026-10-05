@@ -28,7 +28,7 @@ import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {customHistorySharingInputCss} from 'Components/modals/createConversation/createConversationSteps/createConversationSteps.styles';
 import {ChatHistory, HistorySharingUnit} from 'Components/modals/createConversation/types';
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/modals/createConversation/utils';
-import {RadioGroup} from 'Components/Radio';
+import {RadioGroup} from 'Components/radio';
 import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

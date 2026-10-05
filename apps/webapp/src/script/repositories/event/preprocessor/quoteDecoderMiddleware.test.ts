@@ -23,7 +23,7 @@ import {Conversation} from 'Repositories/entity/conversation';
 import {User} from 'Repositories/entity/user';
 import {MessageHasher} from 'src/script/message/messageHasher';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
-import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/eventGenerator';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 

@@ -18,4 +18,4 @@
  */
 
 export * from './userDevices';
-export * from './userDevices.types';
+export * from './userDevicesTypes';

@@ -35,7 +35,7 @@ import {
   createMemberLeaveEvent,
   createMessageAddEvent,
   toSavedEvent,
-} from 'test/helper/EventGenerator';
+} from 'test/helper/eventGenerator';
 import {createUuid} from 'Util/uuid';
 
 import {EventStorageMiddleware} from './eventStorageMiddleware';

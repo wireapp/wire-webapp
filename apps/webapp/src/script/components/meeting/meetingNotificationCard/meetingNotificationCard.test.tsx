@@ -20,7 +20,6 @@ import {fireEvent, render, screen} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
-
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
@@ -39,7 +38,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+import type {MainViewModel} from 'src/script/viewModel/mainViewModel';
 
 jest.mock('Components/meeting/useJoinMeetingCall', () => {
   return {

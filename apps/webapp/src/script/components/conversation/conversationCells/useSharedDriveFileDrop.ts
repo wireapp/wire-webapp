@@ -21,7 +21,7 @@ import {useCallback} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
 import type {Translate} from 'Util/localizerUtil';
 

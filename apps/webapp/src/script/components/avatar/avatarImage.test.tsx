@@ -23,7 +23,7 @@ import {AVATAR_SIZE} from 'Components/avatar';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/user';
-import {viewportObserver} from 'Util/DOM/viewportObserver';
+import {viewportObserver} from 'Util/dom/viewportObserver';
 
 import {AvatarImage} from './avatarImage';
 import {translateForTest} from 'Util/test/translateForTest';

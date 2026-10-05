@@ -33,7 +33,7 @@ import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './deviceSelect';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('CameraPreferences');

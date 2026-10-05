@@ -29,8 +29,8 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {entities} from 'test/api/payloads';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
+import {TestFactory} from 'test/helper/testFactory';
+import {generateAPIUser} from 'test/helper/userGenerator';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ClientRepository} from 'Repositories/client';

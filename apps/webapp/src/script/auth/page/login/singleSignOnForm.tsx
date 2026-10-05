@@ -37,7 +37,7 @@ import {isBackendError} from 'Util/typePredicateUtil';
 
 import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';

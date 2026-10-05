@@ -27,7 +27,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {Page} from './page';
 import {styles} from './setAccountType.styles';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {BackButton} from '../component/backButton';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';

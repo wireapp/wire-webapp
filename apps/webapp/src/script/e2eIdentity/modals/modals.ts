@@ -30,7 +30,7 @@ import {
   PrimaryModalTranslatedValue,
   PrimaryModalType,
 } from 'Components/modals/primaryModal/primaryModalTypes';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};

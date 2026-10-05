@@ -19,8 +19,8 @@
 
 import React, {useEffect, useRef} from 'react';
 
-import {overlayedObserver} from 'Util/DOM/overlayedObserver';
-import {viewportObserver} from 'Util/DOM/viewportObserver';
+import {overlayedObserver} from 'Util/dom/overlayedObserver';
+import {viewportObserver} from 'Util/dom/viewportObserver';
 
 interface InViewportParams {
   onVisible: () => void;

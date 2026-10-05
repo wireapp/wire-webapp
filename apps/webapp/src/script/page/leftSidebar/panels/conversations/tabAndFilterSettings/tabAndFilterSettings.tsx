@@ -24,7 +24,7 @@ import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from 'Util/keyboardUtil';

@@ -19,7 +19,7 @@
 
 import {User} from 'Repositories/entity/user';
 
-import {ACCENT_ID} from '../Config';
+import {ACCENT_ID} from '../config';
 
 const avatarHashMultiplier = 31;
 

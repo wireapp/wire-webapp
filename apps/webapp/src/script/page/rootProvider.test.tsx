@@ -24,7 +24,7 @@ import {renderHook} from '@testing-library/react';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {applockRefactoredFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {MainViewModel} from '../viewModel/mainViewModel';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';
 import {RootContext, RootContextValue, RootProvider, useApplicationContext, useMainViewModel} from './rootProvider';
 import {translateForTest} from 'Util/test/translateForTest';

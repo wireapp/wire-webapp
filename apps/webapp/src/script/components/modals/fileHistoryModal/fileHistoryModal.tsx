@@ -17,7 +17,7 @@
  *
  */
 
-import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
+import {FileLoader} from 'Components/fileFullscreenModal/fileLoader/fileLoader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 

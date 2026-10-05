@@ -33,11 +33,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/modals/modalComponent';
-import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
-import {SearchInput} from 'Components/SearchInput';
-import {TextInput} from 'Components/TextInput';
-import {InfoToggle} from 'Components/toggle/InfoToggle';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {AppsDisabledNote} from 'Components/note/appsDisabledNote/appsDisabledNote';
+import {SearchInput} from 'Components/searchInput';
+import {TextInput} from 'Components/textInput';
+import {InfoToggle} from 'Components/toggle/infoToggle';
+import {UserSearchableList} from 'Components/userSearchableList';
 import {ACCESS_STATE} from 'Repositories/conversation/accessState';
 import {
   ACCESS_TYPES,
@@ -57,8 +57,8 @@ import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
-import {Config} from '../../../Config';
-import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {Config} from '../../../config';
+import {isProtocolOption, ProtocolOption} from '../../../guards/protocol';
 import {getSharedDrivePermissionHint} from '../createConversation/utils';
 import {PrimaryModal} from '../primaryModal';
 

@@ -11,7 +11,7 @@
 import {act, renderHook} from '@testing-library/react';
 
 import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {MessageHasher} from 'src/script/message/messageHasher';
 
 import {useMessageSend} from './useMessageSend';

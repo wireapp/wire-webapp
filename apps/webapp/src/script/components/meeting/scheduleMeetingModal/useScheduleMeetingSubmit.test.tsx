@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import type {ReactNode} from 'react';
 
 import {act, renderHook} from '@testing-library/react';
@@ -35,7 +34,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+import type {MainViewModel} from 'src/script/viewModel/mainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';

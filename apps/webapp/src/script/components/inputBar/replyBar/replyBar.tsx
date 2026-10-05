@@ -19,8 +19,8 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
-import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
+import {RestrictedVideo} from 'Components/asset/restrictedVideo';
+import {ParticipantMicOnIcon} from 'Components/calling/participantMicOnIcon';
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/image';
 import {MultipartAssetPreview} from 'Components/messagesList/message/contentMessage/asset/multipartAssetPreview';

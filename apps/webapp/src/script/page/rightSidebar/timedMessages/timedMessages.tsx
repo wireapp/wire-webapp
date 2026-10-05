@@ -24,15 +24,15 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {RadioGroup} from 'Components/Radio';
+import {RadioGroup} from 'Components/radio';
 import {Conversation} from 'Repositories/entity/conversation';
 import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatDuration} from 'Util/timeUtil';
 
-import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {EphemeralTimings} from '../../../ephemeral/ephemeralTimings';
+import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {PanelHeader} from '../panelHeader';
 
 interface TimedMessagesPanelProps {

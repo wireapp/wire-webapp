@@ -38,7 +38,7 @@ import {SelfService} from 'Repositories/self/selfService';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/teamState';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {translate} from 'Util/localizerUtil';
 import {
@@ -47,7 +47,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Components/avatar', () => {

@@ -30,9 +30,9 @@ import {container} from 'tsyringe';
 import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
-import {ChooseScreen} from 'Components/calling/ChooseScreen';
-import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
+import {CallingContainer} from 'Components/calling/callingOverlayContainer';
+import {ChooseScreen} from 'Components/calling/chooseScreen';
+import {DetachedCallingCell} from 'Components/calling/detachedCallingCell';
 import {ConfigToolbar} from 'Components/configToolbar/configToolbar';
 import {ErrorFallback} from 'Components/errorFallback';
 import {CreateConversationModal} from 'Components/modals/createConversation/createConversaionModal';
@@ -51,7 +51,7 @@ import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {showInitialModal} from 'Repositories/user/availabilityModal';
 import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {canUseMeetings} from 'Util/canUseMeetings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -70,13 +70,13 @@ import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
 import {App} from '../main/app';
-import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
+import {initialiseMLSMigrationFlow} from '../mls/mlsMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {configureRouterClock, configureRoutes, navigate} from '../router/Router';
+import {configureRouterClock, configureRoutes, navigate} from '../router/router';
 import {Core} from '../service/coreSingleton';
-import {MainViewModel} from '../view_model/MainViewModel';
-import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
-import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
+import {MainViewModel} from '../viewModel/mainViewModel';
+import {useWarningOffset} from '../viewModel/warningsContainer/useWarningOffset';
+import {WarningsContainer} from '../viewModel/warningsContainer/warningsContainer';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;

@@ -30,7 +30,7 @@ import {InvitationState, initialInvitationState, invitationReducer} from './invi
 import {LanguageState, initialLanguageState, languageReducer} from './languageReducer';
 import {SelfState, initialSelfState, selfReducer} from './selfReducer';
 
-import type {Configuration} from '../../../Config';
+import type {Configuration} from '../../../config';
 import type {ActionRoot} from '../action';
 
 export type Api = {

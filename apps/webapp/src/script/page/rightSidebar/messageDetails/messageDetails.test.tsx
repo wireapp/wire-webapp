@@ -37,7 +37,7 @@ import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './messageDetails';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './MLSConversations';
+export * from './mlsConversations';

@@ -21,7 +21,7 @@ import {defineConfig, devices} from '@playwright/test';
 import {config} from 'dotenv';
 import {resolve} from 'node:path';
 
-config({path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true});
+config({path: resolve(__dirname, './test/e2eTests/.env'), quiet: true});
 
 // The number of parallel workers needs to be limited since otherwise the number of parallel requests could run into rate limiting by the backend
 const numberOfParallelWorkersOnCI = 1;
@@ -31,7 +31,7 @@ const numberOfRetriesOnCI = 2;
  * See https://playwright.dev/docs/test-configuration.
  */
 module.exports = defineConfig({
-  testDir: './test/e2e_tests',
+  testDir: './test/e2eTests',
   tsconfig: './tsconfig.playwright.json',
   /* Run tests in files in parallel */
   fullyParallel: true,

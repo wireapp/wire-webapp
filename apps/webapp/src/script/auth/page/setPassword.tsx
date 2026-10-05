@@ -32,7 +32,7 @@ import {toError} from 'Util/toError';
 
 import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/validationError';

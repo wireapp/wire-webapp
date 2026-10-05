@@ -29,7 +29,7 @@ import {getLogger, Logger} from 'Util/logger';
 import {isSelfAPIUser} from './userGuards';
 
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
-import '../../view_model/bindings/CommonBindings';
+import '../../viewModel/bindings/commonBindings';
 
 export class UserMapper {
   private readonly logger: Logger;

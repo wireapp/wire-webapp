@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/conversation';
 import {TeamState} from 'Repositories/team/teamState';
-import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
+import {EphemeralTimings} from 'src/script/ephemeral/ephemeralTimings';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {showContextMenu} from 'src/script/ui/contextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

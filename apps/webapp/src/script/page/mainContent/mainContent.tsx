@@ -31,7 +31,7 @@ import {HistoryExport} from 'Components/historyExport';
 import {HistoryImport} from 'Components/historyImport';
 import * as Icon from 'Components/icon';
 import {Meetings} from 'Components/meeting/meetings';
-import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModalState';
 import {ClientState} from 'Repositories/client/clientState';
 import {ConversationState} from 'Repositories/conversation/conversationState';
 import {User} from 'Repositories/entity/user';

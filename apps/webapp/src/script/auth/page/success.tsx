@@ -23,7 +23,7 @@ import {SuccessShield} from '@wireapp/react-ui-kit/lib/images/successShield';
 
 import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

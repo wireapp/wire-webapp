@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {task} from 'true-myth';
@@ -27,7 +26,7 @@ import type {CallingRepository} from 'Repositories/calling/callingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import type {ConversationState} from 'Repositories/conversation/conversationState';
 import {createConversation} from 'src/script/auth/util/test/testUtil';
-import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
+import type {CallingViewModel} from 'src/script/viewModel/callingViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};

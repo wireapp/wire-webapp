@@ -29,7 +29,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {externalUrl} from '../../../../externalRoute';
 
 interface AboutPreferencesProps {

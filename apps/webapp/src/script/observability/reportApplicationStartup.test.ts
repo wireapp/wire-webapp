@@ -22,7 +22,7 @@ import {Maybe} from 'true-myth';
 import type {ApplicationStartupReport} from './applicationStartupReport';
 import {reportApplicationStartup} from './reportApplicationStartup';
 
-import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import {AppInitTimingsStep} from '../telemetry/appInit/appInitTimingsStep';
 
 describe('reportApplicationStartup', () => {
   it('reports a failure startup result', async () => {

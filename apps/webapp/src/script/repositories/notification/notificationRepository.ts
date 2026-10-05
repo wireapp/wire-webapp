@@ -71,7 +71,7 @@ import {SuperType} from '../../message/superType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';
 import {ContentState, useAppState} from '../../page/useAppState';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 
 const notificationTimeoutInSeconds = 5;
 

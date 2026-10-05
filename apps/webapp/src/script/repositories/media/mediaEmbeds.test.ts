@@ -19,7 +19,7 @@
 
 import type {TypeUtil} from '@wireapp/commons';
 
-import {Configuration, Config} from 'src/script/Config';
+import {Configuration, Config} from 'src/script/config';
 
 import {MediaEmbeds} from './mediaEmbeds';
 import {MediaParser} from './mediaParser';

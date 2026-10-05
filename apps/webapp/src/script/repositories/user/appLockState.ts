@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
 import {TeamState} from 'Repositories/team/teamState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 
 const defaultEnabled = true;
 const defaultEnforced = false;

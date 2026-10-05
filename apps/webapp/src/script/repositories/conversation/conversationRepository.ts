@@ -178,12 +178,12 @@ import {isSelfInitiatedConversationLeave} from './isSelfInitiatedConversationLea
 import {MessageRepository} from './messageRepository';
 import {NOTIFICATION_STATE} from './notificationSetting';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
-import {isMemberMessage} from '../../guards/Message';
-import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
-import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
+import {isMemberMessage} from '../../guards/message';
+import * as LegalHoldEvaluator from '../../legalHold/legalHoldEvaluator';
+import type {MappedEvent} from '../../legalHold/legalHoldEvaluator';
 import {MessageCategory} from '../../message/messageCategory';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';

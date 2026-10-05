@@ -16,13 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import type {ReactNode} from 'react';
-
 import {act, renderHook} from '@testing-library/react';
 import {task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
-
 import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
@@ -32,8 +29,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
+import {MainViewModel} from 'src/script/viewModel/mainViewModel';
+import {useWarningsState} from 'src/script/viewModel/warningsContainer/warningsState';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {type MeetNowSubmitResult, meetNowSubmitResults, wasMeetNowMeetingCreated} from './meetNowTypes';

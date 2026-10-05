@@ -58,7 +58,7 @@ import {UsernameInput} from './accountPreferences/usernameInput';
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {AccentColorPicker} from '../../../accentColorPicker';
 
 interface AccountPreferencesProps {

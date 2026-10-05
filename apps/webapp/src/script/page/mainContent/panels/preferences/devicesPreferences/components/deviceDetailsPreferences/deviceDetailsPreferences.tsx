@@ -28,8 +28,8 @@ import {WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {Config} from '../../../../../../../Config';
-import {MotionDuration} from '../../../../../../../motion/MotionDuration';
+import {Config} from '../../../../../../../config';
+import {MotionDuration} from '../../../../../../../motion/motionDuration';
 import {contentStyle} from '../../../components/preferencesPage.styles';
 import {DetailedDevice} from '../detailedDevice';
 

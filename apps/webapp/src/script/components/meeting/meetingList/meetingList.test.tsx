@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import {useMemo} from 'react';
 
 import {act, fireEvent, render, screen} from '@testing-library/react';
@@ -34,7 +33,7 @@ import {
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {MainViewModel} from 'src/script/viewModel/mainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {isMeetingListItemLastInDay, MeetingList, type MeetingListProps} from './meetingList';

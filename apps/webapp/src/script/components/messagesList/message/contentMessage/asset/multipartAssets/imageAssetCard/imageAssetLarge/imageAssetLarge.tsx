@@ -38,7 +38,7 @@ import {
   loaderIconStyles,
 } from './imageAssetLarge.styles';
 
-import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../fileFullscreenModal/fileFullscreenModal';
 
 interface ImageAssetLargeProps {
   filePreviewUrl?: string;

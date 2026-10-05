@@ -1,0 +1,176 @@
+/*
+ * Wire
+ * Copyright (C) 2024 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+
+import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/avatar';
+import {Duration} from 'Components/calling/duration';
+import * as Icon from 'Components/icon';
+import {User} from 'Repositories/entity/user';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
+
+import {
+  callAvatar,
+  callDescription,
+  callDetails,
+  callingHeaderContainer,
+  callingHeaderWrapper,
+  cbrCallState,
+  conversationCallName,
+  detachedWindowButton,
+} from './callingHeader.styles';
+
+import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+
+interface CallingHeaderProps {
+  isMeeting: boolean;
+  isOngoing: boolean;
+  isGroupCall: boolean;
+  isChannel: boolean;
+  showAlert: boolean;
+  isVideoCall: boolean;
+  clearShowAlert: () => void;
+  conversationUrl: string;
+  callStartedAlert: string;
+  ongoingCallAlert: string;
+  isTemporaryUser: boolean;
+  conversationParticipants: User[];
+  conversationName: string;
+  currentCallStatus: any;
+  startedAt?: number;
+  isCbrEnabled: boolean;
+  toggleDetachedWindow: () => void;
+  isDetachedWindow: boolean;
+  conversationID: string;
+}
+
+export const CallingHeader = ({
+  isMeeting,
+  isGroupCall,
+  isChannel,
+  isOngoing,
+  showAlert,
+  isVideoCall,
+  clearShowAlert,
+  conversationUrl,
+  callStartedAlert,
+  ongoingCallAlert,
+  isTemporaryUser,
+  conversationParticipants,
+  conversationName,
+  currentCallStatus,
+  startedAt,
+  isCbrEnabled,
+  toggleDetachedWindow,
+  isDetachedWindow,
+  conversationID,
+}: CallingHeaderProps) => {
+  const {translate} = useApplicationContext();
+
+  let ariaLabel: string;
+  if (showAlert) {
+    ariaLabel = callStartedAlert;
+  } else {
+    const ongoingPrefix = isOngoing ? `${ongoingCallAlert} ` : '';
+    ariaLabel = `${ongoingPrefix}${translate('accessibility.openConversation', {name: conversationName})}`;
+  }
+
+  let avatarContent;
+  if (isChannel) {
+    avatarContent = <ChannelAvatar conversationID={conversationID} />;
+  } else if (isGroupCall) {
+    avatarContent = <GroupAvatar conversationID={conversationID} />;
+  } else if (conversationParticipants.length > 0) {
+    avatarContent = <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />;
+  }
+
+  return (
+    <div css={callingHeaderContainer}>
+      <div
+        ref={element => {
+          if ((isGroupCall || isOngoing) && showAlert && !isVideoCall) {
+            element?.focus();
+          }
+        }}
+        css={callingHeaderWrapper}
+        onClick={!isMeeting ? createNavigate(conversationUrl) : undefined}
+        onBlur={() => {
+          if (isGroupCall || isOngoing) {
+            clearShowAlert();
+          }
+        }}
+        onKeyDown={!isMeeting ? createNavigateKeyboard(conversationUrl) : undefined}
+        tabIndex={TabIndex.FOCUSABLE}
+        role="button"
+        aria-label={ariaLabel}
+      >
+        {isDetachedWindow && !isTemporaryUser && <div css={callAvatar}>{avatarContent}</div>}
+
+        <h2 css={callDetails}>
+          <div css={conversationCallName}>{conversationName}</div>
+
+          {currentCallStatus != null && (
+            <div data-uie-name={currentCallStatus.dataUieName} css={callDescription}>
+              {currentCallStatus.text}
+            </div>
+          )}
+
+          {isOngoing && startedAt != null && (
+            <div css={callDescription}>
+              {isDetachedWindow ? (
+                <span data-uie-name="call-lead" aria-label={translate('viewingInAnotherWindow')}>
+                  {translate('viewingInAnotherWindow')}
+                </span>
+              ) : (
+                <span data-uie-name="call-duration" aria-label={translate('callDurationLabel')}>
+                  <Duration {...{startedAt}} />
+                </span>
+              )}
+
+              {isCbrEnabled && (
+                <span
+                  title={translate('callStateCbr')}
+                  aria-label={translate('callStateCbr')}
+                  data-uie-name="call-cbr"
+                  css={cbrCallState}
+                >
+                  CBR
+                </span>
+              )}
+            </div>
+          )}
+        </h2>
+      </div>
+
+      {isDetachedCallingFeatureEnabled() && isOngoing && (
+        <div>
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            title={translate('videoCallOverlayOpenPopupWindow')}
+            css={detachedWindowButton}
+            onClick={toggleDetachedWindow}
+          >
+            {isDetachedWindow ? <Icon.CloseDetachedWindowIcon /> : <Icon.OpenDetachedWindowIcon />}
+          </IconButton>
+        </div>
+      )}
+    </div>
+  );
+};

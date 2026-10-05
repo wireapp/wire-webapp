@@ -25,7 +25,7 @@ import {ICellAsset} from '@wireapp/protocol-messaging';
 import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from 'Components/fileFullscreenModal/fileFullscreenModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {isPreviewableImage} from 'Util/imageUtil';
 import {getFileExtension, getName} from 'Util/util';

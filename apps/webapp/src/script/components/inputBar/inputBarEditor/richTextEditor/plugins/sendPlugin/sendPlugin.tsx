@@ -23,7 +23,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {isNull} from '@sindresorhus/is';
 import {COMMAND_PRIORITY_LOW, INSERT_PARAGRAPH_COMMAND, KEY_ENTER_COMMAND} from 'lexical';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 
 type Props = {
   onSend: () => void;

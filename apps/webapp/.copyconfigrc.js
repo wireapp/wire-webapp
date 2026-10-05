@@ -24,7 +24,7 @@ const rootDir = path.join(__dirname, '..', '..');
 const pkg = require(path.join(rootDir, 'package.json'));
 const appConfigPkg = require('./app-config/package.json');
 
-const {selectConfiguration} = require('./configuration-selection');
+const {selectConfiguration} = require('./configurationSelection');
 require('dotenv').config({quiet: true});
 
 /**

@@ -30,7 +30,7 @@ import {Conversation} from 'Repositories/entity/conversation';
 import {SelfService} from 'Repositories/self/selfService';
 import {TeamService} from 'Repositories/team/teamService';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateUser} from 'test/helper/userGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';

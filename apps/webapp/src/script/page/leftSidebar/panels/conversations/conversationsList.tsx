@@ -62,7 +62,7 @@ import {getConversationsToDisplay} from './helpers';
 
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../viewModel/listViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';
 

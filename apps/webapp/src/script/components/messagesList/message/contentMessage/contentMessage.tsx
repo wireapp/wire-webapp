@@ -26,7 +26,7 @@ import ko from 'knockout';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
-import {FileFullscreenModalSourceConversationProvider} from 'Components/FileFullscreenModal/FileFullscreenModalSourceConversationContext';
+import {FileFullscreenModalSourceConversationProvider} from 'Components/fileFullscreenModal/fileFullscreenModalSourceConversationContext';
 import {ReadIndicator} from 'Components/messagesList/message/readIndicator';
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {Conversation} from 'Repositories/entity/conversation';
@@ -43,7 +43,7 @@ import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './contentMessage.styles';
 import {MessageActionsMenu} from './messageActions/messageActions';
-import {useMessageActionsState} from './messageActions/messageActions.state';
+import {useMessageActionsState} from './messageActions/messageActionsState';
 import {MessageReactionsList} from './messageActions/messageReactions/messageReactionsList';
 import {MessageHeader} from './messageHeader';
 import {Quote} from './messageQuote';

@@ -31,7 +31,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('CallOptions');

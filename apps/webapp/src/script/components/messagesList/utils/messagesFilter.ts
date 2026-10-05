@@ -25,7 +25,7 @@ import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateM
 import {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import {ClientEvent} from 'Repositories/event/client';
 
-import {isMemberMessage} from '../../../guards/Message';
+import {isMemberMessage} from '../../../guards/message';
 
 /**
  * Filters out duplicated system messages.

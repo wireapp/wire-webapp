@@ -38,7 +38,7 @@ import {showCallNotEstablishedModal, useNoInternetCallGuard} from 'Hooks/useNoIn
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {CallState} from 'Repositories/calling/callState';
 import {ConversationState} from 'Repositories/conversation/conversationState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';

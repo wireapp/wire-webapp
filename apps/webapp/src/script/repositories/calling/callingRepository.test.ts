@@ -54,7 +54,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandli
 import {MediaType} from 'Repositories/media/mediaType';
 import {UserRepository} from 'Repositories/user/userRepository';
 import type {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from 'test/helper/testFactory';
 import {createUuid} from 'Util/uuid';
 
 import {Call} from './call';
@@ -68,7 +68,7 @@ import {useActiveWindowState} from 'Hooks/useActiveWindow';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 import {z} from 'zod';
 import {translateForTest} from 'Util/test/translateForTest';
 import {MessageRepository} from 'Repositories/conversation/messageRepository';

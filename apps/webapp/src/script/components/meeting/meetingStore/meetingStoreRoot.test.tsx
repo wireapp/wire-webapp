@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -34,13 +33,13 @@ import {
 import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+import type {MainViewModel} from 'src/script/viewModel/mainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

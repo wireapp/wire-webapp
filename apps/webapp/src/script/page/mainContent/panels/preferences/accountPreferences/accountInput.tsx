@@ -24,10 +24,10 @@ import {isEmptyString, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {TextInput} from 'Components/TextInput';
+import {TextInput} from 'Components/textInput';
 import {useIsMounted} from 'Util/useIsMounted';
 
-import {MotionDuration} from '../../../../../motion/MotionDuration';
+import {MotionDuration} from '../../../../../motion/motionDuration';
 import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 
 const inputFeedbackDurationMultiplier = 2;

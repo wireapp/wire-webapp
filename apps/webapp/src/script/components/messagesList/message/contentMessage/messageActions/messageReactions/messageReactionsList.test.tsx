@@ -22,7 +22,7 @@ import {act, fireEvent, render, waitFor, within} from '@testing-library/react';
 import {User} from 'Repositories/entity/user';
 import {ReactionMap} from 'Repositories/storage';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {generateQualifiedId} from 'test/helper/UserGenerator';
+import {generateQualifiedId} from 'test/helper/userGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 

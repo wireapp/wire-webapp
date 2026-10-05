@@ -45,7 +45,7 @@ import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModalState';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
 import {ClientEntity} from 'Repositories/client/clientEntity';
@@ -77,7 +77,7 @@ import type {UserService} from './userService';
 import {UserState} from './userState';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 

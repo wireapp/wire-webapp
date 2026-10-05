@@ -75,11 +75,11 @@ import {
   useSidebarStore,
 } from './useSidebarStore';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {setHistoryParam} from '../../../../router/Router';
+import {setHistoryParam} from '../../../../router/router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../viewModel/listViewModel';
 import {ListWrapper} from '../listWrapper';
 import {StartUI} from '../startUi';
 

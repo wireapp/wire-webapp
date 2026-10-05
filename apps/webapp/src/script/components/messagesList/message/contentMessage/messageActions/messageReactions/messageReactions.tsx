@@ -29,8 +29,8 @@ import {EmojiChar} from './emojiChar';
 import {reactionImgSize} from './emojiChar.styles';
 
 import {MessageActionsId} from '../messageActions';
-import {useMessageActionsState} from '../messageActions.state';
 import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../messageActions.styles';
+import {useMessageActionsState} from '../messageActionsState';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';

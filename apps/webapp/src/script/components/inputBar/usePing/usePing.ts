@@ -22,7 +22,7 @@ import {useState} from 'react';
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import {MessageRepository} from 'Repositories/conversation/messageRepository';
 import {Conversation} from 'Repositories/entity/conversation';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

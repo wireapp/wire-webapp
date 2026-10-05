@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
@@ -28,7 +27,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+import type {MainViewModel} from 'src/script/viewModel/mainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {ScheduleMeetingForm} from './scheduleMeetingForm';

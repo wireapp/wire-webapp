@@ -26,7 +26,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/user';
 import {ClientEvent} from 'Repositories/event/client';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
 import {Declension, joinNames} from 'Util/localizerUtil';

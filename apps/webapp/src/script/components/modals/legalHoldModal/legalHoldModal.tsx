@@ -25,10 +25,10 @@ import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import * as Icon from 'Components/icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {LegalHoldDot} from 'Components/legalHoldDot';
 import {ModalComponent} from 'Components/modals/modalComponent';
 import {UserDevicesState, UserDevices} from 'Components/userDevices';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {UserSearchableList} from 'Components/userSearchableList';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
@@ -49,7 +49,7 @@ import {splitFingerprint} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
-import {useLegalHoldModalState} from './legalHoldModal.state';
+import {useLegalHoldModalState} from './legalHoldModalState';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;
 const legalHoldModalLineBreakMarker = createReactTranslationMarker('legal-hold-modal-line-break');

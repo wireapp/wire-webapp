@@ -32,7 +32,7 @@ import {handleEnterDown} from 'Util/keyboardUtil';
 
 import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {actionRoot} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/clientSelector';

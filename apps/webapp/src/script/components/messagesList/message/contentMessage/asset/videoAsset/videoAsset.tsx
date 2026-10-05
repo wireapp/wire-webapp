@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 
-import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
+import {RestrictedVideo} from 'Components/asset/restrictedVideo';
 import {AssetError} from 'Repositories/assets/assetError';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';

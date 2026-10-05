@@ -27,7 +27,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 
 interface ServiceModalProps {
   translate: Translate;

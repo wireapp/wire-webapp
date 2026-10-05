@@ -17,7 +17,7 @@
  *
  */
 
-import type {Configuration} from '../Config';
+import type {Configuration} from '../config';
 
 export function isDataDogEnabled(): boolean {
   return false;

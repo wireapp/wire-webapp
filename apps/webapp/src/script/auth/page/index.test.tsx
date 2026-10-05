@@ -22,7 +22,7 @@ import {Navigate} from 'react-router';
 
 import {Index} from './index';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {initialRootState} from '../module/reducer';
 import {initialAuthState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';

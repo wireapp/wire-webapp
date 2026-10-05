@@ -60,7 +60,7 @@ import {EventValidationError} from './preprocessor/eventStorageMiddleware/eventH
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 
 const callEventLifetimeInSeconds = 30;
 const heartbeatIntervalInSeconds = 30;

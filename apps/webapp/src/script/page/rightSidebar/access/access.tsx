@@ -27,7 +27,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {ConversationAccess} from 'Components/modals/createConversation/types';
 import {getConversationAccessOptions, getConversationManagerOptions} from 'Components/modals/createConversation/utils';
-import {RadioGroup} from 'Components/Radio';
+import {RadioGroup} from 'Components/radio';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
 import {Conversation} from 'Repositories/entity/conversation';

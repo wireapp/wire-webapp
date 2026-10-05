@@ -44,9 +44,9 @@ import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import {Root} from './page/root';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
-import {setAppLocale} from '../localization/Localizer';
+import {setAppLocale} from '../localization/localizer';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 

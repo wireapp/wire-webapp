@@ -29,7 +29,7 @@ import type {ConversationRepository} from 'Repositories/conversation/conversatio
 import {isMLSCapableConversation} from 'Repositories/conversation/conversationSelectors';
 import type {ConversationState} from 'Repositories/conversation/conversationState';
 import type {Conversation} from 'Repositories/entity/conversation';
-import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
+import type {CallingViewModel} from 'src/script/viewModel/callingViewModel';
 
 export const joinMeetingCallErrors = {
   conversationNotFound: 'conversationNotFound',

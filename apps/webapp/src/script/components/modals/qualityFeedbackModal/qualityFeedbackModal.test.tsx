@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from 'test/helper/testFactory';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/modals/qualityFeedbackModal/constants';

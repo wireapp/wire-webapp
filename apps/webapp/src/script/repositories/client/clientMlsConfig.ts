@@ -20,7 +20,7 @@
 import {isUndefined} from '@sindresorhus/is';
 import {FeatureList} from '@wireapp/api-client/lib/team';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {getE2EIConfig} from '../../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {getMLSConfig} from '../../page/components/featureConfigChange/featureConfigChangeHandler/features/mls';
 

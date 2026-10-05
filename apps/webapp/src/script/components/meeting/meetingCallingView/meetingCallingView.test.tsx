@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
-
 import {render} from '@testing-library/react';
 import {container} from 'tsyringe';
 
@@ -32,7 +31,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+import type {MainViewModel} from 'src/script/viewModel/mainViewModel';
 import {buildMediaDevicesHandler} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';

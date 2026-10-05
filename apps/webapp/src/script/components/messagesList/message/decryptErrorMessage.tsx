@@ -24,8 +24,8 @@ import {isNan, isNonEmptyString} from '@sindresorhus/is';
 
 import * as Icon from 'Components/icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
-import {Config} from 'src/script/Config';
-import {MotionDuration} from 'src/script/motion/MotionDuration';
+import {Config} from 'src/script/config';
+import {MotionDuration} from 'src/script/motion/motionDuration';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';

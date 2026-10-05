@@ -33,7 +33,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {ContentState, useAppState} from '../useAppState';
 
 const windowTitleLogger = getLogger('WindowTitlesViewModel');

@@ -36,7 +36,7 @@ import {clamp} from 'Util/numberUtil';
 import {getFirstChar} from 'Util/stringUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {ACCENT_ID} from '../../../Config';
+import {ACCENT_ID} from '../../../config';
 
 const guestExpirationThresholdInSeconds = 10;
 const singleNameInitialsLength = 2;

@@ -28,9 +28,9 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {RadioGroup} from 'Components/Radio';
-import {SelectText} from 'Components/SelectText';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {RadioGroup} from 'Components/radio';
+import {SelectText} from 'Components/selectText';
+import {BaseToggle} from 'Components/toggle/baseToggle';
 import {ACCESS_STATE} from 'Repositories/conversation/accessState';
 import {teamPermissionsForAccessState} from 'Repositories/conversation/conversationAccessPermission';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
@@ -41,7 +41,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {copyText} from 'Util/clipboardUtil';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
 

@@ -22,7 +22,7 @@ import {MessagesListParams} from 'Components/messagesList/messageList.types';
 
 import {VirtualizedMessageListWrapper} from './virtualizedMessageListWrapper';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 export const MessageListWrapper = ({
   assetRepository,

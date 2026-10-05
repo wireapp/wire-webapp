@@ -26,7 +26,7 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ZoomableImage} from 'Components/ZoomableImage';
+import {ZoomableImage} from 'Components/zoomableImage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {MessageRepository} from 'Repositories/conversation/messageRepository';
@@ -43,7 +43,7 @@ import {waitFor} from 'Util/waitFor';
 import {DetailViewModalFooter} from './detailViewModalFooter';
 import {DetailViewModalHeader} from './detailViewModalHeader';
 
-import {isContentMessage} from '../../../guards/Message';
+import {isContentMessage} from '../../../guards/message';
 import {MessageCategory} from '../../../message/messageCategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 

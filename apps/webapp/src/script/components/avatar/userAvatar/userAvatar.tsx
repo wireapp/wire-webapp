@@ -26,7 +26,7 @@ import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
 import {AvailabilityIcon} from 'Components/availabilityIcon/index';
-import {useUserName} from 'Components/UserName';
+import {useUserName} from 'Components/userName';
 import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';

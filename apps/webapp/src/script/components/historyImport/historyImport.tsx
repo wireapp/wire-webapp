@@ -25,7 +25,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
+import {ProgressBar} from 'Components/progressBar/progressBar';
 import {BackupRepository} from 'Repositories/backup/backupRepository';
 import {
   CancelError,
@@ -43,8 +43,8 @@ import {loadFileBuffer} from 'Util/util';
 
 import {BackupFileUpload} from './backupFileUpload';
 
-import {Config} from '../../Config';
-import {MotionDuration} from '../../motion/MotionDuration';
+import {Config} from '../../config';
+import {MotionDuration} from '../../motion/motionDuration';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',

@@ -23,8 +23,8 @@ import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {SearchInput} from 'Components/SearchInput';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {SearchInput} from 'Components/searchInput';
+import {UserSearchableList} from 'Components/userSearchableList';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';

@@ -30,7 +30,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {ClientList} from '../component/clientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';

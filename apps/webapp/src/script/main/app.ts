@@ -110,7 +110,7 @@ import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
-import {Config, Configuration} from '../Config';
+import {Config, Configuration} from '../config';
 import {E2EIHandler} from '../e2eIdentity';
 import {getModalOptions, ModalType} from '../e2eIdentity/modals';
 import {AccessTokenError} from '../error/accessTokenError';
@@ -126,7 +126,7 @@ import {
 } from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations, recoverMLSConversationsInBatches} from '../mls';
-import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
+import {joinConversationsAfterMigrationFinalisation} from '../mls/mlsMigration/migrationFinaliser';
 import type {ApplicationObservability} from '../observability/applicationObservability';
 import type {ApplicationStartupReport} from '../observability/applicationStartupReport';
 import {reportApplicationStartup} from '../observability/reportApplicationStartup';
@@ -134,13 +134,13 @@ import {configureDownloadPath} from '../page/components/featureConfigChange/feat
 import {configureE2EI} from '../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
-import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
-import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import {AppInitStatisticsValue} from '../telemetry/appInit/appInitStatisticsValue';
+import {AppInitTelemetry} from '../telemetry/appInit/appInitTelemetry';
+import {AppInitTimingsStep} from '../telemetry/appInit/appInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
-import {ViewModelRepositories} from '../view_model/MainViewModel';
-import {Warnings} from '../view_model/WarningsContainer';
+import {ViewModelRepositories} from '../viewModel/mainViewModel';
+import {Warnings} from '../viewModel/warningsContainer';
 
 const notificationCheckIntervalInSeconds = 10;
 const connectionStatisticsRoundingFactor = 50;

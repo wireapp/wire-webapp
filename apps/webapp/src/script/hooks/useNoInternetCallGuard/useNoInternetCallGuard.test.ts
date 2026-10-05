@@ -24,10 +24,10 @@ import type {TranslationKey} from 'Util/localizerUtil';
 
 import {useNoInternetCallGuard} from './useNoInternetCallGuard';
 
-import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
-import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
+import {useWarningsState} from '../../viewModel/warningsContainer/warningsState';
+import {TYPE} from '../../viewModel/warningsContainer/warningsTypes';
 
-jest.mock('../../view_model/WarningsContainer/WarningsState');
+jest.mock('../../viewModel/warningsContainer/warningsState');
 jest.mock('Components/modals/primaryModal', () => {
   return {
     PrimaryModal: {

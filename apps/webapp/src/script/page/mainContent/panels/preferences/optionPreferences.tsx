@@ -25,12 +25,12 @@ import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/r
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Theme} from 'Components/appContainer/hooks/useTheme';
-import {RadioGroup} from 'Components/Radio';
+import {RadioGroup} from 'Components/radio';
 import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
 import {User} from 'Repositories/entity/user';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';

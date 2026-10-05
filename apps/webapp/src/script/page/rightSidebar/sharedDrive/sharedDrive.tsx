@@ -33,7 +33,7 @@ import {
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {ParticipantItemContent} from 'Components/participantItemContent';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {BaseToggle} from 'Components/toggle/baseToggle';
 import {Conversation} from 'Repositories/entity/conversation';
 import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';

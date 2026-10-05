@@ -63,7 +63,7 @@ import {
 } from './oauthPermissions.styles';
 import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {actionRoot} from '../module/action';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as SelfSelector from '../module/selector/selfSelector';

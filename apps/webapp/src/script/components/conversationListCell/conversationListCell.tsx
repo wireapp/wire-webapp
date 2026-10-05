@@ -36,7 +36,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from 'Components/avatar';
 import {UserBlockedBadge} from 'Components/badge';
 import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
-import {UserInfo} from 'Components/UserInfo';
+import {UserInfo} from 'Components/userInfo';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';

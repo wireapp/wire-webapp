@@ -26,12 +26,12 @@ import {ReactionType} from '@wireapp/core/lib/conversation';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DownloadButton} from 'Components/messagesList/message/contentMessage/messageActions/downloadButton';
-import {useMessageActionsState} from 'Components/messagesList/message/contentMessage/messageActions/messageActions.state';
 import {
   getActionsMenuCSS,
   getIconCSS,
   messageActionsMenuButton,
 } from 'Components/messagesList/message/contentMessage/messageActions/messageActions.styles';
+import {useMessageActionsState} from 'Components/messagesList/message/contentMessage/messageActions/messageActionsState';
 import {MessageReactions} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions';
 import {ReplyButton} from 'Components/messagesList/message/contentMessage/messageActions/replyButton';
 import {MessageRepository} from 'Repositories/conversation/messageRepository';

@@ -27,11 +27,11 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from 'test/helper/testFactory';
 
 import {Notifications} from './notifications';
 
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 

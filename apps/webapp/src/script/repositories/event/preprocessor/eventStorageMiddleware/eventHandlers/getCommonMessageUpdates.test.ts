@@ -19,7 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 import {StatusType} from 'src/script/message/statusType';
-import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {createMessageAddEvent, toSavedEvent} from 'test/helper/eventGenerator';
 
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 

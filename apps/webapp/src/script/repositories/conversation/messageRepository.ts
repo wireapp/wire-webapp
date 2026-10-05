@@ -117,9 +117,9 @@ import {EventBuilder} from './eventBuilder';
 import {EventMapper} from './eventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {ConversationError} from '../../error/conversationError';
-import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
+import {showLegalHoldWarningModal} from '../../legalHold/legalHoldWarning';
 import {MentionEntity} from '../../message/mentionEntity';
 import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';

@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 

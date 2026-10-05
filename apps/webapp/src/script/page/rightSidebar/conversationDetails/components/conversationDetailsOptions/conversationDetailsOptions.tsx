@@ -33,7 +33,7 @@ import {
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import * as Icon from 'Components/icon';
 import {PanelActions} from 'Components/panel/panelActions';
-import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
+import {ReceiptModeToggle} from 'Components/toggle/receiptModeToggle';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
 import {supportsReadReceipts} from 'Repositories/conversation/conversationSelectors';
@@ -47,7 +47,7 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
-import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../../../viewModel/actionsViewModel';
 import {PanelEntity, PanelState} from '../../../rightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';
 import {ConversationDetailsBottomActions} from '../conversationDetailsBottomActions';

@@ -26,7 +26,7 @@ import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSu
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
-import {Config, Configuration} from '../../../Config';
+import {Config, Configuration} from '../../../config';
 import {actionRoot} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';
 import {initialRootState} from '../../module/reducer';

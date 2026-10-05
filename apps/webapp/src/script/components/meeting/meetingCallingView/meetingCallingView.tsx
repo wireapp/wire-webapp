@@ -19,7 +19,7 @@
 
 import {container} from 'tsyringe';
 
-import {CallingCell} from 'Components/calling/CallingCell';
+import {CallingCell} from 'Components/calling/callingCell';
 import {meetingCallingViewStyles} from 'Components/meeting/meetingCallingView/meetingCallingView.styles';
 import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {CallState} from 'Repositories/calling/callState';

@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import React from 'react';
 
 import userEvent from '@testing-library/user-event';
@@ -37,8 +36,8 @@ import {SearchRepository} from 'Repositories/search/searchRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
-import * as Router from 'src/script/router/Router';
-import {TestFactory} from 'test/helper/TestFactory';
+import * as Router from 'src/script/router/router';
+import {TestFactory} from 'test/helper/testFactory';
 
 import {Conversations, shouldClearDeepLinkForTab} from './';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';

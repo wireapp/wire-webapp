@@ -26,7 +26,7 @@ import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Te
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 export interface JoinGuestLinkPasswordModalProps {
   onSubmitPassword: (password: string) => void;

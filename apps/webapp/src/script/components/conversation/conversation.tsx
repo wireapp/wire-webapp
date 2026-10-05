@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CallingCell} from 'Components/calling/CallingCell';
+import {CallingCell} from 'Components/calling/callingCell';
 import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
 import {Giphy} from 'Components/giphy';
 import {InputBar} from 'Components/inputBar';
@@ -46,7 +46,7 @@ import {Message} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {TeamState} from 'Repositories/team/teamState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {sharedDriveDirectUploadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -91,9 +91,9 @@ import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDro
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {UserError} from '../../error/userError';
-import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
-import {isServiceEntity} from '../../guards/Service';
-import {MotionDuration} from '../../motion/MotionDuration';
+import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/mouse';
+import {isServiceEntity} from '../../guards/service';
+import {MotionDuration} from '../../motion/motionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';

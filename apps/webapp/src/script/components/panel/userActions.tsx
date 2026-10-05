@@ -45,7 +45,7 @@ import type {MenuItem} from './panelActions';
 import {PanelActions} from './panelActions';
 import {SingleAction} from './singleAction/singleAction';
 
-import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import type {ActionsViewModel} from '../../viewModel/actionsViewModel';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',

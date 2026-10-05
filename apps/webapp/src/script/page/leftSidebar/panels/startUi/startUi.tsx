@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import {showInviteModal} from 'Components/modals/inviteModal';
 import {showServiceModal} from 'Components/modals/serviceModal';
 import {showUserModal} from 'Components/modals/userModal';
-import {SearchInput} from 'Components/SearchInput';
+import {SearchInput} from 'Components/searchInput';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {ConversationState} from 'Repositories/conversation/conversationState';
 import {User} from 'Repositories/entity/user';
@@ -41,12 +41,12 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {MainViewModel} from 'src/script/viewModel/mainViewModel';
 
 import {PeopleTab, SearchResultsData} from './peopleTab';
 import {ServicesTab} from './servicesTab';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {ListWrapper} from '../listWrapper';
 
 type StartUIProps = {

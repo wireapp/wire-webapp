@@ -51,7 +51,7 @@ jest.mock('Util/logger', () => {
 });
 
 const mockWindowTitleLoggerDebug = (getLogger as jest.Mock).mock.results[0].value.debug as jest.Mock;
-jest.mock('../../Config', () => {
+jest.mock('../../config', () => {
   return {
     Config: {
       getConfig: jest.fn(() => {

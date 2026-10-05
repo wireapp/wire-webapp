@@ -25,7 +25,7 @@ import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import type {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {PanelHeader} from '../panelHeader';
 
 interface ParticipantDevicesProps {

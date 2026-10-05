@@ -37,7 +37,7 @@ import {CallingEpochCache} from './callingEpochCache';
 import {MuteState} from './callState';
 import type {ClientId, Participant} from './participant';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 const participantsPerPage = 9;
 const maximumDisplayedParticipantNames = 4;

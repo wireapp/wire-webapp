@@ -45,10 +45,10 @@ import {useTheme} from './hooks/useTheme';
 
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
-import {Config, Configuration} from '../../Config';
+import {Config, Configuration} from '../../config';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
-import {setAppLocale} from '../../localization/Localizer';
+import {setAppLocale} from '../../localization/localizer';
 import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
@@ -56,7 +56,7 @@ import {RootProvider} from '../../page/rootProvider';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
-import {MainViewModel} from '../../view_model/MainViewModel';
+import {MainViewModel} from '../../viewModel/mainViewModel';
 import {AppLoader} from '../appLoader/index';
 
 type AppProps = {

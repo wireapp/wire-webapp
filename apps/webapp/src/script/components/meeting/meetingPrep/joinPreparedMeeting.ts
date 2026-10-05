@@ -27,7 +27,7 @@ import {
   type NoInternetCallGuardCopy,
 } from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import type {Translate} from 'Util/localizerUtil';
 
 export type JoinPreparedMeetingParams = {

@@ -19,8 +19,8 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {isMLSSupportedByEnvironment} from '../../../mls/isMLSSupportedByEnvironment';
-import {MLSMigrationStatus} from '../../../mls/MLSMigration/migrationStatus';
+import {isMLSSupportedByEnvironment} from '../../../mls/isMlsSupportedByEnvironment';
+import {MLSMigrationStatus} from '../../../mls/mlsMigration/migrationStatus';
 
 interface SelfSupportedProtocolsTeamHandler {
   getTeamSupportedProtocols: () => CONVERSATION_PROTOCOL[];

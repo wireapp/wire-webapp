@@ -29,7 +29,7 @@ import {Conversation} from 'Repositories/entity/conversation';
 import {User} from 'Repositories/entity/user';
 import {ROLE, roleMap} from 'Repositories/user/userPermission';
 import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {TeamEntity} from './teamEntity';

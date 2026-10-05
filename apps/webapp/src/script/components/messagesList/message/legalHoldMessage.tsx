@@ -19,8 +19,8 @@
 
 import {container} from 'tsyringe';
 
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
+import {LegalHoldDot} from 'Components/legalHoldDot';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModalState';
 import {ConversationState} from 'Repositories/conversation/conversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';

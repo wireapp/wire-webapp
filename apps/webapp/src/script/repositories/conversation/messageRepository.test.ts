@@ -53,7 +53,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {ConversationError} from 'src/script/error/conversationError';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {generateQualifiedId} from 'test/helper/UserGenerator';
+import {generateQualifiedId} from 'test/helper/userGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';

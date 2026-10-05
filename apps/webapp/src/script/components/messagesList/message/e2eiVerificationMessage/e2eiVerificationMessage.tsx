@@ -37,7 +37,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {MessageIcon, IconInfo, Link as LinkStyles} from './e2eiVerificationMessage.styles';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {E2EIHandler} from '../../../../e2eIdentity';
 import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
 

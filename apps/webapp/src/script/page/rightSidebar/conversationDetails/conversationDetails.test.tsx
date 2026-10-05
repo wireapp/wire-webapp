@@ -52,9 +52,9 @@ import {createUuid} from 'Util/uuid';
 
 import {ConversationDetails} from './conversationDetails';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {MainViewModel} from '../../../view_model/MainViewModel';
+import {TestFactory} from '../../../../../test/helper/testFactory';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
+import {MainViewModel} from '../../../viewModel/mainViewModel';
 import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {PanelState} from '../rightSidebar';
 

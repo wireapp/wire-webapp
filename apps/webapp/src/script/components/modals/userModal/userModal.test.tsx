@@ -26,7 +26,7 @@ import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {setStrings, translate} from 'Util/localizerUtil';
@@ -37,7 +37,7 @@ import {
 import {Core} from 'src/script/service/coreSingleton';
 
 import {UserModal, UserModalProps} from './userModal';
-import {showUserModal, useUserModalState} from './userModal.state';
+import {showUserModal, useUserModalState} from './userModalState';
 
 describe('UserModal', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

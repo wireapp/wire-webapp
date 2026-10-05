@@ -23,7 +23,7 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation/';
 
 import {FormatSeparator} from 'Components/inputBar/common/formatSeparator/formatSeparator';
 import {Conversation} from 'Repositories/entity/conversation';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 
 import {AssetUploadButton} from './assetUploadButton/assetUploadButton';
 import {CancelEditButton} from './cancelEditButton/cancelEditButton';

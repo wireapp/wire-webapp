@@ -28,7 +28,7 @@ import type {
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
 } from 'Components/modals/primaryModal/primaryModalTypes';
-import {getUserNameWithTranslate} from 'Components/UserName';
+import {getUserNameWithTranslate} from 'Components/userName';
 import type {User} from 'Repositories/entity/user';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';

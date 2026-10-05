@@ -31,7 +31,7 @@ import * as Icon from 'Components/icon';
 import {EnrichedFields} from 'Components/panel/enrichedFields';
 import {UserActions, Actions} from 'Components/panel/userActions';
 import {UserDetails} from 'Components/panel/userDetails';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {BaseToggle} from 'Components/toggle/baseToggle';
 import {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
 import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/eventBuilder';
 import {Conversation} from 'Repositories/entity/conversation';
@@ -43,7 +43,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity} from '../rightSidebar';
 

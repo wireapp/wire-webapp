@@ -16,14 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import {task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
-
 import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
@@ -42,11 +40,10 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
+import {MainViewModel} from 'src/script/viewModel/mainViewModel';
+import {useWarningsState} from 'src/script/viewModel/warningsContainer/warningsState';
 import {KEY} from 'Util/keyboardUtil';
 import {translateForTest} from 'Util/test/translateForTest';
-
 import {MeetNowModal} from './meetNowModal';
 import {useMeetNowModal} from './useMeetNowModal';
 

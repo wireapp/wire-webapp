@@ -38,7 +38,7 @@ import {getLogger, Logger} from 'Util/logger';
 import {failedWrapperStyles, getImageStyle, getWrapperStyles} from './image.styles';
 import {RestrictedImage} from './restrictedImage';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {
   AssetUrl,
   useAssetTransfer,

@@ -28,7 +28,7 @@ import {
   MemberMessage as MemberMessageEntity,
 } from 'Repositories/entity/message/memberMessage';
 import {User} from 'Repositories/entity/user';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

@@ -78,7 +78,7 @@ const config: Config = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons', 'require', 'import', 'default'],
   },
-  testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
+  testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2eTests'],
   testRunner: 'jest-jasmine2',
   // Some dependencies are ESM and/or expose only package.json exports import conditions.
   // Jest still needs help resolving and transforming them in this CommonJS-ish test setup.

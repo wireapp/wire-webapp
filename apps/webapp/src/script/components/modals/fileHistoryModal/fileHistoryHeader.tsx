@@ -20,7 +20,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
+import {FileLoader} from 'Components/fileFullscreenModal/fileLoader/fileLoader';
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

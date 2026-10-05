@@ -47,7 +47,7 @@ import {formatDuration} from 'Util/timeUtil';
 
 import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 
 type Features =
   | 'FileSharing'

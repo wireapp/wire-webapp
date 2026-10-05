@@ -25,7 +25,7 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/federationStopMessage';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';

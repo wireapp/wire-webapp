@@ -18,7 +18,7 @@
  */
 
 import {ReactionMap} from 'Repositories/storage';
-import {generateQualifiedId} from 'test/helper/UserGenerator';
+import {generateQualifiedId} from 'test/helper/userGenerator';
 
 import {addReaction, userReactionMapToReactionMap} from './reactionUtil';
 import {createUuid} from './uuid';

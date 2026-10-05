@@ -61,7 +61,7 @@ import {isBackendError} from 'Util/typePredicateUtil';
 
 import {separator} from './login.styles';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {AccountAlreadyExistsModal} from '../../component/accountAlreadyExistsModal';
 import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
 import {BackButton} from '../../component/backButton';

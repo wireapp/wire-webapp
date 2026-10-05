@@ -29,7 +29,7 @@ import {User} from 'Repositories/entity/user';
 import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 
 interface InviteModalProps {
   translate: Translate;

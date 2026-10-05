@@ -87,13 +87,13 @@ import {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {ConversationError} from 'src/script/error/conversationError';
 import {
   generateConversation as _generateConversation,
   generateAPIConversation,
-} from 'test/helper/ConversationGenerator';
-import {createDeleteEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
+} from 'test/helper/conversationGenerator';
+import {createDeleteEvent, createMessageAddEvent} from 'test/helper/eventGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {escapeRegex} from 'Util/sanitizationUtil';
@@ -117,9 +117,9 @@ import {MessageRepository} from './messageRepository';
 import {NOTIFICATION_STATE} from './notificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
-import {generateUser} from '../../../../test/helper/UserGenerator';
+import {generateUser} from '../../../../test/helper/userGenerator';
 import {Core} from '../../service/coreSingleton';
 
 function getCoreConversationServiceForTest(): NonNullable<NonNullable<Core['service']>['conversation']> {

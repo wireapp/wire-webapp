@@ -26,7 +26,7 @@ import {isNull} from '@sindresorhus/is';
 import type {Translate} from 'Util/localizerUtil';
 
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {MainViewModel} from '../viewModel/mainViewModel';
 
 export type ApplicationNavigation = {
   readonly currentPathname: string;

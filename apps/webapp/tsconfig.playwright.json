@@ -20,6 +20,6 @@
       "I18n/*": ["./src/i18n/*"]
     }
   },
-  "include": ["playwright.config.ts", "test/e2e_tests/playwright-globals.d.ts", "test/e2e_tests/**/*.ts", "test/e2e_tests/**/*.tsx"],
+  "include": ["playwright.config.ts", "test/e2eTests/playwrightGlobals.d.ts", "test/e2eTests/**/*.ts", "test/e2eTests/**/*.tsx"],
   "exclude": ["node_modules"]
 }

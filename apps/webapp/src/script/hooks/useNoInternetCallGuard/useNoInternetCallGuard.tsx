@@ -23,8 +23,8 @@ import {PrimaryModal} from 'Components/modals/primaryModal';
 import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
 import type {Translate} from 'Util/localizerUtil';
 
-import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
-import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
+import {useWarningsState} from '../../viewModel/warningsContainer/warningsState';
+import {TYPE} from '../../viewModel/warningsContainer/warningsTypes';
 
 export interface NoInternetCallGuardCopy {
   description: string;

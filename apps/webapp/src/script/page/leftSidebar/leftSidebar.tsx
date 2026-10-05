@@ -34,7 +34,7 @@ import {Conversations} from './panels/conversations';
 import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
-import {ListViewModel} from '../../view_model/ListViewModel';
+import {ListViewModel} from '../../viewModel/listViewModel';
 import {ListState, useAppState} from '../useAppState';
 
 type LeftSidebarProps = {

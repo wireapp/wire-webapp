@@ -34,7 +34,7 @@ import {
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
-import {generateAPIConversation} from 'test/helper/ConversationGenerator';
+import {generateAPIConversation} from 'test/helper/conversationGenerator';
 
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
 import {translateForTest} from 'Util/test/translateForTest';

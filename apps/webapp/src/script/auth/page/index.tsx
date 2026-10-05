@@ -38,8 +38,8 @@ import {getWebEnvironment} from 'Util/environment';
 
 import {Page} from './page';
 
-import {Config} from '../../Config';
-import '../../localization/Localizer';
+import {Config} from '../../config';
+import '../../localization/localizer';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/authSelector';

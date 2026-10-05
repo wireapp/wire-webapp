@@ -22,7 +22,7 @@ import {ClientEvent, CONVERSATION} from 'Repositories/event/client';
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {createMessageAddEvent} from 'test/helper/EventGenerator';
+import {createMessageAddEvent} from 'test/helper/eventGenerator';
 
 import {AssetType} from 'Repositories/assets/assetType';
 import {EventBuilder} from 'Repositories/conversation/eventBuilder';

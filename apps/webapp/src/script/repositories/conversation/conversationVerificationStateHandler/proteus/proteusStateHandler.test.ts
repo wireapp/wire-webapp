@@ -24,7 +24,7 @@ import {createUuid} from 'Util/uuid';
 
 import {ProteusConversationVerificationStateHandler} from './proteusStateHandler';
 
-import {TestFactory} from '../../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../../test/helper/testFactory';
 import {ConversationRepository} from '../../conversationRepository';
 import {ConversationVerificationState} from '../../conversationVerificationState';
 import {EventBuilder} from '../../eventBuilder';

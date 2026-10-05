@@ -20,7 +20,7 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {currentLanguage} from './auth/localeConfig';
-import {Config} from './Config';
+import {Config} from './config';
 
 const languageCodeLength = 2;
 

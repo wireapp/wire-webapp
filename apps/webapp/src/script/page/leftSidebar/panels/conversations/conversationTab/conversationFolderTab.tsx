@@ -26,7 +26,7 @@ import * as Icons from 'Components/icon';
 import {createLabel, LabelType} from 'Repositories/conversation/conversationLabelRepository';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {Conversation} from 'Repositories/entity/conversation';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useFolderStore} from 'src/script/page/leftSidebar/panels/conversations/useFoldersStore';
 import {
   SidebarStatus,

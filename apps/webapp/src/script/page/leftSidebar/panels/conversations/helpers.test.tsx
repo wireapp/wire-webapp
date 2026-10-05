@@ -28,8 +28,8 @@ import {
   getTabConversations,
   scrollToConversation,
 } from 'src/script/page/leftSidebar/panels/conversations/helpers';
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateConversation} from 'test/helper/conversationGenerator';
+import {generateUser} from 'test/helper/userGenerator';
 
 import {SidebarTabs} from './useSidebarStore';
 

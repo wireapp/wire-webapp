@@ -24,7 +24,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import en from 'I18n/en-US.json';
 import si from 'I18n/si-LK.json';
 import {ClientEntity} from 'Repositories/client/clientEntity';
-import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModalState';
 import {CallingRepository} from 'Repositories/calling/callingRepository';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
@@ -45,7 +45,7 @@ import {
 
 import {LegalHoldModal, LegalHoldModalProps, LegalHoldModalType} from './legalHoldModal';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const userRepository = {} as UserRepository;

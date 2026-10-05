@@ -53,8 +53,8 @@ import {Success} from './success';
 import {VerifyEmailCode} from './verifyEmailCode';
 import {VerifyEmailLink} from './verifyEmailLink';
 
-import {Config} from '../../Config';
-import {MainViewModel} from '../../view_model/MainViewModel';
+import {Config} from '../../config';
+import {MainViewModel} from '../../viewModel/mainViewModel';
 import {RouteA11y} from '../component/routeA11Y';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';

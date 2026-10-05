@@ -12,7 +12,7 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
-test/e2e_tests/.env
+test/e2eTests/.env
 
 # Yarn 2 - not using zero-installs
 .pnp.*

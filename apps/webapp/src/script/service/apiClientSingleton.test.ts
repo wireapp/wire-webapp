@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from '../Config';
+import {Config} from '../config';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {APIClient} from './apiClientSingleton';
 

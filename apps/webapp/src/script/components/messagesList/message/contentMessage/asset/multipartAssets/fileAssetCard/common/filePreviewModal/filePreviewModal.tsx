@@ -17,7 +17,7 @@
  *
  */
 
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from 'Components/fileFullscreenModal/fileFullscreenModal';
 
 interface FilePreviewModalProps {
   id: string;

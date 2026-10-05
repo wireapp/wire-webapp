@@ -18,9 +18,9 @@
  */
 
 import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
-import {PasswordFields, type PasswordFieldsProps} from 'Components/PasswordFields/PasswordFields';
-import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
-import {Config} from 'src/script/Config';
+import {PasswordFields, type PasswordFieldsProps} from 'Components/passwordFields/passwordFields';
+import {PasswordGeneratorButton} from 'Components/passwordGeneratorButton';
+import {Config} from 'src/script/config';
 
 import {
   embeddedPasswordActionsStyles,

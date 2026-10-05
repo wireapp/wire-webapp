@@ -51,10 +51,10 @@ import {ConversationDetailsHeader} from './components/conversationDetailsHeader'
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
 
-import {isServiceEntity} from '../../../guards/Service';
+import {isServiceEntity} from '../../../guards/service';
 import {Shortcut} from '../../../ui/shortcut';
 import {ShortcutType} from '../../../ui/shortcutType';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

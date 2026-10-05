@@ -23,7 +23,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {UserState} from 'Repositories/user/userState';
-import {ACCENT_ID} from 'src/script/Config';
+import {ACCENT_ID} from 'src/script/config';
 
 function setAccentColor(accentColor?: number) {
   const accentColorClassId = accentColor ?? ACCENT_ID.BLUE;

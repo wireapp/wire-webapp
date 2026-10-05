@@ -27,7 +27,7 @@ import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
 import {errorHandlerStrings} from 'Util/errorUtil';
 import {validationErrorStrings} from 'Util/validationUtil';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 interface ExceptionProps {
   errors: unknown[];

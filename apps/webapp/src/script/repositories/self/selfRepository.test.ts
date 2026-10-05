@@ -24,7 +24,7 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from 'Repositories/client';
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from 'test/helper/testFactory';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

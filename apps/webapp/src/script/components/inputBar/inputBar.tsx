@@ -67,7 +67,7 @@ import {useMessageHandling} from './useMessageHandling/useMessageHandling';
 import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {useApplicationContext} from '../../page/rootProvider';
 
 const pingTimeoutInSeconds = 2;

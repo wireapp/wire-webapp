@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {STATE as CALL_STATE, CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
@@ -31,7 +30,7 @@ import type {Conversation} from 'Repositories/entity/conversation';
 import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import type {ConversationState} from 'Repositories/conversation/conversationState';
 import type {CallingRepository} from 'Repositories/calling/callingRepository';
-import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
+import type {CallingViewModel} from 'src/script/viewModel/callingViewModel';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};
 const media = {cameraEnabled: true, microphoneEnabled: false};

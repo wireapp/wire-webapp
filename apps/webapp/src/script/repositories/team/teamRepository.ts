@@ -49,7 +49,7 @@ import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/user/userPermission';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -63,7 +63,7 @@ import {TeamService} from './teamService';
 import {TeamState} from './teamState';
 
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
-import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
+import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/mlsMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
 
 const teamRefreshIntervalInMinutes = 5;

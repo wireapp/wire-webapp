@@ -34,7 +34,7 @@ import {MessageRepository} from 'Repositories/conversation/messageRepository';
 import {Conversation} from 'Repositories/entity/conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {User} from 'Repositories/entity/user';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';

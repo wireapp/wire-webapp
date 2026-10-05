@@ -28,7 +28,7 @@ import {ClientEntity} from 'Repositories/client/clientEntity';
 import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
 import {ConversationMapper} from 'Repositories/conversation/conversationMapper';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/notificationSetting';
-import 'src/script/localization/Localizer';
+import 'src/script/localization/localizer';
 import {StatusType} from 'src/script/message/statusType';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';

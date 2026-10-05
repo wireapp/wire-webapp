@@ -21,7 +21,7 @@ import {useState} from 'react';
 
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const ConversationViewerPermissionBanner = () => {

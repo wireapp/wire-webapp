@@ -23,7 +23,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {containerStyles, imageStyles} from './imageAssetSmall.styles';
 
-import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../fileFullscreenModal/fileFullscreenModal';
 import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
 
 interface ImageAssetSmallProps {

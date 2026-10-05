@@ -22,7 +22,7 @@ import React from 'react';
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/user';
-import {generateConversation} from 'test/helper/ConversationGenerator';
+import {generateConversation} from 'test/helper/conversationGenerator';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

@@ -59,7 +59,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandli
 import {BrowserPermissionStatus} from 'Repositories/permission/browserPermissionStatus';
 import {UserMapper} from 'Repositories/user/userMapper';
 import {UserState} from 'Repositories/user/userState';
-import 'src/script/localization/Localizer';
+import 'src/script/localization/localizer';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/callMessageType';
 import {MentionEntity} from 'src/script/message/mentionEntity';
 import {QuoteEntity} from 'src/script/message/quoteEntity';

@@ -19,7 +19,7 @@
 
 import {FC, ReactNode, useEffect, useRef, useState} from 'react';
 
-import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {LoadingBar} from 'Components/loadingBar/loadingBar';
 import {User} from 'Repositories/entity/user';
 
 import {styles} from './appLoader.styles';

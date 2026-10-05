@@ -49,12 +49,12 @@ import {ParticipantDevices} from './participantDevices';
 import {SharedDrive} from './sharedDrive';
 import {TimedMessages} from './timedMessages';
 
-import {isReadableMessage} from '../../guards/Message';
-import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
-import {isAppOrServiceEntity} from '../../guards/Service';
+import {isReadableMessage} from '../../guards/message';
+import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/panel';
+import {isAppOrServiceEntity} from '../../guards/service';
 import {Core} from '../../service/coreSingleton';
-import {ActionsViewModel} from '../../view_model/ActionsViewModel';
-import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {ActionsViewModel} from '../../viewModel/actionsViewModel';
+import {ViewModelRepositories} from '../../viewModel/mainViewModel';
 import {RightSidebarParams} from '../appMain';
 import {useAppMainState} from '../state';
 import {ContentState} from '../useAppState';

@@ -35,7 +35,7 @@ import {ClientState} from 'Repositories/client/clientState';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';

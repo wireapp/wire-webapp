@@ -45,7 +45,7 @@ import {
   meetingNotificationViewBtnStyles,
 } from './meetingNotificationCard.styles';
 
-import {navigate} from '../../../router/Router';
+import {navigate} from '../../../router/router';
 import {type MeetingNotification, MeetingNotificationKind} from '../meetingNotificationStore/meetingNotificationStore';
 
 type MeetingNotificationCardProps = MeetingNotification & {

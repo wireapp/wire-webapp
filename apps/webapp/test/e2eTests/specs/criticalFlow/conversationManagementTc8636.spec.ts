@@ -1,0 +1,112 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {PageManager} from 'test/e2eTests/pageManager';
+import {createGroup, sendTextMessageToConversation} from 'test/e2eTests/utils/userActions';
+
+import {test, expect, withLogin} from '../../testFixtures';
+
+// Generating test data
+const conversationName = 'Test Conversation';
+
+test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({createUser, createTeam, createPage}) => {
+  test.setTimeout(150_000);
+
+  const members = await Promise.all(Array.from({length: 5}, createUser));
+  const {owner} = await createTeam('Conversation Management', {users: members});
+
+  const [ownerPage, ...memberPages] = await Promise.all([
+    createPage(withLogin(owner)),
+    ...members.map(member => {
+      return createPage(withLogin(member));
+    }),
+  ]);
+  const [ownerPageManager, ...memberPageManagers] = [
+    PageManager.from(ownerPage),
+    ...memberPages.map(page => {
+      return PageManager.from(page);
+    }),
+  ];
+
+  const conversation = ownerPageManager.webapp.pages.conversationList().getConversation(conversationName);
+
+  await test.step('Team owner creates a group with all the five members', async () => {
+    const {pages} = ownerPageManager.webapp;
+    await createGroup(pages, conversationName, members);
+    await expect(conversation).toBeVisible();
+  });
+
+  await test.step('Team owner sends a message in the conversation', async () => {
+    await sendTextMessageToConversation(ownerPageManager, conversationName, 'Hello team! Admin here.');
+  });
+
+  await test.step('Team members sign in and send messages', async () => {
+    await Promise.all(
+      members.map(async (member, index) => {
+        await sendTextMessageToConversation(
+          memberPageManagers[index],
+          conversationName,
+          `Hello team! ${member.firstName} here.`,
+        );
+      }),
+    );
+  });
+
+  await test.step('Team owner signed in to the application and verify messages', async () => {
+    const {pages} = ownerPageManager.webapp;
+    await conversation.open();
+    await Promise.all(
+      members.map(async member => {
+        const message = pages.conversation().getMessage({content: `Hello team! ${member.firstName} here.`});
+        await expect(message).toBeVisible();
+      }),
+    );
+  });
+
+  await test.step('Team owner send self-destructing messages', async () => {
+    const {pages, components} = ownerPageManager.webapp;
+    const textMessage = 'This message will self-destruct in 10 seconds.';
+    await components.inputBarControls().setEphemeralTimerTo('10 seconds');
+    await pages.conversation().sendMessage(textMessage);
+
+    await expect(pages.conversation().getMessage({content: textMessage})).toBeVisible();
+    // Wait for more than 10 seconds to ensure the message is deleted
+    await ownerPage.waitForTimeout(11000);
+
+    await expect(pages.conversation().getMessage({content: textMessage})).not.toBeVisible();
+    await components.inputBarControls().setEphemeralTimerTo('Off');
+  });
+
+  await test.step('Team owner open searched conversation', async () => {
+    const {pages} = ownerPageManager.webapp;
+    await pages.conversationList().searchConversationsInput.fill(conversationName);
+    await conversation.open();
+    await expect(conversation).toBeVisible();
+    await conversation.open();
+  });
+
+  await test.step('Team owner leave conversation with clear history', async () => {
+    const {pages, modals} = ownerPageManager.webapp;
+    const contextMenu = await conversation.openContextMenu();
+    await contextMenu.leaveConversationButton.click();
+    await modals.leaveConversation().modalCheckbox.click();
+    await modals.leaveConversation().actionButton.click();
+    await expect(pages.conversation().messageInput).not.toBeAttached();
+  });
+});

@@ -24,7 +24,7 @@ import {Accept, DropzoneInputProps, FileRejection, useDropzone} from 'react-drop
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Conversation} from 'Repositories/entity/conversation';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 

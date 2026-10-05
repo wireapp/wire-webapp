@@ -27,9 +27,9 @@ import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
-import {SearchInput} from 'Components/SearchInput';
-import {ServiceList} from 'Components/ServiceList/ServiceList';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {SearchInput} from 'Components/searchInput';
+import {ServiceList} from 'Components/serviceList/serviceList';
+import {UserSearchableList} from 'Components/userSearchableList';
 import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {Conversation} from 'Repositories/entity/conversation';
 import {User} from 'Repositories/entity/user';

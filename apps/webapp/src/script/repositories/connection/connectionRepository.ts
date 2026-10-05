@@ -49,7 +49,7 @@ import {ConnectionMapper} from './connectionMapper';
 import type {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {SystemMessageType} from '../../message/systemMessageType';
 
 export class ConnectionRepository {

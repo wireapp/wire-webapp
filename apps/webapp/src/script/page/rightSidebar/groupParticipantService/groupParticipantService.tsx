@@ -37,7 +37,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {PanelHeader} from '../panelHeader';
 
 interface GroupParticipantServiceProps {

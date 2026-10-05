@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {ProgressBar} from 'Components/ProgressBar';
+import {ProgressBar} from 'Components/progressBar';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

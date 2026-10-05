@@ -28,7 +28,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatDurationCaption, TIME_IN_MILLIS} from 'Util/timeUtil';

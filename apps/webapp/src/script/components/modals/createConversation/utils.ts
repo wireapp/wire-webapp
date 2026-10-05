@@ -27,7 +27,7 @@ import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 
 export type Translate = RootContextValue['translate'];
 

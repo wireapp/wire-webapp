@@ -22,7 +22,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {useUserName} from 'Components/UserName';
+import {useUserName} from 'Components/userName';
 import type {User} from 'Repositories/entity/user';
 
 import {avatarItemStyles} from './stackedAvatars.styles';

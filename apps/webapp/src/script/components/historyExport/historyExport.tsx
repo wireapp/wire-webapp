@@ -27,7 +27,7 @@ import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
+import {ProgressBar} from 'Components/progressBar/progressBar';
 import {CancelError} from 'Repositories/backup/error';
 import {ClientState} from 'Repositories/client/clientState';
 import {User} from 'Repositories/entity/user';
@@ -39,7 +39,7 @@ import {getLogger} from 'Util/logger';
 import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',

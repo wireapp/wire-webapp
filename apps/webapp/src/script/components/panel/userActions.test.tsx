@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import {act, fireEvent, render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
@@ -40,7 +39,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
+import {ActionsViewModel} from 'src/script/viewModel/actionsViewModel';
 import {noop} from 'Util/util';
 
 import {ActionIdentifier, Actions, UserActions} from './userActions';

@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

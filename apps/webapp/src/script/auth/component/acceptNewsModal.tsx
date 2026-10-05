@@ -25,7 +25,7 @@ import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 interface Props {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;

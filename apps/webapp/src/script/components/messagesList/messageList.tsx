@@ -41,8 +41,8 @@ import type {UserRepository} from 'Repositories/user/userRepository';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
-import {useResizeObserver} from 'Util/DOM/resizeObserver';
+import {onHitTopOrBottom} from 'Util/dom/onHitTopOrBottom';
+import {useResizeObserver} from 'Util/dom/resizeObserver';
 
 import {Message, MessageActions} from './message';
 import {MarkerComponent} from './message/marker';

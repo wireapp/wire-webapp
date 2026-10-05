@@ -1,0 +1,625 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {PrimaryModal, usePrimaryModalState} from 'Components/modals/primaryModal';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
+import type {TeamRepository} from 'Repositories/team/teamRepository';
+import {TeamState} from 'Repositories/team/teamState';
+import {UserState} from 'Repositories/user/userState';
+import {iterateItem} from 'Util/arrayUtil';
+import {isEscapeKey} from 'Util/keyboardUtil';
+import {type Translate} from 'Util/localizerUtil';
+
+import type {ActionsViewModel} from './actionsViewModel';
+import {CallingViewModel} from './callingViewModel';
+import {ContentViewModel} from './contentViewModel';
+import type {MainViewModel, ViewModelRepositories} from './mainViewModel';
+
+import {Config} from '../config';
+import {
+  getConversationListTab,
+  SidebarTabs,
+  useSidebarStore,
+} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+import {PanelState} from '../page/rightSidebar';
+import {useAppMainState} from '../page/state';
+import {ContentState, ListState, useAppState} from '../page/useAppState';
+import {setHistoryParam} from '../router/router';
+import {showContextMenu} from '../ui/contextMenu';
+import {showLabelContextMenu} from '../ui/labelContextMenu';
+import {Shortcut} from '../ui/shortcut';
+import {ShortcutType} from '../ui/shortcutType';
+
+export class ListViewModel {
+  private readonly userState: UserState;
+  private readonly teamState: TeamState;
+  private readonly conversationState: ConversationState;
+
+  readonly isActivatedAccount: ko.PureComputed<boolean>;
+  readonly lastUpdate: ko.Observable<number>;
+  readonly repositories: ViewModelRepositories;
+
+  public readonly mainViewModel: MainViewModel;
+  public readonly conversationRepository: ConversationRepository;
+  public readonly propertiesRepository: PropertiesRepository;
+  private readonly callingRepository: CallingRepository;
+  public readonly teamRepository: TeamRepository;
+  public readonly searchRepository: SearchRepository;
+  private readonly actionsViewModel: ActionsViewModel;
+  public readonly contentViewModel: ContentViewModel;
+  public readonly callingViewModel: CallingViewModel;
+  private readonly isProAccount: ko.PureComputed<boolean>;
+  public readonly selfUser: ko.Subscribable<User>;
+  private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
+
+  get isFederated() {
+    return this.mainViewModel.isFederated;
+  }
+
+  constructor(
+    mainViewModel: MainViewModel,
+    repositories: ViewModelRepositories,
+    private readonly translate: Translate,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
+  ) {
+    this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
+    this.conversationState = container.resolve(ConversationState);
+
+    this.mainViewModel = mainViewModel;
+    this.repositories = repositories;
+    this.conversationRepository = repositories.conversation;
+    this.callingRepository = repositories.calling;
+    this.teamRepository = repositories.team;
+    this.propertiesRepository = repositories.properties;
+    this.searchRepository = repositories.search;
+
+    this.actionsViewModel = mainViewModel.actions;
+    this.contentViewModel = mainViewModel.content;
+    this.callingViewModel = mainViewModel.calling;
+
+    this.isProAccount = this.teamState.isTeam;
+    this.selfUser = this.userState.self;
+    this.isActivatedAccount = ko.pureComputed(() => {
+      return this.selfUser().isActivatedAccount();
+    });
+
+    // State
+    this.lastUpdate = ko.observable(0);
+
+    this.visibleListItems = ko.pureComputed(() => {
+      const {listState} = useAppState.getState();
+      const isStatePreferences = listState === ListState.PREFERENCES;
+
+      if (isStatePreferences) {
+        const preferenceItems = [
+          ContentState.PREFERENCES_ACCOUNT,
+          ContentState.PREFERENCES_DEVICES,
+          ContentState.PREFERENCES_OPTIONS,
+          ContentState.PREFERENCES_AV,
+        ];
+
+        if (!Runtime.isDesktopApp()) {
+          preferenceItems.push(ContentState.PREFERENCES_ABOUT);
+        }
+
+        return preferenceItems;
+      }
+
+      const hasConnectRequests = isNonEmptyArray(this.userState.connectRequests());
+      const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
+
+      return states.concat(this.conversationState.visibleConversations());
+    });
+
+    this._initSubscriptions();
+  }
+
+  private readonly _initSubscriptions = () => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+      this.openConversations(conversation?.archivedState());
+    });
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
+    amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
+    amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI);
+    amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext);
+    amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious);
+    amplify.subscribe(WebAppEvents.SHORTCUT.ARCHIVE, this.clickToArchive);
+    amplify.subscribe(WebAppEvents.SHORTCUT.DELETE, this.clickToClear);
+    amplify.subscribe(WebAppEvents.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
+    amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
+  };
+
+  readonly answerCall = async (conversationEntity: Conversation): Promise<void> => {
+    const call = this.callingRepository.findCall(conversationEntity.qualifiedId);
+
+    if (isUndefined(call)) {
+      return;
+    }
+
+    if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
+      return PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: `${this.translate('modalConferenceCallNotSupportedMessage')} ${this.translate(
+              'modalConferenceCallNotSupportedJoinMessage',
+            )}`,
+            title: this.translate('modalConferenceCallNotSupportedHeadline'),
+          },
+        },
+        undefined,
+        this.translate,
+      );
+    }
+
+    await this.callingViewModel.callActions.answer(call);
+  };
+
+  readonly changeNotificationSetting = () => {
+    if (this.isProAccount()) {
+      const {rightSidebar} = useAppMainState.getState();
+      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
+    } else {
+      this.clickToToggleMute();
+    }
+  };
+
+  readonly goToNext = () => {
+    this.iterateActiveItem(true);
+  };
+
+  readonly goToPrevious = () => {
+    this.iterateActiveItem(false);
+  };
+
+  onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
+    const {currentModalId} = usePrimaryModalState.getState();
+    const {currentTab} = useSidebarStore.getState();
+
+    // don't switch view for primary modal(ex: preferences->set status->modal opened)
+    // when user press escape, only close the modal and stay within the preference screen
+    if (
+      isEscapeKey(keyboardEvent) &&
+      currentModalId === null &&
+      ![SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(currentTab)
+    ) {
+      const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
+      this.switchList(newState);
+    }
+  };
+
+  private readonly iterateActiveItem = (reverse = false) => {
+    const {listState} = useAppState.getState();
+    const isStatePreferences = listState === ListState.PREFERENCES;
+
+    return isStatePreferences ? this.iterateActivePreference(reverse) : this.iterateActiveConversation(reverse);
+  };
+
+  private readonly iterateActiveConversation = (reverse: boolean) => {
+    const {contentState} = useAppState.getState();
+
+    const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
+    const activeConversationItem = isStateRequests
+      ? ContentState.CONNECTION_REQUESTS
+      : this.conversationState.activeConversation();
+    const nextItem = iterateItem(this.visibleListItems(), activeConversationItem, reverse);
+    const isConnectionRequestItem = nextItem === ContentState.CONNECTION_REQUESTS;
+
+    if (isConnectionRequestItem) {
+      return this.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
+    }
+
+    if (nextItem !== undefined) {
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem, {});
+    }
+  };
+
+  private readonly iterateActivePreference = (reverse: boolean) => {
+    const {contentState} = useAppState.getState();
+    let activePreference = contentState;
+    const isDeviceDetails = activePreference === ContentState.PREFERENCES_DEVICE_DETAILS;
+
+    if (isDeviceDetails) {
+      activePreference = ContentState.PREFERENCES_DEVICES;
+    }
+
+    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as ContentState;
+
+    if (nextPreference !== undefined) {
+      this.contentViewModel.switchContent(nextPreference);
+    }
+  };
+
+  private switchListAndSetTab = (listState: ListState, tab: SidebarTabs) => {
+    useSidebarStore.getState().setCurrentTab(tab);
+    this.switchList(listState);
+  };
+
+  openPreferencesAccount = (): void => {
+    this.fireAndForgetInvoker.fireAndForget(() => {
+      return this.teamRepository.getTeam();
+    });
+    this.openPreferences(ContentState.PREFERENCES_ACCOUNT);
+  };
+
+  readonly openPreferences = (contentState: ContentState): void => {
+    const {listState, contentState: currentContentState} = useAppState.getState();
+    if (listState === ListState.PREFERENCES && currentContentState === contentState) {
+      return;
+    }
+
+    const preferencePaths: Partial<Record<ContentState, string>> = {
+      [ContentState.PREFERENCES_ABOUT]: '/preferences/about',
+      [ContentState.PREFERENCES_ACCOUNT]: '/preferences/account',
+      [ContentState.PREFERENCES_AV]: '/preferences/av',
+      [ContentState.PREFERENCES_DEVICES]: '/preferences/devices',
+      [ContentState.PREFERENCES_OPTIONS]: '/preferences/options',
+    };
+
+    const preferencePath = preferencePaths[contentState];
+    if (isNonEmptyString(preferencePath)) {
+      setHistoryParam(preferencePath);
+    }
+
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
+    this.contentViewModel.switchContent(contentState);
+  };
+
+  readonly openPreferencesDevices = (): void => {
+    this.openPreferences(ContentState.PREFERENCES_DEVICES);
+  };
+
+  readonly openPreferencesAbout = (): void => {
+    this.openPreferences(ContentState.PREFERENCES_ABOUT);
+  };
+
+  readonly openPreferencesAudioVideo = (): void => {
+    this.openPreferences(ContentState.PREFERENCES_AV);
+  };
+
+  readonly openPreferencesOptions = (): void => {
+    this.openPreferences(ContentState.PREFERENCES_OPTIONS);
+  };
+
+  readonly openStartUI = (): void => {
+    this.switchList(ListState.START_UI);
+  };
+
+  readonly openMeetingsList = (): void => {
+    const {listState, contentState} = useAppState.getState();
+    if (listState === ListState.MEETINGS && contentState === ContentState.MEETINGS) {
+      return;
+    }
+
+    setHistoryParam('/meetings');
+    this.switchListAndSetTab(ListState.MEETINGS, SidebarTabs.MEETINGS);
+    this.contentViewModel.switchContent(ContentState.MEETINGS);
+  };
+
+  readonly switchList = (newListState: ListState, loadPreviousContent = true): void => {
+    const {listState} = useAppState.getState();
+    const isStateChange = listState !== newListState;
+
+    if (isStateChange) {
+      this.hideList();
+      this.updateList(newListState, loadPreviousContent);
+      this.showList(newListState);
+    }
+  };
+
+  readonly openConversations = (archive = false): void => {
+    const {currentTab, setCurrentTab} = useSidebarStore.getState();
+    let newState = ListState.TEMPORARY_GUEST;
+    if (this.isActivatedAccount()) {
+      newState = archive ? ListState.ARCHIVE : ListState.CONVERSATIONS;
+    }
+    this.switchList(newState, false);
+
+    if (archive) {
+      setCurrentTab(SidebarTabs.ARCHIVES);
+    } else if (currentTab !== SidebarTabs.CONNECT) {
+      setCurrentTab(getConversationListTab(currentTab));
+    }
+  };
+
+  private readonly hideList = (): void => {
+    document.removeEventListener('keydown', this.onKeyDownListView);
+  };
+
+  private readonly showList = (newListState: ListState): void => {
+    const {setListState} = useAppState.getState();
+
+    setListState(newListState);
+    this.lastUpdate(Date.now());
+
+    document.addEventListener('keydown', this.onKeyDownListView);
+  };
+
+  private readonly updateList = (newListState: ListState, loadPreviousContent: boolean): void => {
+    switch (newListState) {
+      case ListState.PREFERENCES:
+        this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
+        break;
+      case ListState.TEMPORARY_GUEST:
+      case ListState.CONVERSATIONS:
+        if (loadPreviousContent) {
+          this.contentViewModel.loadPreviousContent();
+        }
+    }
+  };
+
+  readonly showTemporaryGuest = (): void => {
+    this.switchList(ListState.TEMPORARY_GUEST);
+    const conversationEntity = this.conversationState.getMostRecentConversation();
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+  };
+
+  readonly onContextMenu = (
+    conversationEntity: Conversation,
+    event: MouseEvent | React.MouseEvent<Element, MouseEvent>,
+  ): void => {
+    const entries = [];
+
+    if (conversationEntity.isMutable()) {
+      const notificationsShortcut = Shortcut.getShortcutTooltip(ShortcutType.NOTIFICATIONS);
+
+      if (this.isProAccount()) {
+        entries.push({
+          click: () => {
+            return this.clickToOpenNotificationSettings(conversationEntity);
+          },
+          label: this.translate('conversationsPopoverNotificationSettings'),
+          title: this.translate('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
+        });
+      } else {
+        const label = conversationEntity.showNotificationsNothing()
+          ? this.translate('conversationsPopoverNotify')
+          : this.translate('conversationsPopoverSilence');
+        const title = conversationEntity.showNotificationsNothing()
+          ? this.translate('tooltipConversationsNotify', {shortcut: notificationsShortcut})
+          : this.translate('tooltipConversationsSilence', {shortcut: notificationsShortcut});
+
+        entries.push({
+          click: () => {
+            return this.clickToToggleMute(conversationEntity);
+          },
+          label,
+          title,
+        });
+      }
+    }
+
+    if (!conversationEntity.is_archived()) {
+      const {conversationLabelRepository} = this.conversationRepository;
+
+      if (!conversationLabelRepository.isFavorite(conversationEntity)) {
+        entries.push({
+          click: () => {
+            conversationLabelRepository.addConversationToFavorites(conversationEntity);
+          },
+          label: this.translate('conversationPopoverFavorite'),
+        });
+      } else {
+        entries.push({
+          click: () => {
+            return conversationLabelRepository.removeConversationFromFavorites(conversationEntity);
+          },
+          label: this.translate('conversationPopoverUnfavorite'),
+        });
+      }
+
+      const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
+
+      if (!isUndefined(customLabel)) {
+        entries.push({
+          click: () => {
+            return conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity);
+          },
+          label: this.translate('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
+        });
+      }
+
+      entries.push({
+        click: () => {
+          return showLabelContextMenu(event, conversationEntity, conversationLabelRepository, {
+            newFolder: this.translate('conversationsPopoverNewFolder'),
+            noCustomFolders: this.translate('conversationsPopoverNoCustomFolders'),
+          });
+        },
+        label: this.translate('conversationsPopoverMoveTo'),
+      });
+    }
+
+    if (conversationEntity.is_archived()) {
+      entries.push({
+        click: () => {
+          return this.clickToUnarchive(conversationEntity);
+        },
+        label: this.translate('conversationsPopoverUnarchive'),
+      });
+    } else {
+      const shortcut = Shortcut.getShortcutTooltip(ShortcutType.ARCHIVE);
+
+      entries.push({
+        click: () => {
+          return this.clickToArchive(conversationEntity);
+        },
+        label: this.translate('conversationsPopoverArchive'),
+        title: this.translate('tooltipConversationsArchive', {shortcut}),
+      });
+    }
+
+    if (conversationEntity.isRequest()) {
+      entries.push({
+        click: () => {
+          return this.clickToCancelRequest(conversationEntity);
+        },
+        label: this.translate('conversationsPopoverCancel'),
+      });
+    }
+
+    if (conversationEntity.isClearable()) {
+      entries.push({
+        click: () => {
+          return this.clickToClear(conversationEntity);
+        },
+        label: this.translate('conversationsPopoverClear'),
+      });
+    }
+
+    if (!conversationEntity.isGroupOrChannel()) {
+      const userEntity = conversationEntity.firstUserEntity();
+      const canBlock = userEntity !== undefined && (userEntity.isConnected() || userEntity.isRequest());
+      const canUnblock = userEntity !== undefined && userEntity.isBlocked();
+
+      if (canBlock) {
+        entries.push({
+          click: () => {
+            return this.clickToBlock(conversationEntity);
+          },
+          label: this.translate('conversationsPopoverBlock'),
+        });
+      } else if (canUnblock) {
+        entries.push({
+          click: () => {
+            return this.clickToUnblock(conversationEntity);
+          },
+          label: this.translate('conversationsPopoverUnblock'),
+        });
+      }
+    }
+
+    if (conversationEntity.isLeavable()) {
+      entries.push({
+        click: () => {
+          return this.clickToLeave(conversationEntity);
+        },
+        label: conversationEntity.isChannel()
+          ? this.translate('channelsPopoverLeave')
+          : this.translate('groupsPopoverLeave'),
+        identifier: 'conversation-leave',
+      });
+    }
+
+    if (
+      Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION &&
+      conversationEntity.isGroupOrChannel() &&
+      conversationEntity.isSelfUserRemoved()
+    ) {
+      entries.push({
+        click: () => {
+          return this.actionsViewModel.removeConversation(conversationEntity);
+        },
+        label: this.translate('conversationsPopoverDeleteForMe'),
+      });
+    }
+
+    showContextMenu({event, entries, identifier: 'conversation-list-options-menu'});
+  };
+
+  readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
+    if (this.isActivatedAccount() && conversationEntity !== undefined) {
+      void this.actionsViewModel.archiveConversation(conversationEntity);
+    }
+  };
+
+  clickToBlock = async (conversationEntity: Conversation): Promise<void> => {
+    const userEntity = conversationEntity.firstUserEntity();
+
+    if (userEntity === undefined) {
+      return;
+    }
+
+    await this.actionsViewModel.blockUser(userEntity);
+  };
+
+  clickToUnblock = async (conversationEntity: Conversation): Promise<void> => {
+    const userEntity = conversationEntity.firstUserEntity();
+    if (userEntity === undefined) {
+      return;
+    }
+    await this.actionsViewModel.unblockUser(userEntity);
+  };
+
+  readonly clickToCancelRequest = (conversationEntity: Conversation): void => {
+    const userEntity = conversationEntity.firstUserEntity();
+    if (userEntity === undefined) {
+      return;
+    }
+    const hideConversation = this.shouldHideConversation(conversationEntity);
+    const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
+
+    void this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
+  };
+
+  readonly clickToClear = (conversationEntity = this.conversationState.activeConversation()): void => {
+    if (conversationEntity !== undefined) {
+      void this.actionsViewModel.clearConversation(conversationEntity);
+    }
+  };
+
+  readonly clickToLeave = (conversationEntity: Conversation): void => {
+    void this.actionsViewModel.leaveConversation(conversationEntity);
+  };
+
+  readonly clickToToggleMute = (conversationEntity = this.conversationState.activeConversation()): void => {
+    if (conversationEntity !== undefined) {
+      void this.actionsViewModel.toggleMuteConversation(conversationEntity);
+    }
+  };
+
+  readonly clickToOpenNotificationSettings = (
+    conversationEntity = this.conversationState.activeConversation(),
+  ): void => {
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
+  };
+
+  readonly clickToUnarchive = (conversationEntity: Conversation): void => {
+    void this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
+      if (isEmptyArray(this.conversationState.archivedConversations())) {
+        this.switchList(ListState.CONVERSATIONS);
+      }
+    });
+  };
+
+  private readonly shouldHideConversation = (conversationEntity: Conversation): boolean => {
+    const {listState} = useAppState.getState();
+    const isStateConversations = listState === ListState.CONVERSATIONS;
+    const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
+
+    return isStateConversations && isActiveConversation;
+  };
+}

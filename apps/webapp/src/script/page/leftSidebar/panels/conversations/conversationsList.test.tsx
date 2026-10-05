@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 jest.mock('@tanstack/react-virtual', () => {
   return {
     useVirtualizer: ({count}: {count: number}) => {
@@ -52,7 +51,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
+import {ListViewModel} from 'src/script/viewModel/listViewModel';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {ConversationsList} from './conversationsList';

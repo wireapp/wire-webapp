@@ -27,7 +27,7 @@ import {HashRouter as Router} from 'react-router';
 
 import {Login} from './login';
 
-import {Config, Configuration} from '../../../Config';
+import {Config, Configuration} from '../../../config';
 import {configureStore} from '../../configureStore';
 import {actionRoot} from '../../module/action';
 import {AuthActionCreator} from '../../module/action/creator';

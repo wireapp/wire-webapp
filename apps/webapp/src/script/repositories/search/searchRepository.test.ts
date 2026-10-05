@@ -19,7 +19,7 @@
 
 import {User} from 'Repositories/entity/user';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateUser} from 'test/helper/userGenerator';
 import {createUuid} from 'Util/uuid';
 
 import {SearchRepository} from './searchRepository';

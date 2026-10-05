@@ -35,7 +35,7 @@ import {getLogger} from 'Util/logger';
 import {styles} from './accountForm.styles';
 import {Exception} from './exception';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/validationError';
 import {RootState, bindActionCreators} from '../module/reducer';

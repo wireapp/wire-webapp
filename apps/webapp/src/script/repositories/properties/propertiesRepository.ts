@@ -35,7 +35,7 @@ import {StorageKey} from 'Repositories/storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';

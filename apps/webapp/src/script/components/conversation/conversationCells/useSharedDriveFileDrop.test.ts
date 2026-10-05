@@ -21,7 +21,7 @@ import {act, renderHook} from '@testing-library/react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';

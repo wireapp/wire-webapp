@@ -19,7 +19,7 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

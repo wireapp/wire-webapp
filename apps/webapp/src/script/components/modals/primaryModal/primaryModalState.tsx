@@ -39,7 +39,7 @@ import {
   type Translate,
 } from './primaryModalTypes';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 
 type PrimaryModalState = {
   errorMessage: string | null;

@@ -32,7 +32,6 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {useMessageActionsState} from './messageActions.state';
 import {
   messageActionsGroup,
   messageBodyActions,
@@ -41,6 +40,7 @@ import {
   getIconCSS,
   messageWithHeaderTop,
 } from './messageActions.styles';
+import {useMessageActionsState} from './messageActionsState';
 import {MessageReactions} from './messageReactions/messageReactions';
 import {ReplyButton} from './replyButton';
 

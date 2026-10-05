@@ -21,7 +21,7 @@ import type {ReactNode} from 'react';
 
 import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 

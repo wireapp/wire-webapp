@@ -17,7 +17,7 @@
  *
  */
 
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from 'Components/fileFullscreenModal/fileFullscreenModal';
 import type {Conversation} from 'Repositories/entity/conversation';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 

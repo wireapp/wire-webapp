@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {StorageKey} from 'Repositories/storage';
 import {EventName} from 'Repositories/tracking/eventName';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
 export const useFormatToolbar = () => {

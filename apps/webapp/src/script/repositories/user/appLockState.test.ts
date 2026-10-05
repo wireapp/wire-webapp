@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import ko from 'knockout';
 
 import {TeamState} from 'Repositories/team/teamState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {AppLockState} from './appLockState';
 
 describe('AppLockState', () => {

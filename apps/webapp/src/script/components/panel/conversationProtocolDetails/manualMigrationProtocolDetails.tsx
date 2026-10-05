@@ -32,8 +32,8 @@ import {
   canManuallyMigrateConversation,
   manuallyMigrateConversation,
   type ManualMigrationFailure,
-} from 'src/script/mls/MLSMigration/manualMigration';
-import {useManualMigrationStore} from 'src/script/mls/MLSMigration/useManualMigrationStore';
+} from 'src/script/mls/mlsMigration/manualMigration';
+import {useManualMigrationStore} from 'src/script/mls/mlsMigration/useManualMigrationStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {errorHandlerStrings} from 'Util/errorUtil';

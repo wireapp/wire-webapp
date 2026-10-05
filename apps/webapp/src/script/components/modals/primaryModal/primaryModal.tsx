@@ -26,7 +26,7 @@ import {ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {isValidPassword} from 'Util/stringUtil';

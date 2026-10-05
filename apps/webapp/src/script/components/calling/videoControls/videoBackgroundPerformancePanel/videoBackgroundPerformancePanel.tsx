@@ -1,0 +1,316 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
+
+import {isNullOrUndefined} from '@sindresorhus/is';
+import {Maybe} from 'true-myth';
+
+import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
+
+import {areCapabilityInfosEqual} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
+import {
+  buttonBaseStyles,
+  buttonNeutralStyles,
+  metricsLabelStyles,
+  metricsListStyles,
+  metricsRowStyles,
+  metricsValueStyles,
+  performancePanelCloseButtonStyles,
+  performancePanelContainerStyles,
+  performancePanelHeaderStyles,
+  performancePanelResetButtonContainerStyles,
+  performancePanelResetButtonStyles,
+  performancePanelStyles,
+  performancePanelTitleStyles,
+} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel.styles';
+import {QualityMode} from 'Repositories/media/backgroundEffects';
+import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
+import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
+type PerformancePanelProps = {
+  backgroundEffectsHandler: BackgroundEffectsHandler;
+};
+
+const QUALITY_OPTIONS: readonly QualityMode[] = ['auto', 'fhd', 'hd', 'qhd', 'nhd', 'bypass'];
+
+const formatMs = (value?: number | null): string => {
+  return typeof value === 'number' ? `${value.toFixed(1)} ms` : '-';
+};
+
+const formatPercent = (value?: number | null): string => {
+  return typeof value === 'number' ? `${value.toFixed(1)} %` : '-';
+};
+
+const formatValue = (value?: string | number | null): string => {
+  return value === null || value === undefined || value === '' ? '-' : String(value);
+};
+
+const getMetricRows = (renderMetrics: RenderMetrics) => {
+  return Maybe.of(renderMetrics)
+    .map(metrics => {
+      return [
+        {label: 'Quality', value: formatValue(metrics.tier).toUpperCase()},
+        {label: 'Total', value: formatMs(metrics.avgTotalMs)},
+        {label: 'Segmentation', value: formatMs(metrics.avgSegmentationMs)},
+        {label: 'GPU', value: formatMs(metrics.avgGpuMs)},
+        {label: 'Budget', value: formatMs(metrics.budget)},
+        {label: 'ML delegate type', value: formatValue(metrics.ml)},
+        {label: 'Utilization', value: formatPercent(metrics.utilShare)},
+        {label: 'ML', value: formatPercent(metrics.mlShare)},
+        {label: 'WebGL', value: formatPercent(metrics.webglShare)},
+        {
+          label: 'Delegate',
+          value: formatValue(metrics.segmentationDelegate),
+        },
+        {label: 'Dropped', value: formatValue(metrics.droppedFrames)},
+      ];
+    })
+    .unwrapOr([]);
+};
+
+const getCapabilityRows = (capabilityInfo: CapabilityInfo | null | undefined) => {
+  return Maybe.of(capabilityInfo)
+    .map(info => {
+      return [
+        {label: 'WebGL2', value: info.webgl2 ? '✔' : '✖'},
+        {label: 'Worker', value: info.worker ? '✔' : '✖'},
+        {label: 'OffscreenCanvas', value: info.offscreenCanvas ? '✔' : '✖'},
+        {label: 'VideoFrameCallback', value: info.requestVideoFrameCallback ? '✔' : '✖'},
+      ];
+    })
+    .unwrapOr([]);
+};
+
+type MetricRowProps = {
+  label: string;
+  value: ReactNode;
+};
+
+type MetricsDisplayProps = {
+  readonly capabilityInfo: CapabilityInfo;
+};
+
+const MetricRow = ({label, value}: MetricRowProps) => {
+  return (
+    <div css={metricsRowStyles}>
+      <span css={metricsLabelStyles}>{label}</span>
+      <span css={metricsValueStyles}>{value}</span>
+    </div>
+  );
+};
+
+const POLLING_INTERVAL = 500;
+
+const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
+  const renderMetrics = useBackgroundEffectsStore(state => {
+    return state.metrics;
+  });
+  const model = useBackgroundEffectsStore(state => {
+    return state.model;
+  });
+
+  const metricRows = isNullOrUndefined(renderMetrics) ? [] : getMetricRows(renderMetrics);
+
+  const capabilityRows = getCapabilityRows(capabilityInfo);
+
+  return (
+    <div css={metricsListStyles}>
+      <MetricRow label="Model" value={formatValue(model)} />
+      {metricRows.map(row => {
+        return <MetricRow key={row.label} label={row.label} value={row.value} />;
+      })}
+      {capabilityRows.map(row => {
+        return <MetricRow key={row.label} label={row.label} value={row.value} />;
+      })}
+    </div>
+  );
+};
+
+const qualitySelectOptions = QUALITY_OPTIONS.map(option => {
+  return {
+    label: option.toUpperCase(),
+    value: option,
+  };
+});
+
+export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
+  const {translate} = useApplicationContext();
+  const isPerformancePanelEnabled = useBackgroundEffectsStore(state => {
+    return state.isPerformancePanelEnabled;
+  });
+
+  const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => {
+    return backgroundEffectsHandler.getQuality();
+  });
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [capabilityInfo, setCapabilityInfo] = useState<CapabilityInfo | null>(null);
+
+  const selectedOption = useMemo(() => {
+    return (
+      qualitySelectOptions.find(option => {
+        return option.value === selectedQuality;
+      }) ?? null
+    );
+  }, [selectedQuality]);
+
+  useEffect(() => {
+    if (!isPerformancePanelEnabled || !isPanelOpen) {
+      setCapabilityInfo(null);
+      return;
+    }
+
+    setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
+  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
+
+  // Quality polling (fallback for non-reactive quality)
+  useEffect((): void | (() => void) => {
+    if (!isPerformancePanelEnabled || !isPanelOpen) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const current = backgroundEffectsHandler.getQuality();
+
+      setSelectedQuality(prev => {
+        return prev !== current ? current : prev;
+      });
+    }, POLLING_INTERVAL);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
+
+  // Capability polling (controller updates these after pipeline start)
+  useEffect((): void | (() => void) => {
+    if (!isPerformancePanelEnabled || !isPanelOpen) {
+      setCapabilityInfo(null);
+      return;
+    }
+
+    const syncCapabilities = () => {
+      const current = backgroundEffectsHandler.getCapabilityInfo();
+      setCapabilityInfo(prev => {
+        return areCapabilityInfosEqual(Maybe.of(prev), Maybe.of(current)) ? prev : current;
+      });
+    };
+
+    syncCapabilities();
+
+    const interval = setInterval(syncCapabilities, POLLING_INTERVAL);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
+
+  // Auto close if disabled
+  useEffect(() => {
+    if (!isPerformancePanelEnabled && isPanelOpen) {
+      setIsPanelOpen(false);
+    }
+  }, [isPerformancePanelEnabled, isPanelOpen]);
+
+  const togglePerformancePanel = () => {
+    setIsPanelOpen(prev => {
+      return !prev;
+    });
+  };
+
+  const handleQualityChange = useCallback(
+    (quality: Option) => {
+      if (quality === undefined || quality === null) {
+        return;
+      }
+
+      const nextQuality = quality.value as QualityMode;
+      setSelectedQuality(nextQuality);
+      backgroundEffectsHandler.applyQuality(nextQuality);
+    },
+    [backgroundEffectsHandler],
+  );
+
+  const handleResetQuality = useCallback(() => {
+    const defaultQuality: QualityMode = 'auto';
+    setSelectedQuality(defaultQuality);
+    backgroundEffectsHandler.applyQuality(defaultQuality);
+  }, [backgroundEffectsHandler]);
+
+  if (!isPerformancePanelEnabled) {
+    return null;
+  }
+
+  return (
+    <div css={performancePanelContainerStyles}>
+      <button
+        type="button"
+        onClick={togglePerformancePanel}
+        css={[buttonBaseStyles, buttonNeutralStyles]}
+        aria-expanded={isPanelOpen}
+        aria-haspopup="dialog"
+      >
+        Performance
+      </button>
+
+      {isPanelOpen && (
+        <div css={performancePanelStyles} role="dialog" aria-label={translate('videoCallBackgroundsPerformancePanel')}>
+          <div css={performancePanelHeaderStyles}>
+            <h3 css={performancePanelTitleStyles}>{translate('videoCallBackgroundsPerformancePanel')}</h3>
+            <button
+              type="button"
+              className="icon-button"
+              css={performancePanelCloseButtonStyles}
+              onClick={togglePerformancePanel}
+              aria-label={translate('modalCloseButton')}
+            >
+              <CloseIcon width={12} height={12} />
+            </button>
+          </div>
+
+          <Select
+            id="background-effects-quality"
+            inputId="background-effects-quality"
+            dataUieName="background-effects-quality"
+            aria-label="Background effects quality"
+            value={selectedOption}
+            options={qualitySelectOptions}
+            isSearchable={true}
+            menuPlacement="auto"
+            onChange={handleQualityChange}
+          />
+
+          <div css={performancePanelResetButtonContainerStyles}>
+            <Button
+              css={performancePanelResetButtonStyles}
+              variant={ButtonVariant.TERTIARY}
+              onClick={handleResetQuality}
+            >
+              Reset (Auto)
+            </Button>
+          </div>
+
+          {!isNullOrUndefined(capabilityInfo) && <MetricsDisplay capabilityInfo={capabilityInfo} />}
+        </div>
+      )}
+    </div>
+  );
+};

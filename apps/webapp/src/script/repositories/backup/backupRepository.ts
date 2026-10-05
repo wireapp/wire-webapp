@@ -50,7 +50,7 @@ import {
 } from './error';
 import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './legacyBackup.helper';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 const backupMetadataIndentationSpaces = 2;
 

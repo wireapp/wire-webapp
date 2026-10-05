@@ -28,7 +28,7 @@ import {createUuid} from 'Util/uuid';
 
 import {ConnectionRequests} from './connectionRequests';
 
-import {generateUser} from '../../../../../../../test/helper/UserGenerator';
+import {generateUser} from '../../../../../../../test/helper/userGenerator';
 
 const mockOnConnectionRequestClick = jest.fn();
 const rootProviderWrapper = createRootProviderWrapperForTest(

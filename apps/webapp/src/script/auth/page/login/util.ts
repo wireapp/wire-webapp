@@ -26,7 +26,7 @@ import {noop} from 'noop-esm';
 import {Dispatch, UnknownAction} from 'redux';
 import {match, P} from 'ts-pattern';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {APIClient} from 'src/script/service/apiClientSingleton';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
