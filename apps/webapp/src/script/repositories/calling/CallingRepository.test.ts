@@ -647,9 +647,10 @@ describe('CallingRepository', () => {
         const setMute = jest.spyOn(wCall, 'setMute');
         jest.spyOn(wCall, 'start');
 
-        await callingRepository.startCall(conversation, {cameraEnabled, microphoneEnabled});
+        const call = await callingRepository.startCall(conversation, {cameraEnabled, microphoneEnabled});
 
         expect(setMute).toHaveBeenCalledWith(wUser, mute);
+        expect(call?.muteState()).toBe(microphoneEnabled ? MuteState.NOT_MUTED : MuteState.SELF_MUTED);
         expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE_MLS, 0, 1);
       },
     );
@@ -945,7 +946,7 @@ describe('CallingRepository', () => {
           true,
         );
         incomingCall.state(CALL_STATE.INCOMING);
-        incomingCall.muteState(MuteState.SELF_MUTED);
+        incomingCall.muteState(microphoneEnabled ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
 
         jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
         const setMute = jest.spyOn(wCall, 'setMute');
@@ -955,6 +956,7 @@ describe('CallingRepository', () => {
         await callingRepository.answerCall(incomingCall, undefined, {cameraEnabled, microphoneEnabled});
 
         expect(setMute).toHaveBeenCalledWith(wUser, mute);
+        expect(incomingCall.muteState()).toBe(microphoneEnabled ? MuteState.NOT_MUTED : MuteState.SELF_MUTED);
         expect(answer).toHaveBeenCalledWith(
           wUser,
           conversation.id,
