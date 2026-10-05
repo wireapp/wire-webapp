@@ -55,6 +55,7 @@ export class ConversationPage {
   readonly messages: Locator;
   readonly messageDetails: Locator;
   readonly messageItems: Locator;
+  readonly messagesTab: Locator;
   readonly filesTab: Locator;
   readonly typingIndicator: Locator;
   readonly itemPendingRequest: Locator;
@@ -107,6 +108,7 @@ export class ConversationPage {
       `[data-uie-name="item-message"]:not([data-uie-send-status="1"]):not([data-uie-send-status="-1"]):not(.system-message)`,
     );
     this.messageDetails = page.locator('#message-details');
+    this.messagesTab = page.locator('#conversation-tab-messages');
     this.filesTab = page.locator('#conversation-tab-files');
     this.typingIndicator = page.getByTestId('typing-indicator-title');
     this.itemPendingRequest = page.getByTestId('item-pending-requests');
@@ -141,6 +143,10 @@ export class ConversationPage {
 
   async clickFilesTab() {
     await this.filesTab.click();
+  }
+
+  async clickMessagesTab() {
+    await this.messagesTab.click();
   }
 
   async clickIgnoreButton() {

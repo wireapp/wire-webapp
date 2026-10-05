@@ -168,6 +168,7 @@ test.describe('Drive file uploads', () => {
           await sharedDrive.refresh();
           await expect(sharedDrive.getFile(TextFileName)).toHaveCount(0);
         }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+        await conversation.clickMessagesTab();
         await expect(conversation.messages).toHaveCount(initialMessageCount);
       });
     },
