@@ -85,6 +85,10 @@ export class MeetingsPage {
     const participantOption = this.page.getByTestId('item-user').filter({hasText: fullName});
 
     await participantsInput.fill(fullName);
+    const contactsToggle = this.page.getByTestId('do-toggle-search-list');
+    if ((await contactsToggle.getAttribute('aria-expanded')) !== 'true') {
+      await contactsToggle.click();
+    }
     await expect(participantOption).toBeVisible();
     await participantOption.click();
   }
@@ -182,6 +186,10 @@ export class MeetingsPage {
     const participantOption = dropdown.getByTestId('item-user').filter({hasText: fullName});
 
     await participants.getByTestId('schedule-meeting-participants-input').fill(fullName);
+    const contactsToggle = dropdown.getByTestId('do-toggle-search-list');
+    if ((await contactsToggle.getAttribute('aria-expanded')) !== 'true') {
+      await contactsToggle.click();
+    }
     await expect(participantOption).toBeVisible();
     await participantOption.click();
     await this.closeParticipantsPicker();
