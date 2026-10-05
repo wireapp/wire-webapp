@@ -969,10 +969,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  private async verifyRemoteMLSKeyPackagesAmount(clientId: string, isStartup = false) {
+  private async verifyRemoteMLSKeyPackagesAmount(clientId: string, requireFullIncreasedAllowance = false) {
     const uploadAmount = this.keyPackageUploadAmount;
     const increasedAllowance = uploadAmount > this.config.nbKeyPackages;
-    const threshold = isStartup && increasedAllowance ? uploadAmount : Math.floor(uploadAmount / 2);
+    const threshold = requireFullIncreasedAllowance && increasedAllowance ? uploadAmount : Math.floor(uploadAmount / 2);
     const backendKeyPackagesCount = await this.getRemoteMLSKeyPackageCount(clientId);
     let isConversationRecoveryRequired = await this.isMLSConversationRecoveryRequired();
 
