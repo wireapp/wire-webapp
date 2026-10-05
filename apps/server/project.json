@@ -24,7 +24,7 @@
         "commands": [
           "rimraf {projectRoot}/build/server",
           "tsc -p {projectRoot}/tsconfig.json --outDir {projectRoot}/build/server",
-          "WIRE_WEBAPP_SERVER_OUTPUT_PATH={projectRoot}/build/server node {projectRoot}/bin/copy_server_assets.js"
+          "WIRE_WEBAPP_SERVER_OUTPUT_PATH={projectRoot}/build/server node {projectRoot}/bin/copyServerAssets.js"
         ],
         "parallel": false
       }
@@ -38,7 +38,7 @@
         "commands": [
           "rimraf {projectRoot}/dist",
           "tsc -p {projectRoot}/tsconfig.json",
-          "node {projectRoot}/bin/copy_server_assets.js",
+          "node {projectRoot}/bin/copyServerAssets.js",
           "cp {projectRoot}/build/metadata/version.json {projectRoot}/dist/version.json"
         ],
         "parallel": false

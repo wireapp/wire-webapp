@@ -26,7 +26,7 @@ import {Env} from './env';
 
 const ROBOTS_DIR = path.join(__dirname, 'robots');
 const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
-const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
+const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robotsDisallow.txt');
 
 const defaultCSP = {
   connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
@@ -115,8 +115,8 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
   const parsedHttpPort = Number(env.PORT);
   const isHttpPortMissingOrZero = Number.isNaN(parsedHttpPort) || parsedHttpPort === 0;
   const httpPort = isHttpPortMissingOrZero ? 21080 : parsedHttpPort;
-  const defaultSslCertificateKeyPath = resolveServerCertificatePath('development-key.pem');
-  const defaultSslCertificatePath = resolveServerCertificatePath('development-cert.pem');
+  const defaultSslCertificateKeyPath = resolveServerCertificatePath('developmentKey.pem');
+  const defaultSslCertificatePath = resolveServerCertificatePath('developmentCert.pem');
   const sslCertificateKeyPath = getNonEmptyStringValueOrDefault(
     env.SSL_CERTIFICATE_KEY_PATH,
     defaultSslCertificateKeyPath,

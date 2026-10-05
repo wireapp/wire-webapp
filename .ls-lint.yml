@@ -4139,3 +4139,80 @@ ls:
 
   libraries/telemetry/adr/001-initialize-library.md:
     .md: kebab-case
+
+  apps/server/http:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  apps/server/bin:
+    .dir: camelCase
+    .js: camelCase
+    .json: camelCase
+    .mts: camelCase
+
+  apps/server/certificate:
+    .dir: camelCase
+    .pem: camelCase
+
+  apps/server/robots:
+    .dir: camelCase
+    .txt: camelCase
+
+  apps/server/templates:
+    .dir: camelCase
+    .html: camelCase
+
+  apps/server/server.ts:
+    .ts: camelCase
+
+  apps/server/babel.config.js:
+    .config.js: camelCase
+
+  apps/server/buildMetadata.test.ts:
+    .test.ts: camelCase
+
+  apps/server/buildMetadata.ts:
+    .ts: camelCase
+
+  apps/server/config.ts:
+    .ts: camelCase
+
+  apps/server/index.ts:
+    .ts: camelCase
+
+  apps/server/jest.config.js:
+    .config.js: camelCase
+
+  apps/server/package.json:
+    .json: camelCase
+
+  apps/server/project.json:
+    .json: camelCase
+
+  apps/server/server.test.ts:
+    .test.ts: camelCase
+
+  apps/server/serverStartupLog.test.ts:
+    .test.ts: camelCase
+
+  apps/server/serverStartupLog.ts:
+    .ts: camelCase
+
+  apps/server/tsconfig.json:
+    .json: camelCase
+
+  apps/server/.ebextensions/environment00.config:
+    .config: camelCase
+
+  apps/server/.ebextensions/logRotation10.config:
+    .config: camelCase
+
+  apps/server/.ebextensions/nginx20.config:
+    .config: camelCase
+
+  apps/server/.platform/confighooks/predeploy/npmInstall01.sh:
+    .sh: camelCase
+
+  apps/server/.platform/hooks/predeploy/npmInstall01.sh:
+    .sh: camelCase

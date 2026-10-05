@@ -110,8 +110,8 @@ Notes:
 | --- | --- | --- | --- |
 | `PORT` | `21080` when empty/invalid/`0` | HTTP server port | N/A |
 | `ENFORCE_HTTPS` | `true` (unless explicitly `false`) | Enforce HTTPS redirects/behavior in server config | N/A |
-| `SSL_CERTIFICATE_KEY_PATH` | `certificate/development-key.pem` (workspace or `apps/server/dist`) | TLS private key path | N/A |
-| `SSL_CERTIFICATE_PATH` | `certificate/development-cert.pem` (workspace or `apps/server/dist`) | TLS certificate path | N/A |
+| `SSL_CERTIFICATE_KEY_PATH` | `certificate/developmentKey.pem` (workspace or `apps/server/dist`) | TLS private key path | N/A |
+| `SSL_CERTIFICATE_PATH` | `certificate/developmentCert.pem` (workspace or `apps/server/dist`) | TLS certificate path | N/A |
 | `ENABLE_DYNAMIC_HOSTNAME` | `false` | Replace `{{hostname}}` placeholders in URLs with client hostname | N/A |
 | `ENABLE_CLIENT_VERSION_ENFORCEMENT` | `false` | Enforce exact deployed client version matching for incident-driven force reloads | N/A |
 | `APP_NAME` | `Wire` | App name shown in client config | N/A |

@@ -5,7 +5,7 @@ import {createFactory} from '@enormora/objectory';
 import {isError, isNonEmptyString, isNullOrUndefined, isNumber, isString} from '@sindresorhus/is';
 import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
 
-import {Server} from './Server';
+import {Server} from './server';
 
 type HttpResponse = {
   readonly body: string;

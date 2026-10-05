@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "scripts": {
-    "build": "rimraf ./dist/ && tsc && node ./bin/generateVersionFile.mts && node ./bin/copy_server_assets.js",
-    "copy-assets": "node ./bin/copy_server_assets.js",
+    "build": "rimraf ./dist/ && tsc && node ./bin/generateVersionFile.mts && node ./bin/copyServerAssets.js",
+    "copy-assets": "node ./bin/copyServerAssets.js",
     "generate-version-file": "node ./bin/generateVersionFile.mts",
     "clean": "rimraf ./dist/",
     "start:prod": "node ./index.js",

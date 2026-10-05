@@ -737,7 +737,7 @@ graph TD
     E --> E1[rimraf dist]
     E --> E2[tsc -p tsconfig.json]
     E --> E3[generateVersionFile.js]
-    E --> E4[copy_server_assets.js]
+    E --> E4[copyServerAssets.js]
     C --> F[nx run webapp:build:production]
     B --> G[node tools/server-packaging/zip.js]
     G --> G1[Modify package.json]
@@ -789,7 +789,7 @@ The package command executes these steps sequentially:
 
 ### Workspace Dependency Pre-Bundling
 
-The deployment process includes a special step to pre-bundle workspace dependencies. This is handled by [`apps/server/bin/copy_server_assets.js`](apps/server/bin/copy_server_assets.js).
+The deployment process includes a special step to pre-bundle workspace dependencies. This is handled by [`apps/server/bin/copyServerAssets.js`](apps/server/bin/copyServerAssets.js).
 
 **Why this is needed:**
 

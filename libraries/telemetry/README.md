@@ -34,7 +34,7 @@ To initialize the library code you have to include the `embed.js` script on you 
 
 One way to do it is to diretcly copy telemetry package, and store it in the client build directory.
 
-`copy_server_assets.js`:
+`copyServerAssets.js`:
 
 ```js
 const fs = require('fs-extra');
@@ -52,7 +52,7 @@ fs.copySync(
 
 ```json
 "scripts": {
-    "copy-assets": "node ./bin/copy_server_assets.js"
+    "copy-assets": "node ./bin/copyServerAssets.js"
   },
 ```
 
