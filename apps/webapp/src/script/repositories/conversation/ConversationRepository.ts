@@ -114,13 +114,7 @@ import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
-import {
-  compareTransliteration,
-  fixWebsocketString,
-  sortByPriority,
-  sortUsersByPriority,
-  startsWith,
-} from 'Util/stringUtil';
+import {compareTransliteration, sortByPriority, sortUsersByPriority, startsWith} from 'Util/stringUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
 import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
@@ -4097,7 +4091,7 @@ export class ConversationRepository {
         return this.onProtocolUpdate(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.RENAME:
-        return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
+        return this.onRename(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
         return this.onMLSWelcomeMessage(conversationEntity);
@@ -4881,10 +4875,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.rename' event
    * @returns Resolves when the event was handled
    */
-  private async onRename(conversationEntity: Conversation, eventJson: ConversationRenameEvent, isWebSocket = false) {
-    if (isWebSocket && isNonEmptyString(eventJson.data?.name)) {
-      eventJson.data.name = fixWebsocketString(eventJson.data.name);
-    }
+  private async onRename(conversationEntity: Conversation, eventJson: ConversationRenameEvent) {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
