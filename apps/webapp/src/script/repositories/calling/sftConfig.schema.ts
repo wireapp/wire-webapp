@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,15 @@
  *
  */
 
-export interface ICECandidate {
-  credential: string;
-  urls: string[];
-  username: string;
-}
+import {z} from 'zod';
 
-export type SFTServer = {
-  readonly urls: readonly string[];
-};
+const sftServerListSchema = z.array(z.unknown()).optional().catch([]);
 
-export type AuthSFTServer = SFTServer & {
-  readonly username?: string;
-  readonly credential?: string;
-};
+export const sftConfigurationListsSchema = z.object({
+  sft_servers: sftServerListSchema,
+  sft_servers_all: sftServerListSchema,
+});
 
-export interface CallConfigData {
-  ice_servers: ICECandidate[];
-  ttl: number;
-  readonly sft_servers?: readonly SFTServer[];
-  readonly sft_servers_all?: readonly AuthSFTServer[];
-  readonly is_federating?: boolean;
-}
+export const sftServerUrlsSchema = z.object({
+  urls: z.array(z.unknown()),
+});
