@@ -1091,6 +1091,86 @@ describe('MLSService', () => {
   });
 
   describe('handleMLSWelcomeMessageEvent', () => {
+    it.each([
+      [499, true, true],
+      [500, true, false],
+      [501, false, false],
+    ])(
+      'checks the migration allowance on welcome: local=%s, checks backend=%s, uploads=%s',
+      async (count, checksBackend, uploads) => {
+        const [mlsService, {apiClient, transactionContext}] = await createMLSService();
+        mlsService.config.getNbKeyPackages = () => {
+          return 1000;
+        };
+        transactionContext.clientValidKeypackagesCount.mockResolvedValue(count);
+        transactionContext.clientKeypackages.mockResolvedValue([new Uint8Array()]);
+        transactionContext.processWelcomeMessage.mockResolvedValue({
+          id: new ConversationId(new Uint8Array()),
+          crlNewDistributionPoints: [],
+        } as unknown as WelcomeBundle);
+        jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
+        const getRemoteCount = jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValue(count);
+        const upload = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);
+
+        await mlsService.handleMLSWelcomeMessageEvent(
+          {
+            type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+            conversation: '',
+            data: mockedMLSWelcomeEventData,
+            from: '',
+            time: '',
+          },
+          'client-1',
+        );
+
+        expect(getRemoteCount).toHaveBeenCalledTimes(checksBackend ? 1 : 0);
+        expect(upload).toHaveBeenCalledTimes(uploads ? 1 : 0);
+        if (uploads) {
+          expect(transactionContext.clientKeypackages).toHaveBeenCalledWith(
+            mlsService.config.defaultCiphersuite,
+            expect.anything(),
+            1000,
+          );
+        }
+        expect(transactionContext.processWelcomeMessage).toHaveBeenCalled();
+      },
+    );
+
+    it('uses allowance changes for local welcome checks without reinitializing', async () => {
+      const [mlsService, {apiClient, transactionContext}] = await createMLSService();
+      let allowance = 100;
+      mlsService.config.getNbKeyPackages = () => {
+        return allowance;
+      };
+      transactionContext.clientValidKeypackagesCount.mockResolvedValue(200);
+      transactionContext.clientKeypackages.mockResolvedValue([new Uint8Array()]);
+      transactionContext.processWelcomeMessage.mockResolvedValue({
+        id: new ConversationId(new Uint8Array()),
+        crlNewDistributionPoints: [],
+      } as unknown as WelcomeBundle);
+      jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
+      const getRemoteCount = jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValue(200);
+      const upload = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);
+      const event: ConversationMLSWelcomeEvent = {
+        type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+        conversation: '',
+        data: mockedMLSWelcomeEventData,
+        from: '',
+        time: '',
+      };
+
+      await mlsService.handleMLSWelcomeMessageEvent(event, 'client-1');
+      expect(getRemoteCount).not.toHaveBeenCalled();
+      allowance = 1000;
+      await mlsService.handleMLSWelcomeMessageEvent(event, 'client-1');
+      expect(getRemoteCount).toHaveBeenCalledTimes(1);
+      expect(upload).toHaveBeenCalledTimes(1);
+      allowance = 100;
+      await mlsService.handleMLSWelcomeMessageEvent(event, 'client-1');
+      expect(getRemoteCount).toHaveBeenCalledTimes(1);
+      expect(upload).toHaveBeenCalledTimes(1);
+    });
+
     it("before processing welcome it verifies that there's enough key packages locally", async () => {
       const [mlsService, {apiClient, transactionContext}] = await createMLSService();
 

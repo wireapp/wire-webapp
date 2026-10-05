@@ -197,7 +197,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   private get minRequiredKeyPackages() {
-    return Math.floor(this.config.nbKeyPackages / keyPackageReplenishmentDivisor);
+    return Math.floor(this.keyPackageUploadAmount / keyPackageReplenishmentDivisor);
   }
 
   /** Recheck after a consumer policy change, without reinitializing the MLS client. */
